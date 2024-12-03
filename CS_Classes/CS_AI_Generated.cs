@@ -17101,7 +17101,7 @@ namespace CS_Classes
         List<cv.Point2f> ptList = new List<cv.Point2f>();
         KNN_Basics knn = new KNN_Basics();
         List<cv.Point2f> ptLost = new List<cv.Point2f>();
-        Feature_Gather gather = new Feature_Gather();
+        Feature_Methods method = new Feature_Methods();
         List<Mat> featureMat = new List<Mat>();
         public Options_Features options = new Options_Features();
         public Feature_Stable_CS()
@@ -17114,7 +17114,7 @@ namespace CS_Classes
             options.RunOpt();
             dst2 = src.Clone();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            gather.Run(src);
+            method.Run(src);
             if (vbc.task.optionsChanged)
             {
                 vbc.task.features.Clear();
@@ -17127,7 +17127,7 @@ namespace CS_Classes
             {
                 Point2f pt = vbc.task.features[i];
                 cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), featureMat[i].Width, featureMat[i].Height));
-                if (!gather.ptList.Contains(new cv.Point((int)pt.X, (int)pt.Y)))
+                if (!method.ptList.Contains(new cv.Point((int)pt.X, (int)pt.Y)))
                 {
                     Cv2.MatchTemplate(src.SubMat(rect), featureMat[i], correlationMat, TemplateMatchModes.CCoeffNormed);
                     if (correlationMat.Get<float>(0, 0) < options.correlationMin)
@@ -17144,13 +17144,13 @@ namespace CS_Classes
             vbc.task.features = new List<cv.Point2f>(ptList);
             double extra = 1 + (1 - options.resyncThreshold);
             vbc.task.featureMotion = true;
-            if (vbc.task.features.Count < gather.features.Count * options.resyncThreshold || 
-                vbc.task.features.Count > extra * gather.features.Count)
+            if (vbc.task.features.Count < method.features.Count * options.resyncThreshold || 
+                vbc.task.features.Count > extra * method.features.Count)
             {
                 ptLost.Clear();
                 featureMat.Clear();
                 vbc.task.features.Clear();
-                foreach (Point2f pt in gather.features)
+                foreach (Point2f pt in method.features)
                 {
                     cv.Rect rect = ValidateRect(new cv.Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
                     featureMat.Add(src.SubMat(rect));
@@ -17162,7 +17162,7 @@ namespace CS_Classes
                 if (ptLost.Count > 0)
                 {
                     knn.queries = ptLost;
-                    knn.trainInput = gather.features;
+                    knn.trainInput = method.features;
                     knn.Run(null);
                     for (int i = 0; i < knn.queries.Count; i++)
                     {
@@ -17196,7 +17196,7 @@ namespace CS_Classes
     public class Feature_Basics_CS : TaskParent
     {
         public Options_Features options = new Options_Features();
-        Feature_Gather gather = new Feature_Gather();
+        Feature_Methods method = new Feature_Methods();
         public Feature_Basics_CS()
         {
             UpdateAdvice(traceName + ": Use 'Options_Features' to control output.");
@@ -17206,16 +17206,16 @@ namespace CS_Classes
         {
             options.RunOpt();
             dst2 = src.Clone();
-            gather.Run(src);
+            method.Run(src);
             vbc.task.features.Clear();
             vbc.task.featurePoints.Clear();
-            foreach (Point2f pt in gather.features)
+            foreach (Point2f pt in method.features)
             {
                 vbc.task.features.Add(pt);
                 vbc.task.featurePoints.Add(new cv.Point((int)pt.X, (int)pt.X));
                 DrawCircle(dst2, pt, vbc.task.DotSize, vbc.task.HighlightColor);
             }
-            labels[2] = gather.labels[2];
+            labels[2] = method.labels[2];
         }
     }
 

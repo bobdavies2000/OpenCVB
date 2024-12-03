@@ -1042,7 +1042,6 @@ End Enum
 	If algorithmName = "Feature_Compare_CS" Then return new Feature_Compare_CS
 	If algorithmName = "Feature_Delaunay" Then return new Feature_Delaunay
 	If algorithmName = "Feature_Delaunay_CS" Then return new Feature_Delaunay_CS
-	If algorithmName = "Feature_Gather" Then return new Feature_Gather
 	If algorithmName = "Feature_Gather_CPP_CS" Then return new Feature_Gather_CPP_CS
 	If algorithmName = "Feature_Generations" Then return new Feature_Generations
 	If algorithmName = "Feature_Generations_CS" Then return new Feature_Generations_CS
@@ -1056,6 +1055,8 @@ End Enum
 	If algorithmName = "Feature_LeftRight_CS" Then return new Feature_LeftRight_CS
 	If algorithmName = "Feature_LucasKanade" Then return new Feature_LucasKanade
 	If algorithmName = "Feature_LucasKanade_CS" Then return new Feature_LucasKanade_CS
+	If algorithmName = "Feature_Matching" Then return new Feature_Matching
+	If algorithmName = "Feature_Methods" Then return new Feature_Methods
 	If algorithmName = "Feature_MultiPass" Then return new Feature_MultiPass
 	If algorithmName = "Feature_MultiPass_CS" Then return new Feature_MultiPass_CS
 	If algorithmName = "Feature_NearestCell" Then return new Feature_NearestCell
@@ -1840,10 +1841,11 @@ End Enum
 	If algorithmName = "KNN_N3BasicsTest" Then return new KNN_N3BasicsTest
 	If algorithmName = "KNN_N4Basics" Then return new KNN_N4Basics
 	If algorithmName = "KNN_N4BasicsTest" Then return new KNN_N4BasicsTest
-	If algorithmName = "KNN_NBasicsTest" Then return new KNN_NBasicsTest
 	If algorithmName = "KNN_NNBasics" Then return new KNN_NNBasics
 	If algorithmName = "KNN_NNBasicsNormalized" Then return new KNN_NNBasicsNormalized
 	If algorithmName = "KNN_NNBasicsTest" Then return new KNN_NNBasicsTest
+	If algorithmName = "KNN_NNBasicsTestNormalized" Then return new KNN_NNBasicsTestNormalized
+	If algorithmName = "KNN_NNearest" Then return new KNN_NNearest
 	If algorithmName = "KNN_NoDups" Then return new KNN_NoDups
 	If algorithmName = "KNN_NoDups_CC" Then return new CPP_Basics(ccFunctionNames._KNN_NoDups_CC)
 	If algorithmName = "KNN_NoDups_CS" Then return new KNN_NoDups_CS

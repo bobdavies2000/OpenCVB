@@ -1,8 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
-Imports OpenCvSharp.Flann
-
 Public Class KNN_Basics : Inherits TaskParent
     Public knn2 As New KNN_N2Basics
     Public trainInput As New List(Of cvb.Point2f) ' put training data here
@@ -1113,7 +1111,7 @@ End Class
 
 
 
-Public Class KNN_NBasicsTest : Inherits TaskParent
+Public Class KNN_NNBasicsTest : Inherits TaskParent
     Dim knn As New KNN_NNBasics
     Public Sub New()
         labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
@@ -1143,7 +1141,6 @@ Public Class KNN_NBasicsTest : Inherits TaskParent
         For i = 0 To knn.queries.Count - 1 Step knn.options.knnDimension
             Dim pt = New cvb.Point2f(knn.queries(i), knn.queries(i + 1))
             Dim index = knn.result(i, 0)
-            If index * knn.options.knnDimension >= knn.trainInput.Count Or index < 0 Then Continue For
             Dim nn = New cvb.Point2f(knn.trainInput(index * knn.options.knnDimension), knn.trainInput(index * knn.options.knnDimension + 1))
             DrawCircle(dst2, pt, task.DotSize + 1, task.HighlightColor)
             DrawLine(dst2, pt, nn, task.HighlightColor)
@@ -1156,6 +1153,57 @@ Public Class KNN_NBasicsTest : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class KNN_NNBasicsTestNormalized : Inherits TaskParent
+    Public knn As New KNN_NNBasicsNormalized
+    Dim random As New Random_Basics
+    Public Sub New()
+        FindSlider("KNN Dimension").Value = 2
+        FindSlider("Random Pixel Count").Value = 3
+        desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors."
+    End Sub
+    Public Sub displayResults()
+        dst2.SetTo(0)
+        For i = 0 To knn.queryData.Rows - 1
+            Dim pt = knn.queryData.Get(Of cvb.Point2f)(i, 0)
+            Dim index = knn.result(i, 0)
+            Dim nn = knn.trainData.Get(Of cvb.Point2f)(index, 0)
+            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
+            DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
+        Next
+
+        For i = 0 To knn.trainData.Rows - 1
+            Dim pt = knn.trainData.Get(Of cvb.Point2f)(i, 0)
+            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Red)
+        Next
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If task.heartBeat Then
+            dst3.SetTo(0)
+            random.Run(empty)
+            knn.trainInput.Clear()
+            For Each pt In random.PointList
+                knn.trainInput.Add(pt.X)
+                knn.trainInput.Add(pt.Y)
+            Next
+        End If
+        random.Run(empty)
+        knn.queries.Clear()
+        For Each pt In random.PointList
+            knn.queries.Add(pt.X)
+            knn.queries.Add(pt.Y)
+        Next
+
+        knn.Run(empty)
+        displayResults()
+        dst2 = knn.dst2
+
+        labels(2) = "The top " + CStr(knn.trainInput.Count / 2) + " best matches are shown. Red=TrainingData, yellow = queries"
+    End Sub
+End Class
 
 
 
@@ -1218,58 +1266,6 @@ End Class
 
 
 
-Public Class KNN_NNBasicsTest : Inherits TaskParent
-    Public knn As New KNN_NNBasicsNormalized
-    Dim random As New Random_Basics
-    Public Sub New()
-        FindSlider("KNN Dimension").Value = 2
-        FindSlider("Random Pixel Count").Value = 3
-        desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors."
-    End Sub
-    Public Sub displayResults()
-        dst2.SetTo(0)
-        For i = 0 To knn.queryData.Rows - 1
-            Dim pt = knn.queryData.Get(Of cvb.Point2f)(i, 0)
-            Dim index = knn.result(i, 0)
-            Dim nn = knn.trainData.Get(Of cvb.Point2f)(index, 0)
-            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
-            DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
-        Next
-
-        For i = 0 To knn.trainData.Rows - 1
-            Dim pt = knn.trainData.Get(Of cvb.Point2f)(i, 0)
-            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Red)
-        Next
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If task.heartBeat Then
-            dst3.SetTo(0)
-            random.Run(empty)
-            knn.trainInput.Clear()
-            For Each pt In random.PointList
-                knn.trainInput.Add(pt.X)
-                knn.trainInput.Add(pt.Y)
-            Next
-        End If
-        random.Run(empty)
-        knn.queries.Clear()
-        For Each pt In random.PointList
-            knn.queries.Add(pt.X)
-            knn.queries.Add(pt.Y)
-        Next
-
-        knn.Run(empty)
-        displayResults()
-        dst2 = knn.dst2
-
-        labels(2) = "The top " + CStr(knn.trainInput.Count / 2) + " best matches are shown. Red=TrainingData, yellow = queries"
-    End Sub
-End Class
-
-
-
-
-
 Public Class KNN_NNBasicsNormalized : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public queries As New List(Of Single)
@@ -1300,6 +1296,61 @@ Public Class KNN_NNBasicsNormalized : Inherits TaskParent
         queryData = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
         Dim queryMat As cvb.Mat = queryData.Clone
         ' cvb.Cv2.Normalize(queryData, queryMat, 0, 1, cvb.NormTypes.L2)
+        Dim tRows = CInt(trainInput.Count / options.knnDimension)
+        trainData = cvb.Mat.FromPixelData(tRows, options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray())
+
+        Dim response As cvb.Mat = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
+                                  Enumerable.Range(start:=0, trainData.Rows).ToArray)
+
+        knn.Train(trainData, cvb.ML.SampleTypes.RowSample, response)
+        Dim neighbors As New cvb.Mat
+        knn.FindNearest(queryMat, trainData.Rows, New cvb.Mat, neighbors)
+
+        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
+        For i = 0 To neighbors.Rows - 1
+            For j = 0 To neighbors.Cols - 1
+                Dim test = neighbors.Get(Of Single)(i, j)
+                If test < trainData.Rows And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_NNearest : Inherits TaskParent
+    Public knn As cvb.ML.KNearest
+    Public queries As New List(Of Single)
+    Public trainInput As New List(Of Single)
+    Public trainData As cvb.Mat
+    Public queryData As cvb.Mat
+    Public result(,) As Integer ' Get results here...
+    Public options As New Options_KNN
+    Public Sub New()
+        knn = cvb.ML.KNearest.Create()
+        desc = "Find the nearest cells to the selected cell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
+        If standaloneTest() Then
+            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
+            Exit Sub
+        End If
+
+        Dim qRows = CInt(queries.Count / options.knnDimension)
+        If qRows = 0 Then
+            SetTrueText("There were no queries provided.  There is nothing to do...")
+            Exit Sub
+        End If
+
+        queryData = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
+        Dim queryMat As cvb.Mat = queryData.Clone
+        'cvb.Cv2.Normalize(queryData, queryMat, 0, 1, cvb.NormTypes.L2)
 
         Dim tRows = CInt(trainInput.Count / options.knnDimension)
         trainData = cvb.Mat.FromPixelData(tRows, options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray())

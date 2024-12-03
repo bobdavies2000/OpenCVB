@@ -35,8 +35,6 @@ Public Class FCS_Basics : Inherits TaskParent
                 If match.correlation > options.MinCorrelation Then
                     task.fpList(i) = fpUpdate(fp, fpLast)
                     matchCount += 1
-                Else
-                    Dim k = 0
                 End If
 
                 If fp.index = 0 Then
@@ -62,7 +60,6 @@ Public Class FCS_Basics : Inherits TaskParent
         End If
         labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
         fpLastSrc = src.Clone
-        cvb.Cv2.ImShow("fpLastSrc", fpLastSrc)
         DrawCircle(task.color, task.ClickPoint, task.DotSize, task.HighlightColor)
     End Sub
 End Class
@@ -850,7 +847,8 @@ Public Class FCS_Delaunay : Inherits TaskParent
             cvb.Cv2.MeanStdDev(task.pcSplit(2)(fp.rect), depthMean, stdev, fp.mask)
             fp.depthMean = depthMean(0)
             fp.depthStdev = stdev(0)
-            Dim mm = GetMinMax(task.pcSplit(2)(fp.rect), fp.mask)
+            Dim mask As cvb.Mat = fp.mask And task.depthMask(fp.rect)
+            Dim mm = GetMinMax(task.pcSplit(2)(fp.rect), mask)
             fp.depthMin = mm.minVal
             fp.depthMax = mm.maxVal
 
@@ -987,74 +985,6 @@ End Class
 
 
 
-Public Class FCS_KNNfeatures : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Dim knn As New KNN_NNBasicsNormalized
-    Dim info As New FCS_Info
-    Dim dimension As Integer
-    Public Sub New()
-        task.gOptions.debugSyncUI.Checked = True
-        If standalone Then task.gOptions.setDisplay1()
-        FindSlider("KNN Dimension").Value = 4
-        desc = "Can we distinguish each feature point cell with color, depth, and grid."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Static dimensionSlider = FindSlider("KNN Dimension")
-        dimension = dimensionSlider.value
-
-        fcs.Run(src)
-        dst0 = fcs.dst0
-        dst2 = fcs.dst2
-
-        Static fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
-        If task.mouseClickFlag Then
-            fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
-        End If
-
-        info.fpSelection = fpSave
-        info.Run(empty)
-        SetTrueText(info.strOut, 1)
-
-        knn.trainInput.Clear()
-        For Each fp In task.fpList
-            For i = 0 To dimension - 1
-                knn.trainInput.Add(Choose(i + 1, fp.depthMean, fp.depthStdev,
-                                                 fp.depthMin, fp.depthMax,
-                                                 fp.colorMean(0), fp.colorMean(1), fp.colorMean(2),
-                                                 fp.colorStdev(0), fp.colorStdev(1), fp.colorStdev(2)))
-            Next
-        Next
-
-        knn.queries.Clear()
-        For i = 0 To dimension - 1
-            knn.queries.Add(Choose(i + 1, fpSave.depthMean, fpSave.depthStdev,
-                                          fpSave.depthMin, fpSave.depthMax,
-                                          fpSave.colorMean(0), fpSave.colorMean(1),
-                                          fpSave.colorMean(2), fpSave.colorStdev(0),
-                                          fpSave.colorStdev(1), fpSave.colorStdev(2)))
-        Next
-
-        knn.Run(empty)
-
-        fpDisplayCell()
-
-        Dim index = knn.result(0, 0)
-        If index < task.fpList.Count Then
-            info.fpSelection = task.fpList(index)
-            info.Run(empty)
-            SetTrueText(info.strOut, 3)
-        End If
-        fpCellContour(info.fpSelection, dst2)
-
-        fpSave = info.fpSelection
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class FCS_ByDepth : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Dim fcs As New FCS_Basics
@@ -1122,5 +1052,81 @@ Public Class FCS_ByDepth : Inherits TaskParent
         Next
 
         labels(3) = "Cells with depth between " + Format(depthStart, fmt1) + "m to " + Format(depthEnd, fmt1) + "m"
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_KNNfeatures : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Dim knn As New KNN_NNBasicsNormalized
+    Dim info As New FCS_Info
+    Dim dimension As Integer
+    Public Sub New()
+        task.gOptions.debugSyncUI.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
+        FindSlider("KNN Dimension").Value = 3
+        desc = "Can we distinguish each feature point cell with color, depth, and grid."
+    End Sub
+    Private Function buildEntry(fp As fpData) As List(Of Single)
+        Dim dataList As New List(Of Single)
+        For i = 0 To dimension - 1
+            dataList.Add(Choose(i + 1, fp.depthMean, fp.depthMin, fp.depthMax,
+                                       fp.colorMean(0), fp.colorMean(1), fp.colorMean(2),
+                                       fp.depthStdev, fp.colorStdev(0), fp.colorStdev(1),
+                                       fp.colorStdev(2)))
+        Next
+        Return dataList
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        Static dimensionSlider = FindSlider("KNN Dimension")
+        dimension = dimensionSlider.value
+
+        fcs.Run(src)
+        dst0 = fcs.dst0
+        dst2 = fcs.dst2
+
+        Static fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
+        If task.mouseClickFlag Then
+            fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
+        End If
+
+        info.fpSelection = fpSave
+        info.Run(empty)
+        SetTrueText(info.strOut, 1)
+
+        Dim query = buildEntry(fpSave)
+        knn.queries.Clear()
+        For Each e In query
+            knn.queries.Add(e)
+        Next
+
+        knn.trainInput.Clear()
+
+        For Each fp In task.fpList
+            Dim entry = buildEntry(fp)
+            For Each e In entry
+                knn.trainInput.Add(e)
+            Next
+        Next
+
+        knn.Run(empty)
+
+        fpDisplayCell()
+
+        For i = 0 To 10
+            Dim fp = task.fpList(knn.result(0, i))
+            fpCellContour(fp, dst2)
+            SetTrueText(CStr(i), fp.ptCenter, 0)
+        Next
+
+        info.fpSelection = task.fpList(knn.result(0, 0))
+        info.Run(empty)
+        SetTrueText(info.strOut, 3)
+        fpCellContour(info.fpSelection, dst2)
+
+        'fpSave = info.fpSelection
     End Sub
 End Class

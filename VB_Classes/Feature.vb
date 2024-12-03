@@ -2,7 +2,7 @@ Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
-    Dim gather As New Feature_Gather
+    Dim method As New Feature_Methods
     Public Sub New()
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
@@ -35,9 +35,9 @@ Public Class Feature_Basics : Inherits TaskParent
         options.RunOpt()
         dst2 = src.Clone
 
-        gather.Run(src)
+        method.Run(src)
 
-        Dim ptlist = motionFilter(gather.features)
+        Dim ptlist = motionFilter(method.features)
 
         task.features.Clear()
         task.featurePoints.Clear()
@@ -53,7 +53,97 @@ Public Class Feature_Basics : Inherits TaskParent
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
-        labels(2) = gather.labels(2)
+        labels(2) = method.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Methods : Inherits TaskParent
+    Dim harris As New Corners_HarrisDetector_CPP_VB
+    Dim FAST As New Corners_Basics
+    Dim featureMethod As New Options_FeatureGather
+    Public features As New List(Of cvb.Point2f)
+    Public ptList As New List(Of cvb.Point)
+    Dim brisk As New BRISK_Basics
+    Public options As New Options_Features
+    Public Sub New()
+        cPtr = Agast_Open()
+        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        featureMethod.RunOpt()
+
+        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+
+        Select Case featureMethod.featureSource
+            Case FeatureSrc.GoodFeaturesFull
+                features = cvb.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
+                                                      options.blockSize, True, options.k).ToList
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.GoodFeaturesGrid
+                options.featurePoints = 4
+                features.Clear()
+                For i = 0 To task.gridRects.Count - 1
+                    Dim roi = task.gridRects(i)
+                    Dim tmpFeatures = cvb.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
+                                                                 options.blockSize, True, options.k).ToList
+                    For j = 0 To tmpFeatures.Count - 1
+                        features.Add(New cvb.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
+                    Next
+                Next
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.Agast
+                src = task.color.Clone
+                Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
+                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+
+                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
+                handleSrc.Free()
+
+                Dim ptMat = cvb.Mat.FromPixelData(Agast_Count(cPtr), 1, cvb.MatType.CV_32FC2, imagePtr).Clone
+                features.Clear()
+                If standaloneTest() Then dst2 = src
+
+                For i = 0 To ptMat.Rows - 1
+                    Dim pt = ptMat.Get(Of cvb.Point2f)(i, 0)
+                    features.Add(pt)
+                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
+                Next
+
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.BRISK
+                brisk.Run(src)
+                features = brisk.features
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.Harris
+                harris.Run(src)
+                features = harris.features
+                labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.FAST
+                FAST.Run(src)
+                features = FAST.features
+                labels(2) = "FAST produced " + CStr(features.Count) + " features"
+        End Select
+
+        ptList.Clear()
+        For Each pt In features
+            ptList.Add(New cvb.Point(pt.X, pt.Y))
+        Next
+        If standaloneTest() Then
+            dst2 = task.color.Clone
+            For Each pt In features
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            Next
+        End If
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
     End Sub
 End Class
 
@@ -64,7 +154,7 @@ End Class
 ' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_NoMotionTest : Inherits TaskParent
     Public options As New Options_Features
-    Dim gather As New Feature_Gather
+    Dim method As New Feature_Methods
     Public Sub New()
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
@@ -73,17 +163,17 @@ Public Class Feature_NoMotionTest : Inherits TaskParent
         options.RunOpt()
         dst2 = src.Clone
 
-        gather.Run(src)
+        method.Run(src)
 
         task.features.Clear()
         task.featurePoints.Clear()
-        For Each pt In gather.features
+        For Each pt In method.features
             task.features.Add(pt)
             task.featurePoints.Add(New cvb.Point(pt.X, pt.X))
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
         Next
 
-        labels(2) = gather.labels(2)
+        labels(2) = method.labels(2)
     End Sub
 End Class
 
@@ -95,7 +185,7 @@ Public Class Feature_Stable : Inherits TaskParent
     Dim ptList As New List(Of cvb.Point2f)
     Dim knn As New KNN_Basics
     Dim ptLost As New List(Of cvb.Point2f)
-    Dim gather As New Feature_Gather
+    Dim method As New Feature_Methods
     Dim featureMatList As New List(Of cvb.Mat)
     Public options As New Options_Features
     Dim noMotionFrames As Single
@@ -108,7 +198,7 @@ Public Class Feature_Stable : Inherits TaskParent
         dst2 = src.Clone
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        gather.Run(src)
+        method.Run(src)
 
         If task.optionsChanged Then
             task.features.Clear()
@@ -122,7 +212,7 @@ Public Class Feature_Stable : Inherits TaskParent
         For i = 0 To saveFeatureCount - 1
             Dim pt = task.features(i)
             Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMatList(i).Width, featureMatList(i).Height))
-            If gather.ptList.Contains(pt) = False Then
+            If method.ptList.Contains(pt) = False Then
                 cvb.Cv2.MatchTemplate(src(rect), featureMatList(i), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
                 If correlationMat.Get(Of Single)(0, 0) < options.correlationMin Then
                     Dim ptNew = New cvb.Point2f(CInt(pt.X), CInt(pt.Y))
@@ -138,12 +228,12 @@ Public Class Feature_Stable : Inherits TaskParent
         Dim extra = 1 + (1 - options.resyncThreshold)
         task.features = New List(Of cvb.Point2f)(ptList)
 
-        If task.features.Count < gather.features.Count * options.resyncThreshold Or task.features.Count > extra * gather.features.Count Then
+        If task.features.Count < method.features.Count * options.resyncThreshold Or task.features.Count > extra * method.features.Count Then
             task.featureMotion = True
             ptLost.Clear()
             featureMatList.Clear()
             task.features.Clear()
-            For Each pt In gather.features
+            For Each pt In method.features
                 Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
                 featureMatList.Add(src(rect))
                 task.features.Add(pt)
@@ -151,7 +241,7 @@ Public Class Feature_Stable : Inherits TaskParent
         Else
             If ptLost.Count > 0 Then
                 knn.queries = ptLost
-                knn.trainInput = gather.features
+                knn.trainInput = method.features
                 knn.Run(Nothing)
 
                 For i = 0 To knn.queries.Count - 1
@@ -742,96 +832,6 @@ End Class
 
 
 
-
-
-Public Class Feature_Gather : Inherits TaskParent
-    Dim harris As New Corners_HarrisDetector_CPP_VB
-    Dim FAST As New Corners_Basics
-    Dim myOptions As New Options_FeatureGather
-    Public features As New List(Of cvb.Point2f)
-    Public ptList As New List(Of cvb.Point)
-    Dim brisk As New BRISK_Basics
-    Public options As New Options_Features
-    Public Sub New()
-        cPtr = Agast_Open()
-        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        myOptions.RunOpt()
-
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-
-        Select Case myOptions.featureSource
-            Case FeatureSrc.GoodFeaturesFull
-                features = cvb.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
-                                                      options.blockSize, True, options.k).ToList
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.GoodFeaturesGrid
-                options.featurePoints = 4
-                features.Clear()
-                For i = 0 To task.gridRects.Count - 1
-                    Dim roi = task.gridRects(i)
-                    Dim tmpFeatures = cvb.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
-                                                                 options.blockSize, True, options.k).ToList
-                    For j = 0 To tmpFeatures.Count - 1
-                        features.Add(New cvb.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
-                    Next
-                Next
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.Agast
-                src = task.color.Clone
-                Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-
-                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
-                handleSrc.Free()
-
-                Dim ptMat = cvb.Mat.FromPixelData(Agast_Count(cPtr), 1, cvb.MatType.CV_32FC2, imagePtr).Clone
-                features.Clear()
-                If standaloneTest() Then dst2 = src
-
-                For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of cvb.Point2f)(i, 0)
-                    features.Add(pt)
-                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
-                Next
-
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.BRISK
-                brisk.Run(src)
-                features = brisk.features
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.Harris
-                harris.Run(src)
-                features = harris.features
-                labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.FAST
-                FAST.Run(src)
-                features = FAST.features
-                labels(2) = "FAST produced " + CStr(features.Count) + " features"
-        End Select
-
-        ptList.Clear()
-        For Each pt In features
-            ptList.Add(New cvb.Point(pt.X, pt.Y))
-        Next
-        If standaloneTest() Then
-            dst2 = task.color.Clone
-            For Each pt In features
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-            Next
-        End If
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
 Public Class Feature_Agast : Inherits TaskParent
     Dim stablePoints As List(Of cvb.Point2f)
     Dim agastFD As cvb.AgastFeatureDetector
@@ -900,5 +900,33 @@ Public Class Feature_AKaze : Inherits TaskParent
         For i As Integer = 0 To kazeKeyPoints.Length - 1
             DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.HighlightColor)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Matching : Inherits TaskParent
+    Public features As New List(Of cvb.Point2f)
+    Public options As New Options_Features
+    Dim match As New Match_Basics
+    Public Sub New()
+        desc = "Use correlation coefficient to keep features from frame to frame."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        Dim matchCount As Integer
+        For Each pt In features
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+
+        Next
+        If features.Count < options.featurePoints / 2 Then
+
+            features = cvb.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
+                                                          options.blockSize, True, options.k).ToList
+        End If
     End Sub
 End Class
