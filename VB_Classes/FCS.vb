@@ -36,10 +36,6 @@ Public Class FCS_Basics : Inherits TaskParent
                     task.fpList(i) = fpUpdate(fp, fpLast)
                     matchCount += 1
                 End If
-
-                If fp.index = 0 Then
-                    DrawCircle(task.color, fp.ptCenter, task.DotSize, task.HighlightColor)
-                End If
             Next
         End If
 
@@ -60,7 +56,7 @@ Public Class FCS_Basics : Inherits TaskParent
         End If
         labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
         fpLastSrc = src.Clone
-        DrawCircle(task.color, task.ClickPoint, task.DotSize, task.HighlightColor)
+        ' DrawCircle(task.color, task.ClickPoint, task.DotSize, task.HighlightColor)
     End Sub
 End Class
 
@@ -1061,13 +1057,13 @@ End Class
 
 Public Class FCS_KNNfeatures : Inherits TaskParent
     Dim fcs As New FCS_Basics
-    Dim knn As New KNN_NNBasicsNormalized
+    Dim knn As New KNNorm_Basics
     Dim info As New FCS_Info
     Dim dimension As Integer
     Public Sub New()
         task.gOptions.debugSyncUI.Checked = True
         If standalone Then task.gOptions.setDisplay1()
-        FindSlider("KNN Dimension").Value = 3
+        FindSlider("KNN Dimension").Value = 10
         desc = "Can we distinguish each feature point cell with color, depth, and grid."
     End Sub
     Private Function buildEntry(fp As fpData) As List(Of Single)
@@ -1085,15 +1081,13 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         dimension = dimensionSlider.value
 
         fcs.Run(src)
-        dst0 = fcs.dst0
         dst2 = fcs.dst2
 
-        Static fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
-        If task.mouseClickFlag Then
+        Static fpSave As fpData
+        If task.FirstPass Or task.mouseClickFlag Then
             fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
         End If
 
-        info.fpSelection = fpSave
         info.Run(empty)
         SetTrueText(info.strOut, 1)
 
@@ -1116,17 +1110,37 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
 
         fpDisplayCell()
 
-        For i = 0 To 10
+        For i = 0 To 5
             Dim fp = task.fpList(knn.result(0, i))
-            fpCellContour(fp, dst2)
-            SetTrueText(CStr(i), fp.ptCenter, 0)
+            fpCellContour(fp, task.color, 1)
+            SetTrueText(CStr(i), fp.ptCenter, 3)
         Next
 
         info.fpSelection = task.fpList(knn.result(0, 0))
         info.Run(empty)
         SetTrueText(info.strOut, 3)
-        fpCellContour(info.fpSelection, dst2)
+        task.ClickPoint = info.fpSelection.ptCenter
+    End Sub
+End Class
 
-        'fpSave = info.fpSelection
+
+
+
+
+
+
+Public Class FCS_Tracker : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        desc = "Track the selected cell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        labels(2) = fcs.labels(2)
+
+        fpDisplayCell()
+
+        task.ClickPoint = task.fpSelected.ptCenter
     End Sub
 End Class

@@ -21,6 +21,10 @@ Public Class KNN_Basics : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
 Public Class KNN_N2Basics : Inherits TaskParent
     Public knn As cvb.ML.KNearest
     Public trainInput As New List(Of cvb.Point2f) ' put training data here
@@ -1215,6 +1219,7 @@ Public Class KNN_NNBasics : Inherits TaskParent
     Public queries As New List(Of Single) ' put Query data here
     Public result(,) As Integer ' Get results here...
     Dim messageSent As Boolean
+    Public neighbors As New cvb.Mat
     Public options As New Options_KNN
     Public Sub New()
         knn = cvb.ML.KNearest.Create()
@@ -1248,7 +1253,6 @@ Public Class KNN_NNBasics : Inherits TaskParent
                                              Enumerable.Range(start:=0, trainData.Rows).ToArray)
 
         knn.Train(trainData, cvb.ML.SampleTypes.RowSample, response)
-        Dim neighbors As New cvb.Mat
         Dim dm = trainInput.Count
         knn.FindNearest(queryMat, dm, New cvb.Mat, neighbors)
 

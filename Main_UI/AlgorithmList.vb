@@ -1026,6 +1026,7 @@ End Enum
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "FCS_Periphery" Then return new FCS_Periphery
 	If algorithmName = "FCS_RedCloud" Then return new FCS_RedCloud
+	If algorithmName = "FCS_Tracker" Then return new FCS_Tracker
 	If algorithmName = "FCS_TravelDistance" Then return new FCS_TravelDistance
 	If algorithmName = "FCS_ViewLeft" Then return new FCS_ViewLeft
 	If algorithmName = "FCS_ViewLeftRight" Then return new FCS_ViewLeftRight
@@ -1855,6 +1856,7 @@ End Enum
 	If algorithmName = "KNN_TrackEach_CS" Then return new KNN_TrackEach_CS
 	If algorithmName = "KNN_TrackMean" Then return new KNN_TrackMean
 	If algorithmName = "KNN_TrackMean_CS" Then return new KNN_TrackMean_CS
+	If algorithmName = "KNNorm_Basics" Then return new KNNorm_Basics
 	If algorithmName = "LaneFinder_Basics" Then return new LaneFinder_Basics
 	If algorithmName = "LaneFinder_Basics_CS" Then return new LaneFinder_Basics_CS
 	If algorithmName = "LaneFinder_Edges" Then return new LaneFinder_Edges
