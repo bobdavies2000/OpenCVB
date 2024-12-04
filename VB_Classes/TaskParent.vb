@@ -577,6 +577,7 @@ Public Class TaskParent : Implements IDisposable
         End While
         fp.ID = fpLast.ID
         fp.indexLast = fpLast.index
+        fp.colorTracking = fpLast.colorTracking
         fp.age = fpLast.age + 1
         fp.ptHistory = New List(Of cvb.Point)(fpLast.ptHistory) From {fp.pt}
         fp.travelDistance = fp.pt.DistanceTo(fp.ptHistory(0))

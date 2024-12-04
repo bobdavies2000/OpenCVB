@@ -847,6 +847,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             Dim mm = GetMinMax(task.pcSplit(2)(fp.rect), mask)
             fp.depthMin = mm.minVal
             fp.depthMax = mm.maxVal
+            fp.colorTracking = New cvb.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
 
             cvb.Cv2.MeanStdDev(task.color(fp.rect), fp.colorMean, fp.colorStdev, fp.mask)
 
@@ -1132,14 +1133,30 @@ End Class
 Public Class FCS_Tracker : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        labels(3) = "dst2 is a tracking color while dst3 is the color mean"
         desc = "Track the selected cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fcs.Run(src)
-        dst2 = fcs.dst2
+        dst1 = fcs.dst2
         labels(2) = fcs.labels(2)
+        labels(1) = labels(2)
 
         fpDisplayCell()
+
+        Dim colors As New List(Of cvb.Scalar)
+        For i = 0 To task.fpList.Count - 1
+            Dim fp = task.fpList(i)
+            If colors.Contains(fp.colorTracking) Then
+                fp.colorTracking = New cvb.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                task.fpList(i) = fp
+            End If
+            dst2(fp.rect).SetTo(fp.colorTracking, fp.mask)
+            dst3(fp.rect).SetTo(fp.colorMean, fp.mask)
+
+            colors.Add(fp.colorTracking)
+        Next
 
         task.ClickPoint = task.fpSelected.ptCenter
     End Sub

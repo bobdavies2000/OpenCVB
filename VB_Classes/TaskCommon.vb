@@ -232,6 +232,7 @@ Public Class fpData ' feature point
     Public depthMax As Single
     Public depthStdev As Single
     Public colorMean As cvb.Scalar
+    Public colorTracking As cvb.Scalar
     Public colorStdev As cvb.Scalar
     Public correlation As Single
     Sub New()
