@@ -910,23 +910,50 @@ End Class
 
 Public Class Feature_Matching : Inherits TaskParent
     Public features As New List(Of cvb.Point2f)
-    Public options As New Options_Features
     Dim match As New Match_Basics
+    Dim options As New Options_FCSMatch
     Public Sub New()
+        FindSlider("Feature Sample Size").Value = 150
         desc = "Use correlation coefficient to keep features from frame to frame."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        Dim matchCount As Integer
+        Static fpLastSrc = src.Clone
+
+        Dim matched As New List(Of cvb.Point2f)
+        Dim motionPoints As New List(Of cvb.Point2f)
         For Each pt In features
-            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
-
+            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val = 0 Then
+                Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+                Dim r = task.gridRects(index)
+                match.template = fpLastSrc(r)
+                match.Run(src(r))
+                If match.correlation > options.MinCorrelation Then matched.Add(pt)
+            Else
+                motionPoints.Add(pt)
+            End If
         Next
-        If features.Count < options.featurePoints / 2 Then
 
-            features = cvb.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
-                                                          options.blockSize, True, options.k).ToList
+        labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
+                    " were matched to the previous frame"
+
+        If matched.Count < match.options.featurePoints / 2 Then
+            dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            features = cvb.Cv2.GoodFeaturesToTrack(dst1, match.options.featurePoints,
+                                                         match.options.quality,
+                                                         match.options.minDistance, New cvb.Mat,
+                                                         match.options.blockSize, True, match.options.k).ToList
+        Else
+            features = New List(Of cvb.Point2f)(matched)
         End If
+
+        dst2 = src.Clone
+        For Each pt In features
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+
+        fpLastSrc = src.Clone
     End Sub
 End Class
