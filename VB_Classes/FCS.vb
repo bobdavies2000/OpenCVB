@@ -1,4 +1,5 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cvb = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim delaunay As New FCS_Delaunay
     Public buildFeatures As Boolean = True
@@ -1110,8 +1111,8 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         knn.Run(empty)
 
         fpDisplayCell()
-
-        For i = 0 To 5
+        fpCellContour(task.fpSelected, dst2)
+        For i = 0 To 10
             Dim fp = task.fpList(knn.result(0, i))
             fpCellContour(fp, task.color, 1)
             SetTrueText(CStr(i), fp.ptCenter, 3)

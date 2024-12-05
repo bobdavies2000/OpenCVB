@@ -5503,10 +5503,8 @@ Public Class Options_Features : Inherits TaskParent
         resyncThreshold = resyncSlider.value / 100
         agastThreshold = agastslider.value
 
-        If task.optionsChanged Then
-            quality = qualitySlider.Value / 100
-            minDistance = distSlider.Value
-        End If
+        quality = qualitySlider.Value / 100
+        minDistance = distSlider.Value
     End Sub
 End Class
 

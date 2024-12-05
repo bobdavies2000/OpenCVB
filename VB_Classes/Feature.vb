@@ -67,6 +67,7 @@ Public Class Feature_Methods : Inherits TaskParent
     Dim FAST As New Corners_Basics
     Dim featureMethod As New Options_FeatureGather
     Public features As New List(Of cvb.Point2f)
+    Public featurePoints As New List(Of cvb.Point)
     Public ptList As New List(Of cvb.Point)
     Dim brisk As New BRISK_Basics
     Public options As New Options_Features
@@ -130,6 +131,11 @@ Public Class Feature_Methods : Inherits TaskParent
                 features = FAST.features
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
         End Select
+
+        featurePoints.Clear()
+        For Each pt In features
+            featurePoints.Add(New cvb.Point(pt.X, pt.Y))
+        Next
 
         ptList.Clear()
         For Each pt In features
@@ -909,8 +915,10 @@ End Class
 
 
 Public Class Feature_Matching : Inherits TaskParent
-    Public features As New List(Of cvb.Point2f)
+    Public features As New List(Of cvb.Point)
+    Public motionPoints As New List(Of cvb.Point)
     Dim match As New Match_Basics
+    Dim method As New Feature_Methods
     Dim options As New Options_FCSMatch
     Public Sub New()
         FindSlider("Feature Sample Size").Value = 150
@@ -921,8 +929,8 @@ Public Class Feature_Matching : Inherits TaskParent
 
         Static fpLastSrc = src.Clone
 
-        Dim matched As New List(Of cvb.Point2f)
-        Dim motionPoints As New List(Of cvb.Point2f)
+        Dim matched As New List(Of cvb.Point)
+        motionPoints.Clear()
         For Each pt In features
             Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
             If val = 0 Then
@@ -940,13 +948,10 @@ Public Class Feature_Matching : Inherits TaskParent
                     " were matched to the previous frame"
 
         If matched.Count < match.options.featurePoints / 2 Then
-            dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-            features = cvb.Cv2.GoodFeaturesToTrack(dst1, match.options.featurePoints,
-                                                         match.options.quality,
-                                                         match.options.minDistance, New cvb.Mat,
-                                                         match.options.blockSize, True, match.options.k).ToList
+            method.Run(src)
+            features = method.featurePoints
         Else
-            features = New List(Of cvb.Point2f)(matched)
+            features = New List(Of cvb.Point)(matched)
         End If
 
         dst2 = src.Clone
