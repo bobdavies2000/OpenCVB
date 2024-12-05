@@ -1857,6 +1857,7 @@ End Enum
 	If algorithmName = "KNN_TrackMean" Then return new KNN_TrackMean
 	If algorithmName = "KNN_TrackMean_CS" Then return new KNN_TrackMean_CS
 	If algorithmName = "KNNorm_Basics" Then return new KNNorm_Basics
+	If algorithmName = "KNNorm_N2BasicsTest" Then return new KNNorm_N2BasicsTest
 	If algorithmName = "LaneFinder_Basics" Then return new LaneFinder_Basics
 	If algorithmName = "LaneFinder_Basics_CS" Then return new LaneFinder_Basics_CS
 	If algorithmName = "LaneFinder_Edges" Then return new LaneFinder_Edges

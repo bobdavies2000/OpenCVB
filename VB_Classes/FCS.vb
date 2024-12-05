@@ -1094,9 +1094,9 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         SetTrueText(info.strOut, 1)
 
         Dim query = buildEntry(fpSave)
-        knn.queries.Clear()
+        knn.queryInput.Clear()
         For Each e In query
-            knn.queries.Add(e)
+            knn.queryInput.Add(e)
         Next
 
         knn.trainInput.Clear()
