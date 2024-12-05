@@ -41,13 +41,13 @@ End Class
 
 
 
-Public Class KNNorm_N2BasicsTest : Inherits TaskParent
+Public Class KNNorm_TestDim2 : Inherits TaskParent
     Public knn As New KNNorm_Basics
     Dim random As New Random_Basics
-    Dim trainInput As New List(Of cvb.Point2f)
-    Dim queryInput As New List(Of cvb.Point2f)
+    Public trainInput As New List(Of cvb.Point2f)
+    Public queryInput As New List(Of cvb.Point2f)
     Public Sub New()
-        FindSlider("Random Pixel Count").Value = 10
+        FindSlider("Random Pixel Count").Value = 20
         FindSlider("KNN Dimension").Value = 2
         desc = "Test KNNorm_Basics with random 2D points in the image.  Find the nearest requested neighbors."
     End Sub
@@ -56,7 +56,6 @@ Public Class KNNorm_N2BasicsTest : Inherits TaskParent
         For i = 0 To queryInput.Count - 1
             Dim pt = queryInput(i)
             Dim index = knn.result(i, 0)
-            If index >= trainInput.Count Or index < 0 Then Continue For
             Dim nn = trainInput(index)
             DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
             DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
@@ -67,9 +66,19 @@ Public Class KNNorm_N2BasicsTest : Inherits TaskParent
         Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.heartBeat Then
-            random.Run(empty)
-            trainInput = New List(Of cvb.Point2f)(random.PointList)
+        If standalone Then
+            If task.heartBeat Then
+                queryInput.Clear()
+                trainInput.Clear()
+                random.Run(empty)
+                For Each pt In random.PointList
+                    If trainInput.Count < 10 Then
+                        trainInput.Add(pt)
+                    Else
+                        queryInput.Add(pt)
+                    End If
+                Next
+            End If
         End If
 
         knn.trainInput.Clear()
@@ -78,9 +87,7 @@ Public Class KNNorm_N2BasicsTest : Inherits TaskParent
             knn.trainInput.Add(pt.Y)
         Next
 
-        random.Run(empty)
         knn.queryInput.Clear()
-        queryInput = New List(Of cvb.Point2f)(random.PointList)
         For Each pt In queryInput
             knn.queryInput.Add(pt.X)
             knn.queryInput.Add(pt.Y)
@@ -89,6 +96,140 @@ Public Class KNNorm_N2BasicsTest : Inherits TaskParent
         knn.Run(empty)
         displayResults()
 
-        labels(2) = "The top " + CStr(knn.trainInput.Count) + " best matches are shown. Red=TrainingData, yellow = queries"
+        labels(2) = "Top " + CStr(trainInput.Count) + " best matches. Red=TrainInput, yellow = queryInput"
+    End Sub
+End Class
+
+
+
+
+
+Public Class KNNorm_TestDim3 : Inherits TaskParent
+    Public knn As New KNNorm_Basics
+    Dim random As New Random_Basics3D
+    Public trainInput As New List(Of cvb.Point3f)
+    Public queryInput As New List(Of cvb.Point3f)
+    Public Sub New()
+        FindSlider("Random Pixel Count").Value = 20
+        FindSlider("KNN Dimension").Value = 3
+        desc = "Test KNNorm_Basics with random 3D points.  Find the nearest neighbors."
+    End Sub
+    Public Sub displayResults()
+        dst2.SetTo(0)
+        For i = 0 To queryInput.Count - 1
+            Dim pt = New cvb.Point(queryInput(i).X, queryInput(i).Y)
+            Dim index = knn.result(i, 0)
+            Dim nn = New cvb.Point(trainInput(index).X, trainInput(index).Y)
+            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
+            DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
+        Next
+
+        For Each pt In trainInput
+            Dim p1 = New cvb.Point(pt.X, pt.Y)
+            DrawCircle(dst2, p1, task.DotSize + 2, cvb.Scalar.Red)
+        Next
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            If task.heartBeat Then
+                queryInput.Clear()
+                trainInput.Clear()
+                random.Run(empty)
+                For Each pt In random.PointList
+                    If trainInput.Count < 10 Then
+                        trainInput.Add(pt)
+                    Else
+                        queryInput.Add(pt)
+                    End If
+                Next
+            End If
+        End If
+
+        knn.trainInput.Clear()
+        For Each pt In trainInput
+            knn.trainInput.Add(pt.X)
+            knn.trainInput.Add(pt.Y)
+            knn.trainInput.Add(pt.Z)
+        Next
+
+        knn.queryInput.Clear()
+        For Each pt In queryInput
+            knn.queryInput.Add(pt.X)
+            knn.queryInput.Add(pt.Y)
+            knn.queryInput.Add(pt.Z)
+        Next
+
+        knn.Run(empty)
+        displayResults()
+
+        labels(2) = "Top " + CStr(trainInput.Count) + " best matches. Red=TrainInput, yellow = queryInput"
+    End Sub
+End Class
+
+
+
+
+
+Public Class KNNorm_TestDim4 : Inherits TaskParent
+    Public knn As New KNNorm_Basics
+    Dim random As New Random_Basics4D
+    Public trainInput As New List(Of cvb.Vec4f)
+    Public queryInput As New List(Of cvb.Vec4f)
+    Public Sub New()
+        FindSlider("Random Pixel Count").Value = 20
+        FindSlider("KNN Dimension").Value = 4
+        desc = "Test KNNorm_Basics with random 4D points.  Find the nearest neighbors."
+    End Sub
+    Public Sub displayResults()
+        dst2.SetTo(0)
+        For i = 0 To queryInput.Count - 1
+            Dim pt = New cvb.Point(queryInput(i).Item(0), queryInput(i).Item(1))
+            Dim index = knn.result(i, 0)
+            Dim nn = New cvb.Point(trainInput(index).Item(0), trainInput(index).Item(1))
+            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
+            DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
+        Next
+
+        For Each pt In trainInput
+            Dim p1 = New cvb.Point(pt.Item(0), pt.Item(1))
+            DrawCircle(dst2, p1, task.DotSize + 2, cvb.Scalar.Red)
+        Next
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            If task.heartBeat Then
+                queryInput.Clear()
+                trainInput.Clear()
+                random.Run(empty)
+                For Each pt In random.PointList
+                    If trainInput.Count < 10 Then
+                        trainInput.Add(pt)
+                    Else
+                        queryInput.Add(pt)
+                    End If
+                Next
+            End If
+        End If
+
+        knn.trainInput.Clear()
+        For Each pt In trainInput
+            knn.trainInput.Add(pt.Item(0))
+            knn.trainInput.Add(pt.Item(1))
+            knn.trainInput.Add(pt.Item(2))
+            knn.trainInput.Add(pt.Item(3))
+        Next
+
+        knn.queryInput.Clear()
+        For Each pt In queryInput
+            knn.queryInput.Add(pt.Item(0))
+            knn.queryInput.Add(pt.Item(1))
+            knn.queryInput.Add(pt.Item(2))
+            knn.queryInput.Add(pt.Item(3))
+        Next
+
+        knn.Run(empty)
+        displayResults()
+
+        labels(2) = "Top " + CStr(trainInput.Count) + " best matches. Red=TrainInput, yellow = queryInput"
     End Sub
 End Class

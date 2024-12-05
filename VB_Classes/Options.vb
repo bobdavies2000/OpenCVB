@@ -4725,6 +4725,7 @@ Public Class Options_KNN : Inherits TaskParent
             check.addCheckBox("Use 'Outside' feature points (unchecked use 'Inside'")
             check.Box(0).Checked = True
             check.Box(1).Checked = True
+            check.Box(2).Checked = True
         End If
     End Sub
     Public Sub RunOpt()

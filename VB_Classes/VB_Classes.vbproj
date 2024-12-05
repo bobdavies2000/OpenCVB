@@ -118,6 +118,7 @@
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />
     <Compile Include="ImageOffset.vb" />
+    <Compile Include="KNN.vb" />
     <Compile Include="KNNorm.vb" />
     <Compile Include="Linear.vb" />
     <Compile Include="LineTrack.vb" />
@@ -352,7 +353,6 @@
     <Compile Include="Kalman.vb" />
     <Compile Include="KLT.vb" />
     <Compile Include="KMeans.vb" />
-    <Compile Include="KNN.vb" />
     <Compile Include="LaPlacian.vb" />
     <Compile Include="LUT.vb" />
     <Compile Include="Mat.vb" />
