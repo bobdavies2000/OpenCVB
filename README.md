@@ -1350,7 +1350,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   Features_LeftRight finds “good” features the left and right images.
 -   FeatureLess_Basics was added to the list of possible inputs to RedCloud.
     -   Each region without features is isolated and identified to RedCloud.
--   Cell_Generate reuses cell features for exact matches – less work, same result.
+-   Cell_GenerateOld reuses cell features for exact matches – less work, same result.
 -   Cells with motion are now identified providing another way to detect motion.
 -   A log of previous changes is included at the bottom of this document.
 

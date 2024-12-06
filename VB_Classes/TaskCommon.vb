@@ -511,12 +511,14 @@ Public Class rcData
     Public mask As cvb.Mat
     Public pixels As Integer
     Public floodPoint As cvb.Point
+    Public age As Integer
 
     Public color As New cvb.Vec3b
     Public naturalColor As New cvb.Vec3b
     Public naturalGray As Integer
     Public exactMatch As Boolean
-    Public pointMatch As Boolean
+    Public colorMatch As Boolean
+    Public colorTracking As cvb.Scalar
 
     Public depthPixels As Integer
     Public depthMask As cvb.Mat

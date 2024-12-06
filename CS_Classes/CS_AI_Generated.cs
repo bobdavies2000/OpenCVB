@@ -6549,10 +6549,10 @@ namespace CS_Classes
                             byte val = vbc.task.redMap.Get<byte>(rc.maxDStable.Y, rc.maxDStable.X);
                             if (val != rc.indexLast)
                                 rc.maxDStable = rc.maxDist; // maxDist has finally hit the edges of the cell.
-                            rc.pointMatch = true;
+                            rc.colorMatch = true;
                         }
                     }
-                    if (!rc.pointMatch && !rc.exactMatch)
+                    if (!rc.colorMatch && !rc.exactMatch)
                         rc.color = new cv.Vec3b((byte)msRNG.Next(40, 220), (byte)msRNG.Next(40, 220), (byte)msRNG.Next(40, 220));
                     if (usedColors.Contains(rc.color))
                         rc.color = vbc.task.vecColors[sortedCells.Count + 1];
@@ -21916,7 +21916,7 @@ namespace CS_Classes
     public class Flood_Basics_CS : TaskParent
     {
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
-        public Cell_Generate genCells = new Cell_Generate();
+        public Cell_GenerateOld genCells = new Cell_GenerateOld();
         Color8U_Basics color;
         public Flood_Basics_CS()
         {
@@ -22032,7 +22032,7 @@ namespace CS_Classes
     {
         public Mat binarizedImage;
         public Mat inputMask;
-        public Cell_Generate genCells = new Cell_Generate();
+        public Cell_GenerateOld genCells = new Cell_GenerateOld();
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public bool buildInputMask;
         public bool showSelected = true;
@@ -22264,7 +22264,7 @@ namespace CS_Classes
     {
         Boundary_RemovedRects bounds = new Boundary_RemovedRects();
         RedCloud_MaxDist_CPP_VB redCPP = new RedCloud_MaxDist_CPP_VB();
-        public Cell_Generate genCells = new Cell_Generate();
+        public Cell_GenerateOld genCells = new Cell_GenerateOld();
         Color8U_Basics cvt = new Color8U_Basics();
         public Flood_MaxDistPoints_CS()
         {
@@ -50805,7 +50805,7 @@ namespace CS_Classes
 
     public class RedCloud_Basics_CS : TaskParent
     {
-        public Cell_Generate genCells = new Cell_Generate();
+        public Cell_GenerateOld genCells = new Cell_GenerateOld();
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public Mat inputMask = new Mat();
         Color8U_Basics color;

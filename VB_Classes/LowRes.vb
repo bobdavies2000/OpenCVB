@@ -530,6 +530,9 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
         motionDetected = False
         If task.frameCount < 10 Then ' some of the grid configurations are not compatible between cameras.
             src.CopyTo(dst3)
+            motionRects.Clear()
+            motionRects.Add(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
+            motionDetected = True
         Else
             If motionRects.Count > 0 Then
                 For Each roi In motionRects

@@ -7,17 +7,27 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        dst3 = task.motionMask
         edges.Run(src)
-        dst2 = edges.dst2
-        If standaloneTest() Then
-            dst3 = src.Clone
-            dst3.SetTo(cvb.Scalar.Yellow, dst2)
-        End If
+        edges.dst2.CopyTo(dst2, task.motionMask)
     End Sub
 End Class
 
 
 
+
+Public Class FeatureLess_WithoutMotion : Inherits TaskParent
+    Dim edges As New EdgeDraw_Basics
+    Public classCount As Integer = 2
+    Public Sub New()
+        labels = {"", "", "EdgeDraw_Basics output", ""}
+        desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+    End Sub
+End Class
 
 
 
@@ -221,26 +231,6 @@ End Class
 
 
 
-
-Public Class FeatureLess_RedCloud : Inherits TaskParent
-    Public redC As New RedCloud_Basics
-    Dim fless As New FeatureLess_Basics
-    Public Sub New()
-        desc = "Floodfill the FeatureLess output so each cell can be tracked."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        fless.Run(src)
-        redC.Run(fless.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class FeatureLess_Groups : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP_VB
     Dim fless As New FeatureLess_Basics
@@ -257,5 +247,52 @@ Public Class FeatureLess_Groups : Inherits TaskParent
         classCount = redCPP.classCount
         dst3 = redCPP.dst2
         labels(3) = CStr(classCount) + " featureless regions were found."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class FeatureLess_RedCloud1 : Inherits TaskParent
+    Public redC As New RedCloud_Basics
+    Dim fless As New FeatureLess_WithoutMotion
+    Public Sub New()
+        desc = "Floodfill the FeatureLess output so each cell can be tracked."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fless.Run(src)
+        redC.Run(fless.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class FeatureLess_RedCloud : Inherits TaskParent
+    Public redC As New RedCloud_Basics
+    Dim fless As New FeatureLess_Basics
+    Public Sub New()
+        desc = "Floodfill the FeatureLess output so each cell can be tracked."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fless.Run(src)
+        redC.Run(fless.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        For Each rc In task.redCells
+            dst3(rc.rect).SetTo(rc.colorTracking, rc.mask)
+        Next
     End Sub
 End Class

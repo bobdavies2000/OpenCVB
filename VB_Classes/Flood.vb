@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Public Class Flood_Basics : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP_VB
-    Public genCells As New Cell_Generate
+    Public genCells As New Cell_GenerateOld
     Dim color As Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
@@ -121,7 +121,7 @@ End Class
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cvb.Mat
     Public inputMask As cvb.Mat
-    Public genCells As New Cell_Generate
+    Public genCells As New Cell_GenerateOld
     Dim redCPP As New RedCloud_CPP_VB
     Public buildInputMask As Boolean
     Public showSelected As Boolean = True
@@ -351,7 +351,7 @@ End Class
 Public Class Flood_MaxDistPoints : Inherits TaskParent
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP_VB
-    Public genCells As New Cell_Generate
+    Public genCells As New Cell_GenerateOld
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)

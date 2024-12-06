@@ -359,6 +359,145 @@ End Class
 
 
 
+Public Class Cell_GenerateOld : Inherits TaskParent
+    Public classCount As Integer
+    Public rectList As New List(Of cvb.Rect)
+    Public floodPoints As New List(Of cvb.Point)
+    Public removeContour As Boolean
+    Dim diffLeft As New Diff_Basics
+    Dim diffRight As New Diff_Basics
+    Public useLeftImage As Boolean = True
+    Dim bounds As Boundary_RemovedRects
+    Dim redCPP As RedCloud_CPP_VB
+    Public Sub New()
+        task.redMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.redCells = New List(Of rcData)
+        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            If bounds Is Nothing Then bounds = New Boundary_RemovedRects
+            bounds.Run(src)
+            task.redMap = bounds.bRects.bounds.dst2
+            src = task.redMap Or bounds.dst2
+            If task.FirstPass Then task.redMap.SetTo(0)
+
+            redCPP = bounds.bRects.bounds.redCPP
+
+            If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+            classCount = redCPP.classCount
+            rectList = redCPP.rectList
+            floodPoints = redCPP.floodPoints
+            removeContour = False
+            src = redCPP.dst2
+        End If
+
+        If useLeftImage Then diffLeft.Run(task.leftView) Else diffRight.Run(task.rightView)
+
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim usedColors As New List(Of cvb.Vec3b)({black})
+        Dim retained As Integer
+        Dim initList As New List(Of rcData)({New rcData})
+        For i = 1 To classCount - 1
+            Dim rc As New rcData
+            rc.rect = rectList(i - 1)
+            If rc.rect.Size = dst2.Size Then Continue For ' FeatureLess_RedCloud find a cell this big.  
+            rc.floodPoint = floodPoints(i - 1)
+            rc.mask = src(rc.rect).InRange(i, i)
+
+            If task.heartBeat Or rc.indexLast = 0 Or rc.indexLast >= task.redCells.Count Then
+                If useLeftImage Then
+                    cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+                Else
+                    cvb.Cv2.MeanStdDev(task.rightView(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+                End If
+            Else
+                rc.colorMean = task.redCells(rc.indexLast).colorMean
+            End If
+
+            rc.naturalColor = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            rc.naturalGray = CInt(rc.colorMean(2) * 0.299 + rc.colorMean(1) * 0.587 + rc.colorMean(0) * 0.114)
+            rc.colorTracking = New cvb.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+
+            rc.maxDist = GetMaxDist(rc)
+            rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If useLeftImage Then rc.motionPixels = diffLeft.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
+            If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
+                Dim lrc = task.redCells(rc.indexLast)
+                If (task.heartBeat = False Or task.FirstPass) And
+                    Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
+                    rc = lrc
+                    rc.exactMatch = True
+                    retained += 1
+                End If
+            End If
+            initList.Add(rc)
+        Next
+
+        For Each rc In initList
+            If rc.exactMatch = False Then
+                rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+                DrawContour(rc.mask, rc.contour, 255, -1)
+                If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
+
+                rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+                rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
+                If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
+                    Dim lrc = task.redCells(rc.indexLast)
+                    If Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And
+                        rc.motionPixels = 0 Then
+                        rc = lrc
+                        rc.exactMatch = True
+                    Else
+                        rc.color = lrc.color
+                        Dim stableCheck = task.redMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
+                        If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                        Dim val = task.redMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                        If val <> rc.indexLast Then rc.maxDStable = rc.maxDist ' maxDist has finally hit the edges of the cell.
+                        rc.colorMatch = True
+                    End If
+                End If
+
+                If rc.colorMatch = False And rc.exactMatch = False Then
+                    rc.color = New cvb.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
+                End If
+
+                If usedColors.Contains(rc.color) Then rc.color = task.vecColors(sortedCells.Count + 1)
+                usedColors.Add(rc.color)
+
+                rc.pixels = rc.mask.CountNonZero ' the number of pixels may have changed with the infill or contour.
+                If rc.pixels = 0 Then Continue For
+
+                rc.depthMask = rc.mask.Clone
+                rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+                rc.depthPixels = rc.depthMask.CountNonZero
+
+                If rc.depthPixels Then
+                    task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+
+                    cvb.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+                End If
+            End If
+
+            sortedCells.Add(rc.pixels, rc)
+        Next
+
+        task.redCells = New List(Of rcData)(sortedCells.Values)
+        dst2 = RebuildCells(sortedCells)
+
+        Static saveRetained As Integer = retained
+        If retained > 0 Then saveRetained = retained
+        If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " total cells with " + CStr(saveRetained) + " exact matches"
+    End Sub
+End Class
+
+
+
+
+
 Public Class Cell_Generate : Inherits TaskParent
     Public classCount As Integer
     Public rectList As New List(Of cvb.Rect)
@@ -417,13 +556,15 @@ Public Class Cell_Generate : Inherits TaskParent
 
             rc.naturalColor = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
             rc.naturalGray = CInt(rc.colorMean(2) * 0.299 + rc.colorMean(1) * 0.587 + rc.colorMean(0) * 0.114)
+            rc.colorTracking = New cvb.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
 
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If useLeftImage Then rc.motionPixels = diffLeft.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
-                If (task.heartBeat = False Or task.FirstPass) And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
+                If (task.heartBeat = False Or task.FirstPass) And
+                    Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
                     rc = lrc
                     rc.exactMatch = True
                     retained += 1
@@ -443,7 +584,8 @@ Public Class Cell_Generate : Inherits TaskParent
 
                 If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                     Dim lrc = task.redCells(rc.indexLast)
-                    If task.heartBeat = False And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
+                    If Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And
+                        rc.motionPixels = 0 Then
                         rc = lrc
                         rc.exactMatch = True
                     Else
@@ -452,11 +594,11 @@ Public Class Cell_Generate : Inherits TaskParent
                         If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
                         Dim val = task.redMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                         If val <> rc.indexLast Then rc.maxDStable = rc.maxDist ' maxDist has finally hit the edges of the cell.
-                        rc.pointMatch = True
+                        rc.colorMatch = True
                     End If
                 End If
 
-                If rc.pointMatch = False And rc.exactMatch = False Then
+                If rc.colorMatch = False And rc.exactMatch = False Then
                     rc.color = New cvb.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
                 End If
 

@@ -421,6 +421,7 @@ End Enum
 	If algorithmName = "Cell_Floodfill_CS" Then return new Cell_Floodfill_CS
 	If algorithmName = "Cell_Generate" Then return new Cell_Generate
 	If algorithmName = "Cell_Generate_CS" Then return new Cell_Generate_CS
+	If algorithmName = "Cell_GenerateOld" Then return new Cell_GenerateOld
 	If algorithmName = "Cell_PixelCountCompare" Then return new Cell_PixelCountCompare
 	If algorithmName = "Cell_PixelCountCompare_CS" Then return new Cell_PixelCountCompare_CS
 	If algorithmName = "Cell_Stable" Then return new Cell_Stable
@@ -1126,12 +1127,14 @@ End Enum
 	If algorithmName = "FeatureLess_LeftRight_CS" Then return new FeatureLess_LeftRight_CS
 	If algorithmName = "FeatureLess_RedCloud" Then return new FeatureLess_RedCloud
 	If algorithmName = "FeatureLess_RedCloud_CS" Then return new FeatureLess_RedCloud_CS
+	If algorithmName = "FeatureLess_RedCloud1" Then return new FeatureLess_RedCloud1
 	If algorithmName = "FeatureLess_Sobel" Then return new FeatureLess_Sobel
 	If algorithmName = "FeatureLess_Sobel_CS" Then return new FeatureLess_Sobel_CS
 	If algorithmName = "FeatureLess_Unique3Pixels" Then return new FeatureLess_Unique3Pixels
 	If algorithmName = "FeatureLess_Unique3Pixels_CS" Then return new FeatureLess_Unique3Pixels_CS
 	If algorithmName = "FeatureLess_UniquePixels" Then return new FeatureLess_UniquePixels
 	If algorithmName = "FeatureLess_UniquePixels_CS" Then return new FeatureLess_UniquePixels_CS
+	If algorithmName = "FeatureLess_WithoutMotion" Then return new FeatureLess_WithoutMotion
 	If algorithmName = "FeatureLine_Basics" Then return new FeatureLine_Basics
 	If algorithmName = "FeatureLine_Basics_CS" Then return new FeatureLine_Basics_CS
 	If algorithmName = "FeatureLine_DetailsAll" Then return new FeatureLine_DetailsAll
