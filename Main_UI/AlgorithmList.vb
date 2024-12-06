@@ -420,12 +420,8 @@ End Enum
 	If algorithmName = "Cell_Floodfill" Then return new Cell_Floodfill
 	If algorithmName = "Cell_Floodfill_CS" Then return new Cell_Floodfill_CS
 	If algorithmName = "Cell_Generate" Then return new Cell_Generate
-	If algorithmName = "Cell_Generate_CS" Then return new Cell_Generate_CS
-	If algorithmName = "Cell_GenerateOld" Then return new Cell_GenerateOld
 	If algorithmName = "Cell_PixelCountCompare" Then return new Cell_PixelCountCompare
 	If algorithmName = "Cell_PixelCountCompare_CS" Then return new Cell_PixelCountCompare_CS
-	If algorithmName = "Cell_Stable" Then return new Cell_Stable
-	If algorithmName = "Cell_Stable_CS" Then return new Cell_Stable_CS
 	If algorithmName = "Cell_ValidateColorCells" Then return new Cell_ValidateColorCells
 	If algorithmName = "Cell_ValidateColorCells_CS" Then return new Cell_ValidateColorCells_CS
 	If algorithmName = "CellularAutomata_All256" Then return new CellularAutomata_All256
@@ -462,8 +458,6 @@ End Enum
 	If algorithmName = "Cluster_Basics_CS" Then return new Cluster_Basics_CS
 	If algorithmName = "Cluster_Hulls" Then return new Cluster_Hulls
 	If algorithmName = "Cluster_Hulls_CS" Then return new Cluster_Hulls_CS
-	If algorithmName = "Cluster_RedCloud" Then return new Cluster_RedCloud
-	If algorithmName = "Cluster_RedCloud_CS" Then return new Cluster_RedCloud_CS
 	If algorithmName = "Coherence_Basics" Then return new Coherence_Basics
 	If algorithmName = "Coherence_Basics_CS" Then return new Coherence_Basics_CS
 	If algorithmName = "Coherence_Depth" Then return new Coherence_Depth
@@ -1229,8 +1223,6 @@ End Enum
 	If algorithmName = "Flood_CellStatsPlot_CS" Then return new Flood_CellStatsPlot_CS
 	If algorithmName = "Flood_ContainedCells" Then return new Flood_ContainedCells
 	If algorithmName = "Flood_ContainedCells_CS" Then return new Flood_ContainedCells_CS
-	If algorithmName = "Flood_LeftRight" Then return new Flood_LeftRight
-	If algorithmName = "Flood_LeftRight_CS" Then return new Flood_LeftRight_CS
 	If algorithmName = "Flood_MaxDistPoints" Then return new Flood_MaxDistPoints
 	If algorithmName = "Flood_MaxDistPoints_CS" Then return new Flood_MaxDistPoints_CS
 	If algorithmName = "Flood_Motion" Then return new Flood_Motion
@@ -1364,8 +1356,6 @@ End Enum
 	If algorithmName = "Gravity_BasicsOriginal_CS" Then return new Gravity_BasicsOriginal_CS
 	If algorithmName = "Gravity_Horizon" Then return new Gravity_Horizon
 	If algorithmName = "Gravity_HorizonCompare" Then return new Gravity_HorizonCompare
-	If algorithmName = "GrayToColor_Palette" Then return new GrayToColor_Palette
-	If algorithmName = "GrayToColor_Palette_CS" Then return new GrayToColor_Palette_CS
 	If algorithmName = "Grid_Basics" Then return new Grid_Basics
 	If algorithmName = "Grid_Basics_CC" Then return new CPP_Basics(ccFunctionNames._Grid_Basics_CC)
 	If algorithmName = "Grid_Basics_CS" Then return new Grid_Basics_CS
@@ -3218,8 +3208,6 @@ End Enum
 	If algorithmName = "RedCloud_JoinCells_CS" Then return new RedCloud_JoinCells_CS
 	If algorithmName = "RedCloud_KMeans" Then return new RedCloud_KMeans
 	If algorithmName = "RedCloud_KMeans_CS" Then return new RedCloud_KMeans_CS
-	If algorithmName = "RedCloud_LeftRight" Then return new RedCloud_LeftRight
-	If algorithmName = "RedCloud_LeftRight_CS" Then return new RedCloud_LeftRight_CS
 	If algorithmName = "RedCloud_LikelyFlatSurfaces" Then return new RedCloud_LikelyFlatSurfaces
 	If algorithmName = "RedCloud_LikelyFlatSurfaces_CS" Then return new RedCloud_LikelyFlatSurfaces_CS
 	If algorithmName = "RedCloud_MaxDist" Then return new RedCloud_MaxDist
@@ -3237,8 +3225,6 @@ End Enum
 	If algorithmName = "RedCloud_MotionCompare" Then return new RedCloud_MotionCompare
 	If algorithmName = "RedCloud_NaturalColor" Then return new RedCloud_NaturalColor
 	If algorithmName = "RedCloud_NaturalColor_CS" Then return new RedCloud_NaturalColor_CS
-	If algorithmName = "RedCloud_NaturalGray" Then return new RedCloud_NaturalGray
-	If algorithmName = "RedCloud_NaturalGray_CS" Then return new RedCloud_NaturalGray_CS
 	If algorithmName = "RedCloud_OnlyColorAlt" Then return new RedCloud_OnlyColorAlt
 	If algorithmName = "RedCloud_OnlyColorAlt_CS" Then return new RedCloud_OnlyColorAlt_CS
 	If algorithmName = "RedCloud_OnlyColorHist3D" Then return new RedCloud_OnlyColorHist3D

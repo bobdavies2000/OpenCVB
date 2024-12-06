@@ -112,31 +112,3 @@ Public Class Cluster_Hulls : Inherits TaskParent
         labels(3) = feat.labels(3)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Cluster_RedCloud : Inherits TaskParent
-    Dim cluster As New Cluster_Basics
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Cluster the center points of the RedCloud cells"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        cluster.ptInput.Clear()
-        Dim smallCellThreshold = src.Total / 1000
-        For Each rc In task.redCells
-            If rc.pixels < smallCellThreshold And rc.pixels > 0 Then Exit For
-            If rc.exactMatch Then cluster.ptInput.Add(rc.maxDist)
-        Next
-        cluster.Run(src)
-        dst3 = cluster.dst2
-        If task.heartBeat Then labels(3) = cluster.labels(2)
-    End Sub
-End Class

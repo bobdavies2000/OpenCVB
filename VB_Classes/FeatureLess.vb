@@ -281,7 +281,9 @@ End Class
 Public Class FeatureLess_RedCloud : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Dim fless As New FeatureLess_Basics
+    Dim stats As New Cell_Basics
     Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Floodfill the FeatureLess output so each cell can be tracked."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -290,9 +292,16 @@ Public Class FeatureLess_RedCloud : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
+        If standalone Then
+            stats.Run(src)
+            strOut = stats.strOut
+            SetTrueText(strOut, 1)
+        End If
+
         dst3.SetTo(0)
         For Each rc In task.redCells
             dst3(rc.rect).SetTo(rc.colorTracking, rc.mask)
+            If rc.index < 20 Then SetTrueText(CStr(rc.index) + " " + CStr(rc.age), rc.maxDist, 3)
         Next
     End Sub
 End Class

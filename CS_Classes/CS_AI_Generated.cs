@@ -6407,193 +6407,7 @@ namespace CS_Classes
 
 
 
-    public class Cell_Stable_CS : TaskParent
-    {
-        RedCloud_Basics redC = new RedCloud_Basics();
-        public Cell_Stable_CS()
-        {
-            labels[3] = "Below are cells that were not exact matches.";
-            desc = "Identify cells which were NOT present in the previous generation.";
-        }
-        public void RunAlg(Mat src)
-        {
-            redC.Run(src);
-            dst2 = redC.dst2;
-            labels[2] = redC.labels[2];
-            if (vbc.task.heartBeat)
-                return;
-            int retained = 0;
-            dst3.SetTo(0);
-            foreach (var rc in vbc.task.redCells)
-            {
-                if (rc.exactMatch)
-                    retained++;
-                else
-                    dst3[rc.rect].SetTo(rc.color, rc.mask);
-            }
-            labels[3] = (vbc.task.redCells.Count - retained).ToString() + " were not exact matches (shown below)";
-        }
-    }
-
-
-
-
-    public class Cell_Generate_CS : TaskParent
-    {
-        public int classCount;
-        public List<cv.Rect> rectList = new List<cv.Rect>();
-        public List<cv.Point> floodPoints = new List<cv.Point>();
-        public bool removeContour;
-        Diff_Basics diffLeft = new Diff_Basics();
-        Diff_Basics diffRight = new Diff_Basics();
-        public bool useLeftImage = true;
-        Boundary_RemovedRects bounds = new Boundary_RemovedRects();
-        RedCloud_CPP_VB redCPP;
-        int saveRetained = -1;
-        public Cell_Generate_CS()
-        {
-            vbc.task.redMap = new cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0));
-            vbc.task.redCells = new List<rcData>();
-            desc = "Generate the RedCloud cells from the rects, mask, and pixel counts.";
-        }
-        public void RunAlg(Mat src)
-        {
-            if (standalone)
-            {
-                bounds.Run(src);
-                vbc.task.redMap = bounds.bRects.bounds.dst2;
-                src = vbc.task.redMap.BitwiseOr(bounds.dst2);
-                if (vbc.task.FirstPass)
-                    vbc.task.redMap.SetTo(0);
-                redCPP = bounds.bRects.bounds.redCPP;
-                if (redCPP.classCount == 0)
-                    return; // no data to process.
-                classCount = redCPP.classCount;
-                rectList = redCPP.rectList;
-                floodPoints = redCPP.floodPoints;
-                removeContour = false;
-                src = redCPP.dst2;
-            }
-            if (useLeftImage)
-                diffLeft.Run(vbc.task.leftView);
-            else
-                diffRight.Run(vbc.task.rightView);
-            SortedList<int, rcData> sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
-            List<cv.Vec3b> usedColors = new List<cv.Vec3b> { black };
-            int retained = 0;
-            List<rcData> initList = new List<rcData> { new rcData() };
-            for (int i = 1; i < classCount; i++)
-            {
-                rcData rc = new rcData();
-                rc.rect = rectList[i - 1];
-                if (rc.rect.Width == dst2.Width && rc.rect.Height == dst2.Height)
-                    continue; // FeatureLess_RedCloud find a cell this big.  
-                rc.floodPoint = floodPoints[i - 1];
-                rc.mask = src[rc.rect].InRange(i, i);
-                if (vbc.task.heartBeat || rc.indexLast == 0 || rc.indexLast >= vbc.task.redCells.Count)
-                {
-                    if (useLeftImage)
-                        cv.Cv2.MeanStdDev(vbc.task.color[rc.rect], out rc.colorMean, out rc.colorStdev, rc.mask);
-                    else
-                        cv.Cv2.MeanStdDev(vbc.task.rightView[rc.rect], out rc.colorMean, out rc.colorStdev, rc.mask);
-                }
-                else
-                {
-                    rc.colorMean = vbc.task.redCells[rc.indexLast].colorMean;
-                }
-                rc.naturalColor = new cv.Vec3b((byte)rc.colorMean[0], (byte)rc.colorMean[1], (byte)rc.colorMean[2]);
-                rc.naturalGray = (int)(rc.colorMean[2] * 0.299 + rc.colorMean[1] * 0.587 + rc.colorMean[0] * 0.114);
-                rc.maxDist = GetMaxDist(ref rc);
-                rc.indexLast = vbc.task.redMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
-                if (useLeftImage)
-                    rc.motionPixels = diffLeft.dst2[rc.rect].CountNonZero();
-                else
-                    rc.motionPixels = diffRight.dst2[rc.rect].CountNonZero();
-                if (rc.indexLast > 0 && rc.indexLast < vbc.task.redCells.Count)
-                {
-                    var lrc = vbc.task.redCells[rc.indexLast];
-                    if ((!vbc.task.heartBeat || vbc.task.FirstPass) && Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 && rc.motionPixels == 0)
-                    {
-                        rc = lrc;
-                        rc.exactMatch = true;
-                        retained++;
-                    }
-                }
-                initList.Add(rc);
-            }
-            for (int i = 0; i < initList.Count; i++)
-            {
-                var rc = initList[i];
-                if (!rc.exactMatch)
-                {
-                    rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone); // .ApproxTC89L1
-                    DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
-                    if (removeContour)
-                        DrawContour(rc.mask, rc.contour, cv.Scalar.All(0), 2); // no overlap with neighbors.
-                    rc.maxDStable = rc.maxDist; // assume it has to use the latest.
-                    rc.indexLast = vbc.task.redMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
-                    if (rc.indexLast > 0 && rc.indexLast < vbc.task.redCells.Count)
-                    {
-                        var lrc = vbc.task.redCells[rc.indexLast];
-                        if (!vbc.task.heartBeat && Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 && rc.motionPixels == 0)
-                        {
-                            rc = lrc;
-                            rc.exactMatch = true;
-                        }
-                        else
-                        {
-                            rc.color = lrc.color;
-                            byte stableCheck = vbc.task.redMap.Get<byte>(lrc.maxDist.Y, lrc.maxDist.X);
-                            if (stableCheck == rc.indexLast)
-                                rc.maxDStable = lrc.maxDStable; // keep maxDStable if cell matched to previous
-                            byte val = vbc.task.redMap.Get<byte>(rc.maxDStable.Y, rc.maxDStable.X);
-                            if (val != rc.indexLast)
-                                rc.maxDStable = rc.maxDist; // maxDist has finally hit the edges of the cell.
-                            rc.colorMatch = true;
-                        }
-                    }
-                    if (!rc.colorMatch && !rc.exactMatch)
-                        rc.color = new cv.Vec3b((byte)msRNG.Next(40, 220), (byte)msRNG.Next(40, 220), (byte)msRNG.Next(40, 220));
-                    if (usedColors.Contains(rc.color))
-                        rc.color = vbc.task.vecColors[sortedCells.Count + 1];
-                    usedColors.Add(rc.color);
-                    rc.pixels = rc.mask.CountNonZero(); // the number of pixels may have changed with the infill or contour.
-                    if (rc.pixels == 0)
-                        continue;
-                    rc.depthMask = rc.mask.Clone();
-                    rc.depthMask.SetTo(0, new Mat(vbc.task.noDepthMask, rc.rect));
-                    rc.depthPixels = rc.depthMask.CountNonZero();
-                    if (rc.depthPixels != 0)
-                    {
-                        double minVal, maxVal;
-                        vbc.task.pcSplit[0][rc.rect].MinMaxLoc(out minVal, out maxVal, out rc.minLoc, out rc.maxLoc, rc.depthMask);
-                        rc.minVec.X = (float)minVal;
-                        rc.maxVec.X = (float)maxVal;
-                        vbc.task.pcSplit[1][rc.rect].MinMaxLoc(out minVal, out maxVal, out rc.minLoc, out rc.maxLoc, rc.depthMask);
-                        rc.minVec.Y = (float)minVal;
-                        rc.maxVec.Y = (float)maxVal;
-                        vbc.task.pcSplit[2][rc.rect].MinMaxLoc(out minVal, out maxVal, out rc.minLoc, out rc.maxLoc, rc.depthMask);
-                        rc.minVec.Z = (float)minVal;
-                        rc.maxVec.Z = (float)maxVal;
-                        cv.Cv2.MeanStdDev(vbc.task.pointCloud[rc.rect], out rc.depthMean, out rc.depthStdev, rc.depthMask);
-                    }
-                }
-                sortedCells.Add(rc.pixels, rc);
-            }
-            vbc.task.redCells = new List<rcData>(sortedCells.Values);
-            dst2 = RebuildCells(sortedCells);
-            if (saveRetained < 0) saveRetained = retained;
-            if (retained > 0)
-                saveRetained = retained;
-            if (vbc.task.heartBeat)
-                labels[2] = vbc.task.redCells.Count.ToString() + " total cells with " + saveRetained.ToString() + " exact matches";
-        }
-    }
     // http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-
-
-
-
     public class CellularAutomata_Life_CS : TaskParent
     {
         public int lastPopulation;
@@ -7407,32 +7221,6 @@ namespace CS_Classes
         }
     }
 
-
-    public class Cluster_RedCloud_CS : TaskParent
-    {
-        Cluster_Basics cluster = new Cluster_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
-        public Cluster_RedCloud_CS()
-        {
-            desc = "Cluster the center points of the RedCloud cells";
-        }
-        public void RunAlg(Mat src)
-        {
-            redC.Run(src);
-            dst2 = redC.dst2;
-            labels[2] = redC.labels[2];
-            cluster.ptInput.Clear();
-            var smallCellThreshold = src.Total() / 1000;
-            foreach (var rc in vbc.task.redCells)
-            {
-                if (rc.pixels < smallCellThreshold && rc.pixels > 0) break;
-                if (rc.exactMatch) cluster.ptInput.Add(rc.maxDist);
-            }
-            cluster.Run(src);
-            dst3 = cluster.dst2;
-            if (vbc.task.heartBeat) labels[3] = cluster.labels[2];
-        }
-    }
 
 
 
@@ -21916,7 +21704,7 @@ namespace CS_Classes
     public class Flood_Basics_CS : TaskParent
     {
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
-        public Cell_GenerateOld genCells = new Cell_GenerateOld();
+        public Cell_Generate genCells = new Cell_Generate();
         Color8U_Basics color;
         public Flood_Basics_CS()
         {
@@ -22032,7 +21820,7 @@ namespace CS_Classes
     {
         public Mat binarizedImage;
         public Mat inputMask;
-        public Cell_GenerateOld genCells = new Cell_GenerateOld();
+        public Cell_Generate genCells = new Cell_Generate();
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public bool buildInputMask;
         public bool showSelected = true;
@@ -22206,56 +21994,56 @@ namespace CS_Classes
 
 
 
-    public class Flood_LeftRight_CS : TaskParent
-    {
-        RedCloud_Basics redLeft = new RedCloud_Basics();
-        RedCloud_Basics redRight = new RedCloud_Basics();
-        public Mat mapLeft;
-        public Mat mapRight;
-        public List<rcData> cellsLeft = new List<rcData>();
-        public List<rcData> cellsRight = new List<rcData>();
-        public Flood_LeftRight_CS()
-        {
-            mapLeft = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            mapRight = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            vbc.task.redOptions.setIdentifyCells(false);
-            if (standalone) vbc.task.gOptions.setDisplay1();
-            desc = "Floodfill left and right images.";
-        }
-        public void RunAlg(Mat src)
-        {
-            vbc.task.redCells = new List<rcData>(cellsLeft);
-            vbc.task.redMap = mapLeft.Clone();
-            redLeft.genCells.useLeftImage = true;
-            redLeft.Run(vbc.task.leftView);
-            labels[2] = redLeft.labels[2];
-            dst2 = redLeft.dst2;
-            cellsLeft = new List<rcData>(vbc.task.redCells);
-            mapLeft = vbc.task.redMap.Clone();
-            vbc.task.redCells = new List<rcData>(cellsRight);
-            vbc.task.redMap = mapRight.Clone();
-            redRight.genCells.useLeftImage = false;
-            redRight.Run(vbc.task.rightView);
-            labels[3] = redRight.labels[2];
-            dst3 = redRight.dst2;
-            cellsRight = new List<rcData>(vbc.task.redCells);
-            mapRight = vbc.task.redMap.Clone();
-            if (vbc.task.redOptions.getIdentifyCells())
-            {
-                if (vbc.task.mousePicTag == 2)
-                {
-                    vbc.task.setSelectedContour(ref cellsLeft, ref mapLeft);
-                    vbc.task.color[vbc.task.rc.rect].SetTo(Scalar.White, vbc.task.rc.mask);
-                }
-                else
-                {
-                    vbc.task.setSelectedContour(ref cellsRight, ref mapRight);
-                    dst1 = vbc.task.rightView;
-                    dst1[vbc.task.rc.rect].SetTo(Scalar.White, vbc.task.rc.mask);
-                }
-            }
-        }
-    }
+    //public class Flood_LeftRight_CS : TaskParent
+    //{
+    //    RedCloud_Basics redLeft = new RedCloud_Basics();
+    //    RedCloud_Basics redRight = new RedCloud_Basics();
+    //    public Mat mapLeft;
+    //    public Mat mapRight;
+    //    public List<rcData> cellsLeft = new List<rcData>();
+    //    public List<rcData> cellsRight = new List<rcData>();
+    //    public Flood_LeftRight_CS()
+    //    {
+    //        mapLeft = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+    //        mapRight = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
+    //        vbc.task.redOptions.setIdentifyCells(false);
+    //        if (standalone) vbc.task.gOptions.setDisplay1();
+    //        desc = "Floodfill left and right images.";
+    //    }
+    //    public void RunAlg(Mat src)
+    //    {
+    //        vbc.task.redCells = new List<rcData>(cellsLeft);
+    //        vbc.task.redMap = mapLeft.Clone();
+    //        redLeft.genCells.useLeftImage = true;
+    //        redLeft.Run(vbc.task.leftView);
+    //        labels[2] = redLeft.labels[2];
+    //        dst2 = redLeft.dst2;
+    //        cellsLeft = new List<rcData>(vbc.task.redCells);
+    //        mapLeft = vbc.task.redMap.Clone();
+    //        vbc.task.redCells = new List<rcData>(cellsRight);
+    //        vbc.task.redMap = mapRight.Clone();
+    //        redRight.genCells.useLeftImage = false;
+    //        redRight.Run(vbc.task.rightView);
+    //        labels[3] = redRight.labels[2];
+    //        dst3 = redRight.dst2;
+    //        cellsRight = new List<rcData>(vbc.task.redCells);
+    //        mapRight = vbc.task.redMap.Clone();
+    //        if (vbc.task.redOptions.getIdentifyCells())
+    //        {
+    //            if (vbc.task.mousePicTag == 2)
+    //            {
+    //                vbc.task.setSelectedContour(ref cellsLeft, ref mapLeft);
+    //                vbc.task.color[vbc.task.rc.rect].SetTo(Scalar.White, vbc.task.rc.mask);
+    //            }
+    //            else
+    //            {
+    //                vbc.task.setSelectedContour(ref cellsRight, ref mapRight);
+    //                dst1 = vbc.task.rightView;
+    //                dst1[vbc.task.rc.rect].SetTo(Scalar.White, vbc.task.rc.mask);
+    //            }
+    //        }
+    //    }
+    //}
 
 
 
@@ -22264,7 +22052,7 @@ namespace CS_Classes
     {
         Boundary_RemovedRects bounds = new Boundary_RemovedRects();
         RedCloud_MaxDist_CPP_VB redCPP = new RedCloud_MaxDist_CPP_VB();
-        public Cell_GenerateOld genCells = new Cell_GenerateOld();
+        public Cell_Generate genCells = new Cell_Generate();
         Color8U_Basics cvt = new Color8U_Basics();
         public Flood_MaxDistPoints_CS()
         {
@@ -23719,46 +23507,6 @@ namespace CS_Classes
         }
     }
 
-
-
-
-    public class GrayToColor_Palette_CS : TaskParent
-    {
-        Flood_Basics flood = new Flood_Basics();
-        public GrayToColor_Palette_CS()
-        {
-            labels = new string[] { "", "Right View", "", "Grayscale left view after palette applied." };
-            if (standalone) vbc.task.gOptions.setDisplay1();
-            desc = "Identify the main colors in an image using RedCloud";
-        }
-        public void RunAlg(Mat src)
-        {
-            flood.Run(src);
-            dst2 = flood.dst2;
-            labels[2] = flood.labels[2];
-            byte[] indices = new byte[256];
-            Vec3b[] colors = new Vec3b[256];
-            SortedList<int, Vec3b> sorted = new SortedList<int, Vec3b>(new CompareAllowIdenticalInteger());
-            foreach (var rc in vbc.task.redCells)
-            {
-                int index = rc.naturalGray;
-                if (index == 0) continue;
-                colors[index] = rc.naturalColor;
-                indices[index] = (byte)index;
-                sorted.Add(index, rc.naturalColor);
-            }
-            int firstIndex = sorted.Keys[0];
-            Vec3b lastColor = colors[firstIndex];
-            for (int i = 0; i < colors.Length; i++)
-            {
-                if (indices[i] == 0) colors[i] = lastColor;
-                else lastColor = colors[i];
-            }
-            dst1 = vbc.task.rightView;
-            Mat colorMap = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC3, colors);
-            Cv2.ApplyColorMap(vbc.task.leftView, dst3, colorMap);
-        }
-    }
 
 
 
@@ -50805,7 +50553,7 @@ namespace CS_Classes
 
     public class RedCloud_Basics_CS : TaskParent
     {
-        public Cell_GenerateOld genCells = new Cell_GenerateOld();
+        public Cell_Generate genCells = new Cell_Generate();
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public Mat inputMask = new Mat();
         Color8U_Basics color;
@@ -52976,27 +52724,6 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_LeftRight_CS : TaskParent
-    {
-        Flood_LeftRight redC = new Flood_LeftRight();
-        public RedCloud_LeftRight_CS()
-        {
-            if (standalone) vbc.task.gOptions.setDisplay1();
-            desc = "Placeholder to make it easier to find where left and right images are floodfilled.";
-        }
-        public void RunAlg(Mat src)
-        {
-            redC.Run(src);
-            dst1 = redC.dst1;
-            dst2 = redC.dst2;
-            dst3 = redC.dst3;
-            labels = redC.labels;
-        }
-    }
-
-
-
-
     public class RedCloud_ColorAndDepth_CS : TaskParent
     {
         Flood_Basics flood = new Flood_Basics();
@@ -53247,33 +52974,6 @@ namespace CS_Classes
             dst2 = dst2 * 255 / (mm.maxVal - mm.minVal);
             dst2.ConvertTo(dst2, MatType.CV_8U);
             labels[2] = "Reduced Pointcloud - reduction factor = " + options.reduceAmt.ToString() + " produced " + classCount.ToString() + " regions";
-        }
-    }
-
-
-
-
-    public class RedCloud_NaturalGray_CS : TaskParent
-    {
-        RedCloud_Consistent redC = new RedCloud_Consistent();
-        Options_RedCloudOther options = new Options_RedCloudOther();
-        public RedCloud_NaturalGray_CS()
-        {
-            desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta";
-        }
-        public void RunAlg(Mat src)
-        {
-            options.RunOpt();
-            redC.Run(src);
-            dst2 = redC.dst2;
-            labels[2] = redC.labels[2];
-            var rc = vbc.task.rc;
-            var val = (int)(0.299 * rc.colorMean[0] + 0.587 * rc.colorMean[1] + 0.114 * rc.colorMean[2]);
-            dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            dst0 = dst1.InRange(val - options.range, val + options.range);
-            var color = new Vec3b((byte)rc.colorMean[0], (byte)rc.colorMean[1], (byte)rc.colorMean[2]);
-            dst3.SetTo(0);
-            dst3.SetTo(Scalar.White, dst0);
         }
     }
 

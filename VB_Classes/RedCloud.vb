@@ -2208,28 +2208,6 @@ End Class
 
 
 
-
-
-Public Class RedCloud_LeftRight : Inherits TaskParent
-    Dim redC As New Flood_LeftRight
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        desc = "Placeholder to make it easier to find where left and right images are floodfilled."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst1 = redC.dst1
-        dst2 = redC.dst2
-        dst3 = redC.dst3
-        labels = redC.labels
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedCloud_ColorAndDepth : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim floodPC As New Flood_Basics
@@ -2433,40 +2411,6 @@ Public Class RedCloud_MaxDist_CPP_VB : Inherits TaskParent
         If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class RedCloud_NaturalGray : Inherits TaskParent
-    Dim redC As New RedCloud_Consistent
-    Dim options As New Options_RedCloudOther
-    Public Sub New()
-        desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        Dim rc = task.rc
-        Dim val = CInt(0.299 * rc.colorMean(0) + 0.587 * rc.colorMean(1) + 0.114 * rc.colorMean(2))
-
-        dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        dst0 = dst1.InRange(val - options.range, val + options.range)
-
-        Dim color = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
-        dst3.SetTo(0)
-        dst3.SetTo(white, dst0)
-    End Sub
-End Class
-
 
 
 

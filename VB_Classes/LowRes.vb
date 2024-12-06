@@ -528,7 +528,7 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
         Next
 
         motionDetected = False
-        If task.frameCount < 10 Then ' some of the grid configurations are not compatible between cameras.
+        If task.frameCount < 3 Then ' some of the grid configurations are not compatible between cameras.
             src.CopyTo(dst3)
             motionRects.Clear()
             motionRects.Add(New cvb.Rect(0, 0, dst2.Width, dst2.Height))

@@ -515,10 +515,9 @@ Public Class rcData
 
     Public color As New cvb.Vec3b
     Public naturalColor As New cvb.Vec3b
-    Public naturalGray As Integer
-    Public exactMatch As Boolean
-    Public colorMatch As Boolean
     Public colorTracking As cvb.Scalar
+
+    Public matched As Boolean
 
     Public depthPixels As Integer
     Public depthMask As cvb.Mat

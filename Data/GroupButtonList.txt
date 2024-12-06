@@ -98,7 +98,6 @@ Gif
 GrabCut
 Gradient
 Gravity
-GrayToColor
 Grid
 Guess
 GuidedBP

@@ -143,7 +143,6 @@
     <Compile Include="Duster.vb" />
     <Compile Include="FeatureLine.vb" />
     <Compile Include="Gravity.vb" />
-    <Compile Include="GrayToColor.vb" />
     <Compile Include="Horizon.vb" />
     <Compile Include="LinearRegression.vb" />
     <Compile Include="LineCoin.vb" />

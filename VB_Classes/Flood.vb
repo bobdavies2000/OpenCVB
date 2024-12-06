@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Public Class Flood_Basics : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP_VB
-    Public genCells As New Cell_GenerateOld
+    Public genCells As New Cell_Generate
     Dim color As Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
@@ -121,7 +121,7 @@ End Class
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cvb.Mat
     Public inputMask As cvb.Mat
-    Public genCells As New Cell_GenerateOld
+    Public genCells As New Cell_Generate
     Dim redCPP As New RedCloud_CPP_VB
     Public buildInputMask As Boolean
     Public showSelected As Boolean = True
@@ -292,55 +292,55 @@ End Class
 
 
 
-Public Class Flood_LeftRight : Inherits TaskParent
-    Dim redLeft As New RedCloud_Basics
-    Dim redRight As New RedCloud_Basics
-    Public mapLeft As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-    Public mapRight As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-    Public cellsLeft As New List(Of rcData)
-    Public cellsRight As New List(Of rcData)
-    Public Sub New()
-        task.redOptions.setIdentifyCells(False)
-        If standalone Then task.gOptions.setDisplay1()
-        desc = "Floodfill left and right images."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        task.redCells = New List(Of rcData)(cellsLeft)
-        task.redMap = mapLeft.Clone
+'Public Class Flood_LeftRight : Inherits TaskParent
+'    Dim redLeft As New RedCloud_Basics
+'    Dim redRight As New RedCloud_Basics
+'    Public mapLeft As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+'    Public mapRight As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+'    Public cellsLeft As New List(Of rcData)
+'    Public cellsRight As New List(Of rcData)
+'    Public Sub New()
+'        task.redOptions.setIdentifyCells(False)
+'        If standalone Then task.gOptions.setDisplay1()
+'        desc = "Floodfill left and right images."
+'    End Sub
+'    Public Sub RunAlg(src As cvb.Mat)
+'        task.redCells = New List(Of rcData)(cellsLeft)
+'        task.redMap = mapLeft.Clone
 
-        redLeft.genCells.useLeftImage = True
-        redLeft.Run(task.leftView)
-        labels(2) = redLeft.labels(2)
+'        redLeft.genCells.useLeftImage = True
+'        redLeft.Run(task.leftView)
+'        labels(2) = redLeft.labels(2)
 
-        dst2 = redLeft.dst2
+'        dst2 = redLeft.dst2
 
-        cellsLeft = New List(Of rcData)(task.redCells)
-        mapLeft = task.redMap.Clone
+'        cellsLeft = New List(Of rcData)(task.redCells)
+'        mapLeft = task.redMap.Clone
 
-        task.redCells = New List(Of rcData)(cellsRight)
-        task.redMap = mapRight.Clone
+'        task.redCells = New List(Of rcData)(cellsRight)
+'        task.redMap = mapRight.Clone
 
-        redRight.genCells.useLeftImage = False
-        redRight.Run(task.rightView)
-        labels(3) = redRight.labels(2)
+'        redRight.genCells.useLeftImage = False
+'        redRight.Run(task.rightView)
+'        labels(3) = redRight.labels(2)
 
-        dst3 = redRight.dst2
+'        dst3 = redRight.dst2
 
-        cellsRight = New List(Of rcData)(task.redCells)
-        mapRight = task.redMap.Clone
+'        cellsRight = New List(Of rcData)(task.redCells)
+'        mapRight = task.redMap.Clone
 
-        If task.redOptions.IdentifyCells.Checked Then
-            If task.mousePicTag = 2 Then
-                task.setSelectedContour(cellsLeft, mapLeft)
-                task.color(task.rc.rect).SetTo(white, task.rc.mask)
-            Else
-                task.setSelectedContour(cellsRight, mapRight)
-                dst1 = task.rightView
-                dst1(task.rc.rect).SetTo(white, task.rc.mask)
-            End If
-        End If
-    End Sub
-End Class
+'        If task.redOptions.IdentifyCells.Checked Then
+'            If task.mousePicTag = 2 Then
+'                task.setSelectedContour(cellsLeft, mapLeft)
+'                task.color(task.rc.rect).SetTo(white, task.rc.mask)
+'            Else
+'                task.setSelectedContour(cellsRight, mapRight)
+'                dst1 = task.rightView
+'                dst1(task.rc.rect).SetTo(white, task.rc.mask)
+'            End If
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -351,7 +351,7 @@ End Class
 Public Class Flood_MaxDistPoints : Inherits TaskParent
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP_VB
-    Public genCells As New Cell_GenerateOld
+    Public genCells As New Cell_Generate
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
