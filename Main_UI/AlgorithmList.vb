@@ -1020,6 +1020,7 @@ End Enum
 	If algorithmName = "FCS_InfoTest" Then return new FCS_InfoTest
 	If algorithmName = "FCS_KNNfeatures" Then return new FCS_KNNfeatures
 	If algorithmName = "FCS_Lines" Then return new FCS_Lines
+	If algorithmName = "FCS_Lines1" Then return new FCS_Lines1
 	If algorithmName = "FCS_Motion" Then return new FCS_Motion
 	If algorithmName = "FCS_MotionDirection" Then return new FCS_MotionDirection
 	If algorithmName = "FCS_Neighbors" Then return new FCS_Neighbors
