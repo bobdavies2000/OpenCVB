@@ -1843,13 +1843,12 @@ End Enum
 	If algorithmName = "KNN_N4Basics" Then return new KNN_N4Basics
 	If algorithmName = "KNN_N4BasicsTest" Then return new KNN_N4BasicsTest
 	If algorithmName = "KNN_NNBasics" Then return new KNN_NNBasics
-	If algorithmName = "KNN_NNBasicsNormalized" Then return new KNN_NNBasicsNormalized
 	If algorithmName = "KNN_NNBasicsTest" Then return new KNN_NNBasicsTest
 	If algorithmName = "KNN_NNearest" Then return new KNN_NNearest
-	If algorithmName = "KNN_NoDups" Then return new KNN_NoDups
 	If algorithmName = "KNN_NoDups_CC" Then return new CPP_Basics(ccFunctionNames._KNN_NoDups_CC)
 	If algorithmName = "KNN_NoDups_CS" Then return new KNN_NoDups_CS
 	If algorithmName = "KNN_NoDupsOld_CS" Then return new KNN_NoDupsOld_CS
+	If algorithmName = "KNN_OneToOne" Then return new KNN_OneToOne
 	If algorithmName = "KNN_TrackEach" Then return new KNN_TrackEach
 	If algorithmName = "KNN_TrackEach_CS" Then return new KNN_TrackEach_CS
 	If algorithmName = "KNN_TrackMean" Then return new KNN_TrackMean

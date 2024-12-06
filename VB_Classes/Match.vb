@@ -606,7 +606,7 @@ End Class
 
 
 Public Class Match_GoodFeatureKNN : Inherits TaskParent
-    Public knn As New KNN_NoDups
+    Public knn As New KNN_OneToOne
     Public feat As New Feature_Stable
     Dim frameList As New List(Of cvb.Mat)
     Public Sub New()

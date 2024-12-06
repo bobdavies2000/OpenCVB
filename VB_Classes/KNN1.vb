@@ -57,6 +57,8 @@ Public Class KNN_N2Basics : Inherits TaskParent
         Dim KNNdimension = 2
 
         If standalone Then
+
+
             If task.heartBeat Then
                 random.Run(empty)
                 trainInput = New List(Of cvb.Point2f)(random.PointList)
@@ -401,7 +403,7 @@ End Class
 
 Public Class KNN_TrackMean : Inherits TaskParent
     Dim plot As New Plot_Histogram
-    Dim knn As New KNN_NoDups
+    Dim knn As New KNN_OneToOne
     Dim feat As New Feature_Stable
     Const maxDistance As Integer = 50
     Public shiftX As Single
@@ -677,102 +679,8 @@ End Class
 
 
 
-Public Class KNN_NoDups : Inherits TaskParent
-    Public matches As New List(Of PointPair)
-    Public noMatch As New List(Of cvb.Point)
-    Public knn As New KNN_Basics
-    Public queries As New List(Of cvb.Point2f)
-    Dim random As New Random_Basics
-    Public Sub New()
-        labels(2) = "KNN_Basics output with many-to-one results"
-        labels(3) = "KNN_NoDupsOld output with just the closest match.  Red = training data, yellow = queries."
-        desc = "Map points 1:1 with losses.  When duplicates are found, toss the farthest.  Too hard to follow.  Trying a better approach."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then
-            If task.heartBeat Then
-                random.Run(empty)
-                knn.trainInput = New List(Of cvb.Point2f)(random.PointList)
-            End If
-            random.Run(empty)
-            queries = New List(Of cvb.Point2f)(random.PointList)
-        End If
-
-        If queries.Count = 0 Then
-            SetTrueText("Place some input points in queries before starting the knn run.")
-            Exit Sub
-        End If
-
-        knn.queries = queries
-        knn.Run(empty)
-        knn.knn2.displayResults()
-        dst2 = knn.dst2
-
-        Dim nearest As New List(Of Integer)
-        ' map the points 1 to 1: find duplicates, choose which is better.
-        ' loser must relinquish the training data element
-        Dim sortedResults As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-        For i = 0 To queries.Count - 1
-            nearest.Add(knn.result(i, 0))
-            sortedResults.Add(knn.result(i, 0), i)
-        Next
-
-        For i = 0 To sortedResults.Count - 2 ' we are comparing each element to the next
-            Dim resultA = sortedResults.ElementAt(i).Key
-            Dim resultB = sortedResults.ElementAt(i + 1).Key
-            If resultA = resultB Then
-                Dim nn = knn.trainInput(resultA)
-                Dim queryA = sortedResults.ElementAt(i).Value
-                For j = i + 1 To sortedResults.Count - 1
-                    resultB = sortedResults.ElementAt(j).Key
-                    If resultA <> resultB Then Exit For
-                    Dim queryB = sortedResults.ElementAt(j).Value
-                    Dim p1 = queries(queryA)
-                    Dim p2 = queries(queryB)
-                    Dim distance1 = Math.Sqrt((p1.X - nn.X) * (p1.X - nn.X) + (p1.Y - nn.Y) * (p1.Y - nn.Y))
-                    Dim distance2 = Math.Sqrt((p2.X - nn.X) * (p2.X - nn.X) + (p2.Y - nn.Y) * (p2.Y - nn.Y))
-                    If distance1 < distance2 Then
-                        nearest(queryB) = -1
-                    Else
-                        nearest(queryA) = -1
-                        queryA = queryB
-                    End If
-                Next
-            End If
-        Next
-
-        dst3.SetTo(0)
-        For Each pt In knn.trainInput
-            DrawCircle(dst3, pt, task.DotSize + 4, cvb.Scalar.Red)
-        Next
-
-        noMatch.Clear()
-        matches.Clear()
-        For i = 0 To queries.Count - 1
-            Dim pt = queries(i)
-            DrawCircle(dst3, pt, task.DotSize + 4, cvb.Scalar.Yellow)
-            If nearest(i) = -1 Then
-                noMatch.Add(pt)
-            Else
-                If nearest(i) < knn.trainInput.Count Then ' there seems like a boundary condition when there is only 1 traininput...
-                    Dim nn = knn.trainInput(nearest(i))
-                    matches.Add(New PointPair(pt, nn))
-                    DrawLine(dst3, nn, pt, white)
-                End If
-            End If
-        Next
-        If standaloneTest() = False Then knn.trainInput = New List(Of cvb.Point2f)(queries)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class KNN_TrackEach : Inherits TaskParent
-    Dim knn As New KNN_NoDups
+    Dim knn As New KNN_OneToOne
     Dim feat As New Feature_Stable
     Dim trackAll As New List(Of List(Of PointPair))
     Public Sub New()
@@ -1136,59 +1044,6 @@ End Class
 
 
 
-Public Class KNN_NNBasicsNormalized : Inherits TaskParent
-    Public knn As cvb.ML.KNearest
-    Public queries As New List(Of Single)
-    Public trainInput As New List(Of Single)
-    Public trainData As cvb.Mat
-    Public queryData As cvb.Mat
-    Public result(,) As Integer ' Get results here...
-    Public options As New Options_KNN
-    Public Sub New()
-        knn = cvb.ML.KNearest.Create()
-        desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
-        If standaloneTest() Then
-            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
-            Exit Sub
-        End If
-
-        Dim qRows = CInt(queries.Count / options.knnDimension)
-        If qRows = 0 Then
-            SetTrueText("There were no queries provided.  There is nothing to do...")
-            Exit Sub
-        End If
-
-        queryData = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
-        Dim queryMat As cvb.Mat = queryData.Clone
-        ' cvb.Cv2.Normalize(queryData, queryMat, 0, 1, cvb.NormTypes.L2)
-        Dim tRows = CInt(trainInput.Count / options.knnDimension)
-        trainData = cvb.Mat.FromPixelData(tRows, options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray())
-
-        Dim response As cvb.Mat = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
-                                  Enumerable.Range(start:=0, trainData.Rows).ToArray)
-
-        knn.Train(trainData, cvb.ML.SampleTypes.RowSample, response)
-        Dim neighbors As New cvb.Mat
-        knn.FindNearest(queryMat, trainData.Rows, New cvb.Mat, neighbors)
-
-        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
-        For i = 0 To neighbors.Rows - 1
-            For j = 0 To neighbors.Cols - 1
-                Dim test = neighbors.Get(Of Single)(i, j)
-                If test < trainData.Rows And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class KNN_NNearest : Inherits TaskParent
@@ -1220,7 +1075,6 @@ Public Class KNN_NNearest : Inherits TaskParent
 
         queryData = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queries.ToArray)
         Dim queryMat As cvb.Mat = queryData.Clone
-        'cvb.Cv2.Normalize(queryData, queryMat, 0, 1, cvb.NormTypes.L2)
 
         Dim tRows = CInt(trainInput.Count / options.knnDimension)
         trainData = cvb.Mat.FromPixelData(tRows, options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray())
@@ -1239,5 +1093,97 @@ Public Class KNN_NNearest : Inherits TaskParent
                 If test < trainData.Rows And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
             Next
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_OneToOne : Inherits TaskParent
+    Public matches As New List(Of PointPair)
+    Public noMatch As New List(Of cvb.Point)
+    Public knn As New KNN_Basics
+    Public queries As New List(Of cvb.Point2f)
+    Dim random As New Random_Basics
+    Public Sub New()
+        labels(2) = "KNN_OneToOne output with just the closest match.  Red = training data, yellow = queries."
+        desc = "Map points 1:1 with losses.  When duplicates are found, keep the nearest."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standaloneTest() Then
+            If task.heartBeat Then
+                random.Run(empty)
+                knn.trainInput = New List(Of cvb.Point2f)(random.PointList)
+                random.Run(empty)
+                queries = New List(Of cvb.Point2f)(random.PointList)
+            End If
+        End If
+
+        If queries.Count = 0 Then
+            SetTrueText("Place some input points in queries before starting the knn run.")
+            Exit Sub
+        End If
+
+        knn.queries = queries
+        knn.Run(empty)
+        'knn.knn2.displayResults()
+        'dst2 = knn.dst2
+
+        Dim nearest As New List(Of Integer)
+        ' map the points 1 to 1: find duplicates, choose which is better.
+        ' loser must relinquish the training data element
+        Dim sortedResults As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+        For i = 0 To queries.Count - 1
+            nearest.Add(knn.result(i, 0))
+            sortedResults.Add(knn.result(i, 0), i)
+        Next
+
+        For i = 0 To sortedResults.Count - 2 ' we are comparing each element to the next
+            Dim resultA = sortedResults.ElementAt(i).Key
+            Dim resultB = sortedResults.ElementAt(i + 1).Key
+            If resultA = resultB Then
+                Dim nn = knn.trainInput(resultA)
+                Dim queryA = sortedResults.ElementAt(i).Value
+                For j = i + 1 To sortedResults.Count - 1
+                    resultB = sortedResults.ElementAt(j).Key
+                    If resultA <> resultB Then Exit For
+                    Dim queryB = sortedResults.ElementAt(j).Value
+                    Dim p1 = queries(queryA)
+                    Dim p2 = queries(queryB)
+                    Dim distance1 = Math.Sqrt((p1.X - nn.X) * (p1.X - nn.X) + (p1.Y - nn.Y) * (p1.Y - nn.Y))
+                    Dim distance2 = Math.Sqrt((p2.X - nn.X) * (p2.X - nn.X) + (p2.Y - nn.Y) * (p2.Y - nn.Y))
+                    If distance1 < distance2 Then
+                        nearest(queryB) = -1
+                    Else
+                        nearest(queryA) = -1
+                        queryA = queryB
+                    End If
+                Next
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each pt In knn.trainInput
+            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Red)
+        Next
+
+        noMatch.Clear()
+        matches.Clear()
+        For i = 0 To queries.Count - 1
+            Dim pt = queries(i)
+            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
+            If nearest(i) = -1 Then
+                noMatch.Add(pt)
+            Else
+                If nearest(i) < knn.trainInput.Count Then ' there seems like a boundary condition when there is only 1 traininput...
+                    Dim nn = knn.trainInput(nearest(i))
+                    matches.Add(New PointPair(pt, nn))
+                    DrawLine(dst2, nn, pt, white)
+                End If
+            End If
+        Next
+        If standaloneTest() = False Then knn.trainInput = New List(Of cvb.Point2f)(queries)
     End Sub
 End Class

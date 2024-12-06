@@ -10973,7 +10973,7 @@ namespace CS_Classes
     {
         public List<cv.Point2f> inputPoints;
         public Delaunay_Basics facet = new Delaunay_Basics();
-        KNN_NoDups knn = new KNN_NoDups();
+        KNN_OneToOne knn = new KNN_OneToOne();
         Random_Basics random = new Random_Basics();
 
         public Delaunay_Generations_CS()
@@ -32599,7 +32599,7 @@ namespace CS_Classes
     public class KNN_TrackMean_CS : TaskParent
     {
         Plot_Histogram plot = new Plot_Histogram();
-        KNN_NoDups knn = new KNN_NoDups();
+        KNN_OneToOne knn = new KNN_OneToOne();
         Feature_Stable feat = new Feature_Stable();
         const int maxDistance = 50;
         public float shiftX;
@@ -33020,7 +33020,7 @@ namespace CS_Classes
 
     public class KNN_TrackEach_CS : TaskParent
     {
-        KNN_NoDups knn = new KNN_NoDups();
+        KNN_OneToOne knn = new KNN_OneToOne();
         Feature_Stable feat = new Feature_Stable();
         List<List<PointPair>> trackAll = new List<List<PointPair>>();
         public KNN_TrackEach_CS()
@@ -37085,7 +37085,7 @@ namespace CS_Classes
 
     public class Match_GoodFeatureKNN_CS : TaskParent
     {
-        public KNN_NoDups knn = new KNN_NoDups();
+        public KNN_OneToOne knn = new KNN_OneToOne();
         public Feature_Stable feat = new Feature_Stable();
         List<Mat> frameList = new List<Mat>();
         Options_Match options = new Options_Match();

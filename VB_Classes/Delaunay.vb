@@ -256,7 +256,7 @@ End Class
 Public Class Delaunay_Generations : Inherits TaskParent
     Public inputPoints As New List(Of cvb.Point2f)
     Public facet As New Delaunay_Basics
-    Dim knn As New KNN_NoDups
+    Dim knn As New KNN_OneToOne
     Dim random As New Random_Basics
     Public Sub New()
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32S, 0)
