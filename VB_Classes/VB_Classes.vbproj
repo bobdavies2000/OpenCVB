@@ -118,7 +118,7 @@
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />
     <Compile Include="ImageOffset.vb" />
-    <Compile Include="KNN1.vb" />
+    <Compile Include="KNN.vb" />
     <Compile Include="KNNorm.vb" />
     <Compile Include="Linear.vb" />
     <Compile Include="LineTrack.vb" />

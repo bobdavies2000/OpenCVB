@@ -1109,7 +1109,7 @@ Public Class KNN_OneToOne : Inherits TaskParent
     Dim random As New Random_Basics
     Public Sub New()
         labels(2) = "KNN_OneToOne output with just the closest match.  Red = training data, yellow = queries."
-        desc = "Map points 1:1 with losses.  When duplicates are found, keep the nearest."
+        desc = "Map points 1:1 with neighbor.  Keep only the nearest."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
