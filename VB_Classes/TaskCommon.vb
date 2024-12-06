@@ -257,7 +257,7 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
     Public xIntercept As Single
     Public rect As cvb.Rect
     Public length As Single
-    Public xp1 As cvb.Point2f
+    Public xp1 As cvb.Point2f ' intercept points at the edges of the image.
     Public xp2 As cvb.Point2f
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
         p1 = _p1
@@ -319,6 +319,23 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
         p1 = New cvb.Point2f()
         p2 = New cvb.Point2f()
     End Sub
+    Public Function perpendicularPoints(pt As cvb.Point2f, distance As Integer) As (cvb.Point2f, cvb.Point2f)
+        Dim perpSlope = -1 / slope
+        Dim angleRadians As Double = Math.Atan(perpSlope)
+        Dim xShift = distance * Math.Cos(angleRadians)
+        Dim yShift = distance * Math.Sin(angleRadians)
+        Dim p1 = New cvb.Point2f(pt.X + xShift, pt.Y + yShift)
+        Dim p2 = New cvb.Point2f(pt.X - xShift, pt.Y - yShift)
+        If p1.X < 0 Then p1.X = 0
+        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
+        If p1.Y < 0 Then p1.Y = 0
+        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
+        If p2.X < 0 Then p2.X = 0
+        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
+        If p2.Y < 0 Then p2.Y = 0
+        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
+        Return (p1, p2)
+    End Function
     Public Function compare(mp As PointPair) As Boolean
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False

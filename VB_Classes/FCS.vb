@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp
+﻿Imports System.Web.UI
+Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim delaunay As New FCS_Delaunay
@@ -1175,31 +1176,42 @@ Public Class FCS_Lines : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
         fcs.buildFeatures = False
-        labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
+        FindSlider("Min Line Length").Value = 60
+        FindSlider("Distance to next center").Value = 1
+        labels(3) = "Cell boundaries with the age (in frames) for each cell."
         desc = "Use lines as input to FCS."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        Static minSlider = FindSlider("Min Distance to next")
+        Dim minDistance = minSlider.value
         lines.Run(src)
 
         task.features.Clear()
-        For Each lp In lines.lpList
-            task.features.Add(lp.center)
+        For i = 0 To lines.lpList.Count - 1
+            Dim lp = lines.lpList(i)
+
+            Dim pair = lp.perpendicularPoints(lp.p1, minDistance)
+            task.features.Add(pair.Item1)
+            task.features.Add(pair.Item2)
+
+            pair = lp.perpendicularPoints(lp.p2, minDistance)
+            task.features.Add(pair.Item1)
+            task.features.Add(pair.Item2)
+
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
 
         fcs.Run(src)
         dst2 = fcs.dst2
         dst2.SetTo(white, lines.dst3)
 
-        For i = 0 To lines.lpList.Count - 1
-            Dim lp = lines.lpList(i)
-            DrawCircle(dst2, lp.center, task.DotSize, red, -1)
-            dst0.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+        For Each pt In task.features
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
         Next
-
+        task.color.SetTo(0, task.fpOutline)
         fpDisplayAge()
-        fpDisplayCell()
 
-        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were found."
+        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were used to create " +
+                                           CStr(task.fpList.Count) + " cells"
     End Sub
 End Class
