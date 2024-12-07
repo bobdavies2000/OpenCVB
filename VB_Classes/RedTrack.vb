@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class RedTrack_Basics : Inherits TaskParent
     Dim stats As New Cell_Basics
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If New cvb.Size(task.dst2.Width, task.dst2.Height) <> New cvb.Size(168, 94) Then task.frameHistoryCount = 1
@@ -178,7 +178,7 @@ Public Class RedTrack_GoodCell : Inherits TaskParent
         good.Run(src)
         dst3.SetTo(0)
         For Each pt In good.featureList
-            DrawCircle(dst3,pt, task.DotSize, white)
+            DrawCircle(dst3, pt, task.DotSize, white)
         Next
     End Sub
 End Class
@@ -214,7 +214,7 @@ Public Class RedTrack_GoodCells : Inherits TaskParent
                 trackIndex.Add(index)
 
                 DrawCircle(dst0, pt, task.DotSize, task.HighlightColor)
-                DrawCircle(dst3,pt, task.DotSize, white)
+                DrawCircle(dst3, pt, task.DotSize, white)
                 trackCells.Add(rc)
             End If
         Next
@@ -301,7 +301,7 @@ End Class
 Public Class RedTrack_Features : Inherits TaskParent
     Dim options As New Options_Flood
     Dim feat As New Feature_Stable
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",

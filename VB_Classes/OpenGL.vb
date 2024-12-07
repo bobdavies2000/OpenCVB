@@ -477,7 +477,7 @@ End Class
 
 Public Class OpenGL_StructuredCloud : Inherits TaskParent
     Dim sCloud As New Structured_Cloud
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels(2) = "Structured cloud 32fC3 data"
@@ -890,7 +890,7 @@ End Class
 Public Class OpenGL_Contours : Inherits TaskParent
     Dim options2 As New Options_OpenGL_Contours
     Public options As New Options_OpenGLFunctions
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCells
         task.OpenGLTitle = "OpenGL_Functions"
@@ -1107,7 +1107,7 @@ End Class
 
 
 Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Dim eq As New Plane_Equation
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
@@ -1610,7 +1610,7 @@ End Class
 
 
 Public Class OpenGL_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCloud cells in OpenGL"
@@ -1981,7 +1981,7 @@ End Class
 
 
 Public Class OpenGL_ColorBin4Way : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB

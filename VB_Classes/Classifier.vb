@@ -109,12 +109,12 @@ End Class
 
 
 Public Class Classifier_BayesianTest : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Dim nabs As New Neighbors_Precise
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output"}
+        labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Core output", "Classifier_Bayesian output"}
         If standalone Then task.gOptions.setDisplay1()
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."

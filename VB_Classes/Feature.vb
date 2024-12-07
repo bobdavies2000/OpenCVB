@@ -529,7 +529,7 @@ End Class
 
 
 Public Class Feature_NearestCell : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Dim feat As New FeatureLeftRight_Basics
     Dim knn As New KNN_Basics
     Public Sub New()

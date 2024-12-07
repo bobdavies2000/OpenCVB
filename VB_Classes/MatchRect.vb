@@ -5,7 +5,7 @@ Public Class MatchRect_Basics : Inherits TaskParent
     Public rectInput As New cvb.Rect
     Public rectOutput As New cvb.Rect
     Dim rectSave As New cvb.Rect
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell."
     End Sub
@@ -37,7 +37,7 @@ End Class
 
 Public Class MatchRect_RedCloud : Inherits TaskParent
     Dim matchRect As New MatchRect_Basics
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Track a RedCloud cell using MatchTemplate."
     End Sub

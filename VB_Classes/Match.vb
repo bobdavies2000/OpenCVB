@@ -388,7 +388,7 @@ End Class
 
 
 Public Class Match_TraceRedC : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Dim frameList As New List(Of cvb.Mat)
     Public Sub New()
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32S, 0)

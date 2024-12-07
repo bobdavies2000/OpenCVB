@@ -22,7 +22,7 @@ Public Class PCA_Basics : Inherits TaskParent
     Dim prep As New PCA_Prep_CPP_VB
     Public pca_analysis As New cvb.PCA
     Public runRedCloud As Boolean
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Find the Principal Component Analysis vector for the 3D points in a RedCloud cell contour."
     End Sub

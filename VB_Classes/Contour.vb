@@ -415,7 +415,7 @@ End Class
 
 Public Class Contour_Outline : Inherits TaskParent
     Public rc As New rcData
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Create a simplified contour of the selected cell"
     End Sub
@@ -452,7 +452,7 @@ End Class
 
 Public Class Contour_SelfIntersect : Inherits TaskParent
     Public rc As New rcData
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
     End Sub
@@ -547,7 +547,7 @@ End Class
 
 
 Public Class Contour_Compare : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public options As New Options_Contours
     Public Sub New()
         desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
@@ -581,7 +581,7 @@ End Class
 Public Class Contour_RedCloudCorners : Inherits TaskParent
     Public corners(4 - 1) As cvb.Point
     Public rc As New rcData
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         labels(2) = "The RedCloud Output with the highlighted contour to smooth"
         desc = "Find the point farthest from the center in each cell."
@@ -659,7 +659,7 @@ End Class
 
 
 Public Class Contour_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Show all the contours found in the RedCloud output"
@@ -705,7 +705,7 @@ End Class
 
 Public Class Contour_Smoothing : Inherits TaskParent
     Dim options As New Options_Contours2
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         labels(3) = "The white outline is the truest contour while the red is the selected approximation."
         desc = "Compare contours of the selected cell. Cells are offset to help comparison."

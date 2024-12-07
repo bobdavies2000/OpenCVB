@@ -219,7 +219,7 @@ End Class
 
 
 Public Class LUT_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Dim sort3 As New Sort_3Channel
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()

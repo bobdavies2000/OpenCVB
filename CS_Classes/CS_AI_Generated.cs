@@ -6073,7 +6073,7 @@ namespace CS_Classes
         PCA_Basics pca = new PCA_Basics();
         Plane_Equation eq = new Plane_Equation();
         public bool runRedCloud;
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Cell_Basics_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setHistogramBins(20);
@@ -6151,7 +6151,7 @@ namespace CS_Classes
 
     public class Cell_PixelCountCompare_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Cell_PixelCountCompare_CS()
         {
             vbc.task.gOptions.setDebugCheckBox(true);
@@ -6194,7 +6194,7 @@ namespace CS_Classes
 
     public class Cell_ValidateColorCells_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Cell_ValidateColorCells_CS()
         {
             labels[3] = "Cells shown below have rc.depthPixels / rc.pixels < 50%";
@@ -6244,7 +6244,7 @@ namespace CS_Classes
 
     public class Cell_Distance_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Cell_Distance_CS()
         {
             if (standalone) vbc.task.gOptions.setDisplay1();
@@ -6288,7 +6288,7 @@ namespace CS_Classes
 
     public class Cell_Binarize_CS : TaskParent
     {
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public Cell_Binarize_CS()
         {
             if (standaloneTest())
@@ -6361,7 +6361,7 @@ namespace CS_Classes
         Hist_Depth plot = new Hist_Depth();
         public bool runRedCloud;
         Cell_Basics stats = new Cell_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Cell_BasicsPlot_CS()
         {
             vbc.task.redOptions.setIdentifyCells(true);
@@ -6831,14 +6831,14 @@ namespace CS_Classes
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern void Classifier_Bayesian_Train(IntPtr cPtr, IntPtr trainInput, IntPtr response, int count);
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)] public static extern IntPtr Classifier_Bayesian_RunCPP(IntPtr cPtr, IntPtr trainInput, int count);
 
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Neighbors_Precise nabs = new Neighbors_Precise();
 
         public Classifier_BayesianTest_CS()
         {
             vbc.task.redOptions.useColorOnlyChecked = true;
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            labels = new string[] { "", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output" };
+            labels = new string[] { "", "Mask of the neighbors to the selected cell", "RedCloud_Core output", "Classifier_Bayesian output" };
             if (standalone) vbc.task.gOptions.setDisplay1();
             cPtr = Classifier_Bayesian_Open();
             desc = "Classify the neighbor cells to be similar to the selected cell or not.";
@@ -8394,7 +8394,7 @@ namespace CS_Classes
     }
     public class Contour_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Contour_RedCloud_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -8431,7 +8431,7 @@ namespace CS_Classes
     public class Contour_Smoothing_CS : TaskParent
     {
         Options_Contours2 options = new Options_Contours2();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Contour_Smoothing_CS()
         {
             labels[3] = "The white outline is the truest contour while the red is the selected approximation.";
@@ -8789,7 +8789,7 @@ namespace CS_Classes
     public class Contour_Outline_CS : TaskParent
     {
         public rcData rc = new rcData();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
 
         public Contour_Outline_CS()
         {
@@ -8830,7 +8830,7 @@ namespace CS_Classes
     public class Contour_SelfIntersect_CS : TaskParent
     {
         public rcData rc = new rcData();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
 
         public Contour_SelfIntersect_CS()
         {
@@ -8950,7 +8950,7 @@ namespace CS_Classes
 
     public class Contour_Compare_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Options_Contours options = new Options_Contours();
 
         public Contour_Compare_CS()
@@ -8987,7 +8987,7 @@ namespace CS_Classes
     {
         public cv.Point[] corners = new cv.Point[4];
         public rcData rc = new rcData();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
 
         public Contour_RedCloudCorners_CS()
         {
@@ -9353,13 +9353,13 @@ namespace CS_Classes
     public class Convex_RedCloud_CS : TaskParent
     {
         Convex_Basics_CS convex;
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
 
         public Convex_RedCloud_CS()
         {
             convex = new Convex_Basics_CS();
             labels = new string[] { "", "", "Selected contour - line shows hull with white is contour. Click to select another contour.", "RedCloud cells" };
-            desc = "Get lots of odd shapes from the RedCloud_Basics output and use ConvexHull to simplify them.";
+            desc = "Get lots of odd shapes from the RedCloud_Core output and use ConvexHull to simplify them.";
         }
 
         public void RunAlg(Mat src)
@@ -9431,7 +9431,7 @@ namespace CS_Classes
             contours = new Contour_Largest_CS();
 
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            labels = new string[] { "", "", "Hull outline in green, lines show defects.", "Output of RedCloud_Basics" };
+            labels = new string[] { "", "", "Hull outline in green, lines show defects.", "Output of RedCloud_Core" };
             desc = "Find the convexityDefects in the selected RedCloud cell";
         }
 
@@ -9905,7 +9905,7 @@ namespace CS_Classes
 
     public class Corners_RedCloud_CS : TaskParent
     {
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public Neighbors_Intersects corners = new Neighbors_Intersects();
 
         public Corners_RedCloud_CS()
@@ -13970,7 +13970,7 @@ namespace CS_Classes
 
     public class Distance_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public List<List<float>> pixelVector = new List<List<float>>();
         SortedList<double, int> distances = new SortedList<double, int>(new compareAllowIdenticalDoubleInverted());
@@ -14700,7 +14700,7 @@ namespace CS_Classes
     public class Duster_RedCloud_CS : TaskParent
     {
         Duster_Basics duster = new Duster_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Duster_RedCloud_CS()
         {
             desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics";
@@ -17253,7 +17253,7 @@ namespace CS_Classes
 
     public class Feature_NearestCell_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         FeatureLeftRight_Basics feat = new FeatureLeftRight_Basics();
         KNN_Basics knn = new KNN_Basics();
         public Feature_NearestCell_CS()
@@ -18604,7 +18604,7 @@ namespace CS_Classes
 
     public class FeatureLess_RedCloud_CS : TaskParent
     {
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         FeatureLess_Basics fless = new FeatureLess_Basics();
         public FeatureLess_RedCloud_CS()
         {
@@ -21428,7 +21428,7 @@ namespace CS_Classes
 
     public class FitEllipse_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         FitEllipse_Basics fitE = new FitEllipse_Basics();
         public FitEllipse_RedCloud_CS()
         {
@@ -21707,7 +21707,7 @@ namespace CS_Classes
     public class Flood_Basics_CS : TaskParent
     {
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
-        public Cell_Generate genCells = new Cell_Generate();
+        public Cell_Generate cellGen = new Cell_Generate();
         Color8U_Basics color;
         public Flood_Basics_CS()
         {
@@ -21728,14 +21728,14 @@ namespace CS_Classes
             }
             redCPP.Run(src);
             if (redCPP.classCount == 0) return; // no data to process.
-            genCells.classCount = redCPP.classCount;
-            genCells.rectList = redCPP.rectList;
-            genCells.floodPoints = redCPP.floodPoints;
-            genCells.removeContour = false;
-            genCells.Run(redCPP.dst2);
-            dst2 = genCells.dst2;
+            cellGen.classCount = redCPP.classCount;
+            cellGen.rectList = redCPP.rectList;
+            cellGen.floodPoints = redCPP.floodPoints;
+            cellGen.removeContour = false;
+            cellGen.Run(redCPP.dst2);
+            dst2 = cellGen.dst2;
             vbc.task.setSelectedContour();
-            labels[2] = genCells.labels[2];
+            labels[2] = cellGen.labels[2];
         }
     }
 
@@ -21823,7 +21823,7 @@ namespace CS_Classes
     {
         public Mat binarizedImage;
         public Mat inputMask;
-        public Cell_Generate genCells = new Cell_Generate();
+        public Cell_Generate cellGen = new Cell_Generate();
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public bool buildInputMask;
         public bool showSelected = true;
@@ -21845,11 +21845,11 @@ namespace CS_Classes
             dst3 = inputMask;
             redCPP.inputMask = inputMask;
             redCPP.Run(src);
-            genCells.classCount = redCPP.classCount;
-            genCells.rectList = redCPP.rectList;
-            genCells.floodPoints = redCPP.floodPoints;
-            genCells.Run(redCPP.dst2);
-            dst2 = genCells.dst2;
+            cellGen.classCount = redCPP.classCount;
+            cellGen.rectList = redCPP.rectList;
+            cellGen.floodPoints = redCPP.floodPoints;
+            cellGen.Run(redCPP.dst2);
+            dst2 = cellGen.dst2;
             int cellCount = Math.Min(vbc.task.redOptions.identifyCount, vbc.task.redCells.Count);
             if (vbc.task.heartBeat) labels[2] = $"{vbc.task.redCells.Count} cells identified and the largest {cellCount} are numbered below.";
             if (showSelected) vbc.task.setSelectedContour();
@@ -21999,8 +21999,8 @@ namespace CS_Classes
 
     //public class Flood_LeftRight_CS : TaskParent
     //{
-    //    RedCloud_Basics redLeft = new RedCloud_Basics();
-    //    RedCloud_Basics redRight = new RedCloud_Basics();
+    //    RedCloud_Core redLeft = new RedCloud_Core();
+    //    RedCloud_Core redRight = new RedCloud_Core();
     //    public Mat mapLeft;
     //    public Mat mapRight;
     //    public List<rcData> cellsLeft = new List<rcData>();
@@ -22017,7 +22017,7 @@ namespace CS_Classes
     //    {
     //        vbc.task.redCells = new List<rcData>(cellsLeft);
     //        vbc.task.redMap = mapLeft.Clone();
-    //        redLeft.genCells.useLeftImage = true;
+    //        redLeft.cellGen.useLeftImage = true;
     //        redLeft.Run(vbc.task.leftView);
     //        labels[2] = redLeft.labels[2];
     //        dst2 = redLeft.dst2;
@@ -22025,7 +22025,7 @@ namespace CS_Classes
     //        mapLeft = vbc.task.redMap.Clone();
     //        vbc.task.redCells = new List<rcData>(cellsRight);
     //        vbc.task.redMap = mapRight.Clone();
-    //        redRight.genCells.useLeftImage = false;
+    //        redRight.cellGen.useLeftImage = false;
     //        redRight.Run(vbc.task.rightView);
     //        labels[3] = redRight.labels[2];
     //        dst3 = redRight.dst2;
@@ -22055,12 +22055,12 @@ namespace CS_Classes
     {
         Boundary_RemovedRects bounds = new Boundary_RemovedRects();
         RedCloud_MaxDist_CPP_VB redCPP = new RedCloud_MaxDist_CPP_VB();
-        public Cell_Generate genCells = new Cell_Generate();
+        public Cell_Generate cellGen = new Cell_Generate();
         Color8U_Basics cvt = new Color8U_Basics();
         public Flood_MaxDistPoints_CS()
         {
             vbc.task.redOptions.setIdentifyCells(true);
-            labels[3] = "Contour boundaries - input to RedCloud_Basics";
+            labels[3] = "Contour boundaries - input to RedCloud_Core";
             desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code.";
         }
         public void RunAlg(Mat src)
@@ -22068,12 +22068,12 @@ namespace CS_Classes
             cvt.Run(src);
             redCPP.Run(cvt.dst2);
             if (redCPP.classCount == 0) return; // no data to process.
-            genCells.classCount = redCPP.classCount;
-            genCells.rectList = redCPP.RectList;
-            genCells.floodPoints = redCPP.floodPoints;
-            genCells.removeContour = false;
-            genCells.Run(redCPP.dst2);
-            dst2 = genCells.dst2;
+            cellGen.classCount = redCPP.classCount;
+            cellGen.rectList = redCPP.RectList;
+            cellGen.floodPoints = redCPP.floodPoints;
+            cellGen.removeContour = false;
+            cellGen.Run(redCPP.dst2);
+            dst2 = cellGen.dst2;
             redCPP.maxList.Clear();
             for (int i = 1; i < vbc.task.redCells.Count; i++)
             {
@@ -22081,7 +22081,7 @@ namespace CS_Classes
                 redCPP.maxList.Add(vbc.task.redCells[i].maxDist.Y);
             }
             vbc.task.setSelectedContour();
-            labels[2] = genCells.labels[2];
+            labels[2] = cellGen.labels[2];
         }
     }
 
@@ -22362,7 +22362,7 @@ namespace CS_Classes
     public class Foreground_CellsFore_CS : TaskParent
     {
         Foreground_Hist3D fore = new Foreground_Hist3D();
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public List<rcData> redCells = new List<rcData>();
         public Foreground_CellsFore_CS()
         {
@@ -22391,7 +22391,7 @@ namespace CS_Classes
     public class Foreground_CellsBack_CS : TaskParent
     {
         Foreground_Hist3D fore = new Foreground_Hist3D();
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public List<rcData> redCells = new List<rcData>();
         public Foreground_CellsBack_CS()
         {
@@ -22589,11 +22589,11 @@ namespace CS_Classes
 
     public class Fractal_Dimension_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Fractal_Dimension_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            labels = new string[] { "", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)" };
+            labels = new string[] { "", "", "RedCloud_Core output - select any region.", "The selected region (as a square)" };
             desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete.";
         }
         public double dimension(Mat Input)
@@ -25841,7 +25841,7 @@ namespace CS_Classes
     public class Hist_Cell_CS : TaskParent
     {
         Hist_Depth hist = new Hist_Depth();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Hist_Cell_CS()
         {
             dst1 = new Mat(dst1.Size(), MatType.CV_32F, cv.Scalar.All(0));
@@ -26254,12 +26254,12 @@ namespace CS_Classes
 
     public class Hist3D_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Hist3D_Basics hist3D = new Hist3D_Basics();
         public Hist3D_RedCloud_CS()
         {
             vbc.task.redOptions.setUseColorOnly(true);
-            desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output.";
+            desc = "Run RedCloud_Core on the combined Hist3D color/cloud output.";
         }
         public void RunAlg(Mat src)
         {
@@ -26277,13 +26277,13 @@ namespace CS_Classes
 
     public class Hist3D_RedColor_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public Hist3D_RedColor_CS()
         {
             vbc.task.redOptions.setIdentifyCells(true);
             vbc.task.redOptions.setUseColorOnly(true);
-            desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics";
+            desc = "Use the Hist3D color classes to segment the image with RedCloud_Core";
         }
         public void RunAlg(Mat src)
         {
@@ -26392,10 +26392,10 @@ namespace CS_Classes
     public class Hist3D_PixelClassify_CS : TaskParent
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Hist3D_PixelClassify_CS()
         {
-            desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Basics on the output.";
+            desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Core on the output.";
         }
         public void RunAlg(Mat src)
         {
@@ -26416,7 +26416,7 @@ namespace CS_Classes
     public class Hist3D_PixelDiffMask_CS : TaskParent
     {
         Hist3D_Pixel pixel = new Hist3D_Pixel();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Mat lastImage = new cv.Mat();
         public Hist3D_PixelDiffMask_CS()
         {
@@ -28996,7 +28996,7 @@ namespace CS_Classes
 
     public class Hull_Contour_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Hull_Contour_CS()
         {
             desc = "Compare the hull to the contour of a RedCloud cell";
@@ -31454,7 +31454,7 @@ namespace CS_Classes
         Edge_Canny edges = new Edge_Canny();
         public KMeans_Image km = new KMeans_Image();
         public int classCount;
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public KMeans_Edges_CS()
         {
             vbc.task.redOptions.setUseColorOnly(true);
@@ -33351,7 +33351,7 @@ namespace CS_Classes
 
     public class LeftRight_RedCloudRight_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public LeftRight_RedCloudRight_CS()
         {
             vbc.task.redOptions.setUseColorOnly(true);
@@ -33370,7 +33370,7 @@ namespace CS_Classes
 
     public class LeftRight_RedCloudLeft_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public LeftRight_RedCloudLeft_CS()
         {
             vbc.task.redOptions.setUseColorOnly(true);
@@ -34139,10 +34139,10 @@ namespace CS_Classes
     public class Line_Cells_CS : TaskParent
     {
         Line_Basics lines = new Line_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Line_Cells_CS()
         {
-            desc = "Identify all lines in the RedCloud_Basics cell boundaries";
+            desc = "Identify all lines in the RedCloud_Core cell boundaries";
         }
         public void RunAlg(Mat src)
         {
@@ -35651,7 +35651,7 @@ namespace CS_Classes
 
     public class LUT_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Sort_3Channel sort3 = new Sort_3Channel();
         public LUT_RedCloud_CS()
         {
@@ -36619,7 +36619,7 @@ namespace CS_Classes
 
     public class Match_TraceRedC_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         List<Mat> frameList = new List<Mat>();
         public Match_TraceRedC_CS()
         {
@@ -37179,7 +37179,7 @@ namespace CS_Classes
         public cv.Rect rectInput = new cv.Rect();
         public cv.Rect rectOutput = new cv.Rect();
         cv.Rect rectSave = new cv.Rect();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public MatchRect_Basics_CS()
         {
             desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell.";
@@ -37215,7 +37215,7 @@ namespace CS_Classes
     public class MatchRect_RedCloud_CS : TaskParent
     {
         MatchRect_Basics matchRect = new MatchRect_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public MatchRect_RedCloud_CS()
         {
             desc = "Track a RedCloud cell using MatchTemplate.";
@@ -37359,7 +37359,7 @@ namespace CS_Classes
         public rcData rc = new rcData();
         Options_MatchShapes options = new Options_MatchShapes();
         public bool runStandalone = false;
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         RedCloud_ContourUpdate addTour = new RedCloud_ContourUpdate();
         public MatchShapes_Nearby_CS()
         {
@@ -37451,11 +37451,11 @@ namespace CS_Classes
     public class MatchShapes_Contours_CS : TaskParent
     {
         Options_MatchShapes options = new Options_MatchShapes();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public MatchShapes_Contours_CS()
         {
             FindSlider("Match Threshold %").Value = 3;
-            labels = new string[] { "", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below." };
+            labels = new string[] { "", "", "Output of RedCloud_Core", "All RedCloud cells that matched the selected cell with the current settings are below." };
             desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact.";
         }
         public void RunAlg(Mat src)
@@ -38819,7 +38819,7 @@ namespace CS_Classes
         public List<Vec4f> objectList = new List<Vec4f>();
         public bool showRectangles = true;
         Projection_HistTop histTop = new Projection_HistTop();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Projection_Basics_CS()
         {
             desc = "Find all the masks, rects, and counts in the input";
@@ -38999,13 +38999,13 @@ namespace CS_Classes
     {
         HeatMap_Basics heat = new HeatMap_Basics();
         HeatMap_Basics heatCell = new HeatMap_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Projection_Cell_CS()
         {
             dst0 = new Mat(dst0.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
             vbc.task.gOptions.setUnfiltered(true);
-            labels = new string[] { "", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell" };
+            labels = new string[] { "", "Top View projection of the selected cell", "RedCloud_Core output - select a cell to project at right and above", "Side projection of the selected cell" };
             desc = "Create a top and side projection of the selected cell";
         }
         public void RunAlg(Mat src)
@@ -39034,7 +39034,7 @@ namespace CS_Classes
     public class Projection_Top_CS : TaskParent
     {
         public Projection_HistTop histTop = new Projection_HistTop();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Projection_Basics objects = new Projection_Basics();
         public Projection_Top_CS()
         {
@@ -39062,7 +39062,7 @@ namespace CS_Classes
     public class Projection_Side_CS : TaskParent
     {
         public Projection_HistSide histSide = new Projection_HistSide();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Projection_Basics objects = new Projection_Basics();
         public Projection_Side_CS()
         {
@@ -39689,7 +39689,7 @@ namespace CS_Classes
 
     public class Motion_Enclosing_CPP_CS : TaskParent
     {
-        RedCloud_Basics redMasks = new RedCloud_Basics();
+        RedCloud_Core redMasks = new RedCloud_Core();
         double learnRate;
         public cv.Rect motionRect = new cv.Rect();
         public Motion_Enclosing_CPP_CS()
@@ -39800,7 +39800,7 @@ namespace CS_Classes
 
     public class Motion_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Motion_RedCloud_CS()
         {
             labels[3] = "Motion detected in the cells below";
@@ -40301,10 +40301,10 @@ namespace CS_Classes
     public class MSER_RedCloud_CS : TaskParent
     {
         MSER_Basics mBase = new MSER_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public MSER_RedCloud_CS()
         {
-            desc = "Use the MSER_Basics output as input to RedCloud_Basics";
+            desc = "Use the MSER_Basics output as input to RedCloud_Core";
         }
         public void RunAlg(Mat src)
         {
@@ -40395,7 +40395,7 @@ namespace CS_Classes
     public class MSER_Basics1_CS : TaskParent
     {
         MSER_CPP_VB detect = new MSER_CPP_VB();
-        RedCloud_Basics flood = new RedCloud_Basics();
+        RedCloud_Core flood = new RedCloud_Core();
         public MSER_Basics1_CS()
         {
             desc = "Create cells for each region in MSER output";
@@ -40691,7 +40691,7 @@ namespace CS_Classes
 
     public class Neighbors_Basics_CS : TaskParent
     {
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         KNN_Basics knn = new KNN_Basics();
         public bool runRedCloud = false;
         public Options_XNeighbors options = new Options_XNeighbors();
@@ -40749,7 +40749,7 @@ namespace CS_Classes
     public class Neighbors_Intersects_CS : TaskParent
     {
         public List<cv.Point> nPoints = new List<cv.Point>();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Neighbors_Intersects_CS()
         {
             desc = "Find the corner points where multiple cells intersect.";
@@ -40834,7 +40834,7 @@ namespace CS_Classes
         Cell_Basics stats = new Cell_Basics();
         public List<rcData> redCells;
         public bool runRedCloud = false;
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Neighbors_Precise_CPP_CS()
         {
             cPtr = Neighbors_Open();
@@ -42570,7 +42570,7 @@ namespace CS_Classes
     public class OpenGL_StructuredCloud_CS : TaskParent
     {
         readonly Structured_Cloud sCloud = new Structured_Cloud();
-        readonly RedCloud_Basics redC = new RedCloud_Basics();
+        readonly RedCloud_Core redC = new RedCloud_Core();
         public OpenGL_StructuredCloud_CS()
         {
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
@@ -42970,7 +42970,7 @@ namespace CS_Classes
     {
         Options_OpenGL_Contours options2 = new Options_OpenGL_Contours();
         public Options_OpenGLFunctions options = new Options_OpenGLFunctions();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public OpenGL_Contours_CS()
         {
             vbc.task.ogl.oglFunction = (int)oCase.drawCells;
@@ -43182,7 +43182,7 @@ namespace CS_Classes
 
     public class OpenGL_PlaneClusters3D_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Plane_Equation eq = new Plane_Equation();
         public OpenGL_PlaneClusters3D_CS()
         {
@@ -43688,7 +43688,7 @@ namespace CS_Classes
 
     public class OpenGL_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public OpenGL_RedCloud_CS()
         {
             vbc.task.ogl.oglFunction = (int)oCase.pointCloudAndRGB;
@@ -44048,7 +44048,7 @@ namespace CS_Classes
 
     public class OpenGL_ColorBin4Way_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public OpenGL_ColorBin4Way_CS()
         {
             vbc.task.OpenGLTitle = "OpenGL_Functions";
@@ -44783,7 +44783,7 @@ namespace CS_Classes
         PCA_Prep_CPP_VB prep = new PCA_Prep_CPP_VB();
         public PCA pca_analysis = new PCA();
         public bool runRedCloud;
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public PCA_Basics_CS()
         {
             desc = "Find the Principal Component Analysis vector for the 3D points in a RedCloud cell contour.";
@@ -46002,7 +46002,7 @@ namespace CS_Classes
         {
             labels = new string[] { "RedCloud Cell contours", "", "RedCloud cells", "" };
             addW.src2 = dst2.Clone();
-            desc = "Find all the cells from a RedCloud_Basics output that are likely to be flat";
+            desc = "Find all the cells from a RedCloud_Core output that are likely to be flat";
         }
         public void RunAlg(Mat src)
         {
@@ -46155,7 +46155,7 @@ namespace CS_Classes
     public class Plane_CellColor_CS : TaskParent
     {
         public Options_Plane options = new Options_Plane();
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public Plane_CellColor_CS()
         {
             labels = new string[] { "", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis" };
@@ -46225,7 +46225,7 @@ namespace CS_Classes
         public List<Vec4f> equations = new List<Vec4f>();
         public List<Point3f> ptList = new List<Point3f>();
         public List<List<cv.Point>> ptList2D = new List<List<cv.Point>>();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         bool needOutput = false;
         public Plane_Points_CS()
         {
@@ -46349,7 +46349,7 @@ namespace CS_Classes
     {
         public rcData rc = new rcData();
         public string justEquation;
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Plane_Equation_CS()
         {
             desc = "Compute the coefficients for an estimated plane equation given the rc contour";
@@ -47338,8 +47338,8 @@ namespace CS_Classes
     public class PointCloud_Spin2_CS : TaskParent
     {
         PointCloud_Spin spin = new PointCloud_Spin();
-        RedCloud_Basics redC = new RedCloud_Basics();
-        RedCloud_Basics redCSpin = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
+        RedCloud_Core redCSpin = new RedCloud_Core();
         public PointCloud_Spin2_CS()
         {
             labels = new string[] { "", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes." };
@@ -48499,7 +48499,7 @@ namespace CS_Classes
         public List<cv.Point3f> corners3D = new List<cv.Point3f>();
         public List<cv.Point> corners = new List<cv.Point>();
         public List<cv.Point> cornersRaw = new List<cv.Point>();
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public Profile_Basics_CS()
         {
             desc = "Find the left/right, top/bottom, and near/far sides of a cell";
@@ -49051,12 +49051,12 @@ namespace CS_Classes
 
     public class PyrFilter_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Reduction_Basics reduction = new Reduction_Basics();
         PyrFilter_Basics pyr = new PyrFilter_Basics();
         public PyrFilter_RedCloud_CS()
         {
-            labels = new string[] { "", "", "RedCloud_Basics output", "PyrFilter output before reduction" };
+            labels = new string[] { "", "", "RedCloud_Core output", "PyrFilter output before reduction" };
             desc = "Use RedColor to segment the output of PyrFilter";
         }
         public void RunAlg(Mat src)
@@ -50559,7 +50559,7 @@ namespace CS_Classes
 
     public class RedCloud_Basics_CS : TaskParent
     {
-        public Cell_Generate genCells = new Cell_Generate();
+        public Cell_Generate cellGen = new Cell_Generate();
         RedCloud_CPP_VB redCPP = new RedCloud_CPP_VB();
         public Mat inputMask = new Mat();
         Color8U_Basics color;
@@ -50582,12 +50582,12 @@ namespace CS_Classes
             redCPP.inputMask = inputMask;
             redCPP.Run(src);
             if (redCPP.classCount == 0) return; // no data to process.
-            genCells.classCount = redCPP.classCount;
-            genCells.rectList = redCPP.rectList;
-            genCells.floodPoints = redCPP.floodPoints;
-            genCells.Run(redCPP.dst2);
-            dst2 = genCells.dst2;
-            labels[2] = genCells.labels[2];
+            cellGen.classCount = redCPP.classCount;
+            cellGen.rectList = redCPP.rectList;
+            cellGen.floodPoints = redCPP.floodPoints;
+            cellGen.Run(redCPP.dst2);
+            dst2 = cellGen.dst2;
+            labels[2] = cellGen.labels[2];
             dst3.SetTo(0);
             var smallCellThreshold = src.Total() / 1000;
             int cellCount = 0;
@@ -50608,7 +50608,7 @@ namespace CS_Classes
 
     public class RedCloud_Reduction_CS : TaskParent
     {
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_Reduction_CS()
         {
             vbc.task.redOptions.setUseColorOnly(true);
@@ -50631,7 +50631,7 @@ namespace CS_Classes
     public class RedCloud_Hulls_CS : TaskParent
     {
         Convex_RedCloudDefects convex = new Convex_RedCloudDefects();
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_Hulls_CS()
         {
             labels = new string[] { "", "Cells where convexity defects failed", "", "Improved contour results using OpenCV's ConvexityDefects" };
@@ -50676,7 +50676,7 @@ namespace CS_Classes
     public class RedCloud_FindCells_CPP_CS : TaskParent
     {
         public List<int> cellList = new List<int>();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_FindCells_CPP_CS()
         {
             vbc.task.redOptions.setIdentifyCells(true);
@@ -50753,7 +50753,7 @@ namespace CS_Classes
     {
         Plane_Equation eq = new Plane_Equation();
         public List<rcData> redCells = new List<rcData>();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_Equations_CS()
         {
             labels[3] = "The estimated plane equations for the largest 20 RedCloud cells.";
@@ -50806,7 +50806,7 @@ namespace CS_Classes
     {
         Plot_Histogram plot = new Plot_Histogram();
         Kalman_Basics kalman = new Kalman_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_CellsAtDepth_CS()
         {
             plot.removeZeroEntry = false;
@@ -50857,7 +50857,7 @@ namespace CS_Classes
 
     public class RedCloud_ShapeCorrelation_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_ShapeCorrelation_CS()
         {
             desc = "A shape correlation is between each x and y in list of contours points.  It allows classification based on angle and shape.";
@@ -50889,7 +50889,7 @@ namespace CS_Classes
     public class RedCloud_FPS_CS : TaskParent
     {
         Grid_FPS fps = new Grid_FPS();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_FPS_CS()
         {
             vbc.task.gOptions.setDisplay1();
@@ -50916,7 +50916,7 @@ namespace CS_Classes
     public class RedCloud_PlaneColor_CS : TaskParent
     {
         public Options_Plane options = new Options_Plane();
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         RedCloud_PlaneFromMask planeMask = new RedCloud_PlaneFromMask();
         RedCloud_PlaneFromContour planeContour = new RedCloud_PlaneFromContour();
         Plane_CellColor planeCells = new Plane_CellColor();
@@ -50964,7 +50964,7 @@ namespace CS_Classes
 
     public class RedCloud_PlaneFromContour_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_PlaneFromContour_CS()
         {
             labels[3] = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis";
@@ -51000,7 +51000,7 @@ namespace CS_Classes
 
     public class RedCloud_PlaneFromMask_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_PlaneFromMask_CS()
         {
             labels[3] = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis";
@@ -51040,11 +51040,11 @@ namespace CS_Classes
 
     public class RedCloud_BProject3D_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
         public RedCloud_BProject3D_CS()
         {
-            desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection";
+            desc = "Run RedCloud_Core on the output of the RGB 3D backprojection";
         }
         public void RunAlg(Mat src)
         {
@@ -51129,10 +51129,10 @@ namespace CS_Classes
     public class RedCloud_KMeans_CS : TaskParent
     {
         KMeans_MultiChannel km = new KMeans_MultiChannel();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_KMeans_CS()
         {
-            labels = new string[] { "", "", "KMeans_MultiChannel output", "RedCloud_Basics output" };
+            labels = new string[] { "", "", "KMeans_MultiChannel output", "RedCloud_Core output" };
             desc = "Use RedCloud to identify the regions created by kMeans";
         }
         public void RunAlg(Mat src)
@@ -51150,7 +51150,7 @@ namespace CS_Classes
     public class RedCloud_Diff_CS : TaskParent
     {
         Diff_RGBAccum diff = new Diff_RGBAccum();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_Diff_CS()
         {
             labels = new string[] { "", "", "Diff output, RedCloud input", "RedCloud output" };
@@ -51176,7 +51176,7 @@ namespace CS_Classes
         Hist_ShapeTop topView = new Hist_ShapeTop();
         Hist_ShapeSide sideView = new Hist_ShapeSide();
         Mat_4Click mats = new Mat_4Click();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_ProjectCell_CS()
         {
             vbc.task.gOptions.setDisplay1();
@@ -51198,7 +51198,7 @@ namespace CS_Classes
     public class RedCloud_LikelyFlatSurfaces_CS : TaskParent
     {
         Plane_Basics verts = new Plane_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public List<rcData> vCells = new List<rcData>();
         public List<rcData> hCells = new List<rcData>();
         public RedCloud_LikelyFlatSurfaces_CS()
@@ -51243,7 +51243,7 @@ namespace CS_Classes
 
     public class RedCloud_PlaneEq3D_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Plane_Equation eq = new Plane_Equation();
         public RedCloud_PlaneEq3D_CS()
         {
@@ -51273,7 +51273,7 @@ namespace CS_Classes
     public class RedCloud_DelaunayGuidedFeatures_CS : TaskParent
     {
         Feature_Delaunay features = new Feature_Delaunay();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         List<List<cv.Point2f>> goodList = new List<List<cv.Point2f>>();
         public RedCloud_DelaunayGuidedFeatures_CS()
         {
@@ -51307,7 +51307,7 @@ namespace CS_Classes
 
     public class RedCloud_UnstableCells_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         List<cv.Point> prevList = new List<cv.Point>();
         public RedCloud_UnstableCells_CS()
         {
@@ -51344,7 +51344,7 @@ namespace CS_Classes
 
     public class RedCloud_UnstableHulls_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         List<cv.Point> prevList = new List<cv.Point>();
         public RedCloud_UnstableHulls_CS()
         {
@@ -51382,12 +51382,12 @@ namespace CS_Classes
 
     public class RedCloud_CellChanges_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Mat dst2Last;
         public RedCloud_CellChanges_CS()
         {
             dst2Last = dst2.Clone();
-            if (standaloneTest()) redC = new RedCloud_Basics();
+            if (standaloneTest()) redC = new RedCloud_Core();
             desc = "Count the cells that have changed in a RedCloud generation";
         }
         public void RunAlg(Mat src)
@@ -51415,7 +51415,7 @@ namespace CS_Classes
 
     public class RedCloud_FloodPoint_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Cell_Basics stats = new Cell_Basics();
         public RedCloud_FloodPoint_CS()
         {
@@ -51466,7 +51466,7 @@ namespace CS_Classes
 
     public class RedCloud_MostlyColor_CS : TaskParent
     {
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_MostlyColor_CS()
         {
             labels[3] = "Cells that have no depth data.";
@@ -51491,12 +51491,12 @@ namespace CS_Classes
     public class RedCloud_OutlineColor_CS : TaskParent
     {
         Depth_Outline outline = new Depth_Outline();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Color8U_Basics colorClass = new Color8U_Basics();
         public RedCloud_OutlineColor_CS()
         {
-            labels[3] = "Color input to RedCloud_Basics with depth boundary blocking color connections.";
-            desc = "Use the depth outline as input to RedCloud_Basics";
+            labels[3] = "Color input to RedCloud_Core with depth boundary blocking color connections.";
+            desc = "Use the depth outline as input to RedCloud_Core";
         }
         public void RunAlg(Mat src)
         {
@@ -51517,7 +51517,7 @@ namespace CS_Classes
     public class RedCloud_DepthOutline_CS : TaskParent
     {
         Depth_Outline outline = new Depth_Outline();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_DepthOutline_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -51564,7 +51564,7 @@ namespace CS_Classes
     public class RedCloud_FourColor_CS : TaskParent
     {
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_FourColor_CS()
         {
             vbc.task.redOptions.setIdentifyCells(true);
@@ -51588,7 +51588,7 @@ namespace CS_Classes
     public class RedCloud_CCompColor_CS : TaskParent
     {
         CComp_Both ccomp = new CComp_Both();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_CCompColor_CS()
         {
             vbc.task.redOptions.setUseColorOnly(true);
@@ -51611,7 +51611,7 @@ namespace CS_Classes
 
     public class RedCloud_Cells_CS : TaskParent
     {
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public Mat cellmap = new Mat();
         public List<rcData> redCells = new List<rcData>();
         public RedCloud_Cells_CS()
@@ -51634,7 +51634,7 @@ namespace CS_Classes
 
     public class RedCloud_Flippers_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Mat lastMap;
         public RedCloud_Flippers_CS()
         {
@@ -51678,7 +51678,7 @@ namespace CS_Classes
     {
         public List<rcData> redCells = new List<rcData>();
         public Mat cellMap;
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_Overlaps_CS()
         {
             cellMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -51714,11 +51714,11 @@ namespace CS_Classes
 
     public class RedCloud_OnlyColorHist3D_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
         public RedCloud_OnlyColorHist3D_CS()
         {
-            desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_Basics.";
+            desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_Core.";
         }
         public void RunAlg(Mat src)
         {
@@ -51737,7 +51737,7 @@ namespace CS_Classes
 
     public class RedCloud_OnlyColorAlt_CS : TaskParent
     {
-        public RedCloud_Basics redMasks = new RedCloud_Basics();
+        public RedCloud_Core redMasks = new RedCloud_Core();
         public RedCloud_OnlyColorAlt_CS()
         {
             desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
@@ -51792,12 +51792,12 @@ namespace CS_Classes
 
     public class RedCloud_Gaps_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         History_Basics frames = new History_Basics();
         public RedCloud_Gaps_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            desc = "Find the gaps that are different in the RedCloud_Basics results.";
+            desc = "Find the gaps that are different in the RedCloud_Core results.";
         }
         public void RunAlg(Mat src)
         {
@@ -51825,7 +51825,7 @@ namespace CS_Classes
 
     public class RedCloud_SizeOrder_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_SizeOrder_CS()
         {
             vbc.task.redOptions.setUseColorOnly(true);
@@ -51935,7 +51935,7 @@ namespace CS_Classes
 
     public class RedCloud_MotionBasics_CS : TaskParent
     {
-        public RedCloud_Basics redMasks = new RedCloud_Basics();
+        public RedCloud_Core redMasks = new RedCloud_Core();
         public List<rcData> redCells = new List<rcData>();
         public RedCloud_MotionBGsubtract rMotion = new RedCloud_MotionBGsubtract();
         Mat lastColors;
@@ -52000,7 +52000,7 @@ namespace CS_Classes
 
     public class RedCloud_ContourVsFeatureLess_CS : TaskParent
     {
-        RedCloud_Basics redMasks = new RedCloud_Basics();
+        RedCloud_Core redMasks = new RedCloud_Core();
         Contour_WholeImage contour = new Contour_WholeImage();
         FeatureLess_Basics fLess = new FeatureLess_Basics();
         System.Windows.Forms.RadioButton useContours;
@@ -52008,8 +52008,8 @@ namespace CS_Classes
         {
             useContours = FindRadio("Use Contour_WholeImage");
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            labels = new string[] { "", "Contour_WholeImage Input", "RedCloud_Basics - toggling between Contour and Featureless inputs", "FeatureLess_Basics Input" };
-            desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_Basics";
+            labels = new string[] { "", "Contour_WholeImage Input", "RedCloud_Core - toggling between Contour and Featureless inputs", "FeatureLess_Basics Input" };
+            desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_Core";
         }
         public void RunAlg(Mat src)
         {
@@ -52044,8 +52044,8 @@ namespace CS_Classes
             if (standaloneTest())
             {
                 SetTrueText("RedCloud_UnmatchedCount_CS has no output when run standaloneTest()." + "\n" +
-                            "It requires redCells and RedCloud_Basics is the only way to create redCells." + "\n" +
-                            "Since RedCloud_Basics calls RedCloud_UnmatchedCount_CS, it would be circular and never finish the initialize.");
+                            "It requires redCells and RedCloud_Core is the only way to create redCells." + "\n" +
+                            "Since RedCloud_Core calls RedCloud_UnmatchedCount_CS, it would be circular and never finish the initialize.");
                 return;
             }
             int unMatchedCells = 0;
@@ -52096,7 +52096,7 @@ namespace CS_Classes
     public class RedCloud_ContourUpdate_CS : TaskParent
     {
         public List<rcData> redCells = new List<rcData>();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_ContourUpdate_CS()
         {
             desc = "For each cell, add a contour if its count is zero.";
@@ -52127,7 +52127,7 @@ namespace CS_Classes
 
     public class RedCloud_MaxDist_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         RedCloud_ContourUpdate addTour = new RedCloud_ContourUpdate();
         public RedCloud_MaxDist_CS()
         {
@@ -52159,7 +52159,7 @@ namespace CS_Classes
 
     public class RedCloud_Tiers_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         public RedCloud_Tiers_CS()
@@ -52185,7 +52185,7 @@ namespace CS_Classes
 
     public class RedCloud_TiersBinarize_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
         public RedCloud_TiersBinarize_CS()
@@ -52211,7 +52211,7 @@ namespace CS_Classes
     {
         public Color8U_Basics colorClass = new Color8U_Basics();
         public GuidedBP_Depth guided = new GuidedBP_Depth();
-        public RedCloud_Basics redMasks = new RedCloud_Basics();
+        public RedCloud_Core redMasks = new RedCloud_Core();
         public List<rcData> combinedCells = new List<rcData>();
         Depth_MaxMask maxDepth = new Depth_MaxMask();
         RedCloud_Reduce prep = new RedCloud_Reduce();
@@ -52275,7 +52275,7 @@ namespace CS_Classes
 
     public class RedCloud_TopX_CS : TaskParent
     {
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public Options_TopX options = new Options_TopX();
         public RedCloud_TopX_CS()
         {
@@ -52355,7 +52355,7 @@ namespace CS_Classes
 
     public class RedCloud_Hue_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Color8U_Hue hue = new Color8U_Hue();
         public RedCloud_Hue_CS()
         {
@@ -52414,10 +52414,10 @@ namespace CS_Classes
     {
         Depth_Tiers tiers = new Depth_Tiers();
         Bin4Way_Regions binar4 = new Bin4Way_Regions();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_PlusTiers_CS()
         {
-            desc = "Add the depth tiers to the input for RedCloud_Basics.";
+            desc = "Add the depth tiers to the input for RedCloud_Core.";
         }
         public void RunAlg(Mat src)
         {
@@ -52654,7 +52654,7 @@ namespace CS_Classes
 
     public class RedCloud_NaturalColor_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_NaturalColor_CS()
         {
             desc = "Display the RedCloud results with the mean color of the cell";
@@ -52675,7 +52675,7 @@ namespace CS_Classes
     {
         public BGSubtract_Basics bgSub = new BGSubtract_Basics();
         public List<rcData> redCells = new List<rcData>();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedCloud_MotionBGsubtract_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -52710,12 +52710,12 @@ namespace CS_Classes
 
     public class RedCloud_JoinCells_CS : TaskParent
     {
-        FeatureLess_RedCloud fLess = new FeatureLess_RedCloud();
+        RedCloud_Basics fLess = new RedCloud_Basics();
         public RedCloud_JoinCells_CS()
         {
             vbc.task.gOptions.setHistogramBins(20);
-            labels = new string[] { "", "FeatureLess_RedCloud output.", "RedCloud_Basics output", "RedCloud_Basics cells joined by using the color from the FeatureLess_RedCloud cellMap" };
-            desc = "Run RedCloud_Basics and use FeatureLess_RedCloud to join cells that are in the same featureless regions.";
+            labels = new string[] { "", "RedCloud_Basics output.", "RedCloud_Core output", "RedCloud_Core cells joined by using the color from the RedCloud_Basics cellMap" };
+            desc = "Run RedCloud_Core and use RedCloud_Basics to join cells that are in the same featureless regions.";
         }
         public void RunAlg(Mat src)
         {
@@ -52992,7 +52992,7 @@ namespace CS_Classes
 
     public class RedCloud_FeatureLessReduce_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         FeatureROI_Basics devGrid = new FeatureROI_Basics();
         public List<rcData> redCells = new List<rcData>();
         public Mat cellMap;
@@ -53040,7 +53040,7 @@ namespace CS_Classes
 
     public class RedCloud_Features_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Options_RedCloudFeatures options = new Options_RedCloudFeatures();
         public RedCloud_Features_CS()
         {
@@ -53107,7 +53107,7 @@ namespace CS_Classes
     public class RedTrack_Basics_CS : TaskParent
     {
         Cell_Basics stats = new Cell_Basics();
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public RedTrack_Basics_CS()
         {
             if (standaloneTest()) vbc.task.gOptions.setDisplay1();
@@ -53396,7 +53396,7 @@ namespace CS_Classes
     {
         Options_Flood options = new Options_Flood();
         Feature_Stable feat = new Feature_Stable();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public RedTrack_Features_CS()
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -53472,7 +53472,7 @@ namespace CS_Classes
     public class Reduction_Floodfill_CS : TaskParent
     {
         public Reduction_Basics reduction = new Reduction_Basics();
-        public RedCloud_Basics redC = new RedCloud_Basics();
+        public RedCloud_Core redC = new RedCloud_Core();
         public Reduction_Floodfill_CS()
         {
             vbc.task.redOptions.setIdentifyCells(true);
@@ -54480,10 +54480,10 @@ namespace CS_Classes
     public class Sides_Profile_CS : TaskParent
     {
         Contour_SidePoints sides = new Contour_SidePoints();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Sides_Profile_CS()
         {
-            labels = new string[] { "", "", "RedCloud_Basics Output", "Selected Cell" };
+            labels = new string[] { "", "", "RedCloud_Core Output", "Selected Cell" };
             desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell";
         }
         public void RunAlg(Mat src)
@@ -54502,10 +54502,10 @@ namespace CS_Classes
     public class Sides_Corner_CS : TaskParent
     {
         Contour_RedCloudCorners sides = new Contour_RedCloudCorners();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Sides_Corner_CS()
         {
-            labels = new string[] { "", "", "RedCloud_Basics output", "" };
+            labels = new string[] { "", "", "RedCloud_Core output", "" };
             desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell";
         }
         public void RunAlg(Mat src)
@@ -54523,7 +54523,7 @@ namespace CS_Classes
 
     public class Sides_ColorC_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         Sides_Basics sides = new Sides_Basics();
         public Sides_ColorC_CS()
         {
@@ -57530,7 +57530,7 @@ namespace CS_Classes
 
     public class SuperPixel_Basics_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public SuperPixel_Basics_CS()
         {
             labels[2] = "Super Pixel cells";
@@ -57832,7 +57832,7 @@ namespace CS_Classes
 
     public class SVD_Example2_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public SVD_Example2_CS()
         {
             desc = "Compute the mean and tangent of a RedCloud Cell";
@@ -58384,12 +58384,12 @@ namespace CS_Classes
         {
             swarm.Run(src);
             cvt.Run(src);
-            flood.genCells.removeContour = false;
+            flood.cellGen.removeContour = false;
             flood.inputMask = swarm.dst2;
             flood.Run(cvt.dst2);
             dst2 = flood.dst2;
             vbc.task.setSelectedContour();
-            labels[2] = flood.genCells.labels[2];
+            labels[2] = flood.cellGen.labels[2];
         }
     }
 
@@ -58439,7 +58439,7 @@ namespace CS_Classes
         public Swarm_Flood2_CS()
         {
             vbc.task.redOptions.setIdentifyCells(true);
-            flood.genCells.removeContour = false;
+            flood.cellGen.removeContour = false;
             desc = "Floodfill the color image using the swarm outline as a mask";
         }
         public Mat runRedCloud(Mat src)
@@ -58456,7 +58456,7 @@ namespace CS_Classes
             dst2 = runRedCloud(src).Clone();
             dst3 = lines.dst3.Clone();
             vbc.task.setSelectedContour();
-            labels[2] = flood.genCells.labels[2];
+            labels[2] = flood.cellGen.labels[2];
             labels[3] = lines.labels[2];
         }
     }
@@ -58584,7 +58584,7 @@ namespace CS_Classes
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Tessallate_QuadSimple_CS()
         {
             vbc.task.gOptions.setGridSize(20);
@@ -58699,7 +58699,7 @@ namespace CS_Classes
         public List<List<double>> depthList2 = new List<List<double>>();
         public List<Scalar> colorList = new List<Scalar>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Tessallate_QuadMinMax_CS()
         {
             vbc.task.gOptions.setGridSize(20);
@@ -59058,7 +59058,7 @@ namespace CS_Classes
     {
         public rcData rc = new rcData();
         public Volume_Basics volZ = new Volume_Basics();
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Thickness_Basics_CS()
         {
             desc = "Determine the thickness of a RedCloud cell";
@@ -59548,7 +59548,7 @@ namespace CS_Classes
 
     public class Triangle_Basics_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
         public Triangle_Basics_CS()
         {
@@ -59594,7 +59594,7 @@ namespace CS_Classes
         public Triangle_HullContour_CS()
         {
             vbc.task.gOptions.setDisplay1();
-            labels = new string[] { "", "Selected cell", "RedCloud_Basics output", "Selected contour" };
+            labels = new string[] { "", "Selected cell", "RedCloud_Core output", "Selected contour" };
             desc = "Given a contour, convert that contour to a series of triangles";
         }
         public void RunAlg(Mat src)
@@ -59624,11 +59624,11 @@ namespace CS_Classes
 
     public class Triangle_RedCloud_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
         public Triangle_RedCloud_CS()
         {
-            labels = new string[] { "", "", "RedCloud_Basics output", "Selected contour - each pixel has depth" };
+            labels = new string[] { "", "", "RedCloud_Core output", "Selected contour - each pixel has depth" };
             desc = "Given a contour, convert that contour to a series of triangles";
         }
         public void RunAlg(Mat src)
@@ -59668,11 +59668,11 @@ namespace CS_Classes
 
     public class Triangle_Cell_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
         public Triangle_Cell_CS()
         {
-            labels = new string[] { "", "", "RedCloud_Basics output", "Selected contour - each pixel has depth" };
+            labels = new string[] { "", "", "RedCloud_Core output", "Selected contour - each pixel has depth" };
             desc = "Given a contour, convert that contour to a series of triangles";
         }
         public void RunAlg(Mat src)
@@ -59726,11 +59726,11 @@ namespace CS_Classes
 
     public class Triangle_Mask_CS : TaskParent
     {
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public List<cv.Point3f> triangles = new List<cv.Point3f>();
         public Triangle_Mask_CS()
         {
-            labels = new string[] { "", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist." };
+            labels = new string[] { "", "", "RedCloud_Core output", "Selected rc.mask - each pixel has depth. Red dot is maxDist." };
             desc = "Given a RedCloud cell, resize it and show the points with depth.";
         }
         public void RunAlg(Mat src)
@@ -60126,7 +60126,7 @@ namespace CS_Classes
     {
         public rcData rc = new rcData();
         public float volume;
-        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_Core redC = new RedCloud_Core();
         public Volume_Basics_CS()
         {
             desc = "Build a box containing all the 3D points of a RedCloud cell";

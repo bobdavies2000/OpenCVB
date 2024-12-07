@@ -127,7 +127,7 @@ End Class
 
 
 Public Class FitEllipse_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Dim fitE As New FitEllipse_Basics
     Public Sub New()
         desc = "Create an ellipse from a contour"

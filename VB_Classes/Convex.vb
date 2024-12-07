@@ -53,10 +53,10 @@ End Class
 
 Public Class Convex_RedCloud : Inherits TaskParent
     Dim convex As New Convex_Basics
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Core
     Public Sub New()
         labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
-        desc = "Get lots of odd shapes from the RedCloud_Basics output and use ConvexHull to simplify them."
+        desc = "Get lots of odd shapes from the RedCloud_Core output and use ConvexHull to simplify them."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)
@@ -115,7 +115,7 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
     Dim contours As New Contour_Largest
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedCloud_Basics"}
+        labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedCloud_Core"}
         desc = "Find the convexityDefects in the selected RedCloud cell"
     End Sub
     Public Function betterContour(c As List(Of cvb.Point), defects() As cvb.Vec4i) As List(Of cvb.Point)

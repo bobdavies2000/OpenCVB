@@ -92,7 +92,7 @@ End Class
 Public Class LineTrack_RedCloud : Inherits TaskParent
     Public lines As New Line_Basics
     Public delaunay As New Delaunay_Basics
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Track the line regions with RedCloud"
     End Sub

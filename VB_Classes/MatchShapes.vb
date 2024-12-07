@@ -123,7 +123,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
     Public rc As New rcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Dim addTour As New RedCloud_ContourUpdate
     Public Sub New()
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
@@ -219,10 +219,10 @@ End Class
 
 Public Class MatchShapes_Contours : Inherits TaskParent
     Dim options As New Options_MatchShapes
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         FindSlider("Match Threshold %").Value = 3
-        labels = {"", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
+        labels = {"", "", "Output of RedCloud_Core", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)

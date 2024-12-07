@@ -2,7 +2,7 @@
 Public Class Cell_Basics : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
@@ -70,9 +70,9 @@ End Class
 
 
 Public Class Cell_PixelCountCompare : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
-        task.gOptions.DebugChecked = True
+        task.gOptions.debugChecked = True
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -87,7 +87,7 @@ Public Class Cell_PixelCountCompare : Inherits TaskParent
                 If rc.pixels <> rc.depthPixels Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     Dim pt = New cvb.Point(rc.maxDist.X - 10, rc.maxDist.Y)
-                    If task.gOptions.DebugChecked Then
+                    If task.gOptions.debugChecked Then
                         strOut = CStr(rc.pixels) + "/" + CStr(rc.depthPixels)
                     Else
                         strOut = Format(rc.depthPixels / rc.pixels, "0%")
@@ -108,7 +108,7 @@ End Class
 
 
 Public Class Cell_ValidateColorCells : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -156,7 +156,7 @@ End Class
 
 
 Public Class Cell_Distance : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         If standalone Then task.gOptions.setDisplay1()
@@ -200,7 +200,7 @@ End Class
 
 
 Public Class Cell_Binarize : Inherits TaskParent
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -270,7 +270,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         If standalone Then task.gOptions.setDisplay1()
@@ -347,7 +347,7 @@ Public Class Cell_Generate : Inherits TaskParent
             Dim rc As New rcData
             rc.index = i - 1
             rc.rect = rectList(rc.index)
-            If rc.rect.Size = dst2.Size Then Continue For ' FeatureLess_RedCloud finds a cell this big.  
+            If rc.rect.Size = dst2.Size Then Continue For ' RedCloud_Basics finds a cell this big.  
             rc.mask = src(rc.rect).InRange(i, i)
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)

@@ -176,7 +176,7 @@ End Class
 
 
 Public Class Distance_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)

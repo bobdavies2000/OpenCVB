@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
-    Dim feat As New Feature_Stable
+    Dim feat As New Feature_Basics
     Public mpList As New List(Of PointPair)
     Public distanceAvg As Single
     Public directionAvg As Single
@@ -80,7 +80,7 @@ Public Class Swarm_Basics : Inherits TaskParent
         End If
         If dirList.Count > 0 Then
             directionAvg = dirList.Average
-            labels(3) = Format(directionAvg, fmt1) + " average direction (radians)"
+            labels(3) += " " + Format(directionAvg, fmt1) + " average direction (radians)"
         End If
         If cornerHistory.Count >= histCount Then cornerHistory.RemoveAt(0)
     End Sub
@@ -199,13 +199,13 @@ Public Class Swarm_Flood : Inherits TaskParent
 
         color8U.Run(src)
 
-        flood.genCells.removeContour = False
+        flood.cellGen.removeContour = False
         flood.inputMask = swarm.dst2
         flood.Run(color8U.dst2)
         dst2 = flood.dst2
 
         task.setSelectedContour()
-        labels(2) = flood.genCells.labels(2)
+        labels(2) = flood.cellGen.labels(2)
     End Sub
 End Class
 
@@ -221,7 +221,7 @@ Public Class Swarm_Flood2 : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
-        flood.genCells.removeContour = False
+        flood.cellGen.removeContour = False
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
     Public Function runRedCloud(src As cvb.Mat) As cvb.Mat
@@ -240,7 +240,7 @@ Public Class Swarm_Flood2 : Inherits TaskParent
 
         task.setSelectedContour()
         labels(1) = "Color8U_Basics input = " + task.redOptions.ColorSource.Text
-        labels(2) = flood.genCells.labels(2)
+        labels(2) = flood.cellGen.labels(2)
         labels(3) = lines.labels(2)
     End Sub
 End Class

@@ -262,7 +262,7 @@ End Class
 
 
 Public Class LeftRight_RedCloudRight : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         desc = "Segment the right view image with RedCloud"
@@ -281,7 +281,7 @@ End Class
 
 
 Public Class LeftRight_RedCloudLeft : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         desc = "Segment the left view image with RedCloud"

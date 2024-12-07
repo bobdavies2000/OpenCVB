@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Triangle_Basics : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
@@ -45,7 +45,7 @@ Public Class Triangle_HullContour : Inherits TaskParent
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
         task.gOptions.setDisplay1()
-        labels = {"", "Selected cell", "RedCloud_Basics output", "Selected contour"}
+        labels = {"", "Selected cell", "RedCloud_Core output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -77,10 +77,10 @@ End Class
 
 
 Public Class Triangle_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedCloud_Core output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -120,10 +120,10 @@ End Class
 
 
 Public Class Triangle_Cell : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedCloud_Core output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -175,10 +175,10 @@ End Class
 
 
 Public Class Triangle_Mask : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+        labels = {"", "", "RedCloud_Core output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 

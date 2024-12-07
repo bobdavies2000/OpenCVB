@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 Public Class Neighbors_Basics : Inherits TaskParent
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Core
     Dim knn As New KNN_Basics
     Public runRedCloud As Boolean = False
     Public options As New Options_XNeighbors
@@ -55,7 +55,7 @@ End Class
 
 Public Class Neighbors_Intersects : Inherits TaskParent
     Public nPoints As New List(Of cvb.Point)
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
@@ -139,7 +139,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
     Dim stats As New Cell_Basics
     Public redCells As List(Of rcData)
     Public runRedCloud As Boolean = False
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         cPtr = Neighbors_Open()
         If standaloneTest() Then task.gOptions.setDisplay1()

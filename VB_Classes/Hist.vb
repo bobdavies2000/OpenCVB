@@ -1258,7 +1258,7 @@ End Class
 
 Public Class Hist_Cell : Inherits TaskParent
     Dim hist As New Hist_Depth
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public Sub New()
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}

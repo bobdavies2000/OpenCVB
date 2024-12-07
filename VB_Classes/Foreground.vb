@@ -155,7 +155,7 @@ End Class
 
 Public Class Foreground_CellsFore : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Core
     Public redCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.setIdentifyCells(False)
@@ -180,7 +180,7 @@ End Class
 
 Public Class Foreground_CellsBack : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Core
     Public redCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.setIdentifyCells(False)

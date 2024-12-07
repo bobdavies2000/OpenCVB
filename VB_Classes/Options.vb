@@ -3052,7 +3052,7 @@ Public Class Options_Spectrum : Inherits TaskParent
     Public gapDepth As Integer = 1
     Public gapGray As Integer = 1
     Public sampleThreshold As Integer = 10
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Core
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, gapDepth)

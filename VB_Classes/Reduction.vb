@@ -37,7 +37,7 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits TaskParent
     Public reduction As New Reduction_Basics
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Core
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         task.redOptions.setUseColorOnly(True)

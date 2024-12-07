@@ -1119,7 +1119,6 @@ End Enum
 	If algorithmName = "FeatureLess_History_CS" Then return new FeatureLess_History_CS
 	If algorithmName = "FeatureLess_LeftRight" Then return new FeatureLess_LeftRight
 	If algorithmName = "FeatureLess_LeftRight_CS" Then return new FeatureLess_LeftRight_CS
-	If algorithmName = "FeatureLess_RedCloud" Then return new FeatureLess_RedCloud
 	If algorithmName = "FeatureLess_RedCloud_CS" Then return new FeatureLess_RedCloud_CS
 	If algorithmName = "FeatureLess_RedCloud1" Then return new FeatureLess_RedCloud1
 	If algorithmName = "FeatureLess_Sobel" Then return new FeatureLess_Sobel
@@ -3167,6 +3166,7 @@ End Enum
 	If algorithmName = "RedCloud_ContourUpdate_CS" Then return new RedCloud_ContourUpdate_CS
 	If algorithmName = "RedCloud_ContourVsFeatureLess" Then return new RedCloud_ContourVsFeatureLess
 	If algorithmName = "RedCloud_ContourVsFeatureLess_CS" Then return new RedCloud_ContourVsFeatureLess_CS
+	If algorithmName = "RedCloud_Core" Then return new RedCloud_Core
 	If algorithmName = "RedCloud_CPP_CS" Then return new RedCloud_CPP_CS
 	If algorithmName = "RedCloud_CPP_VB" Then return new RedCloud_CPP_VB
 	If algorithmName = "RedCloud_Delaunay" Then return new RedCloud_Delaunay

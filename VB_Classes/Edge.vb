@@ -1100,7 +1100,7 @@ End Class
 
 Public Class Edge_RedCloud : Inherits TaskParent
     Dim canny As New Edge_Basics
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Core
     Public mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Canny Edges (0), RedCloud output (1), RedCloud Edges(2), 0 And'd with 2"
