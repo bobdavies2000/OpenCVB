@@ -1251,12 +1251,12 @@ Public Class RedCloud_OnlyColorAlt : Inherits TaskParent
         Dim newCells As New List(Of rcData)
         task.redMap.SetTo(0)
         dst3.SetTo(0)
-        Dim usedColors = New List(Of cvb.Vec3b)({black})
+        Dim usedColors = New List(Of cvb.Scalar)({black})
         Dim unmatched As Integer
         For Each cell In task.redCells
             Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
             If index < lastCells.Count Then
-                cell.color = lastColors.Get(Of cvb.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
+                cell.color = lastColors.Get(Of cvb.Vec3b)(cell.maxDist.Y, cell.maxDist.X).ToVec3f
             Else
                 unmatched += 1
             End If
@@ -1456,7 +1456,7 @@ Public Class RedCloud_MotionBasics : Inherits TaskParent
         redCells.Clear()
         dst2.SetTo(0)
         dst3.SetTo(0)
-        Dim usedColors = New List(Of cvb.Vec3b)({black})
+        Dim usedColors = New List(Of cvb.Scalar)({black})
         Dim motionCount As Integer
         For Each cell In rMotion.redCells
             Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
@@ -1467,7 +1467,8 @@ Public Class RedCloud_MotionBasics : Inherits TaskParent
             End If
 
             If index > 0 And index < lastCells.Count Then
-                cell.color = lastColors.Get(Of cvb.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
+                Dim vec = lastColors.Get(Of cvb.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
+                cell.color = New cvb.Scalar(vec(0), vec(1), vec(2))
             End If
             If usedColors.Contains(cell.color) Then cell.color = randomCellColor()
             usedColors.Add(cell.color)

@@ -17,6 +17,7 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
             strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf + "rc.color = " + rc.color.ToString() + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
+            strOut += "rc.motionPixels = " + CStr(rc.motionPixels) + vbCrLf
 
             strOut += If(rc.depthPixels > 0, "Cell is marked as depthCell " + vbCrLf, "")
             If rc.depthPixels > 0 Then
@@ -363,24 +364,30 @@ Public Class Cell_Generate : Inherits TaskParent
 
         For Each rc In initialList
             If rc.age = 0 Then
-                rc.maxDist = GetMaxDist(rc)
+                If rc.index = 2 Then Dim k = 0
+                rc.age = 1
+                If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
+                    Dim lrc = task.redCells(rc.indexLast)
+                    lrc.mask = rc.mask
+                    lrc.rect = rc.rect
+                    lrc.age = lrc.age + 1
+                    lrc.maxDist = rc.maxDist
+                    lrc.indexLast = rc.indexLast
+                    lrc.motionPixels = rc.motionPixels
+                    lrc.floodPoint = rc.floodPoint
+                    rc = lrc
+                Else
+                    rc.color = randomCellColor()
+                End If
+
                 cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-
                 rc.naturalColor = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
-
-                'If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
-                '    Dim lrc = task.redCells(rc.indexLast)
-                '    rc.colorTracking = lrc.colorTracking
-                'Else
-                rc.colorTracking = New cvb.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                ' End If
 
                 rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
                 DrawContour(rc.mask, rc.contour, 255, -1)
                 If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
                 rc.maxDStable = rc.maxDist
-                rc.age = 1
 
                 ' the number of pixels - may have changed with the infill or contour.
                 rc.pixels = rc.mask.CountNonZero

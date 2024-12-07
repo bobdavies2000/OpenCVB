@@ -300,7 +300,7 @@ Public Class FeatureLess_RedCloud : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each rc In task.redCells
-            dst3(rc.rect).SetTo(rc.colorTracking, rc.mask)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
             If rc.index < 20 Then SetTrueText(CStr(rc.index) + " " + CStr(rc.age), rc.maxDist, 3)
         Next
     End Sub

@@ -9483,7 +9483,7 @@ namespace CS_Classes
             cv.Point[] hull = Cv2.ConvexHull(c, false);
             int[] hullIndices = Cv2.ConvexHullIndices(c, false);
             dst2.SetTo(0);
-            DrawContour(dst2, hull.ToList(), vecToScalar(rc.color), -1);
+            DrawContour(dst2, hull.ToList(), rc.color, -1);
 
             try
             {
@@ -10871,7 +10871,7 @@ namespace CS_Classes
                 var nextColor = dst3.Get<Vec3b>((int)pt.Y, (int)pt.X);
                 if (usedColors.Contains(nextColor))
                 {
-                    nextColor = randomCellColor();
+                    nextColor = randomCellColor().ToVec3b();
                 }
                 usedColors.Add(nextColor);
 
@@ -35514,7 +35514,7 @@ namespace CS_Classes
         {
             for (int i = 0; i <= 255; i++)
             {
-                vector.Set<Vec3b>(i, 0, randomCellColor());
+                vector.Set<Vec3b>(i, 0, randomCellColor().ToVec3b());
             }
             labels[3] = "Custom Color Lookup Table";
             desc = "Build and use a custom color palette";
@@ -37397,7 +37397,7 @@ namespace CS_Classes
                         minMatch = (float)matchVal;
                         bestCell = similarCells.Count();
                     }
-                    DrawContour(dst3[rc2.rect], rc2.contour, vecToScalar(rc2.color), -1);
+                    DrawContour(dst3[rc2.rect], rc2.contour, rc2.color, -1);
                     similarCells.Add(rc2);
                 }
             }
@@ -40111,7 +40111,7 @@ namespace CS_Classes
             {
                 rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
                 pixels += rc.pixels;
-                DrawContour(dst3[rc.rect], rc.hull, vecToScalar(rc.color), -1);
+                DrawContour(dst3[rc.rect], rc.hull, rc.color, -1);
             }
             if (vbc.task.heartBeat) labels[2] = mBase.mserCells.Count() + " Regions with average size " + (mBase.mserCells.Count() > 0 ?
                 (pixels / mBase.mserCells.Count()).ToString() : "0");
@@ -40492,7 +40492,7 @@ namespace CS_Classes
                 Cv2.MeanStdDev(vbc.task.color[rc.rect], out mean, out stdev, rc.mask);
                 rc.colorMean = mean;
                 rc.colorStdev = stdev;
-                rc.color = new Vec3b((byte)rc.colorMean[0], (byte)rc.colorMean[1], (byte)rc.colorMean[2]);
+                rc.color = new Scalar((byte)rc.colorMean[0], (byte)rc.colorMean[1], (byte)rc.colorMean[2]);
                 if (rc.indexLast != 0) matchCount++;
                 redCells.Add(rc);
                 cellMap[rc.rect].SetTo(rc.index, rc.mask);
@@ -42932,7 +42932,7 @@ namespace CS_Classes
                 }
                 else
                 {
-                    oglData.Add(new Point3f(rc.color[2] / 255f, rc.color[1] / 255f, rc.color[0] / 255f));
+                    oglData.Add(new Point3f((float)rc.color[2] / 255f, (float)rc.color[1] / 255f, (float)rc.color[0] / 255f));
                 }
                 int hullPoints = 0;
                 foreach (var pt in rc.hull)
@@ -42999,7 +42999,8 @@ namespace CS_Classes
                 }
                 else
                 {
-                    oglData.Add(new Point3f(rc.color[2] / 255f, rc.color[1] / 255f, rc.color[0] / 255f));
+                    oglData.Add(new Point3f((float)rc.color[2] / 255f, (float)rc.color[1] / 255f, 
+                                            (float)rc.color[0] / 255f));
                 }
                 lastDepth = rc.depthMean;
                 foreach (var pt in rc.contour)
@@ -44475,7 +44476,7 @@ namespace CS_Classes
             colorMap = new Mat(256, 1, MatType.CV_8UC3, cv.Scalar.All(0));
             for (int i = 0; i <= 255; i++)
             {
-                colorMap.Set<Vec3b>(i, 0, randomCellColor());
+                colorMap.Set<Vec3b>(i, 0, randomCellColor().ToVec3b());
             }
             desc = "Build a random colorGrad - no smooth transitions.";
         }
@@ -44498,7 +44499,7 @@ namespace CS_Classes
             colorGrad = new Mat(1, 256, MatType.CV_8UC3, cv.Scalar.All(0));
             for (int i = 0; i <= 255; i++)
             {
-                colorGrad.Set<Vec3b>(0, i, randomCellColor());
+                colorGrad.Set<Vec3b>(0, i, randomCellColor().ToVec3b());
             }
             originalColorMap = colorGrad.Clone();
             desc = "Build a new palette for every frame.";
@@ -46416,7 +46417,7 @@ namespace CS_Classes
             {
                 SetTrueText(strOut, 3);
                 dst3.SetTo(0);
-                DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                DrawContour(dst3[rc.rect], rc.contour, rc.color, -1);
             }
         }
     }
@@ -50654,7 +50655,7 @@ namespace CS_Classes
                     {
                         defectCount++;
                     }
-                    DrawContour(dst3[rc.rect], rc.hull, vecToScalar(rc.color), -1);
+                    DrawContour(dst3[rc.rect], rc.hull, rc.color, -1);
                     DrawContour(vbc.task.redMap[rc.rect], rc.hull, cv.Scalar.All(rc.index), -1);
                 }
                 redCells.Add(rc);
@@ -50705,7 +50706,7 @@ namespace CS_Classes
                 {
                     if (vbc.task.redCells.Count() <= index) continue;
                     var rc = vbc.task.redCells[index];
-                    DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                    DrawContour(dst3[rc.rect], rc.contour, rc.color, -1);
                     if (vbc.task.redOptions.getNaturalColor())
                         dst3[rc.rect].SetTo(rc.naturalColor, rc.mask);
                     else
@@ -51215,14 +51216,14 @@ namespace CS_Classes
                 if (rc.pixels == 0) continue;
                 if (tmp.CountNonZero() / rc.pixels > 0.5)
                 {
-                    DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                    DrawContour(dst2[rc.rect], rc.contour, rc.color, -1);
                     vCells.Add(rc);
                 }
                 tmp = verts.dst3[rc.rect] & rc.mask;
                 int count = tmp.CountNonZero();
                 if (count / rc.pixels > 0.5)
                 {
-                    DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                    DrawContour(dst3[rc.rect], rc.contour, rc.color, -1);
                     hCells.Add(rc);
                 }
             }
@@ -51256,7 +51257,7 @@ namespace CS_Classes
                 rc = eq.rc;
             }
             dst3.SetTo(0);
-            DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+            DrawContour(dst3[rc.rect], rc.contour, rc.color, -1);
             SetTrueText(eq.strOut, 3);
         }
     }
@@ -51648,7 +51649,8 @@ namespace CS_Classes
             int unMatchedPixels = 0;
             foreach (var cell in vbc.task.redCells)
             {
-                var lastColor = lastMap.Get<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                var vec = lastMap.Get<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                Scalar lastColor = new Scalar(vec.Item0, vec.Item1, vec.Item2);
                 if (lastColor != cell.color)
                 {
                     dst2[cell.rect].SetTo(cell.color, cell.mask);
@@ -51744,14 +51746,15 @@ namespace CS_Classes
             List<rcData> newCells = new List<rcData>();
             vbc.task.redMap.SetTo(0);
             dst3.SetTo(0);
-            List<Vec3b> usedColors = new List<Vec3b> { black };
+            List<Scalar> usedColors = new List<Scalar> { cv.Scalar.Black };
             int unmatched = 0;
             foreach (var cell in vbc.task.redCells)
             {
                 int index = lastMap.Get<byte>(cell.maxDist.Y, cell.maxDist.X);
                 if (index < lastCells.Count())
                 {
-                    cell.color = lastColors.Get<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                    var vec = lastColors.Get<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                    cell.color = new cv.Scalar(vec.Item0, vec.Item1, vec.Item2);
                 }
                 else
                 {
@@ -51870,7 +51873,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             foreach (var rc in motion.redCells)
             {
-                if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, rc.color, -1);
             }
             Mat pc = new Mat(vbc.task.pointCloud.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             vbc.task.pointCloud.CopyTo(pc, dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
@@ -51911,7 +51914,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             foreach (var rc in motion.redCells)
             {
-                if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                if (rc.motionFlag) DrawContour(dst2[rc.rect], rc.contour, rc.color, -1);
             }
             Mat pc = new Mat(vbc.task.pointCloud.Size(), MatType.CV_32FC3, cv.Scalar.All(0));
             vbc.task.pointCloud.CopyTo(pc, dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
@@ -51948,7 +51951,7 @@ namespace CS_Classes
             redCells.Clear();
             dst2.SetTo(0);
             dst3.SetTo(0);
-            List<Vec3b> usedColors = new List<Vec3b> { black };
+            List<Scalar> usedColors = new List<Scalar> { cv.Scalar.Black };
             int motionCount = 0;
             foreach (var nextCell in rMotion.redCells)
             {
@@ -51964,7 +51967,8 @@ namespace CS_Classes
                 }
                 if (index > 0 && index < lastCells.Count())
                 {
-                    cell.color = lastColors.At<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                    var vec = lastColors.Get<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
+                    cell.color = new cv.Scalar(vec.Item0, vec.Item1, vec.Item2);
                 }
                 if (usedColors.Contains(cell.color)) cell.color = randomCellColor();
                 usedColors.Add(cell.color);
@@ -52108,7 +52112,7 @@ namespace CS_Classes
                 rc.contour = ContourBuild(rc.mask, ContourApproximationModes.ApproxNone);
                 DrawContour(rc.mask, rc.contour, cv.Scalar.All(255), -1);
                 redCells[i] = rc;
-                DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                DrawContour(dst3[rc.rect], rc.contour, rc.color, -1);
             }
         }
     }
@@ -52329,7 +52333,7 @@ namespace CS_Classes
                 if (rc.contour.Count() >= 5)
                 {
                     rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
-                    DrawContour(dst2[rc.rect], rc.hull, vecToScalar(rc.color), -1);
+                    DrawContour(dst2[rc.rect], rc.hull, rc.color, -1);
                     DrawContour(rc.mask, rc.hull, cv.Scalar.All(255), -1);
                     vbc.task.redMap[rc.rect].SetTo(rc.index, rc.mask);
                 }
@@ -52622,8 +52626,9 @@ namespace CS_Classes
                     int index = sizes.IndexOf(sizes.Max());
                     rcData rcNext = rc;
                     rcNext = redData[index];
-                    var color = lastImage.Get<Vec3b>(rcNext.maxDStable.Y, rcNext.maxDStable.X);
-                    if (color != black) rcNext.color = color;
+                    var vec = lastImage.Get<Vec3b>(rcNext.maxDStable.Y, rcNext.maxDStable.X);
+                    Scalar color = new Scalar(vec.Item0, vec.Item1, vec.Item2);
+                    if (color != Scalar.Black) rcNext.color = color;
                     rcNext.index = newCells.Count();
                     newCells.Add(rcNext);
                 }
@@ -53112,7 +53117,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             foreach (rcData rc in vbc.task.redCells)
             {
-                DrawContour(dst2[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                DrawContour(dst2[rc.rect], rc.contour, rc.color, -1);
                 if (rc.index == vbc.task.rc.index) DrawContour(dst2[rc.rect], rc.contour, Scalar.White, -1);
             }
             strOut = stats.strOut;
@@ -53407,7 +53412,7 @@ namespace CS_Classes
             foreach (var rc in vbc.task.redCells)
             {
                 if (rc.rect.X == 0 && rc.rect.Y == 0) continue;
-                DrawContour(dst3[rc.rect], rc.contour, vecToScalar(rc.color), -1);
+                DrawContour(dst3[rc.rect], rc.contour, rc.color, -1);
                 if (rc.contour.Count() > 0) SetTrueText(shapeCorrelation(rc.contour).ToString(vbc.fmt3), new cv.Point(rc.rect.X, rc.rect.Y), 3);
             }
             SetTrueText("Move camera to see the value of this algorithm", 2);
@@ -58490,7 +58495,7 @@ namespace CS_Classes
             var pt1 = getWorldCoordinates(new Point3f(c1.X, c1.Y, (float)rc.depthMean[2]));
             var ptCenter = getWorldCoordinates(new Point3f(center.X, center.Y, (float)rc.depthMean[2]));
             var pt2 = getWorldCoordinates(new Point3f(c2.X, c2.Y, (float)rc.depthMean[2]));
-            colors.Add(vecToScalar(rc.color));
+            colors.Add(rc.color);
             points.Add(new Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z));
             points.Add(new Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z));
             points.Add(new Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z));
@@ -58600,7 +58605,8 @@ namespace CS_Classes
                 SetTrueText(rc.depthMean[2].ToString(vbc.fmt1), new cv.Point(roi.X, roi.Y));
                 var topLeft = getWorldCoordinates(new Point3f(roi.X, roi.Y, (float)rc.depthMean[2]));
                 var botRight = getWorldCoordinates(new Point3f(roi.X + roi.Width, roi.Y + roi.Height, (float)rc.depthMean[2]));
-                oglData.Add(new Point3f(rc.color[2] / 255, rc.color[1] / 255, rc.color[0] / 255));
+                oglData.Add(new Point3f((float)rc.color[2] / 255f, (float)rc.color[1] / 255f,
+                                        (float)rc.color[0] / 255f));
                 oglData.Add(new Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, (float)(rc.depthMean[2] + shift.Z)));
                 oglData.Add(new Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, (float)(rc.depthMean[2] + shift.Z)));
                 oglData.Add(new Point3f(botRight.X + shift.X, botRight.Y + shift.Y, (float)(rc.depthMean[2] + shift.Z)));
@@ -58617,7 +58623,7 @@ namespace CS_Classes
     {
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public List<List<double>> depthList = new List<List<double>>();
-        public List<Vec3b> colorList = new List<Vec3b>();
+        public List<Scalar> colorList = new List<Scalar>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
         RedCloud_Hulls hulls = new RedCloud_Hulls();
         public Tessallate_QuadHulls_CS()
@@ -58638,7 +58644,7 @@ namespace CS_Classes
                 for (int i = 0; i < vbc.task.gridRects.Count(); i++)
                 {
                     depthList.Add(new List<double>());
-                    colorList.Add(black);
+                    colorList.Add(cv.Scalar.Black);
                 }
             }
             oglData.Clear();
@@ -58651,7 +58657,7 @@ namespace CS_Classes
                 if (index <= 0)
                 {
                     depthList[i].Clear();
-                    colorList[i] = black;
+                    colorList[i] = cv.Scalar.Black;
                     continue;
                 }
                 var rc = vbc.task.redCells[index];
@@ -58665,7 +58671,8 @@ namespace CS_Classes
                     var depth = depthList[i].Average();
                     var topLeft = getWorldCoordinates(new Point3f(roi.X, roi.Y, (float)depth));
                     var botRight = getWorldCoordinates(new Point3f(roi.X + roi.Width, roi.Y + roi.Height, (float)depth));
-                    oglData.Add(new Point3f(rc.color[2] / 255, rc.color[1] / 255, rc.color[0] / 255));
+                    oglData.Add(new Point3f((float)rc.color[2] / 255f, (float)rc.color[1] / 255f,
+                                            (float)rc.color[0] / 255f));
                     oglData.Add(new Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, (float)(depth + shift.Z)));
                     oglData.Add(new Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, (float)(depth + shift.Z)));
                     oglData.Add(new Point3f(botRight.X + shift.X, botRight.Y + shift.Y, (float)(depth + shift.Z)));
@@ -58685,7 +58692,7 @@ namespace CS_Classes
         public List<cv.Point3f> oglData = new List<cv.Point3f>();
         public List<List<double>> depthList1 = new List<List<double>>();
         public List<List<double>> depthList2 = new List<List<double>>();
-        public List<Vec3b> colorList = new List<Vec3b>();
+        public List<Scalar> colorList = new List<Scalar>();
         public Options_OpenGLFunctions oglOptions = new Options_OpenGLFunctions();
         RedCloud_Basics redC = new RedCloud_Basics();
         public Tessallate_QuadMinMax_CS()
@@ -58708,7 +58715,7 @@ namespace CS_Classes
                 {
                     depthList1.Add(new List<double>());
                     depthList2.Add(new List<double>());
-                    colorList.Add(black);
+                    colorList.Add(cv.Scalar.Black);
                 }
             }
             oglData.Clear();
@@ -58724,7 +58731,7 @@ namespace CS_Classes
                 {
                     depthList1[i].Clear();
                     depthList2[i].Clear();
-                    colorList[i] = black;
+                    colorList[i] = cv.Scalar.Black;
                     continue;
                 }
                 var rc = vbc.task.redCells[index];
@@ -58753,7 +58760,8 @@ namespace CS_Classes
                     var botRight = getWorldCoordinates(new Point3f(roi.X + roi.Width, roi.Y + roi.Height, (float)depth));
                     var color = rc.color;
                     dst3[roi].SetTo(color);
-                    oglData.Add(new Point3f(color[2] / 255f, color[1] / 255f, color[0] / 255f));
+                    oglData.Add(new Point3f((float)rc.color[2] / 255f, (float)rc.color[1] / 255f,
+                                            (float)rc.color[0] / 255f));
                     oglData.Add(new Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, (float)(depth + shift.Z)));
                     oglData.Add(new Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, (float)(depth + shift.Z)));
                     oglData.Add(new Point3f(botRight.X + shift.X, botRight.Y + shift.Y, (float)(depth + shift.Z)));
@@ -58827,7 +58835,8 @@ namespace CS_Classes
                         var avg = depthMaxList[i].Average() - depthMin;
                         depthMax = depthMin + (avg < 0.2 ? avg : 0.2); // trim the max depth - often unreliable 
                         var color = rc.color;
-                        oglData.Add(new Point3f(color[2] / 255f, color[1] / 255f, color[0] / 255f));
+                        oglData.Add(new Point3f((float)rc.color[2] / 255f, (float)rc.color[1] / 255f,
+                                                (float)rc.color[0] / 255f));
                         for (int j = 0; j < 4; j++)
                         {
                             var x = (j == 0) ? roi.X : (j == 1) ? roi.X + roi.Width : (j == 2) ? roi.X + roi.Width : roi.X;
@@ -59559,7 +59568,8 @@ namespace CS_Classes
             }
             var c3D = vbc.task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
             triangles.Clear();
-            var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
+            var color3D = new Point3f((float)rc.color[2] / 255f, (float)rc.color[1]/ 255f,
+                                      (float)rc.color[0]/ 255f);
             for (int i = 0; i < pt3D.Count(); i++)
             {
                 triangles.Add(color3D);
@@ -59635,7 +59645,8 @@ namespace CS_Classes
                     if (vec.Z > 0) pt3D.Add(vec);
                 }
                 var c3D = vbc.task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
-                var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
+                var color3D = new Point3f((float)rc.color[2] / 255f, (float)rc.color[1] / 255f, 
+                                          (float)rc.color[0] / 255f);
                 for (int i = 0; i < pt3D.Count(); i++)
                 {
                     triangles.Add(color3D);
@@ -59693,7 +59704,8 @@ namespace CS_Classes
             }
             var c3D = vbc.task.pointCloud.Get<cv.Point3f>(rc.maxDist.Y, rc.maxDist.X);
             triangles.Clear();
-            var color3D = new Point3f(rc.color.Item2 / 255f, rc.color.Item1 / 255f, rc.color.Item0 / 255f);
+            var color3D = new Point3f((float)rc.color[2] / 255f, (float)rc.color[1] / 255f, 
+                                      (float)rc.color[0] / 255f);
             for (int i = 0; i < pt3D.Count(); i++)
             {
                 triangles.Add(color3D);

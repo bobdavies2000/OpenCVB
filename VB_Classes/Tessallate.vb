@@ -149,7 +149,7 @@ End Class
 Public Class Tessallate_QuadHulls : Inherits TaskParent
     Public oglData As New List(Of cvb.Point3f)
     Public depthList As New List(Of List(Of Single))
-    Public colorList As New List(Of cvb.Vec3b)
+    Public colorList As New List(Of cvb.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -225,7 +225,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
     Public oglData As New List(Of cvb.Point3f)
     Public depthList1 As New List(Of List(Of Single))
     Public depthList2 As New List(Of List(Of Single))
-    Public colorList As New List(Of cvb.Vec3b)
+    Public colorList As New List(Of cvb.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
     Dim redC As New RedCloud_Basics
     Public Sub New()

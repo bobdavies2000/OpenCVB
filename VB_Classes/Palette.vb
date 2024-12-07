@@ -1,5 +1,6 @@
 Imports cvb = OpenCvSharp
 Imports System.IO
+Imports System.Drawing.Imaging
 Public Class Palette_Basics : Inherits TaskParent
     Public whitebackground As Boolean
     Public Sub New()
@@ -374,7 +375,8 @@ Public Class Palette_Random : Inherits TaskParent
         UpdateAdvice(traceName + ": There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
         colorMap = New cvb.Mat(256, 1, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         For i = 0 To 255
-            colorMap.Set(Of cvb.Vec3b)(i, 0, randomCellColor())
+            Dim vec = randomCellColor()
+            colorMap.Set(Of cvb.Vec3b)(i, 0, New cvb.Vec3b(vec(0), vec(1), vec(2)))
         Next
 
         desc = "Build a random colorGrad - no smooth transitions."
@@ -395,7 +397,8 @@ Public Class Palette_Variable : Inherits TaskParent
     Public Sub New()
         colorGrad = New cvb.Mat(1, 256, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         For i = 0 To 255
-            colorGrad.Set(Of cvb.Vec3b)(0, i, randomCellColor())
+            Dim vec = randomCellColor()
+            colorGrad.Set(Of cvb.Vec3b)(0, i, New cvb.Vec3b(vec(0), vec(1), vec(2)))
         Next
         originalColorMap = colorGrad.Clone
         desc = "Build a new palette for every frame."
