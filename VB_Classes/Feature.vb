@@ -457,7 +457,7 @@ End Class
 
 
 Public Class Feature_Delaunay : Inherits TaskParent
-    Dim facet As New Delaunay_Contours
+    Dim delaunay As New Delaunay_Contours
     Dim feat As New Feature_Stable
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
@@ -468,13 +468,13 @@ Public Class Feature_Delaunay : Inherits TaskParent
         dst2 = feat.dst2
         labels(2) = feat.labels(2)
 
-        facet.inputPoints.Clear()
+        delaunay.inputPoints.Clear()
         For Each pt In task.features
-            facet.inputPoints.Add(pt)
+            delaunay.inputPoints.Add(pt)
         Next
 
-        facet.Run(src)
-        dst3 = facet.dst2
+        delaunay.Run(src)
+        dst3 = delaunay.dst2
         For Each pt In task.features
             DrawCircle(dst3, pt, task.DotSize, white)
         Next

@@ -9,8 +9,16 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Floodfill the FeatureLess output so each cell can be tracked."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        fless.Run(src)
-        redC.Run(fless.dst2)
+        If src.Channels = 1 Then
+            Static color As Color8U_Basics
+            If color Is Nothing Then color = New Color8U_Basics
+            color.Run(src)
+            src = color.dst2
+        Else
+            fless.Run(src)
+            src = fless.dst2
+        End If
+        redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
@@ -390,9 +398,7 @@ End Class
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneColor : Inherits TaskParent
     Public options As New Options_Plane
-    Public redC As New RedCloud_Core
-    Dim planeMask As New RedCloud_PlaneFromMask
-    Dim planeContour As New RedCloud_PlaneFromContour
+    Public redC As New RedCloud_Basics
     Dim planeCells As New Plane_CellColor
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
@@ -433,7 +439,7 @@ End Class
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneFromContour : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
         desc = "Create a plane equation each cell's contour"
@@ -469,7 +475,7 @@ End Class
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneFromMask : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
         desc = "Create a plane equation from the pointcloud samples in a RedCloud cell"
@@ -505,14 +511,14 @@ End Class
 
 
 Public Class RedCloud_BProject3D : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
-        desc = "Run RedCloud_Core on the output of the RGB 3D backprojection"
+        desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         hcloud.Run(src)
-        dst3 = hcloud.dst2
+        dst3 = hcloud.dst3
 
         dst3.ConvertTo(dst0, cvb.MatType.CV_8U)
         redC.Run(dst0)
@@ -596,97 +602,17 @@ End Class
 
 Public Class RedCloud_KMeans : Inherits TaskParent
     Dim km As New KMeans_MultiChannel
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
-        labels = {"", "", "KMeans_MultiChannel output", "RedCloud_Core output"}
+        labels = {"", "", "KMeans_MultiChannel output", "RedCloud_Basics output"}
         desc = "Use RedCloud to identify the regions created by kMeans"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         km.Run(src)
         dst3 = km.dst2
 
-        redC.Run(km.dst3)
-        dst2 = redC.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class RedCloud_Diff : Inherits TaskParent
-    Dim diff As New Diff_RGBAccum
-    Dim redC As New RedCloud_Core
-    Public Sub New()
-        labels = {"", "", "Diff output, RedCloud input", "RedCloud output"}
-        desc = "Isolate blobs in the diff output with RedCloud"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        SetTrueText("Wave at the camera to see the segmentation of the motion.", 3)
-        diff.Run(src)
-        dst3 = diff.dst2
-
         redC.Run(dst3)
-        dst2.SetTo(0)
-        redC.dst2.CopyTo(dst2, dst3)
-
-        labels(3) = CStr(task.redCells.Count) + " objects identified in the diff output"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class RedCloud_ProjectCell : Inherits TaskParent
-    Dim topView As New Hist_ShapeTop
-    Dim sideView As New Hist_ShapeSide
-    Dim mats As New Mat_4Click
-    Dim redC As New RedCloud_Core
-    Public Sub New()
-        task.gOptions.setDisplay1()
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        labels(3) = "Top: XZ values and mask, Bottom: ZY values and mask"
-        desc = "Visualize the top and side projection of a RedCloud cell"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
         dst2 = redC.dst2
-
-        'labels(2) = redC.labels(2)
-
-        'Dim rc = task.rc
-
-        'Dim pc = New cvb.Mat(rc.rect.Height, rc.rect.Width, cvb.MatType.CV_32FC3, 0)
-        'task.pointCloud(rc.rect).CopyTo(pc, rc.mask)
-
-        'topView.rc = rc
-        'topView.Run(pc)
-
-        'sideView.rc = rc
-        'sideView.Run(pc)
-
-        'mats.mat(0) = topView.dst2
-        'mats.mat(1) = topView.dst3
-        'mats.mat(2) = sideView.dst2
-        'mats.mat(3) = sideView.dst3
-        'mats.Run(empty)
-        'dst1 = mats.dst2
-        'dst3 = mats.dst3
-
-        'Dim padX = dst2.Width / 15
-        'Dim padY = dst2.Height / 20
-        'strOut = "Top" + vbTab + "Top Mask" + vbCrLf + vbCrLf + "Side" + vbTab + "Side Mask"
-        'SetTrueText(strOut, New cvb.Point(dst2.Width / 2 - padX, dst2.Height / 2 - padY), 1)
-        'SetTrueText("Select a RedCloud cell above to project it into the top and side views at left.", 3)
     End Sub
 End Class
 
@@ -698,7 +624,7 @@ End Class
 
 Public Class RedCloud_LikelyFlatSurfaces : Inherits TaskParent
     Dim verts As New Plane_Basics
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public vCells As New List(Of rcData)
     Public hCells As New List(Of rcData)
     Public Sub New()
@@ -743,7 +669,7 @@ End Class
 
 
 Public Class RedCloud_PlaneEq3D : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Dim eq As New Plane_Equation
     Public Sub New()
         desc = "If a RedColor cell contains depth then build a plane equation"

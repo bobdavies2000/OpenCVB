@@ -51147,54 +51147,6 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Diff_CS : TaskParent
-    {
-        Diff_RGBAccum diff = new Diff_RGBAccum();
-        RedCloud_Core redC = new RedCloud_Core();
-        public RedCloud_Diff_CS()
-        {
-            labels = new string[] { "", "", "Diff output, RedCloud input", "RedCloud output" };
-            desc = "Isolate blobs in the diff output with RedCloud";
-        }
-        public void RunAlg(Mat src)
-        {
-            SetTrueText("Wave at the camera to see the segmentation of the motion.", 3);
-            diff.Run(src);
-            dst3 = diff.dst2;
-            redC.Run(dst3);
-            dst2.SetTo(0);
-            redC.dst2.CopyTo(dst2, dst3);
-            labels[3] = vbc.task.redCells.Count() + " objects identified in the diff output";
-        }
-    }
-
-
-
-
-    public class RedCloud_ProjectCell_CS : TaskParent
-    {
-        Hist_ShapeTop topView = new Hist_ShapeTop();
-        Hist_ShapeSide sideView = new Hist_ShapeSide();
-        Mat_4Click mats = new Mat_4Click();
-        RedCloud_Core redC = new RedCloud_Core();
-        public RedCloud_ProjectCell_CS()
-        {
-            vbc.task.gOptions.setDisplay1();
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            labels[3] = "Top: XZ values and mask, Bottom: ZY values and mask";
-            desc = "Visualize the top and side projection of a RedCloud cell";
-        }
-        public void RunAlg(Mat src)
-        {
-            redC.Run(src);
-            dst2 = redC.dst2;
-            // The commented code is omitted for clarity
-        }
-    }
-
-
-
-
     public class RedCloud_LikelyFlatSurfaces_CS : TaskParent
     {
         Plane_Basics verts = new Plane_Basics();

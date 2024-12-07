@@ -72,6 +72,8 @@ Public Class Delaunay_Contours : Inherits TaskParent
             inputPoints = New List(Of cvb.Point2f)(randEnum.points)
         End If
 
+        If inputPoints.Count = 0 Then inputPoints = task.features
+
         subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(inputPoints)
 

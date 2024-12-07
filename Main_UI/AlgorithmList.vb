@@ -3177,8 +3177,6 @@ End Enum
 	If algorithmName = "RedCloud_Depth_CS" Then return new RedCloud_Depth_CS
 	If algorithmName = "RedCloud_DepthOutline" Then return new RedCloud_DepthOutline
 	If algorithmName = "RedCloud_DepthOutline_CS" Then return new RedCloud_DepthOutline_CS
-	If algorithmName = "RedCloud_Diff" Then return new RedCloud_Diff
-	If algorithmName = "RedCloud_Diff_CS" Then return new RedCloud_Diff_CS
 	If algorithmName = "RedCloud_Equations" Then return new RedCloud_Equations
 	If algorithmName = "RedCloud_Equations_CS" Then return new RedCloud_Equations_CS
 	If algorithmName = "RedCloud_FeatureLessReduce" Then return new RedCloud_FeatureLessReduce
@@ -3245,8 +3243,6 @@ End Enum
 	If algorithmName = "RedCloud_Planes_CS" Then return new RedCloud_Planes_CS
 	If algorithmName = "RedCloud_PlusTiers" Then return new RedCloud_PlusTiers
 	If algorithmName = "RedCloud_PlusTiers_CS" Then return new RedCloud_PlusTiers_CS
-	If algorithmName = "RedCloud_ProjectCell" Then return new RedCloud_ProjectCell
-	If algorithmName = "RedCloud_ProjectCell_CS" Then return new RedCloud_ProjectCell_CS
 	If algorithmName = "RedCloud_Reduce" Then return new RedCloud_Reduce
 	If algorithmName = "RedCloud_Reduce_CC" Then return new CPP_Basics(ccFunctionNames._RedCloud_Reduce_CC)
 	If algorithmName = "RedCloud_Reduce_CS" Then return new RedCloud_Reduce_CS
