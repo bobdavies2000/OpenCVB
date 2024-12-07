@@ -8242,7 +8242,8 @@ namespace CS_Classes
             {
                 cv.Point[] tour = allContours[sortedList.ElementAt(i).Value];
                 contourlist.Add(tour);
-                Scalar color = vecToScalar(dst2.Get<Vec3b>(tour[0].Y, tour[0].X));
+                var vec1 = dst2.Get<cv.Vec3b>(tour[0].Y, tour[0].X);
+                Scalar color = new cv.Scalar(vec1.Item0, vec1.Item1, vec1.Item2);
                 DrawContour(dst3, tour.ToList(), color, -1);
             }
             labels[3] = $"Top {sortedList.Count} contours found";
@@ -10856,8 +10857,8 @@ namespace CS_Classes
             var facetCenters = new Point2f[1];
             subdiv.GetVoronoiFacetList(new List<int>(), out facets, out facetCenters);
 
-            var usedColors = new List<Vec3b>();
-            usedColors.Add(new Vec3b(0, 0, 0));
+            var usedColors = new List<cv.Scalar>();
+            usedColors.Add(new cv.Scalar(0, 0, 0));
             facetList.Clear();
             for (int i = 0; i < facets.GetUpperBound(0); i++)
             {
@@ -10868,14 +10869,15 @@ namespace CS_Classes
                 }
 
                 var pt = inputPoints[i];
-                var nextColor = dst3.Get<Vec3b>((int)pt.Y, (int)pt.X);
+                var vec = dst3.Get<Vec3b>((int)pt.Y, (int)pt.X);
+                Scalar nextColor = new cv.Scalar(vec.Item0, vec.Item1, vec.Item2);
                 if (usedColors.Contains(nextColor))
                 {
-                    nextColor = randomCellColor().ToVec3b();
+                    nextColor = randomCellColor();
                 }
                 usedColors.Add(nextColor);
 
-                dst2.FillConvexPoly(nextFacet.ToArray(), vecToScalar(nextColor));
+                dst2.FillConvexPoly(nextFacet.ToArray(), nextColor);
                 facet32s.FillConvexPoly(nextFacet.ToArray(), cv.Scalar.All(i), vbc.task.lineType);
                 facetList.Add(nextFacet);
             }
@@ -17356,8 +17358,9 @@ namespace CS_Classes
                 foreach (var pt in pt_List)
                 {
                     DrawCircle(vbc.task.color, pt, vbc.task.DotSize, vbc.task.HighlightColor);
-                    Vec3b c = dst3.Get<Vec3b>((int)pt.Y, (int)pt.X);
-                    DrawCircle(dst2, pt, vbc.task.DotSize + 1, vecToScalar(c));
+                    Vec3b vec = dst3.Get<Vec3b>((int)pt.Y, (int)pt.X);
+                    cv.Scalar c = new cv.Scalar(vec.Item0, vec.Item1, vec.Item2);
+                    DrawCircle(dst2, pt, vbc.task.DotSize + 1, c);
                 }
             }
             labels[2] = $"{vbc.task.features.Count} features were identified in the image.";
@@ -41160,7 +41163,8 @@ namespace CS_Classes
                     {
                         ifacet.Clear();
                         ifacet.AddRange(facets[i].Select(p => new cv.Point(p.X, p.Y)));
-                        Scalar color = vecToScalar(vbc.task.vecColors[i % 256]);
+                        var vec = vbc.task.vecColors[i % 256];
+                        Scalar color = new cv.Scalar(vec.Item0, vec.Item1, vec.Item2);
                         dst3.FillConvexPoly(ifacet, color, cv.LineTypes.Link8, 0);
                         ifacets[0] = ifacet;
                         Cv2.Polylines(dst3, ifacets, true, new cv.Scalar(), vbc.task.lineWidth, vbc.task.lineType);
@@ -41589,7 +41593,8 @@ namespace CS_Classes
                 for (int x = 0; x < img.Width; x++)
                 {
                     var nPt = rand.Get<cv.Point>(y, x);
-                    var nextColor = src.Get<Vec3b>(saveDrawRect.Y + nPt.Y, saveDrawRect.X + nPt.X);
+                    var vec = src.Get<Vec3b>(saveDrawRect.Y + nPt.Y, saveDrawRect.X + nPt.X);
+                    var nextColor = new cv.Scalar(vec.Item0, vec.Item1, vec.Item2);
                     var fx = fieldx[saveDrawRect].Get<float>(nPt.Y, nPt.X);
                     var fy = fieldy[saveDrawRect].Get<float>(nPt.Y, nPt.X);
                     var nPoint = new Point2f(nPt.X, nPt.Y);
@@ -41601,11 +41606,11 @@ namespace CS_Classes
                     var rotatedRect = new RotatedRect(nPoint, eSize, (float)angle);
                     if (options.useElliptical)
                     {
-                        dst2[saveDrawRect].Ellipse(rotatedRect, vecToScalar(nextColor));
+                        dst2[saveDrawRect].Ellipse(rotatedRect, nextColor);
                     }
                     else
                     {
-                        DrawCircle(dst2[saveDrawRect], nPoint, (int)(slen / 4), vecToScalar(nextColor));
+                        DrawCircle(dst2[saveDrawRect], nPoint, (int)(slen / 4), nextColor);
                     }
                 }
             }
@@ -51290,8 +51295,8 @@ namespace CS_Classes
             {
                 foreach (var pt in ptList)
                 {
-                    var c = dst2.Get<Vec3b>((int)pt.Y, (int)pt.X);
-                    DrawCircle(dst3, pt, vbc.task.DotSize, vecToScalar(c));
+                    var vec = dst2.Get<Vec3b>((int)pt.Y, (int)pt.X);
+                    DrawCircle(dst3, pt, vbc.task.DotSize, new cv.Scalar(vec.Item0, vec.Item1, vec.Item2));
                 }
             }
         }

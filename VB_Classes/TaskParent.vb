@@ -140,9 +140,6 @@ Public Class TaskParent : Implements IDisposable
 
         Return b
     End Function
-    Public Function vecToScalar(v As cvb.Vec3b) As cvb.Scalar
-        Return New cvb.Scalar(v(0), v(1), v(2))
-    End Function
     Public Sub DrawRotatedRect(rotatedRect As cvb.RotatedRect, dst As cvb.Mat, color As cvb.Scalar)
         Dim vertices2f = rotatedRect.Points()
         Dim vertices(vertices2f.Length - 1) As cvb.Point

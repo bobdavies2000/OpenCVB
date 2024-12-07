@@ -331,7 +331,7 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
         Dim facets = New cvb.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
-        Dim usedColors As New List(Of cvb.Vec3b)
+        Dim usedColors As New List(Of cvb.Scalar)
         facetList.Clear()
         Static lastColor = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         For i = 0 To facets.Length - 1
@@ -341,11 +341,12 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
             Next
 
             Dim pt = inputPoints(i)
-            Dim nextColor = lastColor.Get(Of cvb.Vec3b)(pt.Y, pt.X)
+            Dim vec As cvb.Vec3b = lastColor.Get(Of cvb.Vec3b)(pt.Y, pt.X)
+            Dim nextColor As cvb.Scalar = vec.ToVec3d
             If usedColors.Contains(nextColor) Then nextColor = randomCellColor()
             usedColors.Add(nextColor)
 
-            dst2.FillConvexPoly(nextFacet, vecToScalar(nextColor))
+            dst2.FillConvexPoly(nextFacet, nextColor)
             facet32s.FillConvexPoly(nextFacet, i, task.lineType)
             facetList.Add(nextFacet)
         Next

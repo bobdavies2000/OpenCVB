@@ -146,10 +146,12 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
         For i = 0 To knn.neighbors.Count - 1
             Dim p1 = knn.queries(i)
             Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
-            Dim p2 = knn.trainInput(index)
-            DrawCircle(dst3, p1, task.DotSize, cvb.Scalar.Yellow)
-            DrawCircle(dst3, p2, task.DotSize, cvb.Scalar.Yellow)
-            DrawLine(dst3, p1, p2, white)
+            If index >= 0 And index < knn.trainInput.Count Then
+                Dim p2 = knn.trainInput(index)
+                DrawCircle(dst3, p1, task.DotSize, cvb.Scalar.Yellow)
+                DrawCircle(dst3, p2, task.DotSize, cvb.Scalar.Yellow)
+                DrawLine(dst3, p1, p2, white)
+            End If
         Next
         knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
     End Sub
@@ -248,8 +250,10 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
         For i = 0 To knn.neighbors.Count - 1
             Dim p1 = knn.queries(i)
             Dim index = knn.neighbors(i)(0) ' find nearest
-            Dim p2 = knn.trainInput(index)
-            If p1.DistanceTo(p2) < maxDistance Then featureList.Add(p1)
+            If index >= 0 And index < knn.trainInput.Count Then
+                Dim p2 = knn.trainInput(index)
+                If p1.DistanceTo(p2) < maxDistance Then featureList.Add(p1)
+            End If
         Next
         knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
     End Sub
