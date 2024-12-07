@@ -3,10 +3,8 @@ Imports OpenCvSharp
 Imports cvb = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim delaunay As New FCS_Delaunay
-    Public buildFeatures As Boolean = True
     Dim match As New Match_Basics
     Dim options As New Options_FCSMatch
-    Dim feat As New Feature_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         labels(1) = "The feature point of each cell."
@@ -16,7 +14,6 @@ Public Class FCS_Basics : Inherits TaskParent
         options.RunOpt()
 
         task.fpSrc = src.Clone
-        If buildFeatures Then feat.Run(src)
 
         task.fpListLast = New List(Of fpData)(task.fpList)
         task.fpMapLast = task.fpMap.Clone
@@ -277,7 +274,6 @@ Public Class FCS_RedCloud : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Dim knnMin As New KNN_MinDistance
     Public Sub New()
-        fcs.buildFeatures = False
         desc = "Use the RedCloud maxDist points as feature points in an FCS display."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -626,7 +622,6 @@ Public Class FCS_ViewLeftRight : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public options As New Options_Features
     Public Sub New()
-        fcs.buildFeatures = False
         desc = "Use both the left and right features as input to the FCS_Basics"
     End Sub
     Private Function getPoints(src As cvb.Mat) As List(Of cvb.Point2f)
@@ -638,15 +633,12 @@ Public Class FCS_ViewLeftRight : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        Dim fLeft = getPoints(task.leftView)
         Dim fRight = getPoints(task.rightView)
 
-        task.features.Clear()
         Dim ptLeft As New List(Of cvb.Point)
         Dim ptRight As New List(Of cvb.Point)
-        For Each pt In fLeft
+        For Each pt In task.features
             Dim p = New cvb.Point(CInt(pt.X), CInt(pt.Y))
-            task.features.Add(p)
             ptLeft.Add(p)
         Next
         For Each pt In fRight
@@ -1137,7 +1129,6 @@ Public Class FCS_Lines1 : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim fcs As New FCS_Basics
     Public Sub New()
-        fcs.buildFeatures = False
         labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
         desc = "Use lines as input to FCS."
     End Sub
@@ -1176,7 +1167,6 @@ Public Class FCS_Lines : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim fcs As New FCS_Basics
     Public Sub New()
-        fcs.buildFeatures = False
         FindSlider("Min Line Length").Value = 60
         FindSlider("Distance to next center").Value = 1
         labels(3) = "Cell boundaries with the age (in frames) for each cell."

@@ -458,20 +458,13 @@ End Class
 
 Public Class Feature_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Contours
-    Dim feat As New Feature_Stable
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
-        labels(2) = feat.labels(2)
-
-        delaunay.inputPoints.Clear()
-        For Each pt In task.features
-            delaunay.inputPoints.Add(pt)
-        Next
+        dst2 = task.feat.dst2
+        labels(2) = task.feat.labels(2)
 
         delaunay.Run(src)
         dst3 = delaunay.dst2

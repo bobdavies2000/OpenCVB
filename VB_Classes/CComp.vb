@@ -108,13 +108,6 @@ Public Class CComp_Both : Inherits TaskParent
         dst2 = below.dst3
         dst1 = below.dst1
         labels(3) = above.labels(3)
-
-        'Dim dark = src.Threshold(above.options.dark, 255, cvb.ThresholdTypes.Binary)
-        'above.Run(dark)
-        'dst3 = above.dst3
-        'dst1 += (above.dst1 + below.numberOfLabels)
-        'dst2 += dst3
-        'labels(2) = above.labels(3)
     End Sub
 End Class
 

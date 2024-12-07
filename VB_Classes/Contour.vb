@@ -903,7 +903,6 @@ End Class
 
 
 Public Class Contour_FromPoints : Inherits TaskParent
-    Dim contour As New Contour_Basics
     Dim random As New Random_Basics
     Public Sub New()
         FindSlider("Random Pixel Count").Value = 3
@@ -930,5 +929,27 @@ Public Class Contour_FromPoints : Inherits TaskParent
 
         dst3.SetTo(0)
         DrawContour(dst3, hull, white, -1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_Cells : Inherits TaskParent
+    Public redC As New RedCloud_Core
+    Public cellmap As New cvb.Mat
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        task.redOptions.setUseColorOnly(True)
+        desc = "Create RedCloud output using only color"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        cellmap = task.redMap
+        redCells = task.redCells
     End Sub
 End Class

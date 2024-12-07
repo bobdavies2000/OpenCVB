@@ -340,80 +340,70 @@ Public Class Cell_Generate : Inherits TaskParent
             src = redCPP.dst2
         End If
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim retained As Integer
-        Dim initialList As New List(Of rcData)({New rcData})
-        For i = 1 To classCount - 1
+        Dim retained As Integer = 0
+        Dim initialList As New List(Of rcData)
+        Dim usedColors = New List(Of cvb.Scalar)({black})
+        For i = 0 To rectList.Count - 1
             Dim rc As New rcData
-            rc.index = i - 1
-            rc.rect = rectList(rc.index)
+            rc.rect = rectList(i)
             If rc.rect.Size = dst2.Size Then Continue For ' RedCloud_Basics finds a cell this big.  
-            rc.mask = src(rc.rect).InRange(i, i)
+            rc.mask = src(rc.rect).InRange(i + 1, i + 1)
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             rc.motionPixels = task.motionMask(rc.rect).CountNonZero
-            rc.floodPoint = floodPoints(rc.index)
-            If rc.motionPixels = 0 And rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
-                rc = task.redCells(rc.indexLast)
-                rc.age += 1
+            rc.floodPoint = floodPoints(i)
+            If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
+                Dim lrc = task.redCells(rc.indexLast)
+                rc.age = lrc.age + 1
+                rc.color = lrc.color
+                If usedColors.Contains(rc.color) Then rc.color = randomCellColor()
                 retained += 1
+            Else
+                rc.age = 1
+                rc.color = randomCellColor()
             End If
 
+            usedColors.Add(rc.color)
             initialList.Add(rc)
         Next
 
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
         For Each rc In initialList
-            If rc.age = 0 Then
-                If rc.index = 2 Then Dim k = 0
-                rc.age = 1
-                If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
-                    Dim lrc = task.redCells(rc.indexLast)
-                    lrc.mask = rc.mask
-                    lrc.rect = rc.rect
-                    lrc.age = lrc.age + 1
-                    lrc.maxDist = rc.maxDist
-                    lrc.indexLast = rc.indexLast
-                    lrc.motionPixels = rc.motionPixels
-                    lrc.floodPoint = rc.floodPoint
-                    rc = lrc
-                Else
-                    rc.color = randomCellColor()
-                End If
+            cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            rc.naturalColor = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
 
-                cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-                rc.naturalColor = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            DrawContour(rc.mask, rc.contour, 255, -1)
+            If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
-                rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-                DrawContour(rc.mask, rc.contour, 255, -1)
-                If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
+            rc.maxDStable = rc.maxDist
 
-                rc.maxDStable = rc.maxDist
+            ' the number of pixels - may have changed with the infill or contour.
+            rc.pixels = rc.mask.CountNonZero
+            If rc.pixels = 0 Then Continue For
 
-                ' the number of pixels - may have changed with the infill or contour.
-                rc.pixels = rc.mask.CountNonZero
-                If rc.pixels = 0 Then Continue For
+            rc.depthMask = rc.mask.Clone
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
 
-                rc.depthMask = rc.mask.Clone
-                rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-                rc.depthPixels = rc.depthMask.CountNonZero
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
 
-                If rc.depthPixels Then
-                    task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
-                    task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
-                    task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
-
-                    cvb.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
-                End If
+                cvb.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
 
             sortedCells.Add(rc.pixels, rc)
         Next
 
-        task.redCells = New List(Of rcData)(sortedCells.Values)
         dst2 = RebuildCells(sortedCells)
 
         Static saveRetained As Integer = retained
         If retained > 0 Then saveRetained = retained
-        If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " total cells with " + CStr(saveRetained) + " exact matches"
+        If task.heartBeat Then
+            labels(2) = CStr(task.redCells.Count) + " total cells with " +
+                        CStr(saveRetained) + " matched to previous frame"
+        End If
     End Sub
 End Class

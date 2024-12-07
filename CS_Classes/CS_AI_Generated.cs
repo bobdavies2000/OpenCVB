@@ -17181,7 +17181,6 @@ namespace CS_Classes
     public class Feature_Delaunay_CS : TaskParent
     {
         Delaunay_Contours facet = new Delaunay_Contours();
-        Feature_Stable feat = new Feature_Stable();
         public Feature_Delaunay_CS()
         {
             FindSlider("Min Distance to next").Value = 10;
@@ -17189,14 +17188,9 @@ namespace CS_Classes
         }
         public void RunAlg(Mat src)
         {
-            feat.Run(src);
-            dst2 = feat.dst2;
-            labels[2] = feat.labels[2];
-            facet.inputPoints.Clear();
-            foreach (var pt in vbc.task.features)
-            {
-                facet.inputPoints.Add(pt);
-            }
+            dst2 = vbc.task.feat.dst2;
+            labels[2] = vbc.task.feat.labels[2];
+
             facet.Run(src);
             dst3 = facet.dst2;
             foreach (var pt in vbc.task.features)
@@ -51623,43 +51617,6 @@ namespace CS_Classes
         }
     }
 
-
-
-
-    public class RedCloud_Overlaps_CS : TaskParent
-    {
-        public List<rcData> redCells = new List<rcData>();
-        public Mat cellMap;
-        RedCloud_Core redC = new RedCloud_Core();
-        public RedCloud_Overlaps_CS()
-        {
-            cellMap = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            desc = "Remove the overlapping cells.  Keep the largest.";
-        }
-        public void RunAlg(Mat src)
-        {
-            redC.Run(src);
-            dst2 = redC.dst2;
-            labels = redC.labels;
-            List<int> overlappingCells = new List<int>();
-            cellMap.SetTo(0);
-            redCells.Clear();
-            foreach (var rc in vbc.task.redCells)
-            {
-                var valMap = cellMap.Get<byte>(rc.maxDist.Y, rc.maxDist.X);
-                cellMap[rc.rect].SetTo(rc.index, rc.mask);
-                redCells.Add(rc);
-            }
-            dst3.SetTo(0);
-            for (int i = overlappingCells.Count() - 1; i >= 0; i--)
-            {
-                var rc = redCells[overlappingCells[i]];
-                dst3[rc.rect].SetTo(rc.color, rc.mask);
-                redCells.RemoveAt(overlappingCells[i]);
-            }
-            labels[3] = "Before removing overlapping cells: " + vbc.task.redCells.Count().ToString() + ". After: " + redCells.Count().ToString();
-        }
-    }
 
 
 

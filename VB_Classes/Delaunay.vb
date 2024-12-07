@@ -58,7 +58,6 @@ End Class
 
 
 Public Class Delaunay_Contours : Inherits TaskParent
-    Public inputPoints As New List(Of cvb.Point2f)
     Dim randEnum As New Random_Enumerable
     Dim subdiv As New cvb.Subdiv2D
     Public Sub New()
@@ -67,15 +66,8 @@ Public Class Delaunay_Contours : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.heartBeat And standalone Then
-            randEnum.Run(empty)
-            inputPoints = New List(Of cvb.Point2f)(randEnum.points)
-        End If
-
-        If inputPoints.Count = 0 Then inputPoints = task.features
-
         subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
-        subdiv.Insert(inputPoints)
+        subdiv.Insert(task.features)
 
         Dim facets = New cvb.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
@@ -89,7 +81,7 @@ Public Class Delaunay_Contours : Inherits TaskParent
 
             DrawContour(dst2, ptList, 255, 1)
         Next
-        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+        labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells were present."
     End Sub
 End Class
 

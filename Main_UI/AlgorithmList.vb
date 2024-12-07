@@ -3229,8 +3229,6 @@ End Enum
 	If algorithmName = "RedCloud_OnlyColorHist3D_CS" Then return new RedCloud_OnlyColorHist3D_CS
 	If algorithmName = "RedCloud_OutlineColor" Then return new RedCloud_OutlineColor
 	If algorithmName = "RedCloud_OutlineColor_CS" Then return new RedCloud_OutlineColor_CS
-	If algorithmName = "RedCloud_Overlaps" Then return new RedCloud_Overlaps
-	If algorithmName = "RedCloud_Overlaps_CS" Then return new RedCloud_Overlaps_CS
 	If algorithmName = "RedCloud_PlaneColor" Then return new RedCloud_PlaneColor
 	If algorithmName = "RedCloud_PlaneColor_CS" Then return new RedCloud_PlaneColor_CS
 	If algorithmName = "RedCloud_PlaneEq3D" Then return new RedCloud_PlaneEq3D

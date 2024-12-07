@@ -101,6 +101,7 @@ Public Class VBtask : Implements IDisposable
     Public grid As Grid_Basics
     Public ogl As OpenGL_Basics
     Public palette As Palette_LoadColorMap
+    Public feat As Feature_Basics
 
     Public drawRotatedRect As Draw_RotatedRect
     Public centerRect As cvb.Rect
@@ -411,6 +412,8 @@ Public Class VBtask : Implements IDisposable
 
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
+
+        feat = New Feature_Basics
 
         colorizer = New Depth_Colorizer_CPP_VB
         IMUBasics = New IMU_Basics
@@ -780,6 +783,8 @@ Public Class VBtask : Implements IDisposable
 
             cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
+
+        feat.Run(src)
 
         colorizer.RunAlg(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc))
         task.depthRGB = colorizer.dst2.Clone
