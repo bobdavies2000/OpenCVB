@@ -501,13 +501,15 @@ Public Class VBtask : Implements IDisposable
     End Sub
     Public Sub setSelectedContour()
         If task.redCells.Count = 0 Then Exit Sub
-        If task.ClickPoint = newPoint And task.redCells.Count > 1 Then task.ClickPoint = task.redCells(1).maxDist
+        If task.ClickPoint = newPoint And task.redCells.Count > 1 Then
+            task.ClickPoint = task.redCells(1).maxDist
+        End If
         Dim index = task.redMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         If index > 0 And index < task.redCells.Count Then
             ' task.ClickPoint = task.redCells(index).maxDist
             task.rc = task.redCells(index)
         Else
-            task.rc = task.redCells(0)
+            task.rc = task.redCells(1)
         End If
     End Sub
     Private Function checkIntermediateResults(lookupName As String) As TaskParent
@@ -583,38 +585,15 @@ Public Class VBtask : Implements IDisposable
             If task.redCells.Count > 0 Then setSelectedContour()
 
             If task.redOptions.IdentifyCells.Checked Then
-                Dim ptNew As New cvb.Point
-                For i = redCells.Count - 1 To Math.Max(redCells.Count - 20, 0) Step -1
-                    Dim rc = redCells(i)
-                    Dim str As New TrueText(CStr(rc.age), rc.maxDist, 2)
+                ' cannot use rc as it means task.rc here!  Be careful...
+                For Each rcX In task.redCells
+                    Dim str As New TrueText(CStr(rcX.index), rcX.maxDist, 2)
                     trueData.Add(str)
+                    If rcX.index = 20 Then Exit For
                 Next
 
-                task.color.Rectangle(rc.rect, cvb.Scalar.Yellow, task.lineWidth)
-                task.color(rc.rect).SetTo(cvb.Scalar.White, rc.mask)
-
-                task.depthRGB.Rectangle(rc.rect, cvb.Scalar.Yellow, task.lineWidth)
-                If task.redOptions.DisplayCellStats.Checked Then
-                    dst3.SetTo(0)
-                    If task.ClickPoint = newPoint Then
-                        If task.redCells.Count > 1 Then
-                            task.rc = task.redCells(1)
-                            task.ClickPoint = task.rc.maxDist
-                        End If
-                    End If
-                    If cellStats Is Nothing Then cellStats = New Cell_Basics
-                    cellStats.statsString()
-                    dst1 = cellStats.dst1
-                    Dim str As New TrueText(cellStats.strOut, New cvb.Point, 3)
-                    trueData.Add(str)
-                End If
-            End If
-
-            If task.redOptions.DisplayCellStats.Checked And task.ClickPoint = newPoint Then
-                If task.redCells.Count > 1 Then
-                    task.rc = task.redCells(1)
-                    task.ClickPoint = task.rc.maxDist
-                End If
+                task.color.Rectangle(task.rc.rect, cvb.Scalar.Yellow, task.lineWidth)
+                task.color(task.rc.rect).SetTo(cvb.Scalar.White, rc.mask)
             End If
 
             If task.gOptions.showMotionMask.Checked Then
@@ -651,7 +630,7 @@ Public Class VBtask : Implements IDisposable
         End If
         Return mm
     End Function
-    Public Sub RunAlgorithm()
+    Public Function RunAlgorithm() As Boolean
         If allOptions.titlesAdded Then
             allOptions.titlesAdded = False
             allOptions.layoutOptions(normalRequest:=True)
@@ -819,6 +798,7 @@ Public Class VBtask : Implements IDisposable
         '    src = rgbFilter.dst2
         'End If
 
+        Dim saveOptionsChanged = task.optionsChanged
         If task.paused = False Then
             task.trueData.Clear()
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
@@ -826,5 +806,6 @@ Public Class VBtask : Implements IDisposable
             task.heartBeatLT = False
             postProcess(src)
         End If
-    End Sub
+        Return saveOptionsChanged
+    End Function
 End Class

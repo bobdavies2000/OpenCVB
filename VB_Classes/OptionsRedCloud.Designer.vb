@@ -64,10 +64,10 @@ Partial Class OptionsRedCloud
         Me.IdentifyCountLabel = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
-        Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.NaturalColor = New System.Windows.Forms.CheckBox()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
+        Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -536,16 +536,6 @@ Partial Class OptionsRedCloud
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 11
         '
-        'IdentifyCells
-        '
-        Me.IdentifyCells.AutoSize = True
-        Me.IdentifyCells.Location = New System.Drawing.Point(1049, 277)
-        Me.IdentifyCells.Name = "IdentifyCells"
-        Me.IdentifyCells.Size = New System.Drawing.Size(200, 24)
-        Me.IdentifyCells.TabIndex = 75
-        Me.IdentifyCells.Text = "Identify RedCloud Cells"
-        Me.IdentifyCells.UseVisualStyleBackColor = True
-        '
         'DisplayCellStats
         '
         Me.DisplayCellStats.AutoSize = True
@@ -579,6 +569,16 @@ Partial Class OptionsRedCloud
         Me.CheckBox1.TabIndex = 77
         Me.CheckBox1.Text = "Exact matches only"
         Me.CheckBox1.UseVisualStyleBackColor = True
+        '
+        'IdentifyCells
+        '
+        Me.IdentifyCells.AutoSize = True
+        Me.IdentifyCells.Location = New System.Drawing.Point(1049, 277)
+        Me.IdentifyCells.Name = "IdentifyCells"
+        Me.IdentifyCells.Size = New System.Drawing.Size(200, 24)
+        Me.IdentifyCells.TabIndex = 75
+        Me.IdentifyCells.Text = "Identify RedCloud Cells"
+        Me.IdentifyCells.UseVisualStyleBackColor = True
         '
         'OptionsRedCloud
         '
@@ -664,8 +664,8 @@ Partial Class OptionsRedCloud
     Friend WithEvents LabelIdentify As System.Windows.Forms.Label
     Friend WithEvents IdentifyCountBar As System.Windows.Forms.TrackBar
     Friend WithEvents IdentifyCountLabel As System.Windows.Forms.Label
-    Friend WithEvents IdentifyCells As System.Windows.Forms.CheckBox
     Friend WithEvents DisplayCellStats As System.Windows.Forms.CheckBox
     Friend WithEvents NaturalColor As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox1 As System.Windows.Forms.CheckBox
+    Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
 End Class

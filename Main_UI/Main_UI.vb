@@ -1543,7 +1543,7 @@ Public Class Main_UI
             Dim saveDrawRect As cvb.Rect
 
             SyncLock trueDataLock
-                trueData.Clear()
+                trueData.Clear() ' clear out any truetext from a previous algorithm...
             End SyncLock
             While 1
                 Dim waitTime = Now
@@ -1664,9 +1664,16 @@ Public Class Main_UI
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
 
-                task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
+                Dim optionsChange = task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
                 picLabels = task.labels
                 motionLabel = task.MotionLabel
+
+                If optionsChange Then
+                    SyncLock trueDataLock
+                        trueData.Clear() ' clear out any truetext from a previous algorithm...
+                    End SyncLock
+                End If
+
                 SyncLock mouseLock
                     If mousePoint.X < task.gridMap32S.Width And mousePoint.Y < task.gridMap32S.Height Then
                         Try

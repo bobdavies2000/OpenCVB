@@ -3264,7 +3264,6 @@ End Enum
 	If algorithmName = "RedCloud_TopX_CS" Then return new RedCloud_TopX_CS
 	If algorithmName = "RedCloud_TopXHulls" Then return new RedCloud_TopXHulls
 	If algorithmName = "RedCloud_TopXHulls_CS" Then return new RedCloud_TopXHulls_CS
-	If algorithmName = "RedCloud_TopXNeighbors" Then return new RedCloud_TopXNeighbors
 	If algorithmName = "RedCloud_TopXNeighbors_CS" Then return new RedCloud_TopXNeighbors_CS
 	If algorithmName = "RedCloud_UnmatchedCount" Then return new RedCloud_UnmatchedCount
 	If algorithmName = "RedCloud_UnmatchedCount_CS" Then return new RedCloud_UnmatchedCount_CS

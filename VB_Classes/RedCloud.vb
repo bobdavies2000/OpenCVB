@@ -41,7 +41,6 @@ Public Class RedCloud_Core : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP_VB
     Public inputMask As New cvb.Mat
     Dim color As Color8U_Basics
-    Public smallCellThreshold As Integer = dst2.Total / 1000
     Public Sub New()
         task.gOptions.setHistogramBins(40)
         task.redOptions.setIdentifyCells(True)
@@ -68,15 +67,7 @@ Public Class RedCloud_Core : Inherits TaskParent
         dst2 = cellGen.dst2
 
         labels(2) = cellGen.labels(2)
-
-        Dim cellCount As Integer
-        For Each rc In task.redCells
-            If rc.pixels > smallCellThreshold Then
-                DrawCircle(dst2, rc.maxDist, task.DotSize, task.HighlightColor)
-                cellCount += 1
-            End If
-        Next
-        labels(3) = CStr(cellCount) + " RedCloud cells with more than " + CStr(smallCellThreshold) + " pixels.  " + CStr(task.redCells.Count) + " cells present."
+        labels(3) = CStr(task.redCells.Count) + " RedCloud cells"
     End Sub
 End Class
 
@@ -1574,63 +1565,6 @@ Public Class RedCloud_TopX : Inherits TaskParent
         labels(2) = $"The top {options.topX} RedCloud cells by size."
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class RedCloud_TopXNeighbors : Inherits TaskParent
-    Dim options As New Options_TopX
-    Dim nab As New Neighbors_Precise
-    Public Sub New()
-        nab.runRedCloud = True
-        desc = "Add unused neighbors to each of the top X cells"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        nab.Run(src)
-        SetTrueText("Review the neighbors_Precise algorithm")
-
-        'If task.heartBeat Then dst2.SetTo(0)
-        'cellMap.SetTo(0)
-        'Dim tmpMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        'redCells.Clear()
-        'redCells.Add(nab.redCells(0)) ' placeholder for zero.
-        'For i = 1 To options.topX - 1
-        '    Dim rc = nab.redCells(i)
-        '    tmpMap.SetTo(0)
-        '    tmpMap(rc.rect).SetTo(rc.index, rc.mask)
-        '    Dim count = 0
-        '    For Each index In rc.nabs
-        '        Dim rcX = nab.redCells(index)
-        '        If rcX.index > options.topX And rcX.depthPixels > 0 Then
-        '            Dim val = cellMap.Get(Of Byte)(rcX.maxDStable.Y, rcX.maxDStable.X)
-        '            If val = 0 Then
-        '                rc.rect = rc.rect.Union(rcX.rect)
-        '                tmpMap(rcX.rect).SetTo(rc.index, rcX.mask)
-        '                count += 1
-        '            End If
-        '        End If
-        '    Next
-        '    rc.mask = New cvb.Mat(rc.rect.Height, rc.rect.Width, cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        '    rc.mask = tmpMap(rc.rect).InRange(rc.index, rc.index)
-        '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
-        '    dst2(rc.rect).SetTo(rc.color, rc.mask)
-        '    redCells.Add(rc)
-        'Next
-        'redCells(0).mask = cellMap.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv)
-
-        'setSelectedContour()
-        'If task.rc.index = 0 Then task.rc = redCells(redCells.Count - 1)
-        'labels(2) = $"The top {options.topX} RedCloud cells by size."
-    End Sub
-End Class
-
-
-
 
 
 
