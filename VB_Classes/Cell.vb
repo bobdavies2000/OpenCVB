@@ -367,7 +367,7 @@ Public Class Cell_Generate : Inherits TaskParent
             initialList.Add(rc)
         Next
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For Each rc In initialList
             cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
             rc.naturalColor = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))

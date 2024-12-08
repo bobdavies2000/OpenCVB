@@ -580,42 +580,33 @@ Public Class VBtask : Implements IDisposable
                 If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.gridMask)
             End If
 
-            Dim rc = task.rc
             If task.redCells.Count > 0 Then setSelectedContour()
 
             If task.redOptions.IdentifyCells.Checked Then
                 Dim ptNew As New cvb.Point
-                Dim ptCells As New List(Of cvb.Point)
-                For i = 1 To redCells.Count - 1
-                    Dim rcx = redCells(i)
-                    If ptCells.Contains(rcx.maxDStable) = False Then
-                        If rcx.maxDStable <> ptNew And rcx.index <= task.redOptions.identifyCount Then
-                            Dim str As New TrueText(CStr(rcx.index), rcx.maxDStable, 2)
-                            trueData.Add(str)
-                        End If
-                        ptCells.Add(rcx.maxDStable)
-                    End If
+                For i = redCells.Count - 1 To Math.Max(redCells.Count - 20, 0) Step -1
+                    Dim rc = redCells(i)
+                    Dim str As New TrueText(CStr(rc.age), rc.maxDist, 2)
+                    trueData.Add(str)
                 Next
 
-                If rc.index > 0 Then
-                    task.color.Rectangle(rc.rect, cvb.Scalar.Yellow, task.lineWidth)
-                    task.color(rc.rect).SetTo(cvb.Scalar.White, rc.mask)
+                task.color.Rectangle(rc.rect, cvb.Scalar.Yellow, task.lineWidth)
+                task.color(rc.rect).SetTo(cvb.Scalar.White, rc.mask)
 
-                    task.depthRGB.Rectangle(rc.rect, cvb.Scalar.Yellow, task.lineWidth)
-                    If task.redOptions.DisplayCellStats.Checked Then
-                        dst3.SetTo(0)
-                        If task.ClickPoint = newPoint Then
-                            If task.redCells.Count > 1 Then
-                                task.rc = task.redCells(1)
-                                task.ClickPoint = task.rc.maxDist
-                            End If
+                task.depthRGB.Rectangle(rc.rect, cvb.Scalar.Yellow, task.lineWidth)
+                If task.redOptions.DisplayCellStats.Checked Then
+                    dst3.SetTo(0)
+                    If task.ClickPoint = newPoint Then
+                        If task.redCells.Count > 1 Then
+                            task.rc = task.redCells(1)
+                            task.ClickPoint = task.rc.maxDist
                         End If
-                        If cellStats Is Nothing Then cellStats = New Cell_Basics
-                        cellStats.statsString()
-                        dst1 = cellStats.dst1
-                        Dim str As New TrueText(cellStats.strOut, New cvb.Point, 3)
-                        trueData.Add(str)
                     End If
+                    If cellStats Is Nothing Then cellStats = New Cell_Basics
+                    cellStats.statsString()
+                    dst1 = cellStats.dst1
+                    Dim str As New TrueText(cellStats.strOut, New cvb.Point, 3)
+                    trueData.Add(str)
                 End If
             End If
 
