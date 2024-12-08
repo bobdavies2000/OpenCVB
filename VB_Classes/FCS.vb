@@ -600,14 +600,16 @@ Public Class FCS_Neighbors : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim fp = task.fpSelected
-        For Each index In fp.nabeList
-            Dim nabe = task.fpList(index)
-            Dim vec = dst2.Get(Of cvb.Vec3b)(nabe.ptCenter.Y, nabe.ptCenter.X)
-            Dim color = New cvb.Scalar(vec.Item0, vec.Item1, vec.Item2)
-            dst3(nabe.rect).SetTo(color, nabe.mask)
-        Next
-        fpCellContour(task.fpSelected, dst3)
-        fpDisplayCell()
+        If fp IsNot Nothing Then
+            For Each index In fp.nabeList
+                Dim nabe = task.fpList(index)
+                Dim vec = dst2.Get(Of cvb.Vec3b)(nabe.ptCenter.Y, nabe.ptCenter.X)
+                Dim color = New cvb.Scalar(vec.Item0, vec.Item1, vec.Item2)
+                dst3(nabe.rect).SetTo(color, nabe.mask)
+            Next
+            fpCellContour(task.fpSelected, dst3)
+            fpDisplayCell()
+        End If
     End Sub
 End Class
 

@@ -97,7 +97,7 @@ Public Class HistValley_FromPeaks : Inherits TaskParent
         If task.optionsChanged Then ReDim avgValley(valleyIndex.Count - 1)
 
         Dim depthPerBin = task.MaxZmeters / histList.Count
-        For i = 0 To avgValley.Count - 1
+        For i = 0 To Math.Min(avgValley.Count, valleyIndex.Count) - 1
             avgValley(i) = (avgValley(i) + valleyIndex(i) * depthPerBin) / 2
         Next
 
