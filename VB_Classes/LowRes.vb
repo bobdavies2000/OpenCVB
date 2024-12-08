@@ -70,7 +70,6 @@ End Class
 
 
 Public Class LowRes_Features : Inherits TaskParent
-    Dim feat As New Feature_Basics
     Dim lowRes As New LowRes_Basics
     Public Sub New()
         FindSlider("Min Distance to next").Value = 3
@@ -81,8 +80,6 @@ Public Class LowRes_Features : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
-
-        feat.Run(src)
 
         Dim gridIndex As New List(Of Integer)
         Dim gridCounts As New List(Of Integer)

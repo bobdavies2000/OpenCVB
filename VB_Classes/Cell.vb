@@ -356,7 +356,10 @@ Public Class Cell_Generate : Inherits TaskParent
                 Dim lrc = task.redCells(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.color = lrc.color
-                If usedColors.Contains(rc.color) Then rc.color = randomCellColor()
+                If usedColors.Contains(rc.color) Then
+                    rc.age = 1 ' a new cell was found that was previously part of another.
+                    rc.color = randomCellColor()
+                End If
                 retained += 1
             Else
                 rc.age = 1

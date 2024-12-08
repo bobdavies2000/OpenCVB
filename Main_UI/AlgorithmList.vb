@@ -1025,7 +1025,6 @@ End Enum
 	If algorithmName = "FCS_Tracker" Then return new FCS_Tracker
 	If algorithmName = "FCS_TravelDistance" Then return new FCS_TravelDistance
 	If algorithmName = "FCS_ViewLeft" Then return new FCS_ViewLeft
-	If algorithmName = "FCS_ViewLeftRight" Then return new FCS_ViewLeftRight
 	If algorithmName = "FCS_ViewRight" Then return new FCS_ViewRight
 	If algorithmName = "Feature_Agast" Then return new Feature_Agast
 	If algorithmName = "Feature_Agast_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Agast_CC)
@@ -1035,7 +1034,6 @@ End Enum
 	If algorithmName = "Feature_AKaze_CS" Then return new Feature_AKaze_CS
 	If algorithmName = "Feature_Basics" Then return new Feature_Basics
 	If algorithmName = "Feature_Basics_CS" Then return new Feature_Basics_CS
-	If algorithmName = "Feature_Compare" Then return new Feature_Compare
 	If algorithmName = "Feature_Compare_CS" Then return new Feature_Compare_CS
 	If algorithmName = "Feature_Delaunay" Then return new Feature_Delaunay
 	If algorithmName = "Feature_Delaunay_CS" Then return new Feature_Delaunay_CS

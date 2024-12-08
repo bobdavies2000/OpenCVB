@@ -1,7 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
-    Dim feat As New Feature_Basics
     Public mpList As New List(Of PointPair)
     Public distanceAvg As Single
     Public directionAvg As Single
@@ -35,8 +34,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        feat.Run(src)
-        dst3 = feat.dst2
+        dst3 = task.feat.dst2
 
         If task.optionsChanged Then cornerHistory.Clear()
 

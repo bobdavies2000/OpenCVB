@@ -1336,7 +1336,7 @@ End Class
 
 
 Public Class RedCloud_MaxDist : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Dim addTour As New RedCloud_ContourUpdate
     Public Sub New()
         desc = "Show the maxdist before and after updating the mask with the contour."

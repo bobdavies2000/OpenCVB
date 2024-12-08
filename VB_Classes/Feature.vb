@@ -800,37 +800,6 @@ End Class
 
 
 
-
-
-
-
-
-Public Class Feature_Compare : Inherits TaskParent
-    Dim feat As New Feature_Stable
-    Dim noFrill As New Feature_Basics
-    Dim saveLFeatures As New List(Of cvb.Point2f)
-    Dim saveRFeatures As New List(Of cvb.Point2f)
-    Public Sub New()
-        desc = "Prepare features for the left and right views"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        task.features = New List(Of cvb.Point2f)(saveLFeatures)
-        feat.Run(src.Clone)
-        dst2 = feat.dst2
-        labels(2) = feat.labels(2)
-        saveLFeatures = New List(Of cvb.Point2f)(task.features)
-
-        task.features = New List(Of cvb.Point2f)(saveRFeatures)
-        noFrill.Run(src.Clone)
-        dst3 = noFrill.dst2
-        labels(3) = "With no correlation coefficients " + noFrill.labels(2)
-        saveRFeatures = New List(Of cvb.Point2f)(task.features)
-    End Sub
-End Class
-
-
-
-
 Public Class Feature_Agast : Inherits TaskParent
     Dim stablePoints As List(Of cvb.Point2f)
     Dim agastFD As cvb.AgastFeatureDetector

@@ -730,17 +730,11 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public outputPoints2f As New List(Of cvb.Point2f)
     Public outputPoints As New List(Of cvb.Point)
     Public Sub New()
+        If standalone Then FindRadio("Agast Features").Checked = True
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            Static options As New Options_Edges3
-            Static feat As New Feature_Basics
-            Static agastRadio = FindRadio("Agast Features")
-            If task.FirstPass Then agastRadio.checked = True
-            feat.Run(src)
-            inputPoints = task.features
-        End If
+        If standalone Then inputPoints = task.features
 
         Static minSlider = FindSlider("Min Distance to next")
         Dim minDistance = minSlider.value

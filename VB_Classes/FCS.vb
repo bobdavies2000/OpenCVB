@@ -618,66 +618,6 @@ End Class
 
 
 
-
-Public Class FCS_ViewLeftRight : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Dim feat As New Feature_Basics
-    Public options As New Options_Features
-    Public Sub New()
-        desc = "Use both the left and right features as input to the FCS_Basics"
-    End Sub
-    Private Function getPoints(src As cvb.Mat) As List(Of cvb.Point2f)
-        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        Return cvb.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality,
-                                           options.minDistance, New cvb.Mat, options.blockSize,
-                                           True, options.k).ToList
-    End Function
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        Dim fRight = getPoints(task.rightView)
-
-        Dim ptLeft As New List(Of cvb.Point)
-        Dim ptRight As New List(Of cvb.Point)
-        For Each pt In task.features
-            Dim p = New cvb.Point(CInt(pt.X), CInt(pt.Y))
-            ptLeft.Add(p)
-        Next
-        For Each pt In fRight
-            Dim p = New cvb.Point(CInt(pt.X), CInt(pt.Y))
-            task.features.Add(p)
-            ptRight.Add(p)
-        Next
-
-        task.features = feat.motionFilter(task.features)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        dst3 = fcs.dst3.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-
-        For i = 0 To task.fpList.Count - 1
-            Dim fp = task.fpList(i)
-            Dim index = ptLeft.IndexOf(fp.pt)
-            If index >= 0 Then
-                dst3(fp.rect).SetTo(cvb.Scalar.Blue, fp.mask)
-            Else
-                dst3(fp.rect).SetTo(cvb.Scalar.Red, fp.mask)
-            End If
-            DrawCircle(dst3, fp.ptCenter, task.DotSize, task.HighlightColor)
-        Next
-
-        labels(2) = CStr(task.features.Count) + " features with "
-        labels(3) = "Left image (blue) had " + CStr(ptLeft.Count) + " points while the right image (red) had " +
-                    CStr(ptRight.Count) + " points"
-        fpDisplayCell()
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class FCS_NoTracking : Inherits TaskParent
     Public facetList As New List(Of List(Of cvb.Point))
     Public facet32s As cvb.Mat
@@ -689,9 +629,6 @@ Public Class FCS_NoTracking : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Static feat As New Feature_Basics
-        feat.Run(src)
-
         subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
@@ -741,11 +678,6 @@ Public Class FCS_Delaunay : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            Static feat As New Feature_Basics
-            feat.Run(src)
-        End If
-
         subdiv.InitDelaunay(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
