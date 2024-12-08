@@ -1512,7 +1512,7 @@ Public Class RedCloud_PlusTiers : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
-        desc = "Add the depth tiers to the input for RedCloud_Core."
+        desc = "Add the depth tiers to the input for RedCloud_Basics."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         tiers.Run(src)
@@ -1796,31 +1796,6 @@ Public Class RedCloud_MotionBGsubtract : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCloud_JoinCells : Inherits TaskParent
-    Dim fLess As New RedCloud_Basics
-    Public Sub New()
-        task.gOptions.setHistogramBins(20)
-        labels = {"", "RedCloud_Basics output.", "RedCloud_Core output", "RedCloud_Core cells joined by using the color from the RedCloud_Basics cellMap"}
-        desc = "Run RedCloud_Core and use RedCloud_Basics to join cells that are in the same featureless regions."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        fLess.Run(src)
-        dst2 = fLess.dst2
-        labels(2) = fLess.labels(2)
-
-        dst3.SetTo(0)
-        For Each rc In task.redCells
-            Dim color = fLess.dst2.Get(Of cvb.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            dst3(rc.rect).SetTo(color, rc.mask)
-        Next
-    End Sub
-End Class
 
 
 
@@ -2293,16 +2268,15 @@ End Class
 
 
 Public Class RedCloud_Gaps : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim frames As New History_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Find the gaps that are different in the RedCloud_Core results."
+        desc = "Find the gaps that are different in the RedCloud_Basics results."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(3)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(3)
 
         frames.Run(task.redMap.InRange(0, 0))
         dst3 = frames.dst2
