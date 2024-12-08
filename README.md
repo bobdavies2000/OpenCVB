@@ -516,7 +516,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![Graphical user interface, application Description automatically generated](media/5db655fc1b209508cc62adeeab3f7a2a.png)
 
-*The image in the bottom left is the output of the RedCloud_Core algorithm where each cell is consistently identified by applying reduction in X and Y to the point cloud image. The bottom right image shows the RedCloud output after processing with OpenCV’s ConvexHull API. The upper left and right images appear with every algorithm – RGB on the left and the point cloud on the right.*
+*The image in the bottom left is the output of the RedCloud_Basics algorithm where each cell is consistently identified by applying reduction in X and Y to the point cloud image. The bottom right image shows the RedCloud output after processing with OpenCV’s ConvexHull API. The upper left and right images appear with every algorithm – RGB on the left and the point cloud on the right.*
 
 # Recent Changes – April 2022
 
@@ -681,8 +681,8 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   There are now some 50 new C++ algorithms available in an “IncludeOnly” file
         -   An imgui example shows how to include all 50 algorithms in your C++ application with one include file
 -   FeatureLess regions are mapped and tracked with the RedCloud image segmentation tool (example below)
--   FloodFill examples now use RedCloud_Core for image segmentation and tracking (previously they used a similar algorithm.)
--   ColorMatch algorithms now use RedCloud_Core as well for image segmentation and tracking.
+-   FloodFill examples now use RedCloud_Basics for image segmentation and tracking (previously they used a similar algorithm.)
+-   ColorMatch algorithms now use RedCloud_Basics as well for image segmentation and tracking.
 -   A monthly history of changes is included at the bottom of this document
 -   OpenCVB’s support for the Oak-D Lite and Oak-D Pro was brought up to date with the latest C++ interface (depthai-core)
     -   The Python interface is no longer needed as the C++ interface is much more direct.
@@ -694,7 +694,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A picture containing text, electronics, screenshot Description automatically generated](media/ba224180471b27b6c66f1caaa140989f.png)
 
-**CPP_RedColor_FeatureLess:** *The scene in the upper left is segmented into different featureless regions using only RGB. The image in the bottom right is the output of the edge-drawing C++ algorithm and is the input to a distance transform. A mask created by the distance transform is used to create the identified regions in the lower left image with RedCloud_Core.*
+**CPP_RedColor_FeatureLess:** *The scene in the upper left is segmented into different featureless regions using only RGB. The image in the bottom right is the output of the edge-drawing C++ algorithm and is the input to a distance transform. A mask created by the distance transform is used to create the identified regions in the lower left image with RedCloud_Basics.*
 
 # Recent Changes – January 2023
 
@@ -714,7 +714,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A picture containing text, indoor, screenshot, display Description automatically generated](media/20aa54d92af5420755e4f9ff108d0d09.png)
 
-**Profile_Derivative:** *A new series of algorithms was added to work with the contour of RedCloud cells. In this example some key points on the contour of a cell are explored. The upper left image outlines in yellow the selected RedCloud cell in the RGB image. The upper right image shows the RedCloud_Core output (click to select another cell.) The lower left image shows the derivative of the contour in depth with yellow highlighting where contour points are closest to the camera and blue shows where contour points are farther away from the camera. The information in the lower right image shows the point cloud coordinates of the rightmost, leftmost, highest, lowest, closest and farthest points (see the key in the lower right image for color definitions.)*
+**Profile_Derivative:** *A new series of algorithms was added to work with the contour of RedCloud cells. In this example some key points on the contour of a cell are explored. The upper left image outlines in yellow the selected RedCloud cell in the RGB image. The upper right image shows the RedCloud_Basics output (click to select another cell.) The lower left image shows the derivative of the contour in depth with yellow highlighting where contour points are closest to the camera and blue shows where contour points are farther away from the camera. The information in the lower right image shows the point cloud coordinates of the rightmost, leftmost, highest, lowest, closest and farthest points (see the key in the lower right image for color definitions.)*
 
 # Recent Changes – January 2023
 
@@ -753,7 +753,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A picture containing text, indoor, display, different Description automatically generated](media/72003f6ab495cbb5a6f3f080567d5e97.png)
 
-**RedCloud_Core:** *Depth shadow is a significant problem – there is no depth data in the shadow of objects close to the camera because one camera cannot see what the other camera can. The depth shadow around the hand is black in the RGB representation of the depth data in the upper right. Note that the RedCloud output in the lower left has identified regions in the depth shadow of the hand. These regions are found with color – not depth. The next step is to …*
+**RedCloud_Basics:** *Depth shadow is a significant problem – there is no depth data in the shadow of objects close to the camera because one camera cannot see what the other camera can. The depth shadow around the hand is black in the RGB representation of the depth data in the upper right. Note that the RedCloud output in the lower left has identified regions in the depth shadow of the hand. These regions are found with color – not depth. The next step is to …*
 
 # Recent Changes – February 2023
 
@@ -1031,7 +1031,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
     ![](media/6cba27c1ec97a5d241d60e43951855c1.gif)
 
-**RedCloud_MotionBGSubtract:** *The GIF above shows another way to detect motion in an image. The lower right shows the conventional difference between images – a standard way to detect changes in pixel values by comparing images. The lower left image is the RedCloud_Core output with cells for each reduced color segment. The upper right image shows the RedCloud cells that contain pixels that changed.*
+**RedCloud_MotionBGSubtract:** *The GIF above shows another way to detect motion in an image. The lower right shows the conventional difference between images – a standard way to detect changes in pixel values by comparing images. The lower left image is the RedCloud_Basics output with cells for each reduced color segment. The upper right image shows the RedCloud cells that contain pixels that changed.*
 
 # Recent Changes – July 2023
 
@@ -1059,7 +1059,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 -   Almost 1700 algorithms are included, averaging 30 lines of code per algorithm.
 -   Improvements to tracking RedCloud cells. Below is an example GIF.
-    -   RedColor_Basics and RedCloud_Core both track all cells.
+    -   RedColor_Basics and RedCloud_Basics both track all cells.
     -   Reduced color =RedColor, Reduced point cloud = RedCloud.
     -   RedCC is an abbreviation for Reduced color and cloud.
 -   FeatureMatch algorithms independently find features in left and right images.
@@ -1133,7 +1133,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   Pixel differences identify cells that have changed (as usual).
     -   The “motionRect” variable is the union of current and previous rect.
         -   Motion is the combination of where the cell was with where it is now
--   RedCloud_Motion uses the latest version of RedCloud_Core to detect motion
+-   RedCloud_Motion uses the latest version of RedCloud_Basics to detect motion
     -   A “motionRect” variable describes the union of the previous and current rect.
     -   It is not flawless. Test the RGB image quality with RedCloud_MotionTest.
     -   Option automation is used to define the lowest pixel difference threshold.
@@ -1148,11 +1148,11 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Core:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
-**RedCloud_Core** *(This is the previous version of RedCloud_Core from September 2023.) This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the whole image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
+**RedCloud_Basics** *(This is the previous version of RedCloud_Basics from September 2023.) This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the whole image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
 
 # Recent Changes – November 2023
 
@@ -1163,7 +1163,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   “redOptions” includes RedCloud and related options and is always present.
 -   RedCloud algorithms were consolidated and are now all in RedCloud.vb.
     -   Each algorithm can use guided backprojection or reduction to create cells.
-    -   Pointcloud reduction is now controlled by the slider in RedCloud_Core.
+    -   Pointcloud reduction is now controlled by the slider in RedCloud_Basics.
         -   Needed to be separate from reduction slider.
     -   Each algorithm can use different color sources for cells with no depth.
 -   RedColor algorithms now supplement RedCloud algorithms with color data.
@@ -1306,7 +1306,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   Gravity and horizon vectors are now available in the image coordinates.
     -   See example below to see what it looks like.
     -   The IMU code is now simplified and more responsive.
--   RedCloud_Core and Flood_Basics are now more stable and accurate.
+-   RedCloud_Basics and Flood_Basics are now more stable and accurate.
     -   Removing contours before flooding helped isolate cells better.
     -   RedCloud cell statistics can now be shown any time.
         -   See global option labelled ‘Display Cell stats’.

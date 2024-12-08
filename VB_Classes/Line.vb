@@ -1228,10 +1228,10 @@ End Class
 
 Public Class Line_Cells : Inherits TaskParent
     Dim lines As New Line_Basics
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public lpList As New List(Of PointPair)
     Public Sub New()
-        desc = "Identify all lines in the RedCloud_Core cell boundaries"
+        desc = "Identify all lines in the RedCloud_Basics cell boundaries"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)

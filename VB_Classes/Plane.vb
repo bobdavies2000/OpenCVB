@@ -85,7 +85,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
     Public Sub New()
         labels = {"RedCloud Cell contours", "", "RedCloud cells", ""}
         addW.src2 = dst2.Clone
-        desc = "Find all the cells from a RedCloud_Core output that are likely to be flat"
+        desc = "Find all the cells from a RedCloud_Basics output that are likely to be flat"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         plane.Run(src)
@@ -241,7 +241,7 @@ End Class
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class Plane_CellColor : Inherits TaskParent
     Public options As New Options_Plane
-    Public redC As New RedCloud_Core
+    Public redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
@@ -303,7 +303,7 @@ Public Class Plane_Points : Inherits TaskParent
     Public equations As New List(Of cvb.Vec4f)
     Public ptList As New List(Of cvb.Point3f)
     Public ptList2D As New List(Of List(Of cvb.Point))
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Dim needOutput As Boolean
     Public Sub New()
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
@@ -428,7 +428,7 @@ End Class
 Public Class Plane_Equation : Inherits TaskParent
     Public rc As New rcData
     Public justEquation As String
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compute the coefficients for an estimated plane equation given the rc contour"
     End Sub

@@ -258,7 +258,7 @@ End Class
 
 
 Public Class FeatureLess_RedCloud1 : Inherits TaskParent
-    Public redC As New RedCloud_Core
+    Public redC As New RedCloud_Basics
     Dim fless As New FeatureLess_WithoutMotion
     Public Sub New()
         desc = "Floodfill the FeatureLess output so each cell can be tracked."

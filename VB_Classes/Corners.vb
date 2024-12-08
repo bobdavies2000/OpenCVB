@@ -329,16 +329,15 @@ End Class
 
 
 Public Class Corners_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim corners As New Neighbors_Intersects
     Public Sub New()
         labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
         desc = "Find the corners for each RedCloud cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         corners.Run(task.redMap)
 

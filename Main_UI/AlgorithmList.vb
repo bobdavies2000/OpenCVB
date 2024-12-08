@@ -1220,6 +1220,7 @@ End Enum
 	If algorithmName = "Flood_CellStatsPlot_CS" Then return new Flood_CellStatsPlot_CS
 	If algorithmName = "Flood_ContainedCells" Then return new Flood_ContainedCells
 	If algorithmName = "Flood_ContainedCells_CS" Then return new Flood_ContainedCells_CS
+	If algorithmName = "Flood_CPP" Then return new Flood_CPP
 	If algorithmName = "Flood_MaxDistPoints" Then return new Flood_MaxDistPoints
 	If algorithmName = "Flood_MaxDistPoints_CS" Then return new Flood_MaxDistPoints_CS
 	If algorithmName = "Flood_Motion" Then return new Flood_Motion
@@ -3160,7 +3161,6 @@ End Enum
 	If algorithmName = "RedCloud_Consistent2_CS" Then return new RedCloud_Consistent2_CS
 	If algorithmName = "RedCloud_ContourUpdate" Then return new RedCloud_ContourUpdate
 	If algorithmName = "RedCloud_ContourUpdate_CS" Then return new RedCloud_ContourUpdate_CS
-	If algorithmName = "RedCloud_Core" Then return new RedCloud_Core
 	If algorithmName = "RedCloud_CPP_CS" Then return new RedCloud_CPP_CS
 	If algorithmName = "RedCloud_CPP_VB" Then return new RedCloud_CPP_VB
 	If algorithmName = "RedCloud_Delaunay" Then return new RedCloud_Delaunay
@@ -3196,7 +3196,6 @@ End Enum
 	If algorithmName = "RedCloud_Hue_CS" Then return new RedCloud_Hue_CS
 	If algorithmName = "RedCloud_Hulls" Then return new RedCloud_Hulls
 	If algorithmName = "RedCloud_Hulls_CS" Then return new RedCloud_Hulls_CS
-	If algorithmName = "RedCloud_JoinCells" Then return new RedCloud_JoinCells
 	If algorithmName = "RedCloud_JoinCells_CS" Then return new RedCloud_JoinCells_CS
 	If algorithmName = "RedCloud_KMeans" Then return new RedCloud_KMeans
 	If algorithmName = "RedCloud_KMeans_CS" Then return new RedCloud_KMeans_CS
@@ -3273,12 +3272,8 @@ End Enum
 	If algorithmName = "RedTrack_Features_CS" Then return new RedTrack_Features_CS
 	If algorithmName = "RedTrack_FeaturesKNN" Then return new RedTrack_FeaturesKNN
 	If algorithmName = "RedTrack_FeaturesKNN_CS" Then return new RedTrack_FeaturesKNN_CS
-	If algorithmName = "RedTrack_GoodCell" Then return new RedTrack_GoodCell
-	If algorithmName = "RedTrack_GoodCell_CS" Then return new RedTrack_GoodCell_CS
 	If algorithmName = "RedTrack_GoodCellInput" Then return new RedTrack_GoodCellInput
 	If algorithmName = "RedTrack_GoodCellInput_CS" Then return new RedTrack_GoodCellInput_CS
-	If algorithmName = "RedTrack_GoodCells" Then return new RedTrack_GoodCells
-	If algorithmName = "RedTrack_GoodCells_CS" Then return new RedTrack_GoodCells_CS
 	If algorithmName = "RedTrack_Lines" Then return new RedTrack_Lines
 	If algorithmName = "RedTrack_Lines_CS" Then return new RedTrack_Lines_CS
 	If algorithmName = "RedTrack_LineSingle" Then return new RedTrack_LineSingle

@@ -342,8 +342,8 @@ End Class
 
 Public Class GuidedBP_RedCloud : Inherits TaskParent
     Dim guide As New GuidedBP_MultiSlice
-    Public redCx As New RedCloud_Core
-    Public redCy As New RedCloud_Core
+    Public redCx As New RedCloud_Basics
+    Public redCy As New RedCloud_Basics
     Public redCellsX As New List(Of rcData)
     Public redCellsY As New List(Of rcData)
     Public redMapX As New cvb.Mat

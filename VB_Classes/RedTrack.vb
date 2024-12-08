@@ -1,23 +1,18 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class RedTrack_Basics : Inherits TaskParent
-    Dim stats As New Cell_Basics
-    Public redC As New RedCloud_Core
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
         If New cvb.Size(task.dst2.Width, task.dst2.Height) <> New cvb.Size(168, 94) Then task.frameHistoryCount = 1
+        labels(2) = task.redC.labels(3)
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        stats.Run(src)
-        labels = stats.labels
+        task.redC.Run(src)
+        dst2 = task.redC.dst3
         dst2.SetTo(0)
         For Each rc As rcData In task.redCells
             DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
             If rc.index = task.rc.index Then DrawContour(dst2(rc.rect), rc.contour, white, -1)
         Next
-        strOut = stats.strOut
-        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -29,9 +24,8 @@ End Class
 
 Public Class RedTrack_Lines : Inherits TaskParent
     Dim lines As New Line_Basics
-    Dim track As New RedTrack_Basics
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -45,10 +39,8 @@ Public Class RedTrack_Lines : Inherits TaskParent
             If index > 10 Then Exit For
         Next
 
-        track.Run(dst3.Clone)
-        dst0 = track.redC.dst0
-        dst1 = track.redC.dst1
-        dst2 = track.dst2
+        task.redC.Run(dst3.Clone)
+        dst2 = task.redC.dst2
     End Sub
 End Class
 
@@ -82,9 +74,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
     End Function
     Public Sub RunAlg(src As cvb.Mat)
         track.Run(src)
-        dst0 = track.redC.dst0
-        dst1 = track.redC.dst1
-        dst2 = track.dst2
+        dst2 = task.dst2
         If task.redCells.Count = 0 Then
             SetTrueText("No lines found to track.", 3)
             Exit Sub
@@ -118,7 +108,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
         rightCenter = task.redCells(rightmost).maxDist
 
         DrawLine(dst2, leftCenter, rightCenter, white)
-        labels(2) = track.redC.labels(2)
+        labels(2) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -163,74 +153,8 @@ End Class
 
 
 
-
-Public Class RedTrack_GoodCell : Inherits TaskParent
-    Dim good As New RedTrack_GoodCellInput
-    Dim hulls As New RedCloud_Hulls
-    Public Sub New()
-        FindSlider("Feature Sample Size").Value = 100
-        desc = "Track the cells that have good features"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst2
-
-        good.Run(src)
-        dst3.SetTo(0)
-        For Each pt In good.featureList
-            DrawCircle(dst3, pt, task.DotSize, white)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class RedTrack_GoodCells : Inherits TaskParent
-    Dim good As New RedTrack_GoodCellInput
-    Dim hulls As New RedCloud_Hulls
-    Public Sub New()
-        desc = "Track the cells that have good features"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst2.Clone
-
-        good.Run(src)
-        dst3.SetTo(0)
-        dst0 = src
-        Dim trackCells As New List(Of rcData)
-        Dim trackIndex As New List(Of Integer)
-        For Each pt In good.featureList
-            Dim index = task.redMap.Get(Of Byte)(pt.Y, pt.X)
-            If trackIndex.Contains(index) = False Then
-                Dim rc = task.redCells(index)
-                If rc.hull Is Nothing Then Continue For
-                DrawContour(dst2(rc.rect), rc.hull, white, -1)
-                trackIndex.Add(index)
-
-                DrawCircle(dst0, pt, task.DotSize, task.HighlightColor)
-                DrawCircle(dst3, pt, task.DotSize, white)
-                trackCells.Add(rc)
-            End If
-        Next
-
-        labels(3) = "There were " + CStr(trackCells.Count) + " cells that could be tracked."
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedTrack_GoodCellInput : Inherits TaskParent
     Public knn As New KNN_Basics
-    Public feat As New Feature_Stable
     Public featureList As New List(Of cvb.Point2f)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
@@ -240,8 +164,7 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
         Static distSlider = FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
-        feat.Run(src)
-        dst2 = feat.dst2
+        dst2 = task.feat.dst2
 
         knn.queries = New List(Of cvb.Point2f)(task.features)
         knn.Run(empty)
@@ -286,9 +209,7 @@ Public Class RedTrack_Points : Inherits TaskParent
         Next
 
         track.Run(dst3)
-        dst0 = track.redC.dst0
-        dst1 = track.redC.dst1
-        dst2 = track.dst2
+        dst2 = task.dst2
     End Sub
 End Class
 
@@ -301,7 +222,7 @@ End Class
 Public Class RedTrack_Features : Inherits TaskParent
     Dim options As New Options_Flood
     Dim feat As New Feature_Stable
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",

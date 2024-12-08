@@ -1,15 +1,28 @@
 Imports cvb = OpenCvSharp
 Public Class Flood_Basics : Inherits TaskParent
+    Public Sub New()
+        desc = "Build the RedCloud cells with the grayscale input."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If src.Channels = 1 Then task.redC.inputMask = src
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels = task.redC.labels
+    End Sub
+End Class
+
+
+
+
+Public Class Flood_CPP : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP_VB
     Public cellGen As New Cell_Generate
-    Dim color As Color8U_Basics
+    Dim color As New Color8U_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         desc = "Build the RedCloud cells with the grayscale input."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then
-            If color Is Nothing Then color = New Color8U_Basics
             color.Run(src)
             src = color.dst2
         Else
@@ -38,26 +51,19 @@ End Class
 
 
 
-
-
-
 Public Class Flood_CellStatsPlot : Inherits TaskParent
-    Dim flood As New Flood_Basics
-    Dim stats As New Cell_BasicsPlot
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
+        task.redOptions.DisplayCellStats.Checked = True
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.setHistogramBins(1000)
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        flood.Run(src)
+        task.redC.Run(src)
 
-        stats.Run(src)
-        dst1 = stats.dst1
-        dst2 = flood.dst2
-        SetTrueText(stats.strOut, 3)
+        dst3 = task.redC.stats.dst1
+        dst2 = task.redC.dst2
 
         If task.ClickPoint = newPoint Then
             If task.redCells.Count > 1 Then
@@ -76,16 +82,14 @@ End Class
 
 
 Public Class Flood_ContainedCells : Inherits TaskParent
-    Dim flood As New Flood_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
-        desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell."
+        desc = "Find cells that have only one neighbor.  They are likely to be contained in another cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
-            flood.Run(src)
-            dst2 = flood.dst2
-            labels = flood.labels
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels = task.redC.labels
         End If
 
         Dim removeCells As New List(Of Integer)
@@ -108,7 +112,9 @@ Public Class Flood_ContainedCells : Inherits TaskParent
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        If task.heartBeat Then labels(3) = CStr(removeCells.Count) + " cells were completely contained in exactly one other cell's rect"
+        If task.heartBeat Then
+            labels(3) = CStr(removeCells.Count) + " cells were completely contained in another cell's rect"
+        End If
     End Sub
 End Class
 
@@ -127,7 +133,6 @@ Public Class Flood_BasicsMask : Inherits TaskParent
     Public showSelected As Boolean = True
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         labels(3) = "The inputMask used to limit how much of the image is processed."
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
@@ -165,7 +170,6 @@ Public Class Flood_Tiers : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         desc = "Subdivide the Flood_Basics cells using depth tiers."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -292,70 +296,13 @@ End Class
 
 
 
-'Public Class Flood_LeftRight : Inherits TaskParent
-'    Dim redLeft As New RedCloud_Core
-'    Dim redRight As New RedCloud_Core
-'    Public mapLeft As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-'    Public mapRight As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-'    Public cellsLeft As New List(Of rcData)
-'    Public cellsRight As New List(Of rcData)
-'    Public Sub New()
-'        task.redOptions.setIdentifyCells(False)
-'        If standalone Then task.gOptions.setDisplay1()
-'        desc = "Floodfill left and right images."
-'    End Sub
-'    Public Sub RunAlg(src As cvb.Mat)
-'        task.redCells = New List(Of rcData)(cellsLeft)
-'        task.redMap = mapLeft.Clone
-
-'        redLeft.cellGen.useLeftImage = True
-'        redLeft.Run(task.leftView)
-'        labels(2) = redLeft.labels(2)
-
-'        dst2 = redLeft.dst2
-
-'        cellsLeft = New List(Of rcData)(task.redCells)
-'        mapLeft = task.redMap.Clone
-
-'        task.redCells = New List(Of rcData)(cellsRight)
-'        task.redMap = mapRight.Clone
-
-'        redRight.cellGen.useLeftImage = False
-'        redRight.Run(task.rightView)
-'        labels(3) = redRight.labels(2)
-
-'        dst3 = redRight.dst2
-
-'        cellsRight = New List(Of rcData)(task.redCells)
-'        mapRight = task.redMap.Clone
-
-'        If task.redOptions.IdentifyCells.Checked Then
-'            If task.mousePicTag = 2 Then
-'                task.setSelectedContour(cellsLeft, mapLeft)
-'                task.color(task.rc.rect).SetTo(white, task.rc.mask)
-'            Else
-'                task.setSelectedContour(cellsRight, mapRight)
-'                dst1 = task.rightView
-'                dst1(task.rc.rect).SetTo(white, task.rc.mask)
-'            End If
-'        End If
-'    End Sub
-'End Class
-
-
-
-
-
-
-
 Public Class Flood_MaxDistPoints : Inherits TaskParent
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP_VB
     Public cellGen As New Cell_Generate
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
-        labels(3) = "Contour boundaries - input to RedCloud_Core"
+        labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)

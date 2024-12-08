@@ -192,8 +192,8 @@ End Class
 
 Public Class PointCloud_Spin2 : Inherits TaskParent
     Dim spin As New PointCloud_Spin
-    Dim redC As New RedCloud_Core
-    Dim redCSpin As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
+    Dim redCSpin As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes."}
         desc = "Spin the RedCloud output exercise"

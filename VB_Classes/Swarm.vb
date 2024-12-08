@@ -189,7 +189,6 @@ Public Class Swarm_Flood : Inherits TaskParent
     Public flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -218,7 +217,6 @@ Public Class Swarm_Flood2 : Inherits TaskParent
     Public flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         flood.cellGen.removeContour = False
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub

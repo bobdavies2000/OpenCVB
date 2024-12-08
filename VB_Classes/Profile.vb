@@ -8,7 +8,7 @@ Public Class Profile_Basics : Inherits TaskParent
     Public corners3D As New List(Of cvb.Point3f)
     Public corners As New List(Of cvb.Point)
     Public cornersRaw As New List(Of cvb.Point)
-    Public redC As New RedCloud_Core
+    Public redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
     End Sub

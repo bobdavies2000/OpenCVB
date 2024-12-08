@@ -2,7 +2,6 @@
 Public Class Cell_Basics : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
-    Dim redC As New RedCloud_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
@@ -51,9 +50,9 @@ Public Class Cell_Basics : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels(2) = task.redC.labels(2)
         End If
 
         statsString()
@@ -70,15 +69,14 @@ End Class
 
 
 Public Class Cell_PixelCountCompare : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Public Sub New()
         task.gOptions.debugChecked = True
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         dst3.SetTo(0)
         Dim missCount As Integer
@@ -108,16 +106,15 @@ End Class
 
 
 Public Class Cell_ValidateColorCells : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         dst1.SetTo(0)
         dst3.SetTo(0)
@@ -137,7 +134,7 @@ Public Class Cell_ValidateColorCells : Inherits TaskParent
         Dim aftercount = dst1.CountNonZero
 
         If beforeCount <> aftercount Then
-            strOut = "There are color cells with depth in them - not good" + vbCrLf
+            strOut = "There are color cells with limited depth in them" + vbCrLf
         Else
             strOut = "There are no color cells with depth in them." + vbCrLf
         End If
@@ -156,7 +153,6 @@ End Class
 
 
 Public Class Cell_Distance : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         If standalone Then task.gOptions.setDisplay1()
@@ -167,10 +163,10 @@ Public Class Cell_Distance : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Or task.quarterBeat Then
-            redC.Run(src)
+            task.redC.Run(src)
             dst0 = task.color
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redC.dst2
+            labels(2) = task.redC.labels(2)
 
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
@@ -200,7 +196,6 @@ End Class
 
 
 Public Class Cell_Binarize : Inherits TaskParent
-    Public redC As New RedCloud_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -212,9 +207,9 @@ Public Class Cell_Binarize : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         dst0 = src
         If task.heartBeat Or task.quarterBeat Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels(2) = task.redC.labels(2)
 
             Dim grayMeans As New List(Of Single)
             Dim gray = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -270,9 +265,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
-    Dim redC As New RedCloud_Core
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         If standalone Then task.gOptions.setDisplay1()
         If standalone Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
@@ -289,9 +282,9 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels(2) = task.redC.labels(2)
             If task.ClickPoint = newPoint Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)

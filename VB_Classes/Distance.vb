@@ -176,7 +176,6 @@ End Class
 
 
 Public Class Distance_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
@@ -197,7 +196,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
         Return Math.Sqrt(result)
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
+        task.redC.Run(src)
 
         pixelVector.Clear()
         distances.Clear()
@@ -254,7 +253,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
             task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
             dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
         Next
-        labels(2) = redC.labels(3)
+        labels(2) = task.redC.labels(3)
 
         lastDistances.Clear()
         For Each el In distances

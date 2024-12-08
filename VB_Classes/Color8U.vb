@@ -22,7 +22,7 @@ Public Class Color8U_Basics : Inherits TaskParent
                 Case 3
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
                 Case 4
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = New FeatureLess_Groups
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New FeatureLess_Basics
                 Case 5
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
                 Case 6
@@ -33,8 +33,6 @@ Public Class Color8U_Basics : Inherits TaskParent
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Reduction_Basics
                 Case 9
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New PCA_NColor_CPP_VB
-                Case 10
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = New Color8U_Grayscale
             End Select
             classifier = colorMethods(index)
         End If

@@ -650,7 +650,7 @@ End Class
 
 
 Public Class Pixel_Vector3D : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
     Public pixelVector As New List(Of List(Of Single))
@@ -658,7 +658,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         task.redOptions.setUseColorOnly(True)
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.HistBinBar3D.Value = 3
-        labels = {"", "RedCloud_Core output", "3D Histogram counts for each of the cells at left", ""}
+        labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -727,13 +727,13 @@ End Class
 
 
 Public Class Pixel_Vectors : Inherits TaskParent
-    Public redC As New RedCloud_Core
+    Public redC As New RedCloud_Basics
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
     Public redCells As New List(Of rcData)
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
     Public Sub New()
-        labels = {"", "", "RedCloud_Core output", ""}
+        labels = {"", "", "RedCloud_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)

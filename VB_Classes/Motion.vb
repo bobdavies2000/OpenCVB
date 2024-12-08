@@ -100,7 +100,7 @@ End Class
 
 
 Public Class Motion_BGSub_QT : Inherits TaskParent
-    Dim redMasks As New RedCloud_Core
+    Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cvb.Rect)
     Public Sub New()
@@ -514,7 +514,7 @@ End Class
 
 
 Public Class Motion_Enclosing : Inherits TaskParent
-    Dim redMasks As New RedCloud_Core
+    Dim redMasks As New RedCloud_Basics
     Dim learnRate As Double
     Public motionRect As New cvb.Rect
     Public Sub New()
@@ -587,7 +587,7 @@ End Class
 
 
 Public Class Motion_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Motion detected in the cells below"
         desc = "Use RedCloud to define where there is motion"

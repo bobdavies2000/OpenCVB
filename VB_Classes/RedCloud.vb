@@ -1,21 +1,36 @@
 ﻿Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
-    Public redC As New RedCloud_Core
-    Dim fless As New FeatureLess_Basics
-    Dim stats As New Cell_Basics
+    Public stats As New Cell_Basics
+    Dim color As New Color8U_Basics
+    Public inputMask As New cvb.Mat
+    Dim redCPP As New RedCloud_CPP_VB
+    Public cellGen As New Cell_Generate
     Public Sub New()
-        labels(3) = "The 'tracking' color (shown below) switches when a cells splits or is lost."
-        desc = "Floodfill the FeatureLess output so each cell can be tracked."
+        labels(3) = "The 'tracking' color (shown below) is unique and switches when a cell is split or lost."
+        task.gOptions.setHistogramBins(40)
+        inputMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        UpdateAdvice(traceName + ": there are dedicated options for RedCloud algorithms." + vbCrLf +
+                        "It is behind the global options (options which affect most algorithms.)")
+        desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels <> 1 Then
-            fless.Run(src)
-            src = fless.dst2
+            color.Run(src)
+            src = color.dst2
         End If
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        redCPP.inputMask = inputMask
+        redCPP.Run(src)
+
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+        cellGen.classCount = redCPP.classCount
+        cellGen.rectList = redCPP.rectList
+        cellGen.floodPoints = redCPP.floodPoints
+        cellGen.Run(redCPP.dst2)
+
+        dst2 = cellGen.dst2
+
+        labels(2) = cellGen.labels(2)
 
         If task.redOptions.DisplayCellStats.Checked Then
             task.gOptions.setDisplay1()
@@ -33,44 +48,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class RedCloud_Core : Inherits TaskParent
-    Public cellGen As New Cell_Generate
-    Dim redCPP As New RedCloud_CPP_VB
-    Public inputMask As New cvb.Mat
-    Dim color As Color8U_Basics
-    Public Sub New()
-        task.gOptions.setHistogramBins(40)
-        task.redOptions.setIdentifyCells(True)
-        inputMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        UpdateAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
-        desc = "Find cells and then match them to the previous generation with minimum boundary"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If src.Channels <> 1 Then
-            If color Is Nothing Then color = New Color8U_Basics
-            color.Run(src)
-            src = color.dst2
-        End If
-        redCPP.inputMask = inputMask
-        redCPP.Run(src)
-
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-        cellGen.classCount = redCPP.classCount
-        cellGen.rectList = redCPP.rectList
-        cellGen.floodPoints = redCPP.floodPoints
-        cellGen.Run(redCPP.dst2)
-
-        dst2 = cellGen.dst2
-
-        labels(2) = cellGen.labels(2)
-        labels(3) = CStr(task.redCells.Count) + " RedCloud cells"
-    End Sub
-End Class
 
 
 
@@ -143,7 +120,6 @@ End Class
 Public Class RedCloud_FindCells : Inherits TaskParent
     Public cellList As New List(Of Integer)
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         task.gOptions.pixelDiffThreshold = 25
         cPtr = RedCloud_FindCells_Open()
         desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
@@ -839,7 +815,6 @@ End Class
 Public Class RedCloud_CellStatsPlot : Inherits TaskParent
     Dim cells As New Cell_BasicsPlot
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         If standaloneTest() Then task.gOptions.setDisplay1()
         cells.runRedCloud = True
         desc = "Display the stats for the requested cell"
@@ -967,7 +942,6 @@ End Class
 Public Class RedCloud_FourColor : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         task.redOptions.setUseColorOnly(True)
         labels(3) = "A 4-way split of the input grayscale image based on brightness"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -1020,7 +994,6 @@ End Class
 
 Public Class RedCloud_Flippers : Inherits TaskParent
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         task.redOptions.setUseColorOnly(True)
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
@@ -1460,7 +1433,7 @@ Public Class RedCloud_Hue : Inherits TaskParent
         hue.Run(src)
         dst3 = hue.dst2
 
-        task.redC.redC.inputMask = Not dst3
+        task.redC.inputMask = Not dst3
         task.redC.Run(src)
         dst2 = task.redC.dst2
     End Sub
@@ -1476,7 +1449,6 @@ Public Class RedCloud_GenCellContains : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim contains As New Flood_ContainedCells
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         desc = "Merge cells contained in the top X cells and remove all other cells."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -2222,7 +2194,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         maxDepth.Run(src)
         If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
-            task.redC.redC.inputMask.SetTo(0)
+            task.redC.inputMask.SetTo(0)
             If src.Channels() = 3 Then
                 color8U.Run(src)
                 dst2 = color8U.dst2.Clone
@@ -2230,7 +2202,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
                 dst2 = src
             End If
         Else
-            task.redC.redC.inputMask = task.noDepthMask
+            task.redC.inputMask = task.noDepthMask
             dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         End If
 

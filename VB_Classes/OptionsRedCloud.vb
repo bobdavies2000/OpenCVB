@@ -26,8 +26,10 @@ Public Class OptionsRedCloud
     Public useDepthChecked As Boolean
     Public identifyCount As Integer
     Public histBins3D As Integer
-    Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions", "Binarize_DepthTiers", "FeatureLess_Groups", "Hist3DColor_Basics",
-                                       "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP", "Color8U_Grayscale"}
+    Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions",
+                                       "Binarize_DepthTiers", "FeatureLess_Basics", "Hist3DColor_Basics",
+                                       "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
+                                       "PCA_NColor_CPP"}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
@@ -95,7 +97,7 @@ Public Class OptionsRedCloud
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem() = "Reduction_Basics"
+        ColorSource.SelectedItem() = "FeatureLess_Basics"
 
         Select Case task.cameraName
             Case "Oak-D camera"
@@ -316,7 +318,7 @@ Public Class OptionsRedCloud
 
     Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs) Handles DisplayCellStats.CheckedChanged
         task.gOptions.displayDst1.Checked = DisplayCellStats.Checked
-        task.redOptions.setIdentifyCells(True)
+        task.redOptions.IdentifyCells.Checked = True
         task.optionsChanged = True
     End Sub
     Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged

@@ -7,7 +7,7 @@ Public Class Projection_Basics : Inherits TaskParent
     Public objectList As New List(Of cvb.Vec4f)
     Public showRectangles As Boolean = True
     Dim histTop As New Projection_HistTop
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find all the masks, rects, and counts in the input"
     End Sub
@@ -183,12 +183,12 @@ End Class
 Public Class Projection_Cell : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Dim heatCell As New HeatMap_Basics
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32FC3, 0)
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.unFiltered.Checked = True
-        labels = {"", "Top View projection of the selected cell", "RedCloud_Core output - select a cell to project at right and above", "Side projection of the selected cell"}
+        labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
         desc = "Create a top and side projection of the selected cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -223,10 +223,9 @@ End Class
 
 Public Class Projection_Top : Inherits TaskParent
     Public histTop As New Projection_HistTop
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -255,10 +254,9 @@ End Class
 
 Public Class Projection_Side : Inherits TaskParent
     Public histSide As New Projection_HistSide
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         objects.viewType = "Side"
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub

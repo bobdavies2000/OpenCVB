@@ -37,9 +37,8 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits TaskParent
     Public reduction As New Reduction_Basics
-    Public redC As New RedCloud_Core
+    Public redC As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.setIdentifyCells(True)
         task.redOptions.setUseColorOnly(True)
         labels(2) = "Reduced input to floodfill"
         task.redOptions.setBitReductionBar(32)

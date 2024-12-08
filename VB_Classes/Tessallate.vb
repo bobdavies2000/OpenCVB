@@ -101,7 +101,7 @@ End Class
 Public Class Tessallate_QuadSimple : Inherits TaskParent
     Public oglData As New List(Of cvb.Point3f)
     Public oglOptions As New Options_OpenGLFunctions
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
@@ -227,7 +227,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
     Public depthList2 As New List(Of List(Of Single))
     Public colorList As New List(Of cvb.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"

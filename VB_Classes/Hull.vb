@@ -39,7 +39,7 @@ End Class
 
 
 Public Class Hull_Contour : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compare the hull to the contour of a RedCloud cell"
     End Sub

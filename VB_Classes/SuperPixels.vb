@@ -1,7 +1,7 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class SuperPixel_Basics : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(2) = "Super Pixel cells"
         desc = "A Better superpixel algorithm"

@@ -43,7 +43,7 @@ End Class
 ' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
 ' https://github.com/mzucker/page_dewarp/blob/master/page_dewarp.py
 Public Class SVD_Example2 : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compute the mean and tangent of a RedCloud Cell"
     End Sub

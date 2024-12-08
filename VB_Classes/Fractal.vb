@@ -161,10 +161,10 @@ End Class
 
 ' https://github.com/brian-xu/FractalDimension/blob/master/FractalDimension.py
 Public Class Fractal_Dimension : Inherits TaskParent
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        labels = {"", "", "RedCloud_Core output - select any region.", "The selected region (as a square)"}
+        labels = {"", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub
     Public Function dimension(Input As cvb.Mat) As Double
