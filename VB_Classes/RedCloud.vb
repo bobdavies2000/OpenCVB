@@ -1083,7 +1083,7 @@ Public Class RedCloud_OnlyColorHist3D : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_Core."
+        desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_Basics."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         hColor.Run(src)
@@ -1147,35 +1147,6 @@ Public Class RedCloud_OnlyColorAlt : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class RedCloud_SizeOrder : Inherits TaskParent
-    Dim redC As New RedCloud_Core
-    Public Sub New()
-        task.redOptions.setUseColorOnly(True)
-        UpdateAdvice(traceName + ": Use the goptions 'DebugSlider' to select which cell is isolated.")
-        task.gOptions.setDebugSlider(0)
-        desc = "Select blobs by size using the DebugSlider in the global options"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        SetTrueText("Use the goptions 'DebugSlider' to select cells by size." + vbCrLf + "Size order changes frequently.", 3)
-        redC.Run(src)
-        dst2 = redC.dst3
-        labels(2) = redC.labels(3)
-
-        Dim index = task.gOptions.DebugSliderValue
-        If index < task.redCells.Count Then
-            dst3.SetTo(0)
-            Dim cell = task.redCells(index)
-            dst3(cell.rect).SetTo(cell.color, cell.mask)
-        End If
-    End Sub
-End Class
 
 
 
@@ -1267,105 +1238,11 @@ End Class
 
 
 
-Public Class RedCloud_MotionBasics : Inherits TaskParent
-    Public redMasks As New RedCloud_Core
-    Public redCells As New List(Of rcData)
-    Public rMotion As New RedCloud_MotionBGsubtract
-    Dim lastColors = dst3.Clone
-    Dim lastMap As cvb.Mat = dst2.Clone
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        labels = {"", "Mask of active RedCloud cells", "CV_8U representation of redCells", ""}
-        desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redMasks.Run(src)
-
-        rMotion.Run(task.color.Clone)
-
-        Dim lastCells As New List(Of rcData)(redCells)
-
-        redCells.Clear()
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        Dim usedColors = New List(Of cvb.Scalar)({black})
-        Dim motionCount As Integer
-        For Each cell In rMotion.redCells
-            Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
-            If cell.motionFlag = False Then
-                If index > 0 And index < lastCells.Count Then cell = lastCells(index - 1)
-            Else
-                motionCount += 1
-            End If
-
-            If index > 0 And index < lastCells.Count Then
-                Dim vec = lastColors.Get(Of cvb.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
-                cell.color = New cvb.Scalar(vec(0), vec(1), vec(2))
-            End If
-            If usedColors.Contains(cell.color) Then cell.color = randomCellColor()
-            usedColors.Add(cell.color)
-
-            If dst2.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
-                cell.index = redCells.Count + 1
-                redCells.Add(cell)
-                dst2(cell.rect).SetTo(cell.index, cell.mask)
-                dst3(cell.rect).SetTo(cell.color, cell.mask)
-
-                SetTrueText(CStr(cell.index), cell.maxDist, 2)
-                SetTrueText(CStr(cell.index), cell.maxDist, 3)
-            End If
-        Next
-
-        labels(3) = "There were " + CStr(redCells.Count) + " collected cells and " + CStr(motionCount) +
-                            " cells removed because of motion.  "
-
-        lastColors = dst3.Clone
-        lastMap = dst2.Clone
-        If redCells.Count > 0 Then dst1 = ShowPalette(lastMap * 255 / redCells.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class RedCloud_ContourVsFeatureLess : Inherits TaskParent
-    Dim redMasks As New RedCloud_Core
-    Dim contour As New Contour_WholeImage
-    Dim fLess As New FeatureLess_Basics
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        labels = {"", "Contour_WholeImage Input", "RedCloud_Core - toggling between Contour and Featureless inputs",
-                  "FeatureLess_Basics Input"}
-        desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_Core"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Static useContours = FindRadio("Use Contour_WholeImage")
-
-        contour.Run(src)
-        dst1 = contour.dst2
-
-        fLess.Run(src)
-        dst3 = fLess.dst2
-
-        If task.toggleOnOff Then redMasks.Run(dst3) Else redMasks.Run(dst1)
-        dst2 = redMasks.dst3
-    End Sub
-End Class
-
-
-
-
-
 
 
 
 
 Public Class RedCloud_UnmatchedCount : Inherits TaskParent
-    Public redCells As New List(Of rcData)
     Dim myFrameCount As Integer
     Dim changedCellCounts As New List(Of Integer)
     Dim framecounts As New List(Of Integer)
@@ -1376,18 +1253,17 @@ Public Class RedCloud_UnmatchedCount : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         myFrameCount += 1
-        If standaloneTest() Then
-            SetTrueText("RedCloud_UnmatchedCount has no output when run standaloneTest()." + vbCrLf +
-                        "It requires redCells and RedCloud_Core is the only way to create redCells." + vbCrLf +
-                        "Since RedCloud_Core calls RedCloud_UnmatchedCount, it would be circular and never finish the initialize.")
-            Exit Sub
+        If standalone Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
         End If
 
         Dim unMatchedCells As Integer
         Dim mostlyColor As Integer
-        For i = 0 To redCells.Count - 1
-            Dim rc = redCells(i)
-            If redCells(i).depthPixels / redCells(i).pixels < 0.5 Then mostlyColor += 1
+        For i = 0 To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
+            If task.redCells(i).depthPixels / task.redCells(i).pixels < 0.5 Then mostlyColor += 1
             If rc.indexLast <> 0 Then
                 Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If val = 0 Then
@@ -1412,8 +1288,8 @@ Public Class RedCloud_UnmatchedCount : Inherits TaskParent
             myFrameCount = 0
             Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
             labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
-            labels(2) = CStr(redCells.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
-                        CStr(mostlyColor) + " cells were mostly color and " + CStr(redCells.Count - mostlyColor) + " had depth."
+            labels(2) = CStr(task.redCells.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
+                        CStr(mostlyColor) + " cells were mostly color and " + CStr(task.redCells.Count - mostlyColor) + " had depth."
             changedCellCounts.Clear()
         End If
     End Sub
@@ -1429,7 +1305,7 @@ End Class
 
 Public Class RedCloud_ContourUpdate : Inherits TaskParent
     Public redCells As New List(Of rcData)
-    Dim redC As New RedCloud_Core
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "For each cell, add a contour if its count is zero."
     End Sub

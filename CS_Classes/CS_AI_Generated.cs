@@ -51732,34 +51732,6 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_SizeOrder_CS : TaskParent
-    {
-        RedCloud_Core redC = new RedCloud_Core();
-        public RedCloud_SizeOrder_CS()
-        {
-            vbc.task.redOptions.setUseColorOnly(true);
-            UpdateAdvice(traceName + ": Use the goptions 'DebugSlider' to select which cell is isolated.");
-            vbc.task.gOptions.setDebugSlider(0);
-            desc = "Select blobs by size using the DebugSlider in the global options";
-        }
-        public void RunAlg(Mat src)
-        {
-            SetTrueText("Use the goptions 'DebugSlider' to select cells by size." + "\n" + "Size order changes frequently.", 3);
-            redC.Run(src);
-            dst2 = redC.dst3;
-            labels[2] = redC.labels[3];
-            int index = vbc.task.gOptions.getDebugSlider();
-            if (index < vbc.task.redCells.Count())
-            {
-                dst3.SetTo(0);
-                var cell = vbc.task.redCells[index];
-                dst3[cell.rect].SetTo(cell.color, cell.mask);
-            }
-        }
-    }
-
-
-
 
     public class RedCloud_StructuredH_CS : TaskParent
     {
@@ -51836,99 +51808,6 @@ namespace CS_Classes
             dst3 = histSide.dst2;
             dst2.SetTo(Scalar.White, sliceMask);
             dst0.SetTo(Scalar.White, sliceMask);
-        }
-    }
-
-
-
-
-    public class RedCloud_MotionBasics_CS : TaskParent
-    {
-        public RedCloud_Core redMasks = new RedCloud_Core();
-        public List<rcData> redCells = new List<rcData>();
-        public RedCloud_MotionBGsubtract rMotion = new RedCloud_MotionBGsubtract();
-        Mat lastColors;
-        Mat lastMap;
-        public RedCloud_MotionBasics_CS()
-        {
-            lastColors = dst3.Clone();
-            lastMap = dst2.Clone();
-            dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            labels = new string[] { "", "Mask of active RedCloud cells", "CV_8U representation of redCells", "" };
-            desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
-        }
-        public void RunAlg(Mat src)
-        {
-            redMasks.Run(src);
-            rMotion.Run(vbc.task.color.Clone());
-            List<rcData> lastCells = new List<rcData>(redCells);
-            redCells.Clear();
-            dst2.SetTo(0);
-            dst3.SetTo(0);
-            List<Scalar> usedColors = new List<Scalar> { cv.Scalar.Black };
-            int motionCount = 0;
-            foreach (var nextCell in rMotion.redCells)
-            {
-                rcData cell = nextCell;
-                int index = lastMap.At<byte>(cell.maxDist.Y, cell.maxDist.X);
-                if (!cell.motionFlag)
-                {
-                    if (index > 0 && index < lastCells.Count()) cell = lastCells[index - 1];
-                }
-                else
-                {
-                    motionCount++;
-                }
-                if (index > 0 && index < lastCells.Count())
-                {
-                    var vec = lastColors.Get<Vec3b>(cell.maxDist.Y, cell.maxDist.X);
-                    cell.color = new cv.Scalar(vec.Item0, vec.Item1, vec.Item2);
-                }
-                if (usedColors.Contains(cell.color)) cell.color = randomCellColor();
-                usedColors.Add(cell.color);
-                if (dst2.At<byte>(cell.maxDist.Y, cell.maxDist.X) == 0)
-                {
-                    cell.index = redCells.Count() + 1;
-                    redCells.Add(cell);
-                    dst2[cell.rect].SetTo(cell.index, cell.mask);
-                    dst3[cell.rect].SetTo(cell.color, cell.mask);
-                    SetTrueText(cell.index.ToString(), cell.maxDist, 2);
-                    SetTrueText(cell.index.ToString(), cell.maxDist, 3);
-                }
-            }
-            labels[3] = "There were " + redCells.Count() + " collected cells and " + motionCount +
-                        " cells removed because of motion.  ";
-            lastColors = dst3.Clone();
-            lastMap = dst2.Clone();
-            if (redCells.Count() > 0) dst1 = ShowPalette(lastMap * 255 / redCells.Count());
-        }
-    }
-
-
-
-
-    public class RedCloud_ContourVsFeatureLess_CS : TaskParent
-    {
-        RedCloud_Core redMasks = new RedCloud_Core();
-        Contour_WholeImage contour = new Contour_WholeImage();
-        FeatureLess_Basics fLess = new FeatureLess_Basics();
-        System.Windows.Forms.RadioButton useContours;
-        public RedCloud_ContourVsFeatureLess_CS()
-        {
-            useContours = FindRadio("Use Contour_WholeImage");
-            if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            labels = new string[] { "", "Contour_WholeImage Input", "RedCloud_Core - toggling between Contour and Featureless inputs", "FeatureLess_Basics Input" };
-            desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_Core";
-        }
-        public void RunAlg(Mat src)
-        {
-            contour.Run(src);
-            dst1 = contour.dst2;
-            fLess.Run(src);
-            dst3 = fLess.dst2;
-            if (vbc.task.toggleOnOff) redMasks.Run(dst3);
-            else redMasks.Run(dst1);
-            dst2 = redMasks.dst3;
         }
     }
 

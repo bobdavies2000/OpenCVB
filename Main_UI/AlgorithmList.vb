@@ -3164,8 +3164,6 @@ End Enum
 	If algorithmName = "RedCloud_Consistent2_CS" Then return new RedCloud_Consistent2_CS
 	If algorithmName = "RedCloud_ContourUpdate" Then return new RedCloud_ContourUpdate
 	If algorithmName = "RedCloud_ContourUpdate_CS" Then return new RedCloud_ContourUpdate_CS
-	If algorithmName = "RedCloud_ContourVsFeatureLess" Then return new RedCloud_ContourVsFeatureLess
-	If algorithmName = "RedCloud_ContourVsFeatureLess_CS" Then return new RedCloud_ContourVsFeatureLess_CS
 	If algorithmName = "RedCloud_Core" Then return new RedCloud_Core
 	If algorithmName = "RedCloud_CPP_CS" Then return new RedCloud_CPP_CS
 	If algorithmName = "RedCloud_CPP_VB" Then return new RedCloud_CPP_VB
@@ -3216,8 +3214,6 @@ End Enum
 	If algorithmName = "RedCloud_MeterByMeter_CS" Then return new RedCloud_MeterByMeter_CS
 	If algorithmName = "RedCloud_MostlyColor" Then return new RedCloud_MostlyColor
 	If algorithmName = "RedCloud_MostlyColor_CS" Then return new RedCloud_MostlyColor_CS
-	If algorithmName = "RedCloud_MotionBasics" Then return new RedCloud_MotionBasics
-	If algorithmName = "RedCloud_MotionBasics_CS" Then return new RedCloud_MotionBasics_CS
 	If algorithmName = "RedCloud_MotionBGsubtract" Then return new RedCloud_MotionBGsubtract
 	If algorithmName = "RedCloud_MotionBGsubtract_CS" Then return new RedCloud_MotionBGsubtract_CS
 	If algorithmName = "RedCloud_MotionCompare" Then return new RedCloud_MotionCompare
@@ -3250,8 +3246,6 @@ End Enum
 	If algorithmName = "RedCloud_Reduction_CS" Then return new RedCloud_Reduction_CS
 	If algorithmName = "RedCloud_ShapeCorrelation" Then return new RedCloud_ShapeCorrelation
 	If algorithmName = "RedCloud_ShapeCorrelation_CS" Then return new RedCloud_ShapeCorrelation_CS
-	If algorithmName = "RedCloud_SizeOrder" Then return new RedCloud_SizeOrder
-	If algorithmName = "RedCloud_SizeOrder_CS" Then return new RedCloud_SizeOrder_CS
 	If algorithmName = "RedCloud_StructuredH" Then return new RedCloud_StructuredH
 	If algorithmName = "RedCloud_StructuredH_CS" Then return new RedCloud_StructuredH_CS
 	If algorithmName = "RedCloud_StructuredV" Then return new RedCloud_StructuredV
