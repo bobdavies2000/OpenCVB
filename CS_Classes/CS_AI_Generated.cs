@@ -52107,40 +52107,6 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_TopXHulls_CS : TaskParent
-    {
-        RedCloud_TopX topX = new RedCloud_TopX();
-        public RedCloud_TopXHulls_CS()
-        {
-            desc = "Build the hulls for the top X RedCloud cells";
-        }
-        public void RunAlg(Mat src)
-        {
-            topX.Run(src);
-            labels = topX.redC.labels;
-            var newCells = new List<rcData>();
-            vbc.task.redMap.SetTo(0);
-            dst2.SetTo(0);
-            foreach (var rc in vbc.task.redCells)
-            {
-                if (rc.contour.Count() >= 5)
-                {
-                    rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
-                    DrawContour(dst2[rc.rect], rc.hull, rc.color, -1);
-                    DrawContour(rc.mask, rc.hull, cv.Scalar.All(255), -1);
-                    vbc.task.redMap[rc.rect].SetTo(rc.index, rc.mask);
-                }
-                newCells.Add(rc);
-                if (rc.index > topX.options.topX) break;
-            }
-            vbc.task.redCells = new List<rcData>(newCells);
-            vbc.task.setSelectedContour();
-        }
-    }
-
-
-
-
     public class RedCloud_Hue_CS : TaskParent
     {
         RedCloud_Core redC = new RedCloud_Core();

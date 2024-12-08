@@ -5,6 +5,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Dim fless As New FeatureLess_Basics
     Dim stats As New Cell_Basics
     Public Sub New()
+        labels(3) = "The 'tracking' color (shown below) switches when a cells splits or is lost."
         desc = "Floodfill the FeatureLess output so each cell can be tracked."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -20,7 +21,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             task.gOptions.setDisplay1()
             stats.Run(src)
             strOut = stats.strOut
-            SetTrueText(strOut, 1)
+            SetTrueTextRedC(strOut)
         End If
 
         If standalone Then
@@ -77,7 +78,6 @@ End Class
 
 
 Public Class RedCloud_Reduction : Inherits TaskParent
-    Public redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
@@ -85,10 +85,10 @@ Public Class RedCloud_Reduction : Inherits TaskParent
         desc = "Segment the image based on both the reduced color"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
+        task.redC.Run(src)
         dst3 = task.redMap
-        dst2 = redC.dst2
-        labels = redC.labels
+        dst2 = task.redC.dst2
+        labels = task.redC.labels
     End Sub
 End Class
 
@@ -100,14 +100,13 @@ End Class
 
 Public Class RedCloud_Hulls : Inherits TaskParent
     Dim convex As New Convex_RedCloudDefects
-    Public redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "Cells where convexity defects failed", "", "Improved contour results using OpenCV's ConvexityDefects"}
         desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         dst3.SetTo(0)
         Dim defectCount As Integer
@@ -143,7 +142,6 @@ End Class
 
 Public Class RedCloud_FindCells : Inherits TaskParent
     Public cellList As New List(Of Integer)
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         task.gOptions.pixelDiffThreshold = 25
@@ -153,9 +151,9 @@ Public Class RedCloud_FindCells : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         cellList = New List(Of Integer)
 
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         Dim count As Integer
         dst3.SetTo(0)
@@ -220,15 +218,14 @@ End Class
 Public Class RedCloud_Equations : Inherits TaskParent
     Dim eq As New Plane_Equation
     Public redCells As New List(Of rcData)
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
         desc = "Show the estimated plane equations for all the cells."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            redC.Run(src)
-            dst2 = redC.dst2
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
             redCells = New List(Of rcData)(task.redCells)
         End If
 
@@ -271,16 +268,15 @@ End Class
 Public Class RedCloud_CellsAtDepth : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Dim kalman As New Kalman_Basics
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         plot.removeZeroEntry = False
         labels(3) = "Histogram of depth weighted by the size of the cell."
         desc = "Create a histogram of depth using RedCloud cells"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         Dim histBins = task.histogramBins
         Dim slotList(histBins) As List(Of Integer)
@@ -324,14 +320,13 @@ End Class
 
 
 Public Class RedCloud_ShapeCorrelation : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "A shape correlation is between each x and y in list of contours points.  It allows classification based on angle and shape."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         Dim rc = task.rc
         If rc.contour.Count > 0 Then
@@ -355,7 +350,6 @@ End Class
 
 Public Class RedCloud_FPS : Inherits TaskParent
     Dim fps As New Grid_FPS
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.setDisplay1()
         task.gOptions.setDisplay1()
@@ -365,12 +359,12 @@ Public Class RedCloud_FPS : Inherits TaskParent
         fps.Run(empty)
 
         If fps.heartBeat Then
-            redC.Run(src)
+            task.redC.Run(src)
             dst0 = task.color.Clone
             dst1 = task.depthRGB.Clone
-            dst2 = redC.dst2.Clone
+            dst2 = task.redC.dst2.Clone
         End If
-        labels(2) = redC.labels(2) + " " + fps.strOut
+        labels(2) = task.redC.labels(2) + " " + fps.strOut
     End Sub
 End Class
 
@@ -385,7 +379,6 @@ End Class
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneColor : Inherits TaskParent
     Public options As New Options_Plane
-    Public redC As New RedCloud_Basics
     Dim planeCells As New Plane_CellColor
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
@@ -394,9 +387,9 @@ Public Class RedCloud_PlaneColor : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         dst3.SetTo(0)
         Dim fitPoints As New List(Of cvb.Point3f)
@@ -426,16 +419,15 @@ End Class
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneFromContour : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
         desc = "Create a plane equation each cell's contour"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels(2) = task.redC.labels(2)
         End If
 
         Dim rc = task.rc
@@ -462,16 +454,15 @@ End Class
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneFromMask : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
         desc = "Create a plane equation from the pointcloud samples in a RedCloud cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels(2) = task.redC.labels(2)
         End If
 
         Dim rc = task.rc
@@ -498,7 +489,6 @@ End Class
 
 
 Public Class RedCloud_BProject3D : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
         desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection"
@@ -508,8 +498,8 @@ Public Class RedCloud_BProject3D : Inherits TaskParent
         dst3 = hcloud.dst3
 
         dst3.ConvertTo(dst0, cvb.MatType.CV_8U)
-        redC.Run(dst0)
-        dst2 = redC.dst2
+        task.redC.Run(dst0)
+        dst2 = task.redC.dst2
     End Sub
 End Class
 
@@ -589,7 +579,6 @@ End Class
 
 Public Class RedCloud_KMeans : Inherits TaskParent
     Dim km As New KMeans_MultiChannel
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "KMeans_MultiChannel output", "RedCloud_Basics output"}
         desc = "Use RedCloud to identify the regions created by kMeans"
@@ -598,8 +587,8 @@ Public Class RedCloud_KMeans : Inherits TaskParent
         km.Run(src)
         dst3 = km.dst2
 
-        redC.Run(dst3)
-        dst2 = redC.dst2
+        task.redC.Run(dst3)
+        dst2 = task.redC.dst2
     End Sub
 End Class
 
@@ -611,7 +600,6 @@ End Class
 
 Public Class RedCloud_LikelyFlatSurfaces : Inherits TaskParent
     Dim verts As New Plane_Basics
-    Dim redC As New RedCloud_Basics
     Public vCells As New List(Of rcData)
     Public hCells As New List(Of rcData)
     Public Sub New()
@@ -621,7 +609,7 @@ Public Class RedCloud_LikelyFlatSurfaces : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         verts.Run(src)
 
-        redC.Run(src)
+        task.redC.Run(src)
         dst2.SetTo(0)
         dst3.SetTo(0)
 
@@ -644,7 +632,7 @@ Public Class RedCloud_LikelyFlatSurfaces : Inherits TaskParent
 
         Dim rcX = task.rc
         SetTrueText("mean depth = " + Format(rcX.depthMean(2), "0.0"), 3)
-        labels(2) = redC.labels(2)
+        labels(2) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -656,15 +644,14 @@ End Class
 
 
 Public Class RedCloud_PlaneEq3D : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim eq As New Plane_Equation
     Public Sub New()
         desc = "If a RedColor cell contains depth then build a plane equation"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         Dim rc = task.rc
         If rc.maxVec.Z Then
@@ -692,7 +679,6 @@ End Class
 
 Public Class RedCloud_DelaunayGuidedFeatures : Inherits TaskParent
     Dim features As New Feature_Delaunay
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(2) = "RedCloud Output of GoodFeature points"
         desc = "Track the feature points using RedCloud."
@@ -702,9 +688,9 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits TaskParent
         dst3 = features.dst3
         labels(3) = features.labels(3)
 
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(dst3)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -716,16 +702,15 @@ End Class
 
 
 Public Class RedCloud_UnstableCells : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim prevList As New List(Of cvb.Point)
     Public Sub New()
         labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
         desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         If task.heartBeat Or task.frameCount = 2 Then
             dst1 = dst2.Clone
@@ -754,16 +739,15 @@ End Class
 
 
 Public Class RedCloud_UnstableHulls : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim prevList As New List(Of cvb.Point)
     Public Sub New()
         labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
         desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         If task.heartBeat Or task.frameCount = 2 Then
             dst1 = dst2.Clone
@@ -795,14 +779,13 @@ End Class
 
 
 Public Class RedCloud_CellChanges : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim dst2Last = dst2.Clone
     Public Sub New()
         desc = "Count the cells that have changed in a RedCloud generation"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         dst3 = (dst2 - dst2Last).ToMat
 
@@ -828,16 +811,15 @@ End Class
 
 
 Public Class RedCloud_FloodPoint : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim stats As New Cell_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Verify that floodpoints correctly determine if depth is present."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         dst1 = task.depthRGB
         For Each rc In task.redCells
@@ -879,15 +861,14 @@ End Class
 
 
 Public Class RedCloud_MostlyColor : Inherits TaskParent
-    Public redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Cells that have more than 50% depth data."
         desc = "Identify cells that have more than 50% depth data"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         dst3.SetTo(0)
         For Each rc In task.redCells
@@ -905,7 +886,6 @@ End Class
 
 Public Class RedCloud_OutlineColor : Inherits TaskParent
     Dim outline As New Depth_Outline
-    Dim redC As New RedCloud_Basics
     Dim color8U As New Color8U_Basics
     Public Sub New()
         labels(3) = "Color input to RedCloud_Basics with depth boundary blocking color connections."
@@ -919,9 +899,9 @@ Public Class RedCloud_OutlineColor : Inherits TaskParent
         dst1.SetTo(0, outline.dst2)
         dst3 = ShowPalette(dst1 * 255 / color8U.classCount)
 
-        redC.Run(dst1)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(dst1)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -933,7 +913,6 @@ End Class
 
 Public Class RedCloud_DepthOutline : Inherits TaskParent
     Dim outline As New Depth_Outline
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         task.redOptions.setUseColorOnly(True)
@@ -947,9 +926,9 @@ Public Class RedCloud_DepthOutline : Inherits TaskParent
 
         dst1.SetTo(0)
         src.CopyTo(dst1, Not dst3)
-        redC.Run(dst1)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(dst1)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -987,7 +966,6 @@ End Class
 
 Public Class RedCloud_FourColor : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         task.redOptions.setUseColorOnly(True)
@@ -998,9 +976,9 @@ Public Class RedCloud_FourColor : Inherits TaskParent
         binar4.Run(src)
         dst3 = ShowPalette(binar4.dst2 * 255 / 5)
 
-        redC.Run(binar4.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(3)
+        task.redC.Run(binar4.dst2)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(3)
     End Sub
 End Class
 
@@ -1015,7 +993,6 @@ End Class
 ' https://docs.opencvb.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
 Public Class RedCloud_CCompColor : Inherits TaskParent
     Dim ccomp As New CComp_Both
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         desc = "Identify each Connected component as a RedCloud Cell."
@@ -1026,9 +1003,9 @@ Public Class RedCloud_CCompColor : Inherits TaskParent
         ccomp.dst1.ConvertTo(dst3, cvb.MatType.CV_8U)
         labels(3) = ccomp.labels(2)
 
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(3)
+        task.redC.Run(dst3)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(3)
     End Sub
 End Class
 
@@ -1042,7 +1019,6 @@ End Class
 
 
 Public Class RedCloud_Flippers : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setIdentifyCells(True)
         task.redOptions.setUseColorOnly(True)
@@ -1050,9 +1026,9 @@ Public Class RedCloud_Flippers : Inherits TaskParent
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst3 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst3 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         Static lastMap As cvb.Mat = task.redMap.Clone
         dst2.SetTo(0)
@@ -1066,7 +1042,7 @@ Public Class RedCloud_Flippers : Inherits TaskParent
                 unMatchedPixels += rc.pixels
             End If
         Next
-        lastMap = redC.dst3.Clone
+        lastMap = task.redC.dst3.Clone
 
         If task.heartBeat Then
             labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."
@@ -1080,7 +1056,6 @@ End Class
 
 
 Public Class RedCloud_OnlyColorHist3D : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_Basics."
@@ -1090,10 +1065,10 @@ Public Class RedCloud_OnlyColorHist3D : Inherits TaskParent
         dst2 = hColor.dst3
         labels(2) = hColor.labels(3)
 
-        redC.Run(dst2)
+        task.redC.Run(dst2)
         dst3 = task.redMap
         dst3.SetTo(0, task.noDepthMask)
-        labels(3) = redC.labels(2)
+        labels(3) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -1103,12 +1078,11 @@ End Class
 
 
 Public Class RedCloud_OnlyColorAlt : Inherits TaskParent
-    Public redMasks As New RedCloud_Basics
     Public Sub New()
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redMasks.Run(src)
+        task.redC.Run(src)
         Dim lastCells As New List(Of rcData)(task.redCells)
         Dim lastMap As cvb.Mat = task.redMap.Clone
         Dim lastColors As cvb.Mat = dst3.Clone
@@ -1141,7 +1115,7 @@ Public Class RedCloud_OnlyColorAlt : Inherits TaskParent
 
         task.redCells = New List(Of rcData)(newCells)
         labels(3) = CStr(task.redCells.Count) + " cells were identified."
-        labels(2) = redMasks.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
+        labels(2) = task.redC.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
         If task.redCells.Count > 0 Then dst2 = ShowPalette(lastMap * 255 / task.redCells.Count)
     End Sub
@@ -1254,9 +1228,8 @@ Public Class RedCloud_UnmatchedCount : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         myFrameCount += 1
         If standalone Then
-            Static redC As New RedCloud_Basics
-            redC.Run(src)
-            dst2 = redC.dst2
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
         End If
 
         Dim unMatchedCells As Integer
@@ -1305,15 +1278,14 @@ End Class
 
 Public Class RedCloud_ContourUpdate : Inherits TaskParent
     Public redCells As New List(Of rcData)
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "For each cell, add a contour if its count is zero."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels = redC.labels
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels = task.redC.labels
             redCells = task.redCells
         End If
 
@@ -1336,15 +1308,14 @@ End Class
 
 
 Public Class RedCloud_MaxDist : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim addTour As New RedCloud_ContourUpdate
     Public Sub New()
         desc = "Show the maxdist before and after updating the mask with the contour."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels = redC.labels
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels = task.redC.labels
 
         For Each rc In task.redCells
             DrawCircle(dst2, rc.maxDist, task.DotSize, task.HighlightColor)
@@ -1369,7 +1340,6 @@ End Class
 
 
 Public Class RedCloud_Tiers : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
@@ -1384,9 +1354,10 @@ Public Class RedCloud_Tiers : Inherits TaskParent
         dst3 = tiers.dst3
 
         dst0 = tiers.dst2 + binar4.dst2
-        redC.Run(dst0)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(dst0)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
+        labels(3) = tiers.labels(2)
     End Sub
 End Class
 
@@ -1394,7 +1365,6 @@ End Class
 
 
 Public Class RedCloud_TiersBinarize : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
@@ -1407,9 +1377,9 @@ Public Class RedCloud_TiersBinarize : Inherits TaskParent
         tiers.Run(src)
         dst2 = tiers.dst2 + binar4.dst2
 
-        redC.Run(dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(dst2)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -1423,7 +1393,6 @@ End Class
 
 
 Public Class RedCloud_TopX : Inherits TaskParent
-    Public redC As New RedCloud_Core
     Public options As New Options_TopX
     Public Sub New()
         desc = "Show only the top X cells"
@@ -1431,7 +1400,7 @@ Public Class RedCloud_TopX : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        redC.Run(src)
+        task.redC.Run(src)
 
         dst2.SetTo(0)
         For Each rc In task.redCells
@@ -1453,7 +1422,7 @@ Public Class RedCloud_TopXHulls : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         topX.Run(src)
-        labels = topX.redC.labels
+        labels = task.redC.labels
 
         Dim newCells As New List(Of rcData)
         task.redMap.SetTo(0)
@@ -1481,19 +1450,19 @@ End Class
 
 
 Public Class RedCloud_Hue : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim hue As New Color8U_Hue
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
+        labels(3) = "Mask of the areas with Hue"
         desc = "Run RedCloud on just the red hue regions."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         hue.Run(src)
         dst3 = hue.dst2
 
-        redC.inputMask = Not dst3
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.redC.inputMask = Not dst3
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
     End Sub
 End Class
 
@@ -1542,16 +1511,16 @@ End Class
 Public Class RedCloud_PlusTiers : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
-    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Add the depth tiers to the input for RedCloud_Core."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         tiers.Run(src)
         binar4.Run(src)
-        redC.Run(binar4.dst2 + tiers.dst2)
-        dst2 = redC.dst2
-        labels = redC.labels
+        task.redC.Run(binar4.dst2 + tiers.dst2)
+        dst2 = task.redC.dst2
+        dst3 = task.redC.dst3
+        labels = task.redC.labels
     End Sub
 End Class
 
@@ -1778,13 +1747,12 @@ End Class
 
 
 Public Class RedCloud_NaturalColor : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Public Sub New()
         desc = "Display the RedCloud results with the mean color of the cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        labels(2) = task.redC.labels(2)
         dst2 = DisplayCells()
     End Sub
 End Class
@@ -1800,7 +1768,6 @@ End Class
 Public Class RedCloud_MotionBGsubtract : Inherits TaskParent
     Public bgSub As New BGSubtract_Basics
     Public redCells As New List(Of rcData)
-    Dim redC As New RedCloud_Core
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.pixelDiffThreshold = 25
@@ -1811,9 +1778,9 @@ Public Class RedCloud_MotionBGsubtract : Inherits TaskParent
         bgSub.Run(src)
         dst3 = bgSub.dst2
 
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(3)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(3)
 
         redCells.Clear()
         dst1.SetTo(0)
@@ -2070,7 +2037,6 @@ End Class
 
 
 Public Class RedCloud_FeatureLessReduce : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim devGrid As New FeatureROI_Basics
     Public redCells As New List(Of rcData)
     Public cellMap As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -2084,9 +2050,9 @@ Public Class RedCloud_FeatureLessReduce : Inherits TaskParent
 
         devGrid.Run(src)
 
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         dst3.SetTo(0)
         redCells.Clear()
@@ -2122,7 +2088,6 @@ End Class
 
 
 Public Class RedCloud_Features : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim options As New Options_RedCloudFeatures
     Public Sub New()
         desc = "Display And validate the keyPoints for each RedCloud cell"
@@ -2140,8 +2105,8 @@ Public Class RedCloud_Features : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         Dim rc = task.rc
 
@@ -2253,7 +2218,6 @@ End Class
 
 
 Public Class RedCloud_ReduceTest : Inherits TaskParent
-    Dim redC As New RedCloud_Core
     Dim redInput As New RedCloud_Reduce
     Public Sub New()
         desc = "Run RedCloud with the depth reduction."
@@ -2261,95 +2225,10 @@ Public Class RedCloud_ReduceTest : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         redInput.Run(src)
 
-        redC.Run(redInput.dst2)
-        dst2 = redC.dst2
+        task.redC.Run(redInput.dst2)
+        dst2 = task.redC.dst2
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class RedCloud_MotionCompare : Inherits TaskParent
-    Dim redC As New RedCloud_Core
-    Public Sub New()
-        desc = "Compare motion only vs full image RedCloud"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        src.SetTo(0, Not task.motionMask)
-        redC.Run(src)
-        If task.heartBeatLT Then dst3.SetTo(0)
-        redC.dst2.CopyTo(dst3, task.motionMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_CellFLess : Inherits TaskParent
-    Dim redC As New RedCloud_Core
-    Dim edges As New LowRes_Edges
-    Dim tiers As New Depth_Tiers
-    Public classCount As Integer
-    Public Sub New()
-        dst0 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U, 0)
-        desc = "Isolate the featureless regions in the image by cell and depth."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        tiers.Run(src)
-
-        edges.Run(src)
-        labels(2) = edges.labels(2)
-
-        dst1 = tiers.dst2 + task.fLessMask * 1 / 255
-        redC.Run(dst1)
-        dst2 = redC.dst2
-
-        dst3 = redC.dst2
-        dst3.SetTo(0, task.featureMask)
-        labels(3) = CStr(task.fLessRects.Count) + " featureless cells were found."
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_CellFeatures : Inherits TaskParent
-    Dim redC As New RedCloud_Core
-    Dim edges As New LowRes_Edges
-    Dim tiers As New Depth_Tiers
-    Public classCount As Integer
-    Public Sub New()
-        desc = "Isolate the featureless regions in the image by cell and depth."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        tiers.Run(src)
-
-        edges.Run(src)
-        labels(2) = edges.labels(2)
-
-        src.SetTo(0, task.fLessMask)
-
-        redC.Run(src)
-        dst2 = redC.dst2
-        dst3 = redC.dst2
-        dst3.SetTo(0, task.fLessMask)
-        labels(3) = CStr(task.featureRects.Count) + " feature cells were found."
-    End Sub
-End Class
-
-
 
 
 
@@ -2359,7 +2238,6 @@ End Class
 Public Class RedCloud_Combine : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public guided As New GuidedBP_Depth
-    Public redC As New RedCloud_Core
     Public combinedCells As New List(Of rcData)
     Dim maxDepth As New Depth_MaxMask
     Dim prep As New RedCloud_Reduce
@@ -2369,7 +2247,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         maxDepth.Run(src)
         If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
-            redC.inputMask.SetTo(0)
+            task.redC.redC.inputMask.SetTo(0)
             If src.Channels() = 3 Then
                 color8U.Run(src)
                 dst2 = color8U.dst2.Clone
@@ -2377,7 +2255,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
                 dst2 = src
             End If
         Else
-            redC.inputMask = task.noDepthMask
+            task.redC.redC.inputMask = task.noDepthMask
             dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         End If
 
@@ -2394,8 +2272,8 @@ Public Class RedCloud_Combine : Inherits TaskParent
             End Select
         End If
 
-        redC.Run(dst2)
-        dst2 = redC.dst2
+        task.redC.Run(dst2)
+        dst2 = task.redC.dst2
 
         combinedCells.Clear()
         Dim drawRectOnlyRun As Boolean

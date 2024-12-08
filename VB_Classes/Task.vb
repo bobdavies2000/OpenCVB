@@ -102,6 +102,7 @@ Public Class VBtask : Implements IDisposable
     Public ogl As OpenGL_Basics
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
+    Public redC As RedCloud_Basics
 
     Public drawRotatedRect As Draw_RotatedRect
     Public centerRect As cvb.Rect
@@ -414,6 +415,7 @@ Public Class VBtask : Implements IDisposable
         PixelViewer = New Pixel_Viewer
 
         feat = New Feature_Basics
+        redC = New RedCloud_Basics
 
         colorizer = New Depth_Colorizer_CPP_VB
         IMUBasics = New IMU_Basics
@@ -594,6 +596,12 @@ Public Class VBtask : Implements IDisposable
 
                 task.color.Rectangle(task.rc.rect, cvb.Scalar.Yellow, task.lineWidth)
                 task.color(task.rc.rect).SetTo(cvb.Scalar.White, rc.mask)
+            End If
+
+            If task.redOptions.DisplayCellStats.Checked Then
+                For Each tt In task.redC.trueData
+                    trueData.Add(tt)
+                Next
             End If
 
             If task.gOptions.showMotionMask.Checked Then

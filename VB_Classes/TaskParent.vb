@@ -616,11 +616,14 @@ Public Class TaskParent : Implements IDisposable
             trueData.Add(str)
         End If
     End Sub
+    Public Sub SetTrueTextRedC(text As String, Optional picTag As Integer = 1)
+        Dim str As New TrueText(text, New cvb.Point(0, 0), picTag)
+        trueData.Add(str)
+    End Sub
     Public Sub SetTrueText(text As String)
         If primaryAlg Then
-            Dim pt = New cvb.Point(0, 0)
             Dim picTag = 2
-            Dim str As New TrueText(text, pt, picTag)
+            Dim str As New TrueText(text, New cvb.Point(0, 0), picTag)
             trueData.Add(str)
         End If
     End Sub

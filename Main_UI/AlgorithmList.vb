@@ -3142,8 +3142,6 @@ End Enum
 	If algorithmName = "RedCloud_CCompColor_CS" Then return new RedCloud_CCompColor_CS
 	If algorithmName = "RedCloud_CellChanges" Then return new RedCloud_CellChanges
 	If algorithmName = "RedCloud_CellChanges_CS" Then return new RedCloud_CellChanges_CS
-	If algorithmName = "RedCloud_CellFeatures" Then return new RedCloud_CellFeatures
-	If algorithmName = "RedCloud_CellFLess" Then return new RedCloud_CellFLess
 	If algorithmName = "RedCloud_Cells" Then return new RedCloud_Cells
 	If algorithmName = "RedCloud_Cells_CS" Then return new RedCloud_Cells_CS
 	If algorithmName = "RedCloud_CellsAtDepth" Then return new RedCloud_CellsAtDepth
@@ -3214,7 +3212,6 @@ End Enum
 	If algorithmName = "RedCloud_MostlyColor_CS" Then return new RedCloud_MostlyColor_CS
 	If algorithmName = "RedCloud_MotionBGsubtract" Then return new RedCloud_MotionBGsubtract
 	If algorithmName = "RedCloud_MotionBGsubtract_CS" Then return new RedCloud_MotionBGsubtract_CS
-	If algorithmName = "RedCloud_MotionCompare" Then return new RedCloud_MotionCompare
 	If algorithmName = "RedCloud_NaturalColor" Then return new RedCloud_NaturalColor
 	If algorithmName = "RedCloud_NaturalColor_CS" Then return new RedCloud_NaturalColor_CS
 	If algorithmName = "RedCloud_OnlyColorAlt" Then return new RedCloud_OnlyColorAlt
@@ -3255,7 +3252,6 @@ End Enum
 	If algorithmName = "RedCloud_TopX" Then return new RedCloud_TopX
 	If algorithmName = "RedCloud_TopX_CS" Then return new RedCloud_TopX_CS
 	If algorithmName = "RedCloud_TopXHulls" Then return new RedCloud_TopXHulls
-	If algorithmName = "RedCloud_TopXHulls_CS" Then return new RedCloud_TopXHulls_CS
 	If algorithmName = "RedCloud_TopXNeighbors_CS" Then return new RedCloud_TopXNeighbors_CS
 	If algorithmName = "RedCloud_UnmatchedCount" Then return new RedCloud_UnmatchedCount
 	If algorithmName = "RedCloud_UnmatchedCount_CS" Then return new RedCloud_UnmatchedCount_CS
