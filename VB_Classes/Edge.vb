@@ -1100,7 +1100,6 @@ End Class
 
 Public Class Edge_RedCloud : Inherits TaskParent
     Dim canny As New Edge_Basics
-    Dim redC As New RedCloud_Basics
     Public mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Canny Edges (0), RedCloud output (1), RedCloud Edges(2), 0 And'd with 2"
@@ -1112,10 +1111,10 @@ Public Class Edge_RedCloud : Inherits TaskParent
         canny.Run(src)
         mats.mat(0) = canny.dst2
 
-        redC.Run(src)
-        mats.mat(1) = redC.dst2
+        task.redC.Run(src)
+        mats.mat(1) = task.redC.dst2
 
-        canny.Run(redC.dst2)
+        canny.Run(task.redC.dst2)
         mats.mat(2) = canny.dst2
 
         mats.mat(3) = mats.mat(2).SetTo(0, Not mats.mat(0))

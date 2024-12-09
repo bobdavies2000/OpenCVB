@@ -241,7 +241,6 @@ End Class
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class Plane_CellColor : Inherits TaskParent
     Public options As New Options_Plane
-    Public redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
@@ -267,8 +266,8 @@ Public Class Plane_CellColor : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         dst3.SetTo(0)
         Dim newCells As New List(Of rcData)
@@ -303,15 +302,14 @@ Public Class Plane_Points : Inherits TaskParent
     Public equations As New List(Of cvb.Vec4f)
     Public ptList As New List(Of cvb.Point3f)
     Public ptList2D As New List(Of List(Of cvb.Point))
-    Dim redC As New RedCloud_Basics
     Dim needOutput As Boolean
     Public Sub New()
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         Dim rc = task.rc
         labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
@@ -428,14 +426,13 @@ End Class
 Public Class Plane_Equation : Inherits TaskParent
     Public rc As New rcData
     Public justEquation As String
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compute the coefficients for an estimated plane equation given the rc contour"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            redC.Run(src)
-            dst2 = redC.dst2
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
             rc = task.rc
             If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")
         End If

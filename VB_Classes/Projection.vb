@@ -7,7 +7,6 @@ Public Class Projection_Basics : Inherits TaskParent
     Public objectList As New List(Of cvb.Vec4f)
     Public showRectangles As Boolean = True
     Dim histTop As New Projection_HistTop
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find all the masks, rects, and counts in the input"
     End Sub
@@ -16,11 +15,11 @@ Public Class Projection_Basics : Inherits TaskParent
             histTop.Run(src)
             src = histTop.dst2
 
-            redC.inputMask = Not histTop.dst3
-            redC.Run(histTop.dst3)
+            task.redC.inputMask = Not histTop.dst3
+            task.redC.Run(histTop.dst3)
             redCellInput = task.redCells
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redC.dst2
+            labels(2) = task.redC.labels(2)
         End If
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -183,7 +182,6 @@ End Class
 Public Class Projection_Cell : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Dim heatCell As New HeatMap_Basics
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32FC3, 0)
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -192,9 +190,9 @@ Public Class Projection_Cell : Inherits TaskParent
         desc = "Create a top and side projection of the selected cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         heat.Run(src)
         dst1 = heat.dst2.Clone
@@ -223,7 +221,6 @@ End Class
 
 Public Class Projection_Top : Inherits TaskParent
     Public histTop As New Projection_HistTop
-    Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
         desc = "Find all the masks, rects, and counts in the top down view."
@@ -231,16 +228,16 @@ Public Class Projection_Top : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         histTop.Run(src)
 
-        redC.inputMask = Not histTop.dst3
-        redC.Run(histTop.dst3)
+        task.redC.inputMask = Not histTop.dst3
+        task.redC.Run(histTop.dst3)
 
         objects.redCellInput = task.redCells
-        objects.dst2 = redC.dst2
-        objects.labels(2) = redC.labels(2)
+        objects.dst2 = task.redC.dst2
+        objects.labels(2) = task.redC.labels(2)
         objects.Run(histTop.dst2)
 
         dst2 = objects.dst2
-        labels(2) = redC.labels(2)
+        labels(2) = task.redC.labels(2)
         SetTrueText(objects.strOut, 3)
     End Sub
 End Class
@@ -254,7 +251,6 @@ End Class
 
 Public Class Projection_Side : Inherits TaskParent
     Public histSide As New Projection_HistSide
-    Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
         objects.viewType = "Side"
@@ -263,16 +259,16 @@ Public Class Projection_Side : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         histSide.Run(src)
 
-        redC.inputMask = Not histSide.dst3
-        redC.Run(histSide.dst3)
+        task.redC.inputMask = Not histSide.dst3
+        task.redC.Run(histSide.dst3)
 
         objects.redCellInput = task.redCells
-        objects.dst2 = redC.dst2
-        objects.labels(2) = redC.labels(2)
+        objects.dst2 = task.redC.dst2
+        objects.labels(2) = task.redC.labels(2)
         objects.Run(histSide.dst2)
 
         dst2 = objects.dst2
-        labels(2) = redC.labels(2)
+        labels(2) = task.redC.labels(2)
         SetTrueText(objects.strOut, 3)
     End Sub
 End Class

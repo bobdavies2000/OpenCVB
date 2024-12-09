@@ -100,7 +100,6 @@ End Class
 
 
 Public Class Motion_BGSub_QT : Inherits TaskParent
-    Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cvb.Rect)
     Public Sub New()
@@ -116,7 +115,7 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
 
         dst2 = src
 
-        redMasks.Run(src.Threshold(0, 255, cvb.ThresholdTypes.Binary))
+        task.redC.Run(src.Threshold(0, 255, cvb.ThresholdTypes.Binary))
         If task.redCells.Count < 2 Then
             rectList.Clear()
         Else
@@ -514,7 +513,6 @@ End Class
 
 
 Public Class Motion_Enclosing : Inherits TaskParent
-    Dim redMasks As New RedCloud_Basics
     Dim learnRate As Double
     Public motionRect As New cvb.Rect
     Public Sub New()
@@ -532,8 +530,8 @@ Public Class Motion_Enclosing : Inherits TaskParent
 
         dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cvb.ThresholdTypes.Binary)
 
-        redMasks.inputMask = Not dst2
-        redMasks.Run(dst2)
+        task.redC.inputMask = Not dst2
+        task.redC.Run(dst2)
 
         motionRect = New cvb.Rect
         If task.redCells.Count < 2 Then Exit Sub
@@ -587,15 +585,14 @@ End Class
 
 
 Public Class Motion_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Motion detected in the cells below"
         desc = "Use RedCloud to define where there is motion"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         dst3.SetTo(0)
         For Each rc In task.redCells

@@ -127,15 +127,14 @@ End Class
 
 
 Public Class FitEllipse_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim fitE As New FitEllipse_Basics
     Public Sub New()
         desc = "Create an ellipse from a contour"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         If task.rc.contour Is Nothing Then Exit Sub
         fitE.inputPoints.Clear()

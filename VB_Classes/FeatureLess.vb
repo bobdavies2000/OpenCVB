@@ -249,24 +249,3 @@ Public Class FeatureLess_Groups : Inherits TaskParent
         labels(3) = CStr(classCount) + " featureless regions were found."
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Public Class FeatureLess_RedCloud1 : Inherits TaskParent
-    Public redC As New RedCloud_Basics
-    Dim fless As New FeatureLess_WithoutMotion
-    Public Sub New()
-        desc = "Floodfill the FeatureLess output so each cell can be tracked."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        fless.Run(src)
-        redC.Run(fless.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-    End Sub
-End Class

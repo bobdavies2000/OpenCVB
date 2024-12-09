@@ -2,14 +2,13 @@
 Public Class Thickness_Basics : Inherits TaskParent
     Public rc As New rcData
     Public volZ As New Volume_Basics
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Determine the thickness of a RedCloud cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            redC.Run(src)
-            dst2 = redC.dst2
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
             rc = task.rc
         End If
 

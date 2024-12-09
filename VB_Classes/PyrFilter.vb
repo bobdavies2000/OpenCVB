@@ -18,7 +18,6 @@ End Class
 
 
 Public Class PyrFilter_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim reduction As New Reduction_Basics
     Dim pyr As New PyrFilter_Basics
     Public Sub New()
@@ -31,8 +30,8 @@ Public Class PyrFilter_RedCloud : Inherits TaskParent
 
         reduction.Run(dst3)
 
-        redC.Run(reduction.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(reduction.dst2)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
     End Sub
 End Class

@@ -1258,22 +1258,22 @@ End Class
 
 Public Class Hist_Cell : Inherits TaskParent
     Dim hist As New Hist_Depth
-    Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
+        If standalone Then task.redOptions.DisplayCellStats.Checked = True
+        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
         desc = "Review depth data for a RedCloud Cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
         hist.rc = task.rc
         If hist.rc.index = 0 Or hist.rc.maxVec.Z = 0 Then Exit Sub
 
-        dst1.SetTo(0)
-        task.pcSplit(2)(hist.rc.rect).CopyTo(dst1)
+        dst0.SetTo(0)
+        task.pcSplit(2)(hist.rc.rect).CopyTo(dst0)
 
-        hist.Run(dst1)
+        hist.Run(dst0)
         dst3 = hist.dst2
     End Sub
 End Class

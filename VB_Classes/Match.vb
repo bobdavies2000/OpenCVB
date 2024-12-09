@@ -388,7 +388,6 @@ End Class
 
 
 Public Class Match_TraceRedC : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim frameList As New List(Of cvb.Mat)
     Public Sub New()
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32S, 0)
@@ -398,7 +397,7 @@ Public Class Match_TraceRedC : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If task.heartBeat Or task.cameraStable = False Then dst2.SetTo(0)
-        redC.Run(src)
+        task.redC.Run(src)
 
         If task.optionsChanged Then frameList.Clear()
 
@@ -418,7 +417,7 @@ Public Class Match_TraceRedC : Inherits TaskParent
         dst1 = dst1.Add(dst0)
         dst1.ConvertTo(dst2, cvb.MatType.CV_8U)
         dst2 = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
-        dst3 = redC.dst2
+        dst3 = task.redC.dst2
     End Sub
 End Class
 

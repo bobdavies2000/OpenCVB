@@ -477,7 +477,6 @@ End Class
 
 Public Class OpenGL_StructuredCloud : Inherits TaskParent
     Dim sCloud As New Structured_Cloud
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels(2) = "Structured cloud 32fC3 data"
@@ -486,9 +485,9 @@ Public Class OpenGL_StructuredCloud : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         sCloud.Run(src)
 
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels = redC.labels
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels = task.redC.labels
         task.ogl.pointCloudInput = sCloud.dst2
         task.ogl.Run(dst2)
         task.ogl.options.PointSizeSlider.Value = task.gridSize
@@ -890,7 +889,6 @@ End Class
 Public Class OpenGL_Contours : Inherits TaskParent
     Dim options2 As New Options_OpenGL_Contours
     Public options As New Options_OpenGLFunctions
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCells
         task.OpenGLTitle = "OpenGL_Functions"
@@ -905,8 +903,8 @@ Public Class OpenGL_Contours : Inherits TaskParent
 
         options2.RunOpt()
 
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
         Dim rcx = task.rc
 
         Dim polygonCount As Integer
@@ -1107,7 +1105,6 @@ End Class
 
 
 Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim eq As New Plane_Equation
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
@@ -1116,9 +1113,9 @@ Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        dst3 = redC.dst3
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        dst3 = task.redC.dst3
 
         Dim pcPoints As New List(Of cvb.Point3f)
         Dim blue As New cvb.Point3f(0, 0, 1), red As New cvb.Point3f(1, 0, 0), green As New cvb.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
@@ -1610,14 +1607,13 @@ End Class
 
 
 Public Class OpenGL_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCloud cells in OpenGL"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(dst2)
@@ -1981,7 +1977,6 @@ End Class
 
 
 Public Class OpenGL_ColorBin4Way : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1990,8 +1985,8 @@ Public Class OpenGL_ColorBin4Way : Inherits TaskParent
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         dst1.SetTo(0)
         task.color(task.rc.rect).CopyTo(dst1(task.rc.rect), task.rc.mask)

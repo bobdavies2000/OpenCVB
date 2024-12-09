@@ -161,7 +161,6 @@ End Class
 
 ' https://github.com/brian-xu/FractalDimension/blob/master/FractalDimension.py
 Public Class Fractal_Dimension : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)"}
@@ -206,8 +205,8 @@ Public Class Fractal_Dimension : Inherits TaskParent
         Return d
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
         dst3.SetTo(0)
 
         Static rect = New cvb.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)

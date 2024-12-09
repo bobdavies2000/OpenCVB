@@ -39,14 +39,13 @@ End Class
 
 
 Public Class Hull_Contour : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compare the hull to the contour of a RedCloud cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         dst3.SetTo(0)
         Dim rc = task.rc

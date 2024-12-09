@@ -1,14 +1,13 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Triangle_Basics : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
@@ -77,17 +76,14 @@ End Class
 
 
 Public Class Triangle_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst0 = redC.dst0
-        dst1 = redC.dst1
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         If task.redCells.Count <= 1 Then Exit Sub
         If task.rc.index = 0 Then Exit Sub
@@ -120,15 +116,14 @@ End Class
 
 
 Public Class Triangle_Cell : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
         If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
@@ -175,7 +170,6 @@ End Class
 
 
 Public Class Triangle_Mask : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cvb.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
@@ -183,8 +177,8 @@ Public Class Triangle_Mask : Inherits TaskParent
     End Sub
 
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
         If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
@@ -218,6 +212,6 @@ Public Class Triangle_Mask : Inherits TaskParent
         Dim newMaxDist = New cvb.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
                                       yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
         DrawCircle(dst3, newMaxDist, task.DotSize + 2, cvb.Scalar.Red)
-        labels(2) = redC.labels(2)
+        labels(2) = task.redC.labels(2)
     End Sub
 End Class

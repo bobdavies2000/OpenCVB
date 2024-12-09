@@ -89,7 +89,6 @@ End Class
 
 
 Public Class Hist3D_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim hist3D As New Hist3D_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
@@ -100,9 +99,9 @@ Public Class Hist3D_RedCloud : Inherits TaskParent
         dst2 = hist3D.dst3
         labels(2) = hist3D.labels(3)
 
-        redC.Run(hist3D.dst2)
-        dst3 = redC.dst2
-        labels(3) = redC.labels(2)
+        task.redC.Run(hist3D.dst2)
+        dst3 = task.redC.dst2
+        labels(3) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -114,7 +113,6 @@ End Class
 
 
 Public Class Hist3D_RedColor : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
@@ -125,9 +123,9 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
 
-        redC.Run(hColor.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(3)
+        task.redC.Run(hColor.dst2)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(3)
 
         If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(white, task.rc.mask)
@@ -237,16 +235,15 @@ End Class
 
 Public Class Hist3D_PixelClassify : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Basics on the output."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         pixel.Run(src)
 
-        redC.Run(pixel.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(pixel.dst2)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(white, task.rc.mask)
@@ -261,7 +258,6 @@ End Class
 
 Public Class Hist3D_PixelDiffMask : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
@@ -272,12 +268,6 @@ Public Class Hist3D_PixelDiffMask : Inherits TaskParent
         cvb.Cv2.Absdiff(lastImage, pixel.dst2, dst3)
         dst2 = dst3.Threshold(0, 255, cvb.ThresholdTypes.Binary)
         lastImage = pixel.dst2.Clone
-
-        'redC.combine.redMasks.inputMask = dst2
-        'redC.Run(pixel.dst2)
-        'dst3 = redC.dst2.Clone
-        'dst3.SetTo(0, dst2)
-        'labels(3) = redC.labels(3)
     End Sub
 End Class
 

@@ -222,7 +222,6 @@ End Class
 Public Class RedTrack_Features : Inherits TaskParent
     Dim options As New Options_Flood
     Dim feat As New Feature_Stable
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",
@@ -237,7 +236,7 @@ Public Class RedTrack_Features : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, 255)
         Next
 
-        redC.Run(dst2)
+        task.redC.Run(dst2)
         dst3.SetTo(0)
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For

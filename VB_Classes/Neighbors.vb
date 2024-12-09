@@ -1,7 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
 Public Class Neighbors_Basics : Inherits TaskParent
-    Public redC As New RedCloud_Basics
     Dim knn As New KNN_Basics
     Public runRedCloud As Boolean = False
     Public options As New Options_XNeighbors
@@ -12,9 +11,9 @@ Public Class Neighbors_Basics : Inherits TaskParent
         options.RunOpt()
 
         If standalone Or runRedCloud Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels = redC.labels
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels = task.redC.labels
         End If
 
         knn.queries.Clear()
@@ -55,16 +54,15 @@ End Class
 
 Public Class Neighbors_Intersects : Inherits TaskParent
     Public nPoints As New List(Of cvb.Point)
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or src.Type <> cvb.MatType.CV_8U Then
-            redC.Run(src)
-            dst2 = redC.dst2
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
             src = task.redMap
-            labels(2) = redC.labels(2)
+            labels(2) = task.redC.labels(2)
         End If
 
         Dim samples(src.Total - 1) As Byte
@@ -139,7 +137,6 @@ Public Class Neighbors_Precise : Inherits TaskParent
     Dim stats As New Cell_Basics
     Public redCells As List(Of rcData)
     Public runRedCloud As Boolean = False
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         cPtr = Neighbors_Open()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -147,9 +144,9 @@ Public Class Neighbors_Precise : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels = redC.labels
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels = task.redC.labels
 
             src = task.redMap
             redCells = task.redCells

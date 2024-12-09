@@ -123,7 +123,6 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
     Public rc As New rcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
-    Dim redC As New RedCloud_Basics
     Dim addTour As New RedCloud_ContourUpdate
     Public Sub New()
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
@@ -135,9 +134,9 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         Dim myStandalone = standaloneTest() Or runStandalone
 
         If myStandalone Then
-            redC.Run(task.color)
+            task.redC.Run(task.color)
             If task.redCells.Count = 0 Then Exit Sub
-            dst2 = redC.dst2
+            dst2 = task.redC.dst2
             addTour.redCells = New List(Of rcData)(task.redCells)
             addTour.Run(src)
             rc = task.rc
@@ -219,7 +218,6 @@ End Class
 
 Public Class MatchShapes_Contours : Inherits TaskParent
     Dim options As New Options_MatchShapes
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         FindSlider("Match Threshold %").Value = 3
         labels = {"", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
@@ -228,8 +226,8 @@ Public Class MatchShapes_Contours : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
         Dim rcX = task.rc

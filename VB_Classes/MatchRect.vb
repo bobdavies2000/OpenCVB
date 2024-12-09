@@ -37,14 +37,13 @@ End Class
 
 Public Class MatchRect_RedCloud : Inherits TaskParent
     Dim matchRect As New MatchRect_Basics
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Track a RedCloud cell using MatchTemplate."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
         task.ClickPoint = task.rc.maxDist
 
         If task.heartBeat Then matchRect.rectInput = task.rc.rect

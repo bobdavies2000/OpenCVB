@@ -1118,7 +1118,6 @@ End Enum
 	If algorithmName = "FeatureLess_LeftRight" Then return new FeatureLess_LeftRight
 	If algorithmName = "FeatureLess_LeftRight_CS" Then return new FeatureLess_LeftRight_CS
 	If algorithmName = "FeatureLess_RedCloud_CS" Then return new FeatureLess_RedCloud_CS
-	If algorithmName = "FeatureLess_RedCloud1" Then return new FeatureLess_RedCloud1
 	If algorithmName = "FeatureLess_Sobel" Then return new FeatureLess_Sobel
 	If algorithmName = "FeatureLess_Sobel_CS" Then return new FeatureLess_Sobel_CS
 	If algorithmName = "FeatureLess_Unique3Pixels" Then return new FeatureLess_Unique3Pixels

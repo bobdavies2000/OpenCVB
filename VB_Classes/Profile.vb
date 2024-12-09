@@ -8,7 +8,6 @@ Public Class Profile_Basics : Inherits TaskParent
     Public corners3D As New List(Of cvb.Point3f)
     Public corners As New List(Of cvb.Point)
     Public cornersRaw As New List(Of cvb.Point)
-    Public redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
     End Sub
@@ -16,9 +15,9 @@ Public Class Profile_Basics : Inherits TaskParent
         Return Format(v.X, fmt3) + vbTab + Format(v.Y, fmt3) + vbTab + Format(v.Z, fmt3)
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
         Dim rc = task.rc
         If rc.depthPixels = 0 Then
             strOut = "There is no depth data for that cell."
@@ -344,7 +343,6 @@ Public Class Profile_Kalman : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         sides.Run(src)
-        dst0 = sides.redC.dst0
         dst1 = sides.dst2
         dst2 = sides.dst3
         Dim rc = task.rc

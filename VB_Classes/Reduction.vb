@@ -37,7 +37,6 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits TaskParent
     Public reduction As New Reduction_Basics
-    Public redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         labels(2) = "Reduced input to floodfill"
@@ -47,9 +46,9 @@ Public Class Reduction_Floodfill : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
-        redC.Run(reduction.dst2)
-        dst3 = redC.dst2
-        labels(3) = redC.labels(3)
+        task.redC.Run(reduction.dst2)
+        dst3 = task.redC.dst2
+        labels(3) = task.redC.labels(3)
     End Sub
 End Class
 

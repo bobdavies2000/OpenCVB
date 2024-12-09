@@ -650,7 +650,6 @@ End Class
 
 
 Public Class Pixel_Vector3D : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
     Public pixelVector As New List(Of List(Of Single))
@@ -662,7 +661,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
+        task.redC.Run(src)
         Dim maxRegion = 20
 
         If task.heartBeat Then
@@ -689,7 +688,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
             dst1(cell.rect).SetTo(cell.color, cell.mask)
             If cell.index <= maxRegion Then SetTrueText(CStr(cell.index), cell.maxDist, 2)
         Next
-        labels(2) = redC.labels(3)
+        labels(2) = task.redC.labels(3)
     End Sub
 End Class
 
@@ -727,19 +726,17 @@ End Class
 
 
 Public Class Pixel_Vectors : Inherits TaskParent
-    Public redC As New RedCloud_Basics
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
     Public redCells As New List(Of rcData)
-    Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(3)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(3)
 
         pixelVector.Clear()
         For Each cell In task.redCells

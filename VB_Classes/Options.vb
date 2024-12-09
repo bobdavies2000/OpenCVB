@@ -3052,7 +3052,6 @@ Public Class Options_Spectrum : Inherits TaskParent
     Public gapDepth As Integer = 1
     Public gapGray As Integer = 1
     Public sampleThreshold As Integer = 10
-    Public redC As New RedCloud_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, gapDepth)
@@ -3061,8 +3060,8 @@ Public Class Options_Spectrum : Inherits TaskParent
         End If
     End Sub
     Public Function runRedCloud(ByRef label As String) As cvb.Mat
-        label = redC.labels(2)
-        Return redC.dst2
+        label = task.redC.labels(2)
+        Return task.redC.dst2
     End Function
     Public Function buildDepthRanges(input As cvb.Mat, typeSpec As String)
         Dim ranges As New List(Of rangeData)
@@ -3212,7 +3211,7 @@ Public Class Options_Spectrum : Inherits TaskParent
         Return ranges
     End Function
     Public Sub RunOpt()
-        If task.FirstPass Then redC.Run(task.color) ' special case!  Can't run it in constructor or measurements fail...
+        If task.FirstPass Then task.redC.Run(task.color) ' special case!  Can't run it in constructor or measurements fail...
         Static frmSliders = FindFrm("Options_Spectrum Sliders")
         Static gapDSlider = FindSlider("Gap in depth spectrum (cm's)")
         Static gapGSlider = FindSlider("Gap in gray spectrum")

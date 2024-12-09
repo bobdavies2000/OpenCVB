@@ -522,7 +522,6 @@ End Class
 
 
 Public Class Feature_NearestCell : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim feat As New FeatureLeftRight_Basics
     Dim knn As New KNN_Basics
     Public Sub New()
@@ -530,10 +529,10 @@ Public Class Feature_NearestCell : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         feat.Run(src)
-        redC.Run(src)
-        dst2 = redC.dst2
-        dst3 = redC.dst2.Clone
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        dst3 = task.redC.dst2.Clone
+        labels(2) = task.redC.labels(2)
 
         knn.queries.Clear()
         For Each rc In task.redCells

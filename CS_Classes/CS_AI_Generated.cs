@@ -48827,7 +48827,6 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             sides.Run(src);
-            dst0 = sides.redC.dst0;
             dst1 = sides.dst2;
             dst2 = sides.dst3;
             var rc = vbc.task.rc;

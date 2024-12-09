@@ -155,7 +155,6 @@ End Class
 
 Public Class Foreground_CellsFore : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
-    Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.setIdentifyCells(False)
@@ -163,10 +162,10 @@ Public Class Foreground_CellsFore : Inherits TaskParent
         desc = "Get the foreground cells"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
+        task.redC.Run(src)
 
         fore.Run(src)
-        dst3 = fore.dst2 And task.depthMask
+        dst3 = fore.dst3
         dst2.SetTo(0)
         For Each rc In task.redCells
             Dim tmp As cvb.Mat = dst3(rc.rect) And rc.mask
@@ -180,7 +179,6 @@ End Class
 
 Public Class Foreground_CellsBack : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
-    Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.setIdentifyCells(False)
@@ -188,7 +186,7 @@ Public Class Foreground_CellsBack : Inherits TaskParent
         desc = "Get the background cells"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
+        task.redC.Run(src)
 
         fore.Run(src)
         dst3 = Not fore.dst2 And task.depthMask

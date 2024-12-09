@@ -1,14 +1,13 @@
 Imports cvb = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class SuperPixel_Basics : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(2) = "Super Pixel cells"
         desc = "A Better superpixel algorithm"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
 
         dst3 = src
         For Each rc In task.redCells

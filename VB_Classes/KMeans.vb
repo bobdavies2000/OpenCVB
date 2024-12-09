@@ -214,7 +214,6 @@ Public Class KMeans_Edges : Inherits TaskParent
     Dim edges As New Edge_Basics
     Public km As New KMeans_Image
     Public classCount As Integer
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         labels(3) = "KMeans with edges output"
@@ -228,9 +227,9 @@ Public Class KMeans_Edges : Inherits TaskParent
         dst3 = km.dst2 + 1
         classCount = km.classCount
 
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(3)
+        task.redC.Run(dst3)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(3)
     End Sub
 End Class
 

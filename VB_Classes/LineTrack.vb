@@ -92,7 +92,6 @@ End Class
 Public Class LineTrack_RedCloud : Inherits TaskParent
     Public lines As New Line_Basics
     Public delaunay As New Delaunay_Basics
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Track the line regions with RedCloud"
     End Sub
@@ -105,8 +104,8 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
         Next
         delaunay.Run(src)
 
-        redC.Run(delaunay.dst3)
-        dst2 = redC.dst2
+        task.redC.Run(delaunay.dst3)
+        dst2 = task.redC.dst2
 
         dst3.SetTo(0)
         For Each lp In lines.lpList
