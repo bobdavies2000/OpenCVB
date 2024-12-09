@@ -372,6 +372,8 @@ Public Class Cell_Generate : Inherits TaskParent
             DrawContour(rc.mask, rc.contour, 255, -1)
             If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
+            rc.maxDStable = rc.maxDist
+
             ' the number of pixels - may have changed with the infill or contour.
             rc.pixels = rc.mask.CountNonZero
             If rc.pixels = 0 Then Continue For
