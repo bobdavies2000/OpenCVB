@@ -1140,3 +1140,60 @@ Public Class FCS_Lines : Inherits TaskParent
                                            CStr(task.fpList.Count) + " cells"
     End Sub
 End Class
+
+
+
+
+
+Public Class FCS_WithAge : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        labels(3) = "Ages are kept below 1000 to make the output more readable..."
+        desc = "Display the age of each cell."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        labels(2) = fcs.labels(2)
+
+        dst3.SetTo(0)
+        For Each fp In task.fpList
+            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            Dim age = If(fp.age >= 900, fp.age Mod 900 + 100, fp.age)
+            SetTrueText(CStr(age), fp.pt, 3)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_BestAge : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        labels(3) = "Ages are kept below 1000 to make the output more readable..."
+        desc = "Display the top X oldest (best) cells."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        labels(2) = fcs.labels(2)
+
+        Dim fpSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For Each fp In task.fpList
+            fpSorted.Add(fp.age, fp.index)
+        Next
+
+        dst3.SetTo(0)
+        Dim maxIndex As Integer = 0
+        For Each index In fpSorted.Values
+            Dim fp = task.fpList(index)
+            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            Dim age = If(fp.age >= 900, fp.age Mod 900 + 100, fp.age)
+            SetTrueText(CStr(age), fp.pt, 3)
+            maxIndex += 1
+            If maxIndex >= 10 Then Exit For
+        Next
+    End Sub
+End Class

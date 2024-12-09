@@ -996,6 +996,7 @@ End Enum
 	If algorithmName = "Face_Haar_LBP" Then return new Face_Haar_LBP
 	If algorithmName = "Face_Haar_LBP_CS" Then return new Face_Haar_LBP_CS
 	If algorithmName = "FCS_Basics" Then return new FCS_Basics
+	If algorithmName = "FCS_BestAge" Then return new FCS_BestAge
 	If algorithmName = "FCS_ByDepth" Then return new FCS_ByDepth
 	If algorithmName = "FCS_Delaunay" Then return new FCS_Delaunay
 	If algorithmName = "FCS_Edges" Then return new FCS_Edges
@@ -1015,6 +1016,7 @@ End Enum
 	If algorithmName = "FCS_TravelDistance" Then return new FCS_TravelDistance
 	If algorithmName = "FCS_ViewLeft" Then return new FCS_ViewLeft
 	If algorithmName = "FCS_ViewRight" Then return new FCS_ViewRight
+	If algorithmName = "FCS_WithAge" Then return new FCS_WithAge
 	If algorithmName = "Feature_Agast" Then return new Feature_Agast
 	If algorithmName = "Feature_Agast_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Agast_CC)
 	If algorithmName = "Feature_Agast_CS" Then return new Feature_Agast_CS
@@ -2200,7 +2202,6 @@ End Enum
 	If algorithmName = "Motion_CenterLeftRight" Then return new Motion_CenterLeftRight
 	If algorithmName = "Motion_CenterRect" Then return new Motion_CenterRect
 	If algorithmName = "Motion_CenterRotation" Then return new Motion_CenterRotation
-	If algorithmName = "Motion_Depth" Then return new Motion_Depth
 	If algorithmName = "Motion_Diff" Then return new Motion_Diff
 	If algorithmName = "Motion_Diff_CS" Then return new Motion_Diff_CS
 	If algorithmName = "Motion_EdgeStability" Then return new Motion_EdgeStability

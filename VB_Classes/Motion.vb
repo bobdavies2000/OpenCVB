@@ -244,7 +244,7 @@ Public Class Motion_Grid_MP : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
-        desc = "Detect Motion in the color image using multi-threading."
+        desc = "Detect Motion in the color image using multi-threading - slower than single-threaded!"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Static correlationSlider = FindSlider("Correlation Threshold")
@@ -279,7 +279,7 @@ Public Class Motion_Grid : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
-        desc = "Detect Motion in the color image"
+        desc = "Detect Motion in the color image.  Rectangles outlines didn't have high correlation."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Static correlationSlider = FindSlider("Correlation Threshold")
@@ -606,37 +606,19 @@ End Class
 Public Class Motion_PointCloud : Inherits TaskParent
     Dim diff As New Diff_Depth32f
     Public Sub New()
-        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
-        desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
+        labels = {"", "", "Pointcloud updated only with motion mask", "Diff of dst2 and latest pointcloud"}
+        desc = "Display the pointcloud after updating only with the motion mask.  Resync every heartbeat."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        If task.heartBeat Then dst2 = task.pointCloud
+        task.pointCloud.CopyTo(dst2, task.motionMask)
+
+        Dim split = dst2.Split()
+        diff.lastDepth32f = split(2)
         diff.Run(task.pcSplit(2))
         dst3 = diff.dst2
-        dst3.Rectangle(task.motionRect, 255, task.lineWidth)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Motion_Depth : Inherits TaskParent
-    Dim diff As New Diff_Depth32f
-    Public Sub New()
-        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
-        desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If task.heartBeat Then dst2 = task.pcSplit(2).Clone
-
-        diff.lastDepth32f = dst2
-        diff.Run(task.pcSplit(2))
-        diff.dst2.ConvertTo(dst3, cvb.MatType.CV_8U)
-    End Sub
-End Class
-
-
 
 
 
@@ -721,135 +703,6 @@ Public Class Motion_EdgeStability : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Motion_TopFeatureFail : Inherits TaskParent
-    Dim fPoly As New FPoly_TopFeatures
-    Public featureRects As New List(Of cvb.Rect)
-    Public searchRects As New List(Of cvb.Rect)
-    Dim match As New Match_Basics
-    Dim saveMat As New cvb.Mat
-    Public Sub New()
-        labels(2) = "Track the feature rect (small one) in each larger rectangle"
-        desc = "Find the top feature cells and track them in the next frame."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Dim half As Integer = CInt(task.gridSize / 2)
-
-        If task.heartBeatLT Then
-            fPoly.Run(src)
-            searchRects.Clear()
-            featureRects.Clear()
-            saveMat = src.Clone
-            For Each pt In task.topFeatures
-                Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
-                Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
-                roi = ValidateRect(roi)
-                featureRects.Add(roi)
-                searchRects.Add(task.gridNabeRects(index))
-            Next
-
-            dst2 = saveMat.Clone
-            For Each pt In task.topFeatures
-                Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
-                Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
-                roi = ValidateRect(roi)
-                dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
-                dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
-            Next
-        End If
-
-        dst3 = src.Clone
-        Dim matchRects As New List(Of cvb.Rect)
-        For i = 0 To featureRects.Count - 1
-            Dim roi = featureRects(i)
-            match.template = saveMat(roi)
-            match.searchRect = searchRects(i)
-            match.Run(src)
-            dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
-            matchRects.Add(match.matchRect)
-        Next
-
-        saveMat = src.Clone
-        searchRects.Clear()
-        featureRects.Clear()
-        For Each roi In matchRects
-            Dim pt = New cvb.Point(roi.X + half, roi.Y + half)
-            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
-            featureRects.Add(roi)
-            searchRects.Add(task.gridNabeRects(index))
-        Next
-    End Sub
-End Class
-
-
-
-
-
-Public Class Motion_TopFeatures : Inherits TaskParent
-    Dim fPoly As New FPoly_TopFeatures
-    Public featureRects As New List(Of cvb.Rect)
-    Public searchRects As New List(Of cvb.Rect)
-    Dim match As New Match_Basics
-    Dim half As Integer
-    Public Sub New()
-        labels(2) = "Track the feature rect (small one) in each larger rectangle"
-        desc = "Find the top feature cells and track them in the next frame."
-    End Sub
-    Private Sub snapShotFeatures()
-        searchRects.Clear()
-        featureRects.Clear()
-        For Each pt In task.topFeatures
-            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
-            Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
-            roi = ValidateRect(roi)
-            featureRects.Add(roi)
-            searchRects.Add(task.gridNabeRects(index))
-        Next
-
-        dst2 = dst1.Clone
-        For Each pt In task.topFeatures
-            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
-            Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
-            roi = ValidateRect(roi)
-            dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
-            dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
-        Next
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        half = CInt(task.gridSize / 2)
-
-        dst1 = src.Clone
-        fPoly.Run(src)
-
-        If task.heartBeatLT Then
-            snapShotFeatures()
-        End If
-
-        dst3 = src.Clone
-        Dim matchRects As New List(Of cvb.Rect)
-        For i = 0 To featureRects.Count - 1
-            Dim roi = featureRects(i)
-            match.template = dst1(roi)
-            match.searchRect = searchRects(i)
-            match.Run(src)
-            dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
-            matchRects.Add(match.matchRect)
-        Next
-
-        searchRects.Clear()
-        featureRects.Clear()
-        For Each roi In matchRects
-            Dim pt = New cvb.Point(roi.X + half, roi.Y + half)
-            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
-            featureRects.Add(roi)
-            searchRects.Add(task.gridNabeRects(index))
-        Next
-    End Sub
-End Class
 
 
 
@@ -1067,7 +920,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         dst0 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U, 0)
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         FindSlider("Threshold value").Value = 200
-        desc = "Find the rotation angle using an unreliable diamond shape " +
+        desc = "Find the approximate rotation angle using the diamond shape " +
                "from the thresholded MatchTemplate output."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -1104,9 +957,10 @@ Public Class Motion_CenterRotation : Inherits TaskParent
             mp = New PointPair(pair.xp1, pair.xp2)
             dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
 
-            Dim sideAdjacent = Math.Abs(mp.p1.X - mp.p2.X)
-            angle = Math.Atan(dst2.Height / sideAdjacent) * 180 / cvb.Cv2.PI
-            If mp.p1.Y = 0 Then angle -= 90 Else angle = 90 - angle
+            Dim sideAdjacent = dst2.Height
+            Dim sideOpposite = mp.xp1.X - mp.xp2.X
+            angle = Math.Atan(sideOpposite / sideAdjacent) * 180 / cvb.Cv2.PI
+            If mp.xp1.Y = dst2.Height Then angle = -angle
             rotatedRect = New cvb.RotatedRect(mm.maxLoc, task.centerRect.Size, angle)
             labels(3) = "angle = " + Format(angle, fmt1) + " degrees"
             task.drawRotatedRect.rr = rotatedRect
@@ -1114,5 +968,135 @@ Public Class Motion_CenterRotation : Inherits TaskParent
             dst3 = task.drawRotatedRect.dst2
         End If
         labels(3) = motion.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_TopFeatureFail : Inherits TaskParent
+    Dim fPoly As New FPoly_TopFeatures
+    Public featureRects As New List(Of cvb.Rect)
+    Public searchRects As New List(Of cvb.Rect)
+    Dim match As New Match_Basics
+    Dim saveMat As New cvb.Mat
+    Public Sub New()
+        labels(2) = "Track the feature rect (small one) in each larger rectangle"
+        desc = "Find the top feature cells and track them in the next frame."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Dim half As Integer = CInt(task.gridSize / 2)
+
+        If task.heartBeatLT Then
+            fPoly.Run(src)
+            searchRects.Clear()
+            featureRects.Clear()
+            saveMat = src.Clone
+            For Each pt In task.topFeatures
+                Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+                Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+                roi = ValidateRect(roi)
+                featureRects.Add(roi)
+                searchRects.Add(task.gridNabeRects(index))
+            Next
+
+            dst2 = saveMat.Clone
+            For Each pt In task.topFeatures
+                Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+                Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+                roi = ValidateRect(roi)
+                dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
+                dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
+            Next
+        End If
+
+        dst3 = src.Clone
+        Dim matchRects As New List(Of cvb.Rect)
+        For i = 0 To featureRects.Count - 1
+            Dim roi = featureRects(i)
+            match.template = saveMat(roi)
+            match.searchRect = searchRects(i)
+            match.Run(src)
+            dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
+            matchRects.Add(match.matchRect)
+        Next
+
+        saveMat = src.Clone
+        searchRects.Clear()
+        featureRects.Clear()
+        For Each roi In matchRects
+            Dim pt = New cvb.Point(roi.X + half, roi.Y + half)
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+            featureRects.Add(roi)
+            searchRects.Add(task.gridNabeRects(index))
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_TopFeatures : Inherits TaskParent
+    Dim fPoly As New FPoly_TopFeatures
+    Public featureRects As New List(Of cvb.Rect)
+    Public searchRects As New List(Of cvb.Rect)
+    Dim match As New Match_Basics
+    Dim half As Integer
+    Public Sub New()
+        labels(2) = "Track the feature rect (small one) in each larger rectangle"
+        desc = "Find the top feature cells and track them in the next frame."
+    End Sub
+    Private Sub snapShotFeatures()
+        searchRects.Clear()
+        featureRects.Clear()
+        For Each pt In task.topFeatures
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+            Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+            roi = ValidateRect(roi)
+            featureRects.Add(roi)
+            searchRects.Add(task.gridNabeRects(index))
+        Next
+
+        dst2 = dst1.Clone
+        For Each pt In task.topFeatures
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+            Dim roi = New cvb.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+            roi = ValidateRect(roi)
+            dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
+        Next
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        half = CInt(task.gridSize / 2)
+
+        dst1 = src.Clone
+        fPoly.Run(src)
+
+        If task.heartBeatLT Then
+            snapShotFeatures()
+        End If
+
+        dst3 = src.Clone
+        Dim matchRects As New List(Of cvb.Rect)
+        For i = 0 To featureRects.Count - 1
+            Dim roi = featureRects(i)
+            match.template = dst1(roi)
+            match.searchRect = searchRects(i)
+            match.Run(src)
+            dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
+            matchRects.Add(match.matchRect)
+        Next
+
+        searchRects.Clear()
+        featureRects.Clear()
+        For Each roi In matchRects
+            Dim pt = New cvb.Point(roi.X + half, roi.Y + half)
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+            featureRects.Add(roi)
+            searchRects.Add(task.gridNabeRects(index))
+        Next
     End Sub
 End Class

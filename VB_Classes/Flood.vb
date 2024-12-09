@@ -261,7 +261,6 @@ End Class
 
 
 Public Class Flood_MaxDistPoints : Inherits TaskParent
-    Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP_VB
     Public cellGen As New Cell_Generate
     Dim color8U As New Color8U_Basics
