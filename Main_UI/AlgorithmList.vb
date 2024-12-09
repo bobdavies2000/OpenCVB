@@ -1219,7 +1219,6 @@ End Enum
 	If algorithmName = "Flood_CellStatsPlot_CS" Then return new Flood_CellStatsPlot_CS
 	If algorithmName = "Flood_ContainedCells" Then return new Flood_ContainedCells
 	If algorithmName = "Flood_ContainedCells_CS" Then return new Flood_ContainedCells_CS
-	If algorithmName = "Flood_CPP" Then return new Flood_CPP
 	If algorithmName = "Flood_MaxDistPoints" Then return new Flood_MaxDistPoints
 	If algorithmName = "Flood_MaxDistPoints_CS" Then return new Flood_MaxDistPoints_CS
 	If algorithmName = "Flood_Motion" Then return new Flood_Motion
@@ -3565,12 +3564,14 @@ End Enum
 	If algorithmName = "Swarm_Flood2_CS" Then return new Swarm_Flood2_CS
 	If algorithmName = "Swarm_Flood3" Then return new Swarm_Flood3
 	If algorithmName = "Swarm_Flood3_CS" Then return new Swarm_Flood3_CS
+	If algorithmName = "Swarm_LeftFeatures" Then return new Swarm_LeftFeatures
 	If algorithmName = "Swarm_LeftRight" Then return new Swarm_LeftRight
 	If algorithmName = "Swarm_LeftRight_CS" Then return new Swarm_LeftRight_CS
 	If algorithmName = "Swarm_LeftRightFeatures" Then return new Swarm_LeftRightFeatures
 	If algorithmName = "Swarm_LeftRightFeatures_CS" Then return new Swarm_LeftRightFeatures_CS
 	If algorithmName = "Swarm_Percentage" Then return new Swarm_Percentage
 	If algorithmName = "Swarm_Percentage_CS" Then return new Swarm_Percentage_CS
+	If algorithmName = "Swarm_RightFeatures" Then return new Swarm_RightFeatures
 	If algorithmName = "Tessallate_Basics" Then return new Tessallate_Basics
 	If algorithmName = "Tessallate_Basics_CS" Then return new Tessallate_Basics_CS
 	If algorithmName = "Tessallate_Bricks" Then return new Tessallate_Bricks

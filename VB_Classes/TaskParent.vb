@@ -250,7 +250,8 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Function randomCellColor() As cvb.Scalar
         Static msRNG As New System.Random
-        Return New cvb.Scalar(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240)) ' trying to avoid extreme colors... 
+        ' trying to avoid extreme colors... 
+        Return New cvb.Scalar(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
     End Function
     Public Function validContourPoint(rc As rcData, pt As cvb.Point, offset As Integer) As cvb.Point
         If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt

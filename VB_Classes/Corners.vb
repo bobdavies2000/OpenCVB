@@ -353,7 +353,6 @@ End Class
 
 
 Public Class Corners_SubPix : Inherits TaskParent
-    Public feat As New Feature_Stable
     Dim options As New Options_PreCorners
     Public Sub New()
         labels(2) = "Output of PreCornerDetect"
@@ -365,7 +364,6 @@ Public Class Corners_SubPix : Inherits TaskParent
         dst2 = src.Clone
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        feat.Run(src)
         cvb.Cv2.CornerSubPix(src, task.features, New cvb.Size(options.subpixSize, options.subpixSize), New cvb.Size(-1, -1), term)
 
         task.featurePoints.Clear()

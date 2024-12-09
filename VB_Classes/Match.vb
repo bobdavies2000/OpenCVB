@@ -606,7 +606,6 @@ End Class
 
 Public Class Match_GoodFeatureKNN : Inherits TaskParent
     Public knn As New KNN_OneToOne
-    Public feat As New Feature_Stable
     Dim frameList As New List(Of cvb.Mat)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Maximum travel distance per frame", 1, 20, 5)
@@ -618,8 +617,6 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         Static distSlider = FindSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
-
-        feat.Run(src)
 
         knn.queries = New List(Of cvb.Point2f)(task.features)
         knn.Run(empty)
@@ -697,7 +694,6 @@ Public Class Match_Points : Inherits TaskParent
     Public ptx As New List(Of cvb.Point2f)
     Public correlation As New List(Of Single)
     Public mPoint As New Match_Point
-    Dim feat As New Feature_Stable
     Public Sub New()
         labels(2) = "Rectangle shown is the search rectangle."
         desc = "Track the selected points"
@@ -706,7 +702,6 @@ Public Class Match_Points : Inherits TaskParent
         If task.FirstPass Then mPoint.target = src.Clone
 
         If standaloneTest() Then
-            feat.Run(src)
             ptx = New List(Of cvb.Point2f)(task.features)
             SetTrueText("Move camera around to watch the point being tracked", 3)
         End If

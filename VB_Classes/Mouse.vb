@@ -43,14 +43,12 @@ End Class
 
 
 Public Class Mouse_ClickPointUsage : Inherits TaskParent
-    Dim feat As New Feature_Stable
     Public Sub New()
         desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
-        feat.Run(src)
-        dst2 = feat.dst2
+        dst2 = task.feat.dst2
 
         For Each pt In task.features
             If pt = task.ClickPoint Then

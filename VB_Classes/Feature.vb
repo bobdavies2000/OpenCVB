@@ -73,7 +73,7 @@ Public Class Feature_Methods : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()
         cPtr = Agast_Open()
-        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
+        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
@@ -83,8 +83,9 @@ Public Class Feature_Methods : Inherits TaskParent
 
         Select Case featureMethod.featureSource
             Case FeatureSrc.GoodFeaturesFull
-                features = cvb.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cvb.Mat,
-                                                      options.blockSize, True, options.k).ToList
+                features = cvb.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality,
+                                                       options.minDistance, New cvb.Mat,
+                                                       options.blockSize, True, options.k).ToList
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.GoodFeaturesGrid
                 options.featurePoints = 4
@@ -293,14 +294,11 @@ End Class
 Public Class Feature_KNN : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public featurePoints As New List(Of cvb.Point2f)
-    Public feat As New Feature_Stable
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-
         knn.queries = New List(Of cvb.Point2f)(task.features)
         If task.FirstPass Then knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
         knn.Run(empty)
@@ -309,7 +307,7 @@ Public Class Feature_KNN : Inherits TaskParent
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.trainInput(trainIndex)
             Dim qPt = task.features(i)
-            If pt.DistanceTo(qPt) > feat.options.minDistance Then knn.trainInput(trainIndex) = task.features(i)
+            If pt.DistanceTo(qPt) > task.feat.options.minDistance Then knn.trainInput(trainIndex) = task.features(i)
         Next
         featurePoints = New List(Of cvb.Point2f)(knn.trainInput)
 
@@ -320,8 +318,8 @@ Public Class Feature_KNN : Inherits TaskParent
             DrawCircle(dst3, pt, task.DotSize + 2, white)
         Next
 
-        labels(2) = feat.labels(2)
-        labels(3) = feat.labels(2)
+        labels(2) = task.feat.labels(2)
+        labels(3) = task.feat.labels(2)
     End Sub
 End Class
 
@@ -333,7 +331,7 @@ End Class
 
 Public Class Feature_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim feat As New Feature_Stable
+    Dim feat As New Feature_Basics
     Public Sub New()
         labels = {"", "", "Good features", "History of good features"}
         desc = "Get the features in a reduction grayscale image."
@@ -358,7 +356,7 @@ End Class
 
 
 Public Class Feature_MultiPass : Inherits TaskParent
-    Dim feat As New Feature_Stable
+    Dim feat As New Feature_Basics
     Public featurePoints As New List(Of cvb.Point2f)
     Dim sharpen As New PhotoShop_SharpenDetail
     Public Sub New()
@@ -403,7 +401,6 @@ End Class
 
 Public Class Feature_PointTracker : Inherits TaskParent
     Dim flow As New Font_FlowText
-    Public feat As New Feature_Stable
     Dim mPoints As New Match_Points
     Dim options As New Options_Features
     Public Sub New()
@@ -421,7 +418,6 @@ Public Class Feature_PointTracker : Inherits TaskParent
         strOut = ""
         If mPoints.ptx.Count <= 3 Then
             mPoints.ptx.Clear()
-            feat.Run(src)
             For Each pt In task.features
                 mPoints.ptx.Add(pt)
                 Dim rect = ValidateRect(New cvb.Rect(pt.X - templatePad, pt.Y - templatePad, templateSize, templateSize))
@@ -562,21 +558,19 @@ End Class
 
 
 Public Class Feature_Points : Inherits TaskParent
-    Public feat As New Feature_Stable
     Public Sub New()
         labels(3) = "Features found in the image"
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
+        dst2 = task.feat.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
         Next
-        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(feat.options.featurePoints) + " requested."
+        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(task.feat.options.featurePoints) + " requested."
     End Sub
 End Class
 
@@ -671,7 +665,6 @@ End Class
 
 
 Public Class Feature_Generations : Inherits TaskParent
-    Dim feat As New Feature_Stable
     Dim features As New List(Of cvb.Point)
     Dim gens As New List(Of Integer)
     Public Sub New()
@@ -679,8 +672,6 @@ Public Class Feature_Generations : Inherits TaskParent
         desc = "Find feature age maximum and average."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-
         Dim newfeatures As New SortedList(Of Integer, cvb.Point)(New compareAllowIdenticalIntegerInverted)
         For Each pt In task.featurePoints
             Dim index = features.IndexOf(pt)
@@ -714,7 +705,6 @@ End Class
 ' https://docs.opencvb.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_History : Inherits TaskParent
     Public features As New List(Of cvb.Point)
-    Public feat As New Feature_Stable
     Dim featureHistory As New List(Of List(Of cvb.Point))
     Dim gens As New List(Of Integer)
     Public Sub New()
@@ -723,7 +713,6 @@ Public Class Feature_History : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         Dim histCount = task.gOptions.FrameHistory.Value
 
-        feat.Run(src)
         dst2 = src.Clone
 
         featureHistory.Add(New List(Of cvb.Point)(task.featurePoints))
@@ -772,16 +761,14 @@ End Class
 
 
 Public Class Feature_GridPopulation : Inherits TaskParent
-    Dim feat As New Feature_Stable
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
         desc = "Find the feature population for each cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
-        labels(2) = feat.labels(2)
+        dst2 = task.feat.dst2
+        labels(2) = task.feat.labels(2)
 
         dst3.SetTo(0)
         For Each pt In task.featurePoints

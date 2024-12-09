@@ -404,7 +404,6 @@ End Class
 Public Class KNN_TrackMean : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Dim knn As New KNN_OneToOne
-    Dim feat As New Feature_Stable
     Const maxDistance As Integer = 50
     Public shiftX As Single
     Public shiftY As Single
@@ -450,8 +449,6 @@ Public Class KNN_TrackMean : Inherits TaskParent
         If task.FirstPass Then lastImage = src.Clone
         Dim multiplier = dotSlider.Value
 
-        feat.Run(src)
-
         knn.queries = New List(Of cvb.Point2f)(task.features)
         knn.Run(src)
 
@@ -463,7 +460,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
         For Each mps In knn.matches
             Dim currRect = ValidateRect(New cvb.Rect(mps.p1.X - sz, mps.p1.Y - sz, sz * 2, sz * 2))
             Dim prevRect = ValidateRect(New cvb.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))
-            cvb.Cv2.MatchTemplate(lastImage(prevRect), src(currRect), correlationMat, feat.options.matchOption)
+            cvb.Cv2.MatchTemplate(lastImage(prevRect), src(currRect), correlationMat, task.feat.options.matchOption)
             Dim corrNext = correlationMat.Get(Of Single)(0, 0)
             DrawCircle(dst2, mps.p1, task.DotSize, task.HighlightColor)
             diffX.Add(mps.p1.X - mps.p2.X)
@@ -681,17 +678,14 @@ End Class
 
 Public Class KNN_TrackEach : Inherits TaskParent
     Dim knn As New KNN_OneToOne
-    Dim feat As New Feature_Stable
     Dim trackAll As New List(Of List(Of PointPair))
     Public Sub New()
         desc = "Track each good feature with KNN and match the features from frame to frame"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Dim minDistance = feat.options.minDistance
+        Dim minDistance = task.feat.options.minDistance
         ' if there was no motion, use minDistance to eliminate the unstable points.
         If task.optionsChanged = False Then minDistance = 2
-
-        feat.Run(src)
 
         knn.queries = New List(Of cvb.Point2f)(task.features)
         knn.Run(src)

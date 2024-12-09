@@ -14,42 +14,6 @@ End Class
 
 
 
-Public Class Flood_CPP : Inherits TaskParent
-    Dim redCPP As New RedCloud_CPP_VB
-    Public cellGen As New Cell_Generate
-    Dim color As New Color8U_Basics
-    Public Sub New()
-        desc = "Build the RedCloud cells with the grayscale input."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If src.Channels() <> 1 Then
-            color.Run(src)
-            src = color.dst2
-        Else
-            redCPP.inputMask = src
-        End If
-        redCPP.Run(src)
-
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-
-        cellGen.classCount = redCPP.classCount
-        cellGen.rectList = redCPP.rectList
-        cellGen.floodPoints = redCPP.floodPoints
-        cellGen.removeContour = False
-        cellGen.Run(redCPP.dst2)
-
-        dst2 = cellGen.dst2
-
-        task.setSelectedContour()
-
-        labels(2) = cellGen.labels(2)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Flood_CellStatsPlot : Inherits TaskParent
     Public Sub New()

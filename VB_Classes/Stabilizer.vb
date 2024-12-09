@@ -167,7 +167,6 @@ End Class
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_OpticalFlow : Inherits TaskParent
-    Public feat As New Feature_Stable
     Public inputFeat As New List(Of cvb.Point2f)
     Public borderCrop = 30
     Dim sumScale As cvb.Mat, sScale As cvb.Mat, features1 As cvb.Mat
@@ -189,7 +188,6 @@ Public Class Stabilizer_OpticalFlow : Inherits TaskParent
         dst2 = src
 
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        feat.Run(src)
         inputFeat = New List(Of cvb.Point2f)(task.features)
         features1 = cvb.Mat.FromPixelData(inputFeat.Count, 1, cvb.MatType.CV_32FC2, inputFeat.ToArray)
 

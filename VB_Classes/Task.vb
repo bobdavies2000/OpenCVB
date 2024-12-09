@@ -762,7 +762,7 @@ Public Class VBtask : Implements IDisposable
             cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
 
-        feat.Run(src)
+        If task.gOptions.UseMotionColor.Checked Then feat.Run(src)
 
         colorizer.RunAlg(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc))
         task.depthRGB = colorizer.dst2.Clone

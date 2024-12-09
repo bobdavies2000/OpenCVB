@@ -70,7 +70,8 @@ Public Class Motion_BasicsTest : Inherits TaskParent
         diff.Run(src)
         dst2 = diff.dst2
 
-        labels(2) = "Pixels that were different: " + CStr(dst2.CountNonZero)
+        labels(2) = "The image below is a diff of the camera image and the task.color built" +
+                    " with the motion mask.  Difference in pixels = " + CStr(dst2.CountNonZero)
     End Sub
 End Class
 

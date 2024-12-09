@@ -6,17 +6,13 @@ Public Class Cluster_Basics : Inherits TaskParent
     Public ptList As New List(Of cvb.Point)
     Public clusterID As New List(Of Integer)
     Public clusters As New SortedList(Of Integer, List(Of cvb.Point))
-    Dim feat As New Feature_Stable
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
         desc = "Group the points based on their proximity to each other."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
-        If standalone Then
-            feat.Run(src)
-            ptInput = task.featurePoints
-        End If
+        If standalone Then ptInput = task.featurePoints
 
         If ptInput.Count <= 3 Then Exit Sub
 
@@ -79,14 +75,12 @@ End Class
 Public Class Cluster_Hulls : Inherits TaskParent
     Dim cluster As New Cluster_Basics
     Public hulls As New List(Of List(Of cvb.Point))
-    Dim feat As New Feature_Stable
     Public Sub New()
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         dst2 = src.Clone
 
-        feat.Run(src)
         cluster.ptInput = task.featurePoints
         cluster.Run(src)
         dst2 = cluster.dst2
@@ -109,6 +103,6 @@ Public Class Cluster_Hulls : Inherits TaskParent
             hulls.Add(hull)
             If (hull.Count > 0) Then DrawContour(dst3, hull, white, task.lineWidth)
         Next
-        labels(3) = feat.labels(3)
+        labels(3) = task.feat.labels(3)
     End Sub
 End Class

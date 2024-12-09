@@ -10,11 +10,7 @@ Public Class Mesh_Basics : Inherits TaskParent
         options.RunOpt()
 
         dst2 = src
-        If task.heartBeat And standaloneTest() Then
-            Dim feat As New Feature_Stable
-            feat.Run(src)
-            ptList = task.features
-        End If
+        If task.heartBeat And standaloneTest() Then ptList = task.features
 
         If ptList.Count <= 3 Then Exit Sub
 
@@ -46,7 +42,6 @@ End Class
 
 
 Public Class Mesh_Features : Inherits TaskParent
-    Dim feat As New Feature_Stable
     Dim mesh As New Mesh_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
@@ -54,15 +49,14 @@ Public Class Mesh_Features : Inherits TaskParent
         desc = "Build triangles from feature points"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
         If task.features.Count < 3 Then Exit Sub
         mesh.ptList = task.features
         mesh.Run(src)
         dst2 = mesh.dst2
         dst3 = mesh.dst3
 
-        Dim pad = feat.options.templatePad
-        Dim size = feat.options.templateSize
+        Dim pad = task.feat.options.templatePad
+        Dim size = task.feat.options.templateSize
         Dim depthMiss As Integer
         For Each pt In task.features
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)

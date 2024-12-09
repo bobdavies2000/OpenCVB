@@ -1,7 +1,6 @@
 Imports NAudio
 Imports cvb = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits TaskParent
-    Dim feat As New Feature_Stable
     Public mpList As New List(Of PointPair)
     Public mpCorrelation As New List(Of Single)
     Public Sub New()
@@ -11,12 +10,12 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
     Public Sub buildCorrelations(prevFeatures As List(Of cvb.Point), currFeatures As List(Of cvb.Point))
-        Dim correlationMin = feat.options.correlationMin
+        Dim correlationMin = task.feat.options.correlationMin
 
         Dim correlationmat As New cvb.Mat
         mpList.Clear()
         mpCorrelation.Clear()
-        Dim pad = feat.options.templatePad, size = feat.options.templateSize
+        Dim pad = task.feat.options.templatePad, size = task.feat.options.templateSize
         For Each p1 In prevFeatures
             Dim rect = ValidateRect(New cvb.Rect(p1.X - pad, p1.Y - pad, size, size))
             Dim correlations As New List(Of Single)
@@ -34,8 +33,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Next
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        labels = feat.labels
+        labels = task.feat.labels
 
         dst3 = If(task.FirstPass, src.Clone, dst2.Clone)
         Static prevFeatures As New List(Of cvb.Point)(task.featurePoints)
@@ -86,7 +84,6 @@ End Class
 Public Class FeatureFlow_LucasKanade : Inherits TaskParent
     Public features As New List(Of cvb.Point2f)
     Public lastFeatures As New List(Of cvb.Point2f)
-    Dim feat As New Feature_Stable
     Dim options As New Options_OpticalFlowSparse
     Public Sub New()
         desc = "Show the optical flow of a sparse matrix."
@@ -99,7 +96,6 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
 
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Static lastGray As cvb.Mat = src.Clone
-        feat.Run(src)
         features = task.features
         Dim features1 = cvb.Mat.FromPixelData(features.Count, 1, cvb.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cvb.Mat

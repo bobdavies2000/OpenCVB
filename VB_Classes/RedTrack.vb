@@ -120,14 +120,12 @@ End Class
 
 Public Class RedTrack_FeaturesKNN : Inherits TaskParent
     Public knn As New KNN_Basics
-    Public feat As New Feature_Stable
     Public Sub New()
         labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
+        dst2 = task.feat.dst2
 
         knn.queries = New List(Of cvb.Point2f)(task.features)
         knn.Run(empty)
@@ -220,8 +218,6 @@ End Class
 
 
 Public Class RedTrack_Features : Inherits TaskParent
-    Dim options As New Options_Flood
-    Dim feat As New Feature_Stable
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",
@@ -229,8 +225,6 @@ Public Class RedTrack_Features : Inherits TaskParent
         desc = "Similar to RedTrack_KNNPoints"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-
         If task.heartBeat Then dst2.SetTo(0)
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, 255)

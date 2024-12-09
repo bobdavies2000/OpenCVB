@@ -1075,7 +1075,7 @@ Public Class Line_KNN : Inherits TaskParent
         swarm.knn.trainInput = New List(Of cvb.Point2f)(swarm.knn.queries)
         swarm.knn.Run(empty)
 
-        swarm.DrawLines(dst3)
+        dst3 = swarm.DrawLines().Clone
         labels(2) = lines.labels(2)
     End Sub
 End Class

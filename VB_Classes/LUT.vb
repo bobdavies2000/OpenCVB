@@ -75,7 +75,9 @@ Public Class LUT_Reduction : Inherits TaskParent
     Dim vector = New cvb.Mat(256, 1, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
     Public Sub New()
         For i = 0 To 255
-            vector.Set(Of cvb.Vec3b)(i, 0, randomCellColor())
+            ' trying to avoid extreme colors... 
+            Dim vec = New cvb.Vec3b(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
+            vector.Set(Of cvb.Vec3b)(i, 0, vec)
         Next
         labels(3) = "Custom Color Lookup Table"
         desc = "Build and use a custom color palette"

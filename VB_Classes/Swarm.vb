@@ -14,7 +14,8 @@ Public Class Swarm_Basics : Inherits TaskParent
         dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
     End Sub
-    Public Sub DrawLines(dst As cvb.Mat)
+    Public Function DrawLines() As cvb.Mat
+        Dim dst = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         Dim queries = knn.queries
         Dim trainInput = knn.trainInput
         Dim neighbors = knn.neighbors
@@ -30,7 +31,8 @@ Public Class Swarm_Basics : Inherits TaskParent
                 If ptNew.Y > dst.Height - options.border Then DrawLine(dst, New cvb.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth)
             Next
         Next
-    End Sub
+        Return dst
+    End Function
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
@@ -66,7 +68,7 @@ Public Class Swarm_Basics : Inherits TaskParent
                 End If
             End If
         Next
-        DrawLines(dst2)
+        dst2 = DrawLines().Clone
 
         labels(3) = CStr(mpList.Count) + " points were matched to the previous set of features."
         distanceAvg = 0
@@ -89,24 +91,56 @@ End Class
 
 
 
-Public Class Swarm_LeftRightFeatures : Inherits TaskParent
-    Public leftList As New List(Of cvb.Point2f)
+Public Class Swarm_RightFeatures : Inherits TaskParent
     Public rightList As New List(Of cvb.Point2f)
-    Dim feat As New Feature_Stable
     Public Sub New()
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(task.leftView)
-        leftList = New List(Of cvb.Point2f)(task.features)
-        dst2 = feat.dst2.Clone
-
-        feat.Run(task.rightView)
+        task.feat.Run(task.rightView)
         rightList = New List(Of cvb.Point2f)(task.features)
-        dst3 = feat.dst2.Clone
+        dst2 = task.feat.dst2.Clone
     End Sub
 End Class
+
+
+
+
+
+Public Class Swarm_LeftFeatures : Inherits TaskParent
+    Public leftList As New List(Of cvb.Point2f)
+    Public Sub New()
+        labels = {"", "", "Left view feature points", "Right view feature points"}
+        desc = "Double the votes on motion by collecting features for both left and right images."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        task.feat.Run(task.leftView)
+        leftList = New List(Of cvb.Point2f)(task.features)
+        dst2 = task.feat.dst2.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Swarm_LeftRightFeatures : Inherits TaskParent
+    Dim swLeft As New Swarm_LeftFeatures
+    Dim swRight As New Swarm_RightFeatures
+    Public Sub New()
+        labels = {"", "", "Left view feature points", "Right view feature points"}
+        desc = "Double the votes on motion by collecting features for both left and right images."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        swLeft.Run(empty)
+        dst2 = swLeft.dst2
+        swRight.Run(empty)
+        dst3 = swRight.dst2
+    End Sub
+End Class
+
 
 
 
@@ -132,14 +166,14 @@ Public Class Swarm_LeftRight : Inherits TaskParent
         leftDirection = swarm.directionAvg
         leftMax = swarm.distanceMax
         dst2 = task.leftView
-        swarm.DrawLines(dst2)
+        dst2.SetTo(cvb.Scalar.White, swarm.DrawLines())
 
         swarm.Run(task.rightView)
         rightDistance = swarm.distanceAvg
         rightDirection = swarm.directionAvg
         rightMax = swarm.distanceMax
         dst3 = task.rightView
-        swarm.DrawLines(dst3)
+        dst3.SetTo(cvb.Scalar.White, swarm.DrawLines())
 
         strOut = swarm.labels(2) + vbCrLf + swarm.labels(3)
         SetTrueText(strOut, 1)

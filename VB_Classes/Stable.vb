@@ -59,13 +59,11 @@ End Class
 
 Public Class Stable_BasicsCount : Inherits TaskParent
     Public basics As New Stable_Basics
-    Public feat As New Feature_Stable
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
         basics.facetGen.inputPoints = New List(Of cvb.Point2f)(task.features)
         basics.Run(src)
         dst2 = basics.dst2
@@ -170,14 +168,12 @@ End Class
 
 Public Class Stable_GoodFeatures : Inherits TaskParent
     Public basics As New Stable_Basics
-    Public feat As New Feature_Stable
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Track the stable good features found in the BGR image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
         dst3 = basics.dst3
         If task.features.Count = 0 Then Exit Sub ' nothing to work on...
 

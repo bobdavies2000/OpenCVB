@@ -465,14 +465,12 @@ End Class
 
 
 Public Class OEX_GoodFeaturesToTrackDemo : Inherits TaskParent
-    Dim feat As New Feature_Stable
     Public Sub New()
         desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Stable"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
-        labels(2) = feat.labels(2)
+        dst2 = task.feat.dst2
+        labels(2) = task.feat.labels(2)
     End Sub
 End Class
 

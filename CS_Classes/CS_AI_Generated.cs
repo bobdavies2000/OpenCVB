@@ -34525,7 +34525,7 @@ namespace CS_Classes
             }
             swarm.knn.trainInput = new List<cv.Point2f>(swarm.knn.queries);
             swarm.knn.Run(empty);
-            swarm.DrawLines(dst3);
+            dst3 = swarm.DrawLines().Clone();
             labels[2] = lines.labels[2];
         }
     }
@@ -58013,13 +58013,14 @@ namespace CS_Classes
             leftDirection = swarm.directionAvg;
             leftMax = swarm.distanceMax;
             dst2 = vbc.task.leftView;
-            swarm.DrawLines(dst2);
+            dst2.SetTo(cv.Scalar.White, swarm.DrawLines());
+
             swarm.Run(vbc.task.rightView);
             rightDistance = swarm.distanceAvg;
             rightDirection = swarm.directionAvg;
             rightMax = swarm.distanceMax;
             dst3 = vbc.task.rightView;
-            swarm.DrawLines(dst3);
+            dst3.SetTo(cv.Scalar.White, swarm.DrawLines());
             strOut = swarm.labels[2] + "\n" + swarm.labels[3];
             SetTrueText(strOut, 1);
         }

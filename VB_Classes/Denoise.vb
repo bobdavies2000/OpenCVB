@@ -118,7 +118,8 @@ Public Class Denoise_SinglePixels_CPP_VB : Inherits TaskParent
             Dim dataSrc(src.Total - 1) As Byte
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-            Dim imagePtr = Denoise_SinglePixels_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+            Dim imagePtr = Denoise_SinglePixels_Run(cPtr, handleSrc.AddrOfPinnedObject(),
+                                                    src.Rows, src.Cols)
             handleSrc.Free()
 
             If imagePtr <> 0 Then dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, src.Type, imagePtr).Clone
