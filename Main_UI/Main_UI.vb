@@ -33,6 +33,7 @@ Public Class Main_UI
     Dim upArrow As Boolean, downArrow As Boolean
 
     Dim threadStartTime As DateTime
+    Dim pathList As New List(Of String)
 
     Dim optionsForm As Options
     Dim AlgorithmTestAllCount As Integer
@@ -147,11 +148,11 @@ Public Class Main_UI
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
         With settings
             .cameraSupported = New List(Of Boolean)({True, True, True, True, True, True,
-                                                         False, True}) ' Mynt support updated below
+                                                     False, True}) ' Mynt support updated below
             .camera640x480Support = New List(Of Boolean)({False, False, True, True, False,
-                                                              False, False, True})
+                                                          False, False, True})
             .camera1920x1080Support = New List(Of Boolean)({True, True, False, False, False,
-                                                                True, False, False})
+                                                            True, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim sr = New StreamReader(defines.FullName)
             If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then
@@ -196,18 +197,18 @@ Public Class Main_UI
 
             Dim myntIndex = cameraNames.IndexOf("MYNT-EYE-D1000")
             If .cameraPresent(myntIndex) And .cameraSupported(myntIndex) = False Then
-                'MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
-                '   "Cam_MyntD.dll has not been built." + vbCrLf + vbCrLf +
-                '   "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                '   "and run AddMynt.bat in OpenCVB's home directory.")
+                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                       "Cam_MyntD.dll has not been built." + vbCrLf + vbCrLf +
+                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "and run AddMynt.bat in OpenCVB's home directory.")
             End If
 
             Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
             If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False Then
                 MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
-                           "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                           "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                           "and rebuild OpenCVB with the StereoLabs SDK.")
+                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "and rebuild OpenCVB with the StereoLabs SDK.")
             End If
 
             settings.cameraFound = False
@@ -324,6 +325,7 @@ Public Class Main_UI
         If Directory.Exists(neededDirectory) Then
             foundDirectory = True
             systemPath = neededDirectory + ";" + systemPath
+            pathList.Add(neededDirectory)
         End If
 
         If foundDirectory = False And notFoundMessage.Length > 0 Then
@@ -378,7 +380,9 @@ Public Class Main_UI
                 End If
             Next
         End If
+        Dim testlist As New List(Of String)
         For Each usbDevice In usblist
+            If LCase(usbDevice).Contains("zed") Then testlist.Add(usbDevice) ' debugging assistance...
             If usbDevice.Contains(searchName) Then Return True
         Next
         Return False
@@ -944,24 +948,24 @@ Public Class Main_UI
             updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
             updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")
         End If
-        updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
-        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
-        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
-        updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
+        'updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
+        'updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
+        'updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
+        'updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
 
-        updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
+        'updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
 
-        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
-        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
+        'updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
+        'updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
 
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
-        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
+        'updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
 
-        updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
-        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+        'updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
+        'updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
 
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
@@ -1367,7 +1371,8 @@ Public Class Main_UI
             Case "Oak-D camera"
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
-                Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                '   Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"

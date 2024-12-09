@@ -63,7 +63,7 @@ End Class
 
 
 Public Class Feature_Methods : Inherits TaskParent
-    Dim harris As New Corners_HarrisDetector_CPP_VB
+    Dim harris As Corners_HarrisDetector_CPP_VB
     Dim FAST As New Corners_Basics
     Dim featureMethod As New Options_FeatureGather
     Public features As New List(Of cvb.Point2f)
@@ -124,6 +124,7 @@ Public Class Feature_Methods : Inherits TaskParent
                 features = brisk.features
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.Harris
+                If harris Is Nothing Then harris = New Corners_HarrisDetector_CPP_VB
                 harris.Run(src)
                 features = harris.features
                 labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"

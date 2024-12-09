@@ -43,6 +43,7 @@ public:
 	float imuTemperature = 0;
 	double imuTimeStamp = 0;
 	Pose zed_pose;
+	Point3f acc3f;
 	Camera zed;
 	cv::Mat color, rightView, pointCloud;
 	int captureWidth, captureHeight;
@@ -167,6 +168,8 @@ public:
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
+		sl::float3 acc = sensordata.imu.linear_acceleration;
+		acc3f = Point3f(acc.x, acc.y, acc.z);
 	}
 };
 
@@ -175,10 +178,7 @@ extern "C" __declspec(dllexport) int* Zed2Open(int w, int h) { StereoLabsZed2* c
 extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * cPtr) { cPtr->zed.close(); }
 extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) 
 { 
-	sl::float3 acc = cPtr->sensordata.imu.linear_acceleration;
-	Point3f acc3f = Point3f(acc.x, acc.y, acc.z);
-	printf("x = %f y = %f z = %f", acc.x, acc.y, acc.z);
-	return (int*)&acc3f;
+	return (int*)&cPtr->acc3f;
 }
 extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }
 extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * cPtr) { return cPtr->serialNumber; }
