@@ -3139,6 +3139,8 @@ End Enum
 	If algorithmName = "RedCloud_Consistent_CS" Then return new RedCloud_Consistent_CS
 	If algorithmName = "RedCloud_Consistent1" Then return new RedCloud_Consistent1
 	If algorithmName = "RedCloud_Consistent1_CS" Then return new RedCloud_Consistent1_CS
+	If algorithmName = "RedCloud_Consistent2" Then return new RedCloud_Consistent2
+	If algorithmName = "RedCloud_Consistent2_CS" Then return new RedCloud_Consistent2_CS
 	If algorithmName = "RedCloud_ContourUpdate" Then return new RedCloud_ContourUpdate
 	If algorithmName = "RedCloud_ContourUpdate_CS" Then return new RedCloud_ContourUpdate_CS
 	If algorithmName = "RedCloud_CPP_CS" Then return new RedCloud_CPP_CS
@@ -3235,6 +3237,9 @@ End Enum
 	If algorithmName = "RedCloud_UnmatchedCount" Then return new RedCloud_UnmatchedCount
 	If algorithmName = "RedCloud_UnmatchedCount_CS" Then return new RedCloud_UnmatchedCount_CS
 	If algorithmName = "RedCloud_UnstableCells" Then return new RedCloud_UnstableCells
+	If algorithmName = "RedCloud_UnstableCells_CS" Then return new RedCloud_UnstableCells_CS
+	If algorithmName = "RedCloud_UnstableHulls" Then return new RedCloud_UnstableHulls
+	If algorithmName = "RedCloud_UnstableHulls_CS" Then return new RedCloud_UnstableHulls_CS
 	If algorithmName = "RedCloud_World" Then return new RedCloud_World
 	If algorithmName = "RedCloud_World_CS" Then return new RedCloud_World_CS
 	If algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ

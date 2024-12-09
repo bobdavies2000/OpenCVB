@@ -17081,7 +17081,7 @@ namespace CS_Classes
             knn.queries.Clear();
             foreach (var rc in vbc.task.redCells)
             {
-                knn.queries.Add(rc.maxDist);
+                knn.queries.Add(rc.maxDStable);
             }
             knn.trainInput.Clear();
             foreach (var mp in feat.mpList)
@@ -17093,7 +17093,7 @@ namespace CS_Classes
             {
                 var rc = vbc.task.redCells[i];
                 rc.nearestFeature = knn.trainInput[knn.result[i, 0]];
-                DrawLine(dst3, rc.nearestFeature, rc.maxDist, vbc.task.HighlightColor, vbc.task.lineWidth);
+                DrawLine(dst3, rc.nearestFeature, rc.maxDStable, vbc.task.HighlightColor, vbc.task.lineWidth);
             }
         }
     }
@@ -39677,9 +39677,13 @@ namespace CS_Classes
                 if (rc.indexLast != 0 && rc.indexLast < vbc.task.redCells.Count())
                 {
                     var lrc = vbc.task.redCells[rc.indexLast];
+                    rc.maxDStable = lrc.maxDStable;
                     rc.color = lrc.color;
-                    rc.age = lrc.age + 1;
                     matched.Add(rc.indexLast, rc.indexLast);
+                }
+                else
+                {
+                    rc.maxDStable = rc.maxDist;
                 }
                 cv.Scalar mean, stdev;
                 Cv2.MeanStdDev(vbc.task.color[rc.rect], out mean, out stdev, rc.mask);
@@ -40452,7 +40456,7 @@ namespace CS_Classes
             knn.queries.Clear();
             foreach (var rc in vbc.task.redCells)
             {
-                knn.queries.Add(rc.maxDist);
+                knn.queries.Add(rc.maxDStable);
             }
             knn.trainInput = new List<Point2f>(knn.queries);
             knn.Run(src);
@@ -40468,8 +40472,8 @@ namespace CS_Classes
                 int ptCount = 0;
                 foreach (var index in vbc.task.rc.nabs)
                 {
-                    var pt = vbc.task.redCells[index].maxDist;
-                    if (pt == vbc.task.rc.maxDist)
+                    var pt = vbc.task.redCells[index].maxDStable;
+                    if (pt == vbc.task.rc.maxDStable)
                     {
                         DrawCircle(dst2, pt, vbc.task.DotSize, cv.Scalar.Black);
                     }
@@ -50995,6 +50999,80 @@ namespace CS_Classes
 
 
 
+    public class RedCloud_UnstableCells_CS : TaskParent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        List<cv.Point> prevList = new List<cv.Point>();
+        public RedCloud_UnstableCells_CS()
+        {
+            labels = new[] { "", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing" };
+            desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation.";
+        }
+        public void RunAlg(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            if (vbc.task.heartBeat || vbc.task.frameCount == 2)
+            {
+                dst1 = dst2.Clone();
+                dst3.SetTo(0);
+            }
+            var currList = new List<cv.Point>();
+            foreach (var rc in vbc.task.redCells)
+            {
+                if (!prevList.Contains(rc.maxDStable))
+                {
+                    DrawContour(dst1[rc.rect], rc.contour, Scalar.White, -1);
+                    DrawContour(dst1[rc.rect], rc.contour, Scalar.Black);
+                    DrawContour(dst3[rc.rect], rc.contour, Scalar.White, -1);
+                }
+                currList.Add(rc.maxDStable);
+            }
+            prevList = new List<cv.Point>(currList);
+        }
+    }
+
+
+
+
+    public class RedCloud_UnstableHulls_CS : TaskParent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        List<cv.Point> prevList = new List<cv.Point>();
+        public RedCloud_UnstableHulls_CS()
+        {
+            labels = new[] { "", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing" };
+            desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation.";
+        }
+        public void RunAlg(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            if (vbc.task.heartBeat || vbc.task.frameCount == 2)
+            {
+                dst1 = dst2.Clone();
+                dst3.SetTo(0);
+            }
+            var currList = new List<cv.Point>();
+            foreach (var rc in vbc.task.redCells)
+            {
+                rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
+                if (!prevList.Contains(rc.maxDStable))
+                {
+                    DrawContour(dst1[rc.rect], rc.hull, Scalar.White, -1);
+                    DrawContour(dst1[rc.rect], rc.hull, Scalar.Black);
+                    DrawContour(dst3[rc.rect], rc.hull, Scalar.White, -1);
+                }
+                currList.Add(rc.maxDStable);
+            }
+            prevList = new List<cv.Point>(currList);
+        }
+    }
+
+
+
 
     public class RedCloud_CellChanges_CS : TaskParent
     {
@@ -51872,74 +51950,6 @@ namespace CS_Classes
 
 
 
-    public class RedCloud_Consistent_CS : TaskParent
-    {
-        Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
-        Diff_Basics diff = new Diff_Basics();
-        List<Mat> cellmaps = new List<Mat>();
-        List<List<rcData>> cellLists = new List<List<rcData>>();
-        List<Mat> diffs = new List<Mat>();
-        public RedCloud_Consistent_CS()
-        {
-            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            vbc.task.gOptions.pixelDiffThreshold = 1;
-            desc = "Remove RedCloud results that are inconsistent with the previous frame.";
-        }
-        public void RunAlg(Mat src)
-        {
-            redC.Run(src);
-            dst2 = redC.dst2;
-            diff.Run(vbc.task.redMap);
-            dst1 = diff.dst2;
-            cellLists.Add(new List<rcData>(vbc.task.redCells));
-            cellmaps.Add(vbc.task.redMap & ~dst1);
-            diffs.Add(dst1.Clone());
-            vbc.task.redCells.Clear();
-            vbc.task.redCells.Add(new rcData());
-            for (int i = 0; i < cellLists.Count(); i++)
-            {
-                foreach (var rc in cellLists[i])
-                {
-                    bool present = true;
-                    for (int j = 0; j < cellmaps.Count(); j++)
-                    {
-                        var val = cellmaps[i].At<byte>(rc.maxDist.Y, rc.maxDist.X);
-                        if (val == 0)
-                        {
-                            present = false;
-                            break;
-                        }
-                    }
-                    if (present)
-                    {
-                        rc.index = vbc.task.redCells.Count();
-                        vbc.task.redCells.Add(rc);
-                    }
-                }
-            }
-            dst2.SetTo(0);
-            vbc.task.redMap.SetTo(0);
-            foreach (var rc in vbc.task.redCells)
-            {
-                dst2[rc.rect].SetTo(rc.color, rc.mask);
-                vbc.task.redMap[rc.rect].SetTo(rc.index, rc.mask);
-            }
-            foreach (var mat in diffs)
-            {
-                dst2.SetTo(0, mat);
-            }
-            if (cellmaps.Count() > vbc.task.frameHistoryCount)
-            {
-                cellmaps.RemoveAt(0);
-                cellLists.RemoveAt(0);
-                diffs.RemoveAt(0);
-            }
-        }
-    }
-
-
-
-
     public class RedCloud_Consistent1_CS : TaskParent
     {
         Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
@@ -52001,6 +52011,138 @@ namespace CS_Classes
                 cellmaps.RemoveAt(0);
                 cellLists.RemoveAt(0);
                 diffs.RemoveAt(0);
+            }
+        }
+    }
+
+
+
+
+    public class RedCloud_Consistent2_CS : TaskParent
+    {
+        Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
+        Diff_Basics diff = new Diff_Basics();
+        List<Mat> cellmaps = new List<Mat>();
+        List<List<rcData>> cellLists = new List<List<rcData>>();
+        List<Mat> diffs = new List<Mat>();
+        public RedCloud_Consistent2_CS()
+        {
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
+            vbc.task.gOptions.pixelDiffThreshold = 1;
+            desc = "Remove RedCloud results that are inconsistent with the previous frame.";
+        }
+        public void RunAlg(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            diff.Run(vbc.task.redMap);
+            dst1 = diff.dst2;
+            cellLists.Add(new List<rcData>(vbc.task.redCells));
+            cellmaps.Add(vbc.task.redMap & ~dst1);
+            diffs.Add(dst1.Clone());
+            vbc.task.redCells.Clear();
+            vbc.task.redCells.Add(new rcData());
+            for (int i = 0; i < cellLists.Count(); i++)
+            {
+                foreach (var rc in cellLists[i])
+                {
+                    bool present = true;
+                    for (int j = 0; j < cellmaps.Count(); j++)
+                    {
+                        var val = cellmaps[i].At<byte>(rc.maxDist.Y, rc.maxDist.X);
+                        if (val == 0)
+                        {
+                            present = false;
+                            break;
+                        }
+                    }
+                    if (present)
+                    {
+                        rc.index = vbc.task.redCells.Count();
+                        vbc.task.redCells.Add(rc);
+                    }
+                }
+            }
+            dst2.SetTo(0);
+            vbc.task.redMap.SetTo(0);
+            foreach (var rc in vbc.task.redCells)
+            {
+                dst2[rc.rect].SetTo(rc.color, rc.mask);
+                vbc.task.redMap[rc.rect].SetTo(rc.index, rc.mask);
+            }
+            foreach (var mat in diffs)
+            {
+                dst2.SetTo(0, mat);
+            }
+            if (cellmaps.Count() > vbc.task.frameHistoryCount)
+            {
+                cellmaps.RemoveAt(0);
+                cellLists.RemoveAt(0);
+                diffs.RemoveAt(0);
+            }
+        }
+    }
+
+
+
+
+    public class RedCloud_Consistent_CS : TaskParent
+    {
+        Bin3Way_RedCloud redC = new Bin3Way_RedCloud();
+        List<Mat> cellmaps = new List<Mat>();
+        List<List<rcData>> cellLists = new List<List<rcData>>();
+        Mat lastImage;
+        public RedCloud_Consistent_CS()
+        {
+            lastImage = redC.dst2.Clone();
+            desc = "Remove RedCloud results that are inconsistent with the previous frame(s).";
+        }
+        public void RunAlg(Mat src)
+        {
+            redC.Run(src);
+            cellLists.Add(new List<rcData>(vbc.task.redCells));
+            cellmaps.Add(vbc.task.redMap.Clone());
+            List<rcData> newCells = new List<rcData>();
+            newCells.Add(new rcData());
+            foreach (var rc in vbc.task.redCells)
+            {
+                var maxDStable = rc.maxDStable;
+                int count = 0;
+                List<int> sizes = new List<int>();
+                List<rcData> redData = new List<rcData>();
+                for (int i = 0; i < cellmaps.Count(); i++)
+                {
+                    int index = cellmaps[i].Get<Byte>(rc.maxDStable.Y, rc.maxDStable.X);
+                    if (cellLists[i][index].maxDStable == maxDStable)
+                    {
+                        count++;
+                        sizes.Add(cellLists[i][index].pixels);
+                        redData.Add(cellLists[i][index]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (count == cellmaps.Count())
+                {
+                    int index = sizes.IndexOf(sizes.Max());
+                    rcData rcNext = rc;
+                    rcNext = redData[index];
+                    var vec = lastImage.Get<Vec3b>(rcNext.maxDStable.Y, rcNext.maxDStable.X);
+                    Scalar color = new Scalar(vec.Item0, vec.Item1, vec.Item2);
+                    if (color != Scalar.Black) rcNext.color = color;
+                    rcNext.index = newCells.Count();
+                    newCells.Add(rcNext);
+                }
+            }
+            vbc.task.redCells = new List<rcData>(newCells);
+            dst2 = DisplayCells();
+            lastImage = dst2.Clone();
+            if (cellmaps.Count() > vbc.task.frameHistoryCount)
+            {
+                cellmaps.RemoveAt(0);
+                cellLists.RemoveAt(0);
             }
         }
     }

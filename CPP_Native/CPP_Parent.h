@@ -26,9 +26,11 @@ public:
     Point3f maxVec;
 
     Point maxDist;
+    Point maxDStable;  // keep maxDist the same if it is still on the cell.
 
     int index;
     int indexLast;
+    int matchCount;
 
     std::vector<Point> contour;
     std::vector<Point> corners;

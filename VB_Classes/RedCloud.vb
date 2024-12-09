@@ -678,9 +678,10 @@ End Class
 
 
 Public Class RedCloud_UnstableCells : Inherits TaskParent
+    Dim prevList As New List(Of cvb.Point)
     Public Sub New()
-        labels = {"", "", "Current generation of cells", "Recently changed cells highlighted"}
-        desc = "Use age to identify unstable cells - cells which were NOT present in the previous generation."
+        labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
+        desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         task.redC.Run(src)
@@ -692,15 +693,60 @@ Public Class RedCloud_UnstableCells : Inherits TaskParent
             dst3.SetTo(0)
         End If
 
+        Dim currList As New List(Of cvb.Point)
         For Each rc In task.redCells
-            If rc.age = 1 Then
+            If prevList.Contains(rc.maxDStable) = False Then
                 DrawContour(dst1(rc.rect), rc.contour, white, -1)
                 DrawContour(dst1(rc.rect), rc.contour, cvb.Scalar.Black)
                 DrawContour(dst3(rc.rect), rc.contour, white, -1)
             End If
+            currList.Add(rc.maxDStable)
         Next
+
+        prevList = New List(Of cvb.Point)(currList)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_UnstableHulls : Inherits TaskParent
+    Dim prevList As New List(Of cvb.Point)
+    Public Sub New()
+        labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
+        desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
+
+        If task.heartBeat Or task.frameCount = 2 Then
+            dst1 = dst2.Clone
+            dst3.SetTo(0)
+        End If
+
+        Dim currList As New List(Of cvb.Point)
+        For Each rc In task.redCells
+            rc.hull = cvb.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+            If prevList.Contains(rc.maxDStable) = False Then
+                DrawContour(dst1(rc.rect), rc.hull, white, -1)
+                DrawContour(dst1(rc.rect), rc.hull, cvb.Scalar.Black)
+                DrawContour(dst3(rc.rect), rc.hull, white, -1)
+            End If
+            currList.Add(rc.maxDStable)
+        Next
+
+        prevList = New List(Of cvb.Point)(currList)
+    End Sub
+End Class
+
+
+
 
 
 
@@ -1478,74 +1524,6 @@ End Class
 
 
 
-Public Class RedCloud_Consistent : Inherits TaskParent
-    Dim redC As New Bin3Way_RedCloud
-    Dim diff As New Diff_Basics
-    Dim cellmaps As New List(Of cvb.Mat)
-    Dim cellLists As New List(Of List(Of rcData))
-    Dim diffs As New List(Of cvb.Mat)
-    Public Sub New()
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        task.gOptions.pixelDiffThreshold = 1
-        desc = "Remove RedCloud results that are inconsistent with the previous frame."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        diff.Run(task.redMap)
-        dst1 = diff.dst2
-
-        cellLists.Add(New List(Of rcData)(task.redCells))
-        cellmaps.Add(task.redMap And Not dst1)
-        diffs.Add(dst1.Clone)
-
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        For i = 0 To cellLists.Count - 1
-            For Each rc In cellLists(i)
-                Dim present As Boolean = True
-                For j = 0 To cellmaps.Count - 1
-                    Dim val = cellmaps(i).Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                    If val = 0 Then
-                        present = False
-                        Exit For
-                    End If
-                Next
-                If present Then
-                    rc.index = task.redCells.Count
-                    task.redCells.Add(rc)
-                End If
-            Next
-        Next
-
-        dst2.SetTo(0)
-        task.redMap.SetTo(0)
-        For Each rc In task.redCells
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
-        Next
-
-        For Each mat In diffs
-            dst2.SetTo(0, mat)
-        Next
-
-        If cellmaps.Count > task.gOptions.FrameHistory.Value Then
-            cellmaps.RemoveAt(0)
-            cellLists.RemoveAt(0)
-            diffs.RemoveAt(0)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class RedCloud_Consistent1 : Inherits TaskParent
     Dim redC As New Bin3Way_RedCloud
     Dim diff As New Diff_Basics
@@ -1606,6 +1584,133 @@ Public Class RedCloud_Consistent1 : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+Public Class RedCloud_Consistent2 : Inherits TaskParent
+    Dim redC As New Bin3Way_RedCloud
+    Dim diff As New Diff_Basics
+    Dim cellmaps As New List(Of cvb.Mat)
+    Dim cellLists As New List(Of List(Of rcData))
+    Dim diffs As New List(Of cvb.Mat)
+    Public Sub New()
+        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.gOptions.pixelDiffThreshold = 1
+        desc = "Remove RedCloud results that are inconsistent with the previous frame."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        diff.Run(task.redMap)
+        dst1 = diff.dst2
+
+        cellLists.Add(New List(Of rcData)(task.redCells))
+        cellmaps.Add(task.redMap And Not dst1)
+        diffs.Add(dst1.Clone)
+
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        For i = 0 To cellLists.Count - 1
+            For Each rc In cellLists(i)
+                Dim present As Boolean = True
+                For j = 0 To cellmaps.Count - 1
+                    Dim val = cellmaps(i).Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    If val = 0 Then
+                        present = False
+                        Exit For
+                    End If
+                Next
+                If present Then
+                    rc.index = task.redCells.Count
+                    task.redCells.Add(rc)
+                End If
+            Next
+        Next
+
+        dst2.SetTo(0)
+        task.redMap.SetTo(0)
+        For Each rc In task.redCells
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+
+        For Each mat In diffs
+            dst2.SetTo(0, mat)
+        Next
+
+        If cellmaps.Count > task.gOptions.FrameHistory.Value Then
+            cellmaps.RemoveAt(0)
+            cellLists.RemoveAt(0)
+            diffs.RemoveAt(0)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_Consistent : Inherits TaskParent
+    Dim redC As New Bin3Way_RedCloud
+    Dim cellmaps As New List(Of cvb.Mat)
+    Dim cellLists As New List(Of List(Of rcData))
+    Dim lastImage As cvb.Mat = redC.dst2.Clone
+    Public Sub New()
+        desc = "Remove RedCloud results that are inconsistent with the previous frame(s)."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+
+        cellLists.Add(New List(Of rcData)(task.redCells))
+        cellmaps.Add(task.redMap.Clone)
+
+        Dim newCells As New List(Of rcData)
+        newCells.Add(New rcData)
+        For Each rc In task.redCells
+            Dim maxDStable = rc.maxDStable
+            Dim count As Integer = 0
+            Dim sizes As New List(Of Integer)
+            Dim redData As New List(Of rcData)
+            For i = 0 To cellmaps.Count - 1
+                Dim index = cellmaps(i).Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                If cellLists(i)(index).maxDStable = maxDStable Then
+                    count = count + 1
+                    sizes.Add(cellLists(i)(index).pixels)
+                    redData.Add(cellLists(i)(index))
+                Else
+                    Exit For
+                End If
+            Next
+            If count = cellmaps.Count Then
+                Dim index = sizes.IndexOf(sizes.Max)
+                rc = redData(index)
+                Dim color = lastImage.Get(Of cvb.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
+                If color <> black Then rc.color = color
+                rc.index = newCells.Count
+                newCells.Add(rc)
+            End If
+        Next
+
+        task.redCells = New List(Of rcData)(newCells)
+        dst2 = DisplayCells()
+        lastImage = dst2.Clone
+
+        If cellmaps.Count > task.gOptions.FrameHistory.Value Then
+            cellmaps.RemoveAt(0)
+            cellLists.RemoveAt(0)
+        End If
+    End Sub
+End Class
 
 
 
