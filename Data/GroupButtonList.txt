@@ -8,7 +8,6 @@ BackProject
 BackProject2D
 Benford
 Bezier
-BGRPattern
 BGSubtract
 Bin2Way
 Bin3Way
@@ -47,7 +46,6 @@ Crypto
 CSV
 DCT
 Delaunay
-Denoise
 Density
 Depth
 Derivative

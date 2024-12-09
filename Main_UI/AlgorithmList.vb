@@ -224,8 +224,6 @@ End Enum
 	If algorithmName = "Bezier_Basics_CS" Then return new Bezier_Basics_CS
 	If algorithmName = "Bezier_Example" Then return new Bezier_Example
 	If algorithmName = "Bezier_Example_CS" Then return new Bezier_Example_CS
-	If algorithmName = "BGRPattern_Basics" Then return new BGRPattern_Basics
-	If algorithmName = "BGRPattern_Basics_CS" Then return new BGRPattern_Basics_CS
 	If algorithmName = "BGSubtract_Basics" Then return new BGSubtract_Basics
 	If algorithmName = "BGSubtract_Basics_CC" Then return new CPP_Basics(ccFunctionNames._BGSubtract_Basics_CC)
 	If algorithmName = "BGSubtract_Basics_CS" Then return new BGSubtract_Basics_CS
@@ -475,8 +473,6 @@ End Enum
 	If algorithmName = "Color8U_Complementary_CS" Then return new Color8U_Complementary_CS
 	If algorithmName = "Color8U_ComplementaryTest" Then return new Color8U_ComplementaryTest
 	If algorithmName = "Color8U_ComplementaryTest_CS" Then return new Color8U_ComplementaryTest_CS
-	If algorithmName = "Color8U_Denoise" Then return new Color8U_Denoise
-	If algorithmName = "Color8U_Denoise_CS" Then return new Color8U_Denoise_CS
 	If algorithmName = "Color8U_Depth" Then return new Color8U_Depth
 	If algorithmName = "Color8U_Depth_CS" Then return new Color8U_Depth_CS
 	If algorithmName = "Color8U_Edges" Then return new Color8U_Edges
@@ -630,12 +626,6 @@ End Enum
 	If algorithmName = "Delaunay_SubDiv_CS" Then return new Delaunay_SubDiv_CS
 	If algorithmName = "Delaunay_Subdiv2D" Then return new Delaunay_Subdiv2D
 	If algorithmName = "Delaunay_Subdiv2D_CS" Then return new Delaunay_Subdiv2D_CS
-	If algorithmName = "Denoise_Basics_CPP_CS" Then return new Denoise_Basics_CPP_CS
-	If algorithmName = "Denoise_Basics_CPP_VB" Then return new Denoise_Basics_CPP_VB
-	If algorithmName = "Denoise_Pixels_CPP_CS" Then return new Denoise_Pixels_CPP_CS
-	If algorithmName = "Denoise_Pixels_CPP_VB" Then return new Denoise_Pixels_CPP_VB
-	If algorithmName = "Denoise_Reliable" Then return new Denoise_Reliable
-	If algorithmName = "Denoise_SinglePixels_CPP_VB" Then return new Denoise_SinglePixels_CPP_VB
 	If algorithmName = "Density_Basics" Then return new Density_Basics
 	If algorithmName = "Density_Basics_CS" Then return new Density_Basics_CS
 	If algorithmName = "Density_Count_CPP_CS" Then return new Density_Count_CPP_CS
@@ -698,7 +688,6 @@ End Enum
 	If algorithmName = "Depth_MinMaxNone_CS" Then return new Depth_MinMaxNone_CS
 	If algorithmName = "Depth_MinMaxToVoronoi" Then return new Depth_MinMaxToVoronoi
 	If algorithmName = "Depth_MinMaxToVoronoi_CS" Then return new Depth_MinMaxToVoronoi_CS
-	If algorithmName = "Depth_MotionTempered" Then return new Depth_MotionTempered
 	If algorithmName = "Depth_NotMissing" Then return new Depth_NotMissing
 	If algorithmName = "Depth_NotMissing_CS" Then return new Depth_NotMissing_CS
 	If algorithmName = "Depth_Outline" Then return new Depth_Outline
@@ -2207,14 +2196,10 @@ End Enum
 	If algorithmName = "Motion_BGSub_CC" Then return new CPP_Basics(ccFunctionNames._Motion_BGSub_CC)
 	If algorithmName = "Motion_BGSub_CS" Then return new Motion_BGSub_CS
 	If algorithmName = "Motion_BGSub_QT" Then return new Motion_BGSub_QT
-	If algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
-	If algorithmName = "Motion_CCmerge_CS" Then return new Motion_CCmerge_CS
 	If algorithmName = "Motion_CenterKalman" Then return new Motion_CenterKalman
 	If algorithmName = "Motion_CenterLeftRight" Then return new Motion_CenterLeftRight
 	If algorithmName = "Motion_CenterRect" Then return new Motion_CenterRect
 	If algorithmName = "Motion_CenterRotation" Then return new Motion_CenterRotation
-	If algorithmName = "Motion_Contours" Then return new Motion_Contours
-	If algorithmName = "Motion_Contours_CS" Then return new Motion_Contours_CS
 	If algorithmName = "Motion_Depth" Then return new Motion_Depth
 	If algorithmName = "Motion_Diff" Then return new Motion_Diff
 	If algorithmName = "Motion_Diff_CS" Then return new Motion_Diff_CS
@@ -2233,7 +2218,6 @@ End Enum
 	If algorithmName = "Motion_HistoryTest_CS" Then return new Motion_HistoryTest_CS
 	If algorithmName = "Motion_Intersect" Then return new Motion_Intersect
 	If algorithmName = "Motion_Intersect_CS" Then return new Motion_Intersect_CS
-	If algorithmName = "Motion_MinRect" Then return new Motion_MinRect
 	If algorithmName = "Motion_MinRect_CS" Then return new Motion_MinRect_CS
 	If algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
 	If algorithmName = "Motion_PixelDiff_CS" Then return new Motion_PixelDiff_CS
@@ -2242,7 +2226,6 @@ End Enum
 	If algorithmName = "Motion_RectTest_CS" Then return new Motion_RectTest_CS
 	If algorithmName = "Motion_RedCloud" Then return new Motion_RedCloud
 	If algorithmName = "Motion_RedCloud_CS" Then return new Motion_RedCloud_CS
-	If algorithmName = "Motion_TestSingle" Then return new Motion_TestSingle
 	If algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
 	If algorithmName = "Motion_ThruCorrelation_CS" Then return new Motion_ThruCorrelation_CS
 	If algorithmName = "Motion_TopFeatureFail" Then return new Motion_TopFeatureFail
@@ -3295,11 +3278,7 @@ End Enum
 	If algorithmName = "Reduction_XYZ" Then return new Reduction_XYZ
 	If algorithmName = "Reduction_XYZ_CS" Then return new Reduction_XYZ_CS
 	If algorithmName = "Reliable_Basics" Then return new Reliable_Basics
-	If algorithmName = "Reliable_CompareBGR" Then return new Reliable_CompareBGR
 	If algorithmName = "Reliable_Depth" Then return new Reliable_Depth
-	If algorithmName = "Reliable_Edges" Then return new Reliable_Edges
-	If algorithmName = "Reliable_Gray" Then return new Reliable_Gray
-	If algorithmName = "Reliable_Histogram" Then return new Reliable_Histogram
 	If algorithmName = "Reliable_MaxDepth" Then return new Reliable_MaxDepth
 	If algorithmName = "Reliable_RGB" Then return new Reliable_RGB
 	If algorithmName = "Remap_Basics" Then return new Remap_Basics

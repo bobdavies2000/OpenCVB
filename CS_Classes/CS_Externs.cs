@@ -30,18 +30,6 @@ namespace CS_Classes
         public static extern void MinTriangle_Run(IntPtr inputPtr, int numberOfPoints, IntPtr outputTriangle);
 
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr BGRPattern_Open();
-
-        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void BGRPattern_Close(IntPtr cPtr);
-
-        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int BGRPattern_ClassCount(IntPtr cPtr);
-
-        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr BGRPattern_RunCPP(IntPtr cPtr, IntPtr dataPtr, int rows, int cols);
-
-        [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr BGSubtract_BGFG_Open(int currMethod);
 
         [DllImport("CPP_Native.dll", CallingConvention = CallingConvention.Cdecl)]

@@ -39,21 +39,6 @@ Module TaskExterns
 
 
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGRPattern_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub BGRPattern_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGRPattern_ClassCount(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGRPattern_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
-    End Function
-
-
-
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function BGSubtract_BGFG_Open(currMethod As Integer) As IntPtr

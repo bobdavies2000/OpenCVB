@@ -125,7 +125,6 @@
     <Compile Include="LowRes.vb" />
     <Compile Include="AsciiArt.vb" />
     <Compile Include="Bezier.vb" />
-    <Compile Include="BGRPattern.vb" />
     <Compile Include="Bin2Way.vb" />
     <Compile Include="Bin3Way.vb" />
     <Compile Include="Boundary.vb" />
@@ -208,7 +207,6 @@
     <Compile Include="Correlation.vb" />
     <Compile Include="CPP.vb" />
     <Compile Include="Crypto.vb" />
-    <Compile Include="Denoise.vb" />
     <Compile Include="FPoly.vb" />
     <Compile Include="Gif.vb" />
     <Compile Include="Homography.vb" />

@@ -1988,53 +1988,6 @@ namespace CS_Classes
 
 
 
-    public class BGRPattern_Basics_CS : TaskParent
-    {
-        Denoise_Pixels_CPP_VB denoise = new Denoise_Pixels_CPP_VB();
-        Color_Basics colorFmt = new Color_Basics();
-        public int classCount;
-
-        public BGRPattern_Basics_CS()
-        {
-            cPtr = BGRPattern_Open();
-            UpdateAdvice(traceName + ": local options 'Options_ColorFormat' selects color.");
-            desc = "Classify each 3-channel input pixel according to their relative values";
-        }
-
-        public void RunAlg(Mat src)
-        {
-            colorFmt.Run(src);
-            src = colorFmt.dst2;
-
-            byte[] cppData = new byte[src.Total() * src.ElemSize()];
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
-            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
-            IntPtr imagePtr = BGRPattern_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
-            handleSrc.Free();
-
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
-
-            classCount = BGRPattern_ClassCount(cPtr);
-            denoise.classCount = classCount;
-            denoise.Run(dst2);
-            dst2 = denoise.dst2;
-
-            if (standaloneTest())
-            {
-                dst2 = dst2 * 255 / classCount;
-                dst3 = ShowPalette(dst2);
-            }
-        }
-
-        public void Close()
-        {
-            BGRPattern_Close(cPtr);
-        }
-    }
-
-
-
-
     public class BGSubtract_Basics_CS : TaskParent
     {
         public Options_BGSubtract options = new Options_BGSubtract();
@@ -7814,28 +7767,6 @@ namespace CS_Classes
 
 
 
-    public class Color8U_Denoise_CS : TaskParent
-    {
-        Denoise_Pixels_CPP_VB denoise = new Denoise_Pixels_CPP_VB();
-
-        public Color8U_Denoise_CS()
-        {
-            denoise.standalone = true;
-            desc = "Remove single pixels between identical pixels for all color classifiers.";
-        }
-
-        public void RunAlg(Mat src)
-        {
-            denoise.Run(src);
-            dst2 = denoise.dst2;
-            dst3 = denoise.dst3;
-            SetTrueText(denoise.strOut, 2);
-        }
-    }
-
-
-
-
 
     public class Color8U_MotionFiltered_CS : TaskParent
     {
@@ -10935,117 +10866,6 @@ namespace CS_Classes
             labels[2] = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present.";
         }
     }
-
-
-
-
-
-
-    public class Denoise_Basics_CPP_CS : TaskParent
-    {
-        Diff_Basics diff = new Diff_Basics();
-
-        public Denoise_Basics_CPP_CS()
-        {
-            cPtr = Denoise_Basics_Open(3);
-            labels = new string[] { "", "", "Input image", "Output: Use PixelViewer to see changes" };
-            desc = "Denoise example.";
-        }
-
-        public void RunAlg(Mat src)
-        {
-            if (src.Channels() != 1)
-                src = src.CvtColor(ColorConversionCodes.BGR2GRAY) - cv.Scalar.All(1);
-
-            byte[] dataSrc = new byte[src.Total()];
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
-            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
-            IntPtr imagePtr = Denoise_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
-            handleSrc.Free();
-
-            if (imagePtr != IntPtr.Zero)
-            {
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
-                diff.Run(dst2);
-                dst3 = diff.dst2;
-            }
-        }
-
-        public void Close()
-        {
-            if (cPtr != IntPtr.Zero)
-                cPtr = Denoise_Basics_Close(cPtr);
-        }
-    }
-
-
-
-
-
-    public class Denoise_Pixels_CPP_CS : TaskParent
-    {
-        public int classCount;
-        Options_Denoise options = new Options_Denoise();
-        Reduction_Basics reduction = new Reduction_Basics();
-
-        public Denoise_Pixels_CPP_CS()
-        {
-            cPtr = Denoise_Pixels_Open();
-            labels = new string[] { "", "", "Before removing single pixels", "After removing single pixels" };
-            desc = "Remove single pixels between identical pixels";
-        }
-
-        public void RunAlg(Mat src)
-        {
-            options.RunOpt();
-
-            if (standaloneTest())
-            {
-                reduction.Run(src);
-                src = reduction.dst2;
-                classCount = reduction.classCount;
-            }
-
-            if (src.Channels() != 1)
-                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-
-            if (options.removeSinglePixels)
-            {
-                byte[] cppData = new byte[src.Total()];
-                Marshal.Copy(src.Data, cppData, 0, cppData.Length);
-                GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
-                IntPtr imagePtr = Denoise_Pixels_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
-                handleSrc.Free();
-                dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
-            }
-            else
-            {
-                dst2 = src;
-            }
-
-            if (standaloneTest())
-            {
-                dst2 *= 255.0 / classCount;
-                dst3 = ShowPalette(dst2);
-            }
-
-            if (vbc.task.heartBeat)
-            {
-                strOut = $"{classCount} pixel classes\n";
-                strOut += $"{Denoise_Pixels_EdgeCountBefore(cPtr)} edges before\n";
-                strOut += $"{Denoise_Pixels_EdgeCountAfter(cPtr)} edges after";
-            }
-
-            SetTrueText(strOut, 2);
-        }
-
-        public void Close()
-        {
-            Denoise_Pixels_Close(cPtr);
-        }
-    }
-
-
 
 
 
@@ -39315,33 +39135,6 @@ namespace CS_Classes
 
 
 
-
-    public class Motion_CCmerge_CS : TaskParent
-    {
-        Mat lastFrame = new cv.Mat();
-        Motion_ThruCorrelation motionCC = new Motion_ThruCorrelation();
-        public Motion_CCmerge_CS()
-        {
-            desc = "Use the correlation coefficient to maintain an up-to-date image";
-        }
-        public void RunAlg(Mat src)
-        {
-            if (vbc.task.frameCount < 10) dst2 = src.Clone();
-            motionCC.Run(src);
-            if (vbc.task.FirstPass) lastFrame = src.Clone();
-            if (motionCC.dst3.CountNonZero() > src.Total() / 2)
-            {
-                dst2 = src.Clone();
-                lastFrame = src.Clone();
-            }
-            src.CopyTo(dst2, motionCC.dst3);
-            dst3 = motionCC.dst3;
-        }
-    }
-
-
-
-
     public class Motion_PixelDiff_CS : TaskParent
     {
         public int changedPixels;
@@ -39374,35 +39167,6 @@ namespace CS_Classes
         }
     }
 
-
-
-
-
-    public class Motion_Contours_CS : TaskParent
-    {
-        public Motion_MinRect motion = new Motion_MinRect();
-        Contour_Largest contours = new Contour_Largest();
-        public int cumulativePixels;
-        public Motion_Contours_CS()
-        {
-            labels[2] = "Enclosing rectangles are yellow in dst2 and dst3";
-            desc = "Detect contours in the motion data and the resulting rectangles";
-        }
-        public void RunAlg(Mat src)
-        {
-            dst2 = src;
-            motion.Run(src);
-            dst3 = motion.dst3;
-            var changedPixels = Cv2.CountNonZero(dst3);
-            if (vbc.task.heartBeat) cumulativePixels = changedPixels;
-            else cumulativePixels += changedPixels;
-            if (changedPixels > 0)
-            {
-                contours.Run(dst3);
-                DrawContour(dst2, contours.bestContour, Scalar.Yellow);
-            }
-        }
-    }
 
 
 

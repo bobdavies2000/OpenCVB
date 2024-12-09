@@ -376,25 +376,6 @@ End Class
 
 
 
-Public Class Color8U_Denoise : Inherits TaskParent
-    Dim denoise As New Denoise_Pixels_CPP_VB
-    Public Sub New()
-        denoise.standalone = True
-        desc = "Remove single pixels between identical pixels for all color classifiers."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        denoise.Run(src)
-        dst2 = denoise.dst2
-        dst3 = denoise.dst3
-        SetTrueText(denoise.strOut, 2)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Color8U_Hue : Inherits TaskParent
     Public Sub New()
         desc = "Isolate those regions in the image that have a reddish hue."

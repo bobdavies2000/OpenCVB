@@ -204,38 +204,6 @@ End Class
 
 
 
-Public Class Motion_CCmerge : Inherits TaskParent
-    Dim motionCC As New Motion_ThruCorrelation
-    Dim lastFrame As cvb.Mat
-    Public Sub New()
-        desc = "Use the correlation coefficient to maintain an up-to-date image - epic fail..."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If task.heartBeat Then
-            dst2 = src.Clone
-            lastFrame = src.Clone
-        End If
-
-        motionCC.Run(src)
-
-        If motionCC.dst3.CountNonZero > src.Total / 2 Then
-            dst2 = src.Clone
-            lastFrame = src.Clone
-        End If
-
-        src.CopyTo(dst2, motionCC.dst3)
-        dst3 = motionCC.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Motion_PixelDiff : Inherits TaskParent
     Public changedPixels As Integer
     Dim changeCount As Integer, frames As Integer
@@ -634,24 +602,6 @@ End Class
 
 
 
-Public Class Motion_Contours : Inherits TaskParent
-    Public motion As New Motion_MinRect
-    Public changedPixels As Integer
-    Public Sub New()
-        labels(2) = "Enclosing rectangles are yellow in dst2 and dst3"
-        desc = "Detect contours in the motion data and the resulting rectangles"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        dst2 = src
-        motion.Run(src)
-        dst3 = motion.dst3
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Motion_PointCloud : Inherits TaskParent
     Dim diff As New Diff_Depth32f
@@ -686,102 +636,6 @@ Public Class Motion_Depth : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class Motion_TestSingle : Inherits TaskParent
-    Dim singles As New Denoise_SinglePixels_CPP_VB
-    Dim random As New Random_Basics
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-        labels(2) = "Input to the Denoise_SinglePixels_CPP_VB code"
-        desc = "Make sure Denoise_SinglePixels_CPP_VB is working properly."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        random.Run(empty)
-        dst2.SetTo(0)
-        For Each pt In random.PointList
-            dst2.Set(Of Byte)(pt.Y, pt.X, 255)
-            If task.toggleOnOff Then dst2.Set(Of Byte)(pt.Y + 1, pt.X, 255)
-        Next
-
-        labels(3) = If(task.toggleOnOff, "There should be points below that are next to each other", "There should be no points below")
-        singles.Run(dst2.Clone)
-        dst3 = singles.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Motion_MinRect : Inherits TaskParent
-    Dim mRect As New Area_MinRect
-    Dim history As New History_Basics8U
-    Dim lastFrame As cvb.Mat
-    Dim options As New Options_MinArea
-    Dim singles As New Denoise_SinglePixels_CPP_VB
-    Public Sub New()
-        task.gOptions.setPixelDifference(10)
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Find the nonzero points of motion and fit a rotated rectangle to them."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If task.FirstPass Then lastFrame = src.Clone
-        cvb.Cv2.Absdiff(src, lastFrame, dst2)
-        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
-        singles.Run(dst2)
-        dst3 = singles.dst2
-        lastFrame = src.Clone
-
-        history.Run(dst3)
-        dst2 = history.dst2
-
-        Dim nonzeros = dst2.FindNonZero()
-
-        dst3.SetTo(0)
-        If nonzeros.Rows > options.numPoints Then
-            Dim minX As Integer = Integer.MaxValue, maxX As Integer = 0, minY As Integer = Integer.MaxValue, maxY As Integer = 0
-            Dim p1 As cvb.Point, p2 As cvb.Point, p3 As cvb.Point, p4 As cvb.Point
-            For i = 0 To nonzeros.Rows - 1
-                Dim pt = nonzeros.Get(Of cvb.Point)(i, 0)
-                If pt.X < minX Then
-                    minX = pt.X
-                    p1 = pt
-                End If
-                If pt.X > maxX Then
-                    maxX = pt.X
-                    p2 = pt
-                End If
-                If pt.Y < minY Then
-                    minY = pt.Y
-                    p3 = pt
-                End If
-                If pt.Y > maxY Then
-                    maxY = pt.Y
-                    p4 = pt
-                End If
-            Next
-
-            mRect.inputPoints = New List(Of cvb.Point2f)({p1, p2, p3, p4})
-            mRect.Run(empty)
-            DrawRotatedRect(mRect.minRect, dst3, white)
-            If dst3.CountNonZero > dst3.Total / 2 Then dst3.SetTo(255)
-        End If
-    End Sub
-End Class
 
 
 
@@ -1113,7 +967,7 @@ Public Class Motion_CenterKalman : Inherits TaskParent
     Dim centerRect As cvb.Rect
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
-        labels(3) = "Template for motion matchTemplate."
+        labels(3) = "Template for motion matchTemplate.  Shake the camera to see Kalman impact."
         desc = "Kalmanize the output of center rotation"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -1213,7 +1067,8 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         dst0 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U, 0)
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         FindSlider("Threshold value").Value = 200
-        desc = "Find the rotation angle using an unreliable diamond shape from the thresholded MatchTemplate output."
+        desc = "Find the rotation angle using an unreliable diamond shape " +
+               "from the thresholded MatchTemplate output."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()

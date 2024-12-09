@@ -1502,29 +1502,6 @@ End Class
 
 
 
-Public Class Depth_MotionTempered : Inherits TaskParent
-    Dim motion As New Motion_MinRect
-    Dim colorize As New Depth_Colorizer_CPP_VB
-    Public Sub New()
-        desc = "Update depth only near any motion."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If task.heartBeat Then dst2 = task.pcSplit(2)
-        motion.Run(src)
-        task.pcSplit(2).CopyTo(dst2, motion.dst3)
-
-        If standalone Then
-            colorize.Run(dst2)
-            dst3 = colorize.dst2
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Depth_StableMax : Inherits TaskParent
     Public stableMax As cvb.Mat
     Dim colorize As New Depth_Colorizer_CPP_VB
