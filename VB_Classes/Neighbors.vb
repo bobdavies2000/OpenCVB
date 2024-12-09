@@ -18,7 +18,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
 
         knn.queries.Clear()
         For Each rc In task.redCells
-            knn.queries.Add(rc.maxDStable)
+            knn.queries.Add(rc.maxDist)
         Next
         knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
         knn.Run(src)
@@ -33,9 +33,9 @@ Public Class Neighbors_Basics : Inherits TaskParent
             dst3.SetTo(0)
             Dim ptCount As Integer
             For Each index In task.rc.nabs
-                Dim pt = task.redCells(index).maxDStable
-                If pt = task.rc.maxDStable Then
-                    DrawCircle(dst2,pt, task.DotSize, black)
+                Dim pt = task.redCells(index).maxDist
+                If pt = task.rc.maxDist Then
+                    DrawCircle(dst2, pt, task.DotSize, black)
                 Else
                     DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
                     ptCount += 1

@@ -530,7 +530,6 @@ Public Class rcData
     Public maxLoc As cvb.Point
 
     Public maxDist As cvb.Point
-    Public maxDStable As cvb.Point ' keep maxDist the same if it is still on the cell.
 
     Public index As Integer
     Public indexLast As Integer

@@ -40,13 +40,11 @@ Public Class MSER_Basics : Inherits TaskParent
             rc.maxDist = GetMaxDist(rc)
 
             rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast <> 0 And rc.indexLast < task.redCells.Count Then
+            If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
-                rc.maxDStable = lrc.maxDStable
                 rc.color = lrc.color
+                rc.age = lrc.age + 1
                 matched.Add(rc.indexLast, rc.indexLast)
-            Else
-                rc.maxDStable = rc.maxDist
             End If
 
             cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
