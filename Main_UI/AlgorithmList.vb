@@ -716,6 +716,7 @@ End Enum
 	If algorithmName = "Depth_StableMin_CS" Then return new Depth_StableMin_CS
 	If algorithmName = "Depth_StableMinMax" Then return new Depth_StableMinMax
 	If algorithmName = "Depth_StableMinMax_CS" Then return new Depth_StableMinMax_CS
+	If algorithmName = "Depth_Test_CPP_VB" Then return new Depth_Test_CPP_VB
 	If algorithmName = "Depth_TierCount" Then return new Depth_TierCount
 	If algorithmName = "Depth_TierCount_CS" Then return new Depth_TierCount_CS
 	If algorithmName = "Depth_Tiers" Then return new Depth_Tiers

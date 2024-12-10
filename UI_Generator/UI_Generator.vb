@@ -201,7 +201,9 @@ Module UI_Generator
         Catch ex As Exception
             Console.WriteLine("UI_Generator failed writing the C# and VB.Net algorithm lists.  Error is " + vbCrLf + ex.Message)
         End Try
-        Console.WriteLine("AlgorithmList.vb prepared." + vbCrLf + "Next check to see if cross reference needs update.")
+        Console.WriteLine("AlgorithmList.vb prepared." + vbCrLf + "Next check to see if cross-reference needs update.")
+        Console.WriteLine("It can take a minute to update the cross-reference for all the algorithms." +
+                          vbCrLf + "That is why the cross-reference is run selectively.")
 
 
 

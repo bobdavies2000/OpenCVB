@@ -7372,3 +7372,36 @@ int* Edge_DiffY_RunCPP(Edge_DiffY* cPtr, int* dataPtr, int rows, int cols, int c
     cPtr->RunCPP();
     return (int*)cPtr->dst.data;
 }
+
+
+
+
+
+
+class Depth_Test
+{
+private:
+public:
+    Mat src, dst;
+    Depth_Test(){}
+    void RunCPP() {
+        dst = src.clone();
+    }
+};
+extern "C" __declspec(dllexport)
+Depth_Test *Depth_Test_Open() {
+    Depth_Test *cPtr = new Depth_Test();
+    return cPtr;
+}
+extern "C" __declspec(dllexport)
+void Depth_Test_Close(Depth_Test *cPtr)
+{
+    delete cPtr;
+}
+extern "C" __declspec(dllexport)
+int *Depth_Test_RunCPP(Depth_Test *cPtr, int *dataPtr, int rows, int cols, int channels)
+{
+		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
+		cPtr->RunCPP();
+		return (int *) cPtr->dst.data; 
+}
