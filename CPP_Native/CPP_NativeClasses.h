@@ -39,14 +39,9 @@ using namespace ml;
 #include "CPP_Parent.h"
 #include "Options.h"
 
-
+#if 0 
 #ifndef VIDEOSTAB_H
 #define VIDEOSTAB_H
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
-
-using namespace  cv;
 
 class VideoStab
 {
@@ -7373,7 +7368,7 @@ int* Edge_DiffY_RunCPP(Edge_DiffY* cPtr, int* dataPtr, int rows, int cols, int c
     return (int*)cPtr->dst.data;
 }
 
-
+#endif
 
 
 

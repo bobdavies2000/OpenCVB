@@ -543,13 +543,15 @@ Public Class Feature_NearestCell : Inherits TaskParent
             knn.trainInput.Add(New cvb.Point2f(mp.p1.X, mp.p1.Y))
         Next
 
-        knn.Run(Nothing)
+        If knn.trainInput.Count > 0 Then
+            knn.Run(Nothing)
 
-        For i = 0 To task.redCells.Count - 1
-            Dim rc = task.redCells(i)
-            rc.nearestFeature = knn.trainInput(knn.result(i, 0))
-            DrawLine(dst3, rc.nearestFeature, rc.maxDStable, task.HighlightColor)
-        Next
+            For i = 0 To task.redCells.Count - 1
+                Dim rc = task.redCells(i)
+                rc.nearestFeature = knn.trainInput(knn.result(i, 0))
+                DrawLine(dst3, rc.nearestFeature, rc.maxDStable, task.HighlightColor)
+            Next
+        End If
     End Sub
 End Class
 

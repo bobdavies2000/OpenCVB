@@ -68,18 +68,26 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
         Zed2GetData(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         SyncLock cameraLock
-            uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
+            uiColor = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC4,
                                             Zed2Color(cPtr)).Clone
-            uiRight = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3,
+            uiColor = uiColor.CvtColor(cvb.ColorConversionCodes.BGRA2BGR).Resize(WorkingRes, 0, 0,
+                                       cvb.InterpolationFlags.Nearest)
+
+            uiRight = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC4,
                                             Zed2RightView(cPtr)).Clone
+
+            uiRight = uiColor.CvtColor(cvb.ColorConversionCodes.BGRA2BGR).Resize(WorkingRes, 0, 0,
+                                       cvb.InterpolationFlags.Nearest)
             uiLeft = uiColor
 
-            uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
-                                                 cvb.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone
+            uiPointCloud = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                                 cvb.MatType.CV_32FC4, Zed2PointCloud(cPtr)).Clone
+            uiPointCloud = uiPointCloud.CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+            uiPointCloud = uiPointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
 
-            uiPointCloud = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC3,
-                                           Zed2PointCloud(cPtr)).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
-
+            Dim tmp = uiPointCloud.Reshape(1)
+            cvb.Cv2.PatchNaNs(tmp, 0)
+            uiPointCloud = tmp.Reshape(3)
 
             Dim accPtr = Zed2Acceleration(cPtr)
             Dim accel = Marshal.PtrToStructure(Of cvb.Point3f)(accPtr)

@@ -7257,10 +7257,10 @@ End Class
 Public Class Options_ThresholdDef : Inherits TaskParent
     Public threshold As Integer = 127
     Public Sub New()
-        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Threshold", 0, 255, threshold)
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Defined Threshold", 0, 255, threshold)
     End Sub
     Public Sub RunOpt()
-        Static truncateSlider = FindSlider("Threshold")
+        Static truncateSlider = FindSlider("Defined Threshold")
         threshold = truncateSlider.value
     End Sub
 End Class

@@ -160,18 +160,29 @@ Public Class Main_UI
             End If
             sr.Close()
 
+            ' checking the list for specific missing device here...
+            Dim usbList = USBenumeration()
+            Dim testlist As New List(Of String)
+            For Each usbDevice In usbList
+                If LCase(usbDevice).Contains("orb") Then testlist.Add(usbDevice) ' debugging assistance...
+            Next
+
             .cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
-                Dim camName = cameraNames(i)
-                If camName.EndsWith(" C++") Then camName = camName.Replace(" C++", "")
-                Dim present = USBenumeration(camName)
-                If cameraNames(i).Contains("Orbbec") Then present = USBenumeration("Orbbec Gemini 335L Depth Camera")
-                If cameraNames(i).Contains("Oak-D") Then present = USBenumeration("Movidius MyriadX")
-                If cameraNames(i).StartsWith("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2i")
-                If present = False And cameraNames(i).Contains("StereoLabs ZED 2/2i") Then
-                    present = USBenumeration("ZED 2") ' older edition.
+                Dim searchname = cameraNames(i)
+                Dim present As Boolean = False
+                If searchname.EndsWith(" C++") Then
+                    searchname = searchname.Replace(" C++", "")
                 End If
-                .cameraPresent.Add(present <> 0)
+
+                If searchname.Contains("Orbbec") Then searchname = "Orbbec Gemini 335L Depth Camera"
+                If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
+                If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
+
+                For Each usbDevice In usbList
+                    If usbDevice.Contains(searchname) Then present = True
+                Next
+                .cameraPresent.Add(present <> False)
             Next
 
             For i = 0 To cameraNames.Count - 1
@@ -352,7 +363,7 @@ Public Class Main_UI
         If r.Y + r.Height > height Then r.Height = height - r.Y
         Return r
     End Function
-    Public Function USBenumeration(searchName As String) As Boolean
+    Public Function USBenumeration() As List(Of String)
         Static usblist As New List(Of String)
         Dim info As ManagementObject
         Dim search As ManagementObjectSearcher
@@ -388,12 +399,7 @@ Public Class Main_UI
                 End If
             Next
         End If
-        Dim testlist As New List(Of String)
-        For Each usbDevice In usblist
-            If LCase(usbDevice).Contains("zed") Then testlist.Add(usbDevice) ' debugging assistance...
-            If usbDevice.Contains(searchName) Then Return True
-        Next
-        Return False
+        Return usblist
     End Function
     Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupCombo.SelectedIndexChanged
         If GroupCombo.Text = "" Then
@@ -1796,12 +1802,17 @@ Public Class Main_UI
         CamSwitchTimer.Enabled = True
     End Sub
     Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
-        If CamSwitchProgress.Visible Then
-            Static frames As Integer
-            Dim slideCount As Integer = 10
-            CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
-            If frames >= slideCount Then frames = 0
-            frames += 1
+        If settings.cameraName <> "" Then
+            If CamSwitchProgress.Visible Then
+                Static frames As Integer
+                Dim slideCount As Integer = 10
+                CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
+                If frames >= slideCount Then frames = 0
+                frames += 1
+            End If
+        Else
+            CamSwitchProgress.Visible = False
+            CameraSwitching.Visible = False
         End If
     End Sub
     Private Sub GroupButtonList_Click(sender As Object, e As EventArgs) Handles GroupButtonList.Click

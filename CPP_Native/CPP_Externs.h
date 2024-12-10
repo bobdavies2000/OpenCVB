@@ -4,8 +4,8 @@
 
 namespace CPP_Native
 {
-    Grid_Basics_CC* gridBasics;
-    Hist_RedOptions_CC* redOptions;
+    //Grid_Basics_CC* gridBasics;
+    //Hist_RedOptions_CC* redOptions;
 
     extern "C" __declspec(dllexport)
         int* cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWeighted,
@@ -14,7 +14,8 @@ namespace CPP_Native
             bool UseKalman, int paletteIndex, bool optionsChanged, int frameHistory,
             bool displayDst0, bool displayDst1)
     {
-        task = new cppTask(rows, cols);
+        cppTask *task = new cppTask(rows, cols);
+#if 0 
         WorkingRes = Size(cols, rows);
         task->heartBeat = heartBeat;
         task->lineType = lineType;
@@ -188,13 +189,13 @@ namespace CPP_Native
         { task->alg = new Hist_DepthSimple_CC(); task->alg->traceName = "Hist_DepthSimple_CC"; break; }
         // end of switch - don't remove...
         }
-
         task->alg->standalone = true;
         task->font = FONT_HERSHEY_SIMPLEX; // fontSize is set below...
         task->fontColor = Scalar(255, 255, 255);
         task->cppFunction = function;
         gridBasics = new Grid_Basics_CC();
         redOptions = new Hist_RedOptions_CC();
+#endif
 
         return (int*)task;
     }
@@ -207,7 +208,7 @@ namespace CPP_Native
     }
 
 
-
+#if 0 
 
     // https://www.codeproject.com/Articles/197493/Marshal-variable-length-array-of-structs-from-C-to
     extern "C" __declspec(dllexport)
@@ -449,5 +450,6 @@ namespace CPP_Native
 
         return 0;
     }
+#endif
 }
 

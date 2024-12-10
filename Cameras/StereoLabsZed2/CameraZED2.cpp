@@ -11,21 +11,14 @@
 #include "../CameraDefines.hpp"
 #ifdef STEREOLAB_INSTALLED
 
-#include <opencv2/core.hpp>
-#include <opencv2/calib3d.hpp>
-#include <opencv2/imgproc.hpp> 
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
 #pragma comment(lib, "sl_zed64.lib")
 #pragma comment(lib, "cuda.lib") 
 #pragma comment(lib, "cudart.lib") 
 
 #include <sl/Camera.hpp>
-#include "PragmaLibs.h" 
 
 using namespace sl;
 using namespace std;
-using namespace  cv;
 
 class StereoLabsZed2
 {
@@ -43,9 +36,10 @@ public:
 	float imuTemperature = 0;
 	double imuTimeStamp = 0;
 	Pose zed_pose;
-	Point3f acc3f;
+	sl::float3 acc3f;
 	Camera zed;
-	cv::Mat color, rightView, pointCloud;
+	sl::Mat colorSL, rightViewSL, pcMatSL;
+	int *color, *rightView, *pointCloud;
 	int captureWidth, captureHeight;
 private:
 	InitParameters init_params;
@@ -96,70 +90,17 @@ public:
 			if (zed.grab() == ERROR_CODE::SUCCESS) return;
 	}
 
-	cv::Mat getMat(void* dataPtr, int w, int h)
-	{
-		cv::Mat tmp;
-		if (dataPtr != 0)
-		{
-			tmp = cv::Mat(captureHeight, captureWidth, CV_8UC4, dataPtr);
-			cvtColor(tmp, tmp, ColorConversionCodes::COLOR_BGRA2BGR);
-		}
-		else {
-			tmp = cv::Mat(captureHeight, captureWidth, CV_8UC3);
-			tmp.setTo(0);
-			float scale = 0.6f;
-			int thickness = 2;
-			int y = 20, incr = 20;
-			int font = FONT_HERSHEY_SIMPLEX;
-			putText(tmp, "Buffers from StereoLabs ZED driver are 0", Point(20, y), font, scale,
-				Scalar::all(255), thickness);
-			putText(tmp, "Recommendation: install the latest CUDA and StereoLabs SDK",
-				Point(20, y + incr), font, scale, Scalar::all(255), thickness);
-			putText(tmp, "A working version of CUDA is required for StereoLabs cameras.",
-				Point(20, y + incr * 2), font, scale, Scalar::all(255), thickness);
-			putText(tmp, "And make sure that the latest CUDA installed properly.",
-				Point(20, y + incr * 3), font, scale, Scalar::all(255), thickness);
-			putText(tmp, "The NSight Visual Studio Edition can fail and is not essential.",
-				Point(20, y + incr * 4), font, scale, Scalar::all(255), thickness);
-			putText(tmp, "Use the 'Custom' install to remove NSight.",
-				Point(20, y + incr * 5), font, scale, Scalar::all(255), thickness);
-		}
-		if (w != captureWidth) resize(tmp, tmp, Size(w, h), INTER_NEAREST_EXACT);
-		return tmp;
-	}
-
 	void GetData(int w, int h)
 	{
-		sl::Mat colorSL, rightViewSL, pcMatSL;
-
 		zed.retrieveImage(colorSL, VIEW::LEFT);
-		color = getMat((void*)colorSL.getPtr<sl::uchar1>(), w, h);
+		color = (int*)colorSL.getPtr<sl::uchar1>();
 
 		zed.retrieveImage(rightViewSL, VIEW::RIGHT);
-		rightView = getMat((void*)rightViewSL.getPtr<sl::uchar1>(), w, h);
+		rightView = (int *)rightViewSL.getPtr<sl::uchar1>();
 
 		zed.retrieveMeasure(pcMatSL, MEASURE::XYZ); // XYZ has an extra float!
 
-		pointCloud = cv::Mat(captureHeight, captureWidth, CV_32FC4, pcMatSL.getPtr<sl::uchar1>());
-		cvtColor(pointCloud, pointCloud, ColorConversionCodes::COLOR_BGRA2BGR);
-		if (captureWidth != w) resize(pointCloud, pointCloud, Size(w, h), 0, 0, INTER_NEAREST);
-
-		//std::vector<cv::Mat> pcsplit;
-		//cv::split(pointCloud, pcsplit);
-		//pcsplit.pop_back();
-		//cv::merge(pcsplit, pointCloud);
-
-		std::vector<cv::Mat> pcsplit;
-		cv::split(pointCloud, pcsplit);
-
-		cv::Mat mask;
-		cv::inRange(pcsplit[2], -100, 100, mask);
-		cv::Mat zeros(pcsplit[2].rows, pcsplit[2].cols, CV_32F);
-		zeros.setTo(0);
-		cv::absdiff(pcsplit[2], zeros, pcsplit[2]);
-		cv::merge(pcsplit, pointCloud);
-
-		pointCloud.setTo(0, ~mask);
+		pointCloud = (int *)pcMatSL.getPtr<sl::uchar1>();
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 		RotationMatrix = zed_pose.getRotationMatrix();
@@ -168,8 +109,6 @@ public:
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
-		sl::float3 acc = sensordata.imu.linear_acceleration;
-		acc3f = Point3f(acc.x, acc.y, acc.z);
 	}
 };
 
@@ -178,24 +117,28 @@ extern "C" __declspec(dllexport) int* Zed2Open(int w, int h) { StereoLabsZed2* c
 extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * cPtr) { cPtr->zed.close(); }
 extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) 
 { 
-	return (int*)&cPtr->acc3f;
+	return (int*)&cPtr->sensordata.imu.linear_acceleration;
 }
-extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }
+extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) 
+{ 
+	return (int*)&cPtr->sensordata.imu.angular_velocity; 
+}
+
 extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * cPtr) { return cPtr->serialNumber; }
 extern "C" __declspec(dllexport) void Zed2WaitForFrame(StereoLabsZed2 * cPtr) { cPtr->waitForFrame(); }
 extern "C" __declspec(dllexport) double Zed2IMU_TimeStamp(StereoLabsZed2 * cPtr) { return cPtr->imuTimeStamp; }
 extern "C" __declspec(dllexport) void Zed2GetData(StereoLabsZed2 * cPtr, int w, int h) { cPtr->GetData(w, h); }
 extern "C" __declspec(dllexport) int* Zed2Color(StereoLabsZed2 * cPtr)
 {
-	return (int*)cPtr->color.data;
+	return (int*)cPtr->color;
 }
 extern "C" __declspec(dllexport) int* Zed2PointCloud(StereoLabsZed2 * cPtr)
 {
-	return (int*)cPtr->pointCloud.data;
+	return (int*)cPtr->pointCloud;
 }
 extern "C" __declspec(dllexport) int* Zed2RightView(StereoLabsZed2 * cPtr)
 {
-	return (int*)cPtr->rightView.data;
+	return (int*)cPtr->rightView;
 }
 extern "C" __declspec(dllexport) int* Zed2Intrinsics(StereoLabsZed2 * cPtr) { return (int*)&cPtr->cameraData; }
 #else

@@ -83,14 +83,17 @@ Public Class Threshold_Definitions : Inherits TaskParent
         SetTrueText("Trunc", New cvb.Point(dst2.Width / 2 + 5, 10), 2)
         SetTrueText("ToZero", New cvb.Point(10, dst2.Height / 2 + 10), 2)
         SetTrueText("ToZeroInv", New cvb.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2)
+        Dim thresh = CStr(options.threshold)
         SetTrueText(
             vbCrLf + "Upper left:  the input for all the tests below..." + vbCrLf +
-            vbCrLf + "Upper right: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.Binary)" + vbCrLf +
-            vbCrLf + "0: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.BinaryInv)" + vbCrLf +
-            vbCrLf + "1: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.Trunc)" + vbCrLf +
-            vbCrLf + "2: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.Tozero)" + vbCrLf +
-            vbCrLf + "1: dst0.Threshold(threshold, 255, cvb.ThresholdTypes.TozeroInv)" + vbCrLf,
+            vbCrLf + "Upper right: dst0.Threshold(" + thresh + ", 255, cvb.ThresholdTypes.Binary)" + vbCrLf +
+            vbCrLf + "0: dst0.Threshold(" + thresh + ", 255, cvb.ThresholdTypes.BinaryInv)" + vbCrLf +
+            vbCrLf + "1: dst0.Threshold(" + thresh + ", 255, cvb.ThresholdTypes.Trunc)" + vbCrLf +
+            vbCrLf + "2: dst0.Threshold(" + thresh + ", 255, cvb.ThresholdTypes.Tozero)" + vbCrLf +
+            vbCrLf + "1: dst0.Threshold(" + thresh + ", 255, cvb.ThresholdTypes.TozeroInv)" + vbCrLf,
         3)
+
+        labels(3) = "Current threshold is " + CStr(options.threshold)
     End Sub
 End Class
 
