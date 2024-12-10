@@ -10,6 +10,7 @@ echo "OpenCVB requires that .Net Framework 3.5 be installed."
 echo "You need to check before installing OpenCVB."
 echo "When you close the optionalfeatures window, OpenCVB will install."
 start /wait optionalfeatures.exe
+@echo off
 
 if not exist librealsense (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/IntelRealSense/librealsense"
@@ -88,26 +89,11 @@ if not exist zed-c-api\Build (
 )
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
-echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
-echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
-echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
-echo "If you compile OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
-echo "If you compile OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
-echo "If you compile OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
-echo "If you compile OpenCVB and see 'SL/Camera.hpp is missing', it means the stereolabs download is missing..."
-echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
-echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
-echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
 echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
-echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
-echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
-echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
-
-
 echo "StereoLabs SDK install may also download and install CUDA if not already present."
-echo "Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3" <<< or whatever version was downloaded.
-set /p ok="And hit enter after reading the above messages."
+echo "Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3"
+SET /P ok="And hit enter after reading the above messages."
 
 :: Once done, exit the batch file -- skips executing the errorNoPython section
 goto:eof

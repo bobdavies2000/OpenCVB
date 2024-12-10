@@ -100,6 +100,7 @@ Public Class VBtask : Implements IDisposable
     Public imuStabilityTest As Stabilizer_VerticalIMU
     Public grid As Grid_Basics
     Public ogl As OpenGL_Basics
+    Public colorizer As Depth_Palette
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
     Public redC As RedCloud_Basics
@@ -413,6 +414,7 @@ Public Class VBtask : Implements IDisposable
 
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
+        colorizer = New Depth_Palette
 
         feat = New Feature_Basics
         redC = New RedCloud_Basics
@@ -763,7 +765,9 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.UseMotionColor.Checked Then feat.Run(src)
 
-        task.depthRGB = task.pointCloud.ConvertScaleAbs(255)
+        ' task.depthRGB = task.pointCloud.ConvertScaleAbs(255)
+        task.colorizer.Run(src)
+        task.depthRGB = task.colorizer.dst2
 
         TaskTimer.Enabled = True
 

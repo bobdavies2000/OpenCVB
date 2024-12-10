@@ -236,6 +236,14 @@ Public Class Main_UI
                 Case 180, 360, 720
                     .captureRes = New cvb.Size(1280, 720)
                 Case 376, 188, 94
+                    If settings.cameraName <> "StereoLabs ZED 2/2i" Then
+                        MsgBox("The json settings don't appear to be correct!" + vbCrLf +
+                                "The 'settings.json' file will be removed" + vbCrLf +
+                                "and rebuilt with default settings upon restart.")
+                        Dim fileinfo As New FileInfo(jsonfs.jsonFileName)
+                        fileinfo.Delete()
+                        End
+                    End If
                     .captureRes = New cvb.Size(672, 376)
                 Case 120, 240, 480
                     .captureRes = New cvb.Size(640, 480)
@@ -354,7 +362,7 @@ Public Class Main_UI
                 Dim Name = CType(info("Caption"), String)
                 If Name IsNot Nothing Then
                     usblist.Add(Name)
-                    ' why do this?  So enumeration can tell us about the cameras present in a short list.
+                    ' This enumeration can tell us about the cameras present.  Built on first pass.
                     If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or
                             InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
                             InStr(Name, " CPU ") Or InStr(Name, "PCI Express") Or Name.StartsWith("USB ") Or
@@ -956,11 +964,11 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
 
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
-
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-        ' updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
         updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
 
@@ -982,6 +990,7 @@ Public Class Main_UI
         Else
             updatePath(K4ADLL.Directory.FullName, "Kinect depth engine dll.")
         End If
+        ' check pathlist here if there is any problem with dll not found.
     End Sub
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
@@ -1510,7 +1519,7 @@ Public Class Main_UI
             task = New VBtask(parms)
 
             ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
-            Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
+            'Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 

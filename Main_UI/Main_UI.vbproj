@@ -51,7 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CPP_Managed\CPP_Managed.vcxproj" />
     <ProjectReference Include="..\CS_Classes\CS_Classes.csproj" />
     <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj" />
     <ProjectReference Include="..\zed-csharp\zed_csharp.csproj" />
