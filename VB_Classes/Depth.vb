@@ -1569,24 +1569,21 @@ End Class
 
 Public Class Depth_Test_CPP_VB : Inherits TaskParent
     Public Sub New()
-        cPtr = Depth_Test_Open()
-        labels = {"", "", "Grayscale image of src", "dst3Label"}
-        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
-        desc = "description"
+        ' cPtr = Depth_Test_Open()
+        desc = "testing dll problem"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        Dim cptr = fnTestStatic()
 
-        Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Depth_Test_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
-        handleSrc.Free()
+        'If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
-        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, If(src.Channels = 3, cvb.MatType.CV_8UC3, cvb.MatType.CV_8UC1), imagePtr).Clone
-    End Sub
-    Public Sub Close()
-        Depth_Test_Close(cPtr)
+        'Dim cppData(src.Total * src.ElemSize - 1) As Byte
+        'Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        'Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        'Dim imagePtr = Depth_Test_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        'handleSrc.Free()
+
+        'dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, If(src.Channels = 3, cvb.MatType.CV_8UC3, cvb.MatType.CV_8UC1), imagePtr).Clone
     End Sub
 End Class
 
@@ -1599,5 +1596,9 @@ Module Depth_Test_CPP_Module
     End Sub
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Depth_Test_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    End Function
+
+    <DllImport(("TestStatic.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function fnTestStatic() As IntPtr
     End Function
 End Module

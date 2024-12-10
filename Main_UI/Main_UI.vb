@@ -970,6 +970,15 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
 
+
+
+        updatePath(HomeDir.FullName + "bin\Release\", "TestStatic.dll")
+
+
+
+
+
+
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
@@ -1801,6 +1810,11 @@ Public Class Main_UI
         CamSwitchTimer.Enabled = True
     End Sub
     Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
+        If settings Is Nothing Then
+            CamSwitchProgress.Visible = False
+            CameraSwitching.Visible = False
+            Exit Sub
+        End If
         If settings.cameraName <> "" Then
             If CamSwitchProgress.Visible Then
                 Static frames As Integer
