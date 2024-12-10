@@ -1,11 +1,12 @@
+#include <cstdlib>
+#include <cstdio>
+#include <string>
 #include <iostream>
 #include <iomanip>
 #include <cstring>
-#include <string>
 #include <thread>
 #include <mutex>
-#include <cstdlib>
-#include <cstdio>
+
 #include <algorithm>
 
 #include "../CameraDefines.hpp"

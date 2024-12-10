@@ -956,6 +956,9 @@ Public Class Main_UI
             updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
         End If
 
+        updatePath(HomeDir.FullName + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+        updatePath(HomeDir.FullName + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
         Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
         If cudaPath IsNot Nothing Then
             updatePath(cudaPath, "Cuda - needed for StereoLabs")
@@ -969,10 +972,6 @@ Public Class Main_UI
 
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
-
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
 

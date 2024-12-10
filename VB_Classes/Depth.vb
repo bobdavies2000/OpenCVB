@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_Basics : Inherits TaskParent
-    Dim colorizer As New Depth_Colorizer_CPP_VB
     Public Sub New()
         UpdateAdvice(traceName + ": use global option to control 'Max Depth'.")
         desc = "Colorize the depth data into task.depthRGB"
@@ -18,9 +17,6 @@ Public Class Depth_Basics : Inherits TaskParent
         End If
         If standalone Then dst3 = task.maxDepthMask
         SetTrueText(task.gMat.strOut, 3)
-
-        colorizer.Run(task.pcSplit(2))
-        task.depthRGB = colorizer.dst2
     End Sub
 End Class
 

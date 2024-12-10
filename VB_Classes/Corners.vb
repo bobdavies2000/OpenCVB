@@ -292,9 +292,9 @@ Public Class Corners_HarrisDetector_CPP_VB : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
         desc = "Use Harris detector to identify interesting points."
-        cPtr = Harris_Detector_Open()
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        If cPtr = 0 Then cPtr = Harris_Detector_Open()
         options.RunOpt()
 
         dst2 = src.Clone

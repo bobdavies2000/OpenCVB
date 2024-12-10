@@ -651,7 +651,7 @@ Public Class Feature_ShiTomasi : Inherits TaskParent
             dst2 = task.leftView
             dst3 = task.rightView
             shiTomasi.Run(task.leftView)
-            dst2.SetTo(white, shiTomasi.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+            dst2.SetTo(cvb.Scalar.White, shiTomasi.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
 
             shiTomasi.Run(task.rightView)
             dst3.SetTo(task.HighlightColor, shiTomasi.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))

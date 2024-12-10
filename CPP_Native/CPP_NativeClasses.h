@@ -1,11 +1,10 @@
 #pragma once
-#include <string.h>
-#include <Windows.h>
-#include <OleAuto.h>
+#include <string>
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
-#include <algorithm>
+#include <iomanip>
+
 #include <opencv2/core.hpp>
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
@@ -13,27 +12,29 @@
 #include "opencv2/ml/ml.hpp "
 #include "opencv2/imgproc.hpp"
 #include "opencv2/videoio.hpp"
+#include "opencv2/bgsegm.hpp"
+#include "opencv2/photo.hpp"
+
 #include <numeric>
-#include <iomanip>
 #include <sstream>
 #include <memory>
 #include <vector>
 #include <random>
-#include "opencv2/video/tracking.hpp"
-#include "opencv2/bgsegm.hpp"
-#include "opencv2/photo.hpp"
+
+//#include "opencv2/video/tracking.hpp"
+//#include <opencv2/plot.hpp>
+//#include "opencv2/ccalib/randpattern.hpp"
+//#include "opencv2/xphoto/oilpainting.hpp"
+
 #include <map>
-#include <opencv2/ml.hpp>
 #include "harrisDetector.h"
-#include <opencv2/plot.hpp>
-#include "opencv2/ccalib/randpattern.hpp"
-#include "opencv2/xphoto/oilpainting.hpp"
+
 #include "../CPP_Managed/PragmaLibs.h"
 
 using namespace std;
 using namespace cv;
-using namespace bgsegm;
-using namespace ximgproc;
+//using namespace bgsegm;
+//using namespace ximgproc;
 using namespace ml;
 
 #include "CPP_Parent.h"
