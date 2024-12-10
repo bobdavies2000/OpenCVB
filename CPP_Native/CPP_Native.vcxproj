@@ -19,12 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\CPP_Managed\PragmaLibs.h" />
     <ClInclude Include="CPP_Externs.h" />
     <ClInclude Include="CPP_Enum.h" />
     <ClInclude Include="CPP_Parent.h" />
     <ClInclude Include="CPP_NativeClasses.h" />
     <ClInclude Include="Options.h" />
-    <ClInclude Include="PragmaLibs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPP_IncludeOnly.cpp" />
@@ -118,6 +118,8 @@
       <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4267;4244;26495;26812;26451;6294;6201;6011</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -128,6 +130,7 @@
       <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AssemblyDebug>false</AssemblyDebug>
     </Link>
     <PreBuildEvent>
       <Command>"$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe"</Command>
@@ -187,6 +190,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
+      <AssemblyDebug>false</AssemblyDebug>
     </Link>
     <PreBuildEvent>
       <Command>"$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe"</Command>

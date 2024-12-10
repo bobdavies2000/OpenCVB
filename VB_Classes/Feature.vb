@@ -64,15 +64,14 @@ End Class
 
 Public Class Feature_Methods : Inherits TaskParent
     Dim harris As Corners_HarrisDetector_CPP_VB
-    Dim FAST As New Corners_Basics
+    Dim FAST As Corners_Basics
     Dim featureMethod As New Options_FeatureGather
     Public features As New List(Of cvb.Point2f)
     Public featurePoints As New List(Of cvb.Point)
     Public ptList As New List(Of cvb.Point)
-    Dim brisk As New BRISK_Basics
+    Dim brisk As BRISK_Basics
     Public options As New Options_Features
     Public Sub New()
-        cPtr = Agast_Open()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -100,6 +99,7 @@ Public Class Feature_Methods : Inherits TaskParent
                 Next
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.Agast
+                If cPtr = 0 Then cPtr = Agast_Open()
                 src = task.color.Clone
                 Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
                 Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
@@ -120,6 +120,7 @@ Public Class Feature_Methods : Inherits TaskParent
 
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.BRISK
+                If brisk Is Nothing Then brisk = New BRISK_Basics
                 brisk.Run(src)
                 features = brisk.features
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
@@ -129,6 +130,7 @@ Public Class Feature_Methods : Inherits TaskParent
                 features = harris.features
                 labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
             Case FeatureSrc.FAST
+                If FAST Is Nothing Then FAST = New Corners_Basics
                 FAST.Run(src)
                 features = FAST.features
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"

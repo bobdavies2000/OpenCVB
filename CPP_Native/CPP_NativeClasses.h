@@ -3706,7 +3706,11 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport) RedCloud* RedCloud_Open() { return new RedCloud(); }
+extern "C" __declspec(dllexport) RedCloud* RedCloud_Open() 
+{ 
+    return new RedCloud(); 
+}
+
 extern "C" __declspec(dllexport) int RedCloud_Count(RedCloud* cPtr)
 {
     return (int)cPtr->cellRects.size();
@@ -3829,7 +3833,11 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport) RedCloudMaxDist* RedCloudMaxDist_Open() { return new RedCloudMaxDist(); }
+extern "C" __declspec(dllexport) RedCloudMaxDist* RedCloudMaxDist_Open() 
+{ 
+    return new RedCloudMaxDist(); 
+}
+
 extern "C" __declspec(dllexport) int RedCloudMaxDist_Count(RedCloudMaxDist* cPtr)
 {
     return (int)cPtr->cellRects.size();

@@ -1863,10 +1863,10 @@ Public Class RedCloud_CPP_VB : Inherits TaskParent
     Dim color As Color8U_Basics
     Public Sub New()
         inputMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        cPtr = RedCloud_Open()
         desc = "Run the C++ RedCloud interface with or without a mask"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        If cPtr = 0 Then cPtr = RedCloud_Open()
         If src.Channels <> 1 Then
             If color Is Nothing Then color = New Color8U_Basics
             color.Run(src)

@@ -46,11 +46,12 @@ Public Module vbc
             outMat = outMat.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             outMat = Convert32f_To_8UC3(outMat)
         ElseIf input.Type = cvb.MatType.CV_32FC3 Then
-            Dim split = input.Split()
-            split(0) = split(0).ConvertScaleAbs(255)
-            split(1) = split(1).ConvertScaleAbs(255)
-            split(2) = split(2).ConvertScaleAbs(255)
-            cvb.Cv2.Merge(split, outMat)
+            outMat = input.ConvertScaleAbs(255)
+            'Dim split = input.Split()
+            'split(0) = split(0).ConvertScaleAbs(255)
+            'split(1) = split(1).ConvertScaleAbs(255)
+            'split(2) = split(2).ConvertScaleAbs(255)
+            'cvb.Cv2.Merge(split, outMat)
         Else
             outMat = input.Clone
         End If

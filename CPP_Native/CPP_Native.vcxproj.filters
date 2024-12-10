@@ -6,10 +6,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Externs.h" />
-    <ClInclude Include="PragmaLibs.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="CPP_Enum.h" />
     <ClInclude Include="CPP_Parent.h" />
     <ClInclude Include="CPP_NativeClasses.h" />
+    <ClInclude Include="..\CPP_Managed\PragmaLibs.h" />
   </ItemGroup>
 </Project>

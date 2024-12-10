@@ -4,6 +4,7 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
@@ -91,7 +92,6 @@ Public Class VBtask : Implements IDisposable
     ' add any global algorithms here
     Public gravityHorizon As Gravity_Horizon
     Public PixelViewer As Pixel_Viewer
-    Public colorizer As Depth_Colorizer_CPP_VB
     Public rgbFilter As Object
     Public gMat As IMU_GMatrix
     Public IMUBasics As IMU_Basics
@@ -417,7 +417,6 @@ Public Class VBtask : Implements IDisposable
         feat = New Feature_Basics
         redC = New RedCloud_Basics
 
-        colorizer = New Depth_Colorizer_CPP_VB
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
         gravityHorizon = New Gravity_Horizon
@@ -764,8 +763,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.UseMotionColor.Checked Then feat.Run(src)
 
-        colorizer.RunAlg(task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc))
-        task.depthRGB = colorizer.dst2.Clone
+        task.depthRGB = task.pointCloud.ConvertScaleAbs(255)
 
         TaskTimer.Enabled = True
 

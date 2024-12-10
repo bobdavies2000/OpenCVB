@@ -325,7 +325,7 @@ Public Class Main_UI
         If Directory.Exists(neededDirectory) Then
             foundDirectory = True
             systemPath = neededDirectory + ";" + systemPath
-            pathList.Add(neededDirectory)
+            pathList.Add(neededDirectory) ' used only for debugging the path.
         End If
 
         If foundDirectory = False And notFoundMessage.Length > 0 Then
@@ -948,24 +948,24 @@ Public Class Main_UI
             updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
             updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")
         End If
-        'updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
-        'updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
-        'updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
-        'updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
+        updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
+        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
+        updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
+        updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
 
-        'updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
+        updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
 
-        'updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
-        'updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
 
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+        ' updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
-        'updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
+        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
 
-        'updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
-        'updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+        updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
+        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
 
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
@@ -1365,13 +1365,15 @@ Public Class Main_UI
             Case "Azure Kinect 4K C++"
                 Return New CameraK4A_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
+                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
             Case "Intel(R) RealSense(TM) Depth Camera 455"
+                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
             Case "Oak-D camera"
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
-                '   Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                ' Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)

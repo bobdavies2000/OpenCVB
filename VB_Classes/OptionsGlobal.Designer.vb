@@ -44,6 +44,7 @@ Partial Class OptionsGlobal
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
+        Me.UseMotionDepth = New System.Windows.Forms.CheckBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
         Me.UseMotionColor = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -80,7 +81,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.UseMotionDepth = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -350,6 +350,18 @@ Partial Class OptionsGlobal
         Me.MotionBox.TabIndex = 76
         Me.MotionBox.TabStop = False
         Me.MotionBox.Text = "Motion"
+        '
+        'UseMotionDepth
+        '
+        Me.UseMotionDepth.AutoSize = True
+        Me.UseMotionDepth.Checked = True
+        Me.UseMotionDepth.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.UseMotionDepth.Location = New System.Drawing.Point(14, 89)
+        Me.UseMotionDepth.Name = "UseMotionDepth"
+        Me.UseMotionDepth.Size = New System.Drawing.Size(222, 24)
+        Me.UseMotionDepth.TabIndex = 77
+        Me.UseMotionDepth.Text = "Use Motion-Filtered Depth"
+        Me.UseMotionDepth.UseVisualStyleBackColor = True
         '
         'showMotionMask
         '
@@ -717,18 +729,6 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'UseMotionDepth
-        '
-        Me.UseMotionDepth.AutoSize = True
-        Me.UseMotionDepth.Checked = True
-        Me.UseMotionDepth.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.UseMotionDepth.Location = New System.Drawing.Point(14, 89)
-        Me.UseMotionDepth.Name = "UseMotionDepth"
-        Me.UseMotionDepth.Size = New System.Drawing.Size(222, 24)
-        Me.UseMotionDepth.TabIndex = 77
-        Me.UseMotionDepth.Text = "Use Motion-Filtered Depth"
-        Me.UseMotionDepth.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
