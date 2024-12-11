@@ -288,7 +288,7 @@ Public Class Main_UI
             End If
 
             If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
-            If settings.groupComboText = "" Then settings.groupComboText = "< All but Python >"
+            If settings.groupComboText = "" Then settings.groupComboText = "< All VB.Net >"
 
             If testAllRunning = False Then
                 Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
@@ -1533,7 +1533,7 @@ Public Class Main_UI
             task = New VBtask(parms)
 
             ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
-            'Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
+            Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 

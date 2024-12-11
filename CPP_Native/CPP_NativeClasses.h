@@ -1,10 +1,11 @@
 #pragma once
-#include <string>
+#include <string.h>
+#include <Windows.h>
+#include <OleAuto.h>
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
-#include <iomanip>
-
+#include <algorithm>
 #include <opencv2/core.hpp>
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
@@ -12,35 +13,33 @@
 #include "opencv2/ml/ml.hpp "
 #include "opencv2/imgproc.hpp"
 #include "opencv2/videoio.hpp"
-#include "opencv2/bgsegm.hpp"
-#include "opencv2/photo.hpp"
-
 #include <numeric>
+#include <iomanip>
 #include <sstream>
 #include <memory>
 #include <vector>
 #include <random>
-
-//#include "opencv2/video/tracking.hpp"
-//#include <opencv2/plot.hpp>
-//#include "opencv2/ccalib/randpattern.hpp"
-//#include "opencv2/xphoto/oilpainting.hpp"
-
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/bgsegm.hpp"
+#include "opencv2/photo.hpp"
 #include <map>
+#include <opencv2/ml.hpp>
 #include "harrisDetector.h"
-
+#include <opencv2/plot.hpp>
+#include "opencv2/ccalib/randpattern.hpp"
+#include "opencv2/xphoto/oilpainting.hpp"
 #include "../CPP_Managed/PragmaLibs.h"
 
 using namespace std;
 using namespace cv;
-//using namespace bgsegm;
-//using namespace ximgproc;
+using namespace bgsegm;
+using namespace ximgproc;
 using namespace ml;
 
 #include "CPP_Parent.h"
 #include "Options.h"
 
-#if 0 
+
 #ifndef VIDEOSTAB_H
 #define VIDEOSTAB_H
 
@@ -7367,37 +7366,4 @@ int* Edge_DiffY_RunCPP(Edge_DiffY* cPtr, int* dataPtr, int rows, int cols, int c
     cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
     cPtr->RunCPP();
     return (int*)cPtr->dst.data;
-}
-
-#endif
-
-
-
-
-class Depth_Test
-{
-private:
-public:
-    Mat src, dst;
-    Depth_Test(){}
-    void RunCPP() {
-        dst = src.clone();
-    }
-};
-extern "C" __declspec(dllexport)
-Depth_Test *Depth_Test_Open() {
-    Depth_Test *cPtr = new Depth_Test();
-    return cPtr;
-}
-extern "C" __declspec(dllexport)
-void Depth_Test_Close(Depth_Test *cPtr)
-{
-    delete cPtr;
-}
-extern "C" __declspec(dllexport)
-int *Depth_Test_RunCPP(Depth_Test *cPtr, int *dataPtr, int rows, int cols, int channels)
-{
-		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
-		cPtr->RunCPP();
-		return (int *) cPtr->dst.data; 
 }
