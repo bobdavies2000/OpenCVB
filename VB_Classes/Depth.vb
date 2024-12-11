@@ -242,13 +242,15 @@ Public Class Depth_Palette : Inherits TaskParent
         desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        ' couldn't do this in the constructor because it uses gradient_color and is called in task.
         If customColorMap Is Nothing Then
             gColor.gradientWidth = 255
             gColor.Run(empty)
             customColorMap = cvb.Mat.FromPixelData(256, 1, cvb.MatType.CV_8UC3, gColor.gradient.Data())
             customColorMap.Set(Of cvb.Vec3b)(0, 0, black)
         End If
-        Dim depthNorm As cvb.Mat = (task.pcSplit(2) * 255 / task.MaxZmeters)
+        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+        Dim depthNorm As cvb.Mat = (src * 255 / task.MaxZmeters)
         depthNorm.ConvertTo(depthNorm, cvb.MatType.CV_8U)
         cvb.Cv2.ApplyColorMap(depthNorm, dst2, customColorMap)
     End Sub

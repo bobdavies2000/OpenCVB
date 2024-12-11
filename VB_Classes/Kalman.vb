@@ -324,7 +324,6 @@ Public Class Kalman_Depth32f : Inherits TaskParent
     Dim resize As Resize_Smaller
     Public Sub New()
         resize = New Resize_Smaller()
-        FindSlider("LowRes %").Value = 4
 
         labels(2) = "Mask of non-zero depth after Kalman smoothing"
         labels(3) = "Difference from original depth"

@@ -1242,9 +1242,13 @@ Public Class Main_UI
         If algorithmQueueCount <> 0 Then
             Debug.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
             While 1
-                If algorithmQueueCount = 0 Then Exit While
-                Debug.Write(".")
-                Thread.Sleep(100)
+                If algorithmQueueCount <> 0 Or task.TaskTimer.Enabled Then
+                    Debug.Write(".")
+                    Thread.Sleep(100)
+                Else
+                    algorithmQueueCount = 0
+                    Exit While
+                End If
             End While
         End If
 
