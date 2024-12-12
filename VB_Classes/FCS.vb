@@ -269,37 +269,6 @@ End Class
 
 
 
-Public Class FCS_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Combine
-    Dim fcs As New FCS_Basics
-    Dim knnMin As New KNN_MinDistance
-    Public Sub New()
-        desc = "Use the RedCloud maxDist points as feature points in an FCS display."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst3 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        knnMin.inputPoints.Clear()
-        For Each rc In task.redCells
-            knnMin.inputPoints.Add(rc.maxDist)
-        Next
-        knnMin.Run(src)
-
-        task.features = New List(Of cvb.Point2f)(knnMin.outputPoints2f)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        fpDisplayCell()
-        labels(3) = fcs.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class FCS_Periphery : Inherits TaskParent
     Dim fcs As New FCS_Basics
@@ -1194,6 +1163,68 @@ Public Class FCS_BestAge : Inherits TaskParent
             SetTrueText(CStr(age), fp.pt, 3)
             maxIndex += 1
             If maxIndex >= 10 Then Exit For
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_RedCloud : Inherits TaskParent
+    Dim redC As New RedCloud_Combine
+    Dim fcs As New FCS_Basics
+    Dim knnMin As New KNN_MinDistance
+    Public Sub New()
+        desc = "Use the RedCloud maxDist points as feature points in an FCS display."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+        dst3 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        knnMin.inputPoints.Clear()
+        For Each rc In task.redCells
+            knnMin.inputPoints.Add(rc.maxDist)
+        Next
+        knnMin.Run(src)
+
+        task.features = New List(Of cvb.Point2f)(knnMin.outputPoints2f)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        fpDisplayCell()
+        labels(3) = fcs.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_RedCloud1 : Inherits TaskParent
+    Dim redC As New RedCloud_Basics
+    Dim fcs As New FCS_Basics
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        labels(1) = "Output of FCS_Basics."
+        desc = "Isolate FCS cells for each redCell."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        feat.Run(dst2)
+
+        fcs.Run(src)
+        dst1 = fcs.dst2
+        labels(3) = fcs.labels(2)
+        For Each fp In task.fpList
+            Dim val = dst2.Get(Of cvb.Vec3b)(fp.ptCenter.Y, fp.ptCenter.X)
+            dst3(fp.rect).SetTo(val, fp.mask)
         Next
     End Sub
 End Class

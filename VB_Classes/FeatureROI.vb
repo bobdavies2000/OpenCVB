@@ -166,7 +166,9 @@ Public Class FeatureROI_Sorted : Inherits TaskParent
                 colorIndex = 9
             End If
 
-            Dim color = Choose(colorIndex, black, white, grayColor, yellow, purple, teal, blue, green, red)
+            Dim color As cvb.Vec3b = Choose(colorIndex, black.ToVec3b, white.ToVec3b, grayColor.ToVec3b,
+                                            yellow.ToVec3b, purple.ToVec3b, teal.ToVec3b,
+                                            blue.ToVec3b, green.ToVec3b, red.ToVec3b)
             categories(colorIndex) += 1
             bgrList.Add(color)
             roiList.Add(roi)

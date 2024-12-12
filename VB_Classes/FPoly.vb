@@ -1242,7 +1242,7 @@ Public Class FPoly_Core : Inherits TaskParent
                 goodFacets.Add(facet)
                 SetTrueText(Format(absDiff, fmt1), pt, 2)
                 DrawLine(dst3, anchor, pt, task.HighlightColor)
-                dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, white)
+                dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, white.ToVec3b)
             End If
         Next
 

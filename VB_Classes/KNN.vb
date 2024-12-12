@@ -1116,8 +1116,6 @@ Public Class KNN_OneToOne : Inherits TaskParent
 
         knn.queries = queries
         knn.Run(empty)
-        'knn.knn2.displayResults()
-        'dst2 = knn.dst2
 
         Dim nearest As New List(Of Integer)
         ' map the points 1 to 1: find duplicates, choose which is better.
@@ -1128,7 +1126,8 @@ Public Class KNN_OneToOne : Inherits TaskParent
             sortedResults.Add(knn.result(i, 0), i)
         Next
 
-        For i = 0 To sortedResults.Count - 2 ' we are comparing each element to the next
+        ' we are comparing each element to the next so -2
+        For i = 0 To Math.Min(sortedResults.Count, knn.trainInput.Count) - 2
             Dim resultA = sortedResults.ElementAt(i).Key
             Dim resultB = sortedResults.ElementAt(i + 1).Key
             If resultA = resultB Then

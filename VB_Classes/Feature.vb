@@ -6,7 +6,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Public Sub New()
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
-        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
+        desc = "Find good features to track in a BGR image using the motion mask+"
     End Sub
     Public Function motionFilter(featureInput As List(Of cvb.Point2f)) As List(Of cvb.Point2f)
         Static ptList = New List(Of cvb.Point2f)(featureInput)
@@ -41,14 +41,14 @@ Public Class Feature_Basics : Inherits TaskParent
 
         task.features.Clear()
         task.featurePoints.Clear()
-        For Each pt In ptList
+        For Each pt In ptlist
             task.features.Add(pt)
             task.featurePoints.Add(New cvb.Point(CInt(pt.X), CInt(pt.Y)))
         Next
 
         dst3.SetTo(0)
-        For i = 0 To ptList.count - 1
-            Dim pt = ptList(i)
+        For i = 0 To ptlist.Count - 1
+            Dim pt = ptlist(i)
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
@@ -187,105 +187,6 @@ Public Class Feature_NoMotionTest : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-Public Class Feature_Stable : Inherits TaskParent
-    Dim nextMatList As New List(Of cvb.Mat)
-    Dim ptList As New List(Of cvb.Point2f)
-    Dim knn As New KNN_Basics
-    Dim ptLost As New List(Of cvb.Point2f)
-    Dim method As New Feature_Methods
-    Dim featureMatList As New List(Of cvb.Mat)
-    Public options As New Options_Features
-    Dim noMotionFrames As Single
-    Public Sub New()
-        task.features.Clear() ' in case it was previously in use...
-        desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        dst2 = src.Clone
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-
-        method.Run(src)
-
-        If task.optionsChanged Then
-            task.features.Clear()
-            featureMatList.Clear()
-        End If
-
-        nextMatList.Clear()
-        ptList.Clear()
-        Dim correlationMat As New cvb.Mat
-        Dim saveFeatureCount = Math.Min(featureMatList.Count, task.features.Count)
-        For i = 0 To saveFeatureCount - 1
-            Dim pt = task.features(i)
-            Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMatList(i).Width, featureMatList(i).Height))
-            If method.ptList.Contains(pt) = False Then
-                cvb.Cv2.MatchTemplate(src(rect), featureMatList(i), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
-                If correlationMat.Get(Of Single)(0, 0) < options.correlationMin Then
-                    Dim ptNew = New cvb.Point2f(CInt(pt.X), CInt(pt.Y))
-                    If ptLost.Contains(ptNew) = False Then ptLost.Add(ptNew)
-                    Continue For
-                End If
-            End If
-            nextMatList.Add(featureMatList(i))
-            ptList.Add(pt)
-        Next
-
-        Dim survivorPercent As Single = (ptList.Count - ptLost.Count) / saveFeatureCount
-        Dim extra = 1 + (1 - options.resyncThreshold)
-        task.features = New List(Of cvb.Point2f)(ptList)
-
-        If task.features.Count < method.features.Count * options.resyncThreshold Or task.features.Count > extra * method.features.Count Then
-            task.featureMotion = True
-            ptLost.Clear()
-            featureMatList.Clear()
-            task.features.Clear()
-            For Each pt In method.features
-                Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-                featureMatList.Add(src(rect))
-                task.features.Add(pt)
-            Next
-        Else
-            If ptLost.Count > 0 Then
-                knn.queries = ptLost
-                knn.trainInput = method.features
-                knn.Run(Nothing)
-
-                For i = 0 To knn.queries.Count - 1
-                    Dim pt = knn.queries(i)
-                    Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad,
-                                                         options.templateSize, options.templateSize))
-                    featureMatList.Add(src(rect))
-                    task.features.Add(knn.trainInput(knn.result(i, 0)))
-                Next
-            End If
-            task.featureMotion = False
-            noMotionFrames += 1
-            featureMatList = New List(Of cvb.Mat)(nextMatList)
-        End If
-
-        task.featurePoints.Clear()
-        For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-            task.featurePoints.Add(New cvb.Point(pt.X, pt.Y))
-        Next
-        If task.heartBeat Then
-            If task.featureMotion = True Then survivorPercent = 0
-            labels(2) = Format(survivorPercent, "0%") + " of " + CStr(task.features.Count) + " features were matched to the previous frame using correlation and " +
-                        CStr(ptLost.Count) + " features had to be relocated"
-        End If
-        If task.heartBeat Then
-            Dim percent = noMotionFrames / task.fpsRate
-            If percent > 1 Then percent = 1
-            labels(3) = CStr(noMotionFrames) + " frames since the last heartbeat with no motion " +
-                        " or " + Format(percent, "0%")
-            noMotionFrames = 0
-        End If
-    End Sub
-End Class
 
 
 
@@ -866,6 +767,50 @@ End Class
 
 
 
+Public Class Feature_RedCloud : Inherits TaskParent
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Show the feature points in the RedCloud output."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        For Each pt In task.featurePoints
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_WithDepth : Inherits TaskParent
+    Public Sub New()
+        desc = "Show the feature points that have depth."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        dst2 = task.feat.dst2
+        dst3 = src
+        Dim depthCount As Integer
+        For Each pt In task.featurePoints
+            Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If val > 0 Then
+                DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+                depthCount += 1
+            End If
+        Next
+        labels(3) = CStr(depthCount) + " features had depth or " +
+                    Format(depthCount / task.features.Count, "0%")
+    End Sub
+End Class
+
+
+
+
 
 Public Class Feature_Matching : Inherits TaskParent
     Public features As New List(Of cvb.Point)
@@ -913,5 +858,148 @@ Public Class Feature_Matching : Inherits TaskParent
         Next
 
         fpLastSrc = src.Clone
+    End Sub
+End Class
+
+
+
+Public Class Feature_Stable : Inherits TaskParent
+    Dim nextMatList As New List(Of cvb.Mat)
+    Dim ptList As New List(Of cvb.Point2f)
+    Dim knn As New KNN_Basics
+    Dim ptLost As New List(Of cvb.Point2f)
+    Dim method As New Feature_Methods
+    Dim featureMatList As New List(Of cvb.Mat)
+    Public options As New Options_Features
+    Dim noMotionFrames As Single
+    Public Sub New()
+        task.features.Clear() ' in case it was previously in use...
+        desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+
+        method.Run(src)
+
+        If task.optionsChanged Then
+            task.features.Clear()
+            featureMatList.Clear()
+        End If
+
+        nextMatList.Clear()
+        ptList.Clear()
+        Dim correlationMat As New cvb.Mat
+        Dim saveFeatureCount = Math.Min(featureMatList.Count, task.features.Count)
+        For i = 0 To saveFeatureCount - 1
+            Dim pt = task.features(i)
+            Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMatList(i).Width, featureMatList(i).Height))
+            If method.ptList.Contains(pt) = False Then
+                cvb.Cv2.MatchTemplate(src(rect), featureMatList(i), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
+                If correlationMat.Get(Of Single)(0, 0) < options.correlationMin Then
+                    Dim ptNew = New cvb.Point2f(CInt(pt.X), CInt(pt.Y))
+                    If ptLost.Contains(ptNew) = False Then ptLost.Add(ptNew)
+                    Continue For
+                End If
+            End If
+            nextMatList.Add(featureMatList(i))
+            ptList.Add(pt)
+        Next
+
+        Dim survivorPercent As Single = (ptList.Count - ptLost.Count) / saveFeatureCount
+        Dim extra = 1 + (1 - options.resyncThreshold)
+        task.features = New List(Of cvb.Point2f)(ptList)
+
+        If task.features.Count < method.features.Count * options.resyncThreshold Or task.features.Count > extra * method.features.Count Then
+            task.featureMotion = True
+            ptLost.Clear()
+            featureMatList.Clear()
+            task.features.Clear()
+            For Each pt In method.features
+                Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                featureMatList.Add(src(rect))
+                task.features.Add(pt)
+            Next
+        Else
+            If ptLost.Count > 0 Then
+                knn.queries = ptLost
+                knn.trainInput = method.features
+                knn.Run(Nothing)
+
+                For i = 0 To knn.queries.Count - 1
+                    Dim pt = knn.queries(i)
+                    Dim rect = ValidateRect(New cvb.Rect(pt.X - options.templatePad, pt.Y - options.templatePad,
+                                                         options.templateSize, options.templateSize))
+                    featureMatList.Add(src(rect))
+                    task.features.Add(knn.trainInput(knn.result(i, 0)))
+                Next
+            End If
+            task.featureMotion = False
+            noMotionFrames += 1
+            featureMatList = New List(Of cvb.Mat)(nextMatList)
+        End If
+
+        task.featurePoints.Clear()
+        For Each pt In task.features
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            task.featurePoints.Add(New cvb.Point(pt.X, pt.Y))
+        Next
+        If task.heartBeat Then
+            If task.featureMotion = True Then survivorPercent = 0
+            labels(2) = Format(survivorPercent, "0%") + " of " + CStr(task.features.Count) + " features were matched to the previous frame using correlation and " +
+                        CStr(ptLost.Count) + " features had to be relocated"
+        End If
+        If task.heartBeat Then
+            Dim percent = noMotionFrames / task.fpsRate
+            If percent > 1 Then percent = 1
+            labels(3) = CStr(noMotionFrames) + " frames since the last heartbeat with no motion " +
+                        " or " + Format(percent, "0%")
+            noMotionFrames = 0
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_SteadyCam : Inherits TaskParent
+    Public options As New Options_Features
+    Public Sub New()
+        FindSlider("Threshold Percent for Resync").Value = 50
+        desc = "Track features using correlation without the motion mask"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        Static features As New List(Of cvb.Point)(task.featurePoints)
+        Static lastSrc As cvb.Mat = src.Clone
+
+        Dim resync = features.Count / task.features.Count < options.resyncThreshold
+        If task.heartBeat Or task.optionsChanged Or resync Then
+            features = New List(Of cvb.Point)(task.featurePoints)
+        End If
+
+        Dim ptList = New List(Of cvb.Point)(features)
+        Dim correlationMat As New cvb.Mat
+        Dim mode = cvb.TemplateMatchModes.CCoeffNormed
+        features.Clear()
+        For Each pt In ptList
+            Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+            Dim r = task.gridRects(index)
+            cvb.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
+            If correlationMat.Get(Of Single)(0, 0) >= options.correlationMin Then
+                features.Add(pt)
+            End If
+        Next
+
+        dst2 = src
+        For Each pt In features
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+
+        lastSrc = src.Clone
+        labels(2) = CStr(features.Count) + " features were validated by the correlation coefficient"
     End Sub
 End Class

@@ -585,7 +585,8 @@ Public Class VBtask : Implements IDisposable
                 If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.gridMask)
             End If
 
-            If task.redCells.Count > 0 Then setSelectedContour()
+            ' MSER mistakenly can have 1 cell - just ignore it.
+            If task.redCells.Count > 1 Then setSelectedContour()
 
             If task.redOptions.IdentifyCells.Checked Then
                 ' cannot use rc as it means task.rc here!  Be careful...

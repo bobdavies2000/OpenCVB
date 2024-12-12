@@ -8548,7 +8548,7 @@ namespace CS_Classes
                 if (c.Length > minLengthContour)
                 {
                     Vec3b vec = lastImage.Get<Vec3b>(c[0].Y, c[0].X);
-                    if (vec == black || colors.Contains(vec))
+                    if (vec == black.ToVec3b() || colors.Contains(vec))
                     {
                         color = new Scalar(msRNG.Next(10, 240), msRNG.Next(10, 240), msRNG.Next(10, 240)); // trying to avoid extreme colors... 
                     }
@@ -16580,7 +16580,7 @@ namespace CS_Classes
                 }
                 cursor.X = Math.Max(0, Math.Min(cursor.X, src.Width - 1));
                 cursor.Y = Math.Max(0, Math.Min(cursor.Y, src.Height - 1));
-                dst2.Set<Vec3b>(cursor.Y, cursor.X, black);
+                dst2.Set<Vec3b>(cursor.Y, cursor.X, black.ToVec3b());
             }
             if (options.demoMode)
             {
@@ -20509,16 +20509,16 @@ namespace CS_Classes
                 else if (Math.Abs(mean.Item2 - mean.Item0) > options.diffThreshold && Math.Abs(mean.Item2 - mean.Item1) > options.diffThreshold)
                     colorIndex = 9;
 
-                Vec3b color = black;
-                if (colorIndex == 1) color = black;
-                if (colorIndex == 2) color = white;
-                if (colorIndex == 3) color = grayColor;
-                if (colorIndex == 4) color = yellow;
-                if (colorIndex == 5) color = purple;
-                if (colorIndex == 6) color = teal;
-                if (colorIndex == 7) color = blue;
-                if (colorIndex == 8) color = green;
-                if (colorIndex == 9) color = red;
+                Vec3b color = black.ToVec3b();
+                if (colorIndex == 1) color = black.ToVec3b();
+                if (colorIndex == 2) color = white.ToVec3b();
+                if (colorIndex == 3) color = grayColor.ToVec3b();
+                if (colorIndex == 4) color = yellow.ToVec3b();
+                if (colorIndex == 5) color = purple.ToVec3b();
+                if (colorIndex == 6) color = teal.ToVec3b();
+                if (colorIndex == 7) color = blue.ToVec3b();
+                if (colorIndex == 8) color = green.ToVec3b();
+                if (colorIndex == 9) color = red.ToVec3b();
 
                 categories[colorIndex]++;
                 bgrList.Add(color);
@@ -26611,31 +26611,6 @@ namespace CS_Classes
         }
     }
 
-
-
-
-    public class Hist3Dcolor_Reduction_CS : TaskParent
-    {
-        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
-        Reduction_BGR reduction = new Reduction_BGR();
-        public int classCount;
-        public Hist3Dcolor_Reduction_CS()
-        {
-            if (standaloneTest()) vbc.task.gOptions.setDisplay1();
-            vbc.task.redOptions.setSimpleReductionBar(45);
-            desc = "Backproject the 3D histogram for RGB after reduction";
-        }
-        public void RunAlg(Mat src)
-        {
-            if (src.Channels() != 3) src = vbc.task.color;
-            reduction.Run(src);
-            hColor.Run(reduction.dst2);
-            dst1 = reduction.dst2;
-            dst2 = hColor.dst2;
-            dst3 = hColor.dst3;
-            labels[2] = hColor.labels[2];
-        }
-    }
 
 
 
@@ -56075,7 +56050,7 @@ namespace CS_Classes
             foreach (var roi in vbc.task.gridRects)
             {
                 Vec3b c = dst2.Get<Vec3b>(roi.Y, roi.X);
-                if (c == black) continue;
+                if (c == black.ToVec3b()) continue;
                 oglData.Add(new Vec3f(c[2] / 255f, c[1] / 255f, c[0] / 255f));
                 Scalar v = vbc.task.pointCloud[roi].Mean(vbc.task.depthMask[roi]);
                 oglData.Add(new Vec3f((float)v.Val0, (float)v.Val1, (float)v.Val2));

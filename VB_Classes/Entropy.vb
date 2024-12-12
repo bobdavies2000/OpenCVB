@@ -58,20 +58,22 @@ Public Class Entropy_Highest : Inherits TaskParent
         Dim maxEntropy As Single = Single.MinValue
         Dim minEntropy As Single = Single.MaxValue
 
-        src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         For Each roi In task.gridRects
-            entropy.Run(src(roi))
-            entropyMap(roi).SetTo(entropy.entropyVal)
+            If roi.Width = roi.Height Then
+                entropy.Run(src(roi))
+                entropyMap(roi).SetTo(entropy.entropyVal)
 
-            If entropy.entropyVal > maxEntropy Or task.optionsChanged Then
-                maxEntropy = entropy.entropyVal
-                eMaxRect = roi
-            End If
-            If entropy.entropyVal < minEntropy Then minEntropy = entropy.entropyVal
-            If standaloneTest() Then
-                Dim pt = New cvb.Point(roi.X, roi.Y)
-                SetTrueText(Format(entropy.entropyVal, fmt2), pt, 2)
-                SetTrueText(Format(entropy.entropyVal, fmt2), pt, 3)
+                If entropy.entropyVal > maxEntropy Or task.optionsChanged Then
+                    maxEntropy = entropy.entropyVal
+                    eMaxRect = roi
+                End If
+                If entropy.entropyVal < minEntropy Then minEntropy = entropy.entropyVal
+                If standaloneTest() Then
+                    Dim pt = New cvb.Point(roi.X, roi.Y)
+                    SetTrueText(Format(entropy.entropyVal, fmt2), pt, 2)
+                    SetTrueText(Format(entropy.entropyVal, fmt2), pt, 3)
+                End If
             End If
         Next
 

@@ -255,7 +255,7 @@ Public Class Contour_Edges : Inherits TaskParent
         For Each c In contour.allContours
             If c.Count > minLengthContour Then
                 Dim vec = lastImage.Get(Of cvb.Vec3b)(c(0).Y, c(0).X)
-                If vec = black Or colors.Contains(vec) Then
+                If vec = black.ToVec3b Or colors.Contains(vec) Then
                     color = New cvb.Scalar(msRNG.Next(10, 240), msRNG.Next(10, 240), msRNG.Next(10, 240)) ' trying to avoid extreme colors... 
                 Else
                     color = New cvb.Scalar(vec(0), vec(1), vec(2))

@@ -31,11 +31,13 @@ Public Class TaskParent : Implements IDisposable
     Public VB_Algorithm As Object
     Public traceName As String
     Public desc As String
-    Public black As New cvb.Vec3b, white As New cvb.Vec3b(255, 255, 255), grayColor As New cvb.Vec3b(127, 127, 127)
-    Public yellow As New cvb.Vec3b(0, 255, 255), purple As New cvb.Vec3b(255, 0, 255)
-    Public teal As New cvb.Vec3b(255, 255, 0)
-    Public red As New cvb.Vec3b(0, 0, 255), green As New cvb.Vec3b(0, 255, 0), blue As New cvb.Vec3b(255, 0, 0)
-    Public zero3f As New cvb.Point3f(0, 0, 0)
+    Public white As New cvb.Scalar(255, 255, 255), black As New cvb.Scalar(0, 0, 0)
+    Public grayColor As New cvb.Scalar(127, 127, 127)
+    Public yellow As New cvb.Scalar(0, 255, 255), purple As New cvb.Scalar(255, 0, 255)
+    Public teal As New cvb.Scalar(255, 255, 0)
+    Public red As New cvb.Scalar(0, 0, 255), green As New cvb.Scalar(0, 255, 0)
+    Public blue As New cvb.Scalar(255, 0, 0)
+    Public zero3f As New cvb.Point3f
     Public newVec4f As New cvb.Vec4f
     Public cPtr As IntPtr
     Public trueData As New List(Of TrueText)

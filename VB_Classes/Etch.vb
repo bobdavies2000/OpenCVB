@@ -54,7 +54,7 @@ Public Class Etch_ASketch : Inherits TaskParent
             If cursor.Y < 0 Then cursor.Y = 0
             If cursor.X >= src.Width Then cursor.X = src.Width - 1
             If cursor.Y >= src.Height Then cursor.Y = src.Height - 1
-            dst2.Set(Of cvb.Vec3b)(cursor.Y, cursor.X, black)
+            dst2.Set(Of cvb.Vec3b)(cursor.Y, cursor.X, black.ToVec3b)
         Next
         If options.demoMode Then lastCursor = cursor
     End Sub

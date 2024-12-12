@@ -342,7 +342,7 @@ Public Class OEX_PointPolygon : Inherits TaskParent
                     red(2) = 255 - val * 255 / mm.maxVal
                     dst3.Set(Of cvb.Vec3b)(i, j, red)
                 Else
-                    dst3.Set(Of cvb.Vec3b)(i, j, white)
+                    dst3.Set(Of cvb.Vec3b)(i, j, white.ToVec3b)
                 End If
             Next
         Next

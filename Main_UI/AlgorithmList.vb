@@ -1012,6 +1012,7 @@ End Enum
 	If algorithmName = "FCS_NoTracking" Then return new FCS_NoTracking
 	If algorithmName = "FCS_Periphery" Then return new FCS_Periphery
 	If algorithmName = "FCS_RedCloud" Then return new FCS_RedCloud
+	If algorithmName = "FCS_RedCloud1" Then return new FCS_RedCloud1
 	If algorithmName = "FCS_Tracker" Then return new FCS_Tracker
 	If algorithmName = "FCS_TravelDistance" Then return new FCS_TravelDistance
 	If algorithmName = "FCS_ViewLeft" Then return new FCS_ViewLeft
@@ -1052,6 +1053,7 @@ End Enum
 	If algorithmName = "Feature_Points_CS" Then return new Feature_Points_CS
 	If algorithmName = "Feature_PointTracker" Then return new Feature_PointTracker
 	If algorithmName = "Feature_PointTracker_CS" Then return new Feature_PointTracker_CS
+	If algorithmName = "Feature_RedCloud" Then return new Feature_RedCloud
 	If algorithmName = "Feature_Reduction" Then return new Feature_Reduction
 	If algorithmName = "Feature_Reduction_CS" Then return new Feature_Reduction_CS
 	If algorithmName = "Feature_Sample_CS" Then return new Feature_Sample_CS
@@ -1064,6 +1066,7 @@ End Enum
 	If algorithmName = "Feature_Stable_CC" Then return new CPP_Basics(ccFunctionNames._Feature_Stable_CC)
 	If algorithmName = "Feature_Stable_CS" Then return new Feature_Stable_CS
 	If algorithmName = "Feature_StableSorted_CC" Then return new CPP_Basics(ccFunctionNames._Feature_StableSorted_CC)
+	If algorithmName = "Feature_SteadyCam" Then return new Feature_SteadyCam
 	If algorithmName = "Feature_SURF_CS" Then return new Feature_SURF_CS
 	If algorithmName = "Feature_SURF_Draw_CS" Then return new Feature_SURF_Draw_CS
 	If algorithmName = "Feature_SURFMatch_CS" Then return new Feature_SURFMatch_CS
@@ -1071,6 +1074,7 @@ End Enum
 	If algorithmName = "Feature_Trace_CS" Then return new Feature_Trace_CS
 	If algorithmName = "Feature_TraceDelaunay" Then return new Feature_TraceDelaunay
 	If algorithmName = "Feature_TraceDelaunay_CS" Then return new Feature_TraceDelaunay_CS
+	If algorithmName = "Feature_WithDepth" Then return new Feature_WithDepth
 	If algorithmName = "FeatureFlow_Basics" Then return new FeatureFlow_Basics
 	If algorithmName = "FeatureFlow_Basics_CS" Then return new FeatureFlow_Basics_CS
 	If algorithmName = "FeatureFlow_Dense" Then return new FeatureFlow_Dense
@@ -1531,8 +1535,6 @@ End Enum
 	If algorithmName = "Hist3Dcolor_Diff_CS" Then return new Hist3Dcolor_Diff_CS
 	If algorithmName = "Hist3Dcolor_PlotHist1D" Then return new Hist3Dcolor_PlotHist1D
 	If algorithmName = "Hist3Dcolor_PlotHist1D_CS" Then return new Hist3Dcolor_PlotHist1D_CS
-	If algorithmName = "Hist3Dcolor_Reduction" Then return new Hist3Dcolor_Reduction
-	If algorithmName = "Hist3Dcolor_Reduction_CS" Then return new Hist3Dcolor_Reduction_CS
 	If algorithmName = "Hist3Dcolor_Select" Then return new Hist3Dcolor_Select
 	If algorithmName = "Hist3Dcolor_Select_CS" Then return new Hist3Dcolor_Select_CS
 	If algorithmName = "Hist3Dcolor_TopXColors" Then return new Hist3Dcolor_TopXColors

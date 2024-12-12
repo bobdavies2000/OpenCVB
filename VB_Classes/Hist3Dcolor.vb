@@ -13,7 +13,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_8UC3 Then src = task.color
-        If task.heartBeat Or alwaysRun Or histogram.Rows = 0 Then
+        If task.heartBeat Or alwaysRun Then
             Dim bins = task.redOptions.HistBinBar3D.Value
             cvb.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
 
@@ -100,34 +100,6 @@ Public Class Hist3Dcolor_TopXColors : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class Hist3Dcolor_Reduction : Inherits TaskParent
-    Dim hColor As New Hist3Dcolor_Basics
-    Dim reduction As New Reduction_BGR
-    Public classCount As Integer
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        task.redOptions.setBitReductionBar(45)
-        desc = "Backproject the 3D histogram for RGB after reduction"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If src.Channels() <> 3 Then src = task.color
-        reduction.Run(src)
-
-        hColor.Run(reduction.dst2)
-        dst1 = reduction.dst2
-        dst2 = hColor.dst2
-        dst3 = hColor.dst3
-        labels(2) = hColor.labels(2)
-    End Sub
-End Class
 
 
 

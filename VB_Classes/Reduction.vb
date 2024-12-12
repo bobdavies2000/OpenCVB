@@ -220,14 +220,11 @@ Public Class Reduction_BGR : Inherits TaskParent
         For i = 0 To 2
             reduction.Run(split(i))
             If standaloneTest() Then mats.mat(i) = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
-            split(0) = reduction.dst2.Clone
         Next
 
-        If standaloneTest() Then
-            mats.mat(3) = (mats.mat(0) + mats.mat(1) + mats.mat(2))
-            mats.Run(empty)
-            dst3 = mats.dst2
-        End If
+        mats.mat(3) = (mats.mat(0) + mats.mat(1) + mats.mat(2))
+        mats.Run(empty)
+        dst3 = mats.dst2
 
         cvb.Cv2.Merge(split, dst2)
     End Sub

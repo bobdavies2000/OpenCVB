@@ -247,7 +247,7 @@ Public Class Depth_Palette : Inherits TaskParent
             gColor.gradientWidth = 255
             gColor.Run(empty)
             customColorMap = cvb.Mat.FromPixelData(256, 1, cvb.MatType.CV_8UC3, gColor.gradient.Data())
-            customColorMap.Set(Of cvb.Vec3b)(0, 0, black)
+            customColorMap.Set(Of cvb.Vec3b)(0, 0, black.ToVec3b)
         End If
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
         Dim depthNorm As cvb.Mat = (src * 255 / task.MaxZmeters)

@@ -398,7 +398,7 @@ Public Class Cell_Generate : Inherits TaskParent
         Static saveRetained As Integer = retained
         If retained > 0 Then saveRetained = retained
         If task.heartBeat Then
-            labels(2) = CStr(task.redCells.Count) + " total cells with " +
+            labels(2) = CStr(task.redCells.Count) + " total cells (shown with mean or 'natural' color and " +
                         CStr(saveRetained) + " matched to previous frame"
         End If
     End Sub

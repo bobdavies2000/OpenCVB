@@ -282,8 +282,8 @@ Public Class MSER_Grayscale : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         reduction.Run(src)
 
-        mBase.Run(reduction.dst2)
-        dst2 = mBase.dst3
+        mBase.Run(reduction.dst3)
+        dst2 = mBase.dst2
         labels(2) = mBase.labels(2)
     End Sub
 End Class

@@ -70,7 +70,7 @@ Namespace jsonClass
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
-            emptyApp.groupComboText = "< All but Python >"
+            emptyApp.groupComboText = "< All VB.Net >"
             emptyApp.translatorMode = "VB.Net to C#"
             SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 30)
             SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", 30)

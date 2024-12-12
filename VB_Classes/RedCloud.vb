@@ -2182,6 +2182,37 @@ End Class
 
 
 
+Public Class RedCloud_Gaps : Inherits TaskParent
+    Dim frames As New History_Basics
+    Public Sub New()
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        desc = "Find the gaps that are different in the RedCloud_Basics results."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(3)
+
+        frames.Run(task.redMap.InRange(0, 0))
+        dst3 = frames.dst2
+
+        If task.redCells.Count > 0 Then
+            dst2(task.rc.rect).SetTo(white, task.rc.mask)
+        End If
+
+        If task.redCells.Count > 0 Then
+            Dim rc = task.redCells(0) ' index can now be zero.
+            dst3(rc.rect).SetTo(0, rc.mask)
+        End If
+        Dim count = dst3.CountNonZero
+        labels(3) = "Unclassified pixel count = " + CStr(count) + " or " + Format(count / src.Total, "0%")
+    End Sub
+End Class
+
+
+
+
+
 Public Class RedCloud_Combine : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public guided As New GuidedBP_Depth
@@ -2230,38 +2261,5 @@ Public Class RedCloud_Combine : Inherits TaskParent
             combinedCells.Add(rc)
         Next
         labels(2) = CStr(combinedCells.Count) + " cells were found.  Dots indicate maxDist points."
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_Gaps : Inherits TaskParent
-    Dim frames As New History_Basics
-    Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Find the gaps that are different in the RedCloud_Basics results."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        task.redC.Run(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(3)
-
-        frames.Run(task.redMap.InRange(0, 0))
-        dst3 = frames.dst2
-
-        If task.redCells.Count > 0 Then
-            dst2(task.rc.rect).SetTo(white, task.rc.mask)
-        End If
-
-        If task.redCells.Count > 0 Then
-            Dim rc = task.redCells(0) ' index can now be zero.
-            dst3(rc.rect).SetTo(0, rc.mask)
-        End If
-        Dim count = dst3.CountNonZero
-        labels(3) = "Unclassified pixel count = " + CStr(count) + " or " + Format(count / src.Total, "0%")
     End Sub
 End Class
