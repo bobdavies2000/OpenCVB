@@ -393,3 +393,5 @@ Temp/*.ply
 testORB/
 Data/AlgorithmCounts.txt
 packages/
+zed-c-api/
+Build/

@@ -338,20 +338,6 @@ Public Class Main_UI
         If e.KeyValue = Keys.Up Then upArrow = True
         If e.KeyValue = Keys.Down Then downArrow = True
     End Sub
-    Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
-        Dim systemPath = Environment.GetEnvironmentVariable("Path")
-        Dim foundDirectory As Boolean
-        If Directory.Exists(neededDirectory) Then
-            foundDirectory = True
-            systemPath = neededDirectory + ";" + systemPath
-            pathList.Add(neededDirectory) ' used only for debugging the path.
-        End If
-
-        If foundDirectory = False And notFoundMessage.Length > 0 Then
-            MsgBox(neededDirectory + " was not found.  " + notFoundMessage)
-        End If
-        Environment.SetEnvironmentVariable("Path", systemPath)
-    End Sub
     Public Function validateRect(r As cvb.Rect, width As Integer, height As Integer) As cvb.Rect
         If r.Width < 0 Then r.Width = 1
         If r.Height < 0 Then r.Height = 1
@@ -945,6 +931,20 @@ Public Class Main_UI
         End If
     End Sub
 #End Region
+    Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
+        Dim systemPath = Environment.GetEnvironmentVariable("Path")
+        Dim foundDirectory As Boolean
+        If Directory.Exists(neededDirectory) Then
+            foundDirectory = True
+            systemPath = neededDirectory + ";" + systemPath
+            pathList.Add(neededDirectory) ' used only for debugging the path.
+        End If
+
+        If foundDirectory = False And notFoundMessage.Length > 0 Then
+            MsgBox(neededDirectory + " was not found.  " + notFoundMessage)
+        End If
+        Environment.SetEnvironmentVariable("Path", systemPath)
+    End Sub
     Private Sub setupPath()
         ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
         ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
@@ -969,15 +969,6 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
-
-
-
-        updatePath(HomeDir.FullName + "bin\Release\", "TestStatic.dll")
-
-
-
-
-
 
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
