@@ -5,12 +5,11 @@ Public Class CameraZED2 : Inherits GenericCamera
     Dim init_params As New InitParameters()
     Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
         captureRes = _captureRes
-        init_params.cameraFPS = 0
-
         init_params.sensorsRequired = True
         init_params.depthMode = sl.DEPTH_MODE.ULTRA
         init_params.coordinateSystem = sl.COORDINATE_SYSTEM.IMAGE
         init_params.coordinateUnits = sl.UNIT.METER
+        init_params.cameraFPS = 0
 
         If captureRes.Height = 720 Then init_params.resolution = sl.RESOLUTION.HD720
         If captureRes.Height = 1080 Then init_params.resolution = sl.RESOLUTION.HD1080

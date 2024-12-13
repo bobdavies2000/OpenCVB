@@ -102,8 +102,9 @@ if not exist zed-csharp-api\StereoLabs.zed\Build (
 		echo "For zed-csharp-api, you need to change the 'resolution' variable to 'resolutionStruct'"
 		echo "Accessing zed-csharp-api from VB.Net won't work because it is not case sensitive."
 		echo "C# access will work because it is case sensitive."
-		echo "There are 2 variables mapped to 'Resolution' and the zed_camera.vb interface fails to compile."
-		echo "There are also 2 missing commas - errors will show up"
+		echo "There are 3 variables that map to 'Resolution' and the zed_camera.vb interface fails to compile."
+		echo "There are also 2 missing commas - errors will show up.  How did they miss that?"
+		echo "Also change the resolution variable to CURResolution."
 		echo "And you can remove the ZERO_CHECK reference to remove the warning."
 	)
 )

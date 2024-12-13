@@ -1391,8 +1391,8 @@ Public Class Main_UI
             Case "Oak-D camera"
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
-                ' Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
-                Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                'Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"

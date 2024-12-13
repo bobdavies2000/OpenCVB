@@ -58,7 +58,7 @@ public:
 		init_params.coordinate_units = UNIT::METER;
 		init_params.camera_fps = 0; // use the highest frame rate available.
 
-		init_params.camera_resolution = sl::RESOLUTION::AUTO;
+		//init_params.camera_resolution = sl::RESOLUTION::AUTO;
 		if (w == 1920 && h == 1080) init_params.camera_resolution = sl::RESOLUTION::HD1080;
 		if (w == 1920 && h == 1200) init_params.camera_resolution = sl::RESOLUTION::HD1200;
 		if (w == 1280) init_params.camera_resolution = sl::RESOLUTION::HD720;
