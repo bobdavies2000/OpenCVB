@@ -393,6 +393,6 @@ Temp/*.ply
 testORB/
 Data/AlgorithmCounts.txt
 packages/
-zed-c-api/
+zed-c-api/Build/
 zed-csharp-api/Stereolabs.zed/Build/
 Build/
