@@ -2269,10 +2269,10 @@ End Class
 
 
 
-Public Class RedCloud_ByDepth : Inherits TaskParent
+Public Class RedCloud_CellDerivative : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        desc = "Using RedCloud with FeatureLess input, break apart cell"
+        desc = "How connected is the RedCloud cell?  Any jumps in depth?  If so, make another cell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         redC.Run(src)

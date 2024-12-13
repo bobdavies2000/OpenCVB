@@ -1,19 +1,84 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Derivative_Basics : Inherits TaskParent
+    Dim options As New Options_DerivativeBasics
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        plot.removeZeroEntry = False
+        If standalone Then task.gOptions.setDisplay1()
+        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32FC1, 0)
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
+        desc = "Compute the gradient in the Z depth and maintain the units for depth."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        src = task.pcSplit(2)
+        Dim offsetX As Integer = If(options.horizontalDerivative, 1, 0)
+        Dim offsetY As Integer = If(options.verticalDerivative, 1, 0)
+        If offsetX = 0 And offsetY = 0 Then
+            offsetX = 1
+            offsetY = 1
+            SetTrueText("Switched to using both horizontal and vertical derivatives", 3)
+        End If
+        Dim r1 = New cvb.Rect(0, 0, dst2.Width - offsetX, dst2.Height - offsetY)
+        Dim r2 = New cvb.Rect(offsetX, offsetY, dst2.Width - offsetX, dst2.Height - offsetY)
+
+        dst0(r1) = src(r1).Subtract(src(r2))
+
+        Dim ranges = {New cvb.Rangef(-options.mmThreshold - 0.00001, options.mmThreshold + 0.00001)}
+        Dim histogram As New cvb.Mat
+        cvb.Cv2.CalcHist({dst0}, {0}, New cvb.Mat, histogram, 1, {task.histogramBins}, ranges)
+
+        plot.Run(histogram)
+        dst2 = plot.dst2
+
+        Dim brickWidth = dst2.Width / task.histogramBins
+        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
+
+        ' this is guided backprojection.
+        Dim index As Integer = 1
+        For i = 0 To plot.histArray.Count - 1
+            If plot.histArray(i) <> 0 Then
+                plot.histArray(i) = index
+                index += 1
+            End If
+        Next
+        histogram = cvb.Mat.FromPixelData(plot.histArray.Count, 1, cvb.MatType.CV_32F, plot.histArray)
+
+        Dim mask As New cvb.Mat
+        cvb.Cv2.CalcBackProject({dst0(r1)}, {0}, histogram, mask, ranges)
+
+        mask.ConvertTo(mask, cvb.MatType.CV_8U)
+        mask = mask.InRange(histIndex, histIndex)
+
+        dst1 = task.color.Clone
+        If task.heartBeat Then dst3.SetTo(0)
+        dst3(r1).SetTo(white, mask)
+        dst3.SetTo(0, task.noDepthMask)
+        dst1.SetTo(0, dst3)
+
+        dst2.Rectangle(New cvb.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height),
+                       task.HighlightColor, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Derivative_Sobel : Inherits TaskParent
     Public options As New Options_Derivative
-    Dim backp As New BackProject_Image
     Public plot As New Plot_Histogram
     Public Sub New()
-        backp.hist.plot.removeZeroEntry = False
         UpdateAdvice(traceName + ": gOptions histogram Bins and several local options are important.")
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If src.Type <> cvb.MatType.CV_32F Then
-            src = task.pcSplit(options.channel).Sobel(cvb.MatType.CV_32F, 1, 0, options.kernelSize)
-        End If
+        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(options.channel)
+        src = src.Sobel(cvb.MatType.CV_32F, 1, 1, options.kernelSize)
 
         Dim ranges = {New cvb.Rangef(-options.derivativeRange, options.derivativeRange)}
         Dim histogram As New cvb.Mat
@@ -30,13 +95,13 @@ Public Class Derivative_Basics : Inherits TaskParent
                 index += 1
             End If
         Next
-        histogram = cvb.Mat.FromPixelData(plot.histArray.Count, 1, cvb.MatType.CV_32F, plot.histArray)
+        dst1 = cvb.Mat.FromPixelData(plot.histArray.Count, 1, cvb.MatType.CV_32F, plot.histArray)
 
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
 
         Dim mask As New cvb.Mat
-        cvb.Cv2.CalcBackProject({src}, {0}, histogram, mask, ranges)
+        cvb.Cv2.CalcBackProject({src}, {0}, dst1, mask, ranges)
         mask.ConvertTo(mask, cvb.MatType.CV_8U)
         dst0 = mask
         mask = mask.InRange(histIndex, histIndex)
@@ -56,8 +121,8 @@ End Class
 
 
 
-Public Class Derivative_Sobel : Inherits TaskParent
-    Dim deriv As New Derivative_Basics
+Public Class Derivative_Sobel1 : Inherits TaskParent
+    Dim deriv As New Derivative_Sobel
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         If standalone Then task.gOptions.setDisplay1()
@@ -95,7 +160,7 @@ End Class
 
 Public Class Derivative_Laplacian : Inherits TaskParent
     Dim options As New Options_LaplacianKernels
-    Dim deriv As New Derivative_Basics
+    Dim deriv As New Derivative_Sobel
     Public Sub New()
         desc = "Create a histogram and backprojection for the second derivative of depth in the selected dimension."
     End Sub
@@ -121,7 +186,7 @@ End Class
 
 
 Public Class Derivative_Classes : Inherits TaskParent
-    Dim deriv As New Derivative_Basics
+    Dim deriv As New Derivative_Sobel
     Public classCountX As Integer
     Public classCountY As Integer
     Public Sub New()

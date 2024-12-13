@@ -815,7 +815,9 @@ Public Class Pixel_MapLeftRight : Inherits TaskParent
         mapper.Run(src)
         dst2 = mapper.dst2
 
-        cvb.Cv2.ApplyColorMap(task.rightView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst3, mapper.colorMap)
+        Dim tmp As cvb.Mat = task.rightView
+        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        cvb.Cv2.ApplyColorMap(tmp, dst3, mapper.colorMap)
     End Sub
 End Class
 
@@ -867,8 +869,13 @@ Public Class Pixel_MapDistance : Inherits TaskParent
 
             Marshal.Copy(vecs3b.ToArray, 0, mapper.colorMap.Data, myColorMap.Total * myColorMap.ElemSize)
         End If
-        cvb.Cv2.ApplyColorMap(task.leftView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
-        cvb.Cv2.ApplyColorMap(task.rightView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
+        Dim tmp As cvb.Mat = task.leftView
+        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        cvb.Cv2.ApplyColorMap(tmp, dst2, myColorMap)
+
+        tmp = task.rightView
+        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        cvb.Cv2.ApplyColorMap(tmp, dst3, myColorMap)
     End Sub
 End Class
 

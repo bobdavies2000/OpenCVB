@@ -964,6 +964,7 @@ Public Class Main_UI
             updatePath(cudaPath, "Cuda - needed for StereoLabs")
             updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
             updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")
+            updatePath(HomeDir.FullName + "zed-c-api/Build/Debug", "StereoLabs Zed 2i camera support of C# interface.")
         End If
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
@@ -1391,8 +1392,8 @@ Public Class Main_UI
             Case "Oak-D camera"
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
-                Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
-                'Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                'Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"

@@ -813,15 +813,6 @@ public:
 	Options_Classifier() {
 	}
 };
-class Options_Derivative {
-public:
-	int channel =  0;
-	int kernelSize =  3;
-	double derivativeRange =  0.1;
-	void RunOpt() {}
-	Options_Derivative() {
-	}
-};
 class Options_Threshold {
 public:
 	cv::ThresholdTypes thresholdMethod =  cv::ThresholdTypes::THRESH_BINARY;
@@ -917,19 +908,6 @@ public:
 	int xNeighbors =  5;
 	void RunOpt() {}
 	Options_XNeighbors() {
-	}
-};
-class Options_Sobel {
-public:
-	int kernelSize =  3;
-	int threshold =  50;
-	int distanceThreshold =  10;
-	double derivativeRange =  0.1;
-	bool horizontalDerivative =  true;
-	bool verticalDerivative =  true;
-	bool useBlur =  false;
-	void RunOpt() {}
-	Options_Sobel() {
 	}
 };
 class Options_EdgeOverlay {
@@ -2163,5 +2141,36 @@ class Options_FCSMatch {
 public:
 	void RunOpt() {}
 	Options_FCSMatch() {
+	}
+};
+class Options_Sobel {
+public:
+	int kernelSize =  3;
+	int threshold =  50;
+	int distanceThreshold =  10;
+	double derivativeRange =  0.1;
+	bool horizontalDerivative =  true;
+	bool verticalDerivative =  true;
+	bool useBlur =  false;
+	void RunOpt() {}
+	Options_Sobel() {
+	}
+};
+class Options_Derivative {
+public:
+	int channel =  2;
+	int kernelSize =  3;
+	double derivativeRange =  0.1;
+	void RunOpt() {}
+	Options_Derivative() {
+	}
+};
+class Options_DerivativeBasics {
+public:
+	float mmThreshold =  50;
+	bool horizontalDerivative =  true;
+	bool verticalDerivative =  true;
+	void RunOpt() {}
+	Options_DerivativeBasics() {
 	}
 };

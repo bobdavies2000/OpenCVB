@@ -733,13 +733,14 @@ End Enum
 	If algorithmName = "Depth_WorldXYZ" Then return new Depth_WorldXYZ
 	If algorithmName = "Depth_WorldXYZ_CS" Then return new Depth_WorldXYZ_CS
 	If algorithmName = "Derivative_Basics" Then return new Derivative_Basics
-	If algorithmName = "Derivative_Basics_CS" Then return new Derivative_Basics_CS
 	If algorithmName = "Derivative_Classes" Then return new Derivative_Classes
 	If algorithmName = "Derivative_Classes_CS" Then return new Derivative_Classes_CS
 	If algorithmName = "Derivative_Laplacian" Then return new Derivative_Laplacian
 	If algorithmName = "Derivative_Laplacian_CS" Then return new Derivative_Laplacian_CS
 	If algorithmName = "Derivative_Sobel" Then return new Derivative_Sobel
 	If algorithmName = "Derivative_Sobel_CS" Then return new Derivative_Sobel_CS
+	If algorithmName = "Derivative_Sobel1" Then return new Derivative_Sobel1
+	If algorithmName = "Derivative_Sobel1_CS" Then return new Derivative_Sobel1_CS
 	If algorithmName = "DFT_Basics" Then return new DFT_Basics
 	If algorithmName = "DFT_Basics_CS" Then return new DFT_Basics_CS
 	If algorithmName = "DFT_ButterworthDepth" Then return new DFT_ButterworthDepth
@@ -2546,6 +2547,7 @@ End Enum
 	If algorithmName = "Options_DepthHoles" Then return new Options_DepthHoles
 	If algorithmName = "Options_DepthTiers" Then return new Options_DepthTiers
 	If algorithmName = "Options_Derivative" Then return new Options_Derivative
+	If algorithmName = "Options_DerivativeBasics" Then return new Options_DerivativeBasics
 	If algorithmName = "Options_DFT" Then return new Options_DFT
 	If algorithmName = "Options_DFTShape" Then return new Options_DFTShape
 	If algorithmName = "Options_DiffDepth" Then return new Options_DiffDepth
@@ -3123,11 +3125,11 @@ End Enum
 	If algorithmName = "RedCloud_Basics_CS" Then return new RedCloud_Basics_CS
 	If algorithmName = "RedCloud_BProject3D" Then return new RedCloud_BProject3D
 	If algorithmName = "RedCloud_BProject3D_CS" Then return new RedCloud_BProject3D_CS
-	If algorithmName = "RedCloud_ByDepth" Then return new RedCloud_ByDepth
 	If algorithmName = "RedCloud_CCompColor" Then return new RedCloud_CCompColor
 	If algorithmName = "RedCloud_CCompColor_CS" Then return new RedCloud_CCompColor_CS
 	If algorithmName = "RedCloud_CellChanges" Then return new RedCloud_CellChanges
 	If algorithmName = "RedCloud_CellChanges_CS" Then return new RedCloud_CellChanges_CS
+	If algorithmName = "RedCloud_CellDerivative" Then return new RedCloud_CellDerivative
 	If algorithmName = "RedCloud_Cells" Then return new RedCloud_Cells
 	If algorithmName = "RedCloud_Cells_CS" Then return new RedCloud_Cells_CS
 	If algorithmName = "RedCloud_CellsAtDepth" Then return new RedCloud_CellsAtDepth

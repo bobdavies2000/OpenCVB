@@ -12688,13 +12688,13 @@ namespace CS_Classes
 
 
 
-    public class Derivative_Basics_CS : TaskParent
+    public class Derivative_Sobel_CS : TaskParent
     {
         public Options_Derivative options = new Options_Derivative();
         BackProject_Image backp = new BackProject_Image();
         public Plot_Histogram plot = new Plot_Histogram();
 
-        public Derivative_Basics_CS()
+        public Derivative_Sobel_CS()
         {
             backp.hist.plot.removeZeroEntry = false;
             UpdateAdvice(traceName + ": gOptions histogram Bins and several local options are important.");
@@ -12752,13 +12752,13 @@ namespace CS_Classes
 
 
 
-    public class Derivative_Sobel_CS : TaskParent
+    public class Derivative_Sobel1_CS : TaskParent
     {
-        Derivative_Basics_CS deriv;
+        Derivative_Sobel_CS deriv;
 
-        public Derivative_Sobel_CS()
+        public Derivative_Sobel1_CS()
         {
-            deriv = new Derivative_Basics_CS();
+            deriv = new Derivative_Sobel_CS();
             if (standalone) vbc.task.gOptions.setDisplay1();
             if (standalone) vbc.task.gOptions.setDisplay1();
             desc = "Display the derivative of the selected depth dimension.";
@@ -12796,11 +12796,11 @@ namespace CS_Classes
     public class Derivative_Laplacian_CS : TaskParent
     {
         Options_LaplacianKernels options = new Options_LaplacianKernels();
-        Derivative_Basics_CS deriv;
+        Derivative_Sobel_CS deriv;
 
         public Derivative_Laplacian_CS()
         {
-            deriv = new Derivative_Basics_CS();
+            deriv = new Derivative_Sobel_CS();
             desc = "Create a histogram and backprojection for the second derivative of depth in the selected dimension.";
         }
 
@@ -12827,13 +12827,13 @@ namespace CS_Classes
 
     public class Derivative_Classes_CS : TaskParent
     {
-        Derivative_Basics_CS deriv;
+        Derivative_Sobel_CS deriv;
         public int classCountX;
         public int classCountY;
 
         public Derivative_Classes_CS()
         {
-            deriv = new Derivative_Basics_CS();
+            deriv = new Derivative_Sobel_CS();
             desc = "Display the X and Y derivatives for the whole image.";
         }
 

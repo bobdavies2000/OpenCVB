@@ -3425,40 +3425,6 @@ End Class
 
 
 
-
-Public Class Options_Derivative : Inherits TaskParent
-    Public channel As Integer = 0
-    Dim options As New Options_Sobel
-    Public kernelSize As Integer = 3
-    Public derivativeRange As Double = 0.1
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("X Dimension")
-            radio.addRadio("Y Dimension")
-            radio.addRadio("Z Dimension")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub RunOpt()
-        options.RunOpt()
-
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        channel = 2
-        If frm.check(2).checked = False Then
-            If frm.check(0).checked Then channel = 0 Else channel = 1
-        End If
-
-        kernelSize = options.kernelSize
-        derivativeRange = options.derivativeRange
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Options_Threshold : Inherits TaskParent
     Public thresholdMethod As cvb.ThresholdTypes = cvb.ThresholdTypes.Binary
     Public thresholdName As String = ""
@@ -3829,58 +3795,6 @@ Public Class Options_XNeighbors : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Options_Sobel : Inherits TaskParent
-    Public kernelSize As Integer = 3
-    Public threshold As Integer = 50
-    Public distanceThreshold As Integer = 10
-    Public derivativeRange As Double = 0.1
-    Public horizontalDerivative As Boolean = True
-    Public verticalDerivative As Boolean = True
-    Public useBlur As Boolean = False
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
-            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
-            sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
-            sliders.setupTrackBar("Threshold distance", 0, 100, distanceThreshold)
-        End If
-
-        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Vertical Derivative")
-            check.addCheckBox("Horizontal Derivative")
-            check.addCheckBox("Blur input before Sobel")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-    End Sub
-    Public Sub setKernelSize(size As Integer)
-        FindSlider("Sobel kernel Size").Value = size
-    End Sub
-    Public Sub RunOpt()
-        Static thresholdSlider = FindSlider("Threshold to zero pixels below this value")
-        Static ksizeSlider = FindSlider("Sobel kernel Size")
-        Static rangeSlider = FindSlider("Range around zero X100")
-        Static distanceSlider = FindSlider("Threshold distance")
-        kernelSize = ksizeSlider.Value Or 1
-        threshold = thresholdSlider.value
-        Static vDeriv = FindCheckBox("Vertical Derivative")
-        Static hDeriv = FindCheckBox("Horizontal Derivative")
-        Static checkBlur = FindCheckBox("Blur input before Sobel")
-        horizontalDerivative = hDeriv.checked
-        verticalDerivative = vDeriv.checked
-        useBlur = checkBlur.checked
-        derivativeRange = rangeSlider.value / 100
-        distanceThreshold = distanceSlider.value
-    End Sub
-End Class
 
 
 
@@ -7952,5 +7866,121 @@ Public Class Options_FCSMatch : Inherits TaskParent
     Public Sub RunOpt()
         Static correlSlider = FindSlider("Min Correlation Coefficient")
         MinCorrelation = correlSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Options_Sobel : Inherits TaskParent
+    Public kernelSize As Integer = 3
+    Public threshold As Integer = 50
+    Public distanceThreshold As Integer = 10
+    Public derivativeRange As Double = 0.1
+    Public horizontalDerivative As Boolean = True
+    Public verticalDerivative As Boolean = True
+    Public useBlur As Boolean = False
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
+            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
+            sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
+            sliders.setupTrackBar("Threshold distance", 0, 100, distanceThreshold)
+        End If
+
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Vertical Derivative")
+            check.addCheckBox("Horizontal Derivative")
+            check.addCheckBox("Blur input before Sobel")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static thresholdSlider = FindSlider("Threshold to zero pixels below this value")
+        Static ksizeSlider = FindSlider("Sobel kernel Size")
+        Static rangeSlider = FindSlider("Range around zero X100")
+        Static distanceSlider = FindSlider("Threshold distance")
+        kernelSize = ksizeSlider.Value Or 1
+        threshold = thresholdSlider.value
+        Static vDeriv = FindCheckBox("Vertical Derivative")
+        Static hDeriv = FindCheckBox("Horizontal Derivative")
+        Static checkBlur = FindCheckBox("Blur input before Sobel")
+        horizontalDerivative = hDeriv.checked
+        verticalDerivative = vDeriv.checked
+        useBlur = checkBlur.checked
+        derivativeRange = rangeSlider.value / 100
+        distanceThreshold = distanceSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Options_Derivative : Inherits TaskParent
+    Public channel As Integer = 2
+    Dim options As New Options_Sobel
+    Public kernelSize As Integer = 3
+    Public derivativeRange As Double = 0.1
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("X Dimension")
+            radio.addRadio("Y Dimension")
+            radio.addRadio("Z Dimension")
+            radio.check(channel).Checked = True
+        End If
+    End Sub
+    Public Sub RunOpt()
+        options.RunOpt()
+
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        If frm.check(0).checked Then channel = 0
+        If frm.check(1).checked Then channel = 1
+        If frm.check(2).checked Then channel = 2
+
+        kernelSize = options.kernelSize
+        derivativeRange = options.derivativeRange
+    End Sub
+End Class
+
+
+
+
+Public Class Options_DerivativeBasics : Inherits TaskParent
+    Public mmThreshold As Single = 50
+    Public horizontalDerivative As Boolean = True
+    Public verticalDerivative As Boolean = True
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("mm Threshold", 0, 1000, mmThreshold)
+        End If
+
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Vertical Derivative")
+            check.addCheckBox("Horizontal Derivative")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static thresholdSlider = FindSlider("mm Threshold")
+        mmThreshold = thresholdSlider.value / 1000
+
+        Static vDeriv = FindCheckBox("Vertical Derivative")
+        Static hDeriv = FindCheckBox("Horizontal Derivative")
+        horizontalDerivative = hDeriv.checked
+        verticalDerivative = vDeriv.checked
     End Sub
 End Class
