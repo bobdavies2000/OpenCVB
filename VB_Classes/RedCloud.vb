@@ -2263,3 +2263,24 @@ Public Class RedCloud_Combine : Inherits TaskParent
         labels(2) = CStr(combinedCells.Count) + " cells were found.  Dots indicate maxDist points."
     End Sub
 End Class
+
+
+
+
+
+
+Public Class RedCloud_ByDepth : Inherits TaskParent
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Using RedCloud with FeatureLess input, break apart cell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        Dim rc = task.redCells(1)
+        Dim mask = task.pcSplit(2)
+    End Sub
+End Class

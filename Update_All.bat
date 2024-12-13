@@ -31,6 +31,10 @@ if not exist zed-c-api (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/stereolabs/zed-c-api"
 ) 
 
+if not exist zed-csharp-api (
+	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/stereolabs/zed-csharp-api"
+) 
+
 if not exist OrbbecSDK_CSharp (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK_CSharp.git"
 ) 
@@ -87,6 +91,23 @@ if not exist zed-c-api\Build (
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Release
 	)
 )
+
+if not exist zed-csharp-api\StereoLabs.zed\Build (
+	if exist "c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" (
+		"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api/StereoLabs.zed/ -B zed-csharp-api/StereoLabs.zed/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+		msbuild.exe zed-csharp-api/StereoLabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Debug
+		msbuild.exe zed-csharp-api/StereoLabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Release
+
+		echo "This is really just a note to myself about the zed-csharp-api project:"
+		echo "For zed-csharp-api, you need to change the 'resolution' variable to 'resolutionStruct'"
+		echo "Accessing zed-csharp-api from VB.Net won't work because it is not case sensitive."
+		echo "C# access will work because it is case sensitive."
+		echo "There are 2 variables mapped to 'Resolution' and the zed_camera.vb interface fails to compile."
+		echo "There are also 2 missing commas - errors will show up"
+		echo "And you can remove the ZERO_CHECK reference to remove the warning."
+	)
+)
+
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."

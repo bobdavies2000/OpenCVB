@@ -394,4 +394,5 @@ testORB/
 Data/AlgorithmCounts.txt
 packages/
 zed-c-api/
+zed-csharp-api/Stereolabs.zed/Build/
 Build/

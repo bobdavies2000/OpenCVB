@@ -3123,6 +3123,7 @@ End Enum
 	If algorithmName = "RedCloud_Basics_CS" Then return new RedCloud_Basics_CS
 	If algorithmName = "RedCloud_BProject3D" Then return new RedCloud_BProject3D
 	If algorithmName = "RedCloud_BProject3D_CS" Then return new RedCloud_BProject3D_CS
+	If algorithmName = "RedCloud_ByDepth" Then return new RedCloud_ByDepth
 	If algorithmName = "RedCloud_CCompColor" Then return new RedCloud_CCompColor
 	If algorithmName = "RedCloud_CCompColor_CS" Then return new RedCloud_CCompColor_CS
 	If algorithmName = "RedCloud_CellChanges" Then return new RedCloud_CellChanges
