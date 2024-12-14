@@ -178,47 +178,6 @@ End Class
 
 
 
-
-Public Class Projection_Cell : Inherits TaskParent
-    Dim heat As New HeatMap_Basics
-    Dim heatCell As New HeatMap_Basics
-    Public Sub New()
-        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32FC3, 0)
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        task.gOptions.unFiltered.Checked = True
-        labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
-        desc = "Create a top and side projection of the selected cell"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        task.redC.Run(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
-
-        heat.Run(src)
-        dst1 = heat.dst2.Clone
-        dst3 = heat.dst3.Clone
-
-        Dim rc = task.rc
-
-        dst0.SetTo(0)
-        task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
-
-        heatCell.Run(dst0)
-        Dim maskTop = heatCell.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
-        Dim maskSide = heatCell.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
-        If maskTop.CountNonZero = 0 And maskSide.CountNonZero = 0 Then SetTrueText("The selected cell has no depth data.", 3)
-        dst1.SetTo(white, maskTop)
-        dst3.SetTo(white, maskSide)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Projection_Top : Inherits TaskParent
     Public histTop As New Projection_HistTop
     Public objects As New Projection_Basics
@@ -379,5 +338,83 @@ Public Class Projection_Floor : Inherits TaskParent
         Dim maxRow = rowList.Max
         Dim ranges = task.rangesSide
         Dim floor = (ranges(0).End - ranges(0).Start) * maxRow / dst2.Height + ranges(0).Start
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class Projection_Cell : Inherits TaskParent
+    Dim heat As New HeatMap_Basics
+    Dim heatCell As New HeatMap_Basics
+    Public Sub New()
+        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32FC3, 0)
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        task.gOptions.unFiltered.Checked = True
+        labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
+        desc = "Create a top and side projection of the selected cell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
+
+        heat.Run(src)
+        dst1 = heat.dst2.Clone
+        dst3 = heat.dst3.Clone
+
+        Dim rc = task.rc
+
+        dst0.SetTo(0)
+        task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
+
+        heatCell.Run(dst0)
+        Dim maskTop = heatCell.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        Dim maskSide = heatCell.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        dst1.SetTo(white, maskTop)
+        dst3.SetTo(white, maskSide)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Projection_Derivative : Inherits TaskParent
+    Dim heat As New HeatMap_Basics
+    Dim heatDeriv As New HeatMap_Basics
+    Dim deriv As New Derivative_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        desc = "Create a top and side projection the best derivative data"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        deriv.Run(src)
+        dst1 = deriv.dst3
+        labels(1) = deriv.labels(3)
+
+        heat.Run(task.pointCloud)
+        dst2 = heat.dst2
+        dst3 = heat.dst3
+        labels(2) = heat.labels(2)
+        labels(3) = heat.labels(3)
+
+        Dim pc As New cvb.Mat(task.pointCloud.Size, cvb.MatType.CV_32FC3, 0)
+        task.pointCloud.CopyTo(pc, dst1)
+
+        heatDeriv.Run(pc)
+        Dim top = heatDeriv.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        Dim side = heatDeriv.dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        dst2.SetTo(cvb.Scalar.White, top)
+        dst3.SetTo(cvb.Scalar.White, side)
     End Sub
 End Class

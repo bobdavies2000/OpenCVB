@@ -7958,22 +7958,21 @@ End Class
 
 
 Public Class Options_DerivativeBasics : Inherits TaskParent
-    Public mmThreshold As Single = 3
+    Public mmThreshold As Single = 100
     Public histBars As Integer = 1
-    Public horizontalDerivative As Boolean = True
-    Public verticalDerivative As Boolean = True
+    Public rect1 As cvb.Rect, rect2 As cvb.Rect
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Plus/Minus bars around center", 1, 10, histBars)
+            sliders.setupTrackBar("Plus/Minus bars around center", 1, 100, histBars)
             sliders.setupTrackBar("mm Threshold", 0, 1000, mmThreshold)
         End If
 
-        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Vertical Derivative")
-            check.addCheckBox("Horizontal Derivative")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Vertical Derivative")
+            radio.addRadio("Horizontal Derivative")
+            radio.addRadio("Both Derivatives")
+            radio.check(2).Checked = True
         End If
     End Sub
     Public Sub RunOpt()
@@ -7982,9 +7981,22 @@ Public Class Options_DerivativeBasics : Inherits TaskParent
         mmThreshold = thresholdSlider.value / 1000
         histBars = barSlider.value
 
-        Static vDeriv = FindCheckBox("Vertical Derivative")
-        Static hDeriv = FindCheckBox("Horizontal Derivative")
-        horizontalDerivative = hDeriv.checked
-        verticalDerivative = vDeriv.checked
+        Static vertRadio = FindRadio("Vertical Derivative")
+        Static horizRadio = FindRadio("Horizontal Derivative")
+        Static bothRadio = FindRadio("Both Derivatives")
+
+        Dim horizontalDerivative As Boolean
+        Dim verticalDerivative As Boolean
+        If bothRadio.checked Then
+            horizontalDerivative = True
+            verticalDerivative = True
+        Else
+            If vertRadio.checked Then verticalDerivative = True Else horizontalDerivative = True
+        End If
+
+        Dim offsetX As Integer = If(horizontalDerivative, 1, 0)
+        Dim offsetY As Integer = If(verticalDerivative, 1, 0)
+        rect1 = New cvb.Rect(0, 0, dst2.Width - offsetX, dst2.Height - offsetY)
+        rect2 = New cvb.Rect(offsetX, offsetY, dst2.Width - offsetX, dst2.Height - offsetY)
     End Sub
 End Class

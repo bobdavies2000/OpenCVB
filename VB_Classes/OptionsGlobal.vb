@@ -389,7 +389,6 @@ Public Class OptionsGlobal
     Public Function getDebugSlider() As Integer
         Return DebugSlider.Value
     End Function
-
     Public Sub setGravityUsage(val As Boolean)
         gravityPointCloud.Checked = val
     End Sub
@@ -423,8 +422,7 @@ Public Class OptionsGlobal
     Public Sub SetDotSize(val As Integer)
         DotSizeSlider.Value = val
     End Sub
-
-    Private Sub UseMotionColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseMotionColor.CheckedChanged
-
+    Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TruncateDepth.CheckedChanged
+        task.optionsChanged = True
     End Sub
 End Class

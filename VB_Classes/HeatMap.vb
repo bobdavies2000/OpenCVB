@@ -13,10 +13,12 @@ Public Class HeatMap_Basics : Inherits TaskParent
 
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
-        cvb.Cv2.CalcHist({src}, task.channelsTop, New cvb.Mat, histogramTop, 2, task.bins2D, task.rangesTop)
+        cvb.Cv2.CalcHist({src}, task.channelsTop, New cvb.Mat, histogramTop, 2,
+                                task.bins2D, task.rangesTop)
         histogramTop.Row(0).SetTo(0)
 
-        cvb.Cv2.CalcHist({src}, task.channelsSide, New cvb.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
+        cvb.Cv2.CalcHist({src}, task.channelsSide, New cvb.Mat, histogramSide, 2,
+                                task.bins2D, task.rangesSide)
         histogramSide.Col(0).SetTo(0)
 
         topframes.Run(histogramTop)

@@ -112,13 +112,15 @@ Public Class OptionsRedCloud
         Me.Top = 0
     End Sub
     Public Sub Sync()
-        task.MaxZmeters = task.gOptions.maxDepth + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
+        task.MaxZmeters = task.gOptions.maxDepth + 0.01 ' why add anything?  Because histograms are exclusive on ranges.
 
         task.xRange = XRangeBar.Value / 100
         task.yRange = YRangeSlider.Value / 100
 
-        task.rangesTop = New cvb.Rangef() {New cvb.Rangef(0.1, task.MaxZmeters), New cvb.Rangef(-task.xRange, task.xRange)}
-        task.rangesSide = New cvb.Rangef() {New cvb.Rangef(-task.yRange, task.yRange), New cvb.Rangef(0.1, task.MaxZmeters)}
+        task.rangesTop = New cvb.Rangef() {New cvb.Rangef(0.1, task.MaxZmeters + 0.1),
+                                           New cvb.Rangef(-task.xRange, task.xRange)}
+        task.rangesSide = New cvb.Rangef() {New cvb.Rangef(-task.yRange, task.yRange),
+                                            New cvb.Rangef(0.1, task.MaxZmeters + 0.1)}
 
         task.sideCameraPoint = New cvb.Point(0, CInt(task.dst2.Height / 2))
         task.topCameraPoint = New cvb.Point(CInt(task.dst2.Width / 2), 0)

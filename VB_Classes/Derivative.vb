@@ -1,87 +1,93 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Derivative_Basics : Inherits TaskParent
-    Dim options As New Options_DerivativeBasics
+    Dim subD As New Derivative_Subtract
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.removeZeroEntry = False
-        task.gOptions.setMaxDepth(25)
         If standalone Then task.gOptions.setDisplay1()
-        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32FC1, 0)
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
         desc = "Compute the gradient in the Z depth and maintain the units for depth."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
+        subD.Run(task.pcSplit(2))
 
-        src = task.pcSplit(2)
-        Dim offsetX As Integer = If(options.horizontalDerivative, 1, 0)
-        Dim offsetY As Integer = If(options.verticalDerivative, 1, 0)
-        If offsetX = 0 And offsetY = 0 Then
-            offsetX = 1
-            offsetY = 1
-            SetTrueText("Switched to using both horizontal and vertical derivatives", 3)
-        End If
-        Dim r1 = New cvb.Rect(0, 0, dst2.Width - offsetX, dst2.Height - offsetY)
-        Dim r2 = New cvb.Rect(offsetX, offsetY, dst2.Width - offsetX, dst2.Height - offsetY)
-
-        dst0(r1) = src(r1).Subtract(src(r2))
-
-        Dim ranges = {New cvb.Rangef(-options.mmThreshold - 0.00001, options.mmThreshold + 0.00001)}
+        Dim ranges = {New cvb.Rangef(-subD.options.mmThreshold - 0.00001, subD.options.mmThreshold + 0.00001)}
         Dim histogram As New cvb.Mat
-        cvb.Cv2.CalcHist({dst0}, {0}, New cvb.Mat, histogram, 1, {task.histogramBins}, ranges)
+        cvb.Cv2.CalcHist({subD.dst2}, {0}, New cvb.Mat, histogram, 1, {task.histogramBins}, ranges)
 
         plot.Run(histogram)
         dst2 = plot.dst2
 
         Dim proximityCount As Integer = plot.histogram.Sum
-        Dim proximityPercent = proximityCount / src.CountNonZero
+        Dim proximityPercent = proximityCount / dst2.Total
 
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
 
-        ' this is guided backprojection.
         Dim index As Integer = 1
+        Dim bars = subD.options.histBars
         Dim center As Integer = task.histogramBins / 2
         Dim centerAdjust As Integer = If(task.histogramBins Mod 2 = 0, 1, 0)
+        ' this is a variation of guided backprojection.
         For i = 0 To plot.histArray.Count - 1
-            If i >= center - options.histBars And i <= center + options.histBars + centerAdjust Then
-                plot.histArray(i) = 1
-            Else
+            If i >= center - bars And i <= center + bars + centerAdjust Then
                 plot.histArray(i) = 0
+            Else
+                plot.histArray(i) = 1
             End If
         Next
 
         histogram = cvb.Mat.FromPixelData(plot.histArray.Count, 1, cvb.MatType.CV_32F, plot.histArray)
 
         Dim mask As New cvb.Mat
-        cvb.Cv2.CalcBackProject({dst0(r1)}, {0}, histogram, mask, ranges)
+        cvb.Cv2.CalcBackProject({subD.dst2(subD.options.rect1)}, {0}, histogram, mask, ranges)
 
         mask.ConvertTo(mask, cvb.MatType.CV_8U)
         mask = mask.InRange(1, 1)
 
         dst1 = task.color.Clone
         dst3.SetTo(0)
-        dst3(r1).SetTo(white, mask)
+        dst3(subD.options.rect1).SetTo(white, mask)
         dst3.SetTo(0, task.noDepthMask)
         dst1.SetTo(0, dst3)
 
-
-
         Dim nonz = dst3.FindNonZero()
 
-
-
-
-        dst2.Rectangle(New cvb.Rect(CInt((center - options.histBars) * brickWidth), 0,
-                       brickWidth * (options.histBars * 2 + centerAdjust), dst2.Height),
+        dst2.Rectangle(New cvb.Rect(CInt((center - bars) * brickWidth), 0,
+                       brickWidth * (bars * 2 + centerAdjust), dst2.Height),
                        task.HighlightColor, task.lineWidth)
 
-        labels(2) = CStr(proximityCount) + " depth points were within " + CStr(options.mmThreshold * 1000) +
-                    " mm's of their neighbor or " + Format(proximityPercent, "0%")
+        labels(2) = CStr(proximityCount) + " depth points were within " +
+                    CStr(subD.options.mmThreshold * 1000) + " mm's of their neighbor or " +
+                    Format(proximityPercent, "0%")
 
-        Dim proxDistance = 1000 * (options.histBars * 2 + centerAdjust) * options.mmThreshold * 2 / task.histogramBins
+        Dim proxDistance = 1000 * (bars * 2 + centerAdjust) * subD.options.mmThreshold * 2 /
+                           task.histogramBins
         labels(3) = "Of the " + CStr(proximityCount) + " depth points, " + CStr(nonz.Rows) +
                     " were within " + Format(proxDistance, fmt1) + " mm's of their neighbor"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Derivative_Subtract : Inherits TaskParent
+    Public options As New Options_DerivativeBasics
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32FC1, 0)
+        desc = "Subtract neighboring cells in the point cloud depth."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+
+        dst2(options.rect1) = src(options.rect1).Subtract(src(options.rect2))
+        If standaloneTest() Then
+            Dim mm = GetMinMax(dst2)
+            dst2 = dst2.ConvertScaleAbs(255, -mm.minVal)
+        End If
     End Sub
 End Class
 

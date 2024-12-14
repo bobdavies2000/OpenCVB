@@ -43,6 +43,7 @@ Partial Class OptionsGlobal
         Me.MaxDepthBar = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.TruncateDepth = New System.Windows.Forms.CheckBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
         Me.UseMotionDepth = New System.Windows.Forms.CheckBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
@@ -309,6 +310,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.TruncateDepth)
         Me.GroupBox2.Controls.Add(Me.MotionBox)
         Me.GroupBox2.Controls.Add(Me.Label1)
         Me.GroupBox2.Controls.Add(Me.HighlightColor)
@@ -339,14 +341,24 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
+        'TruncateDepth
+        '
+        Me.TruncateDepth.AutoSize = True
+        Me.TruncateDepth.Location = New System.Drawing.Point(24, 292)
+        Me.TruncateDepth.Name = "TruncateDepth"
+        Me.TruncateDepth.Size = New System.Drawing.Size(238, 24)
+        Me.TruncateDepth.TabIndex = 77
+        Me.TruncateDepth.Text = "Truncate depth at MaxDepth"
+        Me.TruncateDepth.UseVisualStyleBackColor = True
+        '
         'MotionBox
         '
         Me.MotionBox.Controls.Add(Me.UseMotionDepth)
         Me.MotionBox.Controls.Add(Me.showMotionMask)
         Me.MotionBox.Controls.Add(Me.UseMotionColor)
-        Me.MotionBox.Location = New System.Drawing.Point(6, 292)
+        Me.MotionBox.Location = New System.Drawing.Point(6, 322)
         Me.MotionBox.Name = "MotionBox"
-        Me.MotionBox.Size = New System.Drawing.Size(356, 132)
+        Me.MotionBox.Size = New System.Drawing.Size(356, 119)
         Me.MotionBox.TabIndex = 76
         Me.MotionBox.TabStop = False
         Me.MotionBox.Text = "Motion"
@@ -823,4 +835,5 @@ Partial Class OptionsGlobal
     Friend WithEvents UseMotionColor As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
     Friend WithEvents UseMotionDepth As Windows.Forms.CheckBox
+    Friend WithEvents TruncateDepth As Windows.Forms.CheckBox
 End Class

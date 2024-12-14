@@ -729,7 +729,7 @@ Public Class VBtask : Implements IDisposable
 
             If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
 
-            task.gOptions.unFiltered.Checked = True ' until the motion rectangle problems are resolved.
+            task.gOptions.unFiltered.Checked = True
         End If
 
         motion.Run(src)
@@ -747,8 +747,13 @@ Public Class VBtask : Implements IDisposable
         task.pcSplit = task.pointCloud.Split
 
         If task.optionsChanged Then task.maxDepthMask.SetTo(0)
-        task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters,
-                                                            cvb.ThresholdTypes.Trunc)
+        task.pcSplit(2) = task.pcSplit(2)
+
+        If task.gOptions.TruncateDepth.Checked Then
+            task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters,
+                                                        cvb.ThresholdTypes.Trunc)
+            cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
+        End If
 
         task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary).
                                          ConvertScaleAbs()
@@ -766,7 +771,6 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.UseMotionColor.Checked Then feat.Run(src)
 
-        ' task.depthRGB = task.pointCloud.ConvertScaleAbs(255)
         task.colorizer.Run(src)
         task.depthRGB = task.colorizer.dst2
 

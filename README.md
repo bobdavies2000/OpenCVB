@@ -1,27 +1,31 @@
-# Recent Changes – November 2024
+# Recent Changes – December 2024
 
 -   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
--   The “A-Z” toolbar button in the main OpenCVB form allows speedy group access.
-
-    ![](media/8bd14069867788f1015665e05437d1b9.png)
-
-    -   There are almost 250 algorithm groups in OpenCVB – now one click away.
-    -   Clicking in the grid will land at the first algorithm in that group.
-    -   Faster than scrolling through the entire list of available algorithms.
--   **Line_VerticalHorizontal** identifies gravity and the horizon in the color image.
-    -   Combined with scene motion, identified lines are retained across images.
--   Camera Motion can be identified in the color, left image, and right image.
-    -   With 3 votes, camera motion can be verified.
--   Horizon can move below the plane causing pointcloud Y-values above/below zero.
-    -   Horizon is now also computed as the perpendicular of the gravity vector.
--   This update includes the Feature Coordinate System – see FCS_Basics.
-    -   A Delaunay map is created using the features or lines.
-    -   The map allows tracking the area even as the features come and go.
+-   RedCloud algorithm default is the featureless option (see below.)
+    -   RedCloud results are validated using the tracking color and age.
+-   The OpenCVSharp NuGet packages updated to November 2024 release.
+-   Install batch file was updated to accommodate .Net 3.5 optional install.
+    -   The Update_All.bat file was updated to build OpenCV examples.
+    -   The prompt to confirm reading the instructions now works.
+    -   Any install problems are high priority given these recent changes.
+-   Features are widely used and are prepared for each frame automatically.
+    -   Feature points are provided in both floating point and integer form.
+-   Added a new version of KNN that normalizes the input data – KNNorm.vb.
+-   Motion mask is used in more algorithms.
+    -   Every frame is optionally updated only where motion occurred.
+    -   Motion-filtered images for depth and RGB are provided by default.
+    -   Motion-filtered depth is not robust but RGB images are.
+-   Switching to the C++ versions of the camera interfaces is simplified.
+    -   Toggle which camera interface is active using comments in getCamera.
+-   A global option determines if the depth is truncated at ‘maxDepth’.
+    -   The default is to use all data but it can optionally truncate at X meters.
+-   The ‘A-Z’ group selection button is moved next to the algorithm combo box.
+    -   See the toolbar in the latest screen shot below for RedCloud_Basics.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/baa4fe87e03b08a9288be72cdb139c41.png)
+![A collage of images of a room Description automatically generated](media/928bcaa46cf6abb063c6824e9086236e.png)
 
-**“A-Z” Toolbar Button:** *There are almost 250 algorithm groups in OpenCVB, and the “A-Z” toolbar button allows speedy access to any of the groups. Clicking on any of grid entries will land the user at the first algorithm in the group in one click. Accessing a specific algorithm in that group is a click away in the pulldown of the list of available algorithms.*
+**RedCloud_Basics:** *All the RedCloud algorithms were reviewed and updated with the best segmentation approach – featureless regions built with Edge_Draw. Edge_Draw is an OpenCV user-contribution and is better suited to detect edges than conventional alternatives like Canny or Sobel. The lower left image uses the mean color of the pixels to paint the entire cell while the lower right image uses a random ‘tracking’ color which changes whenever the cell is split or lost.*
 
 # Introduction
 
@@ -421,7 +425,7 @@ The list of people who have made OpenCVB possible is long but starts with the Op
 
 ![A screenshot of a computer Description automatically generated](media/80ad200f3aea31fd66d4a388697cded6.png)
 
-The Tree View shows the cost of each component of the structure of the algorithm on the left side and the cost of each component on the right side. The active algorithm here was “RedCloud_BasicsOldColor” – also the top entry in the tree view at the left. The frame rate for the algorithm is shown at the top right.
+The Tree View shows the cost of each component of the structure of the algorithm on the left side and the cost of each component on the right side. The active algorithm here was “RedCloud_BasicsColor” – also the top entry in the tree view at the left. The frame rate for the algorithm is shown at the top right.
 
 The ‘waitingForInput’ entry is important to understanding performance. The percentage is often near zero and would indicate that the algorithm is processor-bound. If the value is significantly far from 0, it would indicate that the algorithm is I/O bound.
 
@@ -1001,7 +1005,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   Point cloud input algorithms are in the RedCloud.vb
     -   Color image input algorithms are in the RedColor.vb
     -   RedColor_Basics uses any of the 8 color inputs in the global options.
-    -   Original version of RedCloud is still available – RedCloud_BasicsOldOriginal.
+    -   Original version of RedCloud is still available – RedCloud_BasicsOriginal.
 -   GIF animation in OpenCVB has been reworked and generalized.
     -   Create a GIF image for any algorithm in OpenCVB
     -   Click on the global algorithm checkbox “Create GIF of current algorithm”.
@@ -1009,7 +1013,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   Example below captures the entire application window.
 -   A log of the monthly changes is included at the bottom of this document.
 
-![](media/62ec1d7073fbf71e996e7ada7bec557b.gif)**RedCloud_BasicsOldColor:** *An example of using the GIF interface to capture an OpenCVB algorithm. The bottom left image is the RedCloud_BasicsOldColor output that uses both color and cloud data..*
+![](media/62ec1d7073fbf71e996e7ada7bec557b.gif)**RedCloud_BasicsColor:** *An example of using the GIF interface to capture an OpenCVB algorithm. The bottom left image is the RedCloud_BasicsColor output that uses both color and cloud data..*
 
 # Recent Changes – July 2023
 
@@ -1163,7 +1167,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   “redOptions” includes RedCloud and related options and is always present.
 -   RedCloud algorithms were consolidated and are now all in RedCloud.vb.
     -   Each algorithm can use guided backprojection or reduction to create cells.
-    -   Pointcloud reduction is now controlled by the slider in RedCloud_Basics.
+    -   Pointcloud reduction is now controlled by the slider in RedCloud_Core.
         -   Needed to be separate from reduction slider.
     -   Each algorithm can use different color sources for cells with no depth.
 -   RedColor algorithms now supplement RedCloud algorithms with color data.
@@ -1298,7 +1302,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A screenshot of a computer screen Description automatically generated](media/da280b898b238ab7490bfca8fc4abbfa.gif)
 
-**RedCloud_BasicsOldColor:** *The color input for RedCloud_BasicsOldColor and any other OpenCVB algorithm can be motion-filtered using a global option. The frame is only processed if there is scene motion. The objective is to improve the consistency of the cells produced which can be seen in the cells away from the motion – look to the right side of the image. Cells without motion are updated on a heartbeat (once a second.) There is little benefit to capturing cell perturbations when there is no motion in the color image for that cell. Motion-filtered color images often display artifacts from a previous frame but when the image data is already so variable from frame to frame, there is little downside to motion-filtering for image segmentation using depth and color. A new global option allows the motion rectangle to be displayed in the upper left image (in white.)*
+**RedCloud_BasicsColor:** *The color input for RedCloud_BasicsColor and any other OpenCVB algorithm can be motion-filtered using a global option. The frame is only processed if there is scene motion. The objective is to improve the consistency of the cells produced which can be seen in the cells away from the motion – look to the right side of the image. Cells without motion are updated on a heartbeat (once a second.) There is little benefit to capturing cell perturbations when there is no motion in the color image for that cell. Motion-filtered color images often display artifacts from a previous frame but when the image data is already so variable from frame to frame, there is little downside to motion-filtering for image segmentation using depth and color. A new global option allows the motion rectangle to be displayed in the upper left image (in white.)*
 
 # Recent Changes – March 2024
 
@@ -1609,3 +1613,28 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A screenshot of a computer Description automatically generated](media/9ecba468726fbd244063f9aa06417b68.gif)
 
 **Motion_Basics:** *This motion detection algorithm uses low resolution mean values to find areas that contain motion. The top left image is the original color image (optionally overlaid with cells where motion was detected) while the image below left was constructed from an earlier image (often seconds earlier) updated with cells containing motion. The depth data in the upper right is also a composite of an earlier image and the latest depth where motion was found. The image in the lower right is the difference between the current color image and the image in the lower left. The implication is that almost all motion has been detected and no artifacts have been generated in the color image. Depth data has visible artifacts and will require more work because of shadow.*
+
+# Recent Changes – November 2024
+
+-   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
+-   The “A-Z” toolbar button in the main OpenCVB form allows speedy group access.
+
+    ![A screenshot of a computer Description automatically generated](media/8bd14069867788f1015665e05437d1b9.png)
+
+    -   There are almost 250 algorithm groups in OpenCVB – now one click away.
+    -   Clicking in the grid will land at the first algorithm in that group.
+    -   Faster than scrolling through the entire list of available algorithms.
+-   **Line_VerticalHorizontal** identifies gravity and the horizon in the color image.
+    -   Combined with scene motion, identified lines are retained across images.
+-   Camera Motion can be identified in the color, left image, and right image.
+    -   With 3 votes, camera motion can be verified.
+-   Horizon can move below the plane causing pointcloud Y-values above/below zero.
+    -   Horizon is now also computed as the perpendicular of the gravity vector.
+-   This update includes the Feature Coordinate System – see FCS_Basics.
+    -   A Delaunay map is created using the features or lines.
+    -   The map allows tracking the area even as the features come and go.
+-   A log of previous changes is included at the bottom of this document.
+
+![](media/baa4fe87e03b08a9288be72cdb139c41.png)
+
+**“A-Z” Toolbar Button:** *There are almost 250 algorithm groups in OpenCVB, and the “A-Z” toolbar button allows speedy access to any of the groups. Clicking on any of grid entries will land the user at the first algorithm in the group in one click. Accessing a specific algorithm in that group is a click away in the pulldown of the list of available algorithms.*

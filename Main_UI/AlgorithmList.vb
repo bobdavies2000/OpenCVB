@@ -741,6 +741,7 @@ End Enum
 	If algorithmName = "Derivative_Sobel_CS" Then return new Derivative_Sobel_CS
 	If algorithmName = "Derivative_Sobel1" Then return new Derivative_Sobel1
 	If algorithmName = "Derivative_Sobel1_CS" Then return new Derivative_Sobel1_CS
+	If algorithmName = "Derivative_Subtract" Then return new Derivative_Subtract
 	If algorithmName = "DFT_Basics" Then return new DFT_Basics
 	If algorithmName = "DFT_Basics_CS" Then return new DFT_Basics_CS
 	If algorithmName = "DFT_ButterworthDepth" Then return new DFT_ButterworthDepth
@@ -3012,6 +3013,7 @@ End Enum
 	If algorithmName = "Projection_Basics_CS" Then return new Projection_Basics_CS
 	If algorithmName = "Projection_Cell" Then return new Projection_Cell
 	If algorithmName = "Projection_Cell_CS" Then return new Projection_Cell_CS
+	If algorithmName = "Projection_Derivative" Then return new Projection_Derivative
 	If algorithmName = "Projection_Floor" Then return new Projection_Floor
 	If algorithmName = "Projection_Floor_CS" Then return new Projection_Floor_CS
 	If algorithmName = "Projection_HistSide" Then return new Projection_HistSide
