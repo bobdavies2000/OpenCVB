@@ -3,7 +3,7 @@ Imports cvb = OpenCvSharp
 Imports System.Threading
 Imports VB_Classes
 
-#If 1 Then
+#If 0 Then
 Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
     End Function
@@ -197,7 +197,7 @@ Public Class CameraOakD : Inherits GenericCamera
     Public Sub GetNextFrame(WorkingRes As cvb.Size)
         If cPtr = 0 Then Exit Sub
         ' if it breaks here, it is because you are restarting the Oak-D camera.
-        ' I can't get that to work.  Restart OpenCVB and it will work fine.
+        ' I can't get restart to work.  Restart OpenCVB and it will work fine.
         ' Switching to another camera and then switching back to Oak-D will crash here.
         OakDWaitForFrame(cPtr)
 

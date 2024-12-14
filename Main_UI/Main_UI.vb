@@ -179,7 +179,9 @@ Public Class Main_UI
                 If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
+                Dim subsetList As New List(Of String)
                 For Each usbDevice In usbList
+                    If usbDevice.Contains("Orb") Then subsetList.Add(usbDevice)
                     If usbDevice.Contains(searchname) Then present = True
                 Next
                 .cameraPresent.Add(present <> False)
@@ -973,8 +975,8 @@ Public Class Main_UI
 
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
-        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
 
         updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
 
