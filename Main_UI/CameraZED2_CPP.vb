@@ -1,6 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cvb = OpenCvSharp
-Imports sl
 Imports Intel.RealSense
 Module Zed2_CPP_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>

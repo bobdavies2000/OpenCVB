@@ -823,17 +823,15 @@ Public Class Main_UI
             Return -1
         End Function
     End Class
-    Private Function killPython() As Boolean
+    Private Function killThread(threadName As String) As Boolean
         Dim proc = Process.GetProcesses()
         Dim foundCamera As Boolean
-        'Dim procList As New SortedList(Of String, String)(New compareAllowIdenticalString)
         For i = 0 To proc.Count - 1
-            'procList.Add(proc(i).ProcessName, proc(i).ProcessName)
-            If proc(i).ProcessName.ToLower.Contains("python") Then
+            If proc(i).ProcessName.ToLower.Contains(threadName) Then
                 Try
                     If proc(i).HasExited = False Then
                         proc(i).Kill()
-                        If proc(i).ProcessName.ToLower.Contains("pythonw") Then
+                        If proc(i).ProcessName.ToLower.Contains(threadName) Then
                             Thread.Sleep(100) ' let the camera task free resources.
                             foundCamera = True
                         End If
@@ -952,11 +950,7 @@ Public Class Main_UI
         ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
         ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
         updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
-        ' debug version may not exists anymore.
-        Dim debugDir As New DirectoryInfo(HomeDir.FullName + "bin\Debug\")
-        If debugDir.Exists Then
-            updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
-        End If
+        updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
 
         updatePath(HomeDir.FullName + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
@@ -978,6 +972,7 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
 
+        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Debug\", "LibUsb for Luxonis")
         updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
 
         updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
@@ -1131,7 +1126,9 @@ Public Class Main_UI
 
         cameraTaskHandle = Nothing
 
-        killPython()
+        killThread("python")
+
+        If algorithmTaskHandle.IsAlive Then algorithmTaskHandle.Abort()
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastTime As DateTime = Now
@@ -1386,11 +1383,11 @@ Public Class Main_UI
             Case "Azure Kinect 4K C++"
                 Return New CameraK4A_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
-                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
+                Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
+                'Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
             Case "Intel(R) RealSense(TM) Depth Camera 455"
-                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
-                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
+                Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
+                'Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
             Case "Oak-D camera"
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
@@ -1785,7 +1782,7 @@ Public Class Main_UI
             task.Dispose()
         End SyncLock
 
-        If parms.algName.EndsWith(".py") Then killPython()
+        If parms.algName.EndsWith(".py") Then killThread("python")
         frameCount = 0
     End Sub
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
