@@ -2167,7 +2167,8 @@ public:
 };
 class Options_DerivativeBasics {
 public:
-	float mmThreshold =  50;
+	float mmThreshold =  3;
+	int histBars =  1;
 	bool horizontalDerivative =  true;
 	bool verticalDerivative =  true;
 	void RunOpt() {}

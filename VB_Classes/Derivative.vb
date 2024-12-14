@@ -4,6 +4,7 @@ Public Class Derivative_Basics : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.removeZeroEntry = False
+        task.gOptions.setMaxDepth(25)
         If standalone Then task.gOptions.setDisplay1()
         dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32FC1, 0)
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
@@ -32,33 +33,55 @@ Public Class Derivative_Basics : Inherits TaskParent
         plot.Run(histogram)
         dst2 = plot.dst2
 
+        Dim proximityCount As Integer = plot.histogram.Sum
+        Dim proximityPercent = proximityCount / src.CountNonZero
+
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
 
         ' this is guided backprojection.
         Dim index As Integer = 1
+        Dim center As Integer = task.histogramBins / 2
+        Dim centerAdjust As Integer = If(task.histogramBins Mod 2 = 0, 1, 0)
         For i = 0 To plot.histArray.Count - 1
-            If plot.histArray(i) <> 0 Then
-                plot.histArray(i) = index
-                index += 1
+            If i >= center - options.histBars And i <= center + options.histBars + centerAdjust Then
+                plot.histArray(i) = 1
+            Else
+                plot.histArray(i) = 0
             End If
         Next
+
         histogram = cvb.Mat.FromPixelData(plot.histArray.Count, 1, cvb.MatType.CV_32F, plot.histArray)
 
         Dim mask As New cvb.Mat
         cvb.Cv2.CalcBackProject({dst0(r1)}, {0}, histogram, mask, ranges)
 
         mask.ConvertTo(mask, cvb.MatType.CV_8U)
-        mask = mask.InRange(histIndex, histIndex)
+        mask = mask.InRange(1, 1)
 
         dst1 = task.color.Clone
-        If task.heartBeat Then dst3.SetTo(0)
+        dst3.SetTo(0)
         dst3(r1).SetTo(white, mask)
         dst3.SetTo(0, task.noDepthMask)
         dst1.SetTo(0, dst3)
 
-        dst2.Rectangle(New cvb.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height),
+
+
+        Dim nonz = dst3.FindNonZero()
+
+
+
+
+        dst2.Rectangle(New cvb.Rect(CInt((center - options.histBars) * brickWidth), 0,
+                       brickWidth * (options.histBars * 2 + centerAdjust), dst2.Height),
                        task.HighlightColor, task.lineWidth)
+
+        labels(2) = CStr(proximityCount) + " depth points were within " + CStr(options.mmThreshold * 1000) +
+                    " mm's of their neighbor or " + Format(proximityPercent, "0%")
+
+        Dim proxDistance = 1000 * (options.histBars * 2 + centerAdjust) * options.mmThreshold * 2 / task.histogramBins
+        labels(3) = "Of the " + CStr(proximityCount) + " depth points, " + CStr(nonz.Rows) +
+                    " were within " + Format(proxDistance, fmt1) + " mm's of their neighbor"
     End Sub
 End Class
 

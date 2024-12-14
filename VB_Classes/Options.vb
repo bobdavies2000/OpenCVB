@@ -7958,11 +7958,13 @@ End Class
 
 
 Public Class Options_DerivativeBasics : Inherits TaskParent
-    Public mmThreshold As Single = 50
+    Public mmThreshold As Single = 3
+    Public histBars As Integer = 1
     Public horizontalDerivative As Boolean = True
     Public verticalDerivative As Boolean = True
     Public Sub New()
         If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Plus/Minus bars around center", 1, 10, histBars)
             sliders.setupTrackBar("mm Threshold", 0, 1000, mmThreshold)
         End If
 
@@ -7976,7 +7978,9 @@ Public Class Options_DerivativeBasics : Inherits TaskParent
     End Sub
     Public Sub RunOpt()
         Static thresholdSlider = FindSlider("mm Threshold")
+        Static barSlider = FindSlider("Plus/Minus bars around center")
         mmThreshold = thresholdSlider.value / 1000
+        histBars = barSlider.value
 
         Static vDeriv = FindCheckBox("Vertical Derivative")
         Static hDeriv = FindCheckBox("Horizontal Derivative")
