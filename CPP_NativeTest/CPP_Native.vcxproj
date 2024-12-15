@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,24 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\CPP_Native\PragmaLibs.h" />
-    <ClInclude Include="CPP_Externs.h" />
     <ClInclude Include="CPP_Enum.h" />
-    <ClInclude Include="CPP_Parent.h" />
+    <ClInclude Include="CPP_Externs.h" />
     <ClInclude Include="CPP_NativeClasses.h" />
+    <ClInclude Include="CPP_Parent.h" />
+    <ClInclude Include="CvHMM.h" />
+    <ClInclude Include="harrisDetector.h" />
     <ClInclude Include="Options.h" />
+    <ClInclude Include="ParticleFilter.h" />
+    <ClInclude Include="PragmaLibs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPP_IncludeOnly.cpp" />
     <ClCompile Include="CPP_Non-AI.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}</ProjectGuid>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>CPPAlgorithms</RootNamespace>
+    <ProjectGuid>{7db474ee-dac5-4d9d-95db-ae9927ef6680}</ProjectGuid>
+    <RootNamespace>CPPNative</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>CPP_Native</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -84,153 +86,84 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;CPPNATIVE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;CPPALGORITHMS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;CPPNATIVE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)OpenCV\modules\video\include;$(SolutionDir)OpenCV\modules\photo\include;$(SolutionDir)OpenCV\modules\imgproc\include;$(SolutionDir)OpenCV\modules\core\include;$(SolutionDir)OpenCV\modules\objdetect\include;$(SolutionDir)OpenCV\modules\calib3d\include;$(SolutionDir)OpenCV\modules\imgcodecs\include;$(SolutionDir)OpenCV\modules\features2d\include;$(SolutionDir)OpenCV\modules\flann\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\shape\include;$(SolutionDir)OpenCV\modules\ml\include;$(SolutionDir)OpenCV\modules\videoio\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\datasets\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\text\include;$(SolutionDir)OpenCV\modules\highgui\include;$(SolutionDir)OpenCV\modules\dnn\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\plot\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\optflow\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\ximgproc\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\viz\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\phase_unwrapping\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xfeatures2d\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xphoto\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xobjdetect\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\videostab\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\surface_matching\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\superres\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\structured_light\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\stereo\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\saliency\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\rgbd\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\reg\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\quality\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\line_descriptor\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\img_hash\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\hfs\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\fuzzy\include;$(SolutionDir)OpenCV\$(SolutionDir)\OpenCV\OpenCV_Contrib/\modules\face\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\dpm\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\dnn_objdetect\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\ccalib\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\bioinspired\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\bgsegm\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\aruco\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\Tracking\include;$(SolutionDir)OpenCV\modules\stitching\include;$(SolutionDir)OpenCV\modules\gapi\include;$(SolutionDir)OpenCV\build;$(SolutionDir)OpenCV\include\;$(SolutionDir)OpenCV\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <OpenMPSupport>true</OpenMPSupport>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4267;4244;26495;26812;26451;6294;6201;6011</DisableSpecificWarnings>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)/OpenCV/Build/lib/$(Configuration)/</AdditionalLibraryDirectories>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <AssemblyDebug>false</AssemblyDebug>
-    </Link>
-    <PreBuildEvent>
-      <Command>"$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe"</Command>
-      <Message>
-      </Message>
-    </PreBuildEvent>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Message>
-      </Message>
-    </CustomBuildStep>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;CPPALGORITHMS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;CPPNATIVE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)OpenCV\modules\video\include;$(SolutionDir)OpenCV\modules\photo\include;$(SolutionDir)OpenCV\modules\imgproc\include;$(SolutionDir)OpenCV\modules\core\include;$(SolutionDir)OpenCV\modules\objdetect\include;$(SolutionDir)OpenCV\modules\calib3d\include;$(SolutionDir)OpenCV\modules\imgcodecs\include;$(SolutionDir)OpenCV\modules\features2d\include;$(SolutionDir)OpenCV\modules\flann\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\shape\include;$(SolutionDir)OpenCV\modules\ml\include;$(SolutionDir)OpenCV\modules\videoio\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\datasets\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\text\include;$(SolutionDir)OpenCV\modules\highgui\include;$(SolutionDir)OpenCV\modules\dnn\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\plot\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\optflow\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\ximgproc\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\viz\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\phase_unwrapping\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xfeatures2d\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xphoto\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xobjdetect\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\videostab\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\surface_matching\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\superres\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\structured_light\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\stereo\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\saliency\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\rgbd\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\reg\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\quality\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\line_descriptor\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\img_hash\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\hfs\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\fuzzy\include;$(SolutionDir)OpenCV\$(SolutionDir)\OpenCV\OpenCV_Contrib/\modules\face\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\dpm\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\dnn_objdetect\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\ccalib\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\bioinspired\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\bgsegm\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\aruco\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\Tracking\include;$(SolutionDir)OpenCV\modules\stitching\include;$(SolutionDir)OpenCV\modules\gapi\include;$(SolutionDir)OpenCV\build;$(SolutionDir)OpenCV\include\;$(SolutionDir)OpenCV\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <OpenMPSupport>true</OpenMPSupport>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <DisableSpecificWarnings>4267;4244;26495;26812;26451;6294;6201;6011;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
-      <SupportJustMyCode>false</SupportJustMyCode>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(SolutionDir)/OpenCV/Build/lib/$(Configuration)/</AdditionalLibraryDirectories>
-      <AdditionalOptions>/VERBOSE:LIB %(AdditionalOptions)</AdditionalOptions>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <AssemblyDebug>false</AssemblyDebug>
     </Link>
-    <PreBuildEvent>
-      <Command>"$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe"</Command>
-    </PreBuildEvent>
-    <PreBuildEvent>
-      <Message>
-      </Message>
-    </PreBuildEvent>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Message>
-      </Message>
-    </CustomBuildStep>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;CPPALGORITHMS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;CPPNATIVE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)OpenCV\modules\video\include;$(SolutionDir)OpenCV\modules\photo\include;$(SolutionDir)OpenCV\modules\imgproc\include;$(SolutionDir)OpenCV\modules\core\include;$(SolutionDir)OpenCV\modules\objdetect\include;$(SolutionDir)OpenCV\modules\calib3d\include;$(SolutionDir)OpenCV\modules\imgcodecs\include;$(SolutionDir)OpenCV\modules\features2d\include;$(SolutionDir)OpenCV\modules\flann\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\shape\include;$(SolutionDir)OpenCV\modules\ml\include;$(SolutionDir)OpenCV\modules\videoio\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\datasets\include;$(SolutionDir)OpenCV\OpenCV_Contrib/\modules\text\include;$(SolutionDir)OpenCV\modules\highgui\include;$(SolutionDir)OpenCV\modules\dnn\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\plot\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\optflow\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\ximgproc\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\viz\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\phase_unwrapping\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xfeatures2d\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xphoto\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\xobjdetect\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\videostab\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\surface_matching\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\superres\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\structured_light\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\stereo\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\saliency\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\rgbd\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\reg\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\quality\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\line_descriptor\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\img_hash\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\hfs\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\fuzzy\include;$(SolutionDir)OpenCV\$(SolutionDir)\OpenCV\OpenCV_Contrib/\modules\face\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\dpm\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\dnn_objdetect\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\ccalib\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\bioinspired\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\bgsegm\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\aruco\include;$(SolutionDir)OpenCV\OpenCV_Contrib\modules\Tracking\include;$(SolutionDir)OpenCV\modules\stitching\include;$(SolutionDir)OpenCV\modules\gapi\include;$(SolutionDir)OpenCV\build;$(SolutionDir)OpenCV\include\;$(SolutionDir)OpenCV\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)/OpenCV/Build/lib/$(Configuration)/</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
 </Project>

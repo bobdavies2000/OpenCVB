@@ -17,9 +17,9 @@ if not exist librealsense (
 )
 
 if not exist OpenCV (
-	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv"
+	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv.git"
 	cd OpenCV
-	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv_contrib"	
+	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv_contrib.git"	
 	cd ..\
 ) 
 
@@ -52,7 +52,7 @@ if not exist OakD\depthai-core (
 )
 
 if not exist opencv\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_PERF_TESTS=NO -DBUILD_EXAMPLES=YES -DBUILD_TESTS=NO -DBUILD_opencv_python_tests=NO -DOPENCV_EXTRA_MODULES_PATH=OpenCV/OpenCV_Contrib/Modules -S OpenCV -B OpenCV/Build
+	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_PERF_TESTS=NO -DBUILD_TESTS=NO -DBUILD_opencv_python_tests=NO -DOPENCV_EXTRA_MODULES_PATH=OpenCV/OpenCV_Contrib/Modules -S OpenCV -B OpenCV/Build
 	:: cannot cmake Kinect or depthai until OpenCV is built.
 	msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Debug
 	msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Release

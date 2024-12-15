@@ -25,7 +25,7 @@
 #include <opencv2/plot.hpp>
 #include "opencv2/ccalib/randpattern.hpp"
 #include "opencv2/xphoto/oilpainting.hpp"
-#include "PragmaLibs.h"
+#include "../CPP_Native/PragmaLibs.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;

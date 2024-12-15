@@ -5,7 +5,6 @@
     -   RedCloud results are validated using the tracking color and age.
 -   The OpenCVSharp NuGet packages updated to November 2024 release.
 -   Install batch file was updated to accommodate .Net 3.5 optional install.
-    -   The Update_All.bat file was updated to build OpenCV examples.
     -   The prompt to confirm reading the instructions now works.
     -   Any install problems are high priority given these recent changes.
 -   Features are widely used and are prepared for each frame automatically.

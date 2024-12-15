@@ -4,7 +4,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public stats As New Cell_Basics
     Dim color As New Color8U_Basics
     Public inputMask As New cvb.Mat
-    Dim redCPP As New RedCloud_CPP_VB
     Public cellGen As New Cell_Generate
     Public Sub New()
         labels(3) = "The 'tracking' color (shown below) is unique and switches when a cell is split or lost."
@@ -15,6 +14,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        Static redCPP As New RedCloud_CPP_VB
+
         If src.Channels <> 1 Then
             color.Run(src)
             src = color.dst2

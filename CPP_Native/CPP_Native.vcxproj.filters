@@ -10,6 +10,6 @@
     <ClInclude Include="CPP_Enum.h" />
     <ClInclude Include="CPP_Parent.h" />
     <ClInclude Include="CPP_NativeClasses.h" />
-    <ClInclude Include="..\CPP_Managed\PragmaLibs.h" />
+    <ClInclude Include="..\CPP_Native\PragmaLibs.h" />
   </ItemGroup>
 </Project>

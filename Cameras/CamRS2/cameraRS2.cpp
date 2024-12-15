@@ -17,7 +17,7 @@
 #include "opencv2/highgui.hpp"
 #include <map>
 #include "example.hpp"
-#include "PragmaLibs.h" 
+#include "../CPP_Native/PragmaLibs.h" 
 #include <string.h>
 #include <Windows.h>
 #include <OleAuto.h>

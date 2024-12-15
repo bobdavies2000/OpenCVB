@@ -19,7 +19,7 @@
 #include <k4a/k4a.h>
 #include <k4a/k4a.hpp>
 #include <k4apixel.h>
-#include "PragmaLibs.h"
+#include "../CPP_Native/PragmaLibs.h"
 
 using namespace std;
 using namespace  cv;

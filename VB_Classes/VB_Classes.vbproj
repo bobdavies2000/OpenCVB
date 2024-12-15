@@ -56,7 +56,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\bin\Debug\</OutputPath>
+    <OutputPath>%24%28SolutionDir%29\bin\Debug\</OutputPath>
     <DocumentationFile>VB_Classes.xml</DocumentationFile>
     <NoWarn>002,003,010,41999,42016,42017,42018,42019,42020,42021,42022,42030,42032,42036,42104,42108,42109</NoWarn>
     <DebugType>full</DebugType>
@@ -69,7 +69,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\bin\Release\</OutputPath>
+    <OutputPath>%24%28SolutionDir%29\bin\Debug\</OutputPath>
     <DocumentationFile>VB_Classes.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <NoWarn>002,003,010,41999,42016,42017,42018,42019,42020,42021,42022,42030,42032,42036,42104,42108,42109</NoWarn>

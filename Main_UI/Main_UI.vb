@@ -978,6 +978,9 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
         updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
 
+        updatePath(HomeDir.FullName + "bin\Debug\", "CPP_Native dll")
+        updatePath(HomeDir.FullName + "bin\Release\", "CPP_Native dll")
+
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
@@ -1383,11 +1386,11 @@ Public Class Main_UI
             Case "Azure Kinect 4K C++"
                 Return New CameraK4A_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
-                'Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
+                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
+                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
             Case "Intel(R) RealSense(TM) Depth Camera 455"
-                Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
-                'Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
+                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
+                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
             Case "Oak-D camera"
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"

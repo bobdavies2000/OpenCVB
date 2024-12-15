@@ -13,7 +13,7 @@
 #include <tchar.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-#include "../../CPP_Managed/PragmaLibs.h"
+#include "../../CPP_Native/PragmaLibs.h"
 
 using namespace  cv;
 
