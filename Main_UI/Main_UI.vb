@@ -144,19 +144,20 @@ Public Class Main_UI
     Public Sub jsonRead()
         jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
         settings = jsonfs.Load()(0)
-
+        ' the only place the names are define is here: VBtask.algParms.cameraNames
+        ' the 3 lists below must have an entry for each camera - supported/640x480/1920...
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
         With settings
-            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, True,
+            .cameraSupported = New List(Of Boolean)({True, True, True, True, True,
                                                      False, True}) ' Mynt support updated below
-            .camera640x480Support = New List(Of Boolean)({False, False, True, True, False,
+            .camera640x480Support = New List(Of Boolean)({False, True, True, False,
                                                           False, False, True})
-            .camera1920x1080Support = New List(Of Boolean)({True, True, False, False, False,
+            .camera1920x1080Support = New List(Of Boolean)({True, False, False, False,
                                                             True, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim sr = New StreamReader(defines.FullName)
             If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then
-                .cameraSupported(7) = True
+                .cameraSupported(6) = True
             End If
             sr.Close()
 
@@ -955,6 +956,9 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
+        updatePath(HomeDir.FullName + "bin\Debug\", "CPP_Native dll")
+        updatePath(HomeDir.FullName + "bin\Release\", "CPP_Native dll")
+
         Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
         If cudaPath IsNot Nothing Then
             updatePath(cudaPath, "Cuda - needed for StereoLabs")
@@ -977,9 +981,6 @@ Public Class Main_UI
 
         updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
         updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
-
-        updatePath(HomeDir.FullName + "bin\Debug\", "CPP_Native dll")
-        updatePath(HomeDir.FullName + "bin\Release\", "CPP_Native dll")
 
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
@@ -1395,8 +1396,8 @@ Public Class Main_UI
             Case "Oak-D camera"
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
-                'Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
-                Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                'Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"

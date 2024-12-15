@@ -306,7 +306,6 @@ Public Class VBtask : Implements IDisposable
         ' The order of cameras in cameraNames is important. Add new cameras at the end.
         '  "StereoLabs ZED 2/2i C++", turned off
         Public Shared cameraNames As New List(Of String)({"Azure Kinect 4K",
-                                                          "Azure Kinect 4K C++",
                                                           "Intel(R) RealSense(TM) Depth Camera 435i",
                                                           "Intel(R) RealSense(TM) Depth Camera 455",
                                                           "Oak-D camera",
