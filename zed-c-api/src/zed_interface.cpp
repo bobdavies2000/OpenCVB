@@ -1,3 +1,6 @@
+#include "../../Cameras/CameraDefines.hpp"
+#ifdef STEREOLAB_INSTALLED
+
 #include <memory>
 #include <thread>
 #include <mutex>
@@ -1985,4 +1988,5 @@ extern "C" {
 
 #ifdef __cplusplus
 }
+#endif
 #endif

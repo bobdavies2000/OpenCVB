@@ -1,3 +1,6 @@
+#include "../../Cameras/CameraDefines.hpp"
+#ifdef STEREOLAB_INSTALLED
+
 #include "ZEDFusionController.hpp"
 #include <algorithm>
 #include <cmath>
@@ -701,4 +704,5 @@ void ZEDFusionController::getGeoTrackingCalibration(struct SL_Vector3* translati
 	rotation->y = sdk_rotation.y;
 	rotation->z = sdk_rotation.z;
 	rotation->w = sdk_rotation.w;
-}
+} 
+#endif

@@ -1,3 +1,6 @@
+#include "../../Cameras/CameraDefines.hpp"
+#ifdef STEREOLAB_INSTALLED
+
 #include "ZEDController.hpp"
 #include <algorithm>
 #include <cmath>
@@ -2596,5 +2599,6 @@ sl::ERROR_CODE getBodiesBatchDataCSharp(int index, int* num_data, int* id, int* 
 {
     return sl::ERROR_CODE::INVALID_FUNCTION_CALL;
 }
+#endif
 #endif
 #endif

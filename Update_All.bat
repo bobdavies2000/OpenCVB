@@ -27,14 +27,6 @@ if not exist OrbbecSDK (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK.git"
 ) 
 
-if not exist zed-c-api (
-	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/stereolabs/zed-c-api"
-) 
-
-if not exist zed-csharp-api (
-	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/stereolabs/zed-csharp-api"
-) 
-
 if not exist OrbbecSDK_CSharp (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK_CSharp.git"
 ) 

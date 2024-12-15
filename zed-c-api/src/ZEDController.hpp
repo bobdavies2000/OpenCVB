@@ -1,3 +1,6 @@
+#include "../../Cameras/CameraDefines.hpp"
+#ifdef STEREOLAB_INSTALLED
+
 #ifndef __ZED_CONTROLLER_H__
 #define __ZED_CONTROLLER_H__
 
@@ -277,4 +280,5 @@ private:
     sl::BODY_TRACKING_MODEL current_body_tracking_model;
 };
 
+#endif
 #endif

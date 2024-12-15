@@ -1,3 +1,6 @@
+#include "../../Cameras/CameraDefines.hpp"
+#ifdef STEREOLAB_INSTALLED
+
 #ifndef __ZED_MC_CONTROLLER_H__
 #define __ZED_MC_CONTROLLER_H__
 
@@ -193,4 +196,5 @@ public :
     sl::Fusion fusion;
 };
 
+#endif
 #endif
