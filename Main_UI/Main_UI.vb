@@ -1380,17 +1380,18 @@ Public Class Main_UI
         CameraSwitching.Text = settings.cameraName + " starting"
     End Sub
     Private Function getCamera() As Object
-        Select Case settings.cameraName
+        Dim cameraName = settings.cameraName
+        If cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then
+            cameraName = "Intel(R) RealSense(TM) Depth Camera"
+        End If
+        Select Case cameraName
             Case "Azure Kinect 4K"
                 Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Azure Kinect 4K C++"
                 Return New CameraK4A_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
-                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
-            Case "Intel(R) RealSense(TM) Depth Camera 455"
-                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
-                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
+            Case "Intel(R) RealSense(TM) Depth Camera"
+                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraRS2(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Oak-D camera"
                 Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
