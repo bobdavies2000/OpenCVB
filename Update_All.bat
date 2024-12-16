@@ -78,7 +78,7 @@ if not exist OakD\Build (
 
 if not exist zed-c-api\Build (
 	if exist "c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" (
-		rem "C:\Program Files\CMake\bin\Cmake.exe" -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+		"C:\Program Files\CMake\bin\Cmake.exe" -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Debug
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Release
 	)
@@ -86,7 +86,7 @@ if not exist zed-c-api\Build (
 
 if not exist zed-csharp-api\StereoLabs.zed\Build (
 	if exist "c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" (
-		rem "C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api/StereoLabs.zed/ -B zed-csharp-api/StereoLabs.zed/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+		"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api/StereoLabs.zed/ -B zed-csharp-api/StereoLabs.zed/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
 		msbuild.exe zed-csharp-api/StereoLabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Debug
 		msbuild.exe zed-csharp-api/StereoLabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Release
 
@@ -101,6 +101,7 @@ if not exist zed-csharp-api\StereoLabs.zed\Build (
 	)
 )
 
+msbuild.exe UI_Generator/UI_Generator.vbproj /p:Configuration=Release
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
