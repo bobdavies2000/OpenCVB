@@ -101,11 +101,17 @@ if not exist zed-csharp-api\StereoLabs.zed\Build (
 	)
 )
 
+msbuild.exe UI_Generator/UI_Generator.vcxproj /p:Configuration=Release
+
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
 echo "Download from here for StereoLabs SDK 4.1 with CUDA 12: https://download.stereolabs.com/zedsdk/4.1/cu121/win"
 echo "StereoLabs SDK install may also download and install CUDA if not already present."
 echo "Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3"
+echo
+echo You will need to remove the ZERO_CHECK entry from StereoLabs.zed/References
+echo (I will figure out how to automate that soon.)
+echo 
 SET /P ok="And hit enter after reading the above messages."
 
 :: Once done, exit the batch file -- skips executing the errorNoPython section

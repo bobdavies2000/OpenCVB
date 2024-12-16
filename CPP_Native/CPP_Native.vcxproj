@@ -85,7 +85,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)bin\Debug\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
@@ -94,7 +94,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)bin\Debug\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
@@ -134,7 +134,8 @@
       <AssemblyDebug>false</AssemblyDebug>
     </Link>
     <PreBuildEvent>
-      <Command>"$(SolutionDir)bin\Release\UI_Generator.exe"</Command>
+      <Command>
+      </Command>
       <Message>
       </Message>
     </PreBuildEvent>
@@ -169,7 +170,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -182,6 +183,7 @@
       <SupportJustMyCode>false</SupportJustMyCode>
       <ExceptionHandling>Sync</ExceptionHandling>
       <DebugInformationFormat>None</DebugInformationFormat>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -194,7 +196,8 @@
       <AssemblyDebug>false</AssemblyDebug>
     </Link>
     <PreBuildEvent>
-      <Command>"$(SolutionDir)\bin\Release\UI_Generator.exe"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>

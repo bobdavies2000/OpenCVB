@@ -78,7 +78,7 @@
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)UI_Generator\bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -94,7 +94,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)/OpenCV/Build/lib/$(Configuration)/</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>"$(SolutionDir)bin\Release\UI_Generator.exe"</Command>
+      <Command>"$(SolutionDir)UI_Generator\bin\Release\UI_Generator.exe"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -133,7 +133,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)/OpenCV/Build/lib/$(Configuration)/</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>"$(SolutionDir)bin\Release\UI_Generator.exe"</Command>
+      <Command>"$(SolutionDir)UI_Generator\bin\Release\UI_Generator.exe"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -953,11 +953,12 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
         updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
 
+        ' CPP_Native.dll only exists in the debug directory.
+        ' Turn optimizations on and off by modifying C/C++ Optimizations and Basic Runtime Checking.
+        ' VB only knows CPP_Native.dll and cannot switch between them (I don't see how anyway.)
+
         updatePath(HomeDir.FullName + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-        updatePath(HomeDir.FullName + "bin\Debug\", "CPP_Native dll")
-        updatePath(HomeDir.FullName + "bin\Release\", "CPP_Native dll")
 
         Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
         If cudaPath IsNot Nothing Then
