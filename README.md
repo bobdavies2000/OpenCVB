@@ -20,6 +20,17 @@
     -   The default is to use all data but it can optionally truncate at X meters.
 -   The ‘A-Z’ group selection button is moved next to the algorithm combo box.
     -   See the toolbar in the latest screen shot below for RedCloud_Basics.
+-   Supported cameras were tested again to prepare for this release.
+    -   Azure Kinect, Intel RealSense, Oak-D, Orbbec Gemini, and StereoLabs.
+    -   Mynt cameras are no longer produced but support is still included.
+    -   Support for the Oak 4 D camera is coming in February.
+-   There were 2 cameras in the testing lab that failed. This quick test may help.
+    -   Open the ‘Device Manager’.
+    -   On Windows 11, cameras will be shown in the “Cameras” section.
+    -   If the connected camera is not present, change the cable and USB port.
+    -   If another camera works with the same cable and port, camera is failing.
+    -   It is also a good idea to use the camera SDK to test the camera.
+        -   The Oak camera does not appear in the “Cameras” section.
 -   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a room Description automatically generated](media/928bcaa46cf6abb063c6824e9086236e.png)
@@ -149,7 +160,8 @@ Support for some optional cameras can be added.
     -   NOTE: StereoLabs requires an NVIDIA card with CUDA.
 -   For the Mynt Eye D 1000 camera, download the SDK from:
     -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
--   For the Orbbec 335L camera, the Update_All.bat file has downloaded and prepared the SDK but it is also necessary to download the proprietary binaries from here:
+    -   Mynt Eye cameras are no longer in production and don’t get much testing.
+-   For the Orbbec 335L camera, the Update_All.bat downloaded and prepared the SDK but it is also necessary to download the proprietary binaries from here:
     -   https://github.com/orbbec/OrbbecSDK/releases
 
 Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for StereoLabs Zed 2 or Mynt Eye D 1000 or Orbbec 335L support.
