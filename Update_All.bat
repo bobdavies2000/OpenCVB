@@ -51,7 +51,7 @@ if not exist opencv\Build (
 )
 
 if not exist librealsense\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_SHARED_LIBS=ON -S librealsense -B librealsense/Build
+	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_CSHARP_BINDINGS=ON -S librealsense -B librealsense/Build
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Release
 	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.sln /p:Configuration=Release
@@ -78,7 +78,7 @@ if not exist OakD\Build (
 
 if not exist zed-c-api\Build (
 	if exist "c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" (
-		"C:\Program Files\CMake\bin\Cmake.exe" -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+		rem "C:\Program Files\CMake\bin\Cmake.exe" -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Debug
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Release
 	)
@@ -86,18 +86,18 @@ if not exist zed-c-api\Build (
 
 if not exist zed-csharp-api\StereoLabs.zed\Build (
 	if exist "c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" (
-		"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api/StereoLabs.zed/ -B zed-csharp-api/StereoLabs.zed/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+		rem "C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api/StereoLabs.zed/ -B zed-csharp-api/StereoLabs.zed/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
 		msbuild.exe zed-csharp-api/StereoLabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Debug
 		msbuild.exe zed-csharp-api/StereoLabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Release
 
-		echo "This is really just a note to myself about the zed-csharp-api project:"
-		echo "For zed-csharp-api, you need to change the 'resolution' variable to 'resolutionStruct'"
-		echo "Accessing zed-csharp-api from VB.Net won't work because it is not case sensitive."
-		echo "C# access will work because it is case sensitive."
-		echo "There are 3 variables that map to 'Resolution' and the zed_camera.vb interface fails to compile."
-		echo "There are also 2 missing commas - errors will show up.  How did they miss that?"
-		echo "Also change the resolution variable to CURResolution."
-		echo "And you can remove the ZERO_CHECK reference to remove the warning."
+		rem "This is really just a note to myself about the zed-csharp-api project:"
+		rem "For zed-csharp-api, you need to change the 'resolution' variable to 'resolutionStruct'"
+		rem "Accessing zed-csharp-api from VB.Net won't work because it is not case sensitive."
+		rem "C# access will work because it is case sensitive."
+		rem "There are 3 variables that map to 'Resolution' and the zed_camera.vb interface fails to compile."
+		rem "There are also 2 missing commas - errors will show up.  How did they miss that?"
+		rem "Also change the resolution variable to CURResolution."
+		rem "And you can remove the ZERO_CHECK reference to remove the warning."
 	)
 )
 
