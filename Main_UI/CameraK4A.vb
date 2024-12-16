@@ -105,3 +105,29 @@ Public Class CameraK4A : Inherits GenericCamera
         cPtr = 0
     End Sub
 End Class
+
+
+
+
+
+Module A4K_Interface
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KOpen(width As Integer, height As Integer) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceCount(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceName(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KWaitFrame(cPtr As IntPtr, w As Integer, h As Integer) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KIntrinsics(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KPointCloud(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KColor(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftView(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub A4KClose(cPtr As IntPtr)
+    End Sub
+End Module
+

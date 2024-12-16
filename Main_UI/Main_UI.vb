@@ -1388,8 +1388,6 @@ Public Class Main_UI
         Select Case cameraName
             Case "Azure Kinect 4K"
                 Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case "Azure Kinect 4K C++"
-                Return New CameraK4A_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Intel(R) RealSense(TM) Depth Camera"
                 'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, settings.cameraName)
