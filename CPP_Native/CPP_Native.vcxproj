@@ -134,7 +134,7 @@
       <AssemblyDebug>false</AssemblyDebug>
     </Link>
     <PreBuildEvent>
-      <Command>"$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe"</Command>
+      <Command>"$(SolutionDir)bin\Release\UI_Generator.exe"</Command>
       <Message>
       </Message>
     </PreBuildEvent>
@@ -194,7 +194,7 @@
       <AssemblyDebug>false</AssemblyDebug>
     </Link>
     <PreBuildEvent>
-      <Command>"$(SolutionDir)UI_Generator\bin\x64\Release\UI_Generator.exe"</Command>
+      <Command>"$(SolutionDir)\bin\Release\UI_Generator.exe"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>
