@@ -9,7 +9,6 @@ Module UI_Generator
             mutex.ReleaseMutex()
         End Using
 
-
         Dim fullXRef As Boolean
         If args.Length > 0 Then If args(0) = "All" Then fullXRef = True
         ' fullXRef = True
@@ -18,12 +17,16 @@ Module UI_Generator
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
         Dim HomeDir = New DirectoryInfo(exeDir.FullName + "../../../")
         Directory.SetCurrentDirectory(HomeDir.FullName)
-        HomeDir = New DirectoryInfo("./")
+
+        Dim PythonProjFile As New FileInfo(HomeDir.FullName + "/Python/Python.pyproj")
+        If PythonProjFile.Exists = False Then
+            HomeDir = New DirectoryInfo(exeDir.FullName + "../../../../")
+            PythonProjFile = New FileInfo(HomeDir.FullName + "/Python/Python.pyproj")
+        End If
 
         Dim xRefFile = New FileInfo(HomeDir.FullName + "Data/XRef.txt")
         If xRefFile.Exists = False Then fullXRef = True
 
-        Dim PythonProjFile As New FileInfo(HomeDir.FullName + "/Python/Python.pyproj")
         Dim pyFiles = File.ReadAllLines(PythonProjFile.FullName)
         Dim vbList As New SortedList(Of String, String)
         Dim pythonList As New SortedList(Of String, String)
