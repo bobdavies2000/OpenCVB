@@ -330,9 +330,13 @@ Module UI_Generator
             'Next
             'sw.WriteLine()
 
+            For Each alg In allList.Keys
+                If alg.EndsWith("_CS") Then ccList.Add(alg, alg)
+            Next
+
             sw.Write("(" + CStr(ccList.Count) + ") < All C# >")
             For Each alg In ccList.Keys
-                sw.Write("," + alg)
+                If alg.EndsWith("_CS") Then sw.Write("," + alg)
             Next
             sw.WriteLine()
 
