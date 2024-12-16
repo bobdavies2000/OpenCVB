@@ -58,8 +58,8 @@ Public Class CPP_Basics : Inherits TaskParent
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)
         Dim handlePointCloud = GCHandle.Alloc(pointCloudData, GCHandleType.Pinned)
-        Dim pcPtr = cppTask_PointCloud(cPtr, handlePointCloud.AddrOfPinnedObject(),
-                                       task.pointCloud.Rows, task.pointCloud.Cols)
+        cppTask_PointCloud(cPtr, handlePointCloud.AddrOfPinnedObject(),
+                           task.pointCloud.Rows, task.pointCloud.Cols)
         handlePointCloud.Free()
 
         Dim depthRGBData(task.depthRGB.Total * task.depthRGB.ElemSize - 1) As Byte
@@ -86,9 +86,11 @@ Public Class CPP_Basics : Inherits TaskParent
         Dim inputImage(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, inputImage, 0, inputImage.Length)
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
-        cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
-                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z, task.optionsChanged, task.heartBeat,
-                       task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked, task.gOptions.debugChecked)
+        cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount,
+                       dst2.Rows, dst2.Cols, task.accRadians.X, task.accRadians.Y,
+                       task.accRadians.Z, task.optionsChanged, task.heartBeat,
+                       task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked,
+                       task.gOptions.debugChecked)
         handleInput.Free()
         getOptions()
 
@@ -165,8 +167,9 @@ Public Class CPP_ManagedTask : Inherits TaskParent
         hDepthRGB = GCHandle.Alloc(depthRGBData, GCHandleType.Pinned)
         hCloud = GCHandle.Alloc(cloudData, GCHandleType.Pinned)
 
-        ioIndex = ManagedCPP_Resume(ioIndex, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(), hRight.AddrOfPinnedObject(),
-                                    hDepthRGB.AddrOfPinnedObject(), hCloud.AddrOfPinnedObject(), task.color.Rows,
+        ioIndex = ManagedCPP_Resume(ioIndex, hColor.AddrOfPinnedObject(), hLeft.AddrOfPinnedObject(),
+                                    hRight.AddrOfPinnedObject(), hDepthRGB.AddrOfPinnedObject(),
+                                    hCloud.AddrOfPinnedObject(), task.color.Rows,
                                     task.color.Cols, task.optionsChanged)
 
         hColor.Free()

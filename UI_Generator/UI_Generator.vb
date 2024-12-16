@@ -317,16 +317,18 @@ Module UI_Generator
             sw.Write("(" + CStr(allList.Count) + ") < All >")
             For Each alg In allList.Keys
                 If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
+                If alg.EndsWith("_CC") Then Continue For
+                If alg.EndsWith("_CPP") Then Continue For
                 sw.Write("," + alg)
             Next
             sw.WriteLine()
 
-            sw.Write("(" + CStr(allButPython.Count) + ") < All but Python >")
-            For Each alg In allButPython.Keys
-                If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
-                sw.Write("," + alg)
-            Next
-            sw.WriteLine()
+            'sw.Write("(" + CStr(allButPython.Count) + ") < All but Python >")
+            'For Each alg In allButPython.Keys
+            '    If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
+            '    sw.Write("," + alg)
+            'Next
+            'sw.WriteLine()
 
             sw.Write("(" + CStr(ccList.Count) + ") < All C# >")
             For Each alg In ccList.Keys
@@ -334,11 +336,11 @@ Module UI_Generator
             Next
             sw.WriteLine()
 
-            sw.Write("(" + CStr(cppList.Count) + ") < All C++ >")
-            For Each alg In cppList.Keys
-                sw.Write("," + alg)
-            Next
-            sw.WriteLine()
+            'sw.Write("(" + CStr(cppList.Count) + ") < All C++ >")
+            'For Each alg In cppList.Keys
+            '    if alg.EndsWith("_CC") = False Then sw.Write("," + alg)
+            'Next
+            'sw.WriteLine()
 
             sw.Write("(" + CStr(opengl.Count) + ") < All OpenGL >")
             For Each alg In opengl.Keys

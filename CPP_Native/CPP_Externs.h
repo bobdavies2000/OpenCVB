@@ -4,8 +4,8 @@
 
 namespace CPP_Native
 {
-    //Grid_Basics_CC* gridBasics;
-    //Hist_RedOptions_CC* redOptions;
+    Grid_Basics_CC* gridBasics;
+    Hist_RedOptions_CC* redOptions;
 
     extern "C" __declspec(dllexport)
         int* cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWeighted,
@@ -15,7 +15,6 @@ namespace CPP_Native
             bool displayDst0, bool displayDst1)
     {
         cppTask *task = new cppTask(rows, cols);
-#if 0 
         WorkingRes = Size(cols, rows);
         task->heartBeat = heartBeat;
         task->lineType = lineType;
@@ -195,7 +194,6 @@ namespace CPP_Native
         task->cppFunction = function;
         gridBasics = new Grid_Basics_CC();
         redOptions = new Hist_RedOptions_CC();
-#endif
 
         return (int*)task;
     }
@@ -207,8 +205,6 @@ namespace CPP_Native
     {
     }
 
-
-#if 0 
 
     // https://www.codeproject.com/Articles/197493/Marshal-variable-length-array-of-structs-from-C-to
     extern "C" __declspec(dllexport)
@@ -305,9 +301,9 @@ namespace CPP_Native
         task->maxDepthMask.convertTo(task->maxDepthMask, CV_8U);
 
         static Depth_PointCloud_IMU_CC* pCloud = new Depth_PointCloud_IMU_CC();
-        pCloud->Run(task->pointCloud); // build the task->gCloud - oriented toward gravity.
+        //pCloud->Run(task->pointCloud); // build the task->gCloud - oriented toward gravity.
 
-        return (int*)task->depthRGB.data;
+        return (int*)task->pointCloud.data;
     }
 
     extern "C" __declspec(dllexport)
@@ -450,6 +446,5 @@ namespace CPP_Native
 
         return 0;
     }
-#endif
 }
 
