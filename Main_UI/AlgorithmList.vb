@@ -648,6 +648,7 @@ End Enum
 	If algorithmName = "Depth_HolesOverTime_CS" Then return new Depth_HolesOverTime_CS
 	If algorithmName = "Depth_HolesRect" Then return new Depth_HolesRect
 	If algorithmName = "Depth_HolesRect_CS" Then return new Depth_HolesRect_CS
+	If algorithmName = "Depth_InfinityCheck" Then return new Depth_InfinityCheck
 	If algorithmName = "Depth_InRange" Then return new Depth_InRange
 	If algorithmName = "Depth_InRange_CS" Then return new Depth_InRange_CS
 	If algorithmName = "Depth_LocalMinMax_MT" Then return new Depth_LocalMinMax_MT

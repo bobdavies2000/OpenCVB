@@ -1564,3 +1564,54 @@ Public Class Depth_MinMaxNone : Inherits TaskParent
         labels(2) += " after " + CStr(filtered) + " images"
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Depth_InfinityCheck : Inherits TaskParent
+    Public Sub New()
+        desc = "Check the pointcloud depth for infinities"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static plane As Integer = 0
+        Static warnings As New List(Of String)
+        Static infWarnings As Integer
+        If task.heartBeatLT Then
+            plane = plane + 1
+            If plane > 2 Then plane = 0
+        End If
+
+        If task.gOptions.debugChecked Then
+            Dim mask = task.pcSplit(plane).InRange(-100, 100)
+            task.pcSplit(plane).SetTo(0, Not mask)
+        End If
+
+        Dim infCount As Integer
+        For y = 0 To task.pcSplit(plane).Rows - 1
+            For x = 0 To task.pcSplit(plane).Cols - 1
+                Dim val = task.pcSplit(plane).Get(Of Single)(y, x)
+                If Single.IsInfinity(val) Or Single.IsNegativeInfinity(val) Then infCount += 1
+            Next
+        Next
+        dst2 = task.pcSplit(plane)
+        Dim planeName = Choose(plane + 1, "X ", "Y ", "Z ")
+        labels(2) = CStr(infCount) + " infinite values encountered in the " + planeName + " plane"
+
+        Dim mm = GetMinMax(task.pcSplit(plane))
+        labels(3) = "min val = " + CStr(mm.minVal) + " max val = " + CStr(mm.maxVal)
+        If infCount > 0 Then
+            infWarnings += 1
+            warnings.Add(labels(2) + " " + labels(3))
+            If warnings.Count > 20 Then warnings.RemoveAt(0)
+        End If
+
+        strOut = "Infinity count was not corrected " + vbCrLf
+        For i = 0 To warnings.Count - 1
+            strOut += warnings(i) + vbCrLf
+        Next
+        strOut += CStr(infWarnings) + " warnings encountered."
+        SetTrueText(strOut, 3)
+    End Sub
+End Class

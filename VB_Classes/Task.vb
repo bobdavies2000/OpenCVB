@@ -754,6 +754,11 @@ Public Class VBtask : Implements IDisposable
             cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
 
+        ' The stereolabs camera has some weird -inf and inf values in the Y-plane.  
+        If task.cameraName = "StereoLabs ZED 2/2i" Then
+            Dim mask = task.pcSplit(1).InRange(-100, 100)
+            task.pcSplit(1).SetTo(0, Not mask)
+        End If
         task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary).
                                          ConvertScaleAbs()
 

@@ -149,6 +149,10 @@ Public Class CPP_ManagedTask : Inherits TaskParent
         desc = "Move data to the Managed C++/CLR code (CPP_Managed), run it, and retrieve the results."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            SetTrueText("CPP_Managed is disconnected right while chasing the CPP_Native problem.")
+            Return
+        End If
         Dim colorData(task.color.Total * task.color.ElemSize - 1) As Byte
         Dim leftData(task.leftView.Total * task.leftView.ElemSize - 1) As Byte
         Dim rightData(task.rightView.Total * task.rightView.ElemSize - 1) As Byte

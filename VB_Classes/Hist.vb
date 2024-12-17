@@ -1118,7 +1118,7 @@ Public Class Hist_Cloud : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public histArray() As Single
     Public dimensionLabel As String = "X"
-    Dim maxMaxVal As Integer
+    Dim maxMaxVal As Double
     Public Sub New()
         plot.plot.removeZeroEntry = True
         desc = "Plot the histogram of the X layer of the point cloud"
