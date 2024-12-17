@@ -950,8 +950,9 @@ Public Class Main_UI
         ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
         ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
         ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
+        updatePath(HomeDir.FullName + "bin\", "Debug/Release version of CPP_Native.dll")
         updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
-        updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
+        ' updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
 
         ' CPP_Native.dll only exists in the debug directory.
         ' Turn optimizations on and off by modifying C/C++ Optimizations and Basic Runtime Checking.
@@ -1532,13 +1533,13 @@ Public Class Main_UI
             task = New VBtask(parms)
 
             ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
-            Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
+            ' Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 
-            ' if you land here and you were trying subset group of algorithms,
-            ' then remove the json file, click the OpenCVB options button and click 'Update Algorithm XRef'
-            ' (it is toward the bottom of the options form.)
+            ' if you land here and you were trying a subset group of algorithms,
+            ' then remove the json file and restart, click the OpenCVB options button,
+            ' and click 'Update Algorithm XRef' (it is toward the bottom of the options form.)
             textDesc = task.MainUI_Algorithm.desc
             task.MainUI_Algorithm.primaryAlg = True
 

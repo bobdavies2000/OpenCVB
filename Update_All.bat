@@ -44,14 +44,17 @@ if not exist OakD\depthai-core (
 )
 
 if not exist opencv\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_PERF_TESTS=NO -DBUILD_TESTS=NO -DBUILD_opencv_python_tests=NO -DOPENCV_EXTRA_MODULES_PATH=OpenCV/OpenCV_Contrib/Modules -S OpenCV -B OpenCV/Build
+	cmake -DBUILD_PERF_TESTS=NO -DBUILD_TESTS=NO -DBUILD_opencv_python_tests=NO -DOPENCV_EXTRA_MODULES_PATH=OpenCV/OpenCV_Contrib/Modules -S OpenCV -B OpenCV/Build
 	:: cannot cmake Kinect or depthai until OpenCV is built.
 	msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Debug
 	msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Release
+	cd OpenCV/Build
+	cmake --install .
+	cd ../../
 )
 
 if not exist librealsense\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -DBUILD_CSHARP_BINDINGS=ON -S librealsense -B librealsense/Build
+	cmake -DBUILD_CSHARP_BINDINGS=ON -S librealsense -B librealsense/Build
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Release
 	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.sln /p:Configuration=Release
@@ -59,26 +62,26 @@ if not exist librealsense\Build (
 )
 
 if not exist OrbbecSDK_CSharp\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
+	cmake -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
 	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Debug
 	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Release
 )
 
 if not exist Azure-Kinect-Sensor-SDK\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
+	cmake -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
 	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
 	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Release
 )
 
 if not exist OakD\Build (
-	"C:\Program Files\CMake\bin\Cmake.exe" -S OakD -B OakD\Build -DOpenCV_DIR='%CD%/opencv/Build/'
+	cmake -S OakD -B OakD\Build -DOpenCV_DIR='%CD%/opencv/Build/'
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Debug
 )
 
 if not exist zed-c-api\Build (
 	if exist "c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" (
-		"C:\Program Files\CMake\bin\Cmake.exe" -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+		cmake -S zed-c-api -B zed-c-api/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Debug
 		msbuild.exe zed-c-api/Build/C.sln /p:Configuration=Release
 	)
@@ -86,7 +89,7 @@ if not exist zed-c-api\Build (
 
 if not exist zed-csharp-api\StereoLabs.zed\Build (
 	if exist "c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" (
-		"C:\Program Files\CMake\bin\Cmake.exe" -S zed-csharp-api/StereoLabs.zed/ -B zed-csharp-api/StereoLabs.zed/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
+		cmake -S zed-csharp-api/StereoLabs.zed/ -B zed-csharp-api/StereoLabs.zed/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release
 		msbuild.exe zed-csharp-api/StereoLabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Debug
 		msbuild.exe zed-csharp-api/StereoLabs.zed/Build/Stereolabs.zed.sln /p:Configuration=Release
 

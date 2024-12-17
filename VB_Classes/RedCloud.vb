@@ -1873,7 +1873,6 @@ Public Class RedCloud_CPP_VB : Inherits TaskParent
             color.Run(src)
             src = color.dst2
         End If
-        Dim imagePtr As IntPtr
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
@@ -1882,7 +1881,7 @@ Public Class RedCloud_CPP_VB : Inherits TaskParent
         Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
         Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
-        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols)
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleMask.Free()
         handleInput.Free()
         dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8U, imagePtr).Clone

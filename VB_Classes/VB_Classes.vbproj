@@ -155,6 +155,7 @@
     <Compile Include="FeatureROI.vb" />
     <Compile Include="Stripes.vb" />
     <Compile Include="Swarm.vb" />
+    <Compile Include="TestLib.vb" />
     <Compile Include="TextureFlow.vb" />
     <Compile Include="TaskCommon.vb" />
     <Compile Include="TaskExterns.vb" />
