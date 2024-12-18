@@ -651,10 +651,8 @@ End Class
 
 Public Class Pixel_Vector3D : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
-    Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.HistBinBar3D.Value = 3
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
@@ -688,7 +686,8 @@ Public Class Pixel_Vector3D : Inherits TaskParent
             dst1(cell.rect).SetTo(cell.color, cell.mask)
             If cell.index <= maxRegion Then SetTrueText(CStr(cell.index), cell.maxDist, 2)
         Next
-        labels(2) = task.redC.labels(3)
+        labels(2) = task.redC.labels(2)
+        labels(1) = task.redC.labels(3)
     End Sub
 End Class
 

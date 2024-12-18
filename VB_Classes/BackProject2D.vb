@@ -57,48 +57,48 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
-Public Class BackProject2D_BasicsOld : Inherits TaskParent
-    Public hist2d As New Hist2D_Basics
-    Public xRange As Integer = 255
-    Public yRange As Integer = 255
-    Public minX As Single, maxX As Single, minY As Single, maxY As Single
-    Public colorFmt As New Color_Basics
-    Public bpCol As Integer, bpRow As Integer
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setGridSize(5)
-        UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
-        desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        bpCol = Math.Floor(task.mouseMovePoint.X / task.gridCols)
-        bpRow = Math.Floor(task.mouseMovePoint.Y / task.gridRows)
+'Public Class BackProject2D_BasicsOld : Inherits TaskParent
+'    Public hist2d As New Hist2D_Basics
+'    Public xRange As Integer = 255
+'    Public yRange As Integer = 255
+'    Public minX As Single, maxX As Single, minY As Single, maxY As Single
+'    Public colorFmt As New Color_Basics
+'    Public bpCol As Integer, bpRow As Integer
+'    Public Sub New()
+'        If standaloneTest() Then task.gOptions.setGridSize(5)
+'        UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
+'        desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
+'    End Sub
+'    Public Sub RunAlg(src As cvb.Mat)
+'        bpCol = Math.Floor(task.mouseMovePoint.X / task.gridCols)
+'        bpRow = Math.Floor(task.mouseMovePoint.Y / task.gridRows)
 
-        colorFmt.Run(src)
-        hist2d.Run(colorFmt.dst2)
-        dst2 = hist2d.dst2
+'        colorFmt.Run(src)
+'        hist2d.Run(colorFmt.dst2)
+'        dst2 = hist2d.dst2
 
-        minX = bpRow * xRange / task.gridSize
-        maxX = (bpRow + 1) * xRange / task.gridSize
-        minY = bpCol * yRange / task.gridSize
-        maxY = (bpCol + 1) * yRange / task.gridSize
+'        minX = bpRow * xRange / task.gridSize
+'        maxX = (bpRow + 1) * xRange / task.gridSize
+'        minY = bpCol * yRange / task.gridSize
+'        maxY = (bpCol + 1) * yRange / task.gridSize
 
-        Dim ranges() = New cvb.Rangef() {New cvb.Rangef(minX, maxX), New cvb.Rangef(minY, maxY)}
-        cvb.Cv2.CalcBackProject({src}, task.redOptions.channels, hist2d.histogram, dst0, ranges)
-        Dim bpCount = hist2d.histogram.Get(Of Single)(bpRow, bpCol)
+'        Dim ranges() = New cvb.Rangef() {New cvb.Rangef(minX, maxX), New cvb.Rangef(minY, maxY)}
+'        cvb.Cv2.CalcBackProject({src}, task.redOptions.channels, hist2d.histogram, dst0, ranges)
+'        Dim bpCount = hist2d.histogram.Get(Of Single)(bpRow, bpCol)
 
-        dst3.SetTo(0)
-        dst3.SetTo(cvb.Scalar.Yellow, dst0)
-        If task.heartBeat Then
-            labels(2) = colorFmt.options.colorFormat + ": Cell minX/maxX " + Format(minX, "0") + "/" + Format(maxX, "0") + " minY/maxY " +
-                                Format(minY, "0") + "/" + Format(maxY, "0")
-            Dim c1 = task.redOptions.channels(0), c2 = task.redOptions.channels(1)
-            labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
-                        " pixels while image total is " + Format(dst0.Total, "0")
-        End If
-        SetTrueText("Use Global Algorithm Option 'grid Square Size' to control the 2D histogram at left",
-                    New cvb.Point(10, dst3.Height - 20), 3)
-    End Sub
-End Class
+'        dst3.SetTo(0)
+'        dst3.SetTo(cvb.Scalar.Yellow, dst0)
+'        If task.heartBeat Then
+'            labels(2) = colorFmt.options.colorFormat + ": Cell minX/maxX " + Format(minX, "0") + "/" + Format(maxX, "0") + " minY/maxY " +
+'                                Format(minY, "0") + "/" + Format(maxY, "0")
+'            Dim c1 = task.redOptions.channels(0), c2 = task.redOptions.channels(1)
+'            labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
+'                        " pixels while image total is " + Format(dst0.Total, "0")
+'        End If
+'        SetTrueText("Use Global Algorithm Option 'grid Square Size' to control the 2D histogram at left",
+'                    New cvb.Point(10, dst3.Height - 20), 3)
+'    End Sub
+'End Class
 
 
 

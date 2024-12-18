@@ -175,7 +175,6 @@ End Class
 
 
 Public Class Corners_BasicsStablePoints : Inherits TaskParent
-    Public features As New List(Of cvb.Point)
     Dim fast As New Corners_Basics
     Public Sub New()
         labels = {"", "", "", "FAST stable points without context"}
@@ -185,25 +184,20 @@ Public Class Corners_BasicsStablePoints : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         fast.Run(src)
 
-        If task.optionsChanged Then
-            For Each pt In fast.features
-                features.Add(pt)
-            Next
-        End If
         Dim newPts As New List(Of cvb.Point)
         dst2 = src
         dst3.SetTo(0)
         For Each pt In fast.features
             Dim test = New cvb.Point(pt.X, pt.Y)
-            If features.Contains(test) Then
+            If task.features.Contains(test) Then
                 DrawCircle(dst2, test, task.DotSize, cvb.Scalar.Yellow)
                 newPts.Add(test)
                 dst3.Set(Of Byte)(test.Y, test.X, 255)
             End If
         Next
 
-        features = New List(Of cvb.Point)(newPts)
-        labels(2) = Format(features.Count, "000") + " identified FAST stable points - slider adjusts threshold"
+        task.featurePoints = New List(Of cvb.Point)(newPts)
+        labels(2) = Format(task.features.Count, "000") + " identified FAST stable points - slider adjusts threshold"
     End Sub
 End Class
 

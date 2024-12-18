@@ -172,7 +172,6 @@ End Enum
 	If algorithmName = "BackProject_Vertical_CS" Then return new BackProject_Vertical_CS
 	If algorithmName = "BackProject2D_Basics" Then return new BackProject2D_Basics
 	If algorithmName = "BackProject2D_Basics_CS" Then return new BackProject2D_Basics_CS
-	If algorithmName = "BackProject2D_BasicsOld" Then return new BackProject2D_BasicsOld
 	If algorithmName = "BackProject2D_BasicsOld_CS" Then return new BackProject2D_BasicsOld_CS
 	If algorithmName = "BackProject2D_Compare" Then return new BackProject2D_Compare
 	If algorithmName = "BackProject2D_Compare_CS" Then return new BackProject2D_Compare_CS
