@@ -952,11 +952,14 @@ Public Class Main_UI
         ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
         updatePath(HomeDir.FullName + "bin\", "Debug/Release version of CPP_Native.dll")
         updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
-        ' updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
+        Dim testDebug As New DirectoryInfo(HomeDir.FullName + "bin\Debug\")
+        If testDebug.Exists Then
+            updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
+        End If
 
-        ' CPP_Native.dll only exists in the debug directory.
+        ' CPP_Native.dll only exists in the homedir.fullname + "bin" directory.
         ' Turn optimizations on and off by modifying C/C++ Optimizations and Basic Runtime Checking.
-        ' VB only knows CPP_Native.dll and cannot switch between them (I don't see how anyway.)
+        ' VB knows CPP_Native.dll and doesn't switch the debug version (there's a way to do it tho.)
 
         updatePath(HomeDir.FullName + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")

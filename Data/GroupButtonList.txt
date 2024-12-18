@@ -224,7 +224,6 @@ SVD
 SVM
 Swarm
 Tessallate
-TestLib
 Texture
 TextureFlow
 Thickness

@@ -3491,8 +3491,6 @@ End Enum
 	If algorithmName = "Tessallate_QuadSimple_CS" Then return new Tessallate_QuadSimple_CS
 	If algorithmName = "Tessallate_Triangles" Then return new Tessallate_Triangles
 	If algorithmName = "Tessallate_Triangles_CS" Then return new Tessallate_Triangles_CS
-	If algorithmName = "TestLib_Basics" Then return new TestLib_Basics
-	If algorithmName = "TestLib_RedCloud" Then return new TestLib_RedCloud
 	If algorithmName = "Texture_Basics" Then return new Texture_Basics
 	If algorithmName = "Texture_Basics_CS" Then return new Texture_Basics_CS
 	If algorithmName = "Texture_Flow_CS" Then return new Texture_Flow_CS
