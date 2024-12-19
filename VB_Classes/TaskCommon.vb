@@ -543,11 +543,7 @@ Public Class rcData
     Public motionFlag As Boolean
     Public motionPixels As Integer
 
-    Public nearestFeature As cvb.Point2f
-    Public features As New List(Of cvb.Point)
-    Public featurePair As New List(Of PointPair)
-    Public matchCandidatesSorted As New SortedList(Of Integer, Integer)
-    Public matchCandidates As New List(Of Integer)
+    Public ptFacets As New List(Of cvb.Point)
 
     ' transition these...
     Public nabs As New List(Of Integer)

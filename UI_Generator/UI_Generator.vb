@@ -215,7 +215,6 @@ Module UI_Generator
 
 
         Dim sortedXRefs As New List(Of String)
-        Dim refCounts As New List(Of String)
         Try
             If fullXRef Then
                 Console.WriteLine("The algorithm cross reference needs to be prepared.")
@@ -268,19 +267,22 @@ Module UI_Generator
                     Next
                 Next
 
+                Dim refCounts As New List(Of String)
                 For i = 0 To tokens.Count - 1
                     ' sort the tokens before creating the final entry
                     Dim split As String() = Regex.Split(tokens(i), ",")
                     Dim tokenSort As New SortedList(Of String, String)
                     For j = 0 To split.Length - 1
-                        tokenSort.Add(split(j), split(j))
+                        If split(j).EndsWith("_CC") = False Then tokenSort.Add(split(j), split(j))
                     Next
-                    Dim finalEntry = allButPython.ElementAt(i).Key
-                    For j = 0 To tokenSort.Keys.Count - 1
-                        finalEntry += "," + tokenSort.ElementAt(j).Key
-                    Next
-                    sortedXRefs.Add(finalEntry)
-                    refCounts.Add("(" + CStr(tokenSort.Keys.Count) + ") ")
+                    If tokenSort.Count > 0 Then
+                        Dim finalEntry = allButPython.ElementAt(i).Key
+                        For j = 0 To tokenSort.Keys.Count - 1
+                            finalEntry += "," + tokenSort.ElementAt(j).Key
+                        Next
+                        sortedXRefs.Add(finalEntry)
+                        refCounts.Add("(" + CStr(tokenSort.Keys.Count) + ") ")
+                    End If
                 Next
 
                 Dim xRefsw As New StreamWriter(xRefFile.FullName)
@@ -288,16 +290,16 @@ Module UI_Generator
                     xRefsw.WriteLine(refCounts(i) + sortedXRefs(i))
                 Next
                 xRefsw.Close()
-
                 Console.WriteLine("Algorithm references prepared.")
-            Else
-                Dim xreflines = File.ReadAllLines(xRefFile.FullName)
-                For i = 0 To xreflines.Count - 1
-                    sortedXRefs.Add(xreflines(i))
-                Next
             End If
+
+            sortedXRefs.Clear()
+            Dim xreflines = File.ReadAllLines(xRefFile.FullName)
+            For i = 0 To xreflines.Count - 1
+                sortedXRefs.Add(xreflines(i))
+            Next
         Catch ex As Exception
-            Console.WriteLine("UI_Generator failed creating the usage index.  Error is " + vbCrLf + ex.Message)
+            Console.WriteLine("UI_Generator failed creating the usage index.  Error Is " + vbCrLf + ex.Message)
         End Try
 
 
@@ -338,8 +340,8 @@ Module UI_Generator
                 If alg.EndsWith("_CS") Then ccList.Add(alg, alg)
             Next
 
-            sw.Write("(" + CStr(ccList.Count) + ") < All C# >")
-            For Each alg In ccList.Keys
+            sw.Write("(" + CStr(csList.Count) + ") < All C# >")
+            For Each alg In csList.Keys
                 If alg.EndsWith("_CS") Then sw.Write("," + alg)
             Next
             sw.WriteLine()
@@ -379,7 +381,7 @@ Module UI_Generator
             Next
             sw.Close()
         Catch ex As Exception
-            Console.WriteLine("UI_Generator failed writing the algorithm groups.  Error is " + vbCrLf + ex.Message)
+            Console.WriteLine("UI_Generator failed writing the algorithm groups.  Error Is " + vbCrLf + ex.Message)
         End Try
 
         Console.WriteLine("Algorithm Group Names prepared.")
@@ -411,9 +413,9 @@ Module UI_Generator
             index += 1
             If line.StartsWith("Public Class Options_") Then
                 For i = index To lines.Count - 1
-                    line = line.Replace(" = True", " = true")
-                    line = line.Replace(" = False", " = false")
-                    line = line.Replace("(Of String)", "(Of string)")
+                    line = line.Replace(" = True", " = True")
+                    line = line.Replace(" = False", " = False")
+                    line = line.Replace("(Of String)", "(Of String)")
                     line = line.Replace("Nothing", "null")
 
                     If line.Contains(" As New ") Then

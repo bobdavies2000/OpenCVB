@@ -1204,7 +1204,6 @@ End Class
 
 
 Public Class FCS_RedCloud1 : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Dim fcs As New FCS_Basics
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -1213,9 +1212,9 @@ Public Class FCS_RedCloud1 : Inherits TaskParent
         desc = "Isolate FCS cells for each redCell."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        If standalone Then task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         feat.Run(dst2)
 

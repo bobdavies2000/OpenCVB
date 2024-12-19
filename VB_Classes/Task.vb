@@ -511,7 +511,8 @@ Public Class VBtask : Implements IDisposable
             ' task.ClickPoint = task.redCells(index).maxDist
             task.rc = task.redCells(index)
         Else
-            task.rc = task.redCells(1)
+            ' the 0th cell is always the upper left corner with just 1 pixel.
+            If task.redCells.Count > 1 Then task.rc = task.redCells(1)
         End If
     End Sub
     Private Function checkIntermediateResults(lookupName As String) As TaskParent

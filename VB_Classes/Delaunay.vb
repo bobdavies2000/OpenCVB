@@ -3,6 +3,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
     Public inputPoints As New List(Of cvb.Point2f)
     Public facetList As New List(Of List(Of cvb.Point))
     Public facet32s As cvb.Mat
+    Public ptList As New List(Of cvb.Point)
     Dim randEnum As New Random_Enumerable
     Dim subdiv As New cvb.Subdiv2D
     Public Sub New()
@@ -35,10 +36,13 @@ Public Class Delaunay_Basics : Inherits TaskParent
         Next
 
         dst1.SetTo(0)
+        ptList.Clear()
         For i = 0 To facets.Length - 1
-            Dim ptList As New List(Of cvb.Point)
             For j = 0 To facets(i).Length - 1
-                ptList.Add(New cvb.Point(facets(i)(j).X, facets(i)(j).Y))
+                Dim pt = facets(i)(j)
+                If pt.X >= 0 And pt.X < dst2.Width And pt.Y >= 0 And pt.Y < dst2.Height Then
+                    ptList.Add(New cvb.Point(pt.X, pt.Y))
+                End If
             Next
 
             DrawContour(dst1, ptList, 255, 1)

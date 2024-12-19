@@ -421,46 +421,6 @@ End Class
 
 
 
-Public Class Feature_NearestCell : Inherits TaskParent
-    Dim feat As New FeatureLeftRight_Basics
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        desc = "Find the nearest feature to every cell in task.redCells"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        feat.Run(src)
-        task.redC.Run(src)
-        dst2 = task.redC.dst2
-        dst3 = task.redC.dst2.Clone
-        labels(2) = task.redC.labels(2)
-
-        knn.queries.Clear()
-        For Each rc In task.redCells
-            knn.queries.Add(rc.maxDStable)
-        Next
-
-        knn.trainInput.Clear()
-        For Each mp In feat.mpList
-            knn.trainInput.Add(New cvb.Point2f(mp.p1.X, mp.p1.Y))
-        Next
-
-        If knn.trainInput.Count > 0 Then
-            knn.Run(Nothing)
-
-            For i = 0 To task.redCells.Count - 1
-                Dim rc = task.redCells(i)
-                rc.nearestFeature = knn.trainInput(knn.result(i, 0))
-                DrawLine(dst3, rc.nearestFeature, rc.maxDStable, task.HighlightColor)
-            Next
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Feature_Points : Inherits TaskParent
@@ -1001,5 +961,51 @@ Public Class Feature_SteadyCam : Inherits TaskParent
 
         lastSrc = src.Clone
         labels(2) = CStr(features.Count) + " features were validated by the correlation coefficient"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_FacetPoints : Inherits TaskParent
+    Dim delaunay As New Delaunay_Basics
+    Public Sub New()
+        desc = "Assign each delaunay point to a RedCell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then task.redC.Run(src)
+        delaunay.inputPoints = task.features
+        delaunay.Run(src)
+
+        For Each pt In delaunay.ptList
+            Dim index = task.redMap.Get(Of Byte)(pt.Y, pt.X)
+            If index = 0 Then Continue For
+            Dim rc = task.redCells(index)
+            Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If val <> 0 Then
+                rc.ptFacets.Add(pt)
+                task.redCells(index) = rc
+            End If
+        Next
+
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
+
+        For Each rc In task.redCells
+            For Each pt In rc.ptFacets
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            Next
+        Next
+
+        If standalone Then
+            Dim rc = task.redCells(task.rc.index)
+            task.color.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            For Each pt In rc.ptFacets
+                DrawCircle(task.color, pt, task.DotSize, task.HighlightColor)
+            Next
+        End If
     End Sub
 End Class

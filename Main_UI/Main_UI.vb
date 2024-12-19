@@ -1137,7 +1137,9 @@ Public Class Main_UI
 
         killThread("python")
 
-        If algorithmTaskHandle.IsAlive Then algorithmTaskHandle.Abort()
+        If algorithmTaskHandle IsNot Nothing Then
+            If algorithmTaskHandle.IsAlive Then algorithmTaskHandle.Abort()
+        End If
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastTime As DateTime = Now
@@ -1540,6 +1542,8 @@ Public Class Main_UI
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 
+            ' You may land here when the Group x-reference file has not been updated recently.
+            ' It is not updated on every run because it would make rerunning take too long.
             ' if you land here and you were trying a subset group of algorithms,
             ' then remove the json file and restart, click the OpenCVB options button,
             ' and click 'Update Algorithm XRef' (it is toward the bottom of the options form.)

@@ -1826,35 +1826,6 @@ End Class
 
 
 
-Public Class RedCloud_Delaunay : Inherits TaskParent
-    Dim redCPP As New RedCloud_CPP_VB
-    Dim delaunay As New Feature_Delaunay
-    Dim color As Color8U_Basics
-    Public Sub New()
-        desc = "Test Feature_Delaunay points after Delaunay contours have been added."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        delaunay.Run(src)
-        dst1 = delaunay.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-
-        If src.Channels <> 1 Then
-            If color Is Nothing Then color = New Color8U_Basics
-            color.Run(src)
-            src = color.dst2
-        End If
-        redCPP.inputMask = dst1
-        redCPP.Run(src)
-
-        dst2 = redCPP.dst2
-        labels(2) = redCPP.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class RedCloud_CPP_VB : Inherits TaskParent
     Public inputMask As cvb.Mat
@@ -2261,26 +2232,5 @@ Public Class RedCloud_Combine : Inherits TaskParent
             combinedCells.Add(rc)
         Next
         labels(2) = CStr(combinedCells.Count) + " cells were found.  Dots indicate maxDist points."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCloud_CellDerivative : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "How connected is the RedCloud cell?  Any jumps in depth?  If so, make another cell."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        dst3.SetTo(0)
-        Dim rc = task.redCells(1)
-        Dim mask = task.pcSplit(2)
     End Sub
 End Class

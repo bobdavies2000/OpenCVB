@@ -990,6 +990,7 @@ End Enum
 	If algorithmName = "Feature_Compare_CS" Then return new Feature_Compare_CS
 	If algorithmName = "Feature_Delaunay" Then return new Feature_Delaunay
 	If algorithmName = "Feature_Delaunay_CS" Then return new Feature_Delaunay_CS
+	If algorithmName = "Feature_FacetPoints" Then return new Feature_FacetPoints
 	If algorithmName = "Feature_Gather_CPP_CS" Then return new Feature_Gather_CPP_CS
 	If algorithmName = "Feature_Generations" Then return new Feature_Generations
 	If algorithmName = "Feature_Generations_CS" Then return new Feature_Generations_CS
@@ -1007,8 +1008,6 @@ End Enum
 	If algorithmName = "Feature_Methods" Then return new Feature_Methods
 	If algorithmName = "Feature_MultiPass" Then return new Feature_MultiPass
 	If algorithmName = "Feature_MultiPass_CS" Then return new Feature_MultiPass_CS
-	If algorithmName = "Feature_NearestCell" Then return new Feature_NearestCell
-	If algorithmName = "Feature_NearestCell_CS" Then return new Feature_NearestCell_CS
 	If algorithmName = "Feature_NoMotionTest" Then return new Feature_NoMotionTest
 	If algorithmName = "Feature_Points" Then return new Feature_Points
 	If algorithmName = "Feature_Points_CS" Then return new Feature_Points_CS
@@ -3057,7 +3056,6 @@ End Enum
 	If algorithmName = "RedCloud_CCompColor_CS" Then return new RedCloud_CCompColor_CS
 	If algorithmName = "RedCloud_CellChanges" Then return new RedCloud_CellChanges
 	If algorithmName = "RedCloud_CellChanges_CS" Then return new RedCloud_CellChanges_CS
-	If algorithmName = "RedCloud_CellDerivative" Then return new RedCloud_CellDerivative
 	If algorithmName = "RedCloud_Cells" Then return new RedCloud_Cells
 	If algorithmName = "RedCloud_Cells_CS" Then return new RedCloud_Cells_CS
 	If algorithmName = "RedCloud_CellsAtDepth" Then return new RedCloud_CellsAtDepth
@@ -3078,7 +3076,6 @@ End Enum
 	If algorithmName = "RedCloud_ContourUpdate_CS" Then return new RedCloud_ContourUpdate_CS
 	If algorithmName = "RedCloud_CPP_CS" Then return new RedCloud_CPP_CS
 	If algorithmName = "RedCloud_CPP_VB" Then return new RedCloud_CPP_VB
-	If algorithmName = "RedCloud_Delaunay" Then return new RedCloud_Delaunay
 	If algorithmName = "RedCloud_Delaunay_CS" Then return new RedCloud_Delaunay_CS
 	If algorithmName = "RedCloud_DelaunayGuidedFeatures" Then return new RedCloud_DelaunayGuidedFeatures
 	If algorithmName = "RedCloud_DelaunayGuidedFeatures_CS" Then return new RedCloud_DelaunayGuidedFeatures_CS

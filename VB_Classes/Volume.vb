@@ -2,14 +2,14 @@
 Public Class Volume_Basics : Inherits TaskParent
     Public rc As New rcData
     Public volume As Single
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Build a box containing all the 3D points of a RedCloud cell"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then
-            redC.Run(src)
-            dst2 = redC.dst2
+            task.redC.Run(src)
+            dst2 = task.redC.dst2
+            labels(2) = task.redC.labels(2)
             rc = task.rc
         End If
 

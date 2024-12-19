@@ -34,6 +34,7 @@ namespace CPP_Native
 
         task->HighlightColor = HighlightColors[task->frameCount % HighlightColors.size()];
 
+#if 0 
         switch (function)
         {
         case _AddWeighted_Basics_CC:
@@ -188,6 +189,7 @@ namespace CPP_Native
         { task->alg = new Hist_DepthSimple_CC(); task->alg->traceName = "Hist_DepthSimple_CC"; break; }
         // end of switch - don't remove...
         }
+#endif
         task->alg->standalone = true;
         task->font = FONT_HERSHEY_SIMPLEX; // fontSize is set below...
         task->fontColor = Scalar(255, 255, 255);
@@ -280,7 +282,7 @@ namespace CPP_Native
         int* cppTask_Close(cppTask* task)
     {
         if (task == (cppTask*)0) return (int*)0;
-        if (task->cppFunction != _Delaunay_GenerationsNoKNN_CC) delete task;  // why does fDelaunay_GenerationsNoKNN fail.  Skipping it for now.
+        //if (task->cppFunction != _Delaunay_GenerationsNoKNN_CC) delete task;  // why does fDelaunay_GenerationsNoKNN fail.  Skipping it for now.
         return (int*)0;
     }
 

@@ -5,7 +5,6 @@ Public Class MatchRect_Basics : Inherits TaskParent
     Public rectInput As New cvb.Rect
     Public rectOutput As New cvb.Rect
     Dim rectSave As New cvb.Rect
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell."
     End Sub
@@ -13,9 +12,9 @@ Public Class MatchRect_Basics : Inherits TaskParent
         If task.optionsChanged Then match.correlation = 0
         If match.correlation < match.options.correlationMin Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
-                redC.Run(src)
-                dst2 = redC.dst2
-                labels(2) = redC.labels(2)
+                task.redC.Run(src)
+                dst2 = task.redC.dst2
+                labels(2) = task.redC.labels(2)
                 rectInput = task.rc.rect
             End If
             rectSave = rectInput

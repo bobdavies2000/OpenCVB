@@ -17062,44 +17062,6 @@ namespace CS_Classes
 
 
 
-    public class Feature_NearestCell_CS : TaskParent
-    {
-        RedCloud_Basics redC = new RedCloud_Basics();
-        FeatureLeftRight_Basics feat = new FeatureLeftRight_Basics();
-        KNN_Basics knn = new KNN_Basics();
-        public Feature_NearestCell_CS()
-        {
-            desc = "Find the nearest feature to every cell in vbc.task.redCells";
-        }
-        public void RunAlg(Mat src)
-        {
-            feat.Run(src);
-            redC.Run(src);
-            dst2 = redC.dst2;
-            dst3 = redC.dst2.Clone();
-            labels[2] = redC.labels[2];
-            knn.queries.Clear();
-            foreach (var rc in vbc.task.redCells)
-            {
-                knn.queries.Add(rc.maxDStable);
-            }
-            knn.trainInput.Clear();
-            foreach (var mp in feat.mpList)
-            {
-                knn.trainInput.Add(new Point2f(mp.p1.X, mp.p1.Y));
-            }
-            knn.Run(null);
-            for (int i = 0; i < vbc.task.redCells.Count; i++)
-            {
-                var rc = vbc.task.redCells[i];
-                rc.nearestFeature = knn.trainInput[knn.result[i, 0]];
-                DrawLine(dst3, rc.nearestFeature, rc.maxDStable, vbc.task.HighlightColor, vbc.task.lineWidth);
-            }
-        }
-    }
-
-
-
 
     public class Feature_Points_CS : TaskParent
     {
