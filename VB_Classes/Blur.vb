@@ -1,5 +1,4 @@
 Imports System.Windows.Forms
-Imports System.Security.Cryptography
 Imports cvb = OpenCvSharp
 Public Class Blur_Basics : Inherits TaskParent
     Public Options As New Options_Blur

@@ -42,7 +42,6 @@ Corners
 Correlation
 Covariance
 CPP
-Crypto
 CSV
 DCT
 Delaunay

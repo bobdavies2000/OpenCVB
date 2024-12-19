@@ -573,8 +573,6 @@ End Enum
 	If algorithmName = "Covariance_Test" Then return new Covariance_Test
 	If algorithmName = "Covariance_Test_CS" Then return new Covariance_Test_CS
 	If algorithmName = "CPP_ManagedTask" Then return new CPP_ManagedTask
-	If algorithmName = "Crypto_Hash" Then return new Crypto_Hash
-	If algorithmName = "Crypto_Hash_CS" Then return new Crypto_Hash_CS
 	If algorithmName = "CSV_Basics" Then return new CSV_Basics
 	If algorithmName = "CSV_Basics_CS" Then return new CSV_Basics_CS
 	If algorithmName = "DCT_Basics" Then return new DCT_Basics

@@ -1243,8 +1243,7 @@ Public Class Main_UI
             Debug.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
             While 1
                 If algorithmQueueCount <> 0 Or task.TaskTimer.Enabled Then
-                    Debug.Write(".")
-                    Thread.Sleep(100)
+                    Exit Sub
                 Else
                     algorithmQueueCount = 0
                     Exit While
@@ -1404,6 +1403,7 @@ Public Class Main_UI
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"
+                'Return New CameraORB_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
         End Select
         Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)

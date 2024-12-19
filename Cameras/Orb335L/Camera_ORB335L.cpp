@@ -1,8 +1,4 @@
 #include "../CameraDefines.hpp"
-// Turn on this #ifdef if you need to fall back to the C++ interface.
-// The corresponding driver interface in CameraOrb.vb needs to be turned off.
-// The CameraOrb.vb supports both the C++ and the VB.Net interfaces.
-#if 0
 #include "libobsensor/hpp/Pipeline.hpp"
 #include "libobsensor/hpp/Error.hpp"
 #include <mutex>
@@ -18,7 +14,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
-#include "PragmaLibs.h"
+#include "../CPP_Native/PragmaLibs.h"
 #pragma comment(lib, "../../OrbbecSDK/lib/win_x64/OrbbecSDK.lib") 
 
 using namespace  cv;
@@ -49,7 +45,7 @@ public:
     {
         width = _width;
         height = _height;
-        int fps = 15;
+        int fps = 0;
         auto devList = ctx.queryDeviceList();
         auto dev = devList->getDevice(0);
 
@@ -195,4 +191,3 @@ extern "C" __declspec(dllexport) int* ORBPointCloud(CameraOrb335L * cPtr) { retu
 extern "C" __declspec(dllexport) int* ORBAccel(CameraOrb335L * cPtr){return (int*)&cPtr->acceleration;}
 extern "C" __declspec(dllexport) int* ORBGyro(CameraOrb335L * cPtr){return (int*)&cPtr->gyro;}
 extern "C" __declspec(dllexport) double ORBIMUTimeStamp(CameraOrb335L * cPtr){return cPtr->imuTimeStamp;}
-#endif

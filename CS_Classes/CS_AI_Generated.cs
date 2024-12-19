@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using static CS_Classes.CS_Externs;
 using OpenCvSharp.XImgProc;
 using System.IO;
-using System.Security.Cryptography;
+//using System.Security.Cryptography;
 using System.Numerics;
 using System.Diagnostics;
 using OpenCvSharp.ML;
@@ -10099,59 +10099,59 @@ namespace CS_Classes
 
 
 
-    public class Crypto_Hash_CS : TaskParent
-    {
-        Font_FlowText flow = new Font_FlowText();
-        List<Mat> images = new List<Mat>();
-        List<string> guids = new List<string>();
+    //public class Crypto_Hash_CS : TaskParent
+    //{
+    //    Font_FlowText flow = new Font_FlowText();
+    //    List<Mat> images = new List<Mat>();
+    //    List<string> guids = new List<string>();
 
-        public Crypto_Hash_CS()
-        {
-            flow.parentData = this;
-            desc = "Experiment with hashing algorithm and guid";
-        }
+    //    public Crypto_Hash_CS()
+    //    {
+    //        flow.parentData = this;
+    //        desc = "Experiment with hashing algorithm and guid";
+    //    }
 
-        public void RunAlg(Mat src)
-        {
-            int iSize = (int)(src.Total() * src.ElemSize());
-            int maxImages = 10;
-            images.Add(src);
+    //    public void RunAlg(Mat src)
+    //    {
+    //        int iSize = (int)(src.Total() * src.ElemSize());
+    //        int maxImages = 10;
+    //        images.Add(src);
 
-            if (images.Count >= maxImages)
-            {
-                byte[] bytes = new byte[iSize * maxImages];
-                images.RemoveAt(0);
+    //        if (images.Count >= maxImages)
+    //        {
+    //            byte[] bytes = new byte[iSize * maxImages];
+    //            images.RemoveAt(0);
 
-                int index = 0;
-                foreach (Mat mat in images)
-                {
-                    Marshal.Copy(mat.Data, bytes, iSize * index, iSize);
-                    index++;
-                }
+    //            int index = 0;
+    //            foreach (Mat mat in images)
+    //            {
+    //                Marshal.Copy(mat.Data, bytes, iSize * index, iSize);
+    //                index++;
+    //            }
 
-                using (MD5 algorithm = MD5.Create())
-                {
-                    bytes = algorithm.ComputeHash(bytes);
-                }
+    //            using (MD5 algorithm = MD5.Create())
+    //            {
+    //                bytes = algorithm.ComputeHash(bytes);
+    //            }
 
-                guids.Add(new Guid(bytes).ToString());
-                flow.flowText.Clear();
+    //            guids.Add(new Guid(bytes).ToString());
+    //            flow.flowText.Clear();
 
-                for (int i = 0; i < guids.Count; i++)
-                {
-                    flow.flowText.Add(guids[i]);
-                }
+    //            for (int i = 0; i < guids.Count; i++)
+    //            {
+    //                flow.flowText.Add(guids[i]);
+    //            }
 
-                if (guids.Count >= flow.maxLines)
-                {
-                    guids.RemoveAt(0);
-                }
+    //            if (guids.Count >= flow.maxLines)
+    //            {
+    //                guids.RemoveAt(0);
+    //            }
 
 
-                flow.Run(empty);
-            }
-        }
-    }
+    //            flow.Run(empty);
+    //        }
+    //    }
+    //}
 
 
 

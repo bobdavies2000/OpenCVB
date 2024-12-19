@@ -2,8 +2,6 @@
 Imports cvb = OpenCvSharp
 Imports System.Threading
 Imports Orbbec
-' switch between the VB.Net version of the Orbbec camera interface and the C++ one.
-#If 1 Then
 Public Class CameraORB : Inherits GenericCamera
     Dim pipe As New Pipeline()
     Dim accelSensor As Sensor
@@ -17,7 +15,7 @@ Public Class CameraORB : Inherits GenericCamera
         Dim devList = ctx.QueryDeviceList()
         Dim dev = devList.GetDevice(0)
 
-        Dim fps = 30
+        Dim fps = 0
         Dim w = captureRes.Width, h = captureRes.Height
         Dim colorProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_COLOR).
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_BGR, fps)
@@ -134,7 +132,7 @@ Public Class CameraORB : Inherits GenericCamera
         pipe.Stop()
     End Sub
 End Class
-#Else
+
 Module ORB_Module
     <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBWaitForFrame(cPtr As IntPtr) As IntPtr
     End Function
@@ -160,7 +158,7 @@ Module ORB_Module
                                                    width As Integer, height As Integer) As IntPtr
     End Function
 End Module
-Public Class CameraORB : Inherits GenericCamera
+Public Class CameraORB_CPP : Inherits GenericCamera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
@@ -239,4 +237,3 @@ Public Class CameraORB : Inherits GenericCamera
         cPtr = 0
     End Sub
 End Class
-#End If

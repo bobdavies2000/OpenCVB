@@ -1,5 +1,4 @@
-﻿Imports System.Security.Cryptography
-Imports cvb = OpenCvSharp
+﻿Imports cvb = OpenCvSharp
 Public Class Model_Basics : Inherits TaskParent
     Dim oglM As New OpenGL_BasicsMouse
     Public Sub New()
