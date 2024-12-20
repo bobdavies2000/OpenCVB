@@ -309,7 +309,6 @@ Public Class Main_UI
             Me.Width = .locationMain.Item2
             Me.Height = .locationMain.Item3
 
-            TreeViewDialog = New TreeviewForm
             optionsForm = New Options
             optionsForm.defineCameraResolutions(settings.cameraIndex)
         End With
@@ -484,6 +483,7 @@ Public Class Main_UI
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         TreeButton.Checked = Not TreeButton.Checked
         settings.treeButton = TreeButton.Checked
+        If TreeViewDialog Is Nothing Then TreeViewDialog = New TreeviewForm
         If TreeButton.Checked Then
             TreeViewDialog.Show()
             TreeViewDialog.Left = settings.treeLocation.Item0

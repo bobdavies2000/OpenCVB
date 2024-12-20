@@ -111,7 +111,7 @@ Module UI_Generator
                             Dim split As String() = Regex.Split(line, "\W+")
                             classname = split(2)
                             If classname.StartsWith("OpenGL_") Then opengl.Add(classname, line)
-                            vbList.Add(classname, line)
+                            If classname.StartsWith("Python_") = False Then vbList.Add(classname, line)
                             allButPython.Add(classname, line)
                             allList.Add(classname, line)
                         End If

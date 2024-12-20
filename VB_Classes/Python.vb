@@ -133,6 +133,7 @@ Public Class Python_Stream : Inherits TaskParent
     Dim dst2Buffer(1) As Byte
     Dim memMap As Python_MemMap
     Public Sub New()
+        If standalone Then Exit Sub
         task.pipeName = "PyStream2Way" + CStr(task.pythonPipeIndex)
         task.pythonPipeIndex += 1
         Try
@@ -164,7 +165,7 @@ Public Class Python_Stream : Inherits TaskParent
         desc = "General purpose class to pipe BGR and Depth to Python scripts."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Then
+        If standalone Then
             SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
