@@ -7,178 +7,178 @@ using namespace cv;
 using namespace std;
 class Options_Annealing {
 public:
-	int cityCount =  25;
-	bool copyBestFlag =  false;
-	bool circularFlag =  true;
-	int successCount =  8;
+	int cityCount = 25;
+	bool copyBestFlag = false; 
+	bool circularFlag = true;
+	int successCount = 8;
 	void RunOpt() {}
 	Options_Annealing() {
 	}
 };
 class Options_CamShift {
 public:
-	int camMax =  255;
-	cv::Scalar camSBins =  cv::Scalar(0, 40, 32);
+	int camMax = 255;
+	cv::Scalar camSBins = cv::Scalar(0, 40, 32);
 	void RunOpt() {}
 	Options_CamShift() {
 	}
 };
 class Options_Contours2 {
 public:
-	cv::ContourApproximationModes ApproximationMode =  cv::ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
+	cv::ContourApproximationModes ApproximationMode = cv::ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
 	void RunOpt() {}
 	Options_Contours2() {
 	}
 };
 class Options_Contours {
 public:
-	cv::RetrievalModes retrievalMode =  cv::RetrievalModes::RETR_EXTERNAL;
-	cv::ContourApproximationModes ApproximationMode =  cv::ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
-	double epsilon =  0.03;
-	int minPixels =  30;
-	int trueTextOffset =  80;
-	int maxContourCount =  50;
+	cv::RetrievalModes retrievalMode = cv::RetrievalModes::RETR_EXTERNAL;
+	cv::ContourApproximationModes ApproximationMode = cv::ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
+	double epsilon = 0.03;
+	int minPixels = 30;
+	int trueTextOffset = 80;
+	int maxContourCount = 50;
 	void RunOpt() {}
 	Options_Contours() {
 	}
 };
 class Options_DepthTiers {
 public:
-	int cmPerTier =  50;
+	int cmPerTier = 50;
 	void RunOpt() {}
 	Options_DepthTiers() {
 	}
 };
 class Options_Encode {
 public:
-	int qualityLevel =  1;
-	int scalingLevel =  85;
-	int encodeOption =  cv::ImwriteFlags::IMWRITE_JPEG_PROGRESSIVE;
+	int qualityLevel = 1;
+	int scalingLevel = 85;
+	int encodeOption = cv::ImwriteFlags::IMWRITE_JPEG_PROGRESSIVE;
 	void RunOpt() {}
 	Options_Encode() {
 	}
 };
 class Options_Filter {
 public:
-	int kernelSize =  3;
+	int kernelSize = 3;
 	void RunOpt() {}
 	Options_Filter() {
 	}
 };
 class Options_GeneticDrawing {
 public:
-	int stageTotal =  100;
-	double brushPercent =  1.0;
-	int strokeCount =  10;
-	bool snapCheck =  false;
-	int generations =  20;
+	int stageTotal = 100;
+	double brushPercent = 1.0;
+	int strokeCount = 10;
+	bool snapCheck = false;
+	int generations = 20;
 	void RunOpt() {}
 	Options_GeneticDrawing() {
 	}
 };
 class Options_MatchShapes {
 public:
-	cv::ShapeMatchModes matchOption =  cv:: ShapeMatchModes::CONTOURS_MATCH_I1;
-	double matchThreshold =  0.4;
-	double maxYdelta =  0.05;
-	double minSize =  120;
+	cv::ShapeMatchModes matchOption = cv:: ShapeMatchModes::CONTOURS_MATCH_I1;
+	double matchThreshold = 0.4;
+	double maxYdelta = 0.05;
+	double minSize = 120;
 	void RunOpt() {}
 	Options_MatchShapes() {
 	}
 };
 class Options_Plane {
 public:
-	double rmsThreshold =  0.1;
-	bool useMaskPoints =  false;
-	bool useContourPoints =  false;
-	bool use3Points =  false;
-	bool reuseRawDepthData =  false;
+	double rmsThreshold = 0.1;
+	bool useMaskPoints = false;
+	bool useContourPoints = false;
+	bool use3Points = false;
+	bool reuseRawDepthData = false;
 	void RunOpt() {}
 	Options_Plane() {
 	}
 };
 class Options_Neighbors {
 public:
-	double threshold =  0.005;
-	int pixels =  6;
-	bool patchZ =  false;
+	double threshold = 0.005;
+	int pixels = 6;
+	bool patchZ = false;
 	void RunOpt() {}
 	Options_Neighbors() {
 	}
 };
 class Options_Interpolate {
 public:
-	int resizePercent =  2;
-	int interpolationThreshold =  4;
-	int pixelCountThreshold =  0;
-	int saveDefaultThreshold =  resizePercent;
+	int resizePercent = 2;
+	int interpolationThreshold = 4;
+	int pixelCountThreshold = 0;
+	int saveDefaultThreshold = resizePercent;
 	void RunOpt() {}
 	Options_Interpolate() {
 	}
 };
 class Options_Resize {
 public:
-	cv::InterpolationFlags warpFlag =  cv::InterpolationFlags::INTER_NEAREST;
-	int radioIndex =  0;
+	cv::InterpolationFlags warpFlag = cv::InterpolationFlags::INTER_NEAREST;
+	int radioIndex = 0;
 	void RunOpt() {}
 	Options_Resize() {
 	}
 };
 class Options_Smoothing {
 public:
-	int iterations =  8;
-	double interiorTension =  0.5;
-	int stepSize =  30;
+	int iterations = 8;
+	double interiorTension = 0.5;
+	int stepSize = 30;
 	void RunOpt() {}
 	Options_Smoothing() {
 	}
 };
 class Options_SuperRes {
 public:
-	string method =  "farneback";
-	int iterations =  10;
-	bool restartWithNewOptions =  false;
+	string method = "farneback";
+	int iterations = 10;
+	bool restartWithNewOptions = false;
 	void RunOpt() {}
 	Options_SuperRes() {
 	}
 };
 class Options_SVM2 {
 public:
-	int SVMType =  cv::ml::SVM::C_SVC;
+	int SVMType = cv::ml::SVM::C_SVC;
 	void RunOpt() {}
 	Options_SVM2() {
 	}
 };
 class Options_SVM {
 public:
-	int kernelType =  cv::ml::SVM::KernelTypes::POLY;
-	int granularity =  5;
-	double svmDegree =  1;
-	int gamma =  1;
-	double svmCoef0 =  1;
-	double svmC =  1;
-	double svmNu =  0.5;
-	double svmP =  0;
-	int sampleCount =  500;
+	int kernelType = cv::ml::SVM::KernelTypes::POLY;
+	int granularity = 5;
+	double svmDegree = 1;
+	int gamma = 1;
+	double svmCoef0 = 1;
+	double svmC = 1;
+	double svmNu = 0.5;
+	double svmP = 0;
+	int sampleCount = 500;
 	void RunOpt() {}
 	Options_SVM() {
 	}
 };
 class Options_WarpModel {
 public:
-	bool useGradient =  false;
-	int warpMode =  0;
-	bool useWarpAffine =  false;
-	bool useWarpHomography =  false;
+	bool useGradient = false;
+	int warpMode = 0;
+	bool useWarpAffine = false;
+	bool useWarpHomography = false;
 	void RunOpt() {}
 	Options_WarpModel() {
 	}
 };
 class Options_MinMaxNone {
 public:
-	bool useMax =  false;
-	bool useMin =  false;
-	bool useNone =  false;
+	bool useMax = false;
+	bool useMin = false;
+	bool useNone = false;
 	void RunOpt() {}
 	Options_MinMaxNone() {
 	}
@@ -186,43 +186,43 @@ public:
 class Options_MinArea {
 public:
 vector<cv::Point2f> srcPoints;
-	int squareWidth =  100;
-	int numPoints =  5;
+	int squareWidth = 100;
+	int numPoints = 5;
 	void RunOpt() {}
 	Options_MinArea() {
 	}
 };
 class Options_DCT {
 public:
-	int dctFlag =  cv::DCT_INVERSE | cv::DCT_ROWS;
-	int runLengthMin =  15;
-	int removeFrequency =  1;
+	int dctFlag = cv::DCT_INVERSE | cv::DCT_ROWS;
+	int runLengthMin = 15;
+	int removeFrequency = 1;
 	void RunOpt() {}
 	Options_DCT() {
 	}
 };
 class Options_Eigen {
 public:
-	bool highlight =  false;
-	bool recompute =  false;
-	int randomCount =  100;
-	int linePairCount =  20;
-	int noiseOffset =  10;
+	bool highlight = false;
+	bool recompute = false;
+	int randomCount = 100;
+	int linePairCount = 20;
+	int noiseOffset = 10;
 	void RunOpt() {}
 	Options_Eigen() {
 	}
 };
 class Options_FitLine {
 public:
-	int radiusAccuracy =  10;
-	int angleAccuracy =  10;
+	int radiusAccuracy = 10;
+	int angleAccuracy = 10;
 	void RunOpt() {}
 	Options_FitLine() {
 	}
 };
 class Options_Fractal {
 public:
-	int iterations =  34;
+	int iterations = 34;
 	void RunOpt() {}
 	Options_Fractal() {
 	}
@@ -230,112 +230,112 @@ public:
 class Options_ProCon {
 public:
 	int buffer[9];
-	int pduration =  1;
-	int cduration =  1;
-	int bufferSize =  0;
+	int pduration = 1;
+	int cduration = 1;
+	int bufferSize = 0;
 	void RunOpt() {}
 	Options_ProCon() {
 	}
 };
 class Options_OilPaint {
 public:
-	int kernelSize =  4;
-	int intensity =  20;
-	int threshold =  25;
-	int filterSize =  3;
+	int kernelSize = 4;
+	int intensity = 20;
+	int threshold = 25;
+	int filterSize = 3;
 	void RunOpt() {}
 	Options_OilPaint() {
 	}
 };
 class Options_Pointilism {
 public:
-	int smoothingRadius =  32 * 2 + 1;
-	int strokeSize =  3;
-	bool useElliptical =  false;
+	int smoothingRadius = 32 * 2 + 1;
+	int strokeSize = 3;
+	bool useElliptical = false;
 	void RunOpt() {}
 	Options_Pointilism() {
 	}
 };
 class Options_MotionBlur {
 public:
-	bool showDirection =  true;
-	int kernelSize =  51;
-	double theta =  0;
-	int restoreLen =  10;
-	int SNR =  700;
-	int gamma =  5;
+	bool showDirection = true;
+	int kernelSize = 51;
+	double theta = 0;
+	int restoreLen = 10;
+	int SNR = 700;
+	int gamma = 5;
 	void RunOpt() {}
 	Options_MotionBlur() {
 	}
 };
 class Options_BinarizeNiBlack {
 public:
-	int kernelSize =  51;
-	double niBlackK =  -200 / 1000;
-	double nickK =  100 / 1000;
-	double sauvolaK =  100 / 1000;
-	double sauvolaR =  64;
+	int kernelSize = 51;
+	double niBlackK = -200 / 1000;
+	double nickK = 100 / 1000;
+	double sauvolaK = 100 / 1000;
+	double sauvolaR = 64;
 	void RunOpt() {}
 	Options_BinarizeNiBlack() {
 	}
 };
 class Options_Bernson {
 public:
-	int kernelSize =  51;
-	int bgThreshold =  100;
-	int contrastMin =  50;
+	int kernelSize = 51;
+	int bgThreshold = 100;
+	int contrastMin = 50;
 	void RunOpt() {}
 	Options_Bernson() {
 	}
 };
 class Options_BlockMatching {
 public:
-	int numDisparity =  2 * 16;
-	int blockSize =  15;
-	int distance =  20;
+	int numDisparity = 2 * 16;
+	int blockSize = 15;
+	int distance = 20;
 	void RunOpt() {}
 	Options_BlockMatching() {
 	}
 };
 class Options_Cartoonify {
 public:
-	int medianBlur =  7;
-	int medianBlur2 =  3;
-	int kernelSize =  5;
-	int threshold =  80;
+	int medianBlur = 7;
+	int medianBlur2 = 3;
+	int kernelSize = 5;
+	int threshold = 80;
 	void RunOpt() {}
 	Options_Cartoonify() {
 	}
 };
 class Options_Dither {
 public:
-	int radioIndex =  0;
-	int bppIndex =  1;
+	int radioIndex = 0;
+	int bppIndex = 1;
 	void RunOpt() {}
 	Options_Dither() {
 	}
 };
 class Options_SymmetricalShapes {
 public:
-	double rotateAngle =  0;
-	cv::Scalar fillColor =  cv::Scalar(0, 0, 255);
-	int numPoints =  0;
-	int nGenPer =  0;
-	int radius1 =  0;
-	int radius2 =  0;
-	double dTheta =  0;
-	bool symmetricRipple =  false;
-	bool reverseInOut =  false;
-	bool fillRequest =  false;
+	double rotateAngle = 0;
+	cv::Scalar fillColor = cv::Scalar(0, 0, 255);
+	int numPoints = 0;
+	int nGenPer = 0;
+	int radius1 = 0;
+	int radius2 = 0;
+	double dTheta = 0;
+	bool symmetricRipple = false;
+	bool reverseInOut = false;
+	bool fillRequest = false;
 	void RunOpt() {}
 	Options_SymmetricalShapes() {
 	}
 };
 class Options_DrawArc {
 public:
-	int saveMargin =  32;
-	bool drawFull =  false;
-	bool drawFill =  false;
+	int saveMargin = 32;
+	bool drawFull = false;
+	bool drawFill = false;
 	void RunOpt() {}
 	Options_DrawArc() {
 	}
@@ -348,81 +348,81 @@ public:
 };
 class Options_SepFilter2D {
 public:
-	int xDim =  5;
-	int yDim =  11;
-	double sigma =  17;
-	bool diffCheck =  false;
+	int xDim = 5;
+	int yDim = 11;
+	double sigma = 17;
+	bool diffCheck = false;
 	void RunOpt() {}
 	Options_SepFilter2D() {
 	}
 };
 class Options_IMUFrameTime {
 public:
-	int minDelayIMU =  4;
-	int minDelayHost =  4;
-	int plotLastX =  20;
+	int minDelayIMU = 4;
+	int minDelayHost = 4;
+	int plotLastX = 20;
 	void RunOpt() {}
 	Options_IMUFrameTime() {
 	}
 };
 class Options_KLT {
 public:
-	int maxCorners =  100;
-	double qualityLevel =  0.01;
-	int minDistance =  7;
-	int blockSize =  7;
-	bool nightMode =  false;
-	cv::Size subPixWinSize =  cv::Size(10, 10);
-	cv::Size winSize =  cv::Size(3, 3);
+	int maxCorners = 100;
+	double qualityLevel = 0.01;
+	int minDistance = 7;
+	int blockSize = 7;
+	bool nightMode = false;
+	cv::Size subPixWinSize = cv::Size(10, 10);
+	cv::Size winSize = cv::Size(3, 3);
 	void RunOpt() {}
 	Options_KLT() {
 	}
 };
 class Options_Laplacian {
 public:
-	cv::Size kernel =  cv::Size(3, 3);
-	double scale =  1;
-	double delta =  0;
-	bool gaussianBlur =  false;
-	bool boxFilterBlur =  false;
-	int threshold =  15;
+	cv::Size kernel = cv::Size(3, 3);
+	double scale = 1;
+	double delta = 0;
+	bool gaussianBlur = false;
+	bool boxFilterBlur = false;
+	int threshold = 15;
 	void RunOpt() {}
 	Options_Laplacian() {
 	}
 };
 class Options_OpticalFlow {
 public:
-	double pyrScale =  0.35;
-	int levels =  1;
-	int winSize =  1;
-	int iterations =  1;
-	double polyN =  0;
-	double polySigma =  0;
-	int OpticalFlowFlags =  cv::OPTFLOW_FARNEBACK_GAUSSIAN;
-	int outputScaling =  0;
+	double pyrScale = 0.35;
+	int levels = 1;
+	int winSize = 1;
+	int iterations = 1;
+	double polyN = 0;
+	double polySigma = 0;
+	int OpticalFlowFlags = cv::OPTFLOW_FARNEBACK_GAUSSIAN;
+	int outputScaling = 0;
 	void RunOpt() {}
 	Options_OpticalFlow() {
 	}
 };
 class Options_OpticalFlowSparse {
 public:
-	int OpticalFlowFlag =  cv::OPTFLOW_FARNEBACK_GAUSSIAN;
+	int OpticalFlowFlag = cv::OPTFLOW_FARNEBACK_GAUSSIAN;
 	void RunOpt() {}
 	Options_OpticalFlowSparse() {
 	}
 };
 class Options_XPhoto {
 public:
-	int colorCode =  cv::ColorConversionCodes::COLOR_BGR2GRAY;
-	int dynamicRatio =  0;
-	int blockSize =  0;
+	int colorCode = cv::ColorConversionCodes::COLOR_BGR2GRAY;
+	int dynamicRatio = 0;
+	int blockSize = 0;
 	void RunOpt() {}
 	Options_XPhoto() {
 	}
 };
 class Options_InPaint {
 public:
-	bool telea =  false;
+	bool telea = false;
 	void RunOpt() {}
 	Options_InPaint() {
 	}
@@ -435,49 +435,49 @@ public:
 };
 class Options_FPoly {
 public:
-	int removeThreshold =  4;
-	int autoResyncAfterX =  500;
+	int removeThreshold = 4;
+	int autoResyncAfterX = 500;
 	void RunOpt() {}
 	Options_FPoly() {
 	}
 };
 class Options_Homography {
 public:
-	int hMethod =  cv::LMEDS;
+	int hMethod = cv::LMEDS;
 	void RunOpt() {}
 	Options_Homography() {
 	}
 };
 class Options_Random {
 public:
-	int count =  0;
+	int count = 0;
 	void RunOpt() {}
 	Options_Random() {
 	}
 };
 class Options_Hough {
 public:
-	int rho =  1;
-	double theta =  1000 * CV_PI / 180;
-	int threshold =  3;
-	int lineCount =  25;
-	double relativeIntensity =  90 / 1000;
+	int rho = 1;
+	double theta = 1000 * CV_PI / 180;
+	int threshold = 3;
+	int lineCount = 25;
+	double relativeIntensity = 90 / 1000;
 	void RunOpt() {}
 	Options_Hough() {
 	}
 };
 class Options_Canny {
 public:
-	int threshold1 =  100;
-	int threshold2 =  150;
-	int aperture =  3;
+	int threshold1 = 100;
+	int threshold2 = 150;
+	int aperture = 3;
 	void RunOpt() {}
 	Options_Canny() {
 	}
 };
 class Options_ColorMatch {
 public:
-	bool maxDistanceCheck =  false;
+	bool maxDistanceCheck = false;
 	void RunOpt() {}
 	Options_ColorMatch() {
 	}
@@ -485,81 +485,81 @@ public:
 class Options_Sort {
 public:
 	int sortOption=  cv::SortFlags::SORT_EVERY_COLUMN + cv::SortFlags::SORT_ASCENDING;
-	int sortThreshold =  0;
+	int sortThreshold = 0;
 	void RunOpt() {}
 	Options_Sort() {
 	}
 };
 class Options_Distance {
 public:
-	int distanceType =  cv::DistanceTypes::DIST_L1;
+	int distanceType = cv::DistanceTypes::DIST_L1;
 	void RunOpt() {}
 	Options_Distance() {
 	}
 };
 class Options_Warp {
 public:
-	double alpha =  0;
-	double beta =  0;
-	double gamma =  0;
-	double f =  0;
-	double distance =  0;
+	double alpha = 0;
+	double beta = 0;
+	double gamma = 0;
+	double f = 0;
+	double distance = 0;
 	void RunOpt() {}
 	Options_Warp() {
 	}
 };
 class Options_HistCompare {
 public:
-	cv::HistCompMethods compareMethod =  cv::HistCompMethods::HISTCMP_CORREL;
-	string compareName =  "Chi Square Alt";
+	cv::HistCompMethods compareMethod = cv::HistCompMethods::HISTCMP_CORREL;
+	string compareName = "Chi Square Alt";
 	void RunOpt() {}
 	Options_HistCompare() {
 	}
 };
 class Options_MatchCell {
 public:
-	double overlapPercent =  0.5;
+	double overlapPercent = 0.5;
 	void RunOpt() {}
 	Options_MatchCell() {
 	}
 };
 class Options_Extrinsics {
 public:
-	int leftCorner =  0;
-	int rightCorner =  0;
-	int topCorner =  0;
+	int leftCorner = 0;
+	int rightCorner = 0;
+	int topCorner = 0;
 	void RunOpt() {}
 	Options_Extrinsics() {
 	}
 };
 class Options_Translation {
 public:
-	int leftTrans =  0;
-	int rightTrans =  0;
+	int leftTrans = 0;
+	int rightTrans = 0;
 	void RunOpt() {}
 	Options_Translation() {
 	}
 };
 class Options_OpenGL_Contours {
 public:
-	int depthPointStyle =  0;
-	double filterThreshold =  0.3;
+	int depthPointStyle = 0;
+	double filterThreshold = 0.3;
 	void RunOpt() {}
 	Options_OpenGL_Contours() {
 	}
 };
 class Options_Motion {
 public:
-	int motionThreshold =  0;
-	double cumulativePercentThreshold =  0.1;
+	int motionThreshold = 0;
+	double cumulativePercentThreshold = 0.1;
 	void RunOpt() {}
 	Options_Motion() {
 	}
 };
 class Options_Emax {
 public:
-	int predictionStepSize =  5;
-	bool consistentcolors =  false;
+	int predictionStepSize = 5;
+	bool consistentcolors = false;
 
 	void RunOpt() {}
 	Options_Emax() {
@@ -567,36 +567,36 @@ public:
 };
 class Options_Intercepts {
 public:
-	int interceptRange =  10;
-	int mouseMovePoint =  0;
-	int selectedIntercept =  0;
+	int interceptRange = 10;
+	int mouseMovePoint = 0;
+	int selectedIntercept = 0;
 	void RunOpt() {}
 	Options_Intercepts() {
 	}
 };
 class Options_PlaneEstimation {
 public:
-	bool useDiagonalLines =  false;
-	bool useContour_SidePoints =  true;
+	bool useDiagonalLines = false;
+	bool useContour_SidePoints = true;
 	void RunOpt() {}
 	Options_PlaneEstimation() {
 	}
 };
 class Options_ForeGround {
 public:
-	float maxForegroundDepthInMeters =  1500 / 1000;
-	int minSizeContour =  100;
-	double depthPerRegion =  0;
-	int numberOfRegions =  5;
+	float maxForegroundDepthInMeters = 1500 / 1000;
+	int minSizeContour = 100;
+	double depthPerRegion = 0;
+	int numberOfRegions = 5;
 	void RunOpt() {}
 	Options_ForeGround() {
 	}
 };
 class Options_Flood {
 public:
-	int floodFlag =  4 | cv::FloodFillFlags::FLOODFILL_FIXED_RANGE;
-	int stepSize =  30;
-	int minPixels =  30;
+	int floodFlag = 4 | cv::FloodFillFlags::FLOODFILL_FIXED_RANGE;
+	int stepSize = 30;
+	int minPixels = 30;
 	void RunOpt() {}
 	Options_Flood() {
 	}
@@ -609,69 +609,69 @@ public:
 };
 class Options_Blur {
 public:
-	int kernelSize =  3;
-	double sigma =  1.5;
+	int kernelSize = 3;
+	double sigma = 1.5;
 	void RunOpt() {}
 	Options_Blur() {
 	}
 };
 class Options_Wavelet {
 public:
-	bool useHaar =  true;
-	int iterations =  3;
+	bool useHaar = true;
+	int iterations = 3;
 	void RunOpt() {}
 	Options_Wavelet() {
 	}
 };
 class Options_SOM {
 public:
-	int iterations =  3000;
-	double learningRate =  0.1;
-	int radius =  15;
+	int iterations = 3000;
+	double learningRate = 0.1;
+	int radius = 15;
 	void RunOpt() {}
 	Options_SOM() {
 	}
 };
 class Options_SURF {
 public:
-	int hessianThreshold =  2000;
-	bool useBFMatcher =  true;
-	int verticalRange =  1;
-	int pointCount =  200;
+	int hessianThreshold = 2000;
+	bool useBFMatcher = true;
+	int verticalRange = 1;
+	int pointCount = 200;
 	void RunOpt() {}
 	Options_SURF() {
 	}
 };
 class Options_Sift {
 public:
-	bool useBFMatcher =  false;
-	int pointCount =  200;
-	int stepSize =  10;
+	bool useBFMatcher = false;
+	int pointCount = 200;
+	int stepSize = 10;
 	void RunOpt() {}
 	Options_Sift() {
 	}
 };
 class Options_Dilate {
 public:
-	int kernelSize =  3;
-	int iterations =  1;
-	cv::MorphShapes morphShape =  cv::MorphShapes::MORPH_CROSS;
-	bool noshape =  false;
+	int kernelSize = 3;
+	int iterations = 1;
+	cv::MorphShapes morphShape = cv::MorphShapes::MORPH_CROSS;
+	bool noshape = false;
 	void RunOpt() {}
 	Options_Dilate() {
 	}
 };
 class Options_KMeans {
 public:
-	int kMeansFlag =  cv::KmeansFlags::KMEANS_RANDOM_CENTERS;
-	int kMeansK =  5;
+	int kMeansFlag = cv::KmeansFlags::KMEANS_RANDOM_CENTERS;
+	int kMeansK = 5;
 	void RunOpt() {}
 	Options_KMeans() {
 	}
 };
 class Options_LUT {
 public:
-	int lutSegments =  10;
+	int lutSegments = 10;
 	int splits[5];
 	int vals[5];
 	void RunOpt() {}
@@ -680,16 +680,16 @@ public:
 };
 class Options_WarpModel2 {
 public:
-	int warpMode =  0;
-	bool useWarpAffine =  false;
-	bool useWarpHomography =  false;
+	int warpMode = 0;
+	bool useWarpAffine = false;
+	bool useWarpHomography = false;
 	void RunOpt() {}
 	Options_WarpModel2() {
 	}
 };
 class Options_Photoshop {
 public:
-	int switchColor =  3;
+	int switchColor = 3;
 	void RunOpt() {}
 	Options_Photoshop() {
 	}
@@ -702,430 +702,430 @@ public:
 };
 class Options_IMU {
 public:
-	int rotateX =  0;
-	int rotateY =  0;
-	int rotateZ =  0;
-	double stableThreshold =  0.02;
+	int rotateX = 0;
+	int rotateY = 0;
+	int rotateZ = 0;
+	double stableThreshold = 0.02;
 	void RunOpt() {}
 	Options_IMU() {
 	}
 };
 class Options_FeatureMatch {
 public:
-	int matchOption =  cv::TemplateMatchModes::TM_CCOEFF_NORMED;
-	string matchText =  "CCoeffNormed";
+	int matchOption = cv::TemplateMatchModes::TM_CCOEFF_NORMED;
+	string matchText = "CCoeffNormed";
 	void RunOpt() {}
 	Options_FeatureMatch() {
 	}
 };
 class Options_HeatMap {
 public:
-	int redThreshold =  20;
-	string viewName =  "vertical";
-	bool topView =  true;
-	bool sideView =  false;
+	int redThreshold = 20;
+	string viewName = "vertical";
+	bool topView = true;
+	bool sideView = false;
 	void RunOpt() {}
 	Options_HeatMap() {
 	}
 };
 class Options_Boundary {
 public:
-	int desiredBoundaries =  15;
-	int peakDistance =  20;
+	int desiredBoundaries = 15;
+	int peakDistance = 20;
 	void RunOpt() {}
 	Options_Boundary() {
 	}
 };
 class Options_Denoise {
 public:
-	bool removeSinglePixels =  true;
+	bool removeSinglePixels = true;
 	void RunOpt() {}
 	Options_Denoise() {
 	}
 };
 class Options_MSER {
 public:
-	int delta =  9;
-	int minArea =  0;
-	int maxArea =  0;
-	double maxVariation =  0.25;
-	double minDiversity =  0.2;
-	int maxEvolution =  200;
-	double areaThreshold =  1.01;
-	double minMargin =  0.003;
-	int edgeBlurSize =  5;
-	int pass2Setting =  0;
-	bool graySetting =  false;
+	int delta = 9;
+	int minArea = 0;
+	int maxArea = 0;
+	double maxVariation = 0.25;
+	double minDiversity = 0.2;
+	int maxEvolution = 200;
+	double areaThreshold = 1.01;
+	double minMargin = 0.003;
+	int edgeBlurSize = 5;
+	int pass2Setting = 0;
+	bool graySetting = false;
 	void RunOpt() {}
 	Options_MSER() {
 	}
 };
 class Options_Spectrum {
 public:
-	int gapDepth =  1;
-	int gapGray =  1;
-	int sampleThreshold =  10;
+	int gapDepth = 1;
+	int gapGray = 1;
+	int sampleThreshold = 10;
 	void RunOpt() {}
 	Options_Spectrum() {
 	}
 };
 class Options_HistXD {
 public:
-	int sideThreshold =  5;
-	int topThreshold =  15;
-	int threshold3D =  40;
+	int sideThreshold = 5;
+	int topThreshold = 15;
+	int threshold3D = 40;
 	void RunOpt() {}
 	Options_HistXD() {
 	}
 };
 class Options_Complexity {
 public:
-	cv::Scalar plotColor =  cv::Scalar(255, 255, 0);
+	cv::Scalar plotColor = cv::Scalar(255, 255, 0);
 	void RunOpt() {}
 	Options_Complexity() {
 	}
 };
 class Options_BGSubtractSynthetic {
 public:
-	double amplitude =  200;
-	double magnitude =  20;
-	double waveSpeed =  20;
-	double objectSpeed =  15;
+	double amplitude = 200;
+	double magnitude = 20;
+	double waveSpeed = 20;
+	double objectSpeed = 15;
 	void RunOpt() {}
 	Options_BGSubtractSynthetic() {
 	}
 };
 class Options_BGSubtract {
 public:
-	double learnRate =  0.01;
-	string methodDesc =  "MOG2";
-	int currMethod =  4;
+	double learnRate = 0.01;
+	string methodDesc = "MOG2";
+	int currMethod = 4;
 	void RunOpt() {}
 	Options_BGSubtract() {
 	}
 };
 class Options_Classifier {
 public:
-	int methodIndex =  0;
-	string methodName =  "Normal Bayes (NBC)";
-	int sampleCount =  200;
+	int methodIndex = 0;
+	string methodName = "Normal Bayes (NBC)";
+	int sampleCount = 200;
 	void RunOpt() {}
 	Options_Classifier() {
 	}
 };
 class Options_Threshold {
 public:
-	cv::ThresholdTypes thresholdMethod =  cv::ThresholdTypes::THRESH_BINARY;
-	string thresholdName =  "";
-	int threshold =  128;
-	bool inputGray =  false;
-	bool otsuOption =  false;
+	cv::ThresholdTypes thresholdMethod = cv::ThresholdTypes::THRESH_BINARY;
+	string thresholdName = "";
+	int threshold = 128;
+	bool inputGray = false;
+	bool otsuOption = false;
 	void RunOpt() {}
 	Options_Threshold() {
 	}
 };
 class Options_AdaptiveThreshold {
 public:
-	cv::AdaptiveThresholdTypes method =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
-	int blockSize =  5;
-	int constantVal =  0;
+	cv::AdaptiveThresholdTypes method = cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
+	int blockSize = 5;
+	int constantVal = 0;
 	void RunOpt() {}
 	Options_AdaptiveThreshold() {
 	}
 };
 class Options_Colors {
 public:
-	int redS =  180;
-	int greenS =  180;
-	int blueS =  180;
+	int redS = 180;
+	int greenS = 180;
+	int blueS = 180;
 	void RunOpt() {}
 	Options_Colors() {
 	}
 };
 class Options_Threshold_AdaptiveMin {
 public:
-	cv::AdaptiveThresholdTypes adaptiveMethod =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
+	cv::AdaptiveThresholdTypes adaptiveMethod = cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
 	void RunOpt() {}
 	Options_Threshold_AdaptiveMin() {
 	}
 };
 class Options_ThresholdAll {
 public:
-	cv::ThresholdTypes thresholdMethod =  cv::ThresholdTypes::THRESH_BINARY;
-	int blockSize =  5;
-	int constantVal =  0;
-	int maxVal =  255;
-	int threshold =  100;
-	bool inputGray =  false;
-	bool otsuOption =  false;
-	cv::AdaptiveThresholdTypes adaptiveMethod =  cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
+	cv::ThresholdTypes thresholdMethod = cv::ThresholdTypes::THRESH_BINARY;
+	int blockSize = 5;
+	int constantVal = 0;
+	int maxVal = 255;
+	int threshold = 100;
+	bool inputGray = false;
+	bool otsuOption = false;
+	cv::AdaptiveThresholdTypes adaptiveMethod = cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C;
 	void RunOpt() {}
 	Options_ThresholdAll() {
 	}
 };
 class Options_StdevGrid {
 public:
-	int minThreshold =  30;
-	int maxThreshold =  230;
-	int diffThreshold =  5;
+	int minThreshold = 30;
+	int maxThreshold = 230;
+	int diffThreshold = 5;
 	void RunOpt() {}
 	Options_StdevGrid() {
 	}
 };
 class Options_DFT {
 public:
-	int radius =  120;
-	int order =  2;
-	int dftFlag =  cv::DftFlags::DFT_COMPLEX_OUTPUT;
+	int radius = 120;
+	int order = 2;
+	int dftFlag = cv::DftFlags::DFT_COMPLEX_OUTPUT;
 	void RunOpt() {}
 	Options_DFT() {
 	}
 };
 class Options_DFTShape {
 public:
-	string dftShape =  "Draw Circle";
+	string dftShape = "Draw Circle";
 	void RunOpt() {}
 	Options_DFTShape() {
 	}
 };
 class Options_FitEllipse {
 public:
-	int fitType =  0;
-	int threshold =  70;
+	int fitType = 0;
+	int threshold = 70;
 	void RunOpt() {}
 	Options_FitEllipse() {
 	}
 };
 class Options_TopX {
 public:
-	int topX =  10;
+	int topX = 10;
 	void RunOpt() {}
 	Options_TopX() {
 	}
 };
 class Options_XNeighbors {
 public:
-	int xNeighbors =  5;
+	int xNeighbors = 5;
 	void RunOpt() {}
 	Options_XNeighbors() {
 	}
 };
 class Options_EdgeOverlay {
 public:
-	int xDisp =  7;
-	int yDisp =  11;
+	int xDisp = 7;
+	int yDisp = 11;
 	void RunOpt() {}
 	Options_EdgeOverlay() {
 	}
 };
 class Options_AddWeighted {
 public:
-	double addWeighted =  0.5;
-	double accumWeighted =  0.1;
+	double addWeighted = 0.5;
+	double accumWeighted = 0.1;
 	void RunOpt() {}
 	Options_AddWeighted() {
 	}
 };
 class Options_ApproxPoly {
 public:
-	double epsilon =  3;
-	bool closedPoly =  true;
+	double epsilon = 3;
+	bool closedPoly = true;
 	void RunOpt() {}
 	Options_ApproxPoly() {
 	}
 };
 class Options_Bin3WayRedCloud {
 public:
-	int startRegion =  0;
-	int endRegion =  0;
+	int startRegion = 0;
+	int endRegion = 0;
 	void RunOpt() {}
 	Options_Bin3WayRedCloud() {
 	}
 };
 class Options_Bin2WayRedCloud {
 public:
-	int startRegion =  0;
-	int endRegion =  0;
+	int startRegion = 0;
+	int endRegion = 0;
 	void RunOpt() {}
 	Options_Bin2WayRedCloud() {
 	}
 };
 class Options_GuidedBPDepth {
 public:
-	int bins =  1000;
-	double maxClusters =  5;
+	int bins = 1000;
+	double maxClusters = 5;
 	void RunOpt() {}
 	Options_GuidedBPDepth() {
 	}
 };
 class Options_OpenGL_Duster {
 public:
-	bool useClusterColors =  false;
-	bool useTaskPointCloud =  false;
+	bool useClusterColors = false;
+	bool useTaskPointCloud = false;
 	void RunOpt() {}
 	Options_OpenGL_Duster() {
 	}
 };
 class Options_FeatureGather {
 public:
-	int featureSource =  0;
+	int featureSource = 0;
 	void RunOpt() {}
 	Options_FeatureGather() {
 	}
 };
 class Options_AsciiArt {
 public:
-	double hStep =  31;
-	double wStep =  55;
-	cv::Size size =  cv::Size(wStep, hStep);
+	double hStep = 31;
+	double wStep = 55;
+	cv::Size size = cv::Size(wStep, hStep);
 	void RunOpt() {}
 	Options_AsciiArt() {
 	}
 };
 class Options_MotionDetect {
 public:
-	cv::Vec3i threadData =  cv::Vec3i(0, 0, 0);
-	double CCthreshold =  0;
-	int pad =  0;
-	int stdevThreshold =  0;
+	cv::Vec3i threadData = cv::Vec3i(0, 0, 0);
+	double CCthreshold = 0;
+	int pad = 0;
+	int stdevThreshold = 0;
 	void RunOpt() {}
 	Options_MotionDetect() {
 	}
 };
 class Options_JpegQuality {
 public:
-	int quality =  90;
+	int quality = 90;
 	void RunOpt() {}
 	Options_JpegQuality() {
 	}
 };
 class Options_PNGCompression {
 public:
-	int compression =  90;
+	int compression = 90;
 	void RunOpt() {}
 	Options_PNGCompression() {
 	}
 };
 class Options_Binarize {
 public:
-	string binarizeLabel =  "Binary";
+	string binarizeLabel = "Binary";
 	void RunOpt() {}
 	Options_Binarize() {
 	}
 };
 class Options_BlurTopo {
 public:
-	double savePercent =  0;
-	double nextPercent =  20;
-	int reduction =  20;
-	int frameCycle =  0.5;
-	double kernelSize =  101;
+	double savePercent = 0;
+	double nextPercent = 20;
+	int reduction = 20;
+	int frameCycle = 0.5;
+	double kernelSize = 101;
 	void RunOpt() {}
 	Options_BlurTopo() {
 	}
 };
 class Options_BoundaryRect {
 public:
-	double percentRect =  25;
+	double percentRect = 25;
 	void RunOpt() {}
 	Options_BoundaryRect() {
 	}
 };
 class Options_BrightnessContrast {
 public:
-	int contrast =  500;
-	double brightness =  -100;
-	double hsvBrightness =  100;
-	double exponent =  0.3;
+	int contrast = 500;
+	double brightness = -100;
+	double hsvBrightness = 100;
+	double exponent = 0.3;
 	void RunOpt() {}
 	Options_BrightnessContrast() {
 	}
 };
 class Options_HistPointCloud {
 public:
-	int threshold =  60;
-	int xBins =  30;
-	int yBins =  30;
-	int zBins =  100;
+	int threshold = 60;
+	int xBins = 30;
+	int yBins = 30;
+	int zBins = 100;
 	void RunOpt() {}
 	Options_HistPointCloud() {
 	}
 };
 class Options_Harris {
 public:
-	double threshold =  0.00001;
-	int neighborhood =  3;
-	int aperture =  21;
-	double harrisParm =  1;
+	double threshold = 0.00001;
+	int neighborhood = 3;
+	int aperture = 21;
+	double harrisParm = 1;
 	void RunOpt() {}
 	Options_Harris() {
 	}
 };
 class Options_HarrisCorners {
 public:
-	int quality =  50;
-	int qualityMax =  100;
-	int blockSize =  3;
-	int aperture =  3;
+	int quality = 50;
+	int qualityMax = 100;
+	int blockSize = 3;
+	int aperture = 3;
 	void RunOpt() {}
 	Options_HarrisCorners() {
 	}
 };
 class Options_Databases {
 public:
-	string linkAddress =  "";
-	bool downloadActive =  false;
-	int downloadIndex =  0;
+	string linkAddress = "";
+	bool downloadActive = false;
+	int downloadIndex = 0;
 	void RunOpt() {}
 	Options_Databases() {
 	}
 };
 class Options_EdgeMatching {
 public:
-	int searchDepth =  256;
-	double threshold =  80;
-	bool overlayChecked =  false;
-	bool highlightChecked =  true;
-	bool clearChecked =  false;
+	int searchDepth = 256;
+	double threshold = 80;
+	bool overlayChecked = false;
+	bool highlightChecked = true;
+	bool clearChecked = false;
 	void RunOpt() {}
 	Options_EdgeMatching() {
 	}
 };
 class Options_EmaxInputClusters {
 public:
-	int samplesPerRegion =  10;
-	int sigma =  10;
+	int samplesPerRegion = 10;
+	int sigma = 10;
 	void RunOpt() {}
 	Options_EmaxInputClusters() {
 	}
 };
 class Options_CComp {
 public:
-	int light =  127;
-	int dark =  50;
-	int threshold =  0;
+	int light = 127;
+	int dark = 50;
+	int threshold = 0;
 	void RunOpt() {}
 	Options_CComp() {
 	}
 };
 class Options_CellAutomata {
 public:
-	int currentRule =  0;
+	int currentRule = 0;
 	void RunOpt() {}
 	Options_CellAutomata() {
 	}
 };
 class Options_BackProject2D {
 public:
-	bool backProjectRow =  true;
+	bool backProjectRow = true;
 	void RunOpt() {}
 	Options_BackProject2D() {
 	}
 };
 class Options_Kaze {
 public:
-	int pointsToMatch =  100;
-	int maxDistance =  100;
+	int pointsToMatch = 100;
+	int maxDistance = 100;
 	void RunOpt() {}
 	Options_Kaze() {
 	}
@@ -1139,416 +1139,416 @@ public:
 };
 class Options_SLR {
 public:
-	double tolerance =  0.3;
-	int halfLength =  10;
+	double tolerance = 0.3;
+	int halfLength = 10;
 	void RunOpt() {}
 	Options_SLR() {
 	}
 };
 class Options_KNN {
 public:
-	int knnDimension =  2;
-	int numPoints =  10;
-	int multiplier =  10;
-	int topXDistances =  20;
+	int knnDimension = 2;
+	int numPoints = 10;
+	int multiplier = 10;
+	int topXDistances = 20;
 	void RunOpt() {}
 	Options_KNN() {
 	}
 };
 class Options_Clone {
 public:
-	double alpha =  0.2;
-	double beta =  0.2;
-	int lowThreshold =  10;
-	int highThreshold =  50;
-	double blueChange =  0.5;
-	double greenChange =  0.5;
-	double redChange =  1.5;
-	int cloneFlag =  cv::MIXED_CLONE;
+	double alpha = 0.2;
+	double beta = 0.2;
+	int lowThreshold = 10;
+	int highThreshold = 50;
+	double blueChange = 0.5;
+	double greenChange = 0.5;
+	double redChange = 1.5;
+	int cloneFlag = cv::MIXED_CLONE;
 	void RunOpt() {}
 	Options_Clone() {
 	}
 };
 class Options_Coherence {
 public:
-	int sigma =  9;
-	double blend =  10;
-	int str_sigma =  155;
-	int eigenkernelsize =  1;
+	int sigma = 9;
+	double blend = 10;
+	int str_sigma = 155;
+	int eigenkernelsize = 1;
 	void RunOpt() {}
 	Options_Coherence() {
 	}
 };
 class Options_Color {
 public:
-	string colorFormat =  "BGR";
+	string colorFormat = "BGR";
 	void RunOpt() {}
 	Options_Color() {
 	}
 };
 class Options_Grayscale8U {
 public:
-	bool useOpenCV =  true;
+	bool useOpenCV = true;
 	void RunOpt() {}
 	Options_Grayscale8U() {
 	}
 };
 class Options_Color8UTopX {
 public:
-	int topXcount =  16;
+	int topXcount = 16;
 	void RunOpt() {}
 	Options_Color8UTopX() {
 	}
 };
 class Options_Morphology {
 public:
-	int widthHeight =  20;
-	int iterations =  1;
-	double scaleFactor =  70;
+	int widthHeight = 20;
+	int iterations = 1;
+	double scaleFactor = 70;
 	void RunOpt() {}
 	Options_Morphology() {
 	}
 };
 class Options_Convex {
 public:
-	int hullCount =  10;
+	int hullCount = 10;
 	void RunOpt() {}
 	Options_Convex() {
 	}
 };
 class Options_Corners {
 public:
-	bool useNonMax =  true;
+	bool useNonMax = true;
 	void RunOpt() {}
 	Options_Corners() {
 	}
 };
 class Options_PreCorners {
 public:
-	int kernelSize =  19;
-	int subpixSize =  3;
+	int kernelSize = 19;
+	int subpixSize = 3;
 	void RunOpt() {}
 	Options_PreCorners() {
 	}
 };
 class Options_ShiTomasi {
 public:
-	bool useShiTomasi =  true;
-	int threshold =  0;
-	int aperture =  3;
-	int blocksize =  3;
+	bool useShiTomasi = true;
+	int threshold = 0;
+	int aperture = 3;
+	int blocksize = 3;
 	void RunOpt() {}
 	Options_ShiTomasi() {
 	}
 };
 class Options_FlatLand {
 public:
-	double reductionFactor =  10;
+	double reductionFactor = 10;
 	void RunOpt() {}
 	Options_FlatLand() {
 	}
 };
 class Options_Depth {
 public:
-	int millimeters =  8;
-	double mmThreshold =  millimeters / 1000;
-	double threshold =  250;
+	int millimeters = 8;
+	double mmThreshold = millimeters / 1000;
+	double threshold = 250;
 	void RunOpt() {}
 	Options_Depth() {
 	}
 };
 class Options_DepthHoles {
 public:
-	int borderDilation =  1;
-	int holeDilation =  0;
+	int borderDilation = 1;
+	int holeDilation = 0;
 	void RunOpt() {}
 	Options_DepthHoles() {
 	}
 };
 class Options_Uncertainty {
 public:
-	int uncertaintyThreshold =  100;
+	int uncertaintyThreshold = 100;
 	void RunOpt() {}
 	Options_Uncertainty() {
 	}
 };
 class Options_DepthColor {
 public:
-	double alpha =  0.05;
-	double beta =  3;
+	double alpha = 0.05;
+	double beta = 3;
 	void RunOpt() {}
 	Options_DepthColor() {
 	}
 };
 class Options_DNN {
 public:
-	string superResModelFileName =  "";
-	string shortModelName =  "";
-	int superResMultiplier =  0;
-	double ScaleFactor =  78;
-	double scaleMax =  255;
-	double meanValue =  127;
-	double confidenceThreshold =  0.8;
+	string superResModelFileName = "";
+	string shortModelName = "";
+	int superResMultiplier = 0;
+	double ScaleFactor = 78;
+	double scaleMax = 255;
+	double meanValue = 127;
+	double confidenceThreshold = 0.8;
 	void RunOpt() {}
 	Options_DNN() {
 	}
 };
 class Options_DrawNoise {
 public:
-	int noiseCount =  100;
-	int noiseWidth =  3;
+	int noiseCount = 100;
+	int noiseWidth = 3;
 	void RunOpt() {}
 	Options_DrawNoise() {
 	}
 };
 class Options_Edges {
 public:
-	double scharrMultiplier =  50;
-	double EP_Sigma_s =  10;
-	double EP_Sigma_r =  40;
-	bool recurseCheck =  true;
+	double scharrMultiplier = 50;
+	double EP_Sigma_s = 10;
+	double EP_Sigma_r = 40;
+	bool recurseCheck = true;
 	void RunOpt() {}
 	Options_Edges() {
 	}
 };
 class Options_Edges2 {
 public:
-	int removeFrequencies =  32;
-	int dctThreshold =  20;
-	int edgeRFthreshold =  35;
+	int removeFrequencies = 32;
+	int dctThreshold = 20;
+	int edgeRFthreshold = 35;
 	void RunOpt() {}
 	Options_Edges2() {
 	}
 };
 class Options_Edges3 {
 public:
-	double alpha =  100;
-	double omega =  100;
-	int gapDistance =  5;
-	int threshold =  128;
-	int gapdiff =  10;
+	double alpha = 100;
+	double omega = 100;
+	int gapDistance = 5;
+	int threshold = 128;
+	int gapdiff = 10;
 	void RunOpt() {}
 	Options_Edges3() {
 	}
 };
 class Options_DepthEdges {
 public:
-	int depthDiff =  200;
-	double depthOffset =  0.001;
-	int depthDist =  5;
-	int mmDepthDiff =  1.0;
+	int depthDiff = 200;
+	double depthOffset = 0.001;
+	int depthDist = 5;
+	int mmDepthDiff = 1.0;
 	void RunOpt() {}
 	Options_DepthEdges() {
 	}
 };
 class Options_Edges4 {
 public:
-	int vertPixels =  5;
-	int horizPixels =  5;
-	bool horizonCheck =  true;
-	bool verticalCheck =  true;
+	int vertPixels = 5;
+	int horizPixels = 5;
+	bool horizonCheck = true;
+	bool verticalCheck = true;
 	void RunOpt() {}
 	Options_Edges4() {
 	}
 };
 class Options_Erode {
 public:
-	int kernelSize =  3;
-	int iterations =  1;
-	cv::MorphShapes morphShape =  cv::MorphShapes::MORPH_CROSS;
-	bool noshape =  false;
-	double flatDepth =  100;
+	int kernelSize = 3;
+	int iterations = 1;
+	cv::MorphShapes morphShape = cv::MorphShapes::MORPH_CROSS;
+	bool noshape = false;
+	double flatDepth = 100;
 	void RunOpt() {}
 	Options_Erode() {
 	}
 };
 class Options_Etch_ASketch {
 public:
-	bool demoMode =  false;
-	bool cleanMode =  false;
+	bool demoMode = false;
+	bool cleanMode = false;
 	void RunOpt() {}
 	Options_Etch_ASketch() {
 	}
 };
 class Options_Features {
 public:
-	double quality =  0.01;
-	double minDistance =  10;
-	int matchOption =  cv::TemplateMatchModes::TM_CCOEFF_NORMED;
-	string matchText =  "";
-	double k =  0.04;
-	int blockSize =  3;
-	int featurePoints =  400;
-	int templatePad =  10;
-	int templateSize =  0;
-	double correlationMin =  0.75;
-	double resyncThreshold =  0.95;
-	int agastThreshold =  20;
-	bool useVertical =  false;
-	bool useBRISK =  false;
+	double quality = 0.01;
+	double minDistance = 10;
+	int matchOption = cv::TemplateMatchModes::TM_CCOEFF_NORMED;
+	string matchText = "";
+	double k = 0.04;
+	int blockSize = 3;
+	int featurePoints = 400;
+	int templatePad = 10;
+	int templateSize = 0;
+	double correlationMin = 0.75;
+	double resyncThreshold = 0.95;
+	int agastThreshold = 20;
+	bool useVertical = false;
+	bool useBRISK = false;
 	void RunOpt() {}
 	Options_Features() {
 	}
 };
 class Options_LineFinder {
 public:
-	int kernelSize =  5;
-	int tolerance =  5;
-	int kSize =  kernelSize - 1;
+	int kernelSize = 5;
+	int tolerance = 5;
+	int kSize = kernelSize - 1;
 	void RunOpt() {}
 	Options_LineFinder() {
 	}
 };
 class Options_PCA_NColor {
 public:
-	int desiredNcolors =  8;
+	int desiredNcolors = 8;
 	void RunOpt() {}
 	Options_PCA_NColor() {
 	}
 };
 class Options_FPolyCore {
 public:
-	int maxShift =  50;
-	int resyncThreshold =  4;
-	int anchorMovement =  5;
+	int maxShift = 50;
+	int resyncThreshold = 4;
+	int anchorMovement = 5;
 	void RunOpt() {}
 	Options_FPolyCore() {
 	}
 };
 class Options_FLANN {
 public:
-	bool reuseData =  false;
-	int matchCount =  0;
-	int queryCount =  0;
-	int searchCheck =  0;
-	double eps =  0;
-	bool sorted =  false;
+	bool reuseData = false;
+	int matchCount = 0;
+	int queryCount = 0;
+	int searchCheck = 0;
+	double eps = 0;
+	bool sorted = false;
 	void RunOpt() {}
 	Options_FLANN() {
 	}
 };
 class Options_TrackerDepth {
 public:
-	bool displayRect =  true;
-	int minRectSize =  10000;
+	bool displayRect = true;
+	int minRectSize = 10000;
 	void RunOpt() {}
 	Options_TrackerDepth() {
 	}
 };
 class Options_Gabor {
 public:
-	double ksize =  15;
-	double Sigma =  4;
-	double theta =  90;
-	double lambda =  10;
-	double gamma =  5;
-	double phaseOffset =  0;
+	double ksize = 15;
+	double Sigma = 4;
+	double theta = 90;
+	double lambda = 10;
+	double gamma = 5;
+	double phaseOffset = 0;
 	void RunOpt() {}
 	Options_Gabor() {
 	}
 };
 class Options_GrabCut {
 public:
-	bool clearAll =  false;
-	bool fineTuning =  true;
+	bool clearAll = false;
+	bool fineTuning = true;
 	void RunOpt() {}
 	Options_GrabCut() {
 	}
 };
 class Options_Gradient {
 public:
-	double exponent =  30;
+	double exponent = 30;
 	void RunOpt() {}
 	Options_Gradient() {
 	}
 };
 class Options_Grid {
 public:
-	int desiredFPS =  2;
-	int width =  32;
-	int height =  32;
+	int desiredFPS = 2;
+	int width = 32;
+	int height = 32;
 	void RunOpt() {}
 	Options_Grid() {
 	}
 };
 class Options_Histogram {
 public:
-	int minGray =  50;
-	int maxGray =  200;
+	int minGray = 50;
+	int maxGray = 200;
 	void RunOpt() {}
 	Options_Histogram() {
 	}
 };
 class Options_Guess {
 public:
-	int MaxDistance =  50;
+	int MaxDistance = 50;
 	void RunOpt() {}
 	Options_Guess() {
 	}
 };
 class Options_Hist3D {
 public:
-	bool addCloud =  true;
+	bool addCloud = true;
 	void RunOpt() {}
 	Options_Hist3D() {
 	}
 };
 class Options_HOG {
 public:
-	int thresholdHOG =  0;
-	int strideHOG =  1;
-	double scaleHOG =  0.3;
+	int thresholdHOG = 0;
+	int strideHOG = 1;
+	double scaleHOG = 0.3;
 	void RunOpt() {}
 	Options_HOG() {
 	}
 };
 class Options_Images {
 public:
-	int fileIndex =  0;
-	string dirName =  "";
-	bool imageSeries =  false;
+	int fileIndex = 0;
+	string dirName = "";
+	bool imageSeries = false;
 	void RunOpt() {}
 	Options_Images() {
 	}
 };
 class Options_VerticalVerify {
 public:
-	int angleThreshold =  80;
+	int angleThreshold = 80;
 	void RunOpt() {}
 	Options_VerticalVerify() {
 	}
 };
 class Options_IMUPlot {
 public:
-	bool setBlue =  true;
-	bool setGreen =  true;
-	bool setRed =  true;
+	bool setBlue = true;
+	bool setGreen = true;
+	bool setRed = true;
 	void RunOpt() {}
 	Options_IMUPlot() {
 	}
 };
 class Options_Kalman_VB {
 public:
-	double kalmanInput =  0;
-	int noisyInput =  0;
-	double angle =  0;
+	double kalmanInput = 0;
+	int noisyInput = 0;
+	double angle = 0;
 	void RunOpt() {}
 	Options_Kalman_VB() {
 	}
 };
 class Options_Kalman {
 public:
-	double delta =  0.05;
-	double pdotEntry =  0.3;
-	double processCovar =  0.0001;
-	int averageInputCount =  20;
+	double delta = 0.05;
+	double pdotEntry = 0.3;
+	double processCovar = 0.0001;
+	int averageInputCount = 20;
 	void RunOpt() {}
 	Options_Kalman() {
 	}
 };
 class Options_LaneFinder {
 public:
-	string inputName =  "/Data/challenge.mp4";
+	string inputName = "/Data/challenge.mp4";
 	void RunOpt() {}
 	Options_LaneFinder() {
 	}
@@ -1561,478 +1561,478 @@ public:
 };
 class Options_LeftRight {
 public:
-	int sliceY =  25;
-	int sliceHeight =  20;
+	int sliceY = 25;
+	int sliceHeight = 20;
 	void RunOpt() {}
 	Options_LeftRight() {
 	}
 };
 class Options_LongLine {
 public:
-	int maxCount =  25;
-	int pad =  3;
+	int maxCount = 25;
+	int pad = 3;
 	void RunOpt() {}
 	Options_LongLine() {
 	}
 };
 class Options_LUT_Create {
 public:
-	int lutThreshold =  10;
+	int lutThreshold = 10;
 	void RunOpt() {}
 	Options_LUT_Create() {
 	}
 };
 class Options_Mat {
 public:
-	int decompType =  cv::DecompTypes::DECOMP_CHOLESKY;
+	int decompType = cv::DecompTypes::DECOMP_CHOLESKY;
 	void RunOpt() {}
 	Options_Mat() {
 	}
 };
 class Options_Match {
 public:
-	int maxDistance =  5;
-	int stdevThreshold =  10;
+	int maxDistance = 5;
+	int stdevThreshold = 10;
 	void RunOpt() {}
 	Options_Match() {
 	}
 };
 class Options_Math {
 public:
-	bool showMean =  false;
-	bool showStdev =  false;
+	bool showMean = false;
+	bool showStdev = false;
 	void RunOpt() {}
 	Options_Math() {
 	}
 };
 class Options_MeanSubtraction {
 public:
-	double scaleVal =  1;
+	double scaleVal = 1;
 	void RunOpt() {}
 	Options_MeanSubtraction() {
 	}
 };
 class Options_Mesh {
 public:
-	int nabeCount =  2;
+	int nabeCount = 2;
 	void RunOpt() {}
 	Options_Mesh() {
 	}
 };
 class Options_OEX {
 public:
-	cv::Scalar lows =  cv::Scalar(90, 50, 50);
-	cv::Scalar highs =  cv::Scalar(180, 150, 150);
+	cv::Scalar lows = cv::Scalar(90, 50, 50);
+	cv::Scalar highs = cv::Scalar(180, 150, 150);
 	void RunOpt() {}
 	Options_OEX() {
 	}
 };
 class Options_ORB {
 public:
-	int desiredCount =  100;
+	int desiredCount = 100;
 	void RunOpt() {}
 	Options_ORB() {
 	}
 };
 class Options_Palette {
 public:
-	int transitions =  7;
-	int convertScale =  45;
-	string schemeName =  "schemeRandom";
-	int radius =  0;
+	int transitions = 7;
+	int convertScale = 45;
+	string schemeName = "schemeRandom";
+	int radius = 0;
 	void RunOpt() {}
 	Options_Palette() {
 	}
 };
 class Options_PCA {
 public:
-	double retainedVariance =  0.95;
+	double retainedVariance = 0.95;
 	void RunOpt() {}
 	Options_PCA() {
 	}
 };
 class Options_Pendulum {
 public:
-	bool initialize =  false;
-	int fps =  300;
+	bool initialize = false;
+	int fps = 300;
 	void RunOpt() {}
 	Options_Pendulum() {
 	}
 };
 class Options_PhaseCorrelate {
 public:
-	int shiftThreshold =  30;
+	int shiftThreshold = 30;
 	void RunOpt() {}
 	Options_PhaseCorrelate() {
 	}
 };
 class Options_PlaneFloor {
 public:
-	int countThreshold =  10;
+	int countThreshold = 10;
 	void RunOpt() {}
 	Options_PlaneFloor() {
 	}
 };
 class Options_PlyFormat {
 public:
-	string playButton =  "";
-	int allOptionsLeft =  0;
-	string saveFileName =  "";
+	string playButton = "";
+	int allOptionsLeft = 0;
+	string saveFileName = "";
 	void RunOpt() {}
 	Options_PlyFormat() {
 	}
 };
 class Options_PointCloud {
 public:
-	double deltaThreshold =  5;
+	double deltaThreshold = 5;
 	void RunOpt() {}
 	Options_PointCloud() {
 	}
 };
 class Options_PolyLines {
 public:
-	int polyCount =  100;
-	bool polyClosed =  true;
+	int polyCount = 100;
+	bool polyClosed = true;
 	void RunOpt() {}
 	Options_PolyLines() {
 	}
 };
 class Options_Projection {
 public:
-	bool topCheck =  true;
-	int index =  0;
-	int projectionThreshold =  2;
+	bool topCheck = true;
+	int index = 0;
+	int projectionThreshold = 2;
 	void RunOpt() {}
 	Options_Projection() {
 	}
 };
 class Options_Puzzle {
 public:
-	bool startPuzzle =  true;
+	bool startPuzzle = true;
 	void RunOpt() {}
 	Options_Puzzle() {
 	}
 };
 class Options_Pyramid {
 public:
-	int zoom =  0;
+	int zoom = 0;
 	void RunOpt() {}
 	Options_Pyramid() {
 	}
 };
 class Options_PyrFilter {
 public:
-	int spatialRadius =  1;
-	int colorRadius =  20;
-	int maxPyramid =  3;
+	int spatialRadius = 1;
+	int colorRadius = 20;
+	int maxPyramid = 3;
 	void RunOpt() {}
 	Options_PyrFilter() {
 	}
 };
 class Options_NormalDist {
 public:
-	int blueVal =  125;
-	int greenVal =  25;
-	int redVal =  180;
-	int stdev =  50;
-	bool grayChecked =  false;
+	int blueVal = 125;
+	int greenVal = 25;
+	int redVal = 180;
+	int stdev = 50;
+	bool grayChecked = false;
 	void RunOpt() {}
 	Options_NormalDist() {
 	}
 };
 class Options_MonteCarlo {
 public:
-	int dimension =  91;
+	int dimension = 91;
 	void RunOpt() {}
 	Options_MonteCarlo() {
 	}
 };
 class Options_StaticTV {
 public:
-	int rangeVal =  50;
-	double threshPercent =  20;
+	int rangeVal = 50;
+	double threshPercent = 20;
 	void RunOpt() {}
 	Options_StaticTV() {
 	}
 };
 class Options_Clusters {
 public:
-	int numClusters =  9;
-	int numPoints =  20;
-	double stdev =  10;
+	int numClusters = 9;
+	int numPoints = 20;
+	double stdev = 10;
 	void RunOpt() {}
 	Options_Clusters() {
 	}
 };
 class Options_Draw {
 public:
-	int proximity =  250;
-	int drawCount =  3;
-	int drawFilled =  2;
-	bool drawRotated =  false;
+	int proximity = 250;
+	int drawCount = 3;
+	int drawFilled = 2;
+	bool drawRotated = false;
 	void RunOpt() {}
 	Options_Draw() {
 	}
 };
 class Options_RBF {
 public:
-	int RBFCount =  2;
+	int RBFCount = 2;
 	void RunOpt() {}
 	Options_RBF() {
 	}
 };
 class Options_RedCloudOther {
 public:
-	int range =  30;
-	int reduceAmt =  250;
-	double threshold =  0.95;
+	int range = 30;
+	int reduceAmt = 250;
+	double threshold = 0.95;
 	void RunOpt() {}
 	Options_RedCloudOther() {
 	}
 };
 class Options_RedCloudFeatures {
 public:
-	int selection =  3;
-	string labelName =  "Correlation Y to Z";
+	int selection = 3;
+	string labelName = "Correlation Y to Z";
 	void RunOpt() {}
 	Options_RedCloudFeatures() {
 	}
 };
 class Options_RedTrack {
 public:
-	int maxDistance =  10;
+	int maxDistance = 10;
 	void RunOpt() {}
 	Options_RedTrack() {
 	}
 };
 class Options_Reduction {
 public:
-	bool reduceXYZ[3] = {true, true, true};
+	bool reduceXYZ[3] = {true,true,true};
 	void RunOpt() {}
 	Options_Reduction() {
 	}
 };
 class Options_Retina {
 public:
-	bool useLogSampling =  false;
-	int sampleFactor =  2;
-	bool xmlCheck =  false;
+	bool useLogSampling = false;
+	int sampleFactor = 2;
+	bool xmlCheck = false;
 	void RunOpt() {}
 	Options_Retina() {
 	}
 };
 class Options_ROI {
 public:
-	double roiPercent =  0.25;
+	double roiPercent = 0.25;
 	void RunOpt() {}
 	Options_ROI() {
 	}
 };
 class Options_Rotate {
 public:
-	double rotateAngle =  24;
+	double rotateAngle = 24;
 	void RunOpt() {}
 	Options_Rotate() {
 	}
 };
 class Options_Salience {
 public:
-	int numScales =  6;
+	int numScales = 6;
 	void RunOpt() {}
 	Options_Salience() {
 	}
 };
 class Options_SLRImages {
 public:
-	string radioText =  "Grayscale input";
+	string radioText = "Grayscale input";
 	void RunOpt() {}
 	Options_SLRImages() {
 	}
 };
 class Options_StabilizerOther {
 public:
-	int fastThreshold =  0;
-	int range =  8;
+	int fastThreshold = 0;
+	int range = 8;
 	void RunOpt() {}
 	Options_StabilizerOther() {
 	}
 };
 class Options_Stabilizer {
 public:
-	double lostMax =  0.1;
-	int width =  128;
-	int height =  96;
-	double minStdev =  10;
-	double corrThreshold =  0.95;
-	int pad =  20;
+	double lostMax = 0.1;
+	int width = 128;
+	int height = 96;
+	double minStdev = 10;
+	double corrThreshold = 0.95;
+	int pad = 20;
 	void RunOpt() {}
 	Options_Stabilizer() {
 	}
 };
 class Options_Stitch {
 public:
-	int imageCount =  10;
-	int width =  0;
-	int height =  0;
+	int imageCount = 10;
+	int width = 0;
+	int height = 0;
 	void RunOpt() {}
 	Options_Stitch() {
 	}
 };
 class Options_StructuredFloor {
 public:
-	bool xCheck =  false;
-	bool yCheck =  true;
-	bool zCheck =  false;
+	bool xCheck = false;
+	bool yCheck = true;
+	bool zCheck = false;
 	void RunOpt() {}
 	Options_StructuredFloor() {
 	}
 };
 class Options_StructuredCloud {
 public:
-	int xLines =  50;
-	int yLines =  50;
-	int indexX =  50;
-	int indexY =  50;
-	int threshold =  10;
-	bool xConstraint =  true;
-	bool yConstraint =  true;
+	int xLines = 50;
+	int yLines = 50;
+	int indexX = 50;
+	int indexY = 50;
+	int threshold = 10;
+	bool xConstraint = true;
+	bool yConstraint = true;
 	void RunOpt() {}
 	Options_StructuredCloud() {
 	}
 };
 class Options_StructuredMulti {
 public:
-	int maxSides =  4;
+	int maxSides = 4;
 	void RunOpt() {}
 	Options_StructuredMulti() {
 	}
 };
 class Options_Structured {
 public:
-	bool rebuilt =  true;
-	int sliceSize =  1;
-	int stepSize =  6;
+	bool rebuilt = true;
+	int sliceSize = 1;
+	int stepSize = 6;
 	void RunOpt() {}
 	Options_Structured() {
 	}
 };
 class Options_SuperPixels {
 public:
-	int numSuperPixels =  400;
-	int numIterations =  4;
-	int prior =  2;
+	int numSuperPixels = 400;
+	int numIterations = 4;
+	int prior = 2;
 	void RunOpt() {}
 	Options_SuperPixels() {
 	}
 };
 class Options_Swarm {
 public:
-	int ptCount =  2;
-	int border =  5;
+	int ptCount = 2;
+	int border = 5;
 	void RunOpt() {}
 	Options_Swarm() {
 	}
 };
 class Options_SwarmPercent {
 public:
-	double percent =  0.8;
+	double percent = 0.8;
 	void RunOpt() {}
 	Options_SwarmPercent() {
 	}
 };
 class Options_Texture {
 public:
-	int TFdelta =  30;
-	int TFblockSize =  50;
-	int TFksize =  1;
+	int TFdelta = 30;
+	int TFblockSize = 50;
+	int TFksize = 1;
 	void RunOpt() {}
 	Options_Texture() {
 	}
 };
 class Options_ThresholdDef {
 public:
-	int threshold =  127;
+	int threshold = 127;
 	void RunOpt() {}
 	Options_ThresholdDef() {
 	}
 };
 class Options_Tracker {
 public:
-	int trackType =  1;
+	int trackType = 1;
 	void RunOpt() {}
 	Options_Tracker() {
 	}
 };
 class Options_Transform {
 public:
-	double resizeFactor =  0.5;
-	int angle =  30;
-	double scale =  1;
-	bool firstCheck =  false;
-	bool secondCheck =  false;
-	int centerX =  0;
-	int centerY =  0;
+	double resizeFactor = 0.5;
+	int angle = 30;
+	double scale = 1;
+	bool firstCheck = false;
+	bool secondCheck = false;
+	int centerX = 0;
+	int centerY = 0;
 	void RunOpt() {}
 	Options_Transform() {
 	}
 };
 class Options_TransformationMatrix {
 public:
-	int mul =  500;
+	int mul = 500;
 	void RunOpt() {}
 	Options_TransformationMatrix() {
 	}
 };
 class Options_Vignetting {
 public:
-	double radius =  80;
+	double radius = 80;
 	void RunOpt() {}
 	Options_Vignetting() {
 	}
 };
 class Options_Video {
 public:
-	int maxFrames =  1000;
-	int currFrame =  0;
+	int maxFrames = 1000;
+	int currFrame = 0;
 	void RunOpt() {}
 	Options_Video() {
 	}
 };
 class Options_WarpAffine {
 public:
-	int angle =  10;
+	int angle = 10;
 	void RunOpt() {}
 	Options_WarpAffine() {
 	}
 };
 class Options_WarpPerspective {
 public:
-	int width =  0;
-	int height =  0;
-	int angle =  0;
+	int width = 0;
+	int height = 0;
+	int angle = 0;
 	void RunOpt() {}
 	Options_WarpPerspective() {
 	}
 };
 class Options_XPhotoInpaint {
 public:
-	bool FSRFast =  false;
-	bool shiftMap =  false;
+	bool FSRFast = false;
+	bool shiftMap = false;
 	void RunOpt() {}
 	Options_XPhotoInpaint() {
 	}
 };
 class Options_Density {
 public:
-	int zCount =  3;
-	double distance =  0;
+	int zCount = 3;
+	double distance = 0;
 	void RunOpt() {}
 	Options_Density() {
 	}
 };
 class Options_Edge_Basics {
 public:
-	string edgeSelection =  "Canny";
+	string edgeSelection = "Canny";
 	void RunOpt() {}
 	Options_Edge_Basics() {
 	}
@@ -2075,8 +2075,8 @@ public:
 };
 class Options_LaplacianKernels {
 public:
-	int gaussiankernelSize =  1;
-	int LaplaciankernelSize =  3;
+	int gaussiankernelSize = 1;
+	int LaplaciankernelSize = 3;
 	void RunOpt() {}
 	Options_LaplacianKernels() {
 	}
@@ -2107,32 +2107,32 @@ public:
 };
 class Options_OpenGLFunctions {
 public:
-	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
-	double FOV =  75;
-	double yaw =  -3;
-	double pitch =  3;
-	double roll =  0;
-	double zNear =  0;
-	double zFar =  20.0;
-	double zTrans =  0.5;
-	cv::Vec3f eye =  cv::Vec3f(0, 0, -40);
-	cv::Vec3f scaleXYZ =  cv::Vec3f(10, 10, 1);
+	cv::Scalar moveAmount = cv::Scalar(0, 0, 0);
+	double FOV = 75;
+	double yaw = -3;
+	double pitch = 3;
+	double roll = 0;
+	double zNear = 0;
+	double zFar = 20.0;
+	double zTrans = 0.5;
+	cv::Vec3f eye = cv::Vec3f(0, 0, -40);
+	cv::Vec3f scaleXYZ = cv::Vec3f(10, 10, 1);
 	void RunOpt() {}
 	Options_OpenGLFunctions() {
 	}
 };
 class Options_OpenGL {
 public:
-	double FOV =  75;
-	double yaw =  -3;
-	double pitch =  3;
-	double roll =  0;
-	double zNear =  0;
-	double zFar =  20;
-	int pointSize =  2;
-	double zTrans =  0.5;
-	cv::Vec3f eye =  cv::Vec3f(0, 0, -40);
-	cv::Vec3f scaleXYZ =  cv::Vec3f(10, 10, 1);
+	double FOV = 75;
+	double yaw = -3;
+	double pitch = 3;
+	double roll = 0;
+	double zNear = 0;
+	double zFar = 20;
+	int pointSize = 2;
+	double zTrans = 0.5;
+	cv::Vec3f eye = cv::Vec3f(0, 0, -40);
+	cv::Vec3f scaleXYZ = cv::Vec3f(10, 10, 1);
 	void RunOpt() {}
 	Options_OpenGL() {
 	}
@@ -2145,30 +2145,30 @@ public:
 };
 class Options_Sobel {
 public:
-	int kernelSize =  3;
-	int threshold =  50;
-	int distanceThreshold =  10;
-	double derivativeRange =  0.1;
-	bool horizontalDerivative =  true;
-	bool verticalDerivative =  true;
-	bool useBlur =  false;
+	int kernelSize = 3;
+	int threshold = 50;
+	int distanceThreshold = 10;
+	double derivativeRange = 0.1;
+	bool horizontalDerivative = true;
+	bool verticalDerivative = true;
+	bool useBlur =false;
 	void RunOpt() {}
 	Options_Sobel() {
 	}
 };
 class Options_Derivative {
 public:
-	int channel =  2;
-	int kernelSize =  3;
-	double derivativeRange =  0.1;
+	int channel = 2;
+	int kernelSize = 3;
+	double derivativeRange = 0.1;
 	void RunOpt() {}
 	Options_Derivative() {
 	}
 };
 class Options_DerivativeBasics {
 public:
-	float mmThreshold =  100;
-	int histBars =  1;
+	float mmThreshold = 100;
+	int histBars = 1;
 	void RunOpt() {}
 	Options_DerivativeBasics() {
 	}
