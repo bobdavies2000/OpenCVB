@@ -1009,3 +1009,46 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Feature_GridPoints : Inherits TaskParent
+    Public Sub New()
+        desc = "Assign each corner of a grid rect to a RedCell"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then task.redC.Run(src)
+
+        'For Each pt In delaunay.ptList
+        '    Dim index = task.redMap.Get(Of Byte)(pt.Y, pt.X)
+        '    If index = 0 Then Continue For
+        '    Dim rc = task.redCells(index)
+        '    Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+        '    If val <> 0 Then
+        '        rc.ptFacets.Add(pt)
+        '        task.redCells(index) = rc
+        '    End If
+        'Next
+
+        'dst2 = task.redC.dst2
+        'labels(2) = task.redC.labels(2)
+
+        'For Each rc In task.redCells
+        '    For Each pt In rc.ptFacets
+        '        DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        '    Next
+        'Next
+
+        'If standalone Then
+        '    Dim rc = task.redCells(task.rc.index)
+        '    task.color.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+        '    For Each pt In rc.ptFacets
+        '        DrawCircle(task.color, pt, task.DotSize, task.HighlightColor)
+        '    Next
+        'End If
+    End Sub
+End Class

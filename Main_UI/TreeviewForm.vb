@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.Runtime
 Imports cvb = OpenCvSharp
 Public Class TreeviewForm
     Dim botDistance As Integer
@@ -13,12 +14,6 @@ Public Class TreeviewForm
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
         PercentTime.Height = TreeView1.Height
-    End Sub
-    Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = GetSetting("OpenCVB", "treeViewLeft", "treeViewLeft", Me.Left)
-        Me.Top = GetSetting("OpenCVB", "treeViewTop", "treeViewTop", Me.Top)
-        Me.Width = GetSetting("OpenCVB", "treeViewWidth", "treeViewWidth", Me.Width)
-        Me.Height = GetSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode

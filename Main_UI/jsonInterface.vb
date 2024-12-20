@@ -39,6 +39,7 @@ Namespace jsonClass
         Public showConsoleLog As Boolean
 
         Public treeButton As Boolean
+        Public treeLocation As cvb.Vec4f
 
         Public fontInfo As Font
         Public desiredFPS As Integer
@@ -70,6 +71,7 @@ Namespace jsonClass
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
+            emptyApp.treeLocation = New cvb.Vec4f(20, 20, 500, 600)
             emptyApp.groupComboText = "< All VB.Net >"
             emptyApp.translatorMode = "VB.Net to C#"
             SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 30)

@@ -308,16 +308,16 @@ Public Class Main_UI
             Me.Top = .locationMain.Item1
             Me.Width = .locationMain.Item2
             Me.Height = .locationMain.Item3
+
+            TreeViewDialog = New TreeviewForm
             optionsForm = New Options
             optionsForm.defineCameraResolutions(settings.cameraIndex)
         End With
     End Sub
     Public Sub jsonWrite()
         If TreeButton.Checked Then
-            SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", TreeViewDialog.Left)
-            SaveSetting("OpenCVB", "treeViewTop", "treeViewTop", TreeViewDialog.Top)
-            SaveSetting("OpenCVB", "treeViewWidth", "treeViewWidth", TreeViewDialog.Width)
-            SaveSetting("OpenCVB", "treeViewHeight", "treeViewHeight", TreeViewDialog.Height)
+            settings.treeLocation = New cvb.Vec4f(TreeViewDialog.Left, TreeViewDialog.Top,
+                                                  TreeViewDialog.Width, TreeViewDialog.Height)
         End If
 
         If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
@@ -485,10 +485,13 @@ Public Class Main_UI
         TreeButton.Checked = Not TreeButton.Checked
         settings.treeButton = TreeButton.Checked
         If TreeButton.Checked Then
-            TreeViewDialog = New TreeviewForm
             TreeViewDialog.Show()
+            TreeViewDialog.Left = settings.treeLocation.Item0
+            TreeViewDialog.Top = settings.treeLocation.Item1
+            TreeViewDialog.Width = settings.treeLocation.Item2
+            TreeViewDialog.Height = settings.treeLocation.Item3
         Else
-            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Close()
+            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Hide()
         End If
     End Sub
     Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click

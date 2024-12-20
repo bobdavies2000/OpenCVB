@@ -89,6 +89,7 @@ Public Class Grid_Basics : Inherits TaskParent
                 Next
             End If
 
+            task.gridPoints.Clear()
             For Each roi In gridRects
                 Dim xSub = roi.X + roi.Width
                 Dim ySub = roi.Y + roi.Height
@@ -107,8 +108,10 @@ Public Class Grid_Basics : Inherits TaskParent
                     If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then task.subDivisions.Add(7)
                     If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(8)
                 End If
+                task.gridPoints.Add(roi.TopLeft)
             Next
-            If task.gridRects.Count <> gridRects.Count Then task.gridRects = gridRects
+
+            task.gridRects = gridRects
         End If
         If standaloneTest() Then
             dst2 = New cvb.Mat(src.Size(), cvb.MatType.CV_8U)

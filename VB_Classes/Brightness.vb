@@ -55,7 +55,7 @@ Public Class Brightness_Grid : Inherits TaskParent
     Dim bright As New Brightness_Basics
     Public brightRect As cvb.Rect
     Public Sub New()
-        desc = "Find the grid element with the highest brightness"
+        desc = "Adjust the brightness to get all gray levels below X (here 200) - no whiteout."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Static alphaSlider = FindSlider("Alpha (contrast)")
@@ -64,7 +64,7 @@ Public Class Brightness_Grid : Inherits TaskParent
         dst2 = bright.dst2
 
         Dim meanVals As New List(Of Single)
-        For Each r In task.gridNabeRects
+        For Each r In task.gridRects
             meanVals.Add(dst2(r).Mean()(0))
         Next
 
@@ -73,7 +73,7 @@ Public Class Brightness_Grid : Inherits TaskParent
             Dim nextVal = alphaSlider.value - 10
             If nextVal > 0 Then alphaSlider.value = nextVal
         End If
-        brightRect = task.gridNabeRects(meanVals.IndexOf(max))
+        brightRect = task.gridRects(meanVals.IndexOf(max))
         If standaloneTest() Then
             dst3.SetTo(0)
             dst2(brightRect).CopyTo(dst3(brightRect))

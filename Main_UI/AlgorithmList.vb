@@ -994,6 +994,7 @@ End Enum
 	If algorithmName = "Feature_Gather_CPP_CS" Then return new Feature_Gather_CPP_CS
 	If algorithmName = "Feature_Generations" Then return new Feature_Generations
 	If algorithmName = "Feature_Generations_CS" Then return new Feature_Generations_CS
+	If algorithmName = "Feature_GridPoints" Then return new Feature_GridPoints
 	If algorithmName = "Feature_GridPopulation" Then return new Feature_GridPopulation
 	If algorithmName = "Feature_GridPopulation_CS" Then return new Feature_GridPopulation_CS
 	If algorithmName = "Feature_History" Then return new Feature_History
@@ -3052,6 +3053,7 @@ End Enum
 	If algorithmName = "RedCloud_Basics_CS" Then return new RedCloud_Basics_CS
 	If algorithmName = "RedCloud_BProject3D" Then return new RedCloud_BProject3D
 	If algorithmName = "RedCloud_BProject3D_CS" Then return new RedCloud_BProject3D_CS
+	If algorithmName = "RedCloud_BrightnessLevel" Then return new RedCloud_BrightnessLevel
 	If algorithmName = "RedCloud_CCompColor" Then return new RedCloud_CCompColor
 	If algorithmName = "RedCloud_CCompColor_CS" Then return new RedCloud_CCompColor_CS
 	If algorithmName = "RedCloud_CellChanges" Then return new RedCloud_CellChanges

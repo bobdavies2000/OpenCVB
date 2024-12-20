@@ -26,8 +26,9 @@ Public Class VBtask : Implements IDisposable
     Public gridMask As cvb.Mat
     Public gridMap32S As New cvb.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
-    Public gridNabeRects As New List(Of cvb.Rect)
+    Public gridNabeRects As New List(Of cvb.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
+    Public gridPoints As New List(Of cvb.Point) ' the list of each gridRect corner 
 
     Public fpList As New List(Of fpData)
     Public fpListLast As New List(Of fpData)

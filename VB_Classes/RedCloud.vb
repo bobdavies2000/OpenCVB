@@ -2234,3 +2234,24 @@ Public Class RedCloud_Combine : Inherits TaskParent
         labels(2) = CStr(combinedCells.Count) + " cells were found.  Dots indicate maxDist points."
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class RedCloud_BrightnessLevel : Inherits TaskParent
+    Dim bright As New Brightness_Grid
+    Public Sub New()
+        desc = "Adjust the brightness so there is no whiteout and then run RedCloud with that."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        bright.Run(src)
+
+        task.redC.Run(bright.dst2)
+        dst2 = task.redC.dst2
+        dst3 = task.redC.dst3
+        labels(2) = task.redC.labels(2)
+    End Sub
+End Class
