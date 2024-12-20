@@ -633,10 +633,10 @@ Public Class Main_UI
     Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAllToolbarBitmap)
         If TestAllButton.Text = "Test All" Then
+            Debug.WriteLine("Starting 'TestAll' overnight run.")
             AlgorithmTestAllCount = 0
 
             setupTestAll()
-            AlgorithmTestAllCount = 1
 
             TestAllButton.Text = "Stop Test"
             AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.

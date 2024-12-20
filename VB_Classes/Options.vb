@@ -3467,7 +3467,6 @@ Public Class Options_Threshold : Inherits TaskParent
         Static inputGrayCheck = FindCheckBox("GrayScale Input")
         Static otsuCheck = FindCheckBox("Add OTSU Option - a 50/50 split")
         Static threshSlider = FindSlider("Threshold value")
-        Static maxSlider = FindSlider("MaxVal setting")
 
         inputGray = inputGrayCheck.checked
         otsuOption = otsuCheck.checked

@@ -707,6 +707,15 @@ Public Class VBtask : Implements IDisposable
         IMUBasics.RunAlg(src)
         gMat.RunAlg(src)
 
+        'If task.gOptions.RGBFilterActive.Checked Then
+        '    Static filterObject As Object = createAlgorithm(filterName)
+        '    Dim filterName = task.gOptions.RGBFilterList.Text
+        '    If rgbFilter Is Nothing Then rgbFilter = algorithmList.createAlgorithm(filterName)
+        '    If rgbFilter.traceName <> filterName Then rgbFilter = algorithmList.createAlgorithm(filterName)
+        '    rgbFilter.RunAlg(src)
+        '    src = rgbFilter.dst2
+        'End If
+
         If task.gOptions.CreateGif.Checked Then
             heartBeat = False
             task.optionsChanged = False
@@ -809,14 +818,6 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
         End If
-
-        'If task.gOptions.RGBFilterActive.Checked Then
-        '    Dim filterName = task.gOptions.RGBFilterList.Text
-        '    If rgbFilter Is Nothing Then rgbFilter = algoList.createVBAlgorithm(filterName)
-        '    If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createVBAlgorithm(filterName)
-        '    rgbFilter.RunAlg(src)
-        '    src = rgbFilter.dst2
-        'End If
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.paused = False Then
