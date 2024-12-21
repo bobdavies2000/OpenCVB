@@ -367,7 +367,6 @@ End Enum
 	If algorithmName = "Brightness_HSV_CS" Then return new Brightness_HSV_CS
 	If algorithmName = "BRISK_Basics" Then return new BRISK_Basics
 	If algorithmName = "BRISK_Basics_CS" Then return new BRISK_Basics_CS
-	If algorithmName = "C3D_Basics" Then return new C3D_Basics
 	If algorithmName = "CameraMotion_Basics" Then return new CameraMotion_Basics
 	If algorithmName = "CameraMotion_Basics_CS" Then return new CameraMotion_Basics_CS
 	If algorithmName = "CameraMotion_SceneMotion" Then return new CameraMotion_SceneMotion
@@ -1893,12 +1892,13 @@ End Enum
 	If algorithmName = "Line_ViewSide_CS" Then return new Line_ViewSide_CS
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop
 	If algorithmName = "Line_ViewTop_CS" Then return new Line_ViewTop_CS
+	If algorithmName = "Line3D_Basics" Then return new Line3D_Basics
 	If algorithmName = "Line3D_CandidatesAll" Then return new Line3D_CandidatesAll
 	If algorithmName = "Line3D_CandidatesAll_CS" Then return new Line3D_CandidatesAll_CS
 	If algorithmName = "Line3D_CandidatesFirstLast" Then return new Line3D_CandidatesFirstLast
 	If algorithmName = "Line3D_CandidatesFirstLast_CS" Then return new Line3D_CandidatesFirstLast_CS
-	If algorithmName = "Line3D_Checks" Then return new Line3D_Checks
 	If algorithmName = "Line3D_Checks_CS" Then return new Line3D_Checks_CS
+	If algorithmName = "Line3D_Correlation" Then return new Line3D_Correlation
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
 	If algorithmName = "Linear_Basics" Then return new Linear_Basics
@@ -3369,6 +3369,7 @@ End Enum
 	If algorithmName = "Stripes_CloudZ" Then return new Stripes_CloudZ
 	If algorithmName = "Stripes_Histogram" Then return new Stripes_Histogram
 	If algorithmName = "Stripes_XYZ" Then return new Stripes_XYZ
+	If algorithmName = "Structured_Basics" Then return new Structured_Basics
 	If algorithmName = "Structured_Cloud" Then return new Structured_Cloud
 	If algorithmName = "Structured_Cloud_CS" Then return new Structured_Cloud_CS
 	If algorithmName = "Structured_Cloud2" Then return new Structured_Cloud2

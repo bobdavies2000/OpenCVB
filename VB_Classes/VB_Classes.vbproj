@@ -115,7 +115,6 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
-    <Compile Include="C3D.vb" />
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />
     <Compile Include="ImageOffset.vb" />

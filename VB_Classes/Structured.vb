@@ -1,4 +1,47 @@
 Imports cvb = OpenCvSharp
+Public Class Structured_Basics : Inherits TaskParent
+    Dim options As New Options_Structured
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
+        desc = "Build structured slices through the point cloud."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        Dim stepsize = options.stepSize
+
+        dst2.SetTo(0)
+        For yCoordinate = 0 To src.Height - 1 Step stepsize
+            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+            Dim depthMask As New cvb.Mat
+            Dim minVal As Double, maxVal As Double
+            minVal = planeY - task.metersPerPixel
+            maxVal = planeY + task.metersPerPixel
+            depthMask = task.pcSplit(1).InRange(minVal, maxVal)
+            dst2.SetTo(255, depthMask)
+            If minVal < 0 And maxVal > 0 Then dst2.SetTo(0, task.noDepthMask)
+        Next
+
+        dst3.SetTo(0)
+        For xCoordinate = 0 To src.Width - 1 Step stepsize
+            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+            Dim depthMask As New cvb.Mat
+            Dim minVal As Double, maxVal As Double
+            minVal = planeX - task.metersPerPixel
+            maxVal = planeX + task.metersPerPixel
+            depthMask = task.pcSplit(0).InRange(minVal, maxVal)
+            dst3.SetTo(255, depthMask)
+            If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
+        Next
+    End Sub
+End Class
+
+
+
+
+
 Public Class Structured_LinearizeFloor : Inherits TaskParent
     Public floor As New Structured_FloorCeiling
     Dim kalman As New Kalman_VB_Basics
@@ -473,29 +516,6 @@ End Class
 
 
 
-Public Class Structured_FeatureLines : Inherits TaskParent
-    Dim struct As New Structured_MultiSlice
-    Dim lines As New FeatureLine_Finder
-    Public Sub New()
-        desc = "Find the lines in the Structured_MultiSlice algorithm output"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        struct.Run(src)
-        dst2 = struct.dst2
-
-        lines.Run(struct.dst2)
-        dst3 = src.Clone
-        For i = 0 To lines.lines2D.Count - 1 Step 2
-            Dim p1 = lines.lines2D(i), p2 = lines.lines2D(i + 1)
-            dst3.Line(p1, p2, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Structured_FloorCeiling : Inherits TaskParent
     Public slice As New Structured_SliceEither
@@ -597,45 +617,6 @@ Public Class Structured_MultiSliceH : Inherits TaskParent
         labels(3) = heat.labels(3)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Structured_MultiSliceV : Inherits TaskParent
-    Public heat As New HeatMap_Basics
-    Dim options As New Options_Structured
-    Public Sub New()
-        FindCheckBox("Top View (Unchecked Side View)").Checked = True
-        desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-        Dim stepsize = options.stepSize
-
-        heat.Run(src)
-        dst3 = heat.dst2
-
-        Dim sliceMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-            Dim depthMask As New cvb.Mat
-            Dim minVal As Double, maxVal As Double
-            minVal = planeX - task.metersPerPixel
-            maxVal = planeX + task.metersPerPixel
-            cvb.Cv2.InRange(task.pcSplit(0).Clone, minVal, maxVal, depthMask)
-            sliceMask.SetTo(255, depthMask)
-            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
-        Next
-
-        dst2 = task.color.Clone
-        dst2.SetTo(white, sliceMask)
-        labels(3) = heat.labels(3)
-    End Sub
-End Class
-
 
 
 
@@ -1375,5 +1356,67 @@ Public Class Structured_MultiSlice : Inherits TaskParent
 
         dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(3) = "ClassCount = " + CStr(classCount)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Structured_MultiSliceV : Inherits TaskParent
+    Public heat As New HeatMap_Basics
+    Dim options As New Options_Structured
+    Public Sub New()
+        FindCheckBox("Top View (Unchecked Side View)").Checked = True
+        desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        Dim stepsize = options.stepSize
+
+        heat.Run(src)
+        dst3 = heat.dst2
+
+        Dim sliceMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        For xCoordinate = 0 To src.Width - 1 Step stepsize
+            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+            Dim depthMask As New cvb.Mat
+            Dim minVal As Double, maxVal As Double
+            minVal = planeX - task.metersPerPixel
+            maxVal = planeX + task.metersPerPixel
+            cvb.Cv2.InRange(task.pcSplit(0).Clone, minVal, maxVal, depthMask)
+            sliceMask.SetTo(255, depthMask)
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
+        Next
+
+        dst2 = task.color.Clone
+        dst2.SetTo(white, sliceMask)
+        labels(3) = heat.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Structured_FeatureLines : Inherits TaskParent
+    Dim struct As New Structured_MultiSlice
+    Public lines As New FeatureLine_Finder
+    Public Sub New()
+        desc = "Find the lines in the Structured_MultiSlice algorithm output"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        struct.Run(src)
+        dst2 = struct.dst2
+
+        lines.Run(struct.dst2)
+        dst3 = src.Clone
+        For i = 0 To lines.lines2D.Count - 1 Step 2
+            Dim p1 = lines.lines2D(i), p2 = lines.lines2D(i + 1)
+            dst3.Line(p1, p2, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
+        Next
     End Sub
 End Class

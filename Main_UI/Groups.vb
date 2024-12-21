@@ -43,4 +43,7 @@ Public Class Groups
         Me.Hide()
         Main_UI.groupButtonSelection = GroupDataView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
     End Sub
+    Private Sub Groups_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        If e.KeyCode = Keys.Escape Then Me.Hide()
+    End Sub
 End Class

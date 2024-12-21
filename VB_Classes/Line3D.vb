@@ -1,4 +1,125 @@
 ﻿Imports cvb = OpenCvSharp
+Public Class Line3D_Basics : Inherits TaskParent
+    Dim sLines As New Structured_FeatureLines
+    Public Sub New()
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        desc = "Find the lines in the Structured_MultiSlice algorithm output but age them with motion."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        sLines.Run(src)
+        dst2 = src
+
+        Dim newSet As New List(Of cvb.Point2f)
+        Static ptList As New List(Of cvb.Point2f)(sLines.lines.lines2D)
+        '  unlike Feature_Basics, we have to check each pair, not each point
+        For i = 0 To ptList.Count - 1 Step 2
+            Dim val1 = task.motionMask.Get(Of Byte)(ptList(i).Y, ptList(i).X)
+            Dim val2 = task.motionMask.Get(Of Byte)(ptList(i + 1).Y, ptList(i + 1).X)
+
+            If val1 = 0 And val2 = 0 Then
+                newSet.Add(ptList(i))
+                newSet.Add(ptList(i + 1))
+            End If
+        Next
+
+        Dim lines = sLines.lines.lines2D
+        '  unlike Feature_Basics, we have to check each pair, not each point
+        For i = 0 To lines.Count - 1 Step 2
+            'Dim val1 = task.motionMask.Get(Of Byte)(lines(i).Y, lines(i).X)
+            'Dim val2 = task.motionMask.Get(Of Byte)(lines(i + 1).Y, lines(i + 1).X)
+
+            'If val1 <> 0 And val2 <> 0 Then
+            newSet.Add(lines(i))
+            newSet.Add(lines(i + 1))
+            ' End If
+        Next
+
+        Dim ptSort As New SortedList(Of Integer, cvb.Point2f)(New compareAllowIdenticalInteger)
+        ' organize the lines top to bottom, left to right, and ordered points left to right
+        For i = 0 To newSet.Count - 1 Step 2
+            Dim index = task.gridMap32S.Get(Of Integer)(newSet(i).Y, newSet(i).X)
+            If newSet(i).X < newSet(i + 1).X Then
+                ptSort.Add(index, newSet(i))
+                ptSort.Add(index, newSet(i + 1))
+            Else
+                ptSort.Add(index, newSet(i + 1))
+                ptSort.Add(index, newSet(i))
+            End If
+        Next
+
+        dst3.SetTo(0)
+        ptList.Clear()
+        For i = 0 To ptSort.Count - 1 Step 2
+            Dim p1 = ptSort.Values(i)
+            Dim p2 = ptSort.Values(i + 1)
+            Dim w = Math.Abs(p1.X - p2.X)
+            Dim h = Math.Abs(p1.Y - p2.Y)
+            Dim r = ValidateRect(New cvb.Rect(p1.X - 1, p1.Y - 1, w + 2, h + 2))
+            Dim count = dst3(r).CountNonZero
+            If count = 0 Then
+                dst3.Line(p1, p2, 255, task.lineWidth, task.lineType)
+                ptList.Add(p1)
+                ptList.Add(p2)
+            End If
+        Next
+
+        labels(2) = CStr(ptList.Count / 2) + " lines were found in the structured light."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line3D_Correlation : Inherits TaskParent
+    Dim gpoints As New Feature_GridPoints
+    Public Sub New()
+        task.gOptions.GridSlider.Minimum = 2 ' smaller will hang
+        desc = "Find the correlation of image coordinates to pointcloud coordinates"
+    End Sub
+    Private Function getCorrelation(A As cvb.Mat, B As cvb.Mat) As Single
+        Dim correlation As New cvb.Mat
+        cvb.Cv2.MatchTemplate(A, B, correlation, cvb.TemplateMatchModes.CCoeffNormed)
+        Return correlation.Get(Of Single)(0, 0)
+    End Function
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
+
+        gpoints.Run(src)
+
+        Dim xList As New List(Of Single), yList As New List(Of Single), zList As New List(Of Single)
+        For Each pt In task.rc.ptList
+            Dim vec = task.pointCloud.Get(Of cvb.Point3f)(pt.Y, pt.X)
+            xList.Add(vec.X)
+            yList.Add(vec.Y)
+            zList.Add(vec.Z)
+        Next
+
+        If xList.Count > 0 Then
+            Dim xMat As cvb.Mat = cvb.Mat.FromPixelData(xList.Count, 1, cvb.MatType.CV_32F, xList.ToArray)
+            Dim yMat As cvb.Mat = cvb.Mat.FromPixelData(xList.Count, 1, cvb.MatType.CV_32F, yList.ToArray)
+            Dim zMat As cvb.Mat = cvb.Mat.FromPixelData(xList.Count, 1, cvb.MatType.CV_32F, zList.ToArray)
+
+            Dim correlationXZ As Single = getCorrelation(xMat, zMat)
+            Dim correlationYZ As Single = getCorrelation(yMat, zMat)
+
+            strOut = "X to Z correlation = " + Format(correlationXZ, fmt3) + vbCrLf +
+                     "Y to Z correlation = " + Format(correlationYZ, fmt3) + vbCrLf
+        End If
+        If task.heartBeat Then SetTrueText(strOut, 3)
+        For Each pt In task.rc.ptList
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Line3D_Draw : Inherits TaskParent
     Public p1 As cvb.Point, p2 As cvb.Point
     Dim plot As New Plot_OverTimeScalar
@@ -62,46 +183,6 @@ Public Class Line3D_Draw : Inherits TaskParent
         labels(3) = "using " + CStr(nextList.Count) + " points, the correlation of X to Z = " + Format(c1, fmt3) + " (blue), correlation of Y to Z = " + Format(c2, fmt3) + " (green)"
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-
-Public Class Line3D_Checks : Inherits TaskParent
-    Dim pts As New PointCloud_Basics
-    Public pcLines As New List(Of cvb.Point3f)
-    Public Sub New()
-        desc = "Use the first and last points in the sequence to build a single line and then check it against the rest of the sequence."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        pts.Run(src)
-        dst3 = pts.dst2
-
-        pcLines.Clear()
-        For y = 0 To task.gridRows - 1
-            Dim vecList As New List(Of cvb.Point3f)
-            For x = 0 To task.gridCols - 1
-                Dim vec = pts.dst3.Get(Of cvb.Point3f)(y, x)
-                If vec.Z > 0 Then
-                    vecList.Add(vec)
-                Else
-                    If vecList.Count > 2 Then
-                        pcLines.Add(New cvb.Point3f(1, 1, 1))
-                        pcLines.Add(vecList(0))
-                        pcLines.Add(vecList(vecList.Count - 1))
-                    End If
-                    vecList.Clear()
-                End If
-            Next
-        Next
-    End Sub
-End Class
-
 
 
 
@@ -191,3 +272,9 @@ Public Class Line3D_CandidatesAll : Inherits TaskParent
         labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
     End Sub
 End Class
+
+
+
+
+
+

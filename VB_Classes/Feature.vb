@@ -23,6 +23,7 @@ Public Class Feature_Basics : Inherits TaskParent
         Next
 
         Dim ptSort As New SortedList(Of Integer, cvb.Point2f)(New compareAllowIdenticalInteger)
+        ' Not technically needed but organizes all the points from top to bottom, left to right.
         For Each pt In newSet
             Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
             ptSort.Add(index, pt)

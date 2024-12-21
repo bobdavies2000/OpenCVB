@@ -45,6 +45,7 @@ Partial Class Groups
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1994, 1358)
         Me.Controls.Add(Me.GroupDataView)
+        Me.KeyPreview = True
         Me.Name = "Groups"
         Me.Text = "Groups"
         CType(Me.GroupDataView, System.ComponentModel.ISupportInitialize).EndInit()
