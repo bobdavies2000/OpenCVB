@@ -544,6 +544,7 @@ Public Class rcData
     Public motionPixels As Integer
 
     Public ptFacets As New List(Of cvb.Point)
+    Public ptList As New List(Of cvb.Point)
 
     ' transition these...
     Public nabs As New List(Of Integer)

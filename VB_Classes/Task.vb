@@ -491,7 +491,7 @@ Public Class VBtask : Implements IDisposable
         Dim str As New TrueText(text, pt, picTag)
         task.trueData.Add(str)
     End Sub
-    Public Sub setSelectedContour(ByRef redCells As List(Of rcData), ByRef cellMap As cvb.Mat)
+    Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cvb.Mat)
         Static ptNew As New cvb.Point
         If redCells.Count = 0 Then Exit Sub
         If task.ClickPoint = ptNew And redCells.Count > 1 Then task.ClickPoint = redCells(1).maxDist
@@ -502,7 +502,7 @@ Public Class VBtask : Implements IDisposable
             task.rc = redCells(index)
         End If
     End Sub
-    Public Sub setSelectedContour()
+    Public Sub setSelectedCell()
         If task.redCells.Count = 0 Then Exit Sub
         If task.ClickPoint = newPoint And task.redCells.Count > 1 Then
             task.ClickPoint = task.redCells(1).maxDist
@@ -587,7 +587,7 @@ Public Class VBtask : Implements IDisposable
             End If
 
             ' MSER mistakenly can have 1 cell - just ignore it.
-            If task.redCells.Count > 1 Then setSelectedContour()
+            If task.redCells.Count > 1 Then setSelectedCell()
 
             If task.redOptions.IdentifyCells.Checked Then
                 ' cannot use rc as it means task.rc here!  Be careful...

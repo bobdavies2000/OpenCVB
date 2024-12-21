@@ -29,7 +29,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
         Next
 
         If standalone Then
-            task.setSelectedContour()
+            task.setSelectedCell()
             dst3.SetTo(0)
             Dim ptCount As Integer
             For Each index In task.rc.nabs

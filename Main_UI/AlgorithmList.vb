@@ -367,6 +367,7 @@ End Enum
 	If algorithmName = "Brightness_HSV_CS" Then return new Brightness_HSV_CS
 	If algorithmName = "BRISK_Basics" Then return new BRISK_Basics
 	If algorithmName = "BRISK_Basics_CS" Then return new BRISK_Basics_CS
+	If algorithmName = "C3D_Basics" Then return new C3D_Basics
 	If algorithmName = "CameraMotion_Basics" Then return new CameraMotion_Basics
 	If algorithmName = "CameraMotion_Basics_CS" Then return new CameraMotion_Basics_CS
 	If algorithmName = "CameraMotion_SceneMotion" Then return new CameraMotion_SceneMotion

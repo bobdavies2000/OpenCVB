@@ -121,7 +121,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
         Dim cellCount = Math.Min(task.redOptions.identifyCount, task.redCells.Count)
         If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below."
 
-        If showSelected Then task.setSelectedContour()
+        If showSelected Then task.setSelectedCell()
     End Sub
 End Class
 
@@ -158,7 +158,7 @@ Public Class Flood_Tiers : Inherits TaskParent
         dst2 = flood.dst2
         dst3 = flood.dst3
 
-        task.setSelectedContour()
+        task.setSelectedCell()
     End Sub
 End Class
 
@@ -274,7 +274,7 @@ Public Class Flood_MaxDistPoints : Inherits TaskParent
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 
         cellGen.classCount = redCPP.classCount
-        cellGen.rectList = redCPP.rectlist
+        cellGen.rectList = redCPP.RectList
         cellGen.floodPoints = redCPP.floodPoints
         cellGen.removeContour = False
         cellGen.Run(redCPP.dst2)
@@ -287,7 +287,7 @@ Public Class Flood_MaxDistPoints : Inherits TaskParent
             redCPP.maxList.Add(task.redCells(i).maxDist.Y)
         Next
 
-        task.setSelectedContour()
+        task.setSelectedCell()
 
         labels(2) = cellGen.labels(2)
     End Sub

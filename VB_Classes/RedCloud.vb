@@ -6,7 +6,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public inputMask As New cvb.Mat
     Public cellGen As New Cell_Generate
     Public Sub New()
-        labels(3) = "The 'tracking' color (shown below) is unique and switches when a cell is split or lost."
+        labels(3) = "The 'tracking' color (shown below) is unique for each cell and switches when a cell is split or lost."
         task.gOptions.setHistogramBins(40)
         inputMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         UpdateAdvice(traceName + ": there are dedicated options for RedCloud algorithms." + vbCrLf +
@@ -1413,7 +1413,7 @@ Public Class RedCloud_TopXHulls : Inherits TaskParent
         Next
 
         task.redCells = New List(Of rcData)(newCells)
-        task.setSelectedContour()
+        task.setSelectedCell()
     End Sub
 End Class
 
@@ -1809,11 +1809,11 @@ Public Class RedCloud_ColorAndDepth : Inherits TaskParent
         If task.mouseClickFlag Then mousePicTag = task.mousePicTag
         Select Case mousePicTag
             Case 1
-                ' setSelectedContour()
+                ' setSelectedCell()
             Case 2
-                task.setSelectedContour(colorCells, colorMap)
+                task.setSelectedCell(colorCells, colorMap)
             Case 3
-                task.setSelectedContour(depthCells, depthMap)
+                task.setSelectedCell(depthCells, depthMap)
         End Select
         dst2.Rectangle(task.rc.rect, task.HighlightColor, task.lineWidth)
         dst3(task.rc.rect).SetTo(white, task.rc.mask)
@@ -1993,7 +1993,7 @@ Public Class RedCloud_FeatureLessReduce : Inherits TaskParent
         labels(3) = $"{redCells.Count} cells after removing featureless cells that were part of their surrounding.  " +
                     $"{task.redCells.Count - redCells.Count} were removed."
 
-        task.setSelectedContour()
+        task.setSelectedCell()
     End Sub
 End Class
 

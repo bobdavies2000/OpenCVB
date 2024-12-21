@@ -21,6 +21,7 @@ BlurMotion
 Boundary
 Brightness
 BRISK
+C3D
 CameraMotion
 CamShift
 Cartoonify

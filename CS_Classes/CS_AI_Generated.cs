@@ -21506,7 +21506,7 @@ namespace CS_Classes
             cellGen.removeContour = false;
             cellGen.Run(redCPP.dst2);
             dst2 = cellGen.dst2;
-            vbc.task.setSelectedContour();
+            vbc.task.setSelectedCell();
             labels[2] = cellGen.labels[2];
         }
     }
@@ -21621,7 +21621,7 @@ namespace CS_Classes
             dst2 = cellGen.dst2;
             int cellCount = Math.Min(vbc.task.redOptions.identifyCount, vbc.task.redCells.Count);
             if (vbc.task.heartBeat) labels[2] = $"{vbc.task.redCells.Count} cells identified and the largest {cellCount} are numbered below.";
-            if (showSelected) vbc.task.setSelectedContour();
+            if (showSelected) vbc.task.setSelectedCell();
         }
     }
 
@@ -21656,7 +21656,7 @@ namespace CS_Classes
             flood.Run(cvt.dst2);
             dst2 = flood.dst2;
             dst3 = flood.dst3;
-            vbc.task.setSelectedContour();
+            vbc.task.setSelectedCell();
         }
     }
 
@@ -21803,12 +21803,12 @@ namespace CS_Classes
     //        {
     //            if (vbc.task.mousePicTag == 2)
     //            {
-    //                vbc.task.setSelectedContour(ref cellsLeft, ref mapLeft);
+    //                vbc.task.setSelectedCell(ref cellsLeft, ref mapLeft);
     //                vbc.task.color[vbc.task.rc.rect].SetTo(Scalar.White, vbc.task.rc.mask);
     //            }
     //            else
     //            {
-    //                vbc.task.setSelectedContour(ref cellsRight, ref mapRight);
+    //                vbc.task.setSelectedCell(ref cellsRight, ref mapRight);
     //                dst1 = vbc.task.rightView;
     //                dst1[vbc.task.rc.rect].SetTo(Scalar.White, vbc.task.rc.mask);
     //            }
@@ -21847,7 +21847,7 @@ namespace CS_Classes
                 redCPP.maxList.Add(vbc.task.redCells[i].maxDist.X);
                 redCPP.maxList.Add(vbc.task.redCells[i].maxDist.Y);
             }
-            vbc.task.setSelectedContour();
+            vbc.task.setSelectedCell();
             labels[2] = cellGen.labels[2];
         }
     }
@@ -40400,7 +40400,7 @@ namespace CS_Classes
             }
             if (standalone)
             {
-                vbc.task.setSelectedContour();
+                vbc.task.setSelectedCell();
                 dst3.SetTo(0);
                 int ptCount = 0;
                 foreach (var index in vbc.task.rc.nabs)
@@ -52204,13 +52204,13 @@ namespace CS_Classes
             switch (mousePicTag)
             {
                 case 1:
-                    // setSelectedContour();
+                    // setSelectedCell();
                     break;
                 case 2:
-                    vbc.task.setSelectedContour(ref colorCells, ref colorMap);
+                    vbc.task.setSelectedCell(ref colorCells, ref colorMap);
                     break;
                 case 3:
-                    vbc.task.setSelectedContour(ref depthCells, ref depthMap);
+                    vbc.task.setSelectedCell(ref depthCells, ref depthMap);
                     break;
             }
             dst2.Rectangle(vbc.task.rc.rect, vbc.task.HighlightColor, vbc.task.lineWidth);
@@ -52462,7 +52462,7 @@ namespace CS_Classes
             dst2 = addw.dst2;
             labels[3] = $"{redCells.Count()} cells after removing featureless cells that were part of their surrounding.  " +
                         $"{vbc.task.redCells.Count() - redCells.Count()} were removed.";
-            vbc.task.setSelectedContour();
+            vbc.task.setSelectedCell();
         }
     }
 
@@ -57744,7 +57744,7 @@ namespace CS_Classes
             flood.inputMask = swarm.dst2;
             flood.Run(cvt.dst2);
             dst2 = flood.dst2;
-            vbc.task.setSelectedContour();
+            vbc.task.setSelectedCell();
             labels[2] = flood.cellGen.labels[2];
         }
     }
@@ -57810,7 +57810,7 @@ namespace CS_Classes
             if (!vbc.task.heartBeat) return;
             dst2 = runRedCloud(src).Clone();
             dst3 = lines.dst3.Clone();
-            vbc.task.setSelectedContour();
+            vbc.task.setSelectedCell();
             labels[2] = flood.cellGen.labels[2];
             labels[3] = lines.labels[2];
         }

@@ -235,7 +235,7 @@ Public Class Swarm_Flood : Inherits TaskParent
         flood.Run(color8U.dst2)
         dst2 = flood.dst2
 
-        task.setSelectedContour()
+        task.setSelectedCell()
         labels(2) = flood.cellGen.labels(2)
     End Sub
 End Class
@@ -268,7 +268,7 @@ Public Class Swarm_Flood2 : Inherits TaskParent
         dst2 = runRedCloud(src).Clone()
         dst3 = lines.dst3.Clone
 
-        task.setSelectedContour()
+        task.setSelectedCell()
         labels(1) = "Color8U_Basics input = " + task.redOptions.ColorSource.Text
         labels(2) = flood.cellGen.labels(2)
         labels(3) = lines.labels(2)
