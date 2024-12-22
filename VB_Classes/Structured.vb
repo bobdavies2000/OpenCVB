@@ -11,11 +11,12 @@ Public Class Structured_Basics : Inherits TaskParent
         Dim stepsize = options.stepSize
 
         dst2.SetTo(0)
-        For yCoordinate = 0 To src.Height - 1 Step stepsize
+        Static startingOffset As Integer = 0
+        Dim depthMask As New cvb.Mat
+        Dim minVal As Double, maxVal As Double
+        For yCoordinate = startingOffset To src.Height - 1 Step stepsize
             Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
             If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-            Dim depthMask As New cvb.Mat
-            Dim minVal As Double, maxVal As Double
             minVal = planeY - task.metersPerPixel
             maxVal = planeY + task.metersPerPixel
             depthMask = task.pcSplit(1).InRange(minVal, maxVal)
@@ -24,17 +25,17 @@ Public Class Structured_Basics : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        For xCoordinate = 0 To src.Width - 1 Step stepsize
+        For xCoordinate = startingOffset To src.Width - 1 Step stepsize
             Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-            Dim depthMask As New cvb.Mat
-            Dim minVal As Double, maxVal As Double
             minVal = planeX - task.metersPerPixel
             maxVal = planeX + task.metersPerPixel
             depthMask = task.pcSplit(0).InRange(minVal, maxVal)
             dst3.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
         Next
+        startingOffset += 1
+        If startingOffset >= stepsize Then startingOffset = 0
     End Sub
 End Class
 
@@ -1428,8 +1429,8 @@ End Class
 Public Class Structured_Lines : Inherits TaskParent
     Dim struct As New Structured_Basics
     Public lines As New Line_Basics
-    Public mpListH As New List(Of PointPair)
-    Public mpListV As New List(Of PointPair)
+    Public lpListX As New List(Of PointPair)
+    Public lpListY As New List(Of PointPair)
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         desc = "Find the lines in the Structured_Basics output"
@@ -1438,28 +1439,28 @@ Public Class Structured_Lines : Inherits TaskParent
         struct.Run(src)
         lines.Run(struct.dst2)
 
-        mpListH.Clear()
-        For Each mp In lines.lpList
-            mpListH.Add(mp)
+        lpListX.Clear()
+        For Each lp In lines.lpList
+            lpListX.Add(lp)
         Next
 
         dst2.SetTo(0)
-        For Each mp In mpListH
-            dst2.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+        For Each lp In lpListX
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
-        labels(2) = CStr(mpListH.Count) + " horizontal lines found"
+        labels(2) = CStr(lpListX.Count) + " lines found in X-direction slices"
 
         lines.Run(struct.dst3)
-        mpListV.Clear()
-        For Each mp In lines.lpList
-            mpListV.Add(mp)
+        lpListY.Clear()
+        For Each lp In lines.lpList
+            lpListY.Add(lp)
         Next
 
         dst3.SetTo(0)
-        For Each mp In mpListV
-            dst3.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+        For Each lp In lpListY
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
-        labels(3) = CStr(mpListV.Count) + " vertical lines found"
+        labels(3) = CStr(lpListY.Count) + " lines found in Y-direction slices"
     End Sub
 End Class

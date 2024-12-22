@@ -11,26 +11,26 @@ Public Class Line3D_Basics : Inherits TaskParent
         sLines.Run(src)
         dst2 = src
 
-        lineH.mpListInput = sLines.mpListH
+        lineH.lpListInput = sLines.lpListX
         lineH.Run(src)
-        Dim mpListH As New List(Of PointPair)(lineH.mpList)
+        Dim lpListH As New List(Of PointPair)(lineH.lpList)
 
-        lineV.mpListInput = sLines.mpListV
+        lineV.lpListInput = sLines.lpListY
         lineV.Run(src)
-        Dim mpListV As New List(Of PointPair)(lineV.mpList)
+        Dim lpListV As New List(Of PointPair)(lineV.lpList)
 
         dst3.SetTo(0)
-        For Each mp In mpListV
-            dst2.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-            dst3.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+        For Each lp In lpListV
+            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
-        For Each mp In mpListH
-            dst2.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-            dst3.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+        For Each lp In lpListH
+            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
-        labels(2) = CStr(mpListV.Count) + " vertical and " + CStr(mpListH.Count) +
-                         " horizontal lines were identified in 3D."
+        labels(2) = CStr(lpListV.Count) + " Y-direction lines and " + CStr(lpListH.Count) +
+                         " X-direction lines were identified in 3D."
         labels(3) = labels(2)
     End Sub
 End Class
@@ -41,61 +41,37 @@ End Class
 
 
 Public Class Line3D_Core : Inherits TaskParent
-    Public mpListInput As New List(Of PointPair)
-    Public mpList As New List(Of PointPair)
+    Public lpListInput As New List(Of PointPair)
+    Public lpList As New List(Of PointPair)
+    Public collect As New Line_Collection
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
         desc = "Find the lines in the Structured_MultiSlice algorithm output but age them with motion."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             Static slines As New Structured_Lines
-            mpListInput = New List(Of PointPair)(slines.mpListV)
+            slines.Run(src)
+            lpListInput = New List(Of PointPair)(slines.lpListY)
         End If
 
-        Dim newSet As New List(Of PointPair)
-        Static ptList As New List(Of PointPair)(mpListInput)
-        '  unlike Feature_Basics, we have to check each pair, not each point
-        For Each mp In ptList
-            Dim val1 = task.motionMask.Get(Of Byte)(mp.p1.Y, mp.p1.X)
-            Dim val2 = task.motionMask.Get(Of Byte)(mp.p2.Y, mp.p2.X)
-            If val1 = 0 And val2 = 0 Then newSet.Add(mp)
+        collect.lpListInput = lpListInput
+        collect.Run(src)
+
+        dst2.SetTo(0)
+        lpList.Clear()
+        For Each lp In collect.lpListOutput
+            Dim w = Math.Abs(lp.p1.X - lp.p2.X)
+            Dim h = Math.Abs(lp.p1.Y - lp.p2.Y)
+            Dim r = ValidateRect(New cvb.Rect(lp.p1.X, lp.p1.Y, w + 1, h + 1))
+            'Dim count = dst2(r).CountNonZero
+            'If count < Math.Max(r.Width / 2, r.Height / 2) Then
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            lpList.Add(lp)
+            ' End If
         Next
 
-        '  unlike Feature_Basics, we have to check each pair, not each point
-        For Each mp In mpListInput
-            Dim val1 = task.motionMask.Get(Of Byte)(mp.p1.Y, mp.p1.X)
-            Dim val2 = task.motionMask.Get(Of Byte)(mp.p2.Y, mp.p2.X)
-            If val1 <> 0 Or val2 <> 0 Then newSet.Add(mp)
-        Next
-
-        Dim ptSort As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalInteger)
-        ' organize the lines top to bottom, left to right, and ordered points left to right
-        For Each mp In newSet
-            Dim index = task.gridMap32S.Get(Of Integer)(mp.p1.Y, mp.p1.X)
-            If mp.p1.X < mp.p2.X Then
-                ptSort.Add(index, mp)
-            Else
-                ptSort.Add(index, New PointPair(mp.p2, mp.p1))
-            End If
-        Next
-
-        dst3.SetTo(0)
-        ptList.Clear()
-        For i = 0 To ptSort.Count - 1
-            Dim mp = ptSort.Values(i)
-            Dim w = Math.Abs(mp.p1.X - mp.p2.X)
-            Dim h = Math.Abs(mp.p1.Y - mp.p2.Y)
-            Dim r = ValidateRect(New cvb.Rect(mp.p1.X - 1, mp.p1.Y - 1, w + 2, h + 2))
-            Dim count = dst3(r).CountNonZero
-            If count = 0 Then
-                dst3.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
-                ptList.Add(mp)
-            End If
-        Next
-
-        mpList = New List(Of PointPair)(ptList)
-        labels(2) = CStr(ptList.Count) + " lines were found in the structured light."
+        labels(2) = CStr(lpList.Count) + " lines were found in the structured light."
     End Sub
 End Class
 

@@ -1836,9 +1836,11 @@ End Enum
 	If algorithmName = "Line_Cells" Then return new Line_Cells
 	If algorithmName = "Line_Cells_CS" Then return new Line_Cells_CS
 	If algorithmName = "Line_CellsVertHoriz_CS" Then return new Line_CellsVertHoriz_CS
+	If algorithmName = "Line_Collection" Then return new Line_Collection
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
 	If algorithmName = "Line_ColorClass_CS" Then return new Line_ColorClass_CS
 	If algorithmName = "Line_Core" Then return new Line_Core
+	If algorithmName = "Line_Core1" Then return new Line_Core1
 	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
 	If algorithmName = "Line_DisplayInfoOld_CS" Then return new Line_DisplayInfoOld_CS
 	If algorithmName = "Line_FromContours" Then return new Line_FromContours
@@ -1881,7 +1883,6 @@ End Enum
 	If algorithmName = "Line_TimeViewLines" Then return new Line_TimeViewLines
 	If algorithmName = "Line_TimeViewLines_CS" Then return new Line_TimeViewLines_CS
 	If algorithmName = "Line_TopXlines" Then return new Line_TopXlines
-	If algorithmName = "Line_Unordered" Then return new Line_Unordered
 	If algorithmName = "Line_Vertical" Then return new Line_Vertical
 	If algorithmName = "Line_VerticalHorizontal" Then return new Line_VerticalHorizontal
 	If algorithmName = "Line_VerticalHorizontal1" Then return new Line_VerticalHorizontal1

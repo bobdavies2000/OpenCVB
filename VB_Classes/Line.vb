@@ -1,6 +1,6 @@
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Public lines As New Line_Unordered
+    Public lines As New Line_Core
     Public lpList As New List(Of PointPair)
     Public Sub New()
         desc = "Create a feature coordinate layout for line endpoints."
@@ -26,63 +26,6 @@ Public Class Line_Basics : Inherits TaskParent
         End If
 
         If task.heartBeat Then labels(2) = CStr(lpList.Count) + " lines were identified."
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line_Unordered : Inherits TaskParent
-    Public lines As New Line_Core
-    Public lpList As New List(Of PointPair)
-    Public Sub New()
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Where motion, remove existing lines but add new lines.  Keep existing lines where no motion."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        dst2 = src.Clone
-
-        lines.Run(src)
-
-        If lpList.Count = 0 Then lpList = New List(Of PointPair)(lines.lpList)
-
-        Dim nextSet As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
-        dst3.SetTo(0)
-        Dim motionToss As Integer
-        For Each lp In lpList
-            Dim v1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            Dim v2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-            If v1 = 0 And v2 = 0 Then
-                nextSet.Add(lp.length, lp)
-                dst3.Line(lp.p1, lp.p2, white, 2, cvb.LineTypes.Link8)
-            Else
-                motionToss += 1
-            End If
-        Next
-
-        Dim motionLineCount As Integer
-        For Each lp In lines.lpList
-            Dim v1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            Dim v2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-            If v1 <> 0 Or v2 <> 0 Then
-                nextSet.Add(lp.length, lp)
-                dst3.Line(lp.p1, lp.p2, white, 2, cvb.LineTypes.Link8)
-            Else
-                motionLineCount += 1
-            End If
-        Next
-
-        lpList = New List(Of PointPair)(nextSet.Values)
-
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, white, 3, cvb.LineTypes.Link8)
-        Next
-        If task.heartBeat Then
-            labels(2) = "Existing lines tossed because of motion: " + CStr(motionToss) +
-                        " Lines added in Motion areas: " + CStr(motionLineCount)
-            labels(3) = CStr(lpList.Count) + " lines were identified."
-        End If
     End Sub
 End Class
 
@@ -136,65 +79,6 @@ Public Class Line_OriginalBasics : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Line_Core : Inherits TaskParent
-    Dim ld As cvb.XImgProc.FastLineDetector
-    Public lpList As New List(Of PointPair)
-    Public lineColor As cvb.Scalar = cvb.Scalar.White
-    Public options As New Options_Line
-    Public Sub New()
-        ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        If src.Channels() = 3 Then dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
-        If dst2.Type <> cvb.MatType.CV_8U Then dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
-
-        Dim lines = ld.Detect(dst2)
-
-        Dim sortByLen As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= dst2.Cols And v(1) >= 0 And v(1) <= dst2.Rows And
-               v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
-                Dim p1 = New cvb.Point(v(0), v(1))
-                Dim p2 = New cvb.Point(v(2), v(3))
-                Dim lp = New PointPair(p1, p2)
-                If lp.length > options.minLength Then sortByLen.Add(lp.length, lp)
-            End If
-        Next
-
-        dst3.SetTo(0)
-        Dim lpFiltered As New List(Of PointPair)(sortByLen.Values)
-        For i = 0 To sortByLen.Values.Count - 1
-            Dim lp = sortByLen.Values(i)
-            Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For j = i + 1 To lpFiltered.Count - 1
-                Dim mp = lpFiltered(j)
-                If mp.center.DistanceTo(lp.center) < options.minDistance Then
-                    removeList.Add(j, j)
-                End If
-            Next
-            For Each index In removeList.Keys
-                lpFiltered.RemoveAt(index)
-            Next
-        Next
-        lpList = New List(Of PointPair)(lpFiltered)
-        For Each lp In lpList
-            DrawLine(dst2, lp.p1, lp.p2, lineColor)
-            DrawLine(dst3, lp.p1, lp.p2, 255)
-            DrawCircle(dst3, lp.center, task.DotSize + 1, cvb.Scalar.White, -1)
-        Next
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-    End Sub
-End Class
 
 
 
@@ -1888,5 +1772,177 @@ Public Class Line_MatchedLines : Inherits TaskParent
             labels(2) = CStr(lpInput.Count) + " lines were input and " + CStr(combineCount) +
                         " lines were matched to the previous frame"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_Core1 : Inherits TaskParent
+    Dim ld As cvb.XImgProc.FastLineDetector
+    Public lpList As New List(Of PointPair)
+    Public lineColor As cvb.Scalar = cvb.Scalar.White
+    Public options As New Options_Line
+    Public Sub New()
+        ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        If src.Channels() = 3 Then dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
+        If dst2.Type <> cvb.MatType.CV_8U Then dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
+
+        Dim lines = ld.Detect(dst2)
+
+        Dim sortByLen As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= dst2.Cols And v(1) >= 0 And v(1) <= dst2.Rows And
+               v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
+                Dim p1 = New cvb.Point(v(0), v(1))
+                Dim p2 = New cvb.Point(v(2), v(3))
+                Dim lp = New PointPair(p1, p2)
+                If lp.length > options.minLength Then sortByLen.Add(lp.length, lp)
+            End If
+        Next
+
+        dst3.SetTo(0)
+        Dim lpFiltered As New List(Of PointPair)(sortByLen.Values)
+        For i = 0 To sortByLen.Values.Count - 1
+            Dim lp = sortByLen.Values(i)
+            Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+            For j = i + 1 To lpFiltered.Count - 1
+                Dim mp = lpFiltered(j)
+                If mp.center.DistanceTo(lp.center) < options.minDistance Then
+                    removeList.Add(j, j)
+                End If
+            Next
+            For Each index In removeList.Keys
+                lpFiltered.RemoveAt(index)
+            Next
+        Next
+        lpList = New List(Of PointPair)(lpFiltered)
+        For Each lp In lpList
+            DrawLine(dst2, lp.p1, lp.p2, lineColor)
+            DrawLine(dst3, lp.p1, lp.p2, 255)
+            ' DrawCircle(dst3, lp.center, task.DotSize + 1, cvb.Scalar.White, -1)
+        Next
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Collection : Inherits TaskParent
+    Public lpListInput As New List(Of PointPair)
+    Public lpListOutput As New List(Of PointPair)
+    Public Sub New()
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
+        desc = "Collect lines across frame using the motion mask."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static lines As New Line_Basics
+            lines.Run(src)
+            lpListInput = lines.lpList
+        End If
+
+        Dim newSet As New List(Of PointPair)
+        Static ptList As New List(Of PointPair)(lpListInput)
+        '  unlike Feature_Basics, we have to check each pair, not each point
+        For Each lp In ptList
+            Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+            If val1 = 0 And val2 = 0 Then newSet.Add(lp)
+        Next
+
+        '  unlike Feature_Basics, we have to check each pair, not each point
+        For Each lp In lpListInput
+            Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+            If val1 <> 0 Or val2 <> 0 Then newSet.Add(lp)
+        Next
+
+        Dim ptSort As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalInteger)
+        ' organize the lines top to bottom, left to right, and order points left to right
+        For Each lp In newSet
+            Dim index = task.gridMap32S.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            If lp.p1.X < lp.p2.X Then
+                ptSort.Add(index, lp)
+            Else
+                ptSort.Add(index, New PointPair(lp.p2, lp.p1))
+            End If
+        Next
+
+        If standaloneTest() Then
+            dst2 = src
+            dst3.SetTo(0)
+            For Each lp In lpListOutput
+                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Next
+        End If
+        lpListOutput = New List(Of PointPair)(ptSort.Values)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_Core : Inherits TaskParent
+    Dim ld As cvb.XImgProc.FastLineDetector
+    Public lpList As New List(Of PointPair)
+    Public lineColor As cvb.Scalar = cvb.Scalar.White
+    Public options As New Options_Line
+    Dim collect As New Line_Collection
+    Public Sub New()
+        ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = src.Clone
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cvb.MatType.CV_8U Then src.ConvertTo(src, cvb.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src)
+
+        Dim sortByLen As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= dst2.Cols And v(1) >= 0 And v(1) <= dst2.Rows And
+               v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
+                Dim p1 = New cvb.Point(v(0), v(1))
+                Dim p2 = New cvb.Point(v(2), v(3))
+                Dim lp = New PointPair(p1, p2)
+                If lp.length > options.minLength Then sortByLen.Add(lp.length, lp)
+            End If
+        Next
+
+        collect.lpListInput = New List(Of PointPair)(sortByLen.Values)
+        collect.Run(src)
+
+        lpList = New List(Of PointPair)(collect.lpListOutput)
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            For Each lp In lpList
+                DrawLine(dst2, lp.p1, lp.p2, lineColor)
+                DrawLine(dst3, lp.p1, lp.p2, 255)
+            Next
+        End If
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
 End Class
