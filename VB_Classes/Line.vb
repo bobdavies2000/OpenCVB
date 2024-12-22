@@ -1,4 +1,3 @@
-Imports System.Windows.Documents
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lines As New Line_Unordered

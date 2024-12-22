@@ -1898,6 +1898,7 @@ End Enum
 	If algorithmName = "Line3D_CandidatesFirstLast" Then return new Line3D_CandidatesFirstLast
 	If algorithmName = "Line3D_CandidatesFirstLast_CS" Then return new Line3D_CandidatesFirstLast_CS
 	If algorithmName = "Line3D_Checks_CS" Then return new Line3D_Checks_CS
+	If algorithmName = "Line3D_Core" Then return new Line3D_Core
 	If algorithmName = "Line3D_Correlation" Then return new Line3D_Correlation
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
@@ -3390,6 +3391,7 @@ End Enum
 	If algorithmName = "Structured_FloorCeiling_CS" Then return new Structured_FloorCeiling_CS
 	If algorithmName = "Structured_LinearizeFloor" Then return new Structured_LinearizeFloor
 	If algorithmName = "Structured_LinearizeFloor_CS" Then return new Structured_LinearizeFloor_CS
+	If algorithmName = "Structured_Lines" Then return new Structured_Lines
 	If algorithmName = "Structured_MouseSlice" Then return new Structured_MouseSlice
 	If algorithmName = "Structured_MouseSlice_CS" Then return new Structured_MouseSlice_CS
 	If algorithmName = "Structured_MultiSlice" Then return new Structured_MultiSlice

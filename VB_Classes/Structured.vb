@@ -516,6 +516,29 @@ End Class
 
 
 
+Public Class Structured_FeatureLines : Inherits TaskParent
+    Dim struct As New Structured_MultiSlice
+    Public lines As New FeatureLine_Finder
+    Public Sub New()
+        desc = "Find the lines in the Structured_MultiSlice algorithm output"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        struct.Run(src)
+        dst2 = struct.dst2
+
+        lines.Run(struct.dst2)
+        dst3 = src.Clone
+        For i = 0 To lines.lines2D.Count - 1 Step 2
+            Dim p1 = lines.lines2D(i), p2 = lines.lines2D(i + 1)
+            dst3.Line(p1, p2, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
 
 Public Class Structured_FloorCeiling : Inherits TaskParent
     Public slice As New Structured_SliceEither
@@ -1402,21 +1425,41 @@ End Class
 
 
 
-Public Class Structured_FeatureLines : Inherits TaskParent
-    Dim struct As New Structured_MultiSlice
-    Public lines As New FeatureLine_Finder
+Public Class Structured_Lines : Inherits TaskParent
+    Dim struct As New Structured_Basics
+    Public lines As New Line_Basics
+    Public mpListH As New List(Of PointPair)
+    Public mpListV As New List(Of PointPair)
     Public Sub New()
-        desc = "Find the lines in the Structured_MultiSlice algorithm output"
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        desc = "Find the lines in the Structured_Basics output"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         struct.Run(src)
-        dst2 = struct.dst2
-
         lines.Run(struct.dst2)
-        dst3 = src.Clone
-        For i = 0 To lines.lines2D.Count - 1 Step 2
-            Dim p1 = lines.lines2D(i), p2 = lines.lines2D(i + 1)
-            dst3.Line(p1, p2, cvb.Scalar.Yellow, task.lineWidth, task.lineType)
+
+        mpListH.Clear()
+        For Each mp In lines.lpList
+            mpListH.Add(mp)
         Next
+
+        dst2.SetTo(0)
+        For Each mp In mpListH
+            dst2.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(mpListH.Count) + " horizontal lines found"
+
+        lines.Run(struct.dst3)
+        mpListV.Clear()
+        For Each mp In lines.lpList
+            mpListV.Add(mp)
+        Next
+
+        dst3.SetTo(0)
+        For Each mp In mpListV
+            dst3.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+        Next
+
+        labels(3) = CStr(mpListV.Count) + " vertical lines found"
     End Sub
 End Class

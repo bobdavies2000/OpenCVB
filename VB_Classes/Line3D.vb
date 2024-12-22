@@ -1,69 +1,101 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
-    Dim sLines As New Structured_FeatureLines
+    Dim sLines As New Structured_Lines
+    Dim lineH As New Line3D_Core
+    Dim lineV As New Line3D_Core
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
-        desc = "Find the lines in the Structured_MultiSlice algorithm output but age them with motion."
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
+        desc = "Find all the lines in 3D using the structured slices through the pointcloud."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         sLines.Run(src)
         dst2 = src
 
-        Dim newSet As New List(Of cvb.Point2f)
-        Static ptList As New List(Of cvb.Point2f)(sLines.lines.lines2D)
-        '  unlike Feature_Basics, we have to check each pair, not each point
-        For i = 0 To ptList.Count - 1 Step 2
-            Dim val1 = task.motionMask.Get(Of Byte)(ptList(i).Y, ptList(i).X)
-            Dim val2 = task.motionMask.Get(Of Byte)(ptList(i + 1).Y, ptList(i + 1).X)
+        lineH.mpListInput = sLines.mpListH
+        lineH.Run(src)
+        Dim mpListH As New List(Of PointPair)(lineH.mpList)
 
-            If val1 = 0 And val2 = 0 Then
-                newSet.Add(ptList(i))
-                newSet.Add(ptList(i + 1))
-            End If
+        lineV.mpListInput = sLines.mpListV
+        lineV.Run(src)
+        Dim mpListV As New List(Of PointPair)(lineV.mpList)
+
+        dst3.SetTo(0)
+        For Each mp In mpListV
+            dst2.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
         Next
 
-        Dim lines = sLines.lines.lines2D
-        '  unlike Feature_Basics, we have to check each pair, not each point
-        For i = 0 To lines.Count - 1 Step 2
-            'Dim val1 = task.motionMask.Get(Of Byte)(lines(i).Y, lines(i).X)
-            'Dim val2 = task.motionMask.Get(Of Byte)(lines(i + 1).Y, lines(i + 1).X)
+        For Each mp In mpListH
+            dst2.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(mpListV.Count) + " vertical and " + CStr(mpListH.Count) +
+                         " horizontal lines were identified in 3D."
+        labels(3) = labels(2)
+    End Sub
+End Class
 
-            'If val1 <> 0 And val2 <> 0 Then
-            newSet.Add(lines(i))
-            newSet.Add(lines(i + 1))
-            ' End If
+
+
+
+
+
+Public Class Line3D_Core : Inherits TaskParent
+    Public mpListInput As New List(Of PointPair)
+    Public mpList As New List(Of PointPair)
+    Public Sub New()
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        desc = "Find the lines in the Structured_MultiSlice algorithm output but age them with motion."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static slines As New Structured_Lines
+            mpListInput = New List(Of PointPair)(slines.mpListV)
+        End If
+
+        Dim newSet As New List(Of PointPair)
+        Static ptList As New List(Of PointPair)(mpListInput)
+        '  unlike Feature_Basics, we have to check each pair, not each point
+        For Each mp In ptList
+            Dim val1 = task.motionMask.Get(Of Byte)(mp.p1.Y, mp.p1.X)
+            Dim val2 = task.motionMask.Get(Of Byte)(mp.p2.Y, mp.p2.X)
+            If val1 = 0 And val2 = 0 Then newSet.Add(mp)
         Next
 
-        Dim ptSort As New SortedList(Of Integer, cvb.Point2f)(New compareAllowIdenticalInteger)
+        '  unlike Feature_Basics, we have to check each pair, not each point
+        For Each mp In mpListInput
+            Dim val1 = task.motionMask.Get(Of Byte)(mp.p1.Y, mp.p1.X)
+            Dim val2 = task.motionMask.Get(Of Byte)(mp.p2.Y, mp.p2.X)
+            If val1 <> 0 Or val2 <> 0 Then newSet.Add(mp)
+        Next
+
+        Dim ptSort As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalInteger)
         ' organize the lines top to bottom, left to right, and ordered points left to right
-        For i = 0 To newSet.Count - 1 Step 2
-            Dim index = task.gridMap32S.Get(Of Integer)(newSet(i).Y, newSet(i).X)
-            If newSet(i).X < newSet(i + 1).X Then
-                ptSort.Add(index, newSet(i))
-                ptSort.Add(index, newSet(i + 1))
+        For Each mp In newSet
+            Dim index = task.gridMap32S.Get(Of Integer)(mp.p1.Y, mp.p1.X)
+            If mp.p1.X < mp.p2.X Then
+                ptSort.Add(index, mp)
             Else
-                ptSort.Add(index, newSet(i + 1))
-                ptSort.Add(index, newSet(i))
+                ptSort.Add(index, New PointPair(mp.p2, mp.p1))
             End If
         Next
 
         dst3.SetTo(0)
         ptList.Clear()
-        For i = 0 To ptSort.Count - 1 Step 2
-            Dim p1 = ptSort.Values(i)
-            Dim p2 = ptSort.Values(i + 1)
-            Dim w = Math.Abs(p1.X - p2.X)
-            Dim h = Math.Abs(p1.Y - p2.Y)
-            Dim r = ValidateRect(New cvb.Rect(p1.X - 1, p1.Y - 1, w + 2, h + 2))
+        For i = 0 To ptSort.Count - 1
+            Dim mp = ptSort.Values(i)
+            Dim w = Math.Abs(mp.p1.X - mp.p2.X)
+            Dim h = Math.Abs(mp.p1.Y - mp.p2.Y)
+            Dim r = ValidateRect(New cvb.Rect(mp.p1.X - 1, mp.p1.Y - 1, w + 2, h + 2))
             Dim count = dst3(r).CountNonZero
             If count = 0 Then
-                dst3.Line(p1, p2, 255, task.lineWidth, task.lineType)
-                ptList.Add(p1)
-                ptList.Add(p2)
+                dst3.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+                ptList.Add(mp)
             End If
         Next
 
-        labels(2) = CStr(ptList.Count / 2) + " lines were found in the structured light."
+        mpList = New List(Of PointPair)(ptList)
+        labels(2) = CStr(ptList.Count) + " lines were found in the structured light."
     End Sub
 End Class
 
