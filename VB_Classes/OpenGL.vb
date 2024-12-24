@@ -1005,7 +1005,7 @@ End Class
 
 
 Public Class OpenGL_PClinesAll : Inherits TaskParent
-    Dim lines As New Line3D_CandidatesAll
+    Dim lines As New Line3D_DeltaZ1
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
         task.OpenGLTitle = "OpenGL_Functions"

@@ -1894,15 +1894,17 @@ End Enum
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop
 	If algorithmName = "Line_ViewTop_CS" Then return new Line_ViewTop_CS
 	If algorithmName = "Line3D_Basics" Then return new Line3D_Basics
-	If algorithmName = "Line3D_CandidatesAll" Then return new Line3D_CandidatesAll
 	If algorithmName = "Line3D_CandidatesAll_CS" Then return new Line3D_CandidatesAll_CS
 	If algorithmName = "Line3D_CandidatesFirstLast" Then return new Line3D_CandidatesFirstLast
 	If algorithmName = "Line3D_CandidatesFirstLast_CS" Then return new Line3D_CandidatesFirstLast_CS
 	If algorithmName = "Line3D_Checks_CS" Then return new Line3D_Checks_CS
 	If algorithmName = "Line3D_Core" Then return new Line3D_Core
 	If algorithmName = "Line3D_Correlation" Then return new Line3D_Correlation
+	If algorithmName = "Line3D_DeltaZ" Then return new Line3D_DeltaZ
+	If algorithmName = "Line3D_DeltaZ1" Then return new Line3D_DeltaZ1
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
+	If algorithmName = "Line3D_X" Then return new Line3D_X
 	If algorithmName = "Linear_Basics" Then return new Linear_Basics
 	If algorithmName = "Linear_ImageX" Then return new Linear_ImageX
 	If algorithmName = "Linear_ImageY" Then return new Linear_ImageY
@@ -2747,6 +2749,8 @@ End Enum
 	If algorithmName = "PCA_Reconstruct" Then return new PCA_Reconstruct
 	If algorithmName = "PCA_Reconstruct_CS" Then return new PCA_Reconstruct_CS
 	If algorithmName = "PCdiff_Basics" Then return new PCdiff_Basics
+	If algorithmName = "PCdiff_Basics1" Then return new PCdiff_Basics1
+	If algorithmName = "PCdiff_Edges" Then return new PCdiff_Edges
 	If algorithmName = "PCdiff_Filter" Then return new PCdiff_Filter
 	If algorithmName = "PCdiff_GuidedBP" Then return new PCdiff_GuidedBP
 	If algorithmName = "PCdiff_Points" Then return new PCdiff_Points

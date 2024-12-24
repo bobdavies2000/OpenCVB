@@ -366,8 +366,6 @@ Partial Class OptionsGlobal
         'UseMotionDepth
         '
         Me.UseMotionDepth.AutoSize = True
-        Me.UseMotionDepth.Checked = True
-        Me.UseMotionDepth.CheckState = System.Windows.Forms.CheckState.Checked
         Me.UseMotionDepth.Location = New System.Drawing.Point(14, 89)
         Me.UseMotionDepth.Name = "UseMotionDepth"
         Me.UseMotionDepth.Size = New System.Drawing.Size(222, 24)

@@ -42767,7 +42767,7 @@ namespace CS_Classes
 
     public class OpenGL_PClinesAll_CS : TaskParent
     {
-        Line3D_CandidatesAll lines = new Line3D_CandidatesAll();
+        Line3D_DeltaZ1 lines = new Line3D_DeltaZ1();
         public OpenGL_PClinesAll_CS()
         {
             vbc.task.ogl.oglFunction = (int)oCase.pcLines;

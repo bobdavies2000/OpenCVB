@@ -1,6 +1,79 @@
 ﻿Imports cvb = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class PCdiff_Basics : Inherits TaskParent
+    Public options As New Options_ImageOffset
+    Public Sub New()
+        task.gOptions.PixelDiffBar.Value = 10
+        desc = "Find depth regions where neighboring pixels are close in depth"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+        If standalone Then src = task.pcSplit(2)
+
+        Dim r1 = New cvb.Rect(1, 1, task.cols - 2, task.rows - 2)
+        Dim r2 As cvb.Rect
+        Select Case options.offsetDirection
+            Case "Upper Left"
+                r2 = New cvb.Rect(0, 0, r1.Width, r1.Height)
+            Case "Above"
+                r2 = New cvb.Rect(1, 0, r1.Width, r1.Height)
+            Case "Upper Right"
+                r2 = New cvb.Rect(2, 0, r1.Width, r1.Height)
+            Case "Left"
+                r2 = New cvb.Rect(0, 1, r1.Width, r1.Height)
+            Case "Right"
+                r2 = New cvb.Rect(2, 1, r1.Width, r1.Height)
+            Case "Lower Left"
+                r2 = New cvb.Rect(0, 2, r1.Width, r1.Height)
+            Case "Below"
+                r2 = New cvb.Rect(1, 2, r1.Width, r1.Height)
+            Case "Below Right"
+                r2 = New cvb.Rect(2, 2, r1.Width, r1.Height)
+        End Select
+
+        Dim r3 = New cvb.Rect(1, 1, task.cols - 2, task.rows - 2)
+
+        dst2 = New cvb.Mat(dst2.Size, src.Type, 0)
+        cvb.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
+        dst3 = dst2.Threshold(task.gOptions.pixelDiffThreshold / 1000, 255, cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
+        dst3.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+Public Class PCdiff_Edges : Inherits TaskParent
+    Dim pcDiff As New PCdiff_Basics
+    Public Sub New()
+        task.gOptions.DebugSlider.Value = 0
+        task.gOptions.DebugSlider.Minimum = 0
+        task.gOptions.DebugSlider.Maximum = 2
+        desc = "Find any significant differences in neighboring pixels of the pointcloud."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        Static index As Integer = -1
+
+        If task.heartBeatLT Then
+            index += 1
+            If index > 2 Then index = 0
+        End If
+
+        index = task.gOptions.DebugSlider.Value
+        pcDiff.Run(task.pcSplit(index))
+
+        strOut = "Index = " + CStr(index) + "  Difference in the pointcloud "
+        strOut += Choose(index + 1, "X-Direction", "Y-Direction", "Z-Direction")
+        labels(2) = strOut
+        dst2 = pcDiff.dst3
+    End Sub
+End Class
+
+
+
+
+
+Public Class PCdiff_Basics1 : Inherits TaskParent
     Public options As New Options_ImageOffset
     Public masks(2) As cvb.Mat
     Public dst(2) As cvb.Mat

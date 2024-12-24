@@ -1856,7 +1856,7 @@ Public Class Line_Collection : Inherits TaskParent
         End If
 
         Dim newSet As New List(Of PointPair)
-        Static ptList As New List(Of PointPair)(lpListInput)
+        Dim ptList As New List(Of PointPair)(lpListOutput)
         '  unlike Feature_Basics, we have to check each pair, not each point
         For Each lp In ptList
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
@@ -1943,6 +1943,8 @@ Public Class Line_Core : Inherits TaskParent
                 DrawLine(dst3, lp.p1, lp.p2, 255)
             Next
         End If
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+        If task.heartBeat Then
+            labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+        End If
     End Sub
 End Class
