@@ -117,7 +117,8 @@ Public Class PCdiff_Basics1 : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
-            masks(i) = dst(i).Threshold(options.delta, 255, cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
+            masks(i) = dst(i).Threshold(task.gOptions.pixelDiffThreshold / 1000, 255,
+                                        cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
             pcFiltered(i) = New cvb.Mat(src.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
         Next
@@ -139,7 +140,7 @@ Public Class PCdiff_Filter : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         pcDiff.Run(src)
 
-        Dim delta = pcDiff.options.delta
+        Dim delta = task.gOptions.pixelDiffThreshold / 1000
         dst2.SetTo(0)
         For y = 0 To dst2.Height - 1
             For x = 0 To dst2.Width - 1
@@ -176,7 +177,7 @@ Public Class PCdiff_Points : Inherits TaskParent
 
         dst2.SetTo(0)
         Dim countInf As Integer
-        Dim delta = filter.pcDiff.options.delta
+        Dim delta = task.gOptions.pixelDiffThreshold / 1000
         For y = 0 To task.pcSplit(2).Rows - 1
             Dim slice = task.pcSplit(2).Row(y)
             Dim lastVal As Single = 0

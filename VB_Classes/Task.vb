@@ -85,7 +85,12 @@ Public Class VBtask : Implements IDisposable
     Public motion As Motion_Basics
     Public motionPercent As Single
     Public MotionLabel As String = " "
+
     Public topFeatures As New List(Of cvb.Point2f)
+    Public features As New List(Of cvb.Point2f)
+    Public featurePoints As New List(Of cvb.Point)
+    Public featureMotion As Boolean ' false means that none of the features moved.
+
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
@@ -273,10 +278,6 @@ Public Class VBtask : Implements IDisposable
     Public rc As New rcData
     Public redCells As New List(Of rcData)
     Public redMap As cvb.Mat
-
-    Public features As New List(Of cvb.Point2f)
-    Public featurePoints As New List(Of cvb.Point)
-    Public featureMotion As Boolean ' false means that none of the features moved.
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
     Public xRange As Single

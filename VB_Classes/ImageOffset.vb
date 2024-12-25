@@ -44,7 +44,8 @@ Public Class ImageOffset_Basics : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
-            masks(i) = dst(i).Threshold(options.delta, 255, cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
+            masks(i) = dst(i).Threshold(task.gOptions.pixelDiffThreshold, 255,
+                                        cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
             pcFiltered(i) = New cvb.Mat(src.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
         Next

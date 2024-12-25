@@ -7646,12 +7646,9 @@ End Class
 
 
 Public Class Options_ImageOffset : Inherits TaskParent
-    Public delta As Single
     Public offsetDirection As String
     Public horizontalSlice As Boolean
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Delta (mm)", 1, 1000, 25)
-
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Upper Left")
@@ -7673,9 +7670,6 @@ Public Class Options_ImageOffset : Inherits TaskParent
         End If
     End Sub
     Public Sub RunOpt()
-        Static deltaSlider = FindSlider("Delta (mm)")
-        delta = deltaSlider.value / 1000
-
         Static frm = FindFrm(traceName + " Radio Buttons")
         offsetDirection = frm.check(findRadioIndex(frm.check)).Text
 

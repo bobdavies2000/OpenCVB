@@ -55,7 +55,7 @@ Public Class Line3D_Core : Inherits TaskParent
         If standalone Then
             Static slines As New Structured_Lines
             slines.Run(src)
-            lpListInput = New List(Of PointPair)(slines.lpListY)
+            lpListInput = New List(Of PointPair)(slines.lpListX)
         End If
 
         collect.lpListInput = lpListInput
@@ -63,20 +63,15 @@ Public Class Line3D_Core : Inherits TaskParent
 
         dst2.SetTo(0)
         lpList.Clear()
-        dst2.Line(task.horizonVec.p1, task.horizonVec.p2, 255, task.lineWidth, task.lineType)
-        dst2.Line(task.gravityVec.p1, task.gravityVec.p2, 255, task.lineWidth, task.lineType)
         For Each lp In collect.lpListOutput
-            Dim w = Math.Abs(lp.p1.X - lp.p2.X)
-            Dim h = Math.Abs(lp.p1.Y - lp.p2.Y)
-            Dim r = ValidateRect(New cvb.Rect(lp.p1.X, lp.p1.Y, w + 1, h + 1))
-            Dim count = dst2(r).CountNonZero
-            If count < Math.Max(r.Width / 2, r.Height / 2) Then
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                lpList.Add(lp)
-            End If
+            Dim count = dst2(lp.rect).CountNonZero
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            lpList.Add(lp)
         Next
 
-        labels(2) = CStr(lpList.Count) + " lines were found in the structured light."
+        If task.heartBeat Then
+            labels(2) = CStr(lpList.Count) + " lines in the structured light."
+        End If
     End Sub
 End Class
 
@@ -321,7 +316,7 @@ End Class
 Public Class Line3D_DeltaZ : Inherits TaskParent
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Identify possible lines in Z by measuring the delta Z in neighboring points."
+        desc = "Determine if a pointPair line is actually a line in 3D."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         'Dim r1 = New cvb.Rect(0, 0, dst2.Width - 1, dst2.Height - 1)

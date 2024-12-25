@@ -57,14 +57,8 @@ Module UI_Generator
             Dim includeOptions = New FileInfo(HomeDir.FullName + "CPP_Native/Options.h")
 
             ' create the C++ native options.h with parameters set to default values.
-            Dim result As Integer
-            If includeOptions.Exists Then
-                result = DateTime.Compare(OptionsFile.LastWriteTime, includeOptions.LastWriteTime)
-            End If
-            If result > 0 Or includeOptions.Exists = False Then
-                includeOptions.Delete()
-                ConvertOptionsToCPP(OptionsFile)
-            End If
+            includeOptions.Delete()
+            ConvertOptionsToCPP(OptionsFile)
 
             Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/GroupComboBox.txt")
 
@@ -415,8 +409,8 @@ Module UI_Generator
             index += 1
             If line.StartsWith("Public Class Options_") Then
                 For i = index To lines.Count - 1
-                    line = line.Replace(" = True", " = True")
-                    line = line.Replace(" = False", " = False")
+                    line = line.Replace(" = True", " = true")
+                    line = line.Replace(" = False", " = false")
                     line = line.Replace("(Of String)", "(Of String)")
                     line = line.Replace("Nothing", "null")
 
@@ -595,8 +589,8 @@ Module UI_Generator
             nextLine = nextLine.Replace("DecompTypes ", "int ")
             nextLine = nextLine.Replace("DecompTypes.Cholesky", "DecompTypes::DECOMP_CHOLESKY")
             nextLine = nextLine.Replace("SimpleBlobDetector.Params ", "SimpleBlobDetector::Params ")
-
-
+            nextLine = nextLine.Replace("=  false", "= false")
+            nextLine = nextLine.Replace("=  true", "= true")
             nextLine = nextLine.Replace("FloodFillFlags.FixedRange", "FloodFillFlags::FLOODFILL_FIXED_RANGE")
 
             If nextLine.Contains("SimpleBlobDetector.Params") Then Continue For
