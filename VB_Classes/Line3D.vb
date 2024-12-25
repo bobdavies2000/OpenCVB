@@ -241,7 +241,7 @@ End Class
 
 Public Class Line3D_X : Inherits TaskParent
     Dim struct As New Structured_Lines
-    Public lines As New Line_Core
+    Public lines As New Line_Core1
     Public lpListX As New List(Of PointPair)
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)

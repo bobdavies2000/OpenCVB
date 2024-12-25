@@ -19,7 +19,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
         delaunay.Run(src)
         dst2 = delaunay.dst2
 
-        If task.FirstPass Then
+        If task.firstPass Then
             lineMap = delaunay.dst3
             For Each lp In lines.lpList
                 lp.colorIndex = lineMap.Get(Of Byte)(lp.center.Y, lp.center.X)
@@ -138,7 +138,7 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
         delaunay.Run(src)
         dst2 = delaunay.dst2
 
-        If task.FirstPass Then
+        If task.firstPass Then
             lineMap = delaunay.dst3
             For Each lp In lines.lpList
                 lp.colorIndex = lineMap.Get(Of Byte)(lp.center.Y, lp.center.X)

@@ -20,7 +20,7 @@ Imports System.IO
 
 '        trace.Run(src)
 '        dst2 = trace.dst2
-'        If task.FirstPass Then Exit Sub ' all entries are identical on the first pass.
+'        If task.firstPass Then Exit Sub ' all entries are identical on the first pass.
 
 '        histogram.SetTo(0)
 '        For Each mp In trace.mpList

@@ -11,7 +11,7 @@ Public Class Depth_Basics : Inherits TaskParent
         dst2 = task.pcSplit(2)
 
         task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cvb.ThresholdTypes.Trunc)
-        If task.FirstPass Then
+        If task.firstPass Then
             task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.MaxZmeters, task.MaxZmeters)
             task.maxDepthMask.SetTo(0)
         End If
@@ -1391,7 +1391,7 @@ Public Class Depth_World : Inherits TaskParent
         desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.vb for comparable calculations"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then template.Run(empty) ' intrinsics arrive with the first buffers.
+        If task.firstPass Then template.Run(empty) ' intrinsics arrive with the first buffers.
 
         If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
 

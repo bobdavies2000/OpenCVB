@@ -9,7 +9,7 @@ Public Class Diff_Basics : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If task.FirstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
+        If task.firstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
         If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
 
         cvb.Cv2.Absdiff(src, lastFrame, dst0)

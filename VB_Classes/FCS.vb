@@ -22,7 +22,7 @@ Public Class FCS_Basics : Inherits TaskParent
         delaunay.Run(src)
 
         Dim matchCount As Integer
-        If task.FirstPass = False Then
+        If task.firstPass = False Then
             For i = 0 To task.fpList.Count - 1
                 Dim fp = task.fpList(i)
                 Dim indexLast = task.fpMapLast.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
@@ -945,7 +945,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         dst2 = fcs.dst2
 
         Static fpSave As fpData
-        If task.FirstPass Or task.mouseClickFlag Then
+        If task.firstPass Or task.mouseClickFlag Then
             fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
         End If
 

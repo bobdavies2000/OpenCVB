@@ -171,7 +171,7 @@ Public Class Gravity_Horizon : Inherits TaskParent
         gravity.RunAlg(src)
 
         horizon.RunAlg(src)
-        If task.FirstPass Then lastVec = horizon.vec
+        If task.firstPass Then lastVec = horizon.vec
         If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
         If lastVec IsNot Nothing And horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
 

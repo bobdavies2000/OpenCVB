@@ -231,7 +231,7 @@ Public Class Plot_OverTime : Inherits TaskParent
 
         ' if enough points are off the charted area or if manually requested, then redo the scale.
         If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-            If Not task.FirstPass Then
+            If Not task.firstPass Then
                 maxScale = Integer.MinValue
                 minScale = Integer.MaxValue
                 For i = 0 To lastXdelta.Count - 1
@@ -318,7 +318,7 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
         If fixedScale = False Then
             ' if enough points are off the charted area or if manually requested, then redo the scale.
             If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-                If Not task.FirstPass Then
+                If Not task.firstPass Then
                     maxScale = Integer.MinValue
                     minScale = Integer.MaxValue
                     For i = 0 To lastXdelta.Count - 1

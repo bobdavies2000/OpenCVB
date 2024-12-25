@@ -15,7 +15,7 @@ Public Class FPoly_Basics : Inherits TaskParent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then sides.prevImage = src.Clone
+        If task.firstPass Then sides.prevImage = src.Clone
         sides.options.RunOpt()
 
         topFeatures.Run(src)
@@ -124,7 +124,7 @@ Public Class FPoly_Sides : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.FirstPass Then prevImage = src.Clone
+        If task.firstPass Then prevImage = src.Clone
         options.RunOpt()
 
         If standaloneTest() And task.heartBeat Then
@@ -139,7 +139,7 @@ Public Class FPoly_Sides : Inherits TaskParent
         Next
         currSideIndex = currLengths.IndexOf(currLengths.Max)
 
-        If task.FirstPass Then
+        If task.firstPass Then
             prevPoly = New List(Of cvb.Point2f)(currPoly)
             prevLengths = New List(Of Single)(currLengths)
             prevSideIndex = prevLengths.IndexOf(prevLengths.Max)
@@ -245,7 +245,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then resyncImage = src.Clone
+        If task.firstPass Then resyncImage = src.Clone
         options.RunOpt()
 
         topFeatures.Run(src)
@@ -260,7 +260,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
         For i = 0 To fPD.currPoly.Count - 1
             SetTrueText(CStr(i), fPD.currPoly(i), 1)
         Next
-        If task.FirstPass Then fPD.lengthPrevious = New List(Of Single)(fPD.currLength)
+        If task.firstPass Then fPD.lengthPrevious = New List(Of Single)(fPD.currLength)
 
         center.fPD = fPD
         center.Run(src)
@@ -929,7 +929,7 @@ Public Class FPoly_PointCloud : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         fMask.Run(src)
-        If fMask.fImage.fpoly.resync Or task.FirstPass Then fPolyCloud = task.pointCloud.Clone
+        If fMask.fImage.fpoly.resync Or task.firstPass Then fPolyCloud = task.pointCloud.Clone
         dst1 = fMask.dst1
         dst2 = fMask.dst2
         dst3 = fMask.dst3

@@ -104,7 +104,7 @@ Public Class Rotate_Poly : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         optionsFPoly.RunOpt()
 
-        If options.changeCheck.Checked Or task.FirstPass Then
+        If options.changeCheck.Checked Or task.firstPass Then
             rPoly.Clear()
             For i = 0 To task.polyCount - 1
                 rPoly.Add(New cvb.Point2f(msRNG.Next(dst2.Width / 4, dst2.Width * 3 / 4), msRNG.Next(dst2.Height / 4, dst2.Height * 3 / 4)))

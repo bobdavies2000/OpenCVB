@@ -9,7 +9,7 @@ Public Class SLR_Basics : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         slrCore.Run(src)
 
-        If task.FirstPass And standalone Then
+        If task.firstPass And standalone Then
             Static slrInput As New SLR_PlotTest()
             slrInput.getData(slrCore.inputX, slrCore.inputY)
         End If
@@ -82,7 +82,7 @@ Public Class SLR_Plot : Inherits TaskParent
 
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
-        If task.FirstPass And standalone Then
+        If task.firstPass And standalone Then
             Static slrInput As New SLR_PlotTest()
             slrInput.getData(dataX, dataY)
         End If

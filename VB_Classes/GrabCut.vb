@@ -115,7 +115,7 @@ Public Class GrabCut_ImageRect : Inherits TaskParent
         dst0(fgRect1).SetTo(cvb.GrabCutClasses.FGD)
         dst0(fgRect2).SetTo(cvb.GrabCutClasses.FGD)
 
-        If task.FirstPass Then
+        If task.firstPass Then
             cvb.Cv2.GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, cvb.GrabCutModes.InitWithRect)
             cvb.Cv2.GrabCut(dst2, dst0, bgRect2, bgModel, fgModel, 1, cvb.GrabCutModes.InitWithRect)
             cvb.Cv2.GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, cvb.GrabCutModes.InitWithRect)

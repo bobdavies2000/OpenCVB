@@ -567,7 +567,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             options.RunOpt();
-            if (vbc.task.FirstPass && standalone)
+            if (vbc.task.firstPass && standalone)
             {
                 slrInput.RunAlg(dst2);
                 labels[2] = "Sample data slrInput";

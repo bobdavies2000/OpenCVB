@@ -227,7 +227,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits TaskParent
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
-            If task.FirstPass Then
+            If task.firstPass Then
                 g = usedG.Count
             Else
                 g = generationMap.Get(Of Integer)(pt.Y, pt.X) + 1
@@ -284,7 +284,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
-            If task.FirstPass Then
+            If task.firstPass Then
                 g = usedG.Count
             Else
                 g = generationMap.Get(Of Integer)(mp.p2.Y, mp.p2.X) + 1

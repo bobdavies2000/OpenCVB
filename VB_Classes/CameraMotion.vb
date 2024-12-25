@@ -131,7 +131,7 @@ Public Class CameraMotion_WithRotation : Inherits TaskParent
         End If
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then
+        If task.firstPass Then
             gravityVec = task.gravityVec
             horizonVec = task.horizonVec
         End If

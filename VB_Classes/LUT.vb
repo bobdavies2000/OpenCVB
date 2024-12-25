@@ -256,7 +256,7 @@ Public Class LUT_Create : Inherits TaskParent
 
         Dim split = src.Split()
         For i = 0 To 2
-            If task.FirstPass Then ReDim pixels(i)(src.Total - 1)
+            If task.firstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 

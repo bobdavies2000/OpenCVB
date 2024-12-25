@@ -114,7 +114,7 @@ Public Class EMax_InputClusters : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         options.RunOpt()
 
-        If task.FirstPass Then
+        If task.firstPass Then
             task.gOptions.GridSlider.Maximum = dst2.Width
             task.gOptions.setGridSize(CInt(dst2.Width / 3))
             task.grid.Run(dst2)
@@ -223,7 +223,7 @@ Public Class EMax_PointTracker : Inherits TaskParent
 
         knn.queries = New List(Of cvb.Point2f)(emax.centers)
         knn.Run(empty)
-        If task.FirstPass Then
+        If task.firstPass Then
             knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
             Exit Sub
         End If

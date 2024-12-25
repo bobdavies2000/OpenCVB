@@ -428,7 +428,7 @@ Public Class Mat_4Click : Inherits TaskParent
         mats.Run(empty)
         dst2 = mats.dst2.Clone
         If standalone Then mats.defaultMats(src)
-        If task.FirstPass Then
+        If task.firstPass Then
             task.ClickPoint = New cvb.Point(0, 0)
             task.mousePicTag = 2
         End If

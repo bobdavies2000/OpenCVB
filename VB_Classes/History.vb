@@ -135,7 +135,7 @@ Public Class History_Basics8U : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         If standalone Then
             src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-            If task.FirstPass Then lastFrame = src.Clone
+            If task.firstPass Then lastFrame = src.Clone
             cvb.Cv2.Absdiff(src, lastFrame, dst3)
             lastFrame = src.Clone
             src = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)

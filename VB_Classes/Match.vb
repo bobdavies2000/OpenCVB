@@ -22,7 +22,7 @@ Public Class Match_Basics : Inherits TaskParent
         If standalone Then
             If task.gOptions.debugChecked Then
                 task.gOptions.debugChecked = False
-                Dim inputRect = If(task.FirstPass, New cvb.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
+                Dim inputRect = If(task.firstPass, New cvb.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
                 template = src(inputRect)
             End If
         End If
@@ -67,8 +67,8 @@ Public Class Match_BasicsTest : Inherits TaskParent
         desc = "Test the Match_Basics algorithm"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If (task.FirstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
-            Dim r = If(task.FirstPass, New cvb.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
+        If (task.firstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
+            Dim r = If(task.firstPass, New cvb.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
             match.template = src(r)
             task.drawRectClear = True
         End If
@@ -445,7 +445,7 @@ Public Class Match_DrawRect : Inherits TaskParent
             inputRect = ValidateRect(task.drawRect)
             match.template = src(inputRect).Clone()
         Else
-            If task.FirstPass Then match.template = lastImage(inputRect).Clone()
+            If task.firstPass Then match.template = lastImage(inputRect).Clone()
         End If
 
         match.Run(src)
@@ -699,7 +699,7 @@ Public Class Match_Points : Inherits TaskParent
         desc = "Track the selected points"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then mPoint.target = src.Clone
+        If task.firstPass Then mPoint.target = src.Clone
 
         If standaloneTest() Then
             ptx = New List(Of cvb.Point2f)(task.features)

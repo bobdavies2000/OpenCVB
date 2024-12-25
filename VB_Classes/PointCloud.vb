@@ -407,7 +407,7 @@ Public Class PointCloud_Raw_CPP_VB : Inherits TaskParent
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then ReDim depthBytes(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1)
+        If task.firstPass Then ReDim depthBytes(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1)
 
         Marshal.Copy(task.pcSplit(2).Data, depthBytes, 0, depthBytes.Length)
         Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)

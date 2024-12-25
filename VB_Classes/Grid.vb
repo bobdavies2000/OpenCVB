@@ -6,7 +6,7 @@ Public Class Grid_Basics : Inherits TaskParent
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.mouseClickFlag And Not task.FirstPass Then
+        If task.mouseClickFlag And Not task.firstPass Then
             task.gridROIclicked = task.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
 

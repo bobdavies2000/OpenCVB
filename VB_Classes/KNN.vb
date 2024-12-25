@@ -446,7 +446,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
         Return histSum / histList.Count
     End Function
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then lastImage = src.Clone
+        If task.firstPass Then lastImage = src.Clone
         Dim multiplier = dotSlider.Value
 
         knn.queries = New List(Of cvb.Point2f)(task.features)

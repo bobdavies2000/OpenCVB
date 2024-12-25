@@ -205,7 +205,7 @@ Public Class Feature_KNN : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         knn.queries = New List(Of cvb.Point2f)(task.features)
-        If task.FirstPass Then knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
+        If task.firstPass Then knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
         knn.Run(empty)
 
         For i = 0 To knn.neighbors.Count - 1

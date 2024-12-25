@@ -22,7 +22,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
                                    options.width, options.height)
 
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If task.FirstPass Then lastFrame = src.Clone()
+        If task.firstPass Then lastFrame = src.Clone()
 
         dst2 = src.Clone
 
@@ -106,7 +106,7 @@ Public Class Stabilizer_BasicsRandomInput : Inherits TaskParent
         Dim shiftX = msRNG.Next(-options.range, options.range)
         Dim shiftY = msRNG.Next(-options.range, options.range)
 
-        If task.FirstPass Then
+        If task.firstPass Then
             lastShiftX = shiftX
             lastShiftY = shiftY
         End If
@@ -291,7 +291,7 @@ Public Class Stabilizer_VerticalIMU : Inherits TaskParent
                   Format(task.accRadians.Z * 57.2958, fmt3) + vbCrLf
         Dim avgX = angleXValue.Average
         Dim avgY = angleYValue.Average
-        If task.FirstPass Then
+        If task.firstPass Then
             lastAngleX = avgX
             lastAngleY = avgY
         End If

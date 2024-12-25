@@ -160,7 +160,7 @@ Public Class KMeans_CustomData : Inherits TaskParent
 
         If standaloneTest() Then
             Static randslider = FindSlider("Random Pixel Count")
-            If task.FirstPass Then randslider.Value = 50
+            If task.firstPass Then randslider.Value = 50
             If randslider.Value < k Then randslider.Value = k
             If task.heartBeat Then random.Run(empty)
 

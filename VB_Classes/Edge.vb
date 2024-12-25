@@ -1142,7 +1142,7 @@ Public Class Edge_Color8U : Inherits TaskParent
         desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then
+        If task.firstPass Then
             Dim frmCheck = FindFrm("Options_ColorMethod CheckBoxes")
             frmCheck.Left = task.gOptions.Width / 2
         End If

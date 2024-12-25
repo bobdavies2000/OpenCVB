@@ -121,7 +121,7 @@ Public Class BackProject2D_Compare : Inherits TaskParent
         backP.Run(src)
         mats.mat(2) = backP.dst3
 
-        If task.FirstPass Then mats.quadrant = 3
+        If task.firstPass Then mats.quadrant = 3
         mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3

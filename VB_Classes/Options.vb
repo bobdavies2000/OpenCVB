@@ -3211,7 +3211,7 @@ Public Class Options_Spectrum : Inherits TaskParent
         Return ranges
     End Function
     Public Sub RunOpt()
-        If task.FirstPass Then task.redC.Run(task.color) ' special case!  Can't run it in constructor or measurements fail...
+        If task.firstPass Then task.redC.Run(task.color) ' special case!  Can't run it in constructor or measurements fail...
         Static frmSliders = FindFrm("Options_Spectrum Sliders")
         Static gapDSlider = FindSlider("Gap in depth spectrum (cm's)")
         Static gapGSlider = FindSlider("Gap in gray spectrum")
@@ -3220,7 +3220,7 @@ Public Class Options_Spectrum : Inherits TaskParent
         gapGray = gapGSlider.value
         sampleThreshold = countSlider.value
 
-        If task.FirstPass Then
+        If task.firstPass Then
             frmSliders.Left = task.gOptions.Width / 2
             frmSliders.top = task.gOptions.Height / 2
         End If
@@ -3297,7 +3297,7 @@ Public Class Options_Complexity : Inherits TaskParent
                 Exit For
             End If
         Next
-        If task.FirstPass Then
+        If task.firstPass Then
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
@@ -3410,7 +3410,7 @@ Public Class Options_Classifier : Inherits TaskParent
                 Exit For
             End If
         Next
-        If task.FirstPass Then
+        If task.firstPass Then
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
@@ -3452,7 +3452,7 @@ Public Class Options_Threshold : Inherits TaskParent
         End If
     End Sub
     Public Sub RunOpt()
-        If task.FirstPass Then  ' special case!  Can't run it in constructor or measurements fail...
+        If task.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
             gradient.Run(empty)
             dst2 = gradient.dst2
         End If
@@ -3604,7 +3604,7 @@ Public Class Options_ThresholdAll : Inherits TaskParent
         End If
     End Sub
     Public Sub RunOpt()
-        If task.FirstPass Then  ' special case!  Can't run it in constructor or measurements fail...
+        If task.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
             gradient.Run(empty)
             dst2 = gradient.dst2
         End If
@@ -6298,7 +6298,7 @@ Public Class Options_Pendulum : Inherits TaskParent
         Static initCheck = FindCheckBox("Reset initial conditions")
         Static timeSlider = FindSlider("Pendulum FPS")
         If initCheck.checked Then initCheck.checked = False
-        If task.FirstPass Then check.Box(0).Checked = True
+        If task.firstPass Then check.Box(0).Checked = True
         fps = timeSlider.value
     End Sub
 End Class
@@ -6366,7 +6366,7 @@ Public Class Options_PlyFormat : Inherits TaskParent
         fileNameForm.Show()
     End Sub
     Public Sub RunOpt()
-        If task.FirstPass Then fileNameForm.Left = allOptions.Width / 3
+        If task.firstPass Then fileNameForm.Left = allOptions.Width / 3
         playButton = fileNameForm.PlayButton.Text
         fileName = fileNameForm.filename.Text
 

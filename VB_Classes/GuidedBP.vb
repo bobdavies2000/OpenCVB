@@ -66,7 +66,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits TaskParent
             knn.queries.Add(New cvb.Point2f(CSng(r.X + r.Width / 2), CSng(r.Y + r.Height / 2)))
         Next
 
-        If task.FirstPass Then knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
+        If task.firstPass Then knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
 
         knn.Run(empty)
 

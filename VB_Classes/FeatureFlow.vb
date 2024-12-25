@@ -35,7 +35,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         labels = task.feat.labels
 
-        dst3 = If(task.FirstPass, src.Clone, dst2.Clone)
+        dst3 = If(task.firstPass, src.Clone, dst2.Clone)
         Static prevFeatures As New List(Of cvb.Point)(task.featurePoints)
         buildCorrelations(prevFeatures, task.featurePoints)
 

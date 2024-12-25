@@ -824,7 +824,7 @@ Public Class Motion_CenterKalman : Inherits TaskParent
         desc = "Kalmanize the output of center rotation"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If task.FirstPass Then centerRect = task.centerRect
+        If task.firstPass Then centerRect = task.centerRect
         dst2 = src.Clone
         motion.Run(src)
 

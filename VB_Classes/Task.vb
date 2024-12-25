@@ -47,6 +47,18 @@ Public Class VBtask : Implements IDisposable
     Public fpTravelAvg As Single
     Public fpMotion As cvb.Point2f
 
+    Public topFeatures As New List(Of cvb.Point2f)
+    Public features As New List(Of cvb.Point2f)
+    Public featurePoints As New List(Of cvb.Point)
+    Public featureMotion As Boolean ' false means that none of the features moved.
+
+    Public motionRect As New cvb.Rect ' get rid of this...
+    Public motionRects As New List(Of cvb.Rect)
+    Public motionMask As cvb.Mat
+    Public motion As Motion_Basics
+    Public motionPercent As Single
+    Public MotionLabel As String = " "
+
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
     Public cols As Integer
@@ -78,19 +90,6 @@ Public Class VBtask : Implements IDisposable
     Public maxDepthMask As New cvb.Mat
     Public depthRGB As New cvb.Mat
     Public srcThread As cvb.Mat
-
-    Public motionRect As New cvb.Rect ' get rid of this...
-    Public motionRects As New List(Of cvb.Rect)
-    Public motionMask As cvb.Mat
-    Public motion As Motion_Basics
-    Public motionPercent As Single
-    Public MotionLabel As String = " "
-
-    Public topFeatures As New List(Of cvb.Point2f)
-    Public features As New List(Of cvb.Point2f)
-    Public featurePoints As New List(Of cvb.Point)
-    Public featureMotion As Boolean ' false means that none of the features moved.
-
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
@@ -141,7 +140,7 @@ Public Class VBtask : Implements IDisposable
     Public almostHeartBeat As Boolean
     Public msWatch As Integer
     Public msLast As Integer
-    Public FirstPass As Boolean
+    Public firstPass As Boolean
 
     Public toggleOnOff As Boolean ' toggles on the heartbeat.
     Public paused As Boolean
@@ -520,7 +519,7 @@ Public Class VBtask : Implements IDisposable
     Private Function checkIntermediateResults(lookupName As String) As TaskParent
         If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
         For Each obj In task.activeObjects
-            If obj.traceName = lookupName And task.FirstPass = False Then Return obj
+            If obj.traceName = lookupName And task.firstPass = False Then Return obj
         Next
         Return Nothing
     End Function
@@ -825,7 +824,7 @@ Public Class VBtask : Implements IDisposable
         If task.paused = False Then
             task.trueData.Clear()
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
-            task.FirstPass = False
+            task.firstPass = False
             task.heartBeatLT = False
             postProcess(src)
         End If

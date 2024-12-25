@@ -321,7 +321,7 @@ Public Class Cell_Generate : Inherits TaskParent
             bounds.Run(src)
             task.redMap = bounds.bRects.bounds.dst2
             src = task.redMap Or bounds.dst2
-            If task.FirstPass Then task.redMap.SetTo(0)
+            If task.firstPass Then task.redMap.SetTo(0)
 
             redCPP = bounds.bRects.bounds.redCPP
 

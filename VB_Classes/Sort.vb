@@ -270,7 +270,7 @@ Public Class Sort_GrayScale1 : Inherits TaskParent
 
         Dim split = src.Split()
         For i = 0 To 2
-            If task.FirstPass Then ReDim pixels(i)(src.Total - 1)
+            If task.firstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 
@@ -306,7 +306,7 @@ Public Class Sort_GrayScale : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         Dim split = src.Split()
         For i = 0 To 2
-            If task.FirstPass Then ReDim pixels(i)(src.Total - 1)
+            If task.firstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 

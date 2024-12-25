@@ -58,7 +58,7 @@ Public Class PCA_Basics : Inherits TaskParent
     End Function
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
-            If task.FirstPass Then task.redOptions.setUseColorOnly(True)
+            If task.firstPass Then task.redOptions.setUseColorOnly(True)
             task.redC.Run(src)
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)
