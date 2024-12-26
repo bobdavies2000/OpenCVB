@@ -23,7 +23,7 @@ End Class
 
 
 Public Class RedTrack_Lines : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
@@ -187,7 +187,7 @@ End Class
 
 
 Public Class RedTrack_Points : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Dim track As New RedTrack_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))

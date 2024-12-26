@@ -1,6 +1,63 @@
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Public lines As New Line_Core
+    Dim ld As cvb.XImgProc.FastLineDetector
+    Dim options As New Options_Line
+    Dim collect As New Line_Collection
+    Public Sub New()
+        ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
+        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
+        dst2 = src.Clone
+        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cvb.MatType.CV_8U Then src.ConvertTo(src, cvb.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src)
+
+        Dim sortByLen As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= dst2.Cols And v(1) >= 0 And v(1) <= dst2.Rows And
+               v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
+                Dim lp = New PointPair(New cvb.Point(v(0), v(1)), New cvb.Point(v(2), v(3)))
+                If lp.length > options.minLength Then sortByLen.Add(lp.length, lp)
+            End If
+        Next
+
+        collect.lpListInput = New List(Of PointPair)(sortByLen.Values)
+        collect.Run(src)
+
+        task.lpList.Clear()
+        For Each lp In collect.lpListOutput
+            lp.index = task.lpList.Count
+            Dim mask = dst3(lp.rect) And task.depthMask(lp.rect)
+            lp.mmX = GetMinMax(task.pcSplit(0)(lp.rect), mask)
+            lp.mmY = GetMinMax(task.pcSplit(1)(lp.rect), mask)
+            lp.mmZ = GetMinMax(task.pcSplit(2)(lp.rect), mask)
+            task.lpList.Add(lp)
+        Next
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            For Each lp In task.lpList
+                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+                DrawLine(dst3, lp.p1, lp.p2, 255)
+                SetTrueText(CStr(lp.index), lp.center, 3)
+            Next
+        End If
+        If task.heartBeat Then
+            labels(2) = CStr(task.lpList.Count) + " lines were detected in the current frame"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Basics1 : Inherits TaskParent
+    Public lines As New Line_Core1
     Public lpList As New List(Of PointPair)
     Public Sub New()
         desc = "Create a feature coordinate layout for line endpoints."
@@ -29,63 +86,6 @@ Public Class Line_Basics : Inherits TaskParent
         If task.heartBeat Then labels(2) = CStr(lpList.Count) + " lines were identified."
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Public Class Line_Core : Inherits TaskParent
-    Dim ld As cvb.XImgProc.FastLineDetector
-    Public lpList As New List(Of PointPair)
-    Public lineColor As cvb.Scalar = cvb.Scalar.White
-    Public options As New Options_Line
-    Dim collect As New Line_Collection
-    Public Sub New()
-        ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        dst2 = src.Clone
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cvb.MatType.CV_8U Then src.ConvertTo(src, cvb.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src)
-
-        Dim sortByLen As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= dst2.Cols And v(1) >= 0 And v(1) <= dst2.Rows And
-               v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
-                Dim lp = New PointPair(New cvb.Point(v(0), v(1)), New cvb.Point(v(2), v(3)))
-                If lp.length > options.minLength Then sortByLen.Add(lp.length, lp)
-            End If
-        Next
-
-        collect.lpListInput = New List(Of PointPair)(sortByLen.Values)
-        collect.Run(src)
-
-        lpList = New List(Of PointPair)(collect.lpListOutput)
-        If standaloneTest() Then
-            dst3.SetTo(0)
-            For Each lp In lpList
-                DrawLine(dst2, lp.p1, lp.p2, lineColor)
-                DrawLine(dst3, lp.p1, lp.p2, 255)
-            Next
-        End If
-        If task.heartBeat Then
-            labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-        End If
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -193,7 +193,7 @@ End Class
 
 
 Public Class Line_Rects : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Public Sub New()
         desc = "Show the rectangle for each line"
     End Sub
@@ -354,7 +354,7 @@ End Class
 
 Public Class Line_Intercepts : Inherits TaskParent
     Public extended As New LongLine_Extend
-    Public lines As New Line_Basics
+    Public lines As New Line_Basics1
     Public p1List As New List(Of cvb.Point2f)
     Public p2List As New List(Of cvb.Point2f)
     Dim longLine As New LongLine_Basics
@@ -460,7 +460,7 @@ End Class
 
 
 Public Class Line_InDepthAndBGR : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Public p1List As New List(Of cvb.Point2f)
     Public p2List As New List(Of cvb.Point2f)
     Public z1List As New List(Of cvb.Point3f) ' the point cloud values corresponding to p1 and p2
@@ -563,7 +563,7 @@ End Class
 
 
 Public Class Line_GCloud : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines As New Line_Basics1
     Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
@@ -671,7 +671,7 @@ End Class
 
 Public Class Line_ViewSide : Inherits TaskParent
     Public autoY As New OpAuto_YRange
-    Public lines As New Line_Basics
+    Public lines As New Line_Basics1
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
@@ -695,7 +695,7 @@ End Class
 
 Public Class Line_ViewTop : Inherits TaskParent
     Public autoX As New OpAuto_XRange
-    Public lines As New Line_Basics
+    Public lines As New Line_Basics1
     Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View."}
@@ -749,7 +749,7 @@ End Class
 
 Public Class Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Lines for the current color class", "Color Class input"}
@@ -810,7 +810,7 @@ End Class
 
 Public Class Line_TimeView : Inherits TaskParent
     Public frameList As New List(Of List(Of PointPair))
-    Public lines As New Line_Basics
+    Public lines As New Line_Basics1
     Public pixelcount As Integer
     Public mpList As New List(Of PointPair)
     Public Sub New()
@@ -1044,7 +1044,7 @@ End Class
 
 
 Public Class Line_KNN : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Dim swarm As New Swarm_Basics
     Public Sub New()
         FindSlider("Connect X KNN points").Value = 1
@@ -1076,7 +1076,7 @@ End Class
 
 
 Public Class Line_Vertical : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines As New Line_Basics1
     Public ptList As New List(Of PointPair)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
@@ -1113,7 +1113,7 @@ End Class
 
 
 Public Class Line_Horizontal : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines As New Line_Basics1
     Public ptList As New List(Of PointPair)
     Public Sub New()
         desc = "Find all the Horizontal lines with horizon vector"
@@ -1193,7 +1193,7 @@ End Class
 
 Public Class Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Public lpList As New List(Of PointPair)
     Public Sub New()
         FindSlider("Canny Aperture").Value = 7
@@ -1218,7 +1218,7 @@ End Class
 
 
 Public Class Line_Cells : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Public lpList As New List(Of PointPair)
     Public Sub New()
         desc = "Identify all lines in the RedCloud_Basics cell boundaries"
@@ -1275,7 +1275,7 @@ End Class
 
 
 Public Class Line_VerticalHorizontal1 : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Dim nearest As New Line_Nearest
     Public Sub New()
         task.gOptions.LineWidth.Value = 2
@@ -1398,7 +1398,7 @@ End Class
 
 
 Public Class Line_ViewLeft : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Public Sub New()
         desc = "Find lines in the left image"
     End Sub
@@ -1416,7 +1416,7 @@ End Class
 
 
 Public Class Line_ViewRight : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Public Sub New()
         desc = "Find lines in the right image"
     End Sub
@@ -1494,7 +1494,7 @@ End Class
 
 
 Public Class Line_PointSlope : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Basics1
     Dim knn As New KNN_NNBasics
     Public bestLines As New List(Of PointPair)
     Const lineCount As Integer = 3
@@ -1900,7 +1900,7 @@ Public Class Line_Collection : Inherits TaskParent
         If standalone Then
             Static lines As New Line_Basics
             lines.Run(src)
-            lpListInput = lines.lpList
+            lpListInput = task.lpList
         End If
 
         Dim newSet As New List(Of PointPair)
@@ -1923,6 +1923,7 @@ Public Class Line_Collection : Inherits TaskParent
         ' organize the lines top to bottom, left to right, and order points left to right
         For Each lp In newSet
             Dim index = task.gridMap32S.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            lp.index = ptSort.Count
             If lp.p1.X < lp.p2.X Then
                 ptSort.Add(index, lp)
             Else

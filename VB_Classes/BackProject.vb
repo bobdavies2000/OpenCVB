@@ -180,7 +180,7 @@ End Class
 
 Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = False
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
@@ -672,7 +672,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))

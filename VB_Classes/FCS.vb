@@ -1029,7 +1029,7 @@ End Class
 
 
 Public Class FCS_Lines1 : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Dim fcs As New FCS_Basics
     Public Sub New()
         labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
@@ -1067,7 +1067,7 @@ End Class
 
 
 Public Class FCS_Lines : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Dim fcs As New FCS_Basics
     Public Sub New()
         FindSlider("Min Line Length").Value = 60

@@ -1077,7 +1077,7 @@ End Enum
 	If algorithmName = "FeatureLess_UniquePixels_CS" Then return new FeatureLess_UniquePixels_CS
 	If algorithmName = "FeatureLess_WithoutMotion" Then return new FeatureLess_WithoutMotion
 	If algorithmName = "FeatureLine_Basics" Then return new FeatureLine_Basics
-	If algorithmName = "FeatureLine_Basics_CS" Then return new FeatureLine_Basics_CS
+	If algorithmName = "FeatureLine_Basics1_CS" Then return new FeatureLine_Basics1_CS
 	If algorithmName = "FeatureLine_DetailsAll" Then return new FeatureLine_DetailsAll
 	If algorithmName = "FeatureLine_DetailsAll_CS" Then return new FeatureLine_DetailsAll_CS
 	If algorithmName = "FeatureLine_Finder" Then return new FeatureLine_Finder
@@ -1153,9 +1153,9 @@ End Enum
 	If algorithmName = "FitEllipse_RedCloud" Then return new FitEllipse_RedCloud
 	If algorithmName = "FitEllipse_RedCloud_CS" Then return new FitEllipse_RedCloud_CS
 	If algorithmName = "FitLine_Basics" Then return new FitLine_Basics
-	If algorithmName = "FitLine_Basics_CS" Then return new FitLine_Basics_CS
+	If algorithmName = "FitLine_Basics1_CS" Then return new FitLine_Basics1_CS
+	If algorithmName = "FitLine_Basics13D_CS" Then return new FitLine_Basics13D_CS
 	If algorithmName = "FitLine_Basics3D" Then return new FitLine_Basics3D
-	If algorithmName = "FitLine_Basics3D_CS" Then return new FitLine_Basics3D_CS
 	If algorithmName = "FLANN_Basics" Then return new FLANN_Basics
 	If algorithmName = "FLANN_Basics_CS" Then return new FLANN_Basics_CS
 	If algorithmName = "FLANN_Test" Then return new FLANN_Test
@@ -1830,7 +1830,8 @@ End Enum
 	If algorithmName = "LeftRight_Reduction" Then return new LeftRight_Reduction
 	If algorithmName = "LeftRight_Reduction_CS" Then return new LeftRight_Reduction_CS
 	If algorithmName = "Line_Basics" Then return new Line_Basics
-	If algorithmName = "Line_Basics_CS" Then return new Line_Basics_CS
+	If algorithmName = "Line_Basics1" Then return new Line_Basics1
+	If algorithmName = "Line_Basics1_CS" Then return new Line_Basics1_CS
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Canny_CS" Then return new Line_Canny_CS
 	If algorithmName = "Line_Cells" Then return new Line_Cells
@@ -1839,7 +1840,6 @@ End Enum
 	If algorithmName = "Line_Collection" Then return new Line_Collection
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
 	If algorithmName = "Line_ColorClass_CS" Then return new Line_ColorClass_CS
-	If algorithmName = "Line_Core" Then return new Line_Core
 	If algorithmName = "Line_Core1" Then return new Line_Core1
 	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
 	If algorithmName = "Line_DisplayInfoOld_CS" Then return new Line_DisplayInfoOld_CS

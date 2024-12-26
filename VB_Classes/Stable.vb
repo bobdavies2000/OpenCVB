@@ -92,7 +92,7 @@ End Class
 
 Public Class Stable_Lines : Inherits TaskParent
     Public basics As New Stable_Basics
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Track the line end points found in the BGR image and keep those that are stable."

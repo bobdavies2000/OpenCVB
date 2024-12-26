@@ -146,7 +146,7 @@ End Class
 
 Public Class Projection_Lines : Inherits TaskParent
     Dim heat As New HeatMap_Basics
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Dim options As New Options_Projection
     Public Sub New()
         FindCheckBox("Top View (Unchecked Side View)").Checked = False

@@ -54,7 +54,7 @@ End Class
 
 
 Public Class LongLine_Core : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines as new Line_Basics1
     Public lineCount As Integer = 1 ' How many of the longest lines...
     Public lpList As New List(Of PointPair) ' this will be sorted by length - longest first
     Public Sub New()
@@ -269,7 +269,7 @@ End Class
 
 
 Public Class LongLine_ExtendAll : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines as new Line_Basics1
     Public lpList As New List(Of PointPair)
     Public Sub New()
         labels = {"", "", "Image output from Line_Core", "The extended line for each line found in Line_Core"}

@@ -155,7 +155,7 @@ End Class
 
 
 Public Class FeatureLine_Tutorial1 : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Public Sub New()
         labels(3) = "The highlighted lines are also lines in 3D."
         desc = "Find all the lines in the image and determine which are in the depth data."
@@ -190,7 +190,7 @@ End Class
 
 
 Public Class FeatureLine_Tutorial2 : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Dim gMat As New IMU_GMatrix
     Dim options As New Options_LineFinder()
     Public Sub New()
@@ -589,7 +589,7 @@ End Class
 
 
 Public Class FeatureLine_Finder : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Public lines2D As New List(Of cvb.Point2f)
     Public lines3D As New List(Of cvb.Point3f)
     Public sorted2DV As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)

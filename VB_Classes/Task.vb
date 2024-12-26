@@ -8,14 +8,7 @@ Imports OpenCvSharp
 
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public featureMask As cvb.Mat
-    Public fLessMask As cvb.Mat
-    Public featureRects As New List(Of cvb.Rect)
-    Public fLessRects As New List(Of cvb.Rect)
-    Public flessBoundary As New cvb.Mat
-    Public lowResColor As cvb.Mat
-    Public lowResDepth As cvb.Mat
-
+    Public lpList As New List(Of PointPair)
     Public gridSize As Integer
     Public gridRows As Integer
     Public gridCols As Integer
@@ -51,6 +44,14 @@ Public Class VBtask : Implements IDisposable
     Public features As New List(Of cvb.Point2f)
     Public featurePoints As New List(Of cvb.Point)
     Public featureMotion As Boolean ' false means that none of the features moved.
+
+    Public featureMask As cvb.Mat
+    Public fLessMask As cvb.Mat
+    Public featureRects As New List(Of cvb.Rect)
+    Public fLessRects As New List(Of cvb.Rect)
+    Public flessBoundary As New cvb.Mat
+    Public lowResColor As cvb.Mat
+    Public lowResDepth As cvb.Mat
 
     Public motionRect As New cvb.Rect ' get rid of this...
     Public motionRects As New List(Of cvb.Rect)

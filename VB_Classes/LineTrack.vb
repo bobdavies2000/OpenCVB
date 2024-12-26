@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines as new Line_Basics1
     Public delaunay As New Delaunay_Basics
     Public contours As New Delaunay_Contours
     Public lpList As New List(Of PointPair)
@@ -90,7 +90,7 @@ End Class
 
 
 Public Class LineTrack_RedCloud : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines as new Line_Basics1
     Public delaunay As New Delaunay_Basics
     Public Sub New()
         desc = "Track the line regions with RedCloud"
@@ -121,7 +121,7 @@ End Class
 
 
 Public Class LineTrack_Basics1 : Inherits TaskParent
-    Public lines As New Line_Basics
+    Public lines as new Line_Basics1
     Public delaunay As New Delaunay_Basics
     Public lpList As New List(Of PointPair)
     Dim lineMap As New cvb.Mat

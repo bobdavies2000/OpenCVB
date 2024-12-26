@@ -59,7 +59,7 @@ End Class
 
 
 Public Class Hough_Sudoku1 : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines as new Line_Basics1
     Public Sub New()
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
