@@ -180,22 +180,24 @@ End Class
 
 Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
-    Dim lines as new Line_Basics1
+    Dim lines As New Line_Basics
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = False
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
         desc = "Find lines in the back projection"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         backP.Run(src)
-        dst3 = backP.dst3
+        labels(2) = lines.labels(2)
 
-        lines.Run(backP.dst2)
+        lines.Run(backP.dst3)
         dst2 = lines.dst2
-        For Each lp In lines.lpList
-            DrawLine(dst2, lp.p1, lp.p2, white)
+        dst3.SetTo(0)
+        For Each lp In task.lpList
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+            DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
-        labels(3) = CStr(lines.lpList.Count) + " lines were found"
     End Sub
 End Class
 
@@ -468,7 +470,7 @@ Public Class BackProject_LineTop : Inherits TaskParent
 
         dst2.SetTo(0)
         Dim w = task.lineWidth + 5
-        For Each lp In line.lines.lpList
+        For Each lp In task.lpList
             dst2.Line(lp.xp1, lp.xp2, 255, w, task.lineType)
         Next
 
@@ -499,7 +501,7 @@ Public Class BackProject_LineSide : Inherits TaskParent
         dst2.SetTo(0)
         Dim w = task.lineWidth + 5
         lpList.Clear()
-        For Each lp In line.lines.lpList
+        For Each lp In task.lpList
             If Math.Abs(lp.slope) < 0.1 Then
                 dst2.Line(lp.xp1, lp.xp2, 255, w, task.lineType)
                 lpList.Add(lp)
@@ -672,7 +674,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines as new Line_Basics1
+    Dim lines As New Line_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -689,14 +691,13 @@ Public Class BackProject_MaskLines : Inherits TaskParent
         Static saveHistIndex As Integer = masks.histIndex
         If masks.histIndex <> saveHistIndex Then
             lines.Run(src)
-            lines.lpList = New List(Of PointPair)(lines.lpList)
+            task.lpList = New List(Of PointPair)(task.lpList)
             dst1.SetTo(0)
         End If
 
         lines.Run(masks.mask)
-        cvb.Cv2.ImShow("mask", masks.mask)
 
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, white)
         Next

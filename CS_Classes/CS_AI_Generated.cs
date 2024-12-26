@@ -1468,7 +1468,7 @@ namespace CS_Classes
 
             dst2.SetTo(0);
             int w = vbc.task.lineWidth + 5;
-            foreach (var lp in line.lines.lpList)
+            foreach (var lp in vbc.task.lpList)
             {
                 cv.Point p1 = new cv.Point((int)lp.xp1.X, (int)lp.xp1.Y);
                 cv.Point p2 = new cv.Point((int)lp.xp2.X, (int)lp.xp2.Y);
@@ -1503,7 +1503,7 @@ namespace CS_Classes
             dst2.SetTo(0);
             int w = vbc.task.lineWidth + 5;
             lpList.Clear();
-            foreach (var lp in line.lines.lpList)
+            foreach (var lp in vbc.task.lpList)
             {
                 if (Math.Abs(lp.slope) < 0.1)
                 {
@@ -34038,7 +34038,7 @@ namespace CS_Classes
             dst2 = lines.dst3;
             dst3.SetTo(Scalar.White);
             int index = lines.frameList.Count() - 1; // the most recent.
-            foreach (var lp in lines.lines.lpList)
+            foreach (var lp in vbc.task.lpList)
             {
                 DrawLine(dst3, lp.p1, lp.p2, Scalar.Green);
                 lpList.Add(lp);
@@ -35044,10 +35044,10 @@ namespace CS_Classes
                     if (distance1 < distanceMid * 2 && distance2 < distanceMid * 2)
                     {
                         var cp = new coinPoints();
-                        var mps = extendAll.lines.lpList[index];
+                        var mps = vbc.task.lpList[index];
                         cp.p1 = new cv.Point((int)mps.p1.X, (int)mps.p1.Y);
                         cp.p2 = new cv.Point((int)mps.p2.X, (int)mps.p2.Y);
-                        mps = extendAll.lines.lpList[i];
+                        mps = vbc.task.lpList[i];
                         cp.p3 = new cv.Point((int)mps.p1.X, (int)mps.p1.Y);
                         cp.p4 = new cv.Point((int)mps.p2.X, (int)mps.p2.Y);
                         if (!checkList.Contains(cp.p1) && !checkList.Contains(cp.p2) && !checkList.Contains(cp.p3) && !checkList.Contains(cp.p4))

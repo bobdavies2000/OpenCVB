@@ -248,7 +248,7 @@ End Class
 
 Public Class Match_Lines : Inherits TaskParent
     Dim knn As New KNN_N4Basics
-    Dim lines as new Line_Basics1
+    Dim lines as new Line_Basics
     Public Sub New()
         labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
@@ -256,10 +256,10 @@ Public Class Match_Lines : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = lines.dst2
-        Static lastPt As New List(Of PointPair)(lines.lpList)
+        Static lastPt As New List(Of PointPair)(task.lpList)
 
         knn.queries.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             knn.queries.Add(New cvb.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
         Next
         If task.optionsChanged Then knn.trainInput = New List(Of cvb.Vec4f)(knn.queries)
@@ -268,8 +268,8 @@ Public Class Match_Lines : Inherits TaskParent
         If knn.queries.Count = 0 Then Exit Sub
 
         For Each i In knn.result
-            If i >= lines.lpList.Count Then Continue For
-            Dim lp = lines.lpList(i)
+            If i >= task.lpList.Count Then Continue For
+            Dim lp = task.lpList(i)
 
             Dim index = knn.result(i, 0)
             If index >= 0 And index < lastPt.Count Then
@@ -279,7 +279,7 @@ Public Class Match_Lines : Inherits TaskParent
         Next
 
         knn.trainInput = New List(Of cvb.Vec4f)(knn.queries)
-        lastPt = New List(Of PointPair)(lines.lpList)
+        lastPt = New List(Of PointPair)(task.lpList)
     End Sub
 End Class
 

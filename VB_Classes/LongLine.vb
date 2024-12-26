@@ -54,7 +54,7 @@ End Class
 
 
 Public Class LongLine_Core : Inherits TaskParent
-    Public lines as new Line_Basics1
+    Public lines as new Line_Basics
     Public lineCount As Integer = 1 ' How many of the longest lines...
     Public lpList As New List(Of PointPair) ' this will be sorted by length - longest first
     Public Sub New()
@@ -63,11 +63,11 @@ Public Class LongLine_Core : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = lines.dst2
-        If lines.lpList.Count = 0 Then Exit Sub
+        If task.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
         lpList.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             lpList.Add(lp)
             DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
             If lpList.Count >= lineCount Then Exit For
@@ -269,7 +269,7 @@ End Class
 
 
 Public Class LongLine_ExtendAll : Inherits TaskParent
-    Public lines as new Line_Basics1
+    Public lines as new Line_Basics
     Public lpList As New List(Of PointPair)
     Public Sub New()
         labels = {"", "", "Image output from Line_Core", "The extended line for each line found in Line_Core"}
@@ -281,7 +281,7 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
 
         dst3 = src.Clone
         lpList.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             lpList.Add(lp)
             DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
         Next
@@ -296,7 +296,6 @@ End Class
 Public Class LongLine_ExtendParallel : Inherits TaskParent
     Dim extendAll As New LongLine_ExtendAll
     Dim knn As New KNN_Basics
-    Dim near As New Line_Nearest
     Public parList As New List(Of coinPoints)
     Public Sub New()
         labels = {"", "", "Image output from Line_Core", "Parallel extended lines"}
@@ -336,11 +335,11 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
                 If distance1 < distanceMid * 2 And distance2 < distanceMid * 2 Then
                     Dim cp As coinPoints
 
-                    Dim mps = extendAll.lines.lpList(index)
+                    Dim mps = task.lpList(index)
                     cp.p1 = mps.p1
                     cp.p2 = mps.p2
 
-                    mps = extendAll.lines.lpList(i)
+                    mps = task.lpList(i)
                     cp.p3 = mps.p1
                     cp.p4 = mps.p2
 

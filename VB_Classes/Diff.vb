@@ -105,9 +105,10 @@ End Class
 
 Public Class Diff_Lines : Inherits TaskParent
     Dim diff As New Diff_RGBAccum
-    Dim lines as new Line_Basics1
+    Dim lines As New Line_Basics
     Public Sub New()
-        labels = {"", "", "Add motion to see Diff output and lines input", "Lines output"}
+        lines.displayLines = True
+        labels = {"", "", "Add motion to see Diff output and lines input", "Wave at the camera to see results"}
         desc = "identify lines in the diff output"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -115,10 +116,8 @@ Public Class Diff_Lines : Inherits TaskParent
         dst2 = diff.dst2
 
         lines.Run(dst2)
-        dst3 = src
-        For Each lp In lines.lpList
-            DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Yellow)
-        Next
+        dst3 = lines.dst2
+        labels(2) = lines.labels(2)
     End Sub
 End Class
 

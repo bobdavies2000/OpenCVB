@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
-    Public lines as new Line_Basics1
+    Public lines as new Line_Basics
     Public delaunay As New Delaunay_Basics
     Public contours As New Delaunay_Contours
     Public lpList As New List(Of PointPair)
@@ -13,7 +13,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
         lines.Run(src)
 
         delaunay.inputPoints.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             delaunay.inputPoints.Add(lp.center)
         Next
         delaunay.Run(src)
@@ -21,7 +21,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
 
         If task.firstPass Then
             lineMap = delaunay.dst3
-            For Each lp In lines.lpList
+            For Each lp In task.lpList
                 lp.colorIndex = lineMap.Get(Of Byte)(lp.center.Y, lp.center.X)
                 lpList.Add(lp)
             Next
@@ -33,7 +33,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
             If val = 0 Then newSet.Add(lp)
         Next
 
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             Dim val = task.motionMask.Get(Of Byte)(lp.center.Y, lp.center.X)
             If val <> 0 Then newSet.Add(lp)
         Next
@@ -43,7 +43,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
         For i = 0 To newSet.Count - 1
             Dim lp = newSet(i)
             Dim val = lineMap.Get(Of Byte)(lp.center.Y, lp.center.X)
-            Dim mp = lines.lpList(val)
+            Dim mp = task.lpList(val)
 
             If i < 10 Then
                 SetTrueText("lp " + CStr(i), lp.p1, 3)
@@ -90,7 +90,7 @@ End Class
 
 
 Public Class LineTrack_RedCloud : Inherits TaskParent
-    Public lines as new Line_Basics1
+    Public lines as new Line_Basics
     Public delaunay As New Delaunay_Basics
     Public Sub New()
         desc = "Track the line regions with RedCloud"
@@ -99,7 +99,7 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
         lines.Run(src)
 
         delaunay.inputPoints.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             delaunay.inputPoints.Add(lp.center)
         Next
         delaunay.Run(src)
@@ -108,7 +108,7 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
         dst2 = task.redC.dst2
 
         dst3.SetTo(0)
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             DrawLine(dst2, lp.p1, lp.p2, white, task.lineWidth)
             DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor, -1)
         Next
@@ -121,7 +121,7 @@ End Class
 
 
 Public Class LineTrack_Basics1 : Inherits TaskParent
-    Public lines as new Line_Basics1
+    Public lines as new Line_Basics
     Public delaunay As New Delaunay_Basics
     Public lpList As New List(Of PointPair)
     Dim lineMap As New cvb.Mat
@@ -132,7 +132,7 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
         lines.Run(src)
 
         delaunay.inputPoints.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             delaunay.inputPoints.Add(lp.center)
         Next
         delaunay.Run(src)
@@ -140,7 +140,7 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
 
         If task.firstPass Then
             lineMap = delaunay.dst3
-            For Each lp In lines.lpList
+            For Each lp In task.lpList
                 lp.colorIndex = lineMap.Get(Of Byte)(lp.center.Y, lp.center.X)
                 lpList.Add(lp)
             Next
@@ -150,18 +150,18 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
         For Each lp In lpList
             Dim val = lineMap.Get(Of Byte)(lp.center.Y, lp.center.X)
             If val = 0 Then Continue For
-            Dim mp = lines.lpList(val - 1)
+            Dim mp = task.lpList(val - 1)
             If (lp.slope <= 1 And mp.slope <= 1) Or (lp.slope > 1 And mp.slope > 1) Then
                 ' likely the same.  If not, the old line is tossed
                 If Math.Abs(lp.length - mp.length) < 20 Then
                     mp.colorIndex = lp.colorIndex
-                    lines.lpList(val - 1) = mp
+                    task.lpList(val - 1) = mp
                     linesTracked += 1
                 End If
             End If
         Next
 
-        lpList = New List(Of PointPair)(lines.lpList)
+        lpList = New List(Of PointPair)(task.lpList)
 
         Dim usedIndex As New List(Of Integer)
         For Each lp In lpList

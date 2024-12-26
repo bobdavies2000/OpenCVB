@@ -23,7 +23,7 @@ End Class
 
 
 Public Class RedTrack_Lines : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines as new Line_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
@@ -33,7 +33,7 @@ Public Class RedTrack_Lines : Inherits TaskParent
 
         If task.heartBeat Then dst3.SetTo(0)
         Dim index As Integer
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             DrawLine(dst3, lp.p1, lp.p2, 255)
             index += 1
             If index > 10 Then Exit For
@@ -187,7 +187,7 @@ End Class
 
 
 Public Class RedTrack_Points : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines as new Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -199,7 +199,7 @@ Public Class RedTrack_Points : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim index As Integer
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             DrawCircle(dst3, lp.p1, task.DotSize, 255)
             DrawCircle(dst3, lp.p2, task.DotSize, 255)
             index += 1

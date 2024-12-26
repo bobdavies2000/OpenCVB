@@ -92,7 +92,7 @@ End Class
 
 Public Class Stable_Lines : Inherits TaskParent
     Public basics As New Stable_Basics
-    Dim lines as new Line_Basics1
+    Dim lines as new Line_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Track the line end points found in the BGR image and keep those that are stable."
@@ -102,7 +102,7 @@ Public Class Stable_Lines : Inherits TaskParent
 
         basics.facetGen.inputPoints.Clear()
         dst1 = src.Clone
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             basics.facetGen.inputPoints.Add(lp.p1)
             basics.facetGen.inputPoints.Add(lp.p2)
             DrawLine(dst1, lp.p1, lp.p2, task.HighlightColor)
@@ -118,7 +118,7 @@ Public Class Stable_Lines : Inherits TaskParent
             End If
         Next
         labels(2) = basics.labels(2)
-        labels(3) = CStr(lines.lpList.Count) + " line end points were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(3) = CStr(task.lpList.Count) + " line end points were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class
 

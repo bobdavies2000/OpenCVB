@@ -131,7 +131,7 @@ End Class
 
 Public Class Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
-    Public lines as new Line_Basics1
+    Public lines as new Line_Basics
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub
@@ -140,6 +140,7 @@ Public Class Structured_MultiSliceLines : Inherits TaskParent
         dst3 = multi.dst3
         lines.Run(dst3)
         dst2 = lines.dst2
+        labels(2) = lines.labels(2)
     End Sub
 End Class
 
@@ -727,7 +728,7 @@ End Class
 
 Public Class Structured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
-    Dim lines as new Line_Basics1
+    Dim lines as new Line_Basics
     Public Sub New()
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"
@@ -742,9 +743,9 @@ Public Class Structured_MouseSlice : Inherits TaskParent
         Dim bots As New List(Of Integer)
         Dim topsList As New List(Of cvb.Point)
         Dim botsList As New List(Of cvb.Point)
-        If lines.lpList.Count > 0 Then
+        If task.lpList.Count > 0 Then
             dst3 = lines.dst2
-            For Each lp In lines.lpList
+            For Each lp In task.lpList
                 dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth + 3, task.lineType)
                 tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
                 bots.Add(If(lp.p1.Y > lp.p2.Y, lp.p1.Y, lp.p2.Y))
@@ -1428,7 +1429,7 @@ End Class
 
 Public Class Structured_Lines : Inherits TaskParent
     Dim struct As New Structured_Basics
-    Public lines as new Line_Basics1
+    Public lines as new Line_Basics
     Public lpListX As New List(Of PointPair)
     Public lpListY As New List(Of PointPair)
     Public Sub New()
@@ -1440,7 +1441,7 @@ Public Class Structured_Lines : Inherits TaskParent
         lines.Run(struct.dst2)
 
         lpListX.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             lpListX.Add(lp)
         Next
 
@@ -1452,7 +1453,7 @@ Public Class Structured_Lines : Inherits TaskParent
 
         lines.Run(struct.dst3)
         lpListY.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             lpListY.Add(lp)
         Next
 

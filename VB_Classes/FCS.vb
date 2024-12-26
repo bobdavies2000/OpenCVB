@@ -1029,7 +1029,7 @@ End Class
 
 
 Public Class FCS_Lines1 : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines As New Line_Basics
     Dim fcs As New FCS_Basics
     Public Sub New()
         labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
@@ -1039,7 +1039,7 @@ Public Class FCS_Lines1 : Inherits TaskParent
         lines.Run(src)
 
         task.features.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             task.features.Add(lp.center)
         Next
 
@@ -1047,8 +1047,7 @@ Public Class FCS_Lines1 : Inherits TaskParent
         dst2 = fcs.dst2
         dst2.SetTo(white, lines.dst3)
 
-        For i = 0 To lines.lpList.Count - 1
-            Dim lp = lines.lpList(i)
+        For Each lp In task.lpList
             DrawCircle(dst2, lp.center, task.DotSize, red, -1)
             dst0.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
@@ -1067,7 +1066,7 @@ End Class
 
 
 Public Class FCS_Lines : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines As New Line_Basics
     Dim fcs As New FCS_Basics
     Public Sub New()
         FindSlider("Min Line Length").Value = 60
@@ -1081,9 +1080,7 @@ Public Class FCS_Lines : Inherits TaskParent
         lines.Run(src)
 
         task.features.Clear()
-        For i = 0 To lines.lpList.Count - 1
-            Dim lp = lines.lpList(i)
-
+        For Each lp In task.lpList
             Dim pair = lp.perpendicularPoints(lp.p1, minDistance)
             task.features.Add(pair.Item1)
             task.features.Add(pair.Item2)

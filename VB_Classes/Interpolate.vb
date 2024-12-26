@@ -114,7 +114,7 @@ End Class
 
 
 Public Class Interpolate_Lines : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines as new Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
         FindSlider("Interpolation Resize %").Value = 80
@@ -128,10 +128,10 @@ Public Class Interpolate_Lines : Inherits TaskParent
         lines.Run(dst1)
         dst2 = lines.dst2
         dst3 = src
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             DrawLine(dst3, lp.p1, lp.p2, cvb.Scalar.Yellow)
         Next
-        labels(3) = "There were " + CStr(lines.lpList.Count) + " lines found"
+        labels(3) = "There were " + CStr(task.lpList.Count) + " lines found"
         labels(2) = inter.labels(2)
     End Sub
 End Class

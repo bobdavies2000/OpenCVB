@@ -59,7 +59,7 @@ End Class
 
 
 Public Class Hough_Sudoku1 : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines as new Line_Basics
     Public Sub New()
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
@@ -67,7 +67,8 @@ Public Class Hough_Sudoku1 : Inherits TaskParent
         dst3 = cvb.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
         lines.Run(dst3.Clone)
         dst2 = lines.dst2
-        For Each lp In lines.lpList
+        labels(2) = lines.labels(2)
+        For Each lp In task.lpList
             dst3.Line(lp.xp1, lp.xp2, cvb.Scalar.Red, task.lineWidth, task.lineType)
         Next
     End Sub

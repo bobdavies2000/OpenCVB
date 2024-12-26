@@ -155,7 +155,7 @@ End Class
 
 
 Public Class FeatureLine_Tutorial1 : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines As New Line_Basics
     Public Sub New()
         labels(3) = "The highlighted lines are also lines in 3D."
         desc = "Find all the lines in the image and determine which are in the depth data."
@@ -166,7 +166,7 @@ Public Class FeatureLine_Tutorial1 : Inherits TaskParent
 
         Dim raw2D As New List(Of PointPair)
         Dim raw3D As New List(Of cvb.Point3f)
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             If task.pcSplit(2).Get(Of Single)(lp.p1.Y, lp.p1.X) > 0 And task.pcSplit(2).Get(Of Single)(lp.p2.Y, lp.p2.X) > 0 Then
                 raw2D.Add(lp)
                 raw3D.Add(task.pointCloud.Get(Of cvb.Point3f)(lp.p1.Y, lp.p1.X))
@@ -178,8 +178,9 @@ Public Class FeatureLine_Tutorial1 : Inherits TaskParent
         For i = 0 To raw2D.Count - 2 Step 2
             DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.HighlightColor)
         Next
-        If task.heartBeat Then labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
-                                           Format(raw3D.Count / 2, "000") + " with depth data."
+        If task.heartBeat Then labels(2) = "Starting with " + Format(task.lpList.Count, "000") +
+                                           " lines, there are " + Format(raw3D.Count / 2, "000") +
+                                           " with depth data."
     End Sub
 End Class
 
@@ -190,10 +191,11 @@ End Class
 
 
 Public Class FeatureLine_Tutorial2 : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines As New Line_Basics
     Dim gMat As New IMU_GMatrix
     Dim options As New Options_LineFinder()
     Public Sub New()
+        lines.displayLines = True
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -202,9 +204,8 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
         lines.Run(src)
         dst2 = lines.dst2
 
-        Dim raw2D As New List(Of PointPair)
         Dim raw3D As New List(Of cvb.Point3f)
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             Dim pt1 As cvb.Point3f, pt2 As cvb.Point3f
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
@@ -213,18 +214,13 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
                 If j = 0 Then pt1 = New cvb.Point3f(val(0), val(1), val(2)) Else pt2 = New cvb.Point3f(val(0), val(1), val(2))
             Next
             If pt1.Z > 0 And pt2.Z > 0 Then
-                raw2D.Add(lp)
                 raw3D.Add(task.pointCloud.Get(Of cvb.Point3f)(lp.p1.Y, lp.p1.X))
                 raw3D.Add(task.pointCloud.Get(Of cvb.Point3f)(lp.p2.Y, lp.p2.X))
             End If
         Next
 
-        dst3 = src
-        For i = 0 To raw2D.Count - 2 Step 2
-            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.HighlightColor)
-        Next
-        If task.heartBeat Then labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
-                                           Format(raw3D.Count, "000") + " with depth data."
+        If task.heartBeat Then labels(2) = "Starting with " + Format(task.lpList.Count, "000") +
+                               " lines, there are " + Format(raw3D.Count, "000") + " with depth data."
         If raw3D.Count = 0 Then
             SetTrueText("No vertical or horizontal lines were found")
         Else
@@ -520,8 +516,8 @@ Public Class FeatureLine_LongestKNN : Inherits TaskParent
         If match.correlation >= options.correlationMin Then
             dst3 = match.dst0.Resize(dst3.Size)
             DrawLine(dst2, p1, p2, task.HighlightColor)
-            DrawCircle(dst2,p1, task.DotSize, task.HighlightColor)
-            DrawCircle(dst2,p2, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, p2, task.DotSize, task.HighlightColor)
             rect = ValidateRect(New cvb.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
             match.template = src(rect).Clone
         Else
@@ -589,7 +585,7 @@ End Class
 
 
 Public Class FeatureLine_Finder : Inherits TaskParent
-    Dim lines as new Line_Basics1
+    Dim lines As New Line_Basics
     Public lines2D As New List(Of cvb.Point2f)
     Public lines3D As New List(Of cvb.Point3f)
     Public sorted2DV As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
@@ -615,7 +611,7 @@ Public Class FeatureLine_Finder : Inherits TaskParent
 
         Dim raw2D As New List(Of PointPair)
         Dim raw3D As New List(Of cvb.Point3f)
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             Dim pt1 As cvb.Point3f, pt2 As cvb.Point3f
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
@@ -674,7 +670,7 @@ Public Class FeatureLine_Finder : Inherits TaskParent
                 End If
             Next
         End If
-        labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
+        labels(2) = "Starting with " + Format(task.lpList.Count, "000") + " lines, there are " +
                                        Format(lines3D.Count / 2, "000") + " with depth data."
         labels(3) = "There were " + CStr(sortedVerticals.Count) + " vertical lines (blue) and " + CStr(sortedHorizontals.Count) + " horizontal lines (yellow)"
     End Sub
