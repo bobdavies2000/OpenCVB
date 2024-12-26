@@ -241,7 +241,7 @@ End Class
 
 Public Class Line3D_X : Inherits TaskParent
     Dim struct As New Structured_Lines
-    Public lines As New Line_Core1
+    Public lines As New Line_Basics
     Public lpListX As New List(Of PointPair)
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
@@ -250,9 +250,10 @@ Public Class Line3D_X : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         struct.Run(src)
         lines.Run(struct.dst2)
+        labels(2) = lines.labels(2)
 
         lpListX.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             lpListX.Add(lp)
         Next
 
@@ -260,7 +261,6 @@ Public Class Line3D_X : Inherits TaskParent
         For Each lp In lpListX
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
-        labels(2) = CStr(lpListX.Count) + " lines found in X-direction slices"
     End Sub
 End Class
 

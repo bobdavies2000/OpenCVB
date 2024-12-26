@@ -1867,14 +1867,11 @@ End Enum
 	If algorithmName = "Line_Movement_CS" Then return new Line_Movement_CS
 	If algorithmName = "Line_Nearest" Then return new Line_Nearest
 	If algorithmName = "Line_Nearest_CS" Then return new Line_Nearest_CS
-	If algorithmName = "Line_OriginalBasics" Then return new Line_OriginalBasics
 	If algorithmName = "Line_Perpendicular" Then return new Line_Perpendicular
 	If algorithmName = "Line_Perpendicular_CS" Then return new Line_Perpendicular_CS
 	If algorithmName = "Line_PointSlope" Then return new Line_PointSlope
 	If algorithmName = "Line_PointSlope_CS" Then return new Line_PointSlope_CS
-	If algorithmName = "Line_PointSlope1" Then return new Line_PointSlope1
 	If algorithmName = "Line_Rects" Then return new Line_Rects
-	If algorithmName = "Line_Regions" Then return new Line_Regions
 	If algorithmName = "Line_RegionsVB" Then return new Line_RegionsVB
 	If algorithmName = "Line_SubsetRect" Then return new Line_SubsetRect
 	If algorithmName = "Line_SubsetRect_CS" Then return new Line_SubsetRect_CS
@@ -1882,7 +1879,7 @@ End Enum
 	If algorithmName = "Line_TimeView_CS" Then return new Line_TimeView_CS
 	If algorithmName = "Line_TimeViewLines" Then return new Line_TimeViewLines
 	If algorithmName = "Line_TimeViewLines_CS" Then return new Line_TimeViewLines_CS
-	If algorithmName = "Line_TopXlines" Then return new Line_TopXlines
+	If algorithmName = "Line_TopX" Then return new Line_TopX
 	If algorithmName = "Line_Vertical" Then return new Line_Vertical
 	If algorithmName = "Line_VerticalHorizontal" Then return new Line_VerticalHorizontal
 	If algorithmName = "Line_VerticalHorizontal1" Then return new Line_VerticalHorizontal1

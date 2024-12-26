@@ -141,59 +141,12 @@ End Class
 
 
 
-Public Class Line_OriginalBasics : Inherits TaskParent
-    Public lines As New Line_Core1
-    Public lpList As New List(Of PointPair)
-    Public Sub New()
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Where motion, remove existing lines but didn't (!) add new lines.  Keep existing lines where no motion."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        dst2 = src.Clone
-
-        lines.Run(src)
-
-        Dim nextSet As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalIntegerInverted)
-        dst3.SetTo(0)
-        Dim motionToss As Integer
-        For Each lp In lpList
-            If task.motionMask(lp.rect).CountNonZero() = 0 Then
-                nextSet.Add(lp.length, lp)
-                dst3.Line(lp.p1, lp.p2, white, 2, cvb.LineTypes.Link8)
-            Else
-                motionToss += 1
-            End If
-        Next
-
-        Dim intersectToss As Integer
-        For Each lp In lines.lpList
-            If dst3(lp.rect).CountNonZero() < lines.options.maxIntersection Then
-                nextSet.Add(lp.length, lp)
-            Else
-                intersectToss += 1
-            End If
-        Next
-
-        lpList = New List(Of PointPair)(nextSet.Values)
-
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, white, 3, cvb.LineTypes.Link8)
-        Next
-        If task.heartBeat Then
-            labels(2) = "Existing lines tossed because of motion: " + CStr(motionToss) +
-                        " Lines added in Motion areas: " + CStr(intersectToss)
-            labels(3) = CStr(lpList.Count) + " lines were identified."
-        End If
-    End Sub
-End Class
-
-
 
 
 
 
 Public Class Line_Rects : Inherits TaskParent
-    Dim lines As New Line_Basics1
+    Dim lines As New Line_Basics
     Public Sub New()
         desc = "Show the rectangle for each line"
     End Sub
@@ -201,7 +154,7 @@ Public Class Line_Rects : Inherits TaskParent
         lines.Run(src)
         dst2 = lines.dst2
 
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             dst2.Rectangle(lp.rect, task.HighlightColor, task.lineWidth)
         Next
     End Sub
@@ -719,11 +672,11 @@ End Class
 
 Public Class Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim lines As New Line_Core1
+    Dim lines As New Line_Basics
     Dim contours As New Contour_Gray
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
-        lines.lineColor = red
+        task.gOptions.HighlightColor.SelectedIndex = 3
         UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
         desc = "Find the lines in the contours."
     End Sub
@@ -734,7 +687,7 @@ Public Class Line_FromContours : Inherits TaskParent
         lines.Run(dst2)
 
         dst3.SetTo(0)
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             DrawLine(dst3, lp.p1, lp.p2, white)
         Next
     End Sub
@@ -1568,229 +1521,30 @@ End Class
 
 
 
-
-
-
-Public Class Line_PointSlope1 : Inherits TaskParent
-    Dim lines As New Line_Core1
-    Dim knn As New KNN_NNBasics
-    Dim dimension As Integer = 5
+Public Class Line_TopX : Inherits TaskParent
+    Dim lines As New Line_Basics
     Public Sub New()
-        knn.options.knnDimension = dimension ' yIntercept, p1.x, p1.y, p2.x, p2.y
-        If standalone Then task.gOptions.setDisplay1()
-        desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        desc = "Isolate the top X lines by length"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
-        dst3 = lines.dst3
+        dst2 = lines.dst2
+        labels(2) = lines.labels(2)
 
-        knn.queries.Clear()
-        For Each lp In lines.lpList
-            For j = 0 To knn.options.knnDimension - 1
-                knn.queries.Add(Choose(j + 1, lp.yIntercept, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
-            Next
+        Dim sortLen As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+        For Each lp In task.lpList
+            sortLen.Add(lp.length, lp.index)
         Next
 
-        Static lastTrainInput As New List(Of Single)(knn.queries)
-        Static lastLines As New List(Of PointPair)(lines.lpList)
-        knn.trainInput = New List(Of Single)(lastTrainInput)
-        knn.Run(empty)
-
-        dst2.SetTo(0)
-        dst1.SetTo(0)
-        For i = 0 To 0
-            Dim lp = lines.lpList(i)
-            DrawLine(dst2, lp.xp1, lp.xp2, white)
-            DrawLine(dst1, lp.p1, lp.p2, task.HighlightColor)
-            For j = 0 To knn.result.GetUpperBound(1) Step dimension
-                Dim mp = lastLines(CInt(knn.result(i, j) / dimension))
-                DrawLine(dst2, mp.xp1, mp.xp2, task.HighlightColor)
-                DrawLine(dst1, mp.p1, mp.p2, white)
-                If j = 0 Then Exit For
-            Next
-        Next
-
-        lastTrainInput = New List(Of Single)(knn.queries)
-        lastLines = New List(Of PointPair)(lines.lpList)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_TopXlines : Inherits TaskParent
-    Dim lines As New Line_Core1
-    Public lpList As New List(Of PointPair)
-    Dim delaunay As New Delaunay_Basics
-    Public Sub New()
-        task.gOptions.DotSizeSlider.Value = 3
-        desc = "Isolate the top X lines in the latest lpList of lines."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        Static regionMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-
-        If task.optionsChanged Then
-            regionMap.SetTo(0)
-            lpList.Clear()
-        End If
-
-        Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To lpList.Count - 1
-            Dim lp = lpList(i)
-            Dim val = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            If val > 0 Then
-                removeList.Add(i, i)
-                Continue For
-            Else
-                val = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-                If val > 0 Then removeList.Add(i, i)
-            End If
-        Next
-
-        dst2 = src.Clone
-        lines.Run(src)
-
-        dst3.SetTo(0)
-        Dim topX = lines.options.topX
-        Dim newList As New List(Of PointPair)
-        For i = 0 To lines.lpList.Count - 1
-            Dim lp = lines.lpList(i)
-            Dim index = regionMap.Get(Of Byte)(lp.center.Y, lp.center.X)
-            If index > 0 And removeList.Keys.Contains(index) = False And lpList.Count > index Then
-                Dim mp = lpList(index - 1)
-                If mp.rect.IntersectsWith(lp.rect) Then
-                    Dim r = mp.rect.Union(lp.rect)
-                    If lp.rect.Width * lp.rect.Height / (r.Width * r.Height) < lines.options.overlapPercent Then
-                        newList.Add(lp)
-                    End If
-                End If
-            Else
-                newList.Add(lp)
-            End If
-
-            If newList.Count >= topX Then Exit For
-        Next
-
-        For Each index In removeList.Keys
-            lpList.RemoveAt(index)
-        Next
-
-        For Each lp In newList
-            Dim dupLine As Boolean = False
-            For Each mp In lpList
-                If mp.center.DistanceTo(lp.center) > 10 Then
-                    If mp.rect.IntersectsWith(lp.rect) Then
-                        Dim r = mp.rect.Union(lp.rect)
-                        If lp.rect.Width * lp.rect.Height / (r.Width * r.Height) < lines.options.overlapPercent Then
-                            dupLine = True
-                        End If
-                    End If
-                End If
-            Next
-            If dupLine = False Then lpList.Add(lp)
-        Next
-
-        delaunay.inputPoints.Clear()
-        Dim inputList As New List(Of PointPair)
-        For Each lp In lpList
-            Dim dupLine As Boolean = False
-            For Each pt In delaunay.inputPoints
-                If lp.center.DistanceTo(pt) < lines.options.minDistance Then
-                    dupLine = True
-                    Exit For
-                End If
-            Next
-            If dupLine = False Then
-                If delaunay.inputPoints.Contains(lp.center) = False Then
-                    delaunay.inputPoints.Add(lp.center)
-                    inputList.Add(lp)
-                End If
-            End If
-        Next
-
-        lpList = New List(Of PointPair)(inputList)
-
-        If delaunay.inputPoints.Count < topX Then
-            For Each lp In newList
-                If delaunay.inputPoints.Contains(lp.center) = False Then
-                    delaunay.inputPoints.Add(lp.center)
-                    lpList.Add(lp)
-                    If delaunay.inputPoints.Count >= topX Then Exit For
-                End If
-            Next
-        End If
-
-        delaunay.Run(src)
-        regionMap = delaunay.dst3.Clone
-        dst3 = delaunay.dst2
-
-        For Each lp In lpList
+        dst2 = src
+        If task.heartBeat Then dst3.SetTo(0)
+        For i = 0 To 9
+            Dim index = sortLen.ElementAt(i).Value
+            Dim lp = task.lpList(index)
             dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-            dst3.Line(lp.p1, lp.p2, cvb.Scalar.Black, task.lineWidth, task.lineType)
-            DrawCircle(dst3, lp.center, task.DotSize, white)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
-
-        If task.heartBeat Then labels(2) = CStr(lpList.Count) + " unique lines have been identified."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_Regions : Inherits TaskParent
-    Public lineList As New List(Of PointPair)
-    Public lines As New Line_Core1
-    Public lpList As New List(Of PointPair)
-    Public options As New Options_Line
-    Public Sub New()
-        dst3 = New cvb.Mat(dst0.Size, cvb.MatType.CV_8U)
-        desc = "Track lines across frames removing existing lines where there is motion and adding lines where there is motion"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        options.RunOpt()
-
-        dst2 = src.Clone
-
-        lines.Run(src)
-
-        Dim nextSet As New List(Of PointPair)
-        dst3.SetTo(0)
-
-        Static lastImage As cvb.Mat = dst2.Clone
-        Dim tossCorrelation As Integer
-        Dim correlation As New cvb.Mat
-        For Each lp In lines.lpList
-            If lp.length > options.minLength Then
-                For i = 0 To 1
-                    Dim pt = Choose(i + 1, lp.p1, lp.p2)
-                    Dim index = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
-                    Dim roi = task.gridRects(index)
-                    cvb.Cv2.MatchTemplate(dst2(roi), lastImage(roi), correlation, cvb.TemplateMatchModes.CCoeffNormed)
-                    If correlation.Get(Of Single)(0, 0) < options.correlation Then
-                        tossCorrelation += 1
-                        Exit For
-                    End If
-                    If i = 1 Then nextSet.Add(lp)
-                Next
-            End If
-        Next
-        lastImage = dst2.Clone
-
-        If task.heartBeatLT Then lpList.Clear()
-        For Each lp In nextSet
-            lpList.Add(lp)
-        Next
-
-        For Each lp In lpList
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
-        Next
-        If task.heartBeat Then
-            labels(2) = CStr(lpList.Count) + " Lines identified. Correlation tossed " + CStr(tossCorrelation)
-        End If
     End Sub
 End Class
 
@@ -1798,15 +1552,14 @@ End Class
 
 
 Public Class Line_MatchedLines : Inherits TaskParent
-    Public lines As New Line_Core1
-    Public lpInput As New List(Of PointPair)
+    Public lines As New Line_Basics
     Public options As New Options_Line
     Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
     Dim lpList As New List(Of PointPair)
     Public Sub New()
         FindSlider("Min Line Length").Value = 30
         labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
-        desc = "Combine lines that a approximately the same line."
+        desc = "Combine lines that are approximately the same line."
     End Sub
     Private Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
         If Math.Abs(lp.slope) >= 1 Then
@@ -1827,18 +1580,15 @@ Public Class Line_MatchedLines : Inherits TaskParent
         options.RunOpt()
         dst2 = src.Clone
 
-        If standalone Then
-            lines.Run(src)
-            lpInput = lines.lpList
-        End If
+        If standalone Then lines.Run(src)
 
         Dim tolerance = 0.1
         Dim newSet As New List(Of PointPair)
         Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim addList As New List(Of PointPair)
         Dim combineCount As Integer
-        For i = 0 To lpInput.Count - 1
-            Dim lp = lpInput(i)
+        For i = 0 To task.lpList.Count - 1
+            Dim lp = task.lpList(i)
             Dim lpRemove As Boolean = False
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
@@ -1862,13 +1612,13 @@ Public Class Line_MatchedLines : Inherits TaskParent
         Next
 
         For i = 0 To removeList.Count - 1
-            lpInput.RemoveAt(removeList.ElementAt(i).Value)
+            task.lpList.RemoveAt(removeList.ElementAt(i).Value)
         Next
 
         For Each lp In addList
-            lpInput.Add(lp)
+            task.lpList.Add(lp)
         Next
-        lpList = New List(Of PointPair)(lpInput)
+        lpList = New List(Of PointPair)(task.lpList)
         lineMap.SetTo(0)
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
@@ -1877,7 +1627,7 @@ Public Class Line_MatchedLines : Inherits TaskParent
         lineMap.ConvertTo(dst3, cvb.MatType.CV_8U)
         dst3 = dst3.Threshold(0, cvb.Scalar.White, cvb.ThresholdTypes.Binary)
         If task.heartBeat Then
-            labels(2) = CStr(lpInput.Count) + " lines were input and " + CStr(combineCount) +
+            labels(2) = CStr(task.lpList.Count) + " lines were input and " + CStr(combineCount) +
                         " lines were matched to the previous frame"
         End If
     End Sub
