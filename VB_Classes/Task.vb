@@ -9,6 +9,9 @@ Imports OpenCvSharp
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public lpList As New List(Of PointPair)
+    Public lpMap As New cvb.Mat
+    Public lp As PointPair
+
     Public gridSize As Integer
     Public gridRows As Integer
     Public gridCols As Integer

@@ -504,7 +504,6 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
     Public trainInput As New List(Of cvb.Point2f)
     Dim minDistances As New List(Of Single)
     Public Sub New()
-        lines.displayLines = True
         labels = {"", "", "Highlight the tracked line (move camera to see track results)", "Candidate lines - standaloneTest() only"}
         desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test."
     End Sub

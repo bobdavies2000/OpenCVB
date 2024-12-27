@@ -3,10 +3,10 @@ Public Class Line_Basics : Inherits TaskParent
     Dim ld As cvb.XImgProc.FastLineDetector
     Dim options As New Options_Line
     Dim collect As New Line_Collection
-    Public displayLines As Boolean = False
     Public Sub New()
         ld = cvb.XImgProc.CvXImgProc.CreateFastLineDetector
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.lpMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -18,35 +18,41 @@ Public Class Line_Basics : Inherits TaskParent
 
         Dim lines = ld.Detect(src)
 
-        Dim sortByLen As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
+        collect.lpListInput.Clear()
+        dst3.SetTo(0)
         For Each v In lines
             If v(0) >= 0 And v(0) <= dst2.Cols And v(1) >= 0 And v(1) <= dst2.Rows And
                v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
                 Dim lp = New PointPair(New cvb.Point(v(0), v(1)), New cvb.Point(v(2), v(3)))
-                If lp.length > options.minLength Then sortByLen.Add(lp.length, lp)
+                If lp.length > options.minLength Then
+                    dst3.Line(lp.p1, lp.p2, 255, task.lineWidth + 2, task.lineWidth)
+                    lp.rect = ValidateRect(lp.rect)
+                    lp.mask = dst3(lp.rect) And task.depthMask(lp.rect)
+                    collect.lpListInput.Add(lp)
+                End If
             End If
         Next
-
-        collect.lpListInput = New List(Of PointPair)(sortByLen.Values)
         collect.Run(src)
 
         task.lpList.Clear()
         For Each lp In collect.lpListOutput
-            lp.index = task.lpList.Count
-            Dim mask = dst3(lp.rect) And task.depthMask(lp.rect)
-            lp.mmX = GetMinMax(task.pcSplit(0)(lp.rect), mask)
-            lp.mmY = GetMinMax(task.pcSplit(1)(lp.rect), mask)
-            lp.mmZ = GetMinMax(task.pcSplit(2)(lp.rect), mask)
-            task.lpList.Add(lp)
+            If lp.rect.Width > 0 And lp.rect.Height > 0 Then
+                lp.mmX = GetMinMax(task.pcSplit(0)(lp.rect), lp.mask)
+                lp.mmY = GetMinMax(task.pcSplit(1)(lp.rect), lp.mask)
+                lp.mmZ = GetMinMax(task.pcSplit(2)(lp.rect), lp.mask)
+
+                task.lpList.Add(lp)
+            End If
         Next
-        If standaloneTest() Or displayLines Then
-            dst3.SetTo(0)
-            For Each lp In task.lpList
-                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
-                DrawLine(dst3, lp.p1, lp.p2, 255)
-                SetTrueText(CStr(lp.index), lp.center, 3)
-            Next
-        End If
+
+        If task.firstPass Then task.ClickPoint = task.lpList(0).p1
+
+        For Each lp In task.lpList
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+            SetTrueText(CStr(lp.index), lp.center, 3)
+        Next
+
+        dst3 = dst3 And task.depthMask
         If task.heartBeat Then
             labels(2) = CStr(task.lpList.Count) + " lines were detected in the current frame"
         End If
@@ -1305,67 +1311,6 @@ End Class
 
 
 
-Public Class Line_Info : Inherits TaskParent
-    Public lpInput As New List(Of PointPair)
-    Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        labels(2) = "Click on the oversized line to get details about the line"
-        labels(3) = "Details from the point cloud for the selected line"
-        desc = "Display details about the line selected."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            Static canny As New Line_Canny
-            canny.Run(src)
-            lpInput = canny.lpList
-        End If
-        dst2 = src
-        For Each mp In lpInput
-            dst2.Line(mp.p1, mp.p2, white, 3, cvb.LineTypes.Link8)
-        Next
-
-        Static lp As PointPair = lpInput(0)
-
-        If task.mouseClickFlag Or task.firstPass Then
-            Dim lineMap As New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
-            For i = 0 To lpInput.Count - 1
-                Dim mp = lpInput(i)
-                lineMap.Line(mp.p1, mp.p2, i + 1, 3, cvb.LineTypes.Link8)
-            Next
-
-            Dim lpIndex = lineMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            If task.firstPass = False And lpIndex > 0 Then lp = lpInput(lpIndex - 1)
-
-            Dim mask As New cvb.Mat
-            lineMap(lp.rect).ConvertTo(mask, cvb.MatType.CV_8U)
-            mask.SetTo(0, task.noDepthMask(lp.rect))
-            strOut = "Lines identified in the image: " + CStr(lpInput.Count) + vbCrLf + vbCrLf
-            For i = 0 To 2
-                Dim mm = GetMinMax(task.pcSplit(i)(lp.rect), mask)
-                Dim dm = Choose(i + 1, "X", "Y", "Z")
-                strOut += "Min " + dm + " = " + Format(mm.minVal, fmt1) + " max " + dm + " = " +
-                           Format(mm.maxVal, fmt1) + vbCrLf
-            Next
-
-            strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
-            strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
-            strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
-            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
-
-            dst3.SetTo(0)
-            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
-            dst3.Rectangle(lp.rect, task.HighlightColor, task.lineWidth, task.lineType)
-        End If
-        SetTrueText(strOut, 1)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Line_PointSlope : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim knn As New KNN_NNBasics
@@ -1622,32 +1567,30 @@ Public Class Line_Collection : Inherits TaskParent
         End If
 
         Dim newSet As New List(Of PointPair)
-        Dim ptList As New List(Of PointPair)(lpListOutput)
-        '  unlike Feature_Basics, we have to check each pair, not each point
-        For Each lp In ptList
+        ' unlike Feature_Basics, we have to check each pair, not each point
+        For Each lp In lpListOutput
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If val1 = 0 And val2 = 0 Then newSet.Add(lp)
         Next
 
-        '  unlike Feature_Basics, we have to check each pair, not each point
+        ' unlike Feature_Basics, we have to check each pair, not each point
         For Each lp In lpListInput
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If val1 <> 0 Or val2 <> 0 Then newSet.Add(lp)
         Next
 
-        Dim ptSort As New SortedList(Of Integer, PointPair)(New compareAllowIdenticalInteger)
-        ' organize the lines top to bottom, left to right, and order points left to right
+        Dim ptSort As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
+        ' organize the lines by length and order points left to right
         For Each lp In newSet
-            Dim index = task.gridMap32S.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-            lp.index = ptSort.Count
             If lp.p1.X < lp.p2.X Then
-                ptSort.Add(index, lp)
+                ptSort.Add(lp.length, lp)
             Else
-                ptSort.Add(index, New PointPair(lp.p2, lp.p1))
+                ptSort.Add(lp.length, New PointPair(lp.p2, lp.p1))
             End If
         Next
+        task.lpList = New List(Of PointPair)(ptSort.Values)
 
         If standaloneTest() Then
             dst2 = src
@@ -1657,6 +1600,73 @@ Public Class Line_Collection : Inherits TaskParent
                 dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
         End If
-        lpListOutput = New List(Of PointPair)(ptSort.Values)
+
+        lpListOutput.Clear()
+        task.lpMap.SetTo(0)
+        For Each lp In ptSort.Values
+            lp.index = lpListOutput.Count
+            If lp.mask.Width > 0 Then
+                task.lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cvb.LineTypes.Link8)
+                lpListOutput.Add(lp)
+            End If
+        Next
+
+        Dim lpMap = task.lpMap.ConvertScaleAbs
+        lpMap = lpMap.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        cvb.Cv2.ImShow("lpmap", lpMap)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Info : Inherits TaskParent
+    Public lpInput As New List(Of PointPair)
+    Public Sub New()
+        If standalone Then task.gOptions.setDisplay1()
+        labels(2) = "Click on the oversized line to get details about the line"
+        labels(3) = "Details from the point cloud for the selected line"
+        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
+        desc = "Display details about the line selected."
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static lines As New Line_Basics
+            lines.Run(src)
+            labels(2) = lines.labels(2)
+        End If
+
+        dst2 = src
+        For Each mp In task.lpList
+            dst2.Line(mp.p1, mp.p2, white, 2, cvb.LineTypes.Link8)
+        Next
+
+        If task.mouseClickFlag Or task.firstPass Then
+            Dim index = task.lpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.lp = task.lpList(index)
+
+            strOut = "Click on any line (below left) to get details on that line " + vbCrLf
+            strOut += "Lines identified in the image: " + CStr(task.lpList.Count) + vbCrLf + vbCrLf
+            strOut += "index = " + CStr(task.lp.index) + vbCrLf
+            strOut += "p1 = " + task.lp.p1.ToString + ", p2 = " + task.lp.p2.ToString + vbCrLf + vbCrLf
+            strOut += "Pointcloud range X " + Format(task.lp.mmX.minVal, fmt3) + " to " +
+                       Format(task.lp.mmX.maxVal, fmt3) + vbCrLf
+            strOut += "Pointcloud range Y " + Format(task.lp.mmY.minVal, fmt3) + " to " +
+                       Format(task.lp.mmY.maxVal, fmt3) + vbCrLf
+            strOut += "Pointcloud range Z " + Format(task.lp.mmZ.minVal, fmt3) + " to " +
+                       Format(task.lp.mmZ.maxVal, fmt3) + vbCrLf + vbCrLf
+
+            strOut += "Slope = " + Format(task.lp.slope, fmt3) + vbCrLf
+            strOut += "X-intercept = " + Format(task.lp.xIntercept, fmt1) + vbCrLf
+            strOut += "Y-intercept = " + Format(task.lp.yIntercept, fmt1) + vbCrLf
+            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
+
+            dst3.SetTo(0)
+            DrawLine(dst3, task.lp.p1, task.lp.p2, 255)
+            dst3.Rectangle(task.lp.rect, 255, task.lineWidth, task.lineType)
+        End If
+        SetTrueText(strOut, 1)
     End Sub
 End Class

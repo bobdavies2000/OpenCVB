@@ -257,6 +257,7 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
     Public yIntercept As Single
     Public xIntercept As Single
     Public rect As cvb.Rect
+    Public mask As New cvb.Mat
     Public length As Single
     Public index As Integer
     Public mmX As New mmData
@@ -267,32 +268,26 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
         p1 = _p1
         p2 = _p2
+        If p1.X > p2.X Then
+            p1 = _p2
+            p2 = _p1
+        End If
+        p1 = New cvb.Point2f(CInt(p1.X), CInt(p1.Y))
+        p2 = New cvb.Point2f(CInt(p2.X), CInt(p2.Y))
+
         center = New cvb.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-        rect = New cvb.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y),
-                            Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
+
+        rect = New cvb.Rect(p1.X, p1.Y, Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
+        If p1.Y > p2.Y Then rect = New cvb.Rect(p1.X, p2.Y, rect.Width, rect.Height)
         If rect.Width < 2 Then rect.Width = 2
         If rect.Height < 2 Then rect.Height = 2
+
         If p1.X = p2.X Then
             slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
         Else
             slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
         yIntercept = p1.Y - slope * p1.X
-
-        ' ordered left to right if largely horizontal or ordered top to bottom if largely vertical.
-        If Math.Abs(slope) < 1 Then
-            If p1.X > p2.X Then
-                Dim tmp = p1
-                p1 = p2
-                p2 = tmp
-            End If
-        Else
-            If p1.Y > p2.Y Then
-                Dim tmp = p1
-                p1 = p2
-                p2 = tmp
-            End If
-        End If
 
         length = p1.DistanceTo(p2)
 

@@ -242,7 +242,6 @@ End Class
 Public Class LeftRight_Lines : Inherits TaskParent
     Dim lines as new Line_Basics
     Public Sub New()
-        lines.displayLines = True
         labels = {"", "", "Left camera lines", "Right camera lines"}
         desc = "Find the lines in the Left and Right images."
     End Sub

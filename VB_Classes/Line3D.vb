@@ -64,7 +64,6 @@ Public Class Line3D_Core : Inherits TaskParent
         dst2.SetTo(0)
         lpList.Clear()
         For Each lp In collect.lpListOutput
-            Dim count = dst2(lp.rect).CountNonZero
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             lpList.Add(lp)
         Next

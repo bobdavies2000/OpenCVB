@@ -195,7 +195,6 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
     Dim gMat As New IMU_GMatrix
     Dim options As New Options_LineFinder()
     Public Sub New()
-        lines.displayLines = True
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -593,7 +592,6 @@ Public Class FeatureLine_Finder : Inherits TaskParent
     Public sortedHorizontals As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
     Dim options As New Options_LineFinder()
     Public Sub New()
-        lines.displayLines = True
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
