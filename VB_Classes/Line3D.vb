@@ -204,7 +204,8 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
     Public actualCount As Integer
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line in the sequence"
+        desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line " +
+               " in the sequence"
     End Sub
     Private Sub addLines(nextList As List(Of List(Of cvb.Point3f)), xyList As List(Of List(Of cvb.Point)))
         Dim white32 As New cvb.Point3f(1, 1, 1)

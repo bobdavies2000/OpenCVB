@@ -24,7 +24,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             lines.subsetRect = New cvb.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
             lines.Run(src.Clone)
 
-            If lines.mpList.Count = 0 Then
+            If lines.lpList.Count = 0 Then
                 SetTrueText("No lines found.", 3)
                 Exit Sub
             End If

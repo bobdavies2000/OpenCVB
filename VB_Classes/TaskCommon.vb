@@ -263,6 +263,7 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
     Public mmX As New mmData
     Public mmY As New mmData
     Public mmZ As New mmData
+    Public mmPerPixel As Single
     Public xp1 As cvb.Point2f ' intercept points at the edges of the image.
     Public xp2 As cvb.Point2f
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)

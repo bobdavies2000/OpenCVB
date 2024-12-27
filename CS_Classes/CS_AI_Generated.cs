@@ -18449,7 +18449,7 @@ namespace CS_Classes
                 int templatePad = options.templatePad;
                 lines.subsetRect = new cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6);
                 lines.Run(src.Clone());
-                if (lines.mpList.Count == 0)
+                if (lines.lpList.Count == 0)
                 {
                     SetTrueText("No lines found.", 3);
                     return;

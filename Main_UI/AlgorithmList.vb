@@ -1860,12 +1860,11 @@ End Enum
 	If algorithmName = "Line_KNN_CS" Then return new Line_KNN_CS
 	If algorithmName = "Line_LeftRightImages" Then return new Line_LeftRightImages
 	If algorithmName = "Line_LeftRightImages_CS" Then return new Line_LeftRightImages_CS
-	If algorithmName = "Line_MatchedLines" Then return new Line_MatchedLines
+	If algorithmName = "Line_Matching" Then return new Line_Matching
 	If algorithmName = "Line_Movement" Then return new Line_Movement
 	If algorithmName = "Line_Movement_CS" Then return new Line_Movement_CS
 	If algorithmName = "Line_Nearest" Then return new Line_Nearest
 	If algorithmName = "Line_Nearest_CS" Then return new Line_Nearest_CS
-	If algorithmName = "Line_NoCollect" Then return new Line_NoCollect
 	If algorithmName = "Line_Perpendicular" Then return new Line_Perpendicular
 	If algorithmName = "Line_Perpendicular_CS" Then return new Line_Perpendicular_CS
 	If algorithmName = "Line_PointSlope" Then return new Line_PointSlope
@@ -1876,7 +1875,6 @@ End Enum
 	If algorithmName = "Line_SubsetRect_CS" Then return new Line_SubsetRect_CS
 	If algorithmName = "Line_TimeView" Then return new Line_TimeView
 	If algorithmName = "Line_TimeView_CS" Then return new Line_TimeView_CS
-	If algorithmName = "Line_TimeViewLines" Then return new Line_TimeViewLines
 	If algorithmName = "Line_TimeViewLines_CS" Then return new Line_TimeViewLines_CS
 	If algorithmName = "Line_TopX" Then return new Line_TopX
 	If algorithmName = "Line_Vertical" Then return new Line_Vertical
