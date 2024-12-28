@@ -692,18 +692,18 @@ Public Class KNN_TrackEach : Inherits TaskParent
 
         Dim tracker As New List(Of PointPair)
         dst2 = src.Clone
-        For Each mp In knn.matches
-            If mp.p1.DistanceTo(mp.p2) < minDistance Then tracker.Add(mp)
+        For Each lp In knn.matches
+            If lp.p1.DistanceTo(lp.p2) < minDistance Then tracker.Add(lp)
         Next
 
         trackAll.Add(tracker)
 
         For i = 0 To trackAll.Count - 1 Step 2
             Dim t1 = trackAll(i)
-            For Each mp In t1
-                DrawCircle(dst2, mp.p1, task.DotSize, task.HighlightColor)
-                DrawCircle(dst2, mp.p2, task.DotSize, task.HighlightColor)
-                DrawLine(dst2, mp.p1, mp.p2, cvb.Scalar.Red)
+            For Each lp In t1
+                DrawCircle(dst2, lp.p1, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, lp.p2, task.DotSize, task.HighlightColor)
+                DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Red)
             Next
         Next
 
@@ -783,7 +783,7 @@ End Class
 
 Public Class KNN_Farthest : Inherits TaskParent
     Public knn As New KNN_Basics
-    Public mpFar As PointPair
+    Public lpFar As PointPair
     Public Sub New()
         labels = {"", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line"}
         desc = "Use KNN to find the farthest point from each query point."
@@ -806,12 +806,12 @@ Public Class KNN_Farthest : Inherits TaskParent
         Dim distances As New List(Of Single)
         For i = 0 To knn.result.GetUpperBound(0) - 1
             Dim farIndex = knn.result(i, knn.result.GetUpperBound(1))
-            Dim mp = New PointPair(knn.queries(i), knn.trainInput(farIndex))
-            DrawCircle(dst2, mp.p1, task.DotSize + 4, cvb.Scalar.Yellow)
-            DrawCircle(dst2, mp.p2, task.DotSize + 4, cvb.Scalar.Yellow)
-            DrawLine(dst2, mp.p1, mp.p2, cvb.Scalar.Yellow)
-            farthest.Add(mp)
-            distances.Add(mp.p1.DistanceTo(mp.p2))
+            Dim lp = New PointPair(knn.queries(i), knn.trainInput(farIndex))
+            DrawCircle(dst2, lp.p1, task.DotSize + 4, cvb.Scalar.Yellow)
+            DrawCircle(dst2, lp.p2, task.DotSize + 4, cvb.Scalar.Yellow)
+            DrawLine(dst2, lp.p1, lp.p2, cvb.Scalar.Yellow)
+            farthest.Add(lp)
+            distances.Add(lp.p1.DistanceTo(lp.p2))
         Next
 
         For Each pt In knn.queries
@@ -819,8 +819,8 @@ Public Class KNN_Farthest : Inherits TaskParent
         Next
 
         Dim maxIndex = distances.IndexOf(distances.Max())
-        mpFar = farthest(maxIndex)
-        DrawLine(dst3, mpFar.p1, mpFar.p2, white)
+        lpFar = farthest(maxIndex)
+        DrawLine(dst3, lpFar.p1, lpFar.p2, white)
     End Sub
 End Class
 

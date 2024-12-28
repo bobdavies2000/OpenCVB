@@ -1333,18 +1333,18 @@ Public Class Line_Matching : Inherits TaskParent
         labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
         desc = "Combine lines that are approximately the same line."
     End Sub
-    Private Function combine2Lines(lp As PointPair, mp As PointPair) As PointPair
-        If Math.Abs(lp.slope) >= 1 Then
-            If lp.p1.Y < mp.p1.Y Then
-                Return New PointPair(lp.p1, mp.p2)
+    Private Function combine2Lines(lp1 As PointPair, lp2 As PointPair) As PointPair
+        If Math.Abs(lp1.slope) >= 1 Then
+            If lp1.p1.Y < lp2.p1.Y Then
+                Return New PointPair(lp1.p1, lp2.p2)
             Else
-                Return New PointPair(mp.p1, lp.p2)
+                Return New PointPair(lp2.p1, lp1.p2)
             End If
         Else
-            If lp.p1.X < mp.p1.X Then
-                Return New PointPair(lp.p1, mp.p2)
+            If lp1.p1.X < lp2.p1.X Then
+                Return New PointPair(lp1.p1, lp2.p2)
             Else
-                Return New PointPair(mp.p1, lp.p2)
+                Return New PointPair(lp2.p1, lp1.p2)
             End If
         End If
     End Function
@@ -1498,8 +1498,8 @@ Public Class Line_Info : Inherits TaskParent
         End If
 
         dst2 = src
-        For Each mp In task.lpList
-            dst2.Line(mp.p1, mp.p2, white, 2, cvb.LineTypes.Link8)
+        For Each lp In task.lpList
+            dst2.Line(lp.p1, lp.p2, white, 2, cvb.LineTypes.Link8)
         Next
 
         If task.mouseClickFlag Or task.firstPass Then

@@ -299,34 +299,6 @@ End Class
 
 
 
-
-
-Public Class OpenGL_VerticalSingle : Inherits TaskParent
-    Dim vLine As New FeatureLine_LongestV_Tutorial2
-    Public Sub New()
-        task.ogl.oglFunction = oCase.verticalLines
-        desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        vLine.Run(src)
-        dst2 = vLine.dst2
-        dst3 = vLine.dst3
-
-        Dim pt1 = vLine.pt1
-        Dim pt2 = vLine.pt2
-        Dim linePairs3D As New List(Of cvb.Point3f)({New cvb.Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2), New cvb.Point3f(pt1.X, pt2.Y, pt1.Z)})
-        task.ogl.dataInput = cvb.Mat.FromPixelData(linePairs3D.Count, 1, cvb.MatType.CV_32FC3, linePairs3D.ToArray)
-
-        task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(task.color)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
 ' https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_Pyramid : Inherits TaskParent
     Public Sub New()
@@ -2029,7 +2001,7 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits TaskParent
             radio.check(0).Checked = True
         End If
 
-        task.ogl.oglFunction = oCase.verticalLines
+        task.ogl.oglFunction = oCase.drawLineAndCloud
         desc = "Visualize all the vertical lines found in FeatureLine_Finder"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
@@ -2243,5 +2215,61 @@ Public Class OpenGL_PClinesAll : Inherits TaskParent
         task.pointCloud.CopyTo(task.ogl.pointCloudInput, lines.dst3)
 
         task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_VerticalSingle : Inherits TaskParent
+    Dim vLine As New FeatureLine_LongestV_Tutorial2
+    Public Sub New()
+        task.ogl.oglFunction = oCase.drawLineAndCloud
+        desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        vLine.Run(src)
+        dst2 = vLine.dst2
+        dst3 = vLine.dst3
+
+        Dim pt1 = vLine.pt1
+        Dim pt2 = vLine.pt2
+        Dim linePairs3D As New List(Of cvb.Point3f)({New cvb.Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2), New cvb.Point3f(pt1.X, pt2.Y, pt1.Z)})
+        task.ogl.dataInput = cvb.Mat.FromPixelData(linePairs3D.Count, 1, cvb.MatType.CV_32FC3, linePairs3D.ToArray)
+
+        task.ogl.pointCloudInput = task.pointCloud
+        task.ogl.Run(task.color)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_DrawLines3D : Inherits TaskParent
+    Dim lines As New Line3D_Basics
+    Public Sub New()
+        task.ogl.oglFunction = oCase.drawLines
+        desc = "Draw all the lines found with Line3D_Basics"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+        dst3 = lines.dst3
+
+        'Dim pt1 = task.lines
+        'Dim pt2 = lines.pt2
+        'Dim linePairs3D As New List(Of cvb.Point3f)({New cvb.Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2), New cvb.Point3f(pt1.X, pt2.Y, pt1.Z)})
+        'task.ogl.dataInput = cvb.Mat.FromPixelData(linePairs3D.Count, 1, cvb.MatType.CV_32FC3, linePairs3D.ToArray)
+
+        'task.ogl.pointCloudInput = task.pointCloud
+        'task.ogl.Run(task.color)
+        'If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class

@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
-    Public mpList As New List(Of PointPair)
+    Public lpList As New List(Of PointPair)
     Public distanceAvg As Single
     Public directionAvg As Single
     Public distanceMax As Single
@@ -49,7 +49,7 @@ Public Class Swarm_Basics : Inherits TaskParent
         knn.Run(empty)
 
         dst2.SetTo(0)
-        mpList.Clear()
+        lpList.Clear()
         Dim disList As New List(Of Single)
         Dim dirList As New List(Of Single) ' angle in radians
         For i = 0 To knn.queries.Count - 1
@@ -60,7 +60,7 @@ Public Class Swarm_Basics : Inherits TaskParent
             Dim nextDist = pt.DistanceTo(ptNew)
             DrawLine(dst2, pt, ptNew, white)
             disList.Add(nextDist)
-            mpList.Add(New PointPair(pt, ptNew))
+            lpList.Add(New PointPair(pt, ptNew))
             If nextDist > 0 Then
                 If pt.Y <> ptNew.Y Then
                     Dim nextDirection = Math.Atan((pt.X - ptNew.X) / (pt.Y - ptNew.Y))
@@ -70,7 +70,7 @@ Public Class Swarm_Basics : Inherits TaskParent
         Next
         dst2 = DrawLines().Clone
 
-        labels(3) = CStr(mpList.Count) + " points were matched to the previous set of features."
+        labels(3) = CStr(lpList.Count) + " points were matched to the previous set of features."
         distanceAvg = 0
         If task.heartBeat Then distanceMax = 0
         If disList.Count > 10 Then

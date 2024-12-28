@@ -13526,12 +13526,12 @@ namespace CS_Classes
 
             match.Run(src);
             dst2 = match.dst1;
-            if (match.mpList.Count == 0) return; // no data...
+            if (match.lpList.Count == 0) return; // no data...
 
             var disparity = new SortedDictionary<int, float>(new CompareAllowIdenticalIntegerInverted());
-            for (int i = 0; i < match.mpList.Count; i++)
+            for (int i = 0; i < match.lpList.Count; i++)
             {
-                var mp = match.mpList[i];
+                var mp = match.lpList[i];
                 disparity.Add((int)(mp.p1.X - mp.p2.X), match.mpCorrelation[i]);
             }
 
@@ -17460,7 +17460,7 @@ namespace CS_Classes
     public class FeatureFlow_Basics_CS : TaskParent
     {
         public Feature_Stable feat = new Feature_Stable();
-        public List<PointPair> mpList = new List<PointPair>();
+        public List<PointPair> lpList = new List<PointPair>();
         public List<float> mpCorrelation = new List<float>();
         public FeatureFlow_Basics_CS()
         {
@@ -17473,7 +17473,7 @@ namespace CS_Classes
         {
             double correlationMin = feat.options.correlationMin;
             Mat correlationmat = new Mat();
-            mpList.Clear();
+            lpList.Clear();
             mpCorrelation.Clear();
             int pad = feat.options.templatePad, size = feat.options.templateSize;
             foreach (cv.Point p1 in prevFeatures)
@@ -17490,7 +17490,7 @@ namespace CS_Classes
                 if (maxCorrelation >= correlationMin)
                 {
                     int index = correlations.IndexOf(maxCorrelation);
-                    mpList.Add(new PointPair(p1, currFeatures[index]));
+                    lpList.Add(new PointPair(p1, currFeatures[index]));
                     mpCorrelation.Add(maxCorrelation);
                 }
             }
@@ -17663,12 +17663,12 @@ namespace CS_Classes
                 Cv2.Circle(dst3, pt, vbc.task.DotSize, vbc.task.HighlightColor, -1, vbc.task.lineType, 0);
                 rightY.Add(pt.Y);
             }
-            List<PointPair> mpList = new List<PointPair>();
+            List<PointPair> lpList = new List<PointPair>();
             ptlist.Clear();
             for (int i = 0; i < leftY.Count; i++)
             {
                 int index = rightY.IndexOf(leftY[i]);
-                if (index != -1) mpList.Add(new PointPair(ptLeft[i], ptRight[index]));
+                if (index != -1) lpList.Add(new PointPair(ptLeft[i], ptRight[index]));
             }
             if (vbc.task.heartBeat)
             {
@@ -17851,7 +17851,7 @@ namespace CS_Classes
     public class FeatureLeftRight_Basics_CS : TaskParent
     {
         public FeatureLeftRight_LeftRightPrep prep = new FeatureLeftRight_LeftRightPrep();
-        public List<PointPair> mpList = new List<PointPair>();
+        public List<PointPair> lpList = new List<PointPair>();
         public List<float> mpCorrelation = new List<float>();
         public cv.Point selectedPoint;
         public int mpIndex;
@@ -17892,7 +17892,7 @@ namespace CS_Classes
                 }
             }
             Mat correlationmat = new Mat();
-            mpList.Clear();
+            lpList.Clear();
             mpCorrelation.Clear();
             for (int i = 0; i < prepList.Count; i++)
             {
@@ -17916,11 +17916,11 @@ namespace CS_Classes
                 float maxCorrelation = correlations.Max();
                 if (maxCorrelation >= options.correlationMin)
                 {
-                    mpList.Add(tmpList[correlations.IndexOf(maxCorrelation)]);
+                    lpList.Add(tmpList[correlations.IndexOf(maxCorrelation)]);
                     mpCorrelation.Add(maxCorrelation);
                 }
             }
-            foreach (PointPair mp in mpList)
+            foreach (PointPair mp in lpList)
             {
                 DrawCircle(dst2, mp.p1, vbc.task.DotSize, vbc.task.HighlightColor, -1);
                 DrawCircle(dst3, mp.p2, vbc.task.DotSize, vbc.task.HighlightColor, -1);
@@ -17929,14 +17929,14 @@ namespace CS_Classes
             SetTrueText("Click near any feature to find the corresponding pair of features." + "\n" +
                         "The correlation values in the lower left for the correlation of the left to the right views." + "\n" +
                         "The dst2 shows features for the left view, dst3 shows features for the right view.", 1);
-            if (ClickPoint == new cv.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
-            if (mpList.Count > 0)
+            if (ClickPoint == new cv.Point() && lpList.Count > 0) setClickPoint(lpList[0].p1, 2);
+            if (lpList.Count > 0)
             {
                 knn.queries.Clear();
                 knn.queries.Add(vbc.task.ClickPoint);
                 PointPair mp;
                 knn.trainInput.Clear();
-                foreach (PointPair mpX in mpList)
+                foreach (PointPair mpX in lpList)
                 {
                     Point2f pt = (picTag == 2) ? mpX.p1 : mpX.p2;
                     knn.trainInput.Add(pt);
@@ -17944,7 +17944,7 @@ namespace CS_Classes
                 knn.Run(null);
                 dst1.SetTo(Scalar.All(0));
                 int mpIndex = knn.result[0, 0];
-                mp = mpList[mpIndex];
+                mp = lpList[mpIndex];
                 DrawCircle(dst2, mp.p1, vbc.task.DotSize + 4, Scalar.Red, -1);
                 DrawCircle(dst3, mp.p2, vbc.task.DotSize + 4, Scalar.Red, -1);
                 float dspDistance = vbc.task.pcSplit[2].Get<float>((int)mp.p1.Y, (int)mp.p1.X);
@@ -17952,22 +17952,22 @@ namespace CS_Classes
                 string strOut = string.Format(vbc.fmt3, mpCorrelation[mpIndex]) + "\n" +
                                 string.Format(vbc.fmt3, dspDistance) + "m (from camera)" + "\n" +
                                 offset.ToString() + " Pixel difference";
-                for (int i = 0; i < mpList.Count; i++)
+                for (int i = 0; i < lpList.Count; i++)
                 {
-                    Point2f pt = mpList[i].p1;
+                    Point2f pt = lpList[i].p1;
                     SetTrueText(string.Format("{0:0%}", mpCorrelation[i]), new cv.Point((int)pt.X, (int)pt.Y));
                 }
                 if (vbc.task.heartBeat) dst1.SetTo(Scalar.All(0));
                 DrawCircle(dst1, mp.p1, vbc.task.DotSize, vbc.task.HighlightColor, -1);
                 DrawCircle(dst1, mp.p2, vbc.task.DotSize, vbc.task.HighlightColor, -1);
-                selectedPoint = new cv.Point(mp.p1.X, mpList[mpIndex].p1.Y + 10);
+                selectedPoint = new cv.Point(mp.p1.X, lpList[mpIndex].p1.Y + 10);
                 SetTrueText(strOut, selectedPoint, 1);
                 if (vbc.task.heartBeat)
                 {
-                    labels[2] = mpList.Count + " features matched and confirmed with left/right image correlation coefficients";
+                    labels[2] = lpList.Count + " features matched and confirmed with left/right image correlation coefficients";
                 }
             }
-            labels[2] = mpList.Count + " features were matched using correlation coefficients in the left and right images. White box is cell around click point.";
+            labels[2] = lpList.Count + " features were matched using correlation coefficients in the left and right images. White box is cell around click point.";
         }
     }
 
@@ -18018,11 +18018,11 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             match.Run(src);
-            if (match.mpList.Count() == 0) return;
+            if (match.lpList.Count() == 0) return;
             dst1 = match.dst1.Clone();
             dst2 = match.dst2.Clone();
             dst3 = match.dst3.Clone();
-            if (vbc.task.firstPass) match.setClickPoint(match.mpList[0].p1, 2);
+            if (vbc.task.firstPass) match.setClickPoint(match.lpList[0].p1, 2);
             SetTrueText(match.strOut, match.selectedPoint, 1);
             if (vbc.task.heartBeat) labels = match.labels;
         }
@@ -18035,7 +18035,7 @@ namespace CS_Classes
     {
         public List<cv.Point> ptLeft = new List<cv.Point>();
         public List<cv.Point> ptRight = new List<cv.Point>();
-        public List<PointPair> mpList = new List<PointPair>();
+        public List<PointPair> lpList = new List<PointPair>();
         public List<float> mpCorrelation = new List<float>();
         public cv.Point selectedPoint;
         public cv.Point ClickPoint;
@@ -18076,7 +18076,7 @@ namespace CS_Classes
                 }
             }
             Mat correlationmat = new Mat();
-            mpList.Clear();
+            lpList.Clear();
             mpCorrelation.Clear();
             for (int i = 0; i < prepList.Count; i++)
             {
@@ -18100,11 +18100,11 @@ namespace CS_Classes
                 float maxCorrelation = correlations.Max();
                 if (maxCorrelation >= options.correlationMin)
                 {
-                    mpList.Add(tmpList[correlations.IndexOf(maxCorrelation)]);
+                    lpList.Add(tmpList[correlations.IndexOf(maxCorrelation)]);
                     mpCorrelation.Add(maxCorrelation);
                 }
             }
-            foreach (PointPair mp in mpList)
+            foreach (PointPair mp in lpList)
             {
                 DrawCircle(dst2, mp.p1, vbc.task.DotSize, vbc.task.HighlightColor, -1);
                 DrawCircle(dst3, mp.p2, vbc.task.DotSize, vbc.task.HighlightColor, -1);
@@ -18113,14 +18113,14 @@ namespace CS_Classes
             SetTrueText("Click near any feature to find the corresponding pair of features." + "\n" +
                         "The correlation values in the lower left for the correlation of the left to the right views." + "\n" +
                         "The dst2 shows features for the left view, dst3 shows features for the right view.", 1);
-            if (ClickPoint == new cv.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
-            if (mpList.Count > 0)
+            if (ClickPoint == new cv.Point() && lpList.Count > 0) setClickPoint(lpList[0].p1, 2);
+            if (lpList.Count > 0)
             {
                 knn.queries.Clear();
                 knn.queries.Add(vbc.task.ClickPoint);
                 PointPair mp;
                 knn.trainInput.Clear();
-                foreach (PointPair mpX in mpList)
+                foreach (PointPair mpX in lpList)
                 {
                     cv.Point2f pt = (picTag == 2) ? mpX.p1 : mpX.p2;
                     knn.trainInput.Add(new Point2f(pt.X, pt.Y));
@@ -18128,7 +18128,7 @@ namespace CS_Classes
                 knn.Run(null);
                 dst1.SetTo(Scalar.All(0));
                 int mpIndex = knn.result[0, 0];
-                mp = mpList[mpIndex];
+                mp = lpList[mpIndex];
                 DrawCircle(dst2, mp.p1, vbc.task.DotSize + 4, Scalar.Red, -1);
                 DrawCircle(dst3, mp.p2, vbc.task.DotSize + 4, Scalar.Red, -1);
                 float dspDistance = vbc.task.pcSplit[2].Get<float>((int)mp.p1.Y, (int)mp.p1.X);
@@ -18136,22 +18136,22 @@ namespace CS_Classes
                 string strOut = string.Format(vbc.fmt3, mpCorrelation[mpIndex]) + "\n" +
                                 string.Format(vbc.fmt3, dspDistance) + "m (from camera)" + "\n" +
                                 offset.ToString() + " Pixel difference";
-                for (int i = 0; i < mpList.Count; i++)
+                for (int i = 0; i < lpList.Count; i++)
                 {
-                    Point2f pt = mpList[i].p1;
+                    Point2f pt = lpList[i].p1;
                     SetTrueText(string.Format("{0:0%}", mpCorrelation[i]), new cv.Point((int)pt.X, (int)pt.Y));
                 }
                 if (vbc.task.heartBeat) dst1.SetTo(Scalar.All(0));
                 DrawCircle(dst1, mp.p1, vbc.task.DotSize, vbc.task.HighlightColor, -1);
                 DrawCircle(dst1, mp.p2, vbc.task.DotSize, vbc.task.HighlightColor, -1);
-                selectedPoint = new cv.Point(mp.p1.X, mpList[mpIndex].p1.Y + 10);
+                selectedPoint = new cv.Point(mp.p1.X, lpList[mpIndex].p1.Y + 10);
                 SetTrueText(strOut, selectedPoint, 1);
                 if (vbc.task.heartBeat)
                 {
-                    labels[2] = mpList.Count + " features matched and confirmed with left/right image correlation coefficients";
+                    labels[2] = lpList.Count + " features matched and confirmed with left/right image correlation coefficients";
                 }
             }
-            labels[2] = mpList.Count + " features were matched using correlation coefficients in the left and right images. White box is cell around click point.";
+            labels[2] = lpList.Count + " features were matched using correlation coefficients in the left and right images. White box is cell around click point.";
         }
     }
 
@@ -19635,7 +19635,7 @@ namespace CS_Classes
             }
             dst0.SetTo(new cv.Scalar(255));
             if (standaloneTest()) dst1.SetTo(new cv.Scalar(0));
-            List<PointPair> mpList = new List<PointPair>();
+            List<PointPair> lpList = new List<PointPair>();
             goodPoints = new List<cv.Point>();
             foreach (var pt in fGrid.goodPoints)
             {
@@ -19654,11 +19654,11 @@ namespace CS_Classes
                     facet = facets[startPoint];
                     dst0.FillConvexPoly(facet.ToArray(), cv.Scalar.All(startPoint), cv.LineTypes.Link4);
                     if (standaloneTest()) dst1.FillConvexPoly(facet.ToArray(), vbc.task.scalarColors[startPoint], vbc.task.lineType);
-                    mpList.Add(new PointPair(startPoints[startPoint], pt));
+                    lpList.Add(new PointPair(startPoints[startPoint], pt));
                 }
             }
             // dst3.SetTo(new cv.Scalar(0));
-            foreach (PointPair mp in mpList)
+            foreach (PointPair mp in lpList)
             {
                 if (mp.p1.DistanceTo(mp.p2) <= maxShift) DrawLine(dst1, mp.p1, mp.p2, new cv.Scalar(255, 255, 0), 2);
                 DrawCircle(dst1, mp.p1, vbc.task.DotSize, new cv.Scalar(255, 255, 0), -1);
@@ -33219,7 +33219,7 @@ namespace CS_Classes
     {
         cv.XImgProc.FastLineDetector ld;
         public SortedList<float, PointPair> sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
-        public List<PointPair> mpList = new List<PointPair>();
+        public List<PointPair> lpList = new List<PointPair>();
         public List<cv.Point2f> ptList = new List<cv.Point2f>();
         public cv.Rect subsetRect;
         public Scalar lineColor = Scalar.White;
@@ -33240,7 +33240,7 @@ namespace CS_Classes
                 dst2.ConvertTo(dst2, MatType.CV_8U);
             var lines = ld.Detect(dst2[subsetRect]);
             sortByLen.Clear();
-            mpList.Clear();
+            lpList.Clear();
             ptList.Clear();
             foreach (var v in lines)
             {
@@ -33250,7 +33250,7 @@ namespace CS_Classes
                     var p1 = new cv.Point(v[0] + subsetRect.X, v[1] + subsetRect.Y);
                     var p2 = new cv.Point(v[2] + subsetRect.X, v[3] + subsetRect.Y);
                     var lp = new PointPair(p1, p2);
-                    mpList.Add(lp);
+                    lpList.Add(lp);
                     ptList.Add(p1);
                     ptList.Add(p2);
                     sortByLen.Add(lp.length, lp);
@@ -33263,7 +33263,7 @@ namespace CS_Classes
                 DrawLine(dst2, lp.p1, lp.p2, lineColor);
                 DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.All(255));
             }
-            labels[2] = mpList.Count().ToString() + " lines were detected in the current frame";
+            labels[2] = lpList.Count().ToString() + " lines were detected in the current frame";
         }
     }
 
@@ -34058,7 +34058,7 @@ namespace CS_Classes
         public List<List<PointPair>> frameList = new List<List<PointPair>>();
         public Line_Basics lines = new Line_Basics();
         public int pixelcount;
-        public List<PointPair> mpList = new List<PointPair>();
+        public List<PointPair> lpList = new List<PointPair>();
         public Line_TimeView_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -34072,7 +34072,7 @@ namespace CS_Classes
             frameList.Add(nextMpList);
             dst2 = src;
             dst3.SetTo(0);
-            mpList.Clear();
+            lpList.Clear();
             int lineTotal = 0;
             for (int i = 0; i < frameList.Count(); i++)
             {
@@ -34081,7 +34081,7 @@ namespace CS_Classes
                 {
                     DrawLine(dst2, lp.p1, lp.p2, Scalar.Yellow);
                     DrawLine(dst3, lp.p1, lp.p2, Scalar.White);
-                    mpList.Add(lp);
+                    lpList.Add(lp);
                 }
             }
             if (frameList.Count() >= vbc.task.frameHistoryCount) frameList.RemoveAt(0);
@@ -35135,7 +35135,7 @@ namespace CS_Classes
     {
         LongLine_Basics lines = new LongLine_Basics();
         public List<PointPair> lpList = new List<PointPair>();
-        List<List<PointPair>> mpList = new List<List<PointPair>>();
+        List<List<PointPair>> lpListList = new List<List<PointPair>>();
         public LongLine_History_CS()
         {
             desc = "Find the longest lines and toss any that are intermittant.";
@@ -35144,10 +35144,10 @@ namespace CS_Classes
         {
             lines.Run(src);
             dst2 = lines.dst2;
-            mpList.Add(lines.lpList);
+            lpListList.Add(lines.lpList);
             var tmplist = new List<PointPair>();
             var lpCount = new List<int>();
-            foreach (var list in mpList)
+            foreach (var list in lpListList)
             {
                 foreach (var lp in list)
                 {
@@ -35173,7 +35173,7 @@ namespace CS_Classes
             {
                 DrawLine(dst2, lp.p1, lp.p2, Scalar.White);
             }
-            if (mpList.Count() > vbc.task.frameHistoryCount) mpList.RemoveAt(0);
+            if (lpList.Count() > vbc.task.frameHistoryCount) lpList.RemoveAt(0);
             labels[2] = $"{lpList.Count()} were found that were present for every one of the last {vbc.task.frameHistoryCount} frames.";
         }
     }
@@ -42072,7 +42072,7 @@ namespace CS_Classes
         readonly FeatureLine_LongestV_Tutorial2 vLine = new FeatureLine_LongestV_Tutorial2();
         public OpenGL_VerticalSingle_CS()
         {
-            vbc.task.ogl.oglFunction = (int)oCase.verticalLines;
+            vbc.task.ogl.oglFunction = (int)oCase.drawLines;
             desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial";
         }
         public void RunAlg(Mat src)
@@ -57548,7 +57548,7 @@ namespace CS_Classes
     {
         public KNN_Basics knn = new KNN_Basics();
         Feature_Stable feat = new Feature_Stable();
-        public List<PointPair> mpList = new List<PointPair>();
+        public List<PointPair> lpList = new List<PointPair>();
         public float distanceAvg;
         public float directionAvg;
         public float distanceMax;
@@ -57596,7 +57596,7 @@ namespace CS_Classes
             knn.queries = new List<cv.Point2f>(cornerHistory.ElementAt(lastIndex));
             knn.Run(empty);
             dst2.SetTo(0);
-            mpList.Clear();
+            lpList.Clear();
             var disList = new List<float>();
             var dirList = new List<float>(); // angle in radians
             for (int i = 0; i < knn.queries.Count(); i++)
@@ -57608,7 +57608,7 @@ namespace CS_Classes
                 double nextDist = pt.DistanceTo(ptNew);
                 DrawLine(dst2, pt, ptNew, Scalar.White);
                 disList.Add((float)nextDist);
-                mpList.Add(new PointPair(pt, ptNew));
+                lpList.Add(new PointPair(pt, ptNew));
                 if (nextDist > 0)
                 {
                     if (pt.Y != ptNew.Y)
@@ -57619,7 +57619,7 @@ namespace CS_Classes
                 }
             }
             DrawLines(ref dst2);
-            labels[3] = $"{mpList.Count()} points were matched to the previous set of features.";
+            labels[3] = $"{lpList.Count()} points were matched to the previous set of features.";
             distanceAvg = 0;
             if (vbc.task.heartBeat) distanceMax = 0;
             if (disList.Count() > 10)

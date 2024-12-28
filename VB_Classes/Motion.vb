@@ -723,7 +723,7 @@ Public Class Motion_FPolyRect : Inherits TaskParent
             srcSave = src.Clone
             dst2 = fRect.dst2.Clone()
         End If
-        match.template = srcSave(fRect.mpRect).Clone
+        match.template = srcSave(fRect.lpRect).Clone
         match.Run(src)
         dst3 = src
         dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)

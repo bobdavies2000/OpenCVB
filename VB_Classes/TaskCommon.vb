@@ -134,7 +134,7 @@ End Enum
 
 Public Enum oCase
     pointCloudAndRGB = 0
-    verticalLines = 1
+    drawLineAndCloud = 1
     drawFloor = 2
     tessalateTriangles = 3
     drawPyramid = 4
@@ -152,6 +152,7 @@ Public Enum oCase
     pcPoints = 16
     pcLines = 17
     pcPointsAlone = 18
+    drawLines = 19
 End Enum
 
 

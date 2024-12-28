@@ -188,3 +188,23 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
         labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Line3D_Constructed : Inherits TaskParent
+    Dim lines As New Line3D_Basics
+    Public Sub New()
+        desc = "Build the 3D lines found in Line3D_Basics"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+        dst3 = lines.dst3
+        labels(2) = lines.labels(2)
+
+
+    End Sub
+End Class

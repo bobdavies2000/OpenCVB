@@ -130,8 +130,8 @@ Public Class OpAuto_FloorCeiling : Inherits TaskParent
             If task.heartBeat Then yList.Clear()
             If task.heartBeat Then dst1.SetTo(0)
             Dim h = dst2.Height / 2
-            For Each mp In bpLine.lpList
-                Dim nextY = task.yRange * (mp.p1.Y - h) / h
+            For Each lp In bpLine.lpList
+                Dim nextY = task.yRange * (lp.p1.Y - h) / h
                 If Math.Abs(nextY) > task.yRange / 4 Then yList.Add(nextY)
             Next
 

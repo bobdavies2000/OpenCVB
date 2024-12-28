@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 			glDisable(GL_TEXTURE_2D);
 			break;
 		}
-		case 1: // verticalLines - draw vertical lines oCase.verticalLines
+		case 1: // drawLineAndCloud - draw vertical lines oCase.drawLineAndCloud
 		{
 			drawPointCloud();
 			glDisable(GL_TEXTURE_2D);
@@ -467,8 +467,22 @@ int main(int argc, char* argv[])
 			break;
 		}
 
+	case 19: // drawLines - draw vertical lines oCase.drawLines
+		{
+			glDisable(GL_TEXTURE_2D);
 
+			// draw lines provided in the data buffer
+			glLineWidth(50.0);
+			glBegin(GL_LINES);
+			for (int i = 0; i < pairCount; i += 6)
+			{
+				glColor3f(1, 1, 1); glVertex3fv(&data[i]); glVertex3fv(&data[i + 3]);
+			}
+			glEnd();
+			break;
 		}
+
+	}
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

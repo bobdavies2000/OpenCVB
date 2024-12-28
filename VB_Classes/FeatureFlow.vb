@@ -1,7 +1,7 @@
 Imports NAudio
 Imports cvb = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits TaskParent
-    Public mpList As New List(Of PointPair)
+    Public lpList As New List(Of PointPair)
     Public mpCorrelation As New List(Of Single)
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
@@ -13,7 +13,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Dim correlationMin = task.feat.options.correlationMin
 
         Dim correlationmat As New cvb.Mat
-        mpList.Clear()
+        lpList.Clear()
         mpCorrelation.Clear()
         Dim pad = task.feat.options.templatePad, size = task.feat.options.templateSize
         For Each p1 In prevFeatures
@@ -27,7 +27,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
             Dim maxCorrelation = correlations.Max
             If maxCorrelation >= correlationMin Then
                 Dim index = correlations.IndexOf(maxCorrelation)
-                mpList.Add(New PointPair(p1, currFeatures(index)))
+                lpList.Add(New PointPair(p1, currFeatures(index)))
                 mpCorrelation.Add(maxCorrelation)
             End If
         Next
@@ -173,11 +173,11 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
             rightY.Add(pt.Y)
         Next
 
-        Dim mpList As New List(Of PointPair)
+        Dim lpList As New List(Of PointPair)
         ptlist.Clear()
         For i = 0 To leftY.Count - 1
             Dim index = rightY.IndexOf(leftY(i))
-            If index >= 0 Then mpList.Add(New PointPair(ptLeft(i), ptRight(index)))
+            If index >= 0 Then lpList.Add(New PointPair(ptLeft(i), ptRight(index)))
         Next
 
         If task.heartBeat Then

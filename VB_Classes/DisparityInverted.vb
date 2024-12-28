@@ -36,12 +36,12 @@ Public Class DisparityFunction_Basics : Inherits TaskParent
         End If
         match.Run(src)
         dst2 = match.dst1
-        If match.mpList.Count = 0 Then Exit Sub ' no data...
+        If match.lpList.Count = 0 Then Exit Sub ' no data...
 
         Dim disparity As New SortedList(Of Integer, Single)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To match.mpList.Count - 1
-            Dim mp = match.mpList(i)
-            disparity.Add(mp.p1.X - mp.p2.X, match.mpCorrelation(i))
+        For i = 0 To match.lpList.Count - 1
+            Dim lp = match.lpList(i)
+            disparity.Add(lp.p1.X - lp.p2.X, match.mpCorrelation(i))
         Next
 
         If task.heartBeat Then

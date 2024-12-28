@@ -1892,6 +1892,7 @@ End Enum
 	If algorithmName = "Line3D_CandidatesFirstLast" Then return new Line3D_CandidatesFirstLast
 	If algorithmName = "Line3D_CandidatesFirstLast_CS" Then return new Line3D_CandidatesFirstLast_CS
 	If algorithmName = "Line3D_Checks_CS" Then return new Line3D_Checks_CS
+	If algorithmName = "Line3D_Constructed" Then return new Line3D_Constructed
 	If algorithmName = "Line3D_Correlation" Then return new Line3D_Correlation
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
@@ -2313,6 +2314,7 @@ End Enum
 	If algorithmName = "OpenGL_DrawHull_CS" Then return new OpenGL_DrawHull_CS
 	If algorithmName = "OpenGL_DrawHulls" Then return new OpenGL_DrawHulls
 	If algorithmName = "OpenGL_DrawHulls_CS" Then return new OpenGL_DrawHulls_CS
+	If algorithmName = "OpenGL_DrawLines3D" Then return new OpenGL_DrawLines3D
 	If algorithmName = "OpenGL_Duster" Then return new OpenGL_Duster
 	If algorithmName = "OpenGL_Duster_CS" Then return new OpenGL_Duster_CS
 	If algorithmName = "OpenGL_DusterY" Then return new OpenGL_DusterY

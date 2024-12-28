@@ -627,8 +627,8 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
         End If
 
         dst0.SetTo(0)
-        For Each mp In knn.matches
-            If mp.p1.DistanceTo(mp.p2) <= maxDistance Then dst0.Line(mp.p1, mp.p2, 255, task.lineWidth + 2, cvb.LineTypes.Link4)
+        For Each lp In knn.matches
+            If lp.p1.DistanceTo(lp.p2) <= maxDistance Then dst0.Line(lp.p1, lp.p2, 255, task.lineWidth + 2, cvb.LineTypes.Link4)
         Next
         frameList.Add(dst0.Clone)
         If frameList.Count >= task.frameHistoryCount Then

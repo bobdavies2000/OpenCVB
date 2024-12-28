@@ -279,22 +279,22 @@ Public Class Delaunay_Generations : Inherits TaskParent
         Dim generationMap = dst0.Clone
         dst0.SetTo(0)
         Dim usedG As New List(Of Integer), g As Integer
-        For Each mp In knn.matches
-            Dim index = facet.facet32s.Get(Of Integer)(mp.p2.Y, mp.p2.X)
+        For Each lp In knn.matches
+            Dim index = facet.facet32s.Get(Of Integer)(lp.p2.Y, lp.p2.X)
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
             If task.firstPass Then
                 g = usedG.Count
             Else
-                g = generationMap.Get(Of Integer)(mp.p2.Y, mp.p2.X) + 1
+                g = generationMap.Get(Of Integer)(lp.p2.Y, lp.p2.X) + 1
                 While usedG.Contains(g)
                     g += 1
                 End While
             End If
             dst0.FillConvexPoly(nextFacet, g, task.lineType)
             usedG.Add(g)
-            SetTrueText(CStr(g), mp.p2, 2)
+            SetTrueText(CStr(g), lp.p2, 2)
         Next
     End Sub
 End Class

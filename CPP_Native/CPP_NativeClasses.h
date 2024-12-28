@@ -5821,7 +5821,7 @@ class Line_FastDetect_CC : public CPP_Parent {
 public: 
     Ptr<ximgproc::FastLineDetector> ld;
     map<float, int> sortLength;
-    vector<PointPair> mpList;
+    vector<PointPair> lpList;
     vector<Point2f> ptList;
     Rect subsetRect;
     // vector<tCell> tCells;
@@ -5845,7 +5845,7 @@ public:
         vector<Vec4f> lines;
         ld->detect(dst2(subsetRect), lines);
         sortLength.clear();
-        mpList.clear();
+        lpList.clear();
         ptList.clear();
         //  tCells.clear();
         for (const Vec4f& v : lines) {
@@ -5856,10 +5856,10 @@ public:
                 Point p1(x1, y1), p2(x2, y2);
                 if (norm(p1 - p2) >= options_lineLengthThreshold) {
                     PointPair mps(p1, p2);
-                    mpList.push_back(mps);
+                    lpList.push_back(mps);
                     ptList.push_back(p1);
                     ptList.push_back(p2);
-                    sortLength[norm(p1 - p2)] = int(mpList.size()) - 1;
+                    sortLength[norm(p1 - p2)] = int(lpList.size()) - 1;
                     //tCells.push_back({ p1 });
                     //tCells.push_back({ p2 });
                 }
@@ -5868,11 +5868,11 @@ public:
         dst2 = src.clone();
         dst3.setTo(0);
         for (const auto& nextLine : sortLength) {
-            const PointPair& mps = mpList[nextLine.second];
+            const PointPair& mps = lpList[nextLine.second];
             line(dst2, mps.p1, mps.p2, Scalar(255, 255, 255), task->lineWidth, task->lineType);
             line(dst3, mps.p1, mps.p2, 255, task->lineWidth, task->lineType);
         }
-        labels[2] = to_string(mpList.size()) + " lines were detected in the current frame";
+        labels[2] = to_string(lpList.size()) + " lines were detected in the current frame";
     }
 };
 

@@ -517,7 +517,7 @@ Public Class FPoly_StartPoints : Inherits TaskParent
 
         dst0.SetTo(255)
         If standaloneTest() Then dst1.SetTo(0)
-        Dim mpList As New List(Of PointPair)
+        Dim lpList As New List(Of PointPair)
         goodPoints = New List(Of cvb.Point2f)(fGrid.goodPoints)
         Dim facet As New List(Of cvb.Point)
         Dim usedGood As New List(Of Integer)
@@ -530,14 +530,14 @@ Public Class FPoly_StartPoints : Inherits TaskParent
                 facet = facets(startPoint)
                 dst0.FillConvexPoly(facet, startPoint, cvb.LineTypes.Link4)
                 If standaloneTest() Then dst1.FillConvexPoly(facet, task.scalarColors(startPoint), task.lineType)
-                mpList.Add(New PointPair(startPoints(startPoint), pt))
+                lpList.Add(New PointPair(startPoints(startPoint), pt))
             End If
         Next
 
         ' dst3.SetTo(0)
-        For Each mp In mpList
-            If mp.p1.DistanceTo(mp.p2) <= maxShift Then DrawLine(dst1, mp.p1, mp.p2, cvb.Scalar.Yellow)
-            DrawCircle(dst1, mp.p1, task.DotSize, cvb.Scalar.Yellow)
+        For Each lp In lpList
+            If lp.p1.DistanceTo(lp.p2) <= maxShift Then DrawLine(dst1, lp.p1, lp.p2, cvb.Scalar.Yellow)
+            DrawCircle(dst1, lp.p1, task.DotSize, cvb.Scalar.Yellow)
         Next
         dst1.Line(fGrid.anchor, fGrid.startAnchor, white, task.lineWidth + 1, task.lineType)
     End Sub
@@ -1292,7 +1292,7 @@ End Class
 
 Public Class FPoly_Line : Inherits TaskParent
     Dim topFeatures As New FPoly_TopFeatures
-    Public mp As New PointPair
+    Public lp As New PointPair
     Public Sub New()
         labels = {"", "", "Points found with FPoly_TopFeatures", "Longest line in task.topFeatures"}
         desc = "Identify the longest line in task.topFeatures"
@@ -1308,9 +1308,9 @@ Public Class FPoly_Line : Inherits TaskParent
         Next
 
         Dim index = distances.IndexOf(distances.Max)
-        mp = New PointPair(pts(index), pts(index + 1))
+        lp = New PointPair(pts(index), pts(index + 1))
         dst3 = src
-        DrawLine(dst3, mp.p1, mp.p2, task.HighlightColor)
+        DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
     End Sub
 End Class
 
@@ -1321,7 +1321,7 @@ End Class
 
 Public Class FPoly_LineRect : Inherits TaskParent
     Dim fLine As New FPoly_Line
-    Public mpRect As New cvb.Rect
+    Public lpRect As New cvb.Rect
     Public Sub New()
         labels(2) = "The rectangle is formed by the longest line between the task.topFeatures"
         desc = "Build the rectangle formed by the longest line in task.topFeatures."
@@ -1329,16 +1329,16 @@ Public Class FPoly_LineRect : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         fLine.Run(src)
 
-        Dim mp = fLine.mp
-        Dim x = If(mp.p1.X < mp.p2.X, mp.p1.X, mp.p2.X)
-        Dim y = If(mp.p1.Y < mp.p2.Y, mp.p1.Y, mp.p2.Y)
-        mpRect = New cvb.Rect(x, y, Math.Abs(mp.p1.X - mp.p2.X), Math.Abs(mp.p1.Y - mp.p2.Y))
-        If mpRect.Width < task.gridSize Then mpRect.Width = task.gridSize
-        If mpRect.Height < task.gridSize Then mpRect.Height = task.gridSize
-        mpRect = ValidateRect(mpRect)
+        Dim lp = fLine.lp
+        Dim x = If(lp.p1.X < lp.p2.X, lp.p1.X, lp.p2.X)
+        Dim y = If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y)
+        lpRect = New cvb.Rect(x, y, Math.Abs(lp.p1.X - lp.p2.X), Math.Abs(lp.p1.Y - lp.p2.Y))
+        If lpRect.Width < task.gridSize Then lpRect.Width = task.gridSize
+        If lpRect.Height < task.gridSize Then lpRect.Height = task.gridSize
+        lpRect = ValidateRect(lpRect)
 
         dst2 = src
-        DrawLine(dst2, mp.p1, mp.p2, task.HighlightColor)
-        dst2.Rectangle(mpRect, task.HighlightColor, task.lineWidth)
+        DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+        dst2.Rectangle(lpRect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class

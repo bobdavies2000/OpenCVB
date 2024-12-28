@@ -430,7 +430,7 @@ End Class
 Public Class LongLine_History : Inherits TaskParent
     Dim lines As New LongLine_Basics
     Public lpList As New List(Of PointPair)
-    Dim mpList As New List(Of List(Of PointPair))
+    Dim lpListList As New List(Of List(Of PointPair))
     Public Sub New()
         desc = "Find the longest lines and toss any that are intermittant."
     End Sub
@@ -438,11 +438,11 @@ Public Class LongLine_History : Inherits TaskParent
         lines.Run(src)
         dst2 = lines.dst2
 
-        mpList.Add(lines.lpList)
+        lpListList.Add(lines.lpList)
 
         Dim tmplist As New List(Of PointPair)
         Dim lpCount As New List(Of Integer)
-        For Each list In mpList
+        For Each list In lpListList
             For Each lp In list
                 Dim index = tmplist.IndexOf(lp)
                 If index < 0 Then
@@ -463,7 +463,7 @@ Public Class LongLine_History : Inherits TaskParent
         For Each lp In lpList
             DrawLine(dst2, lp.p1, lp.p2, white)
         Next
-        If mpList.Count > task.gOptions.FrameHistory.Value Then mpList.RemoveAt(0)
+        If lpList.Count > task.gOptions.FrameHistory.Value Then lpList.RemoveAt(0)
 
         labels(2) = $"{lpList.Count} were found that were present for every one of the last {task.frameHistoryCount} frames."
     End Sub

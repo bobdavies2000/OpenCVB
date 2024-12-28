@@ -23,9 +23,9 @@ Imports System.IO
 '        If task.firstPass Then Exit Sub ' all entries are identical on the first pass.
 
 '        histogram.SetTo(0)
-'        For Each mp In trace.mpList
-'            Dim x = mp.p1.X - mp.p2.X + halfsize
-'            Dim y = mp.p1.Y - mp.p2.Y + halfsize
+'        For Each lp In trace.lpList
+'            Dim x = lp.p1.X - lp.p2.X + halfsize
+'            Dim y = lp.p1.Y - lp.p2.Y + halfsize
 '            If x > matSize Or x < 0 Then Continue For
 '            If y > matSize Or y < 0 Then Continue For
 '            Dim val = histogram.Get(Of Single)(y, x)
@@ -93,12 +93,12 @@ End Class
 '        dst2 = trace.dst2
 
 '        Dim net As cvb.Point2f
-'        For Each mp In trace.mpList
+'        For Each mp In trace.lpList
 '            net.X += mp.p1.X - mp.p2.X
 '            net.Y += mp.p1.Y - mp.p2.Y
 '        Next
-'        net.X = dst2.Width / 2 + net.X / trace.mpList.Count
-'        net.Y = dst2.Height / 2 + net.Y / trace.mpList.Count
+'        net.X = dst2.Width / 2 + net.X / trace.lpList.Count
+'        net.Y = dst2.Height / 2 + net.Y / trace.lpList.Count
 '        dst3.SetTo(0)
 '        DrawLine(dst3, New cvb.Point2f(dst2.Width / 2, dst2.Height / 2), net, white, task.lineWidth, task.lineType)
 '        SetTrueText(trace.strOut, 3)
