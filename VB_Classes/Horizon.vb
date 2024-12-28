@@ -2,7 +2,7 @@
 Public Class Horizon_Basics : Inherits TaskParent
     Public points As New List(Of cvb.Point)
     Dim resizeRatio As Integer = 1
-    Public vec As New PointPair
+    Public vec As New linePoints
     Public vecPresent As Boolean
     Public autoDisplay As Boolean
     Public Sub New()
@@ -57,11 +57,11 @@ Public Class Horizon_Basics : Inherits TaskParent
         If distance < 10 Then ' enough to get a line with some credibility
             points.Clear()
             vecPresent = False
-            vec = New PointPair
+            vec = New linePoints
             strOut = "Horizon not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
-            Dim lp = New PointPair(p1, p2)
-            vec = New PointPair(lp.xp1, lp.xp2)
+            Dim lp = New linePoints(p1, p2)
+            vec = New linePoints(lp.xp1, lp.xp2)
             vecPresent = True
             If standaloneTest() Or autoDisplay Then
                 displayResults(p1, p2)
@@ -81,8 +81,8 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.setDisplay1()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
-        task.horizonVec = New PointPair(New cvb.Point2f(0, dst2.Height / 2), New cvb.Point2f(dst2.Width, dst2.Height / 2))
+        task.gravityVec = New linePoints(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
+        task.horizonVec = New linePoints(New cvb.Point2f(0, dst2.Height / 2), New cvb.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
@@ -114,8 +114,8 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
             Dim p1 = points(xVals.IndexOf(xVals.Min()))
             Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
-            Dim lp = New PointPair(p1, p2)
-            task.horizonVec = New PointPair(lp.xp1, lp.xp2)
+            Dim lp = New linePoints(p1, p2)
+            task.horizonVec = New linePoints(lp.xp1, lp.xp2)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
@@ -134,10 +134,10 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
             Dim p1 = points(yVals.IndexOf(yVals.Min()))
             Dim p2 = points(yVals.IndexOf(yVals.Max()))
             If Math.Abs(p1.X - p2.X) < 2 Then
-                task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
+                task.gravityVec = New linePoints(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
             Else
-                Dim lp = New PointPair(p1, p2)
-                task.gravityVec = New PointPair(lp.xp1, lp.xp2)
+                Dim lp = New linePoints(p1, p2)
+                task.gravityVec = New linePoints(lp.xp1, lp.xp2)
             End If
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
@@ -157,8 +157,8 @@ Public Class Horizon_FindNonZeroOld : Inherits TaskParent
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.setDisplay1()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
-        task.horizonVec = New PointPair(New cvb.Point2f(0, dst2.Height / 2), New cvb.Point2f(dst2.Width, dst2.Height / 2))
+        task.gravityVec = New linePoints(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
+        task.horizonVec = New linePoints(New cvb.Point2f(0, dst2.Height / 2), New cvb.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
@@ -190,8 +190,8 @@ Public Class Horizon_FindNonZeroOld : Inherits TaskParent
             Dim p1 = points(xVals.IndexOf(xVals.Min()))
             Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
-            Dim lp = New PointPair(p1, p2)
-            task.horizonVec = New PointPair(lp.xp1, lp.xp2)
+            Dim lp = New linePoints(p1, p2)
+            task.horizonVec = New linePoints(lp.xp1, lp.xp2)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
@@ -214,10 +214,10 @@ Public Class Horizon_FindNonZeroOld : Inherits TaskParent
             Dim p1 = points(yVals.IndexOf(yVals.Min()))
             Dim p2 = points(yVals.IndexOf(yVals.Max()))
             If Math.Abs(p1.X - p2.X) < 2 Then
-                task.gravityVec = New PointPair(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
+                task.gravityVec = New linePoints(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
             Else
-                Dim lp = New PointPair(p1, p2)
-                task.gravityVec = New PointPair(lp.xp1, lp.xp2)
+                Dim lp = New linePoints(p1, p2)
+                task.gravityVec = New linePoints(lp.xp1, lp.xp2)
             End If
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If

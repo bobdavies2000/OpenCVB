@@ -52,8 +52,8 @@ Public Class Gravity_Basics : Inherits TaskParent
                      CStr(CInt(distance)) + " pixels." + vbCrLf
             strOut += "Using the previous value for the gravity vector."
         Else
-            Dim lp = New PointPair(p1, p2)
-            task.gravityVec = New PointPair(lp.xp1, lp.xp2)
+            Dim lp = New linePoints(p1, p2)
+            task.gravityVec = New linePoints(lp.xp1, lp.xp2)
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
@@ -67,7 +67,7 @@ End Class
 
 
 Public Class Gravity_BasicsOriginal : Inherits TaskParent
-    Public vec As New PointPair
+    Public vec As New linePoints
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Search for the transition from positive to negative to find the gravity vector."
@@ -96,8 +96,8 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
-        Dim lp = New PointPair(p1, p2)
-        vec = New PointPair(lp.xp1, lp.xp2)
+        Dim lp = New linePoints(p1, p2)
+        vec = New linePoints(lp.xp1, lp.xp2)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
@@ -160,7 +160,7 @@ End Class
 Public Class Gravity_Horizon : Inherits TaskParent
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
-    Dim lastVec As PointPair
+    Dim lastVec As linePoints
     Public Sub New()
         gravity.autoDisplay = True
         horizon.autoDisplay = True

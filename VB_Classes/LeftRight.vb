@@ -246,8 +246,8 @@ Public Class LeftRight_Lines : Inherits TaskParent
         desc = "Find the lines in the Left and Right images."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Static leftLines As New List(Of PointPair)
-        Static rightLines As New List(Of PointPair)
+        Static leftLines As New List(Of linePoints)
+        Static rightLines As New List(Of linePoints)
 
         lines.Run(task.leftView)
         dst2 = lines.dst2.Clone

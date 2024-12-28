@@ -1321,7 +1321,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   Flood.vb algorithms were improved and some algorithms were removed.
 -   Several methods to identify peaks and valleys in histograms were tested.
     -   See any algorithms starting with ‘HistValley’.
--   EdgeToEdgeLine function in pointPair structure was added.
+-   EdgeToEdgeLine function in linePoints structure was added.
     -   Line is defined in terms of an edge-to-edge pair of points.
 -   A log of previous changes is included at the bottom of this document.
 

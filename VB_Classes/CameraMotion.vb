@@ -14,8 +14,8 @@ Public Class CameraMotion_Basics : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         gravity.Run(src)
 
-        Dim gravityVec = New PointPair(task.gravityVec.p1, task.gravityVec.p2)
-        Dim horizonVec = New PointPair(task.horizonVec.p1, task.horizonVec.p2)
+        Dim gravityVec = New linePoints(task.gravityVec.p1, task.gravityVec.p2)
+        Dim horizonVec = New linePoints(task.horizonVec.p1, task.horizonVec.p2)
 
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
@@ -23,7 +23,7 @@ Public Class CameraMotion_Basics : Inherits TaskParent
         translationY = task.gOptions.DebugSliderValue ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
         If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
         If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
-            horizonVec = New PointPair(New cvb.Point2f, New cvb.Point2f(336, 0))
+            horizonVec = New linePoints(New cvb.Point2f, New cvb.Point2f(336, 0))
             translationY = 0
         End If
 
@@ -67,8 +67,8 @@ Public Class CameraMotion_Basics : Inherits TaskParent
             End If
         End If
 
-        gravityVec = New PointPair(task.gravityVec.p1, task.gravityVec.p2)
-        horizonVec = New PointPair(task.horizonVec.p1, task.horizonVec.p2)
+        gravityVec = New linePoints(task.gravityVec.p1, task.gravityVec.p2)
+        horizonVec = New linePoints(task.horizonVec.p1, task.horizonVec.p2)
         SetTrueText(strOut, 3)
 
         labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
@@ -91,8 +91,8 @@ Public Class CameraMotion_WithRotation : Inherits TaskParent
     Public rotationY As Single
     Public centerY As cvb.Point2f
     Public rotate As New Rotate_BasicsQT
-    Dim gravityVec As PointPair
-    Dim horizonVec As PointPair
+    Dim gravityVec As linePoints
+    Dim horizonVec As linePoints
     Public Sub New()
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         dst3 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))

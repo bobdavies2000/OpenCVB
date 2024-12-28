@@ -1488,7 +1488,7 @@ namespace CS_Classes
     public class BackProject_LineSide_CS : TaskParent
     {
         Line_ViewSide line = new Line_ViewSide();
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
 
         public BackProject_LineSide_CS()
         {
@@ -5456,8 +5456,8 @@ namespace CS_Classes
         Gravity_Basics gravity = new Gravity_Basics();
         public bool secondOpinion;
         Swarm_Basics feat = new Swarm_Basics();
-        PointPair gravityVec;
-        PointPair horizonVec;
+        linePoints gravityVec;
+        linePoints horizonVec;
         public CameraMotion_Basics_CS()
         {
             dst2 = new Mat(dst1.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -5472,8 +5472,8 @@ namespace CS_Classes
 
             if (vbc.task.firstPass)
             {
-                gravityVec = new PointPair(vbc.task.gravityVec.p1, vbc.task.gravityVec.p2);
-                horizonVec = new PointPair(vbc.task.horizonVec.p1, vbc.task.horizonVec.p2);
+                gravityVec = new linePoints(vbc.task.gravityVec.p1, vbc.task.gravityVec.p2);
+                horizonVec = new linePoints(vbc.task.horizonVec.p1, vbc.task.horizonVec.p2);
             }
 
             if (src.Channels() != 1)
@@ -5487,7 +5487,7 @@ namespace CS_Classes
 
             if (horizonVec.p1.Y >= dst2.Height || horizonVec.p2.Y >= dst2.Height || Math.Abs(translationY) >= dst2.Height / 2)
             {
-                horizonVec = new PointPair(new Point2f(), new Point2f(336, 0));
+                horizonVec = new linePoints(new Point2f(), new Point2f(336, 0));
                 translationY = 0;
             }
 
@@ -5542,8 +5542,8 @@ namespace CS_Classes
                 }
             }
 
-            gravityVec = new PointPair(vbc.task.gravityVec.p1, vbc.task.gravityVec.p2);
-            horizonVec = new PointPair(vbc.task.horizonVec.p1, vbc.task.horizonVec.p2);
+            gravityVec = new linePoints(vbc.task.gravityVec.p1, vbc.task.gravityVec.p2);
+            horizonVec = new linePoints(vbc.task.horizonVec.p1, vbc.task.horizonVec.p2);
             SetTrueText(strOut, 3);
 
             labels[2] = "Translation (X, Y) = (" + translationX.ToString() + ", " + translationY.ToString() + ")" +
@@ -5564,8 +5564,8 @@ namespace CS_Classes
         public float rotationY;
         public Point2f centerY;
         public Rotate_BasicsQT rotate = new Rotate_BasicsQT();
-        PointPair gravityVec;
-        PointPair horizonVec;
+        linePoints gravityVec;
+        linePoints horizonVec;
         public CameraMotion_WithRotation_CS()
         {
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0));
@@ -17460,7 +17460,7 @@ namespace CS_Classes
     public class FeatureFlow_Basics_CS : TaskParent
     {
         public Feature_Stable feat = new Feature_Stable();
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         public List<float> mpCorrelation = new List<float>();
         public FeatureFlow_Basics_CS()
         {
@@ -17490,7 +17490,7 @@ namespace CS_Classes
                 if (maxCorrelation >= correlationMin)
                 {
                     int index = correlations.IndexOf(maxCorrelation);
-                    lpList.Add(new PointPair(p1, currFeatures[index]));
+                    lpList.Add(new linePoints(p1, currFeatures[index]));
                     mpCorrelation.Add(maxCorrelation);
                 }
             }
@@ -17663,12 +17663,12 @@ namespace CS_Classes
                 Cv2.Circle(dst3, pt, vbc.task.DotSize, vbc.task.HighlightColor, -1, vbc.task.lineType, 0);
                 rightY.Add(pt.Y);
             }
-            List<PointPair> lpList = new List<PointPair>();
+            List<linePoints> lpList = new List<linePoints>();
             ptlist.Clear();
             for (int i = 0; i < leftY.Count; i++)
             {
                 int index = rightY.IndexOf(leftY[i]);
-                if (index != -1) lpList.Add(new PointPair(ptLeft[i], ptRight[index]));
+                if (index != -1) lpList.Add(new linePoints(ptLeft[i], ptRight[index]));
             }
             if (vbc.task.heartBeat)
             {
@@ -17851,7 +17851,7 @@ namespace CS_Classes
     public class FeatureLeftRight_Basics_CS : TaskParent
     {
         public FeatureLeftRight_LeftRightPrep prep = new FeatureLeftRight_LeftRightPrep();
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         public List<float> mpCorrelation = new List<float>();
         public cv.Point selectedPoint;
         public int mpIndex;
@@ -17883,12 +17883,12 @@ namespace CS_Classes
             dst2 = vbc.task.leftView.Clone();
             dst3 = vbc.task.rightView.Clone();
             prep.Run(src);
-            List<PointPair> prepList = new List<PointPair>();
+            List<linePoints> prepList = new List<linePoints>();
             foreach (cv.Point p1 in prep.leftFeatures)
             {
                 foreach (cv.Point p2 in prep.rightFeatures)
                 {
-                    if (p1.Y == p2.Y) prepList.Add(new PointPair(p1, p2));
+                    if (p1.Y == p2.Y) prepList.Add(new linePoints(p1, p2));
                 }
             }
             Mat correlationmat = new Mat();
@@ -17896,12 +17896,12 @@ namespace CS_Classes
             mpCorrelation.Clear();
             for (int i = 0; i < prepList.Count; i++)
             {
-                PointPair mpBase = prepList[i];
+                linePoints mpBase = prepList[i];
                 List<float> correlations = new List<float>();
-                List<PointPair> tmpList = new List<PointPair>();
+                List<linePoints> tmpList = new List<linePoints>();
                 for (int j = i; j < prepList.Count; j++)
                 {
-                    PointPair mp = prepList[j];
+                    linePoints mp = prepList[j];
                     if (mp.p1.Y != mpBase.p1.Y)
                     {
                         i = j;
@@ -17920,7 +17920,7 @@ namespace CS_Classes
                     mpCorrelation.Add(maxCorrelation);
                 }
             }
-            foreach (PointPair mp in lpList)
+            foreach (linePoints mp in lpList)
             {
                 DrawCircle(dst2, mp.p1, vbc.task.DotSize, vbc.task.HighlightColor, -1);
                 DrawCircle(dst3, mp.p2, vbc.task.DotSize, vbc.task.HighlightColor, -1);
@@ -17934,9 +17934,9 @@ namespace CS_Classes
             {
                 knn.queries.Clear();
                 knn.queries.Add(vbc.task.ClickPoint);
-                PointPair mp;
+                linePoints mp;
                 knn.trainInput.Clear();
-                foreach (PointPair mpX in lpList)
+                foreach (linePoints mpX in lpList)
                 {
                     Point2f pt = (picTag == 2) ? mpX.p1 : mpX.p2;
                     knn.trainInput.Add(pt);
@@ -18035,7 +18035,7 @@ namespace CS_Classes
     {
         public List<cv.Point> ptLeft = new List<cv.Point>();
         public List<cv.Point> ptRight = new List<cv.Point>();
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         public List<float> mpCorrelation = new List<float>();
         public cv.Point selectedPoint;
         public cv.Point ClickPoint;
@@ -18067,12 +18067,12 @@ namespace CS_Classes
                 return;
             }
             options.RunOpt();
-            List<PointPair> prepList = new List<PointPair>();
+            List<linePoints> prepList = new List<linePoints>();
             foreach (cv.Point p1 in ptLeft)
             {
                 foreach (cv.Point p2 in ptRight)
                 {
-                    if (p1.Y == p2.Y) prepList.Add(new PointPair(p1, p2));
+                    if (p1.Y == p2.Y) prepList.Add(new linePoints(p1, p2));
                 }
             }
             Mat correlationmat = new Mat();
@@ -18080,12 +18080,12 @@ namespace CS_Classes
             mpCorrelation.Clear();
             for (int i = 0; i < prepList.Count; i++)
             {
-                PointPair mpBase = prepList[i];
+                linePoints mpBase = prepList[i];
                 List<float> correlations = new List<float>();
-                List<PointPair> tmpList = new List<PointPair>();
+                List<linePoints> tmpList = new List<linePoints>();
                 for (int j = i; j < prepList.Count; j++)
                 {
-                    PointPair mp = prepList[j];
+                    linePoints mp = prepList[j];
                     if (mp.p1.Y != mpBase.p1.Y)
                     {
                         i = j;
@@ -18104,7 +18104,7 @@ namespace CS_Classes
                     mpCorrelation.Add(maxCorrelation);
                 }
             }
-            foreach (PointPair mp in lpList)
+            foreach (linePoints mp in lpList)
             {
                 DrawCircle(dst2, mp.p1, vbc.task.DotSize, vbc.task.HighlightColor, -1);
                 DrawCircle(dst3, mp.p2, vbc.task.DotSize, vbc.task.HighlightColor, -1);
@@ -18118,9 +18118,9 @@ namespace CS_Classes
             {
                 knn.queries.Clear();
                 knn.queries.Add(vbc.task.ClickPoint);
-                PointPair mp;
+                linePoints mp;
                 knn.trainInput.Clear();
-                foreach (PointPair mpX in lpList)
+                foreach (linePoints mpX in lpList)
                 {
                     cv.Point2f pt = (picTag == 2) ? mpX.p1 : mpX.p2;
                     knn.trainInput.Add(new Point2f(pt.X, pt.Y));
@@ -18578,7 +18578,7 @@ namespace CS_Classes
         {
             lines.Run(src);
             dst2 = lines.dst2;
-            var raw2D = new List<PointPair>();
+            var raw2D = new List<linePoints>();
             var raw3D = new List<cv.Point3f>();
             foreach (var lp in vbc.task.lpList)
             {
@@ -18619,7 +18619,7 @@ namespace CS_Classes
 
             lines.Run(src);
             dst2 = lines.dst2;
-            var raw2D = new List<PointPair>();
+            var raw2D = new List<linePoints>();
             var raw3D = new List<cv.Point3f>();
             foreach (var lp in vbc.task.lpList)
             {
@@ -18675,7 +18675,7 @@ namespace CS_Classes
             labels[3] = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines.";
             desc = "Find all the vertical lines and then track the longest one with a lightweight KNN.";
         }
-        bool testLastPair(PointPair lastPair, gravityLine gc)
+        bool testLastPair(linePoints lastPair, gravityLine gc)
         {
             var distance1 = lastPair.p1.DistanceTo(lastPair.p2);
             var p1 = gc.tc1.center;
@@ -18693,13 +18693,13 @@ namespace CS_Classes
             }
             dst3 = src.Clone();
             var index = 0;
-            if (testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value)) longest.knn.lastPair = new PointPair();
+            if (testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value)) longest.knn.lastPair = new linePoints();
             foreach (var gc in gLines.sortedVerticals.Values)
             {
                 if (index >= 10) break;
                 var p1 = gc.tc1.center;
                 var p2 = gc.tc2.center;
-                if (longest.knn.lastPair.compare(new PointPair())) longest.knn.lastPair = new PointPair(p1, p2);
+                if (longest.knn.lastPair.compare(new linePoints())) longest.knn.lastPair = new linePoints(p1, p2);
                 var pt = new cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
                 SetTrueText($"{index}\n{gc.arcY.ToString(vbc.fmt1)}", pt, 3);
                 index++;
@@ -18836,7 +18836,7 @@ namespace CS_Classes
             sortedHorizontals.Clear();
             lines.Run(src);
             dst2 = lines.dst2;
-            List<PointPair> raw2D = new List<PointPair>();
+            List<linePoints> raw2D = new List<linePoints>();
             List<cv.Point3f> raw3D = new List<cv.Point3f>();
             foreach (var lp in vbc.task.lpList)
             {
@@ -19071,7 +19071,7 @@ namespace CS_Classes
             else
             {
                 vbc.task.HighlightColor = vbc.task.HighlightColor == Scalar.Yellow ? Scalar.Blue : Scalar.Yellow;
-                knn.lastPair = new PointPair(new Point2f(), new Point2f());
+                knn.lastPair = new linePoints(new Point2f(), new Point2f());
             }
             labels[2] = $"Longest line end points had correlation of {match.correlation:F3} with the original longest line.";
         }
@@ -19231,12 +19231,12 @@ namespace CS_Classes
         public int currSideIndex;
         public List<float> currLengths = new List<float>();
         public float currFLineLen;
-        public PointPair mpCurr;
+        public linePoints mpCurr;
         public List<cv.Point2f> prevPoly = new List<cv.Point2f>();
         public int prevSideIndex;
         public List<float> prevLengths = new List<float>();
         public float prevFLineLen;
-        public PointPair mpPrev;
+        public linePoints mpPrev;
         public Mat prevImage;
         public Point2f rotateCenter;
         public float rotateAngle;
@@ -19275,24 +19275,24 @@ namespace CS_Classes
                 prevSideIndex = prevLengths.IndexOf(prevLengths.Max());
             }
             if (prevPoly.Count == 0) return;
-            mpPrev = new PointPair(prevPoly[prevSideIndex], prevPoly[(prevSideIndex + 1) % vbc.task.polyCount]);
-            mpCurr = new PointPair(currPoly[currSideIndex], currPoly[(currSideIndex + 1) % vbc.task.polyCount]);
+            mpPrev = new linePoints(prevPoly[prevSideIndex], prevPoly[(prevSideIndex + 1) % vbc.task.polyCount]);
+            mpCurr = new linePoints(currPoly[currSideIndex], currPoly[(currSideIndex + 1) % vbc.task.polyCount]);
             prevFLineLen = Distance(mpPrev.p1, mpPrev.p2);
             currFLineLen = Distance(mpCurr.p1, mpCurr.p2);
             float d1 = Distance(mpPrev.p1, mpCurr.p1);
             float d2 = Distance(mpPrev.p2, mpCurr.p2);
-            PointPair newNear;
+            linePoints newNear;
             if (d1 < d2)
             {
                 centerShift = new Point2f(mpPrev.p1.X - mpCurr.p1.X, mpPrev.p1.Y - mpCurr.p1.Y);
                 rotateCenter = mpPrev.p1;
-                newNear = new PointPair(mpPrev.p2, mpCurr.p2);
+                newNear = new linePoints(mpPrev.p2, mpCurr.p2);
             }
             else
             {
                 centerShift = new Point2f(mpPrev.p2.X - mpCurr.p2.X, mpPrev.p2.Y - mpCurr.p2.Y);
                 rotateCenter = mpPrev.p2;
-                newNear = new PointPair(mpPrev.p1, mpCurr.p1);
+                newNear = new linePoints(mpPrev.p1, mpCurr.p1);
             }
             List<cv.Point2f> transPoly = new List<cv.Point2f>();
             for (int i = 0; i < currPoly.Count; i++)
@@ -19635,7 +19635,7 @@ namespace CS_Classes
             }
             dst0.SetTo(new cv.Scalar(255));
             if (standaloneTest()) dst1.SetTo(new cv.Scalar(0));
-            List<PointPair> lpList = new List<PointPair>();
+            List<linePoints> lpList = new List<linePoints>();
             goodPoints = new List<cv.Point>();
             foreach (var pt in fGrid.goodPoints)
             {
@@ -19654,11 +19654,11 @@ namespace CS_Classes
                     facet = facets[startPoint];
                     dst0.FillConvexPoly(facet.ToArray(), cv.Scalar.All(startPoint), cv.LineTypes.Link4);
                     if (standaloneTest()) dst1.FillConvexPoly(facet.ToArray(), vbc.task.scalarColors[startPoint], vbc.task.lineType);
-                    lpList.Add(new PointPair(startPoints[startPoint], pt));
+                    lpList.Add(new linePoints(startPoints[startPoint], pt));
                 }
             }
             // dst3.SetTo(new cv.Scalar(0));
-            foreach (PointPair mp in lpList)
+            foreach (linePoints mp in lpList)
             {
                 if (mp.p1.DistanceTo(mp.p2) <= maxShift) DrawLine(dst1, mp.p1, mp.p2, new cv.Scalar(255, 255, 0), 2);
                 DrawCircle(dst1, mp.p1, vbc.task.DotSize, new cv.Scalar(255, 255, 0), -1);
@@ -20061,18 +20061,18 @@ namespace CS_Classes
             var mp2 = fPD.prevmp();
             float d1 = (float)mp1.p1.DistanceTo(mp2.p1);
             float d2 = (float)mp1.p2.DistanceTo(mp2.p2);
-            PointPair newNear;
+            linePoints newNear;
             if (d1 < d2)
             {
                 fPD.centerShift = new Point2f(mp1.p1.X - mp2.p1.X, mp1.p1.Y - mp2.p1.Y);
                 fPD.rotateCenter = mp1.p1;
-                newNear = new PointPair(mp1.p2, mp2.p2);
+                newNear = new linePoints(mp1.p2, mp2.p2);
             }
             else
             {
                 fPD.centerShift = new Point2f(mp1.p2.X - mp2.p2.X, mp1.p2.Y - mp2.p2.Y);
                 fPD.rotateCenter = mp1.p2;
-                newNear = new PointPair(mp1.p1, mp2.p1);
+                newNear = new linePoints(mp1.p1, mp2.p1);
             }
             var transPoly = new List<cv.Point2f>();
             foreach (var point in fPD.currPoly)
@@ -20091,7 +20091,7 @@ namespace CS_Classes
             {
                 if (newNear.p1.DistanceTo(newNear.p2) > threshold)
                 {
-                    near.lp = new PointPair(fPD.prevPoly[sindex1], fPD.prevPoly[sIndex2]);
+                    near.lp = new linePoints(fPD.prevPoly[sindex1], fPD.prevPoly[sIndex2]);
                     near.pt = newNear.p1;
                     near.Run(new Mat());
                     DrawLine(dst1, near.pt, near.nearPoint, new Scalar(0, 0, 255), vbc.task.lineWidth + 5);
@@ -23141,7 +23141,7 @@ namespace CS_Classes
     {
         public List<cv.Point> points = new List<cv.Point>();
         int resizeRatio = 1;
-        public PointPair vec = new PointPair();
+        public linePoints vec = new linePoints();
         public bool autoDisplay;
         public Gravity_Basics_CS()
         {
@@ -23204,13 +23204,13 @@ namespace CS_Classes
             if (distance < 10) // enough to get a line with some credibility
             {
                 points.Clear();
-                vec = new PointPair();
+                vec = new linePoints();
                 strOut = "Gravity vector not found " + "\n" + "The distance of p1 to p2 is " + (int)distance + " pixels.";
             }
             else
             {
-                var lp = new PointPair(p1, p2);
-                vec = new PointPair(lp.xp1, lp.xp2);
+                var lp = new linePoints(p1, p2);
+                vec = new linePoints(lp.xp1, lp.xp2);
                 if (standaloneTest() || autoDisplay)
                     displayResults(p1, p2);
             }
@@ -23223,7 +23223,7 @@ namespace CS_Classes
 
     public class Gravity_BasicsOriginal_CS : TaskParent
     {
-        public PointPair vec = new PointPair();
+        public linePoints vec = new linePoints();
         public Gravity_BasicsOriginal_CS()
         {
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -23261,8 +23261,8 @@ namespace CS_Classes
                 dst0 = src;
             var p1 = findTransition(0, dst0.Height - 1, 1);
             var p2 = findTransition(dst0.Height - 1, 0, -1);
-            var lp = new PointPair(p1, p2);
-            vec = new PointPair(lp.xp1, lp.xp2);
+            var lp = new linePoints(p1, p2);
+            vec = new linePoints(lp.xp1, lp.xp2);
             if (p1.X >= 1)
             {
                 strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n" + "      val =  " +
@@ -23741,7 +23741,7 @@ namespace CS_Classes
 
     public class Grid_MinMaxDepth_CS : TaskParent
     {
-        public PointPair[] minMaxLocs = new PointPair[1];
+        public linePoints[] minMaxLocs = new linePoints[1];
         public Vec2f[] minMaxVals = new Vec2f[1];
         public Grid_MinMaxDepth_CS()
         {
@@ -23758,7 +23758,7 @@ namespace CS_Classes
             {
                 var roi = vbc.task.gridRects[i];
                 vbc.task.pcSplit[2][roi].MinMaxLoc(out mm.minVal, out mm.maxVal, out mm.minLoc, out mm.maxLoc, vbc.task.depthMask[roi]);
-                minMaxLocs[i] = new PointPair(mm.minLoc, mm.maxLoc);
+                minMaxLocs[i] = new linePoints(mm.minLoc, mm.maxLoc);
                 minMaxVals[i] = new Vec2f((float)mm.minVal, (float)mm.maxVal);
             }
             if (standaloneTest())
@@ -27989,7 +27989,7 @@ namespace CS_Classes
     {
         public List<cv.Point> points = new List<cv.Point>();
         int resizeRatio = 1;
-        public PointPair vec;
+        public linePoints vec;
         public bool vecPresent;
         public bool autoDisplay;
         public Horizon_Basics_CS()
@@ -28046,13 +28046,13 @@ namespace CS_Classes
             {
                 points.Clear();
                 vecPresent = false;
-                vec = new PointPair();
+                vec = new linePoints();
                 strOut = "Horizon not found \n" + "The distance of p1 to p2 is " + (int)distance + " pixels.";
             }
             else
             {
-                PointPair lp = new PointPair(p1, p2);
-                vec = new PointPair(lp.xp1, lp.xp2);
+                linePoints lp = new linePoints(p1, p2);
+                vec = new linePoints(lp.xp1, lp.xp2);
                 vecPresent = true;
                 if (standaloneTest() || autoDisplay) displayResults(p1, p2);
             }
@@ -28110,8 +28110,8 @@ namespace CS_Classes
             }
             Point2f p1 = findTransition(0, cloudY.Width - 1, 1);
             Point2f p2 = findTransition(cloudY.Width - 1, cloudY.Width - 1, -1);
-            PointPair lp = new PointPair(p1, p2);
-            vbc.task.horizonVec = new PointPair(lp.xp1, lp.xp2);
+            linePoints lp = new linePoints(p1, p2);
+            vbc.task.horizonVec = new linePoints(lp.xp1, lp.xp2);
             if (p1.Y >= 1 && p1.Y <= dst2.Height - 1)
             {
                 strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n" + "      val =  " +
@@ -28138,8 +28138,8 @@ namespace CS_Classes
             vbc.task.redOptions.setYRangeSlider(3);
             if (standalone) vbc.task.gOptions.setDisplay1();
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            vbc.task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
-            vbc.task.horizonVec = new PointPair(new Point2f(0, dst2.Height / 2), new Point2f(dst2.Width, dst2.Height / 2));
+            vbc.task.gravityVec = new linePoints(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
+            vbc.task.horizonVec = new linePoints(new Point2f(0, dst2.Height / 2), new Point2f(dst2.Width, dst2.Height / 2));
             labels = new string[] { "", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask" };
             desc = "Create lines for the gravity vector and horizon vector in the camera image";
         }
@@ -28172,8 +28172,8 @@ namespace CS_Classes
                 }
                 Point2f p1 = points[xVals.IndexOf(xVals.Min())];
                 Point2f p2 = points[xVals.IndexOf(xVals.Max())];
-                PointPair lp = new PointPair(p1, p2);
-                vbc.task.horizonVec = new PointPair(lp.xp1, lp.xp2);
+                linePoints lp = new linePoints(p1, p2);
+                vbc.task.horizonVec = new linePoints(lp.xp1, lp.xp2);
                 DrawLine(dst2, vbc.task.horizonVec.p1, vbc.task.horizonVec.p2, new cv.Scalar(255), vbc.task.lineWidth);
             }
             dst3 = split[0].InRange(-0.01, 0.01);
@@ -28194,12 +28194,12 @@ namespace CS_Classes
                 Point2f p2 = points[yVals.IndexOf(yVals.Max())];
                 if (Math.Abs(p1.X - p2.X) < 2)
                 {
-                    vbc.task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
+                    vbc.task.gravityVec = new linePoints(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
                 }
                 else
                 {
-                    PointPair lp = new PointPair(p1, p2);
-                    vbc.task.gravityVec = new PointPair(lp.xp1, lp.xp2);
+                    linePoints lp = new linePoints(p1, p2);
+                    vbc.task.gravityVec = new linePoints(lp.xp1, lp.xp2);
                 }
                 DrawLine(dst2, vbc.task.gravityVec.p1, vbc.task.gravityVec.p2, new cv.Scalar(255), vbc.task.lineWidth);
             }
@@ -28228,15 +28228,15 @@ namespace CS_Classes
             dst2.SetTo(new cv.Scalar(0));
             if (vbc.task.lpList.Count() > 0)
             {
-                SortedList<float, PointPair> distances = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
-                foreach (PointPair lp in vbc.task.lpList)
+                SortedList<float, linePoints> distances = new SortedList<float, linePoints>(new compareAllowIdenticalSingleInverted());
+                foreach (linePoints lp in vbc.task.lpList)
                 {
                     distances.Add((float)lp.p1.DistanceTo(lp.p2), lp);
                 }
-                PointPair lpBest = distances.Values[0];
+                linePoints lpBest = distances.Values[0];
                 Point2f p1 = new Point2f(0, lpBest.yIntercept);
                 Point2f p2 = new Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept);
-                vbc.task.horizonVec = new PointPair(p1, p2);
+                vbc.task.horizonVec = new linePoints(p1, p2);
                 DrawLine(dst2, p1, p2, new cv.Scalar(255), 255);
                 labels[2] = "horizonVec slope/intercept = " + lpBest.slope.ToString("F4") + "/" + lpBest.yIntercept.ToString("F4");
             }
@@ -28247,15 +28247,15 @@ namespace CS_Classes
             lines.Run(dst0);
             if (vbc.task.lpList.Count() > 0)
             {
-                SortedList<float, PointPair> distances = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
-                foreach (PointPair lp in vbc.task.lpList)
+                SortedList<float, linePoints> distances = new SortedList<float, linePoints>(new compareAllowIdenticalSingleInverted());
+                foreach (linePoints lp in vbc.task.lpList)
                 {
                     distances.Add((float)lp.p1.DistanceTo(lp.p2), lp);
                 }
-                PointPair lpBest = distances.Values[0];
+                linePoints lpBest = distances.Values[0];
                 Point2f p1 = new Point2f(0, lpBest.yIntercept);
                 Point2f p2 = new Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept);
-                vbc.task.gravityVec = new PointPair(p1, p2);
+                vbc.task.gravityVec = new linePoints(p1, p2);
                 DrawLine(dst2, p1, p2, new cv.Scalar(255), 255);
                 labels[3] = "gravityVec slope/intercept = " + lpBest.slope.ToString("F4") + "/" + lpBest.yIntercept.ToString("F4");
             }
@@ -28273,8 +28273,8 @@ namespace CS_Classes
             vbc.task.redOptions.setYRangeSlider(3);
             if (standalone) vbc.task.gOptions.setDisplay1();
             dst2 = new Mat(dst2.Size(), MatType.CV_8U, cv.Scalar.All(0));
-            vbc.task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
-            vbc.task.horizonVec = new PointPair(new Point2f(0, dst2.Height / 2), new Point2f(dst2.Width, dst2.Height / 2));
+            vbc.task.gravityVec = new linePoints(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
+            vbc.task.horizonVec = new linePoints(new Point2f(0, dst2.Height / 2), new Point2f(dst2.Width, dst2.Height / 2));
             labels = new string[] { "", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask" };
             desc = "Create lines for the gravity vector and horizon vector in the camera image";
         }
@@ -28308,8 +28308,8 @@ namespace CS_Classes
                 }
                 Point2f p1 = points[xVals.IndexOf(xVals.Min())];
                 Point2f p2 = points[xVals.IndexOf(xVals.Max())];
-                PointPair lp = new PointPair(p1, p2);
-                vbc.task.horizonVec = new PointPair(lp.xp1, lp.xp2);
+                linePoints lp = new linePoints(p1, p2);
+                vbc.task.horizonVec = new linePoints(lp.xp1, lp.xp2);
                 DrawLine(dst2, vbc.task.horizonVec.p1, vbc.task.horizonVec.p2, new cv.Scalar(255), 255);
             }
             //If vbc.task.horizonVec.originalLength < dst2.Width / 2 And vbc.task.redOptions.YRangeSlider.Value < vbc.task.redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
@@ -28333,12 +28333,12 @@ namespace CS_Classes
                 Point2f p2 = points[yVals.IndexOf(yVals.Max())];
                 if (Math.Abs(p1.X - p2.X) < 2)
                 {
-                    vbc.task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
+                    vbc.task.gravityVec = new linePoints(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
                 }
                 else
                 {
-                    PointPair lp = new PointPair(p1, p2);
-                    vbc.task.gravityVec = new PointPair(lp.xp1, lp.xp2);
+                    linePoints lp = new linePoints(p1, p2);
+                    vbc.task.gravityVec = new linePoints(lp.xp1, lp.xp2);
                 }
                 DrawLine(dst2, vbc.task.gravityVec.p1, vbc.task.gravityVec.p2, new cv.Scalar(255), 255);
             }
@@ -31503,7 +31503,7 @@ namespace CS_Classes
 
     public class KNN_NoDups_CS : TaskParent
     {
-        public List<PointPair> matches = new List<PointPair>();
+        public List<linePoints> matches = new List<linePoints>();
         public List<cv.Point2f> noMatch = new List<cv.Point2f>();
         public KNN_Basics knn = new KNN_Basics();
         public List<cv.Point2f> queries = new List<cv.Point2f>();
@@ -31575,7 +31575,7 @@ namespace CS_Classes
                 else
                 {
                     var nn = knn.trainInput[neighbors[i]];
-                    matches.Add(new PointPair(pt, nn));
+                    matches.Add(new linePoints(pt, nn));
                     DrawLine(dst3, nn, pt, Scalar.White);
                 }
             }
@@ -32186,7 +32186,7 @@ namespace CS_Classes
     public class KNN_ClosestTracker_CS : TaskParent
     {
         public Line_Basics lines = new Line_Basics();
-        public PointPair lastPair = new PointPair();
+        public linePoints lastPair = new linePoints();
         public List<cv.Point2f> trainInput = new List<cv.Point2f>();
         List<float> minDistances = new List<float>();
         public KNN_ClosestTracker_CS()
@@ -32224,7 +32224,7 @@ namespace CS_Classes
                 SetTrueText("No lines were found in the current image.");
                 return;
             }
-            if (lastPair.compare(new PointPair())) lastPair = new PointPair(p1, p2);
+            if (lastPair.compare(new linePoints())) lastPair = new linePoints(p1, p2);
             List<float> distances = new List<float>();
             for (int i = 0; i < trainInput.Count(); i += 2)
             {
@@ -32241,16 +32241,16 @@ namespace CS_Classes
                 if (minDist > minDistances.Max() * 2)
                 {
                     Debug.WriteLine("Overriding KNN min Distance Rule = " + string.Format("{0:0}", minDist) + " max = " + string.Format("{0:0}", minDistances.Max()));
-                    lastPair = new PointPair(trainInput[0], trainInput[1]);
+                    lastPair = new linePoints(trainInput[0], trainInput[1]);
                 }
                 else
                 {
-                    lastPair = new PointPair(p1, p2);
+                    lastPair = new linePoints(p1, p2);
                 }
             }
             else
             {
-                lastPair = new PointPair(p1, p2);
+                lastPair = new linePoints(p1, p2);
             }
             if (minDist > 0) minDistances.Add(minDist);
             if (minDistances.Count() > 100) minDistances.RemoveAt(0);
@@ -32359,7 +32359,7 @@ namespace CS_Classes
 
     public class KNN_NoDupsOld_CS : TaskParent
     {
-        public List<PointPair> matches = new List<PointPair>();
+        public List<linePoints> matches = new List<linePoints>();
         public List<cv.Point> noMatch = new List<cv.Point>();
         public KNN_Basics knn = new KNN_Basics();
         public List<cv.Point2f> queries = new List<cv.Point2f>();
@@ -32447,7 +32447,7 @@ namespace CS_Classes
                     if (nearest[i] < knn.trainInput.Count())
                     {
                         var nn = knn.trainInput[nearest[i]];
-                        matches.Add(new PointPair(pt, nn));
+                        matches.Add(new linePoints(pt, nn));
                         DrawLine(dst3, nn, pt, Scalar.White);
                     }
                 }
@@ -32462,7 +32462,7 @@ namespace CS_Classes
     public class KNN_Farthest_CS : TaskParent
     {
         KNN_Basics knn = new KNN_Basics();
-        public PointPair mpFar;
+        public linePoints mpFar;
         Random_Basics random = new Random_Basics();
         public KNN_Farthest_CS()
         {
@@ -32483,12 +32483,12 @@ namespace CS_Classes
             knn.Run(empty);
             dst2.SetTo(0);
             dst3.SetTo(0);
-            var farthest = new List<PointPair>();
+            var farthest = new List<linePoints>();
             var distances = new List<float>();
             for (int i = 0; i <= knn.result.GetUpperBound(0) - 1; i++)
             {
                 int farIndex = knn.result[i, knn.result.GetUpperBound(1)];
-                var mp = new PointPair(knn.queries[i], knn.trainInput[farIndex]);
+                var mp = new linePoints(knn.queries[i], knn.trainInput[farIndex]);
                 DrawCircle(dst2, mp.p1, vbc.task.DotSize + 4, Scalar.Yellow);
                 DrawCircle(dst2, mp.p2, vbc.task.DotSize + 4, Scalar.Yellow);
                 DrawLine(dst2, mp.p1, mp.p2, Scalar.Yellow);
@@ -32512,7 +32512,7 @@ namespace CS_Classes
     {
         KNN_OneToOne knn = new KNN_OneToOne();
         Feature_Stable feat = new Feature_Stable();
-        List<List<PointPair>> trackAll = new List<List<PointPair>>();
+        List<List<linePoints>> trackAll = new List<List<linePoints>>();
         public KNN_TrackEach_CS()
         {
             desc = "Track each good feature with KNN and match the goodFeatures from frame to frame";
@@ -32524,7 +32524,7 @@ namespace CS_Classes
             feat.Run(src);
             knn.queries = new List<cv.Point2f>(vbc.task.features);
             knn.Run(src);
-            var tracker = new List<PointPair>();
+            var tracker = new List<linePoints>();
             dst2 = src.Clone();
             foreach (var mp in knn.matches)
             {
@@ -33170,7 +33170,7 @@ namespace CS_Classes
     public class Line_Basics_CS : TaskParent
     {
         cv.XImgProc.FastLineDetector ld;
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         public Scalar lineColor = Scalar.White;
         public Line_Basics_CS()
         {
@@ -33187,7 +33187,7 @@ namespace CS_Classes
             if (dst2.Type() != MatType.CV_8U)
                 dst2.ConvertTo(dst2, MatType.CV_8U);
             var lines = ld.Detect(dst2);
-            var sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
+            var sortByLen = new SortedList<float, linePoints>(new compareAllowIdenticalSingleInverted());
             foreach (var v in lines)
             {
                 if (v[0] >= 0 && v[0] <= dst2.Cols && v[1] >= 0 && v[1] <= dst2.Rows &&
@@ -33195,7 +33195,7 @@ namespace CS_Classes
                 {
                     var p1 = new cv.Point(v[0], v[1]);
                     var p2 = new cv.Point(v[2], v[3]);
-                    var lp = new PointPair(p1, p2);
+                    var lp = new linePoints(p1, p2);
                     sortByLen.Add(lp.length, lp);
                 }
             }
@@ -33218,8 +33218,8 @@ namespace CS_Classes
     public class Line_SubsetRect_CS : TaskParent
     {
         cv.XImgProc.FastLineDetector ld;
-        public SortedList<float, PointPair> sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
-        public List<PointPair> lpList = new List<PointPair>();
+        public SortedList<float, linePoints> sortByLen = new SortedList<float, linePoints>(new compareAllowIdenticalSingleInverted());
+        public List<linePoints> lpList = new List<linePoints>();
         public List<cv.Point2f> ptList = new List<cv.Point2f>();
         public cv.Rect subsetRect;
         public Scalar lineColor = Scalar.White;
@@ -33249,7 +33249,7 @@ namespace CS_Classes
                 {
                     var p1 = new cv.Point(v[0] + subsetRect.X, v[1] + subsetRect.Y);
                     var p2 = new cv.Point(v[2] + subsetRect.X, v[3] + subsetRect.Y);
-                    var lp = new PointPair(p1, p2);
+                    var lp = new linePoints(p1, p2);
                     lpList.Add(lp);
                     ptList.Add(p1);
                     ptList.Add(p2);
@@ -33538,7 +33538,7 @@ namespace CS_Classes
         LongLine_Extend extend = new LongLine_Extend();
         Line_Basics lines = new Line_Basics();
         KNN_NNBasics knn = new KNN_NNBasics();
-        public List<PointPair> bestLines = new List<PointPair>();
+        public List<linePoints> bestLines = new List<linePoints>();
         const int lineCount = 3;
         const int searchCount = 100;
         public Line_PointSlope_CS()
@@ -33587,7 +33587,7 @@ namespace CS_Classes
             }
             knn.Run(empty);
             if (knn.result == null) return;
-            var nextLines = new List<PointPair>();
+            var nextLines = new List<linePoints>();
             var usedBest = new List<int>();
             int index = 0;
             for (int i = 0; i <= knn.result.GetUpperBound(0); i++)
@@ -33600,13 +33600,13 @@ namespace CS_Classes
                 usedBest.Add(index);
                 if (index * knn.options.knnDimension + 4 < knn.trainInput.Count())
                 {
-                    var mps = new PointPair(new Point2f(knn.trainInput[index * knn.options.knnDimension + 0], knn.trainInput[index * knn.options.knnDimension + 1]),
+                    var mps = new linePoints(new Point2f(knn.trainInput[index * knn.options.knnDimension + 0], knn.trainInput[index * knn.options.knnDimension + 1]),
                                             new Point2f(knn.trainInput[index * knn.options.knnDimension + 2], knn.trainInput[index * knn.options.knnDimension + 3]));
                     mps.slope = knn.trainInput[index * knn.options.knnDimension];
                     nextLines.Add(mps);
                 }
             }
-            bestLines = new List<PointPair>(nextLines);
+            bestLines = new List<linePoints>(nextLines);
             foreach (var ptS in bestLines)
             {
                 DrawLine(dst2, ptS.p1, ptS.p2, vbc.task.HighlightColor);
@@ -34023,7 +34023,7 @@ namespace CS_Classes
     public class Line_TimeViewLines_CS : TaskParent
     {
         Line_TimeView lines = new Line_TimeView();
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         public Line_TimeViewLines_CS()
         {
             labels[2] = "Lines from the latest Line_TimeLine";
@@ -34055,10 +34055,10 @@ namespace CS_Classes
 
     public class Line_TimeView_CS : TaskParent
     {
-        public List<List<PointPair>> frameList = new List<List<PointPair>>();
+        public List<List<linePoints>> frameList = new List<List<linePoints>>();
         public Line_Basics lines = new Line_Basics();
         public int pixelcount;
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         public Line_TimeView_CS()
         {
             dst3 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -34068,7 +34068,7 @@ namespace CS_Classes
         {
             lines.Run(src);
             if (vbc.task.optionsChanged) frameList.Clear();
-            var nextMpList = new List<PointPair>(vbc.task.lpList);
+            var nextMpList = new List<linePoints>(vbc.task.lpList);
             frameList.Add(nextMpList);
             dst2 = src;
             dst3.SetTo(0);
@@ -34096,7 +34096,7 @@ namespace CS_Classes
     public class Line_Nearest_CS : TaskParent
     {
         public Point2f pt; // How close is this point to the input line?
-        public PointPair lp = new PointPair(); // the input line.
+        public linePoints lp = new linePoints(); // the input line.
         public Point2f nearPoint;
         public bool onTheLine;
         public float distance;
@@ -34586,19 +34586,19 @@ namespace CS_Classes
     public class LineCoin_Basics_CS : TaskParent
     {
         public LongLine_Basics longLines = new LongLine_Basics();
-        public List<PointPair> lpList = new List<PointPair>();
-        List<List<PointPair>> lpLists = new List<List<PointPair>>();
+        public List<linePoints> lpList = new List<linePoints>();
+        List<List<linePoints>> lpLists = new List<List<linePoints>>();
         public LineCoin_Basics_CS()
         {
             dst2 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
             desc = "Find the coincident lines in the image and measure their value.";
         }
-        public List<PointPair> findLines(List<List<PointPair>> lpLists)
+        public List<linePoints> findLines(List<List<linePoints>> lpLists)
         {
             var p1List = new List<cv.Point>();
             var p2List = new List<cv.Point>();
             var ptCounts = new List<int>();
-            PointPair lp;
+            linePoints lp;
             foreach (var lpList in lpLists)
             {
                 foreach (var mp in lpList)
@@ -34606,7 +34606,7 @@ namespace CS_Classes
                     mp.slope = (int)(mp.slope * 10) / 10;
                     if (mp.slope == 0)
                     {
-                        lp = new PointPair(new cv.Point(mp.p1.X, 0), new cv.Point(mp.p1.X, dst2.Height));
+                        lp = new linePoints(new cv.Point(mp.p1.X, 0), new cv.Point(mp.p1.X, dst2.Height));
                     }
                     else
                     {
@@ -34632,7 +34632,7 @@ namespace CS_Classes
                 if (ptCounts[i] >= vbc.task.frameHistoryCount)
                 {
                     DrawLine(dst2, p1List[i], p2List[i], cv.Scalar.All(255));
-                    lpList.Add(new PointPair(p1List[i], p2List[i]));
+                    lpList.Add(new linePoints(p1List[i], p2List[i]));
                 }
             }
             if (lpLists.Count() >= vbc.task.frameHistoryCount) lpLists.RemoveAt(0);
@@ -34662,8 +34662,8 @@ namespace CS_Classes
     public class LineCoin_HistoryIntercept_CS : TaskParent
     {
         LineCoin_Basics coin = new LineCoin_Basics();
-        public List<PointPair> lpList = new List<PointPair>();
-        List<List<PointPair>> mpLists = new List<List<PointPair>>();
+        public List<linePoints> lpList = new List<linePoints>();
+        List<List<linePoints>> mpLists = new List<List<linePoints>>();
         public LineCoin_HistoryIntercept_CS()
         {
             dst2 = new Mat(dst3.Size(), MatType.CV_8U, cv.Scalar.All(0));
@@ -34696,7 +34696,7 @@ namespace CS_Classes
             coinList.Clear();
             foreach (var cp in parallel.parList)
             {
-                near.lp = new PointPair(cp.p1, cp.p2);
+                near.lp = new linePoints(cp.p1, cp.p2);
                 near.pt = cp.p3;
                 near.Run(empty);
                 double d1 = near.distance;
@@ -34720,21 +34720,21 @@ namespace CS_Classes
     public class LongLine_Basics_CS : TaskParent
     {
         public LongLine_Core lines = new LongLine_Core();
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         Options_LongLine options = new Options_LongLine();
         public LongLine_Basics_CS()
         {
             lines.lineCount = 1000;
             desc = "Identify the longest lines";
         }
-        public PointPair BuildLongLine(PointPair lp)
+        public linePoints BuildLongLine(linePoints lp)
         {
             if (lp.p1.X != lp.p2.X)
             {
                 double b = lp.p1.Y - lp.p1.X * lp.slope;
                 if (lp.p1.Y == lp.p2.Y)
                 {
-                    return new PointPair(new cv.Point(0, lp.p1.Y), new cv.Point(dst2.Width, lp.p1.Y));
+                    return new linePoints(new cv.Point(0, lp.p1.Y), new cv.Point(dst2.Width, lp.p1.Y));
                 }
                 else
                 {
@@ -34747,10 +34747,10 @@ namespace CS_Classes
                     if (xint2 >= 0 && xint2 <= dst2.Width) points.Add(new cv.Point(xint2, dst2.Height));
                     if (yint1 >= 0 && yint1 <= dst2.Height) points.Add(new cv.Point(0, yint1));
                     if (yint2 >= 0 && yint2 <= dst2.Height) points.Add(new cv.Point(dst2.Width, yint2));
-                    return new PointPair(points[0], points[1]);
+                    return new linePoints(points[0], points[1]);
                 }
             }
-            return new PointPair(new cv.Point(lp.p1.X, 0), new cv.Point(lp.p1.X, dst2.Height));
+            return new linePoints(new cv.Point(lp.p1.X, 0), new cv.Point(lp.p1.X, dst2.Height));
         }
         public void RunAlg(Mat src)
         {
@@ -34760,9 +34760,9 @@ namespace CS_Classes
             lpList.Clear();
             foreach (var lp in lines.lpList)
             {
-                PointPair lpTmp = BuildLongLine(lp);
+                linePoints lpTmp = BuildLongLine(lp);
                 DrawLine(dst2, lpTmp.p1, lpTmp.p2, Scalar.White);
-                if (lpTmp.p1.X > lpTmp.p2.X) lpTmp = new PointPair(lpTmp.p2, lpTmp.p1);
+                if (lpTmp.p1.X > lpTmp.p2.X) lpTmp = new linePoints(lpTmp.p2, lpTmp.p1);
                 lpList.Add(lpTmp);
                 if (lpList.Count() >= options.maxCount) break;
             }
@@ -34777,7 +34777,7 @@ namespace CS_Classes
     {
         public Line_Basics lines = new Line_Basics();
         public int lineCount = 1; // How many of the longest lines...
-        public List<PointPair> lpList = new List<PointPair>(); // this will be sorted by length - longest first
+        public List<linePoints> lpList = new List<linePoints>(); // this will be sorted by length - longest first
         public LongLine_Core_CS()
         {
             desc = "Isolate the longest X lines.";
@@ -34847,7 +34847,7 @@ namespace CS_Classes
     public class LongLine_Consistent_CS : TaskParent
     {
         LongLine_Core longest = new LongLine_Core();
-        public PointPair ptLong;
+        public linePoints ptLong;
         public LongLine_Consistent_CS()
         {
             longest.lineCount = 4;
@@ -34860,7 +34860,7 @@ namespace CS_Classes
             if (longest.lpList.Count() == 0) return;
             if (ptLong == null) ptLong = longest.lpList[0];
             var minDistance = float.MaxValue;
-            PointPair lpMin = null;
+            linePoints lpMin = null;
             foreach (var lp in longest.lpList)
             {
                 var distance = lp.p1.DistanceTo(ptLong.p1) + lp.p2.DistanceTo(ptLong.p2);
@@ -34950,7 +34950,7 @@ namespace CS_Classes
         public LongLine_ExtendTest_CS()
         {
             labels = new string[] { "", "", "Random Line drawn", "" };
-            desc = "Test PointPair constructor with random values to make sure lines are extended properly";
+            desc = "Test linePoints constructor with random values to make sure lines are extended properly";
         }
         public void RunAlg(Mat src)
         {
@@ -34958,7 +34958,7 @@ namespace CS_Classes
             {
                 var p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
                 var p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
-                var mps = new PointPair(p1, p2);
+                var mps = new linePoints(p1, p2);
                 var emps = longLine.BuildLongLine(mps);
                 dst2 = src;
                 DrawLine(dst2, emps.p1, emps.p2, vbc.task.HighlightColor);
@@ -34974,7 +34974,7 @@ namespace CS_Classes
     public class LongLine_ExtendAll_CS : TaskParent
     {
         public Line_Basics lines = new Line_Basics();
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         public LongLine_ExtendAll_CS()
         {
             labels = new string[] { "", "", "Image output from Line_Basics", "The extended line for each line found in Line_Basics" };
@@ -35096,7 +35096,7 @@ namespace CS_Classes
                 saveP1 = p1;
                 saveP2 = p2;
             }
-            var mps = new PointPair(p1, p2);
+            var mps = new linePoints(p1, p2);
             var emps = lines.BuildLongLine(mps);
             if (standaloneTest())
             {
@@ -35134,8 +35134,8 @@ namespace CS_Classes
     public class LongLine_History_CS : TaskParent
     {
         LongLine_Basics lines = new LongLine_Basics();
-        public List<PointPair> lpList = new List<PointPair>();
-        List<List<PointPair>> lpListList = new List<List<PointPair>>();
+        public List<linePoints> lpList = new List<linePoints>();
+        List<List<linePoints>> lpListList = new List<List<linePoints>>();
         public LongLine_History_CS()
         {
             desc = "Find the longest lines and toss any that are intermittant.";
@@ -35145,7 +35145,7 @@ namespace CS_Classes
             lines.Run(src);
             dst2 = lines.dst2;
             lpListList.Add(lines.lpList);
-            var tmplist = new List<PointPair>();
+            var tmplist = new List<linePoints>();
             var lpCount = new List<int>();
             foreach (var list in lpListList)
             {
@@ -36219,7 +36219,7 @@ namespace CS_Classes
     {
         KNN_N4Basics knn = new KNN_N4Basics();
         Line_Basics lines = new Line_Basics();
-        List<PointPair> lastPt = new List<PointPair>();
+        List<linePoints> lastPt = new List<linePoints>();
         public Match_Lines_CS()
         {
             labels[2] = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected.";
@@ -36229,7 +36229,7 @@ namespace CS_Classes
         {
             lines.Run(src);
             dst2 = lines.dst2;
-            if (vbc.task.firstPass) lastPt = new List<PointPair>(vbc.task.lpList);
+            if (vbc.task.firstPass) lastPt = new List<linePoints>(vbc.task.lpList);
             knn.queries.Clear();
             foreach (var lp in vbc.task.lpList)
             {
@@ -36250,7 +36250,7 @@ namespace CS_Classes
                 }
             }
             knn.trainInput = new List<Vec4f>(knn.queries);
-            lastPt = new List<PointPair>(vbc.task.lpList);
+            lastPt = new List<linePoints>(vbc.task.lpList);
         }
     }
 
@@ -36767,10 +36767,10 @@ namespace CS_Classes
     public class MatchLine_Basics_CS : TaskParent
     {
         public Match_Basics match = new Match_Basics();
-        public PointPair lpInput = new PointPair();
-        public PointPair lpOutput;
+        public linePoints lpInput = new linePoints();
+        public linePoints lpOutput;
         public int corner1, corner2;
-        PointPair lpSave = new PointPair();
+        linePoints lpSave = new linePoints();
         KNN_ClosestTracker knn = new KNN_ClosestTracker();
         public MatchLine_Basics_CS()
         {
@@ -36799,7 +36799,7 @@ namespace CS_Classes
                 if (standalone)
                 {
                     knn.Run(src.Clone());
-                    lpInput = new PointPair(knn.lastPair.p1, knn.lastPair.p2);
+                    lpInput = new linePoints(knn.lastPair.p1, knn.lastPair.p2);
                 }
                 var r = ValidateRect(new cv.Rect(
                     (int)Math.Min(lpInput.p1.X, lpInput.p2.X),
@@ -36838,7 +36838,7 @@ namespace CS_Classes
                 var p1 = cornerToPoint(corner1, match.matchRect);
                 var p2 = cornerToPoint(corner2, match.matchRect);
                 DrawLine(dst2, p1, p2, vbc.task.HighlightColor, vbc.task.lineWidth + 2);
-                lpOutput = new PointPair(p1, p2);
+                lpOutput = new linePoints(p1, p2);
             }
             labels[2] = "Longest line end points had correlation of " + match.correlation.ToString(vbc.fmt3) + " with the original longest line.";
         }
@@ -36858,7 +36858,7 @@ namespace CS_Classes
         public void RunAlg(Mat src)
         {
             knn.Run(src.Clone());
-            matchLine.lpInput = new PointPair(knn.lastPair.p1, knn.lastPair.p2);
+            matchLine.lpInput = new linePoints(knn.lastPair.p1, knn.lastPair.p2);
             matchLine.Run(src);
             dst2 = matchLine.dst2;
             DrawLine(dst2, matchLine.lpOutput.p1, matchLine.lpOutput.p2, Scalar.Red);
@@ -53695,7 +53695,7 @@ namespace CS_Classes
             rotate.Run(src);
             dst2 = rotate.dst2.Clone();
             dst1 = dst2.Clone();
-            PointPair horizonVec = new PointPair(vbc.task.horizonVec.p1, vbc.task.horizonVec.p2);
+            linePoints horizonVec = new linePoints(vbc.task.horizonVec.p1, vbc.task.horizonVec.p2);
             horizonVec.p1 = RotatePoint(vbc.task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle);
             horizonVec.p2 = RotatePoint(vbc.task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle);
             DrawLine(dst2, horizonVec.p1, horizonVec.p2, vbc.task.HighlightColor);
@@ -57548,7 +57548,7 @@ namespace CS_Classes
     {
         public KNN_Basics knn = new KNN_Basics();
         Feature_Stable feat = new Feature_Stable();
-        public List<PointPair> lpList = new List<PointPair>();
+        public List<linePoints> lpList = new List<linePoints>();
         public float distanceAvg;
         public float directionAvg;
         public float distanceMax;
@@ -57608,7 +57608,7 @@ namespace CS_Classes
                 double nextDist = pt.DistanceTo(ptNew);
                 DrawLine(dst2, pt, ptNew, Scalar.White);
                 disList.Add((float)nextDist);
-                lpList.Add(new PointPair(pt, ptNew));
+                lpList.Add(new linePoints(pt, ptNew));
                 if (nextDist > 0)
                 {
                     if (pt.Y != ptNew.Y)

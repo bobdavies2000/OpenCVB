@@ -8,9 +8,9 @@ Imports OpenCvSharp
 
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Public lpMap As New cvb.Mat
-    Public lp As PointPair
+    Public lp As linePoints
 
     Public gridSize As Integer
     Public gridRows As Integer
@@ -157,8 +157,8 @@ Public Class VBtask : Implements IDisposable
 
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
-    Public gravityVec As New PointPair
-    Public horizonVec As New PointPair
+    Public gravityVec As New linePoints
+    Public horizonVec As New linePoints
 
     Public IMU_RawAcceleration As cvb.Point3f
     Public IMU_Acceleration As cvb.Point3f

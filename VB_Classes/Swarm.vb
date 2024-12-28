@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Public distanceAvg As Single
     Public directionAvg As Single
     Public distanceMax As Single
@@ -60,7 +60,7 @@ Public Class Swarm_Basics : Inherits TaskParent
             Dim nextDist = pt.DistanceTo(ptNew)
             DrawLine(dst2, pt, ptNew, white)
             disList.Add(nextDist)
-            lpList.Add(New PointPair(pt, ptNew))
+            lpList.Add(New linePoints(pt, ptNew))
             If nextDist > 0 Then
                 If pt.Y <> ptNew.Y Then
                     Dim nextDirection = Math.Atan((pt.X - ptNew.X) / (pt.Y - ptNew.Y))

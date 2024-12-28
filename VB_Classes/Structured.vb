@@ -1455,7 +1455,7 @@ End Class
 
 Public Class Structured_LinesX : Inherits TaskParent
     Public lines As New Line_Basics
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         desc = "Find the lines in the X-direction of the Structured_Basics output"
@@ -1468,7 +1468,7 @@ Public Class Structured_LinesX : Inherits TaskParent
         End If
 
         lines.Run(src)
-        lpList = New List(Of PointPair)(task.lpList)
+        lpList = New List(Of linePoints)(task.lpList)
 
         dst2.SetTo(0)
         For Each lp In lpList
@@ -1483,7 +1483,7 @@ End Class
 
 Public Class Structured_LinesY : Inherits TaskParent
     Public lines As New Line_Basics
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         desc = "Find the lines in the Y-direction of the Structured_Basics output"
@@ -1496,7 +1496,7 @@ Public Class Structured_LinesY : Inherits TaskParent
         End If
 
         lines.Run(src)
-        lpList = New List(Of PointPair)(task.lpList)
+        lpList = New List(Of linePoints)(task.lpList)
 
         dst2.SetTo(0)
         For Each lp In lpList

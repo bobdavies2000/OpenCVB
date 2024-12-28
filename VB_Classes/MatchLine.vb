@@ -1,10 +1,10 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class MatchLine_Basics : Inherits TaskParent
     Public match As New Match_Basics
-    Public lpInput As New PointPair
-    Public lpOutput As PointPair
+    Public lpInput As New linePoints
+    Public lpOutput As linePoints
     Public corner1 As Integer, corner2 As Integer
-    Dim lpSave As New PointPair
+    Dim lpSave As New linePoints
     Dim knn As New KNN_ClosestTracker
     Public Sub New()
         desc = "Find and track a line in the BGR image."
@@ -28,7 +28,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
             lpSave = lpInput
             If standalone Then
                 knn.Run(src.Clone)
-                lpInput = New PointPair(knn.lastPair.p1, knn.lastPair.p2)
+                lpInput = New linePoints(knn.lastPair.p1, knn.lastPair.p2)
             End If
 
             Dim r = ValidateRect(New cvb.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
@@ -59,7 +59,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
             Dim p1 = cornerToPoint(corner1, match.matchRect)
             Dim p2 = cornerToPoint(corner2, match.matchRect)
             dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 2, task.lineType)
-            lpOutput = New PointPair(p1, p2)
+            lpOutput = New linePoints(p1, p2)
         End If
         labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
     End Sub
@@ -77,7 +77,7 @@ Public Class MatchLine_Longest : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         knn.Run(src.Clone)
-        matchLine.lpInput = New PointPair(knn.lastPair.p1, knn.lastPair.p2)
+        matchLine.lpInput = New linePoints(knn.lastPair.p1, knn.lastPair.p2)
 
         matchLine.Run(src)
         dst2 = matchLine.dst2

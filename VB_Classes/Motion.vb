@@ -737,7 +737,7 @@ End Class
 
 
 Public Class Motion_CenterRect : Inherits TaskParent
-    Dim gravitySnap As New PointPair
+    Dim gravitySnap As New linePoints
     Public template As cvb.Mat
     Dim options As New Options_Features
     Dim correlation As Single
@@ -777,7 +777,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
         dst3 = dst3.Normalize(0, 255, cvb.NormTypes.MinMax).Resize(dst2.Size)
         DrawCircle(dst3, matchCenter, task.DotSize, cvb.Scalar.Black)
 
-        Dim smp = New PointPair(gravitySnap.p1, gravitySnap.p2)
+        Dim smp = New linePoints(gravitySnap.p1, gravitySnap.p2)
         dst2.Line(smp.p1, smp.p2, task.HighlightColor, task.lineWidth + 2, task.lineType)
 
         Dim xDisp = matchCenter.X - dst2.Width / 2
@@ -911,7 +911,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
     Dim motion As New Motion_CenterRect
     Dim vertRect As cvb.Rect
     Dim options As New Options_Threshold
-    Public mp As PointPair
+    Public mp As linePoints
     Public angle As Single
     Public rotatedRect As cvb.RotatedRect
     Public Sub New()
@@ -953,8 +953,8 @@ Public Class Motion_CenterRotation : Inherits TaskParent
             Dim topPoint = tmp.Get(Of cvb.Point)(0, 0)
             Dim botPoint = tmp.Get(Of cvb.Point)(tmp.Rows - 1, 0)
 
-            Dim pair = New PointPair(topPoint, botPoint)
-            mp = New PointPair(pair.xp1, pair.xp2)
+            Dim pair = New linePoints(topPoint, botPoint)
+            mp = New linePoints(pair.xp1, pair.xp2)
             dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
 
             Dim sideAdjacent = dst2.Height

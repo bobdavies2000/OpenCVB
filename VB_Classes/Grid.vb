@@ -419,7 +419,7 @@ End Class
 
 
 Public Class Grid_MinMaxDepth : Inherits TaskParent
-    Public minMaxLocs(0) As PointPair
+    Public minMaxLocs(0) As linePoints
     Public minMaxVals(0) As cvb.Vec2f
     Public Sub New()
         task.gOptions.setGridSize(8)
@@ -433,7 +433,7 @@ Public Class Grid_MinMaxDepth : Inherits TaskParent
         For i = 0 To minMaxLocs.Count - 1
             Dim roi = task.gridRects(i)
             task.pcSplit(2)(roi).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(roi))
-            minMaxLocs(i) = New PointPair(mm.minLoc, mm.maxLoc)
+            minMaxLocs(i) = New linePoints(mm.minLoc, mm.maxLoc)
             minMaxVals(i) = New cvb.Vec2f(mm.minVal, mm.maxVal)
         Next
 

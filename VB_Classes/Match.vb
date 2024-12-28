@@ -256,7 +256,7 @@ Public Class Match_Lines : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = lines.dst2
-        Static lastPt As New List(Of PointPair)(task.lpList)
+        Static lastPt As New List(Of linePoints)(task.lpList)
 
         knn.queries.Clear()
         For Each lp In task.lpList
@@ -279,7 +279,7 @@ Public Class Match_Lines : Inherits TaskParent
         Next
 
         knn.trainInput = New List(Of cvb.Vec4f)(knn.queries)
-        lastPt = New List(Of PointPair)(task.lpList)
+        lastPt = New List(Of linePoints)(task.lpList)
     End Sub
 End Class
 

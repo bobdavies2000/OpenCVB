@@ -490,7 +490,7 @@ End Class
 
 Public Class BackProject_LineSide : Inherits TaskParent
     Dim line As New Line_ViewSide
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Public Sub New()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Backproject the lines found in the side view."
@@ -691,7 +691,7 @@ Public Class BackProject_MaskLines : Inherits TaskParent
         Static saveHistIndex As Integer = masks.histIndex
         If masks.histIndex <> saveHistIndex Then
             lines.Run(src)
-            task.lpList = New List(Of PointPair)(task.lpList)
+            task.lpList = New List(Of linePoints)(task.lpList)
             dst1.SetTo(0)
         End If
 

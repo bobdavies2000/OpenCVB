@@ -249,7 +249,7 @@ End Class
 
 
 
-Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
+Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
     Public center As cvb.Point2f
     Public colorIndex As Integer
     Public p1 As cvb.Point2f
@@ -338,7 +338,7 @@ Public Class PointPair ' LineSegmentPoint in OpenCV does not use Point2f so this
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
         Return (p1, p2)
     End Function
-    Public Function compare(mp As PointPair) As Boolean
+    Public Function compare(mp As linePoints) As Boolean
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function
@@ -436,12 +436,12 @@ Public Class fPolyData
         prevPoly = New List(Of cvb.Point2f)(currPoly)
         jitterCheck.SetTo(0)
     End Sub
-    Public Function prevmp() As PointPair
-        Return New PointPair(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+    Public Function prevmp() As linePoints
+        Return New linePoints(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
-    Public Function currmp() As PointPair
+    Public Function currmp() As linePoints
         If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
-        Return New PointPair(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+        Return New linePoints(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
     Public Sub DrawPolys(dst As cvb.Mat, currPoly As List(Of cvb.Point2f), parent As Object)
         parent.DrawFPoly(dst, prevPoly, cvb.Scalar.White)

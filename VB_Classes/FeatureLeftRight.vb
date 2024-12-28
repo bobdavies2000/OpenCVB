@@ -1,7 +1,7 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class FeatureLeftRight_Basics : Inherits TaskParent
     Dim prep As New FeatureLeftRight_LeftRightPrep
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Public mpCorrelation As New List(Of Single)
     Public selectedPoint As cvb.Point, mpIndex
     Dim ClickPoint As cvb.Point, picTag As Integer
@@ -29,10 +29,10 @@ Public Class FeatureLeftRight_Basics : Inherits TaskParent
         dst3 = task.rightView.Clone
         prep.Run(src)
 
-        Dim prepList As New List(Of PointPair)
+        Dim prepList As New List(Of linePoints)
         For Each p1 In prep.leftFeatures
             For Each p2 In prep.rightFeatures
-                If p1.Y = p2.Y Then prepList.Add(New PointPair(p1, p2))
+                If p1.Y = p2.Y Then prepList.Add(New linePoints(p1, p2))
             Next
         Next
 
@@ -42,7 +42,7 @@ Public Class FeatureLeftRight_Basics : Inherits TaskParent
         For i = 0 To prepList.Count - 1
             Dim lpBase = prepList(i)
             Dim correlations As New List(Of Single)
-            Dim tmpList As New List(Of PointPair)
+            Dim tmpList As New List(Of linePoints)
 
             For j = i To prepList.Count - 1
                 Dim lp = prepList(j)
@@ -81,7 +81,7 @@ Public Class FeatureLeftRight_Basics : Inherits TaskParent
             knn.queries.Clear()
             knn.queries.Add(task.ClickPoint)
 
-            Dim lp As PointPair
+            Dim lp As linePoints
             knn.trainInput.Clear()
             For Each lp In lpList
                 Dim pt = If(picTag = 2, lp.p1, lp.p2)
@@ -186,7 +186,7 @@ End Class
 Public Class FeatureLeftRight_Input : Inherits TaskParent
     Dim ptLeft As New List(Of cvb.Point)
     Dim ptRight As New List(Of cvb.Point)
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Public mpCorrelation As New List(Of Single)
     Public selectedPoint As cvb.Point, mpIndex
     Dim ClickPoint As cvb.Point, picTag As Integer
@@ -215,10 +215,10 @@ Public Class FeatureLeftRight_Input : Inherits TaskParent
 
         options.RunOpt()
 
-        Dim prepList As New List(Of PointPair)
+        Dim prepList As New List(Of linePoints)
         For Each p1 In ptLeft
             For Each p2 In ptRight
-                If p1.Y = p2.Y Then prepList.Add(New PointPair(p1, p2))
+                If p1.Y = p2.Y Then prepList.Add(New linePoints(p1, p2))
             Next
         Next
 
@@ -228,7 +228,7 @@ Public Class FeatureLeftRight_Input : Inherits TaskParent
         For i = 0 To prepList.Count - 1
             Dim mpBase = prepList(i)
             Dim correlations As New List(Of Single)
-            Dim tmpList As New List(Of PointPair)
+            Dim tmpList As New List(Of linePoints)
 
             For j = i To prepList.Count - 1
                 Dim mp = prepList(j)
@@ -253,8 +253,8 @@ Public Class FeatureLeftRight_Input : Inherits TaskParent
         Next
 
         For Each mp In lpList
-            DrawCircle(dst2,mp.p1, task.DotSize, task.HighlightColor)
-            DrawCircle(dst3,mp.p2, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, mp.p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, mp.p2, task.DotSize, task.HighlightColor)
         Next
 
         If task.mouseClickFlag Then setClickPoint(task.ClickPoint, task.mousePicTag)
@@ -267,7 +267,7 @@ Public Class FeatureLeftRight_Input : Inherits TaskParent
             knn.queries.Clear()
             knn.queries.Add(task.ClickPoint)
 
-            Dim lp As PointPair
+            Dim lp As linePoints
             knn.trainInput.Clear()
             For Each lp In lpList
                 Dim pt = If(picTag = 2, lp.p1, lp.p2)

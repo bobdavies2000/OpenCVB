@@ -236,7 +236,7 @@ Public Class Rotate_Horizon : Inherits TaskParent
         dst2 = rotate.dst2.Clone
         dst1 = dst2.Clone
 
-        Dim horizonVec = New PointPair(task.horizonVec.p1, task.horizonVec.p2)
+        Dim horizonVec = New linePoints(task.horizonVec.p1, task.horizonVec.p2)
 
         horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle)
         horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)

@@ -3,7 +3,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
     Public lines as new Line_Basics
     Public delaunay As New Delaunay_Basics
     Public contours As New Delaunay_Contours
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Dim lineMap As New cvb.Mat
     Public Sub New()
         labels(3) = "White lines are the previous frame.  Red the current."
@@ -27,7 +27,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
             Next
         End If
 
-        Dim newSet As New List(Of PointPair)
+        Dim newSet As New List(Of linePoints)
         For Each lp In lpList
             Dim val = task.motionMask.Get(Of Byte)(lp.center.Y, lp.center.X)
             If val = 0 Then newSet.Add(lp)
@@ -54,7 +54,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
 
         Next
 
-        lpList = New List(Of PointPair)(newSet)
+        lpList = New List(Of linePoints)(newSet)
 
         Dim usedIndex As New List(Of Integer)
         For Each lp In lpList
@@ -90,7 +90,7 @@ End Class
 
 
 Public Class LineTrack_RedCloud : Inherits TaskParent
-    Public lines as new Line_Basics
+    Public lines As New Line_Basics
     Public delaunay As New Delaunay_Basics
     Public Sub New()
         desc = "Track the line regions with RedCloud"
@@ -121,9 +121,9 @@ End Class
 
 
 Public Class LineTrack_Basics1 : Inherits TaskParent
-    Public lines as new Line_Basics
+    Public lines As New Line_Basics
     Public delaunay As New Delaunay_Basics
-    Public lpList As New List(Of PointPair)
+    Public lpList As New List(Of linePoints)
     Dim lineMap As New cvb.Mat
     Public Sub New()
         desc = "Track lines from frame to frame"
@@ -161,7 +161,7 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
             End If
         Next
 
-        lpList = New List(Of PointPair)(task.lpList)
+        lpList = New List(Of linePoints)(task.lpList)
 
         Dim usedIndex As New List(Of Integer)
         For Each lp In lpList
