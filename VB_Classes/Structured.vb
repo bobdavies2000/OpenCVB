@@ -1429,39 +1429,80 @@ End Class
 
 Public Class Structured_Lines : Inherits TaskParent
     Dim struct As New Structured_Basics
-    Public lines as new Line_Basics
-    Public lpListX As New List(Of PointPair)
-    Public lpListY As New List(Of PointPair)
+    Public lineX As New Structured_LinesX
+    Public lineY As New Structured_LinesY
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         desc = "Find the lines in the Structured_Basics output"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         struct.Run(src)
-        lines.Run(struct.dst2)
 
-        lpListX.Clear()
-        For Each lp In task.lpList
-            lpListX.Add(lp)
-        Next
+        lineX.Run(struct.dst2)
+        dst2 = lineX.dst2
+        labels(2) = lineX.labels(2)
+
+        lineY.Run(struct.dst3)
+        dst3 = lineY.dst2
+        labels(3) = lineY.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Structured_LinesX : Inherits TaskParent
+    Public lines As New Line_Basics
+    Public lpList As New List(Of PointPair)
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        desc = "Find the lines in the X-direction of the Structured_Basics output"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static struct As New Structured_Basics
+            struct.Run(src)
+            src = struct.dst2
+        End If
+
+        lines.Run(src)
+        lpList = New List(Of PointPair)(task.lpList)
 
         dst2.SetTo(0)
-        For Each lp In lpListX
+        For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
-        labels(2) = CStr(lpListX.Count) + " lines found in X-direction slices"
+        labels(2) = CStr(lpList.Count) + " lines found in X-direction slices"
+    End Sub
+End Class
 
-        lines.Run(struct.dst3)
-        lpListY.Clear()
-        For Each lp In task.lpList
-            lpListY.Add(lp)
+
+
+
+Public Class Structured_LinesY : Inherits TaskParent
+    Public lines As New Line_Basics
+    Public lpList As New List(Of PointPair)
+    Public Sub New()
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        desc = "Find the lines in the Y-direction of the Structured_Basics output"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        If standalone Then
+            Static struct As New Structured_Basics
+            struct.Run(src)
+            src = struct.dst3
+        End If
+
+        lines.Run(src)
+        lpList = New List(Of PointPair)(task.lpList)
+
+        dst2.SetTo(0)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
-        dst3.SetTo(0)
-        For Each lp In lpListY
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-
-        labels(3) = CStr(lpListY.Count) + " lines found in Y-direction slices"
+        labels(2) = CStr(lpList.Count) + " lines found in Y-direction slices"
     End Sub
 End Class

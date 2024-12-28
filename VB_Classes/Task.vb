@@ -826,7 +826,6 @@ Public Class VBtask : Implements IDisposable
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.paused = False Then
-            task.trueData.Clear()
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             task.firstPass = False
             task.heartBeatLT = False

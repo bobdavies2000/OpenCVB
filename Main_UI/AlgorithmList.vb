@@ -1892,13 +1892,9 @@ End Enum
 	If algorithmName = "Line3D_CandidatesFirstLast" Then return new Line3D_CandidatesFirstLast
 	If algorithmName = "Line3D_CandidatesFirstLast_CS" Then return new Line3D_CandidatesFirstLast_CS
 	If algorithmName = "Line3D_Checks_CS" Then return new Line3D_Checks_CS
-	If algorithmName = "Line3D_Core" Then return new Line3D_Core
 	If algorithmName = "Line3D_Correlation" Then return new Line3D_Correlation
-	If algorithmName = "Line3D_DeltaZ" Then return new Line3D_DeltaZ
-	If algorithmName = "Line3D_DeltaZ1" Then return new Line3D_DeltaZ1
 	If algorithmName = "Line3D_Draw" Then return new Line3D_Draw
 	If algorithmName = "Line3D_Draw_CS" Then return new Line3D_Draw_CS
-	If algorithmName = "Line3D_X" Then return new Line3D_X
 	If algorithmName = "Linear_Basics" Then return new Linear_Basics
 	If algorithmName = "Linear_ImageX" Then return new Linear_ImageX
 	If algorithmName = "Linear_ImageY" Then return new Linear_ImageY
@@ -2366,7 +2362,6 @@ End Enum
 	If algorithmName = "OpenGL_PCLineCandidates" Then return new OpenGL_PCLineCandidates
 	If algorithmName = "OpenGL_PCLineCandidates_CS" Then return new OpenGL_PCLineCandidates_CS
 	If algorithmName = "OpenGL_PClinesAll" Then return new OpenGL_PClinesAll
-	If algorithmName = "OpenGL_PClinesAll_CS" Then return new OpenGL_PClinesAll_CS
 	If algorithmName = "OpenGL_PClinesFirstLast" Then return new OpenGL_PClinesFirstLast
 	If algorithmName = "OpenGL_PClinesFirstLast_CS" Then return new OpenGL_PClinesFirstLast_CS
 	If algorithmName = "OpenGL_PCpoints" Then return new OpenGL_PCpoints
@@ -3391,6 +3386,8 @@ End Enum
 	If algorithmName = "Structured_LinearizeFloor" Then return new Structured_LinearizeFloor
 	If algorithmName = "Structured_LinearizeFloor_CS" Then return new Structured_LinearizeFloor_CS
 	If algorithmName = "Structured_Lines" Then return new Structured_Lines
+	If algorithmName = "Structured_LinesX" Then return new Structured_LinesX
+	If algorithmName = "Structured_LinesY" Then return new Structured_LinesY
 	If algorithmName = "Structured_MouseSlice" Then return new Structured_MouseSlice
 	If algorithmName = "Structured_MouseSlice_CS" Then return new Structured_MouseSlice_CS
 	If algorithmName = "Structured_MultiSlice" Then return new Structured_MultiSlice

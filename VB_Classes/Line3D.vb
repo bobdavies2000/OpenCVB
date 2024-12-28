@@ -1,78 +1,33 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
     Dim sLines As New Structured_Lines
-    Dim lineX As New Line3D_Core
-    Dim lineY As New Line3D_Core
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
         desc = "Find all the lines in 3D using the structured slices through the pointcloud."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         sLines.Run(src)
+
         dst2 = src
-
-        lineX.lpListInput = sLines.lpListX
-        lineX.Run(src)
-        Dim lpListX As New List(Of PointPair)(lineX.lpList)
-
-        lineY.lpListInput = sLines.lpListY
-        lineY.Run(src)
-        Dim lpListY As New List(Of PointPair)(lineY.lpList)
-
         dst3.SetTo(0)
-        For Each lp In lpListY
+        For Each lp In sLines.lineX.lpList
             dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
-        For Each lp In lpListX
+        For Each lp In sLines.lineY.lpList
             dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(lpListX.Count) + " X-direction lines and " +
-                        CStr(lpListY.Count) + " Y-direction lines were identified in 3D."
+            labels(2) = CStr(sLines.lineX.lpList.Count) + " X-direction lines and " +
+                        CStr(sLines.lineY.lpList.Count) + " Y-direction lines were identified in 3D."
             labels(3) = labels(2)
         End If
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Line3D_Core : Inherits TaskParent
-    Public lpListInput As New List(Of PointPair)
-    Public lpList As New List(Of PointPair)
-    Public collect As New Line_Collection
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
-        desc = "Find the lines in the Structured_MultiSlice algorithm output but age them with motion."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        If standalone Then
-            Static slines As New Structured_Lines
-            slines.Run(src)
-            lpListInput = New List(Of PointPair)(slines.lpListX)
-        End If
-
-        collect.lpListInput = lpListInput
-        collect.Run(src)
-
-        dst2.SetTo(0)
-        lpList.Clear()
-        For Each lp In collect.lpListOutput
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            lpList.Add(lp)
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(lpList.Count) + " lines in the structured light."
-        End If
-    End Sub
-End Class
 
 
 
@@ -233,108 +188,3 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
         labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Line3D_X : Inherits TaskParent
-    Dim struct As New Structured_Lines
-    Public lines As New Line_Basics
-    Public lpListX As New List(Of PointPair)
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-        desc = "Find all the lines in the X-Direction structured slices"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        struct.Run(src)
-        lines.Run(struct.dst2)
-        labels(2) = lines.labels(2)
-
-        lpListX.Clear()
-        For Each lp In task.lpList
-            lpListX.Add(lp)
-        Next
-
-        dst2.SetTo(0)
-        For Each lp In lpListX
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line3D_DeltaZ1 : Inherits TaskParent
-    Dim pts As New PointCloud_Basics
-    Public pcLines As New List(Of cvb.Point3f)
-    Public pcLinesMat As cvb.Mat
-    Public actualCount As Integer
-    Dim white32 As New cvb.Point3f(1, 1, 1)
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Identify possible lines in Z by measuring the delta Z in neighboring points."
-    End Sub
-    Private Sub addLines(nextList As List(Of List(Of cvb.Point3f)), xyList As List(Of List(Of cvb.Point)))
-        For i = 0 To nextList.Count - 1
-            For j = 0 To nextList(i).Count - 2
-                pcLines.Add(white32)
-                pcLines.Add(nextList(i)(j))
-                pcLines.Add(nextList(i)(j + 1))
-            Next
-        Next
-
-        For Each ptlist In xyList
-            For i = 0 To ptlist.Count - 2
-                Dim p1 = ptlist(i)
-                Dim p2 = ptlist(i + 1)
-                DrawLine(dst2, p1, p2, white)
-            Next
-        Next
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        pts.Run(src)
-        dst2 = pts.dst2
-
-        pcLines.Clear()
-        addLines(pts.hList, pts.xyHList)
-        addLines(pts.vList, pts.xyVList)
-
-        pcLinesMat = cvb.Mat.FromPixelData(pcLines.Count, 1, cvb.MatType.CV_32FC3, pcLines.ToArray)
-        labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line3D_DeltaZ : Inherits TaskParent
-    Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        desc = "Determine if a pointPair line is actually a line in 3D."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        'Dim r1 = New cvb.Rect(0, 0, dst2.Width - 1, dst2.Height - 1)
-        'Dim r2 = New cvb.Rect(1, 1, dst2.Width - 1, dst2.Height - 1)
-
-        'dst2 = task.pcSplit(2)(r1) - task.pcSplit(2)(r2)
-
-        'pts.Run(src)
-        'dst2 = pts.dst2
-
-        'pcLines.Clear()
-        'addLines(pts.hList, pts.xyHList)
-        'addLines(pts.vList, pts.xyVList)
-
-        'pcLinesMat = cvb.Mat.FromPixelData(pcLines.Count, 1, cvb.MatType.CV_32FC3, pcLines.ToArray)
-        'labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
-    End Sub
-End Class
-
-
-

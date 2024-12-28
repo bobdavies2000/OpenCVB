@@ -42765,30 +42765,6 @@ namespace CS_Classes
 
 
 
-    public class OpenGL_PClinesAll_CS : TaskParent
-    {
-        Line3D_DeltaZ1 lines = new Line3D_DeltaZ1();
-        public OpenGL_PClinesAll_CS()
-        {
-            vbc.task.ogl.oglFunction = (int)oCase.pcLines;
-            vbc.task.OpenGLTitle = "OpenGL_Functions";
-            FindSlider("OpenGL Point Size").Value = 10;
-            desc = "Draw the 3D lines found from the PCpoints";
-        }
-        public void RunAlg(Mat src)
-        {
-            lines.Run(src);
-            dst2 = lines.dst2;
-            vbc.task.ogl.dataInput = lines.pcLinesMat.Rows == 0 ? new Mat() : lines.pcLinesMat;
-            vbc.task.ogl.Run(new Mat());
-            if (vbc.task.gOptions.getOpenGLCapture()) dst3 = vbc.task.ogl.dst3;
-            labels[2] = "OpenGL_PClines found " + (lines.pcLinesMat.Rows / 3).ToString() + " lines";
-        }
-    }
-
-
-
-
     public class OpenGL_PatchHorizontal_CS : TaskParent
     {
         Pixel_NeighborsPatchNeighbors patch = new Pixel_NeighborsPatchNeighbors();

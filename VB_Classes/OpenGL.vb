@@ -1003,33 +1003,6 @@ End Class
 
 
 
-
-Public Class OpenGL_PClinesAll : Inherits TaskParent
-    Dim lines As New Line3D_DeltaZ1
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pcLines
-        task.OpenGLTitle = "OpenGL_Functions"
-        FindSlider("OpenGL Point Size").Value = 10
-        desc = "Draw the 3D lines found from the PCpoints"
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
-
-        If lines.pcLinesMat.Rows = 0 Then task.ogl.dataInput = New cvb.Mat Else task.ogl.dataInput = lines.pcLinesMat
-        task.ogl.Run(New cvb.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = "OpenGL_PClines found " + CStr(lines.pcLinesMat.Rows / 3) + " lines"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class OpenGL_PatchHorizontal : Inherits TaskParent
     Dim patch As New Pixel_NeighborsPatchNeighbors
     Public Sub New()
@@ -2244,5 +2217,31 @@ Public Class OpenGL_StableMinMax : Inherits TaskParent
 
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = minmax.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_PClinesAll : Inherits TaskParent
+    Dim lines As New Line3D_Basics
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.OpenGLTitle = "OpenGL_Functions"
+        task.ogl.pointCloudInput = New cvb.Mat(dst3.Size, cvb.MatType.CV_32FC3, 0)
+        desc = "Draw the 3D lines found from the Line3D_Basics"
+    End Sub
+    Public Sub RunAlg(src As cvb.Mat)
+        lines.Run(src.Clone)
+        dst2 = lines.dst2
+        dst3 = lines.dst3
+        labels(2) = lines.labels(2)
+
+        task.ogl.pointCloudInput.SetTo(0)
+        task.pointCloud.CopyTo(task.ogl.pointCloudInput, lines.dst3)
+
+        task.ogl.Run(src)
     End Sub
 End Class
