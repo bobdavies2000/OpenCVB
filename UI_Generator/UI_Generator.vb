@@ -68,15 +68,16 @@ Module UI_Generator
                 Console.WriteLine("Starting work to generate the user interface.")
             End If
 
-            For Each line In pyFiles
-                If line.Contains("<Compile Include=") = False Then Continue For
-                Dim split = line.Split("""")
-                pythonList.Add(split(1), split(1))
-                srcList.Add(PythonProjFile.DirectoryName + "\" + split(1))
+            ' Enable code here to get python back.
+            'For Each line In pyFiles
+            '    If line.Contains("<Compile Include=") = False Then Continue For
+            '    Dim split = line.Split("""")
+            '    pythonList.Add(split(1), split(1))
+            '    srcList.Add(PythonProjFile.DirectoryName + "\" + split(1))
 
-                If split(1).EndsWith("_PS.py") Then pyStream.Add(split(1), split(1))
-                allList.Add(split(1), split(1))
-            Next
+            '    If split(1).EndsWith("_PS.py") Then pyStream.Add(split(1), split(1))
+            '    allList.Add(split(1), split(1))
+            'Next
             Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
             For Each fn In fileEntries
                 If fn.Contains(".Designer") Then Continue For
@@ -113,9 +114,10 @@ Module UI_Generator
                         If line.EndsWith(" : TaskParent") Then
                             Dim split As String() = Regex.Split(line, "\W+")
                             classname = split(2)
-                            csList.Add(classname, line)
-                            allButPython.Add(classname, line)
-                            allList.Add(classname, line)
+                            ' Enable code here to get C# back.
+                            'csList.Add(classname, line)
+                            'allButPython.Add(classname, line)
+                            'allList.Add(classname, line)
                         End If
                     ElseIf line.StartsWith("class") Then ' C++ Native algorithms
                         If line.Contains(" : public CPP_Parent") Then
@@ -182,7 +184,8 @@ Module UI_Generator
             sw.WriteLine("End Enum")
 
             sw.WriteLine(vbTab + "Public Function createAlgorithm(algorithmName as string) as Object")
-            sw.WriteLine(vbTab + "If algorithmName.endsWith("".py"") then return new Python_Run()")
+            ' Enable code here to get python back.
+            'sw.WriteLine(vbTab + "If algorithmName.endsWith("".py"") then return new Python_Run()")
             For Each nextName In allList.Keys
                 If nextName.StartsWith("CPP_Basics") Or nextName.StartsWith("cpp_Task") Then Continue For
                 If nextName.EndsWith(".py") Then Continue For
@@ -332,15 +335,15 @@ Module UI_Generator
             'Next
             'sw.WriteLine()
 
-            For Each alg In allList.Keys
-                If alg.EndsWith("_CS") Then ccList.Add(alg, alg)
-            Next
+            'For Each alg In allList.Keys
+            '    If alg.EndsWith("_CS") Then ccList.Add(alg, alg)
+            'Next
 
-            sw.Write("(" + CStr(csList.Count) + ") < All C# >")
-            For Each alg In csList.Keys
-                If alg.EndsWith("_CS") Then sw.Write("," + alg)
-            Next
-            sw.WriteLine()
+            'sw.Write("(" + CStr(csList.Count) + ") < All C# >")
+            'For Each alg In csList.Keys
+            '    If alg.EndsWith("_CS") Then sw.Write("," + alg)
+            'Next
+            'sw.WriteLine()
 
             'sw.Write("(" + CStr(cppList.Count) + ") < All C++ >")
             'For Each alg In cppList.Keys
@@ -354,23 +357,23 @@ Module UI_Generator
             Next
             sw.WriteLine()
 
-            sw.Write("(" + CStr(pyStream.Count) + ") < All PyStream >")
-            For Each alg In pyStream.Keys
-                sw.Write("," + alg)
-            Next
-            sw.WriteLine()
+            'sw.Write("(" + CStr(pyStream.Count) + ") < All PyStream >")
+            'For Each alg In pyStream.Keys
+            '    sw.Write("," + alg)
+            'Next
+            'sw.WriteLine()
 
-            sw.Write("(" + CStr(pythonList.Count) + ") < All Python >")
-            For Each alg In pythonList.Keys
-                sw.Write("," + alg)
-            Next
-            sw.WriteLine()
+            'sw.Write("(" + CStr(pythonList.Count) + ") < All Python >")
+            'For Each alg In pythonList.Keys
+            '    sw.Write("," + alg)
+            'Next
+            'sw.WriteLine()
 
-            sw.Write("(" + CStr(vbList.Count) + ") < All VB.Net >")
-            For Each alg In vbList.Keys
-                sw.Write("," + alg)
-            Next
-            sw.WriteLine()
+            'sw.Write("(" + CStr(vbList.Count) + ") < All VB.Net >")
+            'For Each alg In vbList.Keys
+            '    sw.Write("," + alg)
+            'Next
+            'sw.WriteLine()
 
             For i = 0 To sortedXRefs.Count - 1
                 sw.WriteLine(sortedXRefs(i))

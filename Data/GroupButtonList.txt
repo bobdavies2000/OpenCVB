@@ -233,11 +233,9 @@ Transform
 TransformationMatrix
 Triangle
 Vector
-VectorMagnitude
 Video
 Vignetting
 Volume
-Voronoi
 WarpAffine
 WarpModel
 WarpPerspective
