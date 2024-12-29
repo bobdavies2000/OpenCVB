@@ -1839,6 +1839,7 @@ End Enum
 	If algorithmName = "Line_Collection" Then return new Line_Collection
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
 	If algorithmName = "Line_ColorClass_CS" Then return new Line_ColorClass_CS
+	If algorithmName = "Line_Detector" Then return new Line_Detector
 	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
 	If algorithmName = "Line_DisplayInfoOld_CS" Then return new Line_DisplayInfoOld_CS
 	If algorithmName = "Line_FromContours" Then return new Line_FromContours
@@ -1871,7 +1872,6 @@ End Enum
 	If algorithmName = "Line_PointSlope_CS" Then return new Line_PointSlope_CS
 	If algorithmName = "Line_Rects" Then return new Line_Rects
 	If algorithmName = "Line_RegionsVB" Then return new Line_RegionsVB
-	If algorithmName = "Line_SubsetRect" Then return new Line_SubsetRect
 	If algorithmName = "Line_SubsetRect_CS" Then return new Line_SubsetRect_CS
 	If algorithmName = "Line_TimeView" Then return new Line_TimeView
 	If algorithmName = "Line_TimeView_CS" Then return new Line_TimeView_CS

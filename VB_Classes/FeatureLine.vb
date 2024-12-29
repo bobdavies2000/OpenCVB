@@ -1,6 +1,6 @@
 ﻿Imports cvb = OpenCvSharp
 Public Class FeatureLine_Basics : Inherits TaskParent
-    Dim lines As New Line_SubsetRect
+    Dim lines As New Line_Detector
     Dim lineDisp As New Line_DisplayInfoOld
     Dim options As New Options_Features
     Dim match As New Match_tCell
@@ -28,7 +28,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
                 SetTrueText("No lines found.", 3)
                 Exit Sub
             End If
-            Dim lp = lines.sortByLen.ElementAt(0).Value
+            Dim lp = lines.lpList(0)
 
             tcells(0) = match.createCell(src, 0, lp.p1)
             tcells(1) = match.createCell(src, 0, lp.p2)

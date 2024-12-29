@@ -18424,7 +18424,7 @@ namespace CS_Classes
 
     public class FeatureLine_Basics_CS : TaskParent
     {
-        Line_SubsetRect lines = new Line_SubsetRect();
+        Line_Detector lines = new Line_Detector();
         Line_DisplayInfoOld lineDisp = new Line_DisplayInfoOld();
         Options_Features options = new Options_Features();
         Match_tCell match = new Match_tCell();
@@ -18454,7 +18454,7 @@ namespace CS_Classes
                     SetTrueText("No lines found.", 3);
                     return;
                 }
-                var lp = lines.sortByLen.ElementAt(0).Value;
+                var lp = lines.lpList[0];
                 tcells[0] = match.createCell(src, 0, lp.p1);
                 tcells[1] = match.createCell(src, 0, lp.p2);
             }
