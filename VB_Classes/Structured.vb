@@ -1444,6 +1444,9 @@ Public Class Structured_Lines : Inherits TaskParent
         lineY.Run(struct.dst3)
         dst3 = lineY.dst2
         labels(3) = lineY.labels(2)
+
+        task.lpList = New List(Of linePoints)(lineX.lpList)
+        task.lpList.AddRange(lineY.lpList)
     End Sub
 End Class
 

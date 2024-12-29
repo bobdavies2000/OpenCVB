@@ -445,3 +445,42 @@ static void drawPointCloud()
 	}
 	glEnd();
 }
+
+
+
+void SaveWindowPosition(HWND hwnd) 
+{
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof(WINDOWPLACEMENT);
+	GetWindowPlacement(hwnd, &wp);
+
+	HKEY hKey;
+	if (RegCreateKeyEx(HKEY_CURRENT_USER, L"OpenCVB\\OpenGLtask\\WindowPlacement", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
+		RegSetValueEx(hKey, L"Placement", 0, REG_BINARY, (const BYTE*)&wp, sizeof(WINDOWPLACEMENT));
+		RegCloseKey(hKey);
+	}
+}
+
+
+
+void LoadWindowPosition(HWND hwnd) {
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof(WINDOWPLACEMENT);
+
+	HKEY hKey;
+	if (RegOpenKeyEx(HKEY_CURRENT_USER, L"OpenCVB\\OpenGLtask\\WindowPlacement", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+		DWORD dwSize = sizeof(WINDOWPLACEMENT);
+		if (RegQueryValueEx(hKey, L"Placement", NULL, NULL, (LPBYTE)&wp, &dwSize) == ERROR_SUCCESS) {
+			// Check if the saved position is valid (e.g., on a visible monitor)
+			if (wp.rcNormalPosition.left >= GetSystemMetrics(SM_XVIRTUALSCREEN) &&
+				wp.rcNormalPosition.top >= GetSystemMetrics(SM_YVIRTUALSCREEN) &&
+				wp.rcNormalPosition.right <= GetSystemMetrics(SM_XVIRTUALSCREEN) + GetSystemMetrics(SM_CXVIRTUALSCREEN) &&
+				wp.rcNormalPosition.bottom <= GetSystemMetrics(SM_YVIRTUALSCREEN) + GetSystemMetrics(SM_CYVIRTUALSCREEN)) {
+
+				wp.flags = 0; // Ensure the window is not minimized or maximized
+				SetWindowPlacement(hwnd, &wp);
+			}
+		}
+		RegCloseKey(hKey);
+	}
+}

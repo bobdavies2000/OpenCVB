@@ -4,6 +4,7 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
+Imports OpenCvSharp
 
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
@@ -75,13 +76,6 @@ Public Class OpenGL_Basics : Inherits TaskParent
         memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize)
 
         task.openGLPipe.WaitForConnection()
-
-        While (1)
-            task.openGL_hwnd = FindWindow(Nothing, task.OpenGLTitle)
-            If task.openGL_hwnd Then Exit While
-        End While
-        task.oglRect = New cvb.Rect(task.OpenGL_Left, task.OpenGL_Top, windowWidth, windowHeight)
-        MoveWindow(task.openGL_hwnd, task.OpenGL_Left, task.OpenGL_Top, task.oglRect.Width, task.oglRect.Height, True)
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         If standaloneTest() Then pointCloudInput = task.pointCloud
@@ -2242,7 +2236,6 @@ Public Class OpenGL_VerticalSingle : Inherits TaskParent
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(task.color)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -2253,7 +2246,7 @@ End Class
 
 
 Public Class OpenGL_DrawLines3D : Inherits TaskParent
-    Dim lines As New Line3D_Basics
+    Dim lines As New Structured_Lines
     Public Sub New()
         task.ogl.oglFunction = oCase.drawLines
         desc = "Draw all the lines found with Line3D_Basics"
@@ -2263,13 +2256,22 @@ Public Class OpenGL_DrawLines3D : Inherits TaskParent
         dst2 = lines.dst2
         dst3 = lines.dst3
 
-        'Dim pt1 = task.lines
-        'Dim pt2 = lines.pt2
-        'Dim linePairs3D As New List(Of cvb.Point3f)({New cvb.Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2), New cvb.Point3f(pt1.X, pt2.Y, pt1.Z)})
-        'task.ogl.dataInput = cvb.Mat.FromPixelData(linePairs3D.Count, 1, cvb.MatType.CV_32FC3, linePairs3D.ToArray)
+        Dim linePairs3D As New List(Of cvb.Point3f)
+        For Each lp In task.lpList
+            If lp.pc1.Z > 0 And lp.pc2.Z > 0 Then
+                If lp.vertical Then
+                    lp.pc2.X = lp.pc1.X
+                    lp.pc2.Z = lp.pc1.Z
+                Else
+                    lp.pc2.Y = lp.pc1.Y
+                End If
+                linePairs3D.Add(lp.pc1)
+                linePairs3D.Add(lp.pc2)
+            End If
+        Next
+        task.ogl.dataInput = cvb.Mat.FromPixelData(linePairs3D.Count, 1, cvb.MatType.CV_32FC3,
+                                                   linePairs3D.ToArray)
 
-        'task.ogl.pointCloudInput = task.pointCloud
-        'task.ogl.Run(task.color)
-        'If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        task.ogl.Run(task.color)
     End Sub
 End Class

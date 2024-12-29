@@ -267,6 +267,10 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
     Public mmPerPixel As Single
     Public xp1 As cvb.Point2f ' intercept points at the edges of the image.
     Public xp2 As cvb.Point2f
+    Public vertical As Boolean
+    Public horizontal As Boolean
+    Public pc1 As cvb.Point3f
+    Public pc2 As cvb.Point3f
     Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
         p1 = _p1
         p2 = _p2
@@ -276,6 +280,17 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
         End If
         p1 = New cvb.Point2f(CInt(p1.X), CInt(p1.Y))
         p2 = New cvb.Point2f(CInt(p2.X), CInt(p2.Y))
+        If p1.X < 0 Then p1.X = 0
+        If p2.X < 0 Then p2.X = 0
+        If p1.X >= task.pointCloud.Width Then p1.X = task.pointCloud.Width - 1
+        If p2.X >= task.pointCloud.Width Then p2.X = task.pointCloud.Width - 1
+        If p1.Y < 0 Then p1.Y = 0
+        If p2.Y < 0 Then p2.Y = 0
+        If p1.Y >= task.pointCloud.Height Then p1.Y = task.pointCloud.Height - 1
+        If p2.Y >= task.pointCloud.Height Then p2.Y = task.pointCloud.Height - 1
+
+        pc1 = task.pointCloud.Get(Of cvb.Point3f)(p1.Y, p1.X)
+        pc2 = task.pointCloud.Get(Of cvb.Point3f)(p2.Y, p2.X)
 
         center = New cvb.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
@@ -316,6 +331,12 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
             xp2.Y = 0
         End If
         colorIndex = -1
+
+        If Math.Abs(p1.X - p2.X) < Math.Abs(p1.Y - p2.Y) Then
+            vertical = True
+        Else
+            horizontal = True
+        End If
     End Sub
     Sub New()
         p1 = New cvb.Point2f()
