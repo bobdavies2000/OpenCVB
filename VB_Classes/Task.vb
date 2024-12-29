@@ -780,8 +780,9 @@ Public Class VBtask : Implements IDisposable
             Dim mask = task.pcSplit(1).InRange(-100, 100)
             task.pcSplit(1).SetTo(0, Not mask)
         End If
-        task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary).
-                                         ConvertScaleAbs()
+
+        task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        task.depthMask = task.depthMask.ConvertScaleAbs()
 
         task.noDepthMask = Not task.depthMask
 

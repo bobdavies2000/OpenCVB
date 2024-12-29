@@ -77,6 +77,7 @@ Public Class TaskParent : Implements IDisposable
             End If
         Next
 
+        ' the _CPP algorithms are old but still used for performance.
         If task.algName.StartsWith("_CPP") Then
             callTrace.Clear()
             algorithm_ms.Clear()
