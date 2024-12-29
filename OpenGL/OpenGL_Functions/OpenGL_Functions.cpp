@@ -475,9 +475,12 @@ int main(int argc, char* argv[])
 				// draw lines provided in the data buffer
 				glLineWidth(50.0);
 				glBegin(GL_LINES);
-				for (int i = 0; i < pairCount; i += 6)
+				int lineCount = (int)(data[0]);
+				for (int i = 1; i < lineCount; i += 9)
 				{
-					glColor3f(1, 1, 1); glVertex3fv(&data[i]); glVertex3fv(&data[i + 3]);
+					glColor3f(data[i], data[i+1], data[i+2]); 
+					glVertex3fv(&data[i+3]); 
+					glVertex3fv(&data[i+6]);
 				}
 				glEnd();
 				break;

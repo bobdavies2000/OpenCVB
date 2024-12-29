@@ -228,6 +228,7 @@ Public Class VBtask : Implements IDisposable
     Public pixelViewerOn As Boolean
 
     Public scalarColors(255) As cvb.Scalar
+    Public oglColors(255) As cvb.Scalar
     Public vecColors(255) As cvb.Vec3b
 
     Public topCameraPoint As cvb.Point
@@ -346,7 +347,12 @@ Public Class VBtask : Implements IDisposable
         For i = 0 To task.vecColors.Length - 1
             rand.NextBytes(bgr)
             task.vecColors(i) = New cvb.Vec3b(bgr(0), bgr(1), bgr(2))
-            task.scalarColors(i) = New cvb.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+            task.scalarColors(i) = New cvb.Scalar(task.vecColors(i)(0),
+                                                  task.vecColors(i)(1),
+                                                  task.vecColors(i)(2))
+            task.oglColors(i) = New cvb.Scalar(task.vecColors(i)(0) / 255,
+                                               task.vecColors(i)(1) / 255,
+                                               task.vecColors(i)(2) / 255)
         Next
     End Sub
     Private Sub VBTaskTimerPop(sender As Object, e As EventArgs)

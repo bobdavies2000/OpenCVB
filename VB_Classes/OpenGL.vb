@@ -90,13 +90,17 @@ Public Class OpenGL_Basics : Inherits TaskParent
         End If
 
         If dataInput.Width > 0 Then
-            If dataBuffer.Length <> dataInput.Total * dataInput.ElemSize Then ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
+            If dataBuffer.Length <> dataInput.Total * dataInput.ElemSize Then
+                ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
+            End If
         Else
             ReDim dataBuffer(0)
         End If
 
         If pointCloudInput.Width > 0 Then
-            If pointCloudBuffer.Length <> pointCloudInput.Total * pointCloudInput.ElemSize Then ReDim pointCloudBuffer(pointCloudInput.Total * pointCloudInput.ElemSize - 1)
+            If pointCloudBuffer.Length <> pointCloudInput.Total * pointCloudInput.ElemSize Then
+                ReDim pointCloudBuffer(pointCloudInput.Total * pointCloudInput.ElemSize - 1)
+            End If
         End If
 
         If memMapPtr = 0 Then
@@ -117,7 +121,7 @@ Public Class OpenGL_Basics : Inherits TaskParent
 
         Try
             If src.Width > 0 Then task.openGLPipe.Write(rgbBuffer, 0, rgbBuffer.Length)
-            If dataInput.Width > 0 Then task.openGLPipe.Write(dataBuffer, 0, dataBuffer.Length)
+            If dataInput.Width > 0 Then task.openGLPipe.Write(dataBuffer, 0, dataBuffer.Length - 1)
             If pointCloudInput.Width > 0 Then task.openGLPipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
 
             Dim buff = System.Text.Encoding.UTF8.GetBytes(task.OpenGLTitle)
@@ -2256,7 +2260,9 @@ Public Class OpenGL_DrawLines3D : Inherits TaskParent
         dst2 = lines.dst2
         dst3 = lines.dst3
 
-        Dim linePairs3D As New List(Of cvb.Point3f)
+        Dim vec(8) As Single
+        Dim lineData As New List(Of Single)
+        lineData.Add(0) ' fill this in below
         For Each lp In task.lpList
             If lp.pc1.Z > 0 And lp.pc2.Z > 0 Then
                 If lp.vertical Then
@@ -2265,12 +2271,16 @@ Public Class OpenGL_DrawLines3D : Inherits TaskParent
                 Else
                     lp.pc2.Y = lp.pc1.Y
                 End If
-                linePairs3D.Add(lp.pc1)
-                linePairs3D.Add(lp.pc2)
+                Dim c = task.oglColors(lp.colorIndex)
+                vec = {c(0), c(1), c(2), lp.pc1.X, lp.pc1.Y, lp.pc1.Z, lp.pc2.X, lp.pc2.Y, lp.pc2.Z}
+                For i = 0 To vec.length - 1
+                    lineData.Add(vec(i))
+                Next
             End If
         Next
-        task.ogl.dataInput = cvb.Mat.FromPixelData(linePairs3D.Count, 1, cvb.MatType.CV_32FC3,
-                                                   linePairs3D.ToArray)
+        lineData(0) = lineData.Count
+        task.ogl.dataInput = cvb.Mat.FromPixelData(lineData.Count, 1, cvb.MatType.CV_32F,
+                                                   lineData.ToArray)
 
         task.ogl.Run(task.color)
     End Sub

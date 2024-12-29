@@ -18,6 +18,7 @@ Public Module vbc
     Public algorithmNames As New List(Of String)
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
+    Public msRNG As New System.Random
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj
@@ -245,127 +246,6 @@ Public Class fpData ' feature point
         nabeList = New List(Of Integer)
     End Sub
 End Class
-
-
-
-
-Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
-    Public center As cvb.Point2f
-    Public colorIndex As Integer
-    Public p1 As cvb.Point2f
-    Public p2 As cvb.Point2f
-    Public slope As Single
-    Public yIntercept As Single
-    Public xIntercept As Single
-    Public rect As cvb.Rect
-    Public mask As New cvb.Mat
-    Public length As Single
-    Public index As Integer
-    Public mmX As New mmData
-    Public mmY As New mmData
-    Public mmZ As New mmData
-    Public mmPerPixel As Single
-    Public xp1 As cvb.Point2f ' intercept points at the edges of the image.
-    Public xp2 As cvb.Point2f
-    Public vertical As Boolean
-    Public horizontal As Boolean
-    Public pc1 As cvb.Point3f
-    Public pc2 As cvb.Point3f
-    Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
-        p1 = _p1
-        p2 = _p2
-        If p1.X > p2.X Then
-            p1 = _p2
-            p2 = _p1
-        End If
-        p1 = New cvb.Point2f(CInt(p1.X), CInt(p1.Y))
-        p2 = New cvb.Point2f(CInt(p2.X), CInt(p2.Y))
-        If p1.X < 0 Then p1.X = 0
-        If p2.X < 0 Then p2.X = 0
-        If p1.X >= task.pointCloud.Width Then p1.X = task.pointCloud.Width - 1
-        If p2.X >= task.pointCloud.Width Then p2.X = task.pointCloud.Width - 1
-        If p1.Y < 0 Then p1.Y = 0
-        If p2.Y < 0 Then p2.Y = 0
-        If p1.Y >= task.pointCloud.Height Then p1.Y = task.pointCloud.Height - 1
-        If p2.Y >= task.pointCloud.Height Then p2.Y = task.pointCloud.Height - 1
-
-        pc1 = task.pointCloud.Get(Of cvb.Point3f)(p1.Y, p1.X)
-        pc2 = task.pointCloud.Get(Of cvb.Point3f)(p2.Y, p2.X)
-
-        center = New cvb.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-
-        rect = New cvb.Rect(p1.X, p1.Y, Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
-        If p1.Y > p2.Y Then rect = New cvb.Rect(p1.X, p2.Y, rect.Width, rect.Height)
-        If rect.Width < 2 Then rect.Width = 2
-        If rect.Height < 2 Then rect.Height = 2
-
-        If p1.X = p2.X Then
-            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
-        Else
-            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
-        End If
-        yIntercept = p1.Y - slope * p1.X
-
-        length = p1.DistanceTo(p2)
-
-        ' compute the edge to edge line - might be useful...
-        Dim w = task.cols, h = task.rows
-        xp1 = New cvb.Point2f(0, yIntercept)
-        xp2 = New cvb.Point2f(w, w * slope + yIntercept)
-        xIntercept = -yIntercept / slope
-        If xp1.Y > h Then
-            xp1.X = (h - yIntercept) / slope
-            xp1.Y = h
-        End If
-        If xp1.Y < 0 Then
-            xp1.X = xIntercept
-            xp1.Y = 0
-        End If
-
-        If xp2.Y > h Then
-            xp2.X = (h - yIntercept) / slope
-            xp2.Y = h
-        End If
-        If xp2.Y < 0 Then
-            xp2.X = xIntercept
-            xp2.Y = 0
-        End If
-        colorIndex = -1
-
-        If Math.Abs(p1.X - p2.X) < Math.Abs(p1.Y - p2.Y) Then
-            vertical = True
-        Else
-            horizontal = True
-        End If
-    End Sub
-    Sub New()
-        p1 = New cvb.Point2f()
-        p2 = New cvb.Point2f()
-    End Sub
-    Public Function perpendicularPoints(pt As cvb.Point2f, distance As Integer) As (cvb.Point2f, cvb.Point2f)
-        Dim perpSlope = -1 / slope
-        Dim angleRadians As Double = Math.Atan(perpSlope)
-        Dim xShift = distance * Math.Cos(angleRadians)
-        Dim yShift = distance * Math.Sin(angleRadians)
-        Dim p1 = New cvb.Point2f(pt.X + xShift, pt.Y + yShift)
-        Dim p2 = New cvb.Point2f(pt.X - xShift, pt.Y - yShift)
-        If p1.X < 0 Then p1.X = 0
-        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
-        If p1.Y < 0 Then p1.Y = 0
-        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
-        If p2.X < 0 Then p2.X = 0
-        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
-        If p2.Y < 0 Then p2.Y = 0
-        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-        Return (p1, p2)
-    End Function
-    Public Function compare(mp As linePoints) As Boolean
-        If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
-        Return False
-    End Function
-End Class
-
-
 
 
 
@@ -611,3 +491,116 @@ Public Enum gifTypes
     openCVBwindow = 4
     openGLwindow = 5
 End Enum
+
+
+
+Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
+    Public center As cvb.Point2f
+    Public colorIndex As Integer
+    Public p1 As cvb.Point2f
+    Public p2 As cvb.Point2f
+    Public slope As Single
+    Public yIntercept As Single
+    Public xIntercept As Single
+    Public rect As cvb.Rect
+    Public mask As New cvb.Mat
+    Public length As Single
+    Public index As Integer
+    Public mmX As New mmData
+    Public mmY As New mmData
+    Public mmZ As New mmData
+    Public mmPerPixel As Single
+    Public xp1 As cvb.Point2f ' intercept points at the edges of the image.
+    Public xp2 As cvb.Point2f
+    Public vertical As Boolean
+    Public pc1 As cvb.Point3f
+    Public pc2 As cvb.Point3f
+    Sub New(_p1 As cvb.Point2f, _p2 As cvb.Point2f)
+        p1 = _p1
+        p2 = _p2
+        If p1.X > p2.X Then
+            p1 = _p2
+            p2 = _p1
+        End If
+        p1 = New cvb.Point2f(CInt(p1.X), CInt(p1.Y))
+        p2 = New cvb.Point2f(CInt(p2.X), CInt(p2.Y))
+        If p1.X < 0 Then p1.X = 0
+        If p2.X < 0 Then p2.X = 0
+        If p1.X >= task.pointCloud.Width Then p1.X = task.pointCloud.Width - 1
+        If p2.X >= task.pointCloud.Width Then p2.X = task.pointCloud.Width - 1
+        If p1.Y < 0 Then p1.Y = 0
+        If p2.Y < 0 Then p2.Y = 0
+        If p1.Y >= task.pointCloud.Height Then p1.Y = task.pointCloud.Height - 1
+        If p2.Y >= task.pointCloud.Height Then p2.Y = task.pointCloud.Height - 1
+
+        pc1 = task.pointCloud.Get(Of cvb.Point3f)(p1.Y, p1.X)
+        pc2 = task.pointCloud.Get(Of cvb.Point3f)(p2.Y, p2.X)
+
+        center = New cvb.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+
+        rect = New cvb.Rect(p1.X, p1.Y, Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
+        If p1.Y > p2.Y Then rect = New cvb.Rect(p1.X, p2.Y, rect.Width, rect.Height)
+        If rect.Width < 2 Then rect.Width = 2
+        If rect.Height < 2 Then rect.Height = 2
+
+        If p1.X = p2.X Then
+            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+        Else
+            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
+        End If
+        yIntercept = p1.Y - slope * p1.X
+
+        length = p1.DistanceTo(p2)
+
+        ' compute the edge to edge line - might be useful...
+        Dim w = task.cols, h = task.rows
+        xp1 = New cvb.Point2f(0, yIntercept)
+        xp2 = New cvb.Point2f(w, w * slope + yIntercept)
+        xIntercept = -yIntercept / slope
+        If xp1.Y > h Then
+            xp1.X = (h - yIntercept) / slope
+            xp1.Y = h
+        End If
+        If xp1.Y < 0 Then
+            xp1.X = xIntercept
+            xp1.Y = 0
+        End If
+
+        If xp2.Y > h Then
+            xp2.X = (h - yIntercept) / slope
+            xp2.Y = h
+        End If
+        If xp2.Y < 0 Then
+            xp2.X = xIntercept
+            xp2.Y = 0
+        End If
+
+        vertical = Math.Abs(p1.X - p2.X) < Math.Abs(p1.Y - p2.Y)
+        colorIndex = msRNG.Next(0, 255)
+    End Sub
+    Sub New()
+        p1 = New cvb.Point2f()
+        p2 = New cvb.Point2f()
+    End Sub
+    Public Function perpendicularPoints(pt As cvb.Point2f, distance As Integer) As (cvb.Point2f, cvb.Point2f)
+        Dim perpSlope = -1 / slope
+        Dim angleRadians As Double = Math.Atan(perpSlope)
+        Dim xShift = distance * Math.Cos(angleRadians)
+        Dim yShift = distance * Math.Sin(angleRadians)
+        Dim p1 = New cvb.Point2f(pt.X + xShift, pt.Y + yShift)
+        Dim p2 = New cvb.Point2f(pt.X - xShift, pt.Y - yShift)
+        If p1.X < 0 Then p1.X = 0
+        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
+        If p1.Y < 0 Then p1.Y = 0
+        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
+        If p2.X < 0 Then p2.X = 0
+        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
+        If p2.Y < 0 Then p2.Y = 0
+        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
+        Return (p1, p2)
+    End Function
+    Public Function compare(mp As linePoints) As Boolean
+        If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
+        Return False
+    End Function
+End Class
