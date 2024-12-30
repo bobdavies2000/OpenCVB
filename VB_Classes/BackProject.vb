@@ -72,7 +72,7 @@ Public Class BackProject_Full : Inherits TaskParent
         cvb.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)
 
         dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 

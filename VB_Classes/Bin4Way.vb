@@ -691,7 +691,7 @@ Public Class Bin4Way_Regions : Inherits TaskParent
         dst2.SetTo(3, binary.mats.mat(2))
         dst2.SetTo(4, binary.mats.mat(3))
 
-        dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
+        If standaloneTest() Then dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
     End Sub
 End Class
 

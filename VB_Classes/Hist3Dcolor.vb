@@ -27,7 +27,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
         End If
 
         cvb.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
 
         labels(2) = simK.labels(2)
         labels(3) = "Backprojection of " + CStr(classCount) + " histogram entries."

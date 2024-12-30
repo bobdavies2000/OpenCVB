@@ -1,6 +1,7 @@
 Imports cvb = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Dim lines As New Line_Detector
+    Dim options As New Options_Line
     Public Sub New()
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
         task.lpMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
@@ -8,6 +9,8 @@ Public Class Line_Basics : Inherits TaskParent
         desc = "Collect lines across frames using the motion mask."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
+        options.RunOpt()
+
         lines.Run(src)
         dst2 = lines.dst2
         If task.lpList.Count = 0 Then task.lpList = New List(Of linePoints)(lines.lpList)

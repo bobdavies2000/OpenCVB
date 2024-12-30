@@ -40,7 +40,7 @@ Public Class KMeans_Basics : Inherits TaskParent
         saveLabels = dst2.Clone
 
         dst2.Reshape(1, src.Height).ConvertTo(dst2, cvb.MatType.CV_8U)
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(2) = "KMeans labels 0-" + CStr(classCount - 1) + " spread out across 255 values."
     End Sub
 End Class

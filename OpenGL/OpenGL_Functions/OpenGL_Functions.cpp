@@ -270,29 +270,7 @@ int main(int argc, char* argv[])
 				glEnd();
 				break;
 			}
-			case 9: // oglFunction = 9  oCase.drawCell (not drawCells!)
-			{
-				glDisable(GL_TEXTURE_2D);
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				glEnable(GL_BLEND);
-				glMatrixMode(GL_TEXTURE);
-				glEnable(GL_TEXTURE_2D);
 
-				glColor4f(1, 1, 1, 1);
-				glBindTexture(GL_TEXTURE_2D, tBuffer.get_gl_handle());
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-				glBegin(GL_POLYGON);
-				for (int i = 0; i < dataCount; i++)
-				{
-					glVertex3fv((GLfloat*)&dataBuff[i]);
-				}
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-				glDisable(GL_BLEND);
-				break;
-			}
 			case 10: // oglFunction = 10  oCase.drawCells
 			{
 				glDisable(GL_TEXTURE_2D);

@@ -299,7 +299,7 @@ Public Class BackProject2D_Full : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         backP.Run(src)
         dst2 = backP.dst0
-        dst3 = backP.dst3
+        If standaloneTest() Then dst3 = backP.dst3
         classCount = backP.classCount
         labels = backP.labels
     End Sub

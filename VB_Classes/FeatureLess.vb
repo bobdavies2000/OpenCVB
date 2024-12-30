@@ -4,12 +4,15 @@ Public Class FeatureLess_Basics : Inherits TaskParent
     Public classCount As Integer = 2
     Public Sub New()
         labels = {"", "", "EdgeDraw_Basics output", ""}
+        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        labels(2) = "CV_8UC1 output of EdgeDraw_Basics - only 0 and 1"
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        dst3 = task.motionMask
         edges.Run(src)
-        edges.dst2.CopyTo(dst2, task.motionMask)
+        dst2.SetTo(0)
+        dst2.SetTo(1, edges.dst2)
+        If standaloneTest() Then dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
     End Sub
 End Class
 

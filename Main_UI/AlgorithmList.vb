@@ -1265,7 +1265,6 @@ End Enum
 	If algorithmName = "OpenGL_Contours" Then return new OpenGL_Contours
 	If algorithmName = "OpenGL_Density2D" Then return new OpenGL_Density2D
 	If algorithmName = "OpenGL_DrawCube" Then return new OpenGL_DrawCube
-	If algorithmName = "OpenGL_DrawHull" Then return new OpenGL_DrawHull
 	If algorithmName = "OpenGL_DrawHulls" Then return new OpenGL_DrawHulls
 	If algorithmName = "OpenGL_DrawLines3D" Then return new OpenGL_DrawLines3D
 	If algorithmName = "OpenGL_Duster" Then return new OpenGL_Duster

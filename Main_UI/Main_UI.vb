@@ -112,6 +112,7 @@ Public Class Main_UI
     Dim arrowIndex As Integer
 
     Public treeViewRequest As String
+    Public treeViewRefresh As Boolean
     Dim pixelViewerRect As cvb.Rect
     Dim pixelViewerOn As Boolean
     Dim pixelViewTag As Integer
@@ -483,7 +484,7 @@ Public Class Main_UI
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         TreeButton.Checked = Not TreeButton.Checked
         settings.treeButton = TreeButton.Checked
-        If TreeViewDialog Is Nothing Then TreeViewDialog = New TreeviewForm
+        TreeViewDialog = New TreeviewForm
         If TreeButton.Checked Then
             TreeViewDialog.Show()
             TreeViewDialog.Left = settings.treeLocation.Item0
@@ -1156,7 +1157,9 @@ Public Class Main_UI
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
         If TreeViewDialog IsNot Nothing Then
-            If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
+            If TreeViewDialog.TreeView1.IsDisposed Then
+                TreeButton.CheckState = CheckState.Unchecked
+            End If
         End If
 
         If pauseAlgorithmThread = False Then
@@ -1701,6 +1704,7 @@ Public Class Main_UI
                 Dim updatedDrawRect = task.drawRect
 
                 Dim optionsChange = task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
+
                 picLabels = task.labels
                 motionLabel = task.MotionLabel
 
@@ -1768,7 +1772,11 @@ Public Class Main_UI
                 End If
 
                 If task.fpsRate = 0 Then task.fpsRate = 1
-                If frameCount Mod task.fpsRate = 0 Then
+
+                treeViewRefresh = task.intermediateRefresh
+                task.intermediateRefresh = False
+
+                If frameCount Mod task.fpsRate = 0 Or treeViewRefresh Then
                     SyncLock callTraceLock
                         callTrace = New List(Of String)(task.callTraceMain)
                         algorithm_ms = New List(Of Single)(task.algorithm_msMain)

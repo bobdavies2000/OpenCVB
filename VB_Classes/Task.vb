@@ -66,6 +66,7 @@ Public Class VBtask : Implements IDisposable
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
     Public cols As Integer
+    Public workingRes As cvb.Size
     Public TaskTimer As New System.Timers.Timer(1000)
 
     Public dst0 As cvb.Mat
@@ -126,7 +127,6 @@ Public Class VBtask : Implements IDisposable
 
     Public openGL_hwnd As IntPtr
     Public openGLPipe As NamedPipeServerStream
-    Public pipeCount As Integer
 
     Public gifCreator As Gif_OpenCVB
     Public gifImages As New List(Of Bitmap)
@@ -224,6 +224,7 @@ Public Class VBtask : Implements IDisposable
     Public advice As String = ""
     Public intermediateName As String
     Public intermediateObject As TaskParent
+    Public intermediateRefresh As Boolean
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
 
@@ -401,6 +402,7 @@ Public Class VBtask : Implements IDisposable
         displayRes = parms.displayRes
         rows = parms.workingRes.Height
         cols = parms.workingRes.Width
+        workingRes = parms.workingRes
         task.optionsChanged = True
 
         dst0 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
@@ -518,7 +520,7 @@ Public Class VBtask : Implements IDisposable
             If task.redCells.Count > 1 Then task.rc = task.redCells(1)
         End If
     End Sub
-    Private Function checkIntermediateResults(lookupName As String) As TaskParent
+    Private Function findIntermediateObject(lookupName As String) As TaskParent
         If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
         For Each obj In task.activeObjects
             If obj.traceName = lookupName And task.firstPass = False Then Return obj
@@ -553,7 +555,7 @@ Public Class VBtask : Implements IDisposable
             dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
 
             Dim lookupName = task.intermediateName
-            Dim obj = checkIntermediateResults(lookupName)
+            Dim obj = findIntermediateObject(lookupName)
             If obj IsNot Nothing Then task.intermediateObject = obj
 
             If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(trueData)

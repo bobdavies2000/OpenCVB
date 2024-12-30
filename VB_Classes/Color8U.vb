@@ -11,6 +11,7 @@ Public Class Color8U_Basics : Inherits TaskParent
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         Dim index = task.redOptions.colorInputIndex
+        Static lastClassifier As String
         If task.optionsChanged Or classifier Is Nothing Then
             Select Case index
                 Case 0
@@ -35,6 +36,8 @@ Public Class Color8U_Basics : Inherits TaskParent
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New PCA_NColor_CPP_VB
             End Select
             classifier = colorMethods(index)
+            If task.firstPass = False Then replaceIntermediateObject(lastClassifier, classifier)
+            lastClassifier = classifier.traceName
         End If
 
         If task.redOptions.colorInputName = "BackProject2D_Full" Then
@@ -51,8 +54,9 @@ Public Class Color8U_Basics : Inherits TaskParent
         dst2 = classifier.dst2
         classCount = classifier.classCount
 
-        dst3 = classifier.dst3
-        labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
+        dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
+        labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
+                    " pixel classifications"
     End Sub
 End Class
 

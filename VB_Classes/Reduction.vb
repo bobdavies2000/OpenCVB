@@ -26,7 +26,7 @@ Public Class Reduction_Basics : Inherits TaskParent
             labels(2) = "No reduction requested"
         End If
 
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class

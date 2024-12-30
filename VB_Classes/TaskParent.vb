@@ -77,15 +77,15 @@ Public Class TaskParent : Implements IDisposable
             callTrace.Add("CPP_Basics\")
         End If
 
+        dst0 = New cvb.Mat(task.workingRes, cvb.MatType.CV_8UC3, 0)
+        dst1 = New cvb.Mat(task.workingRes, cvb.MatType.CV_8UC3, 0)
+        dst2 = New cvb.Mat(task.workingRes, cvb.MatType.CV_8UC3, 0)
+        dst3 = New cvb.Mat(task.workingRes, cvb.MatType.CV_8UC3, 0)
+
         standalone = traceName = task.algName
         If traceName = "Python_Run" Then standalone = True
         If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
         If callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
-
-        dst0 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-        dst1 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-        dst2 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         task.activeObjects.Add(Me)
 
         If task.recordTimings Then
@@ -115,6 +115,21 @@ Public Class TaskParent : Implements IDisposable
                 algorithmStack.Push(3)
             End If
         End If
+    End Sub
+    Public Sub replaceIntermediateObject(lookupName As String, obj As Object)
+        For i = 0 To task.activeObjects.Count - 1
+            If obj.traceName = lookupName Then
+                task.activeObjects(i) = obj
+                Exit For
+            End If
+        Next
+        For i = 0 To callTrace.Count - 1
+            If callTrace(i).EndsWith(lookupName + "\") Then
+                callTrace(i) = callTrace(i).Replace(lookupName, obj.traceName)
+                Exit For
+            End If
+        Next
+        task.intermediateRefresh = True
     End Sub
     Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cvb.Rect) As Bitmap
         Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)

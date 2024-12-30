@@ -4,8 +4,6 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
-Imports OpenCvSharp
-
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim startInfo As New ProcessStartInfo
@@ -53,12 +51,12 @@ Public Class OpenGL_Basics : Inherits TaskParent
         memMapWriter.WriteArray(Of Double)(0, memMap, 0, memMap.Length)
     End Sub
     Private Sub StartOpenGLWindow()
-        task.pipeName = "OpenCVBImages" + CStr(task.pipeCount)
+        task.pipeName = "OpenCVBImages" + CStr(pipeCount)
         Try
             task.openGLPipe = New NamedPipeServerStream(task.pipeName, PipeDirection.InOut, 1)
         Catch ex As Exception
         End Try
-        task.pipeCount += 1
+        pipeCount += 1
 
         Dim memMap = memMapFill()
         Dim memMapbufferSize = 8 * memMap.Length
@@ -143,6 +141,11 @@ Public Class OpenGL_Basics : Inherits TaskParent
 End Class
 
 
+
+
+Module pipeData
+    Public pipeCount As Integer
+End Module
 
 
 
@@ -699,46 +702,6 @@ Public Class OpenGL_PeakFlat : Inherits TaskParent
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
-
-
-
-
-
-
-Public Class OpenGL_DrawHull : Inherits TaskParent
-    Dim hulls As New RedCloud_Hulls
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawCell
-        task.OpenGLTitle = "OpenGL_Functions"
-        labels = {"", "", "RedCloud output", ""}
-        desc = "Select a cell and display its hull in OpenGL as a polygon."
-    End Sub
-    Public Sub RunAlg(src As cvb.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst2
-        Dim oglData As New List(Of cvb.Point3f)
-
-        Dim rc = task.rc
-        Dim hull As New List(Of cvb.Point3f)
-        If rc.hull IsNot Nothing Then
-            For Each pt In rc.hull
-                hull.Add(task.pointCloud(rc.rect).Get(Of cvb.Point3f)(pt.Y, pt.X))
-            Next
-
-            For i = 0 To hull.Count - 1 Step 3
-                oglData.Add(hull(i Mod hull.Count))
-                oglData.Add(hull((i + 1) Mod hull.Count))
-                oglData.Add(hull((i + 2) Mod hull.Count))
-            Next
-        End If
-
-        task.ogl.dataInput = cvb.Mat.FromPixelData(oglData.Count, 1, cvb.MatType.CV_32FC3, oglData.ToArray)
-        task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
 
 
 
@@ -1866,13 +1829,13 @@ Public Class OpenGL_ColorReduced3D : Inherits TaskParent
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.redOptions.ColorSource.SelectedItem = "LUT_Basics"
         FindSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
         color8U.Run(src)
         dst2 = color8U.dst3
-        If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
         dst2.ConvertTo(dst1, cvb.MatType.CV_32FC3)
         labels(2) = "There are " + CStr(color8U.classCount) + " classes for " + task.redOptions.colorInputName
         dst1 = dst1.Normalize(0, 1, cvb.NormTypes.MinMax)

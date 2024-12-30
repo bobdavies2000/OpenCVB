@@ -895,7 +895,7 @@ Public Class PCA_NColor_CPP_VB : Inherits TaskParent
         custom.colorMap = cvb.Mat.FromPixelData(256, 1, cvb.MatType.CV_8UC3, palettize.palette)
 
         custom.Run(dst2)
-        dst3 = custom.dst2
+        If standaloneTest() Then dst3 = custom.dst2
         labels(2) = "The CV_8U image is below.  Values range from 0 to " + CStr(classCount)
         labels(3) = "The upper left image is mapped to " + CStr(classCount) + " colors below.  "
     End Sub

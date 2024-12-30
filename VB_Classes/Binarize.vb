@@ -212,7 +212,7 @@ Public Class Binarize_DepthTiers : Inherits TaskParent
         tiers.Run(src)
 
         dst2 = tiers.dst2 + binar4.dst2
-        dst3 = tiers.dst3
+        If standaloneTest() Then dst3 = tiers.dst3
 
         classCount = binar4.classCount + tiers.classCount
     End Sub
