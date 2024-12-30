@@ -417,7 +417,6 @@ Public Class VBtask : Implements IDisposable
         allOptions = New OptionsContainer
         allOptions.Show()
 
-        callTrace.Add("Options_XYRanges") ' so calltrace is not nothing on initial call...
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
         task.redMap = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
@@ -442,13 +441,6 @@ Public Class VBtask : Implements IDisposable
         ogl = New OpenGL_Basics
         drawRotatedRect = New Draw_RotatedRect
         centerRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
-
-        callTrace.Clear()
-        task.callTraceMain.Clear()
-        task.algorithm_msMain.Clear()
-        task.algorithmNamesMain.Clear()
-        callTrace.Add(algName + "\")
-        activeObjects.Clear()
 
         If task.advice = "" Then
             task.advice = "No advice for " + algName + " yet." + vbCrLf +
@@ -561,9 +553,8 @@ Public Class VBtask : Implements IDisposable
             dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
 
             Dim lookupName = task.intermediateName
-            If lookupName = "" Then lookupName = task.algName
             Dim obj = checkIntermediateResults(lookupName)
-            If task.intermediateName <> "" Then task.intermediateObject = obj
+            If obj IsNot Nothing Then task.intermediateObject = obj
 
             If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(trueData)
 
@@ -575,11 +566,13 @@ Public Class VBtask : Implements IDisposable
                 dst3 = If(dst3.Type = cvb.MatType.CV_8UC3, dst3, Check8uC3(dst3))
                 task.labels = labels
             Else
-                dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, Check8uC3(obj.dst2))
-                dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, Check8uC3(obj.dst3))
-                task.labels = obj.labels
-                task.trueData = New List(Of TrueText)(trueData)
-                If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
+                If obj IsNot Nothing Then
+                    dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, Check8uC3(obj.dst2))
+                    dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, Check8uC3(obj.dst3))
+                    task.labels = obj.labels
+                    task.trueData = New List(Of TrueText)(trueData)
+                    If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
+                End If
             End If
 
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()

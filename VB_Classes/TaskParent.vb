@@ -47,22 +47,14 @@ Public Class TaskParent : Implements IDisposable
     Public primaryAlg As Boolean
 
     Public term As New cvb.TermCriteria(cvb.CriteriaTypes.Eps + cvb.CriteriaTypes.Count, 10, 1.0)
-
-    Dim callStack = ""
-    Public Enum FeatureSrc
-        GoodFeaturesFull = 0
-        GoodFeaturesGrid = 1
-        Agast = 2
-        BRISK = 3
-        Harris = 4
-        FAST = 5
-    End Enum
     Public Sub New()
         VB_Algorithm = Me
         traceName = Me.GetType.Name
+        If callTrace.Count = 0 Then callTrace.Add(task.algName + "\")
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
+        Dim callStack = ""
         For i = 0 To lines.Count - 1
             lines(i) = Trim(lines(i))
             Dim offset = InStr(lines(i), "VB_Classes.")
@@ -85,10 +77,10 @@ Public Class TaskParent : Implements IDisposable
             callTrace.Add("CPP_Basics\")
         End If
 
-        standalone = callTrace(0) = traceName + "\" ' only the first is standalone (the primary algorithm.)
+        standalone = traceName = task.algName
         If traceName = "Python_Run" Then standalone = True
         If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
-        If standalone = False And callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
+        If callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
 
         dst0 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
         dst1 = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
@@ -829,4 +821,12 @@ Public Class TaskParent : Implements IDisposable
         End If
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
+    Public Enum FeatureSrc
+        GoodFeaturesFull = 0
+        GoodFeaturesGrid = 1
+        Agast = 2
+        BRISK = 3
+        Harris = 4
+        FAST = 5
+    End Enum
 End Class

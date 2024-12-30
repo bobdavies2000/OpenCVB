@@ -6,10 +6,7 @@ Public Class TreeviewForm
     Dim treeData As New List(Of String)
     Dim moduleList As New List(Of String) ' the list of all active algorithms.
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
-        Me.TreeViewTimer.Enabled = False
-        Dim algorithm = e.Node.Text
-        Dim split = e.Node.Text.Split(" ")
-        Main_UI.intermediateReview = split(0)
+        Main_UI.treeViewRequest = e.Node.Text
     End Sub
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
@@ -79,7 +76,7 @@ Public Class TreeviewForm
         For Each sn In Main_UI.callTrace
             If sn = "" Then Exit For
             Dim split() = sn.Split("\")
-            treeData.Add(split(split.Length - 2))
+            If split.Length > 1 Then treeData.Add(split(split.Length - 2))
         Next
 
         tv.ExpandAll()

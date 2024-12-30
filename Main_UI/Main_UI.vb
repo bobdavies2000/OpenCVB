@@ -111,7 +111,7 @@ Public Class Main_UI
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
     Dim arrowIndex As Integer
 
-    Public intermediateReview As String
+    Public treeViewRequest As String
     Dim pixelViewerRect As cvb.Rect
     Dim pixelViewerOn As Boolean
     Dim pixelViewTag As Integer
@@ -1553,7 +1553,7 @@ Public Class Main_UI
             textDesc = task.MainUI_Algorithm.desc
             task.MainUI_Algorithm.primaryAlg = True
 
-            intermediateReview = ""
+            treeViewRequest = parms.algName
 
             If ComplexityTimer.Enabled = False Then
                 Debug.WriteLine(CStr(Now))
@@ -1638,11 +1638,7 @@ Public Class Main_UI
                         Dim spanCopy = New TimeSpan(elapsedCopyTicks)
                         task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
 
-                        If intermediateReview = task.algName Then
-                            task.intermediateName = ""
-                            intermediateReview = ""
-                        End If
-                        If intermediateReview <> "" Then task.intermediateName = intermediateReview
+                        task.intermediateName = treeViewRequest
 
                         If testAllRunning Then
                             task.pixelViewerOn = False
