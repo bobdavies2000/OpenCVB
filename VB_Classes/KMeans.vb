@@ -463,7 +463,6 @@ Public Class KMeans_Depth : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         FindSlider("KMeans k").Value = 10
-        labels(2) =
         desc = "Cluster depth using kMeans - useful to split foreground and background"
     End Sub
     Public Overrides Sub runAlg(src As cvb.Mat)

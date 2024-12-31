@@ -16,7 +16,7 @@ Public Class OpenGL_MyOpenGLtest : Inherits TaskParent
         UpdateAdvice(traceName + ": <place advice here on any options that are useful>"
         desc = "description"
     End Sub
-    Public Sub RunAlg(src as cvb.Mat)
+    Public Overrides Sub RunAlg(src as cvb.Mat)
         ogl.pointCloudInput = task.PointCloud
         ogl.Run(task.color)
     End Sub
