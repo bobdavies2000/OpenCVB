@@ -312,12 +312,16 @@ Public Class Main_UI
 
             optionsForm = New Options
             optionsForm.defineCameraResolutions(settings.cameraIndex)
+            refreshTreeView()
         End With
     End Sub
     Public Sub jsonWrite()
-        If TreeButton.Checked Then
+        If TreeViewDialog IsNot Nothing Then
             settings.treeLocation = New cvb.Vec4f(TreeViewDialog.Left, TreeViewDialog.Top,
                                                   TreeViewDialog.Width, TreeViewDialog.Height)
+            settings.treeButton = True
+        Else
+            settings.treeButton = False
         End If
 
         If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
@@ -326,7 +330,6 @@ Public Class Main_UI
         End If
 
         settings.locationMain = New cvb.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
-        settings.treeButton = TreeButton.Checked
         If camPic(0) IsNot Nothing Then
             ' used only when .snapCustom is true
             settings.displayRes = New cvb.Size(camPic(0).Width, camPic(0).Height)
@@ -481,19 +484,26 @@ Public Class Main_UI
     Private Sub BluePlusButton_Click(sender As Object, e As EventArgs) Handles BluePlusButton.Click
         Dim OKcancel = InsertAlgorithm.ShowDialog()
     End Sub
-    Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
-        TreeButton.Checked = Not TreeButton.Checked
-        settings.treeButton = TreeButton.Checked
+    Private Sub refreshTreeView()
+        If TreeViewDialog IsNot Nothing Then TreeViewDialog.Dispose()
         TreeViewDialog = New TreeviewForm
-        If TreeButton.Checked Then
+        If settings.treeButton Then
             TreeViewDialog.Show()
             TreeViewDialog.Left = settings.treeLocation.Item0
             TreeViewDialog.Top = settings.treeLocation.Item1
             TreeViewDialog.Width = settings.treeLocation.Item2
             TreeViewDialog.Height = settings.treeLocation.Item3
         Else
-            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Hide()
+            If TreeViewDialog IsNot Nothing Then
+                TreeViewDialog.Dispose()
+                TreeViewDialog = Nothing
+            End If
         End If
+    End Sub
+    Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
+        settings.treeButton = Not settings.treeButton
+        refreshTreeView()
+        jsonWrite()
     End Sub
     Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
         Translator.Show()
@@ -1072,8 +1082,6 @@ Public Class Main_UI
         frameCount = 0
         setupCamPics()
 
-        TreeButton_Click(sender, e)
-
         loadAlgorithmComboBoxes()
 
         GroupCombo.Text = settings.groupComboText
@@ -1161,6 +1169,9 @@ Public Class Main_UI
                 TreeButton.CheckState = CheckState.Unchecked
             End If
         End If
+
+        If treeViewRefresh Then refreshTreeView()
+        treeViewRefresh = False
 
         If pauseAlgorithmThread = False Then
             Dim timeNow As DateTime = Now
@@ -1521,6 +1532,7 @@ Public Class Main_UI
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
         algorithmTaskHandle.Start(parms)
+
         Debug.WriteLine("Main_UI.StartTask completed.")
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
@@ -1773,16 +1785,16 @@ Public Class Main_UI
 
                 If task.fpsRate = 0 Then task.fpsRate = 1
 
-                treeViewRefresh = task.intermediateRefresh
-                task.intermediateRefresh = False
-
-                If frameCount Mod task.fpsRate = 0 Or treeViewRefresh Then
+                If frameCount Mod task.fpsRate = 0 Or task.intermediateRefresh Then
                     SyncLock callTraceLock
                         callTrace = New List(Of String)(task.callTraceMain)
                         algorithm_ms = New List(Of Single)(task.algorithm_msMain)
                         algorithmNames = New List(Of String)(task.algorithmNamesMain)
                     End SyncLock
                 End If
+
+                treeViewRefresh = task.intermediateRefresh
+                task.intermediateRefresh = False
 
                 Dim elapsedTicks = Now.Ticks - returnTime.Ticks
                 Dim span = New TimeSpan(elapsedTicks)

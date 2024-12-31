@@ -153,7 +153,7 @@ End Class
 
 Public Class Palette_DepthColorMap : Inherits TaskParent
     Public gradientColorMap As New cvb.Mat
-    Dim gColor As New Gradient_Color
+    Dim gColor As New Gradient_ForDepth
     Public Sub New()
         UpdateAdvice(traceName + ": adjust color with 'Convert and Scale' slider")
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Convert And Scale", 0, 100, 45)
@@ -203,7 +203,7 @@ End Class
 
 Public Class Palette_RGBDepth : Inherits TaskParent
     Dim gradientColorMap As New cvb.Mat
-    Dim gColor As New Gradient_Color
+    Dim gColor As New Gradient_ForDepth
     Public Sub New()
         desc = "Build a colormap that best shows the depth.  NOTE: duplicate of Palette_DepthColorMap but no slider."
     End Sub
@@ -419,7 +419,7 @@ End Class
 Public Class Palette_RandomColorMap : Inherits TaskParent
     Public gradientColorMap As New cvb.Mat
     Public transitionCount As Integer = -1
-    Dim gColor As New Gradient_Color
+    Dim gColor As New Gradient_ForDepth
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Color transitions", 1, 255, 7)
         labels(3) = "Generated colormap"

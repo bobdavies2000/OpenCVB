@@ -55,7 +55,7 @@ End Class
 
 ' https://docs.opencvb.org/4.x/d7/d4d/tutorial_py_thresholding.html
 Public Class Threshold_Definitions : Inherits TaskParent
-    Dim gradient As New Gradient_Color
+    Dim gradient As New Gradient_ForDepth
     Dim mats As New Mat_4to1
     Dim options As New Options_ThresholdDef
     Public Sub New()

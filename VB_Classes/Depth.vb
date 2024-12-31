@@ -237,12 +237,12 @@ End Class
 
 Public Class Depth_Palette : Inherits TaskParent
     Dim customColorMap As cvb.Mat
-    Dim gColor As New Gradient_Color
+    Dim gColor As New Gradient_ForDepth
     Public Sub New()
         desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        ' couldn't do this in the constructor because it uses gradient_color and is called in task.
+        ' couldn't do this in the constructor because it uses Gradient_ForDepth and is called in task.
         If customColorMap Is Nothing Then
             gColor.gradientWidth = 255
             gColor.Run(empty)

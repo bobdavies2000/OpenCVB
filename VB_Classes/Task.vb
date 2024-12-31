@@ -423,18 +423,37 @@ Public Class VBtask : Implements IDisposable
         redOptions = New OptionsRedCloud
         task.redMap = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
 
+        callTrace.Clear()
+
         grid = New Grid_Basics
+        grid.taskAlgorithm = True ' task algorithms may be duplicated in the activeObjects list
+
         PixelViewer = New Pixel_Viewer
+        grid.taskAlgorithm = True
+
         colorizer = New Depth_Palette
+        colorizer.taskAlgorithm = True
 
         feat = New Feature_Basics
+        feat.taskAlgorithm = True
+
         redC = New RedCloud_Basics
+        redC.taskAlgorithm = True
 
         IMUBasics = New IMU_Basics
+        IMUBasics.taskAlgorithm = True
+
         gMat = New IMU_GMatrix
+        gMat.taskAlgorithm = True
+
         gravityHorizon = New Gravity_Horizon
+        gravityHorizon.taskAlgorithm = True
+
         imuStabilityTest = New Stabilizer_VerticalIMU
+        imuStabilityTest.taskAlgorithm = True
+
         motion = New Motion_Basics
+        motion.taskAlgorithm = True
 
         updateSettings()
         task.redOptions.Show()
@@ -522,10 +541,17 @@ Public Class VBtask : Implements IDisposable
     End Sub
     Private Function findIntermediateObject(lookupName As String) As TaskParent
         If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
+        Dim saveObject As Object = Nothing
         For Each obj In task.activeObjects
-            If obj.traceName = lookupName And task.firstPass = False Then Return obj
+            If obj.traceName = lookupName And task.firstPass = False Then
+                ' task Algorithms are always allocated first so if taskAlgorithm, keep looking...
+                saveObject = obj ' continue looking if it is a taskAlgorithm.
+                If saveObject.taskAlgorithm = False And saveObject.tracename.startswith("Options_") = False Then
+                    Return saveObject
+                End If
+            End If
         Next
-        Return Nothing
+        Return saveObject
     End Function
     Public Sub DrawLine(dst As cvb.Mat, p1 As cvb.Point2f, p2 As cvb.Point2f, color As cvb.Scalar)
         dst.Line(p1, p2, color, task.lineWidth, task.lineType)
@@ -577,7 +603,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
+                If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
             If dst2.Size <> task.color.Size Then
                 dst2 = dst2.Resize(New cvb.Size(task.color.Width, task.color.Height), cvb.InterpolationFlags.Nearest)

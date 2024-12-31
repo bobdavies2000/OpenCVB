@@ -10,21 +10,21 @@ Public Class Triangle_Basics : Inherits TaskParent
         dst2 = task.redC.dst2
 
         If task.redCells.Count <= 1 Then Exit Sub
-        Dim rc = task.rc
-        If rc.index = 0 Then Exit Sub
+        task.rc = task.redCells(1)
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cvb.Point3f)
-        For Each pt In rc.contour
-            pt = New cvb.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+        For Each pt In task.rc.contour
+            pt = New cvb.Point(pt.X + task.rc.rect.X, pt.Y + task.rc.rect.Y)
             Dim vec = task.pointCloud.Get(Of cvb.Point3f)(pt.Y, pt.X)
             DrawCircle(dst3, pt, task.DotSize, cvb.Scalar.Yellow)
             pt3D.Add(vec)
         Next
 
-        Dim c3D = task.pointCloud.Get(Of cvb.Point3f)(rc.maxDist.Y, rc.maxDist.X)
+        Dim c3D = task.pointCloud.Get(Of cvb.Point3f)(task.rc.maxDist.Y, task.rc.maxDist.X)
         triangles.Clear()
-        Dim color3D As New cvb.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255)
+        Dim color3D As New cvb.Point3f(task.rc.color(2) / 255, task.rc.color(1) / 255,
+                                       task.rc.color(0) / 255)
         For i = 0 To pt3D.Count - 1
             triangles.Add(color3D)
             triangles.Add(c3D)
@@ -86,7 +86,7 @@ Public Class Triangle_RedCloud : Inherits TaskParent
         dst2 = task.redC.dst2
 
         If task.redCells.Count <= 1 Then Exit Sub
-        If task.rc.index = 0 Then Exit Sub
+        task.rc = task.redCells(1)
 
         triangles.Clear()
         For Each rc In task.redCells

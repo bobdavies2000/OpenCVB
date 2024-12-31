@@ -49,7 +49,7 @@ Public Class Cell_Basics : Inherits TaskParent
         End If
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        If standaloneTest() Or runRedCloud Then
+        If standalone Or runRedCloud Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)

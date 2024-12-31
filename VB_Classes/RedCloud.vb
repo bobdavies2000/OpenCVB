@@ -2,9 +2,10 @@
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
     Public stats As New Cell_Basics
-    Dim color As New Color8U_Basics
     Public inputMask As New cvb.Mat
     Public cellGen As New Cell_Generate
+    Dim redCPP As New RedCloud_CPP_VB
+    Dim color As New Color8U_Basics
     Public Sub New()
         labels(3) = "The 'tracking' color (shown below) is unique for each cell and switches when a cell is split or lost."
         task.gOptions.setHistogramBins(40)
@@ -14,8 +15,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Sub RunAlg(src As cvb.Mat)
-        Static redCPP As New RedCloud_CPP_VB
-
         If src.Channels <> 1 Then
             color.Run(src)
             src = color.dst2

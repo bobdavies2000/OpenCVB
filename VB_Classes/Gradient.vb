@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class Gradient_Color : Inherits TaskParent
+Public Class Gradient_ForDepth : Inherits TaskParent
     Public color1 = cvb.Scalar.Blue
     Public color2 = cvb.Scalar.Yellow
     Public gradientWidth As Integer

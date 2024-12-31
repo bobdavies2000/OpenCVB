@@ -3429,7 +3429,7 @@ Public Class Options_Threshold : Inherits TaskParent
     Public thresholdMethod As cvb.ThresholdTypes = cvb.ThresholdTypes.Binary
     Public thresholdName As String = ""
     Public threshold As Integer = 128
-    Public gradient As New Gradient_Color
+    Public gradient As New Gradient_ForDepth
     Public inputGray As Boolean = False
     Public otsuOption As Boolean = False
     Public Sub New()
@@ -3574,7 +3574,7 @@ Public Class Options_ThresholdAll : Inherits TaskParent
     Public constantVal As Integer = 0
     Public maxVal As Integer = 255
     Public threshold As Integer = 100
-    Public gradient As New Gradient_Color
+    Public gradient As New Gradient_ForDepth
     Public inputGray As Boolean = False
     Public otsuOption As Boolean = False
     Public adaptiveMethod As cvb.AdaptiveThresholdTypes = cvb.AdaptiveThresholdTypes.GaussianC

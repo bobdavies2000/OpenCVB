@@ -3,7 +3,6 @@ Imports System.Threading
 Imports cvb = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
-    Dim diff As New Diff_Basics
     Public depthRGB As New cvb.Mat
     Public pointcloud As cvb.Mat
     Public color As cvb.Mat
@@ -28,6 +27,7 @@ Public Class Motion_Basics : Inherits TaskParent
         End If
 
         If standaloneTest() Then ' show any differences
+            Static diff As New Diff_Basics
             diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)
             dst3 = diff.dst2

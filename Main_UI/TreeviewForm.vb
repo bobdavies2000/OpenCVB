@@ -86,9 +86,6 @@ Public Class TreeviewForm
     Private Sub TreeView_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
         If Main_UI.testAllRunning Then Exit Sub ' don't update the treeview when doing overnight testing.
         SyncLock callTraceLock
-            If Main_UI.treeViewRefresh Then updateTree()
-            Main_UI.treeViewRefresh = False
-
             If Main_UI.callTrace Is Nothing Then Exit Sub
             If Main_UI.callTrace.Count > 0 Then
                 Dim firstEntry = Main_UI.callTrace(0)

@@ -1348,11 +1348,13 @@ Public Class OpenGL_TessellateCell : Inherits TaskParent
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
-        task.ogl.dataInput = cvb.Mat.FromPixelData(tess.triangles.Count, 1, cvb.MatType.CV_32FC3, tess.triangles.ToArray)
+        labels = tess.labels
+
+        task.ogl.dataInput = cvb.Mat.FromPixelData(tess.triangles.Count, 1, cvb.MatType.CV_32FC3,
+                                                   tess.triangles.ToArray)
 
         task.ogl.pointCloudInput = New cvb.Mat
         task.ogl.Run(tess.dst2)
-        labels = tess.labels
     End Sub
 End Class
 
@@ -1396,11 +1398,13 @@ Public Class OpenGL_TessellateRGB : Inherits TaskParent
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
-        task.ogl.dataInput = cvb.Mat.FromPixelData(tess.triangles.Count, 1, cvb.MatType.CV_32FC3, tess.triangles.ToArray)
+        labels = tess.labels
+
+        task.ogl.dataInput = cvb.Mat.FromPixelData(tess.triangles.Count, 1, cvb.MatType.CV_32FC3,
+                                                   tess.triangles.ToArray)
 
         task.ogl.pointCloudInput = New cvb.Mat
         task.ogl.Run(src)
-        labels = tess.labels
     End Sub
 End Class
 

@@ -25,6 +25,7 @@ Public Class TaskParent : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public sliders As New OptionsSliders
     Public standalone As Boolean
+    Public taskAlgorithm As Boolean
     Public dst0 As cvb.Mat, dst1 As cvb.Mat, dst2 As cvb.Mat, dst3 As cvb.Mat, empty As cvb.Mat
     Public labels() As String = {"", "", "", ""}
     Public msRNG As New System.Random
@@ -87,6 +88,7 @@ Public Class TaskParent : Implements IDisposable
         If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
         If callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
         task.activeObjects.Add(Me)
+        task.intermediateRefresh = True
 
         If task.recordTimings Then
             If standalone And task.testAllRunning = False Then
@@ -115,21 +117,6 @@ Public Class TaskParent : Implements IDisposable
                 algorithmStack.Push(3)
             End If
         End If
-    End Sub
-    Public Sub replaceIntermediateObject(lookupName As String, obj As Object)
-        For i = 0 To task.activeObjects.Count - 1
-            If obj.traceName = lookupName Then
-                task.activeObjects(i) = obj
-                Exit For
-            End If
-        Next
-        For i = 0 To callTrace.Count - 1
-            If callTrace(i).EndsWith(lookupName + "\") Then
-                callTrace(i) = callTrace(i).Replace(lookupName, obj.traceName)
-                Exit For
-            End If
-        Next
-        task.intermediateRefresh = True
     End Sub
     Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cvb.Rect) As Bitmap
         Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)
