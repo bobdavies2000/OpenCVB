@@ -28,14 +28,13 @@ Public Class KMeans_Basics : Inherits TaskParent
         dst2 = saveLabels
 
         If columnVector.ElemSize Mod 4 <> 0 Or columnVector.Type = cvb.MatType.CV_32S Then columnVector.ConvertTo(columnVector, cvb.MatType.CV_32F)
-        Try
-            If colors.Width = 0 Or colors.Height = 0 Then options.kMeansFlag = cvb.KMeansFlags.PpCenters
-            cvb.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
-        Catch ex As Exception
-            columnVector.SetTo(0)
-            dst2.SetTo(0)
-            cvb.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
-        End Try
+        If colors.Width = 0 Or colors.Height = 0 Then
+            options.kMeansFlag = cvb.KMeansFlags.PpCenters
+            colors = New cvb.Mat(classCount, 1, cvb.MatType.CV_8UC3)
+            colors.SetTo(0)
+        End If
+
+        cvb.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
 
         saveLabels = dst2.Clone
 

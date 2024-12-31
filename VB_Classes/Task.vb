@@ -816,6 +816,9 @@ Public Class VBtask : Implements IDisposable
             cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
 
+        ' the gravity transformation apparently can introduce some NaNs.
+        If task.cameraName.StartsWith("StereoLabs") Then cvb.Cv2.PatchNaNs(task.pcSplit(2))
+
         If task.gOptions.UseMotionColor.Checked Then feat.Run(src)
 
         task.colorizer.Run(src)
