@@ -283,7 +283,9 @@ Public Class KMeans_TierCount : Inherits TaskParent
     Public Sub RunAlg(src As cvb.Mat)
         kCount.Run(src)
         Static kSlider = FindSlider("KMeans k")
-        If kSlider.value <> kCount.classCount Then kSlider.value = Math.Max(kCount.classCount, kSlider.minimum)
+        If kSlider.value <> kCount.classCount Then
+            kSlider.value = Math.Max(kCount.classCount, kSlider.minimum)
+        End If
         classCount = kCount.classCount
 
         km.Run(task.pcSplit(2))

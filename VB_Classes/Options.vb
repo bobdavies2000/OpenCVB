@@ -443,7 +443,6 @@ Public Class Options_Resize : Inherits TaskParent
         End If
     End Sub
     Public Sub RunOpt()
-        Static offsetSlider = FindSlider("Offset from top left corner")
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then

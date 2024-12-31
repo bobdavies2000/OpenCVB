@@ -780,17 +780,20 @@ Public Class TaskParent : Implements IDisposable
         task.trueData.Clear()
         If task.paused = False Then
             trueData.Clear()
-            If traceName.EndsWith("_CPP") Then
-                Static nativeTask As New CPP_ManagedTask()
-                If nativeTask.ManagedObject Is Nothing Then nativeTask.ManagedObject = VB_Algorithm
-                nativeTask.RunAlg(src)
-                VB_Algorithm.RunAlg()
-                nativeTask.Pause()
-            Else
-                VB_Algorithm.RunAlg(src)
-            End If
+            'If traceName.EndsWith("_CPP") Then
+            '    Static nativeTask As New CPP_ManagedTask()
+            '    If nativeTask.ManagedObject Is Nothing Then nativeTask.ManagedObject = VB_Algorithm
+            '    nativeTask.RunAlg(src)
+            '    VB_Algorithm.RunAlg()
+            '    nativeTask.Pause()
+            'Else
+            VB_Algorithm.RunAlg(src)
+            'End If
         End If
         If task.testAllRunning = False Then measureEndRun(traceName)
+    End Sub
+    Public Overridable Sub parentRun(src As cvb.Mat)
+
     End Sub
     Public Enum FeatureSrc
         GoodFeaturesFull = 0

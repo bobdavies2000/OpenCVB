@@ -81,7 +81,8 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.setDisplay1()
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        task.gravityVec = New linePoints(New cvb.Point2f(dst2.Width / 2, 0), New cvb.Point2f(dst2.Width / 2, dst2.Height))
+        task.gravityVec = New linePoints(New cvb.Point2f(dst2.Width / 2, 0),
+                                         New cvb.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New linePoints(New cvb.Point2f(0, dst2.Height / 2), New cvb.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
