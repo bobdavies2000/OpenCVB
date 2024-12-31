@@ -546,7 +546,7 @@ Public Class VBtask : Implements IDisposable
             If obj.traceName = lookupName And task.firstPass = False Then
                 ' task Algorithms are always allocated first so if taskAlgorithm, keep looking...
                 saveObject = obj ' continue looking if it is a taskAlgorithm.
-                If saveObject.taskAlgorithm = False And saveObject.tracename.startswith("Options_") = False Then
+                If saveObject.taskAlgorithm = False Then
                     Return saveObject
                 End If
             End If

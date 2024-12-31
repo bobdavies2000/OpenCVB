@@ -19,6 +19,17 @@ Public Module vbc
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
     Public msRNG As New System.Random
+    Public white As New cvb.Scalar(255, 255, 255), black As New cvb.Scalar(0, 0, 0)
+    Public grayColor As New cvb.Scalar(127, 127, 127)
+    Public yellow As New cvb.Scalar(0, 255, 255), purple As New cvb.Scalar(255, 0, 255)
+    Public teal As New cvb.Scalar(255, 255, 0)
+    Public red As New cvb.Scalar(0, 0, 255), green As New cvb.Scalar(0, 255, 0)
+    Public blue As New cvb.Scalar(255, 0, 0)
+
+    Public zero3f As New cvb.Point3f
+    Public newVec4f As New cvb.Vec4f
+    Public empty As cvb.Mat
+    Public term As New cvb.TermCriteria(cvb.CriteriaTypes.Eps + cvb.CriteriaTypes.Count, 10, 1.0)
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj

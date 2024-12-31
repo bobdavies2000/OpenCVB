@@ -151,6 +151,7 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
     Public colorList As New List(Of cvb.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
     Dim hulls As New RedCloud_Hulls
+    Const depthListMaxCount As Integer = 10
     Public Sub New()
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
@@ -226,6 +227,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
     Public depthList2 As New List(Of List(Of Single))
     Public colorList As New List(Of cvb.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
+    Const depthListMaxCount As Integer = 10
     Public Sub New()
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"

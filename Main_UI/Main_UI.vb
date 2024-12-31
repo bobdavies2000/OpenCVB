@@ -486,6 +486,7 @@ Public Class Main_UI
     End Sub
     Private Sub refreshTreeView()
         If TreeViewDialog IsNot Nothing Then TreeViewDialog.Dispose()
+        If testAllRunning Then Exit Sub ' don't show treeview during testing...
         TreeViewDialog = New TreeviewForm
         If settings.treeButton Then
             TreeViewDialog.Show()
@@ -1164,14 +1165,18 @@ Public Class Main_UI
         If camera Is Nothing Then Exit Sub
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
-        If TreeViewDialog IsNot Nothing Then
-            If TreeViewDialog.TreeView1.IsDisposed Then
-                TreeButton.CheckState = CheckState.Unchecked
-            End If
-        End If
+        'If TreeViewDialog IsNot Nothing Then
+        '    If TreeViewDialog.TreeView1.IsDisposed Then
+        '        TreeButton.CheckState = CheckState.Unchecked
+        '    End If
+        'End If
 
-        If treeViewRefresh Then refreshTreeView()
-        treeViewRefresh = False
+        If testAllRunning Then
+            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Dispose()
+        Else
+            If treeViewRefresh Then refreshTreeView()
+            treeViewRefresh = False
+        End If
 
         If pauseAlgorithmThread = False Then
             Dim timeNow As DateTime = Now
@@ -1566,7 +1571,6 @@ Public Class Main_UI
             ' then remove the json file and restart, click the OpenCVB options button,
             ' and click 'Update Algorithm XRef' (it is toward the bottom of the options form.)
             textDesc = task.MainUI_Algorithm.desc
-            task.MainUI_Algorithm.primaryAlg = True
 
             treeViewRequest = parms.algName
 

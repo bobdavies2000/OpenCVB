@@ -26,28 +26,14 @@ Public Class TaskParent : Implements IDisposable
     Public sliders As New OptionsSliders
     Public standalone As Boolean
     Public taskAlgorithm As Boolean
-    Public dst0 As cvb.Mat, dst1 As cvb.Mat, dst2 As cvb.Mat, dst3 As cvb.Mat, empty As cvb.Mat
+    Public dst0 As cvb.Mat, dst1 As cvb.Mat, dst2 As cvb.Mat, dst3 As cvb.Mat
     Public labels() As String = {"", "", "", ""}
-    Public msRNG As New System.Random
     Public VB_Algorithm As Object
     Public traceName As String
     Public desc As String
-    Public white As New cvb.Scalar(255, 255, 255), black As New cvb.Scalar(0, 0, 0)
-    Public grayColor As New cvb.Scalar(127, 127, 127)
-    Public yellow As New cvb.Scalar(0, 255, 255), purple As New cvb.Scalar(255, 0, 255)
-    Public teal As New cvb.Scalar(255, 255, 0)
-    Public red As New cvb.Scalar(0, 0, 255), green As New cvb.Scalar(0, 255, 0)
-    Public blue As New cvb.Scalar(255, 0, 0)
-    Public zero3f As New cvb.Point3f
-    Public newVec4f As New cvb.Vec4f
     Public cPtr As IntPtr
     Public trueData As New List(Of TrueText)
     Public strOut As String
-    Dim retryCount As Integer
-    Public Const depthListMaxCount As Integer = 10
-    Public primaryAlg As Boolean
-
-    Public term As New cvb.TermCriteria(cvb.CriteriaTypes.Eps + cvb.CriteriaTypes.Count, 10, 1.0)
     Public Sub New()
         VB_Algorithm = Me
         traceName = Me.GetType.Name
@@ -55,7 +41,7 @@ Public Class TaskParent : Implements IDisposable
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
-        Dim callStack = ""
+        Dim callStack As String
         For i = 0 To lines.Count - 1
             lines(i) = Trim(lines(i))
             Dim offset = InStr(lines(i), "VB_Classes.")
@@ -367,58 +353,41 @@ Public Class TaskParent : Implements IDisposable
                 End If
             Next
         Catch ex As Exception
-            Debug.WriteLine("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
+            Debug.WriteLine("FindSlider failed.  Did the list of forms changed while iterating.  Not critical." + ex.Message)
         End Try
         Debug.WriteLine("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
 
         Return Nothing
     End Function
     Public Function FindCheckBox(opt As String) As CheckBox
-        While 1
-            Try
-                For Each frm In Application.OpenForms
-                    If frm.text.endswith(" CheckBoxes") Then
-                        For j = 0 To frm.Box.Count - 1
-                            If frm.Box(j).text = opt Then Return frm.Box(j)
-                        Next
-                    End If
-                Next
-            Catch ex As Exception
-                Debug.WriteLine("FindCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
-            End Try
-            Application.DoEvents()
-            retryCount += 1
-            If retryCount >= 5 Then
-                Debug.WriteLine("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
-                Exit While
-            End If
-        End While
+        Try
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" CheckBoxes") Then
+                    For j = 0 To frm.Box.Count - 1
+                        If frm.Box(j).text = opt Then Return frm.Box(j)
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+            Debug.WriteLine("FindCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
+        End Try
         Return Nothing
     End Function
     Private Function searchForms(opt As String, ByRef index As Integer)
-        Dim retryCount As Integer
-        While 1
-            Try
-                For Each frm In Application.OpenForms
-                    If frm.text.endswith(" Radio Buttons") Then
-                        For j = 0 To frm.check.count - 1
-                            If frm.check(j).text = opt Then
-                                index = j
-                                Return frm.check
-                            End If
-                        Next
-                    End If
-                Next
-            Catch ex As Exception
-                Debug.WriteLine("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
-            End Try
-            Application.DoEvents()
-            retryCount += 1
-            If retryCount >= 5 Then
-                Debug.WriteLine("A Radio button was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
-                Exit While
-            End If
-        End While
+        Try
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" Radio Buttons") Then
+                    For j = 0 To frm.check.count - 1
+                        If frm.check(j).text = opt Then
+                            index = j
+                            Return frm.check
+                        End If
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+            Debug.WriteLine("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
+        End Try
         Return Nothing
     End Function
     Public Function FindRadio(opt As String) As RadioButton
@@ -609,7 +578,7 @@ Public Class TaskParent : Implements IDisposable
         Return mm
     End Function
     Public Sub SetTrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
-        If primaryAlg Then
+        If traceName = task.algName Then
             Dim str As New TrueText(text, pt, picTag)
             trueData.Add(str)
         End If
@@ -619,7 +588,7 @@ Public Class TaskParent : Implements IDisposable
         trueData.Add(str)
     End Sub
     Public Sub SetTrueText(text As String)
-        If primaryAlg Then
+        If traceName = task.algName Then
             Dim picTag = 2
             Dim str As New TrueText(text, New cvb.Point(0, 0), picTag)
             trueData.Add(str)
@@ -627,7 +596,7 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Sub SetTrueText(text As String, picTag As Integer)
         If text Is Nothing Then Return
-        If primaryAlg Then
+        If traceName = task.algName Then
             Dim pt = New cvb.Point(0, 0)
             Dim str As New TrueText(text, pt, picTag)
             trueData.Add(str)
@@ -811,7 +780,7 @@ Public Class TaskParent : Implements IDisposable
         task.trueData.Clear()
         If task.paused = False Then
             trueData.Clear()
-            If VB_Algorithm.traceName.EndsWith("_CPP") Then
+            If traceName.EndsWith("_CPP") Then
                 Static nativeTask As New CPP_ManagedTask()
                 If nativeTask.ManagedObject Is Nothing Then nativeTask.ManagedObject = VB_Algorithm
                 nativeTask.RunAlg(src)
