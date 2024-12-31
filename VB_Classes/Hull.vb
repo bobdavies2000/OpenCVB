@@ -16,7 +16,7 @@ Public Class Hull_Basics : Inherits TaskParent
         Next
         Return ptList
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
             random.Run(empty)
             dst2.SetTo(0)
@@ -42,7 +42,7 @@ Public Class Hull_Contour : Inherits TaskParent
     Public Sub New()
         desc = "Compare the hull to the contour of a RedCloud cell"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)

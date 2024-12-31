@@ -18,7 +18,7 @@ Public Class Etch_ASketch : Inherits TaskParent
         dst2.SetTo(slateColor)
         desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         keys.Run(src)

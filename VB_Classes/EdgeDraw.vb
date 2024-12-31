@@ -6,7 +6,7 @@ Public Class EdgeDraw_Basics : Inherits TaskParent
         labels = {"", "", "EdgeDraw_Basics output", ""}
         desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total - 1) As Byte
@@ -37,7 +37,7 @@ Public Class EdgeDraw_Segments : Inherits TaskParent
         dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total - 1) As Byte
@@ -75,7 +75,7 @@ Public Class EdgeDraw_LeftRight : Inherits TaskParent
     Public Sub New()
         desc = "Find edges is the left and right images using EdgeDraw..."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         edges.Run(task.leftView)
         dst2 = edges.dst2.Clone
 
@@ -96,7 +96,7 @@ Public Class EdgeDraw_LeftRightVertical : Inherits TaskParent
     Public Sub New()
         desc = "Find edges is the left and right images using EdgeDraw after verticalizing the images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         vert.Run(task.leftView)
         edges.Run(vert.dst2)
         dst2 = edges.dst2.Clone
@@ -120,7 +120,7 @@ Public Class EdgeDraw_SplitMean : Inherits TaskParent
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
         desc = "find the edges in a 4-way color split of the image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         binary.Run(src)
 
         dst2.SetTo(0)

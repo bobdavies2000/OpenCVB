@@ -16,7 +16,7 @@ Public Class PhaseCorrelate_Basics : Inherits TaskParent
         cvb.Cv2.CreateHanningWindow(hanning, dst2.Size(), cvb.MatType.CV_64F)
         desc = "Look for a shift between the current frame and the previous"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static thresholdSlider = FindSlider("Threshold shift to cause reset of lastFrame")
 
         Dim input = src
@@ -84,7 +84,7 @@ Public Class PhaseCorrelate_BasicsTest : Inherits TaskParent
         labels(3) = "Stabilized output from Phase_Correlate_Basics"
         desc = "Test the PhaseCorrelate_Basics with random movement"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         random.Run(src)
 
         stable.Run(random.dst3.Clone)
@@ -108,7 +108,7 @@ Public Class PhaseCorrelate_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Use phase correlation on the depth data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static lastFrame = task.pcSplit(2).Clone
         phaseC.Run(task.pcSplit(2))
         dst2 = task.pcSplit(2)
@@ -145,7 +145,7 @@ Public Class PhaseCorrelate_HanningWindow : Inherits TaskParent
         labels(2) = "Looking down on a bell curve in 2 dimensions"
         desc = "Show what a Hanning window looks like"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         cvb.Cv2.CreateHanningWindow(dst2, src.Size(), cvb.MatType.CV_32F)
     End Sub
 End Class

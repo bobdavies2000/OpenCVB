@@ -5,7 +5,7 @@ Public Class Contrast_POW : Inherits TaskParent
         labels = {"", "", "Original Image", "Contrast reduced with POW function"}
         desc = "Reduce contrast with POW function"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -27,7 +27,7 @@ Public Class Contrast_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use the local options to control brightness and contrast.")
         desc = "Show image with varying contrast and brightness."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         dst2 = src.ConvertScaleAbs(options.brightness, options.contrast)

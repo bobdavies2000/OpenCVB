@@ -5,7 +5,7 @@ Public Class Thickness_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Determine the thickness of a RedCloud cell"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Then
             task.redC.Run(src)
             dst2 = task.redC.dst2

@@ -6,7 +6,7 @@ Public Class Math_Subtract : Inherits TaskParent
     Public Sub New()
         desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
 
         Dim bgr = New cvb.Scalar(options.blueS, options.greenS, options.redS)
@@ -49,7 +49,7 @@ Public Class Math_Median_CDF : Inherits TaskParent
     Public Sub New()
         desc = "Compute the src image median"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         medianVal = computeMedian(src, New cvb.Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
 
@@ -77,7 +77,7 @@ Public Class Math_DepthMeanStdev : Inherits TaskParent
     Public Sub New()
         desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         minMax.Run(src)
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask = minMax.dst3 ' the mask for stable depth.
@@ -107,7 +107,7 @@ Public Class Math_RGBCorrelation : Inherits TaskParent
         flow.parentData = Me
         desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim split = src.Split()
         match.template = split(0)
         match.Run(split(1))
@@ -142,7 +142,7 @@ Public Class Math_StdevBoundary : Inherits TaskParent
         labels(3) = "High stdev segments after the first pass"
         desc = "Explore how to get a better boundary on the low stdev mask"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         stdev.Run(src)
         dst2 = stdev.dst2
         stdev.saveFrame.CopyTo(dst3)
@@ -198,7 +198,7 @@ Public Class Math_Template : Inherits TaskParent
         labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
         desc = "Build a template for use with computing the point cloud"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         For i = 0 To dst2.Width - 1
             dst2.Set(Of Single)(0, i, i)
         Next
@@ -231,7 +231,7 @@ Public Class Math_ImageAverage : Inherits TaskParent
     Public Sub New()
         desc = "Create an image that is the mean of x number of previous images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.optionsChanged Then images.Clear()
         dst3 = src.Clone
         If dst3.Type <> cvb.MatType.CV_32F Then
@@ -262,7 +262,7 @@ Public Class Math_ImageMaskedAverage : Inherits TaskParent
     Public Sub New()
         desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.optionsChanged Then images.Clear()
         Dim nextImage As New cvb.Mat
         If src.Type <> cvb.MatType.CV_32F Then src.ConvertTo(nextImage, cvb.MatType.CV_32F) Else nextImage = src
@@ -300,7 +300,7 @@ Public Class Math_ParallelTest : Inherits TaskParent
         labels = {"", "", "Parallel Test Output", ""}
         desc = "Test if 2 vectors are parallel"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z) ' normalize the input
         v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z)
         Dim n1 = dotProduct3D(v1, v2)
@@ -336,7 +336,7 @@ Public Class Math_Stdev : Inherits TaskParent
         lowStdevMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U)
         desc = "Compute the standard deviation in each segment"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim updateCount As Integer

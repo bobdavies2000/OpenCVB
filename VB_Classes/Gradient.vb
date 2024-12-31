@@ -6,7 +6,7 @@ Public Class Gradient_Basics : Inherits TaskParent
         labels = {"", "", "Gradient_Basics - Sobel output", "Phase Output"}
         desc = "Use phase to compute gradient"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         sobel.Run(src)
         cvb.Cv2.Phase(sobel.dst0, sobel.dst1, dst3)
         dst2 = sobel.dst0
@@ -22,7 +22,7 @@ Public Class Gradient_Depth : Inherits TaskParent
         labels(3) = "Phase Output"
         desc = "Use phase to compute gradient on depth image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         sobel.Run(task.pcSplit(2))
         cvb.Cv2.Phase(sobel.dst0, sobel.dst1, dst3)
         dst2 = sobel.dst0
@@ -47,7 +47,7 @@ Public Class Gradient_CartToPolar : Inherits TaskParent
         labels(3) = "CartToPolar Angle Output"
         desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim tmp As New cvb.Mat
@@ -80,7 +80,7 @@ Public Class Gradient_ForDepth : Inherits TaskParent
     Public Sub New()
         desc = "Provide a spectrum that is a gradient from one color to another."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         gradientWidth = dst2.Width
         Dim f As Double = 1.0
         Dim gradientColors As New cvb.Mat(1, gradientWidth, cvb.MatType.CV_64FC3)

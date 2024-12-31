@@ -7,7 +7,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Find all the neighbors with KNN"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If standalone Or runRedCloud Then
@@ -57,7 +57,7 @@ Public Class Neighbors_Intersects : Inherits TaskParent
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Or src.Type <> cvb.MatType.CV_8U Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
@@ -113,7 +113,7 @@ Public Class Neighbors_ColorOnly : Inherits TaskParent
     Public Sub New()
         desc = "Find neighbors in a color only RedCloud cellMap"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
@@ -142,7 +142,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Find the neighbors in a selected RedCloud cell"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
             task.redC.Run(src)
             dst2 = task.redC.dst2

@@ -9,7 +9,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
         labels(3) = "White lines are the previous frame.  Red the current."
         desc = "Track lines from frame to frame"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         lines.Run(src)
 
         delaunay.inputPoints.Clear()
@@ -95,7 +95,7 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Track the line regions with RedCloud"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         lines.Run(src)
 
         delaunay.inputPoints.Clear()
@@ -128,7 +128,7 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
     Public Sub New()
         desc = "Track lines from frame to frame"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         lines.Run(src)
 
         delaunay.inputPoints.Clear()

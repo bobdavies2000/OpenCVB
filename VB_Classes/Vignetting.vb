@@ -9,7 +9,7 @@ Public Class Vignetting_Basics : Inherits TaskParent
         cPtr = Vignetting_Open()
         desc = "C++ version of vignetting for comparison with the VB version."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.ClickPoint <> newPoint Then center = task.ClickPoint
@@ -46,7 +46,7 @@ Public Class Vignetting_VB : Inherits TaskParent
         If x < 0 Then Return 1.27323954 * x + 0.405284735 * x * x
         Return 1.27323954 * x - 0.405284735 * x * x
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.ClickPoint <> newPoint Then center = task.ClickPoint
@@ -81,7 +81,7 @@ Public Class Vignetting_Removal : Inherits TaskParent
         labels = {"", "", "Vignetted input - click anywhere to adjust the center of the vignetting.", "The devignetted output - brighter, more vivid colors."}
         desc = "Demonstrate devignetting"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() And defaultImage Is Nothing Then
             Dim fileInfo = New FileInfo(task.HomeDir + "data/nature.jpg")
             If fileInfo.Exists Then defaultImage = cvb.Cv2.ImRead(fileInfo.FullName)
@@ -107,7 +107,7 @@ Public Class Vignetting_Devignetting : Inherits TaskParent
         labels = {"", "", "Vignetted image", "Devignetted image"}
         desc = "Inject vignetting into the image and then remove it to test devignetting.  Click to relocate the center"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         basics.Run(src)
         dst2 = basics.dst2
 

@@ -7,7 +7,7 @@ Public Class Diff_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.")
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.firstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
         If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
@@ -37,7 +37,7 @@ Public Class Diff_Color : Inherits TaskParent
         labels = {"", "", "Each channel displays the channel's difference", "Mask with all differences"}
         desc = "Use Diff_Basics with a color image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         diff.Run(src.Reshape(1, src.Rows * 3))
         dst2 = diff.dst2.Reshape(3, src.Rows)
         dst3 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -55,7 +55,7 @@ Public Class Diff_UnstableDepthAndColor : Inherits TaskParent
         labels = {"", "", "Stable depth and color", "Unstable depth/color mask"}
         desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         diff.Run(src)
         Dim unstableGray = diff.dst2.Clone()
         depth.Run(task.depthRGB)
@@ -83,7 +83,7 @@ Public Class Diff_RGBAccum : Inherits TaskParent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Run Diff_Basics and accumulate BGR diff data."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         diff.Run(src)
         If task.optionsChanged Then history.Clear()
         history.Add(diff.dst2)
@@ -110,7 +110,7 @@ Public Class Diff_Lines : Inherits TaskParent
         labels = {"", "", "Add motion to see Diff output and lines input", "Wave at the camera to see results"}
         desc = "identify lines in the diff output"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         diff.Run(src)
         dst2 = diff.dst2
 
@@ -132,7 +132,7 @@ Public Class Diff_Heartbeat : Inherits TaskParent
         labels = {"", "", "Unstable mask", "Pixel difference"}
         desc = "Diff an image with one from the last heartbeat."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then
             dst1 = src.Clone
@@ -156,7 +156,7 @@ Public Class Diff_Depth32f : Inherits TaskParent
     Public Sub New()
         desc = "Where is the depth difference between frames greater than X centimeters."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.optionsChanged Or lastDepth32f.Width = 0 Then lastDepth32f = task.pcSplit(2).Clone
@@ -189,7 +189,7 @@ Public Class Diff_Identical : Inherits TaskParent
     Public Sub New()
         desc = "Count frames that are identical to the previous - a driver issue.  The interrupt is triggered by something other than an RGB image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         diffColor.Run(src)
         dst2 = diffColor.dst2
         If diffColor.diff.changedPixels = 0 Then noMotionFrames += 1

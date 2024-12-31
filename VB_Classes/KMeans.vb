@@ -10,7 +10,7 @@ Public Class KMeans_Basics : Inherits TaskParent
         labels = {"", "", "", "Palette output for the kMeans labels"}
         desc = "Cluster the input using kMeans."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If standalone And task.testAllRunning Then
             SetTrueText("KMeans_Basics occasionally fails standalone while running 'testAll'." + vbCrLf +
                         "Testing individually hasn't shown problems.  Skip it for now to continue test.")
@@ -57,7 +57,7 @@ Public Class KMeans_MultiChannel : Inherits TaskParent
         labels = {"", "", "KMeans_Basics output with BGR input", "dst3 contains the labels spread across the palette (dst0 contains the exact labels)"}
         desc = "Cluster the input using kMeans."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If standaloneTest() Then task.color.ConvertTo(src, cvb.MatType.CV_32FC3)
         If src.Type = cvb.MatType.CV_8UC3 Then src.ConvertTo(src, cvb.MatType.CV_32FC3)
         If src.Type = cvb.MatType.CV_8U Then src.ConvertTo(src, cvb.MatType.CV_32F)
@@ -82,7 +82,7 @@ Public Class KMeans_k2_to_k8 : Inherits TaskParent
         labels(2) = "kmeans - k=2,4,6,8"
         desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         Static kSlider = FindSlider("KMeans k")
 
         If task.frameCount Mod 100 = 0 Then
@@ -114,7 +114,7 @@ Public Class KMeans_Fuzzy : Inherits TaskParent
         labels(3) = "The white marks areas that are busy while the black marks areas that are consistent in color - not fuzzy."
         desc = "Use the KMeans output as input to the Fuzzy detector - those areas which have little info"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         km.Run(src)
         dst2 = km.km.dst2
         fuzzyD.Run(dst2)
@@ -133,7 +133,7 @@ Public Class KMeans_MultiGaussian_CPP_VB : Inherits TaskParent
         cPtr = KMeans_MultiGaussian_Open()
         desc = "Use KMeans on a random multi-gaussian distribution."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         Dim imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols)
         If imagePtr <> 0 And task.heartBeat Then dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC3, imagePtr).Clone()
     End Sub
@@ -153,7 +153,7 @@ Public Class KMeans_CustomData : Inherits TaskParent
     Public Sub New()
         desc = "Cluster the selected input using kMeans"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         km.options.RunOpt()
         Dim k = km.options.kMeansK
         If src.Rows < k Then k = src.Rows
@@ -188,7 +188,7 @@ Public Class KMeans_Simple_CPP_VB : Inherits TaskParent
         cPtr = Kmeans_Simple_Open()
         desc = "Split the input into 3 levels - zero (no depth), closer to min, closer to max."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If standaloneTest() Then src = task.pcSplit(2)
         If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
@@ -224,7 +224,7 @@ Public Class KMeans_Edges : Inherits TaskParent
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         edges.Run(src)
         src.SetTo(white, edges.dst2)
 
@@ -253,7 +253,7 @@ Public Class KMeans_CompareMulti : Inherits TaskParent
         labels = {"", "", "KMeans_Basics output", "KMeans on all 3 channels - recombined"}
         desc = "Compare the results of using grayscale KMeans with multi-channel KMeans"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         km.Run(src)
         dst2 = km.dst2
 
@@ -280,7 +280,7 @@ Public Class KMeans_TierCount : Inherits TaskParent
     Public Sub New()
         desc = "Use the Histogram valleys to find the best 'K' value for the current depth data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         kCount.Run(src)
         Static kSlider = FindSlider("KMeans k")
         If kSlider.value <> kCount.classCount Then
@@ -313,7 +313,7 @@ Public Class KMeans_Image : Inherits TaskParent
         labels = {"", "", "KMeans output after Palette run", "Each of the KMeans masks is displayed below in rotation."}
         desc = "Cluster the input image pixels using kMeans and allow any region to be selected for highlight in dst3."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         km.Run(src)
         dst2 = ShowPalette(km.dst2 * 255 / km.classCount)
         classCount = km.options.kMeansK
@@ -349,7 +349,7 @@ Public Class KMeans_DepthPlusGray : Inherits TaskParent
         grayPlus(0) = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_32F, cvb.Scalar.All(0))
         desc = "Cluster the rgb+depth image pixels using kMeans"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).ConvertTo(grayPlus(0), cvb.MatType.CV_32F)
         grayPlus(0).SetTo(0, task.noDepthMask)
         grayPlus(1) = task.pcSplit(2)
@@ -381,7 +381,7 @@ Public Class KMeans_Dimensions : Inherits TaskParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Dimension", 1, 6, 1)
         desc = "Demonstrate how to use KMeans for a variety of dimensions"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         Static dimSlider = FindSlider("Dimension")
 
         Dim merge As New cvb.Mat
@@ -436,7 +436,7 @@ Public Class KMeans_Valleys : Inherits TaskParent
         labels(2) = "8-Bit input to vbPalette output in dst3"
         desc = "Cluster depth using kMeans - use KMeans_TierCount to determine 'K'"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         tiers.Run(src)
 
         Static kSlider = FindSlider("KMeans k")
@@ -466,7 +466,7 @@ Public Class KMeans_Depth : Inherits TaskParent
         labels(2) =
         desc = "Cluster depth using kMeans - useful to split foreground and background"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         km.Run(task.pcSplit(2))
         dst2 = km.dst2 + 1
         dst2.SetTo(0, task.noDepthMask)
@@ -492,7 +492,7 @@ Public Class KMeans_SimKColor : Inherits TaskParent
     Public Sub New()
         desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the results."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If task.heartBeat Then
             plot1D.Run(src)
             dst3 = plot1D.dst2
@@ -521,7 +521,7 @@ Public Class KMeans_SimKDepth : Inherits TaskParent
     Public Sub New()
         desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
         If task.heartBeat Then
             plot1D.Run(src)

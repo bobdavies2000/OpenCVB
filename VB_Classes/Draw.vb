@@ -7,7 +7,7 @@ Public Class Draw_Noise : Inherits TaskParent
     Public Sub New()
         desc = "Add Noise to the color image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         src.CopyTo(dst2)
@@ -36,7 +36,7 @@ Public Class Draw_Ellipses : Inherits TaskParent
     Public Sub New()
         desc = "Draw the requested number of ellipses."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If task.heartBeat Then
             dst2.SetTo(cvb.Scalar.Black)
@@ -60,7 +60,7 @@ Public Class Draw_Circles : Inherits TaskParent
     Public Sub New()
         desc = "Draw the requested number of circles."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If task.heartBeat Then
             dst2.SetTo(cvb.Scalar.Black)
@@ -86,7 +86,7 @@ Public Class Draw_Lines : Inherits TaskParent
     Public Sub New()
         desc = "Draw the requested number of Lines."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If task.heartBeat Then
             dst2.SetTo(cvb.Scalar.Black)
@@ -112,7 +112,7 @@ Public Class Draw_Polygon : Inherits TaskParent
         desc = "Draw Polygon figures"
         labels = {"", "", "Convex Hull for the same points", "Polylines output"}
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If Not task.heartBeat Then Exit Sub
@@ -156,7 +156,7 @@ Public Class Draw_Shapes : Inherits TaskParent
     Public Sub New()
         desc = "Use RNG to draw the same set of shapes every time"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim offsetX = 25, offsetY = 25, lineLength = 25, thickness = 2
 
         dst2.SetTo(0)
@@ -198,7 +198,7 @@ Public Class Draw_SymmetricalShapes : Inherits TaskParent
     Public Sub New()
         desc = "Generate shapes programmatically"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If task.heartBeat Then
             dst2.SetTo(cvb.Scalar.Black)
@@ -246,7 +246,7 @@ Public Class Draw_Arc : Inherits TaskParent
     Public Sub New()
         desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If task.heartBeat Then
             rect = InitRandomRect(options.saveMargin)
@@ -309,7 +309,7 @@ Public Class Draw_ClipLine : Inherits TaskParent
         setup()
         desc = "Demonstrate the use of the ClipLine function in Opencvb. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst3 = src
         kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run(src)
@@ -351,7 +351,7 @@ Public Class Draw_Hexagon : Inherits TaskParent
         alpha.Text = "Perception is the key"
         desc = "What it means to recognize a cube.  Zygmunt Pizlo - UC Irvine"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
     End Sub
 End Class
 
@@ -368,7 +368,7 @@ Public Class Draw_Line : Inherits TaskParent
     Public Sub New()
         desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.firstPass Then task.ClickPoint = New cvb.Point
 
         If p1 <> newPoint And p2 <> New cvb.Point And task.ClickPoint <> newPoint Then
@@ -400,7 +400,7 @@ Public Class Draw_LineTest : Inherits TaskParent
     Public Sub New()
         desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line..."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.heartBeat Then
             line.p1 = New cvb.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
             line.p2 = New cvb.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
@@ -422,7 +422,7 @@ Public Class Draw_Frustrum : Inherits TaskParent
         labels(3) = "Frustrum 3D pointcloud"
         desc = "Draw a frustrum for a camera viewport"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         src = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_32F, cvb.Scalar.All(0))
 
         Dim mid = src.Height / 2
@@ -445,7 +445,7 @@ Public Class Draw_RotatedRect : Inherits TaskParent
     Public Sub New()
         desc = "Draw an OpenCV rotated rect"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standalone Then
             Static angle As Single = -10
             rr = New cvb.RotatedRect(New cvb.Point2f(dst2.Width / 2, dst2.Height / 2),

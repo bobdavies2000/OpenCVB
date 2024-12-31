@@ -5,7 +5,7 @@ Public Class PyrFilter_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         cvb.Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid)
     End Sub
@@ -24,7 +24,7 @@ Public Class PyrFilter_RedCloud : Inherits TaskParent
         labels = {"", "", "RedCloud_Basics output", "PyrFilter output before reduction"}
         desc = "Use RedColor to segment the output of PyrFilter"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         pyr.Run(src)
         dst3 = pyr.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 

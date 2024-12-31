@@ -5,7 +5,7 @@ Public Class WarpPerspective_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Essentials of the rotation matrix of WarpPerspective"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
         dst2 = src.EmptyClone
         cvb.Cv2.WarpPerspective(src, dst2, options.transformMatrix, dst2.Size(), cvb.InterpolationFlags.Cubic Or cvb.InterpolationFlags.WarpInverseMap)
@@ -25,7 +25,7 @@ Public Class WarpPerspective_WidthHeight : Inherits TaskParent
     Public Sub New()
         desc = "Use WarpPerspective to transform input images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim srcPt() = {New cvb.Point2f(0, 0), New cvb.Point2f(0, src.Height), New cvb.Point2f(src.Width, 0), New cvb.Point2f(src.Width, src.Height)}

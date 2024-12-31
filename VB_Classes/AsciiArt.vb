@@ -8,7 +8,7 @@ Public Class AsciiArt_Basics : Inherits TaskParent
         labels = {"", "", "Ascii version", "Grayscale input to ascii art"}
         desc = "Build an ascii art representation of the input stream."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         dst3 = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray).Resize(options.size, 0, 0, cvb.InterpolationFlags.Nearest)
@@ -34,7 +34,7 @@ Public Class AsciiArt_Color : Inherits TaskParent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "A palette'd version of the ascii art data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim hStep = CInt(src.Height / 31) - 1
         Dim wStep = CInt(src.Width / 55) - 1
         Dim size = New cvb.Size(55, 31)
@@ -63,7 +63,7 @@ Public Class AsciiArt_Diff : Inherits TaskParent
     Public Sub New()
         desc = "Display the instability in image pixels."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         grayAA.Run(src)
         dst2 = grayAA.dst2
 

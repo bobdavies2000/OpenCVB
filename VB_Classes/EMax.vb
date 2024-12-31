@@ -20,7 +20,7 @@ Public Class EMax_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use local options to control EMax.")
         desc = "Use EMax - Expectation Maximization - to classify the regions around a series of labeled points"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
 
         If eLabels.Count = 0 Or useInputClusters Then
@@ -83,7 +83,7 @@ Public Class EMax_Centers : Inherits TaskParent
         labels(2) = "Centers are highlighted, Previous centers are black"
         desc = "Display the Emax centers as they move"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         emax.Run(src)
         dst2 = emax.dst2
         Static lastCenters As New List(Of cvb.Point2f)(emax.centers)
@@ -111,7 +111,7 @@ Public Class EMax_InputClusters : Inherits TaskParent
         labels(2) = "EMax algorithms input samples"
         desc = "Options for EMax algorithms."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.firstPass Then
@@ -169,7 +169,7 @@ Public Class EMax_VB_Failing : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV expectation maximization example."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         emaxInput.Run(empty)
         eLabels = New List(Of Integer)(emaxInput.eLabels.ToList)
         eSamples = New List(Of cvb.Point2f)(emaxInput.eSamples)
@@ -217,7 +217,7 @@ Public Class EMax_PointTracker : Inherits TaskParent
         labels = {"", "", "Output of EMax_RedCloud", "Emax centers tracked and smoothed."}
         desc = "Use KNN to track the EMax Centers"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         emax.Run(src)
         dst2 = emax.dst2
 
@@ -256,7 +256,7 @@ Public Class EMax_RandomClusters : Inherits TaskParent
         labels = {"", "", "Random_Clusters output", "EMax layout for the random clusters supplied"}
         desc = "Build an EMax layout for random set of clusters (not a grid)"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static regionSlider = FindSlider("Number of Clusters")
         emax.regionCount = regionSlider.Value
 

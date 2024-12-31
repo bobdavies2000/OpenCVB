@@ -5,7 +5,7 @@ Public Class MeanSubtraction_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Subtract the mean from the image with a scaling factor"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim mean = cvb.Cv2.Mean(src)
         cvb.Cv2.Subtract(mean, src, dst2)
         dst2 *= CSng(100 / options.scaleVal)

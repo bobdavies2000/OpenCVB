@@ -5,7 +5,7 @@ Public Class Line3D_Basics : Inherits TaskParent
         dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
         desc = "Find all the lines in 3D using the structured slices through the pointcloud."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         sLines.Run(src)
 
         dst2 = src
@@ -44,7 +44,7 @@ Public Class Line3D_Correlation : Inherits TaskParent
         cvb.Cv2.MatchTemplate(A, B, correlation, cvb.TemplateMatchModes.CCoeffNormed)
         Return correlation.Get(Of Single)(0, 0)
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standalone Then task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -103,7 +103,7 @@ Public Class Line3D_Draw : Inherits TaskParent
         cvb.Cv2.MatchTemplate(pts1, pts2, correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Then
             If task.mouseClickFlag Then
                 If toggleFirstSecond = False Then
@@ -176,7 +176,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
             DrawLine(dst2, p1, p2, white)
         Next
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 
@@ -199,7 +199,7 @@ Public Class Line3D_Constructed : Inherits TaskParent
     Public Sub New()
         desc = "Build the 3D lines found in Line3D_Basics"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         lines.Run(src)
         dst2 = lines.dst2
         dst3 = lines.dst3

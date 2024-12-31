@@ -11,7 +11,7 @@ Public Class Texture_Basics : Inherits TaskParent
 
         desc = "find the best sample 256x256 texture of a mask"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Or src.Channels() <> 1 Then
             ellipse.Run(src)
             dst2 = ellipse.dst2.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
@@ -56,7 +56,7 @@ Public Class OpenGL_TextureShuffle : Inherits TaskParent
         texture = New Texture_Basics()
         desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Then
             If dst2.Width = 320 Then
                 SetTrueText("Texture_Shuffle is not supported at the 320x240 resolution.  It needs at least 256 rows in the output.")

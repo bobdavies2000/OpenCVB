@@ -18,7 +18,7 @@ Public Class Convex_Basics : Inherits TaskParent
         Next
         Return hullList
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim hullList = task.rc.contour
@@ -57,7 +57,7 @@ Public Class Convex_RedCloud : Inherits TaskParent
         labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
         desc = "Get lots of odd shapes from the RedCloud_Basics output and use ConvexHull to simplify them."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
 
@@ -87,7 +87,7 @@ Public Class Convex_Defects : Inherits TaskParent
         labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, Red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
         desc = "Find the convexityDefects in the image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         contours.Run(dst2.Clone)
         Dim c = contours.bestContour.ToArray
         dst3 = dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
@@ -141,7 +141,7 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
         End If
         Return newC
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst1 = task.redC.dst2
         labels(1) = task.redC.labels(2)
         dst3 = convex.dst3

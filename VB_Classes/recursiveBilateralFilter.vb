@@ -8,7 +8,7 @@ Public Class RecursiveBilateralFilter_CPP_VB : Inherits TaskParent
         cPtr = RecursiveBilateralFilter_Open()
         desc = "Apply the recursive bilateral filter"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If dataSrc.Length <> src.Total * src.ElemSize Then ReDim dataSrc(src.Total * src.ElemSize - 1)

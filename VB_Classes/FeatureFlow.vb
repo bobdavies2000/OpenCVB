@@ -32,7 +32,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
             End If
         Next
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         labels = task.feat.labels
 
         dst3 = If(task.firstPass, src.Clone, dst2.Clone)
@@ -60,7 +60,7 @@ Public Class FeatureFlow_Dense : Inherits TaskParent
         desc = "Use dense optical flow algorithm  "
     End Sub
 
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         options.RunOpt()
         Static lastGray As cvb.Mat = src.Clone
@@ -88,7 +88,7 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
     Public Sub New()
         desc = "Show the optical flow of a sparse matrix."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         dst2 = src.Clone()
@@ -139,7 +139,7 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Find features using optical flow in both the left and right images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         pyrLeft.Run(task.leftView)
         pyrRight.Run(task.rightView)
 
@@ -206,7 +206,7 @@ Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
         Next
         Return dst
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         pyrLeft.Run(task.leftView)
         Dim tmpLeft As New List(Of cvb.Point)
         For i = 0 To pyrLeft.features.Count - 1
@@ -298,7 +298,7 @@ Public Class FeatureFlow_LeftRight : Inherits TaskParent
         Next
         Return dst
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         flowHist.Run(src)
 
         Dim tmpLeft As New SortedList(Of Integer, List(Of cvb.Point))

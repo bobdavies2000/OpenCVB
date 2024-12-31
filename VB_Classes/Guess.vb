@@ -6,7 +6,7 @@ Public Class Guess_Depth_CPP_VB : Inherits TaskParent
         labels = {"", "", "Updated point cloud (holes filled)", "Original point cloud"}
         desc = "Fill single pixel holes in the point cloud."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -37,7 +37,7 @@ Public Class Guess_ImageEdges_CPP_VB : Inherits TaskParent
         labels = {"", "", "Updated point cloud - nearest depth to each edge is replicated to the image boundary", "Original point cloud"}
         desc = "Replicate the nearest depth measurement at all the image edges"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.cameraName = "Oak-D camera" Or task.cameraName = "Azure Kinect 4K" Then
             SetTrueText("Only RealSense cameras are likely to benefit from enhanced depth at the image edges.")
             Exit Sub

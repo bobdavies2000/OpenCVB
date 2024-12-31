@@ -4,7 +4,7 @@ Public Class TextureFlow_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Find and mark the texture flow in an image - see texture_flow.py"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         dst2 = src.Clone
@@ -32,7 +32,7 @@ Public Class TextureFlow_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Display texture flow in the depth data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         flow.Run(task.depthRGB)
         dst2 = flow.dst2
     End Sub
@@ -49,7 +49,7 @@ Public Class TextureFlow_Reduction : Inherits TaskParent
     Public Sub New()
         desc = "Display texture flow in the reduced color image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2
 
@@ -72,7 +72,7 @@ Public Class TextureFlow_DepthSegments : Inherits TaskParent
         labels = {"", "", "TextureFlow output", "TextureFlow Input"}
         desc = "Find the texture flow for the depth segments output"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         segments.Run(src)
         diffx.Run(segments.dst1)
         dst3 = segments.dst3

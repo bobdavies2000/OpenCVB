@@ -7,7 +7,7 @@ Public Class AddWeighted_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'")
         desc = "Add 2 images with specified weights."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If standalone Then src2 = task.depthRGB
@@ -40,7 +40,7 @@ Public Class AddWeighted_DepthAccumulate : Inherits TaskParent
         dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32F, 0)
         desc = "Update a running average of the image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         cvb.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New cvb.Mat)
@@ -61,7 +61,7 @@ Public Class AddWeighted_Accumulate : Inherits TaskParent
         labels(3) = "Instantaneous gray scale image"
         desc = "Update a running average of the image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If src.Channels <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -84,7 +84,7 @@ Public Class AddWeighted_InfraRed : Inherits TaskParent
     Public Sub New()
         desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.toggleOnOff Then
             dst1 = task.leftView
             labels(2) = "Left view combined with depthRGB"
@@ -112,7 +112,7 @@ Public Class AddWeighted_Edges : Inherits TaskParent
         labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}
         desc = "Add in the edges separating light and dark to the color image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         edges.Run(src)
         dst2 = edges.dst2
         labels(2) = edges.labels(2)
@@ -134,7 +134,7 @@ Public Class AddWeighted_LeftRight : Inherits TaskParent
     Public Sub New()
         desc = "Use AddWeighted to add the left and right images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         addw.src2 = task.rightView
         addw.Run(task.leftView)
         dst2 = addw.dst2

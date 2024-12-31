@@ -48,7 +48,7 @@ Public Class Cell_Basics : Inherits TaskParent
             dst1 = plot.dst2
         End If
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If standalone Or runRedCloud Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
@@ -73,7 +73,7 @@ Public Class Cell_PixelCountCompare : Inherits TaskParent
         task.gOptions.debugChecked = True
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -111,7 +111,7 @@ Public Class Cell_ValidateColorCells : Inherits TaskParent
         dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -161,7 +161,7 @@ Public Class Cell_Distance : Inherits TaskParent
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
         desc = "Measure the color distance of each cell to the selected cell."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If task.heartBeat Or task.quarterBeat Then
             task.redC.Run(src)
             dst0 = task.color
@@ -204,7 +204,7 @@ Public Class Cell_Binarize : Inherits TaskParent
         labels = {"", "Binarized image", "", "Relative gray image"}
         desc = "Separate the image into light and dark using RedCloud cells"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         dst0 = src
         If task.heartBeat Or task.quarterBeat Then
             task.redC.Run(src)
@@ -243,7 +243,7 @@ Public Class Cell_Floodfill : Inherits TaskParent
     Public Sub New()
         desc = "Provide cell stats on the flood_basics cells."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         flood.Run(src)
 
         stats.Run(src)
@@ -280,7 +280,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
         stats.statsString()
         strOut = stats.strOut
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If standaloneTest() Or runRedCloud Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
@@ -314,7 +314,7 @@ Public Class Cell_Generate : Inherits TaskParent
         task.redCells = New List(Of rcData)
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If standalone Then
             Static bounds As Boundary_RemovedRects
             If bounds Is Nothing Then bounds = New Boundary_RemovedRects

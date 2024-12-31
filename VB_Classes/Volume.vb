@@ -5,7 +5,7 @@ Public Class Volume_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Build a box containing all the 3D points of a RedCloud cell"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Then
             task.redC.Run(src)
             dst2 = task.redC.dst2

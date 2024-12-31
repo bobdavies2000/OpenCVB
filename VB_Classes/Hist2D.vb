@@ -11,7 +11,7 @@ Public Class Hist2D_Basics : Inherits TaskParent
         labels = {"", "", "All non-zero entries in the 2D histogram", ""}
         desc = "Create a 2D histogram from the input."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         ranges = GetHist2Dminmax(src, channels(0), channels(1))
         cvb.Cv2.CalcHist({src}, channels, New cvb.Mat(), histogram, 2, histRowsCols, ranges)
         dst2 = histogram.Threshold(0, 255, cvb.ThresholdTypes.Binary)
@@ -32,7 +32,7 @@ Public Class Hist2D_Cloud : Inherits TaskParent
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
         desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim r1 As cvb.Vec2f, r2 As cvb.Vec2f
         If task.redOptions.channels(0) = 0 Or task.redOptions.channels(0) = 1 Then
             r1 = New cvb.Vec2f(-task.xRangeDefault, task.xRangeDefault)
@@ -64,7 +64,7 @@ Public Class Hist2D_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Create 2D histogram from the 3D pointcloud - use options to select dimensions."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         hist2d.Run(task.pointCloud)
 
         histogram = hist2d.histogram
@@ -93,7 +93,7 @@ Public Class Hist2D_Zoom : Inherits TaskParent
         labels = {"", "", "Mask of histogram", "DrawRect area from the histogram"}
         desc = "Draw a rectangle on an area to zoom in on..."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         hist2d.Run(src)
         dst2 = hist2d.dst2
 
@@ -118,7 +118,7 @@ Public Class Hist2D_HSV : Inherits TaskParent
         labels = {"", "HSV image", "", ""}
         desc = "Create a 2D histogram for Hue to Saturation and Hue to Value."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim histRowsCols = {dst2.Height, dst2.Width}
 
         src = src.CvtColor(cvb.ColorConversionCodes.BGR2HSV)
@@ -145,7 +145,7 @@ Public Class Hist2D_BGR : Inherits TaskParent
         task.gOptions.setHistogramBins(256)
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim histRowsCols = {dst2.Height, dst2.Width}
         cvb.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, task.redOptions.rangesBGR)
         dst2 = histogram02.Threshold(0, 255, cvb.ThresholdTypes.Binary)
@@ -172,7 +172,7 @@ Public Class Hist2D_PlotHistogram1D : Inherits TaskParent
         labels(2) = "Hist2D_PlotHistogram1D output shown with plot_histogram"
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         cvb.Cv2.CalcHist({src}, task.redOptions.channels, task.depthMask, histogram, 2, {task.histogramBins, task.histogramBins},
                         task.redOptions.rangesBGR)
         dst2 = histogram.Threshold(0, 255, cvb.ThresholdTypes.Binary)

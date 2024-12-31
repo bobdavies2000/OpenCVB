@@ -9,7 +9,7 @@ Public Class Linear_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Confine derivatives to linear values"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         inputZ.Run(src)
@@ -89,7 +89,7 @@ Public Class Linear_Visualize : Inherits TaskParent
         labels(3) = "Histograms showing the range of pointcloud differences for X, Y, and Z"
         desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         Dim r1 As cvb.Rect, r2 As cvb.Rect
 
@@ -155,7 +155,7 @@ Public Class Linear_Input : Inherits TaskParent
         labels = {"", "Mask of differences > deltaX", "Point Cloud deltaX data", ""}
         desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         pc = task.pcSplit(options.dimension)(roi)
@@ -201,7 +201,7 @@ Public Class Linear_InputX : Inherits TaskParent
         FindRadio("X Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         input.Run(src)
         dst2 = input.dst2
         labels = input.labels
@@ -217,7 +217,7 @@ Public Class Linear_InputY : Inherits TaskParent
         FindRadio("Y Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the Y direction"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         input.Run(src)
         dst2 = input.dst2
         labels = input.labels
@@ -234,7 +234,7 @@ Public Class Linear_InputZ : Inherits TaskParent
         FindRadio("Z in X-Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the Z direction"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         input.Run(src)
         dst2 = input.dst2
         dst3 = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
@@ -256,7 +256,7 @@ Public Class Linear_Slices : Inherits TaskParent
         labels(3) = "Move mouse in the depth image above to display line of data."
         desc = "Isolate and display a line segment through the point cloud data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim pt = task.mouseMovePoint
@@ -314,7 +314,7 @@ Public Class Linear_ImageX : Inherits TaskParent
         Next
         desc = "Create SLR slices for the X dimension of an entire image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         dst2 = task.pcSplit(0).Clone
@@ -361,7 +361,7 @@ Public Class Linear_ImageY : Inherits TaskParent
         Next
         desc = "Create SLR slices for the Y dimension of an entire image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         dst2 = task.pcSplit(1).Clone

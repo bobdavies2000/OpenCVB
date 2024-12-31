@@ -8,7 +8,7 @@ Public Class ROI_Basics : Inherits TaskParent
         task.gOptions.pixelDiffThreshold = 30
         desc = "Find the motion ROI in the latest image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         diff.Run(src)
         dst2 = diff.dst2
 
@@ -40,7 +40,7 @@ Public Class ROI_FindNonZeroNoSingle : Inherits TaskParent
         task.gOptions.pixelDiffThreshold = 30
         desc = "Find the motion ROI in just the latest image - eliminate single pixels"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         diff.Run(src)
         dst2 = diff.dst2
         Dim tmp = diff.dst2.FindNonZero()
@@ -87,7 +87,7 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
         task.gOptions.pixelDiffThreshold = 30
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
             dst0 = task.color
@@ -138,7 +138,7 @@ Public Class ROI_Accumulate : Inherits TaskParent
         task.gOptions.pixelDiffThreshold = 30
         desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         SetTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)

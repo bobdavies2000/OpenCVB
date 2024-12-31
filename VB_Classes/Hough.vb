@@ -8,7 +8,7 @@ Public Class Hough_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use Houghlines to find lines in the image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         edges.Run(src)
 
@@ -45,7 +45,7 @@ Public Class Hough_Sudoku : Inherits TaskParent
         FindSlider("Hough threshold").Value = 150
         desc = "Successful use of Hough to find lines in Sudoku grid."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = cvb.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
         dst3 = dst2.Clone
         hough.Run(dst2)
@@ -63,7 +63,7 @@ Public Class Hough_Sudoku1 : Inherits TaskParent
     Public Sub New()
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst3 = cvb.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
         lines.Run(dst3.Clone)
         dst2 = lines.dst2
@@ -90,7 +90,7 @@ Public Class Hough_Circles : Inherits TaskParent
         labels(3) = "Hough Circles found"
         desc = "Find circles using HoughCircles."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         circles.Run(src)
         dst2 = circles.dst2
         cvb.Cv2.CvtColor(dst2, dst3, cvb.ColorConversionCodes.BGR2GRAY)
@@ -122,7 +122,7 @@ Public Class Hough_Lines_MT : Inherits TaskParent
         desc = "Multithread Houghlines to find lines in image fragments."
     End Sub
 
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         edges.Run(src)
         dst2 = edges.dst2
@@ -164,7 +164,7 @@ Public Class Hough_Featureless : Inherits TaskParent
         labels(2) = "Featureless mask"
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         edges.Run(src)
@@ -211,7 +211,7 @@ Public Class Hough_FeatureLessTopX : Inherits TaskParent
         labels = {"", "", "Areas without features", "Areas with features"}
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Static segSlider = FindSlider("Minimum feature pixels")
@@ -260,7 +260,7 @@ Public Class Hough_LaneFinder : Inherits TaskParent
         labels = {"Original video image", "Mask to isolate lane regions", "Combined yellow and white masks", "HoughLines output"}
         desc = "Use Hough to isolate features in the mask of the road."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         hls.Run(empty)
         If task.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
@@ -310,7 +310,7 @@ Public Class Hough_Lines : Inherits TaskParent
         labels(3) = "Hough Lines for each threaded cell or if no lines, the featureless cell depth data."
         desc = "Multithread Houghlines to find lines in image fragments."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         edges.Run(src)
         dst2 = edges.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
@@ -337,7 +337,7 @@ Public Class Hough_FullImage : Inherits TaskParent
     Public Sub New()
         desc = "Use Houghlines to find lines in the image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         edges.Run(src)
 
@@ -369,7 +369,7 @@ Public Class Hough_Probabilistic : Inherits TaskParent
         task.gOptions.GridSlider.Value = 30
         desc = "Use Houghlines to find lines in the image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         edges.Run(src)
 

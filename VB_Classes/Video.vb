@@ -9,7 +9,7 @@ Public Class Video_Basics : Inherits TaskParent
         labels(2) = options.fileInfo.Name
         desc = "Show a video file"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -45,7 +45,7 @@ Public Class Video_CarCounting : Inherits TaskParent
         flow.parentData = Me
         desc = "Count cars in a video file"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         video.Run(src)
         dst2.SetTo(0)
         bgSub.Run(video.dst1) ' use the original size of the video input - not the dst2 size...
@@ -90,7 +90,7 @@ Public Class Video_CarCComp : Inherits TaskParent
     Public Sub New()
         desc = "Outline cars with a rectangle"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         video.Run(src)
         If video.dst2.Empty() = False Then
             bgSub.Run(video.dst2)
@@ -117,7 +117,7 @@ Public Class Video_MinRect : Inherits TaskParent
         video.Run(dst2)
         desc = "Find area of car outline - example of using minAreaRect"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         video.Run(src)
         If video.dst2.Empty() = False Then
             bgSub.Run(video.dst2)
@@ -144,7 +144,7 @@ Public Class Video_MinCircle : Inherits TaskParent
     Public Sub New()
         desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         video.Run(src)
         dst2 = video.dst2
         dst3 = video.dst3

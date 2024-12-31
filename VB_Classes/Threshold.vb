@@ -6,7 +6,7 @@ Public Class Threshold_Basics : Inherits TaskParent
         labels(2) = "Original image"
         desc = "Demonstrate the use of OpenCV's threshold and all its options"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
 
         labels(3) = "Image after thresholding with threshold = " + CStr(options.threshold)
@@ -37,7 +37,7 @@ Public Class Threshold_Adaptive : Inherits TaskParent
         labels = {"", "", "Original input", "Output of AdaptiveThreshold"}
         desc = "Explore what adaptive threshold can do."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         optionsAdaptive.RunOpt()
 
@@ -64,7 +64,7 @@ Public Class Threshold_Definitions : Inherits TaskParent
         labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         gradient.Run(empty)
@@ -114,7 +114,7 @@ Public Class Threshold_ByChannels : Inherits TaskParent
         UpdateAdvice(traceName + ": see local options.")
         desc = "Threshold by channel - use red threshold slider to impact grayscale results."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         optionsColor.RunOpt()
 
@@ -151,7 +151,7 @@ Public Class Threshold_ColorSource : Inherits TaskParent
         UpdateAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.")
         desc = "Use all the alternative color sources as input to Threshold_ByChannels."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         color8U.Run(src)
         byChan.Run(color8U.dst3)
         dst2 = byChan.dst2

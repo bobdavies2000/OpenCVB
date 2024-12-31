@@ -5,7 +5,7 @@ Public Class Stitch_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Stitch together random parts of a color image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim mats As New List(Of cvb.Mat)

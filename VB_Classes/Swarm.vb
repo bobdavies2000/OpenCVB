@@ -33,7 +33,7 @@ Public Class Swarm_Basics : Inherits TaskParent
         Next
         Return dst
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         dst3 = task.feat.dst2
@@ -97,7 +97,7 @@ Public Class Swarm_RightFeatures : Inherits TaskParent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.feat.Run(task.rightView)
         rightList = New List(Of cvb.Point2f)(task.features)
         dst2 = task.feat.dst2.Clone
@@ -114,7 +114,7 @@ Public Class Swarm_LeftFeatures : Inherits TaskParent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.feat.Run(task.leftView)
         leftList = New List(Of cvb.Point2f)(task.features)
         dst2 = task.feat.dst2.Clone
@@ -133,7 +133,7 @@ Public Class Swarm_LeftRightFeatures : Inherits TaskParent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         swLeft.Run(empty)
         dst2 = swLeft.dst2
         swRight.Run(empty)
@@ -160,7 +160,7 @@ Public Class Swarm_LeftRight : Inherits TaskParent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Get direction and distance from the left and right images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         swarm.Run(task.leftView)
         leftDistance = swarm.distanceAvg
         leftDirection = swarm.directionAvg
@@ -193,7 +193,7 @@ Public Class Swarm_Percentage : Inherits TaskParent
     Public Sub New()
         desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         swarm.Run(src)
@@ -225,7 +225,7 @@ Public Class Swarm_Flood : Inherits TaskParent
     Public Sub New()
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         swarm.Run(src)
 
         color8U.Run(src)
@@ -262,7 +262,7 @@ Public Class Swarm_Flood2 : Inherits TaskParent
         flood.Run(color8U.dst2)
         Return flood.dst2
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.heartBeat = False Then Exit Sub
 
         dst2 = runRedCloud(src).Clone()
@@ -286,7 +286,7 @@ Public Class Swarm_Flood3 : Inherits TaskParent
     Public Sub New()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         swarm.Run(src)
         dst2 = swarm.dst2
         labels(2) = swarm.labels(2)

@@ -6,7 +6,7 @@ Public Class Complexity_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Plot all the available complexity runs."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         complex.options.RunOpt()
 
         Dim saveLatestFile = complex.options.filename.FullName
@@ -96,7 +96,7 @@ Public Class Complexity_PlotOpenCV : Inherits TaskParent
         dst2 = plot.dst2.Clone
         Return maxTime
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         maxFrameCount = 0
@@ -127,7 +127,7 @@ Public Class Complexity_Dots : Inherits TaskParent
     Public Sub New()
         desc = "Plot the results of multiple runs at various resolutions."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If fileName <> "" Then options.filename = New FileInfo(fileName)

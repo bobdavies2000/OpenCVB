@@ -13,7 +13,7 @@ Public Class CamShift_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": click 'Show All' to control camShift options.")
         desc = "CamShift Demo - draw on the images to define the object to track. "
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         redHue.Run(src)
         dst2 = redHue.dst2
         Dim hue = redHue.dst1
@@ -51,7 +51,7 @@ Public Class CamShift_RedHue : Inherits TaskParent
         labels = {"", "Hue", "Image regions with red hue", "Mask for hue regions"}
         desc = "Find that portion of the image where red dominates"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
 
         Dim hsv = src.CvtColor(cvb.ColorConversionCodes.BGR2HSV)

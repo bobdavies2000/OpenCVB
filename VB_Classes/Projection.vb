@@ -10,7 +10,7 @@ Public Class Projection_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Find all the masks, rects, and counts in the input"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standalone Then
             histTop.Run(src)
             src = histTop.dst2
@@ -105,7 +105,7 @@ Public Class Projection_HistSide : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
         desc = "Create a 2D side view for ZY histogram of depth"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
         cvb.Cv2.CalcHist({src}, task.channelsSide, New cvb.Mat, histogram, 2, task.bins2D, task.rangesSide)
         histogram.Col(0).SetTo(0)
@@ -127,7 +127,7 @@ Public Class Projection_HistTop : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
         desc = "Create a 2D top view for XZ histogram of depth"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_32FC3 Then src = task.pointCloud
         cvb.Cv2.CalcHist({src}, task.channelsTop, New cvb.Mat, histogram, 2, task.bins2D, task.rangesTop)
         histogram.Row(0).SetTo(0)
@@ -154,7 +154,7 @@ Public Class Projection_Lines : Inherits TaskParent
         labels = {"", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells"}
         desc = "Search for surfaces among the FeatureLess regions"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.heartBeat Then
@@ -184,7 +184,7 @@ Public Class Projection_Top : Inherits TaskParent
     Public Sub New()
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         histTop.Run(src)
 
         task.redC.inputMask = Not histTop.dst3
@@ -215,7 +215,7 @@ Public Class Projection_Side : Inherits TaskParent
         objects.viewType = "Side"
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         histSide.Run(src)
 
         task.redC.inputMask = Not histSide.dst3
@@ -247,7 +247,7 @@ Public Class Projection_ObjectIsolate : Inherits TaskParent
         side.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         top.Run(src)
@@ -284,7 +284,7 @@ Public Class Projection_Object : Inherits TaskParent
         top.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         top.Run(src)
         dst3 = top.dst2
         labels(3) = top.labels(2)
@@ -321,7 +321,7 @@ Public Class Projection_Floor : Inherits TaskParent
         objSlider = FindSlider("Index of object")
         desc = "Isolate just the floor."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         isolate.Run(src)
         dst2 = isolate.dst2
         dst3 = isolate.dst3
@@ -361,7 +361,7 @@ Public Class Projection_Cell : Inherits TaskParent
         labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
         desc = "Create a top and side projection of the selected cell"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -397,7 +397,7 @@ Public Class Projection_Derivative : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Create a top and side projection the best derivative data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         deriv.Run(src)
         dst1 = deriv.dst3
         labels(1) = deriv.labels(3)

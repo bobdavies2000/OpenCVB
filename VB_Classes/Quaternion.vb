@@ -5,7 +5,7 @@ Public Class Quaterion_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         Dim quatmul = Quaternion.Multiply(options.q1, options.q2)
         SetTrueText("q1 = " + options.q1.ToString() + vbCrLf + "q2 = " + options.q2.ToString() + vbCrLf +
@@ -73,7 +73,7 @@ Public Class Quaterion_IMUPrediction : Inherits TaskParent
         Dim s = If(theta2 < Math.Sqrt(120 * Single.Epsilon), 1 - theta2 / 6, Math.Sin(theta) / theta2)
         Return New Quaternion(s * v.X, s * v.Y, s * v.Z, c)
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         host.Run(src)
 
         Dim dt = host.HostInterruptDelayEstimate

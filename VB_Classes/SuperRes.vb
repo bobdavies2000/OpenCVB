@@ -12,7 +12,7 @@ Public Class SuperRes_Basics : Inherits TaskParent
         labels(3) = "SuperRes output"
         desc = "Create superres version of the video input"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If warningMessage > 0 Then
             SetTrueText("The first frame takes a while when iterations are over 50 or so")
             warningMessage -= 1
@@ -71,7 +71,7 @@ Public Class SuperRes_Input : Inherits TaskParent
         inputFileName = video.options.fileInfo.FullName
         desc = "Input data for the superres testing"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         video.Run(empty)
         dst2 = video.dst2
     End Sub
@@ -93,7 +93,7 @@ Public Class SuperRes_SubPixelZoom : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.mouseMovePoint = New cvb.Point(45, 60)
         video.Run(empty)
         If video.video.captureVideo.PosFrames > 30 Then Exit Sub

@@ -33,7 +33,7 @@ Public Class MultiDimensionScaling_Cities : Inherits TaskParent
     Private Function CenteringMatrix(n As integer) As cvb.Mat
         Return cvb.Mat.Eye(n, n, cvb.MatType.CV_64F) - 1.0 / n
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim size = 10 ' we are working with 10 cities.
         Dim cityMat = cvb.Mat.FromPixelData(size, size, cvb.MatType.CV_64FC1, CityDistance)
         cityMat += Torgerson(cityMat)

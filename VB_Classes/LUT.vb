@@ -11,7 +11,7 @@ Public Class LUT_Basics : Inherits TaskParent
         labels(3) = "Palettized version of dst2"
         desc = "Divide the image into n-segments controlled with a slider."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If classCount <> options.lutSegments Then
@@ -47,7 +47,7 @@ Public Class LUT_Sliders : Inherits TaskParent
     Public Sub New()
         desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim gray = If(src.Channels() = 1, src, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
@@ -82,7 +82,7 @@ Public Class LUT_Reduction : Inherits TaskParent
         labels(3) = "Custom Color Lookup Table"
         desc = "Build and use a custom color palette"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR).LUT(vector)
     End Sub
@@ -102,7 +102,7 @@ Public Class LUT_RGBDepth : Inherits TaskParent
     Public Sub New()
         desc = "Use a LUT on the RGBDepth to segregate depth data."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         lut.Run(task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
         dst2 = lut.dst2 * 255 / lut.classCount
         labels(2) = lut.labels(2)
@@ -121,7 +121,7 @@ Public Class LUT_Depth32f : Inherits TaskParent
     Public Sub New()
         desc = "Use a LUT on the 32-bit depth to segregate depth data."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         lut.Run(task.pcSplit(2).Normalize(255).ConvertScaleAbs(255))
         dst2 = lut.dst2 * 255 / lut.classCount
         dst2.SetTo(0, task.noDepthMask)
@@ -145,7 +145,7 @@ Public Class LUT_Equalized : Inherits TaskParent
         labels(3) = "With Histogram Equalized"
         desc = "Use LUT_Basics but with an equalized histogram image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         lut.Run(src)
         dst3 = lut.dst2 * 255 / lut.classCount
 
@@ -174,7 +174,7 @@ Public Class LUT_Watershed : Inherits TaskParent
         wShed.UseCorners = True
         desc = "Use watershed algorithm with LUT input to identify regions in the image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         lut.Run(src)
         dst3 = lut.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
@@ -202,7 +202,7 @@ Public Class LUT_Custom : Inherits TaskParent
         labels(3) = "Custom Color Lookup Table"
         desc = "Use a palette to provide the lookup table for LUT"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static colorSlider = FindSlider("Color transitions")
         If task.optionsChanged Or task.heartBeat Then
             If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
@@ -226,7 +226,7 @@ Public Class LUT_RedCloud : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Use LUT on the grayscale image after masking with rc.mask"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -251,7 +251,7 @@ Public Class LUT_Create : Inherits TaskParent
     Public Sub New()
         desc = "Create a LUT table that can map similar pixels to the same exact pixel."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim split = src.Split()

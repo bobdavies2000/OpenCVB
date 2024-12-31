@@ -35,7 +35,7 @@ Public Class Fractal_Mandelbrot : Inherits TaskParent
             dst2.Set(Of Byte)(y, x, If(iter < options.iterations, 255 * iter / (options.iterations - 1), 0))
         Next
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
         For y = 0 To src.Height - 1
             mandelbrotLoop(y)
@@ -54,7 +54,7 @@ Public Class Fractal_MandelbrotZoom : Inherits TaskParent
     Public Sub New()
         desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.drawRect.Width <> 0 Then
             Dim newStartX = mandel.startX + (mandel.endX - mandel.startX) * task.drawRect.X / src.Width
             mandel.endX = mandel.startX + (mandel.endX - mandel.startX) * (task.drawRect.X + task.drawRect.Width) / src.Width
@@ -90,7 +90,7 @@ Public Class Fractal_MandelbrotZoomColor : Inherits TaskParent
     Public Sub New()
         desc = "Classic Mandelbrot in color"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If zoom.mandel.options.resetCheck.Checked Then zoom.mandel.reset()
         zoom.Run(src)
         dst2 = ShowPalette(zoom.dst2)
@@ -126,7 +126,7 @@ Public Class Fractal_Julia : Inherits TaskParent
         If depth < max / 4 Then Return 0
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static resetCheck = FindCheckBox("Reset to original Mandelbrot")
         If savedMouse <> task.mouseMovePoint Or resetCheck.Checked Then
             savedMouse = task.mouseMovePoint
@@ -204,7 +204,7 @@ Public Class Fractal_Dimension : Inherits TaskParent
         'D = np.polyfit(x, y, 1)[0]  # D = lim r -> 0 log(Nr)/log(1/r)
         Return d
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         dst3.SetTo(0)

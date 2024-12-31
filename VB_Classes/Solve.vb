@@ -4,7 +4,7 @@ Public Class Solve_ByMat : Inherits TaskParent
     Public Sub New()
         desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)
@@ -27,7 +27,7 @@ Public Class Solve_ByArray : Inherits TaskParent
     Public Sub New()
         desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)

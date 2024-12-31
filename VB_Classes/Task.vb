@@ -644,7 +644,7 @@ Public Class VBtask : Implements IDisposable
                 Next
             End If
 
-            gravityHorizon.RunAlg(src)
+            gravityHorizon.runAlg(src)
             If task.gOptions.CrossHairs.Checked Then
                 If task.paused = False Then
                     DrawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
@@ -731,20 +731,20 @@ Public Class VBtask : Implements IDisposable
         task.IMU_RawAcceleration = task.IMU_Acceleration
         task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
         task.IMU_AlphaFilter = 0.5 '  task.gOptions.imu_Alpha
-        grid.RunAlg(task.color)
+        grid.runAlg(task.color)
 
-        imuStabilityTest.RunAlg(src)
+        imuStabilityTest.runAlg(src)
         task.cameraStable = imuStabilityTest.stableTest
         task.cameraStableString = imuStabilityTest.stableStr
-        IMUBasics.RunAlg(src)
-        gMat.RunAlg(src)
+        IMUBasics.runAlg(src)
+        gMat.runAlg(src)
 
         'If task.gOptions.RGBFilterActive.Checked Then
         '    Static filterObject As Object = createAlgorithm(filterName)
         '    Dim filterName = task.gOptions.RGBFilterList.Text
         '    If rgbFilter Is Nothing Then rgbFilter = algorithmList.createAlgorithm(filterName)
         '    If rgbFilter.traceName <> filterName Then rgbFilter = algorithmList.createAlgorithm(filterName)
-        '    rgbFilter.RunAlg(src)
+        '    rgbFilter.runAlg(src)
         '    src = rgbFilter.dst2
         'End If
 
@@ -825,7 +825,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.CreateGif.Checked Then
             If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
-            gifCreator.RunAlg(src)
+            gifCreator.runAlg(src)
             If task.gifBuild Then
                 task.gifBuild = False
                 If task.gifImages.Count = 0 Then

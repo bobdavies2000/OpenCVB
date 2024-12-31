@@ -4,7 +4,7 @@ Public Class SVD_Example : Inherits TaskParent
     Public Sub New()
         desc = "SVD example"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim inputData() As Single = {
             1, 2, 3, 4, 5,
             1, 2, 3, 4, 5,
@@ -46,7 +46,7 @@ Public Class SVD_Example2 : Inherits TaskParent
     Public Sub New()
         desc = "Compute the mean and tangent of a RedCloud Cell"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
 
@@ -100,7 +100,7 @@ Public Class SVD_Gaussian : Inherits TaskParent
     Public Sub New()
         desc = "Compute the SVD for the covariance of 2 images - only close to working..."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         covar.Run(src)
         dst2 = src
 

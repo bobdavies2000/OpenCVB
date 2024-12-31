@@ -23,7 +23,7 @@ Public Class Sieve_BasicsVB : Inherits TaskParent
         Static countSlider = FindSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static countSlider = FindSlider("Count of desired primes")
 
         Dim count = countSlider.Value
@@ -62,7 +62,7 @@ Public Class Sieve_Image : Inherits TaskParent
         labels(3) = "Zoom output"
         desc = "Create an image marking primes"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim numCeiling = numArray.Length - 1
         ReDim numArray(numCeiling)
         numArray(0) = 255

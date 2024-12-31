@@ -12,7 +12,7 @@ Public Class CComp_Basics : Inherits TaskParent
         labels(2) = "Input to ConnectedComponenetsEx"
         desc = "Draw bounding boxes around BGR binarized connected Components"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         rects.Clear()
@@ -59,7 +59,7 @@ Public Class CComp_Shapes : Inherits TaskParent
         labels(3) = "RectView, LabelView, Binary, grayscale"
         desc = "Use connected components to isolate objects in image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim gray = shapes.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, cvb.ThresholdTypes.Otsu + cvb.ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
@@ -100,7 +100,7 @@ Public Class CComp_Both : Inherits TaskParent
         labels = {"", "", "Connected components in both the lighter and darker halves", "Connected components in the darker half of the image"}
         desc = "Prepare the connected components for both above and below the threshold"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         above.options.RunOpt()
 
         Dim light = src.Threshold(above.options.light, 255, cvb.ThresholdTypes.Binary)
@@ -123,7 +123,7 @@ Public Class CComp_Hulls : Inherits TaskParent
     Public Sub New()
         desc = "Create connected components using RedCloud Hulls"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         ccomp.Run(src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
         dst2 = ccomp.dst3
         ccomp.dst1.ConvertTo(dst1, cvb.MatType.CV_8U)
@@ -151,7 +151,7 @@ Public Class CComp_Stats : Inherits TaskParent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Use a threshold slider on the CComp input"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = src
         options.RunOpt()
 

@@ -6,7 +6,7 @@ Public Class DCT_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": local options control the Discrete Cosine Transform'")
         desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
 
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
@@ -38,7 +38,7 @@ Public Class DCT_RGB : Inherits TaskParent
         labels(3) = "Difference from original"
         desc = "Apply OpenCV's Discrete Cosine Transform to a BGR image and use slider to remove the highest frequencies."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dct.Options.RunOpt()
 
         Dim srcPlanes = src.Split()
@@ -73,7 +73,7 @@ Public Class DCT_Depth : Inherits TaskParent
         labels(3) = "Subtract DCT inverse from Grayscale depth"
         desc = "Find featureless surfaces in the depth data - expected to be useful only on the K4A for Azure camera."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim gray = task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         Dim frequencies As New cvb.Mat
         Dim src32f As New cvb.Mat
@@ -101,7 +101,7 @@ Public Class DCT_FeatureLess : Inherits TaskParent
         desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         labels(3) = "FeatureLess BGR regions"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dct.Run(src)
 
         dst2.SetTo(0)
@@ -148,7 +148,7 @@ Public Class DCT_Surfaces_debug : Inherits TaskParent
         task.gOptions.displayDst0.Checked = False
         desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         ' If task.heartBeat Then flow.msgs.Clear()
 
         mats.mat(0) = src.Clone

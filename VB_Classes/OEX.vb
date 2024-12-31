@@ -10,7 +10,7 @@ Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent
         UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "OpenCV Sample CalcBackProject_Demo1"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim ranges() As cvb.Rangef = New cvb.Rangef() {New cvb.Rangef(0, 180)}
 
         Dim hsv As cvb.Mat = task.color.CvtColor(cvb.ColorConversionCodes.BGR2HSV)
@@ -55,7 +55,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits TaskParent
         labels = {"", "Mask for isolated region", "Backprojection of the hsv 2D histogram", "Mask in image context"}
         desc = "OpenCV Sample CalcBackProject_Demo2"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim count As Integer
         If task.ClickPoint <> newPoint Then
             Dim connectivity As Integer = 8
@@ -95,7 +95,7 @@ Public Class OEX_bgfg_segm : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV example bgfg_segm - existing BGSubtract_Basics is the same."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         bgSub.Run(src)
         dst2 = bgSub.dst2
         labels(2) = bgSub.labels(2)
@@ -114,7 +114,7 @@ Public Class OEX_bgSub : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV example bgSub"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -144,7 +144,7 @@ Public Class OEX_BasicLinearTransforms : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         src.ConvertTo(dst2, -1, options.brightness, options.contrast)
     End Sub
@@ -160,7 +160,7 @@ Public Class OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than OEX_BasicLinearTransforms"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If src.Cols >= 640 Then
@@ -216,7 +216,7 @@ Public Class OEX_delaunay2 : Inherits TaskParent
 
         DrawCircle(img, pt, task.DotSize, activeColor)
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.quarterBeat Then
             If points.Count < 10 Then
                 dst2.SetTo(0)
@@ -280,7 +280,7 @@ Public Class OEX_MeanShift : Inherits TaskParent
         labels(3) = "Draw a rectangle around the region of interest"
         desc = "OpenCV Example MeanShift"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim roi = If(task.drawRect.Width > 0, task.drawRect, New cvb.Rect(0, 0, dst2.Width, dst2.Height))
         Dim hsv As cvb.Mat = src.CvtColor(cvb.ColorConversionCodes.BGR2HSV)
         dst2 = src
@@ -308,7 +308,7 @@ Public Class OEX_PointPolygon : Inherits TaskParent
     Public Sub New()
         desc = "PointPolygonTest will decide what is inside and what is outside."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Then
             rotatedRect.Run(src)
             src = rotatedRect.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -360,7 +360,7 @@ Public Class OEX_PointPolygon_demo : Inherits TaskParent
         dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "OpenCV Example PointPolygonTest_demo - it became PointPolygonTest_Basics."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim r As Integer = dst2.Height / 4
         Dim vert As New List(Of cvb.Point)
         vert.Add(New cvb.Point2f(3 * r / 2 + dst2.Width / 4, 1.34 * r))
@@ -392,7 +392,7 @@ Public Class OEX_Remap : Inherits TaskParent
     Public Sub New()
         desc = "The OpenCV Remap example became the Remap_Basics algorithm."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         remap.Run(src)
         dst2 = remap.dst2
         labels(2) = remap.labels(2)
@@ -411,7 +411,7 @@ Public Class OEX_Threshold : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example Threshold became Threshold_Basics"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         threshold.Run(src)
         dst2 = threshold.dst2
         dst3 = threshold.dst3
@@ -431,7 +431,7 @@ Public Class OEX_Threshold_Inrange : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example Threshold_Inrange"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim hsv = src.CvtColor(cvb.ColorConversionCodes.BGR2HSV)
@@ -450,7 +450,7 @@ Public Class OEX_Points_Classifier : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example Points_Classifier became Classifier_Basics"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
@@ -468,7 +468,7 @@ Public Class OEX_GoodFeaturesToTrackDemo : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Stable"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = task.feat.dst2
         labels(2) = task.feat.labels(2)
     End Sub
@@ -489,7 +489,7 @@ Public Class OEX_Core_Reduce : Inherits TaskParent
     Public Sub New()
         desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.heartBeat Then
             Dim m As cvb.Mat = cvb.Mat.FromPixelData(3, 2, cvb.MatType.CV_32F, New Single() {1, 2, 3, 4, 5, 6})
             Dim col_sum As New cvb.Mat, row_sum As New cvb.Mat
@@ -553,7 +553,7 @@ Public Class OEX_Core_Split : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example Core_Split"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim d As cvb.Mat = cvb.Mat.FromPixelData(2, 2, cvb.MatType.CV_8UC3, New Byte() {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12})
 
         Dim channels = d.Split()
@@ -590,7 +590,7 @@ Public Class OEX_Filter2D : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example Filter2D demo - Use a varying kernel to show the impact."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
 
         If task.heartBeat Then ind += 1
         kernelSize = 3 + 2 * (ind Mod 5)
@@ -615,7 +615,7 @@ Public Class OEX_FitEllipse : Inherits TaskParent
         cPtr = OEX_FitEllipse_Open()
         desc = "OEX Example fitellipse"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim cppData(img.Total * img.ElemSize - 1) As Byte

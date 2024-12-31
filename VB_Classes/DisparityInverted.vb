@@ -29,7 +29,7 @@ Public Class DisparityFunction_Basics : Inherits TaskParent
         If depth = 0 Then Return 0
         Return task.baseline * 1000 * task.focalLength / depth
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.cameraName = "Azure Kinect 4K" Then
             SetTrueText("Kinect for Azure does not have a left and right view to compute disparities", 2)
             Exit Sub

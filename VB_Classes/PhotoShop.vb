@@ -13,7 +13,7 @@ Public Class PhotoShop_Clahe : Inherits TaskParent
         labels(3) = "CLAHE Result"
         desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static clipSlider = FindSlider("Clip Limit")
         Static gridSlider = FindSlider("Grid Size")
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
@@ -34,7 +34,7 @@ Public Class PhotoShop_Hue : Inherits TaskParent
         labels(3) = "Saturation"
         desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim imghsv = New cvb.Mat(src.Size(), cvb.MatType.CV_8UC3)
         cvb.Cv2.CvtColor(src, imghsv, cvb.ColorConversionCodes.RGB2HSV)
         Dim hsv_planes = imghsv.Split()
@@ -57,7 +57,7 @@ Public Class PhotoShop_AlphaBeta : Inherits TaskParent
             sliders.setupTrackBar("Brightness Beta", -100, 100, 0)
         End If
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static alphaSlider = FindSlider("Alpha (contrast)")
         Static betaSlider = FindSlider("Brightness Beta")
         dst2 = src.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
@@ -78,7 +78,7 @@ Public Class PhotoShop_Gamma : Inherits TaskParent
         desc = "Use gamma with ConvertScaleAbs."
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Gamma correction", 0, 200, 100)
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static gammaSlider = FindSlider("Brightness Gamma correction")
         If lastGamma <> gammaSlider.Value Then
             lastGamma = gammaSlider.Value
@@ -103,7 +103,7 @@ Public Class PhotoShop_WhiteBalance : Inherits TaskParent
         labels = {"", "", "Image with white balance applied", "White pixels were altered from the original"}
         desc = "Automate getting the right white balance"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static thresholdSlider = FindSlider("White balance threshold X100")
         Dim thresholdVal As Single = thresholdSlider.Value / 100
 
@@ -140,7 +140,7 @@ Public Class PhotoShop_WhiteBalancePlot : Inherits TaskParent
         labels = {"", "", "Image with auto white balance", "Histogram of pixel values"}
         desc = "Automate getting the right white balance"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static thresholdSlider = FindSlider("White balance threshold X100")
         Dim thresholdVal = thresholdSlider.Value / 100
 
@@ -191,7 +191,7 @@ Public Class PhotoShop_ChangeMask : Inherits TaskParent
         FindSlider("White balance threshold X100").Value = 3
         desc = "Create a mask for the changed pixels after white balance"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         whiteBal.Run(src)
         dst2 = whiteBal.dst2
         labels(2) = "White balanced image"
@@ -216,7 +216,7 @@ Public Class PhotoShop_PlotHist : Inherits TaskParent
         hist2.plot.addLabels = False
         desc = "Plot the histogram of the before and after white balancing"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         hist1.Run(src)
         mat2to1.mat(0) = hist1.dst2
 
@@ -245,7 +245,7 @@ Public Class PhotoShop_Sepia : Inherits TaskParent
     Public Sub New()
         desc = "Create a sepia image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = src.CvtColor(cvb.ColorConversionCodes.BGR2RGB)
         Dim tMatrix = cvb.Mat.FromPixelData(3, 3, cvb.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
         dst2 = dst2.Transform(tMatrix).Threshold(255, 255, cvb.ThresholdTypes.Trunc)
@@ -288,7 +288,7 @@ Public Class PhotoShop_Emboss : Inherits TaskParent
         Next
         Return kernel
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static sizeSlider = FindSlider("Emboss Kernel Size")
         Dim kernel = kernelGenerator(sizeSlider.Value)
 
@@ -336,7 +336,7 @@ Public Class PhotoShop_EmbossAll : Inherits TaskParent
         labels(3) = "bottom left, bottom right, top left, top right"
         desc = "Emboss using all the directions provided"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static threshSlider = FindSlider("Emboss threshold")
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
@@ -396,7 +396,7 @@ Public Class PhotoShop_DuoTone : Inherits TaskParent
 
         desc = "Create a DuoTone image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static duoCheck = FindCheckBox("DuoTone Dark if checked, Light otherwise")
         options.RunOpt()
         Static expSlider = FindSlider("DuoTone Exponent")
@@ -444,7 +444,7 @@ Public Class PhotoShop_UnsharpMask : Inherits TaskParent
         desc = "Sharpen an image"
         labels(3) = "Unsharp mask (difference from Blur)"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static sigmaSlider = FindSlider("sigma")
         Static thresholdSlider = FindSlider("Photoshop Threshold")
         Static shiftSlider = FindSlider("Shift Amount")
@@ -475,7 +475,7 @@ Public Class PhotoShop_SharpenDetail : Inherits TaskParent
         End If
         desc = "Enhance detail on an image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static sSigmaSlider = FindSlider("DetailEnhance Sigma_s")
         Static rSigmaSlider = FindSlider("DetailEnhance Sigma_r X100")
         cvb.Cv2.DetailEnhance(src, dst2, sSigmaSlider.Value, rSigmaSlider.Value / rSigmaSlider.Maximum)
@@ -497,7 +497,7 @@ Public Class PhotoShop_SharpenStylize : Inherits TaskParent
         End If
         desc = "Stylize an image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static sSlider = FindSlider("Stylize Sigma_s")
         Static rSlider = FindSlider("Stylize Sigma_r X100")
         cvb.Cv2.Stylization(src, dst2, sSlider.Value, rSlider.Value / rSlider.maximum)
@@ -521,7 +521,7 @@ Public Class PhotoShop_Pencil_Basics : Inherits TaskParent
 
         desc = "Convert image to a pencil sketch"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static sSlider = FindSlider("Pencil Sigma_s")
         Static rSlider = FindSlider("Pencil Sigma_r X100")
         Static shadeSlider = FindSlider("Pencil Shade Factor X100")
@@ -549,7 +549,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits TaskParent
         End If
         desc = "Break down the process of converting an image to a sketch"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cvb.Mat
         grayinv = Not src
@@ -580,7 +580,7 @@ Public Class PhotoShop_Vignetting : Inherits TaskParent
         labels(2) = "Vignetted image.  Click anywhere to establish a different center."
         desc = "Inject vignetting into an image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         vignet.Run(src)
         dst2 = vignet.dst2
     End Sub

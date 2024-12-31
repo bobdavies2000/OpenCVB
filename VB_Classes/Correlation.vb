@@ -7,7 +7,7 @@ Public Class Correlation_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": there are several local options panels.")
         desc = "Compute a correlation for src rows (See also: Match.vb"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         kFlood.Run(src)

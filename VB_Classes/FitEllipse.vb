@@ -9,7 +9,7 @@ Public Class FitEllipse_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use FitEllipse OpenCV API to draw around a set of points"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
             options.RunOpt()
@@ -46,7 +46,7 @@ Public Class FitEllipse_AMS_CPP_VB : Inherits TaskParent
         labels(2) = "FitEllipse_AMS_CPP C++ "
         desc = "Use FitEllipse_AMS to draw around a set of points"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
             options.RunOpt()
@@ -90,7 +90,7 @@ Public Class FitEllipse_Direct_CPP_VB : Inherits TaskParent
         labels(2) = "The FitEllipse_Direct C++ "
         desc = "Use FitEllipse to draw around a set of points"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub
         options.RunOpt()
         Dim dataSrc(options.srcPoints.Count * 2 - 1) As Single
@@ -131,7 +131,7 @@ Public Class FitEllipse_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Create an ellipse from a contour"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If not task.heartBeat Then Exit Sub
         task.redC.Run(src)
         dst2 = task.redC.dst2

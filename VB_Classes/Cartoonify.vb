@@ -8,7 +8,7 @@ Public Class Cartoonify_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": click 'Show All' to control cartoonify options.")
         desc = "Create a cartoon from a color image"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
 
         Dim gray8u = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)

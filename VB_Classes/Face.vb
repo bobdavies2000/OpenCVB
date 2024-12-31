@@ -10,7 +10,7 @@ Public Class Face_Haar_LBP : Inherits TaskParent
         labels(2) = "Faces detected with Haar"
         labels(3) = "Faces detected with LBP"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = src.Clone()
         DetectFace(dst2, haarCascade)
         dst3 = src.Clone()
@@ -29,7 +29,7 @@ Public Class Face_Haar_Alt : Inherits TaskParent
         desc = "Detect faces Haar_alt database."
         labels(2) = "Faces detected with Haar_Alt"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = src.Clone()
         DetectFace(dst2, haarCascade)
     End Sub

@@ -10,7 +10,7 @@ Public Class GrabCut_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use Foreground_Basics to define the foreground for use in GrabCut."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         fore.Run(src)
         dst2 = fore.dst2
         dst3 = fore.dst3
@@ -53,7 +53,7 @@ Public Class GrabCut_FineTune : Inherits TaskParent
         labels(3) = "Grabcut results after adding fine tuning selections"
         desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If options.clearAll Or basics.fgFineTune Is Nothing Then
@@ -106,7 +106,7 @@ Public Class GrabCut_ImageRect : Inherits TaskParent
         image = cvb.Cv2.ImRead(fileInputName.FullName)
         desc = "Grabcut example using a single image.  Fix this."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = image
 
         dst0 = New cvb.Mat(image.Size(), cvb.MatType.CV_8U, cvb.GrabCutClasses.PR_BGD)
@@ -143,7 +143,7 @@ Public Class GrabCut_ImageMask : Inherits TaskParent
         image = cvb.Cv2.ImRead(fileInputName.FullName)
         desc = "Grabcut example using a single image. "
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Static bgModel As New cvb.Mat, fgModel As New cvb.Mat
 
         If task.heartBeat Then

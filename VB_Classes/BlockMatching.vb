@@ -10,7 +10,7 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": click 'Show All' to see all the available options.")
         desc = "Use OpenCV's block matching on left and right views"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Options.RunOpt()
 
         If task.cameraName = "Azure Kinect 4K" Then

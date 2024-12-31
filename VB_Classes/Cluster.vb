@@ -10,7 +10,7 @@ Public Class Cluster_Basics : Inherits TaskParent
         FindSlider("Min Distance to next").Value = 10
         desc = "Group the points based on their proximity to each other."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = src.Clone
         If standalone Then ptInput = task.featurePoints
 
@@ -78,7 +78,7 @@ Public Class Cluster_Hulls : Inherits TaskParent
     Public Sub New()
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst2 = src.Clone
 
         cluster.ptInput = task.featurePoints

@@ -10,7 +10,7 @@ Public Class WarpAffine_Basics : Inherits TaskParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Angle", 0, 360, 10)
         desc = "Use WarpAffine to transform input images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         optionsWarp.RunOpt()
 
@@ -41,7 +41,7 @@ Public Class WarpAffine_BasicsQT : Inherits TaskParent
     Public Sub New()
         desc = "Use WarpAffine to transform input images with no options."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() And task.heartBeat Then
             SetTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.")
             Exit Sub
@@ -118,7 +118,7 @@ Public Class WarpAffine_Captcha : Inherits TaskParent
         cvb.Cv2.WarpPerspective(charImage, charImage, perpectiveTranx, New cvb.Size(charImage.Cols, charImage.Rows), cvb.InterpolationFlags.Cubic,
                                cvb.BorderTypes.Constant, white)
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
         Dim charactersSize = characters.Length / characters(0).Length
 
@@ -159,7 +159,7 @@ Public Class WarpAffine_3Points : Inherits TaskParent
         labels(2) = "Triangles define the affine transform"
         labels(3) = "Image with affine transform applied"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.heartBeat Then
             Dim triangles(1) As cvb.Mat
             triangle.Run(src)
@@ -227,7 +227,7 @@ Public Class WarpAffine_4Points : Inherits TaskParent
         desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         labels(2) = "Color image with perspective transform applied"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.heartBeat Then
             options.RunOpt()
             mRect.inputPoints = options.srcPoints
@@ -288,7 +288,7 @@ Public Class WarpAffine_Repeated : Inherits TaskParent
         labels = {"", "", "Rotated repeatedly 45 degrees - note the blur", "Rotated repeatedly 90 degrees"}
         desc = "Compare an image before and after repeated and equivalent in degrees rotations."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim rect = New cvb.Rect(0, 0, dst2.Height, dst2.Height)
         dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         dst2 = dst1.Clone
@@ -344,7 +344,7 @@ Public Class WarpAffine_RepeatedExample8 : Inherits TaskParent
         labels = {"", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees"}
         desc = "Compare an image before and after repeated rotations."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim input = cvb.Cv2.ImRead(task.HomeDir + "Data/8.jpg", cvb.ImreadModes.Color)
 
         Dim center = New cvb.Point(input.Width / 2, input.Height / 2)

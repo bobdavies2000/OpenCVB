@@ -40,7 +40,7 @@ Public Class CPP_Basics : Inherits TaskParent
     Public Sub New()
     End Sub
 
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
 
         cppTask_OptionsVBtoCPP(cPtr, task.gridSize,
                                task.histogramBins,
@@ -148,7 +148,7 @@ Public Class CPP_ManagedTask : Inherits TaskParent
     Public Sub New()
         desc = "Move data to the Managed C++/CLR code (CPP_Managed), run it, and retrieve the results."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standalone Then
             SetTrueText("CPP_Managed is disconnected right while chasing the CPP_Native problem.")
             Return

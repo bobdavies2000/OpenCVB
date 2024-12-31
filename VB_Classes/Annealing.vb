@@ -46,7 +46,7 @@ Public Class Annealing_Basics_CPP_VB : Inherits TaskParent
         Open()
         desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         Dim saveCityOrder = cityOrder.Clone()
         Dim hCityOrder = GCHandle.Alloc(cityOrder, GCHandleType.Pinned)
         Dim out As IntPtr = Annealing_Basics_Run(cPtr, hCityOrder.AddrOfPinnedObject, cityPositions.Length)
@@ -105,7 +105,7 @@ Public Class Annealing_MT_CPP_VB : Inherits TaskParent
         labels = {"", "", "Top 2 are best solutions, bottom 2 are worst.", "Log of Annealing progress"}
         desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If task.optionsChanged Then setup()
         Parallel.For(0, anneal.Length,

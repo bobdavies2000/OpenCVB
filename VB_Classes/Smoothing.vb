@@ -46,7 +46,7 @@ Public Class Smoothing_Exterior : Inherits TaskParent
         labels(3) = ""
         desc = "Smoothing the line connecting a series of points."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         smOptions.RunOpt()
         If standaloneTest() Then
             If task.heartBeat And Not task.paused Then
@@ -124,7 +124,7 @@ Public Class Smoothing_Interior : Inherits TaskParent
         labels(3) = ""
         desc = "Smoothing the line connecting a series of points staying inside the outline."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If standaloneTest() Then
             If task.heartBeat And task.paused = False Then

@@ -36,7 +36,7 @@ Public Class Benford_Basics : Inherits TaskParent
         ReDim counts(expectedDistribution.Count - 1)
         use99 = True
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Then
             dst2 = If(src.Channels() = 1, src, src.CvtColor(cvb.ColorConversionCodes.BGR2Gray))
             src = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F)
@@ -101,7 +101,7 @@ Public Class Benford_NormalizedImage : Inherits TaskParent
     Public Sub New()
         desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst3 = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         Dim gray32f As New cvb.Mat
         dst3.ConvertTo(gray32f, cvb.MatType.CV_32F)
@@ -126,7 +126,7 @@ Public Class Benford_NormalizedImage99 : Inherits TaskParent
 
         desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dst3 = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
         Dim gray32f As New cvb.Mat
         dst3.ConvertTo(gray32f, cvb.MatType.CV_32F)
@@ -150,7 +150,7 @@ Public Class Benford_JPEG : Inherits TaskParent
     Public Sub New()
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cvb.ImwriteFlags.JpegQuality, options.quality})
@@ -176,7 +176,7 @@ Public Class Benford_JPEG99 : Inherits TaskParent
         benford.setup99()
         desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cvb.ImwriteFlags.JpegQuality, options.quality})
@@ -202,7 +202,7 @@ Public Class Benford_PNG : Inherits TaskParent
     Public Sub New()
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         Dim png = src.ImEncode(".png", New Integer() {cvb.ImwriteFlags.PngCompression, options.compression})
@@ -225,7 +225,7 @@ Public Class Benford_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Apply Benford to the depth data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         benford.Run(task.pcSplit(2))
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -248,7 +248,7 @@ Public Class Benford_Primes : Inherits TaskParent
         labels = {"", "", "Actual Distribution of input", ""}
         desc = "Apply Benford to a list of primes"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If task.optionsChanged Then sieve.Run(src) ' only need to compute this once...
         SetTrueText($"Primes found: {sieve.primes.Count}", 3)
 

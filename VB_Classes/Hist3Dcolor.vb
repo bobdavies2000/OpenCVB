@@ -11,7 +11,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Capture a 3D color histogram, find the gaps, and backproject the clusters found."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Type <> cvb.MatType.CV_8UC3 Then src = task.color
         If task.heartBeat Or alwaysRun Then
             Dim bins = task.redOptions.HistBinBar3D.Value
@@ -47,7 +47,7 @@ Public Class Hist3Dcolor_UniqueRGBPixels : Inherits TaskParent
     Public Sub New()
         desc = "Get the number of non-zero BGR elements in the 3D color histogram of the current image and their BGR values"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         hColor.Run(src)
 
         pixels.Clear()
@@ -82,7 +82,7 @@ Public Class Hist3Dcolor_TopXColors : Inherits TaskParent
     Public Sub New()
         desc = "Get the top 256 of non-zero BGR elements in the 3D color histogram of the current image and their BGR values"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         unique.Run(src)
 
         Dim sortedPixels As New SortedList(Of Integer, cvb.Point3f)(New compareAllowIdenticalIntegerInverted)
@@ -114,7 +114,7 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits TaskParent
     Public Sub New()
         desc = "Breakdown the 3D histogram using the '0' entries as boundaries between clusters."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Channels() <> 3 Then src = task.color
 
         If task.optionsChanged Then
@@ -176,7 +176,7 @@ Public Class Hist3Dcolor_PlotHist1D : Inherits TaskParent
         labels(2) = "The 3D histogram of the RGB image stream - note the number of gaps"
         desc = "Present the 3D histogram as a typical histogram bar chart."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         hColor.Run(src)
         histogram1D = hColor.histogram1D
         histArray = hColor.histArray
@@ -197,7 +197,7 @@ Public Class Hist3Dcolor_Select : Inherits TaskParent
         labels(3) = "The highlighted pixels are in the selected bin"
         desc = "Build a 3D histogram from the BGR image and backproject the 'Selected bin' (in options_HistXD sliders)."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         hColor.Run(src)
 
         Dim selection = task.gOptions.DebugSliderValue
@@ -229,7 +229,7 @@ Public Class Hist3Dcolor_Basics_CPP_VB : Inherits TaskParent
     Public Sub New()
         desc = "Build a 3D histogram from the BGR image and sort it by histogram entry size."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim histInput(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
@@ -273,7 +273,7 @@ Public Class Hist3Dcolor_Diff : Inherits TaskParent
         dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         hColor.Run(src)
         dst2 = hColor.dst3
         labels(2) = hColor.labels(3)
@@ -303,7 +303,7 @@ Public Class Hist3Dcolor_Vector : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions '3D Histogram Bins'")
         desc = "Capture a 3D color histogram for input src - likely to be src(rect)."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Channels() <> 3 Then src = task.color
         If task.optionsChanged Then
             Dim bins = task.redOptions.HistBinBar3D.Value

@@ -24,7 +24,7 @@ Public Class Remap_Basics : Inherits TaskParent
 
         desc = "Use remap to reflect an image in 4 directions."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         labels(2) = Choose(direction + 1, "Remap_Basics - original", "Remap vertically", "Remap horizontally", "Remap horizontally and vertically")
 
         Select Case direction
@@ -53,7 +53,7 @@ Public Class Remap_Flip : Inherits TaskParent
     Public Sub New()
         desc = "Use flip to remap an image."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         labels(2) = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
                                             "Remap_Flip - flip horizontal and vertical")
         Select Case direction
@@ -84,7 +84,7 @@ Public Class Flip_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Placeholder to make it easy to remember 'Remap'."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         flip.Run(src)
         dst2 = flip.dst2
         labels = flip.labels

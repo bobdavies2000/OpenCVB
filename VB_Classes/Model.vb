@@ -5,7 +5,7 @@ Public Class Model_Basics : Inherits TaskParent
         labels = {"", "", "Captured OpenGL output", ""}
         desc = "Capture the output of the OpenGL window"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Then oglM.Run(src)
         dst2 = oglM.dst2
         dst3 = oglM.dst3
@@ -24,7 +24,7 @@ Public Class Model_OpenGL_Sliders : Inherits TaskParent
         labels = {"", "", "Captured OpenGL output", ""}
         desc = "Capture the output of the OpenGL window"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         task.ogl.pointCloudInput = task.pointCloud
         If standaloneTest() Then task.ogl.Run(src)
         model.Run(src)
@@ -45,7 +45,7 @@ Public Class Model_FlatSurfaces : Inherits TaskParent
     Public Sub New()
         desc = "Minimalist approach to find a flat surface that is oriented to gravity (floor or ceiling)"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim ranges() = New cvb.Rangef() {New cvb.Rangef(-task.yRange, task.yRange), New cvb.Rangef(0, task.MaxZmeters)}
         cvb.Cv2.CalcHist({task.pointCloud}, {1, 2}, New cvb.Mat, dst0, 2,
                         {dst2.Height, dst2.Width}, ranges)
@@ -108,7 +108,7 @@ Public Class Model_RedCloud : Inherits TaskParent
         labels = {"", "", "OpenGL output", "RedCloud Output"}
         desc = "Capture the OpenGL output of the drawn cells"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         oglD.Run(src)
         dst2 = oglD.dst2
     End Sub
@@ -128,7 +128,7 @@ Public Class Model_CellZoom : Inherits TaskParent
         labels = {"", "", "RedCloud_Hull output", "Selected cell in 3D"}
         desc = "Zoom in on the selected RedCloud cell in the OpenGL output"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         oglData.Run(src)
         dst2 = oglData.dst2
         dst3 = oglData.oglD.dst3

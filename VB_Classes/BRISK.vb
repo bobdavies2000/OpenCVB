@@ -8,7 +8,7 @@ Public Class BRISK_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": only the 'Min Distance' option affects the BRISK results.")
         desc = "Detect features with BRISK"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         src.CopyTo(dst2)

@@ -34,7 +34,7 @@
 '    Public Sub New()
 '        desc = "Testing the C++ interface in TestLibrary.dll"
 '    End Sub
-'    Public Sub RunAlg(src As cvb.Mat)
+'    Public Overrides sub runAlg(src As cvb.Mat)
 '        Dim inputData(src.Total * 3 - 1) As Byte
 '        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
 '        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
@@ -59,7 +59,7 @@
 '        inputMask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
 '        desc = "Testing RedCloud interface in TestLibrary"
 '    End Sub
-'    Public Sub RunAlg(src As cvb.Mat)
+'    Public Overrides sub runAlg(src As cvb.Mat)
 '        If src.Channels <> 1 Then
 '            If color Is Nothing Then color = New Color8U_Basics
 '            color.Run(src)

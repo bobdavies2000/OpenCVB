@@ -3,7 +3,7 @@ Public Class Flood_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Build the RedCloud cells with the grayscale input."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If src.Channels = 1 Then task.redC.inputMask = src
         task.redC.Run(src)
         dst2 = task.redC.dst2
@@ -23,7 +23,7 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
 
         dst3 = task.redC.stats.dst1
@@ -49,7 +49,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
     Public Sub New()
         desc = "Find cells that have only one neighbor.  They are likely to be contained in another cell."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If standalone Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
@@ -100,7 +100,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
         labels(3) = "The inputMask used to limit how much of the image is processed."
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If standalone Or buildInputMask Then
             color8U.Run(src)
             inputMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
@@ -136,7 +136,7 @@ Public Class Flood_Tiers : Inherits TaskParent
     Public Sub New()
         desc = "Subdivide the Flood_Basics cells using depth tiers."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         Dim tier = task.gOptions.DebugSliderValue
 
         tiers.Run(src)
@@ -178,7 +178,7 @@ Public Class Flood_Motion : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If task.heartBeat Then
             flood.Run(src)
             redCells = New List(Of rcData)(task.redCells)
@@ -223,7 +223,7 @@ Public Class Flood_Motion1 : Inherits TaskParent
     Public Sub New()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If task.heartBeat Then
             flood.Run(src)
             redCells = New List(Of rcData)(task.redCells)
@@ -268,7 +268,7 @@ Public Class Flood_MaxDistPoints : Inherits TaskParent
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         color8U.Run(src)
         redCPP.Run(color8U.dst2)
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.

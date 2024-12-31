@@ -8,7 +8,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         labels(2) = "CV_8UC1 output of EdgeDraw_Basics - only 0 and 1"
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         edges.Run(src)
         dst2.SetTo(0)
         dst2.SetTo(1, edges.dst2)
@@ -26,7 +26,7 @@ Public Class FeatureLess_WithoutMotion : Inherits TaskParent
         labels = {"", "", "EdgeDraw_Basics output", ""}
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         edges.Run(src)
         dst2 = edges.dst2
     End Sub
@@ -43,7 +43,7 @@ Public Class FeatureLess_Canny : Inherits TaskParent
     Public Sub New()
         desc = "Use Canny edges to define featureless regions."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         edges.Run(src)
@@ -64,7 +64,7 @@ Public Class FeatureLess_Sobel : Inherits TaskParent
     Public Sub New()
         desc = "Use Sobel edges to define featureless regions."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         edges.Run(src)
@@ -86,7 +86,7 @@ Public Class FeatureLess_UniquePixels : Inherits TaskParent
         labels = {"", "Gray scale input to sort/remove dups", "Unique pixels", ""}
         desc = "Find the unique gray pixels for the featureless regions"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         fless.Run(src)
         dst2 = fless.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         sort.Run(dst2)
@@ -106,7 +106,7 @@ Public Class FeatureLess_Unique3Pixels : Inherits TaskParent
     Public Sub New()
         desc = "Find the unique 3-channel pixels for the featureless regions"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         fless.Run(src)
         dst2 = fless.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
 
@@ -125,7 +125,7 @@ Public Class FeatureLess_Histogram : Inherits TaskParent
     Public Sub New()
         desc = "Create a histogram of the featureless regions"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         backP.Run(src)
         dst2 = backP.dst2
         dst3 = backP.dst3
@@ -149,7 +149,7 @@ Public Class FeatureLess_DCT : Inherits TaskParent
         desc = "Use DCT to find featureless regions."
     End Sub
 
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         dct.Run(src)
         dst2 = dct.dst2
         dst3 = dct.dst3
@@ -196,7 +196,7 @@ Public Class FeatureLess_LeftRight : Inherits TaskParent
         labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
         desc = "Find the featureless regions of the left and right images"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         fLess.Run(task.leftView)
         dst2 = fLess.dst2.Clone
 
@@ -219,7 +219,7 @@ Public Class FeatureLess_History : Inherits TaskParent
     Public Sub New()
         desc = "Accumulate the edges over a span of X images."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         fLess.Run(src)
         dst2 = fLess.dst2
 
@@ -241,7 +241,7 @@ Public Class FeatureLess_Groups : Inherits TaskParent
     Public Sub New()
         desc = "Group RedCloud cells by the value of their featureless maxDist"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         fless.Run(src)
         dst2 = fless.dst2
         labels(2) = fless.labels(2)

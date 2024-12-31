@@ -28,14 +28,12 @@ Public Class TaskParent : Implements IDisposable
     Public taskAlgorithm As Boolean
     Public dst0 As cvb.Mat, dst1 As cvb.Mat, dst2 As cvb.Mat, dst3 As cvb.Mat
     Public labels() As String = {"", "", "", ""}
-    Public VB_Algorithm As Object
     Public traceName As String
     Public desc As String
     Public cPtr As IntPtr
     Public trueData As New List(Of TrueText)
     Public strOut As String
     Public Sub New()
-        VB_Algorithm = Me
         traceName = Me.GetType.Name
         If callTrace.Count = 0 Then callTrace.Add(task.algName + "\")
         labels = {"", "", traceName, ""}
@@ -780,20 +778,12 @@ Public Class TaskParent : Implements IDisposable
         task.trueData.Clear()
         If task.paused = False Then
             trueData.Clear()
-            'If traceName.EndsWith("_CPP") Then
-            '    Static nativeTask As New CPP_ManagedTask()
-            '    If nativeTask.ManagedObject Is Nothing Then nativeTask.ManagedObject = VB_Algorithm
-            '    nativeTask.RunAlg(src)
-            '    VB_Algorithm.RunAlg()
-            '    nativeTask.Pause()
-            'Else
-            VB_Algorithm.RunAlg(src)
-            'End If
+            runAlg(src)
         End If
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
-    Public Overridable Sub parentRun(src As cvb.Mat)
-
+    Public Overridable Sub runAlg(src As cvb.Mat)
+        ' every algorithm overrides this Sub 
     End Sub
     Public Enum FeatureSrc
         GoodFeaturesFull = 0

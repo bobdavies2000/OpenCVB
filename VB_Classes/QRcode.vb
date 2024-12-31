@@ -15,7 +15,7 @@ Public Class QRcode_Basics : Inherits TaskParent
         End If
         desc = "Read a QR code"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Height < 240 Then
             SetTrueText("This QR Code test does not run at low resolutions")
             Exit Sub

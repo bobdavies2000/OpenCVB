@@ -24,7 +24,7 @@ Public Class Tessallate_Basics : Inherits TaskParent
         points2d.Add(c2)
         Return points2d
     End Function
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
@@ -74,7 +74,7 @@ Public Class Tessallate_Triangles : Inherits TaskParent
         labels = {"", "", "", ""}
         desc = "Prepare colors and triangles for use in OpenGL Triangle presentation."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
@@ -105,7 +105,7 @@ Public Class Tessallate_QuadSimple : Inherits TaskParent
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
@@ -156,7 +156,7 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
@@ -232,7 +232,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
 
@@ -328,7 +328,7 @@ Public Class Tessallate_Bricks : Inherits TaskParent
         task.gOptions.setGridSize(20)
         desc = "Tessellate each quad in point cloud"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cvb.Mat)
         If task.optionsChanged Then
             depthMinList.Clear()
             depthMaxList.Clear()

@@ -14,7 +14,7 @@ Public Class Retina_Basics_CPP_VB : Inherits TaskParent
         labels(3) = "Retina Magno"
         desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If options.xmlCheck Then
@@ -75,7 +75,7 @@ Public Class Retina_Depth : Inherits TaskParent
         labels(2) = "Last result || current result"
         labels(3) = "Current depth motion result"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         retina.Run(task.depthRGB)
         dst3 = retina.dst3
         If lastMotion.Width = 0 Then lastMotion = retina.dst3

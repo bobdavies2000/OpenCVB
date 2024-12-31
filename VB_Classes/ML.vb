@@ -11,7 +11,7 @@ Public Class ML_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Simplify the prep for ML data train and test data and run with ML algorithms."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standalone Then
             SetTrueText("ML_BasicsRTree has no output when run standalone." + vbCrLf + "Use LowRes_Depth to test.")
             Exit Sub
@@ -125,7 +125,7 @@ Public Class ML_BasicsOld : Inherits TaskParent
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
         desc = "Predict depth from color to fill in the depth shadow areas"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim noDepthCount(task.gridRects.Count - 1) As Integer
         Dim roiColor(task.gridRects.Count - 1) As cvb.Vec3b
 
@@ -273,7 +273,7 @@ Public Class ML_FillRGBDepth_MT : Inherits TaskParent
         labels = {"", "", "ML filled shadow", ""}
         desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim minLearnCount = 5
         Parallel.ForEach(task.gridRects,
             Sub(roi)
@@ -300,7 +300,7 @@ Public Class ML_DepthFromColor : Inherits TaskParent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         mats.mat(1) = task.noDepthMask.Clone
 
         Dim color32f As New cvb.Mat
@@ -359,7 +359,7 @@ Public Class ML_DepthFromXYColor : Inherits TaskParent
         FindSlider("LowRes %").Value = 2 ' 2% of the image.
         ' desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         mats.mat(0) = task.noDepthMask.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cvb.Mat
@@ -444,7 +444,7 @@ Public Class ML_Color2Depth : Inherits TaskParent
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         color8U.Run(src)
         dst2 = color8U.dst3
         labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
@@ -511,7 +511,7 @@ Public Class ML_ColorInTier2Depth : Inherits TaskParent
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         color8U.Run(src)
         dst2 = color8U.dst3
         labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
@@ -573,7 +573,7 @@ Public Class ML_RemoveDups_CPP_VB : Inherits TaskParent
         labels = {"", "", "BGR input below is converted to BGRA and sorted as integers", ""}
         desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Type = cvb.MatType.CV_8UC3 Then
             dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_32S, src.CvtColor(cvb.ColorConversionCodes.BGR2BGRA).Data)
         Else
@@ -614,7 +614,7 @@ Public Class ML_LearnZfromXGray : Inherits TaskParent
         task.redOptions.IdentifyCells.Checked = False
         desc = "This runs and is helpful to understanding how to use rtree.  Learn Z from X, Y, and grayscale of the RedCloud cells."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim gray = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) ' input to ML
 
         regions.Run(src)
@@ -661,7 +661,7 @@ Public Class ML_LearnRegions : Inherits TaskParent
         labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
         desc = "Learn region from X, Y, and grayscale for the RedCloud cells."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         regions.Run(src)
 
         color8U.Run(src)

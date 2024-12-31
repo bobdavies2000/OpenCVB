@@ -5,7 +5,7 @@ Public Class Concat_Basics : Inherits TaskParent
         labels(3) = "Vertical concatenation"
         desc = "Concatenate 2 images - horizontally and vertically"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim tmp As New cvb.Mat
         cvb.Cv2.HConcat(src, task.depthRGB, tmp)
         dst2 = tmp.Resize(src.Size())
@@ -26,7 +26,7 @@ Public Class Concat_4way : Inherits TaskParent
         labels(2) = "Color/RGBDepth/Left/Right views"
         desc = "Concatenate 4 images - horizontally and vertically"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If standaloneTest() Then
             img(0) = src
             img(1) = task.depthRGB

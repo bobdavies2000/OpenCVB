@@ -9,7 +9,7 @@ Imports System.IO
 '        labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
 '        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
 '    End Sub
-'    Public Sub RunAlg(src As cvb.Mat)
+'    Public Overrides sub runAlg(src As cvb.Mat)
 '        Static distanceSlider = FindSlider("Distance threshold (pixels)")
 '        Dim matSize = 21 ' must be odd
 '        Dim halfsize = 10
@@ -60,7 +60,7 @@ Public Class ParticleFilter_Example : Inherits TaskParent
         cPtr = ParticleFilterTest_Open(task.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
         desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         imageFrame += 1
         If imageFrame Mod 45 = 0 Then
             imageFrame = 13
@@ -88,7 +88,7 @@ End Class
 '        labels = {"", "", "Particle traffic", "Net movement of all the particles"}
 '        desc = "Use the good features of an image to create a set of particles that can estimate camera motion"
 '    End Sub
-'    Public Sub RunAlg(src As cvb.Mat)
+'    Public Overrides sub runAlg(src As cvb.Mat)
 '        trace.Run(src)
 '        dst2 = trace.dst2
 

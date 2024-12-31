@@ -9,7 +9,7 @@ Public Class BGSubtract_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -43,7 +43,7 @@ Public Class BGSubtract_Basics_QT : Inherits TaskParent
         cPtr = BGSubtract_BGFG_Open(4) ' MOG2 is the default method when running in QT mode.
         desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
@@ -69,7 +69,7 @@ Public Class BGSubtract_MOG2 : Inherits TaskParent
         MOG2 = cvb.BackgroundSubtractorMOG2.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         MOG2.Apply(src, dst2, options.learnRate)
@@ -87,7 +87,7 @@ Public Class BGSubtract_MOG2_QT : Inherits TaskParent
         MOG2 = cvb.BackgroundSubtractorMOG2.Create()
         desc = "Subtract background using a mixture of Gaussians - the QT version"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
         MOG2.Apply(src, dst2, learnRate)
@@ -106,7 +106,7 @@ Public Class BGSubtract_MotionDetect : Inherits TaskParent
         labels(3) = "Only Motion Added"
         desc = "Detect Motion for use with background subtraction"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If task.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
@@ -148,7 +148,7 @@ Public Class BGSubtract_MOG : Inherits TaskParent
         MOG = cvb.BackgroundSubtractorMOG.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         MOG.Apply(src, dst2, options.learnRate)
@@ -169,7 +169,7 @@ Public Class BGSubtract_GMG_KNN : Inherits TaskParent
         knn = cvb.BackgroundSubtractorKNN.Create()
         desc = "GMG and KNN API's to subtract background"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If task.frameCount < 120 Then
             SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
@@ -199,7 +199,7 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits TaskParent
         labels = {"", "", "Unstable depth", "Unstable color (if there is motion)"}
         desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         grayMat = task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
@@ -219,7 +219,7 @@ Public Class BGSubtract_MOG_Retina : Inherits TaskParent
         labels = {"", "", "MOG results of depth motion", "Difference from retina depth motion."}
         desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         retina.Run(task.depthRGB)
         bgSub.Run(retina.dst3.Clone())
         dst2 = bgSub.dst2
@@ -235,7 +235,7 @@ Public Class BGSubtract_DepthOrColorMotion : Inherits TaskParent
     Public Sub New()
         desc = "Detect motion with both depth and color changes"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         motion.Run(src)
         dst2 = motion.dst2
         dst3 = motion.dst3
@@ -257,7 +257,7 @@ Public Class BGSubtract_Video : Inherits TaskParent
         video.options.fileInfo = New FileInfo(task.HomeDir + "opencv/Samples/Data/vtest.avi")
         desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         video.Run(src)
         dst3 = video.dst2
         bgSub.Run(dst3)
@@ -279,7 +279,7 @@ Public Class BGSubtract_Synthetic_CPP_VB : Inherits TaskParent
         labels(2) = "Synthetic background/foreground image."
         desc = "Generate a synthetic input to background subtraction method"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
         If task.optionsChanged Then
             If Not task.firstPass Then BGSubtract_Synthetic_Close(cPtr)
@@ -312,7 +312,7 @@ Public Class BGSubtract_Synthetic : Inherits TaskParent
     Public Sub New()
         desc = "Demonstrate background subtraction algorithms with synthetic images"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         synth.Run(src)
         dst3 = synth.dst2
         bgSub.Run(dst3)
@@ -332,7 +332,7 @@ Public Class BGSubtract_Reduction : Inherits TaskParent
     Public Sub New()
         desc = "Use BGSubtract with the output of a reduction"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         reduction.Run(src)
         Dim mm = GetMinMax(reduction.dst2)
         dst2 = ShowPalette(reduction.dst2 * 255 / mm.maxVal)

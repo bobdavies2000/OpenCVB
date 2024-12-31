@@ -4,7 +4,7 @@ Public Class Color_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Choose a color source"
     End Sub
-    Public Sub RunAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cvb.Mat)
         options.RunOpt()
 
         If options.colorFormat Is Nothing Then options.colorFormat = "BGR" ' multiple invocations cause this to be necessary but how to fix?
