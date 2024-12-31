@@ -664,6 +664,8 @@ Public Class Main_UI
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
         End If
+        testAllRunning = TestAllTimer.Enabled
+        If testAllRunning = False Then refreshTreeView()
     End Sub
     Private Sub ComplexityTimer_Tick(sender As Object, e As EventArgs) Handles ComplexityTimer.Tick
         While 1
