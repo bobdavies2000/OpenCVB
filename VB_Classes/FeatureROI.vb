@@ -1,22 +1,22 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class FeatureROI_Basics : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
-    Public rects As New List(Of cvb.Rect)
+    Public rects As New List(Of cv.Rect)
     Public meanList As New List(Of Single)
     Public stdevList As New List(Of Single)
     Public stdevAverage As Single
     Public Sub New()
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), src.Clone)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         stdevList.Clear()
         meanList.Clear()
-        Dim mean As cvb.Scalar, stdev As cvb.Scalar
+        Dim mean As cv.Scalar, stdev As cv.Scalar
         For Each roi In task.gridRects
-            cvb.Cv2.MeanStdDev(dst1(roi), mean, stdev)
+            cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             stdevList.Add(stdev(0))
             meanList.Add(mean(0))
         Next
@@ -56,16 +56,16 @@ Public Class FeatureROI_Color : Inherits TaskParent
     Public Sub New()
         FindSlider("Add Weighted %").Value = 70
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Dim stdevList0 As New List(Of Single)
         Dim stdevList1 As New List(Of Single)
         Dim stdevList2 As New List(Of Single)
-        Dim mean As cvb.Scalar, stdev As cvb.Scalar
+        Dim mean As cv.Scalar, stdev As cv.Scalar
         For Each roi In task.gridRects
-            cvb.Cv2.MeanStdDev(src(roi), mean, stdev)
+            cv.Cv2.MeanStdDev(src(roi), mean, stdev)
             stdevList0.Add(stdev(0))
             stdevList1.Add(stdev(1))
             stdevList2.Add(stdev(2))
@@ -83,7 +83,7 @@ Public Class FeatureROI_Color : Inherits TaskParent
         Next
         labels(3) = "Stdev average X/Y/Z = " + CInt(stdevList0.Average).ToString + ", " + CInt(stdevList1.Average).ToString + ", " + CInt(stdevList2.Average).ToString
 
-        addw.src2 = dst3.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+        addw.src2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.Run(src)
         dst2 = addw.dst2
     End Sub
@@ -102,9 +102,9 @@ Public Class FeatureROI_Canny : Inherits TaskParent
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         canny.Run(src)
-        dst3 = canny.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+        dst3 = canny.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         devGrid.Run(src Or dst3)
         dst2 = devGrid.dst2
@@ -120,32 +120,32 @@ End Class
 
 Public Class FeatureROI_Sorted : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
-    Public sortedStd As New SortedList(Of Single, cvb.Rect)(New compareAllowIdenticalSingle)
-    Public bgrList As New List(Of cvb.Vec3b)
-    Public roiList As New List(Of cvb.Rect)
+    Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
+    Public bgrList As New List(Of cv.Vec3b)
+    Public roiList As New List(Of cv.Rect)
     Public categories() As Integer
     Public options As New Options_StdevGrid
     Public maskVal As Integer = 255
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         If standalone = False Then maskVal = 1
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
         desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim meanS As cvb.Scalar, stdev As cvb.Scalar
+        Dim meanS As cv.Scalar, stdev As cv.Scalar
         sortedStd.Clear()
         bgrList.Clear()
         roiList.Clear()
         ReDim categories(9)
         For Each roi In task.gridRects
-            cvb.Cv2.MeanStdDev(src(roi), meanS, stdev)
+            cv.Cv2.MeanStdDev(src(roi), meanS, stdev)
             sortedStd.Add(stdev(0) + stdev(1) + stdev(2), roi)
             Dim colorIndex As Integer = 1
-            Dim mean As cvb.Vec3i = New cvb.Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
+            Dim mean As cv.Vec3i = New cv.Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
             If mean(0) < options.minThreshold And mean(1) < options.minThreshold And mean(2) < options.minThreshold Then
                 colorIndex = 1
             ElseIf mean(0) > options.maxThreshold And mean(1) > options.maxThreshold And mean(2) > options.maxThreshold Then
@@ -166,7 +166,7 @@ Public Class FeatureROI_Sorted : Inherits TaskParent
                 colorIndex = 9
             End If
 
-            Dim color As cvb.Vec3b = Choose(colorIndex, black.ToVec3b, white.ToVec3b, grayColor.ToVec3b,
+            Dim color As cv.Vec3b = Choose(colorIndex, black.ToVec3b, white.ToVec3b, grayColor.ToVec3b,
                                             yellow.ToVec3b, purple.ToVec3b, teal.ToVec3b,
                                             blue.ToVec3b, green.ToVec3b, red.ToVec3b)
             categories(colorIndex) += 1
@@ -187,7 +187,7 @@ Public Class FeatureROI_Sorted : Inherits TaskParent
         Next
 
         If standaloneTest() Then
-            addw.src2 = dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+            addw.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             addw.Run(src)
             dst3 = addw.dst2
         End If
@@ -210,7 +210,7 @@ Public Class FeatureROI_ColorSplit : Inherits TaskParent
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Split each roi into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red - based on the stdev for the roi"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         devGrid.Run(src)
 
         For i = 0 To devGrid.bgrList.Count - 1
@@ -243,21 +243,21 @@ Public Class FeatureROI_Correlation : Inherits TaskParent
         FindSlider("Feature Correlation Threshold").Value = 90
         desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
-        Static lastImage As cvb.Mat = dst1.Clone
+        Static lastImage As cv.Mat = dst1.Clone
 
-        Dim correlationMat As New cvb.Mat
+        Dim correlationMat As New cv.Mat
         Dim motionCount As Integer
         For i = 0 To gather.stdevList.Count - 1
             Dim roi = task.gridRects(i)
             If gather.stdevList(i) >= gather.stdevAverage Then
-                cvb.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
+                cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
                 If corr < options.correlationMin Then SetTrueText(Format(corr, fmt1), roi.TopLeft)
                 If corr < options.correlationMin Then motionCount += 1
@@ -280,13 +280,13 @@ End Class
 
 
 Public Class FeatureROI_LowStdev : Inherits TaskParent
-    Public rects As New List(Of cvb.Rect)
+    Public rects As New List(Of cv.Rect)
     Dim gather As New FeatureROI_Basics
     Public Sub New()
         desc = "Isolate the roi's with low stdev"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), src.Clone)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -316,33 +316,33 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits TaskParent
         FindSlider("Feature Correlation Threshold").Value = 50
         desc = "Display the correlation coefficients for roi's with low standard deviation."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
-        Static lastImage As cvb.Mat = dst1.Clone
+        Static lastImage As cv.Mat = dst1.Clone
 
-        Dim correlationMat As New cvb.Mat
+        Dim correlationMat As New cv.Mat
         correlations.Clear()
         For Each roi In gather.rects
-            cvb.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
+            cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim corr = correlationMat.Get(Of Single)(0, 0)
             correlations.Add(corr)
         Next
 
         Static saveCorrs As New List(Of Single)(correlations)
-        Static saveRects As New List(Of cvb.Rect)(gather.rects)
+        Static saveRects As New List(Of cv.Rect)(gather.rects)
         If task.heartBeat Then
             saveCorrs = New List(Of Single)(correlations)
-            saveRects = New List(Of cvb.Rect)(gather.rects)
+            saveRects = New List(Of cv.Rect)(gather.rects)
 
             saveStdev.Clear()
-            Dim mean As cvb.Scalar, stdev As cvb.Scalar
+            Dim mean As cv.Scalar, stdev As cv.Scalar
             For i = 0 To saveRects.Count - 1
-                cvb.Cv2.MeanStdDev(dst1(saveRects(i)), mean, stdev)
+                cv.Cv2.MeanStdDev(dst1(saveRects(i)), mean, stdev)
                 saveStdev.Add(stdev(0))
             Next
         End If
@@ -366,7 +366,7 @@ Public Class FeatureROI_LR : Inherits TaskParent
     Public Sub New()
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         gLeft.Run(task.leftView)
         dst2 = gLeft.dst2
         labels(2) = CStr(gLeft.rects.Count) + " roi's had above average standard deviation in the left image"
@@ -384,7 +384,7 @@ End Class
 
 Public Class FeatureROI_LRClick : Inherits TaskParent
     Dim gather As New FeatureROI_Basics
-    Dim ClickPoint As cvb.Point, picTag As Integer
+    Dim ClickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
     Public Sub New()
         task.gOptions.setGridSize(16)
@@ -394,17 +394,17 @@ Public Class FeatureROI_LRClick : Inherits TaskParent
         labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
-    Public Sub setClickPoint(pt As cvb.Point, _pictag As Integer)
+    Public Sub setClickPoint(pt As cv.Point, _pictag As Integer)
         ClickPoint = pt
         picTag = _pictag
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst0 = src.Clone
-        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
-        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -417,11 +417,11 @@ Public Class FeatureROI_LRClick : Inherits TaskParent
         Dim roi = task.gridRects(gridIndex)
         dst2.Rectangle(roi, white, task.lineWidth)
 
-        Dim correlationMat As New cvb.Mat
+        Dim correlationMat As New cv.Mat
         Dim corr As New List(Of Single)
         For j = 0 To roi.X - 1
-            Dim r = New cvb.Rect(j, roi.Y, roi.Width, roi.Height)
-            cvb.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
+            Dim r = New cv.Rect(j, roi.Y, roi.Width, roi.Height)
+            cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             corr.Add(correlationMat.Get(Of Single)(0, 0))
         Next
 
@@ -433,13 +433,13 @@ Public Class FeatureROI_LRClick : Inherits TaskParent
                 SetTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(options.correlationMin, fmt1), 1)
             Else
                 Dim index = corr.IndexOf(maxCorr)
-                Dim rectRight = New cvb.Rect(index, roi.Y, roi.Width, roi.Height)
+                Dim rectRight = New cv.Rect(index, roi.Y, roi.Width, roi.Height)
                 Dim offset = roi.TopLeft.X - rectRight.TopLeft.X
                 If task.heartBeat Then
                     strOut = "CoeffNormed max correlation = " + Format(maxCorr, fmt3) + vbCrLf
                     strOut += "Left Mean = " + Format(gather.meanList(gridIndex), fmt3) + " Left stdev = " + Format(gather.stdevList(gridIndex), fmt3) + vbCrLf
-                    Dim mean As cvb.Scalar, stdev As cvb.Scalar
-                    cvb.Cv2.MeanStdDev(dst3(rectRight), mean, stdev)
+                    Dim mean As cv.Scalar, stdev As cv.Scalar
+                    cv.Cv2.MeanStdDev(dst3(rectRight), mean, stdev)
                     strOut += "Right Mean = " + Format(mean(0), fmt3) + " Right stdev = " + Format(stdev(0), fmt3) + vbCrLf
                     strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
                 End If
@@ -448,7 +448,7 @@ Public Class FeatureROI_LRClick : Inherits TaskParent
                 dst1.SetTo(0)
                 DrawCircle(dst1, roi.TopLeft, task.DotSize, task.HighlightColor)
                 DrawCircle(dst1, rectRight.TopLeft, task.DotSize + 2, task.HighlightColor)
-                Dim pt = New cvb.Point(rectRight.X, roi.Y + 5)
+                Dim pt = New cv.Point(rectRight.X, roi.Y + 5)
                 SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
                 SetTrueText(strOut, 1)
                 labels(3) = "Corresponding roi highlighted in yellow.  Average stdev = " + Format(gather.stdevAverage, fmt3)
@@ -465,33 +465,33 @@ End Class
 Public Class FeatureROI_LRAll : Inherits TaskParent
     Dim gather As New FeatureROI_Basics
     Dim options As New Options_Features
-    Public sortedRects As New SortedList(Of Single, cvb.Rect)(New compareAllowIdenticalSingleInverted)
+    Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
         task.gOptions.setGridSize(16)
         FindSlider("Feature Correlation Threshold").Value = 95
         labels(3) = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images."
         desc = "Find all the roi's with high stdev and high correlation between left and right images."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cvb.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
-        src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
 
         If gather.rects.Count = 0 Then Exit Sub
 
-        Dim correlationMat As New cvb.Mat
+        Dim correlationMat As New cv.Mat
         sortedRects.Clear()
         For Each roi In gather.rects
             If roi.X = 0 Then Continue For
-            Dim r = New cvb.Rect(0, roi.Y, roi.X, roi.Height)
-            cvb.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
+            Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
+            cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm = GetMinMax(correlationMat)
-            If mm.maxVal >= options.correlationMin Then sortedRects.Add(mm.maxVal, New cvb.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
+            If mm.maxVal >= options.correlationMin Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
         Next
         labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(options.correlationMin, fmt3)
 

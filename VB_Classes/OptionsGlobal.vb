@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class OptionsGlobal
     Public maxDepth As Integer
     Public debugChecked As Boolean
@@ -63,7 +63,7 @@ Public Class OptionsGlobal
         HighlightColor.Items.Add("Red")
         HighlightColor.SelectedIndex = 0
 
-        ShowAllOptions.Checked = GetSetting("OpenCVB", "ShowAllOptions", "ShowAllOptions", False)
+        ShowAllOptions.Checked = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
 
         task.DotSize = 1
         task.cvFontThickness = 1
@@ -75,8 +75,8 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 4
                 task.DotSize = 4
                 task.disparityAdjustment = 1.1
-                task.lowRes = New cvb.Size(240, 135)
-                task.quarterRes = New cvb.Size(480, 270)
+                task.lowRes = New cv.Size(240, 135)
+                task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 40
                 task.FASTthreshold = 25
                 task.fPointMinDistance = 75
@@ -87,8 +87,8 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 2
                 task.DotSize = 2
                 task.disparityAdjustment = 2.2
-                task.lowRes = New cvb.Size(240, 135)
-                task.quarterRes = New cvb.Size(480, 270)
+                task.lowRes = New cv.Size(240, 135)
+                task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 200
                 task.FASTthreshold = 40
                 task.fPointMinDistance = 50
@@ -96,8 +96,8 @@ Public Class OptionsGlobal
                 GridSlider.Value = 20
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cvb.Size(240, 135)
-                task.quarterRes = New cvb.Size(480, 270)
+                task.lowRes = New cv.Size(240, 135)
+                task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 650
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 20
@@ -107,8 +107,8 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 2
                 task.DotSize = 5
                 task.disparityAdjustment = 2.2
-                task.lowRes = New cvb.Size(320, 180)
-                task.quarterRes = New cvb.Size(320, 180)
+                task.lowRes = New cv.Size(320, 180)
+                task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
                 task.FASTthreshold = 40
                 task.fPointMinDistance = 50
@@ -118,8 +118,8 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
-                task.lowRes = New cvb.Size(320, task.dst2.Height / 2)
-                task.quarterRes = New cvb.Size(320, 180)
+                task.lowRes = New cv.Size(320, task.dst2.Height / 2)
+                task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 200
                 task.FASTthreshold = 30
                 task.fPointMinDistance = 25
@@ -127,9 +127,9 @@ Public Class OptionsGlobal
                 GridSlider.Value = 14
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
-                task.lowRes = New cvb.Size(320, 180)
-                task.quarterRes = New cvb.Size(320, 180)
-                If task.dst2.Height = 240 Then task.lowRes = New cvb.Size(160, 120)
+                task.lowRes = New cv.Size(320, 180)
+                task.quarterRes = New cv.Size(320, 180)
+                If task.dst2.Height = 240 Then task.lowRes = New cv.Size(160, 120)
                 task.densityMetric = 500
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 12
@@ -137,8 +137,8 @@ Public Class OptionsGlobal
                 GridSlider.Value = 8
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cvb.Size(160, 120)
-                task.quarterRes = New cvb.Size(320, 180)
+                task.lowRes = New cv.Size(160, 120)
+                task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 100
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 5
@@ -147,8 +147,8 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.5
                 task.DotSize = 1
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cvb.Size(168, 94)
-                task.quarterRes = New cvb.Size(336, 188)
+                task.lowRes = New cv.Size(168, 94)
+                task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 300
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 25
@@ -157,8 +157,8 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.0
                 task.DotSize = 1
                 task.disparityAdjustment = 8.8
-                task.lowRes = New cvb.Size(168, 94)
-                task.quarterRes = New cvb.Size(336, 188)
+                task.lowRes = New cv.Size(168, 94)
+                task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 700
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 10
@@ -166,8 +166,8 @@ Public Class OptionsGlobal
                 GridSlider.Value = 8
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
-                task.lowRes = New cvb.Size(168, 94)
-                task.quarterRes = New cvb.Size(336, 188)
+                task.lowRes = New cv.Size(168, 94)
+                task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 1700
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 7
@@ -185,11 +185,11 @@ Public Class OptionsGlobal
         task.optionsChanged = True
         Select Case LineType.Text
             Case "AntiAlias"
-                task.lineType = cvb.LineTypes.AntiAlias
+                task.lineType = cv.LineTypes.AntiAlias
             Case "Link4"
-                task.lineType = cvb.LineTypes.Link4
+                task.lineType = cv.LineTypes.Link4
             Case "Link8"
-                task.lineType = cvb.LineTypes.Link8
+                task.lineType = cv.LineTypes.Link8
         End Select
     End Sub
     Private Sub LineWidth_Scroll(sender As Object, e As EventArgs) Handles LineWidth.Scroll
@@ -262,7 +262,7 @@ Public Class OptionsGlobal
         task.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
-        SaveSetting("OpenCVB", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
+        SaveSetting("Opencv", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
     End Sub
     Private Sub tempSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         TempSliderLabel.Text = CStr(DebugSlider.Value)
@@ -301,13 +301,13 @@ Public Class OptionsGlobal
     Private Sub HighlightColor_SelectedIndexChanged(sender As Object, e As EventArgs) Handles HighlightColor.SelectedIndexChanged
         Select Case HighlightColor.Text
             Case "Yellow"
-                task.HighlightColor = cvb.Scalar.Yellow
+                task.HighlightColor = cv.Scalar.Yellow
             Case "Black"
-                task.HighlightColor = cvb.Scalar.Black
+                task.HighlightColor = cv.Scalar.Black
             Case "White"
-                task.HighlightColor = cvb.Scalar.White
+                task.HighlightColor = cv.Scalar.White
             Case "Red"
-                task.HighlightColor = cvb.Scalar.Red
+                task.HighlightColor = cv.Scalar.Red
         End Select
     End Sub
     Public Sub setMaxDepth(val As Integer)

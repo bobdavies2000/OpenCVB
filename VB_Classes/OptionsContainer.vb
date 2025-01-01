@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.ComponentModel
 Imports System.Windows.Forms
 Imports System.Drawing
@@ -8,10 +8,10 @@ Public Class OptionsContainer
     Public titlesAdded As Boolean
     Public offset = 30
     Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = GetSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", task.mainFormLocation.X - offset)
-        Me.Top = GetSetting("OpenCVB", "gOptionsTop", "gOptionsTop", task.mainFormLocation.Y - offset)
-        Me.Width = GetSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
-        Me.Height = GetSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
+        Me.Left = GetSetting("Opencv", "gOptionsLeft", "gOptionsLeft", task.mainFormLocation.X - offset)
+        Me.Top = GetSetting("Opencv", "gOptionsTop", "gOptionsTop", task.mainFormLocation.Y - offset)
+        Me.Width = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
+        Me.Height = GetSetting("Opencv", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
     End Sub
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
@@ -23,10 +23,10 @@ Public Class OptionsContainer
         titlesAdded = True
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
-        Dim w = GetSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
-        Dim radioCheckOffset = New cvb.Point(w / 2, 0)
+        Dim w = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
+        Dim radioCheckOffset = New cv.Point(w / 2, 0)
 
-        Dim sliderOffset As New cvb.Point(0, 0)
+        Dim sliderOffset As New cv.Point(0, 0)
         For Each title In hiddenOptions
             Dim hideList As New List(Of Form)
             For Each frm In Application.OpenForms
@@ -37,7 +37,7 @@ Public Class OptionsContainer
             Next
         Next
 
-        Dim showAllOptions = GetSetting("OpenCVB", "ShowAllOptions", "ShowAllOptions", False)
+        Dim showAllOptions = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
         Try
             Dim indexS = 1
             Dim indexO = 1
@@ -82,9 +82,9 @@ Public Class OptionsContainer
         layoutOptions(normalRequest:=False)
     End Sub
     Private Sub OptionsContainer_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", Math.Abs(Me.Left))
-        SaveSetting("OpenCVB", "gOptionsTop", "gOptionsTop", Me.Top)
-        SaveSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", Me.Width)
-        SaveSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", Me.Height)
+        SaveSetting("Opencv", "gOptionsLeft", "gOptionsLeft", Math.Abs(Me.Left))
+        SaveSetting("Opencv", "gOptionsTop", "gOptionsTop", Me.Top)
+        SaveSetting("Opencv", "gOptionsWidth", "gOptionsWidth", Me.Width)
+        SaveSetting("Opencv", "gOptionsHeight", "gOptionsHeight", Me.Height)
     End Sub
 End Class

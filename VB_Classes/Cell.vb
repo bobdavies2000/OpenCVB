@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Cell_Basics : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
@@ -41,14 +41,14 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut += "Color Stdev RGB: " + vbTab + Format(rc.colorStdev(0), fmt1) + vbTab + Format(rc.colorStdev(1), fmt1) + vbTab
             strOut += Format(rc.colorStdev(2), fmt1) + vbCrLf
 
-            Dim tmp = New cvb.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cvb.MatType.CV_32F, cvb.Scalar.All(0))
+            Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
             plot.rc = task.rc
             plot.Run(tmp)
             dst1 = plot.dst2
         End If
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standalone Or runRedCloud Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
@@ -73,7 +73,7 @@ Public Class Cell_PixelCountCompare : Inherits TaskParent
         task.gOptions.debugChecked = True
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -84,7 +84,7 @@ Public Class Cell_PixelCountCompare : Inherits TaskParent
             If rc.depthPixels <> 0 Then
                 If rc.pixels <> rc.depthPixels Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
-                    Dim pt = New cvb.Point(rc.maxDist.X - 10, rc.maxDist.Y)
+                    Dim pt = New cv.Point(rc.maxDist.X - 10, rc.maxDist.Y)
                     If task.gOptions.debugChecked Then
                         strOut = CStr(rc.pixels) + "/" + CStr(rc.depthPixels)
                     Else
@@ -108,10 +108,10 @@ End Class
 Public Class Cell_ValidateColorCells : Inherits TaskParent
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -156,12 +156,12 @@ Public Class Cell_Distance : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         If standalone Then task.gOptions.setDisplay1()
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
         desc = "Measure the color distance of each cell to the selected cell."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Or task.quarterBeat Then
             task.redC.Run(src)
             dst0 = task.color
@@ -170,7 +170,7 @@ Public Class Cell_Distance : Inherits TaskParent
 
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
-            Dim selectedMean As cvb.Scalar = src(task.rc.rect).Mean(task.rc.mask)
+            Dim selectedMean As cv.Scalar = src(task.rc.rect).Mean(task.rc.mask)
             For Each rc In task.redCells
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
                 depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
@@ -199,12 +199,12 @@ Public Class Cell_Binarize : Inherits TaskParent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst1 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Binarized image", "", "Relative gray image"}
         desc = "Separate the image into light and dark using RedCloud cells"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst0 = src
         If task.heartBeat Or task.quarterBeat Then
             task.redC.Run(src)
@@ -212,10 +212,10 @@ Public Class Cell_Binarize : Inherits TaskParent
             labels(2) = task.redC.labels(2)
 
             Dim grayMeans As New List(Of Single)
-            Dim gray = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             For Each rc In task.redCells
-                Dim grayMean As cvb.Scalar, grayStdev As cvb.Scalar
-                cvb.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
+                Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
+                cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
                 grayMeans.Add(grayMean(0))
             Next
             Dim min = grayMeans.Min
@@ -243,7 +243,7 @@ Public Class Cell_Floodfill : Inherits TaskParent
     Public Sub New()
         desc = "Provide cell stats on the flood_basics cells."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         flood.Run(src)
 
         stats.Run(src)
@@ -270,8 +270,8 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
         If standalone Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
     End Sub
-    Public Sub statsString(src As cvb.Mat)
-        Dim tmp = New cvb.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cvb.MatType.CV_32F, cvb.Scalar.All(0))
+    Public Sub statsString(src As cv.Mat)
+        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
         task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
         plot.rc = task.rc
         plot.Run(tmp)
@@ -280,7 +280,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
         stats.statsString()
         strOut = stats.strOut
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
@@ -305,16 +305,16 @@ End Class
 
 Public Class Cell_Generate : Inherits TaskParent
     Public classCount As Integer
-    Public rectList As New List(Of cvb.Rect)
-    Public floodPoints As New List(Of cvb.Point)
+    Public rectList As New List(Of cv.Rect)
+    Public floodPoints As New List(Of cv.Point)
     Public removeContour As Boolean
     Dim redCPP As RedCloud_CPP_VB
     Public Sub New()
-        task.redMap = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.redMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.redCells = New List(Of rcData)
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standalone Then
             Static bounds As Boundary_RemovedRects
             If bounds Is Nothing Then bounds = New Boundary_RemovedRects
@@ -335,7 +335,7 @@ Public Class Cell_Generate : Inherits TaskParent
 
         Dim retained As Integer = 0
         Dim initialList As New List(Of rcData)
-        Dim usedColors = New List(Of cvb.Scalar)({black})
+        Dim usedColors = New List(Of cv.Scalar)({black})
         For i = 0 To rectList.Count - 1
             Dim rc As New rcData
             rc.rect = rectList(i)
@@ -365,10 +365,10 @@ Public Class Cell_Generate : Inherits TaskParent
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For Each rc In initialList
-            cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.naturalColor = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
 
-            rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
             If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
@@ -387,7 +387,7 @@ Public Class Cell_Generate : Inherits TaskParent
                 task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
                 task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
 
-                cvb.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
 
             sortedCells.Add(rc.pixels, rc)

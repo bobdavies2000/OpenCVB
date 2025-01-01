@@ -1,48 +1,48 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Tessallate_Basics : Inherits TaskParent
-    Public points As New List(Of cvb.Point3f)
-    Public colors As New List(Of cvb.Scalar)
+    Public points As New List(Of cv.Point3f)
+    Public colors As New List(Of cv.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
     Public hulls As New RedCloud_Hulls
     Public Sub New()
         task.gOptions.setGridSize(30)
         desc = "Prepare the list of 2D triangles"
     End Sub
-    Private Function addTriangle(c1 As cvb.Point, c2 As cvb.Point, center As cvb.Point, rc As rcData, shift As cvb.Point3f) As List(Of cvb.Point)
-        Dim pt1 = getWorldCoordinates(New cvb.Point3f(c1.X, c1.Y, rc.depthMean(2)))
-        Dim ptCenter = getWorldCoordinates(New cvb.Point3f(center.X, center.Y, rc.depthMean(2)))
-        Dim pt2 = getWorldCoordinates(New cvb.Point3f(c2.X, c2.Y, rc.depthMean(2)))
+    Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As rcData, shift As cv.Point3f) As List(Of cv.Point)
+        Dim pt1 = getWorldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depthMean(2)))
+        Dim ptCenter = getWorldCoordinates(New cv.Point3f(center.X, center.Y, rc.depthMean(2)))
+        Dim pt2 = getWorldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depthMean(2)))
 
         colors.Add(rc.color)
-        points.Add(New cvb.Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z))
-        points.Add(New cvb.Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z))
-        points.Add(New cvb.Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z))
+        points.Add(New cv.Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z))
+        points.Add(New cv.Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z))
+        points.Add(New cv.Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z))
 
-        Dim points2d As New List(Of cvb.Point)
+        Dim points2d As New List(Of cv.Point)
         points2d.Add(c1)
         points2d.Add(center)
         points2d.Add(c2)
         Return points2d
     End Function
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
-        Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         hulls.Run(src)
         dst2 = hulls.dst2
         points.Clear()
         colors.Clear()
-        Dim listOfPoints = New List(Of List(Of cvb.Point))
+        Dim listOfPoints = New List(Of List(Of cv.Point))
         For Each rc In task.redCells
             If rc.contour Is Nothing Then Continue For
             If rc.contour.Count < 5 Then Continue For
-            Dim corners(4 - 1) As cvb.Point
+            Dim corners(4 - 1) As cv.Point
             For i = 0 To corners.Count - 1
                 Dim pt = rc.contour(i * rc.contour.Count / 4)
-                corners(i) = New cvb.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
+                corners(i) = New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
             Next
-            Dim center = New cvb.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
+            Dim center = New cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
             DrawLine(dst2, corners(0), center, white)
             DrawLine(dst2, corners(1), center, white)
             DrawLine(dst2, corners(2), center, white)
@@ -55,7 +55,7 @@ Public Class Tessallate_Basics : Inherits TaskParent
         Next
         dst3.SetTo(0)
         For i = 0 To colors.Count - 1
-            cvb.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
+            cv.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
         Next
         labels(2) = CStr(colors.Count) + " triangles from " + CStr(task.redCells.Count) + " RedCloud cells"
     End Sub
@@ -69,19 +69,19 @@ End Class
 
 Public Class Tessallate_Triangles : Inherits TaskParent
     Public basics As New Tessallate_Basics
-    Public oglData As New List(Of cvb.Point3f)
+    Public oglData As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "", ""}
         desc = "Prepare colors and triangles for use in OpenGL Triangle presentation."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
 
         oglData.Clear()
         For i = 0 To basics.colors.Count - 1
-            oglData.Add(New cvb.Point3f(basics.colors(i)(2) / 255, basics.colors(i)(1) / 255, basics.colors(i)(0) / 255)) ' BGR to RGB
+            oglData.Add(New cv.Point3f(basics.colors(i)(2) / 255, basics.colors(i)(1) / 255, basics.colors(i)(0) / 255)) ' BGR to RGB
             For j = 0 To 3 - 1
                 oglData.Add(basics.points(i * 3 + j))
             Next
@@ -99,16 +99,16 @@ End Class
 
 
 Public Class Tessallate_QuadSimple : Inherits TaskParent
-    Public oglData As New List(Of cvb.Point3f)
+    Public oglData As New List(Of cv.Point3f)
     Public oglOptions As New Options_OpenGLFunctions
     Public Sub New()
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
-        Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         task.redC.Run(src)
         dst2 = task.redC.dst2
@@ -118,23 +118,23 @@ Public Class Tessallate_QuadSimple : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
 
-            Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
+            Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
             Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then Continue For
             Dim rc = task.redCells(index)
 
             dst3(roi).SetTo(rc.color)
-            SetTrueText(Format(rc.depthMean(2), fmt1), New cvb.Point(roi.X, roi.Y))
+            SetTrueText(Format(rc.depthMean(2), fmt1), New cv.Point(roi.X, roi.Y))
 
-            Dim topLeft = getWorldCoordinates(New cvb.Point3f(roi.X, roi.Y, rc.depthMean(2)))
-            Dim botRight = getWorldCoordinates(New cvb.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean(2)))
+            Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean(2)))
+            Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean(2)))
 
-            oglData.Add(New cvb.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
-            oglData.Add(New cvb.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean(2) + shift.Z))
-            oglData.Add(New cvb.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean(2) + shift.Z))
-            oglData.Add(New cvb.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean(2) + shift.Z))
-            oglData.Add(New cvb.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean(2) + shift.Z))
+            oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
+            oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean(2) + shift.Z))
+            oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean(2) + shift.Z))
+            oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean(2) + shift.Z))
+            oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean(2) + shift.Z))
         Next
         labels = {"", "", traceName + " completed with " + Format(oglData.Count / 5, fmt0) + " quad sets (with a 5th element for color)", "Output of Tessallate_QuadSimple"}
     End Sub
@@ -146,9 +146,9 @@ End Class
 
 
 Public Class Tessallate_QuadHulls : Inherits TaskParent
-    Public oglData As New List(Of cvb.Point3f)
+    Public oglData As New List(Of cv.Point3f)
     Public depthList As New List(Of List(Of Single))
-    Public colorList As New List(Of cvb.Scalar)
+    Public colorList As New List(Of cv.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
     Dim hulls As New RedCloud_Hulls
     Const depthListMaxCount As Integer = 10
@@ -156,10 +156,10 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
-        Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         hulls.Run(src)
         dst2 = hulls.dst2
@@ -178,7 +178,7 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
 
-            Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
+            Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
             Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
@@ -199,14 +199,14 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
                 dst3(roi).SetTo(colorList(i))
 
                 Dim depth = depthList(i).Average
-                Dim topLeft = getWorldCoordinates(New cvb.Point3f(roi.X, roi.Y, depth))
-                Dim botRight = getWorldCoordinates(New cvb.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
+                Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, depth))
+                Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
 
-                oglData.Add(New cvb.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
-                oglData.Add(New cvb.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
-                oglData.Add(New cvb.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
-                oglData.Add(New cvb.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
-                oglData.Add(New cvb.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
+                oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
+                oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
+                oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
+                oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
+                oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
 
                 If depthList(i).Count >= depthListMaxCount Then depthList(i).RemoveAt(0)
             End If
@@ -222,23 +222,23 @@ End Class
 
 
 Public Class Tessallate_QuadMinMax : Inherits TaskParent
-    Public oglData As New List(Of cvb.Point3f)
+    Public oglData As New List(Of cv.Point3f)
     Public depthList1 As New List(Of List(Of Single))
     Public depthList2 As New List(Of List(Of Single))
-    Public colorList As New List(Of cvb.Scalar)
+    Public colorList As New List(Of cv.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
     Const depthListMaxCount As Integer = 10
     Public Sub New()
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
 
         oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount
-        Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         If task.optionsChanged Then
             depthList1 = New List(Of List(Of Single))
@@ -253,12 +253,12 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
         oglData.Clear()
         dst3.SetTo(0)
 
-        Dim depth32f As cvb.Mat = task.pcSplit(2) * 1000, depth32s As New cvb.Mat
-        depth32f.ConvertTo(depth32s, cvb.MatType.CV_32S)
+        Dim depth32f As cv.Mat = task.pcSplit(2) * 1000, depth32s As New cv.Mat
+        depth32f.ConvertTo(depth32s, cv.MatType.CV_32S)
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
 
-            Dim center = New cvb.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
+            Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
             Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
@@ -276,7 +276,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
                 depthList2(i).Clear()
             End If
 
-            Dim depthMin As Single, depthMax As Single, minLoc As cvb.Point, maxLoc As cvb.Point
+            Dim depthMin As Single, depthMax As Single, minLoc As cv.Point, maxLoc As cv.Point
             depth32s(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
             depthMax /= 1000
             depthMin /= 1000
@@ -291,18 +291,18 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
             Dim depthCount = If(d1 = d2, 1, 2)
             For j = 0 To depthCount - 1
                 Dim depth = Choose(j + 1, d1, d2)
-                Dim topLeft = getWorldCoordinates(New cvb.Point3f(roi.X, roi.Y, depth))
-                Dim botRight = getWorldCoordinates(New cvb.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
+                Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, depth))
+                Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
 
                 Dim color = rc.color
                 dst3(roi).SetTo(color)
-                oglData.Add(New cvb.Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
-                oglData.Add(New cvb.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
-                oglData.Add(New cvb.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
-                oglData.Add(New cvb.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
-                oglData.Add(New cvb.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
+                oglData.Add(New cv.Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
+                oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
+                oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
+                oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
+                oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
             Next
-            SetTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cvb.Point(roi.X, roi.Y), 3)
+            SetTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cv.Point(roi.X, roi.Y), 3)
 
             If depthList1(i).Count >= depthListMaxCount Then depthList1(i).RemoveAt(0)
             If depthList2(i).Count >= depthListMaxCount Then depthList2(i).RemoveAt(0)
@@ -317,7 +317,7 @@ End Class
 
 
 Public Class Tessallate_Bricks : Inherits TaskParent
-    Public oglData As New List(Of cvb.Point3f)
+    Public oglData As New List(Of cv.Point3f)
     Public depths As New List(Of Single)
     Public options As New Options_OpenGLFunctions
     Public hulls As New RedCloud_Hulls
@@ -328,7 +328,7 @@ Public Class Tessallate_Bricks : Inherits TaskParent
         task.gOptions.setGridSize(20)
         desc = "Tessellate each quad in point cloud"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.optionsChanged Then
             depthMinList.Clear()
             depthMaxList.Clear()
@@ -340,19 +340,19 @@ Public Class Tessallate_Bricks : Inherits TaskParent
 
         options.RunOpt()
         Dim ptM = options.moveAmount
-        Dim shift As New cvb.Point3f(ptM(0), ptM(1), ptM(2))
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         oglData.Clear()
         hulls.Run(src)
         dst2 = hulls.dst2
 
-        Dim min(4 - 1) As cvb.Point3f, max(4 - 1) As cvb.Point3f
+        Dim min(4 - 1) As cv.Point3f, max(4 - 1) As cv.Point3f
         depths.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
-            Dim center = New cvb.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
+            Dim center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
             Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
-            Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cvb.Point, maxLoc As cvb.Point
+            Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
             If index >= 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
                 Dim rc = task.redCells(index)
@@ -368,12 +368,12 @@ Public Class Tessallate_Bricks : Inherits TaskParent
                     Dim avg = depthMaxList(i).Average - depthMin
                     depthMax = depthMin + If(avg < 0.2, avg, 0.2) ' trim the max depth - often unreliable 
                     Dim color = rc.color
-                    oglData.Add(New cvb.Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
+                    oglData.Add(New cv.Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
                     For j = 0 To 4 - 1
                         Dim x = Choose(j + 1, roi.X, roi.X + roi.Width, roi.X + roi.Width, roi.X)
                         Dim y = Choose(j + 1, roi.Y, roi.Y, roi.Y + roi.Height, roi.Y + roi.Height)
-                        min(j) = getWorldCoordinates(New cvb.Point3f(x, y, depthMin))
-                        max(j) = getWorldCoordinates(New cvb.Point3f(x, y, depthMax))
+                        min(j) = getWorldCoordinates(New cv.Point3f(x, y, depthMin))
+                        max(j) = getWorldCoordinates(New cv.Point3f(x, y, depthMax))
                         min(j) += shift
                         oglData.Add(min(j))
                     Next
@@ -403,7 +403,7 @@ Public Class Tessallate_Bricks : Inherits TaskParent
                     oglData.Add(min(3))
                     oglData.Add(max(3))
 
-                    SetTrueText(Format(depthMin, fmt1) + vbCrLf + Format(depthMax, fmt1), New cvb.Point(roi.X, roi.Y))
+                    SetTrueText(Format(depthMin, fmt1) + vbCrLf + Format(depthMax, fmt1), New cv.Point(roi.X, roi.Y))
                     If depthMinList(i).Count >= myListMax Then depthMinList(i).RemoveAt(0)
                     If depthMaxList(i).Count >= myListMax Then depthMaxList(i).RemoveAt(0)
                 End If

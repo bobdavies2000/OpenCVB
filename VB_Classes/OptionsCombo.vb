@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class OptionsCombo
     Public Sub Setup(traceName As String, label As String, comboList As List(Of String))
         Me.MdiParent = allOptions

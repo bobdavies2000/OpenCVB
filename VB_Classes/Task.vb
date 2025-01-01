@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 Imports System.IO.Pipes
 Imports System.Drawing
@@ -9,56 +9,56 @@ Imports OpenCvSharp
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public lpList As New List(Of linePoints)
-    Public lpMap As New cvb.Mat
+    Public lpMap As New cv.Mat
     Public lp As linePoints
 
     Public gridSize As Integer
     Public gridRows As Integer
     Public gridCols As Integer
     Public gridIndex As New List(Of Integer)
-    Public gridRects As List(Of cvb.Rect)
+    Public gridRects As List(Of cv.Rect)
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9
-    Public gridMask As cvb.Mat
-    Public gridMap32S As New cvb.Mat
+    Public gridMask As cv.Mat
+    Public gridMap32S As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
-    Public gridNabeRects As New List(Of cvb.Rect) ' The surrounding rect for every gridRect
+    Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
-    Public gridPoints As New List(Of cvb.Point) ' the list of each gridRect corner 
+    Public gridPoints As New List(Of cv.Point) ' the list of each gridRect corner 
 
     Public fpList As New List(Of fpData)
     Public fpListLast As New List(Of fpData)
     Public fpIDlist As New List(Of Single)
 
-    Public fpMap As cvb.Mat
-    Public fpMapLast As cvb.Mat
-    Public fpSrc As cvb.Mat
+    Public fpMap As cv.Mat
+    Public fpMapLast As cv.Mat
+    Public fpSrc As cv.Mat
 
-    Public fpOutline As cvb.Mat
+    Public fpOutline As cv.Mat
     Public fpSelected As fpData
     Public fPointMinDistance As Integer
     Public fpCorners(3) As Integer
-    Public fpCornerRect(3) As cvb.Rect
-    Public fpSearchRect(3) As cvb.Rect
+    Public fpCornerRect(3) As cv.Rect
+    Public fpSearchRect(3) As cv.Rect
     Public fpTravelAvg As Single
-    Public fpMotion As cvb.Point2f
+    Public fpMotion As cv.Point2f
 
-    Public topFeatures As New List(Of cvb.Point2f)
-    Public features As New List(Of cvb.Point2f)
-    Public featurePoints As New List(Of cvb.Point)
+    Public topFeatures As New List(Of cv.Point2f)
+    Public features As New List(Of cv.Point2f)
+    Public featurePoints As New List(Of cv.Point)
     Public featureMotion As Boolean ' false means that none of the features moved.
 
-    Public featureMask As cvb.Mat
-    Public fLessMask As cvb.Mat
-    Public featureRects As New List(Of cvb.Rect)
-    Public fLessRects As New List(Of cvb.Rect)
-    Public flessBoundary As New cvb.Mat
-    Public lowResColor As cvb.Mat
-    Public lowResDepth As cvb.Mat
+    Public featureMask As cv.Mat
+    Public fLessMask As cv.Mat
+    Public featureRects As New List(Of cv.Rect)
+    Public fLessRects As New List(Of cv.Rect)
+    Public flessBoundary As New cv.Mat
+    Public lowResColor As cv.Mat
+    Public lowResDepth As cv.Mat
 
-    Public motionRect As New cvb.Rect ' get rid of this...
-    Public motionRects As New List(Of cvb.Rect)
-    Public motionMask As cvb.Mat
+    Public motionRect As New cv.Rect ' get rid of this...
+    Public motionRects As New List(Of cv.Rect)
+    Public motionMask As cv.Mat
     Public motion As Motion_Basics
     Public motionPercent As Single
     Public MotionLabel As String = " "
@@ -66,35 +66,35 @@ Public Class VBtask : Implements IDisposable
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
     Public cols As Integer
-    Public workingRes As cvb.Size
+    Public workingRes As cv.Size
     Public TaskTimer As New System.Timers.Timer(1000)
 
-    Public dst0 As cvb.Mat
-    Public dst1 As cvb.Mat
-    Public dst2 As cvb.Mat
-    Public dst3 As cvb.Mat
+    Public dst0 As cv.Mat
+    Public dst1 As cv.Mat
+    Public dst2 As cv.Mat
+    Public dst3 As cv.Mat
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
-    Public lowRes As cvb.Size
-    Public quarterRes As cvb.Size
-    Public displayRes As cvb.Size
+    Public lowRes As cv.Size
+    Public quarterRes As cv.Size
+    Public displayRes As cv.Size
 
     Public cvFontSize As Single = 0.8
     Public cvFontThickness As Integer = 1
 
-    Public color As cvb.Mat
-    Public leftView As cvb.Mat
-    Public rightView As cvb.Mat
-    Public pointCloud As cvb.Mat
-    Public pcSplit() As cvb.Mat
-    Public gMatrix As cvb.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
-    Public noDepthMask As New cvb.Mat
-    Public depthMask As New cvb.Mat
-    Public paletteGradient As cvb.Mat
-    Public maxDepthMask As New cvb.Mat
-    Public depthRGB As New cvb.Mat
-    Public srcThread As cvb.Mat
+    Public color As cv.Mat
+    Public leftView As cv.Mat
+    Public rightView As cv.Mat
+    Public pointCloud As cv.Mat
+    Public pcSplit() As cv.Mat
+    Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
+    Public noDepthMask As New cv.Mat
+    Public depthMask As New cv.Mat
+    Public paletteGradient As cv.Mat
+    Public maxDepthMask As New cv.Mat
+    Public depthRGB As New cv.Mat
+    Public srcThread As cv.Mat
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
@@ -116,7 +116,7 @@ Public Class VBtask : Implements IDisposable
     Public redC As RedCloud_Basics
 
     Public drawRotatedRect As Draw_RotatedRect
-    Public centerRect As cvb.Rect
+    Public centerRect As cv.Rect
 
     Public pythonPipeIn As NamedPipeServerStream
     Public pythonPipeOut As NamedPipeServerStream
@@ -160,21 +160,21 @@ Public Class VBtask : Implements IDisposable
     Public gravityVec As New linePoints
     Public horizonVec As New linePoints
 
-    Public IMU_RawAcceleration As cvb.Point3f
-    Public IMU_Acceleration As cvb.Point3f
-    Public IMU_AverageAcceleration As cvb.Point3f
-    Public IMU_RawAngularVelocity As cvb.Point3f
-    Public IMU_AngularVelocity As cvb.Point3f
-    Public kalmanIMUacc As cvb.Point3f
-    Public kalmanIMUvelocity As cvb.Point3f
+    Public IMU_RawAcceleration As cv.Point3f
+    Public IMU_Acceleration As cv.Point3f
+    Public IMU_AverageAcceleration As cv.Point3f
+    Public IMU_RawAngularVelocity As cv.Point3f
+    Public IMU_AngularVelocity As cv.Point3f
+    Public kalmanIMUacc As cv.Point3f
+    Public kalmanIMUvelocity As cv.Point3f
     Public IMU_TimeStamp As Double
-    Public IMU_Translation As cvb.Point3f
-    Public IMU_AngularAcceleration As cvb.Point3f
+    Public IMU_Translation As cv.Point3f
+    Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_FrameTime As Double
     Public IMU_AlphaFilter As Single ' high pass and low pass filter of the IMU acceleration data.
 
-    Public accRadians As cvb.Point3f  ' rotation angles around x/y/z-axis to align with gravity
-    Public theta As cvb.Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
+    Public accRadians As cv.Point3f  ' rotation angles around x/y/z-axis to align with gravity
+    Public theta As cv.Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
     Public verticalizeAngle As Double
 
     Public pitch As Single
@@ -188,7 +188,7 @@ Public Class VBtask : Implements IDisposable
 
     Public recordTimings As Boolean = True
 
-    Public HighlightColor As cvb.Scalar ' color to use to highlight objects in an image.
+    Public HighlightColor As cv.Scalar ' color to use to highlight objects in an image.
 
     Public histogramBins As Integer
 
@@ -198,23 +198,23 @@ Public Class VBtask : Implements IDisposable
     Public paletteIndex As Integer
 
     Public mouseClickFlag As Boolean
-    Public ClickPoint As cvb.Point
+    Public ClickPoint As cv.Point
     Public mousePicTag As Integer ' which image was the mouse in?
-    Public mouseMovePoint As cvb.Point ' trace any mouse movements using this.
+    Public mouseMovePoint As cv.Point ' trace any mouse movements using this.
     Public mouseMovePointUpdated As Boolean
 
     Public DotSize As Integer
     Public lineWidth As Integer
-    Public lineType As cvb.LineTypes
+    Public lineType As cv.LineTypes
 
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
 
-    Public drawRect As cvb.Rect ' filled in if the user draws on any of the images.
+    Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
     Public drawRectUpdated As Boolean
 
-    Public pixelViewerRect As cvb.Rect
+    Public pixelViewerRect As cv.Rect
     Public pixelViewTag As Integer
 
     Public pipeName As String
@@ -228,12 +228,12 @@ Public Class VBtask : Implements IDisposable
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
 
-    Public scalarColors(255) As cvb.Scalar
-    Public oglColors(255) As cvb.Scalar
-    Public vecColors(255) As cvb.Vec3b
+    Public scalarColors(255) As cv.Scalar
+    Public oglColors(255) As cv.Scalar
+    Public vecColors(255) As cv.Vec3b
 
-    Public topCameraPoint As cvb.Point
-    Public sideCameraPoint As cvb.Point
+    Public topCameraPoint As cv.Point
+    Public sideCameraPoint As cv.Point
 
     Public hFov As Single
     Public vFov As Single
@@ -253,7 +253,7 @@ Public Class VBtask : Implements IDisposable
     Public testAllRunning As Boolean
     Public showConsoleLog As Boolean
 
-    Public mainFormLocation As cvb.Rect
+    Public mainFormLocation As cv.Rect
     Public main_hwnd As IntPtr
 
     Public trueData As New List(Of TrueText)
@@ -267,11 +267,11 @@ Public Class VBtask : Implements IDisposable
     Public returnCopyTime As Single ' the amount of time returning buffers to the host.
 
     Public OpenGLTitle As String
-    Public oglRect As cvb.Rect
+    Public oglRect As cv.Rect
     Public polyCount As Integer
 
-    Public rangesTop() As cvb.Rangef
-    Public rangesSide() As cvb.Rangef
+    Public rangesTop() As cv.Rangef
+    Public rangesSide() As cv.Rangef
     Public channelsTop() As Integer
     Public channelsSide() As Integer
     Public bins2D() As Integer
@@ -282,7 +282,7 @@ Public Class VBtask : Implements IDisposable
 
     Public rc As New rcData
     Public redCells As New List(Of rcData)
-    Public redMap As cvb.Mat
+    Public redMap As cv.Mat
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
     Public xRange As Single
@@ -294,10 +294,10 @@ Public Class VBtask : Implements IDisposable
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
     Public Structure inBuffer
-        Dim color As cvb.Mat
-        Dim leftView As cvb.Mat
-        Dim rightView As cvb.Mat
-        Dim pointCloud As cvb.Mat
+        Dim color As cv.Mat
+        Dim leftView As cv.Mat
+        Dim rightView As cv.Mat
+        Dim pointCloud As cv.Mat
     End Structure
     Public Structure cameraInfo
         Public ppx As Single
@@ -324,19 +324,19 @@ Public Class VBtask : Implements IDisposable
 
         Public HomeDir As String
         Public useRecordedData As Boolean
-        Public externalPythonInvocation As Boolean ' OpenCVB was initialized remotely...
+        Public externalPythonInvocation As Boolean ' Opencv was initialized remotely...
         Public showConsoleLog As Boolean
         Public testAllRunning As Boolean
         Public RotationMatrix() As Single
-        Public RotationVector As cvb.Point3f
+        Public RotationVector As cv.Point3f
 
-        Public mainFormLocation As cvb.Rect
+        Public mainFormLocation As cv.Rect
         Public main_hwnd As IntPtr
 
         Public fpsRate As Integer
-        Public workingRes As cvb.Size
-        Public captureRes As cvb.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
-        Public displayRes As cvb.Size
+        Public workingRes As cv.Size
+        Public captureRes As cv.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
+        Public displayRes As cv.Size
 
         Public algName As String
 
@@ -347,11 +347,11 @@ Public Class VBtask : Implements IDisposable
         Dim bgr(3) As Byte
         For i = 0 To task.vecColors.Length - 1
             rand.NextBytes(bgr)
-            task.vecColors(i) = New cvb.Vec3b(bgr(0), bgr(1), bgr(2))
-            task.scalarColors(i) = New cvb.Scalar(task.vecColors(i)(0),
+            task.vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
+            task.scalarColors(i) = New cv.Scalar(task.vecColors(i)(0),
                                                   task.vecColors(i)(1),
                                                   task.vecColors(i)(2))
-            task.oglColors(i) = New cvb.Scalar(task.vecColors(i)(0) / 255,
+            task.oglColors(i) = New cv.Scalar(task.vecColors(i)(0) / 255,
                                                task.vecColors(i)(1) / 255,
                                                task.vecColors(i)(2) / 255)
         Next
@@ -367,10 +367,10 @@ Public Class VBtask : Implements IDisposable
         If openGL_hwnd <> 0 Then
             Dim r As RECT
             GetWindowRect(openGL_hwnd, r)
-            Dim wRect = New cvb.Rect(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top)
-            SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", wRect.X)
-            SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", wRect.Y)
-            SaveSetting("OpenCVB", "OpenGLtaskWidth", "OpenGLtaskWidth", wRect.Width)
+            Dim wRect = New cv.Rect(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top)
+            SaveSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", wRect.X)
+            SaveSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", wRect.Y)
+            SaveSetting("Opencv", "OpenGLtaskWidth", "OpenGLtaskWidth", wRect.Width)
             openGLPipe.Close()
             openGL_hwnd = 0
         End If
@@ -385,8 +385,8 @@ Public Class VBtask : Implements IDisposable
 
         task = Me
         useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve results.
-        gridRects = New List(Of cvb.Rect)
-        FirstPass = True
+        gridRects = New List(Of cv.Rect)
+        firstPass = True
         algName = parms.algName
         cameraName = parms.cameraName
         testAllRunning = parms.testAllRunning
@@ -405,13 +405,13 @@ Public Class VBtask : Implements IDisposable
         workingRes = parms.workingRes
         task.optionsChanged = True
 
-        dst0 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        dst1 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        dst2 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
-        dst3 = New cvb.Mat(rows, cols, cvb.MatType.CV_8UC3, New cvb.Scalar)
+        dst0 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        dst1 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        dst2 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        dst3 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
 
-        OpenGL_Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
-        OpenGL_Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
+        OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
+        OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
 
         buildColors()
         pythonTaskName = HomeDir + "Python\" + algName
@@ -421,7 +421,7 @@ Public Class VBtask : Implements IDisposable
 
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
-        task.redMap = New cvb.Mat(New cvb.Size(task.dst2.Width, task.dst2.Height), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        task.redMap = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
 
         callTrace.Clear()
 
@@ -461,7 +461,7 @@ Public Class VBtask : Implements IDisposable
         palette = New Palette_LoadColorMap
         ogl = New OpenGL_Basics
         drawRotatedRect = New Draw_RotatedRect
-        centerRect = New cvb.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
+        centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 
         If task.advice = "" Then
             task.advice = "No advice for " + algName + " yet." + vbCrLf +
@@ -469,8 +469,8 @@ Public Class VBtask : Implements IDisposable
         End If
 
         fpList.Clear()
-        fpOutline = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
-        fpMap = New cvb.Mat(dst2.Size, cvb.MatType.CV_32S, 0)
+        fpOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        fpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
 
@@ -510,12 +510,12 @@ Public Class VBtask : Implements IDisposable
         End If
         TaskTimer.Enabled = False
     End Sub
-    Public Sub TrueText(text As String, pt As cvb.Point, Optional picTag As Integer = 2)
+    Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New TrueText(text, pt, picTag)
         task.trueData.Add(str)
     End Sub
-    Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cvb.Mat)
-        Static ptNew As New cvb.Point
+    Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+        Static ptNew As New cv.Point
         If redCells.Count = 0 Then Exit Sub
         If task.ClickPoint = ptNew And redCells.Count > 1 Then task.ClickPoint = redCells(1).maxDist
         Dim index = cellMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
@@ -553,16 +553,16 @@ Public Class VBtask : Implements IDisposable
         Next
         Return saveObject
     End Function
-    Public Sub DrawLine(dst As cvb.Mat, p1 As cvb.Point2f, p2 As cvb.Point2f, color As cvb.Scalar)
+    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         dst.Line(p1, p2, color, task.lineWidth, task.lineType)
     End Sub
-    Private Sub postProcess(src As cvb.Mat)
+    Private Sub postProcess(src As cv.Mat)
         Try
             ' make sure that any outputs from the algorithm are the right size.nearest
-            If dst0.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst0.Width > 0 Then dst0 = dst0.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst1.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst1.Width > 0 Then dst1 = dst1.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst2.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst2.Width > 0 Then dst2 = dst2.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
-            If dst3.Size <> New cvb.Size(task.color.Width, task.color.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cvb.Size(task.color.Width, task.color.Height), 0, 0, cvb.InterpolationFlags.Nearest)
+            If dst0.Size <> New cv.Size(task.color.Width, task.color.Height) And dst0.Width > 0 Then dst0 = dst0.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
+            If dst1.Size <> New cv.Size(task.color.Width, task.color.Height) And dst1.Width > 0 Then dst1 = dst1.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
+            If dst2.Size <> New cv.Size(task.color.Width, task.color.Height) And dst2.Width > 0 Then dst2 = dst2.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
+            If dst3.Size <> New cv.Size(task.color.Width, task.color.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
 
             If task.pixelViewerOn Then
                 task.PixelViewer.viewerForm.Visible = True
@@ -590,31 +590,31 @@ Public Class VBtask : Implements IDisposable
             If task.gOptions.displayDst1.Checked Then dst1 = Check8uC3(obj.dst1) Else dst1 = task.depthRGB
 
             If lookupName.EndsWith("_CC") Or lookupName.StartsWith("CPP_") Or lookupName.EndsWith(".py") Then
-                dst2 = If(dst2.Type = cvb.MatType.CV_8UC3, dst2, Check8uC3(dst2))
-                dst3 = If(dst3.Type = cvb.MatType.CV_8UC3, dst3, Check8uC3(dst3))
+                dst2 = If(dst2.Type = cv.MatType.CV_8UC3, dst2, Check8uC3(dst2))
+                dst3 = If(dst3.Type = cv.MatType.CV_8UC3, dst3, Check8uC3(dst3))
                 task.labels = labels
             Else
                 If obj IsNot Nothing Then
-                    dst2 = If(obj.dst2.Type = cvb.MatType.CV_8UC3, obj.dst2, Check8uC3(obj.dst2))
-                    dst3 = If(obj.dst3.Type = cvb.MatType.CV_8UC3, obj.dst3, Check8uC3(obj.dst3))
+                    dst2 = If(obj.dst2.Type = cv.MatType.CV_8UC3, obj.dst2, Check8uC3(obj.dst2))
+                    dst3 = If(obj.dst3.Type = cv.MatType.CV_8UC3, obj.dst3, Check8uC3(obj.dst3))
                     task.labels = obj.labels
                     task.trueData = New List(Of TrueText)(trueData)
                     If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
                 End If
             End If
 
-                If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
+            If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
             If dst2.Size <> task.color.Size Then
-                dst2 = dst2.Resize(New cvb.Size(task.color.Width, task.color.Height), cvb.InterpolationFlags.Nearest)
+                dst2 = dst2.Resize(New cv.Size(task.color.Width, task.color.Height), cv.InterpolationFlags.Nearest)
             End If
 
             If dst3.Size <> task.color.Size Then
-                dst3 = dst3.Resize(New cvb.Size(task.color.Width, task.color.Height), cvb.InterpolationFlags.Nearest)
+                dst3 = dst3.Resize(New cv.Size(task.color.Width, task.color.Height), cv.InterpolationFlags.Nearest)
             End If
 
             If dst2.Width = task.dst2.Width And dst2.Height = task.dst2.Height Then
-                If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cvb.Scalar.White, task.gridMask)
+                If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, task.gridMask)
             End If
 
             ' MSER mistakenly can have 1 cell - just ignore it.
@@ -628,8 +628,8 @@ Public Class VBtask : Implements IDisposable
                     If rcX.index = 20 Then Exit For
                 Next
 
-                task.color.Rectangle(task.rc.rect, cvb.Scalar.Yellow, task.lineWidth)
-                task.color(task.rc.rect).SetTo(cvb.Scalar.White, rc.mask)
+                task.color.Rectangle(task.rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                task.color(task.rc.rect).SetTo(cv.Scalar.White, rc.mask)
             End If
 
             If task.redOptions.DisplayCellStats.Checked Then
@@ -640,15 +640,15 @@ Public Class VBtask : Implements IDisposable
 
             If task.gOptions.showMotionMask.Checked Then
                 For Each roi In task.motionRects
-                    task.color.Rectangle(roi, cvb.Scalar.White, task.lineWidth)
+                    task.color.Rectangle(roi, cv.Scalar.White, task.lineWidth)
                 Next
             End If
 
             gravityHorizon.runAlg(src)
             If task.gOptions.CrossHairs.Checked Then
                 If task.paused = False Then
-                    DrawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cvb.Scalar.White)
-                    DrawLine(task.color, task.gravityVec.p1, task.gravityVec.p2, cvb.Scalar.White)
+                    DrawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
+                    DrawLine(task.color, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
                 End If
             End If
 
@@ -663,7 +663,7 @@ Public Class VBtask : Implements IDisposable
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
-    Public Function GetMinMax(mat As cvb.Mat, Optional mask As cvb.Mat = Nothing) As mmData
+    Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
             mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
@@ -716,15 +716,15 @@ Public Class VBtask : Implements IDisposable
         task.redOptions.Sync()
 
         Dim src = task.color
-        If src.Size <> New cvb.Size(task.dst2.Cols, task.dst2.Rows) Then dst2 = dst2.Resize(src.Size)
-        If src.Size <> New cvb.Size(task.dst3.Cols, task.dst3.Rows) Then dst3 = dst3.Resize(src.Size)
+        If src.Size <> New cv.Size(task.dst2.Cols, task.dst2.Rows) Then dst2 = dst2.Resize(src.Size)
+        If src.Size <> New cv.Size(task.dst3.Cols, task.dst3.Rows) Then dst3 = dst3.Resize(src.Size)
         task.bins2D = {task.dst2.Height, task.dst2.Width}
 
         ' If the WorkingRes changes, the previous generation of images needs to be reset.
-        If task.pointCloud.Size <> New cvb.Size(cols, rows) Or task.color.Size <> task.dst2.Size Then
-            task.pointCloud = New cvb.Mat(rows, cols, cvb.MatType.CV_32FC3, cvb.Scalar.All(0))
-            task.noDepthMask = New cvb.Mat(rows, cols, cvb.MatType.CV_8U, cvb.Scalar.All(0))
-            task.depthMask = New cvb.Mat(rows, cols, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        If task.pointCloud.Size <> New cv.Size(cols, rows) Or task.color.Size <> task.dst2.Size Then
+            task.pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
+            task.noDepthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
+            task.depthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
         End If
 
         ' run any universal algorithms here
@@ -760,7 +760,7 @@ Public Class VBtask : Implements IDisposable
 
             If task.useGravityPointcloud Then
                 If task.pointCloud.Size <> src.Size Then
-                    task.pointCloud = New cvb.Mat(src.Size, cvb.MatType.CV_32FC3, 0)
+                    task.pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
                 End If
 
                 '******* this is the gravity rotation *******
@@ -778,7 +778,7 @@ Public Class VBtask : Implements IDisposable
         If task.gOptions.UseMotionColor.Checked Then
             task.color = motion.color.Clone
             task.motionMask = motion.motionMask
-            task.motionRects = New List(Of cvb.Rect)(motion.measure.motionRects)
+            task.motionRects = New List(Of cv.Rect)(motion.measure.motionRects)
         End If
 
         If task.gOptions.UseMotionDepth.Checked Then
@@ -792,8 +792,8 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.TruncateDepth.Checked Then
             task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters,
-                                                        cvb.ThresholdTypes.Trunc)
-            cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
+                                                        cv.ThresholdTypes.Trunc)
+            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
 
         ' The stereolabs camera has some weird -inf and inf values in the Y-plane.  
@@ -802,7 +802,7 @@ Public Class VBtask : Implements IDisposable
             task.pcSplit(1).SetTo(0, Not mask)
         End If
 
-        task.depthMask = task.pcSplit(2).Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary)
         task.depthMask = task.depthMask.ConvertScaleAbs()
 
         task.noDepthMask = Not task.depthMask
@@ -813,11 +813,11 @@ Public Class VBtask : Implements IDisposable
             task.pcSplit(0) *= xRatio
             task.pcSplit(1) *= yRatio
 
-            cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
+            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
 
         ' the gravity transformation apparently can introduce some NaNs.
-        If task.cameraName.StartsWith("StereoLabs") Then cvb.Cv2.PatchNaNs(task.pcSplit(2))
+        If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(task.pcSplit(2))
 
         If task.gOptions.UseMotionColor.Checked Then feat.Run(src)
 

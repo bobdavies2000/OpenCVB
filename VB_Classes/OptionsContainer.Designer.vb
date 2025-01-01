@@ -66,7 +66,7 @@ Partial Class OptionsContainer
         Me.Controls.Add(Me.ToolStrip1)
         Me.IsMdiContainer = True
         Me.Name = "OptionsContainer"
-        Me.Text = "OpenCVB Algorithm Options"
+        Me.Text = "Opencv Algorithm Options"
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.ResumeLayout(False)

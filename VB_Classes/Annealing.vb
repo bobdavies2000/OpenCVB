@@ -1,9 +1,9 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Public Class Annealing_Basics_CPP_VB : Inherits TaskParent
     Public numberOfCities As Integer = 25
-    Public cityPositions() As cvb.Point2f
+    Public cityPositions() As cv.Point2f
     Public cityOrder() As Integer
     Public energy As Single
     Public energyLast As Single
@@ -14,13 +14,13 @@ Public Class Annealing_Basics_CPP_VB : Inherits TaskParent
             DrawCircle(dst2, cityPositions(i), task.DotSize, white)
             DrawLine(dst2, cityPositions(i), cityPositions(cityOrder(i)), white)
         Next
-        SetTrueText("Energy" + vbCrLf + Format(energy, fmt0), New cvb.Point(10, 100), 2)
+        SetTrueText("Energy" + vbCrLf + Format(energy, fmt0), New cv.Point(10, 100), 2)
     End Sub
     Public Sub setup()
         ReDim cityOrder(numberOfCities - 1)
 
         Dim radius = dst2.Rows * 0.45
-        Dim center = New cvb.Point(dst2.Cols / 2, dst2.Rows / 2)
+        Dim center = New cv.Point(dst2.Cols / 2, dst2.Rows / 2)
         If circularPattern Then
             ReDim cityPositions(numberOfCities - 1)
             For i = 0 To cityPositions.Length - 1
@@ -33,7 +33,7 @@ Public Class Annealing_Basics_CPP_VB : Inherits TaskParent
         For i = 0 To cityOrder.Length - 1
             cityOrder(i) = (i + 1) Mod numberOfCities
         Next
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
     End Sub
     Public Sub Open()
         Dim hCityPosition = GCHandle.Alloc(cityPositions, GCHandleType.Pinned)
@@ -46,7 +46,7 @@ Public Class Annealing_Basics_CPP_VB : Inherits TaskParent
         Open()
         desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Dim saveCityOrder = cityOrder.Clone()
         Dim hCityOrder = GCHandle.Alloc(cityOrder, GCHandleType.Pinned)
         Dim out As IntPtr = Annealing_Basics_Run(cPtr, hCityOrder.AddrOfPinnedObject, cityPositions.Length)
@@ -105,7 +105,7 @@ Public Class Annealing_MT_CPP_VB : Inherits TaskParent
         labels = {"", "", "Top 2 are best solutions, bottom 2 are worst.", "Log of Annealing progress"}
         desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Overrides Sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         If task.optionsChanged Then setup()
         Parallel.For(0, anneal.Length,
@@ -124,7 +124,7 @@ Public Class Annealing_MT_CPP_VB : Inherits TaskParent
                 strOut += "CPU=" + Format(i, "00") + " energy=" + Format(anneal(i).energy, "0") + vbCrLf
             End If
         Next
-        SetTrueText(strOut, New cvb.Point(10, 10), 3)
+        SetTrueText(strOut, New cv.Point(10, 10), 3)
 
         mats.mat(0) = anneal(CInt(bestList.ElementAt(0).Value)).dst2
         If bestList.Count >= 2 Then

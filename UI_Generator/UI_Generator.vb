@@ -466,13 +466,13 @@ Module UI_Generator
             If line.Contains("fileName") Then Continue While
             If line.Contains("fileNames ") Then Continue While
 
-            line = line.Replace("cvb.", "cv::")
+            line = line.Replace("cv.", "cv::")
             If line.StartsWith("Public Class Options_") Or line.Contains("Public Sub New") Then
                 phase3.Add(line)
                 Continue While
             End If
 
-            If line.Contains(" As cvb.Mat") Then Continue While
+            If line.Contains(" As cv.Mat") Then Continue While
 
             phase3.Add(line)
         End While

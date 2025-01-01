@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class LowRes_Basics : Inherits TaskParent
     Dim lrColor As New LowRes_Color
     Dim lrDepth As New LowRes_Depth
@@ -8,7 +8,7 @@ Public Class LowRes_Basics : Inherits TaskParent
         labels(3) = "Low resolution version of the depth data."
         desc = "Build the low-res image and accompanying map, rect list, and mask."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         lrColor.Run(src)
         dst2 = lrColor.dst2.Clone
         task.lowResColor = lrColor.dst3.Clone
@@ -28,7 +28,7 @@ Public Class LowRes_Color : Inherits TaskParent
         labels = {"", "", "Grid of mean color values", "Resized task.lowResColor"}
         desc = "The bare minimum needed to make the LowRes image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst2 = src.Clone
         For Each roi In task.gridRects
             Dim mean = src(roi).Mean()
@@ -48,8 +48,8 @@ Public Class LowRes_Depth : Inherits TaskParent
         labels = {"", "", "Grid of mean depth values", "Resized task.lowResDepth"}
         desc = "The bare minimum needed to make the LowRes image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2).Clone
+    Public Overrides Sub runAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
         dst2 = src.Clone
         Dim index As Integer
         For y = 0 To task.gridRows - 1
@@ -73,11 +73,11 @@ Public Class LowRes_Features : Inherits TaskParent
     Dim lowRes As New LowRes_Basics
     Public Sub New()
         FindSlider("Min Distance to next").Value = 3
-        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Featureless areas"
         desc = "Identify the cells with features"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
 
@@ -85,7 +85,7 @@ Public Class LowRes_Features : Inherits TaskParent
         Dim gridCounts As New List(Of Integer)
 
         task.featurePoints.Clear()
-        Dim rects As New List(Of cvb.Rect)
+        Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
             Dim tile = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
             Dim test = gridIndex.IndexOf(tile)
@@ -94,7 +94,7 @@ Public Class LowRes_Features : Inherits TaskParent
                 rects.Add(r)
                 gridIndex.Add(tile)
                 gridCounts.Add(1)
-                Dim p1 = New cvb.Point(r.X, r.Y)
+                Dim p1 = New cv.Point(r.X, r.Y)
                 DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
                 task.featurePoints.Add(p1)
             Else
@@ -110,7 +110,7 @@ Public Class LowRes_Features : Inherits TaskParent
 
         If task.gOptions.debugChecked Then
             For Each pt In task.features
-                DrawCircle(dst2, pt, task.DotSize, cvb.Scalar.Black)
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
             Next
         End If
         If standaloneTest() Then
@@ -136,18 +136,18 @@ Public Class LowRes_Edges : Inherits TaskParent
     Public lowRes As New LowRes_Basics
     Public edges As New Edge_Basics
     Public Sub New()
-        task.featureMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
-        task.fLessMask = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U)
+        task.featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        task.fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         FindRadio("Laplacian").Checked = True
         desc = "Add edges to features"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Static stateList As New List(Of Single)
 
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
 
-        Static lastDepth As cvb.Mat = task.lowResDepth.Clone
+        Static lastDepth As cv.Mat = task.lowResDepth.Clone
 
         edges.Run(src)
         dst2.SetTo(0, edges.dst2)
@@ -168,12 +168,12 @@ Public Class LowRes_Edges : Inherits TaskParent
             Next
         End If
 
-        Dim flipRects As New List(Of cvb.Rect)
+        Dim flipRects As New List(Of cv.Rect)
         For i = 0 To task.gridRects.Count - 1
             stateList(i) = (stateList(i) + flist(i)) / 2
             Dim r = task.gridRects(i)
             If stateList(i) >= 1.95 Then
-                DrawCircle(dst2, New cvb.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, New cv.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
                 task.featureRects.Add(r)
                 task.featureMask(r).SetTo(255)
             ElseIf stateList(i) <= 1.05 Then
@@ -219,10 +219,10 @@ Public Class LowRes_Boundaries : Inherits TaskParent
     Public feat As New LowRes_Edges
     Public boundaryCells As New List(Of List(Of Integer))
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Find the boundary cells between feature and featureless cells."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         feat.Run(src)
         dst1 = task.featureMask.Clone
         dst3 = feat.dst2
@@ -271,18 +271,18 @@ Public Class LowRes_MLColor : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         ml.buildEveryPass = True
-        dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         bounds.Run(src)
         Dim edgeMask = bounds.feat.edges.dst2
 
-        Dim rgb32f As New cvb.Mat, tmp As New cvb.Mat
-        src.ConvertTo(rgb32f, cvb.MatType.CV_32FC3)
+        Dim rgb32f As New cv.Mat, tmp As New cv.Mat
+        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
 
         dst1 = task.fLessMask
-        Dim trainRGB As cvb.Mat
+        Dim trainRGB As cv.Mat
         For i = 0 To bounds.boundaryCells.Count - 1
             Dim nList = bounds.boundaryCells(i)
 
@@ -291,25 +291,25 @@ Public Class LowRes_MLColor : Inherits TaskParent
             Dim edgePixels = edgeMask(roi).FindNonZero()
 
             ' mark the edge pixels as class 2 - others will be updated next
-            ml.trainResponse = New cvb.Mat(nList.Count + edgePixels.Rows - 1, 1,
-                                           cvb.MatType.CV_32F, New cvb.Scalar(2))
-            trainRGB = New cvb.Mat(ml.trainResponse.Rows, 1, cvb.MatType.CV_32FC3)
+            ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
+                                           cv.MatType.CV_32F, New cv.Scalar(2))
+            trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
 
             For j = 1 To nList.Count - 1
                 Dim roiA = task.gridRects(nList(j))
                 Dim x As Integer = Math.Floor(roiA.X * task.gridCols / task.cols)
                 Dim y As Integer = Math.Floor(roiA.Y * task.gridRows / task.rows)
-                Dim val = task.lowResColor.Get(Of cvb.Vec3f)(y, x)
-                trainRGB.Set(Of cvb.Vec3f)(j - 1, 0, val)
+                Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
+                trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
                 ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
             Next
 
             ' next, add the edge pixels in the target cell - they are the feature identifiers.
             Dim index = nList.Count - 1
             For j = 0 To edgePixels.Rows - 1
-                Dim pt = edgePixels.Get(Of cvb.Point)(j, 0)
-                Dim val = rgb32f.Get(Of cvb.Vec3f)(roi.Y + pt.Y, roi.X + pt.X)
-                trainRGB.Set(Of cvb.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
+                Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
+                Dim val = rgb32f.Get(Of cv.Vec3f)(roi.Y + pt.Y, roi.X + pt.X)
+                trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
             Next
 
             ml.trainMats = {trainRGB}
@@ -318,7 +318,7 @@ Public Class LowRes_MLColor : Inherits TaskParent
             ml.testMats = {rgb32f(roiB)}
             ml.Run(empty)
 
-            dst1(roiB) = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.BinaryInv).
+            dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
                                         ConvertScaleAbs.Reshape(1, roiB.Height)
         Next
 
@@ -344,18 +344,18 @@ Public Class LowRes_MLColorDepth : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         ml.buildEveryPass = True
-        dst1 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         bounds.Run(src)
         Dim edgeMask = bounds.feat.edges.dst2
 
-        Dim rgb32f As New cvb.Mat, tmp As New cvb.Mat
-        src.ConvertTo(rgb32f, cvb.MatType.CV_32FC3)
+        Dim rgb32f As New cv.Mat, tmp As New cv.Mat
+        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
 
         dst1 = task.fLessMask
-        Dim trainRGB As cvb.Mat, trainDepth As cvb.Mat
+        Dim trainRGB As cv.Mat, trainDepth As cv.Mat
         For i = 0 To bounds.boundaryCells.Count - 1
             Dim nList = bounds.boundaryCells(i)
 
@@ -364,17 +364,17 @@ Public Class LowRes_MLColorDepth : Inherits TaskParent
             Dim edgePixels = edgeMask(roi).FindNonZero()
 
             ' mark the edge pixels as class 2 - others will be updated next
-            ml.trainResponse = New cvb.Mat(nList.Count + edgePixels.Rows - 1, 1,
-                                           cvb.MatType.CV_32F, New cvb.Scalar(2))
-            trainRGB = New cvb.Mat(ml.trainResponse.Rows, 1, cvb.MatType.CV_32FC3)
-            trainDepth = New cvb.Mat(ml.trainResponse.Rows, 1, cvb.MatType.CV_32F)
+            ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
+                                           cv.MatType.CV_32F, New cv.Scalar(2))
+            trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
+            trainDepth = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32F)
 
             For j = 1 To nList.Count - 1
                 Dim roiA = task.gridRects(nList(j))
                 Dim x As Integer = Math.Floor(roiA.X * task.gridCols / task.cols)
                 Dim y As Integer = Math.Floor(roiA.Y * task.gridRows / task.rows)
-                Dim val = task.lowResColor.Get(Of cvb.Vec3f)(y, x)
-                trainRGB.Set(Of cvb.Vec3f)(j - 1, 0, val)
+                Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
+                trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
                 trainDepth.Set(Of Single)(j - 1, 0, task.lowResDepth.Get(Of Single)(y, x))
                 ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
             Next
@@ -382,9 +382,9 @@ Public Class LowRes_MLColorDepth : Inherits TaskParent
             ' next, add the edge pixels in the target cell - they are the feature identifiers.
             Dim index = nList.Count - 1
             For j = 0 To edgePixels.Rows - 1
-                Dim pt = edgePixels.Get(Of cvb.Point)(j, 0)
-                Dim val = rgb32f(roi).Get(Of cvb.Vec3f)(pt.Y, pt.X)
-                trainRGB.Set(Of cvb.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
+                Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
+                Dim val = rgb32f(roi).Get(Of cv.Vec3f)(pt.Y, pt.X)
+                trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
                 Dim depth = task.pcSplit(2)(roi).Get(Of Single)(pt.Y, pt.X)
                 trainDepth.Set(Of Single)(index + j, 0, depth)
             Next
@@ -395,7 +395,7 @@ Public Class LowRes_MLColorDepth : Inherits TaskParent
             ml.testMats = {rgb32f(roiB), task.pcSplit(2)(roiB)}
             ml.Run(empty)
 
-            dst1(roiB) = ml.predictions.Threshold(1.5, 255, cvb.ThresholdTypes.BinaryInv).
+            dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
                                         ConvertScaleAbs.Reshape(1, roiB.Height)
         Next
 
@@ -416,10 +416,10 @@ End Class
 
 Public Class LowRes_DepthMask : Inherits TaskParent
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Create a mask of the cells that are mostly depth - remove speckles in no depth regions"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst2.SetTo(0)
         For Each roi In task.gridRects
             Dim count = task.pcSplit(2)(roi).CountNonZero()
@@ -434,14 +434,14 @@ End Class
 
 Public Class LowRes_MeasureColor : Inherits TaskParent
     Dim lowRes As New LowRes_Color
-    Public colors(0) As cvb.Vec3b
+    Public colors(0) As cv.Vec3b
     Public distances() As Single
     Public options As New Options_LowRes
     Public motionList As New List(Of Integer)
     Public Sub New()
         desc = "Measure how much color changes with and without motion."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         lowRes.Run(src)
@@ -456,11 +456,11 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
         motionList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
-            Dim vec = dst2.Get(Of cvb.Vec3b)(roi.Y, roi.X)
+            Dim vec = dst2.Get(Of cv.Vec3b)(roi.Y, roi.X)
             distances(i) = distance3D(colors(i), vec)
             If distances(i) > options.colorDifferenceThreshold Then
                 If standaloneTest() Then
-                    SetTrueText(Format(distances(i), fmt1), New cvb.Point(roi.X, roi.Y), 3)
+                    SetTrueText(Format(distances(i), fmt1), New cv.Point(roi.X, roi.Y), 3)
                 End If
                 colors(i) = vec
                 For Each index In task.gridNeighbors(i)
@@ -493,16 +493,16 @@ End Class
 Public Class LowRes_MeasureMotion : Inherits TaskParent
     Dim measure As New LowRes_MeasureColor
     Public motionDetected As Boolean
-    Public motionRects As New List(Of cvb.Rect)
+    Public motionRects As New List(Of cv.Rect)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         labels(3) = "A composite of an earlier image and the motion from the latest input"
         desc = "Show all the grid cells above the motionless value (an option)."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Then dst0 = src.Clone
 
-        If task.optionsChanged Then motionRects = New List(Of cvb.Rect)
+        If task.optionsChanged Then motionRects = New List(Of cv.Rect)
 
         measure.Run(src)
         dst2 = measure.dst2
@@ -528,7 +528,7 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
         If task.frameCount < 3 Then ' some of the grid configurations are not compatible between cameras.
             src.CopyTo(dst3)
             motionRects.Clear()
-            motionRects.Add(New cvb.Rect(0, 0, dst2.Width, dst2.Height))
+            motionRects.Add(New cv.Rect(0, 0, dst2.Width, dst2.Height))
             motionDetected = True
         Else
             If motionRects.Count > 0 Then
@@ -558,7 +558,7 @@ Public Class LowRes_MeasureValidate : Inherits TaskParent
                     "Contrast this with BGSubtract."
         desc = "Validate the image provided by LowRes_MeasureMotion"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst0 = src.Clone
         measure.Run(src)
         dst2 = measure.dst3.Clone
@@ -568,11 +568,11 @@ Public Class LowRes_MeasureValidate : Inherits TaskParent
         Dim curr = dst0.Reshape(1, dst0.Rows * 3)
         Dim motion = dst2.Reshape(1, dst2.Rows * 3)
 
-        cvb.Cv2.Absdiff(curr, motion, dst0)
+        cv.Cv2.Absdiff(curr, motion, dst0)
 
         If task.heartBeat = False Then
             Static diff As New Diff_Basics
-            diff.lastFrame = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)
             dst3 = diff.dst2
         End If
