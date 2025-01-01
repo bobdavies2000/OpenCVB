@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Spectrum_Basics : Inherits TaskParent
     Dim dSpec As New Spectrum_Z
     Dim gSpec As New Spectrum_Gray
@@ -6,7 +6,7 @@ Public Class Spectrum_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges of the depth and color."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dst2 = options.runRedCloud(labels(2))
 
         dSpec.Run(src)
@@ -32,7 +32,7 @@ Public Class Spectrum_X : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -56,7 +56,7 @@ Public Class Spectrum_Y : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -80,7 +80,7 @@ Public Class Spectrum_Z : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
@@ -108,7 +108,7 @@ Public Class Spectrum_Cloud : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -139,7 +139,7 @@ Public Class Spectrum_GrayAndCloud : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -166,7 +166,7 @@ Public Class Spectrum_RGB : Inherits TaskParent
     Public Sub New()
         desc = "Create a spectrum of the RGB values for a given RedCloud cell."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -202,7 +202,7 @@ Public Class Spectrum_CellZoom : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         breakdown.options.RunOpt()
 
         dst2 = breakdown.options.runRedCloud(labels(2))
@@ -234,20 +234,20 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
     Public Sub New()
         desc = "Breakdown a cell if possible."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             options.RunOpt()
             dst2 = options.runRedCloud(labels(2))
         End If
 
         Dim rc = task.rc
-        Dim ranges As List(Of rangeData), input As cvb.Mat
+        Dim ranges As List(Of rangeData), input As cv.Mat
         If rc.depthPixels / rc.pixels < 0.5 Then
-            input = New cvb.Mat(rc.mask.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+            input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             src(rc.rect).CopyTo(input, rc.mask)
-            input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            input = New cvb.Mat(rc.mask.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
+            input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(rc.rect).CopyTo(input, rc.mask)
         End If
         ranges = options.buildColorRanges(input, "GrayScale")
@@ -262,20 +262,20 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
             End If
         Next
 
-        Dim rangeClip As New cvb.Mat(input.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        If input.Type = cvb.MatType.CV_8U Then
+        Dim rangeClip As New cv.Mat(input.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        If input.Type = cv.MatType.CV_8U Then
             rangeClip = input.InRange(maxRange.start, maxRange.ending)
-            rangeClip = rangeClip.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+            rangeClip = rangeClip.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         Else
-            rangeClip = New cvb.Mat(rc.mask.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
+            rangeClip = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             input.CopyTo(rangeClip, rc.mask)
 
             rangeClip = rangeClip.InRange(maxRange.start / 100, maxRange.ending / 100)
-            rangeClip = rangeClip.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+            rangeClip = rangeClip.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         End If
 
         If buildMaskOnly = False Then
-            dst3 = rc.mask.Threshold(0, 128, cvb.ThresholdTypes.Binary)
+            dst3 = rc.mask.Threshold(0, 128, cv.ThresholdTypes.Binary)
             dst3.SetTo(255, rangeClip)
         End If
 
@@ -284,7 +284,7 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
             dst3 = proportion.dst2
         End If
 
-        rc.mask = rc.mask.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        rc.mask = rc.mask.Threshold(0, 255, cv.ThresholdTypes.Binary)
         task.rc = rc
     End Sub
 End Class
@@ -302,7 +302,7 @@ Public Class Spectrum_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Breakdown each cell in redCells."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         breakdown.options.RunOpt()
         dst2 = breakdown.options.runRedCloud(labels(2))
 
@@ -333,7 +333,7 @@ Public Class Spectrum_Mask : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Create a mask from the Spectrum ranges"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         gSpec.Run(src)
         dst1 = gSpec.dst2
         labels(2) = gSpec.labels(2)
@@ -353,13 +353,13 @@ Public Class Spectrum_Gray : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the color ranges."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
         Dim input = src(task.rc.rect)
-        If input.Type <> cvb.MatType.CV_8U Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ranges = options.buildColorRanges(input, typeSpec)
         strOut = options.strOut
         SetTrueText(strOut, 3)

@@ -1,13 +1,13 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Etch_ASketch : Inherits TaskParent
     Dim keys As Keyboard_Basics
-    Dim slateColor = New cvb.Scalar(122, 122, 122)
-    Dim cursor As cvb.Point
+    Dim slateColor = New cv.Scalar(122, 122, 122)
+    Dim cursor As cv.Point
     Dim ms_rng As New System.Random
     Dim options As New Options_Etch_ASketch
-    Dim lastCursor As cvb.Point
+    Dim lastCursor As cv.Point
     Private Function randomCursor()
-        Dim nextCursor = New cvb.Point(ms_rng.Next(0, dst2.Width), ms_rng.Next(0, dst2.Height))
+        Dim nextCursor = New cv.Point(ms_rng.Next(0, dst2.Width), ms_rng.Next(0, dst2.Height))
         lastCursor = nextCursor
         Return nextCursor
     End Function
@@ -18,7 +18,7 @@ Public Class Etch_ASketch : Inherits TaskParent
         dst2.SetTo(slateColor)
         desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         keys.Run(src)
@@ -54,7 +54,7 @@ Public Class Etch_ASketch : Inherits TaskParent
             If cursor.Y < 0 Then cursor.Y = 0
             If cursor.X >= src.Width Then cursor.X = src.Width - 1
             If cursor.Y >= src.Height Then cursor.Y = src.Height - 1
-            dst2.Set(Of cvb.Vec3b)(cursor.Y, cursor.X, black.ToVec3b)
+            dst2.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black.ToVec3b)
         Next
         If options.demoMode Then lastCursor = cursor
     End Sub

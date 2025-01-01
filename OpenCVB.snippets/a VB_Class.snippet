@@ -13,8 +13,8 @@ Public Class newClass_Basics : Inherits TaskParent
         UpdateAdvice(tracename + ": <place advice here on any options that are useful>")
         desc = "description"
     End Sub
-    Public Overrides Sub RunAlg(src as cvb.Mat)
-	    dst2 = src.cvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+    Public Overrides Sub RunAlg(src as cv.Mat)
+	    dst2 = src.cvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
 ]]>

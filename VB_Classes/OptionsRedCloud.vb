@@ -74,8 +74,8 @@ Public Class OptionsRedCloud
             End Select
         End If
 
-        XRangeBar.Value = task.xRange * 100
-        YRangeSlider.Value = task.yRange * 100
+        XRangeBar.Value = task.xRange * 200
+        YRangeSlider.Value = task.yRange * 400
         IdentifyCountBar.Value = 20
 
         task.xRangeDefault = task.xRange

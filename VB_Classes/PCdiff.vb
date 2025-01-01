@@ -1,40 +1,40 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class PCdiff_Basics : Inherits TaskParent
     Public options As New Options_ImageOffset
     Public Sub New()
         task.gOptions.PixelDiffBar.Value = 10
         desc = "Find depth regions where neighboring pixels are close in depth"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         If standalone Then src = task.pcSplit(2)
 
-        Dim r1 = New cvb.Rect(1, 1, task.cols - 2, task.rows - 2)
-        Dim r2 As cvb.Rect
+        Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
+        Dim r2 As cv.Rect
         Select Case options.offsetDirection
             Case "Upper Left"
-                r2 = New cvb.Rect(0, 0, r1.Width, r1.Height)
+                r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
             Case "Above"
-                r2 = New cvb.Rect(1, 0, r1.Width, r1.Height)
+                r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
             Case "Upper Right"
-                r2 = New cvb.Rect(2, 0, r1.Width, r1.Height)
+                r2 = New cv.Rect(2, 0, r1.Width, r1.Height)
             Case "Left"
-                r2 = New cvb.Rect(0, 1, r1.Width, r1.Height)
+                r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
             Case "Right"
-                r2 = New cvb.Rect(2, 1, r1.Width, r1.Height)
+                r2 = New cv.Rect(2, 1, r1.Width, r1.Height)
             Case "Lower Left"
-                r2 = New cvb.Rect(0, 2, r1.Width, r1.Height)
+                r2 = New cv.Rect(0, 2, r1.Width, r1.Height)
             Case "Below"
-                r2 = New cvb.Rect(1, 2, r1.Width, r1.Height)
+                r2 = New cv.Rect(1, 2, r1.Width, r1.Height)
             Case "Below Right"
-                r2 = New cvb.Rect(2, 2, r1.Width, r1.Height)
+                r2 = New cv.Rect(2, 2, r1.Width, r1.Height)
         End Select
 
-        Dim r3 = New cvb.Rect(1, 1, task.cols - 2, task.rows - 2)
+        Dim r3 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
 
-        dst2 = New cvb.Mat(dst2.Size, src.Type, 0)
-        cvb.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
-        dst3 = dst2.Threshold(task.gOptions.pixelDiffThreshold / 1000, 255, cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
+        dst2 = New cv.Mat(dst2.Size, src.Type, 0)
+        cv.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
+        dst3 = dst2.Threshold(task.gOptions.pixelDiffThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -51,7 +51,7 @@ Public Class PCdiff_Edges : Inherits TaskParent
         task.gOptions.DebugSlider.Maximum = 2
         desc = "Find any significant differences in neighboring pixels of the pointcloud."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static index As Integer = -1
 
         If task.heartBeatLT Then
@@ -75,51 +75,51 @@ End Class
 
 Public Class PCdiff_Basics1 : Inherits TaskParent
     Public options As New Options_ImageOffset
-    Public masks(2) As cvb.Mat
-    Public dst(2) As cvb.Mat
-    Public pcFiltered(2) As cvb.Mat
+    Public masks(2) As cv.Mat
+    Public dst(2) As cv.Mat
+    Public pcFiltered(2) As cv.Mat
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        dst1 = New cvb.Mat(dst1.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
-        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         desc = "Compute various differences between neighboring pixels"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim r1 = New cvb.Rect(1, 1, task.cols - 2, task.rows - 2)
-        Dim r2 As cvb.Rect
+        Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
+        Dim r2 As cv.Rect
         Select Case options.offsetDirection
             Case "Upper Left"
-                r2 = New cvb.Rect(0, 0, r1.Width, r1.Height)
+                r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
             Case "Above"
-                r2 = New cvb.Rect(1, 0, r1.Width, r1.Height)
+                r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
             Case "Upper Right"
-                r2 = New cvb.Rect(2, 0, r1.Width, r1.Height)
+                r2 = New cv.Rect(2, 0, r1.Width, r1.Height)
             Case "Left"
-                r2 = New cvb.Rect(0, 1, r1.Width, r1.Height)
+                r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
             Case "Right"
-                r2 = New cvb.Rect(2, 1, r1.Width, r1.Height)
+                r2 = New cv.Rect(2, 1, r1.Width, r1.Height)
             Case "Lower Left"
-                r2 = New cvb.Rect(0, 2, r1.Width, r1.Height)
+                r2 = New cv.Rect(0, 2, r1.Width, r1.Height)
             Case "Below"
-                r2 = New cvb.Rect(1, 2, r1.Width, r1.Height)
+                r2 = New cv.Rect(1, 2, r1.Width, r1.Height)
             Case "Below Right"
-                r2 = New cvb.Rect(2, 2, r1.Width, r1.Height)
+                r2 = New cv.Rect(2, 2, r1.Width, r1.Height)
         End Select
 
-        Dim r3 = New cvb.Rect(1, 1, r1.Width, r1.Height)
+        Dim r3 = New cv.Rect(1, 1, r1.Width, r1.Height)
 
-        cvb.Cv2.Absdiff(task.pcSplit(0)(r1), task.pcSplit(0)(r2), dst1(r3))
-        cvb.Cv2.Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
-        cvb.Cv2.Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
+        cv.Cv2.Absdiff(task.pcSplit(0)(r1), task.pcSplit(0)(r2), dst1(r3))
+        cv.Cv2.Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
+        cv.Cv2.Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
             masks(i) = dst(i).Threshold(task.gOptions.pixelDiffThreshold / 1000, 255,
-                                        cvb.ThresholdTypes.BinaryInv).ConvertScaleAbs
-            pcFiltered(i) = New cvb.Mat(src.Size, cvb.MatType.CV_32FC1, New cvb.Scalar(0))
+                                        cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+            pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
         Next
     End Sub
@@ -133,11 +133,11 @@ End Class
 Public Class PCdiff_Filter : Inherits TaskParent
     Public pcDiff As New PCdiff_Basics
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, New cvb.Scalar(0))
-        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_32FC3)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, New cv.Scalar(0))
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3)
         desc = "Filter the pointcloud to isolate only pixels within X mm's of it neighbor"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         pcDiff.Run(src)
 
         Dim delta = task.gOptions.pixelDiffThreshold / 1000
@@ -166,12 +166,12 @@ End Class
 Public Class PCdiff_Points : Inherits TaskParent
     Dim filter As New PCdiff_Filter
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         labels = {"", "", "Point cloud with clean breaks between objects",
                           "Pixels removed to make clean breaks in the depth data"}
         desc = "Review the filtered PCdiff output."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         filter.Run(src)
         task.pcSplit = filter.dst3.Split()
 
@@ -198,7 +198,7 @@ Public Class PCdiff_Points : Inherits TaskParent
         Next
 
         task.noDepthMask = task.pcSplit(2).InRange(0, 0)
-        cvb.Cv2.Merge(task.pcSplit, dst3)
+        cv.Cv2.Merge(task.pcSplit, dst3)
     End Sub
 End Class
 
@@ -212,10 +212,10 @@ Public Class PCdiff_GuidedBP : Inherits TaskParent
     Public Sub New()
         desc = "Isolate the objects found in the contiguous depth"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         points.Run(src)
 
-        cvb.Cv2.Merge(task.pcSplit, task.pointCloud)
+        cv.Cv2.Merge(task.pcSplit, task.pointCloud)
         backP.Run(task.pointCloud)
         dst2 = backP.dst2
         labels(2) = backP.labels(2)

@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 ' https://en.wikipedia.org/wiki/Scatter_matrix
 Public Class ScatterMatrix_Example : Inherits TaskParent
     Dim data(,) As Double
@@ -72,7 +72,7 @@ Public Class ScatterMatrix_Example : Inherits TaskParent
         SetTrueText(strOut, 2)
     End Sub
 
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         ' Compute the mean vector
         Dim meanVector() As Double = ComputeMeanVector(data)
 

@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports  System.IO
 Imports System.Net
 Imports System.Threading
@@ -13,21 +13,21 @@ Public Class Download_Databases : Inherits TaskParent
     Public Sub New()
         desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         'Dim fileToDecompress = New FileInfo(task.HomeDir + "Data/" + filename)
         'Dim downloadDir = New DirectoryInfo(task.HomeDir + "Data/" + Mid(fileToDecompress.Name, 1, Len(fileToDecompress.Name) - Len(".tar.gz")))
         'If downloadActive And pythonActive = False Then
         '    SetTrueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
-        '                  "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", New cvb.Point(40, 200))
+        '                  "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", New cv.Point(40, 200))
         'Else
         '    If pythonActive Then
-        '        SetTrueText("Unzipping files to " + downloadDir.FullName, New cvb.Point(40, 200))
+        '        SetTrueText("Unzipping files to " + downloadDir.FullName, New cv.Point(40, 200))
         '    Else
         '        If linkAddress <> "" Then
         '            If downloadDir.Exists Then
-        '                SetTrueText("The database " + downloadDir.Name + " has been downloaded and is ready for use.", New cvb.Point(40, 100))
+        '                SetTrueText("The database " + downloadDir.Name + " has been downloaded and is ready for use.", New cv.Point(40, 100))
         '                Exit Sub
         '            End If
         '            downloadActive = True
@@ -72,7 +72,7 @@ Public Class Download_Databases : Inherits TaskParent
         '                End Sub)
         '            downloadThread.Start()
         '        Else
-        '            SetTrueText("Check the database to be downloaded in the Options nearby.", New cvb.Point(40, 200))
+        '            SetTrueText("Check the database to be downloaded in the Options nearby.", New cv.Point(40, 200))
         '        End If
         '    End If
         'End If

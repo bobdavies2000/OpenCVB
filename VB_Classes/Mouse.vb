@@ -1,12 +1,12 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Mouse_Basics : Inherits TaskParent
-    Dim lastPoint = New cvb.Point
+    Dim lastPoint = New cv.Point
     Dim colorIndex As Integer
     Public Sub New()
         labels(2) = "Move the mouse below to show mouse tracking."
         desc = "Test the mousePoint interface"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         ' only display mouse movement in the lower left image (pic.tag = 2)
         If lastPoint = task.mouseMovePoint Or task.mousePicTag <> 2 Then Exit Sub
         lastPoint = task.mouseMovePoint
@@ -25,7 +25,7 @@ Public Class Mouse_LeftClickZoom : Inherits TaskParent
         labels(2) = "Left click and drag to draw a rectangle"
         desc = "Demonstrate what the left-click enables"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         SetTrueText("Left-click and drag to select a region in any of the images." + vbCrLf +
                     "The selected area is a rectangle that is saved in task.drawRect." + vbCrLf +
                     "In this example, the selected region from the BGR image will be resized to fit in the Result2 image to the right." + vbCrLf +
@@ -46,7 +46,7 @@ Public Class Mouse_ClickPointUsage : Inherits TaskParent
     Public Sub New()
         desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
         dst2 = task.feat.dst2
 

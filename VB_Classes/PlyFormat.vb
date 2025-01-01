@@ -1,12 +1,12 @@
 ﻿Imports System.IO
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class PlyFormat_Basics : Inherits TaskParent
     Public options As New Options_PlyFormat
     Dim saveFileName As String
     Public Sub New()
         desc = "Create a .ply format file with the pointcloud."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim fileInfo = New FileInfo(options.fileName)
@@ -24,7 +24,7 @@ Public Class PlyFormat_Basics : Inherits TaskParent
                 sw.WriteLine("end_header")
                 For y = 0 To task.pointCloud.Height - 1
                     For x = 0 To task.pointCloud.Width - 1
-                        Dim vec = task.pointCloud.Get(Of cvb.Vec3f)(y, x)
+                        Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
                         sw.WriteLine(Format(vec(0), fmt3) + " " + Format(vec(1), fmt3) + " " + Format(vec(2), fmt3))
                     Next
                 Next
@@ -48,7 +48,7 @@ Public Class PlyFormat_PlusRGB : Inherits TaskParent
     Public Sub New()
         desc = "Save the pointcloud in .ply format and include the RGB data."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim fileInfo = New FileInfo(options.fileName)
@@ -70,8 +70,8 @@ Public Class PlyFormat_PlusRGB : Inherits TaskParent
                 sw.WriteLine("end_header")
                 For y = 0 To task.pointCloud.Height - 1
                     For x = 0 To task.pointCloud.Width - 1
-                        Dim vec = task.pointCloud.Get(Of cvb.Vec3f)(y, x)
-                        Dim bgr = src.Get(Of cvb.Vec3b)(y, x)
+                        Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
+                        Dim bgr = src.Get(Of cv.Vec3b)(y, x)
                         sw.WriteLine(Format(vec(0), fmt3) + " " + Format(vec(1), fmt3) + " " + Format(vec(2), fmt3),
                                  CStr(bgr(2)) + " " + CStr(bgr(1)) + " " + CStr(bgr(0)))
                     Next

@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
 Imports System.IO
@@ -26,7 +26,7 @@ Public Class Gif_Basics : Inherits TaskParent
             If gifFile.Exists Then My.Computer.FileSystem.DeleteFile(gifFile.FullName)
         End If
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src
@@ -59,11 +59,11 @@ Public Class Gif_OpenGL : Inherits TaskParent
     Public Sub New()
         desc = "Create a GIF for the Model_RedCloud output"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         input.Run(src)
 
         dst2 = input.dst3
-        Dim r = New cvb.Rect(0, 0, dst2.Height, dst2.Height)
+        Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
         gifC.Run(dst2(r))
 
         SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options')" + vbCrLf +
@@ -87,13 +87,13 @@ Public Class Gif_OpenGLwithColor : Inherits TaskParent
     Public Sub New()
         desc = "Create a GIF for the Model_RedCloud output and color image at the same time."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         input.Run(src)
 
-        Dim r = New cvb.Rect(0, 0, dst2.Height, dst2.Height)
+        Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
         dst2 = input.dst3(r)
-        Dim tmp As New cvb.Mat
-        cvb.Cv2.HConcat(src, dst2(r), tmp)
+        Dim tmp As New cv.Mat
+        cv.Cv2.HConcat(src, dst2(r), tmp)
 
         gifC.Run(tmp)
 
@@ -122,50 +122,50 @@ Public Class Gif_OpenCVB : Inherits TaskParent
             Dim nextBMP As Bitmap
             Select Case task.gifCaptureIndex
                 Case gifTypes.gifdst0
-                    If task.dst0.Channels() = 1 Then task.dst0 = task.dst0.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                    If task.dst0.Channels() = 1 Then task.dst0 = task.dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     nextBMP = New Bitmap(task.dst0.Width, task.dst0.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst0, nextBMP)
                 Case gifTypes.gifdst1
-                    If task.dst1.Channels() = 1 Then task.dst1 = task.dst1.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                    If task.dst1.Channels() = 1 Then task.dst1 = task.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     nextBMP = New Bitmap(task.dst1.Width, task.dst1.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst1, nextBMP)
                 Case gifTypes.gifdst2
-                    If task.dst2.Channels() = 1 Then task.dst2 = task.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                    If task.dst2.Channels() = 1 Then task.dst2 = task.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     nextBMP = New Bitmap(task.dst2.Width, task.dst2.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst2, nextBMP)
                 Case gifTypes.gifdst3
-                    If task.dst3.Channels() = 1 Then task.dst3 = task.dst3.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                    If task.dst3.Channels() = 1 Then task.dst3 = task.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     nextBMP = New Bitmap(task.dst3.Width, task.dst3.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst3, nextBMP)
                 Case gifTypes.openCVBwindow
-                    Dim r = New cvb.Rect(0, 0, task.mainFormLocation.Width - 20, task.mainFormLocation.Height - 40)
+                    Dim r = New cv.Rect(0, 0, task.mainFormLocation.Width - 20, task.mainFormLocation.Height - 40)
                     nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
                     Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd, r)
                     Dim snap = cvext.BitmapConverter.ToMat(snapshot)
-                    snap = snap.CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+                    snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
                 Case gifTypes.openGLwindow
                     Dim rect As RECT
                     GetWindowRect(task.openGL_hwnd, rect)
-                    Dim r = New cvb.Rect(0, 0, rect.Right - rect.Left + 330, rect.Bottom - rect.Top + 200)
+                    Dim r = New cv.Rect(0, 0, rect.Right - rect.Left + 330, rect.Bottom - rect.Top + 200)
                     nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
                     Dim snapshot As Bitmap = GetWindowImage(task.openGL_hwnd, r)
                     Dim snap = cvext.BitmapConverter.ToMat(snapshot)
-                    snap = snap.CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+                    snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
             End Select
             task.gifImages.Add(nextBMP)
             snapCheck.checked = False
         End If
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         SetTrueText("Results are best when the main form is set to an 'auto-sized' setting.", 3)
         Static snapCheck = FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
 
         If snapCheck.checked Or (standaloneTest() And task.heartBeat) And task.mainFormLocation.Width > 0 Then
             Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd,
-                                     New cvb.Rect(0, 0, task.mainFormLocation.Width, task.mainFormLocation.Height))
-            Dim r = New cvb.Rect(0, 0, snapshot.Width - 16, snapshot.Height - 40)
+                                     New cv.Rect(0, 0, task.mainFormLocation.Width, task.mainFormLocation.Height))
+            Dim r = New cv.Rect(0, 0, snapshot.Width - 16, snapshot.Height - 40)
             dst2 = cvext.BitmapConverter.ToMat(snapshot)(r)
         End If
 

@@ -1,10 +1,10 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 Public Class Pixel_Viewer : Inherits TaskParent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
-    Dim mouseLoc = New cvb.Point(10, 10) ' assume 
+    Dim mouseLoc = New cv.Point(10, 10) ' assume 
     Enum displayTypes
         noType = -1
         type8uC3 = 0
@@ -17,25 +17,25 @@ Public Class Pixel_Viewer : Inherits TaskParent
     Public Sub New()
         desc = "Display pixels under the cursor"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             task.dst0 = task.color.Clone
             task.dst1 = task.depthRGB.Clone
-            task.dst2 = New cvb.Mat(task.dst1.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
-            task.dst3 = New cvb.Mat(task.dst1.Size(), cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+            task.dst2 = New cv.Mat(task.dst1.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            task.dst3 = New cv.Mat(task.dst1.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         End If
 
         Dim dst = Choose(task.mousePicTag + 1, task.dst0, task.dst1, task.dst2, task.dst3)
 
         Dim displayType = displayTypes.noType
-        If dst.Type = cvb.MatType.CV_8UC3 Then displayType = displayTypes.type8uC3
-        If dst.Type = cvb.MatType.CV_8U Then displayType = displayTypes.type8u
-        If dst.Type = cvb.MatType.CV_32F Then displayType = displayTypes.type32F
-        If dst.Type = cvb.MatType.CV_32FC3 Then displayType = displayTypes.type32FC3
-        If dst.Type = cvb.MatType.CV_32SC1 Then displayType = displayTypes.type32SC1
-        If dst.Type = cvb.MatType.CV_32SC3 Then displayType = displayTypes.type32SC3
+        If dst.Type = cv.MatType.CV_8UC3 Then displayType = displayTypes.type8uC3
+        If dst.Type = cv.MatType.CV_8U Then displayType = displayTypes.type8u
+        If dst.Type = cv.MatType.CV_32F Then displayType = displayTypes.type32F
+        If dst.Type = cv.MatType.CV_32FC3 Then displayType = displayTypes.type32FC3
+        If dst.Type = cv.MatType.CV_32SC1 Then displayType = displayTypes.type32SC1
+        If dst.Type = cv.MatType.CV_32SC3 Then displayType = displayTypes.type32SC3
         If displayType < 0 Or dst.Channels() > 3 Then
-            SetTrueText("The pixel Viewer does not support this cvb.Mat!  Please add support.")
+            SetTrueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
             Exit Sub
         End If
 
@@ -50,19 +50,19 @@ Public Class Pixel_Viewer : Inherits TaskParent
         If viewerForm.mousePoint <> newPoint Then
             task.mouseMovePoint += viewerForm.mousePoint
             task.mouseMovePointUpdated = True
-            viewerForm.mousePoint = New cvb.Point
+            viewerForm.mousePoint = New cv.Point
         End If
         If task.mouseMovePoint.X Or task.mouseMovePoint.Y Then
             Dim x As Integer = If(task.mouseMovePoint.X >= drWidth, task.mouseMovePoint.X - drWidth - 1, 0)
             Dim y As Integer = If(task.mouseMovePoint.Y >= drHeight, task.mouseMovePoint.Y - drHeight - 1, 0)
             If task.mouseMovePoint.X >= drWidth Then x += 2
             If task.mouseMovePoint.Y >= drHeight Then y += 2
-            mouseLoc = New cvb.Point(x, y)
+            mouseLoc = New cv.Point(x, y)
         End If
 
-        task.pixelViewerRect = New cvb.Rect(0, 0, -1, -1)
+        task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
         task.pixelViewTag = task.mousePicTag
-        Dim dw = New cvb.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
+        Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
         dw = ValidateRect(dw)
 
         Dim img = dst(dw).Clone
@@ -70,7 +70,7 @@ Public Class Pixel_Viewer : Inherits TaskParent
         Dim mm As mmData
         Dim format32f = "0000.0"
         Dim format32S = "0000"
-        If img.Type = cvb.MatType.CV_32F Or img.Type = cvb.MatType.CV_32FC3 Then
+        If img.Type = cv.MatType.CV_32F Or img.Type = cv.MatType.CV_32FC3 Then
             If img.Channels() = 3 Then
                 Dim tmp = img.Reshape(1)
                 mm = GetMinMax(tmp)
@@ -91,7 +91,7 @@ Public Class Pixel_Viewer : Inherits TaskParent
         End If
 
         Dim imgText = ""
-        Dim ClickPoint = New cvb.Point(task.ClickPoint.X - dw.X, task.ClickPoint.Y - dw.Y)
+        Dim ClickPoint = New cv.Point(task.ClickPoint.X - dw.X, task.ClickPoint.Y - dw.Y)
         Select Case displayType
 
             Case displayTypes.type8uC3
@@ -99,7 +99,7 @@ Public Class Pixel_Viewer : Inherits TaskParent
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
                     For x = 0 To img.Width - 1
-                        Dim vec = img.Get(Of cvb.Vec3b)(y, x)
+                        Dim vec = img.Get(Of cv.Vec3b)(y, x)
                         imgText += Format(vec(0), "000") + " " + Format(vec(1), "000") + " " + Format(vec(2), "000") + "   "
                     Next
                     imgText += vbLf
@@ -134,7 +134,7 @@ Public Class Pixel_Viewer : Inherits TaskParent
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
                     For x = 0 To img.Width - 1
-                        Dim vec = img.Get(Of cvb.Vec3f)(y, x)
+                        Dim vec = img.Get(Of cv.Vec3f)(y, x)
                         imgText += Format(vec(0), format32f) + " " + Format(vec(1), format32f) + " " + Format(vec(2), format32f) + "   "
                     Next
                     imgText += vbLf
@@ -154,7 +154,7 @@ Public Class Pixel_Viewer : Inherits TaskParent
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
                     For x = 0 To img.Width - 1
-                        Dim vec = img.Get(Of cvb.Vec3i)(y, x)
+                        Dim vec = img.Get(Of cv.Vec3i)(y, x)
                         imgText += Format(vec(0), format32S) + " " + Format(vec(1), format32S) + " " + Format(vec(2), format32S) + "   "
                     Next
                     imgText += vbLf
@@ -191,18 +191,18 @@ Public Class Pixel_GetSet : Inherits TaskParent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
-        Dim rgb = src.CvtColor(cvb.ColorConversionCodes.BGR2RGB)
+        Dim rgb = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
 
         Dim watch = Stopwatch.StartNew()
         For y = 0 To rows - 1
             For x = 0 To cols - 1
-                Dim color = rgb.Get(Of cvb.Vec3b)(y, x)
+                Dim color = rgb.Get(Of cv.Vec3b)(y, x)
                 color(0).SwapWith(color(2))
-                mats.mat(0).Set(Of cvb.Vec3b)(y, x, color)
+                mats.mat(0).Set(Of cv.Vec3b)(y, x, color)
             Next
         Next
         watch.Stop()
@@ -210,7 +210,7 @@ Public Class Pixel_GetSet : Inherits TaskParent
 
         mats.mat(1) = rgb.Clone()
         watch = Stopwatch.StartNew()
-        Dim indexer = mats.mat(1).GetGenericIndexer(Of cvb.Vec3b)
+        Dim indexer = mats.mat(1).GetGenericIndexer(Of cv.Vec3b)
         For y = 0 To rows - 1
             For x = 0 To cols - 1
                 Dim color = indexer(y, x)
@@ -227,11 +227,11 @@ Public Class Pixel_GetSet : Inherits TaskParent
         For i = 0 To colorArray.Length - 3 Step 3
             colorArray(i).SwapWith(colorArray(i + 2))
         Next
-        mats.mat(2) = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, colorArray)
+        mats.mat(2) = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorArray)
         watch.Stop()
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
-        SetTrueText(output, New cvb.Point(src.Width / 2 + 10, src.Height / 2 + 20))
+        SetTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
 
         mats.Run(Empty)
         dst2 = mats.dst2
@@ -256,7 +256,7 @@ Public Class Pixel_Measure : Inherits TaskParent
         Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
         Return halfLineInMeters * 2 / dst2.Width
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static distanceSlider = FindSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.Value)
         SetTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
@@ -276,31 +276,31 @@ End Class
 
 Public Class Pixel_SampleColor : Inherits TaskParent
     Public random As New Random_Basics
-    Public maskColor As cvb.Vec3b
+    Public maskColor As cv.Vec3b
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 Dim w = 25, h = 25
-                If task.drawRect <> New cvb.Rect Then
+                If task.drawRect <> New cv.Rect Then
                     random.range = task.drawRect
                 Else
-                    random.range = New cvb.Rect(msRNG.Next(0, src.Width - w), msRNG.Next(0, src.Height - h), w, h)
+                    random.range = New cv.Rect(msRNG.Next(0, src.Width - w), msRNG.Next(0, src.Height - h), w, h)
                 End If
             End If
         Else
-            random.range = New cvb.Rect(0, 0, src.Width, src.Height)
+            random.range = New cv.Rect(0, 0, src.Width, src.Height)
         End If
 
-        Dim index As New List(Of cvb.Point)
-        Dim pixels As New List(Of cvb.Vec3b)
+        Dim index As New List(Of cv.Point)
+        Dim pixels As New List(Of cv.Vec3b)
         Dim counts As New List(Of Integer)
-        Dim pixel0 = New cvb.Vec3b
+        Dim pixel0 = New cv.Vec3b
         random.Run(Empty)
         For Each pt In random.PointList
-            Dim pixel = src.Get(Of cvb.Vec3b)(pt.Y, pt.X)
+            Dim pixel = src.Get(Of cv.Vec3b)(pt.Y, pt.X)
             If pixel <> pixel0 Then
                 If pixels.Contains(pixel) Then
                     counts(pixels.IndexOf(pixel)) += 1
@@ -320,7 +320,7 @@ Public Class Pixel_SampleColor : Inherits TaskParent
                 DrawCircle(dst2,pt, task.DotSize, white)
             Next
             labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
-            SetTrueText("Draw in the image to select a region for testing.", New cvb.Point(10, 200), 3)
+            SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
         End If
     End Sub
 End Class
@@ -334,24 +334,24 @@ Public Class Pixel_Unstable : Inherits TaskParent
     Dim km As New KMeans_Basics
     Dim pixelCounts As New List(Of Integer)
     Dim k As Integer = -1
-    Dim unstable As New List(Of cvb.Mat)
-    Dim lastImage As cvb.Mat
-    Public unstablePixels As New cvb.Mat
+    Dim unstable As New List(Of cv.Mat)
+    Dim lastImage As cv.Mat
+    Public unstablePixels As New cv.Mat
     Dim kSlider = FindSlider("KMeans k")
     Public Sub New()
         task.gOptions.setPixelDifference(2)
         labels(2) = "KMeans_Basics output"
         desc = "Detect where pixels are unstable"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         k = kSlider.Value
 
         km.Run(src)
         dst2 = km.dst2
-        dst2.ConvertTo(dst2, cvb.MatType.CV_32F)
+        dst2.ConvertTo(dst2, cv.MatType.CV_32F)
         If lastImage Is Nothing Then lastImage = dst2.Clone
-        cvb.Cv2.Subtract(dst2, lastImage, dst3)
-        dst3 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+        cv.Cv2.Subtract(dst2, lastImage, dst3)
+        dst3 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
         unstable.Add(dst3)
         If unstable.Count > task.frameHistoryCount Then unstable.RemoveAt(0)
@@ -382,7 +382,7 @@ End Class
 
 
 Public Class Pixel_Zoom : Inherits TaskParent
-    Public mousePoint = New cvb.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
+    Public mousePoint = New cv.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
     Public zoomSlider As TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom Factor", 2, 16, 4)
@@ -390,7 +390,7 @@ Public Class Pixel_Zoom : Inherits TaskParent
         zoomSlider = FindSlider("Zoom Factor")
         desc = "Zoom into the pixels under the mouse in dst2"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoomSlider.Value)
 
@@ -399,8 +399,8 @@ Public Class Pixel_Zoom : Inherits TaskParent
         Dim height As Double = src.Height / zoomFactor
         Dim x = Math.Min(mousePoint.X, src.Width - width)
         Dim y = Math.Min(mousePoint.Y, src.Height - height)
-        dst1 = src(New cvb.Rect(CInt(x), CInt(y), width, height))
-        dst2 = dst1.Resize(dst2.Size(), 0, 0, cvb.InterpolationFlags.Nearest)
+        dst1 = src(New cv.Rect(CInt(x), CInt(y), width, height))
+        dst2 = dst1.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 
@@ -416,7 +416,7 @@ Public Class Pixel_SubPixel : Inherits TaskParent
     Public Sub New()
         desc = "Show how to use the GetRectSubPix OpenCV API"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoom.zoomSlider.Value)
 
@@ -425,8 +425,8 @@ Public Class Pixel_SubPixel : Inherits TaskParent
         Dim height As Double = src.Height / zoomFactor
         Dim x = Math.Min(zoom.mousePoint.X, src.Width - width)
         Dim y = Math.Min(zoom.mousePoint.Y, src.Height - height)
-        dst3 = src.GetRectSubPix(New cvb.Size(width, height), New cvb.Point2f(x, y)).Resize(dst2.Size)
-        Dim r = New cvb.Rect(x - width \ 2, y - height \ 2, width, height)
+        dst3 = src.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y)).Resize(dst2.Size)
+        Dim r = New cv.Rect(x - width \ 2, y - height \ 2, width, height)
         r = ValidateRect(r)
         dst2 = src(r).Resize(dst2.Size)
         labels(2) = "Pixel_SubPixel: No SubPixel zoom with factor " + CStr(zoomFactor)
@@ -440,15 +440,15 @@ End Class
 
 Public Class Pixel_NeighborsHorizontal : Inherits TaskParent
     Public options As New Options_Neighbors
-    Public pt1 As New List(Of cvb.Point)
-    Public pt2 As New List(Of cvb.Point)
+    Public pt1 As New List(Of cv.Point)
+    Public pt2 As New List(Of cv.Point)
     Public Sub New()
         desc = "Manual step through depth data to find horizontal neighbors within x mm's"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         pt1.Clear()
         pt2.Clear()
@@ -458,8 +458,8 @@ Public Class Pixel_NeighborsHorizontal : Inherits TaskParent
                 Dim x2 = src.Get(Of Single)(y, x + options.pixels)
                 If x1 = 0 Or x2 = 0 Then Continue For
                 If Math.Abs(x1 - x2) <= options.threshold Then
-                    pt1.Add(New cvb.Point(x, y))
-                    pt2.Add(New cvb.Point(x + options.pixels, y))
+                    pt1.Add(New cv.Point(x, y))
+                    pt2.Add(New cv.Point(x + options.pixels, y))
                     x += options.pixels
                 End If
             Next
@@ -467,7 +467,7 @@ Public Class Pixel_NeighborsHorizontal : Inherits TaskParent
 
         dst2 = task.color.Clone
         For i = 0 To pt1.Count - 1
-            DrawLine(dst2, pt1(i), pt2(i), cvb.Scalar.Yellow)
+            DrawLine(dst2, pt1(i), pt2(i), cv.Scalar.Yellow)
         Next
         labels(2) = CStr(pt1.Count) + " z-values within " + Format(options.threshold * 1000, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
@@ -482,15 +482,15 @@ End Class
 
 Public Class Pixel_NeighborsVertical : Inherits TaskParent
     Public options As New Options_Neighbors
-    Public pt1 As New List(Of cvb.Point)
-    Public pt2 As New List(Of cvb.Point)
+    Public pt1 As New List(Of cv.Point)
+    Public pt2 As New List(Of cv.Point)
     Public Sub New()
         desc = "Manual step through depth data to find vertical neighbors within x mm's"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         pt1.Clear()
         pt2.Clear()
@@ -500,8 +500,8 @@ Public Class Pixel_NeighborsVertical : Inherits TaskParent
                 Dim x2 = src.Get(Of Single)(y + options.pixels, x)
                 If x1 = 0 Or x2 = 0 Then Continue For
                 If Math.Abs(x1 - x2) <= options.threshold Then
-                    pt1.Add(New cvb.Point(x, y))
-                    pt2.Add(New cvb.Point(x, y + options.pixels))
+                    pt1.Add(New cv.Point(x, y))
+                    pt2.Add(New cv.Point(x, y + options.pixels))
                     y += options.pixels
                 End If
             Next
@@ -509,7 +509,7 @@ Public Class Pixel_NeighborsVertical : Inherits TaskParent
 
         dst2 = task.color.Clone
         For i = 0 To pt1.Count - 1
-            DrawLine(dst2, pt1(i), pt2(i), cvb.Scalar.Yellow)
+            DrawLine(dst2, pt1(i), pt2(i), cv.Scalar.Yellow)
         Next
         labels(2) = CStr(pt1.Count) + " z-values within " + Format(options.threshold * 1000, fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
     End Sub
@@ -526,18 +526,18 @@ Public Class Pixel_NeighborsMaskH : Inherits TaskParent
     Public Sub New()
         desc = "Show where horizontal neighbor depth values are within X mm's"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
-        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
-        Dim r1 = New cvb.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
-        Dim r2 = New cvb.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
-        cvb.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
-        tmp32f = tmp32f.Threshold(options.threshold, 255, cvb.ThresholdTypes.BinaryInv)
+        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
+        Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
+        cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
+        tmp32f = tmp32f.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv)
         dst2 = tmp32f.ConvertScaleAbs(255)
         dst2.SetTo(0, task.noDepthMask)
-        dst2(New cvb.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
+        dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
         labels(2) = "White: z is within " + Format(options.threshold, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
 End Class
@@ -553,18 +553,18 @@ Public Class Pixel_NeighborsMaskV : Inherits TaskParent
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
-        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
-        Dim r1 = New cvb.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
-        Dim r2 = New cvb.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
-        cvb.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
-        tmp32f = tmp32f.Threshold(options.threshold, 255, cvb.ThresholdTypes.BinaryInv)
+        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
+        Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
+        cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
+        tmp32f = tmp32f.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv)
         dst2 = tmp32f.ConvertScaleAbs(255)
         dst2.SetTo(0, task.noDepthMask)
-        dst2(New cvb.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
+        dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
         labels(2) = "White: z is within " + Format(options.threshold, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
 End Class
@@ -583,7 +583,7 @@ Public Class Pixel_NeighborsMask : Inherits TaskParent
     Public Sub New()
         desc = "Show the mask for both the horizontal and vertical neighbors"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         maskH.Run(src)
         dst2 = maskH.dst2
 
@@ -603,10 +603,10 @@ Public Class Pixel_NeighborsPatchNeighbors : Inherits TaskParent
         FindSlider("Minimum offset to neighbor pixel").Value = 1
         desc = "Update depth values for neighbors where they are within X mm's"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         dst2 = src
         If options.patchZ Then
@@ -639,7 +639,7 @@ Public Class Pixel_NeighborsPatchNeighbors : Inherits TaskParent
         Else
             labels(2) = "Z-values not updated "
         End If
-        cvb.Cv2.Merge(task.pcSplit, dst3)
+        cv.Cv2.Merge(task.pcSplit, dst3)
     End Sub
 End Class
 
@@ -658,7 +658,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         Dim maxRegion = 20
 
@@ -701,9 +701,9 @@ Public Class Pixel_Unique_CPP_VB : Inherits TaskParent
         cPtr = Pixels_Vector_Open()
         desc = "Create the list of pixels in a RedCloud Cell"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         src = src.Resize(task.lowRes)
-        If task.drawRect <> New cvb.Rect Then src = src(task.drawRect)
+        If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
@@ -711,7 +711,7 @@ Public Class Pixel_Unique_CPP_VB : Inherits TaskParent
         handleSrc.Free()
 
         If classCount = 0 Then Exit Sub
-        Dim pixelData = cvb.Mat.FromPixelData(classCount, 1, cvb.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
+        Dim pixelData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
         SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src after resizing to low resolution." + vbCrLf +
                     "Or " + Format(classCount / src.Total, "0%") + " of the input were unique pixels.")
     End Sub
@@ -732,7 +732,7 @@ Public Class Pixel_Vectors : Inherits TaskParent
         labels = {"", "", "RedCloud_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(3)
@@ -754,25 +754,25 @@ End Class
 
 
 Public Class Pixel_Mapper : Inherits TaskParent
-    Public colorMap As New cvb.Mat(256, 1, cvb.MatType.CV_8UC3, cvb.Scalar.All(0))
+    Public colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
     Public Sub New()
         desc = "Resize the input to a small image, convert to gray, and map gray to color"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.heartBeat Then
-            Dim nSize = New cvb.Size(src.Width / 8, src.Height / 8)
+            Dim nSize = New cv.Size(src.Width / 8, src.Height / 8)
             dst1 = src.Resize(nSize)
             Dim samples(dst1.Total * dst1.ElemSize - 1) As Byte
             Marshal.Copy(dst1.Data, samples, 0, samples.Length)
 
-            Dim sorted As New SortedList(Of Integer, cvb.Vec3b)(New compareAllowIdenticalIntegerInverted)
+            Dim sorted As New SortedList(Of Integer, cv.Vec3b)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To samples.Count - 1 Step 3
-                Dim vecA = New cvb.Vec3b(samples(i), samples(i + 1), samples(i + 2))
+                Dim vecA = New cv.Vec3b(samples(i), samples(i + 1), samples(i + 2))
                 Dim gPixel = CInt(vecA(2) * 0.299 + vecA(1) * 0.587 + vecA(0) * 0.114)
                 If sorted.ContainsKey(gPixel) = False Then sorted.Add(gPixel, vecA)
             Next
 
-            Dim averaged As New SortedList(Of Integer, cvb.Vec3b)
+            Dim averaged As New SortedList(Of Integer, cv.Vec3b)
             For i = 0 To sorted.Count - 1
                 Dim ele = sorted.ElementAt(i)
                 Dim index = ele.Key
@@ -780,7 +780,7 @@ Public Class Pixel_Mapper : Inherits TaskParent
                 For j = i + 1 To sorted.Count - 1
                     If ele.Key <> sorted.ElementAt(j).Key Then Exit For
                     Dim vecB = sorted.ElementAt(j).Value
-                    vecA = New cvb.Vec3b(vecA(0) / 2 + vecB(0) / 2, vecA(1) / 2 + vecB(1) / 2, vecA(2) / 2 + vecB(2) / 2)
+                    vecA = New cv.Vec3b(vecA(0) / 2 + vecB(0) / 2, vecA(1) / 2 + vecB(1) / 2, vecA(2) / 2 + vecB(2) / 2)
                     i = j
                 Next
                 averaged.Add(index, vecA)
@@ -792,10 +792,10 @@ Public Class Pixel_Mapper : Inherits TaskParent
                 If i < averaged.Count Then
                     If iAvg <> averaged.ElementAt(i).Key Then vec = averaged.ElementAt(i).Value
                 End If
-                colorMap.Set(Of cvb.Vec3b)(i, vec)
+                colorMap.Set(Of cv.Vec3b)(i, vec)
             Next
         End If
-        cvb.Cv2.ApplyColorMap(src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst2, colorMap)
+        cv.Cv2.ApplyColorMap(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, colorMap)
     End Sub
 End Class
 
@@ -810,13 +810,13 @@ Public Class Pixel_MapLeftRight : Inherits TaskParent
         labels = {"", "", "Left view with averaged color", "Right view with averaged color"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 
-        Dim tmp As cvb.Mat = task.rightView
-        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        cvb.Cv2.ApplyColorMap(tmp, dst3, mapper.colorMap)
+        Dim tmp As cv.Mat = task.rightView
+        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.ApplyColorMap(tmp, dst3, mapper.colorMap)
     End Sub
 End Class
 
@@ -832,19 +832,19 @@ Public Class Pixel_MapDistance : Inherits TaskParent
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 
-        Static myColorMap As cvb.Mat = mapper.colorMap.Clone
+        Static myColorMap As cv.Mat = mapper.colorMap.Clone
         If task.heartBeat Then
             Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
             Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
 
-            Dim vecs As New List(Of cvb.Point3f)
+            Dim vecs As New List(Of cv.Point3f)
             Dim vecs3b As New List(Of Byte)
             For i = 0 To samples.Count - 1 Step 3
-                vecs.Add(New cvb.Point3f(samples(i), samples(i + 1), samples(i + 2)))
+                vecs.Add(New cv.Point3f(samples(i), samples(i + 1), samples(i + 2)))
                 vecs3b.Add(samples(i))
                 vecs3b.Add(samples(i + 1))
                 vecs3b.Add(samples(i + 2))
@@ -858,9 +858,9 @@ Public Class Pixel_MapDistance : Inherits TaskParent
             Next
 
             Dim avg = distances.Average
-            Dim vec = New cvb.Vec3b(vecs3b(0), samples(1), samples(2))
+            Dim vec = New cv.Vec3b(vecs3b(0), samples(1), samples(2))
             For i = 0 To vecs.Count - 1
-                If i < 255 Then If distances(i) > avg Then vec = New cvb.Vec3b(vecs3b(i * 3), samples(i * 3 + 1), samples(i * 3 + 2))
+                If i < 255 Then If distances(i) > avg Then vec = New cv.Vec3b(vecs3b(i * 3), samples(i * 3 + 1), samples(i * 3 + 2))
                 vecs3b(i * 3) = vec(0)
                 vecs3b(i * 3 + 1) = vec(1)
                 vecs3b(i * 3 + 2) = vec(2)
@@ -868,13 +868,13 @@ Public Class Pixel_MapDistance : Inherits TaskParent
 
             Marshal.Copy(vecs3b.ToArray, 0, mapper.colorMap.Data, myColorMap.Total * myColorMap.ElemSize)
         End If
-        Dim tmp As cvb.Mat = task.leftView
-        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        cvb.Cv2.ApplyColorMap(tmp, dst2, myColorMap)
+        Dim tmp As cv.Mat = task.leftView
+        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.ApplyColorMap(tmp, dst2, myColorMap)
 
         tmp = task.rightView
-        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        cvb.Cv2.ApplyColorMap(tmp, dst3, myColorMap)
+        If tmp.Channels = 3 Then tmp = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.ApplyColorMap(tmp, dst3, myColorMap)
     End Sub
 End Class
 
@@ -893,22 +893,22 @@ Public Class Pixel_Sampler : Inherits TaskParent
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
-                If task.drawRect <> New cvb.Rect Then
+                If task.drawRect <> New cv.Rect Then
                     random.range = task.drawRect
                 Else
-                    random.range = New cvb.Rect(msRNG.Next(0, src.Width - width), msRNG.Next(0, src.Height - height), width, height)
+                    random.range = New cv.Rect(msRNG.Next(0, src.Width - width), msRNG.Next(0, src.Height - height), width, height)
                 End If
             End If
         Else
-            random.range = New cvb.Rect(0, 0, src.Width, src.Height)
+            random.range = New cv.Rect(0, 0, src.Width, src.Height)
         End If
         random.Run(empty)
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        Dim index As New List(Of cvb.Point)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim index As New List(Of cv.Point)
         Dim pixels As New List(Of Byte)
         Dim counts(random.PointList.Count - 1) As Integer
         For Each pt In random.PointList
@@ -942,7 +942,7 @@ Public Class Pixel_Sampler : Inherits TaskParent
                 DrawCircle(dst2, pt, task.DotSize, white)
             Next
             labels(2) = "Dominant gray value = " + CStr(dominantGray)
-            SetTrueText("Draw in the image to select a region for testing.", New cvb.Point(10, 200), 3)
+            SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
         End If
     End Sub
 End Class
@@ -960,7 +960,7 @@ Public Class Pixel_Display : Inherits TaskParent
         If task.drawRect.Width <> 0 Then
             random.range = task.drawRect
         Else
-            random.range = New cvb.Rect(msRNG.Next(0, dst2.Width - width), msRNG.Next(0, dst2.Height - height), width, height)
+            random.range = New cv.Rect(msRNG.Next(0, dst2.Width - width), msRNG.Next(0, dst2.Height - height), width, height)
         End If
         random.Run(empty)
         task.drawRect = random.range
@@ -968,12 +968,12 @@ Public Class Pixel_Display : Inherits TaskParent
         labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."
         desc = "Find the pixels within the drawrect and display their stats."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dst2 = src
         If task.heartBeat Then
-            Dim mean As cvb.Scalar, stdev As cvb.Scalar
-            cvb.Cv2.MeanStdDev(src(task.drawRect), mean, stdev)
-            Dim pt = New cvb.Vec3i(mean(0), mean(1), mean(2))
+            Dim mean As cv.Scalar, stdev As cv.Scalar
+            cv.Cv2.MeanStdDev(src(task.drawRect), mean, stdev)
+            Dim pt = New cv.Vec3i(mean(0), mean(1), mean(2))
             strOut = "Mean BGR " + pt.ToString() + vbCrLf + "Stdev BGR " + stdev.ToString
         End If
         SetTrueText(strOut, 3)
@@ -993,11 +993,11 @@ Public Class Pixel_ColorGuess : Inherits TaskParent
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 
-        Static myColorMap As cvb.Mat = mapper.colorMap.Clone
+        Static myColorMap As cv.Mat = mapper.colorMap.Clone
         If task.heartBeat Then
             Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
             Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
@@ -1022,17 +1022,17 @@ Public Class Pixel_ColorGuess : Inherits TaskParent
             Next
 
             For i = 0 To myColorMap.Rows - 1
-                Dim vec = New cvb.Vec3b(vecs(i * 3), vecs(i * 3 + 1), vecs(i * 3 + 2))
-                myColorMap.Set(Of cvb.Vec3b)(i, 0, vec)
+                Dim vec = New cv.Vec3b(vecs(i * 3), vecs(i * 3 + 1), vecs(i * 3 + 2))
+                myColorMap.Set(Of cv.Vec3b)(i, 0, vec)
             Next
         End If
 
         If task.leftView.Channels = 1 Then
-            cvb.Cv2.ApplyColorMap(task.leftView, dst2, myColorMap)
-            cvb.Cv2.ApplyColorMap(task.rightView, dst3, myColorMap)
+            cv.Cv2.ApplyColorMap(task.leftView, dst2, myColorMap)
+            cv.Cv2.ApplyColorMap(task.rightView, dst3, myColorMap)
         Else
-            cvb.Cv2.ApplyColorMap(task.leftView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
-            cvb.Cv2.ApplyColorMap(task.rightView.CvtColor(cvb.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
+            cv.Cv2.ApplyColorMap(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
+            cv.Cv2.ApplyColorMap(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
         End If
     End Sub
 End Class

@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Numerics
 ' https://github.com/TheAlgorithms/C-Sharp/blob/master/Algorithms/Other/SieveOfEratosthenes.cs'
 Public Class Sieve_BasicsVB : Inherits TaskParent
@@ -23,7 +23,7 @@ Public Class Sieve_BasicsVB : Inherits TaskParent
         Static countSlider = FindSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static countSlider = FindSlider("Count of desired primes")
 
         Dim count = countSlider.Value
@@ -62,7 +62,7 @@ Public Class Sieve_Image : Inherits TaskParent
         labels(3) = "Zoom output"
         desc = "Create an image marking primes"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim numCeiling = numArray.Length - 1
         ReDim numArray(numCeiling)
         numArray(0) = 255
@@ -81,7 +81,7 @@ Public Class Sieve_Image : Inherits TaskParent
         If referenceResults.containskey(numCeiling) Then
             If referenceResults(numCeiling) <> countPrimes Then SetTrueText("Invalid prime count - check this...")
         End If
-        dst2 = cvb.Mat.FromPixelData(dst2.Rows, dst2.Cols, cvb.MatType.CV_8U, numArray.ToArray)
+        dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, numArray.ToArray)
         dst2 = Not dst2
         zoom.Run(dst2)
         dst3 = zoom.dst2

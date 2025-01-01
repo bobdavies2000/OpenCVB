@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Classifier_Basics_CPP_VB : Inherits TaskParent
     Dim options As New Options_Classifier
@@ -6,19 +6,19 @@ Public Class Classifier_Basics_CPP_VB : Inherits TaskParent
         cPtr = OEX_Points_Classifier_Open()
         desc = "OpenCV Example Points_Classifier"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then task.gOptions.debugChecked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
 If(task.gOptions.debugChecked, 1, 0))
         task.gOptions.debugChecked = False
-        dst1 = cvb.Mat.FromPixelData(dst0.Rows, dst0.Cols, cvb.MatType.CV_32S, imagePtr)
+        dst1 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
 
-        dst1.ConvertTo(dst0, cvb.MatType.CV_8U)
+        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
-        dst3 = cvb.Mat.FromPixelData(dst2.Rows, dst2.Cols, cvb.MatType.CV_8UC3, imagePtr)
+        dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
         SetTrueText("Click the global DebugCheckBox to get another set of points.", 3)
     End Sub
@@ -79,9 +79,9 @@ Public Class Classifier_Bayesian : Inherits TaskParent
         cPtr = OEX_Points_Classifier_Open()
         desc = "Run the Bayesian classifier with the input."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim sampleCount As Integer, methodIndex = 0
-        If src.Type <> cvb.MatType.CV_32FC2 Then
+        If src.Type <> cv.MatType.CV_32FC2 Then
             options.RunOpt()
             sampleCount = options.sampleCount
             methodIndex = options.methodIndex
@@ -92,8 +92,8 @@ Public Class Classifier_Bayesian : Inherits TaskParent
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
 If(task.gOptions.debugChecked, 1, 0))
         task.gOptions.debugChecked = False
-        dst1 = cvb.Mat.FromPixelData(dst1.Rows, dst1.Cols, cvb.MatType.CV_32S, imagePtr)
-        dst1.ConvertTo(dst0, cvb.MatType.CV_8U)
+        dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr)
+        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
     End Sub
@@ -112,13 +112,13 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
     Dim nabs As New Neighbors_Precise
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output"}
         If standalone Then task.gOptions.setDisplay1()
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
 
@@ -126,7 +126,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         'nabs.redCells = task.redCells
         'nabs.Run(task.redMap)
 
-        'Dim trainList As New List(Of cvb.Scalar)
+        'Dim trainList As New List(Of cv.Scalar)
         'Dim responseList As New List(Of Integer)
         'For Each rc In task.redCells
         '    trainList.Add(rc.depthMean)
@@ -143,7 +143,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
 
         'responseList(task.rc.index) = 1
 
-        'Dim queryList As New List(Of cvb.Scalar)
+        'Dim queryList As New List(Of cv.Scalar)
         'Dim maskList As New List(Of Integer)
         'For i = responseList.Count - 1 To 0 Step -1
         '    If responseList(i) = -1 Then

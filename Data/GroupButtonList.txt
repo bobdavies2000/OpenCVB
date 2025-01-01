@@ -35,6 +35,7 @@ Color
 Color8U
 Complexity
 Concat
+Concept
 Contour
 Contrast
 Convex

@@ -1,30 +1,30 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Flann
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits TaskParent
     Dim detect As New MSER_CPP_VB
     Public mserCells As New List(Of rcData)
-    Public floodPoints As New List(Of cvb.Point)
+    Public floodPoints As New List(Of cv.Point)
 
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         detect.Run(src)
-        Dim boxInput = New List(Of cvb.Rect)(detect.boxes)
+        Dim boxInput = New List(Of cv.Rect)(detect.boxes)
         Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To boxInput.Count - 1
             Dim r = boxInput(i)
             boxes.Add(r.Width * r.Height, i)
         Next
-        floodPoints = New List(Of cvb.Point)(detect.floodPoints)
+        floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
 
         Dim matched As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
 
-        dst0 = detect.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst0 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         For i = 0 To boxes.Count - 1
             Dim index = boxes.ElementAt(i).Value
             Dim rc As New rcData
@@ -33,7 +33,7 @@ Public Class MSER_Basics : Inherits TaskParent
             rc.mask = dst0(rc.rect).InRange(val, val)
             rc.pixels = detect.maskCounts(index)
 
-            rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
 
             rc.floodPoint = floodPoints(index)
@@ -49,8 +49,8 @@ Public Class MSER_Basics : Inherits TaskParent
                 rc.maxDStable = rc.maxDist
             End If
 
-            cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.naturalColor = New cvb.Vec3b(CByte(rc.colorMean(0)), CByte(rc.colorMean(1)), CByte(rc.colorMean(2)))
+            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            rc.naturalColor = New cv.Vec3b(CByte(rc.colorMean(0)), CByte(rc.colorMean(1)), CByte(rc.colorMean(2)))
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
@@ -67,31 +67,31 @@ End Class
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Detect : Inherits TaskParent
-    Public boxes() As cvb.Rect
-    Public regions()() As cvb.Point
-    Public mser = cvb.MSER.Create
+    Public boxes() As cv.Rect
+    Public regions()() As cv.Point
+    Public mser = cv.MSER.Create
     Public options As New Options_MSER
     Public classCount As Integer
     Public Sub New()
         desc = "Run the core MSER (Maximally Stable Extremal Region) algorithm"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.Clone
 
         If task.optionsChanged Then
-            mser = cvb.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
+            mser = cv.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                   options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
             mser.Pass2Only = options.pass2Setting
         End If
 
-        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, regions, boxes)
 
         classCount = boxes.Count
         For Each z In boxes
-            dst2.Rectangle(z, cvb.Scalar.Yellow, 1)
+            dst2.Rectangle(z, cv.Scalar.Yellow, 1)
         Next
     End Sub
 End Class
@@ -105,14 +105,14 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_SyntheticInput : Inherits TaskParent
-    Private Sub addNestedRectangles(img As cvb.Mat, p0 As cvb.Point, width() As Integer, color() As Integer, n As Integer)
+    Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
-            img.Rectangle(New cvb.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
-            p0 += New cvb.Point((width(i) - width(i + 1)) / 2, (width(i) - width(i + 1)) / 2)
+            img.Rectangle(New cv.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
+            p0 += New cv.Point((width(i) - width(i + 1)) / 2, (width(i) - width(i + 1)) / 2)
             img.FloodFill(p0, color(i))
         Next
     End Sub
-    Private Sub addNestedCircles(img As cvb.Mat, p0 As cvb.Point, width() As Integer, color() As Integer, n As Integer)
+    Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
             DrawCircle(img, p0, width(i) / 2, color(i))
             img.FloodFill(p0, color(i))
@@ -121,22 +121,22 @@ Public Class MSER_SyntheticInput : Inherits TaskParent
     Public Sub New()
         desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        Dim img = New cvb.Mat(800, 800, cvb.MatType.CV_8U, cvb.Scalar.All(0))
+    Public Overrides sub runAlg(src As cv.Mat)
+        Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, cv.Scalar.All(0))
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
         Dim color2() = {81, 181, 161, 141, 121, 101, 91, 111, 171, 151, 141, 101, 221}
         Dim color3() = {175, 75, 95, 115, 135, 155, 165, 145, 85, 105, 115, 155, 35}
         Dim color4() = {173, 73, 93, 113, 133, 153, 163, 143, 83, 103, 113, 153, 33}
 
-        addNestedRectangles(img, New cvb.Point(10, 10), width, color1, 13)
-        addNestedCircles(img, New cvb.Point(200, 600), width, color2, 13)
+        addNestedRectangles(img, New cv.Point(10, 10), width, color1, 13)
+        addNestedCircles(img, New cv.Point(200, 600), width, color2, 13)
 
-        addNestedRectangles(img, New cvb.Point(410, 10), width, color3, 13)
-        addNestedCircles(img, New cvb.Point(600, 600), width, color4, 13)
+        addNestedRectangles(img, New cv.Point(410, 10), width, color3, 13)
+        addNestedCircles(img, New cv.Point(600, 600), width, color4, 13)
 
-        img = img.Resize(New cvb.Size(src.Rows, src.Rows))
-        dst2(New cvb.Rect(0, 0, src.Rows, src.Rows)) = img.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+        img = img.Resize(New cv.Size(src.Rows, src.Rows))
+        dst2(New cv.Rect(0, 0, src.Rows, src.Rows)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -154,7 +154,7 @@ Public Class MSER_LeftRight : Inherits TaskParent
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics output for right camera"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         left.Run(task.leftView)
         dst2 = left.dst2
         labels(2) = left.labels(2)
@@ -177,7 +177,7 @@ Public Class MSER_Left : Inherits TaskParent
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         mBase.Run(task.leftView)
         dst2 = mBase.dst2
         dst3 = mBase.dst3
@@ -198,7 +198,7 @@ Public Class MSER_Right : Inherits TaskParent
         labels = {"", "", "MSER_Basics output for right camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         mBase.Run(task.rightView)
         dst2 = mBase.dst2
         dst3 = mBase.dst3
@@ -219,7 +219,7 @@ Public Class MSER_Hulls : Inherits TaskParent
     Public Sub New()
         desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         mBase.Run(src)
@@ -228,7 +228,7 @@ Public Class MSER_Hulls : Inherits TaskParent
         Dim pixels As Integer
         dst3.SetTo(0)
         For Each rc In mBase.mserCells
-            rc.hull = cvb.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+            rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
             DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
@@ -254,7 +254,7 @@ Public Class MSER_TestSynthetic : Inherits TaskParent
         labels = {"", "", "Synthetic input", "Output from MSER (Maximally Stable Extremal Region)"}
         desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         synth.Run(src)
@@ -279,7 +279,7 @@ Public Class MSER_Grayscale : Inherits TaskParent
         FindCheckBox("Use grayscale input").Checked = True
         desc = "Run MSER (Maximally Stable Extremal Region) with grayscale input"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         reduction.Run(src)
 
         mBase.Run(reduction.dst3)
@@ -301,7 +301,7 @@ Public Class MSER_ReducedRGB : Inherits TaskParent
         FindCheckBox("Use grayscale input").Checked = False
         desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         reduction.Run(src)
 
         mBase.Run(reduction.dst2)
@@ -318,13 +318,13 @@ End Class
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_rr.cpp
 Public Class MSER_ROI : Inherits TaskParent
-    Public containers As New List(Of cvb.Rect)
+    Public containers As New List(Of cv.Rect)
     Dim options As New Options_MSER
     Dim core As New MSER_Detect
     Public Sub New()
         desc = "Identify the main regions of interest with MSER (Maximally Stable Extremal Region)"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.Clone
@@ -332,12 +332,12 @@ Public Class MSER_ROI : Inherits TaskParent
 
         core.Run(src)
 
-        Dim sortedBoxes As New SortedList(Of Integer, cvb.Rect)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedBoxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         For Each box In core.boxes
             sortedBoxes.Add(box.Width * box.Height, box)
         Next
 
-        Dim boxList As New List(Of cvb.Rect)
+        Dim boxList As New List(Of cv.Rect)
         For i = 0 To sortedBoxes.Count - 1
             boxList.Add(sortedBoxes.ElementAt(i).Value)
         Next
@@ -349,7 +349,7 @@ Public Class MSER_ROI : Inherits TaskParent
             Dim removeBoxes As New List(Of Integer)
             For i = 0 To boxList.Count - 1
                 Dim b = boxList(i)
-                Dim center = New cvb.Point(CInt(b.X + b.Width / 2), CInt(b.Y + b.Height / 2))
+                Dim center = New cv.Point(CInt(b.X + b.Width / 2), CInt(b.Y + b.Height / 2))
                 If center.X >= box.X And center.X <= (box.X + box.Width) Then
                     If center.Y >= box.Y And center.Y <= (box.Y + box.Height) Then
                         removeBoxes.Add(i)
@@ -380,29 +380,29 @@ End Class
 
 ' https://github.com/shimat/opencvsharp/wiki/MSER
 Public Class MSER_TestExample : Inherits TaskParent
-    Dim image As cvb.Mat
-    Dim mser As cvb.MSER
+    Dim image As cv.Mat
+    Dim mser As cv.MSER
     Dim options As New Options_MSER
     Public Sub New()
         labels(2) = "Contour regions from MSER"
         labels(3) = "Box regions from MSER"
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Maximally Stable Extremal Regions example - still image"
-        image = cvb.Cv2.ImRead(task.HomeDir + "Data/MSERtestfile.jpg", cvb.ImreadModes.Color)
-        mser = cvb.MSER.Create()
+        image = cv.Cv2.ImRead(task.HomeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
+        mser = cv.MSER.Create()
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim regions()() As cvb.Point
-        Dim boxes() As cvb.Rect
+        Dim regions()() As cv.Point
+        Dim boxes() As cv.Rect
 
         dst0 = image.Clone
         dst2 = image.Clone
         dst3 = image.Clone()
 
         If task.optionsChanged Then
-            mser = cvb.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
+            mser = cv.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                   options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
             mser.Pass2Only = options.pass2Setting
         End If
@@ -412,7 +412,7 @@ Public Class MSER_TestExample : Inherits TaskParent
         For Each pts In regions
             Dim color = task.vecColors(index Mod 256)
             For Each pt In pts
-                dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, color)
+                dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
             Next
             index += 1
         Next
@@ -434,10 +434,10 @@ Public Class MSER_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Use the MSER_Basics output as input to RedCloud_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         mBase.Run(src)
 
-        task.redC.Run(mBase.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+        task.redC.Run(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub
@@ -461,7 +461,7 @@ Public Class MSER_Mask_CPP_VB : Inherits TaskParent
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "MSER in a nutshell: intensity threshold, stability, maximize region, adaptive threshold."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         If task.optionsChanged Then
             MSER_Close(cPtr)
@@ -469,7 +469,7 @@ Public Class MSER_Mask_CPP_VB : Inherits TaskParent
                              options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         End If
 
-        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.heartBeat Then
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -480,7 +480,7 @@ Public Class MSER_Mask_CPP_VB : Inherits TaskParent
             classCount = MSER_Count(cPtr)
             If classCount = 0 Then Exit Sub
 
-            dst3 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr).InRange(255, 255)
+            dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).InRange(255, 255)
         End If
         labels(3) = CStr(classCount) + " regions identified"
 
@@ -505,7 +505,7 @@ Public Class MSER_Binarize : Inherits TaskParent
     Public Sub New()
         desc = "Instead of a BGR src, try using the color output of Bin4Way_Regions"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         bin4.Run(src)
         dst2 = ShowPalette(bin4.dst2 * 255 / 4)
 
@@ -524,9 +524,9 @@ Public Class MSER_Basics1 : Inherits TaskParent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         detect.Run(src)
-        dst3 = detect.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         task.redC.Run(dst3)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -543,11 +543,11 @@ Public Class MSER_BasicsNew : Inherits TaskParent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         detect.Run(src)
 
-        Dim boxInput = New List(Of cvb.Rect)(detect.boxes)
-        Dim boxes As New SortedList(Of Integer, cvb.Rect)(New compareAllowIdenticalIntegerInverted)
+        Dim boxInput = New List(Of cv.Rect)(detect.boxes)
+        Dim boxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To boxInput.Count - 1
             Dim r = boxInput(i)
             boxes.Add(r.Width * r.Height, r)
@@ -574,17 +574,17 @@ End Class
 
 Public Class MSER_Basics2 : Inherits TaskParent
     Dim detect As New MSER_CPP_VB
-    Dim cellMap As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+    Dim cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
     Public Sub New()
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         detect.Run(src)
-        dst3 = detect.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim floodPoints = New List(Of cvb.Point)(detect.floodPoints)
-        Dim boxInput = New List(Of cvb.Rect)(detect.boxes)
+        Dim floodPoints = New List(Of cv.Point)(detect.floodPoints)
+        Dim boxInput = New List(Of cv.Rect)(detect.boxes)
         Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To boxInput.Count - 1
             Dim r = boxInput(i)
@@ -610,8 +610,8 @@ Public Class MSER_Basics2 : Inherits TaskParent
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
-            cvb.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.color = New cvb.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            rc.color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
             If rc.indexLast <> 0 Then matchCount += 1
 
             redCells.Add(rc)
@@ -632,8 +632,8 @@ End Class
 
 Public Class MSER_CPP_VB : Inherits TaskParent
     Dim options As New Options_MSER
-    Public boxes As New List(Of cvb.Rect)
-    Public floodPoints As New List(Of cvb.Point)
+    Public boxes As New List(Of cv.Rect)
+    Public floodPoints As New List(Of cv.Point)
     Public maskCounts As New List(Of Integer)
     Public classcount As Integer
     Public Sub New()
@@ -643,7 +643,7 @@ Public Class MSER_CPP_VB : Inherits TaskParent
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "C++ version of MSER basics."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         If task.optionsChanged Then
             MSER_Close(cPtr)
@@ -651,26 +651,26 @@ Public Class MSER_CPP_VB : Inherits TaskParent
                              options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         End If
 
-        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        dst0 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC1, imagePtr).Clone
+        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
 
         classcount = MSER_Count(cPtr)
         If classcount = 0 Then Exit Sub
 
-        Dim ptData = cvb.Mat.FromPixelData(classcount, 1, cvb.MatType.CV_32SC2, MSER_FloodPoints(cPtr))
-        Dim maskData = cvb.Mat.FromPixelData(classcount, 1, cvb.MatType.CV_32S, MSER_MaskCounts(cPtr))
-        Dim rectData = cvb.Mat.FromPixelData(classcount, 1, cvb.MatType.CV_32SC4, MSER_Rects(cPtr))
+        Dim ptData = cv.Mat.FromPixelData(classcount, 1, cv.MatType.CV_32SC2, MSER_FloodPoints(cPtr))
+        Dim maskData = cv.Mat.FromPixelData(classcount, 1, cv.MatType.CV_32S, MSER_MaskCounts(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classcount, 1, cv.MatType.CV_32SC4, MSER_Rects(cPtr))
 
         Dim sortedBoxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        Dim rects As New List(Of cvb.Rect)
+        Dim rects As New List(Of cv.Rect)
         For i = 0 To classcount - 1
-            Dim r = rectData.Get(Of cvb.Rect)(i, 0)
+            Dim r = rectData.Get(Of cv.Rect)(i, 0)
             If rects.Contains(r) Then Continue For
             rects.Add(r)
             sortedBoxes.Add(r.Width * r.Height, i)
@@ -681,8 +681,8 @@ Public Class MSER_CPP_VB : Inherits TaskParent
         maskCounts.Clear()
         For i = 0 To sortedBoxes.Count - 1
             Dim index = sortedBoxes.ElementAt(i).Value
-            boxes.Add(rectData.Get(Of cvb.Rect)(index, 0))
-            floodPoints.Add(ptData.Get(Of cvb.Point)(index, 0))
+            boxes.Add(rectData.Get(Of cv.Rect)(index, 0))
+            floodPoints.Add(ptData.Get(Of cv.Point)(index, 0))
             maskCounts.Add(maskData.Get(Of Integer)(index, 0))
         Next
 

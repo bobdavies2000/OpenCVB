@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.IO
 Public Class LaneFinder_Basics : Inherits TaskParent
     Dim lane As New LaneFinder_SlopeIntercept
@@ -7,7 +7,7 @@ Public Class LaneFinder_Basics : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         lane.Run(src)
         dst0 = lane.dst0
         dst1 = lane.dst1
@@ -32,7 +32,7 @@ Public Class LaneFinder_Videos : Inherits TaskParent
         video.options.fileInfo = New FileInfo(inputfile.FullName)
         desc = "Read in the videos showing road conditions."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -57,7 +57,7 @@ Public Class LaneFinder_Edges : Inherits TaskParent
     Public Sub New()
         desc = "Using the videos provided, find the lane markers."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         input.Run(empty)
         dst0 = input.dst2
         edges.Run(dst0)
@@ -79,11 +79,11 @@ Public Class LaneFinder_HLSColor : Inherits TaskParent
         labels = {"HLS color conversion", "InRange White", "InRange Yellow", "Combined InRange White and InRange Yellow results"}
         desc = "Isolate the colors for the white and yellow"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         input.Run(empty)
-        dst0 = input.dst2.CvtColor(cvb.ColorConversionCodes.BGR2HLS)
-        dst1 = dst0.InRange(New cvb.Scalar(0, 200, 0), New cvb.Scalar(255, 255, 255))
-        dst2 = dst0.InRange(New cvb.Scalar(10, 0, 100), New cvb.Scalar(40, 255, 255))
+        dst0 = input.dst2.CvtColor(cv.ColorConversionCodes.BGR2HLS)
+        dst1 = dst0.InRange(New cv.Scalar(0, 200, 0), New cv.Scalar(255, 255, 255))
+        dst2 = dst0.InRange(New cv.Scalar(10, 0, 100), New cv.Scalar(40, 255, 255))
         dst3 = dst1 Or dst2
     End Sub
 End Class
@@ -98,25 +98,25 @@ End Class
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
 Public Class LaneFinder_ROI : Inherits TaskParent
     Dim hls As New LaneFinder_HLSColor
-    Dim pListList = New cvb.Point()() {Nothing}
+    Dim pListList = New cv.Point()() {Nothing}
     Public Sub New()
         labels = {"Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline"}
         desc = "Define the ROI for the location of the lanes"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         hls.Run(empty)
 
         If task.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
             Dim h = hls.input.video.dst2.Height
 
-            Dim bl = New cvb.Point(w * 0.1, h * 0.95)
-            Dim tl = New cvb.Point(w * 0.4, h * 0.6)
-            Dim br = New cvb.Point(w * 0.95, h * 0.95)
-            Dim tr = New cvb.Point(w * 0.6, h * 0.6)
+            Dim bl = New cv.Point(w * 0.1, h * 0.95)
+            Dim tl = New cv.Point(w * 0.4, h * 0.6)
+            Dim br = New cv.Point(w * 0.95, h * 0.95)
+            Dim tr = New cv.Point(w * 0.6, h * 0.6)
 
-            Dim pList() As cvb.Point = {bl, tl, tr, br}
-            dst1 = New cvb.Mat(New cvb.Size(w, h), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+            Dim pList() As cv.Point = {bl, tl, tr, br}
+            dst1 = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst1.FillConvexPoly(pList, white, task.lineType)
             pListList(0) = pList
         End If
@@ -124,9 +124,9 @@ Public Class LaneFinder_ROI : Inherits TaskParent
         dst0 = hls.input.video.dst2
         dst2 = hls.dst0
         dst3 = hls.dst3
-        cvb.Cv2.Polylines(dst0, pListList, True, cvb.Scalar.White, task.lineWidth, task.lineType, 0)
-        cvb.Cv2.Polylines(dst2, pListList, True, cvb.Scalar.White, task.lineWidth, task.lineType, 0)
-        cvb.Cv2.Polylines(dst3, pListList, True, cvb.Scalar.White, task.lineWidth, task.lineType, 0)
+        cv.Cv2.Polylines(dst0, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
+        cv.Cv2.Polylines(dst2, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
+        cv.Cv2.Polylines(dst3, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
     End Sub
 End Class
 
@@ -146,7 +146,7 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
     Public Sub New()
         desc = "Use the Hough lines found to build a slope intercept format line."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         hough.Run(empty)
         dst0 = hough.dst0
         dst1 = hough.dst2
@@ -169,16 +169,16 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
                 rightWeight.Add(line.P1.DistanceTo(line.P2))
             End If
         Next
-        Dim mat1 = cvb.Mat.FromPixelData(leftWeight.Count, 1, cvb.MatType.CV_32F, leftWeight.ToArray)
-        Dim mat2 = cvb.Mat.FromPixelData(leftSlope.Count, 1, cvb.MatType.CV_32F, leftSlope.ToArray)
-        Dim mat3 = cvb.Mat.FromPixelData(leftIntercept.Count, 1, cvb.MatType.CV_32F, leftIntercept.ToArray)
+        Dim mat1 = cv.Mat.FromPixelData(leftWeight.Count, 1, cv.MatType.CV_32F, leftWeight.ToArray)
+        Dim mat2 = cv.Mat.FromPixelData(leftSlope.Count, 1, cv.MatType.CV_32F, leftSlope.ToArray)
+        Dim mat3 = cv.Mat.FromPixelData(leftIntercept.Count, 1, cv.MatType.CV_32F, leftIntercept.ToArray)
         Dim weight = leftWeight.Sum()
         leftLaneIntercept = mat1.Dot(mat3) / weight
         leftAvgSlope = mat1.Dot(mat2) / weight
 
-        mat1 = cvb.Mat.FromPixelData(rightWeight.Count, 1, cvb.MatType.CV_32F, rightWeight.ToArray)
-        mat2 = cvb.Mat.FromPixelData(rightSlope.Count, 1, cvb.MatType.CV_32F, rightSlope.ToArray)
-        mat3 = cvb.Mat.FromPixelData(rightIntercept.Count, 1, cvb.MatType.CV_32F, rightIntercept.ToArray)
+        mat1 = cv.Mat.FromPixelData(rightWeight.Count, 1, cv.MatType.CV_32F, rightWeight.ToArray)
+        mat2 = cv.Mat.FromPixelData(rightSlope.Count, 1, cv.MatType.CV_32F, rightSlope.ToArray)
+        mat3 = cv.Mat.FromPixelData(rightIntercept.Count, 1, cv.MatType.CV_32F, rightIntercept.ToArray)
         weight = rightWeight.Sum()
         rightLaneIntercept = mat1.Dot(mat3) / weight
         rightAvgSlope = mat1.Dot(mat2) / weight
@@ -190,12 +190,12 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
 
         Dim tmp = dst2.EmptyClone()
 
-        Dim p1 = New cvb.Point(0, leftLaneIntercept)
-        Dim p2 = New cvb.Point(-leftLaneIntercept / leftAvgSlope, 0)
+        Dim p1 = New cv.Point(0, leftLaneIntercept)
+        Dim p2 = New cv.Point(-leftLaneIntercept / leftAvgSlope, 0)
         tmp.Line(p1, p2, white, task.lineWidth, task.lineType)
 
-        p1 = New cvb.Point(0, rightLaneIntercept)
-        p2 = New cvb.Point((dst0.Height - rightLaneIntercept) / rightAvgSlope, dst2.Height)
+        p1 = New cv.Point(0, rightLaneIntercept)
+        p2 = New cv.Point((dst0.Height - rightLaneIntercept) / rightAvgSlope, dst2.Height)
         tmp.Line(p1, p2, white, task.lineWidth, task.lineType)
 
         tmp.CopyTo(dst2, hough.mask)

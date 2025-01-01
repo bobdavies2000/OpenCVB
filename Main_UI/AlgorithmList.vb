@@ -285,6 +285,7 @@ End Enum
 	If algorithmName = "Complexity_PlotOpenCV" Then return new Complexity_PlotOpenCV
 	If algorithmName = "Concat_4way" Then return new Concat_4way
 	If algorithmName = "Concat_Basics" Then return new Concat_Basics
+	If algorithmName = "Concept_Parallel" Then return new Concept_Parallel
 	If algorithmName = "Contour_Basics" Then return new Contour_Basics
 	If algorithmName = "Contour_Compare" Then return new Contour_Compare
 	If algorithmName = "Contour_CompareToFeatureless" Then return new Contour_CompareToFeatureless
@@ -379,6 +380,7 @@ End Enum
 	If algorithmName = "Depth_NotMissing" Then return new Depth_NotMissing
 	If algorithmName = "Depth_Outline" Then return new Depth_Outline
 	If algorithmName = "Depth_Palette" Then return new Depth_Palette
+	If algorithmName = "Depth_PaletteOld" Then return new Depth_PaletteOld
 	If algorithmName = "Depth_PunchBlob" Then return new Depth_PunchBlob
 	If algorithmName = "Depth_PunchBlobNew" Then return new Depth_PunchBlobNew
 	If algorithmName = "Depth_PunchDecreasing" Then return new Depth_PunchDecreasing

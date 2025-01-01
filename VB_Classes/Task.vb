@@ -437,8 +437,10 @@ Public Class VBtask : Implements IDisposable
         feat = New Feature_Basics
         feat.taskAlgorithm = True
 
-        redC = New RedCloud_Basics
-        redC.taskAlgorithm = True
+        If task.algName.Contains("RedCloud") Then
+            redC = New RedCloud_Basics
+            redC.taskAlgorithm = True
+        End If
 
         IMUBasics = New IMU_Basics
         IMUBasics.taskAlgorithm = True

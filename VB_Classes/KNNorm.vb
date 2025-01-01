@@ -1,5 +1,5 @@
 ﻿Imports OpenCvSharp.ML
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class KNNorm_Basics : Inherits TaskParent
     Public knn2 As New KNN_NNBasics
     Public queryInput As New List(Of Single)
@@ -9,22 +9,22 @@ Public Class KNNorm_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Default normalized KNN with dimension N"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim qRows = CInt(queryInput.Count / options.knnDimension)
-        Dim queryData = cvb.Mat.FromPixelData(qRows, options.knnDimension, cvb.MatType.CV_32F, queryInput.ToArray)
-        Dim queryMat As cvb.Mat = queryData.Clone
-        cvb.Cv2.Normalize(queryData, queryMat, 0, 1, cvb.NormTypes.L2)
+        Dim queryData = cv.Mat.FromPixelData(qRows, options.knnDimension, cv.MatType.CV_32F, queryInput.ToArray)
+        Dim queryMat As cv.Mat = queryData.Clone
+        cv.Cv2.Normalize(queryData, queryMat, 0, 1, cv.NormTypes.L2)
 
         Dim tRows = CInt(trainInput.Count / options.knnDimension)
-        Dim trainData = cvb.Mat.FromPixelData(tRows, options.knnDimension, cvb.MatType.CV_32F, trainInput.ToArray())
-        cvb.Cv2.Normalize(trainData, trainData, 0, 1, cvb.NormTypes.L2)
-        Dim response As cvb.Mat = cvb.Mat.FromPixelData(trainData.Rows, 1, cvb.MatType.CV_32S,
+        Dim trainData = cv.Mat.FromPixelData(tRows, options.knnDimension, cv.MatType.CV_32F, trainInput.ToArray())
+        cv.Cv2.Normalize(trainData, trainData, 0, 1, cv.NormTypes.L2)
+        Dim response As cv.Mat = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S,
                                   Enumerable.Range(start:=0, trainData.Rows).ToArray)
 
         knn2.trainInput = trainInput
         knn2.queries = queryInput
         knn2.Run(src)
-        Dim neighbors As cvb.Mat = knn2.neighbors
+        Dim neighbors As cv.Mat = knn2.neighbors
         ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
         For i = 0 To neighbors.Rows - 1
             For j = 0 To neighbors.Cols - 1
@@ -44,8 +44,8 @@ End Class
 Public Class KNNorm_TestDim2 : Inherits TaskParent
     Public knn As New KNNorm_Basics
     Dim random As New Random_Basics
-    Public trainInput As New List(Of cvb.Point2f)
-    Public queryInput As New List(Of cvb.Point2f)
+    Public trainInput As New List(Of cv.Point2f)
+    Public queryInput As New List(Of cv.Point2f)
     Public Sub New()
         FindSlider("Random Pixel Count").Value = 20
         FindSlider("KNN Dimension").Value = 2
@@ -57,15 +57,15 @@ Public Class KNNorm_TestDim2 : Inherits TaskParent
             Dim pt = queryInput(i)
             Dim index = knn.result(i, 0)
             Dim nn = trainInput(index)
-            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
-            DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
+            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawLine(dst2, pt, nn, cv.Scalar.Yellow)
         Next
 
         For Each pt In trainInput
-            DrawCircle(dst2, pt, task.DotSize + 2, cvb.Scalar.Red)
+            DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then
                 queryInput.Clear()
@@ -107,8 +107,8 @@ End Class
 Public Class KNNorm_TestDim3 : Inherits TaskParent
     Public knn As New KNNorm_Basics
     Dim random As New Random_Basics3D
-    Public trainInput As New List(Of cvb.Point3f)
-    Public queryInput As New List(Of cvb.Point3f)
+    Public trainInput As New List(Of cv.Point3f)
+    Public queryInput As New List(Of cv.Point3f)
     Public Sub New()
         FindSlider("Random Pixel Count").Value = 20
         FindSlider("KNN Dimension").Value = 3
@@ -117,19 +117,19 @@ Public Class KNNorm_TestDim3 : Inherits TaskParent
     Public Sub displayResults()
         dst2.SetTo(0)
         For i = 0 To queryInput.Count - 1
-            Dim pt = New cvb.Point(queryInput(i).X, queryInput(i).Y)
+            Dim pt = New cv.Point(queryInput(i).X, queryInput(i).Y)
             Dim index = knn.result(i, 0)
-            Dim nn = New cvb.Point(trainInput(index).X, trainInput(index).Y)
-            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
-            DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
+            Dim nn = New cv.Point(trainInput(index).X, trainInput(index).Y)
+            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawLine(dst2, pt, nn, cv.Scalar.Yellow)
         Next
 
         For Each pt In trainInput
-            Dim p1 = New cvb.Point(pt.X, pt.Y)
-            DrawCircle(dst2, p1, task.DotSize + 2, cvb.Scalar.Red)
+            Dim p1 = New cv.Point(pt.X, pt.Y)
+            DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then
                 queryInput.Clear()
@@ -173,8 +173,8 @@ End Class
 Public Class KNNorm_TestDim4 : Inherits TaskParent
     Public knn As New KNNorm_Basics
     Dim random As New Random_Basics4D
-    Public trainInput As New List(Of cvb.Vec4f)
-    Public queryInput As New List(Of cvb.Vec4f)
+    Public trainInput As New List(Of cv.Vec4f)
+    Public queryInput As New List(Of cv.Vec4f)
     Public Sub New()
         FindSlider("Random Pixel Count").Value = 20
         FindSlider("KNN Dimension").Value = 4
@@ -183,19 +183,19 @@ Public Class KNNorm_TestDim4 : Inherits TaskParent
     Public Sub displayResults()
         dst2.SetTo(0)
         For i = 0 To queryInput.Count - 1
-            Dim pt = New cvb.Point(queryInput(i).Item(0), queryInput(i).Item(1))
+            Dim pt = New cv.Point(queryInput(i).Item(0), queryInput(i).Item(1))
             Dim index = knn.result(i, 0)
-            Dim nn = New cvb.Point(trainInput(index).Item(0), trainInput(index).Item(1))
-            DrawCircle(dst2, pt, task.DotSize + 4, cvb.Scalar.Yellow)
-            DrawLine(dst2, pt, nn, cvb.Scalar.Yellow)
+            Dim nn = New cv.Point(trainInput(index).Item(0), trainInput(index).Item(1))
+            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawLine(dst2, pt, nn, cv.Scalar.Yellow)
         Next
 
         For Each pt In trainInput
-            Dim p1 = New cvb.Point(pt.Item(0), pt.Item(1))
-            DrawCircle(dst2, p1, task.DotSize + 2, cvb.Scalar.Red)
+            Dim p1 = New cv.Point(pt.Item(0), pt.Item(1))
+            DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then
                 queryInput.Clear()

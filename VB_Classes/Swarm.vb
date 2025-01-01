@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
     Public lpList As New List(Of linePoints)
@@ -6,16 +6,16 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public directionAvg As Single
     Public distanceMax As Single
     Public options As New Options_Swarm
-    Dim cornerHistory As New List(Of List(Of cvb.Point2f))
+    Dim cornerHistory As New List(Of List(Of cv.Point2f))
     Public Sub New()
         FindSlider("Feature Sample Size").Value = 1000
         FindSlider("Blocksize").Value = 1
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
     End Sub
-    Public Function DrawLines() As cvb.Mat
-        Dim dst = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+    Public Function DrawLines() As cv.Mat
+        Dim dst = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim queries = knn.queries
         Dim trainInput = knn.trainInput
         Dim neighbors = knn.neighbors
@@ -25,15 +25,15 @@ Public Class Swarm_Basics : Inherits TaskParent
             For j = 0 To Math.Min(nabList.Count, options.ptCount)
                 Dim ptNew = trainInput(nabList(j))
                 DrawLine(dst, pt, ptNew, white, task.lineWidth)
-                If ptNew.X < options.border Then DrawLine(dst, New cvb.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth)
-                If ptNew.Y < options.border Then DrawLine(dst, New cvb.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth)
-                If ptNew.X > dst.Width - options.border Then DrawLine(dst, New cvb.Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth)
-                If ptNew.Y > dst.Height - options.border Then DrawLine(dst, New cvb.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth)
+                If ptNew.X < options.border Then DrawLine(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth)
+                If ptNew.Y < options.border Then DrawLine(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth)
+                If ptNew.X > dst.Width - options.border Then DrawLine(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth)
+                If ptNew.Y > dst.Height - options.border Then DrawLine(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth)
             Next
         Next
         Return dst
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst3 = task.feat.dst2
@@ -41,11 +41,11 @@ Public Class Swarm_Basics : Inherits TaskParent
         If task.optionsChanged Then cornerHistory.Clear()
 
         Dim histCount = task.frameHistoryCount
-        cornerHistory.Add(New List(Of cvb.Point2f)(task.features))
+        cornerHistory.Add(New List(Of cv.Point2f)(task.features))
 
         Dim lastIndex = cornerHistory.Count - 1
-        knn.trainInput = New List(Of cvb.Point2f)(cornerHistory.ElementAt(0))
-        knn.queries = New List(Of cvb.Point2f)(cornerHistory.ElementAt(lastIndex))
+        knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
+        knn.queries = New List(Of cv.Point2f)(cornerHistory.ElementAt(lastIndex))
         knn.Run(empty)
 
         dst2.SetTo(0)
@@ -92,14 +92,14 @@ End Class
 
 
 Public Class Swarm_RightFeatures : Inherits TaskParent
-    Public rightList As New List(Of cvb.Point2f)
+    Public rightList As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.feat.Run(task.rightView)
-        rightList = New List(Of cvb.Point2f)(task.features)
+        rightList = New List(Of cv.Point2f)(task.features)
         dst2 = task.feat.dst2.Clone
     End Sub
 End Class
@@ -109,14 +109,14 @@ End Class
 
 
 Public Class Swarm_LeftFeatures : Inherits TaskParent
-    Public leftList As New List(Of cvb.Point2f)
+    Public leftList As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.feat.Run(task.leftView)
-        leftList = New List(Of cvb.Point2f)(task.features)
+        leftList = New List(Of cv.Point2f)(task.features)
         dst2 = task.feat.dst2.Clone
     End Sub
 End Class
@@ -133,7 +133,7 @@ Public Class Swarm_LeftRightFeatures : Inherits TaskParent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         swLeft.Run(empty)
         dst2 = swLeft.dst2
         swRight.Run(empty)
@@ -160,20 +160,20 @@ Public Class Swarm_LeftRight : Inherits TaskParent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Get direction and distance from the left and right images."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         swarm.Run(task.leftView)
         leftDistance = swarm.distanceAvg
         leftDirection = swarm.directionAvg
         leftMax = swarm.distanceMax
         dst2 = task.leftView
-        dst2.SetTo(cvb.Scalar.White, swarm.DrawLines())
+        dst2.SetTo(cv.Scalar.White, swarm.DrawLines())
 
         swarm.Run(task.rightView)
         rightDistance = swarm.distanceAvg
         rightDirection = swarm.directionAvg
         rightMax = swarm.distanceMax
         dst3 = task.rightView
-        dst3.SetTo(cvb.Scalar.White, swarm.DrawLines())
+        dst3.SetTo(cv.Scalar.White, swarm.DrawLines())
 
         strOut = swarm.labels(2) + vbCrLf + swarm.labels(3)
         SetTrueText(strOut, 1)
@@ -193,7 +193,7 @@ Public Class Swarm_Percentage : Inherits TaskParent
     Public Sub New()
         desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         swarm.Run(src)
@@ -225,7 +225,7 @@ Public Class Swarm_Flood : Inherits TaskParent
     Public Sub New()
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         swarm.Run(src)
 
         color8U.Run(src)
@@ -254,7 +254,7 @@ Public Class Swarm_Flood2 : Inherits TaskParent
         flood.cellGen.removeContour = False
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
-    Public Function runRedCloud(src As cvb.Mat) As cvb.Mat
+    Public Function runRedCloud(src As cv.Mat) As cv.Mat
         lines.Run(src)
         color8U.Run(src)
 
@@ -262,7 +262,7 @@ Public Class Swarm_Flood2 : Inherits TaskParent
         flood.Run(color8U.dst2)
         Return flood.dst2
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.heartBeat = False Then Exit Sub
 
         dst2 = runRedCloud(src).Clone()
@@ -286,7 +286,7 @@ Public Class Swarm_Flood3 : Inherits TaskParent
     Public Sub New()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         swarm.Run(src)
         dst2 = swarm.dst2
         labels(2) = swarm.labels(2)

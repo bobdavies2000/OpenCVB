@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 ' http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 Public Class Plane_Basics : Inherits TaskParent
     Dim frames As New History_Basics
@@ -6,17 +6,17 @@ Public Class Plane_Basics : Inherits TaskParent
         labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
         desc = "Find the regions that are mostly vertical and mostly horizontal."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        Dim topHist As New cvb.Mat, sideHist As New cvb.Mat, topBackP As New cvb.Mat, sideBackP As New cvb.Mat
-        cvb.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cvb.Mat, topHist, 2,
+    Public Overrides sub runAlg(src As cv.Mat)
+        Dim topHist As New cv.Mat, sideHist As New cv.Mat, topBackP As New cv.Mat, sideBackP As New cv.Mat
+        cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, topHist, 2,
                         {dst2.Height, dst2.Width}, task.rangesTop)
         topHist.Row(0).SetTo(0)
-        cvb.Cv2.InRange(topHist, task.projectionThreshold, topHist.Total, dst1)
-        dst1.ConvertTo(dst1, cvb.MatType.CV_32F)
-        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, topBackP, task.rangesTop)
+        cv.Cv2.InRange(topHist, task.projectionThreshold, topHist.Total, dst1)
+        dst1.ConvertTo(dst1, cv.MatType.CV_32F)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, topBackP, task.rangesTop)
 
         frames.Run(topBackP)
-        frames.dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
+        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         dst3 = Not dst2
         dst3.SetTo(0, task.noDepthMask)
@@ -32,16 +32,16 @@ End Class
 
 ' http://pi.math.cornell.edu/~froh/231f08e1a.pdf
 Public Class Plane_From3Points : Inherits TaskParent
-    Public input(3 - 1) As cvb.Point3f
+    Public input(3 - 1) As cv.Point3f
     Public showWork As Boolean = True
-    Public cross As cvb.Point3f
+    Public cross As cv.Point3f
     Public k As Single
     Public Sub New()
         labels = {"", "", "Plane Equation", ""}
-        input = {New cvb.Point3f(2, 1, -1), New cvb.Point3f(0, -2, 0), New cvb.Point3f(1, -1, 2)}
+        input = {New cv.Point3f(2, 1, -1), New cv.Point3f(0, -2, 0), New cv.Point3f(1, -1, 2)}
         desc = "Build a plane equation from 3 points in 3-dimensional space"
     End Sub
-    Public Function vbFormatEquation(eq As cvb.Vec4f) As String
+    Public Function vbFormatEquation(eq As cv.Vec4f) As String
         Dim s1 = If(eq(1) < 0, " - ", " +")
         Dim s2 = If(eq(2) < 0, " - ", " +")
         Return If(eq(0) < 0, "-", " ") + Format(Math.Abs(eq(0)), fmt3) + "*x " + s1 +
@@ -49,7 +49,7 @@ Public Class Plane_From3Points : Inherits TaskParent
                                          Format(Math.Abs(eq(2)), fmt3) + "*z = " +
                                          Format(eq(3), fmt3) + vbCrLf
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim v1 = input(1) - input(0)
         Dim v2 = input(1) - input(2)
         cross = crossProduct(v1, v2)
@@ -65,7 +65,7 @@ Public Class Plane_From3Points : Inherits TaskParent
         strOut += "Second " + vbTab + "difference = " + Format(v2.X, fmt3) + ", " + Format(v2.Y, fmt3) + ", " + Format(v2.Z, fmt3) + vbCrLf
         strOut += "Cross Product = " + Format(cross.X, fmt3) + ", " + Format(cross.Y, fmt3) + ", " + Format(cross.Z, fmt3) + vbCrLf
         strOut += "k = " + CStr(k) + vbCrLf
-        strOut += vbFormatEquation(New cvb.Vec4f(cross.X, cross.Y, cross.Z, k))
+        strOut += vbFormatEquation(New cv.Vec4f(cross.X, cross.Y, cross.Z, k))
         Dim s1 = If(cross.Y < 0, " - ", " + ")
         Dim s2 = If(cross.Z < 0, " - ", " + ")
         strOut += "Plane equation: " + Format(cross.X, fmt3) + "x" + s1 + Format(Math.Abs(cross.Y), fmt3) + "y" + s2 +
@@ -87,7 +87,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
         addW.src2 = dst2.Clone
         desc = "Find all the cells from a RedCloud_Basics output that are likely to be flat"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         plane.Run(src)
 
         dst2 = plane.dst2
@@ -103,7 +103,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
                     Dim val = rc.mask.Get(Of Byte)(y, x)
                     If val > 0 Then
                         If msRNG.Next(100) < 10 Then
-                            Dim pt = task.pointCloud(rc.rect).Get(Of cvb.Point3f)(y, x)
+                            Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                             ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                             Dim depth = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
                             RMSerror += Math.Abs(pt.Z - depth)
@@ -134,9 +134,9 @@ End Class
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 Public Class Plane_OnlyPlanes : Inherits TaskParent
     Public plane As New Plane_CellColor
-    Public contours As List(Of cvb.Point)
+    Public contours As List(Of cv.Point)
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_32FC3, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         labels = {"", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data"}
         desc = "Replace the gCloud with planes in every RedCloud cell"
     End Sub
@@ -144,15 +144,15 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
                 If rc.mask.Get(Of Byte)(y, x) > 0 Then
-                    Dim pt = task.pointCloud(rc.rect).Get(Of cvb.Point3f)(y, x)
+                    Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                     ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                     pt.Z = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
-                    If rc.minVec.Z <= pt.Z And rc.maxVec.Z >= pt.Z Then dst3(rc.rect).Set(Of cvb.Point3f)(y, x, pt)
+                    If rc.minVec.Z <= pt.Z And rc.maxVec.Z >= pt.Z Then dst3(rc.rect).Set(Of cv.Point3f)(y, x, pt)
                 End If
             Next
         Next
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         plane.Run(src)
         dst2 = plane.dst2
 
@@ -176,13 +176,13 @@ End Class
 Public Class Plane_EqCorrelation : Inherits TaskParent
     Dim plane As New Plane_Points
     Public correlations As New List(Of Single)
-    Public equations As New List(Of cvb.Vec4f)
-    Public ptList2D As New List(Of List(Of cvb.Point))
+    Public equations As New List(Of cv.Vec4f)
+    Public ptList2D As New List(Of List(Of cv.Point))
     Dim kalman As New Kalman_Basics
     Public Sub New()
         desc = "Classify equations based on the correlation of their coefficients"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         plane.Run(src)
         dst2 = plane.dst2
 
@@ -192,20 +192,20 @@ Public Class Plane_EqCorrelation : Inherits TaskParent
             Exit Sub
         End If
 
-        equations = New List(Of cvb.Vec4f)(plane.equations)
-        ptList2D = New List(Of List(Of cvb.Point))(plane.ptList2D)
+        equations = New List(Of cv.Vec4f)(plane.equations)
+        ptList2D = New List(Of List(Of cv.Point))(plane.ptList2D)
         correlations.Clear()
 
-        Dim correlationMat As New cvb.Mat
+        Dim correlationMat As New cv.Mat
         Dim count(plane.equations.Count - 1) As Integer
         For i = 0 To equations.Count - 1
             Dim p1 = equations(i)
-            Dim data1 = cvb.Mat.FromPixelData(4, 1, cvb.MatType.CV_32F, {p1(0), p1(1), p1(2), p1(3)})
+            Dim data1 = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {p1(0), p1(1), p1(2), p1(3)})
 
             For j = i + 1 To equations.Count - 1
                 Dim p2 = equations(j)
-                Dim data2 = cvb.Mat.FromPixelData(4, 1, cvb.MatType.CV_32F, {p2(0), p2(1), p2(2), p2(3)})
-                cvb.Cv2.MatchTemplate(data1, data2, correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
+                Dim data2 = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {p2(0), p2(1), p2(2), p2(3)})
+                cv.Cv2.MatchTemplate(data1, data2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim correlation = correlationMat.Get(Of Single)(0, 0)
                 correlations.Add(correlation)
 
@@ -245,25 +245,25 @@ Public Class Plane_CellColor : Inherits TaskParent
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
-    Public Function buildContourPoints(rc As rcData) As List(Of cvb.Point3f)
-        Dim fitPoints As New List(Of cvb.Point3f)
+    Public Function buildContourPoints(rc As rcData) As List(Of cv.Point3f)
+        Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
             If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
-            fitPoints.Add(task.pointCloud(rc.rect).Get(Of cvb.Point3f)(pt.Y, pt.X)) ' each contour point is guaranteed to be in the mask and have depth.
+            fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)) ' each contour point is guaranteed to be in the mask and have depth.
         Next
         Return fitPoints
     End Function
-    Public Function buildMaskPointEq(rc As rcData) As List(Of cvb.Point3f)
-        Dim fitPoints As New List(Of cvb.Point3f)
+    Public Function buildMaskPointEq(rc As rcData) As List(Of cv.Point3f)
+        Dim fitPoints As New List(Of cv.Point3f)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
-                If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.rect).Get(Of cvb.Point3f)(y, x))
+                If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
             Next
         Next
         Return fitPoints
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         task.redC.Run(src)
@@ -273,7 +273,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         Dim newCells As New List(Of rcData)
         Dim rcX = task.rc
         For Each rc In task.redCells
-            rc.eq = New cvb.Vec4f
+            rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
                 rc.eq = fitDepthPlane(buildMaskPointEq(rc))
             ElseIf options.useContourPoints Then
@@ -282,7 +282,7 @@ Public Class Plane_CellColor : Inherits TaskParent
                 rc.eq = build3PointEquation(rc)
             End If
             newCells.Add(rc)
-            dst3(rc.rect).SetTo(New cvb.Scalar(Math.Abs(255 * rc.eq(0)),
+            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
                                               Math.Abs(255 * rc.eq(1)),
                                               Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
@@ -299,15 +299,15 @@ End Class
 
 Public Class Plane_Points : Inherits TaskParent
     Dim plane As New Plane_From3Points
-    Public equations As New List(Of cvb.Vec4f)
-    Public ptList As New List(Of cvb.Point3f)
-    Public ptList2D As New List(Of List(Of cvb.Point))
+    Public equations As New List(Of cv.Vec4f)
+    Public ptList As New List(Of cv.Point3f)
+    Public ptList2D As New List(Of List(Of cv.Point))
     Dim needOutput As Boolean
     Public Sub New()
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
 
@@ -315,12 +315,12 @@ Public Class Plane_Points : Inherits TaskParent
         labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
 
         ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
-        rc.contour = ContourBuild(rc.mask, cvb.ContourApproximationModes.ApproxNone)
+        rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
 
-        Dim pt As cvb.Point3f, list2D As New List(Of cvb.Point)
+        Dim pt As cv.Point3f, list2D As New List(Of cv.Point)
         ptList.Clear()
         For i = 0 To rc.contour.Count - 1
-            pt = task.pointCloud.Get(Of cvb.Point3f)(rc.contour(i).Y, rc.contour(i).X)
+            pt = task.pointCloud.Get(Of cv.Point3f)(rc.contour(i).Y, rc.contour(i).X)
             If pt.Z > 0 Then
                 ptList.Add(pt)
                 list2D.Add(rc.contour(i))
@@ -339,7 +339,7 @@ Public Class Plane_Points : Inherits TaskParent
             Else
                 Dim c = ptList.Count
                 For i = 0 To ptList.Count - 1
-                    Dim list2Dinput As New List(Of cvb.Point)
+                    Dim list2Dinput As New List(Of cv.Point)
                     For j = 0 To 3 - 1
                         Dim ptIndex = Choose(j + 1, i, (i + CInt(c / 3)) Mod c, (i + CInt(2 * c / 3)) Mod c)
                         plane.input(j) = ptList(ptIndex)
@@ -347,8 +347,8 @@ Public Class Plane_Points : Inherits TaskParent
                     Next
 
                     plane.Run(empty)
-                    strOut += plane.vbFormatEquation(New cvb.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
-                    equations.Add(New cvb.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
+                    strOut += plane.vbFormatEquation(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
+                    equations.Add(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
                     ptList2D.Add(list2Dinput)
                 Next
             End If
@@ -376,14 +376,14 @@ Public Class Plane_Histogram : Inherits TaskParent
         labels = {"", "", "Histogram of Y-Values of the point cloud after masking", "Mask used to isolate histogram input"}
         desc = "Create a histogram plot of the Y-values in the backprojection of solo points."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         solo.Run(src)
         dst3 = solo.dst3
 
         Dim points = dst3.FindNonZero()
         Dim yList As New List(Of Single)
         For i = 0 To points.Rows - 1
-            Dim pt = points.Get(Of cvb.Point)(i, 0)
+            Dim pt = points.Get(Of cv.Point)(i, 0)
             Dim yVal = task.pcSplit(1).Get(Of Single)(pt.Y, pt.X)
             If yVal <> 0 Then yList.Add(yVal)
         Next
@@ -391,24 +391,24 @@ Public Class Plane_Histogram : Inherits TaskParent
         If yList.Count = 0 Then Exit Sub
         hist.mm.minVal = yList.Min
         hist.mm.maxVal = yList.Max
-        hist.Run(cvb.Mat.FromPixelData(yList.Count, 1, cvb.MatType.CV_32F, yList.ToArray))
+        hist.Run(cv.Mat.FromPixelData(yList.Count, 1, cv.MatType.CV_32F, yList.ToArray))
         dst2 = hist.dst2
         Dim binWidth As Single = dst2.Width / task.histogramBins
         Dim rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
 
         Dim midHist = task.histogramBins / 2
-        Dim mm As mmData = GetMinMax(hist.histogram(New cvb.Rect(0, midHist, 1, midHist)))
+        Dim mm As mmData = GetMinMax(hist.histogram(New cv.Rect(0, midHist, 1, midHist)))
         floorPop = mm.maxVal
         Dim peak = hist.mm.minVal + (midHist + mm.maxLoc.Y + 1) * rangePerBin
         Dim rX As Integer = (midHist + mm.maxLoc.Y) * binWidth
-        dst2.Rectangle(New cvb.Rect(rX, 0, binWidth, dst2.Height), cvb.Scalar.Black, task.lineWidth)
+        dst2.Rectangle(New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Black, task.lineWidth)
         If Math.Abs(peak - peakCeiling) > rangePerBin Then peakCeiling = peak
 
-        mm = GetMinMax(hist.histogram(New cvb.Rect(0, 0, 1, midHist)))
+        mm = GetMinMax(hist.histogram(New cv.Rect(0, 0, 1, midHist)))
         ceilingPop = mm.maxVal
         peak = hist.mm.minVal + (mm.maxLoc.Y + 1) * rangePerBin
         rX = mm.maxLoc.Y * binWidth
-        dst2.Rectangle(New cvb.Rect(rX, 0, binWidth, dst2.Height), cvb.Scalar.Yellow, task.lineWidth)
+        dst2.Rectangle(New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         If Math.Abs(peak - peakFloor) > rangePerBin * 2 Then peakFloor = peak
 
         labels(3) = "Peak Ceiling = " + Format(peakCeiling, fmt3) + " and Peak Floor = " + Format(peakFloor, fmt3)
@@ -429,7 +429,7 @@ Public Class Plane_Equation : Inherits TaskParent
     Public Sub New()
         desc = "Compute the coefficients for an estimated plane equation given the rc contour"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
@@ -449,10 +449,10 @@ Public Class Plane_Equation : Inherits TaskParent
             Dim p3 = rc.contour(j + offset * 2)
             Dim p4 = rc.contour(j + offset * 3)
 
-            Dim v1 = task.pointCloud(rc.rect).Get(Of cvb.Point3f)(p1.Y, p1.X)
-            Dim v2 = task.pointCloud(rc.rect).Get(Of cvb.Point3f)(p2.Y, p2.X)
-            Dim v3 = task.pointCloud(rc.rect).Get(Of cvb.Point3f)(p3.Y, p3.X)
-            Dim v4 = task.pointCloud(rc.rect).Get(Of cvb.Point3f)(p4.Y, p4.X)
+            Dim v1 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
+            Dim v2 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
+            Dim v3 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
+            Dim v4 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p4.Y, p4.X)
             Dim cross1 = crossProduct(v1 - v2, v2 - v3)
             Dim cross2 = crossProduct(v1 - v4, v4 - v3)
 
@@ -467,7 +467,7 @@ Public Class Plane_Equation : Inherits TaskParent
 
         If dotlist.Count Then
             Dim dotIndex = dotlist.IndexOf(dotlist.Max)
-            rc.eq = New cvb.Vec4f(xList(dotIndex), yList(dotIndex), zList(dotIndex), kList(dotIndex))
+            rc.eq = New cv.Vec4f(xList(dotIndex), yList(dotIndex), zList(dotIndex), kList(dotIndex))
         End If
         If dotlist.Count Then
             If task.heartBeat Then
@@ -509,20 +509,20 @@ Public Class Plane_Verticals : Inherits TaskParent
                   "Thresholded heatmap top view mask"}
         desc = "Use a heatmap to isolate vertical walls - incomplete!"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         solo.Run(src)
         dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_32FC1, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC1, 0)
         solo.heat.dst0.CopyTo(dst1, dst3)
-        dst1.ConvertTo(dst1, cvb.MatType.CV_32FC1)
+        dst1.ConvertTo(dst1, cv.MatType.CV_32FC1)
 
-        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
 
         frames.Run(dst2)
-        frames.dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
-        dst2 = frames.dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
-        dst2.ConvertTo(dst0, cvb.MatType.CV_8U)
+        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
         task.color.SetTo(white, dst0)
     End Sub
 End Class
@@ -543,20 +543,20 @@ Public Class Plane_Horizontals : Inherits TaskParent
                   "Thresholded heatmap side view mask"}
         desc = "Use the solo points to isolate horizontal surfaces - floor or ceiling or table tops."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         solo.Run(src)
         dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         solo.heat.dst1.CopyTo(dst1, dst3)
-        dst1.ConvertTo(dst1, cvb.MatType.CV_32FC1)
+        dst1.ConvertTo(dst1, cv.MatType.CV_32FC1)
 
-        cvb.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, dst1, dst2, task.rangesSide)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, dst1, dst2, task.rangesSide)
 
         frames.Run(dst2)
-        frames.dst2.ConvertTo(dst2, cvb.MatType.CV_8U)
-        dst2 = frames.dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
-        dst2.ConvertTo(dst0, cvb.MatType.CV_8U)
+        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
         task.color.SetTo(white, dst0)
     End Sub
 End Class
@@ -579,22 +579,22 @@ Public Class Plane_FloorStudy : Inherits TaskParent
         labels = {"", "", "", ""}
         desc = "Find the floor plane (if present)"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         slice.Run(src)
         dst1 = slice.dst3
 
-        dst0 = dst1.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        Dim thicknessCMs = task.metersPerPixel * 1000 / 100, rect As cvb.Rect, nextY As Single
+        dst0 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim thicknessCMs = task.metersPerPixel * 1000 / 100, rect As cv.Rect, nextY As Single
         For y = dst0.Height - 2 To 0 Step -1
-            rect = New cvb.Rect(0, y, dst0.Width - 1, 1)
+            rect = New cv.Rect(0, y, dst0.Width - 1, 1)
             Dim count = dst0(rect).CountNonZero
             If count > options.countThreshold Then
                 nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
                 labels(2) = "Y = " + Format(planeY, fmt3) + " separates the floor."
                 SetTrueText(labels(2), 3)
-                Dim sliceMask = task.pcSplit(1).InRange(cvb.Scalar.All(planeY), cvb.Scalar.All(3.0))
+                Dim sliceMask = task.pcSplit(1).InRange(cv.Scalar.All(planeY), cv.Scalar.All(3.0))
                 dst2 = src
                 dst2.SetTo(white, sliceMask)
                 Exit For
@@ -604,6 +604,6 @@ Public Class Plane_FloorStudy : Inherits TaskParent
         yList.Add(nextY)
         planeY = yList.Average()
         If yList.Count > 20 Then yList.RemoveAt(0)
-        dst1.Line(New cvb.Point(0, rect.Y), New cvb.Point(dst2.Width, rect.Y), cvb.Scalar.Yellow, slice.options.sliceSize, task.lineType)
+        dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.sliceSize, task.lineType)
     End Sub
 End Class

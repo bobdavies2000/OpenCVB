@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class FPoly_Basics : Inherits TaskParent
     Public resync As Boolean
     Public resyncCause As String
@@ -14,13 +14,13 @@ Public Class FPoly_Basics : Inherits TaskParent
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.firstPass Then sides.prevImage = src.Clone
         sides.options.RunOpt()
 
         topFeatures.Run(src)
         dst2 = topFeatures.dst2
-        sides.currPoly = New List(Of cvb.Point2f)(task.topFeatures)
+        sides.currPoly = New List(Of cv.Point2f)(task.topFeatures)
         If sides.currPoly.Count < task.polyCount Then Exit Sub
         sides.Run(src)
         dst3 = sides.dst2
@@ -62,7 +62,7 @@ Public Class FPoly_Basics : Inherits TaskParent
         causes += vbCrLf
 
         If resync Or sides.prevPoly.Count <> task.polyCount Or task.optionsChanged Then
-            sides.prevPoly = New List(Of cvb.Point2f)(sides.currPoly)
+            sides.prevPoly = New List(Of cv.Point2f)(sides.currPoly)
             sides.prevLengths = New List(Of Single)(sides.currLengths)
             sides.prevSideIndex = sides.prevLengths.IndexOf(sides.prevLengths.Max)
             sides.prevImage = src.Clone
@@ -94,34 +94,34 @@ End Class
 
 
 Public Class FPoly_Sides : Inherits TaskParent
-    Public currPoly As New List(Of cvb.Point2f)
+    Public currPoly As New List(Of cv.Point2f)
     Public currSideIndex As Integer
     Public currLengths As New List(Of Single)
     Public currFLineLen As Single
     Public mpCurr As linePoints
 
-    Public prevPoly As New List(Of cvb.Point2f)
+    Public prevPoly As New List(Of cv.Point2f)
     Public prevSideIndex As Integer
     Public prevLengths As New List(Of Single)
     Public prevFLineLen As Single
     Public mpPrev As linePoints
 
-    Public prevImage As cvb.Mat
+    Public prevImage As cv.Mat
 
-    Public rotateCenter As cvb.Point2f
+    Public rotateCenter As cv.Point2f
     Public rotateAngle As Single
-    Public centerShift As cvb.Point2f
+    Public centerShift As cv.Point2f
 
     Public options As New Options_FPoly
     Dim near As New Line_Nearest
     Public rotatePoly As New Rotate_PolyQT
-    Dim newPoly As List(Of cvb.Point2f)
+    Dim newPoly As List(Of cv.Point2f)
     Dim random As New Random_Basics
     Public Sub New()
         labels(2) = "White is the original FPoly and yellow is the current FPoly."
         desc = "Compute the lengths of each side in a polygon"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.firstPass Then prevImage = src.Clone
@@ -129,7 +129,7 @@ Public Class FPoly_Sides : Inherits TaskParent
 
         If standaloneTest() And task.heartBeat Then
             random.Run(empty)
-            currPoly = New List(Of cvb.Point2f)(random.PointList)
+            currPoly = New List(Of cv.Point2f)(random.PointList)
         End If
 
         dst2.SetTo(0)
@@ -140,7 +140,7 @@ Public Class FPoly_Sides : Inherits TaskParent
         currSideIndex = currLengths.IndexOf(currLengths.Max)
 
         If task.firstPass Then
-            prevPoly = New List(Of cvb.Point2f)(currPoly)
+            prevPoly = New List(Of cv.Point2f)(currPoly)
             prevLengths = New List(Of Single)(currLengths)
             prevSideIndex = prevLengths.IndexOf(prevLengths.Max)
         End If
@@ -158,22 +158,22 @@ Public Class FPoly_Sides : Inherits TaskParent
 
         Dim newNear As linePoints
         If d1 < d2 Then
-            centerShift = New cvb.Point2f(mpPrev.p1.X - mpCurr.p1.X, mpPrev.p1.Y - mpCurr.p1.Y)
+            centerShift = New cv.Point2f(mpPrev.p1.X - mpCurr.p1.X, mpPrev.p1.Y - mpCurr.p1.Y)
             rotateCenter = mpPrev.p1
             newNear = New linePoints(mpPrev.p2, mpCurr.p2)
         Else
-            centerShift = New cvb.Point2f(mpPrev.p2.X - mpCurr.p2.X, mpPrev.p2.Y - mpCurr.p2.Y)
+            centerShift = New cv.Point2f(mpPrev.p2.X - mpCurr.p2.X, mpPrev.p2.Y - mpCurr.p2.Y)
             rotateCenter = mpPrev.p2
             newNear = New linePoints(mpPrev.p1, mpCurr.p1)
         End If
 
-        Dim transPoly As New List(Of cvb.Point2f)
+        Dim transPoly As New List(Of cv.Point2f)
         For i = 0 To currPoly.Count - 1
-            transPoly.Add(New cvb.Point2f(currPoly(i).X - centerShift.X, currPoly(i).Y - centerShift.Y))
+            transPoly.Add(New cv.Point2f(currPoly(i).X - centerShift.X, currPoly(i).Y - centerShift.Y))
         Next
-        newNear.p1 = New cvb.Point2f(newNear.p1.X - centerShift.X, newNear.p1.Y - centerShift.Y)
-        newNear.p2 = New cvb.Point2f(newNear.p2.X - centerShift.X, newNear.p2.Y - centerShift.Y)
-        rotateCenter = New cvb.Point2f(rotateCenter.X - centerShift.X, rotateCenter.Y - centerShift.Y)
+        newNear.p1 = New cv.Point2f(newNear.p1.X - centerShift.X, newNear.p1.Y - centerShift.Y)
+        newNear.p2 = New cv.Point2f(newNear.p2.X - centerShift.X, newNear.p2.Y - centerShift.Y)
+        rotateCenter = New cv.Point2f(rotateCenter.X - centerShift.X, rotateCenter.Y - centerShift.Y)
 
         strOut = "No rotation" + vbCrLf
         rotateAngle = 0
@@ -182,7 +182,7 @@ Public Class FPoly_Sides : Inherits TaskParent
                 near.lp = mpPrev
                 near.pt = newNear.p1
                 near.Run(empty)
-                dst1.Line(near.pt, near.nearPoint, cvb.Scalar.Red, task.lineWidth + 5, task.lineType)
+                dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
 
                 Dim hypotenuse = rotateCenter.DistanceTo(near.pt)
                 rotateAngle = -Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse)
@@ -202,15 +202,15 @@ Public Class FPoly_Sides : Inherits TaskParent
             If near.nearPoint.DistanceTo(rotatePoly.poly(0)) > newNear.p1.DistanceTo(rotatePoly.poly(0)) Then rotateAngle *= -1
 
             rotatePoly.rotateAngle = rotateAngle
-            rotatePoly.poly = New List(Of cvb.Point2f)(transPoly)
+            rotatePoly.poly = New List(Of cv.Point2f)(transPoly)
             rotatePoly.Run(empty)
-            newPoly = New List(Of cvb.Point2f)(rotatePoly.poly)
+            newPoly = New List(Of cv.Point2f)(rotatePoly.poly)
         End If
 
         DrawFPoly(dst2, prevPoly, white)
-        DrawFPoly(dst2, currPoly, cvb.Scalar.Yellow)
+        DrawFPoly(dst2, currPoly, cv.Scalar.Yellow)
         DrawFatLine(mpPrev.p1, mpPrev.p2, dst2, white)
-        DrawFatLine(mpCurr.p1, mpCurr.p2, dst2, cvb.Scalar.Yellow)
+        DrawFatLine(mpCurr.p1, mpCurr.p2, dst2, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -225,7 +225,7 @@ End Class
 
 Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Public fPD As New fPolyData
-    Public resyncImage As cvb.Mat
+    Public resyncImage As cv.Mat
     Public resync As Boolean
     Public resyncCause As String
     Public resyncFrames As Integer
@@ -244,14 +244,14 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.firstPass Then resyncImage = src.Clone
         options.RunOpt()
 
         topFeatures.Run(src)
         dst2 = topFeatures.dst2
         dst1 = topFeatures.dst3
-        fPD.currPoly = New List(Of cvb.Point2f)(task.topFeatures)
+        fPD.currPoly = New List(Of cv.Point2f)(task.topFeatures)
 
         If task.optionsChanged Then fPD = New fPolyData(fPD.currPoly)
         If fPD.currPoly.Count < task.polyCount Then Exit Sub
@@ -359,7 +359,7 @@ Public Class FPoly_Plot : Inherits TaskParent
         labels = {"", "", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot the distribution"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim lastDistance = fGrid.dst0.Clone
 
         fGrid.Run(src)
@@ -387,7 +387,7 @@ Public Class FPoly_Plot : Inherits TaskParent
         Dim peak = hlist.Max
         Dim peakIndex = hlist.IndexOf(peak)
 
-        Dim histMat = cvb.Mat.FromPixelData(hist.Length, 1, cvb.MatType.CV_32F, hist.ToArray)
+        Dim histMat = cv.Mat.FromPixelData(hist.Length, 1, cv.MatType.CV_32F, hist.ToArray)
         plot.maxRange = fGrid.stable.basics.ptList.Count
         plot.Run(histMat)
         dst2 = plot.dst2
@@ -415,11 +415,11 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         labels = {"", "Distance change from previous frame", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot with weighting and Kalman to smooth results"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fPlot.Run(src)
         dst3 = fPlot.dst3
 
-        Dim lastPlot As cvb.Mat = plot.dst2.Clone
+        Dim lastPlot As cv.Mat = plot.dst2.Clone
         If task.optionsChanged Then ReDim kalman.kInput(fPlot.hist.Length - 1)
 
         kalman.kInput = fPlot.hist
@@ -429,7 +429,7 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         Dim hlist = fPlot.hist.ToList
         Dim peak = hlist.Max
         Dim peakIndex = hlist.IndexOf(peak)
-        Dim histMat = cvb.Mat.FromPixelData(fPlot.hist.Length, 1, cvb.MatType.CV_32F, fPlot.hist)
+        Dim histMat = cv.Mat.FromPixelData(fPlot.hist.Length, 1, cv.MatType.CV_32F, fPlot.hist)
         plot.maxRange = fPlot.fGrid.stable.basics.ptList.Count
         plot.Run(histMat)
         addw.src2 = plot.dst2
@@ -456,7 +456,7 @@ Public Class FPoly_Stablizer : Inherits TaskParent
                   "current image with distance map"}
         desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fGrid.Run(src.Clone)
         dst3 = fGrid.dst3
         labels(3) = fGrid.labels(2)
@@ -464,8 +464,8 @@ Public Class FPoly_Stablizer : Inherits TaskParent
         Static syncImage = src.Clone
         If fGrid.startAnchor = fGrid.anchor Then syncImage = src.Clone
 
-        Dim shift As cvb.Point2f = New cvb.Point2f(fGrid.startAnchor.X - fGrid.anchor.X, fGrid.startAnchor.Y - fGrid.anchor.Y)
-        Dim rect As New cvb.Rect
+        Dim shift As cv.Point2f = New cv.Point2f(fGrid.startAnchor.X - fGrid.anchor.X, fGrid.startAnchor.Y - fGrid.anchor.Y)
+        Dim rect As New cv.Rect
         If shift.X < 0 Then rect.X = 0 Else rect.X = shift.X
         If shift.Y < 0 Then rect.Y = 0 Else rect.Y = shift.Y
         rect.Width = dst1.Width - Math.Abs(shift.X)
@@ -476,7 +476,7 @@ Public Class FPoly_Stablizer : Inherits TaskParent
         DrawFatLine(fGrid.startAnchor, fGrid.anchor, dst1, white)
         DrawPolkaDot(fGrid.anchor, dst1)
 
-        Dim r = New cvb.Rect(0, 0, rect.Width, rect.Height)
+        Dim r = New cv.Rect(0, 0, rect.Width, rect.Height)
         If fGrid.anchor.X > fGrid.startAnchor.X Then r.X = fGrid.anchor.X - fGrid.startAnchor.X
         If fGrid.anchor.Y > fGrid.startAnchor.Y Then r.Y = fGrid.anchor.Y - fGrid.startAnchor.Y
 
@@ -493,33 +493,33 @@ End Class
 
 
 Public Class FPoly_StartPoints : Inherits TaskParent
-    Public startPoints As New List(Of cvb.Point2f)
-    Public goodPoints As New List(Of cvb.Point2f)
+    Public startPoints As New List(Of cv.Point2f)
+    Public goodPoints As New List(Of cv.Point2f)
     Dim fGrid As New FPoly_Core
     Public Sub New()
-        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_8U, 255)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 255)
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Track the feature grid points back to the last sync point"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
         Dim maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold
 
         fGrid.Run(src)
         dst2 = fGrid.dst3
-        Static facets As New List(Of List(Of cvb.Point))
+        Static facets As New List(Of List(Of cv.Point))
         Dim lastPoints = dst0.Clone
         If fGrid.startAnchor = fGrid.anchor Or goodPoints.Count < 5 Then
-            startPoints = New List(Of cvb.Point2f)(fGrid.goodPoints)
-            facets = New List(Of List(Of cvb.Point))(fGrid.goodFacets)
+            startPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
+            facets = New List(Of List(Of cv.Point))(fGrid.goodFacets)
         End If
 
         dst0.SetTo(255)
         If standaloneTest() Then dst1.SetTo(0)
         Dim lpList As New List(Of linePoints)
-        goodPoints = New List(Of cvb.Point2f)(fGrid.goodPoints)
-        Dim facet As New List(Of cvb.Point)
+        goodPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
+        Dim facet As New List(Of cv.Point)
         Dim usedGood As New List(Of Integer)
         For i = 0 To goodPoints.Count - 1
             Dim pt = goodPoints(i)
@@ -528,7 +528,7 @@ Public Class FPoly_StartPoints : Inherits TaskParent
             If startPoint < startPoints.Count And usedGood.Contains(startPoint) = False Then
                 usedGood.Add(startPoint)
                 facet = facets(startPoint)
-                dst0.FillConvexPoly(facet, startPoint, cvb.LineTypes.Link4)
+                dst0.FillConvexPoly(facet, startPoint, cv.LineTypes.Link4)
                 If standaloneTest() Then dst1.FillConvexPoly(facet, task.scalarColors(startPoint), task.lineType)
                 lpList.Add(New linePoints(startPoints(startPoint), pt))
             End If
@@ -536,8 +536,8 @@ Public Class FPoly_StartPoints : Inherits TaskParent
 
         ' dst3.SetTo(0)
         For Each lp In lpList
-            If lp.p1.DistanceTo(lp.p2) <= maxShift Then DrawLine(dst1, lp.p1, lp.p2, cvb.Scalar.Yellow)
-            DrawCircle(dst1, lp.p1, task.DotSize, cvb.Scalar.Yellow)
+            If lp.p1.DistanceTo(lp.p2) <= maxShift Then DrawLine(dst1, lp.p1, lp.p2, cv.Scalar.Yellow)
+            DrawCircle(dst1, lp.p1, task.DotSize, cv.Scalar.Yellow)
         Next
         dst1.Line(fGrid.anchor, fGrid.startAnchor, white, task.lineWidth + 1, task.lineType)
     End Sub
@@ -556,11 +556,11 @@ Public Class FPoly_Triangle : Inherits TaskParent
     Public Sub New()
         desc = "Find the minimum triangle that contains the feature grid"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fGrid.Run(src)
         dst2 = fGrid.dst2
 
-        triangle.srcPoints = New List(Of cvb.Point2f)(fGrid.goodPoints)
+        triangle.srcPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
         triangle.Run(empty)
         dst3 = triangle.dst2
     End Sub
@@ -580,10 +580,10 @@ Public Class FPoly_WarpAffinePoly : Inherits TaskParent
                   "Feature polygon with rotation and shift - should be aligned"}
         desc = "Rotate and shift just the Feature polygon as indicated by FPoly_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fPoly.Run(src)
         Dim polyPrev = fPoly.fPD.prevPoly
-        Dim poly = New List(Of cvb.Point2f)(fPoly.fPD.currPoly)
+        Dim poly = New List(Of cv.Point2f)(fPoly.fPD.currPoly)
 
         dst2.SetTo(0)
         dst3.SetTo(0)
@@ -597,27 +597,27 @@ Public Class FPoly_WarpAffinePoly : Inherits TaskParent
 
         rotatePoly.rotateAngle = fPoly.fPD.rotateAngle
         rotatePoly.rotateCenter = fPoly.fPD.rotateCenter
-        rotatePoly.poly = New List(Of cvb.Point2f)(poly)
+        rotatePoly.poly = New List(Of cv.Point2f)(poly)
         rotatePoly.Run(empty)
 
         If fPoly.fPD.polyPrevSideIndex >= rotatePoly.poly.Count Then fPoly.fPD.polyPrevSideIndex = 0
 
-        Dim offset = New cvb.Point2f(rotatePoly.poly(fPoly.fPD.polyPrevSideIndex).X - polyPrev(fPoly.fPD.polyPrevSideIndex).X,
+        Dim offset = New cv.Point2f(rotatePoly.poly(fPoly.fPD.polyPrevSideIndex).X - polyPrev(fPoly.fPD.polyPrevSideIndex).X,
                                     rotatePoly.poly(fPoly.fPD.polyPrevSideIndex).Y - polyPrev(fPoly.fPD.polyPrevSideIndex).Y)
 
-        Dim r1 = New cvb.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
+        Dim r1 = New cv.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
         If offset.X < 0 Then r1.X = 0
         If offset.Y < 0 Then r1.Y = 0
 
-        Dim r2 = New cvb.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height)
+        Dim r2 = New cv.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height)
         If offset.X > 0 Then r2.X = 0
         If offset.Y > 0 Then r2.Y = 0
 
         dst3(r1) = dst2(r2)
         dst3 = dst3 - dst2
 
-        DrawFPoly(dst3, rotatePoly.poly, cvb.Scalar.Yellow)
-        DrawFPoly(dst2, rotatePoly.poly, cvb.Scalar.Yellow)
+        DrawFPoly(dst3, rotatePoly.poly, cv.Scalar.Yellow)
+        DrawFPoly(dst2, rotatePoly.poly, cv.Scalar.Yellow)
 
         SetTrueText(fPoly.strOut, 3)
     End Sub
@@ -634,29 +634,29 @@ End Class
 
 Public Class FPoly_RotatePoints : Inherits TaskParent
     Dim rotatePoly As New Rotate_PolyQT
-    Public poly As New List(Of cvb.Point2f)
-    Public polyPrev As New List(Of cvb.Point2f)
+    Public poly As New List(Of cv.Point2f)
+    Public polyPrev As New List(Of cv.Point2f)
     Public rotateAngle As Single
-    Public rotateCenter As cvb.Point2f
+    Public rotateCenter As cv.Point2f
     Public polyPrevSideIndex As Integer
-    Public centerShift As cvb.Point2f
+    Public centerShift As cv.Point2f
     Public Sub New()
         labels = {"", "", "Feature polygon after just rotation - white (original), yellow (current)",
                   "Feature polygons with rotation and shift - should be aligned"}
         desc = "Rotate and shift just the Feature polygon as indicated by FPoly_Basics"
     End Sub
-    Public Function shiftPoly(polyPrev As List(Of cvb.Point2f), poly As List(Of cvb.Point2f)) As cvb.Point2f
+    Public Function shiftPoly(polyPrev As List(Of cv.Point2f), poly As List(Of cv.Point2f)) As cv.Point2f
         rotatePoly.rotateAngle = rotateAngle
         rotatePoly.rotateCenter = rotateCenter
-        rotatePoly.poly = New List(Of cvb.Point2f)(poly)
+        rotatePoly.poly = New List(Of cv.Point2f)(poly)
         rotatePoly.Run(empty)
 
         Dim totalX = rotatePoly.poly(polyPrevSideIndex).X - polyPrev(polyPrevSideIndex).X
         Dim totalY = rotatePoly.poly(polyPrevSideIndex).Y - polyPrev(polyPrevSideIndex).Y
 
-        Return New cvb.Point2f(totalX, totalY)
+        Return New cv.Point2f(totalX, totalY)
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
             SetTrueText(traceName + " is meant only to run with FPoly_Basics to validate the translation")
             Exit Sub
@@ -665,20 +665,20 @@ Public Class FPoly_RotatePoints : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
 
-        Dim rotateAndShift As New List(Of cvb.Point2f)
+        Dim rotateAndShift As New List(Of cv.Point2f)
         centerShift = shiftPoly(polyPrev, poly)
         DrawFPoly(dst2, polyPrev, white)
-        DrawFPoly(dst2, rotatePoly.poly, cvb.Scalar.Yellow)
+        DrawFPoly(dst2, rotatePoly.poly, cv.Scalar.Yellow)
         For i = 0 To polyPrev.Count - 1
-            Dim p1 = New cvb.Point2f(rotatePoly.poly(i).X - centerShift.X, rotatePoly.poly(i).Y - centerShift.Y)
-            Dim p2 = New cvb.Point2f(rotatePoly.poly((i + 1) Mod task.polyCount).X - centerShift.X,
+            Dim p1 = New cv.Point2f(rotatePoly.poly(i).X - centerShift.X, rotatePoly.poly(i).Y - centerShift.Y)
+            Dim p2 = New cv.Point2f(rotatePoly.poly((i + 1) Mod task.polyCount).X - centerShift.X,
                                     rotatePoly.poly((i + 1) Mod task.polyCount).Y - centerShift.Y)
             rotateAndShift.Add(p1)
             SetTrueText(CStr(i), rotatePoly.poly(i), 2)
             SetTrueText(CStr(i), polyPrev(i), 2)
         Next
         DrawFPoly(dst3, polyPrev, white)
-        DrawFPoly(dst3, rotateAndShift, cvb.Scalar.Yellow)
+        DrawFPoly(dst3, rotateAndShift, cv.Scalar.Yellow)
 
         strOut = "After Rotation: " + Format(rotatePoly.rotateAngle, fmt0) + " degrees " +
                  "After Translation (shift) of: " + Format(centerShift.X, fmt0) + ", " + Format(centerShift.Y, fmt0) + vbCrLf +
@@ -702,7 +702,7 @@ Public Class FPoly_WarpAffineImage : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fPoly.Run(src)
 
         warp.rotateCenter = fPoly.fPD.rotateCenter
@@ -713,19 +713,19 @@ Public Class FPoly_WarpAffineImage : Inherits TaskParent
 
         Dim offset = fPoly.fPD.centerShift
 
-        Dim r1 = New cvb.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
+        Dim r1 = New cv.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
         If offset.X < 0 Then r1.X = 0
         If offset.Y < 0 Then r1.Y = 0
 
-        Dim r2 = New cvb.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height)
+        Dim r2 = New cv.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height)
         If offset.X > 0 Then r2.X = 0
         If offset.Y > 0 Then r2.Y = 0
 
         dst3(r1) = dst2(r2)
         dst3 = src - dst2
 
-        Dim tmp = dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+        Dim tmp = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         Dim diffCount = changed.CountNonZero
         strOut = fPoly.strOut
         strOut += vbCrLf + Format(diffCount / 1000, fmt0) + "k pixels differ or " +
@@ -744,7 +744,7 @@ End Class
 
 ' https://www.google.com/search?q=geometry+find+the+center+of+rotation&rlz=1C1CHBF_enUS838US838&oq=geometry+find+the+center+of+rotation&aqs=chrome..69i57j0i22i30j0i390l3.9576j0j4&sourceid=chrome&ie=UTF-8#kpvalbx=_rgg1Y9rbGM3n0PEP-ae4oAc_34
 Public Class FPoly_Perpendiculars : Inherits TaskParent
-    Public altCenterShift As cvb.Point2f
+    Public altCenterShift As cv.Point2f
     Public fPD As fPolyData
     Public rotatePoints As New FPoly_RotatePoints
     Dim near As New Line_Nearest
@@ -752,18 +752,18 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         labels = {"", "", "Output of FPoly_Basics", "Center of rotation is where the extended lines intersect"}
         desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FPoly_Basics"
     End Sub
-    Private Function findrotateAngle(p1 As cvb.Point2f, p2 As cvb.Point2f, pt As cvb.Point2f) As Single
+    Private Function findrotateAngle(p1 As cv.Point2f, p2 As cv.Point2f, pt As cv.Point2f) As Single
         near.lp = New linePoints(p1, p2)
         near.pt = pt
         near.Run(empty)
-        DrawLine(dst2, pt, near.nearPoint, cvb.Scalar.Red)
+        DrawLine(dst2, pt, near.nearPoint, cv.Scalar.Red)
         Dim d1 = fPD.rotateCenter.DistanceTo(pt)
         Dim d2 = fPD.rotateCenter.DistanceTo(near.nearPoint)
         Dim angle = Math.Asin(near.nearPoint.DistanceTo(pt) / If(d1 > d2, d1, d2))
         If Single.IsNaN(angle) Then Return 0
         Return angle
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().")
             Exit Sub
@@ -778,7 +778,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
                                     fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
         perp1.Run(empty)
 
-        DrawLine(dst2, perp1.output.p1, perp1.output.p2, cvb.Scalar.Yellow)
+        DrawLine(dst2, perp1.output.p1, perp1.output.p2, cv.Scalar.Yellow)
 
         perp2.input = New linePoints(fPD.prevPoly(fPD.polyPrevSideIndex),
                                    fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
@@ -786,16 +786,16 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         DrawLine(dst2, perp2.output.p1, perp2.output.p2, white)
 
         fPD.rotateCenter = IntersectTest(perp2.output.p1, perp2.output.p2,
-                                         perp1.output.p1, perp1.output.p2, New cvb.Rect(0, 0, src.Width, src.Height))
-        If fPD.rotateCenter = New cvb.Point2f Then
+                                         perp1.output.p1, perp1.output.p2, New cv.Rect(0, 0, src.Width, src.Height))
+        If fPD.rotateCenter = New cv.Point2f Then
             fPD.rotateAngle = 0
         Else
-            DrawCircle(dst2, fPD.rotateCenter, task.DotSize + 2, cvb.Scalar.Red)
+            DrawCircle(dst2, fPD.rotateCenter, task.DotSize + 2, cv.Scalar.Red)
             fPD.rotateAngle = findrotateAngle(perp2.output.p1, perp2.output.p2, perp1.output.p1)
         End If
-        If fPD.rotateAngle = 0 Then fPD.rotateCenter = New cvb.Point2f
+        If fPD.rotateAngle = 0 Then fPD.rotateCenter = New cv.Point2f
 
-        altCenterShift = New cvb.Point2f(fPD.currPoly(fPD.polyPrevSideIndex).X - fPD.prevPoly(fPD.polyPrevSideIndex).X,
+        altCenterShift = New cv.Point2f(fPD.currPoly(fPD.polyPrevSideIndex).X - fPD.prevPoly(fPD.polyPrevSideIndex).X,
                                         fPD.currPoly(fPD.polyPrevSideIndex).Y - fPD.prevPoly(fPD.polyPrevSideIndex).Y)
 
         kalman.kInput = {fPD.rotateAngle}
@@ -829,7 +829,7 @@ Public Class FPoly_Image : Inherits TaskParent
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FPoly_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim input = src.Clone
         fpoly.Run(src)
         dst1 = fpoly.dst1
@@ -843,14 +843,14 @@ Public Class FPoly_Image : Inherits TaskParent
                 rotate.Run(fpoly.resyncImage)
                 dst0 = rotate.dst2
 
-                Dim offset As cvb.Point2f = fpoly.fPD.centerShift
+                Dim offset As cv.Point2f = fpoly.fPD.centerShift
 
-                Dim r1 = New cvb.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
+                Dim r1 = New cv.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
                 r1 = ValidateRect(r1)
                 If offset.X < 0 Then r1.X = 0
                 If offset.Y < 0 Then r1.Y = 0
 
-                Dim r2 = New cvb.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height)
+                Dim r2 = New cv.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height)
                 r2.Width = r1.Width
                 r2.Height = r1.Height
                 If r2.X < 0 Or r2.X >= dst2.Width Then Exit Sub ' wedged...
@@ -858,11 +858,11 @@ Public Class FPoly_Image : Inherits TaskParent
                 If offset.X > 0 Then r2.X = 0
                 If offset.Y > 0 Then r2.Y = 0
 
-                Dim mask2 As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, 255)
+                Dim mask2 As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
                 rotate.Run(mask2)
                 mask2 = rotate.dst2
 
-                Dim mask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+                Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 mask(r1).SetTo(255)
                 mask(r1) = mask2(r2)
                 mask = Not mask
@@ -872,8 +872,8 @@ Public Class FPoly_Image : Inherits TaskParent
                 dst3.SetTo(0, mask)
             End If
 
-            Dim tmp = dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-            Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+            Dim tmp = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             Dim diffCount = changed.CountNonZero
             resync = fpoly.resync
             fpoly.maskChangePercent = diffCount / dst3.Total
@@ -903,11 +903,11 @@ Public Class FPoly_ImageMask : Inherits TaskParent
         task.gOptions.pixelDiffThreshold = 10
         desc = "Build the image mask of the differences between the current frame and resync image"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fImage.Run(src)
         dst2 = fImage.dst3
-        dst0 = dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        dst3 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+        dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         labels = fImage.labels
         dst1 = fImage.fpoly.dst1
         SetTrueText(fImage.strOut, 1)
@@ -922,12 +922,12 @@ End Class
 
 Public Class FPoly_PointCloud : Inherits TaskParent
     Public fMask As New FPoly_ImageMask
-    Public fPolyCloud As cvb.Mat
+    Public fPolyCloud As cv.Mat
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Update changed point cloud pixels as indicated by the FPoly_ImageMask"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fMask.Run(src)
         If fMask.fImage.fpoly.resync Or task.firstPass Then fPolyCloud = task.pointCloud.Clone
         dst1 = fMask.dst1
@@ -948,10 +948,10 @@ End Class
 Public Class FPoly_ResyncCheck : Inherits TaskParent
     Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fPoly.Run(src)
         dst2 = fPoly.dst1
         SetTrueText(fPoly.strOut, 2)
@@ -984,7 +984,7 @@ Public Class FPoly_Center : Inherits TaskParent
     Public rotatePoly As New Rotate_PolyQT
     Dim near As New Line_Nearest
     Public fPD As fPolyData
-    Dim newPoly As List(Of cvb.Point2f)
+    Dim newPoly As List(Of cv.Point2f)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         labels = {"", "Layout of feature polygons after just translation - red line is used in sine computation",
@@ -992,7 +992,7 @@ Public Class FPoly_Center : Inherits TaskParent
                       "Layout of feature polygons after rotation and translation"}
         desc = "Manually rotate and translate the current feature polygon to a previous feature polygon."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
             SetTrueText(traceName + " is called by FPoly_Basics to get the image movement." + vbCrLf +
                         "It does not produce any output when run standaloneTest().")
@@ -1011,22 +1011,22 @@ Public Class FPoly_Center : Inherits TaskParent
         Dim d2 = mp1.p2.DistanceTo(mp2.p2)
         Dim newNear As linePoints
         If d1 < d2 Then
-            fPD.centerShift = New cvb.Point2f(mp1.p1.X - mp2.p1.X, mp1.p1.Y - mp2.p1.Y)
+            fPD.centerShift = New cv.Point2f(mp1.p1.X - mp2.p1.X, mp1.p1.Y - mp2.p1.Y)
             fPD.rotateCenter = mp1.p1
             newNear = New linePoints(mp1.p2, mp2.p2)
         Else
-            fPD.centerShift = New cvb.Point2f(mp1.p2.X - mp2.p2.X, mp1.p2.Y - mp2.p2.Y)
+            fPD.centerShift = New cv.Point2f(mp1.p2.X - mp2.p2.X, mp1.p2.Y - mp2.p2.Y)
             fPD.rotateCenter = mp1.p2
             newNear = New linePoints(mp1.p1, mp2.p1)
         End If
 
-        Dim transPoly As New List(Of cvb.Point2f)
+        Dim transPoly As New List(Of cv.Point2f)
         For i = 0 To fPD.currPoly.Count - 1
-            transPoly.Add(New cvb.Point2f(fPD.currPoly(i).X - fPD.centerShift.X, fPD.currPoly(i).Y - fPD.centerShift.Y))
+            transPoly.Add(New cv.Point2f(fPD.currPoly(i).X - fPD.centerShift.X, fPD.currPoly(i).Y - fPD.centerShift.Y))
         Next
-        newNear.p1 = New cvb.Point2f(newNear.p1.X - fPD.centerShift.X, newNear.p1.Y - fPD.centerShift.Y)
-        newNear.p2 = New cvb.Point2f(newNear.p2.X - fPD.centerShift.X, newNear.p2.Y - fPD.centerShift.Y)
-        fPD.rotateCenter = New cvb.Point2f(fPD.rotateCenter.X - fPD.centerShift.X, fPD.rotateCenter.Y - fPD.centerShift.Y)
+        newNear.p1 = New cv.Point2f(newNear.p1.X - fPD.centerShift.X, newNear.p1.Y - fPD.centerShift.Y)
+        newNear.p2 = New cv.Point2f(newNear.p2.X - fPD.centerShift.X, newNear.p2.Y - fPD.centerShift.Y)
+        fPD.rotateCenter = New cv.Point2f(fPD.rotateCenter.X - fPD.centerShift.X, fPD.rotateCenter.Y - fPD.centerShift.Y)
 
         dst1.SetTo(0)
         fPD.DrawPolys(dst1, transPoly, Me)
@@ -1038,7 +1038,7 @@ Public Class FPoly_Center : Inherits TaskParent
                 near.lp = New linePoints(fPD.prevPoly(sindex1), fPD.prevPoly(sIndex2))
                 near.pt = newNear.p1
                 near.Run(empty)
-                dst1.Line(near.pt, near.nearPoint, cvb.Scalar.Red, task.lineWidth + 5, task.lineType)
+                dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
 
                 Dim hypotenuse = fPD.rotateCenter.DistanceTo(near.pt)
                 fPD.rotateAngle = -Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse)
@@ -1058,10 +1058,10 @@ Public Class FPoly_Center : Inherits TaskParent
             If near.nearPoint.DistanceTo(rotatePoly.poly(0)) > newNear.p1.DistanceTo(rotatePoly.poly(0)) Then fPD.rotateAngle *= -1
 
             rotatePoly.rotateAngle = fPD.rotateAngle
-            rotatePoly.poly = New List(Of cvb.Point2f)(transPoly)
+            rotatePoly.poly = New List(Of cv.Point2f)(transPoly)
             rotatePoly.Run(empty)
 
-            newPoly = New List(Of cvb.Point2f)(rotatePoly.poly)
+            newPoly = New List(Of cv.Point2f)(rotatePoly.poly)
         End If
         dst3.SetTo(0)
         fPD.DrawPolys(dst3, fPD.currPoly, Me)
@@ -1083,7 +1083,7 @@ Public Class FPoly_EdgeRemoval : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Remove edges from the FPoly_ImageMask"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fMask.Run(src)
         dst2 = fMask.dst3
 
@@ -1111,7 +1111,7 @@ Public Class FPoly_ImageNew : Inherits TaskParent
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FPoly_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim input = src.Clone
         fpoly.Run(src)
         dst1 = fpoly.dst3
@@ -1125,21 +1125,21 @@ Public Class FPoly_ImageNew : Inherits TaskParent
             rotate.Run(fpoly.sides.prevImage)
             dst0 = rotate.dst2
 
-            Dim offset As cvb.Point2f = fpoly.sides.centerShift
+            Dim offset As cv.Point2f = fpoly.sides.centerShift
 
-            Dim r1 = New cvb.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
+            Dim r1 = New cv.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
             If offset.X < 0 Then r1.X = 0
             If offset.Y < 0 Then r1.Y = 0
 
-            Dim r2 = New cvb.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height)
+            Dim r2 = New cv.Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height)
             If offset.X > 0 Then r2.X = 0
             If offset.Y > 0 Then r2.Y = 0
 
-            Dim mask2 As New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, 255)
+            Dim mask2 As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
             rotate.Run(mask2)
             mask2 = rotate.dst2
 
-            Dim mask = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+            Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             mask(r1).SetTo(255)
             mask(r1) = mask2(r2)
             mask = Not mask
@@ -1149,8 +1149,8 @@ Public Class FPoly_ImageNew : Inherits TaskParent
             dst3.SetTo(0, mask)
             ' End If
 
-            Dim tmp = dst3.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-            Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+            Dim tmp = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             Dim diffCount = changed.CountNonZero
             resync = fpoly.resync
             fpoly.maskChangePercent = diffCount / dst3.Total
@@ -1179,7 +1179,7 @@ Public Class FPoly_LeftRight : Inherits TaskParent
         labels = {"Left image", "Right image", "FPoly output for left image", "FPoly output for right image"}
         desc = "Measure camera motion through the left and right images using FPoly"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dst0 = task.leftView
         dst1 = task.rightView
         leftPoly.Run(task.leftView)
@@ -1201,20 +1201,20 @@ End Class
 
 Public Class FPoly_Core : Inherits TaskParent
     Public stable As New Stable_GoodFeatures
-    Public anchor As cvb.Point2f
-    Public startAnchor As cvb.Point2f
-    Public goodPoints As New List(Of cvb.Point2f)
-    Public goodFacets As New List(Of List(Of cvb.Point))
+    Public anchor As cv.Point2f
+    Public startAnchor As cv.Point2f
+    Public goodPoints As New List(Of cv.Point2f)
+    Public goodFacets As New List(Of List(Of cv.Point))
     Public threshold As Integer
     Dim options As New Options_FPoly
     Dim optionsCore As New Options_FPolyCore
     Public Sub New()
-        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         FindSlider("Feature Sample Size").Value = 20
         labels(3) = "Feature points with anchor"
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         optionsCore.RunOpt()
 
@@ -1242,11 +1242,11 @@ Public Class FPoly_Core : Inherits TaskParent
                 goodFacets.Add(facet)
                 SetTrueText(Format(absDiff, fmt1), pt, 2)
                 DrawLine(dst3, anchor, pt, task.HighlightColor)
-                dst2.Set(Of cvb.Vec3b)(pt.Y, pt.X, white.ToVec3b)
+                dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, white.ToVec3b)
             End If
         Next
 
-        Dim shift As cvb.Point2f = New cvb.Point2f(startAnchor.X - anchor.X, startAnchor.Y - anchor.Y)
+        Dim shift As cv.Point2f = New cv.Point2f(startAnchor.X - anchor.X, startAnchor.Y - anchor.Y)
         If goodPoints.Count = 0 Or Math.Abs(shift.X) > optionsCore.maxShift Or Math.Abs(shift.Y) > optionsCore.maxShift Then startAnchor = anchor
         labels(2) = "Distance change (after threshholding) since last reset = " + shift.ToString
         lastAnchor = anchor
@@ -1265,7 +1265,7 @@ Public Class FPoly_TopFeatures : Inherits TaskParent
     Public Sub New()
         desc = "Get the top features and validate them using Delaunay regions."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         stable.Run(src)
@@ -1297,7 +1297,7 @@ Public Class FPoly_Line : Inherits TaskParent
         labels = {"", "", "Points found with FPoly_TopFeatures", "Longest line in task.topFeatures"}
         desc = "Identify the longest line in task.topFeatures"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         topFeatures.Run(src)
         dst2.SetTo(0)
         Dim pts = task.topFeatures
@@ -1321,18 +1321,18 @@ End Class
 
 Public Class FPoly_LineRect : Inherits TaskParent
     Dim fLine As New FPoly_Line
-    Public lpRect As New cvb.Rect
+    Public lpRect As New cv.Rect
     Public Sub New()
         labels(2) = "The rectangle is formed by the longest line between the task.topFeatures"
         desc = "Build the rectangle formed by the longest line in task.topFeatures."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fLine.Run(src)
 
         Dim lp = fLine.lp
         Dim x = If(lp.p1.X < lp.p2.X, lp.p1.X, lp.p2.X)
         Dim y = If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y)
-        lpRect = New cvb.Rect(x, y, Math.Abs(lp.p1.X - lp.p2.X), Math.Abs(lp.p1.Y - lp.p2.Y))
+        lpRect = New cv.Rect(x, y, Math.Abs(lp.p1.X - lp.p2.X), Math.Abs(lp.p1.Y - lp.p2.Y))
         If lpRect.Width < task.gridSize Then lpRect.Width = task.gridSize
         If lpRect.Height < task.gridSize Then lpRect.Height = task.gridSize
         lpRect = ValidateRect(lpRect)

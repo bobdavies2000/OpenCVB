@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
@@ -7,8 +7,8 @@ Public Class IMU_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Read and display the IMU coordinates"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        Dim gyroAngle As cvb.Point3f
+    Public Overrides sub runAlg(src As cv.Mat)
+        Dim gyroAngle As cv.Point3f
         If task.optionsChanged Then
             lastTimeStamp = task.IMU_TimeStamp
         Else
@@ -16,13 +16,13 @@ Public Class IMU_Basics : Inherits TaskParent
             Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
             If task.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt_gyro /= 1000 ' different units in the timestamp?
             gyroAngle = gyroAngle * dt_gyro
-            task.theta += New cvb.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
+            task.theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
             lastTimeStamp = task.IMU_TimeStamp
         End If
 
         ' NOTE: Initialize the angle around the y-axis to zero.
         Dim g = task.IMU_RawAcceleration
-        task.accRadians = New cvb.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
+        task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
         If task.optionsChanged Then
             task.theta = task.accRadians
@@ -37,7 +37,7 @@ Public Class IMU_Basics : Inherits TaskParent
 
         Dim x1 = -(90 + task.accRadians.X * 57.2958)
         Dim x2 = -(90 + task.theta.X * 57.2958)
-        Dim y1 = task.accRadians.Y - cvb.Cv2.PI
+        Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
         task.verticalizeAngle = y1 * 58.2958
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
@@ -49,8 +49,8 @@ Public Class IMU_Basics : Inherits TaskParent
                   "cz = " + Format(task.gMat.cz, fmt3) + " sz = " + Format(task.gMat.sz, fmt3)
 
         task.accRadians = task.theta
-        If task.accRadians.Y > cvb.Cv2.PI / 2 Then task.accRadians.Y -= cvb.Cv2.PI / 2
-        task.accRadians.Z += cvb.Cv2.PI / 2
+        If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
+        task.accRadians.Z += cv.Cv2.PI / 2
 
         SetTrueText(strOut)
     End Sub
@@ -70,8 +70,8 @@ Public Class IMU_BasicsKalman : Inherits TaskParent
     Public Sub New()
         desc = "Read and display the IMU coordinates"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        Dim gyroAngle As cvb.Point3f
+    Public Overrides sub runAlg(src As cv.Mat)
+        Dim gyroAngle As cv.Point3f
         If task.optionsChanged Then
             lastTimeStamp = task.IMU_TimeStamp
         Else
@@ -84,16 +84,16 @@ Public Class IMU_BasicsKalman : Inherits TaskParent
 
         ' NOTE: Initialize the angle around the y-axis to zero.
         Dim g = task.IMU_RawAcceleration
-        task.accRadians = New cvb.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
+        task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
 
         kalman.kInput = {task.accRadians.X, task.accRadians.Y, task.accRadians.Z}
         kalman.Run(Nothing)
 
-        task.accRadians = New cvb.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
+        task.accRadians = New cv.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
 
         Dim x1 = -(90 + task.accRadians.X * 57.2958)
-        Dim y1 = task.accRadians.Y - cvb.Cv2.PI
+        Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                  Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf
@@ -101,8 +101,8 @@ Public Class IMU_BasicsKalman : Inherits TaskParent
                   "cy = " + Format(task.gMat.cy, fmt3) + " sy = " + Format(task.gMat.sy, fmt3) + vbCrLf +
                   "cz = " + Format(task.gMat.cz, fmt3) + " sz = " + Format(task.gMat.sz, fmt3)
 
-        If task.accRadians.Y > cvb.Cv2.PI / 2 Then task.accRadians.Y -= cvb.Cv2.PI / 2
-        task.accRadians.Z += cvb.Cv2.PI / 2
+        If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
+        task.accRadians.Z += cv.Cv2.PI / 2
 
         SetTrueText(strOut)
     End Sub
@@ -121,10 +121,10 @@ Public Class IMU_BasicsWithOptions : Inherits TaskParent
     Public Sub New()
         desc = "Read and display the IMU coordinates"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim gyroAngle As cvb.Point3f
+        Dim gyroAngle As cv.Point3f
         If task.optionsChanged Then
             lastTimeStamp = task.IMU_TimeStamp
         Else
@@ -132,13 +132,13 @@ Public Class IMU_BasicsWithOptions : Inherits TaskParent
             Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
             If task.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt_gyro /= 1000 ' different units in the timestamp?
             gyroAngle = gyroAngle * dt_gyro
-            task.theta += New cvb.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
+            task.theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
             lastTimeStamp = task.IMU_TimeStamp
         End If
 
         ' NOTE: Initialize the angle around the y-axis to zero.
         Dim g = task.IMU_RawAcceleration
-        task.accRadians = New cvb.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
+        task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
 
         If task.optionsChanged Then
@@ -154,7 +154,7 @@ Public Class IMU_BasicsWithOptions : Inherits TaskParent
 
         Dim x1 = -(90 + task.accRadians.X * 57.2958)
         Dim x2 = -(90 + task.theta.X * 57.2958)
-        Dim y1 = task.accRadians.Y - cvb.Cv2.PI
+        Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                  Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf +
@@ -163,8 +163,8 @@ Public Class IMU_BasicsWithOptions : Inherits TaskParent
         SetTrueText(strOut)
 
         task.accRadians = task.theta
-        If task.accRadians.Y > cvb.Cv2.PI / 2 Then task.accRadians.Y -= cvb.Cv2.PI / 2
-        task.accRadians.Z += cvb.Cv2.PI / 2
+        If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
+        task.accRadians.Z += cv.Cv2.PI / 2
 
         SetTrueText(strOut)
     End Sub
@@ -176,7 +176,7 @@ End Class
 ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
 Public Class IMU_GMatrix : Inherits TaskParent
     Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
-    Public gMatrix As cvb.Mat
+    Public gMatrix As cv.Mat
     Public Sub New()
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
@@ -188,7 +188,7 @@ Public Class IMU_GMatrix : Inherits TaskParent
                                    {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                                    {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-        gMatrix = cvb.Mat.FromPixelData(3, 3, cvb.MatType.CV_32F, {
+        gMatrix = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, {
                   {gArray(0, 0) * cy + gArray(0, 1) * 0 + gArray(0, 2) * sy},
                   {gArray(0, 0) * 0 + gArray(0, 1) * 1 + gArray(0, 2) * 0},
                   {gArray(0, 0) * -sy + gArray(0, 1) * 0 + gArray(0, 2) * cy},
@@ -199,7 +199,7 @@ Public Class IMU_GMatrix : Inherits TaskParent
                   {gArray(2, 0) * 0 + gArray(2, 1) * 1 + gArray(2, 2) * 0},
                   {gArray(2, 0) * -sy + gArray(2, 1) * 0 + gArray(2, 2) * cy}})
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         '[cos(a) -sin(a)    0]
         '[sin(a)  cos(a)    0]
         '[0       0         1] rotate the point cloud around the x-axis.
@@ -244,7 +244,7 @@ Public Class IMU_Stabilize : Inherits TaskParent
         desc = "Stabilize IMU acceleration data."
         labels = {"", "", "IMU Stabilize (move camera around)", "Difference from Color Image"}
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim borderCrop = 5
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         Dim dx = task.IMU_AngularVelocity.X
@@ -259,7 +259,7 @@ Public Class IMU_Stabilize : Inherits TaskParent
         dy = kalman.kOutput(1)
         dz = kalman.kOutput(2)
 
-        Dim smoothedMat = New cvb.Mat(2, 3, cvb.MatType.CV_64F)
+        Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
         smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(dz))
         smoothedMat.Set(Of Double)(0, 1, sx * -Math.Sin(dz))
         smoothedMat.Set(Of Double)(1, 0, sy * Math.Sin(dz))
@@ -268,12 +268,12 @@ Public Class IMU_Stabilize : Inherits TaskParent
         smoothedMat.Set(Of Double)(1, 2, dy)
 
         Dim smoothedFrame = src.WarpAffine(smoothedMat, src.Size())
-        smoothedFrame = smoothedFrame(New cvb.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cvb.Range(borderCrop, smoothedFrame.Cols - borderCrop))
+        smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
         dst2 = smoothedFrame.Resize(src.Size())
-        cvb.Cv2.Subtract(src, dst2, dst3)
+        cv.Cv2.Subtract(src, dst2, dst3)
 
         Dim Text = "dx = " + Format(dx, fmt2) + vbNewLine + "dy = " + Format(dy, fmt2) + vbNewLine + "dz = " + Format(dz, fmt2)
-        SetTrueText(Text, New cvb.Point(10, 10), 3)
+        SetTrueText(Text, New cv.Point(10, 10), 3)
     End Sub
 End Class
 
@@ -298,7 +298,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits TaskParent
         labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Static IMUanchor As Integer = task.IMU_FrameTime Mod 4000000000
@@ -349,7 +349,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits TaskParent
                         "IMU Total Delay = Red" + vbCrLf +
                         "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
-            plot.plotData = New cvb.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
+            plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
             plot.Run(empty)
 
             If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
@@ -387,7 +387,7 @@ Public Class IMU_PlotTotalDelay : Inherits TaskParent
         labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static countSlider = FindSlider("Number of Plot Values")
         Dim plotLastX = countSlider.Value
         host.Run(src)
@@ -417,7 +417,7 @@ Public Class IMU_PlotTotalDelay : Inherits TaskParent
                      "Red" + vbTab + "Host+IMU Total Delay (latency)" + vbCrLf +
                      "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)" + vbCrLf + vbCrLf + vbCrLf
 
-        plot.plotData = New cvb.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
+        plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
         plot.Run(empty)
 
         If plot.lastXdelta.Count > plotLastX Then
@@ -447,7 +447,7 @@ Public Class IMU_VerticalAngles : Inherits TaskParent
         labels = {"", "", "Highlighted vertical lines", "Line details"}
         desc = "Compare the IMU changes to the angle changes in the vertical lines."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dst2 = src.Clone
 
         vert.Run(src)
@@ -482,13 +482,13 @@ Public Class IMU_PlotGravityAngles : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the motion of the camera based on the IMU data in degrees"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         SetTrueText("ts = " + Format(task.IMU_TimeStamp, fmt2) + vbCrLf + "X degrees = " + Format(task.accRadians.X * 57.2958, fmt3) + vbCrLf +
                     "Y degrees = " + Format(Math.Abs(task.accRadians.Y * 57.2958), fmt3) + vbCrLf + "Z degrees = " + Format(task.accRadians.Z * 57.2958, fmt2) + vbCrLf + vbCrLf +
                     "Motion (radians/sec) " + vbCrLf + "pitch = " + Format(task.IMU_AngularVelocity.X, fmt2) + vbCrLf +
                     "Yaw = " + Format(task.IMU_AngularVelocity.Y, fmt2) + vbCrLf + " Roll = " + Format(task.IMU_AngularVelocity.Z, fmt2), 1)
 
-        plot.plotData = New cvb.Scalar(task.accRadians.X * 57.2958, task.accRadians.Y * 57.2958, task.accRadians.Z * 57.2958)
+        plot.plotData = New cv.Scalar(task.accRadians.X * 57.2958, task.accRadians.Y * 57.2958, task.accRadians.Z * 57.2958)
         plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
@@ -509,14 +509,14 @@ Public Class IMU_PlotAngularVelocity : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the IMU Velocity over time."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         SetTrueText("ts = " + Format(task.IMU_TimeStamp, fmt2) + vbCrLf + "X m/sec^2 = " + Format(task.IMU_Acceleration.X, fmt2) + vbCrLf +
                     "Y m/sec^2 = " + Format(task.IMU_Acceleration.Y, fmt2) + vbCrLf + "Z m/sec^2 = " + Format(task.IMU_Acceleration.Z, fmt2) + vbCrLf + vbCrLf +
                     "Motion (radians/sec) " + vbCrLf + "X - Pitch = " + Format(task.IMU_AngularVelocity.X, fmt2) + vbCrLf +
                     "Y - Yaw = " + Format(task.IMU_AngularVelocity.Y, fmt2) + vbCrLf + "Z - Roll = " + Format(task.IMU_AngularVelocity.Z, fmt2) + vbCrLf + vbCrLf +
                     "Move the camera to move values off of zero...", 1)
 
-        plot.plotData = New cvb.Scalar(task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z)
+        plot.plotData = New cv.Scalar(task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z)
         plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
@@ -538,7 +538,7 @@ Public Class IMU_Lines : Inherits TaskParent
         labels(2) = "Vertical lines in Blue and horizontal lines in Yellow"
         desc = "Find the vertical and horizontal lines"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         vert.Run(src)
         dst2 = vert.dst2
         Dim gcell As gravityLine
@@ -549,14 +549,14 @@ Public Class IMU_Lines : Inherits TaskParent
             If task.heartBeat Then dst3.SetTo(0)
             Dim p1 = gcell.tc1.center
             Dim p2 = gcell.tc2.center
-            Dim lastP1 = New cvb.Point(kalman.kOutput(0), kalman.kOutput(1))
-            Dim lastp2 = New cvb.Point(kalman.kOutput(2), kalman.kOutput(3))
+            Dim lastP1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
+            Dim lastp2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
 
             kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
             kalman.Run(empty)
 
-            p1 = New cvb.Point(kalman.kOutput(0), kalman.kOutput(1))
-            p2 = New cvb.Point(kalman.kOutput(2), kalman.kOutput(3))
+            p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
+            p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
             DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
             DrawCircle(dst2, p2, task.DotSize, task.HighlightColor)
             DrawCircle(dst3, p1, task.DotSize, white)
@@ -588,13 +588,13 @@ Public Class IMU_PlotAcceleration : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the IMU Acceleration in m/Sec^2 over time."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         SetTrueText("ts = " + Format(task.IMU_TimeStamp, fmt2) + vbCrLf + "X m/sec^2 = " + Format(task.IMU_Acceleration.X, fmt2) + vbCrLf +
                     "Y m/sec^2 = " + Format(task.IMU_Acceleration.Y, fmt2) + vbCrLf + "Z m/sec^2 = " + Format(task.IMU_Acceleration.Z, fmt2) + vbCrLf + vbCrLf +
                     "Motion (radians/sec) " + vbCrLf + "pitch = " + Format(task.IMU_AngularVelocity.X, fmt2) + vbCrLf +
                     "Yaw = " + Format(task.IMU_AngularVelocity.Y, fmt2) + vbCrLf + " Roll = " + Format(task.IMU_AngularVelocity.Z, fmt2), 1)
 
-        plot.plotData = New cvb.Scalar(task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z)
+        plot.plotData = New cv.Scalar(task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z)
         plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
@@ -608,16 +608,16 @@ End Class
 
 
 Public Class IMU_Average : Inherits TaskParent
-    Dim accList As New List(Of cvb.Scalar)
+    Dim accList As New List(Of cv.Scalar)
     Public Sub New()
         desc = "Average the IMU Acceleration values over the previous X images."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.optionsChanged Then accList.Clear()
         accList.Add(task.IMU_RawAcceleration)
-        Dim accMat = cvb.Mat.FromPixelData(accList.Count, 1, cvb.MatType.CV_64FC4, accList.ToArray)
+        Dim accMat = cv.Mat.FromPixelData(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
         Dim imuMean = accMat.Mean()
-        task.IMU_AverageAcceleration = New cvb.Point3f(imuMean(0), imuMean(1), imuMean(2))
+        task.IMU_AverageAcceleration = New cv.Point3f(imuMean(0), imuMean(1), imuMean(2))
         If accList.Count >= task.frameHistoryCount Then accList.RemoveAt(0)
         strOut = "Average IMU acceleration: " + vbCrLf + Format(task.IMU_AverageAcceleration.X, fmt3) + vbTab + Format(task.IMU_AverageAcceleration.Y, fmt3) + vbTab +
                   Format(task.IMU_AverageAcceleration.Z, fmt3) + vbCrLf
@@ -645,18 +645,18 @@ Public Class IMU_PlotCompareIMU : Inherits TaskParent
         labels = {"IMU Acceleration in X", "IMU Acceleration in Y", "IMU Acceleration in Z", ""}
         desc = "Compare the results of the raw IMU data with the same values after Kalman"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         imuAll.Run(empty)
 
-        plot(0).plotData = New cvb.Scalar(task.IMU_RawAcceleration.X, task.IMU_Acceleration.X, task.kalmanIMUacc.X, task.IMU_AverageAcceleration.X)
+        plot(0).plotData = New cv.Scalar(task.IMU_RawAcceleration.X, task.IMU_Acceleration.X, task.kalmanIMUacc.X, task.IMU_AverageAcceleration.X)
         plot(0).Run(empty)
         dst0 = plot(0).dst2
 
-        plot(1).plotData = New cvb.Scalar(task.IMU_RawAcceleration.Y, task.IMU_Acceleration.Y, task.kalmanIMUacc.Y, task.IMU_AverageAcceleration.Y)
+        plot(1).plotData = New cv.Scalar(task.IMU_RawAcceleration.Y, task.IMU_Acceleration.Y, task.kalmanIMUacc.Y, task.IMU_AverageAcceleration.Y)
         plot(1).Run(empty)
         dst1 = plot(1).dst2
 
-        plot(2).plotData = New cvb.Scalar(task.IMU_RawAcceleration.Z, task.IMU_Acceleration.Z, task.kalmanIMUacc.Z, task.IMU_AverageAcceleration.Z)
+        plot(2).plotData = New cv.Scalar(task.IMU_RawAcceleration.Z, task.IMU_Acceleration.Z, task.kalmanIMUacc.Z, task.IMU_AverageAcceleration.Z)
         plot(2).Run(empty)
         dst2 = plot(2).dst2
 
@@ -682,12 +682,12 @@ Public Class IMU_Kalman : Inherits TaskParent
     Public Sub New()
         desc = "Use Kalman Filter to stabilize the IMU acceleration and velocity"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         kalman.kInput = {task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z,
                          task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z}
         kalman.Run(empty)
-        task.kalmanIMUacc = New cvb.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
-        task.kalmanIMUvelocity = New cvb.Point3f(kalman.kOutput(3), kalman.kOutput(4), kalman.kOutput(5))
+        task.kalmanIMUacc = New cv.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
+        task.kalmanIMUvelocity = New cv.Point3f(kalman.kOutput(3), kalman.kOutput(4), kalman.kOutput(5))
         strOut = "IMU Acceleration Raw" + vbTab + "IMU Velocity Raw" + vbCrLf +
                  Format(task.IMU_RawAcceleration.X, fmt3) + vbTab + Format(task.IMU_RawAcceleration.Y, fmt3) + vbTab +
                  Format(task.IMU_RawAcceleration.Z, fmt3) + vbTab + Format(task.IMU_RawAngularVelocity.X, fmt3) + vbTab +
@@ -713,7 +713,7 @@ Public Class IMU_AllMethods : Inherits TaskParent
     Public Sub New()
         desc = "Compute the IMU acceleration using all available methods - raw, Kalman, averaging, and velocity-filtered."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         basics.Run(empty)
         kalman.Run(empty)
         imuAvg.Run(empty)
@@ -734,7 +734,7 @@ Public Class IMU_VelocityPlot : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the angular velocity"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.pitch = task.IMU_AngularVelocity.X
         task.yaw = task.IMU_AngularVelocity.Y
         task.roll = task.IMU_AngularVelocity.Z
@@ -769,7 +769,7 @@ Public Class IMU_IscameraStable : Inherits TaskParent
     Public Sub New()
         desc = "Track the standard deviation of the angular velocities."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         task.pitch = task.IMU_AngularVelocity.X
@@ -802,7 +802,7 @@ Public Class IMU_PlotHostFrameTimes : Inherits TaskParent
         labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Static CPUanchor As Integer = task.CPU_FrameTime
@@ -843,7 +843,7 @@ Public Class IMU_PlotHostFrameTimes : Inherits TaskParent
                          "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
                          "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
-            plot.plotData = New cvb.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
+            plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
             plot.Run(empty)
 
             If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
@@ -881,7 +881,7 @@ Public Class IMU_PlotHostFrameScalar : Inherits TaskParent
         labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Static CPUanchor As Integer = task.CPU_FrameTime
@@ -907,7 +907,7 @@ Public Class IMU_PlotHostFrameScalar : Inherits TaskParent
                      "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
                      "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
-            plot.plotData = New cvb.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
+            plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
             plot.Run(empty)
             dst2 = plot.dst2
             dst3 = plot.dst3
@@ -925,7 +925,7 @@ End Class
 ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
 Public Class IMU_GMatrixWithOptions : Inherits TaskParent
     Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
-    Public gMatrix As cvb.Mat
+    Public gMatrix As cv.Mat
     Dim xSlider As TrackBar
     Dim ySlider As TrackBar
     Dim zSlider As TrackBar
@@ -937,16 +937,16 @@ Public Class IMU_GMatrixWithOptions : Inherits TaskParent
         If xSlider Is Nothing Then xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
         If ySlider Is Nothing Then ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
         If zSlider Is Nothing Then zSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
-        cx = Math.Cos(xSlider.Value * cvb.Cv2.PI / 180)
-        sx = Math.Sin(xSlider.Value * cvb.Cv2.PI / 180)
+        cx = Math.Cos(xSlider.Value * cv.Cv2.PI / 180)
+        sx = Math.Sin(xSlider.Value * cv.Cv2.PI / 180)
 
-        cy = Math.Cos(ySlider.Value * cvb.Cv2.PI / 180)
-        sy = Math.Sin(ySlider.Value * cvb.Cv2.PI / 180)
+        cy = Math.Cos(ySlider.Value * cv.Cv2.PI / 180)
+        sy = Math.Sin(ySlider.Value * cv.Cv2.PI / 180)
 
-        cz = Math.Cos(zSlider.Value * cvb.Cv2.PI / 180)
-        sz = Math.Sin(zSlider.Value * cvb.Cv2.PI / 180)
+        cz = Math.Cos(zSlider.Value * cv.Cv2.PI / 180)
+        sz = Math.Sin(zSlider.Value * cv.Cv2.PI / 180)
     End Sub
-    Private Function buildGmatrix() As cvb.Mat
+    Private Function buildGmatrix() As cv.Mat
         '[cx -sx    0]  [1  0   0 ] 
         '[sx  cx    0]  [0  cz -sz]
         '[0   0     1]  [0  sz  cz]
@@ -954,7 +954,7 @@ Public Class IMU_GMatrixWithOptions : Inherits TaskParent
                                    {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                                    {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-        Dim tmpGMatrix = cvb.Mat.FromPixelData(3, 3, cvb.MatType.CV_32F, {
+        Dim tmpGMatrix = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, {
                   {gArray(0, 0) * cy + gArray(0, 1) * 0 + gArray(0, 2) * sy},
                   {gArray(0, 0) * 0 + gArray(0, 1) * 1 + gArray(0, 2) * 0},
                   {gArray(0, 0) * -sy + gArray(0, 1) * 0 + gArray(0, 2) * cy},
@@ -967,7 +967,7 @@ Public Class IMU_GMatrixWithOptions : Inherits TaskParent
 
         Return tmpGMatrix
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If xSlider Is Nothing Then xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
         If ySlider Is Nothing Then ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
         If zSlider Is Nothing Then zSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
@@ -1031,7 +1031,7 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
         labels = {"", "", "Highlighted vertical lines", "Line details"}
         desc = "Use the Y-Arc to confirm which vertical lines are valid"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.Clone
@@ -1090,7 +1090,7 @@ Public Class IMU_Plot : Inherits TaskParent
         plot.plotCount = 3
         desc = "Plot the angular velocity of the camera based on the IMU data"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then
@@ -1105,7 +1105,7 @@ Public Class IMU_Plot : Inherits TaskParent
         If options.setGreen Then greenX = greenA
         If options.setRed Then redX = redA
 
-        plot.plotData = New cvb.Scalar(blueX, greenX, redX)
+        plot.plotData = New cv.Scalar(blueX, greenX, redX)
         plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3

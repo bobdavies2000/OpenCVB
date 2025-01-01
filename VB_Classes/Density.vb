@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Density_Basics : Inherits TaskParent
     Dim options = New Options_Density
     Public Sub New()
@@ -7,10 +7,10 @@ Public Class Density_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use local options to control separation of points in 3D.")
         desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -18,7 +18,7 @@ Public Class Density_Basics : Inherits TaskParent
         Dim imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.distance)
         handleSrc.Free()
 
-        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
     End Sub
     Public Sub Close()
         Density_2D_Close(cPtr)
@@ -35,7 +35,7 @@ Public Class Density_Phase : Inherits TaskParent
     Public Sub New()
         desc = "Display gradient phase and 2D density side by side."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         gradient.Run(empty)
         dst3 = Convert32f_To_8UC3(gradient.dst3)
 
@@ -56,10 +56,10 @@ Public Class Density_Count_CPP_VB : Inherits TaskParent
         cPtr = Density_Count_Open()
         desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Type <> cvb.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -67,7 +67,7 @@ Public Class Density_Count_CPP_VB : Inherits TaskParent
         Dim imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.zCount)
         handleSrc.Free()
 
-        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
     End Sub
     Public Sub Close()
         Density_Count_Close(cPtr)
@@ -81,12 +81,12 @@ End Class
 
 
 Public Class Density_Mask : Inherits TaskParent
-    Public pointList As New List(Of cvb.Point)
+    Public pointList As New List(Of cv.Point)
     Public Sub New()
         desc = "Measure a mask's size in any image and track the biggest regions."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
+    Public Overrides sub runAlg(src As cv.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         src.SetTo(0, task.noDepthMask)
 
         Dim threshold = task.gridSize * task.gridSize / 2
@@ -107,7 +107,7 @@ Public Class Density_Mask : Inherits TaskParent
         For i = 0 To activeList.Count - 1
             If activeList(i) Then
                 Dim roi = task.gridRects(i)
-                pointList.Add(New cvb.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2))
+                pointList.Add(New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2))
             End If
         Next
     End Sub

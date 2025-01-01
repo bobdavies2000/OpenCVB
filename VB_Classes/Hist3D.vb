@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Hist3D_Basics : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
@@ -9,7 +9,7 @@ Public Class Hist3D_Basics : Inherits TaskParent
         labels = {"", "", "Sum of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", ""}
         desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         hColor.Run(src)
@@ -41,7 +41,7 @@ Public Class Hist3D_BuildHistogram : Inherits TaskParent
     Public Sub New()
         desc = "Build a guided 3D histogram from the 3D histogram supplied in src."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             task.gOptions.setHistogramBins(100)
             plot.Run(src)
@@ -94,7 +94,7 @@ Public Class Hist3D_RedCloud : Inherits TaskParent
         task.redOptions.setUseColorOnly(True)
         desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         hist3D.Run(src)
         dst2 = hist3D.dst3
         labels(2) = hist3D.labels(3)
@@ -118,7 +118,7 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         task.redOptions.setUseColorOnly(True)
         desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         hColor.Run(src)
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
@@ -141,12 +141,12 @@ End Class
 
 Public Class Hist3D_DepthWithMask : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
-    Public depthMask As New cvb.Mat
+    Public depthMask As New cv.Mat
     Dim fore As New Foreground_KMeans
     Public Sub New()
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             fore.Run(src)
             depthMask = fore.dst2 Or task.noDepthMask
@@ -172,16 +172,16 @@ End Class
 
 
 Public Class Hist3D_Pixel : Inherits TaskParent
-    Public histogram As New cvb.Mat
+    Public histogram As New cv.Mat
     Public histArray() As Single
     Public classCount As Integer
     Public Sub New()
         desc = "Classify each pixel using a 3D histogram backprojection."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If src.Channels() <> 3 Then src = task.color
         Dim bins = task.redOptions.HistBinBar3D.Value
-        cvb.Cv2.CalcHist({src}, {0, 1, 2}, New cvb.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -193,7 +193,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
         classCount = task.redOptions.histBins3D
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
-        cvb.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
         dst3 = If(classCount < 256, ShowPalette(dst2 * 255 / classCount), ShowPalette(dst2))
     End Sub
 End Class
@@ -209,17 +209,17 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New Flood_Basics
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2"}
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         redC.Run(src)
 
         pixel.Run(src)
 
         For Each cell In task.redCells
-            cvb.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst2(cell.rect), task.redOptions.rangesBGR)
+            cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst2(cell.rect), task.redOptions.rangesBGR)
         Next
 
         dst3 = ShowPalette(dst2 * 255 / task.redOptions.histBins3D)
@@ -238,7 +238,7 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
     Public Sub New()
         desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Basics on the output."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         pixel.Run(src)
 
         task.redC.Run(pixel.dst2)
@@ -262,11 +262,11 @@ Public Class Hist3D_PixelDiffMask : Inherits TaskParent
         task.redOptions.setUseColorOnly(True)
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         pixel.Run(src)
-        Static lastImage As cvb.Mat = pixel.dst2.Clone
-        cvb.Cv2.Absdiff(lastImage, pixel.dst2, dst3)
-        dst2 = dst3.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        Static lastImage As cv.Mat = pixel.dst2.Clone
+        cv.Cv2.Absdiff(lastImage, pixel.dst2, dst3)
+        dst2 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
         lastImage = pixel.dst2.Clone
     End Sub
 End Class
@@ -297,7 +297,7 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
         Next
         Return Math.Sqrt(accum)
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         pixels.Run(src)
         dst2 = task.redMap
         dst3 = dst2.InRange(0, 0)

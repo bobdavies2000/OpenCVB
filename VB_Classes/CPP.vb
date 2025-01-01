@@ -1,10 +1,10 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
 Public Class CPP_Basics : Inherits TaskParent
     Dim cppFunction As Integer
-    Public result As cvb.Mat
-    Public neighbors As New List(Of cvb.Point2f)
+    Public result As cv.Mat
+    Public neighbors As New List(Of cv.Point2f)
     Public neighborIndexToTrain As List(Of Integer)
     Public Sub New(_cppFunction As Integer)
         updateFunction(_cppFunction)
@@ -40,7 +40,7 @@ Public Class CPP_Basics : Inherits TaskParent
     Public Sub New()
     End Sub
 
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
 
         cppTask_OptionsVBtoCPP(cPtr, task.gridSize,
                                task.histogramBins,
@@ -96,16 +96,16 @@ Public Class CPP_Basics : Inherits TaskParent
 
         Dim dstPtr As IntPtr, type As Integer
         dstPtr = cppTask_GetDst(cPtr, 0, type)
-        dst0 = cvb.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
+        dst0 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 1, type)
-        dst1 = cvb.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
+        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 2, type)
-        dst2 = cvb.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
 
         dstPtr = cppTask_GetDst(cPtr, 3, type)
-        dst3 = cvb.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
+        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, type, dstPtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = cppTask_Close(cPtr)
@@ -148,7 +148,7 @@ Public Class CPP_ManagedTask : Inherits TaskParent
     Public Sub New()
         desc = "Move data to the Managed C++/CLR code (CPP_Managed), run it, and retrieve the results."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
             SetTrueText("CPP_Managed is disconnected right while chasing the CPP_Native problem.")
             Return
@@ -192,9 +192,9 @@ Public Class CPP_ManagedTask : Inherits TaskParent
         Marshal.Copy(ptr, formats, 0, formats.Length)
         dst2.Type()
 
-        task.dst0 = cvb.Mat.FromPixelData(task.dst0.Rows, task.dst0.Cols, New cvb.MatType(formats(0)), pointers(0)).Clone
-        task.dst1 = cvb.Mat.FromPixelData(task.dst1.Rows, task.dst1.Cols, New cvb.MatType(formats(1)), pointers(1)).Clone
-        task.dst2 = cvb.Mat.FromPixelData(task.dst2.Rows, task.dst2.Cols, New cvb.MatType(formats(2)), pointers(2)).Clone
-        task.dst3 = cvb.Mat.FromPixelData(task.dst3.Rows, task.dst3.Cols, New cvb.MatType(formats(3)), pointers(3)).Clone
+        task.dst0 = cv.Mat.FromPixelData(task.dst0.Rows, task.dst0.Cols, New cv.MatType(formats(0)), pointers(0)).Clone
+        task.dst1 = cv.Mat.FromPixelData(task.dst1.Rows, task.dst1.Cols, New cv.MatType(formats(1)), pointers(1)).Clone
+        task.dst2 = cv.Mat.FromPixelData(task.dst2.Rows, task.dst2.Cols, New cv.MatType(formats(2)), pointers(2)).Clone
+        task.dst3 = cv.Mat.FromPixelData(task.dst3.Rows, task.dst3.Cols, New cv.MatType(formats(3)), pointers(3)).Clone
     End Sub
 End Class

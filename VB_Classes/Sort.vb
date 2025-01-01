@@ -1,21 +1,21 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Sort_Basics : Inherits TaskParent
     Dim options As New Options_Sort
     Public Sub New()
         desc = "Sort the pixels of a grayscale image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         If options.radio5.Checked Then
             src = src.Reshape(1, src.Rows * src.Cols)
-            options.sortOption = cvb.SortFlags.EveryColumn + cvb.SortFlags.Descending
+            options.sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Descending
         End If
         If options.radio4.Checked Then
             src = src.Reshape(1, src.Rows * src.Cols)
-            options.sortOption = cvb.SortFlags.EveryColumn + cvb.SortFlags.Ascending
+            options.sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
         End If
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Sort(options.sortOption)
         If options.radio4.Checked Or options.radio5.Checked Then dst2 = dst2.Reshape(1, dst0.Rows)
     End Sub
@@ -29,19 +29,19 @@ End Class
 
 Public Class Sort_RectAndMask : Inherits TaskParent
     Dim sort As New Sort_Basics
-    Public mask As cvb.Mat
-    Public rect As cvb.Rect
+    Public mask As cv.Mat
+    Public rect As cv.Rect
     Public Sub New()
         labels(3) = "Original input to sort"
-        If standaloneTest() Then task.drawRect = New cvb.Rect(10, 10, 50, 5)
+        If standaloneTest() Then task.drawRect = New cv.Rect(10, 10, 50, 5)
         desc = "Sort the grayscale image portion in a rect while allowing for a mask."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        Dim tmpRect = If(rect = New cvb.Rect, task.drawRect, rect)
+    Public Overrides sub runAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim tmpRect = If(rect = New cv.Rect, task.drawRect, rect)
         dst1 = src(tmpRect).Clone
         If mask IsNot Nothing Then
-            mask = mask.Threshold(0, 255, cvb.ThresholdTypes.BinaryInv)
+            mask = mask.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
             dst1.SetTo(0, mask)
         End If
         sort.Run(dst1)
@@ -57,13 +57,13 @@ End Class
 
 Public Class Sort_MLPrepTest_CPP_VB : Inherits TaskParent
     Public reduction As New Reduction_Basics
-    Public MLTestData As New cvb.Mat
+    Public MLTestData As New cv.Mat
     Public Sub New()
         cPtr = Sort_MLPrepTest_Open()
         desc = "Prepare the grayscale image and row to predict depth"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+    Public Overrides sub runAlg(src As cv.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         reduction.Run(src)
 
@@ -73,7 +73,7 @@ Public Class Sort_MLPrepTest_CPP_VB : Inherits TaskParent
         Dim imagePtr = Sort_MLPrepTest_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
-        MLTestData = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_32FC2, imagePtr).Clone
+        MLTestData = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC2, imagePtr).Clone
         Dim split = MLTestData.Split()
         dst2 = split(0)
         dst3 = split(1)
@@ -101,15 +101,15 @@ Public Class Sort_1Channel : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         FindRadio("Sort all pixels descending").Checked = True
         If standaloneTest() Then task.gOptions.setGridSize(10)
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static thresholdSlider = FindSlider("Threshold for sort input")
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        dst1 = src.Threshold(thresholdSlider.Value, 255, cvb.ThresholdTypes.Binary)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
         dst2.SetTo(0)
         src.CopyTo(dst2, dst1)
@@ -156,27 +156,27 @@ End Class
 Public Class Sort_3Channel : Inherits TaskParent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP_VB
-    Dim bgra As cvb.Mat
+    Dim bgra As cv.Mat
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         FindRadio("Sort all pixels descending").Checked = True
         labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
         desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static thresholdSlider = FindSlider("Threshold for sort input")
-        Dim inputMask = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cvb.ThresholdTypes.Binary)
+        Dim inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
-        bgra = src.CvtColor(cvb.ColorConversionCodes.BGR2BGRA)
-        dst1 = cvb.Mat.FromPixelData(dst1.Rows, dst1.Cols, cvb.MatType.CV_32S, bgra.Data)
+        bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
+        dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, bgra.Data)
 
-        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_32S, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
         dst1.CopyTo(dst0, inputMask)
         sort.Run(dst0)
         dst2 = sort.dst2.Reshape(1, dst2.Rows)
-        Dim tmp = cvb.Mat.FromPixelData(src.Rows, src.Cols, cvb.MatType.CV_8UC4, dst2.Data)
-        dst3 = tmp.CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+        Dim tmp = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC4, dst2.Data)
+        dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
         'dups.Run(dst2)
         'dst2 = dups.dst2
@@ -199,10 +199,10 @@ Public Class Sort_FeatureLess : Inherits TaskParent
         task.gOptions.setGridSize(8)
         desc = "Sort all the featureless grayscale pixels."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         devGrid.Run(src)
         dst2 = devGrid.dst2
-        dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.SetTo(0, Not devGrid.dst3)
 
         sort.Run(dst1)
@@ -230,13 +230,13 @@ Public Class Sort_Integer : Inherits TaskParent
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
             Dim split = src.Split()
-            Dim zero As New cvb.Mat(split(0).Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-            cvb.Cv2.Merge({split(0), split(1), split(2), zero}, src)
+            Dim zero As New cv.Mat(split(0).Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            cv.Cv2.Merge({split(0), split(1), split(2), zero}, src)
             Marshal.Copy(src.Data, data, 0, data.Length)
-            src = New cvb.Mat(src.Size(), cvb.MatType.CV_32S, 0)
+            src = New cv.Mat(src.Size(), cv.MatType.CV_32S, 0)
             Marshal.Copy(data, 0, src.Data, data.Length)
         End If
 
@@ -263,8 +263,8 @@ Public Class Sort_GrayScale1 : Inherits TaskParent
     Public Sub New()
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+    Public Overrides sub runAlg(src As cv.Mat)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray(src.Total - 1) As Byte
         Marshal.Copy(dst1.Data, gray, 0, gray.Length)
 
@@ -279,7 +279,7 @@ Public Class Sort_GrayScale1 : Inherits TaskParent
             input(i) = pixels(0)(i) * 65536 + pixels(1)(i) * 256 + pixels(2)(i)
         Next
 
-        sort.Run(cvb.Mat.FromPixelData(gray.Length, 1, cvb.MatType.CV_32S, input))
+        sort.Run(cv.Mat.FromPixelData(gray.Length, 1, cv.MatType.CV_32S, input))
 
         Dim sorted(gray.Length - 1) As UInteger
 
@@ -303,7 +303,7 @@ Public Class Sort_GrayScale : Inherits TaskParent
     Public Sub New()
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim split = src.Split()
         For i = 0 To 2
             If task.firstPass Then ReDim pixels(i)(src.Total - 1)
@@ -311,14 +311,14 @@ Public Class Sort_GrayScale : Inherits TaskParent
         Next
 
         Dim totals(255) As Single
-        Dim lut(255) As cvb.Vec3b
+        Dim lut(255) As cv.Vec3b
         For i = 0 To src.Total - 1
             Dim index = CInt(0.299 * pixels(2)(i) + 0.587 * pixels(1)(i) + 0.114 * pixels(0)(i))
             totals(index) += 1
-            If totals(index) = 1 Then lut(index) = New cvb.Vec3b(pixels(0)(i), pixels(1)(i), pixels(2)(i))
+            If totals(index) = 1 Then lut(index) = New cv.Vec3b(pixels(0)(i), pixels(1)(i), pixels(2)(i))
         Next
 
-        Dim histogram As cvb.Mat = cvb.Mat.FromPixelData(256, 1, cvb.MatType.CV_32F, totals)
+        Dim histogram As cv.Mat = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_32F, totals)
         plot.Run(histogram)
         dst2 = plot.dst2
     End Sub

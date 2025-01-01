@@ -1,16 +1,16 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Stable_Basics : Inherits TaskParent
     Public facetGen As New Delaunay_Generations
-    Public ptList As New List(Of cvb.Point2f)
-    Public anchorPoint As cvb.Point2f
+    Public ptList As New List(Of cv.Point2f)
+    Public anchorPoint As cv.Point2f
     Dim good As New Feature_KNN
     Public Sub New()
         desc = "Maintain the generation counts around the feature points."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             good.Run(src)
-            facetGen.inputPoints = New List(Of cvb.Point2f)(good.featurePoints)
+            facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
         End If
 
         facetGen.Run(src)
@@ -32,7 +32,7 @@ Public Class Stable_Basics : Inherits TaskParent
         anchorPoint = ptList(index)
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
-            dst2.FillConvexPoly(bestFacet, cvb.Scalar.Black, task.lineType)
+            dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
             DrawContour(dst2, bestFacet, task.HighlightColor)
         End If
 
@@ -63,8 +63,8 @@ Public Class Stable_BasicsCount : Inherits TaskParent
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        basics.facetGen.inputPoints = New List(Of cvb.Point2f)(task.features)
+    Public Overrides sub runAlg(src As cv.Mat)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
@@ -97,7 +97,7 @@ Public Class Stable_Lines : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Track the line end points found in the BGR image and keep those that are stable."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         lines.Run(src)
 
         basics.facetGen.inputPoints.Clear()
@@ -136,11 +136,11 @@ Public Class Stable_FAST : Inherits TaskParent
         FindSlider("FAST Threshold").Value = 100
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fast.Run(src)
 
         basics.facetGen.inputPoints.Clear()
-        basics.facetGen.inputPoints = New List(Of cvb.Point2f)(fast.features)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(fast.features)
         basics.Run(src)
         dst3 = basics.dst3
         dst2 = basics.dst2
@@ -170,14 +170,14 @@ Public Class Stable_GoodFeatures : Inherits TaskParent
     Public basics As New Stable_Basics
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dst3 = basics.dst3
         If task.features.Count = 0 Then Exit Sub ' nothing to work on...
 
-        basics.facetGen.inputPoints = New List(Of cvb.Point2f)(task.features)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         basics.Run(src)
         dst2 = basics.dst2
 
@@ -185,7 +185,7 @@ Public Class Stable_GoodFeatures : Inherits TaskParent
         genSorted.Clear()
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            If standaloneTest() Then DrawCircle(dst2,pt, task.DotSize + 1, cvb.Scalar.Yellow)
+            If standaloneTest() Then DrawCircle(dst2,pt, task.DotSize + 1, cv.Scalar.Yellow)
             dst1.Set(Of Byte)(pt.Y, pt.X, 255)
 
             Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)

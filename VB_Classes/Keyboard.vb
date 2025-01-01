@@ -1,5 +1,5 @@
 
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Keyboard_Basics : Inherits TaskParent
     Public keyInput As New List(Of String)
     Dim flow As New Font_FlowText
@@ -10,7 +10,7 @@ Public Class Keyboard_Basics : Inherits TaskParent
         labels(2) = "Use the Options form to send in keystrokes"
         desc = "Test the keyboard interface available to all algorithms"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() And checkKeys.inputText.Count > 0 Then
             For Each txt In checkKeys.inputText
                 flow.nextMsg += txt.ToString()

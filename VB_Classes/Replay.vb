@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports  System.IO
 Imports System.Runtime.InteropServices
 Module recordPlaybackCommon
@@ -90,10 +90,10 @@ Public Class Replay_Record : Inherits TaskParent
 
         desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If task.useRecordedData And recordingFilename.Exists = False Then
-            SetTrueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", New cvb.Point(10, 125))
+            SetTrueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", New cv.Point(10, 125))
             Exit Sub
         End If
 
@@ -179,23 +179,23 @@ Public Class Replay_Play : Inherits TaskParent
 
         desc = "Playback a file recorded by OpenCVB"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
-        If recordingFilename.Exists = False Then SetTrueText("File not found: " + recordingFilename.FullName, New cvb.Point(10, 125))
+        If recordingFilename.Exists = False Then SetTrueText("File not found: " + recordingFilename.FullName, New cv.Point(10, 125))
         If fileNameForm.fileStarted And recordingFilename.Exists Then
             Dim maxBytes = recordingFilename.Length
             If playbackActive Then
                 colorBytes = binRead.ReadBytes(bytesPerColor)
-                Dim tmpMat = cvb.Mat.FromPixelData(fh.colorHeight, fh.colorWidth, cvb.MatType.CV_8UC3, colorBytes)
-                task.color = tmpMat.Resize(New cvb.Size(task.dst2.Width, task.dst2.Height))
+                Dim tmpMat = cv.Mat.FromPixelData(fh.colorHeight, fh.colorWidth, cv.MatType.CV_8UC3, colorBytes)
+                task.color = tmpMat.Resize(New cv.Size(task.dst2.Width, task.dst2.Height))
                 bytesTotal += colorBytes.Length
 
                 depth32fBytes = binRead.ReadBytes(bytesPerdepth32f)
-                tmpMat = cvb.Mat.FromPixelData(fh.depthHeight, fh.depthWidth, cvb.MatType.CV_16U, depth32fBytes)
+                tmpMat = cv.Mat.FromPixelData(fh.depthHeight, fh.depthWidth, cv.MatType.CV_16U, depth32fBytes)
                 bytesTotal += depth32fBytes.Length
 
                 cloudBytes = binRead.ReadBytes(bytesPerCloud)
-                task.pointCloud = cvb.Mat.FromPixelData(fh.cloudHeight, fh.cloudWidth, cvb.MatType.CV_32FC3, cloudBytes)  ' we cannot resize the point cloud.
+                task.pointCloud = cv.Mat.FromPixelData(fh.cloudHeight, fh.cloudWidth, cv.MatType.CV_32FC3, cloudBytes)  ' we cannot resize the point cloud.
                 bytesTotal += cloudBytes.Length
 
                 ' restart the video at the beginning.
@@ -251,7 +251,7 @@ Public Class Replay_OpenGL : Inherits TaskParent
     Public Sub New()
         desc = "Replay a recorded session with OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         replay.Run(src)
         ogl.pointCloudInput = task.pointCloud
         ogl.Run(task.color)

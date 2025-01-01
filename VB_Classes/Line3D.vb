@@ -1,11 +1,11 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
     Dim sLines As New Structured_Lines
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size, cvb.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find all the lines in 3D using the structured slices through the pointcloud."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         sLines.Run(src)
 
         dst2 = src
@@ -39,12 +39,12 @@ Public Class Line3D_Correlation : Inherits TaskParent
         task.gOptions.GridSlider.Minimum = 2 ' smaller will hang
         desc = "Find the correlation of image coordinates to pointcloud coordinates"
     End Sub
-    Private Function getCorrelation(A As cvb.Mat, B As cvb.Mat) As Single
-        Dim correlation As New cvb.Mat
-        cvb.Cv2.MatchTemplate(A, B, correlation, cvb.TemplateMatchModes.CCoeffNormed)
+    Private Function getCorrelation(A As cv.Mat, B As cv.Mat) As Single
+        Dim correlation As New cv.Mat
+        cv.Cv2.MatchTemplate(A, B, correlation, cv.TemplateMatchModes.CCoeffNormed)
         Return correlation.Get(Of Single)(0, 0)
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -53,16 +53,16 @@ Public Class Line3D_Correlation : Inherits TaskParent
 
         Dim xList As New List(Of Single), yList As New List(Of Single), zList As New List(Of Single)
         For Each pt In task.rc.ptList
-            Dim vec = task.pointCloud.Get(Of cvb.Point3f)(pt.Y, pt.X)
+            Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
             xList.Add(vec.X)
             yList.Add(vec.Y)
             zList.Add(vec.Z)
         Next
 
         If xList.Count > 0 Then
-            Dim xMat As cvb.Mat = cvb.Mat.FromPixelData(xList.Count, 1, cvb.MatType.CV_32F, xList.ToArray)
-            Dim yMat As cvb.Mat = cvb.Mat.FromPixelData(xList.Count, 1, cvb.MatType.CV_32F, yList.ToArray)
-            Dim zMat As cvb.Mat = cvb.Mat.FromPixelData(xList.Count, 1, cvb.MatType.CV_32F, zList.ToArray)
+            Dim xMat As cv.Mat = cv.Mat.FromPixelData(xList.Count, 1, cv.MatType.CV_32F, xList.ToArray)
+            Dim yMat As cv.Mat = cv.Mat.FromPixelData(xList.Count, 1, cv.MatType.CV_32F, yList.ToArray)
+            Dim zMat As cv.Mat = cv.Mat.FromPixelData(xList.Count, 1, cv.MatType.CV_32F, zList.ToArray)
 
             Dim correlationXZ As Single = getCorrelation(xMat, zMat)
             Dim correlationYZ As Single = getCorrelation(yMat, zMat)
@@ -83,27 +83,27 @@ End Class
 
 
 Public Class Line3D_Draw : Inherits TaskParent
-    Public p1 As cvb.Point, p2 As cvb.Point
+    Public p1 As cv.Point, p2 As cv.Point
     Dim plot As New Plot_OverTimeScalar
     Dim toggleFirstSecond As Boolean
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         plot.plotCount = 2
 
-        dst0 = New cvb.Mat(dst0.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_32F, cvb.Scalar.All(0))
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
 
-        p1 = New cvb.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-        p2 = New cvb.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+        p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+        p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         labels(2) = "Click twice in the image below to draw a line and that line's depth is correlated in X to Z and Y to Z in the plot at right"
         desc = "Determine where a 3D line is close to the real depth data"
     End Sub
-    Private Function findCorrelation(pts1 As cvb.Mat, pts2 As cvb.Mat) As Single
-        Dim correlationMat As New cvb.Mat
-        cvb.Cv2.MatchTemplate(pts1, pts2, correlationMat, cvb.TemplateMatchModes.CCoeffNormed)
+    Private Function findCorrelation(pts1 As cv.Mat, pts2 As cv.Mat) As Single
+        Dim correlationMat As New cv.Mat
+        cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.mouseClickFlag Then
                 If toggleFirstSecond = False Then
@@ -125,19 +125,19 @@ Public Class Line3D_Draw : Inherits TaskParent
         task.pcSplit(0).CopyTo(dst1, dst0)
         Dim points = dst1.FindNonZero()
 
-        Dim nextList As New List(Of cvb.Point3f)
+        Dim nextList As New List(Of cv.Point3f)
         For i = 0 To points.Rows - 1
-            Dim pt = points.Get(Of cvb.Point)(i, 0)
-            nextList.Add(task.pointCloud.Get(Of cvb.Point3f)(pt.Y, pt.X))
+            Dim pt = points.Get(Of cv.Point)(i, 0)
+            nextList.Add(task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X))
         Next
         If nextList.Count = 0 Then Exit Sub ' line is completely in area with no depth.
 
-        Dim pts As cvb.Mat = cvb.Mat.FromPixelData(nextList.Count, 1, cvb.MatType.CV_32FC3, nextList.ToArray)
+        Dim pts As cv.Mat = cv.Mat.FromPixelData(nextList.Count, 1, cv.MatType.CV_32FC3, nextList.ToArray)
         Dim zSplit = pts.Split()
         Dim c1 = findCorrelation(zSplit(0), zSplit(2))
         Dim c2 = findCorrelation(zSplit(1), zSplit(2))
 
-        plot.plotData = New cvb.Scalar(c1, c2, 0)
+        plot.plotData = New cv.Scalar(c1, c2, 0)
 
         plot.Run(empty)
         dst2 = plot.dst2
@@ -154,16 +154,16 @@ End Class
 
 Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
     Dim pts As New PointCloud_Basics
-    Public pcLines As New List(Of cvb.Point3f)
-    Public pcLinesMat As cvb.Mat
+    Public pcLines As New List(Of cv.Point3f)
+    Public pcLinesMat As cv.Mat
     Public actualCount As Integer
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line " +
                "in the sequence"
     End Sub
-    Private Sub addLines(nextList As List(Of List(Of cvb.Point3f)), xyList As List(Of List(Of cvb.Point)))
-        Dim white32 As New cvb.Point3f(1, 1, 1)
+    Private Sub addLines(nextList As List(Of List(Of cv.Point3f)), xyList As List(Of List(Of cv.Point)))
+        Dim white32 As New cv.Point3f(1, 1, 1)
         For i = 0 To nextList.Count - 1
             pcLines.Add(white32)
             pcLines.Add(nextList(i)(0))
@@ -176,7 +176,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
             DrawLine(dst2, p1, p2, white)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 
@@ -184,7 +184,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
         addLines(pts.hList, pts.xyHList)
         addLines(pts.vList, pts.xyVList)
 
-        pcLinesMat = cvb.Mat.FromPixelData(pcLines.Count, 1, cvb.MatType.CV_32FC3, pcLines.ToArray)
+        pcLinesMat = cv.Mat.FromPixelData(pcLines.Count, 1, cv.MatType.CV_32FC3, pcLines.ToArray)
         labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
     End Sub
 End Class
@@ -199,7 +199,7 @@ Public Class Line3D_Constructed : Inherits TaskParent
     Public Sub New()
         desc = "Build the 3D lines found in Line3D_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
         dst3 = lines.dst3

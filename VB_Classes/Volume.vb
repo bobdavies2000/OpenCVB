@@ -1,11 +1,11 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Volume_Basics : Inherits TaskParent
     Public rc As New rcData
     Public volume As Single
     Public Sub New()
         desc = "Build a box containing all the 3D points of a RedCloud cell"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             task.redC.Run(src)
             dst2 = task.redC.dst2
@@ -17,7 +17,7 @@ Public Class Volume_Basics : Inherits TaskParent
         Dim yList As New List(Of Single)
         Dim zList As New List(Of Single)
         For Each pt In rc.contour
-            Dim vec = task.pointCloud.Get(Of cvb.Vec3f)(pt.Y, pt.X)
+            Dim vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
             If vec(0) <> 0 Then xList.Add(vec(0))
             If vec(1) <> 0 Then yList.Add(vec(1))
             If vec(2) <> 0 Then zList.Add(vec(2))

@@ -1,16 +1,16 @@
 ﻿Imports System.Windows
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Cluster_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
-    Public ptInput As New List(Of cvb.Point)
-    Public ptList As New List(Of cvb.Point)
+    Public ptInput As New List(Of cv.Point)
+    Public ptList As New List(Of cv.Point)
     Public clusterID As New List(Of Integer)
-    Public clusters As New SortedList(Of Integer, List(Of cvb.Point))
+    Public clusters As New SortedList(Of Integer, List(Of cv.Point))
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
         desc = "Group the points based on their proximity to each other."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dst2 = src.Clone
         If standalone Then ptInput = task.featurePoints
 
@@ -18,7 +18,7 @@ Public Class Cluster_Basics : Inherits TaskParent
 
         knn.queries.Clear()
         For Each pt In ptInput
-            knn.queries.Add(New cvb.Point2f(pt.X, pt.Y))
+            knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
         Next
         knn.trainInput = knn.queries
         knn.Run(empty)
@@ -28,8 +28,8 @@ Public Class Cluster_Basics : Inherits TaskParent
         clusters.Clear()
         Dim groupID As Integer
         For i = 0 To knn.queries.Count - 1
-            Dim p1 = New cvb.Point(knn.queries(i).X, knn.queries(i).Y)
-            Dim p2 = New cvb.Point(knn.queries(knn.result(i, 1)).X, knn.queries(knn.result(i, 1)).Y)
+            Dim p1 = New cv.Point(knn.queries(i).X, knn.queries(i).Y)
+            Dim p2 = New cv.Point(knn.queries(knn.result(i, 1)).X, knn.queries(knn.result(i, 1)).Y)
             Dim index1 = ptList.IndexOf(p1)
             Dim index2 = ptList.IndexOf(p2)
             If index1 >= 0 And index2 >= 0 Then Continue For
@@ -37,7 +37,7 @@ Public Class Cluster_Basics : Inherits TaskParent
                 ptList.Add(p1)
                 ptList.Add(p2)
                 groupID = clusters.Count
-                Dim newList = New List(Of cvb.Point)({p1, p2})
+                Dim newList = New List(Of cv.Point)({p1, p2})
                 clusters.Add(groupID, newList)
                 clusterID.Add(groupID)
                 clusterID.Add(groupID)
@@ -60,7 +60,7 @@ Public Class Cluster_Basics : Inherits TaskParent
         Next
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-            DrawCircle(dst2,knn.queries(i), task.DotSize, cvb.Scalar.Red)
+            DrawCircle(dst2,knn.queries(i), task.DotSize, cv.Scalar.Red)
             DrawCircle(dst3,knn.queries(i), task.DotSize, task.HighlightColor)
         Next
         labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input point and its nearest neighbor."
@@ -74,11 +74,11 @@ End Class
 
 Public Class Cluster_Hulls : Inherits TaskParent
     Dim cluster As New Cluster_Basics
-    Public hulls As New List(Of List(Of cvb.Point))
+    Public hulls As New List(Of List(Of cv.Point))
     Public Sub New()
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dst2 = src.Clone
 
         cluster.ptInput = task.featurePoints
@@ -88,11 +88,11 @@ Public Class Cluster_Hulls : Inherits TaskParent
 
         hulls.Clear()
         For Each group In cluster.clusters
-            Dim hullPoints = cvb.Cv2.ConvexHull(group.Value.ToArray, True).ToList
-            Dim hull As New List(Of cvb.Point)
+            Dim hullPoints = cv.Cv2.ConvexHull(group.Value.ToArray, True).ToList
+            Dim hull As New List(Of cv.Point)
             If hullPoints.Count > 2 Then
                 For Each pt In hullPoints
-                    hull.Add(New cvb.Point(pt.X, pt.Y))
+                    hull.Add(New cv.Point(pt.X, pt.Y))
                 Next
             ElseIf hullPoints.Count = 2 Then
                 DrawLine(dst3, hullPoints(0), hullPoints(1), white)

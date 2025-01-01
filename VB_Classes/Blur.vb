@@ -1,14 +1,14 @@
 Imports System.Windows.Forms
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Blur_Basics : Inherits TaskParent
     Public Options As New Options_Blur
     Public Sub New()
         UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.")
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Options.RunOpt()
-        cvb.Cv2.GaussianBlur(src, dst2, New cvb.Size(Options.kernelSize, Options.kernelSize), Options.sigma, Options.sigma)
+        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(Options.kernelSize, Options.kernelSize), Options.sigma, Options.sigma)
     End Sub
 End Class
 
@@ -25,9 +25,9 @@ Public Class Blur_Homogeneous : Inherits TaskParent
         desc = "Smooth each pixel with a kernel of 1's of different sizes."
         blurKernelSlider = FindSlider("Blur Kernel Size")
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
-        dst2 = src.Blur(New cvb.Size(kernelSize, kernelSize), New cvb.Point(-1, -1))
+        dst2 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
     End Sub
 End Class
 
@@ -44,9 +44,9 @@ Public Class Blur_Median : Inherits TaskParent
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
         blurKernelSlider = FindSlider("Blur Kernel Size")
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
-        cvb.Cv2.MedianBlur(src, dst2, kernelSize)
+        cv.Cv2.MedianBlur(src, dst2, kernelSize)
     End Sub
 End Class
 
@@ -63,9 +63,9 @@ Public Class Blur_Bilateral : Inherits TaskParent
         desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
         blurKernelSlider = FindSlider("Blur Kernel Size")
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
-        cvb.Cv2.BilateralFilter(src, dst2, kernelSize, kernelSize * 2, kernelSize / 2)
+        cv.Cv2.BilateralFilter(src, dst2, kernelSize, kernelSize * 2, kernelSize / 2)
     End Sub
 End Class
 
@@ -83,7 +83,7 @@ Public Class Blur_PlusHistogram : Inherits TaskParent
         labels(3) = "Top is before equalize, Bottom is after Equalize"
         desc = "Compound algorithms Blur and Histogram"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         myhist.Run(src)
 
         mat2to1.mat(0) = myhist.dst2.Clone
@@ -112,13 +112,13 @@ Public Class Blur_TopoMap : Inherits TaskParent
         labels(2) = "Image Gradient"
         desc = "Create a topo map from the blurred image"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         gradient.Run(src)
         dst2 = gradient.magnitude
 
-        If options.kernelSize > 1 Then cvb.Cv2.GaussianBlur(dst2, dst3, New cvb.Size(options.kernelSize, options.kernelSize), 0, 0)
+        If options.kernelSize > 1 Then cv.Cv2.GaussianBlur(dst2, dst3, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
         dst3 = dst3.Normalize(255)
         dst3 = dst3.ConvertScaleAbs(255)
 
@@ -151,10 +151,10 @@ Public Class Blur_Detection : Inherits TaskParent
         labels = {"", "", "Draw a rectangle to blur a region in alternating frames and test further", "Detected blur in the highlight regions - non-blur is white."}
         desc = "Detect blur in an image"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        Dim r = New cvb.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50)
+    Public Overrides sub runAlg(src As cv.Mat)
+        Dim r = New cv.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50)
         If standaloneTest() Then
-            If task.drawRect <> New cvb.Rect Then r = task.drawRect
+            If task.drawRect <> New cv.Rect Then r = task.drawRect
             ' deliberately blur a small region to test the algorithm
             If task.frameCount Mod 2 Then
                 blur.Run(src(r))
@@ -167,7 +167,7 @@ Public Class Blur_Detection : Inherits TaskParent
         dst3 = laplace.dst2
 
         Dim mean As Single, stdev As Single
-        cvb.Cv2.MeanStdDev(dst2, mean, stdev)
+        cv.Cv2.MeanStdDev(dst2, mean, stdev)
         SetTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
 
         If standaloneTest() Then dst2.Rectangle(r, white, task.lineWidth)
@@ -185,8 +185,8 @@ Public Class Blur_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Blur the depth results to help find the boundaries to large depth regions"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        dst3 = task.depthRGB.CvtColor(cvb.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cvb.ThresholdTypes.Binary)
+    Public Overrides sub runAlg(src As cv.Mat)
+        dst3 = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         blur.Run(dst3)
         dst2 = blur.dst2
@@ -202,9 +202,9 @@ Public Class Blur_Gaussian : Inherits TaskParent
     Public Sub New()
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
-        cvb.Cv2.GaussianBlur(src, dst2, New cvb.Size(options.kernelSize, options.kernelSize), 0, 0)
+        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
     End Sub
 End Class
 
@@ -218,11 +218,11 @@ End Class
 '        desc = "Find keypoints using AKAZE algorithm."
 '        labels(2) = "AKAZE key points"
 '    End Sub
-'    Public Overrides sub runAlg(src As cvb.Mat)
-'        CS_AKaze.GetKeypoints(src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+'    Public Overrides sub runAlg(src As cv.Mat)
+'        CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 '        src.CopyTo(dst2)
 '        For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
-'            DrawCircle(dst2, CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.DotSize, cvb.Scalar.Red)
+'            DrawCircle(dst2, CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.DotSize, cv.Scalar.Red)
 '        Next
 '    End Sub
 '    End 
@@ -233,11 +233,11 @@ End Class
 '            desc = "Find keypoints using KAZE algorithm."
 '            labels(2) = "KAZE key points"
 '        End Sub
-'        Public Overrides sub runAlg(src As cvb.Mat)
-'            CS_Kaze.GetKeypoints(src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+'        Public Overrides sub runAlg(src As cv.Mat)
+'            CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 '            src.CopyTo(dst2)
 '            For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
-'                DrawCircle(dst2, CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.DotSize, cvb.Scalar.Red)
+'                DrawCircle(dst2, CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.DotSize, cv.Scalar.Red)
 '            Next
 '        End Sub
 '    End Class

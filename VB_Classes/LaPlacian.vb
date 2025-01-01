@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Laplacian_Basics : Inherits TaskParent
     Dim options As New Options_Laplacian
@@ -7,13 +7,13 @@ Public Class Laplacian_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Laplacian filter - the second derivative."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Options.RunOpt()
         If standaloneTest() Then src = src.GaussianBlur(options.kernel, 0, 0)
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
-        dst3 = src.Laplacian(cvb.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        dst3 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
 
-        erode.Run(dst3.Threshold(options.threshold, 255, cvb.ThresholdTypes.Binary))
+        erode.Run(dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary))
         dilate.Run(erode.dst2)
         dst2 = dilate.dst2
 
@@ -32,7 +32,7 @@ Public Class Laplacian_Blur : Inherits TaskParent
     Public Sub New()
         desc = "Laplacian filter - the second derivative - with different bluring techniques"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Options.RunOpt()
 
         Dim blurText As String
@@ -46,8 +46,8 @@ Public Class Laplacian_Blur : Inherits TaskParent
             src = src.MedianBlur(options.kernel.Width)
             blurText = "MedianBlur"
         End If
-        If src.Channels() = 3 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
-        dst2 = src.Laplacian(cvb.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        dst2 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
         labels(2) = "Laplacian+" + blurText + " k = " + CStr(options.kernel.Width)
     End Sub
 End Class
@@ -62,9 +62,9 @@ Public Class Laplacian_PyramidFilter : Inherits TaskParent
     Public Sub New()
         desc = "VB.Net version of the Laplacian Pyramid Filter - see http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        src.ConvertTo(options.img, cvb.MatType.CV_32F)
+    Public Overrides sub runAlg(src As cv.Mat)
+        src.ConvertTo(options.img, cv.MatType.CV_32F)
         options.RunOpt()
-        options.img.ConvertTo(dst2, cvb.MatType.CV_8UC3)
+        options.img.ConvertTo(dst2, cv.MatType.CV_8UC3)
     End Sub
 End Class

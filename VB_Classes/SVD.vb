@@ -1,10 +1,10 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 ' https://answers.opencvb.org/question/200080/parameters-of-cvsvdecomp/
 Public Class SVD_Example : Inherits TaskParent
     Public Sub New()
         desc = "SVD example"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim inputData() As Single = {
             1, 2, 3, 4, 5,
             1, 2, 3, 4, 5,
@@ -13,15 +13,15 @@ Public Class SVD_Example : Inherits TaskParent
             1, 2, 3, 4, 5
         }
 
-        src = cvb.Mat.FromPixelData(5, 5, cvb.MatType.CV_32F, inputData)
-        Dim W As New cvb.Mat, U As New cvb.Mat, VT As New cvb.Mat
+        src = cv.Mat.FromPixelData(5, 5, cv.MatType.CV_32F, inputData)
+        Dim W As New cv.Mat, U As New cv.Mat, VT As New cv.Mat
 
-        cvb.Cv2.SVDecomp(src, W, U, VT, cvb.SVD.Flags.FullUV)
+        cv.Cv2.SVDecomp(src, W, U, VT, cv.SVD.Flags.FullUV)
 
-        Dim WD As New cvb.Mat(5, 5, cvb.MatType.CV_32F, cvb.Scalar.All(0))
+        Dim WD As New cv.Mat(5, 5, cv.MatType.CV_32F, cv.Scalar.All(0))
         W.CopyTo(WD.Diag)
 
-        Dim rec As cvb.Mat = VT.T * WD * U.T
+        Dim rec As cv.Mat = VT.T * WD * U.T
         strOut = ""
         For i = 0 To rec.Rows - 1
             For j = 0 To rec.Cols - 1
@@ -46,20 +46,20 @@ Public Class SVD_Example2 : Inherits TaskParent
     Public Sub New()
         desc = "Compute the mean and tangent of a RedCloud Cell"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
 
         Dim rc = task.rc
 
         If task.heartBeat Then
-            Dim m = cvb.Cv2.Moments(rc.mask, True)
-            Dim center = New cvb.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
+            Dim m = cv.Cv2.Moments(rc.mask, True)
+            Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
             DrawCircle(task.color(rc.rect), center, task.DotSize, task.HighlightColor)
 
-            Dim mArea = cvb.Mat.FromPixelData(4, 1, cvb.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
-            Dim U As New cvb.Mat
-            cvb.Cv2.SVDecomp(mArea, New cvb.Mat, U, New cvb.Mat, cvb.SVD.Flags.FullUV)
+            Dim mArea = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
+            Dim U As New cv.Mat
+            cv.Cv2.SVDecomp(mArea, New cv.Mat, U, New cv.Mat, cv.SVD.Flags.FullUV)
 
 
             strOut = "The U Mat: " + vbCrLf
@@ -100,12 +100,12 @@ Public Class SVD_Gaussian : Inherits TaskParent
     Public Sub New()
         desc = "Compute the SVD for the covariance of 2 images - only close to working..."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         covar.Run(src)
         dst2 = src
 
-        Dim U As New cvb.Mat, W As New cvb.Mat, VT As New cvb.Mat
-        cvb.Cv2.SVDecomp(covar.covariance, W, U, VT, cvb.SVD.Flags.FullUV)
+        Dim U As New cv.Mat, W As New cv.Mat, VT As New cv.Mat
+        cv.Cv2.SVDecomp(covar.covariance, W, U, VT, cv.SVD.Flags.FullUV)
 
         strOut = "The Covariance Mat: " + vbCrLf
         For j = 0 To covar.covariance.Rows - 1
@@ -134,13 +134,13 @@ Public Class SVD_Gaussian : Inherits TaskParent
         Next
         strOut += vbCrLf
 
-        Dim angle = -Math.Atan2(U.Get(Of Double)(0, 1), U.Get(Of Double)(0, 0)) * (180 / cvb.Cv2.PI)
+        Dim angle = -Math.Atan2(U.Get(Of Double)(0, 1), U.Get(Of Double)(0, 0)) * (180 / cv.Cv2.PI)
         strOut += "Angle = " + Format(angle, fmt3) + " radians" + vbCrLf
 
         W = W.Sqrt() * 3
-        Dim size = New cvb.Size2f(10, 100) ' New cvb.Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
-        Dim pt = New cvb.Point2f(covar.mean.Get(Of Double)(0, 0), covar.mean.Get(Of Double)(0, 1))
-        Dim rrect = New cvb.RotatedRect(pt, size, angle)
+        Dim size = New cv.Size2f(10, 100) ' New cv.Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
+        Dim pt = New cv.Point2f(covar.mean.Get(Of Double)(0, 0), covar.mean.Get(Of Double)(0, 1))
+        Dim rrect = New cv.RotatedRect(pt, size, angle)
         dst2.Ellipse(rrect, task.HighlightColor, task.lineWidth, task.lineType)
 
         SetTrueText(strOut, 3)

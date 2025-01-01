@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports  System.IO
 'https://docs.opencvb.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
@@ -14,7 +14,7 @@ Public Class Retina_Basics_CPP_VB : Inherits TaskParent
         labels(3) = "Retina Magno"
         desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If options.xmlCheck Then
@@ -45,7 +45,7 @@ Public Class Retina_Basics_CPP_VB : Inherits TaskParent
                                          handleMagno.AddrOfPinnedObject(), options.useLogSampling)
         Else
             SetTrueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
-            dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8UC1, 0)
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         End If
         handleSrc.Free()
         handleMagno.Free()
@@ -53,8 +53,8 @@ Public Class Retina_Basics_CPP_VB : Inherits TaskParent
         If imagePtr <> 0 Then
             Dim nextFactor = samplingFactor
             If options.useLogSampling = False Then nextFactor = 1
-            dst2 = cvb.Mat.FromPixelData(src.Rows / nextFactor, src.Cols / nextFactor, cvb.MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone
-            dst3 = cvb.Mat.FromPixelData(src.Rows / nextFactor, src.Cols / nextFactor, cvb.MatType.CV_8U, magnoData).Resize(src.Size())
+            dst2 = cv.Mat.FromPixelData(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, imagePtr).Resize(src.Size()).Clone
+            dst3 = cv.Mat.FromPixelData(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
         End If
     End Sub
     Public Sub Close()
@@ -69,13 +69,13 @@ End Class
 
 Public Class Retina_Depth : Inherits TaskParent
     Dim retina As New Retina_Basics_CPP_VB
-    Dim lastMotion As New cvb.Mat
+    Dim lastMotion As New cv.Mat
     Public Sub New()
         desc = "Use the bio-inspired retina algorithm with the depth data."
         labels(2) = "Last result || current result"
         labels(3) = "Current depth motion result"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         retina.Run(task.depthRGB)
         dst3 = retina.dst3
         If lastMotion.Width = 0 Then lastMotion = retina.dst3

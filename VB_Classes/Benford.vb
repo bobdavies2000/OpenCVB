@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
 ' Benford's Law is pretty cool but I don't think it is a phenomenon of nature.  It is produced from bringing real world measurements to a human scale.
@@ -36,11 +36,11 @@ Public Class Benford_Basics : Inherits TaskParent
         ReDim counts(expectedDistribution.Count - 1)
         use99 = True
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = If(src.Channels() = 1, src, src.CvtColor(cvb.ColorConversionCodes.BGR2Gray))
-            src = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32F)
-            dst2.ConvertTo(src, cvb.MatType.CV_32F)
+            dst2 = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2Gray))
+            src = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
+            dst2.ConvertTo(src, cv.MatType.CV_32F)
         End If
 
         src = src.Reshape(1, src.Width * src.Height)
@@ -69,16 +69,16 @@ Public Class Benford_Basics : Inherits TaskParent
             Next
         End If
 
-        Dim hist = cvb.Mat.FromPixelData(counts.Length, 1, cvb.MatType.CV_32F, counts)
-        plot.backColor = cvb.Scalar.Blue
+        Dim hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
+        plot.backColor = cv.Scalar.Blue
         plot.Run(hist)
         dst3 = plot.dst2.Clone
         For i = 0 To counts.Count - 1
             counts(i) = src.Rows * expectedDistribution(i)
         Next
 
-        hist = cvb.Mat.FromPixelData(counts.Length, 1, cvb.MatType.CV_32F, counts)
-        plot.backColor = cvb.Scalar.Gray
+        hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
+        plot.backColor = cv.Scalar.Gray
         plot.Run(hist)
 
         addW.src2 = Not plot.dst2
@@ -101,10 +101,10 @@ Public Class Benford_NormalizedImage : Inherits TaskParent
     Public Sub New()
         desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        dst3 = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
-        Dim gray32f As New cvb.Mat
-        dst3.ConvertTo(gray32f, cvb.MatType.CV_32F)
+    Public Overrides sub runAlg(src As cv.Mat)
+        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        Dim gray32f As New cv.Mat
+        dst3.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f.Normalize(1))
         dst2 = benford.dst2
@@ -126,10 +126,10 @@ Public Class Benford_NormalizedImage99 : Inherits TaskParent
 
         desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        dst3 = src.CvtColor(cvb.ColorConversionCodes.BGR2Gray)
-        Dim gray32f As New cvb.Mat
-        dst3.ConvertTo(gray32f, cvb.MatType.CV_32F)
+    Public Overrides sub runAlg(src As cv.Mat)
+        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        Dim gray32f As New cv.Mat
+        dst3.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f.Normalize(1))
         dst2 = benford.dst2
@@ -150,12 +150,12 @@ Public Class Benford_JPEG : Inherits TaskParent
     Public Sub New()
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cvb.ImwriteFlags.JpegQuality, options.quality})
-        Dim tmp = cvb.Mat.FromPixelData(jpeg.Count, 1, cvb.MatType.CV_8U, jpeg)
-        dst3 = cvb.Cv2.ImDecode(tmp, cvb.ImreadModes.Color)
+        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
+        Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
+        dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -176,12 +176,12 @@ Public Class Benford_JPEG99 : Inherits TaskParent
         benford.setup99()
         desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cvb.ImwriteFlags.JpegQuality, options.quality})
-        Dim tmp = cvb.Mat.FromPixelData(jpeg.Count, 1, cvb.MatType.CV_8U, jpeg)
-        dst3 = cvb.Cv2.ImDecode(tmp, cvb.ImreadModes.Color)
+        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
+        Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
+        dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -202,12 +202,12 @@ Public Class Benford_PNG : Inherits TaskParent
     Public Sub New()
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim png = src.ImEncode(".png", New Integer() {cvb.ImwriteFlags.PngCompression, options.compression})
-        Dim tmp = cvb.Mat.FromPixelData(png.Count, 1, cvb.MatType.CV_8U, png)
-        dst3 = cvb.Cv2.ImDecode(tmp, cvb.ImreadModes.Color)
+        Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, options.compression})
+        Dim tmp = cv.Mat.FromPixelData(png.Count, 1, cv.MatType.CV_8U, png)
+        dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -225,7 +225,7 @@ Public Class Benford_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Apply Benford to the depth data"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         benford.Run(task.pcSplit(2))
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -248,12 +248,12 @@ Public Class Benford_Primes : Inherits TaskParent
         labels = {"", "", "Actual Distribution of input", ""}
         desc = "Apply Benford to a list of primes"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.optionsChanged Then sieve.Run(src) ' only need to compute this once...
         SetTrueText($"Primes found: {sieve.primes.Count}", 3)
 
-        Dim tmp = cvb.Mat.FromPixelData(sieve.primes.Count, 1, cvb.MatType.CV_32S, sieve.primes.ToArray())
-        tmp.ConvertTo(tmp, cvb.MatType.CV_32F)
+        Dim tmp = cv.Mat.FromPixelData(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
+        tmp.ConvertTo(tmp, cv.MatType.CV_32F)
         benford.Run(tmp)
         dst2 = benford.dst2
     End Sub

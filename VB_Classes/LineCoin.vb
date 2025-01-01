@@ -1,22 +1,22 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class LineCoin_Basics : Inherits TaskParent
     Public longLines As New LongLine_Basics
     Public lpList As New List(Of linePoints)
     Dim lpLists As New List(Of List(Of linePoints))
     Public Sub New()
-        dst2 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the coincident lines in the image and measure their value."
     End Sub
     Public Function findLines(lpLists As List(Of List(Of linePoints))) As List(Of linePoints)
-        Dim p1List As New List(Of cvb.Point)
-        Dim p2List As New List(Of cvb.Point)
+        Dim p1List As New List(Of cv.Point)
+        Dim p2List As New List(Of cv.Point)
         Dim ptCounts As New List(Of Integer)
         Dim lp As linePoints
         For Each lpList In lpLists
             For Each mp In lpList
                 mp.slope = CInt(mp.slope * 10) / 10
                 If mp.slope = 0 Then
-                    lp = New linePoints(New cvb.Point(mp.p1.X, 0), New cvb.Point(mp.p1.X, dst2.Height))
+                    lp = New linePoints(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
                 Else
                     lp = longLines.BuildLongLine(mp)
                 End If
@@ -41,7 +41,7 @@ Public Class LineCoin_Basics : Inherits TaskParent
         If lpLists.Count >= task.frameHistoryCount Then lpLists.RemoveAt(0)
         Return lpList
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.optionsChanged Then lpLists.Clear()
 
         longLines.Run(src)
@@ -68,10 +68,10 @@ Public Class LineCoin_HistoryIntercept : Inherits TaskParent
     Public lpList As New List(Of linePoints)
     Dim mpLists As New List(Of List(Of linePoints))
     Public Sub New()
-        dst2 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "find lines with coincident slopes and intercepts."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.optionsChanged Then mpLists.Clear()
 
         coin.Run(src)
@@ -92,7 +92,7 @@ Public Class LineCoin_Parallel : Inherits TaskParent
     Public Sub New()
         desc = "Find the lines that are coincident in the parallel lines"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         parallel.Run(src)
 
         coinList.Clear()
@@ -110,7 +110,7 @@ Public Class LineCoin_Parallel : Inherits TaskParent
 
         dst2 = src.Clone
         For Each cp In coinList
-            dst2.Line(cp.p3, cp.p4, cvb.Scalar.Red, task.lineWidth + 2, task.lineType)
+            dst2.Line(cp.p3, cp.p4, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
             dst2.Line(cp.p1, cp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(coinList.Count) + " coincident lines were detected"

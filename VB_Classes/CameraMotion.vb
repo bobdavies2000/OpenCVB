@@ -1,4 +1,4 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class CameraMotion_Basics : Inherits TaskParent
     Public translationX As Integer
     Public translationY As Integer
@@ -6,35 +6,35 @@ Public Class CameraMotion_Basics : Inherits TaskParent
     Public secondOpinion As Boolean
     Dim feat As New Swarm_Basics
     Public Sub New()
-        dst2 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gOptions.setDebugSlider(3)
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         gravity.Run(src)
 
         Dim gravityVec = New linePoints(task.gravityVec.p1, task.gravityVec.p2)
         Dim horizonVec = New linePoints(task.horizonVec.p1, task.horizonVec.p2)
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         translationX = task.gOptions.DebugSliderValue ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
         translationY = task.gOptions.DebugSliderValue ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
         If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
         If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
-            horizonVec = New linePoints(New cvb.Point2f, New cvb.Point2f(336, 0))
+            horizonVec = New linePoints(New cv.Point2f, New cv.Point2f(336, 0))
             translationY = 0
         End If
 
-        Dim r1 As cvb.Rect, r2 As cvb.Rect
+        Dim r1 As cv.Rect, r2 As cv.Rect
         If translationX = 0 And translationY = 0 Then
             dst2 = src
             task.camMotionPixels = 0
             task.camDirection = 0
         Else
             ' dst2.SetTo(0)
-            r1 = New cvb.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
+            r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
                                                          Math.Min(dst2.Height - translationY * 2, dst2.Height))
             If r1.X < 0 Then
                 r1.X = -r1.X
@@ -45,7 +45,7 @@ Public Class CameraMotion_Basics : Inherits TaskParent
                 r1.Height += translationY * 2
             End If
 
-            r2 = New cvb.Rect(Math.Abs(translationX), Math.Abs(translationY), r1.Width, r1.Height)
+            r2 = New cv.Rect(Math.Abs(translationX), Math.Abs(translationY), r1.Width, r1.Height)
 
             task.camMotionPixels = Math.Sqrt(translationX * translationX + translationY * translationY)
             If translationX = 0 Then
@@ -63,7 +63,7 @@ Public Class CameraMotion_Basics : Inherits TaskParent
                     task.camMotionPixels = 0
                     src.CopyTo(dst2)
                 End If
-                dst3 = (src - dst2).ToMat.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+                dst3 = (src - dst2).ToMat.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             End If
         End If
 
@@ -86,21 +86,21 @@ End Class
 Public Class CameraMotion_WithRotation : Inherits TaskParent
     Public translationX As Single
     Public rotationX As Single
-    Public centerX As cvb.Point2f
+    Public centerX As cv.Point2f
     Public translationY As Single
     Public rotationY As Single
-    Public centerY As cvb.Point2f
+    Public centerY As cv.Point2f
     Public rotate As New Rotate_BasicsQT
     Dim gravityVec As linePoints
     Dim horizonVec As linePoints
     Public Sub New()
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
-        dst3 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Merge with previous image using rotation AND translation of the camera motion - not as good as translation alone."
     End Sub
     Public Sub translateRotateX(x1 As Integer, x2 As Integer)
         rotationX = Math.Atan(Math.Abs((x1 - x2)) / dst2.Height) * 57.2958
-        centerX = New cvb.Point2f((task.gravityVec.p1.X + task.gravityVec.p2.X) / 2, (task.gravityVec.p1.Y + task.gravityVec.p2.Y) / 2)
+        centerX = New cv.Point2f((task.gravityVec.p1.X + task.gravityVec.p2.X) / 2, (task.gravityVec.p1.Y + task.gravityVec.p2.Y) / 2)
         If x1 >= 0 And x2 > 0 Then
             translationX = If(x1 > x2, x1 - x2, x2 - x1)
             centerX = task.gravityVec.p2
@@ -116,7 +116,7 @@ Public Class CameraMotion_WithRotation : Inherits TaskParent
     End Sub
     Public Sub translateRotateY(y1 As Integer, y2 As Integer)
         rotationY = Math.Atan(Math.Abs((y1 - y2)) / dst2.Width) * 57.2958
-        centerY = New cvb.Point2f((task.horizonVec.p1.X + task.horizonVec.p2.X) / 2, (task.horizonVec.p1.Y + task.horizonVec.p2.Y) / 2)
+        centerY = New cv.Point2f((task.horizonVec.p1.X + task.horizonVec.p2.X) / 2, (task.horizonVec.p1.Y + task.horizonVec.p2.Y) / 2)
         If y1 > 0 And y2 > 0 Then
             translationY = If(y1 > y2, y1 - y2, y2 - y1)
             centerY = task.horizonVec.p2
@@ -130,13 +130,13 @@ Public Class CameraMotion_WithRotation : Inherits TaskParent
             rotationY *= -1
         End If
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.firstPass Then
             gravityVec = task.gravityVec
             horizonVec = task.horizonVec
         End If
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim x1 = gravityVec.p1.X - task.gravityVec.p1.X
         Dim x2 = gravityVec.p2.X - task.gravityVec.p2.X
@@ -150,14 +150,14 @@ Public Class CameraMotion_WithRotation : Inherits TaskParent
         dst1.SetTo(0)
         dst3.SetTo(0)
         If Math.Abs(x1 - x2) > 0.5 Or Math.Abs(y1 - y2) > 0.5 Then
-            Dim r1 = New cvb.Rect(translationX, translationY, dst2.Width - translationX, dst2.Height - translationY)
-            Dim r2 = New cvb.Rect(0, 0, r1.Width, r1.Height)
+            Dim r1 = New cv.Rect(translationX, translationY, dst2.Width - translationX, dst2.Height - translationY)
+            Dim r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
             dst1(r2) = src(r1)
             rotate.rotateAngle = rotationY
             rotate.rotateCenter = centerY
             rotate.Run(dst1)
             dst2 = rotate.dst2
-            dst3 = (src - dst2).ToMat.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+            dst3 = (src - dst2).ToMat.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         Else
             dst2 = src
         End If
@@ -185,12 +185,12 @@ Public Class CameraMotion_SceneMotion : Inherits TaskParent
         labels(2) = "Image after adjusting for camera motion."
         desc = "Display both camera motion (on heartbeats) and scene motion."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         cMotion.Run(src)
         dst2 = cMotion.dst3
 
         motion.Run(src)
-        dst3 = motion.dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        dst3 = motion.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

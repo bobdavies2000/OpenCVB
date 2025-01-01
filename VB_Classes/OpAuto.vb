@@ -1,23 +1,23 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class OpAuto_XRange : Inherits TaskParent
-    Public histogram As New cvb.Mat
+    Public histogram As New cv.Mat
     Dim adjustedCount As Integer = 0
     Public Sub New()
         labels(2) = "Optimized top view to show as many samples as possible."
         desc = "Automatically adjust the X-Range option of the pointcloud to maximize visible pixels"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim expectedCount = task.depthMask.CountNonZero
 
         Dim diff = Math.Abs(expectedCount - adjustedCount)
 
         ' the input is a histogram.  If standaloneTest(), go get one...
         If standaloneTest() Then
-            cvb.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cvb.Mat, histogram, 2, task.bins2D, task.rangesTop)
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
             histogram.Row(0).SetTo(0)
-            dst2 = histogram.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
-            dst3 = histogram.Threshold(task.projectionThreshold, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+            dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             src = histogram
         End If
 
@@ -50,23 +50,23 @@ End Class
 
 
 Public Class OpAuto_YRange : Inherits TaskParent
-    Public histogram As New cvb.Mat
+    Public histogram As New cv.Mat
     Dim adjustedCount As Integer = 0
     Public Sub New()
         labels(2) = "Optimized side view to show as much as possible."
         desc = "Automatically adjust the Y-Range option of the pointcloud to maximize visible pixels"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim expectedCount = task.depthMask.CountNonZero
 
         Dim diff = Math.Abs(expectedCount - adjustedCount)
 
         ' the input is a histogram.  If standaloneTest(), go get one...
         If standaloneTest() Then
-            cvb.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cvb.Mat, histogram, 2, task.bins2D, task.rangesSide)
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
             histogram.Col(0).SetTo(0)
-            dst2 = histogram.Threshold(0, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
-            dst3 = histogram.Threshold(task.projectionThreshold, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+            dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             src = histogram
         End If
 
@@ -104,14 +104,14 @@ Public Class OpAuto_FloorCeiling : Inherits TaskParent
     Public floorY As Single
     Public ceilingY As Single
     Public Sub New()
-        dst1 = New cvb.Mat(dst1.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Automatically find the Y values that best describes the floor and ceiling (if present)"
     End Sub
     Private Sub rebuildMask(maskLabel As String, min As Single, max As Single)
         Dim mask = task.pcSplit(1).InRange(min, max).ConvertScaleAbs
 
-        Dim mean As cvb.Scalar, stdev As cvb.Scalar
-        cvb.Cv2.MeanStdDev(task.pointCloud, mean, stdev, mask)
+        Dim mean As cv.Scalar, stdev As cv.Scalar
+        cv.Cv2.MeanStdDev(task.pointCloud, mean, stdev, mask)
 
         strOut += "The " + maskLabel + " mask has Y mean and stdev are:" + vbCrLf
         strOut += maskLabel + " Y Mean = " + Format(mean(1), fmt3) + vbCrLf
@@ -119,7 +119,7 @@ Public Class OpAuto_FloorCeiling : Inherits TaskParent
 
         If Math.Abs(mean(1)) > task.yRange / 4 Then dst1 = mask Or dst1
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim pad As Single = 0.05 ' pad the estimate by X cm's
 
         dst2 = src.Clone
@@ -160,7 +160,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         Dim desiredBoundaries = options.desiredBoundaries
 
@@ -204,7 +204,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
         If standaloneTest() Then
             For Each entry In valleyOrder
                 Dim col = entry.Value * dst2.Width / task.histogramBins
-                DrawLine(dst2, New cvb.Point(col, 0), New cvb.Point(col, dst2.Height), white)
+                DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), white)
             Next
             SetTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
         End If
@@ -217,14 +217,14 @@ End Class
 
 Public Class OpAuto_Peaks2D : Inherits TaskParent
     Public options As New Options_Boundary
-    Public clusterPoints As New List(Of cvb.Point2f)
+    Public clusterPoints As New List(Of cv.Point2f)
     Dim heatmap As New HeatMap_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         Dim desiredBoundaries = options.desiredBoundaries
         Dim peakDistance = options.peakDistance
@@ -237,7 +237,7 @@ Public Class OpAuto_Peaks2D : Inherits TaskParent
         End If
 
         clusterPoints.Clear()
-        clusterPoints.Add(New cvb.Point(0, 0))
+        clusterPoints.Add(New cv.Point(0, 0))
         For i = 0 To desiredBoundaries - 1
             Dim mm as mmData = GetMinMax(src)
             If clusterPoints.Contains(mm.maxLoc) = False Then clusterPoints.Add(mm.maxLoc)
@@ -257,7 +257,7 @@ End Class
 
 
 Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
-    Public clusterPoints As New List(Of cvb.Point2f)
+    Public clusterPoints As New List(Of cv.Point2f)
     Dim options As New Options_Boundary
     Dim hist2d As New Hist2D_Basics
     Public Sub New()
@@ -265,26 +265,26 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static boundarySlider = FindSlider("Desired boundary count")
         Dim desiredBoundaries = boundarySlider.value
 
         ' input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...
-        If standaloneTest() Or src.Type = cvb.MatType.CV_8UC3 Then
+        If standaloneTest() Or src.Type = cv.MatType.CV_8UC3 Then
             hist2d.Run(src)
             src = hist2d.histogram
             dst2.SetTo(0)
         End If
 
-        Dim pointPop As New SortedList(Of Single, cvb.Point)(New compareAllowIdenticalSingleInverted)
+        Dim pointPop As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
         For Each roi In task.gridRects
             Dim mm as mmData = GetMinMax(src(roi))
             If mm.maxVal = 0 Then Continue For
-            pointPop.Add(mm.maxVal, New cvb.Point(roi.X + mm.maxLoc.X, roi.Y + mm.maxLoc.Y))
+            pointPop.Add(mm.maxVal, New cv.Point(roi.X + mm.maxLoc.X, roi.Y + mm.maxLoc.Y))
         Next
 
         clusterPoints.Clear()
-        clusterPoints.Add(New cvb.Point(0, 0))
+        clusterPoints.Add(New cv.Point(0, 0))
         For Each entry In pointPop
             clusterPoints.Add(entry.Value)
             If desiredBoundaries <= clusterPoints.Count Then Exit For
@@ -318,10 +318,10 @@ Public Class OpAuto_PixelDifference : Inherits TaskParent
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If not task.heartBeat And task.frameCount > 10 Then Exit Sub
         If standaloneTest() Then
-            diff.Run(src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY))
+            diff.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             src = diff.dst2
         End If
 
@@ -352,7 +352,7 @@ Public Class OpAuto_MSER : Inherits TaskParent
     Public Sub New()
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static minSlider = FindSlider("MSER Min Area")
         Static maxSlider = FindSlider("MSER Max Area")
         If standaloneTest() Then
@@ -363,7 +363,7 @@ Public Class OpAuto_MSER : Inherits TaskParent
         dst2 = src.Clone
 
         If task.heartBeat Or checkOften Then
-            If src.Channels() <> 1 Then dst1 = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY) Else dst1 = src
+            If src.Channels() <> 1 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
             Dim count = dst1.CountNonZero
             Dim desired = CInt(dst2.Total * 0.6)
             If count < desired Then

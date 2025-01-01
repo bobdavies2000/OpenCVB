@@ -1,14 +1,14 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Dim edges As New EdgeDraw_Basics
     Public classCount As Integer = 2
     Public Sub New()
         labels = {"", "", "EdgeDraw_Basics output", ""}
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(2) = "CV_8UC1 output of EdgeDraw_Basics - only 0 and 1"
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         edges.Run(src)
         dst2.SetTo(0)
         dst2.SetTo(1, edges.dst2)
@@ -26,7 +26,7 @@ Public Class FeatureLess_WithoutMotion : Inherits TaskParent
         labels = {"", "", "EdgeDraw_Basics output", ""}
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         edges.Run(src)
         dst2 = edges.dst2
     End Sub
@@ -43,11 +43,11 @@ Public Class FeatureLess_Canny : Inherits TaskParent
     Public Sub New()
         desc = "Use Canny edges to define featureless regions."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         edges.Run(src)
-        dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cvb.ThresholdTypes.Binary)
+        dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -64,11 +64,11 @@ Public Class FeatureLess_Sobel : Inherits TaskParent
     Public Sub New()
         desc = "Use Sobel edges to define featureless regions."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         edges.Run(src)
-        dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cvb.ThresholdTypes.Binary)
+        dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -86,9 +86,9 @@ Public Class FeatureLess_UniquePixels : Inherits TaskParent
         labels = {"", "Gray scale input to sort/remove dups", "Unique pixels", ""}
         desc = "Find the unique gray pixels for the featureless regions"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fless.Run(src)
-        dst2 = fless.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst2 = fless.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         sort.Run(dst2)
         dst3 = sort.dst2
     End Sub
@@ -106,9 +106,9 @@ Public Class FeatureLess_Unique3Pixels : Inherits TaskParent
     Public Sub New()
         desc = "Find the unique 3-channel pixels for the featureless regions"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fless.Run(src)
-        dst2 = fless.dst2.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+        dst2 = fless.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         sort3.Run(fless.dst2)
         dst3 = sort3.dst2
@@ -125,7 +125,7 @@ Public Class FeatureLess_Histogram : Inherits TaskParent
     Public Sub New()
         desc = "Create a histogram of the featureless regions"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         backP.Run(src)
         dst2 = backP.dst2
         dst3 = backP.dst3
@@ -149,7 +149,7 @@ Public Class FeatureLess_DCT : Inherits TaskParent
         desc = "Use DCT to find featureless regions."
     End Sub
 
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dct.Run(src)
         dst2 = dct.dst2
         dst3 = dct.dst3
@@ -160,7 +160,7 @@ Public Class FeatureLess_DCT : Inherits TaskParent
         For y = 0 To mask.Rows - 1
             For x = 0 To mask.Cols - 1
                 If mask.Get(Of Byte)(y, x) = 255 Then
-                    Dim pt As New cvb.Point(x, y)
+                    Dim pt As New cv.Point(x, y)
                     Dim floodCount = mask.FloodFill(pt, regionCount)
                     objectSize.Add(floodCount)
                     regionCount += 1
@@ -196,7 +196,7 @@ Public Class FeatureLess_LeftRight : Inherits TaskParent
         labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
         desc = "Find the featureless regions of the left and right images"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fLess.Run(task.leftView)
         dst2 = fLess.dst2.Clone
 
@@ -219,7 +219,7 @@ Public Class FeatureLess_History : Inherits TaskParent
     Public Sub New()
         desc = "Accumulate the edges over a span of X images."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fLess.Run(src)
         dst2 = fLess.dst2
 
@@ -241,7 +241,7 @@ Public Class FeatureLess_Groups : Inherits TaskParent
     Public Sub New()
         desc = "Group RedCloud cells by the value of their featureless maxDist"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         fless.Run(src)
         dst2 = fless.dst2
         labels(2) = fless.labels(2)

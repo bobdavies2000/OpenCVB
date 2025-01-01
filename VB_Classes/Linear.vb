@@ -1,19 +1,19 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Linear_Basics : Inherits TaskParent
     Dim inputX As New Linear_InputX
     Dim inputY As New Linear_InputY
     Dim inputZ As New Linear_InputZ
     Public options As New Options_LinearInput
-    Public cloud As New cvb.Mat
+    Public cloud As New cv.Mat
     Public Sub New()
         desc = "Confine derivatives to linear values"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         inputZ.Run(src)
-        Dim mask As cvb.Mat = inputZ.dst2
+        Dim mask As cv.Mat = inputZ.dst2
 
         inputX.Run(src)
         dst2 = inputX.dst2.Clone
@@ -65,7 +65,7 @@ Public Class Linear_Basics : Inherits TaskParent
         '    Next
         'Next
 
-        cvb.Cv2.Merge({dst2, dst3, task.pcSplit(2)}, cloud)
+        cv.Cv2.Merge({dst2, dst3, task.pcSplit(2)}, cloud)
     End Sub
 End Class
 
@@ -75,8 +75,8 @@ End Class
 
 Public Class Linear_Visualize : Inherits TaskParent
     Public plotHist As New Plot_Histogram
-    Public roi As New cvb.Rect(0, 0, dst2.Width, dst2.Height)
-    Public pc As cvb.Mat
+    Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
+    Public pc As cv.Mat
     Public options As New Options_LinearInput
     Dim mats As New Mat_4to1
     Dim matPlots As New Mat_4to1
@@ -89,26 +89,26 @@ Public Class Linear_Visualize : Inherits TaskParent
         labels(3) = "Histograms showing the range of pointcloud differences for X, Y, and Z"
         desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
-        Dim r1 As cvb.Rect, r2 As cvb.Rect
+        Dim r1 As cv.Rect, r2 As cv.Rect
 
         For i = 0 To task.pcSplit.Count - 1
             pc = task.pcSplit(i)(roi)
 
             ' toggle between the pixel to the right or below
             If task.toggleOnOff Then
-                r1 = New cvb.Rect(0, 0, task.cols - 1, task.rows)
-                r2 = New cvb.Rect(1, 0, r1.Width, r1.Height)
+                r1 = New cv.Rect(0, 0, task.cols - 1, task.rows)
+                r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
             Else
-                r1 = New cvb.Rect(0, 0, task.cols, task.rows - 1)
-                r2 = New cvb.Rect(0, 1, r1.Width, r1.Height)
+                r1 = New cv.Rect(0, 0, task.cols, task.rows - 1)
+                r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
             End If
 
-            cvb.Cv2.Absdiff(pc(r2), pc(r1), dst0)
+            cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
 
-            mats.mat(i) = dst0.Resize(roi.Size, 0, 0, cvb.InterpolationFlags.Nearest)
-            dst1 = mats.mat(i).Threshold(options.delta, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+            mats.mat(i) = dst0.Resize(roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
+            dst1 = mats.mat(i).Threshold(options.delta, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
             mats.mat(i).SetTo(0, dst1)
 
@@ -120,8 +120,8 @@ Public Class Linear_Visualize : Inherits TaskParent
                         CStr(CInt(options.delta * 1000)) + " mm's apart in the X, Y, or Z direction"
             plotHist.Run(mats.mat(i))
             matPlots.mat(i) = plotHist.dst2.Clone
-            If i = 2 Then mats.mat(2) = mats.mat(2).Threshold(0, 255, cvb.ThresholdTypes.Binary)
-            mats.mat(i) = mats.mat(i).Normalize(0, 255, cvb.NormTypes.MinMax).ConvertScaleAbs
+            If i = 2 Then mats.mat(2) = mats.mat(2).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            mats.mat(i) = mats.mat(i).Normalize(0, 255, cv.NormTypes.MinMax).ConvertScaleAbs
         Next
 
         mats.Run(empty)
@@ -133,7 +133,7 @@ Public Class Linear_Visualize : Inherits TaskParent
         SetTrueText("Lower left is a mask showing where depth is" + vbCrLf + "within " +
                      Str(CInt(options.delta * 1000)) + " mm's of its neighbor" + vbCrLf + vbCrLf +
                      "Toggle is between using the pixel to the right " + vbCrLf + "or below",
-                     New cvb.Point(task.cols / 2 + 5, task.rows / 2 + 5))
+                     New cv.Point(task.cols / 2 + 5, task.rows / 2 + 5))
     End Sub
 End Class
 
@@ -143,8 +143,8 @@ End Class
 
 Public Class Linear_Input : Inherits TaskParent
     Public plotHist As New Plot_Histogram
-    Public roi As New cvb.Rect(0, 0, dst2.Width, dst2.Height)
-    Public pc As cvb.Mat
+    Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
+    Public pc As cv.Mat
     Public options As New Options_LinearInput
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
@@ -155,25 +155,25 @@ Public Class Linear_Input : Inherits TaskParent
         labels = {"", "Mask of differences > deltaX", "Point Cloud deltaX data", ""}
         desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         pc = task.pcSplit(options.dimension)(roi)
 
         ' use the pixel below for Y dimension
-        Dim r1 As cvb.Rect, r2 As cvb.Rect
+        Dim r1 As cv.Rect, r2 As cv.Rect
         If options.dimension <> 1 Or (options.dimension = 2 And options.zy) Then
-            r1 = New cvb.Rect(0, 0, task.cols - 1, task.rows)
-            r2 = New cvb.Rect(1, 0, r1.Width, r1.Height)
+            r1 = New cv.Rect(0, 0, task.cols - 1, task.rows)
+            r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
         Else
-            r1 = New cvb.Rect(0, 0, task.cols, task.rows - 1)
-            r2 = New cvb.Rect(0, 1, r1.Width, r1.Height)
+            r1 = New cv.Rect(0, 0, task.cols, task.rows - 1)
+            r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
         End If
 
-        cvb.Cv2.Absdiff(pc(r2), pc(r1), dst0)
+        cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
 
-        dst2 = dst0.Resize(roi.Size, 0, 0, cvb.InterpolationFlags.Nearest)
-        dst1 = dst2.Threshold(options.delta, 255, cvb.ThresholdTypes.Binary).ConvertScaleAbs
+        dst2 = dst0.Resize(roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        dst1 = dst2.Threshold(options.delta, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
         dst2.SetTo(0, dst1)
         Dim msg = Choose(options.dimension + 1, "X direction", "Y direction", "Z in X-direction")
@@ -201,7 +201,7 @@ Public Class Linear_InputX : Inherits TaskParent
         FindRadio("X Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         input.Run(src)
         dst2 = input.dst2
         labels = input.labels
@@ -217,7 +217,7 @@ Public Class Linear_InputY : Inherits TaskParent
         FindRadio("Y Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the Y direction"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         input.Run(src)
         dst2 = input.dst2
         labels = input.labels
@@ -234,10 +234,10 @@ Public Class Linear_InputZ : Inherits TaskParent
         FindRadio("Z in X-Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the Z direction"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         input.Run(src)
         dst2 = input.dst2
-        dst3 = dst2.Threshold(0, 255, cvb.ThresholdTypes.Binary)
+        dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels = input.labels
     End Sub
 End Class
@@ -256,26 +256,26 @@ Public Class Linear_Slices : Inherits TaskParent
         labels(3) = "Move mouse in the depth image above to display line of data."
         desc = "Isolate and display a line segment through the point cloud data"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim pt = task.mouseMovePoint
         If standalone And task.mouseMovePoint = newPoint Then
-            pt = New cvb.Point(dst2.Width / 2, dst2.Height / 2)
+            pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         End If
 
-        Dim rowCol As cvb.Mat, p1 As cvb.Point, p2 As cvb.Point
+        Dim rowCol As cv.Mat, p1 As cv.Point, p2 As cv.Point
         If options.dimension = 1 Or (options.dimension = 2 And options.zy) Then
             rowCol = task.pcSplit(options.dimension).Col(pt.X).Clone
-            rowCol = cvb.Mat.FromPixelData(1, rowCol.Rows, cvb.MatType.CV_32FC1, rowCol.Data)
-            p1 = New cvb.Point(pt.X, 0)
-            p2 = New cvb.Point(pt.X, dst2.Height)
+            rowCol = cv.Mat.FromPixelData(1, rowCol.Rows, cv.MatType.CV_32FC1, rowCol.Data)
+            p1 = New cv.Point(pt.X, 0)
+            p2 = New cv.Point(pt.X, dst2.Height)
             plotSLR.plot.minY = -task.yRange
             plotSLR.plot.maxY = task.yRange
         Else
             rowCol = task.pcSplit(options.dimension).Row(pt.Y)
-            p1 = New cvb.Point(0, pt.Y)
-            p2 = New cvb.Point(dst2.Width, pt.Y)
+            p1 = New cv.Point(0, pt.Y)
+            p2 = New cv.Point(dst2.Width, pt.Y)
             plotSLR.plot.minY = -task.xRange
             plotSLR.plot.maxY = task.xRange
         End If
@@ -314,17 +314,17 @@ Public Class Linear_ImageX : Inherits TaskParent
         Next
         desc = "Create SLR slices for the X dimension of an entire image"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = task.pcSplit(0).Clone
 
         Dim outputX As New List(Of Double)
         Dim outputY As New List(Of Double)
-        Dim output As New List(Of cvb.Point2d)
+        Dim output As New List(Of cv.Point2d)
 
         For y = 0 To dst2.Height - 1
-            Dim rowCol As cvb.Mat = task.pcSplit(0).Row(y)
+            Dim rowCol As cv.Mat = task.pcSplit(0).Row(y)
 
             Dim dataY(rowCol.Total - 1) As Single
             Marshal.Copy(rowCol.Data, dataY, 0, dataY.Length)
@@ -341,7 +341,7 @@ Public Class Linear_ImageX : Inherits TaskParent
                 dst2.Set(Of Single)(y, x, CSng(outputY(x)))
             Next
         Next
-        cvb.Cv2.Merge({dst2, task.pcSplit(1), task.pcSplit(2)}, dst3)
+        cv.Cv2.Merge({dst2, task.pcSplit(1), task.pcSplit(2)}, dst3)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -361,18 +361,18 @@ Public Class Linear_ImageY : Inherits TaskParent
         Next
         desc = "Create SLR slices for the Y dimension of an entire image"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = task.pcSplit(1).Clone
 
         Dim outputX As New List(Of Double)
         Dim outputY As New List(Of Double)
-        Dim output As New List(Of cvb.Point2d)
+        Dim output As New List(Of cv.Point2d)
 
         For x = 0 To dst2.Width - 1
             Dim rowCol = task.pcSplit(1).Col(x).Clone
-            rowCol = cvb.Mat.FromPixelData(1, rowCol.Rows, cvb.MatType.CV_32FC1, rowCol.Data)
+            rowCol = cv.Mat.FromPixelData(1, rowCol.Rows, cv.MatType.CV_32FC1, rowCol.Data)
 
             Dim dataY(rowCol.Total - 1) As Single
             Marshal.Copy(rowCol.Data, dataY, 0, dataY.Length)
@@ -389,7 +389,7 @@ Public Class Linear_ImageY : Inherits TaskParent
                 dst2.Set(Of Single)(y, x, CSng(outputY(y)))
             Next
         Next
-        cvb.Cv2.Merge({task.pcSplit(0), dst2, task.pcSplit(2)}, dst3)
+        cv.Cv2.Merge({task.pcSplit(0), dst2, task.pcSplit(2)}, dst3)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

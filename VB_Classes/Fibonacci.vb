@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class Fibonacci_Basics : Inherits TaskParent
     Dim flow As New Font_FlowText
@@ -7,7 +7,7 @@ Public Class Fibonacci_Basics : Inherits TaskParent
         flow.parentData = Me
         desc = "Generate the fibonacci sequence using conventional code"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If a = 1134903170 Then
             a = 0
             b = 1
@@ -48,7 +48,7 @@ Public Class Fibonacci_Yield : Inherits TaskParent
             b = t
         End While
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
         flow.nextMsg = Format(task.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(task.frameCount), "###,##0")
         flow.Run(empty)

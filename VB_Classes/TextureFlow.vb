@@ -1,10 +1,10 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class TextureFlow_Basics : Inherits TaskParent
     Dim options As New Options_Texture
     Public Sub New()
         desc = "Find and mark the texture flow in an image - see texture_flow.py"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.Clone
@@ -14,9 +14,9 @@ Public Class TextureFlow_Basics : Inherits TaskParent
         Dim d2 = options.TFdelta / 2
         For y = d2 To dst2.Height - 1 Step d2
             For x = d2 To dst2.Width - 1 Step d2
-                Dim delta = New cvb.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * options.TFdelta
-                Dim p1 = New cvb.Point(CInt(x - delta.X), CInt(y - delta.Y))
-                Dim p2 = New cvb.Point(CInt(x + delta.X), CInt(y + delta.Y))
+                Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * options.TFdelta
+                Dim p1 = New cv.Point(CInt(x - delta.X), CInt(y - delta.Y))
+                Dim p2 = New cv.Point(CInt(x + delta.X), CInt(y + delta.Y))
                 DrawLine(dst2, p1, p2, task.HighlightColor)
             Next
         Next
@@ -32,7 +32,7 @@ Public Class TextureFlow_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Display texture flow in the depth data"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         flow.Run(task.depthRGB)
         dst2 = flow.dst2
     End Sub
@@ -49,11 +49,11 @@ Public Class TextureFlow_Reduction : Inherits TaskParent
     Public Sub New()
         desc = "Display texture flow in the reduced color image"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2
 
-        flow.Run(reduction.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR))
+        flow.Run(reduction.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst3 = flow.dst2
     End Sub
 End Class
@@ -72,7 +72,7 @@ Public Class TextureFlow_DepthSegments : Inherits TaskParent
         labels = {"", "", "TextureFlow output", "TextureFlow Input"}
         desc = "Find the texture flow for the depth segments output"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         segments.Run(src)
         diffx.Run(segments.dst1)
         dst3 = segments.dst3

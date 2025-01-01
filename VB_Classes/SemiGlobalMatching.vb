@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/epiception/SGM-Census
 Public Class SemiGlobalMatching_CPP_VB : Inherits TaskParent
@@ -7,7 +7,7 @@ Public Class SemiGlobalMatching_CPP_VB : Inherits TaskParent
     Public Sub New()
         desc = "Find depth using the semi-global matching algorithm."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.frameCount < 10 Then Exit Sub
         If task.cameraName = "Azure Kinect 4K" Then
             SetTrueText("The left and right views are identical with the Microsoft K4A 4 Azure camera.")
@@ -30,7 +30,7 @@ Public Class SemiGlobalMatching_CPP_VB : Inherits TaskParent
         'handleLeft.Free()
         'handleRight.Free()
 
-        'Dim dst2 = New cvb.Mat(task.leftView.Rows, task.leftView.Cols, cvb.MatType.CV_8U, imagePtr)
+        'Dim dst2 = New cv.Mat(task.leftView.Rows, task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
         SetTrueText("This algorithm runs but always returns zero - a bug in the C++ algorithm as ported?" + vbCrLf +
                     "Needs work but investing further is not needed - we have disparity from the device.", 3)
     End Sub

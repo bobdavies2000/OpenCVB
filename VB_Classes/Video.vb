@@ -1,25 +1,25 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports  System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics : Inherits TaskParent
-    Public captureVideo As New cvb.VideoCapture
+    Public captureVideo As New cv.VideoCapture
     Public options As New Options_Video
     Public Sub New()
-        captureVideo = New cvb.VideoCapture(options.fileInfo.FullName)
+        captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
         labels(2) = options.fileInfo.Name
         desc = "Show a video file"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
-            captureVideo = New cvb.VideoCapture(options.fileInfo.FullName)
+            captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
         End If
 
         captureVideo.Read(dst1)
         If dst1.Empty() Then
             captureVideo.Dispose()
-            captureVideo = New cvb.VideoCapture(options.fileInfo.FullName)
+            captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
             captureVideo.Read(dst1)
         End If
 
@@ -45,7 +45,7 @@ Public Class Video_CarCounting : Inherits TaskParent
         flow.parentData = Me
         desc = "Count cars in a video file"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         video.Run(src)
         dst2.SetTo(0)
         bgSub.Run(video.dst1) ' use the original size of the video input - not the dst2 size...
@@ -57,12 +57,12 @@ Public Class Video_CarCounting : Inherits TaskParent
         Dim activeHeight = 30
         Dim finishLine = bgSub.dst2.Height - activeHeight * 8
         For i = 1 To activeState.Length - 1
-            Dim lane = New cvb.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
+            Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
             Dim cellCount = videoImage(lane).CountNonZero
             If cellCount Then
                 activeState(i) = True
-                videoImage.Rectangle(lane, cvb.Scalar.Red, -1)
-                dst3.Rectangle(lane, cvb.Scalar.Red, -1)
+                videoImage.Rectangle(lane, cv.Scalar.Red, -1)
+                dst3.Rectangle(lane, cv.Scalar.Red, -1)
             End If
             If cellCount = 0 And activeState(i) = True Then
                 activeState(i) = False
@@ -72,7 +72,7 @@ Public Class Video_CarCounting : Inherits TaskParent
         Next
 
         Dim tmp = videoImage.Resize(src.Size())
-        If tmp.Channels() <> dst2.Channels() Then tmp = tmp.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+        If tmp.Channels() <> dst2.Channels() Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         flow.nextMsg = "  Cars " + CStr(carCount)
         flow.Run(empty)
         dst2 = dst2 Or tmp
@@ -90,7 +90,7 @@ Public Class Video_CarCComp : Inherits TaskParent
     Public Sub New()
         desc = "Outline cars with a rectangle"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         video.Run(src)
         If video.dst2.Empty() = False Then
             bgSub.Run(video.dst2)
@@ -111,23 +111,23 @@ End Class
 Public Class Video_MinRect : Inherits TaskParent
     Public video As New Video_Basics
     Public bgSub As New BGSubtract_MOG
-    Public contours As cvb.Point()()
+    Public contours As cv.Point()()
     Public Sub New()
         video.options.fileInfo = New FileInfo(task.HomeDir + "Data/CarsDrivingUnderBridge.mp4")
         video.Run(dst2)
         desc = "Find area of car outline - example of using minAreaRect"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         video.Run(src)
         If video.dst2.Empty() = False Then
             bgSub.Run(video.dst2)
 
-            contours = cvb.Cv2.FindContoursAsArray(bgSub.dst2, cvb.RetrievalModes.Tree, cvb.ContourApproximationModes.ApproxSimple)
-            dst2 = bgSub.dst2.CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+            contours = cv.Cv2.FindContoursAsArray(bgSub.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+            dst2 = bgSub.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             If standaloneTest() Then
                 For i = 0 To contours.Length - 1
-                    Dim minRect = cvb.Cv2.MinAreaRect(contours(i))
-                    DrawRotatedRect(minRect, dst2, cvb.Scalar.Red)
+                    Dim minRect = cv.Cv2.MinAreaRect(contours(i))
+                    DrawRotatedRect(minRect, dst2, cv.Scalar.Red)
                 Next
             End If
             dst3 = video.dst2
@@ -144,16 +144,16 @@ Public Class Video_MinCircle : Inherits TaskParent
     Public Sub New()
         desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         video.Run(src)
         dst2 = video.dst2
         dst3 = video.dst3
 
-        Dim center As New cvb.Point2f
+        Dim center As New cv.Point2f
         Dim radius As Single
         If video.contours IsNot Nothing Then
             For i = 0 To video.contours.Length - 1
-                cvb.Cv2.MinEnclosingCircle(video.contours(i), center, radius)
+                cv.Cv2.MinEnclosingCircle(video.contours(i), center, radius)
                 DrawCircle(dst2, center, radius, white)
             Next
         End If

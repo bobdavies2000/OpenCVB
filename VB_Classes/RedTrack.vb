@@ -1,11 +1,11 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class RedTrack_Basics : Inherits TaskParent
     Public Sub New()
-        If New cvb.Size(task.dst2.Width, task.dst2.Height) <> New cvb.Size(168, 94) Then task.frameHistoryCount = 1
+        If New cv.Size(task.dst2.Width, task.dst2.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
         labels(2) = task.redC.labels(3)
         desc = "Get stats on each RedCloud cell."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst3
         dst2.SetTo(0)
@@ -25,10 +25,10 @@ End Class
 Public Class RedTrack_Lines : Inherits TaskParent
     Dim lines as new Line_Basics
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         lines.Run(src)
 
         If task.heartBeat Then dst3.SetTo(0)
@@ -56,11 +56,11 @@ End Class
 Public Class RedTrack_LineSingle : Inherits TaskParent
     Dim track As New RedTrack_Basics
     Dim leftMost As Integer, rightmost As Integer
-    Dim leftCenter As cvb.Point, rightCenter As cvb.Point
+    Dim leftCenter As cv.Point, rightCenter As cv.Point
     Public Sub New()
         desc = "Create a line between the rightmost and leftmost good feature to show camera motion"
     End Sub
-    Private Function findNearest(pt As cvb.Point) As Integer
+    Private Function findNearest(pt As cv.Point) As Integer
         Dim bestDistance As Single = Single.MaxValue
         Dim bestIndex As Integer
         For Each rc In task.redCells
@@ -72,7 +72,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
         Next
         Return bestIndex
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         track.Run(src)
         dst2 = task.dst2
         If task.redCells.Count = 0 Then
@@ -124,10 +124,10 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
         labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         dst2 = task.feat.dst2
 
-        knn.queries = New List(Of cvb.Point2f)(task.features)
+        knn.queries = New List(Of cv.Point2f)(task.features)
         knn.Run(empty)
 
         dst3 = src.Clone
@@ -136,12 +136,12 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
             Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
             If index >= 0 And index < knn.trainInput.Count Then
                 Dim p2 = knn.trainInput(index)
-                DrawCircle(dst3, p1, task.DotSize, cvb.Scalar.Yellow)
-                DrawCircle(dst3, p2, task.DotSize, cvb.Scalar.Yellow)
+                DrawCircle(dst3, p1, task.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Yellow)
                 DrawLine(dst3, p1, p2, white)
             End If
         Next
-        knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
     End Sub
 End Class
 
@@ -153,18 +153,18 @@ End Class
 
 Public Class RedTrack_GoodCellInput : Inherits TaskParent
     Public knn As New KNN_Basics
-    Public featureList As New List(Of cvb.Point2f)
+    Public featureList As New List(Of cv.Point2f)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
         desc = "Use KNN to find good features to track"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Static distSlider = FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
         dst2 = task.feat.dst2
 
-        knn.queries = New List(Of cvb.Point2f)(task.features)
+        knn.queries = New List(Of cv.Point2f)(task.features)
         knn.Run(empty)
 
         featureList.Clear()
@@ -176,7 +176,7 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
                 If p1.DistanceTo(p2) < maxDistance Then featureList.Add(p1)
             End If
         Next
-        knn.trainInput = New List(Of cvb.Point2f)(knn.queries)
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
     End Sub
 End Class
 
@@ -190,11 +190,11 @@ Public Class RedTrack_Points : Inherits TaskParent
     Dim lines as new Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
-        dst3 = New cvb.Mat(dst3.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         lines.Run(src)
 
         dst3.SetTo(0)
@@ -219,12 +219,12 @@ End Class
 
 Public Class RedTrack_Features : Inherits TaskParent
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_8U, cvb.Scalar.All(0))
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
         desc = "Similar to RedTrack_KNNPoints"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.heartBeat Then dst2.SetTo(0)
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, 255)
@@ -235,7 +235,7 @@ Public Class RedTrack_Features : Inherits TaskParent
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-            If rc.contour.Count > 0 Then SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), New cvb.Point(rc.rect.X, rc.rect.Y), 3)
+            If rc.contour.Count > 0 Then SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
         Next
         SetTrueText("Move camera to see the value of this algorithm", 2)
         SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3)

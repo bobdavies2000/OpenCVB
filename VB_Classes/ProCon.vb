@@ -1,4 +1,4 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Threading
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class ProCon_Basics : Inherits TaskParent
@@ -58,7 +58,7 @@ Public Class ProCon_Basics : Inherits TaskParent
             Windows.Forms.Application.DoEvents()
         End While
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.testAllRunning Then
             SetTrueText("ProCon_Basics is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
             Exit Sub
@@ -97,7 +97,7 @@ Public Class ProCon_Variation : Inherits TaskParent
         procon.terminateProducer = True ' we don't need a 2 producer task.  RunVB below provides the second thread.
         desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.testAllRunning Then
             SetTrueText("ProCon_Variation is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
             Exit Sub

@@ -1,15 +1,15 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class History_Basics : Inherits TaskParent
-    Public saveFrames As New List(Of cvb.Mat)
+    Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history to sum the last X frames"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If task.frameHistoryCount = 1 Then
             dst2 = src
             Exit Sub
         End If
-        If src.Type <> cvb.MatType.CV_32F Then src.ConvertTo(src, cvb.MatType.CV_32F)
+        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
 
         If dst1.Type <> src.Type Or dst1.Channels() <> src.Channels() Or task.optionsChanged Then
             dst1 = src
@@ -24,9 +24,9 @@ Public Class History_Basics : Inherits TaskParent
         Next
         dst1 *= 1 / (saveFrames.Count + 1)
         If src.Channels() = 1 Then
-            dst1.ConvertTo(dst2, cvb.MatType.CV_8U)
+            dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         Else
-            dst1.ConvertTo(dst2, cvb.MatType.CV_8UC3)
+            dst1.ConvertTo(dst2, cv.MatType.CV_8UC3)
         End If
     End Sub
 End Class
@@ -39,16 +39,16 @@ End Class
 
 Public Class History_Cloud : Inherits TaskParent
     Public frames As New History_BasicsNoSaturation
-    Dim saveFrames As New List(Of cvb.Mat)
+    Dim saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history and sum the last X task.pointcloud's"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
-        If src.Type <> cvb.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = task.pointCloud
+    Public Overrides sub runAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = task.pointCloud
 
-        If task.optionsChanged Or dst3.Type <> cvb.MatType.CV_32FC3 Then
+        If task.optionsChanged Or dst3.Type <> cv.MatType.CV_32FC3 Then
             saveFrames.Clear()
-            dst3 = New cvb.Mat(dst2.Size(), cvb.MatType.CV_32FC3, 0)
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         End If
 
         If saveFrames.Count >= task.frameHistoryCount Then
@@ -70,15 +70,15 @@ End Class
 
 
 Public Class History_BasicsNoSaturation : Inherits TaskParent
-    Public saveFrames As New List(Of cvb.Mat)
+    Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history and sum the last X frames (without saturation!)"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         Dim input = src.Clone
-        If input.Channels() <> 1 Then input = input.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        If input.Type <> cvb.MatType.CV_32F Then input.ConvertTo(input, cvb.MatType.CV_32F)
-        If dst3.Type <> input.Type Or dst3.Channels() <> input.Channels() Then dst3 = New cvb.Mat(input.Size(), input.Type, 0)
+        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
+        If dst3.Type <> input.Type Or dst3.Channels() <> input.Channels() Then dst3 = New cv.Mat(input.Size(), input.Type, 0)
         input /= 255 ' input is all zeros or ones.
 
         If task.optionsChanged Then
@@ -94,7 +94,7 @@ Public Class History_BasicsNoSaturation : Inherits TaskParent
         saveFrames.Add(input)
         dst3 += input
         dst1 = 255 * dst3 / saveFrames.Count
-        dst1.ConvertTo(dst2, cvb.MatType.CV_8U)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
 End Class
 
@@ -111,7 +111,7 @@ Public Class History_BasicsDiff : Inherits TaskParent
         task.gOptions.pixelDiffThreshold = 0
         desc = "Find the floodfill trouble spots."
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         frames.Run(src)
         dst2 = ShowPalette(frames.dst2)
 
@@ -125,20 +125,20 @@ End Class
 
 
 Public Class History_Basics8U : Inherits TaskParent
-    Public saveFrames As New List(Of cvb.Mat)
+    Public saveFrames As New List(Of cv.Mat)
     Dim mats As New Mat_4to1
-    Dim lastFrame As cvb.Mat
+    Dim lastFrame As cv.Mat
     Public Sub New()
-        dst2 = New cvb.Mat(dst2.Size, cvb.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
-            src = src.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
+            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If task.firstPass Then lastFrame = src.Clone
-            cvb.Cv2.Absdiff(src, lastFrame, dst3)
+            cv.Cv2.Absdiff(src, lastFrame, dst3)
             lastFrame = src.Clone
-            src = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cvb.ThresholdTypes.Binary)
+            src = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         End If
 
         If task.frameHistoryCount = 1 Then
@@ -169,11 +169,11 @@ End Class
 
 
 Public Class History_ReliableDepth : Inherits TaskParent
-    Public saveFrames As New List(Of cvb.Mat)
+    Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         If saveFrames.Count > 0 Then
             If task.optionsChanged Or saveFrames(0).Size <> src.Size Then saveFrames.Clear()
         End If

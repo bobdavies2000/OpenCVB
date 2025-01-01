@@ -1,11 +1,11 @@
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Numerics
 Public Class Quaterion_Basics : Inherits TaskParent
     Dim options As New Options_Quaternion
     Public Sub New()
         desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
         Dim quatmul = Quaternion.Multiply(options.q1, options.q2)
         SetTrueText("q1 = " + options.q1.ToString() + vbCrLf + "q2 = " + options.q2.ToString() + vbCrLf +
@@ -65,7 +65,7 @@ Public Class Quaterion_IMUPrediction : Inherits TaskParent
         labels(3) = ""
         desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
-    Public Function quaternion_exp(v As cvb.Point3f) As Quaternion
+    Public Function quaternion_exp(v As cv.Point3f) As Quaternion
         v *= 0.5
         Dim theta2 = v.X * v.X + v.Y * v.Y + v.Z * v.Z
         Dim theta = Math.Sqrt(theta2)
@@ -73,17 +73,17 @@ Public Class Quaterion_IMUPrediction : Inherits TaskParent
         Dim s = If(theta2 < Math.Sqrt(120 * Single.Epsilon), 1 - theta2 / 6, Math.Sin(theta) / theta2)
         Return New Quaternion(s * v.X, s * v.Y, s * v.Z, c)
     End Function
-    Public Overrides sub runAlg(src As cvb.Mat)
+    Public Overrides sub runAlg(src As cv.Mat)
         host.Run(src)
 
         Dim dt = host.HostInterruptDelayEstimate
 
         Dim t = task.IMU_Translation
-        Dim predictedTranslation = New cvb.Point3f(dt * (dt / 2 * task.IMU_Acceleration.X + task.IMU_AngularVelocity.X) + t.X,
+        Dim predictedTranslation = New cv.Point3f(dt * (dt / 2 * task.IMU_Acceleration.X + task.IMU_AngularVelocity.X) + t.X,
                                                   dt * (dt / 2 * task.IMU_Acceleration.Y + task.IMU_AngularVelocity.Y) + t.Y,
                                                   dt * (dt / 2 * task.IMU_Acceleration.Z + task.IMU_AngularVelocity.Z) + t.Z)
 
-        Dim predictedW = New cvb.Point3f(dt * (dt / 2 * task.IMU_AngularAcceleration.X + task.IMU_AngularVelocity.X),
+        Dim predictedW = New cv.Point3f(dt * (dt / 2 * task.IMU_AngularAcceleration.X + task.IMU_AngularVelocity.X),
                                         dt * (dt / 2 * task.IMU_AngularAcceleration.Y + task.IMU_AngularVelocity.Y),
                                         dt * (dt / 2 * task.IMU_AngularAcceleration.Z + task.IMU_AngularVelocity.Z))
 
