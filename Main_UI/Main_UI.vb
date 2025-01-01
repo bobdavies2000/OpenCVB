@@ -1167,11 +1167,6 @@ Public Class Main_UI
         If camera Is Nothing Then Exit Sub
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
-        'If TreeViewDialog IsNot Nothing Then
-        '    If TreeViewDialog.TreeView1.IsDisposed Then
-        '        TreeButton.CheckState = CheckState.Unchecked
-        '    End If
-        'End If
 
         If testAllRunning Then
             If TreeViewDialog IsNot Nothing Then TreeViewDialog.Dispose()
@@ -1793,7 +1788,7 @@ Public Class Main_UI
 
                 If frameCount Mod task.fpsRate = 0 Or task.intermediateRefresh Then
                     SyncLock callTraceLock
-                        callTrace = New List(Of String)(task.callTraceMain)
+                        callTrace = New List(Of String)(task.callTrace)
                         algorithm_ms = New List(Of Single)(task.algorithm_msMain)
                         algorithmNames = New List(Of String)(task.algorithmNamesMain)
                     End SyncLock

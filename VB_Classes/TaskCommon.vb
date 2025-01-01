@@ -13,7 +13,6 @@ Public Module vbc
     Public Const fmt3 = "0.000"
     Public Const fmt4 = "0.0000"
     Public newPoint As New cv.Point
-    Public callTrace As New List(Of String)
     Public algorithm_ms As New List(Of Single)
     Public algorithmNames As New List(Of String)
     Public algorithmTimes As New List(Of DateTime)
@@ -59,11 +58,6 @@ Public Module vbc
             outMat = Convert32f_To_8UC3(outMat)
         ElseIf input.Type = cv.MatType.CV_32FC3 Then
             outMat = input.ConvertScaleAbs(255)
-            'Dim split = input.Split()
-            'split(0) = split(0).ConvertScaleAbs(255)
-            'split(1) = split(1).ConvertScaleAbs(255)
-            'split(2) = split(2).ConvertScaleAbs(255)
-            'cv.Cv2.Merge(split, outMat)
         Else
             outMat = input.Clone
         End If

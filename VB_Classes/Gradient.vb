@@ -85,7 +85,8 @@ Public Class Gradient_ForDepth : Inherits TaskParent
         Dim f As Double = 1.0
         Dim gradientColors As New cv.Mat(1, gradientWidth, cv.MatType.CV_64FC3)
         For i = 0 To gradientWidth - 1
-            gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
+            gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0),
+                                                                 f * color2(1) + (1 - f) * color1(1),
                                                                  f * color2(2) + (1 - f) * color1(2)))
             f -= 1 / gradientWidth
         Next

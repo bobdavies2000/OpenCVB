@@ -23,11 +23,6 @@ Public Class Line_Basics : Inherits TaskParent
             If val1 = 0 And val2 = 0 Then newSet.Add(lp)
         Next
 
-        'For Each lp In lines.lpList
-        '    Dim val1 = dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-        '    Dim val2 = dst3.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-        '    If val1 = 0 Or val2 = 0 Then newSet.Add(lp)
-        'Next
         ' unlike Feature_Basics, we have to check each pair, not each point
         For Each lp In lines.lpList
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
@@ -61,9 +56,6 @@ Public Class Line_Basics : Inherits TaskParent
                     task.lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
                     task.lpList.Add(lp)
                 End If
-            Else
-
-                Dim k = 0
             End If
         Next
 

@@ -35,7 +35,7 @@ Public Class TaskParent : Implements IDisposable
     Public strOut As String
     Public Sub New()
         traceName = Me.GetType.Name
-        If callTrace.Count = 0 Then callTrace.Add(task.algName + "\")
+        If task.callTrace.Count = 0 Then task.callTrace.Add(task.algName + "\")
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
@@ -56,10 +56,10 @@ Public Class TaskParent : Implements IDisposable
 
         ' the _CPP algorithms are old but still used for performance.
         If task.algName.StartsWith("_CPP") Then
-            callTrace.Clear()
+            task.callTrace.Clear()
             algorithm_ms.Clear()
             algorithmNames.Clear()
-            callTrace.Add("CPP_Basics\")
+            task.callTrace.Add("CPP_Basics\")
         End If
 
         dst0 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
@@ -69,8 +69,8 @@ Public Class TaskParent : Implements IDisposable
 
         standalone = traceName = task.algName
         If traceName = "Python_Run" Then standalone = True
-        If task.algName.EndsWith("_CS") Then callStack = callTrace(0) + callStack
-        If callTrace.Contains(callStack) = False Then callTrace.Add(callStack)
+        If task.algName.EndsWith("_CS") Then callStack = task.callTrace(0) + callStack
+        If task.callTrace.Contains(callStack) = False Then task.callTrace.Add(callStack)
         task.activeObjects.Add(Me)
         task.intermediateRefresh = True
 

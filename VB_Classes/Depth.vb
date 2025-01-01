@@ -1621,10 +1621,8 @@ End Class
 Public Class Depth_Palette : Inherits TaskParent
     Dim customColorMap As cv.Mat
     Public Sub New()
-        Dim color1 = cv.Scalar.Blue
-        Dim color2 = cv.Scalar.Yellow
-        Dim gradientWidth = 256
-        Dim f As Double = 1.0
+        ' duplicated some code from Gradient_ForDepth to reduce the task algorithms in TreeView.
+        Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow, gradientWidth = 256, f As Double = 1.0
         Dim gradientColors As New cv.Mat(1, gradientWidth, cv.MatType.CV_64FC3)
         For i = 0 To gradientWidth - 1
             gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0),

@@ -258,7 +258,7 @@ Public Class VBtask : Implements IDisposable
 
     Public trueData As New List(Of TrueText)
 
-    Public callTraceMain As New List(Of String)
+    Public callTrace As New List(Of String)
     Public algorithm_msMain As New List(Of Single)
     Public algorithmNamesMain As New List(Of String)
 
@@ -428,9 +428,6 @@ Public Class VBtask : Implements IDisposable
         grid = New Grid_Basics
         grid.taskAlgorithm = True ' task algorithms may be duplicated in the activeObjects list
 
-        PixelViewer = New Pixel_Viewer
-        grid.taskAlgorithm = True
-
         colorizer = New Depth_Palette
         colorizer.taskAlgorithm = True
 
@@ -456,6 +453,11 @@ Public Class VBtask : Implements IDisposable
 
         motion = New Motion_Basics
         motion.taskAlgorithm = True
+
+        ' all the algorithms in the list are task algorithms that are children of the task.algname.
+        For i = 1 To callTrace.Count - 1
+            callTrace(i) = task.algName + "\" + callTrace(i)
+        Next
 
         updateSettings()
         task.redOptions.Show()
@@ -566,13 +568,16 @@ Public Class VBtask : Implements IDisposable
             If dst2.Size <> New cv.Size(task.color.Width, task.color.Height) And dst2.Width > 0 Then dst2 = dst2.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
             If dst3.Size <> New cv.Size(task.color.Width, task.color.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
 
-            If task.pixelViewerOn Then
-                task.PixelViewer.viewerForm.Visible = True
-                task.PixelViewer.viewerForm.Show()
-                task.PixelViewer.Run(src)
-            Else
-                task.PixelViewer.viewerForm.Visible = False
+            If task.PixelViewer IsNot Nothing Then
+                If task.pixelViewerOn Then
+                    task.PixelViewer.viewerForm.Visible = True
+                    task.PixelViewer.viewerForm.Show()
+                    task.PixelViewer.Run(src)
+                Else
+                    task.PixelViewer.viewerForm.Visible = False
+                End If
             End If
+
             If task.intermediateObject IsNot Nothing Then
                 dst0 = task.intermediateObject.dst0
                 dst1 = task.intermediateObject.dst1
@@ -658,7 +663,6 @@ Public Class VBtask : Implements IDisposable
             TaskTimer.Enabled = False
             task.frameCount += 1
 
-            task.callTraceMain = New List(Of String)(callTrace)
             task.algorithm_msMain = New List(Of Single)(algorithm_ms)
             task.algorithmNamesMain = New List(Of String)(algorithmNames)
         Catch ex As Exception
@@ -827,6 +831,17 @@ Public Class VBtask : Implements IDisposable
         task.depthRGB = task.colorizer.dst2
 
         TaskTimer.Enabled = True
+
+        If task.pixelViewerOn And PixelViewer Is Nothing Then
+            PixelViewer = New Pixel_Viewer
+            grid.taskAlgorithm = True
+            For i = 1 To callTrace.Count - 1
+                If callTrace(i).Contains("Pixel_Viewer") Then
+                    callTrace(i) = task.algName + "\" + callTrace(i)
+                    Exit For
+                End If
+            Next
+        End If
 
         If task.gOptions.CreateGif.Checked Then
             If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
