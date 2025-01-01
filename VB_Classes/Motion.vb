@@ -16,7 +16,6 @@ Public Class Motion_Basics : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         measure.Run(src)
         color = measure.dst3.Clone
-        dst2 = color
         labels(2) = measure.labels(2)
 
         motionMask.SetTo(0)
@@ -28,10 +27,10 @@ Public Class Motion_Basics : Inherits TaskParent
 
         If standaloneTest() Then ' show any differences
             Static diff As New Diff_Basics
-            diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)
             dst3 = diff.dst2
         End If
+        dst2 = task.motionMask
 
         If task.gOptions.UseMotionDepth.Checked Then
             If task.heartBeatLT Or depthRGB.Rows = 0 Then

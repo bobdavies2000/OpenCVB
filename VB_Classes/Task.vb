@@ -99,7 +99,7 @@ Public Class VBtask : Implements IDisposable
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
 
-    ' add any global algorithms here
+    ' add any task algorithms here
     Public gravityHorizon As Gravity_Horizon
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Object
@@ -107,7 +107,7 @@ Public Class VBtask : Implements IDisposable
     Public IMUBasics As IMU_Basics
     Public IMU_Rotation As System.Numerics.Quaternion
     Public cellStats As Cell_Basics
-    Public imuStabilityTest As Stabilizer_VerticalIMU
+    Public lines As Line_Basics
     Public grid As Grid_Basics
     Public ogl As OpenGL_Basics
     Public colorizer As Depth_Palette
@@ -182,9 +182,6 @@ Public Class VBtask : Implements IDisposable
     Public roll As Single
 
     Public useGravityPointcloud As Boolean
-
-    Public cameraStable As Boolean
-    Public cameraStableString As String
 
     Public recordTimings As Boolean = True
 
@@ -261,6 +258,10 @@ Public Class VBtask : Implements IDisposable
     Public callTrace As New List(Of String)
     Public algorithm_msMain As New List(Of Single)
     Public algorithmNamesMain As New List(Of String)
+    Public algorithm_ms As New List(Of Single)
+    Public algorithmNames As New List(Of String)
+    Public algorithmTimes As New List(Of DateTime)
+    Public algorithmStack As New Stack()
 
     Public waitingForInput As Single ' the amount of time waiting for buffers.
     Public inputBufferCopy As Single ' the amount of time copying the buffers.
@@ -448,8 +449,8 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Horizon
         gravityHorizon.taskAlgorithm = True
 
-        imuStabilityTest = New Stabilizer_VerticalIMU
-        imuStabilityTest.taskAlgorithm = True
+        lines = New Line_Basics
+        lines.taskAlgorithm = True
 
         motion = New Motion_Basics
         motion.taskAlgorithm = True
@@ -662,9 +663,6 @@ Public Class VBtask : Implements IDisposable
             task.optionsChanged = False
             TaskTimer.Enabled = False
             task.frameCount += 1
-
-            task.algorithm_msMain = New List(Of Single)(algorithm_ms)
-            task.algorithmNamesMain = New List(Of String)(algorithmNames)
         Catch ex As Exception
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
@@ -739,9 +737,6 @@ Public Class VBtask : Implements IDisposable
         task.IMU_AlphaFilter = 0.5 '  task.gOptions.imu_Alpha
         grid.runAlg(task.color)
 
-        imuStabilityTest.runAlg(src)
-        task.cameraStable = imuStabilityTest.stableTest
-        task.cameraStableString = imuStabilityTest.stableStr
         IMUBasics.runAlg(src)
         gMat.runAlg(src)
 
@@ -821,6 +816,7 @@ Public Class VBtask : Implements IDisposable
 
             cv.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
+        lines.runAlg(src)
 
         ' the gravity transformation apparently can introduce some NaNs.
         If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(task.pcSplit(2))

@@ -33,7 +33,7 @@ Public Class Feature_Basics : Inherits TaskParent
         Return ptList
     End Function
     Public Overrides Sub runAlg(src As cv.Mat)
-        ' options.RunOpt()
+        options.RunOpt()
         dst2 = src.Clone
 
         method.Run(src)

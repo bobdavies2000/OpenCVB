@@ -11,7 +11,7 @@ Public Class Line_Basics : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        lines.Run(src)
+        lines.Run(src.Clone)
         dst2 = lines.dst2
         If task.lpList.Count = 0 Then task.lpList = New List(Of linePoints)(lines.lpList)
 

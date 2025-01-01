@@ -57,8 +57,8 @@ Public Class TaskParent : Implements IDisposable
         ' the _CPP algorithms are old but still used for performance.
         If task.algName.StartsWith("_CPP") Then
             task.callTrace.Clear()
-            algorithm_ms.Clear()
-            algorithmNames.Clear()
+            task.algorithm_ms.Clear()
+            task.algorithmNames.Clear()
             task.callTrace.Add("CPP_Basics\")
         End If
 
@@ -76,29 +76,29 @@ Public Class TaskParent : Implements IDisposable
 
         If task.recordTimings Then
             If standalone And task.testAllRunning = False Then
-                algorithm_ms.Clear()
-                algorithmNames.Clear()
-                algorithmNames.Add("waitingForInput")
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
+                task.algorithm_ms.Clear()
+                task.algorithmNames.Clear()
+                task.algorithmNames.Add("waitingForInput")
+                task.algorithmTimes.Add(Now)
+                task.algorithm_ms.Add(0)
 
-                algorithmNames.Add("inputBufferCopy")
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
+                task.algorithmNames.Add("inputBufferCopy")
+                task.algorithmTimes.Add(Now)
+                task.algorithm_ms.Add(0)
 
-                algorithmNames.Add("ReturnCopyTime")
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
+                task.algorithmNames.Add("ReturnCopyTime")
+                task.algorithmTimes.Add(Now)
+                task.algorithm_ms.Add(0)
 
-                algorithmNames.Add(traceName)
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
+                task.algorithmNames.Add(traceName)
+                task.algorithmTimes.Add(Now)
+                task.algorithm_ms.Add(0)
 
-                algorithmStack = New Stack()
-                algorithmStack.Push(0)
-                algorithmStack.Push(1)
-                algorithmStack.Push(2)
-                algorithmStack.Push(3)
+                task.algorithmStack = New Stack()
+                task.algorithmStack.Push(0)
+                task.algorithmStack.Push(1)
+                task.algorithmStack.Push(2)
+                task.algorithmStack.Push(3)
             End If
         End If
     End Sub
@@ -710,31 +710,31 @@ Public Class TaskParent : Implements IDisposable
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub
         Dim nextTime = Now
-        If algorithmNames.Contains(name) = False Then
-            algorithmNames.Add(name)
-            algorithm_ms.Add(0)
-            algorithmTimes.Add(nextTime)
+        If task.algorithmNames.Contains(name) = False Then
+            task.algorithmNames.Add(name)
+            task.algorithm_ms.Add(0)
+            task.algorithmTimes.Add(nextTime)
         End If
 
-        Dim index = algorithmStack.Peek
-        Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
+        Dim index = task.algorithmStack.Peek
+        Dim elapsedTicks = nextTime.Ticks - task.algorithmTimes(index).Ticks
         Dim span = New TimeSpan(elapsedTicks)
-        algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+        task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
 
-        index = algorithmNames.IndexOf(name)
-        algorithmTimes(index) = nextTime
-        algorithmStack.Push(index)
+        index = task.algorithmNames.IndexOf(name)
+        task.algorithmTimes(index) = nextTime
+        task.algorithmStack.Push(index)
     End Sub
     Public Sub measureEndRun(name As String)
         Try
             If task.recordTimings = False Then Exit Sub
             Dim nextTime = Now
-            Dim index = algorithmStack.Peek
-            Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
+            Dim index = task.algorithmStack.Peek
+            Dim elapsedTicks = nextTime.Ticks - task.algorithmTimes(index).Ticks
             Dim span = New TimeSpan(elapsedTicks)
-            algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-            algorithmStack.Pop()
-            algorithmTimes(algorithmStack.Peek) = nextTime
+            task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+            task.algorithmStack.Pop()
+            task.algorithmTimes(task.algorithmStack.Peek) = nextTime
         Catch ex As Exception
         End Try
     End Sub

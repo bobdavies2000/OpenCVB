@@ -1789,8 +1789,8 @@ Public Class Main_UI
                 If frameCount Mod task.fpsRate = 0 Or task.intermediateRefresh Then
                     SyncLock callTraceLock
                         callTrace = New List(Of String)(task.callTrace)
-                        algorithm_ms = New List(Of Single)(task.algorithm_msMain)
-                        algorithmNames = New List(Of String)(task.algorithmNamesMain)
+                        algorithm_ms = New List(Of Single)(task.algorithm_ms)
+                        algorithmNames = New List(Of String)(task.algorithmNames)
                     End SyncLock
                 End If
 

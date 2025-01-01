@@ -91,7 +91,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
         plane.Run(src)
 
         dst2 = plane.dst2
-        If task.cameraStable = False Or task.heartBeat Then addW.src2.SetTo(0)
+        If task.heartBeat Then addW.src2.SetTo(0)
 
         Dim flatCount = 0
         For Each rc In task.redCells

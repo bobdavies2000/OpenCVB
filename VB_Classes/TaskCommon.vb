@@ -13,10 +13,6 @@ Public Module vbc
     Public Const fmt3 = "0.000"
     Public Const fmt4 = "0.0000"
     Public newPoint As New cv.Point
-    Public algorithm_ms As New List(Of Single)
-    Public algorithmNames As New List(Of String)
-    Public algorithmTimes As New List(Of DateTime)
-    Public algorithmStack As New Stack()
     Public msRNG As New System.Random
     Public white As New cv.Scalar(255, 255, 255), black As New cv.Scalar(0, 0, 0)
     Public grayColor As New cv.Scalar(127, 127, 127)
