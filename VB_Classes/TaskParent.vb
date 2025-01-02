@@ -64,7 +64,6 @@ Public Class TaskParent : Implements IDisposable
         task.callTrace.Add(callStack)
 
         task.activeObjects.Add(Me)
-        task.intermediateRefresh = True
 
         If task.recordTimings Then
             If standalone And task.testAllRunning = False Then

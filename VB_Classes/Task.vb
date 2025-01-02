@@ -217,7 +217,6 @@ Public Class VBtask : Implements IDisposable
     Public advice As String = ""
     Public intermediateName As String
     Public intermediateObject As TaskParent
-    Public intermediateRefresh As Boolean
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
 

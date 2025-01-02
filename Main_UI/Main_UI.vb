@@ -1786,16 +1786,14 @@ Public Class Main_UI
 
                 If task.fpsRate = 0 Then task.fpsRate = 1
 
-                If frameCount Mod task.fpsRate = 0 Or task.intermediateRefresh Then
+                If frameCount Mod task.fpsRate = 0 Or callTrace.Count <> task.callTrace.Count Then
                     SyncLock callTraceLock
+                        If callTrace.Count <> task.callTrace.Count Then treeViewRefresh = True
                         callTrace = New List(Of String)(task.callTrace)
                         algorithm_ms = New List(Of Single)(task.algorithm_ms)
                         algorithmNames = New List(Of String)(task.algorithmNames)
                     End SyncLock
                 End If
-
-                treeViewRefresh = task.intermediateRefresh
-                task.intermediateRefresh = False
 
                 Dim elapsedTicks = Now.Ticks - returnTime.Ticks
                 Dim span = New TimeSpan(elapsedTicks)
