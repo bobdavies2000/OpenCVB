@@ -42,6 +42,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         If standalone Then
             dst3.SetTo(0)
             For Each rc In task.redCells
+                If rc.pixels > 0 And rc.pixels <= task.redOptions.minCellSize Then Exit For
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             Next
         End If

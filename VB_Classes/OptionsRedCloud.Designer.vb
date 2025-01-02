@@ -59,6 +59,9 @@ Partial Class OptionsRedCloud
         Me.UseDepth = New System.Windows.Forms.RadioButton()
         Me.UseColorOnly = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.minCellSizeSlider = New System.Windows.Forms.TrackBar()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.labelCellSize = New System.Windows.Forms.Label()
         Me.LabelIdentify = New System.Windows.Forms.Label()
         Me.IdentifyCountBar = New System.Windows.Forms.TrackBar()
         Me.IdentifyCountLabel = New System.Windows.Forms.Label()
@@ -80,6 +83,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.SuspendLayout()
         Me.RedCloudType.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
+        CType(Me.minCellSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -477,6 +481,9 @@ Partial Class OptionsRedCloud
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.minCellSizeSlider)
+        Me.GroupBox2.Controls.Add(Me.Label1)
+        Me.GroupBox2.Controls.Add(Me.labelCellSize)
         Me.GroupBox2.Controls.Add(Me.LabelIdentify)
         Me.GroupBox2.Controls.Add(Me.IdentifyCountBar)
         Me.GroupBox2.Controls.Add(Me.IdentifyCountLabel)
@@ -489,6 +496,34 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.TabIndex = 9
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "RedCloud Options"
+        '
+        'minCellSizeSlider
+        '
+        Me.minCellSizeSlider.Location = New System.Drawing.Point(180, 171)
+        Me.minCellSizeSlider.Maximum = 10000
+        Me.minCellSizeSlider.Name = "minCellSizeSlider"
+        Me.minCellSizeSlider.Size = New System.Drawing.Size(482, 69)
+        Me.minCellSizeSlider.TabIndex = 34
+        Me.minCellSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.minCellSizeSlider.Value = 500
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(21, 171)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(159, 20)
+        Me.Label1.TabIndex = 33
+        Me.Label1.Text = "Min Cell Size in Pixels"
+        '
+        'labelCellSize
+        '
+        Me.labelCellSize.AutoSize = True
+        Me.labelCellSize.Location = New System.Drawing.Point(668, 177)
+        Me.labelCellSize.Name = "labelCellSize"
+        Me.labelCellSize.Size = New System.Drawing.Size(57, 20)
+        Me.labelCellSize.TabIndex = 35
+        Me.labelCellSize.Text = "Label7"
         '
         'LabelIdentify
         '
@@ -617,6 +652,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudType.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        CType(Me.minCellSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -668,4 +704,7 @@ Partial Class OptionsRedCloud
     Friend WithEvents NaturalColor As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox1 As System.Windows.Forms.CheckBox
     Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
+    Friend WithEvents minCellSizeSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label1 As Windows.Forms.Label
+    Friend WithEvents labelCellSize As Windows.Forms.Label
 End Class

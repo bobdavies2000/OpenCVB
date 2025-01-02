@@ -550,7 +550,7 @@ Public Class VBtask : Implements IDisposable
         feat = New Feature_Basics
         feat.taskAlgorithm = True
 
-        If task.algName.Contains("RedCloud") Then
+        If task.algName.Contains("RedCloud") Or task.algName.StartsWith("Flood_") Then
             redC = New RedCloud_Basics
             redC.taskAlgorithm = True
         End If
