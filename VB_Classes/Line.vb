@@ -409,7 +409,7 @@ Public Class Line_GCloud : Inherits TaskParent
     Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-    Public options As New Options_Features
+    Public options As New Options_LineFinder
     Dim match As New Match_tCell
     Dim angleSlider As System.Windows.Forms.TrackBar
     Public Sub New()

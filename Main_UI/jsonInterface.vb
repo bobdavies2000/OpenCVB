@@ -72,7 +72,7 @@ Namespace jsonClass
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
             emptyApp.treeLocation = New cvb.Vec4f(20, 20, 500, 600)
-            emptyApp.groupComboText = "< All VB.Net >"
+            emptyApp.groupComboText = "< All >"
             emptyApp.translatorMode = "VB.Net to C#"
             SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 30)
             SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", 30)

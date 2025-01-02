@@ -5347,84 +5347,6 @@ End Class
 
 
 
-
-Public Class Options_Features : Inherits TaskParent
-    Public quality As Double = 0.01
-    Public minDistance As Double = 10
-    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
-    Public matchText As String = ""
-    Public k As Double = 0.04
-    Public blockSize As Integer = 3
-
-    Public featurePoints As Integer = 400
-    Public templatePad As Integer = 10
-    Public templateSize As Integer = 0
-    Public correlationMin As Double = 0.75
-    Public resyncThreshold As Double = 0.95
-    Public agastThreshold As Integer = 20
-    Public useVertical As Boolean = False
-    Public useBRISK As Boolean = False
-    Public Sub New()
-        correlationMin = If(dst2.Width > 336, 0.8, 0.9)
-        templatePad = If(dst2.Width > 336, 20, 10)
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Vertical lines")
-            radio.addRadio("Horizontal lines")
-            radio.check(0).Checked = True
-        End If
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
-
-            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
-            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
-            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
-            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
-
-            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
-            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
-            sliders.setupTrackBar("Blocksize", 1, 21, blockSize)
-            sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
-            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
-            sliders.setupTrackBar("Angle tolerance in degrees", 0, 20, 10)
-            sliders.setupTrackBar("X angle tolerance in degrees", 0, 10, 2)
-            sliders.setupTrackBar("Z angle tolerance in degrees", 0, 10, 7)
-        End If
-    End Sub
-    Public Sub RunOpt()
-        Static qualitySlider = FindSlider("Quality Level")
-        Static distSlider = FindSlider("Min Distance to next")
-        Static kSlider = FindSlider("k X1000")
-        Static blocksizeSlider = FindSlider("Blocksize")
-        Static featureSlider = FindSlider("Feature Sample Size")
-        Static corrSlider = FindSlider("Feature Correlation Threshold")
-        Static cellSlider = FindSlider("MatchTemplate Cell Size")
-        Static resyncSlider = FindSlider("Threshold Percent for Resync")
-        Static agastslider = FindSlider("Agast Threshold")
-        Static FASTslider = FindSlider("FAST Threshold")
-        Static vertRadio = FindRadio("Vertical lines")
-        useVertical = vertRadio.checked
-        task.FASTthreshold = FASTslider.value
-
-        blockSize = blocksizeSlider.value Or 1
-        k = kSlider.value / 1000
-
-        featurePoints = featureSlider.value
-        correlationMin = corrSlider.value / 100
-        templatePad = CInt(cellSlider.value / 2)
-        templateSize = cellSlider.value Or 1
-        resyncThreshold = resyncSlider.value / 100
-        agastThreshold = agastslider.value
-
-        quality = qualitySlider.Value / 100
-        minDistance = distSlider.Value
-    End Sub
-End Class
-
-
-
-
-
 Public Class Options_LineFinder : Inherits TaskParent
     Public kernelSize As Integer = 5
     Public tolerance As Integer = 5
@@ -7991,5 +7913,105 @@ Public Class Options_DerivativeBasics : Inherits TaskParent
         Dim offsetY As Integer = If(verticalDerivative, 1, 0)
         rect1 = New cv.Rect(0, 0, dst2.Width - offsetX, dst2.Height - offsetY)
         rect2 = New cv.Rect(offsetX, offsetY, dst2.Width - offsetX, dst2.Height - offsetY)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_FeaturesEx : Inherits TaskParent
+    Public templatePad As Integer = 10
+    Public templateSize As Integer = 0
+    Public correlationMin As Double = 0.75
+    Public resyncThreshold As Double = 0.95
+    Public agastThreshold As Integer = 20
+    Public useVertical As Boolean = False
+    Public useBRISK As Boolean = False
+    Public Sub New()
+        correlationMin = If(dst2.Width > 336, 0.8, 0.9)
+        templatePad = If(dst2.Width > 336, 20, 10)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
+            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
+            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
+            sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
+            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static corrSlider = FindSlider("Feature Correlation Threshold")
+        Static cellSlider = FindSlider("MatchTemplate Cell Size")
+        Static resyncSlider = FindSlider("Threshold Percent for Resync")
+        Static agastslider = FindSlider("Agast Threshold")
+        Static FASTslider = FindSlider("FAST Threshold")
+        Static vertRadio = FindRadio("Vertical lines")
+        useVertical = vertRadio.checked
+        task.FASTthreshold = FASTslider.value
+
+        correlationMin = corrSlider.value / 100
+        templatePad = CInt(cellSlider.value / 2)
+        templateSize = cellSlider.value Or 1
+        resyncThreshold = resyncSlider.value / 100
+        agastThreshold = agastslider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Features : Inherits TaskParent
+    Public quality As Double = 0.01
+    Public minDistance As Double = 10
+    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
+    Public matchText As String = ""
+    Public k As Double = 0.04
+    Public blockSize As Integer = 3
+    Public featurePoints As Integer = 400
+
+    Dim optionsEx As New Options_FeaturesEx
+    Public templatePad As Integer = 10
+    Public templateSize As Integer = 0
+    Public correlationMin As Double = 0.75
+    Public resyncThreshold As Double = 0.95
+    Public agastThreshold As Integer = 20
+    Public useVertical As Boolean = False
+    Public useBRISK As Boolean = False
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Vertical lines")
+            radio.addRadio("Horizontal lines")
+            radio.check(0).Checked = True
+        End If
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
+            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
+            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
+            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        optionsEx.RunOpt()
+        templatePad = optionsEx.templatePad
+        templateSize = optionsEx.templateSize
+        correlationMin = optionsEx.correlationMin
+        resyncThreshold = optionsEx.resyncThreshold
+        agastThreshold = optionsEx.agastThreshold
+        useVertical = optionsEx.useVertical
+        useBRISK = optionsEx.useBRISK
+
+        Static qualitySlider = FindSlider("Quality Level")
+        Static distSlider = FindSlider("Min Distance to next")
+        Static kSlider = FindSlider("k X1000")
+        Static featureSlider = FindSlider("Feature Sample Size")
+        Static vertRadio = FindRadio("Vertical lines")
+        useVertical = vertRadio.checked
+        k = kSlider.value / 1000
+
+        featurePoints = featureSlider.value
+        quality = qualitySlider.Value / 100
+        minDistance = distSlider.Value
     End Sub
 End Class

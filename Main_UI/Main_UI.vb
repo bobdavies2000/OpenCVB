@@ -292,7 +292,7 @@ Public Class Main_UI
             End If
 
             If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
-            If settings.groupComboText = "" Then settings.groupComboText = "< All VB.Net >"
+            If settings.groupComboText = "" Then settings.groupComboText = "< All >"
 
             If testAllRunning = False Then
                 Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
@@ -317,8 +317,12 @@ Public Class Main_UI
     End Sub
     Public Sub jsonWrite()
         If TreeViewDialog IsNot Nothing Then
+            Dim Width = TreeViewDialog.Width
+            If Width < 200 Then Width = 200
+            Dim height = TreeViewDialog.Height
+            If height < 200 Then height = 200
             settings.treeLocation = New cvb.Vec4f(TreeViewDialog.Left, TreeViewDialog.Top,
-                                                  TreeViewDialog.Width, TreeViewDialog.Height)
+                                                  Width, height)
             settings.treeButton = True
         Else
             settings.treeButton = False

@@ -204,6 +204,8 @@ Public Class Feature_KNN : Inherits TaskParent
         desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        getFeatures(src)
+
         knn.queries = New List(Of cv.Point2f)(task.features)
         If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
@@ -360,11 +362,16 @@ End Class
 
 Public Class Feature_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Contours
+    Dim options As New Options_Features
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        options.RunOpt()
+
+        getFeatures(src)
+
         dst2 = task.feat.dst2
         labels(2) = task.feat.labels(2)
 
@@ -431,6 +438,7 @@ Public Class Feature_Points : Inherits TaskParent
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        getFeatures(src)
         dst2 = task.feat.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
@@ -540,6 +548,8 @@ Public Class Feature_Generations : Inherits TaskParent
         desc = "Find feature age maximum and average."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        getFeatures(src)
+
         Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         For Each pt In task.featurePoints
             Dim index = features.IndexOf(pt)
@@ -561,7 +571,7 @@ Public Class Feature_Generations : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, white)
         Next
 
-        If task.heartBeat Then
+        If task.heartBeat And gens.Count > 0 Then
             labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + Format(gens.Average, fmt0) + " generations"
         End If
     End Sub
@@ -635,6 +645,8 @@ Public Class Feature_GridPopulation : Inherits TaskParent
         desc = "Find the feature population for each cell."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        getFeatures(src)
+
         dst2 = task.feat.dst2
         labels(2) = task.feat.labels(2)
 
@@ -755,6 +767,8 @@ Public Class Feature_WithDepth : Inherits TaskParent
         desc = "Show the feature points that have depth."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        getFeatures(src)
+
         dst2 = task.feat.dst2
         dst3 = src
         Dim depthCount As Integer

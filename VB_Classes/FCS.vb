@@ -648,13 +648,13 @@ Public Class FCS_Delaunay : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        getFeatures(src)
+
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
         Dim facets = New cv.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-        getFeatures(src)
 
         task.fpList.Clear()
         task.fpIDlist.Clear()

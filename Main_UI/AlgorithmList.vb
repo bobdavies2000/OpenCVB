@@ -1397,6 +1397,7 @@ End Enum
 	If algorithmName = "Options_FeatureGather" Then return new Options_FeatureGather
 	If algorithmName = "Options_FeatureMatch" Then return new Options_FeatureMatch
 	If algorithmName = "Options_Features" Then return new Options_Features
+	If algorithmName = "Options_FeaturesEx" Then return new Options_FeaturesEx
 	If algorithmName = "Options_Filter" Then return new Options_Filter
 	If algorithmName = "Options_FilterNorm" Then return new Options_FilterNorm
 	If algorithmName = "Options_FitEllipse" Then return new Options_FitEllipse

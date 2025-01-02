@@ -467,10 +467,11 @@ Public Class TaskParent : Implements IDisposable
         Next
     End Sub
     Public Sub fpDisplayCell()
+        If task.fpList.Count = 0 Then Exit Sub
         If task.ClickPoint.X = 0 And task.ClickPoint.Y = 0 Then
             task.ClickPoint = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
         End If
-        Dim index = task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim index As Integer = task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         task.fpSelected = task.fpList(index)
         SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
         fpCellContour(task.fpSelected, task.color)
@@ -647,8 +648,8 @@ Public Class TaskParent : Implements IDisposable
         Return palette.dst2.Clone
     End Function
     Public Sub getFeatures(src As cv.Mat)
-        Static feat = New Feature_Basics
-        feat.Run(src)
+        If task.feat Is Nothing Then task.feat = New Feature_Basics
+        task.feat.Run(src)
     End Sub
     Public Function ShowIntermediate() As Boolean
         If task.intermediateObject Is Nothing Then Return False

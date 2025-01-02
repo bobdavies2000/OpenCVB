@@ -94,7 +94,7 @@ Public Class FeatureLine_VH : Inherits TaskParent
         ' gLines.lines.subsetRect = New cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
         gLines.Run(src)
 
-        Dim sortedLines = If(options.usevertical, gLines.sortedVerticals, gLines.sortedHorizontals)
+        Dim sortedLines = If(options.useVertical, gLines.sortedVerticals, gLines.sortedHorizontals)
         If sortedLines.Count = 0 Then
             SetTrueText("There were no vertical lines found.", 3)
             Exit Sub

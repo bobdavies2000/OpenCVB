@@ -1370,26 +1370,6 @@ public:
 	Options_Etch_ASketch() {
 	}
 };
-class Options_Features {
-public:
-	double quality =  0.01;
-	double minDistance =  10;
-	int matchOption =  cv::TemplateMatchModes::TM_CCOEFF_NORMED;
-	string matchText =  "";
-	double k =  0.04;
-	int blockSize =  3;
-	int featurePoints =  400;
-	int templatePad =  10;
-	int templateSize =  0;
-	double correlationMin =  0.75;
-	double resyncThreshold =  0.95;
-	int agastThreshold =  20;
-	bool useVertical = false;
-	bool useBRISK = false;
-	void RunOpt() {}
-	Options_Features() {
-	}
-};
 class Options_LineFinder {
 public:
 	int kernelSize =  5;
@@ -2172,5 +2152,38 @@ public:
 	int histBars =  1;
 	void RunOpt() {}
 	Options_DerivativeBasics() {
+	}
+};
+class Options_FeaturesEx {
+public:
+	int templatePad =  10;
+	int templateSize =  0;
+	double correlationMin =  0.75;
+	double resyncThreshold =  0.95;
+	int agastThreshold =  20;
+	bool useVertical = false;
+	bool useBRISK = false;
+	void RunOpt() {}
+	Options_FeaturesEx() {
+	}
+};
+class Options_Features {
+public:
+	double quality =  0.01;
+	double minDistance =  10;
+	int matchOption =  cv::TemplateMatchModes::TM_CCOEFF_NORMED;
+	string matchText =  "";
+	double k =  0.04;
+	int blockSize =  3;
+	int featurePoints =  400;
+	int templatePad =  10;
+	int templateSize =  0;
+	double correlationMin =  0.75;
+	double resyncThreshold =  0.95;
+	int agastThreshold =  20;
+	bool useVertical = false;
+	bool useBRISK = false;
+	void RunOpt() {}
+	Options_Features() {
 	}
 };

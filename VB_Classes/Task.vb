@@ -535,7 +535,6 @@ Public Class VBtask : Implements IDisposable
         ' task algorithms constructed here.
         grid = New Grid_Basics
         colorizer = New Depth_Palette
-        feat = New Feature_Basics
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
         gravityHorizon = New Gravity_Horizon
@@ -788,8 +787,6 @@ Public Class VBtask : Implements IDisposable
 
         ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
         If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(task.pcSplit(2))
-
-        feat.Run(src)
 
         task.colorizer.Run(src)
         task.depthRGB = task.colorizer.dst2
