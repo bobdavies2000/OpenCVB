@@ -177,7 +177,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
             startNewStage(r)
         End If
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         labels(3) = " stage " + CStr(stage) + "/" + CStr(options.stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
         dst3 = mats.mat(mats.quadrant)

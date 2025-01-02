@@ -27,7 +27,7 @@ Public Class Mat_PointToMat : Inherits TaskParent
         desc = "Convert point2f into a mat of points"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        random.Run(empty)
+        random.Run(src)
         dst2.SetTo(0)
         For Each pt In random.PointList
             DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
@@ -425,7 +425,7 @@ Public Class Mat_4Click : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         mat = mats.mat
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2.Clone
         If standalone Then mats.defaultMats(src)
         If task.firstPass Then
@@ -440,7 +440,7 @@ Public Class Mat_4Click : Inherits TaskParent
                 quadrant = If(task.ClickPoint.X < task.dst2.Width / 2, 2, 3)
             End If
         End If
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2.Clone
         dst3 = mats.mat(quadrant).Clone
     End Sub

@@ -16,7 +16,7 @@ Public Class Fibonacci_Basics : Inherits TaskParent
         a = b
         b = t
         flow.nextMsg = t.ToString
-        flow.Run(empty)
+        flow.Run(src)
     End Sub
 End Class
 
@@ -51,6 +51,6 @@ Public Class Fibonacci_Yield : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
         flow.nextMsg = Format(task.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(task.frameCount), "###,##0")
-        flow.Run(empty)
+        flow.Run(src)
     End Sub
 End Class

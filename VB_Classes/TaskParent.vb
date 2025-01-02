@@ -341,7 +341,8 @@ Public Class TaskParent : Implements IDisposable
                 End If
             Next
         Catch ex As Exception
-            Debug.WriteLine("FindSlider failed.  Did the list of forms changed while iterating.  Not critical." + ex.Message)
+            Debug.WriteLine("FindSlider failed." + vbCrLf +
+                            "Did the list of forms changed while iterating.  Not critical." + ex.Message)
         End Try
         Debug.WriteLine("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
 
@@ -645,6 +646,10 @@ Public Class TaskParent : Implements IDisposable
         palette.Run(input)
         Return palette.dst2.Clone
     End Function
+    Public Sub getFeatures(src As cv.Mat)
+        Static feat = New Feature_Basics
+        feat.Run(src)
+    End Sub
     Public Function ShowIntermediate() As Boolean
         If task.intermediateObject Is Nothing Then Return False
         If task.intermediateObject.traceName = traceName Then Return True

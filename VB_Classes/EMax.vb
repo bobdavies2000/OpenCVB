@@ -25,7 +25,7 @@ Public Class EMax_Basics : Inherits TaskParent
 
         If eLabels.Count = 0 Or useInputClusters Then
             useInputClusters = True
-            emaxInput.Run(empty)
+            emaxInput.Run(src)
             eLabels = New List(Of Integer)(emaxInput.eLabels.ToList)
             eSamples = New List(Of cv.Point2f)(emaxInput.eSamples)
             regionCount = emaxInput.regionCount
@@ -170,7 +170,7 @@ Public Class EMax_VB_Failing : Inherits TaskParent
         desc = "OpenCV expectation maximization example."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        emaxInput.Run(empty)
+        emaxInput.Run(src)
         eLabels = New List(Of Integer)(emaxInput.eLabels.ToList)
         eSamples = New List(Of cv.Point2f)(emaxInput.eSamples)
         regionCount = emaxInput.regionCount
@@ -222,7 +222,7 @@ Public Class EMax_PointTracker : Inherits TaskParent
         dst2 = emax.dst2
 
         knn.queries = New List(Of cv.Point2f)(emax.centers)
-        knn.Run(empty)
+        knn.Run(src)
         If task.firstPass Then
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
             Exit Sub
@@ -260,7 +260,7 @@ Public Class EMax_RandomClusters : Inherits TaskParent
         Static regionSlider = FindSlider("Number of Clusters")
         emax.regionCount = regionSlider.Value
 
-        clusters.Run(empty)
+        clusters.Run(src)
         dst3 = clusters.dst2
         emax.eLabels.Clear()
         emax.eSamples.Clear()

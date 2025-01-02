@@ -20,7 +20,7 @@ Public Class Plot_Basics : Inherits TaskParent
             plot.srcX.Add(i)
             plot.srcY.Add(hist.histRaw(0).Get(Of Single)(i, 0))
         Next
-        plot.Run(empty)
+        plot.Run(src)
         dst3 = plot.dst2
         labels(2) = hist.labels(2)
     End Sub
@@ -49,7 +49,7 @@ Public Class Plot_Depth : Inherits TaskParent
             plotDepth.srcX.Add(i * task.MaxZmeters / task.histogramBins)
             plotDepth.srcY.Add(hist.histogram.Get(Of Single)(i, 0))
         Next
-        plotDepth.Run(empty)
+        plotDepth.Run(src)
         dst2 = plotDepth.dst2
 
         If task.heartBeat Then labels(2) = plotDepth.labels(2)
@@ -172,7 +172,7 @@ Public Class Plot_OverTimeScalar : Inherits TaskParent
             mats.mat(i) = plotList(i).dst2
         Next
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

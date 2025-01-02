@@ -137,7 +137,7 @@ Public Class Binarize_KMeansMasks : Inherits TaskParent
             If i >= 3 Then Exit For
         Next
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -165,7 +165,7 @@ Public Class Binarize_KMeansRGB : Inherits TaskParent
             src.CopyTo(mats.mat(i), km.masks(i))
             If i >= 3 Then Exit For
         Next
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

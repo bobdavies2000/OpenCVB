@@ -75,7 +75,7 @@ Public Class ProCon_Basics : Inherits TaskParent
         End If
 
         SyncLock mutex
-            flow.Run(empty)
+            flow.Run(src)
         End SyncLock
     End Sub
     Public Sub Close()

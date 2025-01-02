@@ -453,6 +453,7 @@ Public Class OpenGL_StructuredCloud : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels(2) = "Structured cloud 32fC3 data"
+        task.redC = New RedCloud_Basics
         desc = "Visualize the Structured_Cloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -694,7 +695,7 @@ Public Class OpenGL_PeakFlat : Inherits TaskParent
         labels(2) = peak.labels(3)
 
         kalman.kInput = {peak.peakFloor, peak.peakCeiling}
-        kalman.Run(empty)
+        kalman.Run(src)
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.dataInput = cv.Mat.FromPixelData(2, 1, cv.MatType.CV_32F, {kalman.kOutput(0), kalman.kOutput(1)})
@@ -826,6 +827,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
         task.ogl.oglFunction = oCase.drawCells
         task.OpenGLTitle = "OpenGL_Functions"
         FindSlider("OpenGL shift fwd/back (Z-axis)").Value = -150
+        task.redC = New RedCloud_Basics
         labels = {"", "", "Output of RedCloud", "OpenGL snapshot"}
         desc = "Draw all the RedCloud contours in OpenGL with various settings."
     End Sub
@@ -1015,6 +1017,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
         FindSlider("OpenGL Point Size").Value = 10
+        task.redC = New RedCloud_Basics
         labels(3) = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis"
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
@@ -1081,7 +1084,7 @@ Public Class OpenGL_Profile : Inherits TaskParent
         If rc.contour3D.Count > 0 Then
             Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
-            rotate.Run(empty)
+            rotate.Run(src)
             Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             vecMat = output.Reshape(3, vecMat.Rows)
 
@@ -1519,6 +1522,7 @@ End Class
 Public Class OpenGL_RedCloud : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.redC = New RedCloud_Basics
         desc = "Display all the RedCloud cells in OpenGL"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -1891,6 +1895,7 @@ Public Class OpenGL_ColorBin4Way : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         task.ogl.options.PointSizeSlider.Value = 10
+        task.redC = New RedCloud_Basics
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8UC3, white)
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub

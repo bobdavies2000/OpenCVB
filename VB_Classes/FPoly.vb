@@ -128,7 +128,7 @@ Public Class FPoly_Sides : Inherits TaskParent
         options.RunOpt()
 
         If standaloneTest() And task.heartBeat Then
-            random.Run(empty)
+            random.Run(src)
             currPoly = New List(Of cv.Point2f)(random.PointList)
         End If
 
@@ -181,7 +181,7 @@ Public Class FPoly_Sides : Inherits TaskParent
             If newNear.p1.DistanceTo(newNear.p2) > options.removeThreshold Then
                 near.lp = mpPrev
                 near.pt = newNear.p1
-                near.Run(empty)
+                near.Run(src)
                 dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
 
                 Dim hypotenuse = rotateCenter.DistanceTo(near.pt)
@@ -197,13 +197,13 @@ Public Class FPoly_Sides : Inherits TaskParent
             rotatePoly.rotateAngle = rotateAngle
             rotatePoly.poly.Clear()
             rotatePoly.poly.Add(newNear.p1)
-            rotatePoly.Run(empty)
+            rotatePoly.Run(src)
 
             If near.nearPoint.DistanceTo(rotatePoly.poly(0)) > newNear.p1.DistanceTo(rotatePoly.poly(0)) Then rotateAngle *= -1
 
             rotatePoly.rotateAngle = rotateAngle
             rotatePoly.poly = New List(Of cv.Point2f)(transPoly)
-            rotatePoly.Run(empty)
+            rotatePoly.Run(src)
             newPoly = New List(Of cv.Point2f)(rotatePoly.poly)
         End If
 
@@ -423,7 +423,7 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         If task.optionsChanged Then ReDim kalman.kInput(fPlot.hist.Length - 1)
 
         kalman.kInput = fPlot.hist
-        kalman.Run(empty)
+        kalman.Run(src)
         fPlot.hist = kalman.kOutput
 
         Dim hlist = fPlot.hist.ToList
@@ -561,7 +561,7 @@ Public Class FPoly_Triangle : Inherits TaskParent
         dst2 = fGrid.dst2
 
         triangle.srcPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
-        triangle.Run(empty)
+        triangle.Run(src)
         dst3 = triangle.dst2
     End Sub
 End Class
@@ -598,7 +598,7 @@ Public Class FPoly_WarpAffinePoly : Inherits TaskParent
         rotatePoly.rotateAngle = fPoly.fPD.rotateAngle
         rotatePoly.rotateCenter = fPoly.fPD.rotateCenter
         rotatePoly.poly = New List(Of cv.Point2f)(poly)
-        rotatePoly.Run(empty)
+        rotatePoly.Run(src)
 
         If fPoly.fPD.polyPrevSideIndex >= rotatePoly.poly.Count Then fPoly.fPD.polyPrevSideIndex = 0
 
@@ -776,13 +776,13 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         dst2.SetTo(0)
         perp1.input = New linePoints(fPD.currPoly(fPD.polyPrevSideIndex),
                                     fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
-        perp1.Run(empty)
+        perp1.Run(src)
 
         DrawLine(dst2, perp1.output.p1, perp1.output.p2, cv.Scalar.Yellow)
 
         perp2.input = New linePoints(fPD.prevPoly(fPD.polyPrevSideIndex),
                                    fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
-        perp2.Run(empty)
+        perp2.Run(src)
         DrawLine(dst2, perp2.output.p1, perp2.output.p2, white)
 
         fPD.rotateCenter = IntersectTest(perp2.output.p1, perp2.output.p2,
@@ -799,7 +799,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
                                         fPD.currPoly(fPD.polyPrevSideIndex).Y - fPD.prevPoly(fPD.polyPrevSideIndex).Y)
 
         kalman.kInput = {fPD.rotateAngle}
-        kalman.Run(empty)
+        kalman.Run(src)
         fPD.rotateAngle = kalman.kOutput(0)
 
         rotatePoints.poly = fPD.currPoly
@@ -1037,7 +1037,7 @@ Public Class FPoly_Center : Inherits TaskParent
             If newNear.p1.DistanceTo(newNear.p2) > threshold Then
                 near.lp = New linePoints(fPD.prevPoly(sindex1), fPD.prevPoly(sIndex2))
                 near.pt = newNear.p1
-                near.Run(empty)
+                near.Run(src)
                 dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
 
                 Dim hypotenuse = fPD.rotateCenter.DistanceTo(near.pt)
@@ -1053,13 +1053,13 @@ Public Class FPoly_Center : Inherits TaskParent
             rotatePoly.rotateAngle = fPD.rotateAngle
             rotatePoly.poly.Clear()
             rotatePoly.poly.Add(newNear.p1)
-            rotatePoly.Run(empty)
+            rotatePoly.Run(src)
 
             If near.nearPoint.DistanceTo(rotatePoly.poly(0)) > newNear.p1.DistanceTo(rotatePoly.poly(0)) Then fPD.rotateAngle *= -1
 
             rotatePoly.rotateAngle = fPD.rotateAngle
             rotatePoly.poly = New List(Of cv.Point2f)(transPoly)
-            rotatePoly.Run(empty)
+            rotatePoly.Run(src)
 
             newPoly = New List(Of cv.Point2f)(rotatePoly.poly)
         End If

@@ -66,7 +66,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        images.Run(empty)
+        images.Run(src)
         dst0 = images.dst2.Clone
         dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -99,7 +99,7 @@ Public Class Image_CellStats : Inherits TaskParent
         task.pointCloud.SetTo(0)
         task.pcSplit = task.pointCloud.Split()
 
-        images.Run(empty)
+        images.Run(src)
         dst0 = images.dst0
         dst1 = images.dst1
         dst2 = images.dst2

@@ -261,7 +261,7 @@ Public Class Hough_LaneFinder : Inherits TaskParent
         desc = "Use Hough to isolate features in the mask of the road."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        hls.Run(empty)
+        hls.Run(src)
         If task.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
             Dim h = hls.input.video.dst2.Height

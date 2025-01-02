@@ -37,7 +37,7 @@ Public Class Font_FlowTextOld : Inherits TaskParent
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
             msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
             msgs.Add("Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass.")
-            msgs.Add("Then at the end of your Run method, invoke flow.Run(empty)")
+            msgs.Add("Then at the end of your Run method, invoke flow.Run(src)")
         End If
 
         Dim maxLines = 31
@@ -87,7 +87,7 @@ Public Class Font_FlowText : Inherits TaskParent
             strOut += "Also optionally indicate if you want result1 or result2 for text (the default is result1.)" + vbCrLf
             strOut += "NOTE: add 'flow.parentData = me to your constructor for the algorithm." + vbCrLf
             strOut += "Then in your Run method, add a line 'flow.nextMsg = 'your next line of text'" + vbCrLf
-            strOut += "Then at the end of your Run method, invoke flow.Run(empty)" + vbCrLf
+            strOut += "Then at the end of your Run method, invoke flow.Run(src)" + vbCrLf
         Else
             flowText.Add(nextMsg)
             If flowText.Count > maxLines Then flowText.RemoveAt(0)

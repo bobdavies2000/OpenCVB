@@ -40,6 +40,7 @@ Public Class Reduction_Floodfill : Inherits TaskParent
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
         labels(2) = "Reduced input to floodfill"
+        task.redC = New RedCloud_Basics
         task.redOptions.setBitReductionBar(32)
         desc = "Use the reduction output as input to floodfill to get masks of cells."
     End Sub
@@ -223,7 +224,7 @@ Public Class Reduction_BGR : Inherits TaskParent
         Next
 
         mats.mat(3) = (mats.mat(0) + mats.mat(1) + mats.mat(2))
-        mats.Run(empty)
+        mats.Run(src)
         dst3 = mats.dst2
 
         cv.Cv2.Merge(split, dst2)

@@ -46,7 +46,7 @@ Public Class Swarm_Basics : Inherits TaskParent
         Dim lastIndex = cornerHistory.Count - 1
         knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
         knn.queries = New List(Of cv.Point2f)(cornerHistory.ElementAt(lastIndex))
-        knn.Run(empty)
+        knn.Run(src)
 
         dst2.SetTo(0)
         lpList.Clear()
@@ -134,9 +134,9 @@ Public Class Swarm_LeftRightFeatures : Inherits TaskParent
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        swLeft.Run(empty)
+        swLeft.Run(src)
         dst2 = swLeft.dst2
-        swRight.Run(empty)
+        swRight.Run(src)
         dst3 = swRight.dst2
     End Sub
 End Class

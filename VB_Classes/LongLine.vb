@@ -102,7 +102,7 @@ Public Class LongLine_Depth : Inherits TaskParent
         Dim mm As mmData = GetMinMax(task.pcSplit(2), dst0)
 
         kalman.kInput = {mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y}
-        kalman.Run(empty)
+        kalman.Run(src)
         mm.minLoc = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         mm.maxLoc = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
 
@@ -120,7 +120,7 @@ Public Class LongLine_Depth : Inherits TaskParent
                     Format(mm.maxVal, fmt1) + " meters "
 
         plot.plotData = New cv.Scalar(depth, mm.minVal, mm.maxVal)
-        plot.Run(empty)
+        plot.Run(src)
         dst2 = plot.dst2
         dst3 = plot.dst3
     End Sub
@@ -184,7 +184,7 @@ Public Class LongLine_Point : Inherits TaskParent
 
         Dim lp = longLine.ptLong
         kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
-        kalman.Run(empty)
+        kalman.Run(src)
         lp.p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         lp.p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
         longPt = New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
@@ -313,7 +313,7 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
 
         If knn.queries.Count = 0 Then Exit Sub ' no input...possible in a dark room...
 
-        knn.Run(empty)
+        knn.Run(src)
         dst2 = src.Clone
         parList.Clear()
         Dim checkList As New List(Of cv.Point)

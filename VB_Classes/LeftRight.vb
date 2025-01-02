@@ -269,6 +269,7 @@ End Class
 Public Class LeftRight_RedCloudRight : Inherits TaskParent
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
+        task.redC = New RedCloud_Basics
         desc = "Segment the right view image with RedCloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -287,6 +288,7 @@ End Class
 Public Class LeftRight_RedCloudLeft : Inherits TaskParent
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
+        task.redC = New RedCloud_Basics
         desc = "Segment the left view image with RedCloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -310,11 +312,11 @@ Public Class LeftRight_RedCloudBoth : Inherits TaskParent
         desc = "Match cells in the left view to the right view - something is flipped here..."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        stRight.Run(empty)
+        stRight.Run(src)
         dst2 = stRight.dst2
         labels(2) = "Left view - " + stRight.labels(2)
 
-        stLeft.Run(empty)
+        stLeft.Run(src)
         dst3 = stLeft.dst2
         labels(3) = "Right view - " + stLeft.labels(2)
     End Sub

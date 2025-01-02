@@ -93,6 +93,7 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
     Public lines As New Line_Basics
     Public delaunay As New Delaunay_Basics
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Track the line regions with RedCloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

@@ -23,7 +23,7 @@ Public Class FrameRate_Basics : Inherits TaskParent
             Next
         End If
         SetTrueText(strOut, 3)
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         lastImages = {task.color.Clone, task.leftview.Clone, task.rightview.Clone, task.depthRGB.Clone}
     End Sub
@@ -66,7 +66,7 @@ Public Class FrameRate_BasicsGray : Inherits TaskParent
             Next
         End If
         SetTrueText(strOut, 3)
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
 
         lastImages = {task.color.Clone, task.leftview.Clone, task.rightview.Clone, task.depthRGB.Clone}

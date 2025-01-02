@@ -130,7 +130,7 @@ Public Class Match_RandomTest : Inherits TaskParent
             dst2.SetTo(0)
             labels(2) = options.matchText + " for " + CStr(template.Cols) + " random test samples = " + Format(correlation, "#,##0.00")
             flow.nextMsg = options.matchText + " = " + Format(correlation, "#,##0.00")
-            flow.Run(empty)
+            flow.Run(src)
             SetTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
                         " a correlation coefficient near zero" + vbCrLf +
                         "The larger the sample size, the closer to zero the correlation will be - See 'Sample Size' slider nearby." + vbCrLf +
@@ -263,7 +263,7 @@ Public Class Match_Lines : Inherits TaskParent
             knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
         Next
         If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        knn.Run(empty)
+        knn.Run(src)
 
         If knn.queries.Count = 0 Then Exit Sub
 
@@ -359,7 +359,7 @@ Public Class Match_PointSlope : Inherits TaskParent
         Next
 
         ' templates = New List(Of cv.Mat)(newTemplates)
-        mats.Run(empty)
+        mats.Run(src)
         dst3 = mats.dst2
 
         Dim incorrectCount As Integer
@@ -393,6 +393,7 @@ Public Class Match_TraceRedC : Inherits TaskParent
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32S, 0)
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.redC = New RedCloud_Basics
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -619,7 +620,7 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
         Dim maxDistance = distSlider.Value
 
         knn.queries = New List(Of cv.Point2f)(task.features)
-        knn.Run(empty)
+        knn.Run(src)
 
         If task.optionsChanged Then
             frameList.Clear()

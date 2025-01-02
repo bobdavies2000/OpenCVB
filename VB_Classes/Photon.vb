@@ -61,7 +61,7 @@ Public Class Photon_Test : Inherits TaskParent
                       Format(counts(i).Max, "###,##0.0") + vbCrLf
         Next
         SetTrueText(strOut, 3)
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
 
         Dim colWidth = dst2.Width / testCount

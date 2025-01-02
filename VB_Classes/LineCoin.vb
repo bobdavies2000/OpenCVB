@@ -100,11 +100,11 @@ Public Class LineCoin_Parallel : Inherits TaskParent
         For Each cp In parallel.parList
             near.lp = New linePoints(cp.p1, cp.p2)
             near.pt = cp.p3
-            near.Run(empty)
+            near.Run(src)
             Dim d1 = near.distance
 
             near.pt = cp.p4
-            near.Run(empty)
+            near.Run(src)
             If near.distance <= 1 Or d1 <= 1 Then coinList.Add(cp)
         Next
 

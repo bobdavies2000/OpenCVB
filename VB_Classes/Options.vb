@@ -3052,6 +3052,7 @@ Public Class Options_Spectrum : Inherits TaskParent
     Public gapGray As Integer = 1
     Public sampleThreshold As Integer = 10
     Public Sub New()
+        task.redC = New RedCloud_Basics
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, gapDepth)
             sliders.setupTrackBar("Gap in gray spectrum", 1, 50, gapGray)
@@ -3604,7 +3605,7 @@ Public Class Options_ThresholdAll : Inherits TaskParent
     End Sub
     Public Sub RunOpt()
         If task.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
-            gradient.Run(empty)
+            gradient.Run(task.color.Clone)
             dst2 = gradient.dst2
         End If
 

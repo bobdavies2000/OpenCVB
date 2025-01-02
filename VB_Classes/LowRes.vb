@@ -316,7 +316,7 @@ Public Class LowRes_MLColor : Inherits TaskParent
 
             Dim roiB = task.gridRects(nList(0))
             ml.testMats = {rgb32f(roiB)}
-            ml.Run(empty)
+            ml.Run(src)
 
             dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
                                         ConvertScaleAbs.Reshape(1, roiB.Height)
@@ -393,7 +393,7 @@ Public Class LowRes_MLColorDepth : Inherits TaskParent
 
             Dim roiB = task.gridRects(nList(0))
             ml.testMats = {rgb32f(roiB), task.pcSplit(2)(roiB)}
-            ml.Run(empty)
+            ml.Run(src)
 
             dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
                                         ConvertScaleAbs.Reshape(1, roiB.Height)

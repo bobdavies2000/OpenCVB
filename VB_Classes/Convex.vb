@@ -55,6 +55,7 @@ Public Class Convex_RedCloud : Inherits TaskParent
     Dim convex As New Convex_Basics
     Public Sub New()
         labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
+        task.redC = New RedCloud_Basics
         desc = "Get lots of odd shapes from the RedCloud_Basics output and use ConvexHull to simplify them."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

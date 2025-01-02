@@ -105,6 +105,7 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.redOptions.setIdentifyCells(False)
+        task.redC = New RedCloud_Basics
         desc = "The option-free version of Motion_BGSub"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -486,6 +487,7 @@ Public Class Motion_Enclosing : Inherits TaskParent
     Public Sub New()
         If dst2.Width >= 1280 Then learnRate = 0.5 Else learnRate = 0.1 ' learn faster with large images (slower frame rate)
         cPtr = BGSubtract_BGFG_Open(4)
+        task.redC = New RedCloud_Basics
         labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
         desc = "Build an enclosing rectangle for the motion"
     End Sub
@@ -555,6 +557,7 @@ End Class
 Public Class Motion_RedCloud : Inherits TaskParent
     Public Sub New()
         labels(3) = "Motion detected in the cells below"
+        task.redC = New RedCloud_Basics
         desc = "Use RedCloud to define where there is motion"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -835,13 +838,13 @@ Public Class Motion_CenterKalman : Inherits TaskParent
             drawRotate.rr = New cv.RotatedRect(motion.matchCenter, task.centerRect.Size, 0)
         Else
             kalman.kInput = {motion.translation.X, motion.translation.Y}
-            kalman.Run(empty)
+            kalman.Run(src)
 
             newRect = New cv.Rect(centerRect.X + kalman.kOutput(0), centerRect.Y + kalman.kOutput(1),
                                        centerRect.Width, centerRect.Height)
 
             kalmanRR.kInput = New Single() {motion.matchCenter.X, motion.matchCenter.Y, motion.angle}
-            kalmanRR.Run(empty)
+            kalmanRR.Run(src)
 
             Dim pt = New cv.Point2f(kalmanRR.kOutput(0), kalmanRR.kOutput(1))
             drawRotate.rr = New cv.RotatedRect(pt, task.centerRect.Size, kalmanRR.kOutput(2))

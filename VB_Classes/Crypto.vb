@@ -29,7 +29,7 @@
 '            flow.nextmsg = New Guid(bytes).ToString
 '            guids.Add(flow.nextMsg)
 '            If guids.Count >= flow.maxLines Then guids.RemoveAt(0)
-'            flow.Run(empty)
+'            flow.Run(src)
 '        End If
 '    End Sub
 'End Class

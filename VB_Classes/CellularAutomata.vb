@@ -102,7 +102,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If random.options.count <> savePointCount Or age = 0 Then
-            random.Run(empty)
+            random.Run(src)
             age = 0
             savePointCount = random.options.count
             For i = 0 To random.PointList.Count - 1
@@ -200,7 +200,7 @@ Public Class CellularAutomata_LifePopulation : Inherits TaskParent
         dst2 = game.dst2
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
-        plot.Run(empty)
+        plot.Run(src)
         dst3 = plot.dst2
     End Sub
 End Class

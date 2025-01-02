@@ -221,7 +221,7 @@ Public Class Plane_EqCorrelation : Inherits TaskParent
 
         If count(index) > plane.equations.Count / 4 Then
             kalman.kInput = {pt(0), pt(1), pt(2), pt(3)}
-            kalman.Run(empty)
+            kalman.Run(src)
 
             strOut = "Normalized Plane equation: " + Format(kalman.kOutput(0), fmt3) + "x" + s1 + Format(Math.Abs(kalman.kOutput(1)), fmt3) + "y" + s2 +
                      Format(Math.Abs(kalman.kOutput(2)), fmt3) + "z = " + Format(-kalman.kOutput(3), fmt3) + " with " + CStr(count(index)) +
@@ -243,6 +243,7 @@ Public Class Plane_CellColor : Inherits TaskParent
     Public options As New Options_Plane
     Public Sub New()
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
+        task.redC = New RedCloud_Basics
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
     Public Function buildContourPoints(rc As rcData) As List(Of cv.Point3f)
@@ -305,6 +306,7 @@ Public Class Plane_Points : Inherits TaskParent
     Dim needOutput As Boolean
     Public Sub New()
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
+        task.redC = New RedCloud_Basics
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -346,7 +348,7 @@ Public Class Plane_Points : Inherits TaskParent
                         list2Dinput.Add(list2D(ptIndex))
                     Next
 
-                    plane.Run(empty)
+                    plane.Run(src)
                     strOut += plane.vbFormatEquation(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
                     equations.Add(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
                     ptList2D.Add(list2Dinput)
@@ -431,6 +433,7 @@ Public Class Plane_Equation : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
             task.redC.Run(src)
             dst2 = task.redC.dst2
             rc = task.rc

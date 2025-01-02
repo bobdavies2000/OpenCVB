@@ -33,7 +33,7 @@ Public Class Bin2Way_Basics : Inherits TaskParent
         mats.mat(1) = src.InRange(halfSplit, 255)            ' lightest
 
         If standaloneTest() Then
-            mats.Run(empty)
+            mats.Run(src)
             dst2 = mats.dst2
         End If
     End Sub
@@ -63,7 +63,7 @@ Public Class Bin2Way_KMeans : Inherits TaskParent
             kmeans.dst3.CopyTo(mats.mat(i), bin2.mats.mat(i))
         Next
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -144,7 +144,7 @@ Public Class Bin2Way_RecurseOnce : Inherits TaskParent
         mats.mat(2) = bin2.mats.mat(0) And Not darkestMask
         mats.mat(3) = bin2.mats.mat(1)
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

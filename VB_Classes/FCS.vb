@@ -13,7 +13,7 @@ Public Class FCS_Basics : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.fpSrc = src.Clone
+        getFeatures(src)
 
         task.fpListLast = New List(Of fpData)(task.fpList)
         task.fpMapLast = task.fpMap.Clone
@@ -128,6 +128,7 @@ Public Class FCS_Motion : Inherits TaskParent
         fcs.Run(src)
         dst2 = fcs.dst1
 
+        getFeatures(src)
         For Each fp In task.fpList
             DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
         Next
@@ -159,7 +160,7 @@ Public Class FCS_Motion : Inherits TaskParent
         End If
 
         plot.plotData = New cv.Scalar(motionPercent, 0, 0)
-        plot.Run(empty)
+        plot.Run(src)
         dst1 = plot.dst2
         fpDisplayCell()
     End Sub
@@ -203,7 +204,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         task.fpMotion.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
         mats.mat(1) = plothist.dst2.Clone
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
 
@@ -430,7 +431,7 @@ End Class
 '            SetTrueText(CStr(fpNabe.age), fpNabe.ptCenter, 3)
 '        Next
 '        Static finfo As New FCS_Info
-'        finfo.Run(empty)
+'        finfo.Run(src)
 '        SetTrueText(finfo.strOut, 3)
 '        labels(2) = fcs.labels(2)
 '        labels(3) = CStr(task.fpList.Count) + " cells found.  Dots below are at fp.ptCenter (not feature point)"
@@ -653,6 +654,8 @@ Public Class FCS_Delaunay : Inherits TaskParent
         Dim facets = New cv.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
+        getFeatures(src)
+
         task.fpList.Clear()
         task.fpIDlist.Clear()
         task.fpOutline.SetTo(0)
@@ -773,6 +776,7 @@ Public Class FCS_Info : Inherits TaskParent
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        getFeatures(src)
         Dim fp = fpSelection
         If fp Is Nothing Then fp = task.fpSelected
         If task.fpList.Count = 0 Then
@@ -830,7 +834,7 @@ Public Class FCS_InfoTest : Inherits TaskParent
         fcs.Run(src)
         dst2 = fcs.dst2
 
-        info.Run(empty)
+        info.Run(src)
         SetTrueText(info.strOut, 3)
 
         fpDisplayCell()
@@ -949,7 +953,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
             fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
         End If
 
-        info.Run(empty)
+        info.Run(src)
         SetTrueText(info.strOut, 1)
 
         Dim query = buildEntry(fpSave)
@@ -967,7 +971,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
             Next
         Next
 
-        knn.Run(empty)
+        knn.Run(src)
 
         fpDisplayCell()
         fpCellContour(task.fpSelected, dst2)
@@ -978,7 +982,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         Next
 
         info.fpSelection = task.fpList(knn.result(0, 0))
-        info.Run(empty)
+        info.Run(src)
         SetTrueText(info.strOut, 3)
         task.ClickPoint = info.fpSelection.ptCenter
     End Sub
@@ -1171,16 +1175,16 @@ End Class
 
 
 Public Class FCS_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Combine
+    Dim redCombo As New RedCloud_Combine
     Dim fcs As New FCS_Basics
     Dim knnMin As New KNN_MinDistance
     Public Sub New()
         desc = "Use the RedCloud maxDist points as feature points in an FCS display."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        redC.Run(src)
-        dst3 = redC.dst2
-        labels(2) = redC.labels(2)
+        redCombo.Run(src)
+        dst3 = redCombo.dst2
+        labels(2) = redCombo.labels(2)
 
         knnMin.inputPoints.Clear()
         For Each rc In task.redCells
@@ -1202,18 +1206,16 @@ End Class
 
 Public Class FCS_RedCloud1 : Inherits TaskParent
     Dim fcs As New FCS_Basics
-    Dim feat As New Feature_Basics
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         labels(1) = "Output of FCS_Basics."
+        task.redC = New RedCloud_Basics
         desc = "Isolate FCS cells for each redCell."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If standalone Then task.redC.Run(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
-
-        feat.Run(dst2)
 
         fcs.Run(src)
         dst1 = fcs.dst2

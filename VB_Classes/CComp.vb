@@ -81,7 +81,7 @@ Public Class CComp_Shapes : Inherits TaskParent
         mats.mat(1) = labelview
         mats.mat(2) = binary
         mats.mat(3) = gray
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

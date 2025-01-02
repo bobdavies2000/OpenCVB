@@ -124,10 +124,10 @@ Public Class Linear_Visualize : Inherits TaskParent
             mats.mat(i) = mats.mat(i).Normalize(0, 255, cv.NormTypes.MinMax).ConvertScaleAbs
         Next
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
 
-        matPlots.Run(empty)
+        matPlots.Run(src)
         dst3 = matPlots.dst2
 
         SetTrueText("Lower left is a mask showing where depth is" + vbCrLf + "within " +

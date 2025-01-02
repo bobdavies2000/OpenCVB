@@ -326,6 +326,7 @@ Public Class Corners_RedCloud : Inherits TaskParent
     Dim corners As New Neighbors_Intersects
     Public Sub New()
         labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
+        task.redC = New RedCloud_Basics
         desc = "Find the corners for each RedCloud cell."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

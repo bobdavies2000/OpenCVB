@@ -16,7 +16,7 @@ Public Class Mesh_Basics : Inherits TaskParent
 
         knn.queries = ptList
         knn.trainInput = knn.queries
-        knn.Run(empty)
+        knn.Run(src)
 
         For i = 0 To knn.queries.Count - 1
             Dim ptLast = knn.queries(i)

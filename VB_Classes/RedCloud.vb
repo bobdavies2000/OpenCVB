@@ -80,6 +80,7 @@ Public Class RedCloud_Hulls : Inherits TaskParent
     Dim convex As New Convex_RedCloudDefects
     Public Sub New()
         labels = {"", "Cells where convexity defects failed", "", "Improved contour results using OpenCV's ConvexityDefects"}
+        task.redC = New RedCloud_Basics
         desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -210,7 +211,7 @@ Public Class RedCloud_Equations : Inherits TaskParent
         For Each rc As rcData In redCells
             If rc.contour.Count > 4 Then
                 eq.rc = rc
-                eq.Run(empty)
+                eq.Run(src)
                 newCells.Add(eq.rc)
             End If
         Next
@@ -333,7 +334,7 @@ Public Class RedCloud_FPS : Inherits TaskParent
         desc = "Display RedCloud output at a fixed frame rate"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        fps.Run(empty)
+        fps.Run(src)
 
         If fps.heartBeat Then
             task.redC.Run(src)
@@ -633,7 +634,7 @@ Public Class RedCloud_PlaneEq3D : Inherits TaskParent
         Dim rc = task.rc
         If rc.maxVec.Z Then
             eq.rc = rc
-            eq.Run(empty)
+            eq.Run(src)
             rc = eq.rc
         End If
 
@@ -2138,6 +2139,7 @@ End Class
 Public Class RedCloud_ReduceTest : Inherits TaskParent
     Dim redInput As New RedCloud_Reduce
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Run RedCloud with the depth reduction."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -2191,6 +2193,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
     Dim maxDepth As New Depth_MaxMask
     Dim prep As New RedCloud_Reduce
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Combine the color and cloud as indicated in the RedOptions panel."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

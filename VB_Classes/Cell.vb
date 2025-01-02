@@ -50,6 +50,7 @@ Public Class Cell_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If standalone Or runRedCloud Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
             task.redC.Run(src)
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)
@@ -71,6 +72,7 @@ End Class
 Public Class Cell_PixelCountCompare : Inherits TaskParent
     Public Sub New()
         task.gOptions.debugChecked = True
+        task.redC = New RedCloud_Basics
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -108,6 +110,7 @@ End Class
 Public Class Cell_ValidateColorCells : Inherits TaskParent
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
+        task.redC = New RedCloud_Basics
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
@@ -158,6 +161,7 @@ Public Class Cell_Distance : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.redC = New RedCloud_Basics
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
         desc = "Measure the color distance of each cell to the selected cell."
     End Sub
@@ -201,6 +205,7 @@ Public Class Cell_Binarize : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.redC = New RedCloud_Basics
         labels = {"", "Binarized image", "", "Relative gray image"}
         desc = "Separate the image into light and dark using RedCloud cells"
     End Sub
@@ -237,7 +242,7 @@ End Class
 
 
 
-Public Class Cell_Floodfill : Inherits TaskParent
+Public Class Cell_FloodFill : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim stats As New Cell_Basics
     Public Sub New()
@@ -282,6 +287,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
             task.redC.Run(src)
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)

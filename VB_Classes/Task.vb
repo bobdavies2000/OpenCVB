@@ -31,7 +31,6 @@ Public Class VBtask : Implements IDisposable
 
     Public fpMap As cv.Mat
     Public fpMapLast As cv.Mat
-    Public fpSrc As cv.Mat
 
     Public fpOutline As cv.Mat
     Public fpSelected As fpData
@@ -544,10 +543,7 @@ Public Class VBtask : Implements IDisposable
         motion = New Motion_Basics
 
         If task.algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
-
-        If task.algName.Contains("RedCloud") Or task.algName.StartsWith("Flood_") Then
-            redC = New RedCloud_Basics
-        End If
+        If task.algName.StartsWith("RedCloud_") Then redC = New RedCloud_Basics
 
         ' all the algorithms in the list are task algorithms that are children of the task.algname.
         For i = 1 To callTrace.Count - 1

@@ -247,7 +247,7 @@ Public Class Color8U_ComplementaryTest : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         images.options.fileNameForm.filename.Text = task.HomeDir + "Data/Glasses by Gilles Tran.png"
-        images.Run(empty)
+        images.Run(src)
         dst2 = images.dst2
 
         comp.Run(dst2)

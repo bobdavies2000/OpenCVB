@@ -421,7 +421,7 @@ Public Class GuidedBP_Regions : Inherits TaskParent
             redCellsY.Add(rc)
         Next
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
 

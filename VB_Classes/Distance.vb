@@ -185,6 +185,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.setUseColorOnly(True)
         task.redOptions.HistBinBar3D.Value = 5
+        task.redC = New RedCloud_Basics
         labels(1) = "3D Histogram distance for each of the cells at left"
         desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
     End Sub

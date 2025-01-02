@@ -11,9 +11,9 @@ Public Class Homography_Basics : Inherits TaskParent
         Options.RunOpt()
 
         If standaloneTest() And task.heartBeat And options.hMethod = cv.HomographyMethods.None Then
-            random.Run(empty)
+            random.Run(src)
             corners1 = New List(Of cv.Point2d)(random.PointList)
-            random.Run(empty)
+            random.Run(src)
             corners2 = New List(Of cv.Point2d)(random.PointList)
         End If
 

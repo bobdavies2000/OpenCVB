@@ -3,10 +3,12 @@ Public Class Volume_Basics : Inherits TaskParent
     Public rc As New rcData
     Public volume As Single
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Build a box containing all the 3D points of a RedCloud cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
             task.redC.Run(src)
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)

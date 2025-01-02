@@ -70,7 +70,7 @@ Public Class KNNorm_TestDim2 : Inherits TaskParent
             If task.heartBeat Then
                 queryInput.Clear()
                 trainInput.Clear()
-                random.Run(empty)
+                random.Run(src)
                 For Each pt In random.PointList
                     If trainInput.Count < 10 Then
                         trainInput.Add(pt)
@@ -93,7 +93,7 @@ Public Class KNNorm_TestDim2 : Inherits TaskParent
             knn.queryInput.Add(pt.Y)
         Next
 
-        knn.Run(empty)
+        knn.Run(src)
         displayResults()
 
         labels(2) = "Top " + CStr(trainInput.Count) + " best matches. Red=TrainInput, yellow = queryInput"
@@ -134,7 +134,7 @@ Public Class KNNorm_TestDim3 : Inherits TaskParent
             If task.heartBeat Then
                 queryInput.Clear()
                 trainInput.Clear()
-                random.Run(empty)
+                random.Run(src)
                 For Each pt In random.PointList
                     If trainInput.Count < 10 Then
                         trainInput.Add(pt)
@@ -159,7 +159,7 @@ Public Class KNNorm_TestDim3 : Inherits TaskParent
             knn.queryInput.Add(pt.Z)
         Next
 
-        knn.Run(empty)
+        knn.Run(src)
         displayResults()
 
         labels(2) = "Top " + CStr(trainInput.Count) + " best matches. Red=TrainInput, yellow = queryInput"
@@ -200,7 +200,7 @@ Public Class KNNorm_TestDim4 : Inherits TaskParent
             If task.heartBeat Then
                 queryInput.Clear()
                 trainInput.Clear()
-                random.Run(empty)
+                random.Run(src)
                 For Each pt In random.PointList
                     If trainInput.Count < 10 Then
                         trainInput.Add(pt)
@@ -227,7 +227,7 @@ Public Class KNNorm_TestDim4 : Inherits TaskParent
             knn.queryInput.Add(pt.Item(3))
         Next
 
-        knn.Run(empty)
+        knn.Run(src)
         displayResults()
 
         labels(2) = "Top " + CStr(trainInput.Count) + " best matches. Red=TrainInput, yellow = queryInput"

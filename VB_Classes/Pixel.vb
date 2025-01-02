@@ -233,7 +233,7 @@ Public Class Pixel_GetSet : Inherits TaskParent
 
         SetTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
 
-        mats.Run(Empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -298,7 +298,7 @@ Public Class Pixel_SampleColor : Inherits TaskParent
         Dim pixels As New List(Of cv.Vec3b)
         Dim counts As New List(Of Integer)
         Dim pixel0 = New cv.Vec3b
-        random.Run(Empty)
+        random.Run(src)
         For Each pt In random.PointList
             Dim pixel = src.Get(Of cv.Vec3b)(pt.Y, pt.X)
             If pixel <> pixel0 Then
@@ -655,6 +655,8 @@ Public Class Pixel_Vector3D : Inherits TaskParent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.HistBinBar3D.Value = 3
+        task.redC = New RedCloud_Basics
+
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
@@ -730,6 +732,7 @@ Public Class Pixel_Vectors : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", ""}
+        task.redC = New RedCloud_Basics
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -905,7 +908,7 @@ Public Class Pixel_Sampler : Inherits TaskParent
         Else
             random.range = New cv.Rect(0, 0, src.Width, src.Height)
         End If
-        random.Run(empty)
+        random.Run(src)
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)

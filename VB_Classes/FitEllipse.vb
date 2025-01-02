@@ -129,6 +129,7 @@ End Class
 Public Class FitEllipse_RedCloud : Inherits TaskParent
     Dim fitE As New FitEllipse_Basics
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Create an ellipse from a contour"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -141,7 +142,7 @@ Public Class FitEllipse_RedCloud : Inherits TaskParent
         For Each pt In task.rc.contour
             fitE.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
         Next
-        fitE.Run(empty)
+        fitE.Run(src)
         dst3.SetTo(0)
         dst3(task.rc.rect).SetTo(white, task.rc.mask)
         dst3.Rectangle(task.rc.rect, white, task.lineWidth, task.lineType)

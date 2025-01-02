@@ -3,6 +3,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
     Public Sub New()
         If New cv.Size(task.dst2.Width, task.dst2.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
         labels(2) = task.redC.labels(3)
+        task.redC = New RedCloud_Basics
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -26,6 +27,7 @@ Public Class RedTrack_Lines : Inherits TaskParent
     Dim lines as new Line_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        task.redC = New RedCloud_Basics
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -128,7 +130,7 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
         dst2 = task.feat.dst2
 
         knn.queries = New List(Of cv.Point2f)(task.features)
-        knn.Run(empty)
+        knn.Run(src)
 
         dst3 = src.Clone
         For i = 0 To knn.neighbors.Count - 1
@@ -165,7 +167,7 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
         dst2 = task.feat.dst2
 
         knn.queries = New List(Of cv.Point2f)(task.features)
-        knn.Run(empty)
+        knn.Run(src)
 
         featureList.Clear()
         For i = 0 To knn.neighbors.Count - 1
@@ -222,6 +224,7 @@ Public Class RedTrack_Features : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
+        task.redC = New RedCloud_Basics
         desc = "Similar to RedTrack_KNNPoints"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

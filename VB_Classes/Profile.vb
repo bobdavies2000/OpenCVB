@@ -9,6 +9,7 @@ Public Class Profile_Basics : Inherits TaskParent
     Public corners As New List(Of cv.Point)
     Public cornersRaw As New List(Of cv.Point)
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
     End Sub
     Private Function point3fToString(v As cv.Point3f) As String
@@ -255,7 +256,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
         Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
         ySlider.Value += 1
-        rotate.Run(empty)
+        rotate.Run(src)
         Dim output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
         vecMat = output.Reshape(3, vecMat.Rows)
 
@@ -273,7 +274,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
         End If
 
         plot.plotData = count
-        plot.Run(empty)
+        plot.Run(src)
         dst3 = plot.dst2
 
         If ySlider.Value >= 45 Then
@@ -311,7 +312,7 @@ Public Class Profile_OpenGL : Inherits TaskParent
 
         If rc.contour3D.Count > 0 Then
             Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
-            rotate.Run(empty)
+            rotate.Run(src)
             Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             task.ogl.dataInput = output.Reshape(3, vecMat.Rows)
             task.ogl.pointCloudInput = New cv.Mat
@@ -353,7 +354,7 @@ Public Class Profile_Kalman : Inherits TaskParent
             kalman.kInput(i * 2 + 1) = sides.corners(i).Y
         Next
 
-        kalman.Run(empty)
+        kalman.Run(src)
 
         If rc.index > 0 Then
             dst3.SetTo(0)

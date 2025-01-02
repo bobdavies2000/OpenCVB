@@ -15,7 +15,7 @@ Public Class Keyboard_Basics : Inherits TaskParent
             For Each txt In checkKeys.inputText
                 flow.nextMsg += txt.ToString()
             Next
-            flow.Run(empty)
+            flow.Run(src)
         End If
         checkKeys.inputText.Clear()
     End Sub

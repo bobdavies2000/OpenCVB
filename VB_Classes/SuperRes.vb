@@ -27,7 +27,7 @@ Public Class SuperRes_Basics : Inherits TaskParent
             Exit Sub
         End If
 
-        video.Run(empty)
+        video.Run(src)
         dst2 = video.dst2
 
         If optFlow Is Nothing Then
@@ -72,7 +72,7 @@ Public Class SuperRes_Input : Inherits TaskParent
         desc = "Input data for the superres testing"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        video.Run(empty)
+        video.Run(src)
         dst2 = video.dst2
     End Sub
 End Class
@@ -95,7 +95,7 @@ Public Class SuperRes_SubPixelZoom : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         task.mouseMovePoint = New cv.Point(45, 60)
-        video.Run(empty)
+        video.Run(src)
         If video.video.captureVideo.PosFrames > 30 Then Exit Sub
         dst1 = video.dst2
         zoom.Run(video.dst2)

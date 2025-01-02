@@ -31,7 +31,7 @@ Public Class Bin4Way_Basics : Inherits TaskParent
 
         Dim quadrant As Integer
         binary.Run(src)
-        binary.mats.Run(empty)
+        binary.mats.Run(src)
         dst2 = binary.mats.dst2
         dst1 = binary.mats.dst3 * 0.5
         matList = binary.mats.mat
@@ -127,7 +127,7 @@ Public Class Bin4Way_Canny : Inherits TaskParent
         edges.Run(binary.mats.mat(3))  ' the darkest of the dark half
         mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = mats.mat(2) Or mats.mat(3)
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         If mats.dst3.Channels() = 3 Then
             labels(3) = "Combo of first 3 below.  Click quadrants in dst2."
@@ -168,7 +168,7 @@ Public Class Bin4Way_Sobel : Inherits TaskParent
         mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = mats.mat(2) Or mats.mat(3)
 
-        mats.Run(empty)
+        mats.Run(src)
         dst3 = mats.dst2
         dst2 = mats.mat(1)
     End Sub
@@ -313,7 +313,7 @@ Public Class Bin4Way_SplitValley : Inherits TaskParent
         mats.mat(2) = gray.InRange(valley.valleys(2), valley.valleys(3) - 1)
         mats.mat(3) = gray.InRange(valley.valleys(3), 255)
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)
@@ -434,7 +434,7 @@ Public Class Bin4Way_SplitGaps : Inherits TaskParent
             diff(i).Run(mats.mat(i))
             dst1 = dst1 Or diff(i).dst2
         Next
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
         If task.heartBeat Then labels(1) = "There are " + CStr(dst1.CountNonZero) + " unstable pixels"
@@ -507,7 +507,7 @@ Public Class Bin4Way_Regions1 : Inherits TaskParent
         mats.mat(2) = gray.InRange(midColor, topColor)
         mats.mat(3) = gray.InRange(topColor, 255)
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)
@@ -606,7 +606,7 @@ Public Class Bin4Way_BasicsRed : Inherits TaskParent
         mats.mat(3) = src.InRange(quartiles(2), 255)
 
         If standaloneTest() Then
-            mats.Run(empty)
+            mats.Run(src)
             dst2 = mats.dst2
         End If
     End Sub
@@ -727,7 +727,7 @@ Public Class Bin4Way_SplitMean : Inherits TaskParent
         mats.mat(2) = gray.InRange(midColor, topColor)
         mats.mat(3) = gray.InRange(topColor, 255)
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)

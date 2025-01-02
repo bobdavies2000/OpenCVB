@@ -168,12 +168,12 @@ Public Class Palette_DepthColorMap : Inherits TaskParent
             Dim gradMat As New cv.Mat
 
             gColor.gradientWidth = dst1.Width
-            gColor.Run(empty)
+            gColor.Run(src)
             gradientColorMap = gColor.gradient
 
             gColor.color2 = gColor.color1
             gColor.color1 = cv.Scalar.Blue
-            gColor.Run(empty)
+            gColor.Run(src)
 
             cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
@@ -214,12 +214,12 @@ Public Class Palette_RGBDepth : Inherits TaskParent
             Dim gradMat As New cv.Mat
 
             gColor.gradientWidth = dst1.Width
-            gColor.Run(empty)
+            gColor.Run(src)
             gradientColorMap = gColor.gradient
 
             gColor.color2 = gColor.color1
             gColor.color1 = cv.Scalar.Blue
-            gColor.Run(empty)
+            gColor.Run(src)
 
             cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
@@ -434,7 +434,7 @@ Public Class Palette_RandomColorMap : Inherits TaskParent
             gColor.color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             For i = 0 To transitionCount - 1
                 gColor.gradientWidth = dst2.Width
-                gColor.Run(empty)
+                gColor.Run(src)
                 gColor.color2 = gColor.color1
                 gColor.color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 If i = 0 Then gradientColorMap = gColor.gradient Else cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)

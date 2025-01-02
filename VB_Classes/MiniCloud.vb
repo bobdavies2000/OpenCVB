@@ -112,14 +112,14 @@ Public Class MiniCloud_RotateAngle : Inherits TaskParent
         mats.mat(2) = mask
 
         plot.plotData = New cv.Scalar(mm.maxVal)
-        plot.Run(empty)
+        plot.Run(src)
         dst3 = plot.dst2
         labels(3) = "Histogram maxVal = " + Format(mm.maxVal, fmt1) + " histogram mean = " + Format(mean, fmt1)
         mats.mat(3) = peak.histogram.ConvertScaleAbs(255)
 
         mats.mat(0) = peak.dst2(peak.mini.rect)
         mats.mat(1) = peak.dst3(peak.mini.rect)
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
     End Sub
 End Class

@@ -266,7 +266,7 @@ Public Class FeatureROI_Correlation : Inherits TaskParent
 
         plot.plotData = motionCount
         plot.min = -1
-        plot.Run(empty)
+        plot.Run(src)
         dst3 = plot.dst2
 
         labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gridRects.Count) + " roi's had above average standard deviation."

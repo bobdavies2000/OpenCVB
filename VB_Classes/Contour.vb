@@ -416,6 +416,7 @@ End Class
 Public Class Contour_Outline : Inherits TaskParent
     Public rc As New rcData
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Create a simplified contour of the selected cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -456,6 +457,7 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
             task.redC.Run(src)
             dst2 = task.redC.dst2
             rc = task.rc
@@ -547,6 +549,7 @@ End Class
 Public Class Contour_Compare : Inherits TaskParent
     Public options As New Options_Contours
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -584,6 +587,7 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
             task.redC.Run(src)
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)
@@ -629,6 +633,7 @@ Public Class Contour_RedCloudEdges : Inherits TaskParent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.redC = New RedCloud_Basics
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
     End Sub
@@ -655,6 +660,7 @@ End Class
 
 Public Class Contour_RedCloud : Inherits TaskParent
     Public Sub New()
+        task.redC = New RedCloud_Basics
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show all the contours found in the RedCloud output"
     End Sub
@@ -701,6 +707,7 @@ Public Class Contour_Smoothing : Inherits TaskParent
     Dim options As New Options_Contours2
     Public Sub New()
         labels(3) = "The white outline is the truest contour while the red is the selected approximation."
+        task.redC = New RedCloud_Basics
         desc = "Compare contours of the selected cell. Cells are offset to help comparison."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -934,6 +941,7 @@ Public Class RedCloud_Cells : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
+        task.redC = New RedCloud_Basics
         desc = "Create RedCloud output using only color"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

@@ -67,14 +67,14 @@ Public Class Threshold_Definitions : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        gradient.Run(empty)
+        gradient.Run(src)
         dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
         mats.mat(0) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv)
         mats.mat(1) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Trunc)
         mats.mat(2) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Tozero)
         mats.mat(3) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.TozeroInv)
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
         SetTrueText("Input Gradient Image", 0)

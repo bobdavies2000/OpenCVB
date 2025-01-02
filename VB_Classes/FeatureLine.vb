@@ -223,7 +223,7 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
         If raw3D.Count = 0 Then
             SetTrueText("No vertical or horizontal lines were found")
         Else
-            gMat.Run(empty)
+            gMat.Run(src)
             task.gMatrix = gMat.gMatrix
             Dim matLines3D As cv.Mat = (cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
         End If
@@ -349,7 +349,7 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits TaskParent
         Next
 
         Dim saveVec = knn.queries(0)
-        knn.Run(empty)
+        knn.Run(src)
 
         Dim index = knn.result(0, 0)
         Dim p1 = New cv.Point2f(knn.trainInput(index)(0), knn.trainInput(index)(1))
@@ -461,7 +461,7 @@ Public Class FeatureLine_DetailsAll : Inherits TaskParent
             Next
             If flow.nextMsg = title Then flow.nextMsg = "No feature line found..."
         End If
-        flow.Run(empty)
+        flow.Run(src)
         If arcList.Count = 0 Then Exit Sub
 
         Dim mostAccurate = arcList(0)

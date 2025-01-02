@@ -163,6 +163,7 @@ End Class
 Public Class Fractal_Dimension : Inherits TaskParent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.redC = New RedCloud_Basics
         labels = {"", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub
@@ -192,7 +193,7 @@ Public Class Fractal_Dimension : Inherits TaskParent
         '                height = (pixel - G_min) // h  # lowest box Is at G_min And Each Is h gray levels tall
         '                boxes[height].append(pixel)  # assign the pixel intensity to the correct box
         '        stddev = np.sqrt(np.var(boxes, axis = 1))  # calculate the standard deviation Of Each box
-        '        stddev = stddev[~np.isnan(stddev)]  # remove boxes With NaN standard deviations (empty)
+        '        stddev = stddev[~np.isnan(stddev)]  # remove boxes With NaN standard deviations (src)
         '        nBox_r = 2 * (stddev // h) + 1
         '                    N_r += sum(nBox_r)
         '                    If N_r!= prev Then :

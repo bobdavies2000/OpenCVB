@@ -93,7 +93,7 @@ Public Class KMeans_k2_to_k8 : Inherits TaskParent
         km.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Mats.mat(kmIndex) = km.dst2 * 255 / km.classCount
 
-        Mats.Run(empty)
+        Mats.Run(src)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub
@@ -161,7 +161,7 @@ Public Class KMeans_CustomData : Inherits TaskParent
             Static randslider = FindSlider("Random Pixel Count")
             If task.firstPass Then randslider.Value = 50
             If randslider.Value < k Then randslider.Value = k
-            If task.heartBeat Then random.Run(empty)
+            If task.heartBeat Then random.Run(src)
 
             Dim input As New List(Of Single)
             For Each pt In random.PointList
@@ -220,6 +220,7 @@ Public Class KMeans_Edges : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
+        task.redC = New RedCloud_Basics
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub

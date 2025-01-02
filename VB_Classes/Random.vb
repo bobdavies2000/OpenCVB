@@ -183,7 +183,7 @@ Public Class Random_LUTMask : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If task.heartBeat Or task.frameCount < 10 Then
-            random.Run(empty)
+            random.Run(src)
             lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, cv.Scalar.All(0))
             Dim lutIndex = 0
             km.Run(src)
@@ -529,7 +529,7 @@ Public Class Random_StaticTVFaster : Inherits TaskParent
 
         cv.Cv2.Add(dst2, valMat, dst2, plusMask)
         cv.Cv2.Subtract(dst2, valMat, dst2, minusMask)
-        mats.Run(empty)
+        mats.Run(src)
         dst3 = mats.dst2
     End Sub
 End Class
@@ -590,7 +590,7 @@ Public Class Random_KalmanPoints : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If refreshPoints Then
-            random.Run(empty)
+            random.Run(src)
             targetSet = New List(Of cv.Point2f)(random.PointList)
             currSet = New List(Of cv.Point2f)(random.PointList) ' just to get the updated size
             refreshPoints = False

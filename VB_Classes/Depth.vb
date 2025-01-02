@@ -499,7 +499,7 @@ Public Class Depth_Smoothing : Inherits TaskParent
         reduction.dst2.ConvertTo(reducedDepth, cv.MatType.CV_32F)
         colorize.Run(reducedDepth)
         dst2 = colorize.dst2
-        mats.Run(empty)
+        mats.Run(src)
         dst3 = mats.dst2
         labels(2) = smooth.labels(2)
     End Sub
@@ -1363,7 +1363,7 @@ Public Class Depth_World : Inherits TaskParent
         desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.vb for comparable calculations"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If task.firstPass Then template.Run(empty) ' intrinsics arrive with the first buffers.
+        If task.firstPass Then template.Run(src) ' intrinsics arrive with the first buffers.
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -1602,7 +1602,7 @@ Public Class Depth_PaletteOld : Inherits TaskParent
         ' couldn't do this in the constructor because it uses Gradient_ForDepth and is called in task.
         If customColorMap Is Nothing Then
             gColor.gradientWidth = 255
-            gColor.Run(empty)
+            gColor.Run(src)
             customColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gColor.gradient.Data())
             customColorMap.Set(Of cv.Vec3b)(0, 0, black.ToVec3b)
         End If

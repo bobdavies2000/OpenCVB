@@ -365,7 +365,7 @@ Public Class PhotoShop_EmbossAll : Inherits TaskParent
             dst2 = mats.mat(i) Or dst2
         Next
 
-        mats.Run(empty)
+        mats.Run(src)
         dst3 = mats.dst2
     End Sub
 End Class

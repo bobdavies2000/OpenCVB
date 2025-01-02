@@ -44,7 +44,7 @@ Public Class Bin3Way_Basics : Inherits TaskParent
         mats.mat(2) = src.InRange(firstThird, lastThird - 1) ' other
 
         If standaloneTest() Then
-            mats.Run(empty)
+            mats.Run(src)
             dst2 = mats.dst2
         End If
     End Sub
@@ -75,7 +75,7 @@ Public Class Bin3Way_KMeans : Inherits TaskParent
             kmeans.dst3.CopyTo(mats.mat(i), bin3.mats.mat(i))
         Next
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

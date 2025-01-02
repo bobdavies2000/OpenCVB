@@ -206,7 +206,7 @@ Public Class Feature_KNN : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         knn.queries = New List(Of cv.Point2f)(task.features)
         If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-        knn.Run(empty)
+        knn.Run(src)
         task.feat.Run(src)
 
         For i = 0 To knn.neighbors.Count - 1
@@ -343,7 +343,7 @@ Public Class Feature_PointTracker : Inherits TaskParent
         Next
         If standaloneTest() Then
             flow.nextMsg = strOut
-            flow.Run(empty)
+            flow.Run(src)
         End If
 
         labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
@@ -980,7 +980,11 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         desc = "Assign each delaunay point to a RedCell"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If standalone Then task.redC.Run(src)
+        If standalone Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
+            task.redC.Run(src)
+        End If
+
         delaunay.inputPoints = task.features
         delaunay.Run(src)
 
@@ -1025,7 +1029,10 @@ Public Class Feature_GridPoints : Inherits TaskParent
         desc = "Assign each corner of a grid rect to a RedCell"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If standalone Then task.redC.Run(src)
+        If standalone Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
+            task.redC.Run(src)
+        End If
 
         For Each pt In task.gridPoints
             Dim index = task.redMap.Get(Of Byte)(pt.Y, pt.X)

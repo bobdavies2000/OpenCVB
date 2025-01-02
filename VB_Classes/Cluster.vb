@@ -21,7 +21,7 @@ Public Class Cluster_Basics : Inherits TaskParent
             knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
         Next
         knn.trainInput = knn.queries
-        knn.Run(empty)
+        knn.Run(src)
 
         ptList.Clear()
         clusterID.Clear()

@@ -122,7 +122,7 @@ Public Class Math_RGBCorrelation : Inherits TaskParent
         Dim redBlueCorrelation = "Red-Blue " + match.labels(2)
 
         flow.nextMsg = blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation
-        flow.Run(empty)
+        flow.Run(src)
         labels(2) = "Log of " + match.options.matchText
     End Sub
 End Class

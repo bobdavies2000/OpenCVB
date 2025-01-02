@@ -132,7 +132,7 @@ Public Class Annealing_MT_CPP : Inherits TaskParent
             mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst2
             mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst2
         End If
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
 
         ' copy the top half of the solutions to the bottom half (worst solutions)

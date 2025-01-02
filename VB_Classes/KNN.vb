@@ -60,10 +60,10 @@ Public Class KNN_N2Basics : Inherits TaskParent
 
 
             If task.heartBeat Then
-                random.Run(empty)
+                random.Run(src)
                 trainInput = New List(Of cv.Point2f)(random.PointList)
             End If
-            random.Run(empty)
+            random.Run(src)
             queries = New List(Of cv.Point2f)(random.PointList)
         End If
 
@@ -142,13 +142,13 @@ Public Class KNN_N2BasicsTest : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         If task.heartBeat Then
             dst3.SetTo(0)
-            random.Run(empty)
+            random.Run(src)
             knn.trainInput = New List(Of cv.Point2f)(random.PointList)
         End If
-        random.Run(empty)
+        random.Run(src)
         knn.queries = New List(Of cv.Point2f)(random.PointList)
 
-        knn.Run(empty)
+        knn.Run(src)
         knn.knn2.displayResults()
         dst2 = knn.knn2.dst2
         accumulateDisplay()
@@ -274,7 +274,7 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
         If task.heartBeat Then
             knn.queries.Clear()
             knn.trainInput.Clear()
-            random.Run(empty)
+            random.Run(src)
             For Each pt In random.PointList
                 Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
                 If knn.trainInput.Count = 10 Then
@@ -288,7 +288,7 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
             Next
         End If
 
-        knn.Run(empty)
+        knn.Run(src)
 
         dst2.SetTo(0)
         dist.inPoint1 = knn.queries(0)
@@ -332,13 +332,13 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If task.heartBeat Then
-            random.Run(empty)
+            random.Run(src)
             knn.trainInput = New List(Of cv.Vec4f)(random.PointList)
             knn.queries.Clear()
             knn.queries.Add(New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, dst2.Height), msRNG.Next(0, dst2.Height)))
         End If
 
-        knn.Run(empty)
+        knn.Run(src)
 
         dst2.SetTo(0)
         dist.inPoint1 = knn.queries(0)
@@ -381,7 +381,7 @@ Public Class KNN_Emax : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         em.Run(src)
-        random.Run(empty)
+        random.Run(src)
 
         knn.queries = New List(Of cv.Point2f)(em.centers)
         knn.Run(src)
@@ -735,7 +735,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)
         knn.trainInput = knn.queries
-        knn.Run(empty)
+        knn.Run(src)
 
         dst3.SetTo(0)
         For Each pt In inputPoints
@@ -792,13 +792,13 @@ Public Class KNN_Farthest : Inherits TaskParent
         If standalone Then
             If task.heartBeat Then
                 Static random As New Random_Basics
-                random.Run(empty)
+                random.Run(src)
                 knn.trainInput = New List(Of cv.Point2f)(random.PointList)
                 knn.queries = New List(Of cv.Point2f)(knn.trainInput)
             End If
         End If
 
-        knn.Run(empty)
+        knn.Run(src)
 
         dst2.SetTo(0)
         dst3.SetTo(0)
@@ -856,7 +856,7 @@ Public Class KNN_MaxDistance : Inherits TaskParent
 
                 knn.queries = New List(Of cv.Point2f)(inputPoints)
                 knn.trainInput = knn.queries
-                knn.Run(empty)
+                knn.Run(src)
 
                 dst3 = src.Clone
                 For Each pt In inputPoints
@@ -949,7 +949,7 @@ Public Class KNN_NNBasicsTest : Inherits TaskParent
             Next
         End If
 
-        knn.Run(empty)
+        knn.Run(src)
         dst2.SetTo(0)
         For i = 0 To knn.trainInput.Count - 1 Step knn.options.knnDimension
             Dim pt = New cv.Point2f(knn.trainInput(i), knn.trainInput(i + 1))
@@ -1102,9 +1102,9 @@ Public Class KNN_OneToOne : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
-                random.Run(empty)
+                random.Run(src)
                 knn.trainInput = New List(Of cv.Point2f)(random.PointList)
-                random.Run(empty)
+                random.Run(src)
                 queries = New List(Of cv.Point2f)(random.PointList)
             End If
         End If
@@ -1115,7 +1115,7 @@ Public Class KNN_OneToOne : Inherits TaskParent
         End If
 
         knn.queries = queries
-        knn.Run(empty)
+        knn.Run(src)
 
         Dim nearest As New List(Of Integer)
         ' map the points 1 to 1: find duplicates, choose which is better.

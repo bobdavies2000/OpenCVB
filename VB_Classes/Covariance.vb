@@ -10,7 +10,7 @@ Public Class Covariance_Basics : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         dst3.SetTo(0)
         If standaloneTest() Then
-            random.Run(empty)
+            random.Run(src)
             src = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
             For i = 0 To random.PointList.Count - 1
                 DrawCircle(dst3,random.PointList(i), 3, white)

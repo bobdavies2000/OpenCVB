@@ -76,11 +76,11 @@ Public Class Hist3Dcloud_DepthSplit : Inherits TaskParent
             mats2.mat(i) = hist2d(i).histogram.ConvertScaleAbs
         Next
 
-        mats1.Run(empty)
+        mats1.Run(src)
         dst2 = mats1.dst2
         dst3 = mats1.mat(mats1.quadrant)
 
-        mats2.Run(empty)
+        mats2.Run(src)
         dst1 = mats2.dst2
     End Sub
 End Class

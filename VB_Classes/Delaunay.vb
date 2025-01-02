@@ -14,7 +14,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
-            randEnum.Run(empty)
+            randEnum.Run(src)
             inputPoints = New List(Of cv.Point2f)(randEnum.points)
         End If
 
@@ -104,7 +104,7 @@ Public Class Delaunay_SubDiv : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then If Not task.heartBeat Then Exit Sub
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        random.Run(empty)
+        random.Run(src)
         dst2.SetTo(0)
         For Each pt In random.PointList
             subdiv.Insert(pt)
@@ -211,7 +211,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
-            random.Run(empty)
+            random.Run(src)
             inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
 
@@ -265,12 +265,12 @@ Public Class Delaunay_Generations : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            If task.heartBeat Then Random.Run(empty)
+            If task.heartBeat Then Random.Run(src)
             inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)
-        knn.Run(empty)
+        knn.Run(src)
 
         facet.inputPoints = New List(Of cv.Point2f)(inputPoints)
         facet.Run(src)
@@ -319,7 +319,7 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
-            randEnum.Run(empty)
+            randEnum.Run(src)
             inputPoints = New List(Of cv.Point2f)(randEnum.points)
         End If
 

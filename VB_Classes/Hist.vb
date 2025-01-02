@@ -192,7 +192,7 @@ Public Class Hist_EqualizeGray : Inherits TaskParent
         mats.mat(1) = histogramEQ.dst2
         mats.mat(2) = src
         mats.mat(3) = dst2
-        mats.Run(empty)
+        mats.Run(src)
         dst3 = mats.dst2
     End Sub
 End Class
@@ -252,7 +252,7 @@ Public Class Hist_ColorsAndGray : Inherits TaskParent
             mats.mat(i) = histogram.plot.dst2.Clone
         Next
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -475,7 +475,7 @@ Public Class Hist_PeaksRGB : Inherits TaskParent
             task.mousePicTag = 2
         End If
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -608,7 +608,7 @@ Public Class Hist_EqualizeColor : Inherits TaskParent
             kalmanEq.Run(rgbEq(channel).Clone())
             mats.mat(1) = kalmanEq.dst2.Clone()
 
-            mats.Run(empty)
+            mats.Run(src)
             dst3 = mats.dst2
             labels(3) = "Before (top) and After Red Histogram"
         End If
@@ -725,7 +725,7 @@ Public Class Hist_CompareNumber : Inherits TaskParent
         Dim sum = cv.Cv2.Sum(comp.normHistDiff)(0) * 100
         Dim sumAbs = cv.Cv2.Sum(comp.normHistDiffAbs)(0) * 100
         plot.plotData = New cv.Scalar(sum, sumAbs, 0)
-        plot.Run(empty)
+        plot.Run(src)
         dst2 = plot.dst2
         dst3 = plot.dst3
 
@@ -1261,6 +1261,7 @@ Public Class Hist_Cell : Inherits TaskParent
     Public Sub New()
         If standalone Then task.redOptions.DisplayCellStats.Checked = True
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        task.redC = New RedCloud_Basics
         labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
         desc = "Review depth data for a RedCloud Cell"
     End Sub

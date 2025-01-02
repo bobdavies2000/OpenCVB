@@ -3,6 +3,7 @@ Public Class Triangle_Basics : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
+        task.redC = New RedCloud_Basics
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -79,6 +80,7 @@ Public Class Triangle_RedCloud : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
+        task.redC = New RedCloud_Basics
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -119,6 +121,7 @@ Public Class Triangle_Cell : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
+        task.redC = New RedCloud_Basics
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -173,6 +176,7 @@ Public Class Triangle_Mask : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+        task.redC = New RedCloud_Basics
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 

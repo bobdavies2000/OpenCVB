@@ -36,7 +36,7 @@ Public Class Density_Phase : Inherits TaskParent
         desc = "Display gradient phase and 2D density side by side."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        gradient.Run(empty)
+        gradient.Run(src)
         dst3 = Convert32f_To_8UC3(gradient.dst3)
 
         dense.Run(src)

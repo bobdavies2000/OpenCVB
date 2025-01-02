@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class SuperPixel_Basics : Inherits TaskParent
     Public Sub New()
         labels(2) = "Super Pixel cells"
+        task.redC = New RedCloud_Basics
         desc = "A Better superpixel algorithm"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

@@ -45,7 +45,10 @@ Public Class Line3D_Correlation : Inherits TaskParent
         Return correlation.Get(Of Single)(0, 0)
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        If standalone Then task.redC.Run(src)
+        If standalone Then
+            If task.firstPass Then task.redC = New RedCloud_Basics
+            task.redC.Run(src)
+        End If
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 
@@ -139,7 +142,7 @@ Public Class Line3D_Draw : Inherits TaskParent
 
         plot.plotData = New cv.Scalar(c1, c2, 0)
 
-        plot.Run(empty)
+        plot.Run(src)
         dst2 = plot.dst2
         dst3 = plot.dst3
         labels(3) = "using " + CStr(nextList.Count) + " points, the correlation of X to Z = " + Format(c1, fmt3) + " (blue), correlation of Y to Z = " + Format(c2, fmt3) + " (green)"

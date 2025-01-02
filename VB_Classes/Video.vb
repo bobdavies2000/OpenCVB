@@ -74,7 +74,7 @@ Public Class Video_CarCounting : Inherits TaskParent
         Dim tmp = videoImage.Resize(src.Size())
         If tmp.Channels() <> dst2.Channels() Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         flow.nextMsg = "  Cars " + CStr(carCount)
-        flow.Run(empty)
+        flow.Run(src)
         dst2 = dst2 Or tmp
     End Sub
 End Class

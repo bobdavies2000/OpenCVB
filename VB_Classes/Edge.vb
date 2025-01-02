@@ -1104,6 +1104,7 @@ Public Class Edge_RedCloud : Inherits TaskParent
     Public Sub New()
         labels(2) = "Canny Edges (0), RedCloud output (1), RedCloud Edges(2), 0 And'd with 2"
         labels(3) = "Cell boundaries that are also real edges."
+        task.redC = New RedCloud_Basics
         task.redOptions.setIdentifyCells(False)
         desc = "Identify cell boundaries that are also edges."
     End Sub
@@ -1362,7 +1363,7 @@ Public Class Edge_DiffXYZ : Inherits TaskParent
 
         mats.mat(3) = diffX.dst2 Or diffY.dst2 ' diffz is too much...
 
-        mats.Run(empty)
+        mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

@@ -544,7 +544,7 @@ Public Class BackProject_Image : Inherits TaskParent
         If kalman.kInput.Length <> 2 Then ReDim kalman.kInput(2 - 1)
         kalman.kInput(0) = hist.mm.minVal
         kalman.kInput(1) = hist.mm.maxVal
-        kalman.Run(empty)
+        kalman.Run(src)
         hist.mm.minVal = Math.Min(kalman.kOutput(0), kalman.kOutput(1))
         hist.mm.maxVal = Math.Max(kalman.kOutput(0), kalman.kOutput(1))
 

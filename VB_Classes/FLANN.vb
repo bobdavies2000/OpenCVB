@@ -60,7 +60,7 @@ Public Class FLANN_Basics : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(empty) ' fill result1 with random points in x and y range of the image.
+        If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(src) ' fill result1 with random points in x and y range of the image.
         Dim features As cv.Mat = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
 
         Dim matchCount = Math.Min(options.matchCount, random.PointList.Count - 1)

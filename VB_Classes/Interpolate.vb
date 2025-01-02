@@ -65,7 +65,7 @@ Public Class Interpolate_Kalman : Inherits TaskParent
         Dim tmp32f As New cv.Mat
         dst2.ConvertTo(tmp32f, cv.MatType.CV_32F)
         Marshal.Copy(tmp32f.Data, kalman.kInput, 0, kalman.kInput.Length)
-        kalman.Run(empty)
+        kalman.Run(src)
 
         Dim results(kalman.kInput.Length - 1) As Byte
         For i = 0 To kalman.kOutput.Length - 1

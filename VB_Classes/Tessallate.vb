@@ -103,6 +103,7 @@ Public Class Tessallate_QuadSimple : Inherits TaskParent
     Public oglOptions As New Options_OpenGLFunctions
     Public Sub New()
         task.gOptions.setGridSize(20)
+        task.redC = New RedCloud_Basics
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -229,6 +230,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
     Public oglOptions As New Options_OpenGLFunctions
     Const depthListMaxCount As Integer = 10
     Public Sub New()
+        task.redC = New RedCloud_Basics
         task.gOptions.setGridSize(20)
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub

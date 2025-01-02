@@ -40,7 +40,7 @@ Public Class LaneFinder_Videos : Inherits TaskParent
             If inputfile.Exists Then video.options.fileInfo = New FileInfo(inputfile.FullName)
         End If
 
-        video.Run(empty)
+        video.Run(src)
         dst2 = video.dst2
     End Sub
 End Class
@@ -58,7 +58,7 @@ Public Class LaneFinder_Edges : Inherits TaskParent
         desc = "Using the videos provided, find the lane markers."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        input.Run(empty)
+        input.Run(src)
         dst0 = input.dst2
         edges.Run(dst0)
         dst2 = edges.dst2
@@ -80,7 +80,7 @@ Public Class LaneFinder_HLSColor : Inherits TaskParent
         desc = "Isolate the colors for the white and yellow"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        input.Run(empty)
+        input.Run(src)
         dst0 = input.dst2.CvtColor(cv.ColorConversionCodes.BGR2HLS)
         dst1 = dst0.InRange(New cv.Scalar(0, 200, 0), New cv.Scalar(255, 255, 255))
         dst2 = dst0.InRange(New cv.Scalar(10, 0, 100), New cv.Scalar(40, 255, 255))
@@ -104,7 +104,7 @@ Public Class LaneFinder_ROI : Inherits TaskParent
         desc = "Define the ROI for the location of the lanes"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        hls.Run(empty)
+        hls.Run(src)
 
         If task.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
@@ -147,7 +147,7 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
         desc = "Use the Hough lines found to build a slope intercept format line."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        hough.Run(empty)
+        hough.Run(src)
         dst0 = hough.dst0
         dst1 = hough.dst2
         dst2 = hough.dst3

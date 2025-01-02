@@ -171,7 +171,7 @@ Public Class DCT_Surfaces_debug : Inherits TaskParent
 
         mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
-        mats.Run(empty)
+        mats.Run(src)
         dst3 = mats.dst2
 
         Dim roi = task.gridRects(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
@@ -200,6 +200,6 @@ Public Class DCT_Surfaces_debug : Inherits TaskParent
                 End If
             End If
         End If
-        flow.Run(empty)
+        flow.Run(src)
     End Sub
 End Class

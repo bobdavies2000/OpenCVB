@@ -195,6 +195,7 @@ Public Class PointCloud_Spin2 : Inherits TaskParent
     Dim redCSpin As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes."}
+        task.redC = New RedCloud_Basics
         desc = "Spin the RedCloud output exercise"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -543,7 +544,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits TaskParent
         For i = plot.srcY.Count - 1 To 0 Step -1
             If botRow = 0 And plot.srcY(i) > 10 Then botRow = i
         Next
-        plot.Run(empty)
+        plot.Run(src)
         dst3 = plot.dst2.Transpose()
         dst3 = dst3.Flip(cv.FlipMode.Y)
         labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)

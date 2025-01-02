@@ -389,7 +389,7 @@ Public Class Line_Movement : Inherits TaskParent
                 dst2.SetTo(0)
             End If
             kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
-            kalman.Run(empty)
+            kalman.Run(src)
             p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
         End If
@@ -875,7 +875,7 @@ Public Class Line_KNN : Inherits TaskParent
             DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
         swarm.knn.trainInput = New List(Of cv.Point2f)(swarm.knn.queries)
-        swarm.knn.Run(empty)
+        swarm.knn.Run(src)
 
         dst3 = swarm.DrawLines().Clone
         labels(2) = lines.labels(2)
@@ -1034,6 +1034,7 @@ Public Class Line_Cells : Inherits TaskParent
     Dim lines As New Line_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Identify all lines in the RedCloud_Basics cell boundaries"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -1251,7 +1252,7 @@ Public Class Line_PointSlope : Inherits TaskParent
             Exit Sub
         End If
 
-        knn.Run(empty)
+        knn.Run(src)
         If knn.result Is Nothing Then Exit Sub
         Dim nextLines As New List(Of linePoints)
         Dim usedBest As New List(Of Integer)
@@ -1471,7 +1472,7 @@ Public Class Line_LeftRight : Inherits TaskParent
         dst2 = task.lines.dst2
         labels(2) = "Left view" + task.lines.labels(2)
 
-        rlines.Run(empty)
+        rlines.Run(src)
         dst3 = rlines.dst2
         labels(3) = "Right View: " + rlines.labels(2)
     End Sub

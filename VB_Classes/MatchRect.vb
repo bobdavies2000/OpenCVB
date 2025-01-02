@@ -37,6 +37,7 @@ End Class
 Public Class MatchRect_RedCloud : Inherits TaskParent
     Dim matchRect As New MatchRect_Basics
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Track a RedCloud cell using MatchTemplate."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
