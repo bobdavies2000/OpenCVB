@@ -6,11 +6,10 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 
+#Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public lpList As New List(Of linePoints)
-    Public lpMap As New cv.Mat
-    Public lp As linePoints
 
     Public gridSize As Integer
     Public gridRows As Integer
@@ -91,7 +90,6 @@ Public Class VBtask : Implements IDisposable
     Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
-    Public paletteGradient As cv.Mat
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
     Public srcThread As cv.Mat
@@ -111,11 +109,9 @@ Public Class VBtask : Implements IDisposable
     Public grid As Grid_Basics
     Public ogl As OpenGL_Basics
     Public colorizer As Depth_Palette
-    Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
     Public redC As RedCloud_Basics
 
-    Public drawRotatedRect As Draw_RotatedRect
     Public centerRect As cv.Rect
 
     Public pythonPipeIn As NamedPipeServerStream
@@ -357,198 +353,11 @@ Public Class VBtask : Implements IDisposable
                                                task.vecColors(i)(2) / 255)
         Next
     End Sub
-    Private Sub VBTaskTimerPop(sender As Object, e As EventArgs)
-        Static WarningIssued As Boolean = False
-        If frameCount > 0 And WarningIssued = False Then
-            WarningIssued = True
-            Debug.WriteLine("Warning: " + task.algName + " has not completed work on a frame in a second.")
-        End If
-    End Sub
-    Public Sub OpenGLClose()
-        If openGL_hwnd <> 0 Then
-            Dim r As RECT
-            GetWindowRect(openGL_hwnd, r)
-            Dim wRect = New cv.Rect(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top)
-            SaveSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", wRect.X)
-            SaveSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", wRect.Y)
-            SaveSetting("Opencv", "OpenGLtaskWidth", "OpenGLtaskWidth", wRect.Width)
-            openGLPipe.Close()
-            openGL_hwnd = 0
-        End If
-    End Sub
-    Public Sub New()
-    End Sub
-    Public Sub New(parms As algParms)
-        AddHandler TaskTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf VBTaskTimerPop)
-        TaskTimer.AutoReset = True
-        TaskTimer.Enabled = True
-        Randomize() ' just in case anyone uses VB.Net's Rnd
-
-        task = Me
-        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve results.
-        gridRects = New List(Of cv.Rect)
-        firstPass = True
-        algName = parms.algName
-        cameraName = parms.cameraName
-        testAllRunning = parms.testAllRunning
-        showConsoleLog = parms.showConsoleLog
-        fpsRate = parms.fpsRate
-        calibData = parms.cameraInfo
-        HomeDir = parms.HomeDir
-        main_hwnd = parms.main_hwnd
-        useRecordedData = parms.useRecordedData
-        externalPythonInvocation = parms.externalPythonInvocation
-
-        mainFormLocation = parms.mainFormLocation
-        displayRes = parms.displayRes
-        rows = parms.workingRes.Height
-        cols = parms.workingRes.Width
-        workingRes = parms.workingRes
-        task.optionsChanged = True
-
-        dst0 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-        dst1 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-        dst2 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-        dst3 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-
-        OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
-        OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
-
-        buildColors()
-        pythonTaskName = HomeDir + "Python\" + algName
-
-        allOptions = New OptionsContainer
-        allOptions.Show()
-
-        gOptions = New OptionsGlobal
-        redOptions = New OptionsRedCloud
-        task.redMap = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-
-        callTrace.Clear()
-
-        grid = New Grid_Basics
-        grid.taskAlgorithm = True ' task algorithms may be duplicated in the activeObjects list
-
-        colorizer = New Depth_Palette
-        colorizer.taskAlgorithm = True
-
-        feat = New Feature_Basics
-        feat.taskAlgorithm = True
-
-        If task.algName.Contains("RedCloud") Then
-            redC = New RedCloud_Basics
-            redC.taskAlgorithm = True
-        End If
-
-        IMUBasics = New IMU_Basics
-        IMUBasics.taskAlgorithm = True
-
-        gMat = New IMU_GMatrix
-        gMat.taskAlgorithm = True
-
-        gravityHorizon = New Gravity_Horizon
-        gravityHorizon.taskAlgorithm = True
-
-        lines = New Line_Basics
-        lines.taskAlgorithm = True
-
-        motion = New Motion_Basics
-        motion.taskAlgorithm = True
-
-        ' all the algorithms in the list are task algorithms that are children of the task.algname.
-        For i = 1 To callTrace.Count - 1
-            callTrace(i) = task.algName + "\" + callTrace(i)
-        Next
-
-        updateSettings()
-        task.redOptions.Show()
-        task.gOptions.Show()
-        palette = New Palette_LoadColorMap
-        ogl = New OpenGL_Basics
-        drawRotatedRect = New Draw_RotatedRect
-        centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
-
-        If task.advice = "" Then
-            task.advice = "No advice for " + algName + " yet." + vbCrLf +
-                               "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
-        End If
-
-        fpList.Clear()
-        fpOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        fpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-
-        If parms.useRecordedData Then recordedData = New Replay_Play()
-
-        ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
-        ' https://www.intelrealsense.com/depth-camera-d435i/
-        ' https://www.intelrealsense.com/depth-camera-d455/
-        ' https://towardsdatascience.com/opinion-26190c7fed1b
-        ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
-        ' https://www.stereolabs.com/assets/datasheets/zed-2i-datasheet-feb2022.pdf
-        ' https://www.mynteye.com/pages/mynt-eye-d
-        ' https://www.orbbec.com/products/stereo-vision-camera/gemini-335l/
-        ' order of cameras is the same as the order above... see cameraNames above
-        Dim vFOVangles() As Single = {59, 59, 72, 58, 42.5, 57, 57, 62, 68} ' all values from the specification - this is usually overridden by calibration data.
-        Dim hFOVangles() As Single = {90, 90, 104, 105, 69.4, 86, 86, 69, 94} ' all values from the specification - this is usually overridden by calibration data.
-        Dim focalLengths() As Single = {5.5, 5.5, 3.4, 1.88, 4.81, 2.31, 2.31, 2.45, 2.45}
-        Dim baseLines() As Single = {0.074, 0.074, 0.073, 0.055, 0.052, 0.06, 0.06, 0.048, 0.048} ' in meters
-
-        ' NOTE: I can't find the VFOV for the Oak-D or Oak-D Lite cameras.
-        ' The 62 is based on Pythagorean theorem and knowing the 71.8 HFOV and the 81.3 DFOV.
-        If parms.cameraInfo.v_fov <> 0 Then vFOVangles(parms.cameraIndex) = parms.cameraInfo.v_fov
-        If parms.cameraInfo.h_fov <> 0 Then hFOVangles(parms.cameraIndex) = parms.cameraInfo.h_fov
-
-        vFov = vFOVangles(parms.cameraIndex)  ' these are default values in case the calibration data is unavailable
-        hFov = hFOVangles(parms.cameraIndex)
-        focalLength = focalLengths(parms.cameraIndex)
-        baseline = baseLines(parms.cameraIndex)
-
-        task.myStopWatch = Stopwatch.StartNew()
-        task.optionsChanged = True
-        Application.DoEvents()
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        allOptions.Close()
-        If openGL_hwnd <> 0 Then
-            task.OpenGLClose()
-            openGL_hwnd = 0
-        End If
-        TaskTimer.Enabled = False
-    End Sub
-    Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
-        Dim str As New TrueText(text, pt, picTag)
-        task.trueData.Add(str)
-    End Sub
-    Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
-        Static ptNew As New cv.Point
-        If redCells.Count = 0 Then Exit Sub
-        If task.ClickPoint = ptNew And redCells.Count > 1 Then task.ClickPoint = redCells(1).maxDist
-        Dim index = cellMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        task.rc = redCells(index)
-        If index > 0 And index < task.redCells.Count Then
-            ' task.ClickPoint = redCells(index).maxDist
-            task.rc = redCells(index)
-        End If
-    End Sub
-    Public Sub setSelectedCell()
-        If task.redCells.Count = 0 Then Exit Sub
-        If task.ClickPoint = newPoint And task.redCells.Count > 1 Then
-            task.ClickPoint = task.redCells(1).maxDist
-        End If
-        Dim index = task.redMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        If index > 0 And index < task.redCells.Count Then
-            ' task.ClickPoint = task.redCells(index).maxDist
-            task.rc = task.redCells(index)
-        Else
-            ' the 0th cell is always the upper left corner with just 1 pixel.
-            If task.redCells.Count > 1 Then task.rc = task.redCells(1)
-        End If
-    End Sub
+#End Region
     Private Function findIntermediateObject(lookupName As String) As TaskParent
-        If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
         Dim saveObject As Object = Nothing
         For Each obj In task.activeObjects
-            If obj.traceName = lookupName And task.firstPass = False Then
+            If obj.traceName = lookupName Then
                 ' task Algorithms are always allocated first so if taskAlgorithm, keep looking...
                 saveObject = obj ' continue looking if it is a taskAlgorithm.
                 If saveObject.taskAlgorithm = False Then
@@ -558,9 +367,6 @@ Public Class VBtask : Implements IDisposable
         Next
         Return saveObject
     End Function
-    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
-        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
-    End Sub
     Private Sub postProcess(src As cv.Mat)
         Try
             ' make sure that any outputs from the algorithm are the right size.nearest
@@ -666,6 +472,198 @@ Public Class VBtask : Implements IDisposable
         Catch ex As Exception
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
+    End Sub
+    Private Sub VBTaskTimerPop(sender As Object, e As EventArgs)
+        Static WarningIssued As Boolean = False
+        If frameCount > 0 And WarningIssued = False Then
+            WarningIssued = True
+            Debug.WriteLine("Warning: " + task.algName + " has not completed work on a frame in a second.")
+        End If
+    End Sub
+    Public Sub OpenGLClose()
+        If openGL_hwnd <> 0 Then
+            Dim r As RECT
+            GetWindowRect(openGL_hwnd, r)
+            Dim wRect = New cv.Rect(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top)
+            SaveSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", wRect.X)
+            SaveSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", wRect.Y)
+            SaveSetting("Opencv", "OpenGLtaskWidth", "OpenGLtaskWidth", wRect.Width)
+            openGLPipe.Close()
+            openGL_hwnd = 0
+        End If
+    End Sub
+    Public Sub New()
+    End Sub
+    Public Sub New(parms As algParms)
+        AddHandler TaskTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf VBTaskTimerPop)
+        TaskTimer.AutoReset = True
+        TaskTimer.Enabled = True
+        Randomize() ' just in case anyone uses VB.Net's Rnd
+
+        task = Me
+        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve results.
+        gridRects = New List(Of cv.Rect)
+        firstPass = True
+        algName = parms.algName
+        cameraName = parms.cameraName
+        testAllRunning = parms.testAllRunning
+        showConsoleLog = parms.showConsoleLog
+        fpsRate = parms.fpsRate
+        calibData = parms.cameraInfo
+        HomeDir = parms.HomeDir
+        main_hwnd = parms.main_hwnd
+        useRecordedData = parms.useRecordedData
+        externalPythonInvocation = parms.externalPythonInvocation
+
+        mainFormLocation = parms.mainFormLocation
+        displayRes = parms.displayRes
+        rows = parms.workingRes.Height
+        cols = parms.workingRes.Width
+        workingRes = parms.workingRes
+        task.optionsChanged = True
+
+        dst0 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        dst1 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        dst2 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        dst3 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+
+        OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
+        OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
+
+        buildColors()
+        pythonTaskName = HomeDir + "Python\" + algName
+
+        allOptions = New OptionsContainer
+        allOptions.Show()
+
+        gOptions = New OptionsGlobal
+        redOptions = New OptionsRedCloud
+        task.redMap = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+
+        callTrace.Clear()
+
+        grid = New Grid_Basics
+        grid.taskAlgorithm = True ' task algorithms may be duplicated in the activeObjects list
+
+        colorizer = New Depth_Palette
+        colorizer.taskAlgorithm = True
+
+        feat = New Feature_Basics
+        feat.taskAlgorithm = True
+
+        If task.algName.Contains("RedCloud") Then
+            redC = New RedCloud_Basics
+            redC.taskAlgorithm = True
+        End If
+
+        IMUBasics = New IMU_Basics
+        IMUBasics.taskAlgorithm = True
+
+        gMat = New IMU_GMatrix
+        gMat.taskAlgorithm = True
+
+        gravityHorizon = New Gravity_Horizon
+        gravityHorizon.taskAlgorithm = True
+
+        lines = New Line_Basics
+        lines.taskAlgorithm = True
+
+        motion = New Motion_Basics
+        motion.taskAlgorithm = True
+
+        If task.algName.StartsWith("OpenGL_") Then
+            ogl = New OpenGL_Basics
+            ogl.taskAlgorithm = True
+        End If
+
+        ' all the algorithms in the list are task algorithms that are children of the task.algname.
+        For i = 1 To callTrace.Count - 1
+            callTrace(i) = task.algName + "\" + callTrace(i)
+        Next
+
+        updateSettings()
+        task.redOptions.Show()
+        task.gOptions.Show()
+        centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
+
+        If task.advice = "" Then
+            task.advice = "No advice for " + algName + " yet." + vbCrLf +
+                               "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
+        End If
+
+        fpList.Clear()
+        fpOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        fpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+
+        If parms.useRecordedData Then recordedData = New Replay_Play()
+
+        ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
+        ' https://www.intelrealsense.com/depth-camera-d435i/
+        ' https://www.intelrealsense.com/depth-camera-d455/
+        ' https://towardsdatascience.com/opinion-26190c7fed1b
+        ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
+        ' https://www.stereolabs.com/assets/datasheets/zed-2i-datasheet-feb2022.pdf
+        ' https://www.mynteye.com/pages/mynt-eye-d
+        ' https://www.orbbec.com/products/stereo-vision-camera/gemini-335l/
+        ' order of cameras is the same as the order above... see cameraNames above
+        Dim vFOVangles() As Single = {59, 59, 72, 58, 42.5, 57, 57, 62, 68} ' all values from the specification - this is usually overridden by calibration data.
+        Dim hFOVangles() As Single = {90, 90, 104, 105, 69.4, 86, 86, 69, 94} ' all values from the specification - this is usually overridden by calibration data.
+        Dim focalLengths() As Single = {5.5, 5.5, 3.4, 1.88, 4.81, 2.31, 2.31, 2.45, 2.45}
+        Dim baseLines() As Single = {0.074, 0.074, 0.073, 0.055, 0.052, 0.06, 0.06, 0.048, 0.048} ' in meters
+
+        ' NOTE: I can't find the VFOV for the Oak-D or Oak-D Lite cameras.
+        ' The 62 is based on Pythagorean theorem and knowing the 71.8 HFOV and the 81.3 DFOV.
+        If parms.cameraInfo.v_fov <> 0 Then vFOVangles(parms.cameraIndex) = parms.cameraInfo.v_fov
+        If parms.cameraInfo.h_fov <> 0 Then hFOVangles(parms.cameraIndex) = parms.cameraInfo.h_fov
+
+        vFov = vFOVangles(parms.cameraIndex)  ' these are default values in case the calibration data is unavailable
+        hFov = hFOVangles(parms.cameraIndex)
+        focalLength = focalLengths(parms.cameraIndex)
+        baseline = baseLines(parms.cameraIndex)
+
+        task.myStopWatch = Stopwatch.StartNew()
+        task.optionsChanged = True
+        Application.DoEvents()
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        allOptions.Close()
+        If openGL_hwnd <> 0 Then
+            task.OpenGLClose()
+            openGL_hwnd = 0
+        End If
+        TaskTimer.Enabled = False
+    End Sub
+    Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
+        Dim str As New TrueText(text, pt, picTag)
+        task.trueData.Add(str)
+    End Sub
+    Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+        Static ptNew As New cv.Point
+        If redCells.Count = 0 Then Exit Sub
+        If task.ClickPoint = ptNew And redCells.Count > 1 Then task.ClickPoint = redCells(1).maxDist
+        Dim index = cellMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        task.rc = redCells(index)
+        If index > 0 And index < task.redCells.Count Then
+            ' task.ClickPoint = redCells(index).maxDist
+            task.rc = redCells(index)
+        End If
+    End Sub
+    Public Sub setSelectedCell()
+        If task.redCells.Count = 0 Then Exit Sub
+        If task.ClickPoint = newPoint And task.redCells.Count > 1 Then
+            task.ClickPoint = task.redCells(1).maxDist
+        End If
+        Dim index = task.redMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        If index > 0 And index < task.redCells.Count Then
+            ' task.ClickPoint = task.redCells(index).maxDist
+            task.rc = task.redCells(index)
+        Else
+            ' the 0th cell is always the upper left corner with just 1 pixel.
+            If task.redCells.Count > 1 Then task.rc = task.redCells(1)
+        End If
+    End Sub
+    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
+        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
     End Sub
     Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
@@ -817,6 +815,7 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
         lines.runAlg(src)
+        task.lpList = New List(Of linePoints)(lines.lpList)
 
         ' the gravity transformation apparently can introduce some NaNs.
         If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(task.pcSplit(2))

@@ -7703,7 +7703,7 @@ End Class
 
 
 Public Class Options_Line : Inherits TaskParent
-    Public minLength As Integer
+    Public minLength As Integer = 1
     Public maxIntersection As Integer
     Public correlation As Single
     Public topX As Integer
@@ -7711,7 +7711,7 @@ Public Class Options_Line : Inherits TaskParent
     Public minDistance As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min Line Length", 1, 100, dst2.Height / 10)
+            sliders.setupTrackBar("Min Line Length", 1, 100, minLength)
             sliders.setupTrackBar("Intersection Maximum Pixel Count", 1, 100, 15)
             sliders.setupTrackBar("Min Correlation", 1, 100, 95)
             sliders.setupTrackBar("Top X count", 1, 254, 3)

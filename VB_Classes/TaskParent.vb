@@ -36,6 +36,7 @@ Public Class TaskParent : Implements IDisposable
     Public Sub New()
         traceName = Me.GetType.Name
         If task.callTrace.Count = 0 Then task.callTrace.Add(task.algName + "\")
+        If traceName = task.algName Then Dim k = 0
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
@@ -54,23 +55,14 @@ Public Class TaskParent : Implements IDisposable
             End If
         Next
 
-        ' the _CPP algorithms are old but still used for performance.
-        If task.algName.StartsWith("_CPP") Then
-            task.callTrace.Clear()
-            task.algorithm_ms.Clear()
-            task.algorithmNames.Clear()
-            task.callTrace.Add("CPP_Basics\")
-        End If
-
         dst0 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         dst1 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         dst3 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
         standalone = traceName = task.algName
-        If traceName = "Python_Run" Then standalone = True
-        If task.algName.EndsWith("_CS") Then callStack = task.callTrace(0) + callStack
-        If task.callTrace.Contains(callStack) = False Then task.callTrace.Add(callStack)
+        task.callTrace.Add(callStack)
+
         task.activeObjects.Add(Me)
         task.intermediateRefresh = True
 
@@ -646,13 +638,14 @@ Public Class TaskParent : Implements IDisposable
         DrawContour(dst, ptlist, color, 1)
     End Sub
     Public Function ShowPalette(input As cv.Mat) As cv.Mat
+        Static palette = New Palette_LoadColorMap
         If input.Type = cv.MatType.CV_32S Then
             Dim mm = GetMinMax(input)
             Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
             input = tmp
         End If
-        task.palette.Run(input)
-        Return task.palette.dst2.Clone
+        palette.Run(input)
+        Return palette.dst2.Clone
     End Function
     Public Function ShowIntermediate() As Boolean
         If task.intermediateObject Is Nothing Then Return False

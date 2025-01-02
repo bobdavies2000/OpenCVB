@@ -746,6 +746,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
     Public translation As cv.Point2f
     Public angle As Single ' in degrees.
     Public rotatedRect As cv.RotatedRect
+    Dim drawRotate As Draw_RotatedRect
     Public Sub New()
         labels(3) = "MatchTemplate output for centerRect - center is black"
         desc = "Build a center rectangle and track it with MatchTemplate."
@@ -796,9 +797,9 @@ Public Class Motion_CenterRect : Inherits TaskParent
         angle = rotationSnap - rotationGravity
         rotatedRect = New cv.RotatedRect(matchCenter, matchRect.Size, angle)
 
-        task.drawRotatedRect.rr = rotatedRect
-        task.drawRotatedRect.Run(dst2)
-        dst2 = task.drawRotatedRect.dst2
+        drawRotate.rr = rotatedRect
+        drawRotate.Run(dst2)
+        dst2 = drawRotate.dst2
 
         labels(2) = "Correlation = " + Format(correlation, fmt3) + ", Translation = (" +
                     Format(xDisp, fmt1) + "," + Format(yDisp, fmt1) + ") " +
@@ -817,6 +818,7 @@ Public Class Motion_CenterKalman : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Dim kalmanRR As New Kalman_Basics
     Dim centerRect As cv.Rect
+    Dim drawRotate As Draw_RotatedRect
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
         labels(3) = "Template for motion matchTemplate.  Shake the camera to see Kalman impact."
@@ -830,7 +832,7 @@ Public Class Motion_CenterKalman : Inherits TaskParent
         Dim newRect As cv.Rect
         If motion.translation.X = 0 And motion.translation.Y = 0 And motion.angle = 0 Then
             newRect = centerRect
-            task.drawRotatedRect.rr = New cv.RotatedRect(motion.matchCenter, task.centerRect.Size, 0)
+            drawRotate.rr = New cv.RotatedRect(motion.matchCenter, task.centerRect.Size, 0)
         Else
             kalman.kInput = {motion.translation.X, motion.translation.Y}
             kalman.Run(empty)
@@ -842,11 +844,11 @@ Public Class Motion_CenterKalman : Inherits TaskParent
             kalmanRR.Run(empty)
 
             Dim pt = New cv.Point2f(kalmanRR.kOutput(0), kalmanRR.kOutput(1))
-            task.drawRotatedRect.rr = New cv.RotatedRect(pt, task.centerRect.Size, kalmanRR.kOutput(2))
+            drawRotate.rr = New cv.RotatedRect(pt, task.centerRect.Size, kalmanRR.kOutput(2))
         End If
 
-        task.drawRotatedRect.Run(dst2)
-        dst2 = task.drawRotatedRect.dst2
+        drawRotate.Run(dst2)
+        dst2 = drawRotate.dst2
         dst2.Rectangle(newRect, task.HighlightColor, task.lineWidth)
 
         dst3(centerRect) = motion.template
@@ -913,6 +915,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
     Public mp As linePoints
     Public angle As Single
     Public rotatedRect As cv.RotatedRect
+    Dim drawRotate As New Draw_RotatedRect
     Public Sub New()
         Dim w = dst2.Width
         vertRect = New cv.Rect(w / 2 - w / 4, 0, w / 2, dst2.Height)
@@ -962,9 +965,9 @@ Public Class Motion_CenterRotation : Inherits TaskParent
             If mp.xp1.Y = dst2.Height Then angle = -angle
             rotatedRect = New cv.RotatedRect(mm.maxLoc, task.centerRect.Size, angle)
             labels(3) = "angle = " + Format(angle, fmt1) + " degrees"
-            task.drawRotatedRect.rr = rotatedRect
-            task.drawRotatedRect.Run(dst3)
-            dst3 = task.drawRotatedRect.dst2
+            drawRotate.rr = rotatedRect
+            drawRotate.Run(dst3)
+            dst3 = drawRotate.dst2
         End If
         labels(3) = motion.labels(2)
     End Sub

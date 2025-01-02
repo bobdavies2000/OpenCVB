@@ -387,7 +387,6 @@ Public Class Depth_ColorMap : Inherits TaskParent
         dst1 += 1
         dst2 = ShowPalette(dst1)
         dst2.SetTo(0, task.noDepthMask)
-        dst3 = task.palette.dst3
     End Sub
 End Class
 

@@ -1023,14 +1023,12 @@ End Enum
 	If algorithmName = "Line_PointSlope" Then return new Line_PointSlope
 	If algorithmName = "Line_Rects" Then return new Line_Rects
 	If algorithmName = "Line_RegionsVB" Then return new Line_RegionsVB
-	If algorithmName = "Line_RightImage" Then return new Line_RightImage
 	If algorithmName = "Line_TimeView" Then return new Line_TimeView
 	If algorithmName = "Line_TopX" Then return new Line_TopX
 	If algorithmName = "Line_Vertical" Then return new Line_Vertical
 	If algorithmName = "Line_VerticalHorizontal" Then return new Line_VerticalHorizontal
 	If algorithmName = "Line_VerticalHorizontal1" Then return new Line_VerticalHorizontal1
 	If algorithmName = "Line_VerticalHorizontalCells" Then return new Line_VerticalHorizontalCells
-	If algorithmName = "Line_ViewLeft" Then return new Line_ViewLeft
 	If algorithmName = "Line_ViewRight" Then return new Line_ViewRight
 	If algorithmName = "Line_ViewSide" Then return new Line_ViewSide
 	If algorithmName = "Line_ViewTop" Then return new Line_ViewTop

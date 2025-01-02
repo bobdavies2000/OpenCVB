@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class Concept_Parallel : Inherits TaskParent
     Dim lrLine As New Line_LeftRight
     Public Sub New()

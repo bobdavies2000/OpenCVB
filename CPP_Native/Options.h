@@ -2101,6 +2101,7 @@ public:
 };
 class Options_Line {
 public:
+	int minLength =  1;
 	void RunOpt() {}
 	Options_Line() {
 	}

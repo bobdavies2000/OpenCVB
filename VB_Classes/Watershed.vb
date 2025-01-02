@@ -40,7 +40,7 @@ Public Class Watershed_Basics : Inherits TaskParent
             markers.ConvertTo(tmp, cv.MatType.CV_8U)
             dst3 = ShowPalette(tmp)
 
-            addW.src2 = task.palette.dst2
+            addW.src2 = dst3
             addW.Run(src)
             dst2 = addW.dst2
         Else

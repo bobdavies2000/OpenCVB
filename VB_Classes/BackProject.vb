@@ -187,14 +187,14 @@ Public Class BackProject_FullLines : Inherits TaskParent
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
         desc = "Find lines in the back projection"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         backP.Run(src)
-        labels(2) = lines.labels(2)
 
         lines.Run(backP.dst3)
-        dst2 = lines.dst2
+        labels(2) = lines.labels(2)
+        dst2 = src
         dst3.SetTo(0)
-        For Each lp In task.lpList
+        For Each lp In lines.lpList
             DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
             DrawLine(dst3, lp.p1, lp.p2, 255)
         Next

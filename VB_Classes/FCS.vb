@@ -1045,7 +1045,7 @@ Public Class FCS_Lines1 : Inherits TaskParent
 
         fcs.Run(src)
         dst2 = fcs.dst2
-        dst2.SetTo(white, lines.dst3)
+        dst2.SetTo(white, lines.dst2)
 
         For Each lp In task.lpList
             DrawCircle(dst2, lp.center, task.DotSize, red, -1)
@@ -1094,7 +1094,7 @@ Public Class FCS_Lines : Inherits TaskParent
 
         fcs.Run(src)
         dst2 = fcs.dst2
-        dst2.SetTo(white, lines.dst3)
+        dst2.SetTo(white, lines.dst2)
 
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
