@@ -1473,7 +1473,6 @@ Public Class Line_LeftRight : Inherits TaskParent
 
         rlines.Run(empty)
         dst3 = rlines.dst2
-        cv.Cv2.ImShow("dst3", dst3)
         labels(3) = "Right View: " + rlines.labels(2)
     End Sub
 End Class
