@@ -52,7 +52,6 @@ Derivative
 DFT
 Diff
 Dilate
-DisparityFunction
 Distance
 Dither
 DNN
@@ -72,7 +71,6 @@ Face
 FCS
 Feature
 FeatureFlow
-FeatureLeftRight
 FeatureLess
 FeatureLine
 FeatureROI

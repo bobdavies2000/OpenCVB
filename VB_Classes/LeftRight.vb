@@ -325,24 +325,6 @@ End Class
 
 
 
-Public Class LeftRight_Features : Inherits TaskParent
-    Dim feat As New FeatureLeftRight_Basics
-    Public Sub New()
-        desc = "Placeholder to make it easier to find FeatureLeftRight_Basics"
-    End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
-        dst3 = feat.dst3
-        labels = feat.labels
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class LeftRight_LowRes : Inherits TaskParent
     Dim lowResL As New LowRes_Color
     Dim lowResR As New LowRes_Color

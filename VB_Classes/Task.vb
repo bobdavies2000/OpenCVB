@@ -45,7 +45,6 @@ Public Class VBtask : Implements IDisposable
     Public topFeatures As New List(Of cv.Point2f)
     Public features As New List(Of cv.Point2f)
     Public featurePoints As New List(Of cv.Point)
-    Public featureMotion As Boolean ' false means that none of the features moved.
 
     Public featureMask As cv.Mat
     Public fLessMask As cv.Mat
@@ -354,17 +353,10 @@ Public Class VBtask : Implements IDisposable
     End Sub
 #End Region
     Private Function findIntermediateObject(lookupName As String) As TaskParent
-        Dim saveObject As Object = Nothing
         For Each obj In task.activeObjects
-            If obj.traceName = lookupName Then
-                ' task Algorithms are always allocated first so if taskAlgorithm, keep looking...
-                saveObject = obj ' continue looking if it is a taskAlgorithm.
-                If saveObject.taskAlgorithm = False Then
-                    Return saveObject
-                End If
-            End If
+            If obj.traceName = lookupName Then Return obj
         Next
-        Return saveObject
+        Return Nothing
     End Function
     Private Sub postProcess(src As cv.Mat)
         Try
@@ -541,38 +533,20 @@ Public Class VBtask : Implements IDisposable
 
         callTrace.Clear()
 
+        ' task algorithms constructed here.
         grid = New Grid_Basics
-        grid.taskAlgorithm = True ' task algorithms may be duplicated in the activeObjects list
-
         colorizer = New Depth_Palette
-        colorizer.taskAlgorithm = True
-
         feat = New Feature_Basics
-        feat.taskAlgorithm = True
+        IMUBasics = New IMU_Basics
+        gMat = New IMU_GMatrix
+        gravityHorizon = New Gravity_Horizon
+        lines = New Line_Basics
+        motion = New Motion_Basics
+
+        If task.algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
 
         If task.algName.Contains("RedCloud") Or task.algName.StartsWith("Flood_") Then
             redC = New RedCloud_Basics
-            redC.taskAlgorithm = True
-        End If
-
-        IMUBasics = New IMU_Basics
-        IMUBasics.taskAlgorithm = True
-
-        gMat = New IMU_GMatrix
-        gMat.taskAlgorithm = True
-
-        gravityHorizon = New Gravity_Horizon
-        gravityHorizon.taskAlgorithm = True
-
-        lines = New Line_Basics
-        lines.taskAlgorithm = True
-
-        motion = New Motion_Basics
-        motion.taskAlgorithm = True
-
-        If task.algName.StartsWith("OpenGL_") Then
-            ogl = New OpenGL_Basics
-            ogl.taskAlgorithm = True
         End If
 
         ' all the algorithms in the list are task algorithms that are children of the task.algname.
@@ -816,10 +790,10 @@ Public Class VBtask : Implements IDisposable
         lines.runAlg(src)
         task.lpList = New List(Of linePoints)(lines.lpList)
 
-        ' the gravity transformation apparently can introduce some NaNs.
+        ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
         If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(task.pcSplit(2))
 
-        If task.gOptions.UseMotionColor.Checked Then feat.Run(src)
+        feat.Run(src)
 
         task.colorizer.Run(src)
         task.depthRGB = task.colorizer.dst2
@@ -828,7 +802,6 @@ Public Class VBtask : Implements IDisposable
 
         If task.pixelViewerOn And PixelViewer Is Nothing Then
             PixelViewer = New Pixel_Viewer
-            grid.taskAlgorithm = True
             For i = 1 To callTrace.Count - 1
                 If callTrace(i).Contains("Pixel_Viewer") Then
                     callTrace(i) = task.algName + "\" + callTrace(i)

@@ -25,7 +25,6 @@ Public Class TaskParent : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public sliders As New OptionsSliders
     Public standalone As Boolean
-    Public taskAlgorithm As Boolean
     Public dst0 As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat
     Public labels() As String = {"", "", "", ""}
     Public traceName As String

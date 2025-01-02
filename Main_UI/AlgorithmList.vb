@@ -421,7 +421,6 @@ End Enum
 	If algorithmName = "Dilate_Basics" Then return new Dilate_Basics
 	If algorithmName = "Dilate_Erode" Then return new Dilate_Erode
 	If algorithmName = "Dilate_OpenClose" Then return new Dilate_OpenClose
-	If algorithmName = "DisparityFunction_Basics" Then return new DisparityFunction_Basics
 	If algorithmName = "Distance_Background" Then return new Distance_Background
 	If algorithmName = "Distance_Basics" Then return new Distance_Basics
 	If algorithmName = "Distance_BinaryImage" Then return new Distance_BinaryImage
@@ -577,7 +576,6 @@ End Enum
 	If algorithmName = "Feature_RedCloud" Then return new Feature_RedCloud
 	If algorithmName = "Feature_Reduction" Then return new Feature_Reduction
 	If algorithmName = "Feature_ShiTomasi" Then return new Feature_ShiTomasi
-	If algorithmName = "Feature_Stable" Then return new Feature_Stable
 	If algorithmName = "Feature_SteadyCam" Then return new Feature_SteadyCam
 	If algorithmName = "Feature_Trace" Then return new Feature_Trace
 	If algorithmName = "Feature_TraceDelaunay" Then return new Feature_TraceDelaunay
@@ -588,10 +586,6 @@ End Enum
 	If algorithmName = "FeatureFlow_LeftRight1" Then return new FeatureFlow_LeftRight1
 	If algorithmName = "FeatureFlow_LeftRightHist" Then return new FeatureFlow_LeftRightHist
 	If algorithmName = "FeatureFlow_LucasKanade" Then return new FeatureFlow_LucasKanade
-	If algorithmName = "FeatureLeftRight_Basics" Then return new FeatureLeftRight_Basics
-	If algorithmName = "FeatureLeftRight_Grid" Then return new FeatureLeftRight_Grid
-	If algorithmName = "FeatureLeftRight_Input" Then return new FeatureLeftRight_Input
-	If algorithmName = "FeatureLeftRight_LeftRightPrep" Then return new FeatureLeftRight_LeftRightPrep
 	If algorithmName = "FeatureLess_Basics" Then return new FeatureLess_Basics
 	If algorithmName = "FeatureLess_Canny" Then return new FeatureLess_Canny
 	If algorithmName = "FeatureLess_DCT" Then return new FeatureLess_DCT
@@ -989,7 +983,6 @@ End Enum
 	If algorithmName = "LeftRight_BRISK" Then return new LeftRight_BRISK
 	If algorithmName = "LeftRight_CompareRaw" Then return new LeftRight_CompareRaw
 	If algorithmName = "LeftRight_Edges" Then return new LeftRight_Edges
-	If algorithmName = "LeftRight_Features" Then return new LeftRight_Features
 	If algorithmName = "LeftRight_Lines" Then return new LeftRight_Lines
 	If algorithmName = "LeftRight_LowRes" Then return new LeftRight_LowRes
 	If algorithmName = "LeftRight_Markers" Then return new LeftRight_Markers
