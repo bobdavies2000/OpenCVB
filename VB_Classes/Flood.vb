@@ -92,7 +92,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
     Public cellGen As New Cell_Generate
-    Dim redCPP As New RedCloud_CPP_VB
+    Dim redCPP As New RedCloud_CPP
     Public buildInputMask As Boolean
     Public showSelected As Boolean = True
     Dim color8U As New Color8U_Basics
@@ -261,7 +261,7 @@ End Class
 
 
 Public Class Flood_MaxDistPoints : Inherits TaskParent
-    Dim redCPP As New RedCloud_MaxDist_CPP_VB
+    Dim redCPP As New RedCloud_MaxDist_CPP
     Public cellGen As New Cell_Generate
     Dim color8U As New Color8U_Basics
     Public Sub New()

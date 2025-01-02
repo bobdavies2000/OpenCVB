@@ -7,8 +7,8 @@ Public Class Edge_Basics : Inherits TaskParent
     Dim binRed As Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
     Dim sobel As Edge_Sobel
-    Dim colorGap As Edge_ColorGap_CPP_VB
-    Dim deriche As Edge_Deriche_CPP_VB
+    Dim colorGap As Edge_ColorGap_CPP
+    Dim deriche As Edge_Deriche_CPP
     Dim Laplacian As Edge_Laplacian
     Dim resizeAdd As Edge_ResizeAdd
     Dim regions As Edge_Regions
@@ -35,9 +35,9 @@ Public Class Edge_Basics : Inherits TaskParent
                 Case "Sobel"
                     edges = New Edge_Sobel
                 Case "Color Gap"
-                    edges = New Edge_ColorGap_CPP_VB
+                    edges = New Edge_ColorGap_CPP
                 Case "Deriche"
-                    edges = New Edge_Deriche_CPP_VB
+                    edges = New Edge_Deriche_CPP
                 Case "Laplacian"
                     edges = New Edge_Laplacian
                 Case "Resize And Add"
@@ -141,7 +141,7 @@ End Class
 
 
 '  https://docs.opencvb.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
-Public Class Edge_RandomForest_CPP_VB : Inherits TaskParent
+Public Class Edge_RandomForest_CPP : Inherits TaskParent
     Dim rgbData() As Byte
     Dim options As New Options_Edges2
     Public Sub New()
@@ -501,7 +501,7 @@ End Class
 
 
 
-Public Class Edge_ColorGap_CPP_VB : Inherits TaskParent
+Public Class Edge_ColorGap_CPP : Inherits TaskParent
     Dim gap As New Edge_ColorGap_VB
     Public Sub New()
         cPtr = Edge_ColorGap_Open()
@@ -627,7 +627,7 @@ End Class
 
 
 
-Public Class Edge_DepthGap_CPP_VB : Inherits TaskParent
+Public Class Edge_DepthGap_CPP : Inherits TaskParent
     Dim options As New Options_DepthEdges
     Public Sub New()
         cPtr = Edge_DepthGap_Open()
@@ -1171,7 +1171,7 @@ Public Class Edge_Color8U : Inherits TaskParent
                         Case 8
                             colorMethods(i) = New Reduction_Basics()
                         Case 9
-                            colorMethods(i) = New PCA_NColor_CPP_VB()
+                            colorMethods(i) = New PCA_NColor_CPP()
                     End Select
                 End If
             End If
@@ -1241,7 +1241,7 @@ End Class
 
 
 
-Public Class Edge_DiffX_CPP_VB : Inherits TaskParent
+Public Class Edge_DiffX_CPP : Inherits TaskParent
     Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
@@ -1274,7 +1274,7 @@ End Class
 
 
 
-Public Class Edge_DiffY_CPP_VB : Inherits TaskParent
+Public Class Edge_DiffY_CPP : Inherits TaskParent
     Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
@@ -1307,7 +1307,7 @@ End Class
 
 
 
-Public Class Edge_DiffZ_CPP_VB : Inherits TaskParent
+Public Class Edge_DiffZ_CPP : Inherits TaskParent
     Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
@@ -1343,9 +1343,9 @@ End Class
 
 
 Public Class Edge_DiffXYZ : Inherits TaskParent
-    Dim diffX As New Edge_DiffX_CPP_VB
-    Dim diffY As New Edge_DiffY_CPP_VB
-    Dim diffZ As New Edge_DiffZ_CPP_VB
+    Dim diffX As New Edge_DiffX_CPP
+    Dim diffY As New Edge_DiffY_CPP
+    Dim diffZ As New Edge_DiffZ_CPP
     Dim mats As New Mat_4Click
     Public Sub New()
         desc = "Combine the edges found in Edge_DiffX/Y/Z and Edge_DiffY of the cloud XY values"
@@ -1448,7 +1448,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
-Public Class Edge_Deriche_CPP_VB : Inherits TaskParent
+Public Class Edge_Deriche_CPP : Inherits TaskParent
     Public options As New Options_Edges3
     Public Sub New()
         cPtr = Edge_Deriche_Open()
@@ -1479,7 +1479,7 @@ End Class
 
 
 Public Class Edge_DericheFiltered : Inherits TaskParent
-    Dim deriche As New Edge_Deriche_CPP_VB
+    Dim deriche As New Edge_Deriche_CPP
     Public Sub New()
         desc = "Filter the data from the Deriche algorithm to highlight the edges."
     End Sub

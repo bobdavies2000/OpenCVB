@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Public Class Plot_Basics : Inherits TaskParent
-    Dim plot As New Plot_Basics_CPP_VB
+    Dim plot As New Plot_Basics_CPP
     Dim hist As New Hist_Graph
     Public plotCount As Integer = 3
     Public Sub New()
@@ -33,7 +33,7 @@ End Class
 
 
 Public Class Plot_Depth : Inherits TaskParent
-    Dim plotDepth As New Plot_Basics_CPP_VB
+    Dim plotDepth As New Plot_Basics_CPP
     Dim hist As New Hist_Basics
     Public Sub New()
         desc = "Show depth using OpenCV's plot format with variable bins."
@@ -401,7 +401,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_Basics_CPP_VB : Inherits TaskParent
+Public Class Plot_Basics_CPP : Inherits TaskParent
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
     Public Sub New()

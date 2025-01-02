@@ -95,7 +95,7 @@ Public Class Translator
 
         algName = Algorithms.Text
         If algName = "" Then Exit Sub
-        If algName.EndsWith("_CPP_VB") Or algName.EndsWith("_CPP_CS") Then
+        If algName.EndsWith("_CPP") Or algName.EndsWith("_CPP_CS") Then
             MsgBox("The selected algorithm is a Native C++ algorithm" + vbCrLf + "Choose a VB.Net or C# algorithm.")
             Exit Sub
         End If

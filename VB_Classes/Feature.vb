@@ -64,7 +64,7 @@ End Class
 
 
 Public Class Feature_Methods : Inherits TaskParent
-    Dim harris As Corners_HarrisDetector_CPP_VB
+    Dim harris As Corners_HarrisDetector_CPP
     Dim FAST As Corners_Basics
     Dim featureMethod As New Options_FeatureGather
     Public features As New List(Of cv.Point2f)
@@ -126,7 +126,7 @@ Public Class Feature_Methods : Inherits TaskParent
                 features = brisk.features
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.Harris
-                If harris Is Nothing Then harris = New Corners_HarrisDetector_CPP_VB
+                If harris Is Nothing Then harris = New Corners_HarrisDetector_CPP
                 harris.Run(src)
                 features = harris.features
                 labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
@@ -498,8 +498,8 @@ End Class
 
 
 Public Class Feature_ShiTomasi : Inherits TaskParent
-    Dim harris As New Corners_HarrisDetector_CPP_VB
-    Dim shiTomasi As New Corners_ShiTomasi_CPP_VB
+    Dim harris As New Corners_HarrisDetector_CPP
+    Dim shiTomasi As New Corners_ShiTomasi_CPP
     Dim options As New Options_ShiTomasi
     Public Sub New()
         FindSlider("Corner normalize threshold").Value = 15

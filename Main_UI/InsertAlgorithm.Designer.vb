@@ -145,7 +145,7 @@ Partial Class InsertAlgorithm
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(457, 20)
         Me.Label4.TabIndex = 13
-        Me.Label4.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_CPP_VB'"
+        Me.Label4.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_CPP'"
         '
         'Label5
         '

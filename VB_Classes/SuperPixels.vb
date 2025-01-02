@@ -20,7 +20,7 @@ End Class
 
 
 
-Public Class SuperPixel_Basics_CPP_VB : Inherits TaskParent
+Public Class SuperPixel_Basics_CPP : Inherits TaskParent
     Public wireGrid As cv.Mat
     Public gridColor = white
     Dim options As New Options_SuperPixels
@@ -65,7 +65,7 @@ End Class
 
 
 Public Class SuperPixel_BinarizedImage : Inherits TaskParent
-    Dim pixels As New SuperPixel_Basics_CPP_VB
+    Dim pixels As New SuperPixel_Basics_CPP
     Dim binarize As Binarize_Basics
     Public Sub New()
         binarize = New Binarize_Basics()
@@ -89,7 +89,7 @@ End Class
 
 
 Public Class SuperPixel_Depth : Inherits TaskParent
-    Dim pixels As New SuperPixel_Basics_CPP_VB
+    Dim pixels As New SuperPixel_Basics_CPP
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
@@ -106,7 +106,7 @@ End Class
 
 
 Public Class SuperPixel_WithCanny : Inherits TaskParent
-    Dim pixels As New SuperPixel_Basics_CPP_VB
+    Dim pixels As New SuperPixel_Basics_CPP
     Dim edges As New Edge_Basics
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
@@ -129,7 +129,7 @@ End Class
 
 
 Public Class SuperPixel_WithLineDetector : Inherits TaskParent
-    Dim pixels As New SuperPixel_Basics_CPP_VB
+    Dim pixels As New SuperPixel_Basics_CPP
     Dim lines as new Line_Basics
     Public Sub New()
         labels(3) = "Input to superpixel basics."

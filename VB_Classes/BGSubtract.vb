@@ -214,7 +214,7 @@ End Class
 
 Public Class BGSubtract_MOG_Retina : Inherits TaskParent
     Dim bgSub As New BGSubtract_MOG
-    Dim retina As New Retina_Basics_CPP_VB
+    Dim retina As New Retina_Basics_CPP
     Public Sub New()
         labels = {"", "", "MOG results of depth motion", "Difference from retina depth motion."}
         desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
@@ -273,7 +273,7 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic_CPP_VB : Inherits TaskParent
+Public Class BGSubtract_Synthetic_CPP : Inherits TaskParent
     Dim options As New Options_BGSubtractSynthetic
     Public Sub New()
         labels(2) = "Synthetic background/foreground image."
@@ -308,7 +308,7 @@ End Class
 
 Public Class BGSubtract_Synthetic : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
-    Dim synth As New BGSubtract_Synthetic_CPP_VB
+    Dim synth As New BGSubtract_Synthetic_CPP
     Public Sub New()
         desc = "Demonstrate background subtraction algorithms with synthetic images"
     End Sub

@@ -127,7 +127,7 @@ End Class
 
 
 ' http://man.hubwiz.com/docset/Opencv.docset/Contents/Resources/Documents/d9/dde/samples_2cpp_2kmeans_8cpp-example.html
-Public Class KMeans_MultiGaussian_CPP_VB : Inherits TaskParent
+Public Class KMeans_MultiGaussian_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = KMeans_MultiGaussian_Open()
         desc = "Use KMeans on a random multi-gaussian distribution."
@@ -182,7 +182,7 @@ End Class
 
 
 
-Public Class KMeans_Simple_CPP_VB : Inherits TaskParent
+Public Class KMeans_Simple_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = Kmeans_Simple_Open()
         desc = "Split the input into 3 levels - zero (no depth), closer to min, closer to max."

@@ -50,7 +50,7 @@ End Class
 
 
 
-Public Class Density_Count_CPP_VB : Inherits TaskParent
+Public Class Density_Count_CPP : Inherits TaskParent
     Dim options = New Options_Density
     Public Sub New()
         cPtr = Density_Count_Open()

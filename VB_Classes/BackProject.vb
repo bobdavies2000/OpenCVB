@@ -111,7 +111,7 @@ End Class
 Public Class BackProject_FeatureLess : Inherits TaskParent
     Dim backP As New BackProject_Basics
     Dim reduction As New Reduction_Basics
-    Dim edges As New Edge_ColorGap_CPP_VB
+    Dim edges As New Edge_ColorGap_CPP
     Public Sub New()
         task.redOptions.BitwiseReduction.Checked = True
         labels = {"", "", "Histogram of the grayscale image at right",

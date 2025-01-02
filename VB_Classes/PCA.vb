@@ -19,7 +19,7 @@ Imports System.Runtime.InteropServices
 ' PCA is a powerful tool that can be used to find the main direction of a series of points.
 
 Public Class PCA_Basics : Inherits TaskParent
-    Dim prep As New PCA_Prep_CPP_VB
+    Dim prep As New PCA_Prep_CPP
     Public pca_analysis As New cv.PCA
     Public runRedCloud As Boolean
     Public Sub New()
@@ -93,7 +93,7 @@ End Class
 
 Public Class PCA_CellMask : Inherits TaskParent
     Dim pca As New PCA_Basics
-    Dim pcaPrep As New PCA_Prep_CPP_VB
+    Dim pcaPrep As New PCA_Prep_CPP
     Public Sub New()
         pca.runRedCloud = True
         desc = "Find the Principal Component Analysis vector for all the 3D points in a RedCloud cell."
@@ -244,7 +244,7 @@ End Class
 
 
 
-Public Class PCA_Prep_CPP_VB : Inherits TaskParent
+Public Class PCA_Prep_CPP : Inherits TaskParent
     Public inputData As New cv.Mat
     Public Sub New()
         cPtr = PCA_Prep_Open()
@@ -868,7 +868,7 @@ End Class
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Public Class PCA_NColor_CPP_VB : Inherits TaskParent
+Public Class PCA_NColor_CPP : Inherits TaskParent
     Dim custom As New Palette_CustomColorMap
     Dim palettize As New PCA_Palettize
     Public rgb(dst1.Total * dst1.ElemSize - 1) As Byte

@@ -1442,7 +1442,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   The breakdown of the suffix for any algorithm is as follows:
     -   AddWeighted_Basics – no suffix means it is VB.Net code only.
     -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
-    -   AddWeighted_Basics_CPP_VB – C++ code with a VB.Net interface.
+    -   AddWeighted_Basics_CPP – C++ code with a VB.Net interface.
     -   AddWeighted_Basics_CPP_CS – C++ code with a C\# interface.
     -   AddWeighted_Basics_MT_CPP – a multi-threaded C++ algorithm.
     -   AddWeighted_Basics_CPP – “_CPP” suffix means it is C++ code.
@@ -1477,7 +1477,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A screenshot of a computer program Description automatically generated](media/b2dafcc91cee598b2abfca8ce921a5b4.png)
 
-**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP_VB. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
+**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
 
 # Recent Changes – September 2024
 
@@ -1502,7 +1502,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   The breakdown of the suffix for any algorithm is as follows:
     -   AddWeighted_Basics – no suffix means it is VB.Net code only.
     -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
-    -   AddWeighted_Basics_CPP_VB – native C++ code with a VB.Net wrapper.
+    -   AddWeighted_Basics_CPP – native C++ code with a VB.Net wrapper.
     -   AddWeighted_Basics_CPP_CS – native C++ code with a C\# wrapper.
     -   AddWeighted_Basics_CPP – “_CPP” suffix means C++/CLR (managed) code.
     -   AddWeighted_Basics_CC – “_CC” suffix means it is Native C++ code.

@@ -551,7 +551,7 @@ End Class
 
 
 Public Class FPoly_Triangle : Inherits TaskParent
-    Dim triangle As New Area_MinTriangle_CPP_VB
+    Dim triangle As New Area_MinTriangle_CPP
     Dim fGrid As New FPoly_Core
     Public Sub New()
         desc = "Find the minimum triangle that contains the feature grid"

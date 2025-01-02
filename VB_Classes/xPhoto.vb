@@ -48,7 +48,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
-Public Class XPhoto_OilPaint_CPP_VB : Inherits TaskParent
+Public Class XPhoto_OilPaint_CPP : Inherits TaskParent
     Dim options As New Options_XPhoto
     Public Sub New()
         cPtr = xPhoto_OilPaint_Open()
@@ -103,7 +103,7 @@ End Class
 
 
 
-Public Class XPhoto_Inpaint_CPP_VB : Inherits TaskParent
+Public Class XPhoto_Inpaint_CPP : Inherits TaskParent
     Dim inpVB As New XPhoto_Inpaint
     Public Sub New()
         cPtr = xPhoto_Inpaint_Open()

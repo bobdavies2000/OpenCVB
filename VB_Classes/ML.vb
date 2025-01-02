@@ -265,7 +265,7 @@ Module ML__Exports
 End Module
 Public Class ML_FillRGBDepth_MT : Inherits TaskParent
     Dim shadow As New Depth_Holes
-    Dim colorizer As New Depth_Colorizer_CPP_VB
+    Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         task.gOptions.GridSlider.Maximum = dst2.Cols / 2
         task.gOptions.setGridSize(CInt(dst2.Cols / 2))
@@ -353,7 +353,7 @@ End Class
 Public Class ML_DepthFromXYColor : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim resizer As New Resize_Smaller
-    Dim colorizer As New Depth_Colorizer_CPP_VB
+    Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         labels(2) = "Predicted Depth"
         FindSlider("LowRes %").Value = 2 ' 2% of the image.
@@ -567,7 +567,7 @@ End Class
 
 
 
-Public Class ML_RemoveDups_CPP_VB : Inherits TaskParent
+Public Class ML_RemoveDups_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = ML_RemoveDups_Open()
         labels = {"", "", "BGR input below is converted to BGRA and sorted as integers", ""}

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Guess_Depth_CPP_VB : Inherits TaskParent
+Public Class Guess_Depth_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = Guess_Depth_Open()
         labels = {"", "", "Updated point cloud (holes filled)", "Original point cloud"}
@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class Guess_ImageEdges_CPP_VB : Inherits TaskParent
+Public Class Guess_ImageEdges_CPP : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance from edge", 0, 100, 50)
 

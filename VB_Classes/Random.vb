@@ -319,7 +319,7 @@ End Class
 
 
 
-Public Class Random_PatternGenerator_CPP_VB : Inherits TaskParent
+Public Class Random_PatternGenerator_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = Random_PatternGenerator_Open()
         desc = "Generate random patterns for use with 'Random Pattern Calibration'"

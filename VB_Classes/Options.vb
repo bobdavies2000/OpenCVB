@@ -7466,7 +7466,7 @@ Public Class Options_ColorMethod : Inherits TaskParent
             check.addCheckBox("KMeans_Basics")
             check.addCheckBox("LUT_Basics")
             check.addCheckBox("Reduction_Basics")
-            check.addCheckBox("PCA_NColor_CPP_VB")
+            check.addCheckBox("PCA_NColor_CPP")
             check.Box(0).Checked = True
         End If
     End Sub

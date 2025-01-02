@@ -216,7 +216,7 @@ End Class
 
 
 Public Class Depth_Uncertainty : Inherits TaskParent
-    Dim retina As New Retina_Basics_CPP_VB
+    Dim retina As New Retina_Basics_CPP
     Dim options As New Options_Uncertainty
     Public Sub New()
         labels(3) = "Mask of areas with stable depth"
@@ -236,7 +236,7 @@ End Class
 
 
 
-Public Class Depth_Colorizer_CPP_VB : Inherits TaskParent
+Public Class Depth_Colorizer_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = Depth_Colorizer_Open()
         desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
@@ -681,7 +681,7 @@ End Class
 
 Public Class Depth_Averaging : Inherits TaskParent
     Public avg As New Math_ImageAverage
-    Public colorize As New Depth_Colorizer_CPP_VB
+    Public colorize As New Depth_Colorizer_CPP
     Public Sub New()
         labels(3) = "32-bit format depth data"
         desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
@@ -1213,7 +1213,7 @@ End Class
 
 Public Class Depth_StableMin : Inherits TaskParent
     Public stableMin As cv.Mat
-    Dim colorize As New Depth_Colorizer_CPP_VB
+    Dim colorize As New Depth_Colorizer_CPP
     Public Sub New()
         task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
@@ -1245,7 +1245,7 @@ End Class
 
 
 Public Class Depth_StableMinMax : Inherits TaskParent
-    Dim colorize As New Depth_Colorizer_CPP_VB
+    Dim colorize As New Depth_Colorizer_CPP
     Public dMin As New Depth_StableMin
     Public dMax As New Depth_StableMax
     Public options As New Options_MinMaxNone
@@ -1375,7 +1375,7 @@ Public Class Depth_World : Inherits TaskParent
 
         cv.Cv2.Merge({dst0, dst1, src}, dst2)
         If standaloneTest() Then
-            Static colorizer As New Depth_Colorizer_CPP_VB
+            Static colorizer As New Depth_Colorizer_CPP
             colorizer.Run(dst2)
             dst2 = colorizer.dst2
         End If
@@ -1474,7 +1474,7 @@ End Class
 
 Public Class Depth_StableMax : Inherits TaskParent
     Public stableMax As cv.Mat
-    Dim colorize As New Depth_Colorizer_CPP_VB
+    Dim colorize As New Depth_Colorizer_CPP
     Public Sub New()
         task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}

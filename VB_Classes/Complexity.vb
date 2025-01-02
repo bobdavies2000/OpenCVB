@@ -52,7 +52,7 @@ End Class
 
 ' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
 Public Class Complexity_PlotOpenCV : Inherits TaskParent
-    Public plot As New Plot_Basics_CPP_VB
+    Public plot As New Plot_Basics_CPP
     Public maxFrameCount As Integer
     Public sortData As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Complexity

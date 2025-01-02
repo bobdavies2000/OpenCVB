@@ -4,7 +4,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public stats As New Cell_Basics
     Public inputMask As New cv.Mat
     Public cellGen As New Cell_Generate
-    Dim redCPP As New RedCloud_CPP_VB
+    Dim redCPP As New RedCloud_CPP
     Dim color As New Color8U_Basics
     Public Sub New()
         labels(3) = "The 'tracking' color (shown below) is unique for each cell and switches when a cell is split or lost."
@@ -1826,7 +1826,7 @@ End Class
 
 
 
-Public Class RedCloud_CPP_VB : Inherits TaskParent
+Public Class RedCloud_CPP : Inherits TaskParent
     Public inputMask As cv.Mat
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
@@ -1891,7 +1891,7 @@ End Class
 
 
 
-Public Class RedCloud_MaxDist_CPP_VB : Inherits TaskParent
+Public Class RedCloud_MaxDist_CPP : Inherits TaskParent
     Public classCount As Integer
     Public RectList As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)

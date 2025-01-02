@@ -87,15 +87,15 @@ End Enum
 	If algorithmName = "AddWeighted_InfraRed" Then return new AddWeighted_InfraRed
 	If algorithmName = "AddWeighted_LeftRight" Then return new AddWeighted_LeftRight
 	If algorithmName = "AlphaChannel_Basics" Then return new AlphaChannel_Basics
-	If algorithmName = "Annealing_Basics_CPP_VB" Then return new Annealing_Basics_CPP_VB
-	If algorithmName = "Annealing_MT_CPP_VB" Then return new Annealing_MT_CPP_VB
+	If algorithmName = "Annealing_Basics_CPP" Then return new Annealing_Basics_CPP
+	If algorithmName = "Annealing_MT_CPP" Then return new Annealing_MT_CPP
 	If algorithmName = "ApproxPoly_Basics" Then return new ApproxPoly_Basics
 	If algorithmName = "ApproxPoly_FindandDraw" Then return new ApproxPoly_FindandDraw
 	If algorithmName = "ApproxPoly_Hull" Then return new ApproxPoly_Hull
 	If algorithmName = "Area_FindNonZero" Then return new Area_FindNonZero
 	If algorithmName = "Area_MinMotionRect" Then return new Area_MinMotionRect
 	If algorithmName = "Area_MinRect" Then return new Area_MinRect
-	If algorithmName = "Area_MinTriangle_CPP_VB" Then return new Area_MinTriangle_CPP_VB
+	If algorithmName = "Area_MinTriangle_CPP" Then return new Area_MinTriangle_CPP
 	If algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 	If algorithmName = "AsciiArt_Basics" Then return new AsciiArt_Basics
 	If algorithmName = "AsciiArt_Color" Then return new AsciiArt_Color
@@ -158,7 +158,7 @@ End Enum
 	If algorithmName = "BGSubtract_MotionDetect" Then return new BGSubtract_MotionDetect
 	If algorithmName = "BGSubtract_Reduction" Then return new BGSubtract_Reduction
 	If algorithmName = "BGSubtract_Synthetic" Then return new BGSubtract_Synthetic
-	If algorithmName = "BGSubtract_Synthetic_CPP_VB" Then return new BGSubtract_Synthetic_CPP_VB
+	If algorithmName = "BGSubtract_Synthetic_CPP" Then return new BGSubtract_Synthetic_CPP
 	If algorithmName = "BGSubtract_Video" Then return new BGSubtract_Video
 	If algorithmName = "Bin2Way_Basics" Then return new Bin2Way_Basics
 	If algorithmName = "Bin2Way_KMeans" Then return new Bin2Way_KMeans
@@ -250,7 +250,7 @@ End Enum
 	If algorithmName = "CellularAutomata_LifeColor" Then return new CellularAutomata_LifeColor
 	If algorithmName = "CellularAutomata_LifePopulation" Then return new CellularAutomata_LifePopulation
 	If algorithmName = "CellularAutomata_MultiPoint" Then return new CellularAutomata_MultiPoint
-	If algorithmName = "Classifier_Basics_CPP_VB" Then return new Classifier_Basics_CPP_VB
+	If algorithmName = "Classifier_Basics_CPP" Then return new Classifier_Basics_CPP
 	If algorithmName = "Classifier_Bayesian" Then return new Classifier_Bayesian
 	If algorithmName = "Classifier_BayesianTest" Then return new Classifier_BayesianTest
 	If algorithmName = "Clone_Basics" Then return new Clone_Basics
@@ -320,11 +320,11 @@ End Enum
 	If algorithmName = "Corners_BasicsCentroids" Then return new Corners_BasicsCentroids
 	If algorithmName = "Corners_BasicsStablePoints" Then return new Corners_BasicsStablePoints
 	If algorithmName = "Corners_Harris" Then return new Corners_Harris
-	If algorithmName = "Corners_Harris_CPP_VB" Then return new Corners_Harris_CPP_VB
-	If algorithmName = "Corners_HarrisDetector_CPP_VB" Then return new Corners_HarrisDetector_CPP_VB
+	If algorithmName = "Corners_Harris_CPP" Then return new Corners_Harris_CPP
+	If algorithmName = "Corners_HarrisDetector_CPP" Then return new Corners_HarrisDetector_CPP
 	If algorithmName = "Corners_PreCornerDetect" Then return new Corners_PreCornerDetect
 	If algorithmName = "Corners_RedCloud" Then return new Corners_RedCloud
-	If algorithmName = "Corners_ShiTomasi_CPP_VB" Then return new Corners_ShiTomasi_CPP_VB
+	If algorithmName = "Corners_ShiTomasi_CPP" Then return new Corners_ShiTomasi_CPP
 	If algorithmName = "Corners_SubPix" Then return new Corners_SubPix
 	If algorithmName = "Correlation_Basics" Then return new Correlation_Basics
 	If algorithmName = "Covariance_Basics" Then return new Covariance_Basics
@@ -346,13 +346,13 @@ End Enum
 	If algorithmName = "Delaunay_SubDiv" Then return new Delaunay_SubDiv
 	If algorithmName = "Delaunay_Subdiv2D" Then return new Delaunay_Subdiv2D
 	If algorithmName = "Density_Basics" Then return new Density_Basics
-	If algorithmName = "Density_Count_CPP_VB" Then return new Density_Count_CPP_VB
+	If algorithmName = "Density_Count_CPP" Then return new Density_Count_CPP
 	If algorithmName = "Density_Mask" Then return new Density_Mask
 	If algorithmName = "Density_Phase" Then return new Density_Phase
 	If algorithmName = "Depth_Averaging" Then return new Depth_Averaging
 	If algorithmName = "Depth_Basics" Then return new Depth_Basics
 	If algorithmName = "Depth_BGSubtract" Then return new Depth_BGSubtract
-	If algorithmName = "Depth_Colorizer_CPP_VB" Then return new Depth_Colorizer_CPP_VB
+	If algorithmName = "Depth_Colorizer_CPP" Then return new Depth_Colorizer_CPP
 	If algorithmName = "Depth_Colorizer_VB" Then return new Depth_Colorizer_VB
 	If algorithmName = "Depth_ColorMap" Then return new Depth_ColorMap
 	If algorithmName = "Depth_Contour" Then return new Depth_Contour
@@ -466,20 +466,20 @@ End Enum
 	If algorithmName = "Edge_CannyMin" Then return new Edge_CannyMin
 	If algorithmName = "Edge_CloudSegments" Then return new Edge_CloudSegments
 	If algorithmName = "Edge_Color8U" Then return new Edge_Color8U
-	If algorithmName = "Edge_ColorGap_CPP_VB" Then return new Edge_ColorGap_CPP_VB
+	If algorithmName = "Edge_ColorGap_CPP" Then return new Edge_ColorGap_CPP
 	If algorithmName = "Edge_ColorGap_VB" Then return new Edge_ColorGap_VB
 	If algorithmName = "Edge_Consistent" Then return new Edge_Consistent
 	If algorithmName = "Edge_DCTfrequency" Then return new Edge_DCTfrequency
 	If algorithmName = "Edge_DCTinput" Then return new Edge_DCTinput
 	If algorithmName = "Edge_DepthAndColor" Then return new Edge_DepthAndColor
-	If algorithmName = "Edge_DepthGap_CPP_VB" Then return new Edge_DepthGap_CPP_VB
+	If algorithmName = "Edge_DepthGap_CPP" Then return new Edge_DepthGap_CPP
 	If algorithmName = "Edge_DepthGap_Native" Then return new Edge_DepthGap_Native
-	If algorithmName = "Edge_Deriche_CPP_VB" Then return new Edge_Deriche_CPP_VB
+	If algorithmName = "Edge_Deriche_CPP" Then return new Edge_Deriche_CPP
 	If algorithmName = "Edge_DericheFiltered" Then return new Edge_DericheFiltered
-	If algorithmName = "Edge_DiffX_CPP_VB" Then return new Edge_DiffX_CPP_VB
+	If algorithmName = "Edge_DiffX_CPP" Then return new Edge_DiffX_CPP
 	If algorithmName = "Edge_DiffXYZ" Then return new Edge_DiffXYZ
-	If algorithmName = "Edge_DiffY_CPP_VB" Then return new Edge_DiffY_CPP_VB
-	If algorithmName = "Edge_DiffZ_CPP_VB" Then return new Edge_DiffZ_CPP_VB
+	If algorithmName = "Edge_DiffY_CPP" Then return new Edge_DiffY_CPP
+	If algorithmName = "Edge_DiffZ_CPP" Then return new Edge_DiffZ_CPP
 	If algorithmName = "Edge_HSV" Then return new Edge_HSV
 	If algorithmName = "Edge_Laplacian" Then return new Edge_Laplacian
 	If algorithmName = "Edge_LaplacianColor" Then return new Edge_LaplacianColor
@@ -487,7 +487,7 @@ End Enum
 	If algorithmName = "Edge_MotionFrames" Then return new Edge_MotionFrames
 	If algorithmName = "Edge_MotionOverlay" Then return new Edge_MotionOverlay
 	If algorithmName = "Edge_Preserving" Then return new Edge_Preserving
-	If algorithmName = "Edge_RandomForest_CPP_VB" Then return new Edge_RandomForest_CPP_VB
+	If algorithmName = "Edge_RandomForest_CPP" Then return new Edge_RandomForest_CPP
 	If algorithmName = "Edge_RedCloud" Then return new Edge_RedCloud
 	If algorithmName = "Edge_Reduction" Then return new Edge_Reduction
 	If algorithmName = "Edge_Regions" Then return new Edge_Regions
@@ -637,9 +637,9 @@ End Enum
 	If algorithmName = "Filter_Normalized2D" Then return new Filter_Normalized2D
 	If algorithmName = "Filter_NormalizedKernel" Then return new Filter_NormalizedKernel
 	If algorithmName = "Filter_SepFilter2D" Then return new Filter_SepFilter2D
-	If algorithmName = "FitEllipse_AMS_CPP_VB" Then return new FitEllipse_AMS_CPP_VB
+	If algorithmName = "FitEllipse_AMS_CPP" Then return new FitEllipse_AMS_CPP
 	If algorithmName = "FitEllipse_Basics" Then return new FitEllipse_Basics
-	If algorithmName = "FitEllipse_Direct_CPP_VB" Then return new FitEllipse_Direct_CPP_VB
+	If algorithmName = "FitEllipse_Direct_CPP" Then return new FitEllipse_Direct_CPP
 	If algorithmName = "FitEllipse_RedCloud" Then return new FitEllipse_RedCloud
 	If algorithmName = "FitLine_Basics" Then return new FitLine_Basics
 	If algorithmName = "FitLine_Basics3D" Then return new FitLine_Basics3D
@@ -732,8 +732,8 @@ End Enum
 	If algorithmName = "Grid_ShowMap" Then return new Grid_ShowMap
 	If algorithmName = "Grid_Special" Then return new Grid_Special
 	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter
-	If algorithmName = "Guess_Depth_CPP_VB" Then return new Guess_Depth_CPP_VB
-	If algorithmName = "Guess_ImageEdges_CPP_VB" Then return new Guess_ImageEdges_CPP_VB
+	If algorithmName = "Guess_Depth_CPP" Then return new Guess_Depth_CPP
+	If algorithmName = "Guess_ImageEdges_CPP" Then return new Guess_ImageEdges_CPP
 	If algorithmName = "GuidedBP_Basics" Then return new GuidedBP_Basics
 	If algorithmName = "GuidedBP_Depth" Then return new GuidedBP_Depth
 	If algorithmName = "GuidedBP_HotPoints" Then return new GuidedBP_HotPoints
@@ -753,7 +753,7 @@ End Enum
 	If algorithmName = "HeatMap_Hot" Then return new HeatMap_Hot
 	If algorithmName = "HeatMap_HotNot" Then return new HeatMap_HotNot
 	If algorithmName = "Hist_Basics" Then return new Hist_Basics
-	If algorithmName = "Hist_Byte_CPP_VB" Then return new Hist_Byte_CPP_VB
+	If algorithmName = "Hist_Byte_CPP" Then return new Hist_Byte_CPP
 	If algorithmName = "Hist_Cell" Then return new Hist_Cell
 	If algorithmName = "Hist_Cloud" Then return new Hist_Cloud
 	If algorithmName = "Hist_CloudSegments" Then return new Hist_CloudSegments
@@ -774,7 +774,7 @@ End Enum
 	If algorithmName = "Hist_Frustrum" Then return new Hist_Frustrum
 	If algorithmName = "Hist_Gotcha" Then return new Hist_Gotcha
 	If algorithmName = "Hist_Gotcha2D" Then return new Hist_Gotcha2D
-	If algorithmName = "Hist_GotchaFixed_CPP_VB" Then return new Hist_GotchaFixed_CPP_VB
+	If algorithmName = "Hist_GotchaFixed_CPP" Then return new Hist_GotchaFixed_CPP
 	If algorithmName = "Hist_Graph" Then return new Hist_Graph
 	If algorithmName = "Hist_Grayscale" Then return new Hist_Grayscale
 	If algorithmName = "Hist_Kalman" Then return new Hist_Kalman
@@ -814,7 +814,7 @@ End Enum
 	If algorithmName = "Hist3Dcloud_Highlights" Then return new Hist3Dcloud_Highlights
 	If algorithmName = "Hist3Dcloud_PlotHist1D" Then return new Hist3Dcloud_PlotHist1D
 	If algorithmName = "Hist3Dcolor_Basics" Then return new Hist3Dcolor_Basics
-	If algorithmName = "Hist3Dcolor_Basics_CPP_VB" Then return new Hist3Dcolor_Basics_CPP_VB
+	If algorithmName = "Hist3Dcolor_Basics_CPP" Then return new Hist3Dcolor_Basics_CPP
 	If algorithmName = "Hist3Dcolor_Diff" Then return new Hist3Dcolor_Diff
 	If algorithmName = "Hist3Dcolor_PlotHist1D" Then return new Hist3Dcolor_PlotHist1D
 	If algorithmName = "Hist3Dcolor_Select" Then return new Hist3Dcolor_Select
@@ -851,7 +851,7 @@ End Enum
 	If algorithmName = "HistValley_Simple" Then return new HistValley_Simple
 	If algorithmName = "HistValley_Test" Then return new HistValley_Test
 	If algorithmName = "HistValley_Tiers" Then return new HistValley_Tiers
-	If algorithmName = "HMM_Example_CPP_VB" Then return new HMM_Example_CPP_VB
+	If algorithmName = "HMM_Example_CPP" Then return new HMM_Example_CPP
 	If algorithmName = "HOG_Basics" Then return new HOG_Basics
 	If algorithmName = "Homography_Basics" Then return new Homography_Basics
 	If algorithmName = "Homography_FPoly" Then return new Homography_FPoly
@@ -946,10 +946,10 @@ End Enum
 	If algorithmName = "KMeans_Image" Then return new KMeans_Image
 	If algorithmName = "KMeans_k2_to_k8" Then return new KMeans_k2_to_k8
 	If algorithmName = "KMeans_MultiChannel" Then return new KMeans_MultiChannel
-	If algorithmName = "KMeans_MultiGaussian_CPP_VB" Then return new KMeans_MultiGaussian_CPP_VB
+	If algorithmName = "KMeans_MultiGaussian_CPP" Then return new KMeans_MultiGaussian_CPP
 	If algorithmName = "KMeans_SimKColor" Then return new KMeans_SimKColor
 	If algorithmName = "KMeans_SimKDepth" Then return new KMeans_SimKDepth
-	If algorithmName = "KMeans_Simple_CPP_VB" Then return new KMeans_Simple_CPP_VB
+	If algorithmName = "KMeans_Simple_CPP" Then return new KMeans_Simple_CPP
 	If algorithmName = "KMeans_TierCount" Then return new KMeans_TierCount
 	If algorithmName = "KMeans_Valleys" Then return new KMeans_Valleys
 	If algorithmName = "KNN_Basics" Then return new KNN_Basics
@@ -1158,7 +1158,7 @@ End Enum
 	If algorithmName = "ML_FillRGBDepth_MT" Then return new ML_FillRGBDepth_MT
 	If algorithmName = "ML_LearnRegions" Then return new ML_LearnRegions
 	If algorithmName = "ML_LearnZfromXGray" Then return new ML_LearnZfromXGray
-	If algorithmName = "ML_RemoveDups_CPP_VB" Then return new ML_RemoveDups_CPP_VB
+	If algorithmName = "ML_RemoveDups_CPP" Then return new ML_RemoveDups_CPP
 	If algorithmName = "Model_Basics" Then return new Model_Basics
 	If algorithmName = "Model_CellZoom" Then return new Model_CellZoom
 	If algorithmName = "Model_FlatSurfaces" Then return new Model_FlatSurfaces
@@ -1200,13 +1200,13 @@ End Enum
 	If algorithmName = "MSER_Basics2" Then return new MSER_Basics2
 	If algorithmName = "MSER_BasicsNew" Then return new MSER_BasicsNew
 	If algorithmName = "MSER_Binarize" Then return new MSER_Binarize
-	If algorithmName = "MSER_CPP_VB" Then return new MSER_CPP_VB
+	If algorithmName = "MSER_CPP" Then return new MSER_CPP
 	If algorithmName = "MSER_Detect" Then return new MSER_Detect
 	If algorithmName = "MSER_Grayscale" Then return new MSER_Grayscale
 	If algorithmName = "MSER_Hulls" Then return new MSER_Hulls
 	If algorithmName = "MSER_Left" Then return new MSER_Left
 	If algorithmName = "MSER_LeftRight" Then return new MSER_LeftRight
-	If algorithmName = "MSER_Mask_CPP_VB" Then return new MSER_Mask_CPP_VB
+	If algorithmName = "MSER_Mask_CPP" Then return new MSER_Mask_CPP
 	If algorithmName = "MSER_RedCloud" Then return new MSER_RedCloud
 	If algorithmName = "MSER_ReducedRGB" Then return new MSER_ReducedRGB
 	If algorithmName = "MSER_Right" Then return new MSER_Right
@@ -1602,10 +1602,10 @@ End Enum
 	If algorithmName = "PCA_Depth" Then return new PCA_Depth
 	If algorithmName = "PCA_DrawImage" Then return new PCA_DrawImage
 	If algorithmName = "PCA_NColor" Then return new PCA_NColor
-	If algorithmName = "PCA_NColor_CPP_VB" Then return new PCA_NColor_CPP_VB
+	If algorithmName = "PCA_NColor_CPP" Then return new PCA_NColor_CPP
 	If algorithmName = "PCA_NColorPalettize" Then return new PCA_NColorPalettize
 	If algorithmName = "PCA_Palettize" Then return new PCA_Palettize
-	If algorithmName = "PCA_Prep_CPP_VB" Then return new PCA_Prep_CPP_VB
+	If algorithmName = "PCA_Prep_CPP" Then return new PCA_Prep_CPP
 	If algorithmName = "PCA_Reconstruct" Then return new PCA_Reconstruct
 	If algorithmName = "PCdiff_Basics" Then return new PCdiff_Basics
 	If algorithmName = "PCdiff_Basics1" Then return new PCdiff_Basics1
@@ -1656,7 +1656,7 @@ End Enum
 	If algorithmName = "Pixel_SampleColor" Then return new Pixel_SampleColor
 	If algorithmName = "Pixel_Sampler" Then return new Pixel_Sampler
 	If algorithmName = "Pixel_SubPixel" Then return new Pixel_SubPixel
-	If algorithmName = "Pixel_Unique_CPP_VB" Then return new Pixel_Unique_CPP_VB
+	If algorithmName = "Pixel_Unique_CPP" Then return new Pixel_Unique_CPP
 	If algorithmName = "Pixel_Unstable" Then return new Pixel_Unstable
 	If algorithmName = "Pixel_Vector3D" Then return new Pixel_Vector3D
 	If algorithmName = "Pixel_Vectors" Then return new Pixel_Vectors
@@ -1675,7 +1675,7 @@ End Enum
 	If algorithmName = "Plane_Points" Then return new Plane_Points
 	If algorithmName = "Plane_Verticals" Then return new Plane_Verticals
 	If algorithmName = "Plot_Basics" Then return new Plot_Basics
-	If algorithmName = "Plot_Basics_CPP_VB" Then return new Plot_Basics_CPP_VB
+	If algorithmName = "Plot_Basics_CPP" Then return new Plot_Basics_CPP
 	If algorithmName = "Plot_Beats" Then return new Plot_Beats
 	If algorithmName = "Plot_Depth" Then return new Plot_Depth
 	If algorithmName = "Plot_Dots" Then return new Plot_Dots
@@ -1702,7 +1702,7 @@ End Enum
 	If algorithmName = "PointCloud_PCPointsPlane" Then return new PointCloud_PCPointsPlane
 	If algorithmName = "PointCloud_Point3f" Then return new PointCloud_Point3f
 	If algorithmName = "PointCloud_Raw" Then return new PointCloud_Raw
-	If algorithmName = "PointCloud_Raw_CPP_VB" Then return new PointCloud_Raw_CPP_VB
+	If algorithmName = "PointCloud_Raw_CPP" Then return new PointCloud_Raw_CPP
 	If algorithmName = "PointCloud_ReducedSideView" Then return new PointCloud_ReducedSideView
 	If algorithmName = "PointCloud_ReducedTopView" Then return new PointCloud_ReducedTopView
 	If algorithmName = "PointCloud_ReducedViews" Then return new PointCloud_ReducedViews
@@ -1715,7 +1715,7 @@ End Enum
 	If algorithmName = "PointCloud_Spin2" Then return new PointCloud_Spin2
 	If algorithmName = "PointCloud_Split" Then return new PointCloud_Split
 	If algorithmName = "PointCloud_SurfaceH" Then return new PointCloud_SurfaceH
-	If algorithmName = "PointCloud_SurfaceH_CPP_VB" Then return new PointCloud_SurfaceH_CPP_VB
+	If algorithmName = "PointCloud_SurfaceH_CPP" Then return new PointCloud_SurfaceH_CPP
 	If algorithmName = "PointCloud_Visualize" Then return new PointCloud_Visualize
 	If algorithmName = "PointCloud_XRangeTest" Then return new PointCloud_XRangeTest
 	If algorithmName = "PointCloud_YRangeTest" Then return new PointCloud_YRangeTest
@@ -1773,7 +1773,7 @@ End Enum
 	If algorithmName = "Random_LUTMask" Then return new Random_LUTMask
 	If algorithmName = "Random_MonteCarlo" Then return new Random_MonteCarlo
 	If algorithmName = "Random_NormalDist" Then return new Random_NormalDist
-	If algorithmName = "Random_PatternGenerator_CPP_VB" Then return new Random_PatternGenerator_CPP_VB
+	If algorithmName = "Random_PatternGenerator_CPP" Then return new Random_PatternGenerator_CPP
 	If algorithmName = "Random_Point2d" Then return new Random_Point2d
 	If algorithmName = "Random_Shuffle" Then return new Random_Shuffle
 	If algorithmName = "Random_StaticTV" Then return new Random_StaticTV
@@ -1787,7 +1787,7 @@ End Enum
 	If algorithmName = "Rectangle_Overlap" Then return new Rectangle_Overlap
 	If algorithmName = "Rectangle_Rotated" Then return new Rectangle_Rotated
 	If algorithmName = "Rectangle_Union" Then return new Rectangle_Union
-	If algorithmName = "RecursiveBilateralFilter_CPP_VB" Then return new RecursiveBilateralFilter_CPP_VB
+	If algorithmName = "RecursiveBilateralFilter_CPP" Then return new RecursiveBilateralFilter_CPP
 	If algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
 	If algorithmName = "RedCloud_BProject3D" Then return new RedCloud_BProject3D
 	If algorithmName = "RedCloud_BrightnessLevel" Then return new RedCloud_BrightnessLevel
@@ -1802,7 +1802,7 @@ End Enum
 	If algorithmName = "RedCloud_Consistent1" Then return new RedCloud_Consistent1
 	If algorithmName = "RedCloud_Consistent2" Then return new RedCloud_Consistent2
 	If algorithmName = "RedCloud_ContourUpdate" Then return new RedCloud_ContourUpdate
-	If algorithmName = "RedCloud_CPP_VB" Then return new RedCloud_CPP_VB
+	If algorithmName = "RedCloud_CPP" Then return new RedCloud_CPP
 	If algorithmName = "RedCloud_DelaunayGuidedFeatures" Then return new RedCloud_DelaunayGuidedFeatures
 	If algorithmName = "RedCloud_Depth" Then return new RedCloud_Depth
 	If algorithmName = "RedCloud_DepthOutline" Then return new RedCloud_DepthOutline
@@ -1821,7 +1821,7 @@ End Enum
 	If algorithmName = "RedCloud_KMeans" Then return new RedCloud_KMeans
 	If algorithmName = "RedCloud_LikelyFlatSurfaces" Then return new RedCloud_LikelyFlatSurfaces
 	If algorithmName = "RedCloud_MaxDist" Then return new RedCloud_MaxDist
-	If algorithmName = "RedCloud_MaxDist_CPP_VB" Then return new RedCloud_MaxDist_CPP_VB
+	If algorithmName = "RedCloud_MaxDist_CPP" Then return new RedCloud_MaxDist_CPP
 	If algorithmName = "RedCloud_MeterByMeter" Then return new RedCloud_MeterByMeter
 	If algorithmName = "RedCloud_MostlyColor" Then return new RedCloud_MostlyColor
 	If algorithmName = "RedCloud_MotionBGsubtract" Then return new RedCloud_MotionBGsubtract
@@ -1879,7 +1879,7 @@ End Enum
 	If algorithmName = "Resize_Basics" Then return new Resize_Basics
 	If algorithmName = "Resize_Proportional" Then return new Resize_Proportional
 	If algorithmName = "Resize_Smaller" Then return new Resize_Smaller
-	If algorithmName = "Retina_Basics_CPP_VB" Then return new Retina_Basics_CPP_VB
+	If algorithmName = "Retina_Basics_CPP" Then return new Retina_Basics_CPP
 	If algorithmName = "Retina_Depth" Then return new Retina_Depth
 	If algorithmName = "ROI_Accumulate" Then return new ROI_Accumulate
 	If algorithmName = "ROI_AccumulateOld" Then return new ROI_AccumulateOld
@@ -1893,10 +1893,10 @@ End Enum
 	If algorithmName = "Rotate_Poly" Then return new Rotate_Poly
 	If algorithmName = "Rotate_PolyQT" Then return new Rotate_PolyQT
 	If algorithmName = "Rotate_Verticalize" Then return new Rotate_Verticalize
-	If algorithmName = "Salience_Basics_CPP_VB" Then return new Salience_Basics_CPP_VB
+	If algorithmName = "Salience_Basics_CPP" Then return new Salience_Basics_CPP
 	If algorithmName = "Salience_Basics_MT" Then return new Salience_Basics_MT
 	If algorithmName = "ScatterMatrix_Example" Then return new ScatterMatrix_Example
-	If algorithmName = "SemiGlobalMatching_CPP_VB" Then return new SemiGlobalMatching_CPP_VB
+	If algorithmName = "SemiGlobalMatching_CPP" Then return new SemiGlobalMatching_CPP
 	If algorithmName = "Sides_Basics" Then return new Sides_Basics
 	If algorithmName = "Sides_ColorC" Then return new Sides_ColorC
 	If algorithmName = "Sides_Corner" Then return new Sides_Corner
@@ -1921,7 +1921,7 @@ End Enum
 	If algorithmName = "Sort_GrayScale" Then return new Sort_GrayScale
 	If algorithmName = "Sort_GrayScale1" Then return new Sort_GrayScale1
 	If algorithmName = "Sort_Integer" Then return new Sort_Integer
-	If algorithmName = "Sort_MLPrepTest_CPP_VB" Then return new Sort_MLPrepTest_CPP_VB
+	If algorithmName = "Sort_MLPrepTest_CPP" Then return new Sort_MLPrepTest_CPP
 	If algorithmName = "Sort_RectAndMask" Then return new Sort_RectAndMask
 	If algorithmName = "Sound_Basics" Then return new Sound_Basics
 	If algorithmName = "Sound_Display" Then return new Sound_Display
@@ -1992,7 +1992,7 @@ End Enum
 	If algorithmName = "Structured_TransformH" Then return new Structured_TransformH
 	If algorithmName = "Structured_TransformV" Then return new Structured_TransformV
 	If algorithmName = "SuperPixel_Basics" Then return new SuperPixel_Basics
-	If algorithmName = "SuperPixel_Basics_CPP_VB" Then return new SuperPixel_Basics_CPP_VB
+	If algorithmName = "SuperPixel_Basics_CPP" Then return new SuperPixel_Basics_CPP
 	If algorithmName = "SuperPixel_BinarizedImage" Then return new SuperPixel_BinarizedImage
 	If algorithmName = "SuperPixel_Depth" Then return new SuperPixel_Depth
 	If algorithmName = "SuperPixel_WithCanny" Then return new SuperPixel_WithCanny
@@ -2076,8 +2076,8 @@ End Enum
 	If algorithmName = "XPhoto_Bm3dDenoise" Then return new XPhoto_Bm3dDenoise
 	If algorithmName = "XPhoto_Bm3dDenoiseDepthImage" Then return new XPhoto_Bm3dDenoiseDepthImage
 	If algorithmName = "XPhoto_Inpaint" Then return new XPhoto_Inpaint
-	If algorithmName = "XPhoto_Inpaint_CPP_VB" Then return new XPhoto_Inpaint_CPP_VB
-	If algorithmName = "XPhoto_OilPaint_CPP_VB" Then return new XPhoto_OilPaint_CPP_VB
+	If algorithmName = "XPhoto_Inpaint_CPP" Then return new XPhoto_Inpaint_CPP
+	If algorithmName = "XPhoto_OilPaint_CPP" Then return new XPhoto_OilPaint_CPP
 		Return Nothing
 	End Function
 End Class
