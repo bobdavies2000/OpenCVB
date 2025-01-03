@@ -464,26 +464,6 @@ End Class
 
 
 
-Public Class OEX_GoodFeaturesToTrackDemo : Inherits TaskParent
-    Public Sub New()
-        desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Stable"
-    End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = task.feat.dst2
-        labels(2) = task.feat.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
 
 Public Class OEX_Core_Reduce : Inherits TaskParent
     Public Sub New()

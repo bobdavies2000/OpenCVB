@@ -858,11 +858,13 @@ Public Class Line_KNN : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim swarm As New Swarm_Basics
     Public Sub New()
-        FindSlider("Connect X KNN points").Value = 1
+        task.feat = New Feature_Basics
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use KNN to find the nearest point to an endpoint and connect the 2 lines with a line."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        task.feat.Run(src)
+
         swarm.options.RunOpt()
         lines.Run(src)
         dst2 = lines.dst2

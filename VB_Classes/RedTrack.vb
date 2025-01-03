@@ -2,13 +2,12 @@
 Public Class RedTrack_Basics : Inherits TaskParent
     Public Sub New()
         If New cv.Size(task.dst2.Width, task.dst2.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
-        labels(2) = task.redC.labels(3)
         task.redC = New RedCloud_Basics
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         task.redC.Run(src)
-        dst2 = task.redC.dst3
+        labels(2) = task.redC.labels(3)
         dst2.SetTo(0)
         For Each rc As rcData In task.redCells
             DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
@@ -124,9 +123,11 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
     Public knn As New KNN_Basics
     Public Sub New()
         labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
+        task.feat = New Feature_Basics
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        task.feat.Run(src)
         dst2 = task.feat.dst2
 
         knn.queries = New List(Of cv.Point2f)(task.features)
@@ -158,12 +159,14 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
     Public featureList As New List(Of cv.Point2f)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
+        task.feat = New Feature_Basics
         desc = "Use KNN to find good features to track"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         Static distSlider = FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
+        task.feat.Run(src)
         dst2 = task.feat.dst2
 
         knn.queries = New List(Of cv.Point2f)(task.features)

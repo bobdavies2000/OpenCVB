@@ -1223,7 +1223,6 @@ End Enum
 	If algorithmName = "OEX_delaunay2" Then return new OEX_delaunay2
 	If algorithmName = "OEX_Filter2D" Then return new OEX_Filter2D
 	If algorithmName = "OEX_FitEllipse" Then return new OEX_FitEllipse
-	If algorithmName = "OEX_GoodFeaturesToTrackDemo" Then return new OEX_GoodFeaturesToTrackDemo
 	If algorithmName = "OEX_MeanShift" Then return new OEX_MeanShift
 	If algorithmName = "OEX_PointPolygon" Then return new OEX_PointPolygon
 	If algorithmName = "OEX_PointPolygon_demo" Then return new OEX_PointPolygon_demo

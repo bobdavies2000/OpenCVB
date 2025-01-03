@@ -1983,16 +1983,16 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits TaskParent
 
         task.ogl.pointCloudInput = task.pointCloud
 
-        Dim lines3D As New List(Of cv.Point3f)
-        Dim count = If(showVerticals, vLine.sortedVerticals.Count, vLine.sortedHorizontals.Count)
-        For i = 0 To count - 1
-            Dim index = If(showVerticals, vLine.sortedVerticals.ElementAt(i).Value, vLine.sortedHorizontals.ElementAt(i).Value)
-            lines3D.Add(vLine.lines3D(index))
-            lines3D.Add(vLine.lines3D(index + 1))
-        Next
-        task.ogl.dataInput = cv.Mat.FromPixelData(lines3D.Count, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
-        task.ogl.Run(task.color)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        'Dim lines3D As New List(Of cv.Point3f)
+        'Dim count = If(showVerticals, vLine.sortedVerticals.Count, vLine.sortedHorizontals.Count)
+        'For i = 0 To count - 1
+        '    Dim index = If(showVerticals, vLine.sortedVerticals.ElementAt(i).Value, vLine.sortedHorizontals.ElementAt(i).Value)
+        '    lines3D.Add(vLine.lines3D(index))
+        '    lines3D.Add(vLine.lines3D(index + 1))
+        'Next
+        'task.ogl.dataInput = cv.Mat.FromPixelData(lines3D.Count, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
+        'task.ogl.Run(task.color)
+        'If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
 

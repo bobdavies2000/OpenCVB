@@ -167,7 +167,7 @@ Public Class Projection_Lines : Inherits TaskParent
         dst1 = dst2.Threshold(options.projectionThreshold, 255, cv.ThresholdTypes.Binary)
 
         lines.Run(dst1)
-        dst3 += lines.dst3
+        dst3 += lines.dst2
     End Sub
 End Class
 

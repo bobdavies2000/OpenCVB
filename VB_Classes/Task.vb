@@ -4,7 +4,6 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
@@ -352,10 +351,11 @@ Public Class VBtask : Implements IDisposable
     End Sub
 #End Region
     Private Function findIntermediateObject(lookupName As String) As TaskParent
+        Dim saveObject As Object
         For Each obj In task.activeObjects
-            If obj.traceName = lookupName Then Return obj
+            If obj.traceName = lookupName Then saveObject = obj
         Next
-        Return Nothing
+        Return saveObject
     End Function
     Private Sub postProcess(src As cv.Mat)
         Try
@@ -542,6 +542,7 @@ Public Class VBtask : Implements IDisposable
         motion = New Motion_Basics
 
         If task.algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
+        If task.algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
         If task.algName.StartsWith("RedCloud_") Then redC = New RedCloud_Basics
 
         ' all the algorithms in the list are task algorithms that are children of the task.algname.
@@ -741,10 +742,10 @@ Public Class VBtask : Implements IDisposable
         End If
 
         motion.Run(src)
+        task.motionMask = motion.motionMask
 
         If task.gOptions.UseMotionColor.Checked Then
             task.color = motion.color.Clone
-            task.motionMask = motion.motionMask
             task.motionRects = New List(Of cv.Rect)(motion.measure.motionRects)
         End If
 
@@ -782,6 +783,7 @@ Public Class VBtask : Implements IDisposable
 
             cv.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
+
         lines.runAlg(src)
         task.lpList = New List(Of linePoints)(lines.lpList)
 

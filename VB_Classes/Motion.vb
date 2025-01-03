@@ -30,7 +30,7 @@ Public Class Motion_Basics : Inherits TaskParent
             diff.Run(src)
             dst3 = diff.dst2
         End If
-        dst2 = task.motionMask
+        dst2 = motionMask
 
         If task.gOptions.UseMotionDepth.Checked Then
             If task.heartBeatLT Or depthRGB.Rows = 0 Then
@@ -715,10 +715,13 @@ Public Class Motion_FPolyRect : Inherits TaskParent
     Public match As New Match_Basics
     Dim srcSave As New cv.Mat
     Public Sub New()
+        task.feat = New Feature_Basics
         match.searchRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         desc = "Confirm the FPoly_LineRect matched the previous image."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        task.feat.Run(src)
+
         fRect.Run(src)
 
         If task.heartBeatLT Or match.correlation < 0.5 Then
@@ -749,7 +752,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
     Public translation As cv.Point2f
     Public angle As Single ' in degrees.
     Public rotatedRect As cv.RotatedRect
-    Dim drawRotate As Draw_RotatedRect
+    Dim drawRotate As New Draw_RotatedRect
     Public Sub New()
         labels(3) = "MatchTemplate output for centerRect - center is black"
         desc = "Build a center rectangle and track it with MatchTemplate."
@@ -821,7 +824,7 @@ Public Class Motion_CenterKalman : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Dim kalmanRR As New Kalman_Basics
     Dim centerRect As cv.Rect
-    Dim drawRotate As Draw_RotatedRect
+    Dim drawRotate As New Draw_RotatedRect
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
         labels(3) = "Template for motion matchTemplate.  Shake the camera to see Kalman impact."

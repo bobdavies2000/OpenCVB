@@ -582,6 +582,7 @@ Public Class RedCloud_LikelyFlatSurfaces : Inherits TaskParent
     Public hCells As New List(Of rcData)
     Public Sub New()
         labels(1) = "RedCloud output"
+        task.redC = New RedCloud_Basics
         desc = "Use the mask for vertical surfaces to identify RedCloud cells that appear to be flat."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

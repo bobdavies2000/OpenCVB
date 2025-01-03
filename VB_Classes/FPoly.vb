@@ -236,6 +236,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Public center As Object
     Public Sub New()
         center = New FPoly_Center
+        task.feat = New Feature_Basics
         FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then task.gOptions.setDisplay1()

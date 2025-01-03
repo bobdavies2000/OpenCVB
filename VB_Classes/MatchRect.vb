@@ -1,5 +1,4 @@
-﻿Imports System.Windows
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class MatchRect_Basics : Inherits TaskParent
     Public match As New Match_Basics
     Public rectInput As New cv.Rect
@@ -12,6 +11,7 @@ Public Class MatchRect_Basics : Inherits TaskParent
         If task.optionsChanged Then match.correlation = 0
         If match.correlation < match.options.correlationMin Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
+                If task.firstPass Then task.redC = New RedCloud_Basics
                 task.redC.Run(src)
                 dst2 = task.redC.dst2
                 labels(2) = task.redC.labels(2)

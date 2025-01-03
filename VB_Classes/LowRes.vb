@@ -72,6 +72,7 @@ End Class
 Public Class LowRes_Features : Inherits TaskParent
     Dim lowRes As New LowRes_Basics
     Public Sub New()
+        task.feat = New Feature_Basics
         FindSlider("Min Distance to next").Value = 3
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Featureless areas"

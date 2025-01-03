@@ -300,6 +300,7 @@ Public Class Profile_OpenGL : Inherits TaskParent
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
         If standaloneTest() Then task.gOptions.setGravityUsage(False)
+        task.ogl = New OpenGL_Basics
         task.ogl.options.PointSizeSlider.Value = 10
         task.ogl.oglFunction = oCase.pcPointsAlone
         desc = "Visualize just the RedCloud cell contour in OpenGL"

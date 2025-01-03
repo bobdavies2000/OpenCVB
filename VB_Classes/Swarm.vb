@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
     Public lpList As New List(Of linePoints)
@@ -8,8 +9,10 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public options As New Options_Swarm
     Dim cornerHistory As New List(Of List(Of cv.Point2f))
     Public Sub New()
+        task.feat = New Feature_Basics
+        Application.DoEvents()
         FindSlider("Feature Sample Size").Value = 1000
-        FindSlider("Blocksize").Value = 1
+        ' FindSlider("Blocksize").Value = 1
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
@@ -33,9 +36,10 @@ Public Class Swarm_Basics : Inherits TaskParent
         Next
         Return dst
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
+        task.feat.Run(src)
         dst3 = task.feat.dst2
 
         If task.optionsChanged Then cornerHistory.Clear()
@@ -95,6 +99,7 @@ Public Class Swarm_RightFeatures : Inherits TaskParent
     Public rightList As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Left view feature points", "Right view feature points"}
+        task.feat = New Feature_Basics
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -112,6 +117,7 @@ Public Class Swarm_LeftFeatures : Inherits TaskParent
     Public leftList As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Left view feature points", "Right view feature points"}
+        task.feat = New Feature_Basics
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
