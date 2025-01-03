@@ -351,21 +351,21 @@ Public Class Corners_SubPix : Inherits TaskParent
     Dim options As New Options_PreCorners
     Public Sub New()
         labels(2) = "Output of PreCornerDetect"
+        task.feat = New Feature_Basics
         desc = "Use PreCornerDetect to refine the feature points to sub-pixel accuracy."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
+        task.feat.Run(src)
 
         dst2 = src.Clone
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
+        If task.features.Count = 0 Then Exit Sub ' completely dark?  No features...
         cv.Cv2.CornerSubPix(src, task.features, New cv.Size(options.subpixSize, options.subpixSize), New cv.Size(-1, -1), term)
 
-        task.featurePoints.Clear()
-        For i = 0 To task.features.Count - 1
-            Dim pt = task.features(i)
-            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
+        For Each pt In task.features
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
         Next
     End Sub
 End Class
