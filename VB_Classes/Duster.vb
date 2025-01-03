@@ -122,7 +122,6 @@ End Class
 Public Class Duster_RedCloud : Inherits TaskParent
     Dim duster As New Duster_Basics
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -133,7 +132,7 @@ Public Class Duster_RedCloud : Inherits TaskParent
         src.CopyTo(dst3, dst1)
 
         task.redC.inputMask = Not dst1
-        task.redC.Run(dst3)
+        getRedCloud(dst3)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub

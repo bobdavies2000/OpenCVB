@@ -655,13 +655,11 @@ Public Class Pixel_Vector3D : Inherits TaskParent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.HistBinBar3D.Value = 3
-        task.redC = New RedCloud_Basics
-
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         Dim maxRegion = 20
 
         If task.heartBeat Then
@@ -732,11 +730,10 @@ Public Class Pixel_Vectors : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", ""}
-        task.redC = New RedCloud_Basics
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(3)
 

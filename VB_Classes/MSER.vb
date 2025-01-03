@@ -432,13 +432,12 @@ End Class
 Public Class MSER_RedCloud : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Use the MSER_Basics output as input to RedCloud_Basics"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         mBase.Run(src)
 
-        task.redC.Run(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        getRedCloud(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub
@@ -523,13 +522,12 @@ End Class
 Public Class MSER_Basics1 : Inherits TaskParent
     Dim detect As New MSER_CPP
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Create cells for each region in MSER output"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        task.redC.Run(dst3)
+        getRedCloud(dst3)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub

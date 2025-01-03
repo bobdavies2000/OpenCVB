@@ -45,10 +45,7 @@ Public Class Line3D_Correlation : Inherits TaskParent
         Return correlation.Get(Of Single)(0, 0)
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        If standalone Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
-        End If
+        If standalone Then getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 

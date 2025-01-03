@@ -163,7 +163,6 @@ End Class
 Public Class Fractal_Dimension : Inherits TaskParent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.redC = New RedCloud_Basics
         labels = {"", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub
@@ -206,7 +205,7 @@ Public Class Fractal_Dimension : Inherits TaskParent
         Return d
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         dst3.SetTo(0)
 

@@ -454,13 +454,12 @@ Public Class OpenGL_StructuredCloud : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels(2) = "Structured cloud 32fC3 data"
-        task.redC = New RedCloud_Basics
         desc = "Visualize the Structured_Cloud"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         sCloud.Run(src)
 
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels = task.redC.labels
         task.ogl.pointCloudInput = sCloud.dst2
@@ -828,7 +827,6 @@ Public Class OpenGL_Contours : Inherits TaskParent
         task.ogl.oglFunction = oCase.drawCells
         task.OpenGLTitle = "OpenGL_Functions"
         optiBase.FindSlider("OpenGL shift fwd/back (Z-axis)").Value = -150
-        task.redC = New RedCloud_Basics
         labels = {"", "", "Output of RedCloud", "OpenGL snapshot"}
         desc = "Draw all the RedCloud contours in OpenGL with various settings."
     End Sub
@@ -839,7 +837,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
 
         options2.RunOpt()
 
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         Dim rcx = task.rc
 
@@ -1018,12 +1016,11 @@ Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
         optiBase.FindSlider("OpenGL Point Size").Value = 10
-        task.redC = New RedCloud_Basics
         labels(3) = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis"
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         dst3 = task.redC.dst3
 
@@ -1523,11 +1520,10 @@ End Class
 Public Class OpenGL_RedCloud : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        task.redC = New RedCloud_Basics
         desc = "Display all the RedCloud cells in OpenGL"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         task.ogl.pointCloudInput = task.pointCloud
@@ -1896,12 +1892,11 @@ Public Class OpenGL_ColorBin4Way : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         task.ogl.options.PointSizeSlider.Value = 10
-        task.redC = New RedCloud_Basics
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8UC3, white)
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         dst1.SetTo(0)

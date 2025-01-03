@@ -858,12 +858,11 @@ Public Class Line_KNN : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim swarm As New Swarm_Basics
     Public Sub New()
-        task.feat = New Feature_Basics
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use KNN to find the nearest point to an endpoint and connect the 2 lines with a line."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.feat.Run(src)
+        getFeatures(src)
 
         swarm.options.RunOpt()
         lines.Run(src)
@@ -1036,11 +1035,10 @@ Public Class Line_Cells : Inherits TaskParent
     Dim lines As New Line_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Identify all lines in the RedCloud_Basics cell boundaries"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         lines.Run(dst2.Clone)

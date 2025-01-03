@@ -224,11 +224,10 @@ Public Class LUT_RedCloud : Inherits TaskParent
     Dim sort3 As New Sort_3Channel
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        task.redC = New RedCloud_Basics
         desc = "Use LUT on the grayscale image after masking with rc.mask"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 

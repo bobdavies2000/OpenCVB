@@ -416,11 +416,10 @@ End Class
 Public Class Contour_Outline : Inherits TaskParent
     Public rc As New rcData
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Create a simplified contour of the selected cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         Dim ptList As List(Of cv.Point) = rc.contour
 
@@ -457,8 +456,7 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
+            getRedCloud(src)
             dst2 = task.redC.dst2
             rc = task.rc
             DrawContour(dst2(rc.rect), rc.contour, white, -1)
@@ -501,7 +499,7 @@ Public Class Contour_Largest : Inherits TaskParent
         labels = {"", "", "Input to FindContours", "Largest single contour in the input image."}
         desc = "Create a mask from the largest contour of the input."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         If standaloneTest() Then
             If task.heartBeat Then
@@ -549,13 +547,12 @@ End Class
 Public Class Contour_Compare : Inherits TaskParent
     Public options As New Options_Contours
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 
@@ -585,10 +582,9 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
         labels(2) = "The RedCloud Output with the highlighted contour to smooth"
         desc = "Find the point farthest from the center in each cell."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
+            getRedCloud(src)
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)
             rc = task.rc
@@ -633,12 +629,11 @@ Public Class Contour_RedCloudEdges : Inherits TaskParent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.redC = New RedCloud_Basics
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        getRedCloud(src)
         labels(2) = task.redC.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
         dst2.SetTo(0)
@@ -660,12 +655,11 @@ End Class
 
 Public Class Contour_RedCloud : Inherits TaskParent
     Public Sub New()
-        task.redC = New RedCloud_Basics
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show all the contours found in the RedCloud output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         dst3.SetTo(0)
@@ -688,7 +682,7 @@ Public Class Contour_CompareToFeatureless : Inherits TaskParent
         labels = {"", "", "Contour_WholeImage output", "FeatureLess_Basics output"}
         desc = "Compare Contour_WholeImage and FeatureLess_Basics."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         contour.Run(src)
         dst2 = contour.dst2
 
@@ -707,11 +701,10 @@ Public Class Contour_Smoothing : Inherits TaskParent
     Dim options As New Options_Contours2
     Public Sub New()
         labels(3) = "The white outline is the truest contour while the red is the selected approximation."
-        task.redC = New RedCloud_Basics
         desc = "Compare contours of the selected cell. Cells are offset to help comparison."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         Dim rc = task.rc
@@ -744,7 +737,7 @@ Public Class Contour_RC_AddContour : Inherits TaskParent
     Public Sub New()
         desc = "Find the contour for the src."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If myFrameCount <> task.frameCount Then
             options.RunOpt() ' avoid running options more than once per frame.
             myFrameCount = task.frameCount
@@ -788,7 +781,7 @@ Public Class Contour_Gray : Inherits TaskParent
     Public Sub New()
         desc = "Find the contour for the src."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If myFrameCount <> task.frameCount Then
             options.RunOpt() ' avoid running options more than once per frame.
             myFrameCount = task.frameCount
@@ -824,11 +817,11 @@ End Class
 Public Class Contour_WholeImage : Inherits TaskParent
     Dim contour As New Contour_Basics
     Public Sub New()
-       optiBase.findslider("Max contours").Value = 20
+        optiBase.FindSlider("Max contours").Value = 20
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the top X contours by size and display them."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         contour.Run(src)
         Dim sortedContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
         For Each tour In contour.contourlist
@@ -856,12 +849,12 @@ Public Class Contour_DepthTiers : Inherits TaskParent
     Public contourlist As New List(Of cv.Point())
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        optibase.findRadio("FloodFill").Checked = True
+        optiBase.findRadio("FloodFill").Checked = True
         UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         task.pcSplit(2).ConvertTo(dst1, cv.MatType.CV_32S, 100 / optionsTiers.cmPerTier, 1)
@@ -905,11 +898,11 @@ End Class
 Public Class Contour_FromPoints : Inherits TaskParent
     Dim random As New Random_Basics
     Public Sub New()
-       optiBase.findslider("Random Pixel Count").Value = 3
+        optiBase.FindSlider("Random Pixel Count").Value = 3
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a contour from some random points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Then
             random.Run(src)
             dst2.SetTo(0)
@@ -941,11 +934,10 @@ Public Class RedCloud_Cells : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
-        task.redC = New RedCloud_Basics
         desc = "Create RedCloud output using only color"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 

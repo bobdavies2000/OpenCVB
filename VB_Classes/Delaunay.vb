@@ -374,7 +374,9 @@ Public Class Delaunay_Points : Inherits TaskParent
         desc = "This algorithm explores what happens when Delaunay is used on 2 points"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static ptSlider =optiBase.findslider("Points to use in Feature Poly")
+        Static ptSlider = optiBase.FindSlider("Points to use in Feature Poly")
+
+        getFeatures(src)
 
         fPoly.Run(src)
         dst3 = fPoly.dst3

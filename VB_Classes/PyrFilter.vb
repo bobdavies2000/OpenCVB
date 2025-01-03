@@ -22,7 +22,6 @@ Public Class PyrFilter_RedCloud : Inherits TaskParent
     Dim pyr As New PyrFilter_Basics
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", "PyrFilter output before reduction"}
-        task.redC = New RedCloud_Basics
         desc = "Use RedColor to segment the output of PyrFilter"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -31,7 +30,7 @@ Public Class PyrFilter_RedCloud : Inherits TaskParent
 
         reduction.Run(dst3)
 
-        task.redC.Run(reduction.dst2)
+        getRedCloud(reduction.dst2)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub

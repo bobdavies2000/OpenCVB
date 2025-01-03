@@ -9,7 +9,6 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public options As New Options_Swarm
     Dim cornerHistory As New List(Of List(Of cv.Point2f))
     Public Sub New()
-        task.feat = New Feature_Basics
         Application.DoEvents()
         optiBase.FindSlider("Feature Sample Size").Value = 1000
         ' optiBase.findslider("Blocksize").Value = 1
@@ -39,7 +38,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.feat.Run(src)
+        getFeatures(src)
         dst3 = task.feat.dst2
 
         If task.optionsChanged Then cornerHistory.Clear()
@@ -99,11 +98,10 @@ Public Class Swarm_RightFeatures : Inherits TaskParent
     Public rightList As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Left view feature points", "Right view feature points"}
-        task.feat = New Feature_Basics
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.feat.Run(task.rightView)
+        getFeatures(task.rightView)
         rightList = New List(Of cv.Point2f)(task.features)
         dst2 = task.feat.dst2.Clone
     End Sub
@@ -117,11 +115,10 @@ Public Class Swarm_LeftFeatures : Inherits TaskParent
     Public leftList As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Left view feature points", "Right view feature points"}
-        task.feat = New Feature_Basics
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.feat.Run(task.leftView)
+        getFeatures(task.leftView)
         leftList = New List(Of cv.Point2f)(task.features)
         dst2 = task.feat.dst2.Clone
     End Sub

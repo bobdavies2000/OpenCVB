@@ -543,7 +543,6 @@ Public Class VBtask : Implements IDisposable
 
         If task.algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If task.algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
-        If task.algName.StartsWith("RedCloud_") Then redC = New RedCloud_Basics
 
         ' all the algorithms in the list are task algorithms that are children of the task.algname.
         For i = 1 To callTrace.Count - 1

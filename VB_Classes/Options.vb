@@ -3199,7 +3199,9 @@ Public Class Options_Spectrum : Inherits OptionParent
         Return ranges
     End Function
     Public Sub RunOpt()
-        If task.firstPass Then task.redC.Run(task.color) ' special case!  Can't run it in constructor or measurements fail...
+        If task.firstPass Then
+            task.redC.Run(task.color) ' special case!  Can't run it in constructor or measurements fail...
+        End If
         Static frmSliders = FindFrm("Options_Spectrum Sliders")
         Static gapDSlider = FindSlider("Gap in depth spectrum (cm's)")
         Static gapGSlider = FindSlider("Gap in gray spectrum")

@@ -9,14 +9,13 @@ Public Class Profile_Basics : Inherits TaskParent
     Public corners As New List(Of cv.Point)
     Public cornersRaw As New List(Of cv.Point)
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
     End Sub
     Private Function point3fToString(v As cv.Point3f) As String
         Return Format(v.X, fmt3) + vbTab + Format(v.Y, fmt3) + vbTab + Format(v.Z, fmt3)
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
         Dim rc = task.rc

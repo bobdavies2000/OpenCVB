@@ -11,9 +11,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
         options.RunOpt()
 
         If standalone Or runRedCloud Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-
-            task.redC.Run(src)
+            getRedCloud(src)
             dst2 = task.redC.dst2
             labels = task.redC.labels
         End If
@@ -61,8 +59,7 @@ Public Class Neighbors_Intersects : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
+            getRedCloud(src)
             dst2 = task.redC.dst2
             src = task.redMap
             labels(2) = task.redC.labels(2)
@@ -147,8 +144,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
+            getRedCloud(src)
             dst2 = task.redC.dst2
             labels = task.redC.labels
 

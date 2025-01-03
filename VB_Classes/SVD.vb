@@ -44,11 +44,10 @@ End Class
 ' https://github.com/mzucker/page_dewarp/blob/master/page_dewarp.py
 Public Class SVD_Example2 : Inherits TaskParent
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Compute the mean and tangent of a RedCloud Cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         Dim rc = task.rc

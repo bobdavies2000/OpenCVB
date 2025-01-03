@@ -105,7 +105,6 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.redOptions.setIdentifyCells(False)
-        task.redC = New RedCloud_Basics
         desc = "The option-free version of Motion_BGSub"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -116,7 +115,7 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
 
         dst2 = src
 
-        task.redC.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        getRedCloud(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
         If task.redCells.Count < 2 Then
             rectList.Clear()
         Else
@@ -487,7 +486,6 @@ Public Class Motion_Enclosing : Inherits TaskParent
     Public Sub New()
         If dst2.Width >= 1280 Then learnRate = 0.5 Else learnRate = 0.1 ' learn faster with large images (slower frame rate)
         cPtr = BGSubtract_BGFG_Open(4)
-        task.redC = New RedCloud_Basics
         labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
         desc = "Build an enclosing rectangle for the motion"
     End Sub
@@ -501,7 +499,7 @@ Public Class Motion_Enclosing : Inherits TaskParent
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         task.redC.inputMask = Not dst2
-        task.redC.Run(dst2)
+        getRedCloud(dst2)
 
         motionRect = New cv.Rect
         If task.redCells.Count < 2 Then Exit Sub
@@ -557,11 +555,10 @@ End Class
 Public Class Motion_RedCloud : Inherits TaskParent
     Public Sub New()
         labels(3) = "Motion detected in the cells below"
-        task.redC = New RedCloud_Basics
         desc = "Use RedCloud to define where there is motion"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 
@@ -715,12 +712,11 @@ Public Class Motion_FPolyRect : Inherits TaskParent
     Public match As New Match_Basics
     Dim srcSave As New cv.Mat
     Public Sub New()
-        task.feat = New Feature_Basics
         match.searchRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         desc = "Confirm the FPoly_LineRect matched the previous image."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.feat.Run(src)
+        getFeatures(src)
 
         fRect.Run(src)
 

@@ -1261,12 +1261,11 @@ Public Class Hist_Cell : Inherits TaskParent
     Public Sub New()
         If standalone Then task.redOptions.DisplayCellStats.Checked = True
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.redC = New RedCloud_Basics
         labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
         desc = "Review depth data for a RedCloud Cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         hist.rc = task.rc
         If hist.rc.index = 0 Or hist.rc.maxVec.Z = 0 Then Exit Sub

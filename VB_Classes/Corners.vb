@@ -326,11 +326,10 @@ Public Class Corners_RedCloud : Inherits TaskParent
     Dim corners As New Neighbors_Intersects
     Public Sub New()
         labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
-        task.redC = New RedCloud_Basics
         desc = "Find the corners for each RedCloud cell."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 
@@ -351,12 +350,11 @@ Public Class Corners_SubPix : Inherits TaskParent
     Dim options As New Options_PreCorners
     Public Sub New()
         labels(2) = "Output of PreCornerDetect"
-        task.feat = New Feature_Basics
         desc = "Use PreCornerDetect to refine the feature points to sub-pixel accuracy."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
-        task.feat.Run(src)
+        getFeatures(src)
 
         dst2 = src.Clone
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

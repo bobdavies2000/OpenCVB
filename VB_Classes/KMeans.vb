@@ -220,7 +220,6 @@ Public Class KMeans_Edges : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
-        task.redC = New RedCloud_Basics
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub
@@ -232,7 +231,7 @@ Public Class KMeans_Edges : Inherits TaskParent
         dst3 = km.dst2 + 1
         classCount = km.classCount
 
-        task.redC.Run(dst3)
+        getRedCloud(dst3)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(3)
     End Sub

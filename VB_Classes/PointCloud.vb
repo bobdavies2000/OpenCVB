@@ -195,11 +195,10 @@ Public Class PointCloud_Spin2 : Inherits TaskParent
     Dim redCSpin As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes."}
-        task.redC = New RedCloud_Basics
         desc = "Spin the RedCloud output exercise"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         spin.Run(src)

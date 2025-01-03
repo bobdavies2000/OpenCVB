@@ -6,7 +6,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         labels(2) = task.redC.labels(3)
         dst2.SetTo(0)
         For Each rc As rcData In task.redCells
@@ -23,13 +23,12 @@ End Class
 
 
 Public Class RedTrack_Lines : Inherits TaskParent
-    Dim lines as new Line_Basics
+    Dim lines As New Line_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
-        task.redC = New RedCloud_Basics
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         lines.Run(src)
 
         If task.heartBeat Then dst3.SetTo(0)
@@ -40,7 +39,7 @@ Public Class RedTrack_Lines : Inherits TaskParent
             If index > 10 Then Exit For
         Next
 
-        task.redC.Run(dst3.Clone)
+        getRedCloud(dst3.Clone)
         dst2 = task.redC.dst2
     End Sub
 End Class
@@ -73,7 +72,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
         Next
         Return bestIndex
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         track.Run(src)
         dst2 = task.dst2
         If task.redCells.Count = 0 Then
@@ -123,11 +122,10 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
     Public knn As New KNN_Basics
     Public Sub New()
         labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
-        task.feat = New Feature_Basics
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.feat.Run(src)
+        getFeatures(src)
         dst2 = task.feat.dst2
 
         knn.queries = New List(Of cv.Point2f)(task.features)
@@ -159,14 +157,13 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
     Public featureList As New List(Of cv.Point2f)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
-        task.feat = New Feature_Basics
         desc = "Use KNN to find good features to track"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Static distSlider = optiBase.FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
-        task.feat.Run(src)
+        getFeatures(src)
         dst2 = task.feat.dst2
 
         knn.queries = New List(Of cv.Point2f)(task.features)
@@ -192,14 +189,14 @@ End Class
 
 
 Public Class RedTrack_Points : Inherits TaskParent
-    Dim lines as new Line_Basics
+    Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         lines.Run(src)
 
         dst3.SetTo(0)
@@ -227,16 +224,15 @@ Public Class RedTrack_Features : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
-        task.redC = New RedCloud_Basics
         desc = "Similar to RedTrack_KNNPoints"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Then dst2.SetTo(0)
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, 255)
         Next
 
-        task.redC.Run(dst2)
+        getRedCloud(dst2)
         dst3.SetTo(0)
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For

@@ -134,9 +134,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         Dim myStandalone = standaloneTest() Or runStandalone
 
         If myStandalone Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-
-            task.redC.Run(task.color)
+            getRedCloud(task.color)
             If task.redCells.Count = 0 Then Exit Sub
             dst2 = task.redC.dst2
             addTour.redCells = New List(Of rcData)(task.redCells)
@@ -223,13 +221,12 @@ Public Class MatchShapes_Contours : Inherits TaskParent
     Public Sub New()
        optiBase.findslider("Match Threshold %").Value = 3
         labels = {"", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
-        task.redC = New RedCloud_Basics
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
 

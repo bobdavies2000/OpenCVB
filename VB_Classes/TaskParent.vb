@@ -585,6 +585,10 @@ Public Class TaskParent : Implements IDisposable
         If task.feat Is Nothing Then task.feat = New Feature_Basics
         task.feat.Run(src)
     End Sub
+    Public Sub getRedCloud(src As cv.Mat)
+        If task.redC Is Nothing Then task.redC = New RedCloud_Basics
+        task.redC.Run(src)
+    End Sub
     Public Function ShowIntermediate() As Boolean
         If task.intermediateObject Is Nothing Then Return False
         If task.intermediateObject.traceName = traceName Then Return True

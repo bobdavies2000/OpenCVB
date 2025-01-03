@@ -243,7 +243,6 @@ Public Class Plane_CellColor : Inherits TaskParent
     Public options As New Options_Plane
     Public Sub New()
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
-        task.redC = New RedCloud_Basics
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
     Public Function buildContourPoints(rc As rcData) As List(Of cv.Point3f)
@@ -267,7 +266,7 @@ Public Class Plane_CellColor : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         dst3.SetTo(0)
@@ -306,11 +305,10 @@ Public Class Plane_Points : Inherits TaskParent
     Dim needOutput As Boolean
     Public Sub New()
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
-        task.redC = New RedCloud_Basics
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         Dim rc = task.rc
@@ -433,8 +431,7 @@ Public Class Plane_Equation : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
+            getRedCloud(src)
             dst2 = task.redC.dst2
             rc = task.rc
             If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")

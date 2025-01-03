@@ -12,12 +12,11 @@ Public Class Projection_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
             histTop.Run(src)
             src = histTop.dst2
 
             task.redC.inputMask = Not histTop.dst3
-            task.redC.Run(histTop.dst3)
+            getRedCloud(histTop.dst3)
             redCellInput = task.redCells
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)
@@ -183,14 +182,13 @@ Public Class Projection_Top : Inherits TaskParent
     Public histTop As New Projection_HistTop
     Public objects As New Projection_Basics
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         histTop.Run(src)
 
         task.redC.inputMask = Not histTop.dst3
-        task.redC.Run(histTop.dst3)
+        getRedCloud(histTop.dst3)
 
         objects.redCellInput = task.redCells
         objects.dst2 = task.redC.dst2
@@ -215,14 +213,13 @@ Public Class Projection_Side : Inherits TaskParent
     Public objects As New Projection_Basics
     Public Sub New()
         objects.viewType = "Side"
-        task.redC = New RedCloud_Basics
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         histSide.Run(src)
 
         task.redC.inputMask = Not histSide.dst3
-        task.redC.Run(histSide.dst3)
+        getRedCloud(histSide.dst3)
 
         objects.redCellInput = task.redCells
         objects.dst2 = task.redC.dst2
@@ -360,13 +357,12 @@ Public Class Projection_Cell : Inherits TaskParent
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
         If standaloneTest() Then task.gOptions.setDisplay1()
-        task.redC = New RedCloud_Basics
         task.gOptions.unFiltered.Checked = True
         labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
         desc = "Create a top and side projection of the selected cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 

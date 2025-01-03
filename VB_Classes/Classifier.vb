@@ -114,13 +114,12 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         task.redOptions.setUseColorOnly(True)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output"}
-        task.redC = New RedCloud_Basics
         If standalone Then task.gOptions.setDisplay1()
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
 
         SetTrueText("Review the neighbors_Precise algorithm")

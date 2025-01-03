@@ -220,7 +220,6 @@ Public Class Feature_KNN : Inherits TaskParent
         knn.queries = New List(Of cv.Point2f)(task.features)
         If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
-        task.feat.Run(src)
 
         For i = 0 To knn.neighbors.Count - 1
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
@@ -1005,10 +1004,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         desc = "Assign each delaunay point to a RedCell"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If standalone Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
-        End If
+        If standalone Then getRedCloud(src)
 
         delaunay.inputPoints = task.features
         delaunay.Run(src)
@@ -1054,10 +1050,7 @@ Public Class Feature_GridPoints : Inherits TaskParent
         desc = "Assign each corner of a grid rect to a RedCell"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If standalone Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
-        End If
+        If standalone Then getRedCloud(src)
 
         For Each pt In task.gridPoints
             Dim index = task.redMap.Get(Of Byte)(pt.Y, pt.X)

@@ -1,12 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits TaskParent
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Build the RedCloud cells with the grayscale input."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If src.Channels = 1 Then task.redC.inputMask = src
-        task.redC.Run(src)
+        getRedCloud(src)
         dst2 = task.redC.dst2
         labels = task.redC.labels
     End Sub
@@ -21,12 +20,11 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
         task.redOptions.DisplayCellStats.Checked = True
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.setHistogramBins(1000)
-        task.redC = New RedCloud_Basics
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.redC.Run(src)
+        getRedCloud(src)
 
         dst3 = task.redC.stats.dst1
         dst2 = task.redC.dst2
@@ -53,8 +51,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If standalone Then
-            If task.firstPass Then task.redC = New RedCloud_Basics
-            task.redC.Run(src)
+            getRedCloud(src)
             dst2 = task.redC.dst2
             labels = task.redC.labels
         End If
