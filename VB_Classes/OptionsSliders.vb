@@ -8,7 +8,7 @@ Public Class OptionsSliders
     Dim defaultWidth = 600
     Dim algoIndex As Integer
     Public Function Setup(traceName As String) As Boolean
-        If FindFrm(traceName + " Sliders") IsNot Nothing Then Return False
+        If optiBase.FindFrm(traceName + " Sliders") IsNot Nothing Then Return False
         If allOptions.Text <> "" Then Me.MdiParent = allOptions
         Me.Text = traceName + " Sliders"
         allOptions.addTitle(Me)

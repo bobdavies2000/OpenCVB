@@ -562,7 +562,7 @@ Public Class Kalman_VB_Basics : Inherits TaskParent
 
         If standaloneTest() Then kInput = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()(0)
 
-        Static avgSlider = FindSlider("Average input count")
+        Static avgSlider =optiBase.findslider("Average input count")
         If avgSlider.Value <> saveAvgCount Then
             saveAvgCount = avgSlider.Value
             matrix.Clear()

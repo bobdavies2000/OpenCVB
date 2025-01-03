@@ -68,10 +68,10 @@ Public Class Random_Enumerable : Inherits TaskParent
     Public options As New Options_Random
     Public points() As cv.Point2f
     Public Sub New()
-        FindSlider("Random Pixel Count").Value = 100
+        optiBase.FindSlider("Random Pixel Count").Value = 100
         desc = "Create an enumerable list of points using a lambda function"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         points = Enumerable.Range(0, options.count).Select(Of cv.Point2f)(
@@ -95,11 +95,11 @@ Public Class Random_Basics3D : Inherits TaskParent
     Public PointList As New List(Of cv.Point3f)
     Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters}
     Public Sub New()
-        FindSlider("Random Pixel Count").Value = 20
-        FindSlider("Random Pixel Count").Maximum = dst2.Cols * dst2.Rows
+        optiBase.FindSlider("Random Pixel Count").Value = 20
+        optiBase.FindSlider("Random Pixel Count").Maximum = dst2.Cols * dst2.Rows
         desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         PointList.Clear()
@@ -131,9 +131,9 @@ Public Class Random_Basics4D : Inherits TaskParent
     Dim countSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         desc = "Create a uniform random mask with a specificied number of pixels."
-        countSlider = FindSlider("Random Pixel Count")
+        countSlider = optiBase.FindSlider("Random Pixel Count")
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         PointList.Clear()
         Dim count = countSlider.Value
         If task.paused = False Then
@@ -161,7 +161,7 @@ Public Class Random_Shuffle : Inherits TaskParent
     Public Sub New()
         desc = "Use randomShuffle to reorder an image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         src.CopyTo(dst2)
         cv.Cv2.RandShuffle(dst2, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         labels(2) = "Random_shuffle - wave at camera"
@@ -181,7 +181,7 @@ Public Class Random_LUTMask : Inherits TaskParent
         desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         labels(3) = "kmeans run to get colors"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Or task.frameCount < 10 Then
             random.Run(src)
             lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, cv.Scalar.All(0))
@@ -210,7 +210,7 @@ Public Class Random_UniformDist : Inherits TaskParent
     Public Sub New()
         desc = "Create a uniform distribution."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         cv.Cv2.Randu(dst2, minVal, maxVal)
     End Sub
@@ -226,7 +226,7 @@ Public Class Random_NormalDist : Inherits TaskParent
     Public Sub New()
         desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If options.grayChecked And dst2.Channels() <> 1 Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
@@ -245,7 +245,7 @@ Public Class Random_CheckUniformSmoothed : Inherits TaskParent
     Public Sub New()
         desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         rUniform.Run(src)
         dst2 = rUniform.dst2
         histogram.plot.maxRange = 255
@@ -265,7 +265,7 @@ Public Class Random_CheckUniformDist : Inherits TaskParent
     Public Sub New()
         desc = "Display the histogram for a uniform distribution."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         rUniform.Run(src)
         dst2 = rUniform.dst2
         histogram.plotRequested = True
@@ -285,7 +285,7 @@ Public Class Random_CheckNormalDist : Inherits TaskParent
     Public Sub New()
         desc = "Display the histogram for a Normal distribution."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         normalDist.Run(src)
         dst3 = normalDist.dst2
         histogram.plotRequested = True
@@ -305,7 +305,7 @@ Public Class Random_CheckNormalDistSmoothed : Inherits TaskParent
         histogram.plot.minRange = 1
         desc = "Display the histogram for a Normal distribution."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         normalDist.Run(src)
         dst3 = normalDist.dst2
         histogram.Run(dst3)
@@ -324,7 +324,7 @@ Public Class Random_PatternGenerator_CPP : Inherits TaskParent
         cPtr = Random_PatternGenerator_Open()
         desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols)
@@ -352,7 +352,7 @@ Public Class Random_CustomDistribution : Inherits TaskParent
         inputCDF = cv.Mat.FromPixelData(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
         desc = "Create a custom random number distribution from any histogram"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If inputCDF.Rows = 0 Then
             SetTrueText("The inputCDF was not provided.", 3)
             Exit Sub
@@ -396,7 +396,7 @@ Public Class Random_MonteCarlo : Inherits TaskParent
         plot.maxRange = 100
         desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim histogram = New cv.Mat(options.dimension, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -436,7 +436,7 @@ Public Class Random_CustomHistogram : Inherits TaskParent
         labels(3) = "Custom random distribution that reflects dst2 image"
         desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         hist.plot.maxRange = 0 ' we are sharing the plot with the code below...
@@ -474,7 +474,7 @@ Public Class Random_StaticTV : Inherits TaskParent
         labels(3) = "Resized selection rectangle in dst2"
         desc = "Imitate an old TV appearance using randomness."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -505,9 +505,9 @@ Public Class Random_StaticTVFaster : Inherits TaskParent
         labels(3) = "Changed pixels, add/sub mask, plusMask, minusMask"
         desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static valSlider = FindSlider("Range of noise to apply (from 0 to this value)")
-        Static percentSlider = FindSlider("Percentage of pixels to include noise")
+    Public Overrides Sub runAlg(src As cv.Mat)
+        Static valSlider = optiBase.FindSlider("Range of noise to apply (from 0 to this value)")
+        Static percentSlider = optiBase.FindSlider("Percentage of pixels to include noise")
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -547,9 +547,9 @@ Public Class Random_StaticTVFastSimple : Inherits TaskParent
     Public Sub New()
         desc = "Remove diagnostics from the faster algorithm to simplify code."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static valSlider = FindSlider("Range of noise to apply (from 0 to this value)")
-        Static percentSlider = FindSlider("Percentage of pixels to include noise")
+    Public Overrides Sub runAlg(src As cv.Mat)
+        Static valSlider = optiBase.FindSlider("Range of noise to apply (from 0 to this value)")
+        Static percentSlider = optiBase.FindSlider("Percentage of pixels to include noise")
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -585,7 +585,7 @@ Public Class Random_KalmanPoints : Inherits TaskParent
     Public Sub New()
         Dim offset = dst2.Width / 5
         random.range = New cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2))
-        FindSlider("Random Pixel Count").Value = 10
+        optiBase.FindSlider("Random Pixel Count").Value = 10
         desc = "Smoothly transition a random point from location to location."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

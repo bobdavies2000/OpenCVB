@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits TaskParent
     Public Sub New()
-        If task.cameraName = "MYNT-EYE-D1000" Then FindSlider("Alpha (contrast)").Value = 1100
+        If task.cameraName = "MYNT-EYE-D1000" Then optiBase.findslider("Alpha (contrast)").Value = 1100
         labels = {"", "", "Left camera image", If(task.cameraName = "Azure Kinect 4K", "No right image", "Right camera image")}
         desc = "Display the left and right views as they came from the camera."
     End Sub
@@ -63,7 +63,7 @@ Public Class LeftRight_BRISK : Inherits TaskParent
     Dim brisk As New BRISK_Basics
     Dim options As New Options_Features
     Public Sub New()
-        FindSlider("Min Distance").Value = 20
+       optiBase.findslider("Min Distance").Value = 20
         labels = {"", "", "Left Image", "Right Image"}
         desc = "Add color to the 8-bit infrared images."
     End Sub

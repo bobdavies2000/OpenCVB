@@ -139,7 +139,7 @@ Public Class PointCloud_Spin : Inherits TaskParent
     Dim gMat As New IMU_GMatrixWithOptions
     Dim xBump = 1, yBump = 1, zBump = 1
     Public Sub New()
-        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
+        If optiBase.FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Spin pointcloud on X-axis")
             check.addCheckBox("Spin pointcloud on Y-axis")
@@ -151,12 +151,12 @@ Public Class PointCloud_Spin : Inherits TaskParent
         desc = "Spin the point cloud exercise"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static xCheck = FindCheckBox("Spin pointcloud on X-axis")
-        Static yCheck = FindCheckBox("Spin pointcloud on Y-axis")
-        Static zCheck = FindCheckBox("Spin pointcloud on Z-axis")
-        Static xRotateSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
-        Static yRotateSlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static xCheck = optiBase.FindCheckBox("Spin pointcloud on X-axis")
+        Static yCheck = optiBase.FindCheckBox("Spin pointcloud on Y-axis")
+        Static zCheck = optiBase.FindCheckBox("Spin pointcloud on Z-axis")
+        Static xRotateSlider =optiBase.findslider("Rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider =optiBase.findslider("Rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider =optiBase.findslider("Rotate pointcloud around Z-axis (degrees)")
 
         If xCheck.checked Then
             If xRotateSlider.value = -90 Then xBump = 1
@@ -225,7 +225,7 @@ Public Class PointCloud_Continuous_VB : Inherits TaskParent
         desc = "Show where the pointcloud is continuous"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Threshold of continuity in mm")
+        Static thresholdSlider =optiBase.findslider("Threshold of continuity in mm")
         Dim threshold = thresholdSlider.Value / 1000
 
         Dim input = src
@@ -473,7 +473,7 @@ End Class
 Public Class PointCloud_Solo : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public Sub New()
-        FindCheckBox("Top View (Unchecked Side View)").Checked = True
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(2) = "Top down view after inrange sampling"
         labels(3) = "Histogram after filtering For Single-only histogram bins"
         desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample"
@@ -564,7 +564,7 @@ Public Class PointCloud_SurfaceH : Inherits TaskParent
     Public botRow As Integer
     Public peakRow As Integer
     Public Sub New()
-        FindCheckBox("Top View (Unchecked Side View)").Checked = True
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(3) = "Histogram Of Each Of " + CStr(task.histogramBins) + " bins aligned With the sideview"
         desc = "Find the horizontal surfaces With a projects Of the SideView histogram."
     End Sub
@@ -834,7 +834,7 @@ Public Class PointCloud_FrustrumTop : Inherits TaskParent
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
         task.gOptions.setGravityUsage(False)
-        FindCheckBox("Top View (Unchecked Side View)").Checked = True
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(3) = "Draw the frustrum from the top view"
         desc = "Draw the top view of the frustrum"
     End Sub
@@ -861,7 +861,7 @@ Public Class PointCloud_FrustrumSide : Inherits TaskParent
     Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
         task.gOptions.setGravityUsage(False)
-        FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         labels(2) = "Draw the frustrum from the side view"
         desc = "Draw the side view of the frustrum"
     End Sub

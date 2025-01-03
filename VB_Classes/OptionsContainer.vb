@@ -43,7 +43,7 @@ Public Class OptionsContainer
             Dim indexO = 1
             Dim indexHide As Integer
             For Each title In optionsTitle
-                Dim frm = FindFrm(title)
+                Dim frm = optiBase.FindFrm(title)
                 If frm IsNot Nothing Then
                     frm.BringToFront()
                     Dim sidelineOptions As Boolean = True

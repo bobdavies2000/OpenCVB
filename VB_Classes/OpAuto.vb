@@ -266,7 +266,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
         desc = "Find the peaks in a 2D histogram"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static boundarySlider = FindSlider("Desired boundary count")
+        Static boundarySlider =optiBase.findslider("Desired boundary count")
         Dim desiredBoundaries = boundarySlider.value
 
         ' input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...
@@ -353,8 +353,8 @@ Public Class OpAuto_MSER : Inherits TaskParent
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static minSlider = FindSlider("MSER Min Area")
-        Static maxSlider = FindSlider("MSER Max Area")
+        Static minSlider =optiBase.findslider("MSER Min Area")
+        Static maxSlider =optiBase.findslider("MSER Max Area")
         If standaloneTest() Then
             mBase.Run(src)
             src = mBase.dst3

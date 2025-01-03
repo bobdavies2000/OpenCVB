@@ -6,7 +6,7 @@ Public Class Contour_Basics : Inherits TaskParent
     Public options As New Options_Contours
     Public sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        FindRadio("FloodFill").Checked = True
+        optibase.findRadio("FloodFill").Checked = True
         UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
@@ -824,7 +824,7 @@ End Class
 Public Class Contour_WholeImage : Inherits TaskParent
     Dim contour As New Contour_Basics
     Public Sub New()
-        FindSlider("Max contours").Value = 20
+       optiBase.findslider("Max contours").Value = 20
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the top X contours by size and display them."
     End Sub
@@ -856,7 +856,7 @@ Public Class Contour_DepthTiers : Inherits TaskParent
     Public contourlist As New List(Of cv.Point())
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        FindRadio("FloodFill").Checked = True
+        optibase.findRadio("FloodFill").Checked = True
         UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
@@ -905,7 +905,7 @@ End Class
 Public Class Contour_FromPoints : Inherits TaskParent
     Dim random As New Random_Basics
     Public Sub New()
-        FindSlider("Random Pixel Count").Value = 3
+       optiBase.findslider("Random Pixel Count").Value = 3
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a contour from some random points"
     End Sub

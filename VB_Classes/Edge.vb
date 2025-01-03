@@ -63,16 +63,16 @@ Public Class Edge_DepthAndColor : Inherits TaskParent
     Dim canny As New Edge_Basics
     Dim dilate As New Dilate_Basics
     Public Sub New()
-        FindRadio("Dilate shape: Rect").Checked = True
+        optiBase.FindRadio("Dilate shape: Rect").Checked = True
 
-        FindSlider("Canny threshold1").Value = 100
-        FindSlider("Canny threshold2").Value = 100
+        optiBase.FindSlider("Canny threshold1").Value = 100
+        optiBase.FindSlider("Canny threshold2").Value = 100
 
         desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         labels(2) = "Edges in color and depth after dilate"
         labels(3) = "Edges in color and depth no dilate"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         canny.Run(src)
         shadow.Run(src)
 
@@ -95,7 +95,7 @@ Public Class Edge_Scharr : Inherits TaskParent
         labels(3) = "x field + y field in CV_32F format"
         desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -118,7 +118,7 @@ Public Class Edge_Preserving : Inherits TaskParent
         labels(3) = "Edge preserving blur for BGR depth image above"
         desc = "OpenCV's edge preserving filter."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If options.recurseCheck Then
@@ -149,7 +149,7 @@ Public Class Edge_RandomForest_CPP : Inherits TaskParent
         ReDim rgbData(dst2.Total * dst2.ElemSize - 1)
         labels(3) = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standalone And task.testAllRunning Then
             SetTrueText("The RandomForest edge detection takes so long " +
                         "that it is not tested during 'Test All' overnight runs.")
@@ -191,7 +191,7 @@ Public Class Edge_DCTfrequency : Inherits TaskParent
         labels(3) = "Mask for the isolated frequencies"
         desc = "Find edges by removing all the highest frequencies."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -224,7 +224,7 @@ Public Class Edge_DCTinput : Inherits TaskParent
         labels(3) = "Edges produced with featureless regions cleared"
         desc = "Use the featureless regions to enhance the edge detection"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
 
         edges.Run(src)
         dst2 = edges.dst2.Clone
@@ -246,10 +246,10 @@ Public Class Edge_Consistent : Inherits TaskParent
     Dim edges As New Bin4Way_Sobel
     Dim saveFrames As New List(Of cv.Mat)
     Public Sub New()
-        FindSlider("Sobel kernel Size").Value = 5
+        optiBase.FindSlider("Sobel kernel Size").Value = 5
         desc = "Edges that are consistent for x number of frames"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
 
         edges.Run(src)
@@ -279,7 +279,7 @@ Public Class Edge_BinarizedReduction : Inherits TaskParent
     Public Sub New()
         desc = "Visualize the impact of reduction on Edge_BinarizeSobel"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         reduction.Run(src)
         dst3 = reduction.dst2
         edges.Run(dst3)
@@ -298,10 +298,10 @@ Public Class Edge_BinarizedBrightness : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim bright As New Brightness_Basics
     Public Sub New()
-        FindRadio("Binarized Sobel").Checked = True
+        optiBase.FindRadio("Binarized Sobel").Checked = True
         desc = "Visualize the impact of brightness on Bin4Way_Sobel"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         bright.Run(src)
         dst2 = bright.dst3
         edges.Run(bright.dst3)
@@ -326,7 +326,7 @@ Public Class Edge_SobelLRBinarized : Inherits TaskParent
         labels = {"", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View"}
         desc = "Isolate edges in the left and right views."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
 
         edges.Run(task.rightView)
@@ -363,7 +363,7 @@ Public Class Edge_Matching : Inherits TaskParent
     Public Sub New()
         desc = "Match edges in the left and right views to determine distance"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = task.leftView
@@ -436,7 +436,7 @@ Public Class Edge_RGB : Inherits TaskParent
     Public Sub New()
         desc = "Combine the edges from all 3 channels"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Dim img32f As New cv.Mat
         src.ConvertTo(img32f, cv.MatType.CV_32FC3)
         Dim split = img32f.Split()
@@ -465,7 +465,7 @@ Public Class Edge_HSV : Inherits TaskParent
     Public Sub New()
         desc = "Combine the edges from all 3 HSV channels"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         edges.Run(hsv)
         dst2 = edges.dst2
@@ -482,11 +482,11 @@ End Class
 Public Class Edge_SobelLR : Inherits TaskParent
     Dim sobel As New Edge_Sobel
     Public Sub New()
-        FindSlider("Sobel kernel Size").Value = 3
+        optiBase.FindSlider("Sobel kernel Size").Value = 3
         desc = "Find the edges in the LeftViewimages."
         labels = {"", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)"}
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         sobel.Run(task.rightView)
         dst3 = sobel.dst2.Clone()
 
@@ -507,9 +507,9 @@ Public Class Edge_ColorGap_CPP : Inherits TaskParent
         cPtr = Edge_ColorGap_Open()
         desc = "Using grayscale image to identify color gaps which imply an edge - C++ version"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static distanceSlider = FindSlider("Input pixel distance")
-        Static diffSlider = FindSlider("Input pixel difference")
+    Public Overrides Sub runAlg(src As cv.Mat)
+        Static distanceSlider = optiBase.FindSlider("Input pixel distance")
+        Static diffSlider = optiBase.FindSlider("Input pixel difference")
         Dim diff = diffSlider.Value
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -548,7 +548,7 @@ Public Class Edge_ColorGap_VB : Inherits TaskParent
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Using grayscale image to identify color gaps which imply an edge - VB edition"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -592,7 +592,7 @@ Public Class Edge_DepthGap_Native : Inherits TaskParent
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Using dpeth image to identify gaps which imply an edge"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Channels() <> 1 Then src = task.pcSplit(2)
@@ -633,7 +633,7 @@ Public Class Edge_DepthGap_CPP : Inherits TaskParent
         cPtr = Edge_DepthGap_Open()
         desc = "Create edges wherever depth differences are greater than x"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
@@ -661,12 +661,12 @@ End Class
 Public Class Edge_CannyMin : Inherits TaskParent
     Dim canny As New Edge_Canny
     Public Sub New()
-        FindSlider("Canny threshold1").Value = 200
-        FindSlider("Canny threshold2").Value = 200
+        optiBase.FindSlider("Canny threshold1").Value = 200
+        optiBase.FindSlider("Canny threshold2").Value = 200
         desc = "Set the max thresholds for Canny to get the minimum number of edge pixels"
         labels(2) = "Essential lines in the image - minimum number of pixels in Canny output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         canny.Run(src)
         dst2 = canny.dst2
     End Sub
@@ -685,12 +685,12 @@ End Class
 Public Class Edge_CannyLeftRight : Inherits TaskParent
     Dim canny As New Edge_Canny
     Public Sub New()
-        FindSlider("Canny threshold1").Value = 200
-        FindSlider("Canny threshold2").Value = 200
+        optiBase.FindSlider("Canny threshold1").Value = 200
+        optiBase.FindSlider("Canny threshold2").Value = 200
         labels = {"", "", "Essential lines in the left image", "Essential lines in the right image"}
         desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         canny.Run(task.leftView)
         dst2 = canny.dst2.Clone
 
@@ -714,7 +714,7 @@ Public Class Edge_Reduction : Inherits TaskParent
         labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
         desc = "Find edges in the reduction image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         reduction.Run(src)
         dst3 = reduction.dst2
 
@@ -733,11 +733,11 @@ Public Class Edge_Regions : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim edge As New Edge_Basics
     Public Sub New()
-        FindSlider("Canny threshold2").Value = 30
+        optiBase.FindSlider("Canny threshold2").Value = 30
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
         desc = "Find the edges for the depth tiers."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         tiers.Run(src)
         dst3 = tiers.dst3
 
@@ -760,7 +760,7 @@ Public Class Edge_Canny : Inherits TaskParent
         labels = {"", "", "Canny using L1 Norm", "Canny using L2 Norm"}
         desc = "Show canny edge detection with varying thresholds"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Channels() <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
@@ -787,7 +787,7 @@ Public Class Edge_CannyHistory : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show canny edge over the last X frame (see global option 'FrameHistory')"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -815,7 +815,7 @@ Public Class Edge_ResizeAdd : Inherits TaskParent
         labels(2) = "Edges found with just resizing"
         labels(3) = "Found edges added to grayscale image source."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim gray = src
@@ -841,7 +841,7 @@ Public Class Edge_CannyCombined : Inherits TaskParent
     Public Sub New()
         desc = "Combine the results of Edge_ResizeAdd and Canny"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         canny.Run(src)
         edges.Run(canny.dst2)
         dst2 = canny.dst2 Or edges.dst2
@@ -858,7 +858,7 @@ Public Class Edge_SobelCustomV : Inherits TaskParent
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
         desc = "Show Sobel edge detection a custom vertical kernel"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst1 = src.Filter2D(cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 0, -1, 2, 0, -2, 1, 0, -1}))
         dst1.ConvertTo(dst2, src.Type)
         dst1 = src.Filter2D(cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {3, 0, -3, 10, 0, -10, 3, 0, -3}))
@@ -877,7 +877,7 @@ Public Class Edge_SobelCustomH : Inherits TaskParent
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
         desc = "Show Sobel edge detection a custom horizontal kernel"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst1 = src.Filter2D(cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 2, 1, 0, 0, 0, -1, -2, -1}))
         dst1.ConvertTo(dst2, src.Type)
         dst1 = src.Filter2D(cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {3, 10, 3, 0, 0, 0, -3, -10, -3}))
@@ -901,7 +901,7 @@ Public Class Edge_SobelCustom : Inherits TaskParent
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
         desc = "Show Sobel edge detection with custom horizont and vertical kernels"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If options.horizonCheck Then
@@ -942,7 +942,7 @@ Public Class Edge_SobelCustomLeftRight : Inherits TaskParent
         labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
         desc = "Show Sobel edge detection for both left and right images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         custom.Run(task.leftView)
         dst0 = custom.dst2.Clone
         dst1 = custom.dst3.Clone
@@ -967,7 +967,7 @@ Public Class Edge_BackProjection : Inherits TaskParent
         labels(3) = "Canny edges in grayscale (red) and edges in back projection (blue)"
         desc = "Find the edges in the HistValley_FromPeaks backprojection"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         canny.Run(src)
         dst1 = canny.dst2.Clone
 
@@ -1001,7 +1001,7 @@ Public Class Edge_Sobel : Inherits TaskParent
     Public Sub New()
         desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
@@ -1029,12 +1029,12 @@ End Class
 Public Class Edge_SobelHorizontal : Inherits TaskParent
     Dim edges As New Edge_Sobel
     Public Sub New()
-        FindCheckBox("Vertical Derivative").Checked = False
-        FindCheckBox("Horizontal Derivative").Checked = True
+        optiBase.FindCheckBox("Vertical Derivative").Checked = False
+        optiBase.FindCheckBox("Horizontal Derivative").Checked = True
         desc = "Find edges with Sobel only in the horizontal direction"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Threshold to zero pixels below this value")
+    Public Overrides Sub runAlg(src As cv.Mat)
+        Static thresholdSlider = optiBase.FindSlider("Threshold to zero pixels below this value")
         edges.Run(src)
 
         dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -1051,11 +1051,11 @@ Public Class Edge_MotionFrames : Inherits TaskParent
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
-        FindSlider("Canny threshold1").Value = 50
-        FindSlider("Canny threshold2").Value = 50
+        optiBase.FindSlider("Canny threshold1").Value = 50
+        optiBase.FindSlider("Canny threshold2").Value = 50
         desc = "Collect edges over several frames controlled with global frame history"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         edges.Run(src)
         dst3 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
@@ -1076,7 +1076,7 @@ Public Class Edge_MotionOverlay : Inherits TaskParent
         labels(3) = "AbsDiff output of offset with original"
         desc = "Find edges by displacing the current BGR image in any direction and diff it with the original."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -1108,7 +1108,7 @@ Public Class Edge_RedCloud : Inherits TaskParent
         task.redOptions.setIdentifyCells(False)
         desc = "Identify cell boundaries that are also edges."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         canny.Run(src)
         mats.mat(0) = canny.dst2
 
@@ -1142,9 +1142,9 @@ Public Class Edge_Color8U : Inherits TaskParent
 
         desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.firstPass Then
-            Dim frmCheck = FindFrm("Options_ColorMethod CheckBoxes")
+            Dim frmCheck = optiBase.FindFrm("Options_ColorMethod CheckBoxes")
             frmCheck.Left = task.gOptions.Width / 2
         End If
         options.RunOpt()
@@ -1213,7 +1213,7 @@ Public Class Edge_CannyAccum : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Accumulate Canny edges to highlight all real edges better."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         canny.Run(src)
         accum.Run(canny.dst2)
         dst2 = accum.dst2
@@ -1231,7 +1231,7 @@ Public Class Edge_CloudSegments : Inherits TaskParent
     Public Sub New()
         desc = "Build edges from the point cloud segments from Hist_Cloud - simplistic approach"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         segments.Run(src)
         dst3 = segments.dst3
         edges.Run(dst3)
@@ -1250,7 +1250,7 @@ Public Class Edge_DiffX_CPP : Inherits TaskParent
         cPtr = Edge_DiffX_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         segments.reductionVal = "X"
         segments.Run(src)
         src = segments.dst1 ' the byte version of the segmented image.
@@ -1283,7 +1283,7 @@ Public Class Edge_DiffY_CPP : Inherits TaskParent
         cPtr = Edge_DiffY_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         segments.reductionVal = "Y"
         segments.Run(src)
         src = segments.dst1 ' the byte version of the segmented image.
@@ -1316,7 +1316,7 @@ Public Class Edge_DiffZ_CPP : Inherits TaskParent
         cPtr = Edge_DiffY_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         segments.reductionVal = "Z"
         segments.Run(src)
         src = segments.dst1 ' the byte version of the segmented image.
@@ -1351,7 +1351,7 @@ Public Class Edge_DiffXYZ : Inherits TaskParent
     Public Sub New()
         desc = "Combine the edges found in Edge_DiffX/Y/Z and Edge_DiffY of the cloud XY values"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         diffX.Run(src)
         mats.mat(0) = diffX.dst3
 
@@ -1383,7 +1383,7 @@ Public Class Edge_LaplacianColor : Inherits TaskParent
         If standalone Then labels(3) = "Laplacian of DepthRGB"
         desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.GaussianBlur(New cv.Size(options.gaussiankernelSize,
@@ -1405,7 +1405,7 @@ Public Class Edge_Laplacian : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Laplacian(cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0).ConvertScaleAbs()
@@ -1423,8 +1423,8 @@ Public Class Edge_Sweep : Inherits TaskParent
     Public Sub New()
         desc = "Sweep through the various edge algorithms"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static frm = FindFrm("Options_Edge_Basics Radio Buttons")
+    Public Overrides Sub runAlg(src As cv.Mat)
+        Static frm = optiBase.FindFrm("Options_Edge_Basics Radio Buttons")
 
         Static index As Integer = -1
         If task.heartBeatLT Then
@@ -1435,7 +1435,7 @@ Public Class Edge_Sweep : Inherits TaskParent
         edges.Run(src)
         dst2 = edges.dst2
 
-        If findRadioIndex(frm.check) <> index Then frm.check(index).checked = True
+        If optiBase.findRadioIndex(frm.check) <> index Then frm.check(index).checked = True
         strOut = "Current edge algorithm is " + frm.check(index).text
         labels(2) = strOut
         SetTrueText(strOut, 3)

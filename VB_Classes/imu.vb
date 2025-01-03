@@ -388,7 +388,7 @@ Public Class IMU_PlotTotalDelay : Inherits TaskParent
         desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static countSlider = FindSlider("Number of Plot Values")
+        Static countSlider =optiBase.findslider("Number of Plot Values")
         Dim plotLastX = countSlider.Value
         host.Run(src)
         imu.Run(src)
@@ -934,9 +934,9 @@ Public Class IMU_GMatrixWithOptions : Inherits TaskParent
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Private Sub getSliderValues()
-        If xSlider Is Nothing Then xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
-        If ySlider Is Nothing Then ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
-        If zSlider Is Nothing Then zSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
+        If xSlider Is Nothing Then xSlider =optiBase.findslider("Rotate pointcloud around X-axis (degrees)")
+        If ySlider Is Nothing Then ySlider =optiBase.findslider("Rotate pointcloud around Y-axis (degrees)")
+        If zSlider Is Nothing Then zSlider =optiBase.findslider("Rotate pointcloud around Z-axis (degrees)")
         cx = Math.Cos(xSlider.Value * cv.Cv2.PI / 180)
         sx = Math.Sin(xSlider.Value * cv.Cv2.PI / 180)
 
@@ -968,9 +968,9 @@ Public Class IMU_GMatrixWithOptions : Inherits TaskParent
         Return tmpGMatrix
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        If xSlider Is Nothing Then xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
-        If ySlider Is Nothing Then ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
-        If zSlider Is Nothing Then zSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
+        If xSlider Is Nothing Then xSlider =optiBase.findslider("Rotate pointcloud around X-axis (degrees)")
+        If ySlider Is Nothing Then ySlider =optiBase.findslider("Rotate pointcloud around Y-axis (degrees)")
+        If zSlider Is Nothing Then zSlider =optiBase.findslider("Rotate pointcloud around Z-axis (degrees)")
 
         If task.useGravityPointcloud Then
             '[cos(a) -sin(a)    0]

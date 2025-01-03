@@ -82,7 +82,7 @@ Public Class FeatureLess_UniquePixels : Inherits TaskParent
     Dim fless As New Hough_FeatureLessTopX
     Dim sort As New Sort_1Channel
     Public Sub New()
-        If standaloneTest() Then FindSlider("Threshold for sort input").Value = 0
+        If standaloneTest() Then optiBase.FindSlider("Threshold for sort input").Value = 0
         labels = {"", "Gray scale input to sort/remove dups", "Unique pixels", ""}
         desc = "Find the unique gray pixels for the featureless regions"
     End Sub

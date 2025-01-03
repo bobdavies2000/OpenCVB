@@ -250,7 +250,7 @@ Public Class MSER_TestSynthetic : Inherits TaskParent
     Dim synth As New MSER_SyntheticInput
     Dim mBase As New MSER_Basics
     Public Sub New()
-        FindCheckBox("Use grayscale input").Checked = True
+        optiBase.FindCheckBox("Use grayscale input").Checked = True
         labels = {"", "", "Synthetic input", "Output from MSER (Maximally Stable Extremal Region)"}
         desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image."
     End Sub
@@ -276,7 +276,7 @@ Public Class MSER_Grayscale : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        FindCheckBox("Use grayscale input").Checked = True
+        optiBase.FindCheckBox("Use grayscale input").Checked = True
         desc = "Run MSER (Maximally Stable Extremal Region) with grayscale input"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -298,7 +298,7 @@ Public Class MSER_ReducedRGB : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Dim reduction As New Reduction_BGR
     Public Sub New()
-        FindCheckBox("Use grayscale input").Checked = False
+        optiBase.FindCheckBox("Use grayscale input").Checked = False
         desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -456,7 +456,7 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
-        FindCheckBox("Use grayscale input").Checked = False
+        optiBase.FindCheckBox("Use grayscale input").Checked = False
         options.RunOpt()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
@@ -639,7 +639,7 @@ Public Class MSER_CPP : Inherits TaskParent
     Public maskCounts As New List(Of Integer)
     Public classcount As Integer
     Public Sub New()
-        FindCheckBox("Use grayscale input").Checked = False
+        optiBase.FindCheckBox("Use grayscale input").Checked = False
         options.RunOpt()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)

@@ -117,7 +117,7 @@ Public Class Gif_OpenCVB : Inherits TaskParent
         desc = "Create a GIF of the OpenCVB main screen for any algorithm."
     End Sub
     Public Sub createNextGifImage()
-        Static snapCheck = FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
+        Static snapCheck = optiBase.FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
         If snapCheck.checked Then
             Dim nextBMP As Bitmap
             Select Case task.gifCaptureIndex
@@ -160,7 +160,7 @@ Public Class Gif_OpenCVB : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         SetTrueText("Results are best when the main form is set to an 'auto-sized' setting.", 3)
-        Static snapCheck = FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
+        Static snapCheck = optiBase.FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
 
         If snapCheck.checked Or (standaloneTest() And task.heartBeat) And task.mainFormLocation.Width > 0 Then
             Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd,

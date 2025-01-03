@@ -145,6 +145,7 @@ End Class
 
 Module pipeData
     Public pipeCount As Integer
+    Public optiBase As New OptionParent
 End Module
 
 
@@ -157,10 +158,10 @@ Public Class OpenGL_BasicsSliders : Inherits TaskParent
     Public pointCloudInput As cv.Mat
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Basics"
-        FindSlider("OpenGL FOV").Value = 150
+        optiBase.FindSlider("OpenGL FOV").Value = 150
         desc = "Show the OpenGL point cloud with sliders support."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then
@@ -197,10 +198,10 @@ Public Class OpenGL_BasicsMouse : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Show the OpenGL point cloud with mouse support."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' seems to not like it when running overnight but it runs fine.
 
-        Static MotionCheck = FindCheckBox("Use Motion Mask on the pointcloud")
+        Static MotionCheck = optiBase.FindCheckBox("Use Motion Mask on the pointcloud")
         task.ogl.pointCloudInput = task.pointCloud
 
         task.ogl.Run(src)
@@ -222,7 +223,7 @@ Public Class OpenGL_ReducedXYZ : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         reduction.Run(src)
         dst2 = reduction.dst3
 
@@ -244,7 +245,7 @@ Public Class OpenGL_Reduction : Inherits TaskParent
         reduction = New Reduction_PointCloud
         desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2
         task.ogl.pointCloudInput = reduction.dst3
@@ -265,7 +266,7 @@ Public Class OpenGL_ReducedSideView : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         sideView.Run(src)
         dst2 = sideView.dst2
         task.ogl.pointCloudInput = sideView.dst3
@@ -287,7 +288,7 @@ Public Class OpenGL_Rebuilt : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Review the rebuilt point cloud from Structured_Rebuild"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         rebuild.Run(src)
         dst2 = rebuild.dst2
         task.ogl.pointCloudInput = rebuild.pointcloud
@@ -307,7 +308,7 @@ Public Class OpenGL_Pyramid : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Draw the traditional OpenGL pyramid"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -325,7 +326,7 @@ Public Class OpenGL_DrawCube : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Draw the traditional OpenGL cube"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -345,7 +346,7 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -371,7 +372,7 @@ Public Class OpenGL_QuadHulls : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -397,7 +398,7 @@ Public Class OpenGL_QuadMinMax : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Reflect the min and max for each roi of the RedCloud data"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -421,7 +422,7 @@ Public Class OpenGL_Bricks : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create blocks in each roi using the min and max depth values"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         tess.Run(src)
         task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
         dst2 = tess.dst3
@@ -456,7 +457,7 @@ Public Class OpenGL_StructuredCloud : Inherits TaskParent
         task.redC = New RedCloud_Basics
         desc = "Visualize the Structured_Cloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         sCloud.Run(src)
 
         task.redC.Run(src)
@@ -481,7 +482,7 @@ Public Class OpenGL_Tiles : Inherits TaskParent
         labels = {"", "", "Input from Structured_Tiles", ""}
         desc = "Display the quads built by Structured_Tiles in OpenGL - uses OpenGL's point size"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         sCloud.Run(src)
         dst2 = sCloud.dst2
         dst3 = sCloud.dst3
@@ -505,7 +506,7 @@ Public Class OpenGL_TilesQuad : Inherits TaskParent
         labels = {"", "", "Input from Structured_Tiles", ""}
         desc = "Display the quads built by Structured_TilesQuad in OpenGL - does NOT use OpenGL's point size"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         sCloud.Run(src)
         dst2 = sCloud.dst2
 
@@ -532,7 +533,7 @@ Public Class OpenGL_OnlyPlanes : Inherits TaskParent
         labels = {"", "", "RedCloud Cells", "Planes built in the point cloud"}
         desc = "Display the pointCloud as a set of RedCloud cell planes"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         planes.Run(src)
         dst2 = planes.dst2
         dst3 = planes.dst3
@@ -557,7 +558,7 @@ Public Class OpenGL_FlatStudy1 : Inherits TaskParent
         labels = {"", "", "Side view of point cloud - use mouse to highlight the floor", "Highlight the floor in BGR image"}
         desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         plane.Run(src)
         dst2 = plane.dst3
         task.ogl.pointCloudInput = task.pointCloud
@@ -579,7 +580,7 @@ Public Class OpenGL_FlatStudy2 : Inherits TaskParent
         task.ogl.oglFunction = oCase.drawFloor
         desc = "Show the floor in the pointcloud as a plane"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         plane.Run(src)
         dst2 = plane.dst3
 
@@ -609,8 +610,8 @@ Public Class OpenGL_FlatStudy3 : Inherits TaskParent
         labels = {"", "", "", ""}
         desc = "Create an OpenGL display where the floor is built as a quad"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static cushionSlider = FindSlider("Structured Depth slice thickness in pixels")
+    Public Overrides Sub runAlg(src As cv.Mat)
+        Static cushionSlider = optiBase.FindSlider("Structured Depth slice thickness in pixels")
 
         plane.Run(src)
         dst2 = plane.dst2
@@ -635,7 +636,7 @@ Public Class OpenGL_FlatFloor : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Using minimal cost, create an OpenGL display where the floor is built as a quad"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         flatness.Run(src)
         SetTrueText(flatness.labels(2), 3)
 
@@ -660,7 +661,7 @@ Public Class OpenGL_FlatCeiling : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Using minimal cost, create an OpenGL display where the ceiling is built as a quad"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         flatness.Run(src)
         SetTrueText(flatness.labels(2), 3)
 
@@ -689,7 +690,7 @@ Public Class OpenGL_PeakFlat : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display the peak flat level in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         peak.Run(src)
         dst2 = peak.dst2
         labels(2) = peak.labels(3)
@@ -719,7 +720,7 @@ Public Class OpenGL_FPolyCloud : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display the pointcloud after FPoly_PointCloud identifies the changes depth pixels"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fpolyPC.Run(src)
         dst1 = fpolyPC.dst1
         dst2 = fpolyPC.dst2
@@ -745,10 +746,10 @@ Public Class OpenGL_Sierpinski : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.sierpinski
         task.OpenGLTitle = "OpenGL_Functions"
-        FindSlider("OpenGL Point Size").Value = 3
+        optiBase.FindSlider("OpenGL Point Size").Value = 3
         desc = "Draw the Sierpinski triangle pattern in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -771,7 +772,7 @@ Public Class OpenGL_DrawHulls : Inherits TaskParent
         labels = {"", "", "", ""}
         desc = "Draw all the hulls in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         Dim ptM = options.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
@@ -826,12 +827,12 @@ Public Class OpenGL_Contours : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCells
         task.OpenGLTitle = "OpenGL_Functions"
-        FindSlider("OpenGL shift fwd/back (Z-axis)").Value = -150
+        optiBase.FindSlider("OpenGL shift fwd/back (Z-axis)").Value = -150
         task.redC = New RedCloud_Basics
         labels = {"", "", "Output of RedCloud", "OpenGL snapshot"}
         desc = "Draw all the RedCloud contours in OpenGL with various settings."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         Dim ptM = options.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
@@ -894,10 +895,10 @@ Public Class OpenGL_PCLineCandidates : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPointsAlone
         task.OpenGLTitle = "OpenGL_Functions"
-        FindSlider("OpenGL Point Size").Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the output of the PointCloud_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 
@@ -919,10 +920,10 @@ Public Class OpenGL_PClinesFirstLast : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
         task.OpenGLTitle = "OpenGL_Functions"
-        FindSlider("OpenGL Point Size").Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         desc = "Draw the 3D lines found from the PCpoints"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
 
@@ -945,7 +946,7 @@ Public Class OpenGL_PatchHorizontal : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Draw the point cloud after patching z-values that are similar"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         patch.Run(src)
         dst2 = patch.dst3
         task.ogl.pointCloudInput = dst2
@@ -967,10 +968,10 @@ Public Class OpenGL_PCpoints : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
         task.OpenGLTitle = "OpenGL_Functions"
-        FindSlider("OpenGL Point Size").Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the output of the PointCloud_Points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 
@@ -994,10 +995,10 @@ Public Class OpenGL_PCpointsPlane : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
         task.OpenGLTitle = "OpenGL_Functions"
-        FindSlider("OpenGL Point Size").Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the points that are likely to be in a plane - found by both the vertical and horizontal searches"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         pts.Run(src)
 
         task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
@@ -1016,12 +1017,12 @@ Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
     Dim eq As New Plane_Equation
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
-        FindSlider("OpenGL Point Size").Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         task.redC = New RedCloud_Basics
         labels(3) = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis"
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
         dst3 = task.redC.dst3
@@ -1065,7 +1066,7 @@ Public Class OpenGL_Profile : Inherits TaskParent
         labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
         desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
 
@@ -1112,7 +1113,7 @@ Public Class OpenGL_ProfileSweep : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Test the X-, Y-, and Z-axis rotation in sequence"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.gOptions.setGravityUsage(False)
         If task.frameCount Mod 100 = 0 Then
             testCase += 1
@@ -1124,9 +1125,9 @@ Public Class OpenGL_ProfileSweep : Inherits TaskParent
         End If
 
         Dim bump = 1
-        Static xRotateSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
-        Static yRotateSlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static xRotateSlider = optiBase.FindSlider("Rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider = optiBase.FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider = optiBase.FindSlider("Rotate pointcloud around Z-axis (degrees)")
         ' NOTE: the z and x sliders are switched on purpose.
         Select Case testCase
             Case 0
@@ -1164,7 +1165,7 @@ Public Class OpenGL_FlatSurfaces : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Review the vertical and horizontal regions from Plane_Basics."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         flat.Run(src)
         task.pointCloud.CopyTo(dst2, flat.dst2)
 
@@ -1184,7 +1185,7 @@ Public Class OpenGL_GradientPhase : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Show the depth gradient Phase in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         gradient.Run(src)
         dst2 = gradient.dst2
         dst3 = gradient.dst3
@@ -1209,7 +1210,7 @@ Public Class OpenGL_GravityTransform : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -1231,7 +1232,7 @@ Public Class OpenGL_GravityAverage : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         strOut = "To remove the point cloud averaging, set the global option 'Frame History' to 1." + vbCrLf +
                  "Or, even alternatively, run the 'OpenGL_GravityTransform' algorithm." + vbCrLf + vbCrLf +
                  "Before Averaging: Average IMU acceleration: X = " + Format(task.IMU_RawAcceleration.X, fmt3) + ", Y = " + Format(task.IMU_RawAcceleration.Y, fmt3) +
@@ -1265,7 +1266,7 @@ Public Class OpenGL_GravityKalman : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Build the GMatrix with the Average IMU acceleration (not the raw or filtered values) and use the resulting GMatrix to stabilize the point cloud in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         strOut = "To remove the point cloud averaging, set the global option 'Frame History' to 1." + vbCrLf +
                  "Or, even alternatively, run the 'OpenGL_GravityTransform' algorithm." + vbCrLf + vbCrLf +
                  "Before Kalman: IMU acceleration: X = " + Format(task.IMU_RawAcceleration.X, fmt3) + ", Y = " + Format(task.IMU_RawAcceleration.Y, fmt3) +
@@ -1300,7 +1301,7 @@ Public Class OpenGL_CloudMisses : Inherits TaskParent
         labels = {"", "", "Point cloud after over the last X frames", ""}
         desc = "Run OpenGL removing all pixels not present for all X frames"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         frames.Run(task.depthMask / 255)
         dst2 = frames.dst2
         dst2 = dst2.Threshold(frames.saveFrames.Count - 1, 255, cv.ThresholdTypes.Binary)
@@ -1325,7 +1326,7 @@ Public Class OpenGL_CloudHistory : Inherits TaskParent
         labels = {"", "", "Point cloud after over the last X frames", "Mask to remove partially missing pixels"}
         desc = "Run OpenGL with a masked point cloud averaged over the last X frames."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         hCloud.Run(task.pointCloud)
         dst2 = hCloud.dst2
 
@@ -1347,7 +1348,7 @@ Public Class OpenGL_TessellateCell : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display a tessellated representation of the point cloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -1373,7 +1374,7 @@ Public Class OpenGL_Tessellate : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display a tessellated representation of the point cloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -1397,7 +1398,7 @@ Public Class OpenGL_TessellateRGB : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display a tessellated representation of the point cloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         tess.Run(src)
         dst2 = tess.dst2
         dst3 = tess.dst3
@@ -1422,7 +1423,7 @@ Public Class OpenGL_RedTrack : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCC cells in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         redCC.Run(src)
         dst2 = redCC.dst2
 
@@ -1446,7 +1447,7 @@ Public Class OpenGL_Density2D : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         desc = "Create a mask showing which pixels are close to each other and display the results."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dense.Run(src)
         dst2.SetTo(0)
         task.pointCloud.CopyTo(dst2, dense.dst2)
@@ -1469,7 +1470,7 @@ Public Class OpenGL_ViewObjects : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Identify the objects in the scene and display them in OpenGL with their respective colors."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst1 = task.pointCloud.Clone
 
         bpDoctor.Run(src)
@@ -1498,7 +1499,7 @@ Public Class OpenGL_NoSolo : Inherits TaskParent
         labels(2) = "The points below were identified as solo points in the point cloud"
         desc = "Display point cloud without solo points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         hotTop.Run(src)
         dst2 = hotTop.dst3
 
@@ -1525,7 +1526,7 @@ Public Class OpenGL_RedCloud : Inherits TaskParent
         task.redC = New RedCloud_Basics
         desc = "Display all the RedCloud cells in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         task.redC.Run(src)
         dst2 = task.redC.dst2
 
@@ -1546,7 +1547,7 @@ Public Class OpenGL_RedCloudSpectrum : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCloud cells after Spectrum filtering."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         redS.Run(src)
         dst2 = redS.dst3
         task.pointCloud.SetTo(0, dst2.InRange(0, 0))
@@ -1570,7 +1571,7 @@ Public Class OpenGL_RedCloudCell : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = " Isolate a RedCloud cell - after filtering by Spectrum_Depth - in an OpenGL display"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst2 = specZ.options.runRedCloud(labels(2))
 
         specZ.Run(src)
@@ -1603,7 +1604,7 @@ Public Class OpenGL_BPFilteredSideView : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         filter.Run(src)
         dst2 = filter.dst2
 
@@ -1624,7 +1625,7 @@ Public Class OpenGL_BPFilteredTopView : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         filter.Run(src)
         dst2 = filter.dst2
 
@@ -1645,7 +1646,7 @@ Public Class OpenGL_BPFilteredBoth : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         filter.Run(src)
         dst2 = filter.dst2
 
@@ -1667,7 +1668,7 @@ Public Class OpenGL_BPFiltered3D : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         filter.Run(src)
         dst2 = filter.dst3
 
@@ -1689,7 +1690,7 @@ Public Class OpenGL_HistNorm3D : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Create an OpenGL plot using the BGR data normalized to between 0 and 1."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         src.ConvertTo(src, cv.MatType.CV_32FC3)
         task.ogl.pointCloudInput = src.Normalize(0, 1, cv.NormTypes.MinMax)
         task.ogl.Run(New cv.Mat)
@@ -1712,7 +1713,7 @@ Public Class OpenGL_HistDepth3D : Inherits TaskParent
         task.ogl.options.PointSizeSlider.Value = 10
         desc = "Display the 3D histogram of the depth in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         hcloud.Run(src)
         Dim histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
         task.ogl.dataInput = histogram
@@ -1736,7 +1737,7 @@ Public Class OpenGL_SoloPointsRemoved : Inherits TaskParent
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Remove the solo points and display the pointcloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.toggleOnOff Then
             solos.Run(src)
             dst2 = solos.dst2
@@ -1763,7 +1764,7 @@ Public Class OpenGL_Duster : Inherits TaskParent
     Public Sub New()
         desc = "Show a dusted version point cloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         duster.Run(src)
@@ -1785,7 +1786,7 @@ Public Class OpenGL_DusterY : Inherits TaskParent
     Public Sub New()
         desc = "Show a dusted version point cloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         duster.Run(src)
@@ -1811,7 +1812,7 @@ Public Class OpenGL_Color3D : Inherits TaskParent
         task.ogl.options.PointSizeSlider.Value = 10
         desc = "Plot the results of a 3D histogram of the BGR data "
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         hColor.Run(src)
         dst2 = hColor.dst3
         labels(2) = hColor.labels(2)
@@ -1838,7 +1839,7 @@ Public Class OpenGL_ColorReduced3D : Inherits TaskParent
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         task.redOptions.ColorSource.SelectedItem = "LUT_Basics"
-        FindSlider("OpenGL Point Size").Value = 20
+        optiBase.FindSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -1928,7 +1929,7 @@ Public Class OpenGL_World : Inherits TaskParent
     Dim world As New Depth_World
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+        If optiBase.FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use Generated Pointcloud")
             radio.addRadio("Use Pointcloud from camera")
@@ -1939,7 +1940,7 @@ Public Class OpenGL_World : Inherits TaskParent
         desc = "Display the generated point cloud in OpenGL"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static generatedRadio = FindRadio("Use Generated Pointcloud")
+        Static generatedRadio = optiBase.FindRadio("Use Generated Pointcloud")
 
         If generatedRadio.checked Then
             world.Run(src)
@@ -1964,7 +1965,7 @@ End Class
 Public Class OpenGL_VerticalOrHorizontal : Inherits TaskParent
     Dim vLine As New FeatureLine_Finder
     Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+        If optiBase.FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Show Vertical Lines")
             radio.addRadio("Show Horizontal Lines")
@@ -1974,8 +1975,8 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits TaskParent
         task.ogl.oglFunction = oCase.drawLineAndCloud
         desc = "Visualize all the vertical lines found in FeatureLine_Finder"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static verticalRadio = FindRadio("Show Vertical Lines")
+    Public Overrides Sub runAlg(src As cv.Mat)
+        Static verticalRadio = optiBase.FindRadio("Show Vertical Lines")
         Dim showVerticals = verticalRadio.checked
 
         vLine.Run(src)

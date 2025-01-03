@@ -198,12 +198,12 @@ Public Class LUT_Custom : Inherits TaskParent
     Public colorMap As cv.Mat
     Dim saveColorCount = -1
     Public Sub New()
-        FindSlider("Color transitions").Value = 5
+       optiBase.findslider("Color transitions").Value = 5
         labels(3) = "Custom Color Lookup Table"
         desc = "Use a palette to provide the lookup table for LUT"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static colorSlider = FindSlider("Color transitions")
+        Static colorSlider =optiBase.findslider("Color transitions")
         If task.optionsChanged Or task.heartBeat Then
             If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
             saveColorCount = colorSlider.Value

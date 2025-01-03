@@ -117,8 +117,8 @@ Public Class Interpolate_Lines : Inherits TaskParent
     Dim lines as new Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
-        FindSlider("Interpolation Resize %").Value = 80
-        FindSlider("Interpolation threshold").Value = 100
+       optiBase.findslider("Interpolation Resize %").Value = 80
+       optiBase.findslider("Interpolation threshold").Value = 100
         desc = "Detect lines in interpolation results."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

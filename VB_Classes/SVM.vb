@@ -99,7 +99,7 @@ Public Class SVM_TestCase : Inherits TaskParent
     Dim responses As New List(Of Integer)
     Dim svm As cv.ML.SVM
     Public Sub New()
-        FindSlider("Granularity").Value = 15
+       optiBase.findslider("Granularity").Value = 15
         labels = {"", "", "Input points - color is the category label", "Predictions"}
         desc = "Text book example on SVM"
     End Sub
@@ -162,8 +162,8 @@ Public Class SVM_ReuseBasics : Inherits TaskParent
     Dim responses As New List(Of Integer)
 
     Public Sub New()
-        FindSlider("Granularity").Value = 15
-        FindSlider("SVM Sample Count").Value = 4
+       optiBase.findslider("Granularity").Value = 15
+       optiBase.findslider("SVM Sample Count").Value = 4
         labels = {"", "", "Input points", "Predictions"}
         desc = "Text book example on SVM"
     End Sub
@@ -209,7 +209,7 @@ Public Class SVM_ReuseRandom : Inherits TaskParent
     Dim svm As New SVM_Basics
     Dim blueCount As Integer
     Public Sub New()
-        FindSlider("Granularity").Value = 15
+       optiBase.findslider("Granularity").Value = 15
         task.drawRect = New cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2)
         labels(2) = "SVM Training data - draw a rectangle anywhere to test further."
         desc = "Use SVM to classify random points - testing if height must equal width - needs more work"

@@ -5,7 +5,7 @@ Public Class FitLine_Basics : Inherits TaskParent
     Public draw As New Draw_Lines
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New()
-        FindSlider("DrawCount").Value = 2
+       optiBase.findslider("DrawCount").Value = 2
 
         labels(3) = "FitLine_Basics input"
         desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."

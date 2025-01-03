@@ -73,7 +73,7 @@ Public Class LowRes_Features : Inherits TaskParent
     Dim lowRes As New LowRes_Basics
     Public Sub New()
         task.feat = New Feature_Basics
-        FindSlider("Min Distance to next").Value = 3
+        optiBase.FindSlider("Min Distance to next").Value = 3
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Featureless areas"
         desc = "Identify the cells with features"
@@ -139,7 +139,7 @@ Public Class LowRes_Edges : Inherits TaskParent
     Public Sub New()
         task.featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        FindRadio("Laplacian").Checked = True
+        optiBase.FindRadio("Laplacian").Checked = True
         desc = "Add edges to features"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

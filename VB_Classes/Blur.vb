@@ -23,7 +23,7 @@ Public Class Blur_Homogeneous : Inherits TaskParent
     Dim blurKernelSlider As TrackBar
     Public Sub New()
         desc = "Smooth each pixel with a kernel of 1's of different sizes."
-        blurKernelSlider = FindSlider("Blur Kernel Size")
+        blurKernelSlider =optiBase.findslider("Blur Kernel Size")
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
@@ -42,7 +42,7 @@ Public Class Blur_Median : Inherits TaskParent
     Dim blurKernelSlider As TrackBar
     Public Sub New()
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
-        blurKernelSlider = FindSlider("Blur Kernel Size")
+        blurKernelSlider =optiBase.findslider("Blur Kernel Size")
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
@@ -61,7 +61,7 @@ Public Class Blur_Bilateral : Inherits TaskParent
     Dim blurKernelSlider As TrackBar
     Public Sub New()
         desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
-        blurKernelSlider = FindSlider("Blur Kernel Size")
+        blurKernelSlider =optiBase.findslider("Blur Kernel Size")
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
@@ -146,8 +146,8 @@ Public Class Blur_Detection : Inherits TaskParent
     Dim laplace As New Laplacian_Basics
     Dim blur As New Blur_Basics
     Public Sub New()
-        FindSlider("Laplacian Threshold").Value = 50
-        FindSlider("Blur Kernel Size").Value = 11
+       optiBase.findslider("Laplacian Threshold").Value = 50
+       optiBase.findslider("Blur Kernel Size").Value = 11
         labels = {"", "", "Draw a rectangle to blur a region in alternating frames and test further", "Detected blur in the highlight regions - non-blur is white."}
         desc = "Detect blur in an image"
     End Sub

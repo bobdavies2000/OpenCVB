@@ -123,8 +123,8 @@ Public Class Image_MSER : Inherits TaskParent
     Dim options As New Options_Images
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        FindSlider("MSER Min Area").Value = 15
-        FindSlider("MSER Max Area").Value = 200000
+       optiBase.findslider("MSER Min Area").Value = 15
+       optiBase.findslider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

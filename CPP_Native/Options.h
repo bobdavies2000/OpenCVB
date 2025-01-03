@@ -968,7 +968,6 @@ public:
 };
 class Options_FeatureGather {
 public:
-	int featureSource =  0;
 	void RunOpt() {}
 	Options_FeatureGather() {
 	}

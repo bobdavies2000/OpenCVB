@@ -139,7 +139,7 @@ Public Class PCA_Reconstruct : Inherits TaskParent
         desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static retainSlider = FindSlider("Retained Variance")
+        Static retainSlider =optiBase.findslider("Retained Variance")
         Dim index = task.frameCount Mod images.Length
         images(index) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
@@ -300,7 +300,7 @@ Public Class PCA_Palettize : Inherits TaskParent
     Public nColor As New PCA_NColor
     Public options As New Options_PCA_NColor
     Public Sub New()
-        FindSlider("Desired number of colors").Value = 256
+       optiBase.findslider("Desired number of colors").Value = 256
         desc = "Create a palette for the input image but don't use it."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -878,7 +878,7 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         cPtr = PCA_NColor_Open()
-        FindSlider("Desired number of colors").Value = 8
+       optiBase.findslider("Desired number of colors").Value = 8
         UpdateAdvice(traceName + ": Adjust the 'Desired number of colors' between 1 and 256")
         labels = {"", "", "Palettized (CV_8U) version of color image.", ""}
         desc = "Create a faster version of the PCA_NColor algorithm."
@@ -920,7 +920,7 @@ Public Class PCA_NColorPalettize : Inherits TaskParent
     Dim nColor As New PCA_NColor
     Dim rgb(dst1.Total * dst1.ElemSize - 1) As Byte
     Public Sub New()
-        FindSlider("Desired number of colors").Value = 8
+       optiBase.findslider("Desired number of colors").Value = 8
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

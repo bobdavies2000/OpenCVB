@@ -121,7 +121,7 @@ Public Class KNN_N2BasicsTest : Inherits TaskParent
     Public knn As New KNN_Basics
     Dim random As New Random_Basics
     Public Sub New()
-        FindSlider("Random Pixel Count").Value = 10
+       optiBase.findslider("Random Pixel Count").Value = 10
         desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub accumulateDisplay()
@@ -267,7 +267,7 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
     Dim random As New Random_Basics3D
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
-        FindSlider("Random Pixel Count").Value = 100
+       optiBase.findslider("Random Pixel Count").Value = 100
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -327,7 +327,7 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
     Dim random As New Random_Basics4D
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
-        FindSlider("Random Pixel Count").Value = 5
+       optiBase.findslider("Random Pixel Count").Value = 5
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -412,8 +412,8 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Dim dotSlider As TrackBar
     Dim options As New Options_KNN
     Public Sub New()
-        FindSlider("Feature Sample Size").Value = 200
-        dotSlider = FindSlider("Average distance multiplier")
+       optiBase.findslider("Feature Sample Size").Value = 200
+        dotSlider =optiBase.findslider("Average distance multiplier")
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"
@@ -724,13 +724,13 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public outputPoints2f As New List(Of cv.Point2f)
     Public outputPoints As New List(Of cv.Point)
     Public Sub New()
-        If standalone Then FindRadio("Agast Features").Checked = True
+        If standalone Then optibase.findRadio("Agast Features").Checked = True
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standalone Then inputPoints = task.features
 
-        Static minSlider = FindSlider("Min Distance to next")
+        Static minSlider =optiBase.findslider("Min Distance to next")
         Dim minDistance = minSlider.value
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)

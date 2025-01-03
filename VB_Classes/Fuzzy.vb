@@ -6,12 +6,12 @@ Public Class Fuzzy_Basics : Inherits TaskParent
     Public contours As cv.Point()()
     Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        Dim floodRadio = FindRadio("FloodFill")
+        Dim floodRadio = optibase.findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.setBitReductionBar(32)
         cPtr = Fuzzy_Open()
-        FindRadio("CComp").Checked = True
+        optibase.findRadio("CComp").Checked = True
         labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}
         desc = "That which is not solid is fuzzy"
     End Sub

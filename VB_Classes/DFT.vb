@@ -198,15 +198,15 @@ Public Class DFT_Shapes : Inherits TaskParent
     Dim options As New Options_Draw
     Dim optionsDFT As New Options_DFTShape
     Public Sub New()
-        FindSlider("DrawCount").Value = 1
+       optiBase.findslider("DrawCount").Value = 1
         labels = {"Inverse of the DFT - the same grayscale input.", "", "Input to the DFT", "Discrete Fourier Transform Output"}
         desc = "Show the spectrum magnitude for some standard shapes"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Static frm = FindFrm("Options_DFTShape Radio Buttons")
-        Select Case findRadioText(frm.check)
+        Static frm = optiBase.FindFrm("Options_DFTShape Radio Buttons")
+        Select Case optiBase.findRadioText(frm.check)
             Case "Draw Circle"
                 circle.Run(src)
                 dst2 = circle.dst2

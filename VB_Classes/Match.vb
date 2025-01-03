@@ -188,7 +188,7 @@ Public Class Match_Motion : Inherits TaskParent
     Dim optionsMatch As New Options_Match
     Dim correlationSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        correlationSlider = FindSlider("Feature Correlation Threshold")
+        correlationSlider = optiBase.FindSlider("Feature Correlation Threshold")
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         dst3 = mask.Clone
         desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
@@ -483,7 +483,7 @@ Public Class Match_tCell : Inherits TaskParent
     Public Sub New()
         Dim tc As tCell
         tCells.Add(tc)
-        cellSlider = FindSlider("MatchTemplate Cell Size")
+        cellSlider = optiBase.FindSlider("MatchTemplate Cell Size")
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
     Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
@@ -545,8 +545,8 @@ Public Class Match_LinePairTest : Inherits TaskParent
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        Static cellSlider = FindSlider("MatchTemplate Cell Size")
-        Static corrSlider = FindSlider("Feature Correlation Threshold")
+        Static cellSlider = optiBase.FindSlider("MatchTemplate Cell Size")
+        Static corrSlider = optiBase.FindSlider("Feature Correlation Threshold")
         Dim minCorrelation = corrSlider.Value / 100
         Dim rSize = cellSlider.Value
         Dim radius = rSize / 2
@@ -616,7 +616,7 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
         desc = "Track the GoodFeatures with KNN"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        Static distSlider = FindSlider("Maximum travel distance per frame")
+        Static distSlider = optiBase.FindSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
 
         knn.queries = New List(Of cv.Point2f)(task.features)
@@ -669,7 +669,7 @@ Public Class Match_Point : Inherits TaskParent
             Exit Sub
         End If
 
-        Static cellSlider = FindSlider("MatchTemplate Cell Size")
+        Static cellSlider = optiBase.FindSlider("MatchTemplate Cell Size")
         Dim rSize = cellSlider.Value
         Dim radius = rSize / 2
 

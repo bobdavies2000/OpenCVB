@@ -58,7 +58,7 @@ Public Class Brightness_Grid : Inherits TaskParent
         desc = "Adjust the brightness to get all gray levels below X (here 200) - no whiteout."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static alphaSlider = FindSlider("Alpha (contrast)")
+        Static alphaSlider =optiBase.findslider("Alpha (contrast)")
 
         bright.Run(src)
         dst2 = bright.dst2

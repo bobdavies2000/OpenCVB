@@ -547,7 +547,7 @@ Public Class Structured_FloorCeiling : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
-        FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Find the floor or ceiling plane"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -614,7 +614,7 @@ Public Class Structured_MultiSliceH : Inherits TaskParent
     Public sliceMask As cv.Mat
     Dim options As New Options_Structured
     Public Sub New()
-        FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -777,12 +777,12 @@ Public Class Structured_SliceEither : Inherits TaskParent
     Public sliceMask As New cv.Mat
     Dim options As New Options_Structured
     Public Sub New()
-        FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Create slices in top and side views"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
-        Static topRadio = FindCheckBox("Top View (Unchecked Side View)")
+        Static topRadio = optiBase.FindCheckBox("Top View (Unchecked Side View)")
         Dim topView = topRadio.checked
 
         Dim sliceVal = If(topView, task.mouseMovePoint.X, task.mouseMovePoint.Y)
@@ -1045,7 +1045,7 @@ Public Class Structured_SliceV : Inherits TaskParent
     Public sliceMask As New cv.Mat
     Public options As New Options_Structured
     Public Sub New()
-        FindCheckBox("Top View (Unchecked Side View)").Checked = True
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -1393,7 +1393,7 @@ Public Class Structured_MultiSliceV : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Dim options As New Options_Structured
     Public Sub New()
-        FindCheckBox("Top View (Unchecked Side View)").Checked = True
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

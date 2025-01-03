@@ -210,7 +210,7 @@ Public Class Rotate_Horizon : Inherits TaskParent
     Dim rotate As New Rotate_Basics
     Dim edges As New CameraMotion_WithRotation
     Public Sub New()
-        FindSlider("Rotation Angle in degrees").Value = 3
+       optiBase.findslider("Rotation Angle in degrees").Value = 3
         labels(2) = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector."
         desc = "Rotate the horizon independently from the rotation of the image to validate the Edge_CameraMotion algorithm."
     End Sub
@@ -266,8 +266,8 @@ Public Class Rotate_Verticalize : Inherits TaskParent
     Dim rotate As New Rotate_Basics
     Dim angleSlider As New System.Windows.Forms.TrackBar
     Public Sub New()
-        angleSlider = FindSlider("Rotation Angle in degrees")
-        FindRadio("Nearest (preserves pixel values best)").Checked = True
+        angleSlider =optiBase.findslider("Rotation Angle in degrees")
+        optibase.findRadio("Nearest (preserves pixel values best)").Checked = True
         desc = "Use gravity vector to rotate the image to be vertical"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

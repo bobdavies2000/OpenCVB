@@ -928,7 +928,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
     Public Sub New()
         task.gOptions.debugSyncUI.Checked = True
         If standalone Then task.gOptions.setDisplay1()
-        FindSlider("KNN Dimension").Value = 10
+        optiBase.FindSlider("KNN Dimension").Value = 10
         desc = "Can we distinguish each feature point cell with color, depth, and grid."
     End Sub
     Private Function buildEntry(fp As fpData) As List(Of Single)
@@ -942,7 +942,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         Return dataList
     End Function
     Public Overrides Sub runAlg(src As cv.Mat)
-        Static dimensionSlider = FindSlider("KNN Dimension")
+        Static dimensionSlider = optiBase.FindSlider("KNN Dimension")
         dimension = dimensionSlider.value
 
         fcs.Run(src)
@@ -1073,13 +1073,13 @@ Public Class FCS_Lines : Inherits TaskParent
     Dim lines As New Line_Basics
     Dim fcs As New FCS_Basics
     Public Sub New()
-        FindSlider("Min Line Length").Value = 60
-        FindSlider("Distance to next center").Value = 1
+        optiBase.FindSlider("Min Line Length").Value = 60
+        optiBase.FindSlider("Distance to next center").Value = 1
         labels(3) = "Cell boundaries with the age (in frames) for each cell."
         desc = "Use lines as input to FCS."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        Static minSlider = FindSlider("Min Distance to next")
+        Static minSlider = optiBase.FindSlider("Min Distance to next")
         Dim minDistance = minSlider.value
         lines.Run(src)
 

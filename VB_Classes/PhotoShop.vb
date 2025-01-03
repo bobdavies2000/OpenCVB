@@ -14,8 +14,8 @@ Public Class PhotoShop_Clahe : Inherits TaskParent
         desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static clipSlider = FindSlider("Clip Limit")
-        Static gridSlider = FindSlider("Grid Size")
+        Static clipSlider =optiBase.findslider("Clip Limit")
+        Static gridSlider =optiBase.findslider("Grid Size")
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
@@ -58,8 +58,8 @@ Public Class PhotoShop_AlphaBeta : Inherits TaskParent
         End If
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static alphaSlider = FindSlider("Alpha (contrast)")
-        Static betaSlider = FindSlider("Brightness Beta")
+        Static alphaSlider =optiBase.findslider("Alpha (contrast)")
+        Static betaSlider =optiBase.findslider("Brightness Beta")
         dst2 = src.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
     End Sub
 End Class
@@ -79,7 +79,7 @@ Public Class PhotoShop_Gamma : Inherits TaskParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static gammaSlider = FindSlider("Brightness Gamma correction")
+        Static gammaSlider =optiBase.findslider("Brightness Gamma correction")
         If lastGamma <> gammaSlider.Value Then
             lastGamma = gammaSlider.Value
             For i = 0 To lookupTable.Length - 1
@@ -104,7 +104,7 @@ Public Class PhotoShop_WhiteBalance : Inherits TaskParent
         desc = "Automate getting the right white balance"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static thresholdSlider = FindSlider("White balance threshold X100")
+        Static thresholdSlider =optiBase.findslider("White balance threshold X100")
         Dim thresholdVal As Single = thresholdSlider.Value / 100
 
         Dim rgbData(src.Total * src.ElemSize - 1) As Byte
@@ -141,7 +141,7 @@ Public Class PhotoShop_WhiteBalancePlot : Inherits TaskParent
         desc = "Automate getting the right white balance"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static thresholdSlider = FindSlider("White balance threshold X100")
+        Static thresholdSlider =optiBase.findslider("White balance threshold X100")
         Dim thresholdVal = thresholdSlider.Value / 100
 
         Dim rgb32f As New cv.Mat
@@ -188,7 +188,7 @@ End Class
 Public Class PhotoShop_ChangeMask : Inherits TaskParent
     Dim whiteBal As New PhotoShop_WhiteBalance
     Public Sub New()
-        FindSlider("White balance threshold X100").Value = 3
+       optiBase.findslider("White balance threshold X100").Value = 3
         desc = "Create a mask for the changed pixels after white balance"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -289,11 +289,11 @@ Public Class PhotoShop_Emboss : Inherits TaskParent
         Return kernel
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        Static sizeSlider = FindSlider("Emboss Kernel Size")
+        Static sizeSlider =optiBase.findslider("Emboss Kernel Size")
         Dim kernel = kernelGenerator(sizeSlider.Value)
 
         Dim direction As Integer
-        Static frm = FindFrm(traceName + " Radio Buttons")
+        Static frm = optiBase.FindFrm(traceName + " Radio Buttons")
         For direction = 0 To frm.check.Count - 1
             If frm.check(direction).Checked Then Exit For
         Next
@@ -329,7 +329,7 @@ Public Class PhotoShop_EmbossAll : Inherits TaskParent
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Emboss threshold", 0, 255, 200)
         End If
-        sizeSlider = FindSlider("Emboss Kernel Size")
+        sizeSlider =optiBase.findslider("Emboss Kernel Size")
         sizeSlider.Value = 5
 
         labels(2) = "The combination of all angles"
@@ -337,7 +337,7 @@ Public Class PhotoShop_EmbossAll : Inherits TaskParent
         desc = "Emboss using all the directions provided"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static threshSlider = FindSlider("Emboss threshold")
+        Static threshSlider =optiBase.findslider("Emboss threshold")
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -397,9 +397,9 @@ Public Class PhotoShop_DuoTone : Inherits TaskParent
         desc = "Create a DuoTone image"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static duoCheck = FindCheckBox("DuoTone Dark if checked, Light otherwise")
+        Static duoCheck = optiBase.FindCheckBox("DuoTone Dark if checked, Light otherwise")
         options.RunOpt()
-        Static expSlider = FindSlider("DuoTone Exponent")
+        Static expSlider =optiBase.findslider("DuoTone Exponent")
         Dim exp = 1 + expSlider.Value / 100
         Dim expMat As New cv.Mat(256, 1, cv.MatType.CV_8U)
         Dim expDark As New cv.Mat(256, 1, cv.MatType.CV_8U)
@@ -411,7 +411,7 @@ Public Class PhotoShop_DuoTone : Inherits TaskParent
         Dim split = src.Split()
 
         Dim switch1 As Integer
-        Static frm = FindFrm(traceName + " Radio Buttons")
+        Static frm = optiBase.FindFrm(traceName + " Radio Buttons")
         For switch1 = 0 To frm.check.Count - 1
             If frm.check(switch1).Checked Then Exit For
         Next
@@ -445,9 +445,9 @@ Public Class PhotoShop_UnsharpMask : Inherits TaskParent
         labels(3) = "Unsharp mask (difference from Blur)"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static sigmaSlider = FindSlider("sigma")
-        Static thresholdSlider = FindSlider("Photoshop Threshold")
-        Static shiftSlider = FindSlider("Shift Amount")
+        Static sigmaSlider =optiBase.findslider("sigma")
+        Static thresholdSlider =optiBase.findslider("Photoshop Threshold")
+        Static shiftSlider =optiBase.findslider("Shift Amount")
 
         Dim blurred As New cv.Mat
         Dim amount As Double = shiftSlider.Value / 1000
@@ -476,8 +476,8 @@ Public Class PhotoShop_SharpenDetail : Inherits TaskParent
         desc = "Enhance detail on an image"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static sSigmaSlider = FindSlider("DetailEnhance Sigma_s")
-        Static rSigmaSlider = FindSlider("DetailEnhance Sigma_r X100")
+        Static sSigmaSlider =optiBase.findslider("DetailEnhance Sigma_s")
+        Static rSigmaSlider =optiBase.findslider("DetailEnhance Sigma_r X100")
         cv.Cv2.DetailEnhance(src, dst2, sSigmaSlider.Value, rSigmaSlider.Value / rSigmaSlider.Maximum)
     End Sub
 End Class
@@ -498,8 +498,8 @@ Public Class PhotoShop_SharpenStylize : Inherits TaskParent
         desc = "Stylize an image"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static sSlider = FindSlider("Stylize Sigma_s")
-        Static rSlider = FindSlider("Stylize Sigma_r X100")
+        Static sSlider =optiBase.findslider("Stylize Sigma_s")
+        Static rSlider =optiBase.findslider("Stylize Sigma_r X100")
         cv.Cv2.Stylization(src, dst2, sSlider.Value, rSlider.Value / rSlider.maximum)
     End Sub
 End Class
@@ -522,9 +522,9 @@ Public Class PhotoShop_Pencil_Basics : Inherits TaskParent
         desc = "Convert image to a pencil sketch"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static sSlider = FindSlider("Pencil Sigma_s")
-        Static rSlider = FindSlider("Pencil Sigma_r X100")
-        Static shadeSlider = FindSlider("Pencil Shade Factor X100")
+        Static sSlider =optiBase.findslider("Pencil Sigma_s")
+        Static rSlider =optiBase.findslider("Pencil Sigma_r X100")
+        Static shadeSlider =optiBase.findslider("Pencil Shade Factor X100")
         cv.Cv2.PencilSketch(src, dst3, dst2, sSlider.Value, rSlider.Value / rSlider.maximum, shadeSlider.Value / 1000)
     End Sub
 End Class
@@ -553,13 +553,13 @@ Public Class PhotoShop_Pencil_Manual : Inherits TaskParent
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         grayinv = Not src
-        Static kernelSlider = FindSlider("Blur kernel size")
+        Static kernelSlider =optiBase.findslider("Blur kernel size")
         Dim ksize As Integer = kernelSlider.Value Or 1
         Dim blur = grayinv.Blur(New cv.Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
         cv.Cv2.Divide(src, 255 - blur, dst2, 256)
 
         Dim index As Integer = -1
-        Static frm = FindFrm(traceName + " Radio Buttons")
+        Static frm = optiBase.FindFrm(traceName + " Radio Buttons")
         For index = 0 To frm.check.Count - 1
             If radio.check(index).Checked Then Exit For
         Next

@@ -148,15 +148,15 @@ Public Class Sound_SignalGenerator : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
-        Static wgenSlider = FindSlider("Sine Wave Frequency")
-        Static DecibelSlider = FindSlider("Decibels")
-        Static endSweepSlider = FindSlider("Sweep Only - End Frequency")
-        Static sweepDurationSlider = FindSlider("Sweep Only - duration secs")
-        Static retainSlider = FindSlider("Retain Data for x seconds")
-        Static reverse0Check = FindCheckBox("PhaseReverse Left")
-        Static reverse1Check = FindCheckBox("PhaseReverse Right")
+        Static wgenSlider =optiBase.findslider("Sine Wave Frequency")
+        Static DecibelSlider =optiBase.findslider("Decibels")
+        Static endSweepSlider =optiBase.findslider("Sweep Only - End Frequency")
+        Static sweepDurationSlider =optiBase.findslider("Sweep Only - duration secs")
+        Static retainSlider =optiBase.findslider("Retain Data for x seconds")
+        Static reverse0Check = optiBase.FindCheckBox("PhaseReverse Left")
+        Static reverse1Check = optiBase.FindCheckBox("PhaseReverse Right")
 
-        Static frm = FindFrm(traceName + " Radio Buttons")
+        Static frm = optiBase.FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 wGen.Type = Choose(i + 1, Pink, white, Sweep, Sin, Square, Triangle, SawTooth)
@@ -237,7 +237,7 @@ Public Class Sound_Display : Inherits TaskParent
         End If
         dst2 = New cv.Mat(New cv.Size(src.Width * 2, src.Height), cv.MatType.CV_8UC3, cv.Scalar.Beige)
         samplesperLine = If(soundSource.stereo, totalSamples / 2 / dst2.Width, totalSamples / dst2.Width)
-        Static frm = FindFrm(traceName + " Radio Buttons")
+        Static frm = optiBase.FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then formatIndex = i
         Next

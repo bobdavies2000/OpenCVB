@@ -296,7 +296,7 @@ Public Class ML_DepthFromColor : Inherits TaskParent
     Dim mats As New Mat_4Click
     Dim resizer As New Resize_Smaller
     Public Sub New()
-        FindSlider("LowRes %").Value = 2 ' 2% of the image.
+       optiBase.findslider("LowRes %").Value = 2 ' 2% of the image.
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
@@ -356,7 +356,7 @@ Public Class ML_DepthFromXYColor : Inherits TaskParent
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         labels(2) = "Predicted Depth"
-        FindSlider("LowRes %").Value = 2 ' 2% of the image.
+       optiBase.findslider("LowRes %").Value = 2 ' 2% of the image.
         ' desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

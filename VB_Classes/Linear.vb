@@ -198,7 +198,7 @@ End Class
 Public Class Linear_InputX : Inherits TaskParent
     Dim input As New Linear_Input
     Public Sub New()
-        FindRadio("X Direction").Checked = True
+        optibase.findRadio("X Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -214,7 +214,7 @@ End Class
 Public Class Linear_InputY : Inherits TaskParent
     Dim input As New Linear_Input
     Public Sub New()
-        FindRadio("Y Direction").Checked = True
+        optibase.findRadio("Y Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the Y direction"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -231,7 +231,7 @@ End Class
 Public Class Linear_InputZ : Inherits TaskParent
     Dim input As New Linear_Input
     Public Sub New()
-        FindRadio("Z in X-Direction").Checked = True
+        optibase.findRadio("Z in X-Direction").Checked = True
         desc = "Find pixels that are withing X mm's of a neighbor in the Z direction"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

@@ -15,7 +15,7 @@ Public Class EMax_Basics : Inherits TaskParent
     Dim palette As New Palette_Variable
     Public Sub New()
         cPtr = EMax_Open()
-        FindSlider("EMax Number of Samples per region").Value = 1
+       optiBase.findslider("EMax Number of Samples per region").Value = 1
         labels(3) = "Emax regions as integers"
         UpdateAdvice(traceName + ": use local options to control EMax.")
         desc = "Use EMax - Expectation Maximization - to classify the regions around a series of labeled points"
@@ -252,12 +252,12 @@ Public Class EMax_RandomClusters : Inherits TaskParent
     Dim clusters As New Random_Clusters
     Dim emax As New EMax_Basics
     Public Sub New()
-        FindSlider("Number of points per cluster").Value = 1
+       optiBase.findslider("Number of points per cluster").Value = 1
         labels = {"", "", "Random_Clusters output", "EMax layout for the random clusters supplied"}
         desc = "Build an EMax layout for random set of clusters (not a grid)"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static regionSlider = FindSlider("Number of Clusters")
+        Static regionSlider =optiBase.findslider("Number of Clusters")
         emax.regionCount = regionSlider.Value
 
         clusters.Run(src)

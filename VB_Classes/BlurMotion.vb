@@ -6,8 +6,8 @@ Public Class BlurMotion_Basics : Inherits TaskParent
     Dim blurSlider As TrackBar
     Dim blurAngleSlider As TrackBar
     Public Sub New()
-        blurSlider = FindSlider("Motion Blur Length")
-        blurAngleSlider = FindSlider("Motion Blur Angle")
+        blurSlider =optiBase.findslider("Motion Blur Length")
+        blurAngleSlider =optiBase.findslider("Motion Blur Angle")
         desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

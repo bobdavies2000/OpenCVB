@@ -53,7 +53,7 @@ Public Class FLANN_Basics : Inherits TaskParent
     Dim dist As New Distance_Point3D
     Dim options As New Options_FLANN
     Public Sub New()
-        FindSlider("Random Pixel Count").Value = 5
+       optiBase.findslider("Random Pixel Count").Value = 5
         desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         labels(2) = "Red is query, Nearest points blue"
     End Sub

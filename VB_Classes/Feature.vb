@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports VB_Classes.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
     Dim method As New Feature_Methods
@@ -72,16 +73,26 @@ Public Class Feature_Methods : Inherits TaskParent
     Public ptList As New List(Of cv.Point)
     Dim brisk As BRISK_Basics
     Public options As New Options_Features
+    Dim methodList As New List(Of Integer)({})
     Public Sub New()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         featureMethod.RunOpt()
-
+        Static frm = optiBase.FindFrm("Options_FeatureGather Radio Buttons")
+        Dim featureSource As Integer
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                featureSource = Choose(i + 1, FeatureSrc.GoodFeaturesFull, FeatureSrc.GoodFeaturesGrid,
+                                       FeatureSrc.Agast, FeatureSrc.BRISK, FeatureSrc.Harris,
+                                       FeatureSrc.FAST)
+                Exit For
+            End If
+        Next
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Select Case featureMethod.featureSource
+        Select Case featureSource
             Case FeatureSrc.GoodFeaturesFull
                 features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality,
                                                        options.minDistance, New cv.Mat,
@@ -364,7 +375,7 @@ Public Class Feature_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Contours
     Dim options As New Options_Features
     Public Sub New()
-        FindSlider("Min Distance to next").Value = 10
+        optiBase.FindSlider("Min Distance to next").Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -511,7 +522,7 @@ Public Class Feature_ShiTomasi : Inherits TaskParent
     Dim shiTomasi As New Corners_ShiTomasi_CPP
     Dim options As New Options_ShiTomasi
     Public Sub New()
-        FindSlider("Corner normalize threshold").Value = 15
+        optiBase.FindSlider("Corner normalize threshold").Value = 15
         labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
         desc = "Identify feature points in the left And right views"
     End Sub
@@ -795,7 +806,7 @@ Public Class Feature_Matching : Inherits TaskParent
     Dim method As New Feature_Methods
     Dim options As New Options_FCSMatch
     Public Sub New()
-        FindSlider("Feature Sample Size").Value = 150
+        optiBase.FindSlider("Feature Sample Size").Value = 150
         desc = "Use correlation coefficient to keep features from frame to frame."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -945,7 +956,7 @@ End Class
 Public Class Feature_SteadyCam : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()
-        FindSlider("Threshold Percent for Resync").Value = 50
+        optiBase.FindSlider("Threshold Percent for Resync").Value = 50
         desc = "Track features using correlation without the motion mask"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

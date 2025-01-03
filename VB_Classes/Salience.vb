@@ -29,7 +29,7 @@ End Class
 Public Class Salience_Basics_MT : Inherits TaskParent
     Dim salience As New Salience_Basics_CPP
     Public Sub New()
-        FindSlider("Salience numScales").Value = 2
+       optiBase.findslider("Salience numScales").Value = 2
         desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

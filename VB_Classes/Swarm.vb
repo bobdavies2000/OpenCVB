@@ -11,8 +11,8 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public Sub New()
         task.feat = New Feature_Basics
         Application.DoEvents()
-        FindSlider("Feature Sample Size").Value = 1000
-        ' FindSlider("Blocksize").Value = 1
+        optiBase.FindSlider("Feature Sample Size").Value = 1000
+        ' optiBase.findslider("Blocksize").Value = 1
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."

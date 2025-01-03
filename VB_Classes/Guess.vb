@@ -42,7 +42,7 @@ Public Class Guess_ImageEdges_CPP : Inherits TaskParent
             SetTrueText("Only RealSense cameras are likely to benefit from enhanced depth at the image edges.")
             Exit Sub
         End If
-        Static distSlider = FindSlider("Max Distance from edge")
+        Static distSlider =optiBase.findslider("Max Distance from edge")
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 

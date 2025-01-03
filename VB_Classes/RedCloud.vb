@@ -545,7 +545,7 @@ Public Class RedCloud_World : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        If task.firstPass Then FindSlider("RedCloud_Reduce Reduction").Value = 1000
+        If task.firstPass Then optiBase.FindSlider("RedCloud_Reduce Reduction").Value = 1000
     End Sub
 End Class
 

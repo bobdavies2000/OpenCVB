@@ -24,7 +24,7 @@ Public Class Benford_Basics : Inherits TaskParent
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
         Next
 
-        weightSlider = FindSlider("Add Weighted %")
+        weightSlider = optiBase.FindSlider("Add Weighted %")
         labels(3) = "Actual distribution of input"
         desc = "Build the capability to perform a Benford analysis."
     End Sub

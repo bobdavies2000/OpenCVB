@@ -7,14 +7,14 @@ Public Class FPoly_Basics : Inherits TaskParent
     Dim topFeatures As New FPoly_TopFeatures
     Public sides As New FPoly_Sides
     Public Sub New()
-        FindSlider("Feature Sample Size").Value = 30
-        If dst2.Width >= 640 Then FindSlider("Resync if feature moves > X pixels").Value = 15
+        optiBase.FindSlider("Feature Sample Size").Value = 30
+        If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.firstPass Then sides.prevImage = src.Clone
         sides.options.RunOpt()
 
@@ -121,7 +121,7 @@ Public Class FPoly_Sides : Inherits TaskParent
         labels(2) = "White is the original FPoly and yellow is the current FPoly."
         desc = "Compute the lengths of each side in a polygon"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.firstPass Then prevImage = src.Clone
@@ -237,15 +237,15 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Public Sub New()
         center = New FPoly_Center
         task.feat = New Feature_Basics
-        FindSlider("Feature Sample Size").Value = 30
-        If dst2.Width >= 640 Then FindSlider("Resync if feature moves > X pixels").Value = 15
+        optiBase.FindSlider("Feature Sample Size").Value = 30
+        If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
                       "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.firstPass Then resyncImage = src.Clone
         options.RunOpt()
 
@@ -360,7 +360,7 @@ Public Class FPoly_Plot : Inherits TaskParent
         labels = {"", "", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot the distribution"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Dim lastDistance = fGrid.dst0.Clone
 
         fGrid.Run(src)
@@ -416,7 +416,7 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         labels = {"", "Distance change from previous frame", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot with weighting and Kalman to smooth results"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fPlot.Run(src)
         dst3 = fPlot.dst3
 
@@ -457,7 +457,7 @@ Public Class FPoly_Stablizer : Inherits TaskParent
                   "current image with distance map"}
         desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fGrid.Run(src.Clone)
         dst3 = fGrid.dst3
         labels(3) = fGrid.labels(2)
@@ -502,8 +502,8 @@ Public Class FPoly_StartPoints : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Track the feature grid points back to the last sync point"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+    Public Overrides Sub runAlg(src As cv.Mat)
+        Static thresholdSlider = optiBase.FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
         Dim maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold
 
@@ -557,7 +557,7 @@ Public Class FPoly_Triangle : Inherits TaskParent
     Public Sub New()
         desc = "Find the minimum triangle that contains the feature grid"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fGrid.Run(src)
         dst2 = fGrid.dst2
 
@@ -581,7 +581,7 @@ Public Class FPoly_WarpAffinePoly : Inherits TaskParent
                   "Feature polygon with rotation and shift - should be aligned"}
         desc = "Rotate and shift just the Feature polygon as indicated by FPoly_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fPoly.Run(src)
         Dim polyPrev = fPoly.fPD.prevPoly
         Dim poly = New List(Of cv.Point2f)(fPoly.fPD.currPoly)
@@ -657,7 +657,7 @@ Public Class FPoly_RotatePoints : Inherits TaskParent
 
         Return New cv.Point2f(totalX, totalY)
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standalone Then
             SetTrueText(traceName + " is meant only to run with FPoly_Basics to validate the translation")
             Exit Sub
@@ -703,7 +703,7 @@ Public Class FPoly_WarpAffineImage : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fPoly.Run(src)
 
         warp.rotateCenter = fPoly.fPD.rotateCenter
@@ -764,7 +764,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         If Single.IsNaN(angle) Then Return 0
         Return angle
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standalone Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().")
             Exit Sub
@@ -830,7 +830,7 @@ Public Class FPoly_Image : Inherits TaskParent
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FPoly_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Dim input = src.Clone
         fpoly.Run(src)
         dst1 = fpoly.dst1
@@ -904,7 +904,7 @@ Public Class FPoly_ImageMask : Inherits TaskParent
         task.gOptions.pixelDiffThreshold = 10
         desc = "Build the image mask of the differences between the current frame and resync image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fImage.Run(src)
         dst2 = fImage.dst3
         dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -928,7 +928,7 @@ Public Class FPoly_PointCloud : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Update changed point cloud pixels as indicated by the FPoly_ImageMask"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fMask.Run(src)
         If fMask.fImage.fpoly.resync Or task.firstPass Then fPolyCloud = task.pointCloud.Clone
         dst1 = fMask.dst1
@@ -952,7 +952,7 @@ Public Class FPoly_ResyncCheck : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fPoly.Run(src)
         dst2 = fPoly.dst1
         SetTrueText(fPoly.strOut, 2)
@@ -993,14 +993,14 @@ Public Class FPoly_Center : Inherits TaskParent
                       "Layout of feature polygons after rotation and translation"}
         desc = "Manually rotate and translate the current feature polygon to a previous feature polygon."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standalone Then
             SetTrueText(traceName + " is called by FPoly_Basics to get the image movement." + vbCrLf +
                         "It does not produce any output when run standaloneTest().")
             Exit Sub
         End If
 
-        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+        Static thresholdSlider = optiBase.FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
 
         Dim sindex1 = fPD.polyPrevSideIndex
@@ -1084,7 +1084,7 @@ Public Class FPoly_EdgeRemoval : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Remove edges from the FPoly_ImageMask"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         fMask.Run(src)
         dst2 = fMask.dst3
 
@@ -1112,7 +1112,7 @@ Public Class FPoly_ImageNew : Inherits TaskParent
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FPoly_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         Dim input = src.Clone
         fpoly.Run(src)
         dst1 = fpoly.dst3
@@ -1180,7 +1180,7 @@ Public Class FPoly_LeftRight : Inherits TaskParent
         labels = {"Left image", "Right image", "FPoly output for left image", "FPoly output for right image"}
         desc = "Measure camera motion through the left and right images using FPoly"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         dst0 = task.leftView
         dst1 = task.rightView
         leftPoly.Run(task.leftView)
@@ -1211,7 +1211,7 @@ Public Class FPoly_Core : Inherits TaskParent
     Dim optionsCore As New Options_FPolyCore
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        FindSlider("Feature Sample Size").Value = 20
+        optiBase.FindSlider("Feature Sample Size").Value = 20
         labels(3) = "Feature points with anchor"
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub

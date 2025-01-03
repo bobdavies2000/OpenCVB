@@ -54,7 +54,7 @@ End Class
 Public Class FeatureROI_Color : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        FindSlider("Add Weighted %").Value = 70
+        optiBase.FindSlider("Add Weighted %").Value = 70
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
@@ -240,7 +240,7 @@ Public Class FeatureROI_Correlation : Inherits TaskParent
     Dim plot As New Plot_OverTimeSingle
     Dim options As New Options_Features
     Public Sub New()
-        FindSlider("Feature Correlation Threshold").Value = 90
+        optiBase.FindSlider("Feature Correlation Threshold").Value = 90
         desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -313,7 +313,7 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits TaskParent
     Dim options As New Options_Features
     Dim saveStdev As New List(Of Single)
     Public Sub New()
-        FindSlider("Feature Correlation Threshold").Value = 50
+        optiBase.FindSlider("Feature Correlation Threshold").Value = 50
         desc = "Display the correlation coefficients for roi's with low standard deviation."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -388,7 +388,7 @@ Public Class FeatureROI_LRClick : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
         task.gOptions.setGridSize(16)
-        FindSlider("Feature Correlation Threshold").Value = 80
+        optiBase.FindSlider("Feature Correlation Threshold").Value = 80
         If standalone Then task.gOptions.setDisplay1()
         If standalone Then task.gOptions.setDisplay1()
         labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
@@ -468,7 +468,7 @@ Public Class FeatureROI_LRAll : Inherits TaskParent
     Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
         task.gOptions.setGridSize(16)
-        FindSlider("Feature Correlation Threshold").Value = 95
+        optiBase.FindSlider("Feature Correlation Threshold").Value = 95
         labels(3) = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images."
         desc = "Find all the roi's with high stdev and high correlation between left and right images."
     End Sub

@@ -66,7 +66,7 @@ Public Class HistValley_FromPeaks : Inherits TaskParent
     Public avgValley() As Single
     Public histList As New List(Of Single)
     Public Sub New()
-        FindSlider("Desired boundary count").Value = 10
+        optiBase.FindSlider("Desired boundary count").Value = 10
         desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks."
     End Sub
     Public Sub updatePlot(dst As cv.Mat, bins As Integer)
@@ -75,7 +75,7 @@ Public Class HistValley_FromPeaks : Inherits TaskParent
             dst.Line(New cv.Point(col, dst.Height), New cv.Point(col, dst.Height * 9 / 10), white, task.lineWidth)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         peak.Run(src)
         dst2 = peak.hist.dst2
 
@@ -121,11 +121,11 @@ Public Class HistValley_Peaks : Inherits TaskParent
     Public histArray() As Single
     Public Sub New()
         task.gOptions.setHistogramBins(100)
-        FindSlider("Desired boundary count").Value = 5
+        optiBase.FindSlider("Desired boundary count").Value = 5
         labels(2) = "Histogram - white lines are peaks"
         desc = "Find the requested number of peaks in the histogram "
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         Dim desiredBoundaries = options.desiredBoundaries
 
@@ -198,7 +198,7 @@ Public Class HistValley_Depth : Inherits TaskParent
         labels(2) = "Top markerstop = peaks, bottom markers = valleys"
         desc = "Find the valleys in the depth histogram."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Then
             valley.Run(src)
             dst2 = valley.dst2
@@ -235,7 +235,7 @@ Public Class HistValley_Depth1 : Inherits TaskParent
     Public Sub New()
         desc = "Find the valleys in the depth histogram."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         valley.Run(src)
         dst1 = valley.dst1
@@ -259,7 +259,7 @@ Public Class HistValley_Test : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         Dim desiredBoundaries = options.desiredBoundaries
 
@@ -325,7 +325,7 @@ Public Class HistValley_OptionsAuto : Inherits TaskParent
         labels = {"", "", "Grayscale histogram - white lines are valleys", ""}
         desc = "Isolate the different levels of gray using the histogram valleys."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Then
             kalman.Run(src)
             dst2 = kalman.dst2
@@ -371,7 +371,7 @@ Public Class HistValley_Diff : Inherits TaskParent
     Public Sub New()
         desc = "Compare frame to frame what has changed"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         valley.Run(src)
         dst2 = valley.dst2
 
@@ -394,7 +394,7 @@ Public Class HistValley_EdgeDraw : Inherits TaskParent
     Public Sub New()
         desc = "Remove edge color in RGB before HistValley_FromPeaks"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         edges.Run(src)
 
         dst3 = src
@@ -419,7 +419,7 @@ Public Class HistValley_Simple : Inherits TaskParent
     Public Sub New()
         desc = "Identify ranges by marking the depth histogram entries from valley to valley"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         trends.Run(src)
 
         If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
@@ -470,7 +470,7 @@ Public Class HistValley_Tiers : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat = False Then Exit Sub
         valleys.Run(src)
 
@@ -498,10 +498,10 @@ Public Class HistValley_Colors : Inherits TaskParent
     Dim splitIndex As Integer
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
-        If standaloneTest() Then FindSlider("Desired boundary count").Value = 10
+        If standaloneTest() Then optiBase.FindSlider("Desired boundary count").Value = 10
         desc = "Find the histogram valleys for each of the colors."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
         src = src.ExtractChannel(splitIndex)
         hist.hist.plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
@@ -535,7 +535,7 @@ Public Class HistValley_GrayKalman : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
-        If standaloneTest() Then FindSlider("Desired boundary count").Value = 4
+        If standaloneTest() Then optiBase.FindSlider("Desired boundary count").Value = 4
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

@@ -113,13 +113,6 @@ Public Module vbc
         task.metersPerPixel = task.MaxZmeters / task.dst2.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
     End Sub
-    Public Function FindFrm(title As String) As System.Windows.Forms.Form
-        On Error Resume Next
-        For Each frm In Application.OpenForms
-            If frm.text = title Then Return frm
-        Next
-        Return Nothing
-    End Function
 End Module
 
 

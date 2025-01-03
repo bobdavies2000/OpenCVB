@@ -59,8 +59,8 @@ Public Class Distance_Foreground : Inherits TaskParent
         desc = "Distance algorithm basics."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static cRadio = FindRadio("C")
-        Static l1Radio = FindRadio("L1")
+        Static cRadio = optibase.findRadio("C")
+        Static l1Radio = optibase.findRadio("L1")
 
         foreground.Run(src)
         dst3 = If(useBackgroundAsInput, foreground.dst2, foreground.dst3)

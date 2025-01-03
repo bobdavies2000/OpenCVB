@@ -35,15 +35,15 @@ Public Class Options_Quaternion : Inherits TaskParent
         End If
     End Sub
     Public Sub RunOpt()
-        Static axSlider = FindSlider("quaternion A.x X100")
-        Static aySlider = FindSlider("quaternion A.y X100")
-        Static azSlider = FindSlider("quaternion A.z X100")
-        Static athetaSlider = FindSlider("quaternion A Theta X100")
+        Static axSlider =optiBase.findslider("quaternion A.x X100")
+        Static aySlider =optiBase.findslider("quaternion A.y X100")
+        Static azSlider =optiBase.findslider("quaternion A.z X100")
+        Static athetaSlider =optiBase.findslider("quaternion A Theta X100")
 
-        Static bxSlider = FindSlider("quaternion B.x X100")
-        Static bySlider = FindSlider("quaternion B.y X100")
-        Static bzSlider = FindSlider("quaternion B.z X100")
-        Static bthetaSlider = FindSlider("quaternion B Theta X100")
+        Static bxSlider =optiBase.findslider("quaternion B.x X100")
+        Static bySlider =optiBase.findslider("quaternion B.y X100")
+        Static bzSlider =optiBase.findslider("quaternion B.z X100")
+        Static bthetaSlider =optiBase.findslider("quaternion B Theta X100")
 
         q1 = New Quaternion(CSng(axSlider.Value / 100), CSng(aySlider.Value / 100),
                                 CSng(azSlider.Value / 100), CSng(athetaSlider.Value / 100))

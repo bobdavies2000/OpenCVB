@@ -49,7 +49,7 @@ Public Class Bin2Way_KMeans : Inherits TaskParent
     Dim kmeans As New KMeans_Dimensions
     Dim mats As New Mat_4Click
     Public Sub New()
-        FindSlider("KMeans k").Value = 2
+        optiBase.FindSlider("KMeans k").Value = 2
         labels = {"", "", "Darkest (upper left),lightest (upper right)", "Selected image from dst2"}
         desc = "Use kmeans with each of the 2-way split images"
     End Sub

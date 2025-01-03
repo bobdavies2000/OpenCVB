@@ -678,7 +678,7 @@ Public Class BackProject_MaskLines : Inherits TaskParent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        FindSlider("Min Line Length").Value = 1 ' show all lines...
+        optiBase.FindSlider("Min Line Length").Value = 1 ' show all lines...
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}
         desc = "Inspect the lines from individual backprojection masks from a histogram"

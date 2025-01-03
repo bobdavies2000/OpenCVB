@@ -62,7 +62,7 @@ Public Class Palette_LinearPolar : Inherits TaskParent
         End If
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static radiusSlider = FindSlider("LinearPolar radius")
+        Static radiusSlider =optiBase.findslider("LinearPolar radius")
         Dim radius = radiusSlider.Value ' msRNG.next(0, dst2.Cols)
 
         dst2.SetTo(0)
@@ -161,7 +161,7 @@ Public Class Palette_DepthColorMap : Inherits TaskParent
         desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static cvtScaleSlider = FindSlider("Convert And Scale")
+        Static cvtScaleSlider =optiBase.findslider("Convert And Scale")
         If task.optionsChanged Then
             gColor.color1 = cv.Scalar.Yellow
             gColor.color2 = cv.Scalar.Red
@@ -304,7 +304,7 @@ Public Class Palette_Create : Inherits TaskParent
         Dim dirInfo = New DirectoryInfo(task.HomeDir + "Data")
         schemes = dirInfo.GetFiles("scheme*.jpg")
 
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+        If optiBase.FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             For i = 0 To schemes.Count - 1
                 radio.addRadio(Mid(schemes(i).Name, 1, Len(schemes(i).Name) - 4))
@@ -330,11 +330,11 @@ Public Class Palette_Create : Inherits TaskParent
         Return result
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        Static transitionSlider = FindSlider("Color Transitions")
+        Static transitionSlider =optiBase.findslider("Color Transitions")
         Dim colorTransitionCount = transitionSlider.Value
 
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        schemeName = schemes(findRadioIndex(frm.check)).FullName
+        Static frm = optiBase.FindFrm(traceName + " Radio Buttons")
+        schemeName = schemes(optiBase.findRadioIndex(frm.check)).FullName
 
         If activeSchemeName <> schemeName Or colorTransitionCount <> saveColorTransitionCount Then
             activeSchemeName = schemeName
@@ -426,7 +426,7 @@ Public Class Palette_RandomColorMap : Inherits TaskParent
         desc = "Build a random colormap that smoothly transitions colors"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static paletteSlider = FindSlider("Color transitions")
+        Static paletteSlider =optiBase.findslider("Color transitions")
         If transitionCount <> paletteSlider.Value Then
             transitionCount = paletteSlider.Value
 

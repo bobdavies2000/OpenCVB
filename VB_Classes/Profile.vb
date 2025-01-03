@@ -109,7 +109,7 @@ Public Class Profile_Rotation : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            Static ySlider = FindSlider("Rotate pointcloud around Y-axis")
+            Static ySlider = optiBase.FindSlider("Rotate pointcloud around Y-axis")
             ySlider.value += 1
             If ySlider.value = ySlider.maximum Then ySlider.value = ySlider.minimum
             SetTrueText("When running standaloneTest(), the Y-axis slider is rotating from -90 to 90.", 3)
@@ -145,7 +145,7 @@ Public Class Profile_Derivative : Inherits TaskParent
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rc
@@ -208,11 +208,11 @@ End Class
 Public Class Profile_ConcentrationSide : Inherits TaskParent
     Dim profile As New Profile_ConcentrationTop
     Public Sub New()
-        FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         labels = {"", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", ""}
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         profile.Run(src)
         dst1 = profile.dst1
         dst2 = profile.dst2
@@ -241,10 +241,10 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
         task.gOptions.setDisplay1()
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static ySlider = optiBase.FindSlider("Rotate pointcloud around Y-axis (degrees)")
 
         sides.Run(src)
         dst2 = sides.dst2

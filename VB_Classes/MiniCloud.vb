@@ -5,7 +5,7 @@ Public Class MiniCloud_Basics : Inherits TaskParent
     Public options As New Options_IMU
     Public Sub New()
         resize = New Resize_Smaller
-        FindSlider("LowRes %").Value = 25
+       optiBase.findslider("LowRes %").Value = 25
         desc = "Create a mini point cloud for use with histograms"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -39,7 +39,7 @@ Public Class MiniCloud_Rotate : Inherits TaskParent
         desc = "Create a histogram for the mini point cloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static ySlider =optiBase.findslider("Rotate pointcloud around Y-axis (degrees)")
 
         Dim input = src
         mini.Run(input)
@@ -101,7 +101,7 @@ Public Class MiniCloud_RotateAngle : Inherits TaskParent
             src = peak.mini.dst3
         End If
 
-        Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static ySlider =optiBase.findslider("Rotate pointcloud around Y-axis (degrees)")
         If ySlider.Value + 1 >= ySlider.maximum Then ySlider.Value = ySlider.minimum Else ySlider.Value += 1
 
         peak.Run(src)
@@ -139,7 +139,7 @@ Public Class MiniCloud_RotateSinglePass : Inherits TaskParent
         desc = "Same operation as New MiniCloud_RotateAngle but in a single pass."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static ySlider =optiBase.findslider("Rotate pointcloud around Y-axis (degrees)")
         peak.mini.Run(src)
 
         Dim maxHist = Single.MinValue
