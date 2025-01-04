@@ -9,7 +9,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public options As New Options_Swarm
     Dim cornerHistory As New List(Of List(Of cv.Point2f))
     Public Sub New()
-        Application.DoEvents()
+        task.feat = New Feature_Basics
         optiBase.FindSlider("Feature Sample Size").Value = 1000
         ' optiBase.findslider("Blocksize").Value = 1
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

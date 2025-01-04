@@ -585,6 +585,17 @@ Public Class TaskParent : Implements IDisposable
         If task.feat Is Nothing Then task.feat = New Feature_Basics
         task.feat.Run(src)
     End Sub
+    Public Function getRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
+        If task.redC Is Nothing Then task.redC = New RedCloud_Basics
+        task.redC.Run(src)
+        label = task.redC.labels(2)
+        Return task.redC.dst2
+    End Function
+    Public Sub getRedCloud(src As cv.Mat, ByRef dst As cv.Mat)
+        If task.redC Is Nothing Then task.redC = New RedCloud_Basics
+        task.redC.Run(src)
+        dst = task.redC.dst2
+    End Sub
     Public Sub getRedCloud(src As cv.Mat)
         If task.redC Is Nothing Then task.redC = New RedCloud_Basics
         task.redC.Run(src)

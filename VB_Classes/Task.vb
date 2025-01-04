@@ -351,11 +351,10 @@ Public Class VBtask : Implements IDisposable
     End Sub
 #End Region
     Private Function findIntermediateObject(lookupName As String) As TaskParent
-        Dim saveObject As Object
         For Each obj In task.activeObjects
-            If obj.traceName = lookupName Then saveObject = obj
+            If obj.traceName = lookupName Then Return obj
         Next
-        Return saveObject
+        Return Nothing
     End Function
     Private Sub postProcess(src As cv.Mat)
         Try

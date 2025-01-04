@@ -8,6 +8,7 @@ Public Class OptionParent : Implements IDisposable
     Public strOut As String
     Public Function FindSlider(opt As String) As TrackBar
         Try
+            Application.DoEvents()
             For Each frm In Application.OpenForms
                 If frm.text.endswith(" Sliders") Then
                     For j = 0 To frm.myTrackbars.Count - 1
@@ -25,6 +26,7 @@ Public Class OptionParent : Implements IDisposable
     End Function
     Public Function FindCheckBox(opt As String) As CheckBox
         Try
+            Application.DoEvents()
             For Each frm In Application.OpenForms
                 If frm.text.endswith(" CheckBoxes") Then
                     For j = 0 To frm.Box.Count - 1
@@ -44,12 +46,14 @@ Public Class OptionParent : Implements IDisposable
         Return radio(index)
     End Function
     Public Function findRadioText(ByRef radioList As List(Of RadioButton)) As String
+        Application.DoEvents()
         For Each rad In radioList
             If rad.Checked Then Return rad.Text
         Next
         Return radioList(0).Text
     End Function
     Public Function findRadioIndex(ByRef radioList As List(Of RadioButton)) As String
+        Application.DoEvents()
         For i = 0 To radioList.Count - 1
             If radioList(i).Checked Then Return i
         Next
@@ -57,6 +61,7 @@ Public Class OptionParent : Implements IDisposable
     End Function
     Private Function searchForms(opt As String, ByRef index As Integer)
         Try
+            Application.DoEvents()
             For Each frm In Application.OpenForms
                 If frm.text.endswith(" Radio Buttons") Then
                     For j = 0 To frm.check.count - 1
@@ -74,6 +79,7 @@ Public Class OptionParent : Implements IDisposable
     End Function
     Public Function FindFrm(title As String) As System.Windows.Forms.Form
         On Error Resume Next
+        Application.DoEvents()
         For Each frm In Application.OpenForms
             If frm.text = title Then Return frm
         Next

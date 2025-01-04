@@ -49,12 +49,7 @@ Public Class Cell_Basics : Inherits TaskParent
         End If
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If standalone Or runRedCloud Then
-            getRedCloud(src)
-            dst2 = task.redC.dst2
-            labels(2) = task.redC.labels(2)
-        End If
-
+        If standalone Or runRedCloud Then dst2 = getRedCloud(src, labels(2))
         statsString()
         SetTrueText(strOut, 3)
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"

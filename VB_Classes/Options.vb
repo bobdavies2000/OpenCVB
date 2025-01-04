@@ -7618,6 +7618,7 @@ Public Class Options_Line : Inherits OptionParent
             sliders.setupTrackBar("Same line overlap %", 1, 100, 50)
             sliders.setupTrackBar("Distance to next center", 1, 100, 30)
         End If
+        Application.DoEvents()
     End Sub
     Public Sub RunOpt()
         Static lenSlider = FindSlider("Min Line Length")
