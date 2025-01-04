@@ -69,9 +69,7 @@ Public Class Cell_PixelCountCompare : Inherits TaskParent
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(src, labels(2))
 
         dst3.SetTo(0)
         Dim missCount As Integer
@@ -107,9 +105,7 @@ Public Class Cell_ValidateColorCells : Inherits TaskParent
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(src, labels(2))
 
         dst1.SetTo(0)
         dst3.SetTo(0)
@@ -158,10 +154,8 @@ Public Class Cell_Distance : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Or task.quarterBeat Then
-            getRedCloud(src)
+            dst2 = getRedCloud(src, labels(2))
             dst0 = task.color
-            dst2 = task.redC.dst2
-            labels(2) = task.redC.labels(2)
 
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
@@ -277,9 +271,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            getRedCloud(src)
-            dst2 = task.redC.dst2
-            labels(2) = task.redC.labels(2)
+            dst2 = getRedCloud(src, labels(2))
             If task.ClickPoint = newPoint Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)

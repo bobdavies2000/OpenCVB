@@ -119,8 +119,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         SetTrueText("Review the neighbors_Precise algorithm")
         'nabs.redCells = task.redCells

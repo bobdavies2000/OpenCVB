@@ -58,15 +58,13 @@ Public Class Convex_RedCloud : Inherits TaskParent
         desc = "Get lots of odd shapes from the RedCloud_Basics output and use ConvexHull to simplify them."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-
+        dst2 = getRedCloud(src, labels(2))
         If task.rc.contour IsNot Nothing Then
             convex.Run(src)
 
             dst3.SetTo(0)
             dst3(task.rc.rect) = convex.dst2(New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height))
-            DrawCircle(dst3,task.rc.maxDist, task.DotSize, white)
+            DrawCircle(dst3, task.rc.maxDist, task.DotSize, white)
         End If
     End Sub
 End Class
@@ -141,7 +139,8 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
         End If
         Return newC
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        getRedCloud(src)
         dst1 = task.redC.dst2
         labels(1) = task.redC.labels(2)
         dst3 = convex.dst3

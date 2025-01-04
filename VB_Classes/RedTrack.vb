@@ -39,8 +39,7 @@ Public Class RedTrack_Lines : Inherits TaskParent
             If index > 10 Then Exit For
         Next
 
-        getRedCloud(dst3.Clone)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(dst3, labels(2))
     End Sub
 End Class
 

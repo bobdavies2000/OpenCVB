@@ -10,11 +10,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If standalone Or runRedCloud Then
-            getRedCloud(src)
-            dst2 = task.redC.dst2
-            labels = task.redC.labels
-        End If
+        If standalone Or runRedCloud Then dst2 = getRedCloud(src, labels(2))
 
         knn.queries.Clear()
         For Each rc In task.redCells
@@ -59,10 +55,8 @@ Public Class Neighbors_Intersects : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
-            getRedCloud(src)
-            dst2 = task.redC.dst2
+            dst2 = getRedCloud(src, labels(2))
             src = task.redMap
-            labels(2) = task.redC.labels(2)
         End If
 
         Dim samples(src.Total - 1) As Byte
@@ -144,9 +138,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            getRedCloud(src)
-            dst2 = task.redC.dst2
-            labels = task.redC.labels
+            dst2 = getRedCloud(src, labels(2))
 
             src = task.redMap
             redCells = task.redCells

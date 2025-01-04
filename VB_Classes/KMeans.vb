@@ -231,9 +231,7 @@ Public Class KMeans_Edges : Inherits TaskParent
         dst3 = km.dst2 + 1
         classCount = km.classCount
 
-        getRedCloud(dst3)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(3)
+        dst2 = getRedCloud(src, labels(2))
     End Sub
 End Class
 

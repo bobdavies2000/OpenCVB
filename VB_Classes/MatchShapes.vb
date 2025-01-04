@@ -134,9 +134,8 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         Dim myStandalone = standaloneTest() Or runStandalone
 
         If myStandalone Then
-            getRedCloud(task.color)
+            dst2 = getRedCloud(task.color, labels(2)).Clone
             If task.redCells.Count = 0 Then Exit Sub
-            dst2 = task.redC.dst2
             addTour.redCells = New List(Of rcData)(task.redCells)
             addTour.Run(src)
             rc = task.rc
@@ -226,8 +225,7 @@ Public Class MatchShapes_Contours : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
         If task.heartBeat Then dst3.SetTo(0)
 
         Dim rcX = task.rc

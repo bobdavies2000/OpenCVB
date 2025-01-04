@@ -11,9 +11,7 @@ Public Class MatchRect_Basics : Inherits TaskParent
         If task.optionsChanged Then match.correlation = 0
         If match.correlation < match.options.correlationMin Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
-                getRedCloud(src)
-                dst2 = task.redC.dst2
-                labels(2) = task.redC.labels(2)
+                dst2 = getRedCloud(src, labels(2)).Clone
                 rectInput = task.rc.rect
             End If
             rectSave = rectInput
@@ -39,9 +37,7 @@ Public Class MatchRect_RedCloud : Inherits TaskParent
         desc = "Track a RedCloud cell using MatchTemplate."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(src, labels(2))
         task.ClickPoint = task.rc.maxDist
 
         If task.heartBeat Then matchRect.rectInput = task.rc.rect

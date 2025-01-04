@@ -591,11 +591,6 @@ Public Class TaskParent : Implements IDisposable
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
-    Public Sub getRedCloud(src As cv.Mat, ByRef dst As cv.Mat)
-        If task.redC Is Nothing Then task.redC = New RedCloud_Basics
-        task.redC.Run(src)
-        dst = task.redC.dst2
-    End Sub
     Public Sub getRedCloud(src As cv.Mat)
         If task.redC Is Nothing Then task.redC = New RedCloud_Basics
         task.redC.Run(src)

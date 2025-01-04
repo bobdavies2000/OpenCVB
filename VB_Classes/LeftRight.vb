@@ -272,9 +272,7 @@ Public Class LeftRight_RedCloudRight : Inherits TaskParent
         desc = "Segment the right view image with RedCloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(task.rightView)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(task.rightView, labels(2))
     End Sub
 End Class
 
@@ -290,9 +288,7 @@ Public Class LeftRight_RedCloudLeft : Inherits TaskParent
         desc = "Segment the left view image with RedCloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(task.leftView)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(task.leftView, labels(2))
     End Sub
 End Class
 

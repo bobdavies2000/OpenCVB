@@ -2,12 +2,10 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class SuperPixel_Basics : Inherits TaskParent
     Public Sub New()
-        labels(2) = "Super Pixel cells"
         desc = "A Better superpixel algorithm"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         dst3 = src
         For Each rc In task.redCells

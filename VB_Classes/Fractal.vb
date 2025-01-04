@@ -205,8 +205,7 @@ Public Class Fractal_Dimension : Inherits TaskParent
         Return d
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
         dst3.SetTo(0)
 
         Static rect = New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)

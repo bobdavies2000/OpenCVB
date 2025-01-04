@@ -133,8 +133,7 @@ Public Class FitEllipse_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If not task.heartBeat Then Exit Sub
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         If task.rc.contour Is Nothing Then Exit Sub
         fitE.inputPoints.Clear()

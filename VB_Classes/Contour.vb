@@ -419,8 +419,7 @@ Public Class Contour_Outline : Inherits TaskParent
         desc = "Create a simplified contour of the selected cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
         Dim ptList As List(Of cv.Point) = rc.contour
 
         dst3.SetTo(0)
@@ -456,11 +455,9 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            getRedCloud(src)
-            dst2 = task.redC.dst2
+            dst2 = getRedCloud(src, labels(2))
             rc = task.rc
             DrawContour(dst2(rc.rect), rc.contour, white, -1)
-            labels(2) = task.redC.labels(2)
         End If
 
         Dim selfInt As Boolean
@@ -552,9 +549,7 @@ Public Class Contour_Compare : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(src, labels(2))
 
         Dim tmp = task.rc.mask.Clone
 
@@ -584,9 +579,7 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            getRedCloud(src)
-            dst2 = task.redC.dst2
-            labels(2) = task.redC.labels(2)
+            dst2 = getRedCloud(src, labels(2))
             rc = task.rc
         End If
 
@@ -659,8 +652,7 @@ Public Class Contour_RedCloud : Inherits TaskParent
         desc = "Show all the contours found in the RedCloud output"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         dst3.SetTo(0)
         For Each rc In task.redCells
@@ -704,8 +696,7 @@ Public Class Contour_Smoothing : Inherits TaskParent
         desc = "Compare contours of the selected cell. Cells are offset to help comparison."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         Dim rc = task.rc
 
@@ -937,9 +928,7 @@ Public Class RedCloud_Cells : Inherits TaskParent
         desc = "Create RedCloud output using only color"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(src, labels(2))
 
         cellmap = task.redMap
         redCells = task.redCells

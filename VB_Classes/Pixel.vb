@@ -733,9 +733,7 @@ Public Class Pixel_Vectors : Inherits TaskParent
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(3)
+        dst2 = getRedCloud(src, labels(2))
 
         pixelVector.Clear()
         For Each cell In task.redCells

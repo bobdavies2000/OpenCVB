@@ -329,9 +329,7 @@ Public Class Corners_RedCloud : Inherits TaskParent
         desc = "Find the corners for each RedCloud cell."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(src, labels(2))
 
         corners.Run(task.redMap)
 

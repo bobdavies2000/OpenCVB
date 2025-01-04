@@ -527,9 +527,7 @@ Public Class MSER_Basics1 : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        getRedCloud(dst3)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(src, labels(2))
     End Sub
 End Class
 

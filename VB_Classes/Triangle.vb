@@ -6,8 +6,7 @@ Public Class Triangle_Basics : Inherits TaskParent
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         If task.redCells.Count <= 1 Then Exit Sub
         task.rc = task.redCells(1)
@@ -82,8 +81,7 @@ Public Class Triangle_RedCloud : Inherits TaskParent
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         If task.redCells.Count <= 1 Then Exit Sub
         task.rc = task.redCells(1)
@@ -122,8 +120,7 @@ Public Class Triangle_Cell : Inherits TaskParent
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
         If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
@@ -177,8 +174,7 @@ Public Class Triangle_Mask : Inherits TaskParent
     End Sub
 
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
         If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub

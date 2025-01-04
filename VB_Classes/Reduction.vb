@@ -46,9 +46,7 @@ Public Class Reduction_Floodfill : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         reduction.Run(src)
         dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
-        getRedCloud(reduction.dst2)
-        dst3 = task.redC.dst2
-        labels(3) = task.redC.labels(3)
+        dst3 = getRedCloud(reduction.dst2, labels(3))
     End Sub
 End Class
 

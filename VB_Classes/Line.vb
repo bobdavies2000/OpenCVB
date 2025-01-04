@@ -1038,13 +1038,12 @@ Public Class Line_Cells : Inherits TaskParent
         desc = "Identify all lines in the RedCloud_Basics cell boundaries"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         lines.Run(dst2.Clone)
         dst3 = lines.dst2
         lpList = New List(Of linePoints)(task.lpList)
-        labels(2) = "Number of lines identified: " + CStr(lpList.Count)
+        labels(3) = "Number of lines identified: " + CStr(lpList.Count)
     End Sub
 End Class
 

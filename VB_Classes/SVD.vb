@@ -47,8 +47,7 @@ Public Class SVD_Example2 : Inherits TaskParent
         desc = "Compute the mean and tangent of a RedCloud Cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         Dim rc = task.rc
 

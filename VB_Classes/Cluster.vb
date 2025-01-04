@@ -6,11 +6,14 @@ Public Class Cluster_Basics : Inherits TaskParent
     Public ptList As New List(Of cv.Point)
     Public clusterID As New List(Of Integer)
     Public clusters As New SortedList(Of Integer, List(Of cv.Point))
+    Dim options As New Options_Features
     Public Sub New()
         optiBase.FindSlider("Min Distance to next").Value = 10
         desc = "Group the points based on their proximity to each other."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
+        options.RunOpt()
+
         getFeatures(src)
 
         dst2 = src.Clone

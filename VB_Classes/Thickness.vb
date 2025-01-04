@@ -7,8 +7,7 @@ Public Class Thickness_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            getRedCloud(src)
-            dst2 = task.redC.dst2
+            dst2 = getRedCloud(src, labels(2))
             rc = task.rc
         End If
 

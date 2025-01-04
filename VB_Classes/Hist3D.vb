@@ -94,14 +94,12 @@ Public Class Hist3D_RedCloud : Inherits TaskParent
         task.redOptions.setUseColorOnly(True)
         desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         hist3D.Run(src)
         dst2 = hist3D.dst3
         labels(2) = hist3D.labels(3)
 
-        getRedCloud(hist3D.dst2)
-        dst3 = task.redC.dst2
-        labels(3) = task.redC.labels(2)
+        dst3 = getRedCloud(hist3D.dst2, labels(3))
     End Sub
 End Class
 
@@ -118,18 +116,12 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         task.redOptions.setUseColorOnly(True)
         desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         hColor.Run(src)
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
-
-        getRedCloud(hColor.dst2)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(3)
-
-        If task.redCells.Count > 0 Then
-            dst2(task.rc.rect).SetTo(white, task.rc.mask)
-        End If
+        dst2 = getRedCloud(hColor.dst2, labels(2))
+        If task.redCells.Count > 0 Then dst2(task.rc.rect).SetTo(white, task.rc.mask)
     End Sub
 End Class
 
@@ -241,9 +233,7 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         pixel.Run(src)
 
-        getRedCloud(pixel.dst2)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(pixel.dst2, labels(2))
 
         If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(white, task.rc.mask)

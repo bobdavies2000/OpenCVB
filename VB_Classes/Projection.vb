@@ -8,6 +8,7 @@ Public Class Projection_Basics : Inherits TaskParent
     Public showRectangles As Boolean = True
     Dim histTop As New Projection_HistTop
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Find all the masks, rects, and counts in the input"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -16,10 +17,8 @@ Public Class Projection_Basics : Inherits TaskParent
             src = histTop.dst2
 
             task.redC.inputMask = Not histTop.dst3
-            getRedCloud(histTop.dst3)
+            dst2 = getRedCloud(histTop.dst3, labels(2))
             redCellInput = task.redCells
-            dst2 = task.redC.dst2
-            labels(2) = task.redC.labels(2)
         End If
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -182,6 +181,7 @@ Public Class Projection_Top : Inherits TaskParent
     Public histTop As New Projection_HistTop
     Public objects As New Projection_Basics
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -212,6 +212,7 @@ Public Class Projection_Side : Inherits TaskParent
     Public histSide As New Projection_HistSide
     Public objects As New Projection_Basics
     Public Sub New()
+        task.redC = New RedCloud_Basics
         objects.viewType = "Side"
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub
@@ -362,9 +363,7 @@ Public Class Projection_Cell : Inherits TaskParent
         desc = "Create a top and side projection of the selected cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = getRedCloud(src, labels(2))
 
         heat.Run(src)
         dst1 = heat.dst2.Clone

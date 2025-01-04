@@ -37,8 +37,7 @@ Public Class Sides_Profile : Inherits TaskParent
         desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         sides.Run(src)
         dst3 = sides.dst3
@@ -60,8 +59,7 @@ Public Class Sides_Corner : Inherits TaskParent
         desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         sides.Run(src)
         dst3 = sides.dst3
@@ -83,8 +81,7 @@ Public Class Sides_ColorC : Inherits TaskParent
         desc = "Find the extrema - top/bottom, left/right, near/far - points for a RedColor Cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
-        dst2 = task.redC.dst2
+        dst2 = getRedCloud(src, labels(2))
 
         sides.Run(src)
         dst3 = sides.dst3
