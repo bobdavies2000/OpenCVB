@@ -17,6 +17,8 @@ Public Class Line_Basics : Inherits TaskParent
         Dim newSet As New List(Of linePoints)
         ' unlike Feature_Basics, we have to check each pair, not each point
         For Each lp In lastList
+            lp.p1 = validatePoint(lp.p1)
+            lp.p2 = validatePoint(lp.p2)
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If val1 = 0 And val2 = 0 Then newSet.Add(lp)
@@ -24,6 +26,8 @@ Public Class Line_Basics : Inherits TaskParent
 
         ' unlike Feature_Basics, we have to check each pair, not each point
         For Each lp In lines.lpList
+            lp.p1 = validatePoint(lp.p1)
+            lp.p2 = validatePoint(lp.p2)
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If val1 <> 0 Or val2 <> 0 Then newSet.Add(lp)
