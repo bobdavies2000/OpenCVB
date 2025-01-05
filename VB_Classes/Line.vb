@@ -96,8 +96,8 @@ Public Class Line_Detector : Inherits TaskParent
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
                v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y))
-                Dim p2 = New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y))
+                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
+                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
                 Dim lp = New linePoints(p1, p2)
                 lp.rect = ValidateRect(lp.rect)
                 lp.mask = dst2(lp.rect)

@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Duster_Basics : Inherits TaskParent
     Public dust As New Duster_MaskZ
     Public Sub New()
-        desc = "Removed blowback in the pointcloud"
+        desc = "Removed blowback (stray 3D points between objects) in the pointcloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         dust.Run(src)

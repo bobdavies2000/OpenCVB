@@ -2124,6 +2124,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
     Dim maxDepth As New Depth_MaxMask
     Dim prep As New RedCloud_Reduce
     Public Sub New()
+        task.redC = New RedCloud_Basics
         desc = "Combine the color and cloud as indicated in the RedOptions panel."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

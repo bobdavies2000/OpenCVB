@@ -16,9 +16,11 @@ End Class
 
 Public Class ImShow_WaitKey : Inherits TaskParent
     Public Sub New()
+        task.feat = New Feature_Basics
         desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        task.feat.Run(src)
         dst2 = task.feat.dst2
         cv.Cv2.ImShow("Hit space bar to advance to the next frame", dst2)
         cv.Cv2.WaitKey(1000) ' No need for waitkey with imshow in OpenCVB - finishing a buffer is the same thing so waitkey just delays by 1 second here.

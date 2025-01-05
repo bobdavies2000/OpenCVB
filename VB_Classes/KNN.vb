@@ -412,8 +412,9 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Dim dotSlider As TrackBar
     Dim options As New Options_KNN
     Public Sub New()
-       optiBase.findslider("Feature Sample Size").Value = 200
-        dotSlider =optiBase.findslider("Average distance multiplier")
+        task.feat = New Feature_Basics
+        optiBase.FindSlider("Feature Sample Size").Value = 200
+        dotSlider = optiBase.FindSlider("Average distance multiplier")
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"
@@ -445,7 +446,9 @@ Public Class KNN_TrackMean : Inherits TaskParent
         Next
         Return histSum / histList.Count
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        task.feat.Run(src)
+
         If task.firstPass Then lastImage = src.Clone
         Dim multiplier = dotSlider.Value
 
@@ -680,9 +683,12 @@ Public Class KNN_TrackEach : Inherits TaskParent
     Dim knn As New KNN_OneToOne
     Dim trackAll As New List(Of List(Of linePoints))
     Public Sub New()
+        task.feat = New Feature_Basics
         desc = "Track each good feature with KNN and match the features from frame to frame"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        task.feat.Run(src)
+
         Dim minDistance = task.feat.options.minDistance
         ' if there was no motion, use minDistance to eliminate the unstable points.
         If task.optionsChanged = False Then minDistance = 2
@@ -724,13 +730,16 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public outputPoints2f As New List(Of cv.Point2f)
     Public outputPoints As New List(Of cv.Point)
     Public Sub New()
-        If standalone Then optibase.findRadio("Agast Features").Checked = True
+        task.feat = New Feature_Basics
+        If standalone Then optiBase.findRadio("Agast Features").Checked = True
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        task.feat.Run(src)
+
         If standalone Then inputPoints = task.features
 
-        Static minSlider =optiBase.findslider("Min Distance to next")
+        Static minSlider = optiBase.FindSlider("Min Distance to next")
         Dim minDistance = minSlider.value
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)

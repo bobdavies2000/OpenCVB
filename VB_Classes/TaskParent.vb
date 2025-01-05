@@ -319,7 +319,13 @@ Public Class TaskParent : Implements IDisposable
         Dim y = CSng((p.Y - task.calibData.ppy) / task.calibData.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)
     End Function
-
+    Public Function validatePoint(pt As cv.Point2f) As cv.Point
+        If pt.X < 0 Then pt.X = 0
+        If pt.X > dst2.Width Then pt.X = dst2.Width
+        If pt.Y < 0 Then pt.Y = 0
+        If pt.Y > dst2.Height Then pt.Y = dst2.Height
+        Return pt
+    End Function
     Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0

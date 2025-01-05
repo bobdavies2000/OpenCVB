@@ -7618,6 +7618,7 @@ Public Class Options_Line : Inherits OptionParent
             sliders.setupTrackBar("Same line overlap %", 1, 100, 50)
             sliders.setupTrackBar("Distance to next center", 1, 100, 30)
         End If
+        Application.DoEvents()
     End Sub
     Public Sub RunOpt()
         Static lenSlider = FindSlider("Min Line Length")
@@ -7917,6 +7918,7 @@ Public Class Options_FeaturesEx : Inherits OptionParent
             sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
             sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
         End If
+        Application.DoEvents()
     End Sub
     Public Sub RunOpt()
         Static corrSlider = FindSlider("Feature Correlation Threshold")
