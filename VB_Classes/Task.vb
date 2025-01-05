@@ -705,14 +705,33 @@ Public Class VBtask : Implements IDisposable
         IMUBasics.runAlg(src)
         gMat.runAlg(src)
 
-        'If task.gOptions.RGBFilterActive.Checked Then
-        '    Static filterObject As Object = createAlgorithm(filterName)
-        '    Dim filterName = task.gOptions.RGBFilterList.Text
-        '    If rgbFilter Is Nothing Then rgbFilter = algorithmList.createAlgorithm(filterName)
-        '    If rgbFilter.traceName <> filterName Then rgbFilter = algorithmList.createAlgorithm(filterName)
-        '    rgbFilter.runAlg(src)
-        '    src = rgbFilter.dst2
-        'End If
+        If task.gOptions.RGBFilterActive.Checked Then
+            Static saveFilterName As String
+            Dim filterName = task.gOptions.RGBFilterList.Text
+            If saveFilterName <> filterName Then
+                saveFilterName = filterName
+                Select Case filterName
+                    Case "Blur_Basics"
+                        rgbFilter = New Blur_Basics
+                    Case "Brightness_Basics"
+                        rgbFilter = New Brightness_Basics
+                    Case "Contrast_Basics"
+                        rgbFilter = New Contrast_Basics
+                    Case "Dilate_Basics"
+                        rgbFilter = New Dilate_Basics
+                    Case "Erode_Basics"
+                        rgbFilter = New Erode_Basics
+                    Case "Filter_Laplacian"
+                        rgbFilter = New Filter_Laplacian
+                    Case "PhotoShop_SharpenDetail"
+                        rgbFilter = New PhotoShop_SharpenDetail
+                    Case "PhotoShop_WhiteBalance"
+                        rgbFilter = New PhotoShop_WhiteBalance
+                End Select
+            End If
+            rgbFilter.runAlg(src)
+            src = rgbFilter.dst2
+        End If
 
         If task.gOptions.CreateGif.Checked Then
             heartBeat = False
@@ -731,7 +750,7 @@ Public Class VBtask : Implements IDisposable
 
                 '******* this is the gravity rotation *******
                 task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).
-                                   ToMat.Reshape(3, src.Rows)
+                                       ToMat.Reshape(3, src.Rows)
             End If
 
             If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split

@@ -7,6 +7,9 @@ Public Class OptionsGlobal
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public heartBeatSeconds = 1
+    Public RGBfilters As String() = {"Blur_Basics", "Brightness_Basics", "Contrast_Basics",
+                                     "Dilate_Basics", "Erode_Basics", "Filter_Laplacian",
+                                     "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"}
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 
@@ -47,14 +50,9 @@ Public Class OptionsGlobal
         LineType.Items.Add("Link8")
         LineType.SelectedIndex = 0
 
-        RGBFilterList.Items.Add("Blur_Basics")
-        RGBFilterList.Items.Add("Brightness_Basics")
-        RGBFilterList.Items.Add("Contrast_Basics")
-        RGBFilterList.Items.Add("Dilate_Basics")
-        RGBFilterList.Items.Add("Erode_Basics")
-        RGBFilterList.Items.Add("Filter_Laplacian")
-        RGBFilterList.Items.Add("PhotoShop_SharpenDetail")
-        RGBFilterList.Items.Add("PhotoShop_WhiteBalance")
+        For Each filt In RGBfilters
+            RGBFilterList.Items.Add(filt)
+        Next
         RGBFilterList.SelectedIndex = 0
 
         HighlightColor.Items.Add("Yellow")
