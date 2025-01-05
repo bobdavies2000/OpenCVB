@@ -97,7 +97,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If task.intermediateObject IsNot Nothing Then
+        If task.displayObject IsNot Nothing Then
             SetTrueText("There are too many operations inside GeneticDrawing_Basics to break down the intermediate results")
             Exit Sub
         End If

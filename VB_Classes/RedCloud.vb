@@ -36,7 +36,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             task.gOptions.setDisplay1()
             stats.Run(src)
             strOut = stats.strOut
-            SetTrueTextRedC(strOut)
+            SetTrueText(strOut, newPoint, 1)
         End If
 
         If standalone Then

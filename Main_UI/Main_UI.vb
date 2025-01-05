@@ -1602,9 +1602,6 @@ Public Class Main_UI
 
             Dim saveDrawRect As cvb.Rect
 
-            SyncLock trueDataLock
-                trueData.Clear() ' clear out any truetext from a previous algorithm...
-            End SyncLock
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.
@@ -1658,7 +1655,7 @@ Public Class Main_UI
                         Dim spanCopy = New TimeSpan(elapsedCopyTicks)
                         task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
 
-                        task.intermediateName = treeViewRequest
+                        task.displayObjectName = treeViewRequest
 
                         If testAllRunning Then
                             task.pixelViewerOn = False
@@ -1725,12 +1722,6 @@ Public Class Main_UI
                 picLabels = task.labels
                 motionLabel = task.MotionLabel
 
-                If optionsChange Then
-                    SyncLock trueDataLock
-                        trueData.Clear() ' clear out any truetext from a previous algorithm...
-                    End SyncLock
-                End If
-
                 SyncLock mouseLock
                     If mousePoint.X < task.gridMap32S.Width And mousePoint.Y < task.gridMap32S.Height Then
                         Try
@@ -1768,6 +1759,7 @@ Public Class Main_UI
 
                 If task.paused = False Then
                     SyncLock trueDataLock
+                        If task.frameCount Mod 50 = 0 Then trueData.Clear()
                         If task.trueData.Count Then trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         task.trueData.Clear()
                     End SyncLock

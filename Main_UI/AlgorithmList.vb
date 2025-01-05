@@ -649,9 +649,9 @@ End Enum
 	If algorithmName = "Flood_Motion" Then return new Flood_Motion
 	If algorithmName = "Flood_Motion1" Then return new Flood_Motion1
 	If algorithmName = "Flood_Tiers" Then return new Flood_Tiers
+	If algorithmName = "Font_Basics" Then return new Font_Basics
+	If algorithmName = "Font_FlowMsgs" Then return new Font_FlowMsgs
 	If algorithmName = "Font_FlowText" Then return new Font_FlowText
-	If algorithmName = "Font_FlowTextOld" Then return new Font_FlowTextOld
-	If algorithmName = "Font_OpenCV" Then return new Font_OpenCV
 	If algorithmName = "Foreground_Basics" Then return new Foreground_Basics
 	If algorithmName = "Foreground_CellsBack" Then return new Foreground_CellsBack
 	If algorithmName = "Foreground_CellsFore" Then return new Foreground_CellsFore

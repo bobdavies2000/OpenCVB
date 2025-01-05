@@ -507,30 +507,25 @@ Public Class TaskParent : Implements IDisposable
         Return mm
     End Function
     Public Sub SetTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
-        If traceName = task.algName Then
-            Dim str As New TrueText(text, pt, picTag)
-            trueData.Add(str)
+        SetTrueTextBase(text, pt, picTag)
+    End Sub
+    Public Sub SetTrueText(text As String, Optional picTag As Integer = 2)
+        SetTrueTextBase(text, New cv.Point(0, 0), picTag)
+    End Sub
+    Public Sub SetTrueTextBase(text As String, pt As cv.Point, picTag As Integer)
+        If text Is Nothing Then Return
+        Dim acceptTrueText As Boolean
+        If task.displayObject Is Nothing Then
+            If traceName = task.algName Then acceptTrueText = True
+        Else
+            If task.displayObject.traceName = traceName Then acceptTrueText = True
         End If
-    End Sub
-    Public Sub SetTrueTextRedC(text As String, Optional picTag As Integer = 1)
-        Dim str As New TrueText(text, New cv.Point(0, 0), picTag)
-        trueData.Add(str)
-    End Sub
-    Public Sub SetTrueText(text As String)
-        If traceName = task.algName Then
-            Dim picTag = 2
+        If acceptTrueText Then
             Dim str As New TrueText(text, New cv.Point(0, 0), picTag)
             trueData.Add(str)
         End If
     End Sub
-    Public Sub SetTrueText(text As String, picTag As Integer)
-        If text Is Nothing Then Return
-        If traceName = task.algName Then
-            Dim pt = New cv.Point(0, 0)
-            Dim str As New TrueText(text, pt, picTag)
-            trueData.Add(str)
-        End If
-    End Sub
+
     Public Function standaloneTest() As Boolean
         If standalone Or ShowIntermediate() Then Return True
         Return False
@@ -601,8 +596,8 @@ Public Class TaskParent : Implements IDisposable
         task.redC.Run(src)
     End Sub
     Public Function ShowIntermediate() As Boolean
-        If task.intermediateObject Is Nothing Then Return False
-        If task.intermediateObject.traceName = traceName Then Return True
+        If task.displayObject Is Nothing Then Return False
+        If task.displayObject.traceName = traceName Then Return True
         Return False
     End Function
     Public Function InitRandomRect(margin As Integer) As cv.Rect
@@ -721,11 +716,11 @@ Public Class TaskParent : Implements IDisposable
     Public Sub Run(src As cv.Mat)
         If task.testAllRunning = False Then measureStartRun(traceName)
 
-        task.trueData.Clear()
         If task.paused = False Then
             trueData.Clear()
             runAlg(src)
         End If
+
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
     Public Overridable Sub runAlg(src As cv.Mat)

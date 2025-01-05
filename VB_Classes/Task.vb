@@ -212,8 +212,8 @@ Public Class VBtask : Implements IDisposable
     Public labels(4 - 1) As String
     Public desc As String
     Public advice As String = ""
-    Public intermediateName As String
-    Public intermediateObject As TaskParent
+    Public displayObjectName As String
+    Public displayObject As TaskParent
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
 
@@ -350,7 +350,7 @@ Public Class VBtask : Implements IDisposable
         Next
     End Sub
 #End Region
-    Private Function findIntermediateObject(lookupName As String) As TaskParent
+    Private Function finddisplayObject(lookupName As String) As TaskParent
         For Each obj In task.activeObjects
             If obj.traceName = lookupName Then Return obj
         Next
@@ -374,37 +374,33 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If task.intermediateObject IsNot Nothing Then
-                dst0 = task.intermediateObject.dst0
-                dst1 = task.intermediateObject.dst1
-                dst2 = task.intermediateObject.dst2
-                dst3 = task.intermediateObject.dst3
+            If task.displayObject IsNot Nothing Then
+                dst0 = task.displayObject.dst0
+                dst1 = task.displayObject.dst1
+                dst2 = task.displayObject.dst2
+                dst3 = task.displayObject.dst3
             End If
             dst0 = If(task.gOptions.displayDst0.Checked, dst0, task.color)
             dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
 
-            Dim lookupName = task.intermediateName
-            Dim obj = findIntermediateObject(lookupName)
-            If obj IsNot Nothing Then task.intermediateObject = obj
+            Dim lookupName = task.displayObjectName
+            task.displayObject = finddisplayObject(lookupName)
 
-            If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(trueData)
-
-            If task.gOptions.displayDst0.Checked Then dst0 = Check8uC3(obj.dst0) Else dst0 = task.color
-            If task.gOptions.displayDst1.Checked Then dst1 = Check8uC3(obj.dst1) Else dst1 = task.depthRGB
-
-            If lookupName.EndsWith("_CC") Or lookupName.StartsWith("CPP_") Or lookupName.EndsWith(".py") Then
-                dst2 = If(dst2.Type = cv.MatType.CV_8UC3, dst2, Check8uC3(dst2))
-                dst3 = If(dst3.Type = cv.MatType.CV_8UC3, dst3, Check8uC3(dst3))
-                task.labels = labels
+            If task.gOptions.displayDst0.Checked Then
+                dst0 = Check8uC3(task.displayObject.dst0)
             Else
-                If obj IsNot Nothing Then
-                    dst2 = If(obj.dst2.Type = cv.MatType.CV_8UC3, obj.dst2, Check8uC3(obj.dst2))
-                    dst3 = If(obj.dst3.Type = cv.MatType.CV_8UC3, obj.dst3, Check8uC3(obj.dst3))
-                    task.labels = obj.labels
-                    task.trueData = New List(Of TrueText)(trueData)
-                    If task.algName.EndsWith("_CS") = False Then task.trueData = New List(Of TrueText)(obj.trueData)
-                End If
+                dst0 = task.color
             End If
+            If task.gOptions.displayDst1.Checked Then
+                dst1 = Check8uC3(task.displayObject.dst1)
+            Else
+                dst1 = task.depthRGB
+            End If
+
+            dst2 = If(task.displayObject.dst2.Type = cv.MatType.CV_8UC3, task.displayObject.dst2,
+                      Check8uC3(displayObject.dst2))
+            dst3 = If(task.displayObject.dst3.Type = cv.MatType.CV_8UC3, displayObject.dst3,
+                      Check8uC3(displayObject.dst3))
 
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
@@ -862,6 +858,9 @@ Public Class VBtask : Implements IDisposable
             task.firstPass = False
             task.heartBeatLT = False
             postProcess(src)
+            task.trueData = New List(Of TrueText)(task.displayObject.trueData)
+            task.displayObject.trueData.Clear()
+            task.labels = task.displayObject.labels
         End If
         Return saveOptionsChanged
     End Function
