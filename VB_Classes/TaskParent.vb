@@ -35,7 +35,6 @@ Public Class TaskParent : Implements IDisposable
     Public Sub New()
         traceName = Me.GetType.Name
         If task.callTrace.Count = 0 Then task.callTrace.Add(task.algName + "\")
-        If traceName = task.algName Then Dim k = 0
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)

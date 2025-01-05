@@ -728,6 +728,11 @@ Public Class VBtask : Implements IDisposable
                     Case "PhotoShop_WhiteBalance"
                         rgbFilter = New PhotoShop_WhiteBalance
                 End Select
+                For i = 0 To callTrace.Count - 1
+                    If callTrace(i).StartsWith(task.algName) = False Then
+                        callTrace(i) = task.algName + "\" + callTrace(i)
+                    End If
+                Next
             End If
             rgbFilter.runAlg(src)
             src = rgbFilter.dst2
