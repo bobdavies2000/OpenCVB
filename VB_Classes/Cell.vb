@@ -295,7 +295,6 @@ Public Class Cell_Generate : Inherits TaskParent
     Public rectList As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)
     Public removeContour As Boolean
-    Dim redCPP As RedCloud_CPP
     Public Sub New()
         task.redMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.redCells = New List(Of rcData)
@@ -310,6 +309,7 @@ Public Class Cell_Generate : Inherits TaskParent
             src = task.redMap Or bounds.dst2
             If task.firstPass Then task.redMap.SetTo(0)
 
+            Static redCPP As New RedCloud_CPP
             redCPP = bounds.bRects.bounds.redCPP
 
             If redCPP.classCount = 0 Then Exit Sub ' no data to process.

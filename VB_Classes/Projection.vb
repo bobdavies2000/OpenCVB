@@ -8,7 +8,6 @@ Public Class Projection_Basics : Inherits TaskParent
     Public showRectangles As Boolean = True
     Dim histTop As New Projection_HistTop
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Find all the masks, rects, and counts in the input"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -181,7 +180,6 @@ Public Class Projection_Top : Inherits TaskParent
     Public histTop As New Projection_HistTop
     Public objects As New Projection_Basics
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -212,7 +210,6 @@ Public Class Projection_Side : Inherits TaskParent
     Public histSide As New Projection_HistSide
     Public objects As New Projection_Basics
     Public Sub New()
-        task.redC = New RedCloud_Basics
         objects.viewType = "Side"
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub

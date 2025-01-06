@@ -1375,7 +1375,6 @@ Public Class RedCloud_Hue : Inherits TaskParent
     Dim hue As New Color8U_Hue
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
-        task.redC = New RedCloud_Basics
         labels(3) = "Mask of the areas with Hue"
         desc = "Run RedCloud on just the red hue regions."
     End Sub
@@ -1775,7 +1774,6 @@ Public Class RedCloud_CPP : Inherits TaskParent
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)
-    Dim color As Color8U_Basics
     Public Sub New()
         cPtr = RedCloud_Open()
         inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -1783,6 +1781,7 @@ Public Class RedCloud_CPP : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If src.Channels <> 1 Then
+            Static color As Color8U_Basics
             If color Is Nothing Then color = New Color8U_Basics
             color.Run(src)
             src = color.dst2
@@ -2128,7 +2127,6 @@ Public Class RedCloud_Combine : Inherits TaskParent
     Dim maxDepth As New Depth_MaxMask
     Dim prep As New RedCloud_Reduce
     Public Sub New()
-        task.redC = New RedCloud_Basics
         desc = "Combine the color and cloud as indicated in the RedOptions panel."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

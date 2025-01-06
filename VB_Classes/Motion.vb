@@ -487,7 +487,6 @@ Public Class Motion_Enclosing : Inherits TaskParent
         If dst2.Width >= 1280 Then learnRate = 0.5 Else learnRate = 0.1 ' learn faster with large images (slower frame rate)
         cPtr = BGSubtract_BGFG_Open(4)
         labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
-        task.redC = New RedCloud_Basics
         desc = "Build an enclosing rectangle for the motion"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

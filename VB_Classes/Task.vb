@@ -106,6 +106,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public grid As Grid_Basics
+    Public palette As Palette_LoadColorMap
     Public Enum algTaskID ' match names in algTasks below...
         gMat = 0
         IMUBasics = 1
@@ -114,6 +115,9 @@ Public Class VBtask : Implements IDisposable
         colorizer = 4
         motion = 5
         gravityHorizon = 6
+        palette = 7
+        features = 8
+        redCloud = 9
     End Enum
 
     ' add any task algorithms here
@@ -478,12 +482,15 @@ Public Class VBtask : Implements IDisposable
         callTrace = New List(Of String)
 
         ' add any algorithm tasks to this list.
-        algTasks = {New IMU_GMatrix, New IMU_Basics, New Line_Basics,
-                    New Grid_Basics, New Depth_Palette, New Motion_Basics, New Gravity_Horizon}
+        algTasks = {New IMU_GMatrix, New IMU_Basics, New Line_Basics, New Grid_Basics, New Depth_Palette,
+                    New Motion_Basics, New Gravity_Horizon, New Palette_LoadColorMap, New Feature_Basics,
+                    New RedCloud_Basics}
 
         gmat = algTasks(algTaskID.gMat)
         lines = algTasks(algTaskID.lines)
         grid = algTasks(algTaskID.grid)
+        palette = algTasks(algTaskID.palette)
+        redC = algTasks(algTaskID.redCloud)
 
         If task.algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If task.algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -808,8 +815,12 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
         For Each obj In task.algTasks
+            If obj.traceName = "Feature_Basics" Then Continue For ' not expected to be active
+            If obj.traceName = "RedCloud_Basics" Then Continue For ' not expected to be active
             obj.activeTask = True
         Next
+        algTasks(algTaskID.palette).activeTask = False ' usually it is inactive
+
         algTasks(algTaskID.gravityHorizon).runAlg(src)
 
         Dim saveOptionsChanged = task.optionsChanged

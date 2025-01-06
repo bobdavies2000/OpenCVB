@@ -6,7 +6,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Dim method As New Feature_Methods
     Public Sub New()
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find good features to track in a BGR image using the motion mask+"
     End Sub
     Public Function motionFilter(featureInput As List(Of cv.Point2f)) As List(Of cv.Point2f)
@@ -752,14 +752,13 @@ End Class
 
 
 Public Class Feature_RedCloud : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Show the feature points in the RedCloud output."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        task.redC.Run(src)
+        dst2 = task.redC.dst2
+        labels(2) = task.redC.labels(2)
 
         For Each pt In task.featurePoints
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)

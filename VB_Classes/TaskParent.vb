@@ -575,27 +575,24 @@ Public Class TaskParent : Implements IDisposable
         DrawContour(dst, ptlist, color, 1)
     End Sub
     Public Function ShowPalette(input As cv.Mat) As cv.Mat
-        Static palette = New Palette_LoadColorMap
         If input.Type = cv.MatType.CV_32S Then
             Dim mm = GetMinMax(input)
             Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
             input = tmp
         End If
-        palette.Run(input)
-        Return palette.dst2.Clone
+        task.palette.Run(input)
+        Return task.palette.dst2.Clone
     End Function
     Public Sub getFeatures(src As cv.Mat)
         If task.feat Is Nothing Then task.feat = New Feature_Basics
         task.feat.Run(src)
     End Sub
     Public Function getRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
-        If task.redC Is Nothing Then task.redC = New RedCloud_Basics
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
     Public Sub getRedCloud(src As cv.Mat)
-        If task.redC Is Nothing Then task.redC = New RedCloud_Basics
         task.redC.Run(src)
     End Sub
     Public Function ShowIntermediate() As Boolean

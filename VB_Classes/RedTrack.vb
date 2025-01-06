@@ -2,7 +2,6 @@
 Public Class RedTrack_Basics : Inherits TaskParent
     Public Sub New()
         If New cv.Size(task.dst2.Width, task.dst2.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
-        task.redC = New RedCloud_Basics
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
