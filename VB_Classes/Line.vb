@@ -34,13 +34,10 @@ Public Class Line_Basics : Inherits TaskParent
         Next
 
         Dim ptSort As New SortedList(Of Single, linePoints)(New compareAllowIdenticalSingleInverted)
-        ' organize the lines by length and order points left to right
+        ' Order points left to right
         For Each lp In newSet
-            If lp.p1.X < lp.p2.X Then
-                ptSort.Add(lp.length, lp)
-            Else
-                ptSort.Add(lp.length, New linePoints(lp.p2, lp.p1))
-            End If
+            If lp.p1.X > lp.p2.X Then lp = New linePoints(lp.p2, lp.p1)
+            ptSort.Add(lp.length, lp)
         Next
 
         lpList.Clear()
