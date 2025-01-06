@@ -7,6 +7,8 @@ Public Class Flood_Basics : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         If src.Channels = 1 Then task.redC.inputMask = src
         dst2 = getRedCloud(src, labels(2))
+        dst1 = task.redC.dst1
+        SetTrueText(task.redC.strOut, 3)
     End Sub
 End Class
 
@@ -24,6 +26,8 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         dst2 = getRedCloud(src, labels(2))
+        dst1 = task.redC.dst1
+        SetTrueText(task.redC.strOut, 3)
 
         If task.ClickPoint = newPoint Then
             If task.redCells.Count > 1 Then

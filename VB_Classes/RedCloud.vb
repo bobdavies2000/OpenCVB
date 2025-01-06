@@ -40,6 +40,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             stats.Run(src)
             strOut = stats.strOut
             SetTrueText(strOut, newPoint, 1)
+            dst1 = stats.dst1
         End If
 
         If standalone Then

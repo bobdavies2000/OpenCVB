@@ -7627,6 +7627,7 @@ Public Class Options_Line : Inherits OptionParent
         Static topXSlider = FindSlider("Top X count")
         Static overlapSlider = FindSlider("Same line overlap %")
         Static distanceSlider = FindSlider("Distance to next center")
+        If lenSlider Is Nothing Then Exit Sub ' diagnostic...
         minLength = lenSlider.value
         maxIntersection = interSlider.value
         correlation = correlSlider.value / 100

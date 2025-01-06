@@ -616,12 +616,18 @@ Public Class VBtask : Implements IDisposable
                 algorithmStack.Push(3)
             End If
 
-            algorithm_ms(0) += waitingForInput
-            algorithm_ms(1) += inputBufferCopy
-            algorithm_ms(2) += returnCopyTime
+            If task.heartBeatLT Then
+                algorithm_ms(0) = waitingForInput
+                algorithm_ms(1) = inputBufferCopy
+                algorithm_ms(2) = returnCopyTime
+            Else
+                algorithm_ms(0) += waitingForInput
+                algorithm_ms(1) += inputBufferCopy
+                algorithm_ms(2) += returnCopyTime
+            End If
             algorithmTimes(3) = Now  ' starting the main algorithm
         End If
-        If task.useRecordedData Then recordedData.Run(task.color.Clone)
+            If task.useRecordedData Then recordedData.Run(task.color.Clone)
 
         task.redOptions.Sync()
 
