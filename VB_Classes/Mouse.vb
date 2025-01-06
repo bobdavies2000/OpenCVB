@@ -44,7 +44,6 @@ End Class
 
 Public Class Mouse_ClickPointUsage : Inherits TaskParent
     Public Sub New()
-        task.feat = New Feature_Basics
         desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

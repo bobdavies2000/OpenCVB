@@ -412,7 +412,6 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Dim dotSlider As TrackBar
     Dim options As New Options_KNN
     Public Sub New()
-        task.feat = New Feature_Basics
         optiBase.FindSlider("Feature Sample Size").Value = 200
         dotSlider = optiBase.FindSlider("Average distance multiplier")
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -683,7 +682,6 @@ Public Class KNN_TrackEach : Inherits TaskParent
     Dim knn As New KNN_OneToOne
     Dim trackAll As New List(Of List(Of linePoints))
     Public Sub New()
-        task.feat = New Feature_Basics
         desc = "Track each good feature with KNN and match the features from frame to frame"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -730,7 +728,6 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public outputPoints2f As New List(Of cv.Point2f)
     Public outputPoints As New List(Of cv.Point)
     Public Sub New()
-        task.feat = New Feature_Basics
         If standalone Then optiBase.findRadio("Agast Features").Checked = True
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub

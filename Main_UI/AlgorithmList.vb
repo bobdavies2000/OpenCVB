@@ -570,7 +570,6 @@ End Enum
 	If algorithmName = "Feature_LucasKanade" Then return new Feature_LucasKanade
 	If algorithmName = "Feature_Matching" Then return new Feature_Matching
 	If algorithmName = "Feature_Methods" Then return new Feature_Methods
-	If algorithmName = "Feature_MultiPass" Then return new Feature_MultiPass
 	If algorithmName = "Feature_NoMotionTest" Then return new Feature_NoMotionTest
 	If algorithmName = "Feature_Points" Then return new Feature_Points
 	If algorithmName = "Feature_PointTracker" Then return new Feature_PointTracker

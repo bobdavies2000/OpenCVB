@@ -584,7 +584,6 @@ Public Class TaskParent : Implements IDisposable
         Return task.palette.dst2.Clone
     End Function
     Public Sub getFeatures(src As cv.Mat)
-        If task.feat Is Nothing Then task.feat = New Feature_Basics
         task.feat.Run(src)
     End Sub
     Public Function getRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat

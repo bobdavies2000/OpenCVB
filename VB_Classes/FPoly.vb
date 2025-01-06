@@ -7,7 +7,6 @@ Public Class FPoly_Basics : Inherits TaskParent
     Dim topFeatures As New FPoly_TopFeatures
     Public sides As New FPoly_Sides
     Public Sub New()
-        task.feat = New Feature_Basics
         optiBase.FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -239,7 +238,6 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Public center As Object
     Public Sub New()
         center = New FPoly_Center
-        task.feat = New Feature_Basics
         optiBase.FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -993,7 +991,6 @@ Public Class FPoly_Center : Inherits TaskParent
     Dim newPoly As List(Of cv.Point2f)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        task.feat = New Feature_Basics
         labels = {"", "Layout of feature polygons after just translation - red line is used in sine computation",
                       "Layout of the starting (white) and current (yellow) feature polygons",
                       "Layout of feature polygons after rotation and translation"}
@@ -1219,7 +1216,6 @@ Public Class FPoly_Core : Inherits TaskParent
     Dim optionsCore As New Options_FPolyCore
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.feat = New Feature_Basics
         optiBase.FindSlider("Feature Sample Size").Value = 20
         labels(3) = "Feature points with anchor"
         desc = "Feature Grid: compute distances between good features from frame to frame"
@@ -1274,7 +1270,6 @@ Public Class FPoly_TopFeatures : Inherits TaskParent
     Public stable As New Stable_BasicsCount
     Public options As New Options_FPoly
     Public Sub New()
-        task.feat = New Feature_Basics
         desc = "Get the top features and validate them using Delaunay regions."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -1307,7 +1302,6 @@ Public Class FPoly_Line : Inherits TaskParent
     Dim topFeatures As New FPoly_TopFeatures
     Public lp As New linePoints
     Public Sub New()
-        task.feat = New Feature_Basics
         labels = {"", "", "Points found with FPoly_TopFeatures", "Longest line in task.topFeatures"}
         desc = "Identify the longest line in task.topFeatures"
     End Sub

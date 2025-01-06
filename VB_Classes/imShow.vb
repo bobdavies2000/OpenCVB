@@ -16,7 +16,6 @@ End Class
 
 Public Class ImShow_WaitKey : Inherits TaskParent
     Public Sub New()
-        task.feat = New Feature_Basics
         desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

@@ -249,7 +249,6 @@ End Class
 
 Public Class Feature_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim feat As New Feature_Basics
     Public Sub New()
         labels = {"", "", "Good features", "History of good features"}
         desc = "Get the features in a reduction grayscale image."
@@ -258,7 +257,7 @@ Public Class Feature_Reduction : Inherits TaskParent
         reduction.Run(src)
         dst2 = src
 
-        feat.Run(reduction.dst2)
+        task.feat.Run(reduction.dst2)
         If task.heartBeat Then dst3.SetTo(0)
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, white)
@@ -266,50 +265,6 @@ Public Class Feature_Reduction : Inherits TaskParent
         Next
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Feature_MultiPass : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Public featurePoints As New List(Of cv.Point2f)
-    Dim sharpen As New PhotoShop_SharpenDetail
-    Public Sub New()
-        task.gOptions.RGBFilterActive.Checked = True
-        task.gOptions.RGBFilterList.SelectedIndex = task.gOptions.RGBFilterList.Items.IndexOf("Filter_Laplacian")
-        desc = "Run Feature_Stable twice and compare results."
-    End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
-        feat.Run(task.color)
-        dst2 = src.Clone
-        featurePoints = New List(Of cv.Point2f)(task.features)
-        Dim passCounts As String = CStr(featurePoints.Count) + "/"
-
-        feat.Run(src)
-        For Each pt In task.features
-            featurePoints.Add(pt)
-        Next
-        passCounts += CStr(task.features.Count) + "/"
-
-        sharpen.Run(task.color)
-        feat.Run(sharpen.dst2)
-        For Each pt In task.features
-            featurePoints.Add(pt)
-        Next
-        passCounts += CStr(task.features.Count)
-
-        For Each pt In featurePoints
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-        Next
-        If task.heartBeat Then
-            labels(2) = "Total features = " + CStr(featurePoints.Count) + ", pass counts = " + passCounts
-        End If
-    End Sub
-End Class
-
 
 
 
