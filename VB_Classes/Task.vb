@@ -362,11 +362,6 @@ Public Class VBtask : Implements IDisposable
         Next
         Return Nothing
     End Function
-    Private Sub setInactiveObjects()
-        For Each obj In task.activeObjects
-            obj.activeTask = False
-        Next
-    End Sub
     Private Sub postProcess(src As cv.Mat)
         Try
             If task.PixelViewer IsNot Nothing Then
@@ -380,7 +375,11 @@ Public Class VBtask : Implements IDisposable
             End If
 
             ' mark each task as inactive so we can find which are really working.
-            If task.heartBeat Then setInactiveObjects()
+            If task.heartBeat Then
+                For Each obj In task.activeObjects
+                    obj.activeTask = False
+                Next
+            End If
 
             Dim lookupName = task.displayObjectName
             task.displayObject = finddisplayObject(lookupName)
@@ -811,6 +810,7 @@ Public Class VBtask : Implements IDisposable
         For Each obj In task.algTasks
             obj.activeTask = True
         Next
+        algTasks(algTaskID.gravityHorizon).runAlg(src)
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.paused = False Then
@@ -864,7 +864,6 @@ Public Class VBtask : Implements IDisposable
                 Next
             End If
 
-            algTasks(algTaskID.gravityHorizon).runAlg(src)
             If task.gOptions.CrossHairs.Checked Then
                 If task.paused = False Then
                     DrawLine(dst0, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
