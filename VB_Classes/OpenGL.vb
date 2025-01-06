@@ -135,7 +135,7 @@ Public Class OpenGL_Basics : Inherits TaskParent
         Catch ex As Exception
             ' OpenGL window was likely closed.  
         End Try
-        If standaloneTest() Then SetTrueText(task.gMat.strOut, 3)
+        If standaloneTest() Then SetTrueText(task.gmat.strOut, 3)
         If standalone Then dst2 = task.pointCloud
     End Sub
 End Class

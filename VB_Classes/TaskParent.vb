@@ -157,7 +157,8 @@ Public Class TaskParent : Implements IDisposable
         If task.useGravityPointcloud Then Return task.pcSplit(index) ' already oriented to gravity
 
         ' rebuild the pointcloud so it is oriented to gravity.
-        Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
+        Dim rows = task.pointCloud.Rows, cols = task.pointCloud.Cols
+        Dim pc = (task.pointCloud.Reshape(1, rows * cols) * task.gMatrix).ToMat.Reshape(3, rows)
         Dim split = pc.Split()
         Return split(index)
     End Function

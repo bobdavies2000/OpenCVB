@@ -225,7 +225,8 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
         Else
             gMat.Run(src)
             task.gMatrix = gMat.gMatrix
-            Dim matLines3D As cv.Mat = (cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
+            Dim matLines3D As cv.Mat = (cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F,
+                                                             raw3D.ToArray)) * task.gMatrix
         End If
     End Sub
 End Class

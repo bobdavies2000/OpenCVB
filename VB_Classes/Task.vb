@@ -55,7 +55,6 @@ Public Class VBtask : Implements IDisposable
     Public motionRect As New cv.Rect ' get rid of this...
     Public motionRects As New List(Of cv.Rect)
     Public motionMask As cv.Mat
-    Public motion As Motion_Basics
     Public motionPercent As Single
     Public MotionLabel As String = " "
 
@@ -85,6 +84,7 @@ Public Class VBtask : Implements IDisposable
     Public pointCloud As cv.Mat
     Public pcSplit() As cv.Mat
     Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
+    Public IMU_Rotation As System.Numerics.Quaternion
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
     Public maxDepthMask As New cv.Mat
@@ -94,18 +94,32 @@ Public Class VBtask : Implements IDisposable
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
 
-    ' add any task algorithms here
-    Public gravityHorizon As Gravity_Horizon
-    Public PixelViewer As Pixel_Viewer
-    Public rgbFilter As Object
-    Public gMat As IMU_GMatrix
-    Public IMUBasics As IMU_Basics
-    Public IMU_Rotation As System.Numerics.Quaternion
-    Public cellStats As Cell_Basics
+    Public callTrace As List(Of String)
+    Public algorithm_msMain As New List(Of Single)
+    Public algorithmNamesMain As New List(Of String)
+    Public algorithm_ms As New List(Of Single)
+    Public algorithmNames As New List(Of String)
+    Public algorithmTimes As New List(Of DateTime)
+    Public algorithmStack As New Stack()
+
+    Public algTasks() As Object
+    Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public grid As Grid_Basics
+    Public Enum algTaskID ' match names in algTasks below...
+        gMat = 0
+        IMUBasics = 1
+        lines = 2
+        grid = 3
+        colorizer = 4
+        motion = 5
+        gravityHorizon = 6
+    End Enum
+
+    ' add any task algorithms here
+    Public PixelViewer As Pixel_Viewer
+    Public rgbFilter As Object
     Public ogl As OpenGL_Basics
-    Public colorizer As Depth_Palette
     Public feat As Feature_Basics
     Public redC As RedCloud_Basics
 
@@ -246,14 +260,6 @@ Public Class VBtask : Implements IDisposable
     Public main_hwnd As IntPtr
 
     Public trueData As New List(Of TrueText)
-
-    Public callTrace As New List(Of String)
-    Public algorithm_msMain As New List(Of Single)
-    Public algorithmNamesMain As New List(Of String)
-    Public algorithm_ms As New List(Of Single)
-    Public algorithmNames As New List(Of String)
-    Public algorithmTimes As New List(Of DateTime)
-    Public algorithmStack As New Stack()
 
     Public waitingForInput As Single ' the amount of time waiting for buffers.
     Public inputBufferCopy As Single ' the amount of time copying the buffers.
@@ -470,16 +476,15 @@ Public Class VBtask : Implements IDisposable
         redOptions = New OptionsRedCloud
         task.redMap = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
 
-        callTrace.Clear()
+        callTrace = New List(Of String)
 
-        ' task algorithms constructed here.
-        grid = New Grid_Basics
-        colorizer = New Depth_Palette
-        IMUBasics = New IMU_Basics
-        gMat = New IMU_GMatrix
-        gravityHorizon = New Gravity_Horizon
-        lines = New Line_Basics
-        motion = New Motion_Basics
+        ' add any algorithm tasks to this list.
+        algTasks = {New IMU_GMatrix, New IMU_Basics, New Line_Basics,
+                    New Grid_Basics, New Depth_Palette, New Motion_Basics, New Gravity_Horizon}
+
+        gmat = algTasks(algTaskID.gMat)
+        lines = algTasks(algTaskID.lines)
+        grid = algTasks(algTaskID.grid)
 
         If task.algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If task.algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -627,7 +632,7 @@ Public Class VBtask : Implements IDisposable
             End If
             algorithmTimes(3) = Now  ' starting the main algorithm
         End If
-            If task.useRecordedData Then recordedData.Run(task.color.Clone)
+        If task.useRecordedData Then recordedData.Run(task.color.Clone)
 
         task.redOptions.Sync()
 
@@ -647,10 +652,10 @@ Public Class VBtask : Implements IDisposable
         task.IMU_RawAcceleration = task.IMU_Acceleration
         task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
         task.IMU_AlphaFilter = 0.5 '  task.gOptions.imu_Alpha
-        grid.runAlg(task.color)
 
-        IMUBasics.runAlg(src)
-        gMat.runAlg(src)
+        grid.runAlg(task.color)
+        algTasks(algTaskID.IMUBasics).runAlg(src)
+        gmat.runAlg(src)
 
         If task.gOptions.RGBFilterActive.Checked Then
             Static saveFilterName As String
@@ -710,16 +715,17 @@ Public Class VBtask : Implements IDisposable
             task.gOptions.unFiltered.Checked = True
         End If
 
-        motion.Run(src)
-        task.motionMask = motion.motionMask
+        algTasks(algTaskID.motion).Run(src)
+        task.motionMask = algTasks(algTaskID.motion).motionMask
 
         If task.gOptions.UseMotionColor.Checked Then
-            task.color = motion.color.Clone
-            task.motionRects = New List(Of cv.Rect)(motion.measure.motionRects)
+            task.color = algTasks(algTaskID.motion).color.Clone
+            Dim rectList As List(Of cv.Rect) = algTasks(algTaskID.motion).measure.motionRects
+            task.motionRects = New List(Of cv.Rect)(rectList)
         End If
 
         If task.gOptions.UseMotionDepth.Checked Then
-            task.pointCloud = motion.pointcloud.Clone
+            task.pointCloud = algTasks(algTaskID.motion).pointcloud.Clone
         End If
 
         task.pcSplit = task.pointCloud.Split
@@ -754,13 +760,13 @@ Public Class VBtask : Implements IDisposable
         End If
 
         lines.runAlg(src)
-        task.lpList = New List(Of linePoints)(lines.lpList)
+        Dim lineList As List(Of linePoints) = lines.lpList
 
         ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
         If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(task.pcSplit(2))
 
-        task.colorizer.Run(src)
-        task.depthRGB = task.colorizer.dst2
+        algTasks(algTaskID.colorizer).Run(src)
+        task.depthRGB = algTasks(algTaskID.colorizer).dst2
 
         TaskTimer.Enabled = True
 
@@ -802,6 +808,9 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
         End If
+        For Each obj In task.algTasks
+            obj.activeTask = True
+        Next
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.paused = False Then
@@ -855,7 +864,7 @@ Public Class VBtask : Implements IDisposable
                 Next
             End If
 
-            gravityHorizon.runAlg(src)
+            algTasks(algTaskID.gravityHorizon).runAlg(src)
             If task.gOptions.CrossHairs.Checked Then
                 If task.paused = False Then
                     DrawLine(dst0, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)

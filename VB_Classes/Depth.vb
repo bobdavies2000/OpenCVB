@@ -17,7 +17,7 @@ Public Class Depth_Basics : Inherits TaskParent
             task.maxDepthMask.SetTo(0)
         End If
         If standalone Then dst3 = task.maxDepthMask
-        SetTrueText(task.gMat.strOut, 3)
+        SetTrueText(task.gmat.strOut, 3)
     End Sub
 End Class
 

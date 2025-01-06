@@ -49,9 +49,9 @@ Public Class IMU_Basics : Inherits TaskParent
                  Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf +
                  "Velocity-Filtered Angles to gravity in degrees" + vbCrLf +
                  Format(x2, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.theta.Z * 57.2958, fmt1) + vbCrLf
-        strOut += "cx = " + Format(task.gMat.cx, fmt3) + " sx = " + Format(task.gMat.sx, fmt3) + vbCrLf +
-                  "cy = " + Format(task.gMat.cy, fmt3) + " sy = " + Format(task.gMat.sy, fmt3) + vbCrLf +
-                  "cz = " + Format(task.gMat.cz, fmt3) + " sz = " + Format(task.gMat.sz, fmt3)
+        strOut += "cx = " + Format(task.gmat.cx, fmt3) + " sx = " + Format(task.gmat.sx, fmt3) + vbCrLf +
+                  "cy = " + Format(task.gmat.cy, fmt3) + " sy = " + Format(task.gmat.sy, fmt3) + vbCrLf +
+                  "cz = " + Format(task.gmat.cz, fmt3) + " sz = " + Format(task.gmat.sz, fmt3)
 
         task.accRadians = task.theta
         If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
@@ -102,10 +102,9 @@ Public Class IMU_BasicsKalman : Inherits TaskParent
         If task.accRadians.X < 0 Then y1 *= -1
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                  Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf
-        strOut += "cx = " + Format(task.gMat.cx, fmt3) + " sx = " + Format(task.gMat.sx, fmt3) + vbCrLf +
-                  "cy = " + Format(task.gMat.cy, fmt3) + " sy = " + Format(task.gMat.sy, fmt3) + vbCrLf +
-                  "cz = " + Format(task.gMat.cz, fmt3) + " sz = " + Format(task.gMat.sz, fmt3)
-
+        strOut += "cx = " + Format(task.gmat.cx, fmt3) + " sx = " + Format(task.gmat.sx, fmt3) + vbCrLf +
+                  "cy = " + Format(task.gmat.cy, fmt3) + " sy = " + Format(task.gmat.sy, fmt3) + vbCrLf +
+                  "cz = " + Format(task.gmat.cz, fmt3) + " sz = " + Format(task.gmat.sz, fmt3)
         If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
         task.accRadians.Z += cv.Cv2.PI / 2
 

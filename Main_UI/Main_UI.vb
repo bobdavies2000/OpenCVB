@@ -1561,9 +1561,6 @@ Public Class Main_UI
             drawRect = New cvb.Rect
             task = New VBtask(parms)
 
-            ' make sure unmanaged portion of the CPP_Managed library is initialized with critical data before the first C++/CLR algorithm.
-            ' Dim setup = New CPP_Managed.CPP_IntializeManaged(task.rows, task.cols)
-
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 
             ' You may land here when the Group x-reference file has not been updated recently.

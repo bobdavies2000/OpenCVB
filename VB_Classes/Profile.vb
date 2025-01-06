@@ -117,7 +117,7 @@ Public Class Profile_Rotation : Inherits TaskParent
         If standaloneTest() Then
             options.RunOpt()
             strOut = "Gravity-oriented gMatrix" + vbCrLf
-            strOut += task.gMat.strOut + vbCrLf
+            strOut += task.gmat.strOut + vbCrLf
             strOut += vbCrLf + "New gMatrix from sliders" + vbCrLf
             strOut += gMatrixToStr(gMat.gMatrix) + vbCrLf + vbCrLf
             strOut += "Angle X = " + Format(options.rotateX, fmt1) + vbCrLf
