@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
-    Public stats As New Cell_Basics
     Public inputMask As New cv.Mat
     Public cellGen As New Cell_Generate
     Dim redCPP As New RedCloud_CPP
@@ -33,7 +32,11 @@ Public Class RedCloud_Basics : Inherits TaskParent
         labels(2) = cellGen.labels(2)
 
         If task.redOptions.DisplayCellStats.Checked Then
-            task.gOptions.setDisplay1()
+            Static stats As Cell_Basics
+            If stats Is Nothing Then
+                task.gOptions.setDisplay1()
+                stats = New Cell_Basics
+            End If
             stats.Run(src)
             strOut = stats.strOut
             SetTrueText(strOut, newPoint, 1)

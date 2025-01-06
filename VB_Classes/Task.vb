@@ -836,9 +836,11 @@ Public Class VBtask : Implements IDisposable
             If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, task.gridMask)
 
             If task.redOptions.DisplayCellStats.Checked Then
-                For Each tt In task.redC.trueData
-                    trueData.Add(tt)
-                Next
+                If task.redC IsNot Nothing Then
+                    For Each tt In task.redC.trueData
+                        trueData.Add(tt)
+                    Next
+                End If
             End If
 
             If task.gOptions.showMotionMask.Checked Then

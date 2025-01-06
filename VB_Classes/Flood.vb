@@ -24,7 +24,6 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         dst2 = getRedCloud(src, labels(2))
-        dst3 = task.redC.stats.dst1
 
         If task.ClickPoint = newPoint Then
             If task.redCells.Count > 1 Then
