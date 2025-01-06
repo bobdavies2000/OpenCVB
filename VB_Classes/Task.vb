@@ -356,14 +356,13 @@ Public Class VBtask : Implements IDisposable
         Next
         Return Nothing
     End Function
+    Private Sub setInactiveObjects()
+        For Each obj In task.activeObjects
+            obj.activeTask = False
+        Next
+    End Sub
     Private Sub postProcess(src As cv.Mat)
         Try
-            ' make sure that any outputs from the algorithm are the right size.nearest
-            If dst0.Size <> New cv.Size(task.color.Width, task.color.Height) And dst0.Width > 0 Then dst0 = dst0.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
-            If dst1.Size <> New cv.Size(task.color.Width, task.color.Height) And dst1.Width > 0 Then dst1 = dst1.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
-            If dst2.Size <> New cv.Size(task.color.Width, task.color.Height) And dst2.Width > 0 Then dst2 = dst2.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
-            If dst3.Size <> New cv.Size(task.color.Width, task.color.Height) And dst3.Width > 0 Then dst3 = dst3.Resize(New cv.Size(task.color.Width, task.color.Height), 0, 0, cv.InterpolationFlags.Nearest)
-
             If task.PixelViewer IsNot Nothing Then
                 If task.pixelViewerOn Then
                     task.PixelViewer.viewerForm.Visible = True
@@ -374,47 +373,13 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If task.displayObject IsNot Nothing Then
-                dst0 = task.displayObject.dst0
-                dst1 = task.displayObject.dst1
-                dst2 = task.displayObject.dst2
-                dst3 = task.displayObject.dst3
-            End If
-            dst0 = If(task.gOptions.displayDst0.Checked, dst0, task.color)
-            dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
+            ' mark each task as inactive so we can find which are really working.
+            If task.heartBeat Then setInactiveObjects()
 
             Dim lookupName = task.displayObjectName
             task.displayObject = finddisplayObject(lookupName)
 
-            If task.gOptions.displayDst0.Checked Then
-                dst0 = Check8uC3(task.displayObject.dst0)
-            Else
-                dst0 = task.color
-            End If
-            If task.gOptions.displayDst1.Checked Then
-                dst1 = Check8uC3(task.displayObject.dst1)
-            Else
-                dst1 = task.depthRGB
-            End If
-
-            dst2 = If(task.displayObject.dst2.Type = cv.MatType.CV_8UC3, task.displayObject.dst2,
-                      Check8uC3(displayObject.dst2))
-            dst3 = If(task.displayObject.dst3.Type = cv.MatType.CV_8UC3, displayObject.dst3,
-                      Check8uC3(displayObject.dst3))
-
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
-
-            If dst2.Size <> task.color.Size Then
-                dst2 = dst2.Resize(New cv.Size(task.color.Width, task.color.Height), cv.InterpolationFlags.Nearest)
-            End If
-
-            If dst3.Size <> task.color.Size Then
-                dst3 = dst3.Resize(New cv.Size(task.color.Width, task.color.Height), cv.InterpolationFlags.Nearest)
-            End If
-
-            If dst2.Width = task.dst2.Width And dst2.Height = task.dst2.Height Then
-                If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, task.gridMask)
-            End If
 
             ' MSER mistakenly can have 1 cell - just ignore it.
             If task.redCells.Count > 1 Then setSelectedCell()
@@ -429,26 +394,6 @@ Public Class VBtask : Implements IDisposable
 
                 task.color.Rectangle(task.rc.rect, cv.Scalar.Yellow, task.lineWidth)
                 task.color(task.rc.rect).SetTo(cv.Scalar.White, rc.mask)
-            End If
-
-            If task.redOptions.DisplayCellStats.Checked Then
-                For Each tt In task.redC.trueData
-                    trueData.Add(tt)
-                Next
-            End If
-
-            If task.gOptions.showMotionMask.Checked Then
-                For Each roi In task.motionRects
-                    task.color.Rectangle(roi, cv.Scalar.White, task.lineWidth)
-                Next
-            End If
-
-            gravityHorizon.runAlg(src)
-            If task.gOptions.CrossHairs.Checked Then
-                If task.paused = False Then
-                    DrawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
-                    DrawLine(task.color, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
-                End If
             End If
 
             task.optionsChanged = False
@@ -857,7 +802,65 @@ Public Class VBtask : Implements IDisposable
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             task.firstPass = False
             task.heartBeatLT = False
+
             postProcess(src)
+
+            If task.gOptions.displayDst0.Checked Then
+                dst0 = Check8uC3(task.displayObject.dst0)
+            Else
+                dst0 = task.color
+            End If
+            If task.gOptions.displayDst1.Checked Then
+                dst1 = Check8uC3(task.displayObject.dst1)
+            Else
+                dst1 = task.depthRGB
+            End If
+
+            dst2 = Check8uC3(displayObject.dst2)
+            dst3 = Check8uC3(displayObject.dst3)
+
+            ' make sure that any outputs from the algorithm are the right size.nearest
+            If dst0.Size <> task.workingRes And dst0.Width > 0 Then
+                dst0 = dst0.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
+            If dst1.Size <> task.workingRes And dst1.Width > 0 Then
+                dst1 = dst1.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
+            If dst2.Size <> task.workingRes And dst2.Width > 0 Then
+                dst2 = dst2.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
+            If dst3.Size <> task.workingRes And dst3.Width > 0 Then
+                dst3 = dst3.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
+
+            If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, task.gridMask)
+
+            If task.redOptions.DisplayCellStats.Checked Then
+                For Each tt In task.redC.trueData
+                    trueData.Add(tt)
+                Next
+            End If
+
+            If task.gOptions.showMotionMask.Checked Then
+                For Each roi In task.motionRects
+                    dst0.Rectangle(roi, cv.Scalar.White, task.lineWidth)
+                Next
+            End If
+
+            gravityHorizon.runAlg(src)
+            If task.gOptions.CrossHairs.Checked Then
+                If task.paused = False Then
+                    DrawLine(dst0, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
+                    DrawLine(dst0, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
+                End If
+            End If
+
+            If task.displayObject.activeTask = False And task.heartBeat = False Then
+                Dim str As New TrueText("This task is not active at this time.",
+                                        New cv.Point(dst2.Width / 2, 0), 3)
+                task.displayObject.trueData.Add(str)
+            End If
+
             task.trueData = New List(Of TrueText)(task.displayObject.trueData)
             task.displayObject.trueData.Clear()
             task.labels = task.displayObject.labels

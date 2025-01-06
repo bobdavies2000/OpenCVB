@@ -351,7 +351,8 @@ Public Class Grid_Special : Inherits TaskParent
     Public Sub New()
         gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
-        desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles.  Specify the Y size."
+        desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
+                "  Specify the Y size."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If task.optionsChanged Then
@@ -382,9 +383,8 @@ Public Class Grid_Special : Inherits TaskParent
                 gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
 
-            For i = 0 To task.gridRects.Count - 1
-                Dim roi = gridRects(i)
-                gridMap.Rectangle(roi, i, -1)
+            For Each roi In gridRects
+                gridMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
             Next
 
             gridNeighbors.Clear()

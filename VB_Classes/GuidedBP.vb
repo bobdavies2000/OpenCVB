@@ -411,12 +411,13 @@ Public Class GuidedBP_Regions : Inherits TaskParent
         redCellsX.Clear()
         redCellsY.Clear()
 
-        For i = 1 To options.cellCount
+        For i = 1 To Math.Min(options.cellCount, redC.redCellsX.Count) - 1
             Dim rc = redC.redCellsX(i)
             mats.mat(2)(rc.rect).SetTo(rc.naturalColor, rc.mask)
             redCellsX.Add(rc)
-
-            rc = redC.redCellsY(i)
+        Next
+        For i = 1 To Math.Min(options.cellCount, redC.redCellsY.Count) - 1
+            Dim rc = redC.redCellsY(i)
             mats.mat(3)(rc.rect).SetTo(rc.naturalColor, rc.mask)
             redCellsY.Add(rc)
         Next
