@@ -1566,6 +1566,7 @@ End Enum
 	If algorithmName = "RedCloud_Hue" Then return new RedCloud_Hue
 	If algorithmName = "RedCloud_Hulls" Then return new RedCloud_Hulls
 	If algorithmName = "RedCloud_KMeans" Then return new RedCloud_KMeans
+	If algorithmName = "RedCloud_LeftRight" Then return new RedCloud_LeftRight
 	If algorithmName = "RedCloud_LikelyFlatSurfaces" Then return new RedCloud_LikelyFlatSurfaces
 	If algorithmName = "RedCloud_MaxDist" Then return new RedCloud_MaxDist
 	If algorithmName = "RedCloud_MaxDist_CPP" Then return new RedCloud_MaxDist_CPP

@@ -14,10 +14,9 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            color.Run(src)
-            src = color.dst2
-        End If
+        color.Run(src)
+        src = color.dst2
+
         redCPP.inputMask = inputMask
         redCPP.Run(src)
 
@@ -43,7 +42,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             dst1 = stats.dst1
         End If
 
-        If standalone Then
+        If standaloneTest() Then
             dst3.SetTo(0)
             For Each rc In task.redCells
                 If rc.pixels > 0 And rc.pixels <= task.redOptions.minCellSize Then Exit For
@@ -2186,5 +2185,24 @@ Public Class RedCloud_BrightnessLevel : Inherits TaskParent
 
         dst2 = getRedCloud(bright.dst2, labels(2))
         dst3 = task.redC.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_LeftRight : Inherits TaskParent
+    Dim redC As New LeftRight_RedCloudBoth
+    Public Sub New()
+        desc = "Run RedCloud on the left and right images.  Duplicate of LeftRight_RedCloudBoth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        dst3 = redC.dst3
+        labels = redC.labels
     End Sub
 End Class

@@ -269,10 +269,19 @@ End Class
 Public Class LeftRight_RedCloudRight : Inherits TaskParent
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Segment the right view image with RedCloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(task.rightView, labels(2))
+        getRedCloud(task.rightView, labels(2))
+
+        For i = 0 To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
+            cv.Cv2.MeanStdDev(task.rightView(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            task.redCells(i) = rc
+            dst2(rc.rect).SetTo(rc.naturalColor(0), rc.mask)
+        Next
     End Sub
 End Class
 
@@ -285,10 +294,19 @@ End Class
 Public Class LeftRight_RedCloudLeft : Inherits TaskParent
     Public Sub New()
         task.redOptions.setUseColorOnly(True)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Segment the left view image with RedCloud"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(task.leftView, labels(2))
+        getRedCloud(task.leftView, labels(2))
+
+        For i = 0 To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
+            cv.Cv2.MeanStdDev(task.leftView(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            task.redCells(i) = rc
+            dst2(rc.rect).SetTo(rc.naturalColor(0), rc.mask)
+        Next
     End Sub
 End Class
 
