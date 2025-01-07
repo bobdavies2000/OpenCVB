@@ -108,6 +108,7 @@ Public Class OptionsRedCloud
         End Select
 
         task.redOptions.setBitReductionBar(5)
+        minCellSizeSlider.Value = 500
 
         Me.Left = 0
         Me.Top = 0

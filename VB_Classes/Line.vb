@@ -1503,5 +1503,17 @@ Public Class Line_LeftRight : Inherits TaskParent
         lineCore.Run(task.rightView)
         dst3 = lineCore.dst2.Clone
         labels(3) = "Right View: " + lineCore.labels(2)
+
+        If standalone Then
+            If task.gOptions.debugChecked Then
+                dst2.SetTo(0, task.noDepthMask)
+                dst3.SetTo(0, task.noDepthMask)
+            End If
+        Else
+            If task.toggleOnOff Then
+                dst2.SetTo(0, task.noDepthMask)
+                dst3.SetTo(0, task.noDepthMask)
+            End If
+        End If
     End Sub
 End Class

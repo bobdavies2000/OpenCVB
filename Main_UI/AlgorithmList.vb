@@ -206,6 +206,7 @@ End Enum
 	If algorithmName = "Blob_Input" Then return new Blob_Input
 	If algorithmName = "Blob_RenderBlobs" Then return new Blob_RenderBlobs
 	If algorithmName = "BlockMatching_Basics" Then return new BlockMatching_Basics
+	If algorithmName = "BlockMatching_Grid" Then return new BlockMatching_Grid
 	If algorithmName = "Blur_Basics" Then return new Blur_Basics
 	If algorithmName = "Blur_Bilateral" Then return new Blur_Bilateral
 	If algorithmName = "Blur_Depth" Then return new Blur_Depth
@@ -1069,6 +1070,7 @@ End Enum
 	If algorithmName = "LowRes_DepthMask" Then return new LowRes_DepthMask
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
+	If algorithmName = "LowRes_LeftRight" Then return new LowRes_LeftRight
 	If algorithmName = "LowRes_MeasureColor" Then return new LowRes_MeasureColor
 	If algorithmName = "LowRes_MeasureMotion" Then return new LowRes_MeasureMotion
 	If algorithmName = "LowRes_MeasureValidate" Then return new LowRes_MeasureValidate

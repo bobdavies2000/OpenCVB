@@ -23,6 +23,7 @@ End Class
 
 
 
+
 Public Class LowRes_Color : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Grid of mean color values", "Resized task.lowResColor"}
@@ -549,7 +550,6 @@ End Class
 
 Public Class LowRes_MeasureValidate : Inherits TaskParent
     Dim measure As New LowRes_MeasureMotion
-    Dim diff As New Diff_Basics
     Public Sub New()
         task.gOptions.setPixelDifference(50)
         task.gOptions.setDisplay1()
@@ -582,3 +582,19 @@ End Class
 
 
 
+
+
+
+Public Class LowRes_LeftRight : Inherits TaskParent
+    Dim lowRes As New LowRes_Color
+    Public Sub New()
+        desc = "Get the lowRes grid image for the left and right views"
+    End Sub
+    Public Overrides Sub runAlg(src As cv.Mat)
+        lowRes.Run(task.leftView)
+        dst2 = lowRes.dst2
+
+        lowRes.Run(task.rightView)
+        dst3 = lowRes.dst2
+    End Sub
+End Class

@@ -4,7 +4,7 @@ Public Class Color8U_Basics : Inherits TaskParent
     Public classifier As Object
     Dim colorMethods(10) As Object
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels(3) = "vbPalette output of dst2 at left"
         UpdateAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
         desc = "Classify pixels by color using a variety of techniques"

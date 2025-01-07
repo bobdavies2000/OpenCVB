@@ -322,17 +322,16 @@ End Class
 
 
 Public Class LeftRight_LowRes : Inherits TaskParent
-    Dim lowResL As New LowRes_Color
-    Dim lowResR As New LowRes_Color
+    Dim lowRes As New LowRes_LeftRight
     Public Sub New()
-        desc = "Get the lowRes image for the left and right views"
+        desc = "Get the lowRes image for the left and right views - duplicate of LowRes_LeftRight (help finding it)"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        lowResL.Run(task.leftView)
-        dst2 = lowResL.dst2
+        lowRes.Run(task.leftView)
+        dst2 = lowRes.dst2
 
-        lowResR.Run(task.rightView)
-        dst3 = lowResR.dst2
+        lowRes.Run(task.rightView)
+        dst3 = lowRes.dst2
     End Sub
 End Class
 

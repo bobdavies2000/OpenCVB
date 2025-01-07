@@ -695,6 +695,10 @@ Public Class VBtask : Implements IDisposable
             End If
             rgbFilter.runAlg(src)
             src = rgbFilter.dst2
+            leftView = src.Clone ' task.color is always the left view
+
+            rgbFilter.runalg(rightView) ' apply the rgb filter to the right view as well.
+            rightView = rgbFilter.dst2
         End If
 
         If task.gOptions.CreateGif.Checked Then
