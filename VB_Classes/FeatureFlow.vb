@@ -33,7 +33,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Next
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getFeatures(src)
+        task.feat.Run(src)
 
         labels = task.feat.labels
 

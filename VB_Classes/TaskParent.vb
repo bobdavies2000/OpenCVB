@@ -583,9 +583,6 @@ Public Class TaskParent : Implements IDisposable
         task.palette.Run(input)
         Return task.palette.dst2.Clone
     End Function
-    Public Sub getFeatures(src As cv.Mat)
-        task.feat.Run(src)
-    End Sub
     Public Function getRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
         task.redC.Run(src)
         label = task.redC.labels(2)

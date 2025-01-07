@@ -491,6 +491,7 @@ Public Class VBtask : Implements IDisposable
         grid = algTasks(algTaskID.grid)
         palette = algTasks(algTaskID.palette)
         redC = algTasks(algTaskID.redCloud)
+        feat = algTasks(algTaskID.features)
 
         If task.algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If task.algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -764,9 +765,6 @@ Public Class VBtask : Implements IDisposable
 
             cv.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
-
-        lines.runAlg(src)
-        Dim lineList As List(Of linePoints) = lines.lpList
 
         ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
         If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(task.pcSplit(2))

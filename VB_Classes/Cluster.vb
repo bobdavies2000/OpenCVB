@@ -14,7 +14,7 @@ Public Class Cluster_Basics : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        getFeatures(src)
+        task.feat.Run(src)
 
         dst2 = src.Clone
         If standalone Then ptInput = task.featurePoints

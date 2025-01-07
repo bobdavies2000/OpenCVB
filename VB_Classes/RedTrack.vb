@@ -123,7 +123,7 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getFeatures(src)
+        task.feat.Run(src)
         dst2 = task.feat.dst2
 
         knn.queries = New List(Of cv.Point2f)(task.features)
@@ -161,7 +161,7 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
         Static distSlider = optiBase.FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
-        getFeatures(src)
+        task.feat.Run(src)
         dst2 = task.feat.dst2
 
         knn.queries = New List(Of cv.Point2f)(task.features)

@@ -714,7 +714,7 @@ Public Class Motion_FPolyRect : Inherits TaskParent
         desc = "Confirm the FPoly_LineRect matched the previous image."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getFeatures(src)
+        task.feat.Run(src)
 
         fRect.Run(src)
 

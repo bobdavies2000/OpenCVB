@@ -1,14 +1,42 @@
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Dim lines As New Line_Detector
-    Dim options As New Options_Line
-    Public lpList As New List(Of linePoints)
+    Dim lineCore As New Line_Core
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public lpSorted As New List(Of linePoints)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
+        lineCore.Run(src)
+        dst2 = lineCore.dst2
+
+        lpMap.SetTo(0)
+        For Each lp In lineCore.lpList
+            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
+        Next
+
+        lpSorted = New List(Of linePoints)(lineCore.lpSorted.Values)
+        task.lpList = New List(Of linePoints)(lineCore.lpList)
+        labels(2) = lineCore.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Core : Inherits TaskParent
+    Dim lines As New Line_Detector
+    Dim options As New Options_Line
+    Public lpList As New List(Of linePoints)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public lpSorted As New SortedList(Of Single, linePoints)(New compareAllowIdenticalSingleInverted)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect lines across frames using the motion mask."
+    End Sub
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
         lines.Run(src.Clone)
@@ -33,16 +61,14 @@ Public Class Line_Basics : Inherits TaskParent
             If val1 <> 0 Or val2 <> 0 Then newSet.Add(lp)
         Next
 
-        Dim ptSort As New SortedList(Of Single, linePoints)(New compareAllowIdenticalSingleInverted)
-        ' Order points left to right
+        lpSorted.Clear()
         For Each lp In newSet
             If lp.p1.X > lp.p2.X Then lp = New linePoints(lp.p2, lp.p1)
-            ptSort.Add(lp.length, lp)
+            lpSorted.Add(lp.length, lp)
         Next
 
         lpList.Clear()
-        lpMap.SetTo(0)
-        For Each lp In ptSort.Values
+        For Each lp In lpSorted.Values
             lp.index = lpList.Count
             If lp.rect.Width > 0 Then
                 If lp.mask.Width > 0 Then
@@ -52,7 +78,6 @@ Public Class Line_Basics : Inherits TaskParent
 
                     lp.mmPerPixel = (lp.mmZ.maxVal - lp.mmZ.minVal) / lp.length
 
-                    lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
                     lpList.Add(lp)
                 End If
             End If
@@ -65,8 +90,8 @@ Public Class Line_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " Line_Detector lines with " +
-                        CStr(lpList.Count) + " collected lines using motion mask."
+            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector with " +
+                        CStr(lpList.Count) + " after filtering with the motion mask."
         End If
     End Sub
 End Class
@@ -87,7 +112,7 @@ Public Class Line_Detector : Inherits TaskParent
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
                "rectangle (provided externally)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
@@ -116,18 +141,17 @@ End Class
 
 
 
-
 Public Class Line_Rects : Inherits TaskParent
-    Dim lines As New Line_Basics
     Public Sub New()
         desc = "Show the rectangle for each line"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
+    Public Overrides Sub runAlg(src As cv.Mat)
+        task.lines.Run(src)
+
+        dst2 = task.lines.dst2
 
         For Each lp In task.lpList
-            dst2.Rectangle(lp.rect, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(lp.rect, 255, task.lineWidth)
         Next
     End Sub
 End Class
@@ -863,7 +887,7 @@ Public Class Line_KNN : Inherits TaskParent
         desc = "Use KNN to find the nearest point to an endpoint and connect the 2 lines with a line."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getFeatures(src)
+        task.feat.Run(src)
 
         swarm.options.RunOpt()
         lines.Run(src)
@@ -1414,7 +1438,7 @@ Public Class Line_Info : Inherits TaskParent
 
         If task.mouseClickFlag Or task.firstPass Then
             Dim index = task.lines.lpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            Dim lp = task.lines.lpList(index)
+            Dim lp = task.lpList(index)
 
             strOut = "Click on any line (below left) to get details on that line " + vbCrLf
             strOut += "Lines identified in the image: " + CStr(task.lpList.Count) + vbCrLf + vbCrLf
@@ -1464,16 +1488,20 @@ End Class
 
 
 Public Class Line_LeftRight : Inherits TaskParent
-    Dim rlines As New Line_ViewRight
+    Dim lineCore As New Line_Core
     Public Sub New()
+        task.gOptions.displayDst1.Checked = True
         desc = "Show lines in both the right and left images."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
+        task.lines.Run(src) ' the default is the left view.
+
+        dst2 = task.lines.dst2.Clone
         labels(2) = "Left view" + task.lines.labels(2)
 
-        rlines.Run(src)
-        dst3 = rlines.dst2
-        labels(3) = "Right View: " + rlines.labels(2)
+        dst1 = task.rightView
+        lineCore.Run(task.rightView)
+        dst3 = lineCore.dst2.Clone
+        labels(3) = "Right View: " + lineCore.labels(2)
     End Sub
 End Class

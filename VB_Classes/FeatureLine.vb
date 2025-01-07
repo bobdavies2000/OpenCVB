@@ -1,5 +1,32 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FeatureLine_Basics : Inherits TaskParent
+    Dim options As New Options_Features
+    Public Sub New()
+        labels = {"", "", "Longest line present.", ""}
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find and track a line using the end points"
+    End Sub
+    Public Overrides Sub runAlg(src As cv.Mat)
+        options.RunOpt()
+
+        task.lines.Run(src)
+
+        dst3.SetTo(0)
+        For Each lp In task.lines.lpSorted
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+
+        dst2 = src
+        Dim lpt = task.lines.lpSorted(0)
+        dst2.Line(lpt.p1, lpt.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLine_Detector : Inherits TaskParent
     Dim lines As New Line_Detector
     Dim lineDisp As New Line_DisplayInfoOld
     Dim options As New Options_Features
@@ -11,7 +38,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         labels = {"", "", "Longest line present.", ""}
         desc = "Find and track a line using the end points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
         Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
@@ -49,7 +76,6 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         SetTrueText(lineDisp.strOut, New cv.Point(10, 40), 3)
     End Sub
 End Class
-
 
 
 

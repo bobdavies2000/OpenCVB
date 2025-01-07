@@ -599,6 +599,7 @@ End Enum
 	If algorithmName = "FeatureLess_WithoutMotion" Then return new FeatureLess_WithoutMotion
 	If algorithmName = "FeatureLine_Basics" Then return new FeatureLine_Basics
 	If algorithmName = "FeatureLine_DetailsAll" Then return new FeatureLine_DetailsAll
+	If algorithmName = "FeatureLine_Detector" Then return new FeatureLine_Detector
 	If algorithmName = "FeatureLine_Finder" Then return new FeatureLine_Finder
 	If algorithmName = "FeatureLine_Longest" Then return new FeatureLine_Longest
 	If algorithmName = "FeatureLine_LongestKNN" Then return new FeatureLine_LongestKNN
@@ -997,6 +998,7 @@ End Enum
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Cells" Then return new Line_Cells
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
+	If algorithmName = "Line_Core" Then return new Line_Core
 	If algorithmName = "Line_Detector" Then return new Line_Detector
 	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
 	If algorithmName = "Line_FromContours" Then return new Line_FromContours

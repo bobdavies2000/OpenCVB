@@ -180,7 +180,6 @@ End Class
 
 Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
-    Dim lines As New Line_Basics
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -190,11 +189,11 @@ Public Class BackProject_FullLines : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         backP.Run(src)
 
-        lines.Run(backP.dst3)
-        labels(2) = lines.labels(2)
+        task.lines.Run(backP.dst3)
+        labels(2) = task.lines.labels(2)
         dst2 = src
         dst3.SetTo(0)
-        For Each lp In lines.lpList
+        For Each lp In task.lpList
             DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
             DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
