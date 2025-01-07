@@ -354,7 +354,7 @@ Public Class TaskParent : Implements IDisposable
         Dim dst As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         task.redMap.SetTo(0)
         For Each rc In task.redCells
-            dst(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
+            dst(rc.rect).SetTo(rc.naturalColor, rc.mask)
             task.redMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
         Return dst
@@ -530,6 +530,7 @@ Public Class TaskParent : Implements IDisposable
     End Sub
 
     Public Function standaloneTest() As Boolean
+        If task.displayObject Is Nothing Then Return False
         If standalone Or task.displayObject.traceName = traceName Then Return True
         Return False
     End Function

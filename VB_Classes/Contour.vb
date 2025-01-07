@@ -620,7 +620,7 @@ End Class
 Public Class Contour_RedCloudEdges : Inherits TaskParent
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
@@ -656,6 +656,7 @@ Public Class Contour_RedCloud : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each rc In task.redCells
+            If rc.index > 1 Then Exit For
             DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
     End Sub

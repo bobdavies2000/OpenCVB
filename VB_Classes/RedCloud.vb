@@ -44,8 +44,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
         If standaloneTest() Then
             dst3.SetTo(0)
-            For Each rc In task.redCells
-                If rc.pixels > 0 And rc.pixels <= task.redOptions.minCellSize Then Exit For
+            For i = 0 To Math.Min(task.redOptions.identifyCount, task.redCells.Count) - 1
+                Dim rc = task.redCells(i)
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             Next
         End If
@@ -151,7 +151,7 @@ Public Class RedCloud_FindCells : Inherits TaskParent
             If task.redCells.Count <= index Then Continue For
             Dim rc = task.redCells(index)
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-            dst3(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, white), rc.mask)
+            dst3(rc.rect).SetTo(rc.naturalColor, rc.mask)
         Next
         labels(3) = CStr(count) + " cells were found using the motion mask"
     End Sub

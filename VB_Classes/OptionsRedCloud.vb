@@ -21,7 +21,6 @@ Public Class OptionsRedCloud
     Public ranges() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
-    Public useNaturalColor As Boolean
     Public useColorOnlyChecked As Boolean
     Public useDepthChecked As Boolean
     Public identifyCount As Integer
@@ -328,10 +327,6 @@ Public Class OptionsRedCloud
     Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged
         task.optionsChanged = True
     End Sub
-    Private Sub naturalColor_CheckedChanged(sender As Object, e As EventArgs) Handles NaturalColor.CheckedChanged
-        task.optionsChanged = True
-        useNaturalColor = NaturalColor.Checked
-    End Sub
     Public Sub setUseColorOnly(newVal As Boolean)
         UseColorOnly.Checked = newVal
     End Sub
@@ -390,12 +385,6 @@ Public Class OptionsRedCloud
     Public Sub setXZReduction(val As Boolean)
         XZReduction.Checked = val
     End Sub
-    Public Sub setNaturalColor(val As Boolean)
-        NaturalColor.Checked = val
-    End Sub
-    Public Function getNaturalColor() As Boolean
-        Return NaturalColor.Checked
-    End Function
     Public Sub setYZReduction(val As Boolean)
         YZReduction.Checked = val
     End Sub

@@ -68,7 +68,6 @@ Partial Class OptionsRedCloud
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
-        Me.NaturalColor = New System.Windows.Forms.CheckBox()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.RedCloudSliders.SuspendLayout()
@@ -581,24 +580,12 @@ Partial Class OptionsRedCloud
         Me.DisplayCellStats.Text = "Display Cell Stats"
         Me.DisplayCellStats.UseVisualStyleBackColor = True
         '
-        'NaturalColor
-        '
-        Me.NaturalColor.AutoSize = True
-        Me.NaturalColor.Checked = True
-        Me.NaturalColor.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.NaturalColor.Location = New System.Drawing.Point(1049, 307)
-        Me.NaturalColor.Name = "NaturalColor"
-        Me.NaturalColor.Size = New System.Drawing.Size(168, 24)
-        Me.NaturalColor.TabIndex = 76
-        Me.NaturalColor.Text = "Use Natural Colors"
-        Me.NaturalColor.UseVisualStyleBackColor = True
-        '
         'CheckBox1
         '
         Me.CheckBox1.AutoSize = True
         Me.CheckBox1.Checked = True
         Me.CheckBox1.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox1.Location = New System.Drawing.Point(1050, 340)
+        Me.CheckBox1.Location = New System.Drawing.Point(1049, 307)
         Me.CheckBox1.Name = "CheckBox1"
         Me.CheckBox1.Size = New System.Drawing.Size(172, 24)
         Me.CheckBox1.TabIndex = 77
@@ -621,7 +608,6 @@ Partial Class OptionsRedCloud
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1585, 604)
         Me.Controls.Add(Me.CheckBox1)
-        Me.Controls.Add(Me.NaturalColor)
         Me.Controls.Add(Me.IdentifyCells)
         Me.Controls.Add(Me.DisplayCellStats)
         Me.Controls.Add(Me.ColorSource)
@@ -701,7 +687,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents IdentifyCountBar As System.Windows.Forms.TrackBar
     Friend WithEvents IdentifyCountLabel As System.Windows.Forms.Label
     Friend WithEvents DisplayCellStats As System.Windows.Forms.CheckBox
-    Friend WithEvents NaturalColor As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox1 As System.Windows.Forms.CheckBox
     Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
     Friend WithEvents minCellSizeSlider As Windows.Forms.TrackBar

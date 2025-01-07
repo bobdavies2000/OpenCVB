@@ -205,7 +205,7 @@ Public Class Swarm_Percentage : Inherits TaskParent
         Dim pixels As Integer
         Dim count As Integer
         For Each rc In task.redCells
-            dst3(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
+            dst3(rc.rect).SetTo(rc.naturalColor, rc.mask)
             pixels += rc.pixels
             count += 1
             If pixels / src.Total >= options.percent Then Exit For

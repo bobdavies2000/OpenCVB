@@ -183,7 +183,7 @@ Partial Class Main_UI
         Me.AvailableAlgorithms.IntegralHeight = False
         Me.AvailableAlgorithms.MaxDropDownItems = 100
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
-        Me.AvailableAlgorithms.Size = New System.Drawing.Size(400, 34)
+        Me.AvailableAlgorithms.Size = New System.Drawing.Size(400, 33)
         '
         'GroupButtonList
         '

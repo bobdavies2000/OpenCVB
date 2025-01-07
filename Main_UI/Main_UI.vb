@@ -354,10 +354,10 @@ Public Class Main_UI
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > width Then r.X = width
-        If r.Y > height Then r.Y = height
-        If r.X + r.Width > width Then r.Width = width - r.X
-        If r.Y + r.Height > height Then r.Height = height - r.Y
+        If r.X > width Then r.X = width - 1
+        If r.Y > height Then r.Y = height - 1
+        If r.X + r.Width > width Then r.Width = width - r.X - 1
+        If r.Y + r.Height > height Then r.Height = height - r.Y - 1
         Return r
     End Function
     Public Function USBenumeration() As List(Of String)
@@ -1244,9 +1244,14 @@ Public Class Main_UI
             settings.cameraIndex = saveCameraIndex
         End If
     End Sub
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles Magnify.Click
+        MagnifyTimer.Enabled = True
+        magIndex += 1
+    End Sub
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
         Dim ratio = task.dst2.Width / camPic(0).Width
         Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+        r = validateRect(r, dst(drawRectPic).Width, dst(drawRectPic).Height)
         If r.Width = 0 Or r.Height = 0 Then Exit Sub
         Dim img = dst(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
         cv.Cv2.ImShow("DrawRect Region " + CStr(magIndex), img)
@@ -1298,10 +1303,6 @@ Public Class Main_UI
         StartTask()
         updateAlgorithmHistory()
         groupButtonSelection = ""
-    End Sub
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles Magnify.Click
-        MagnifyTimer.Enabled = True
-        magIndex += 1
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' don't start another algorithm until the current one has finished 
