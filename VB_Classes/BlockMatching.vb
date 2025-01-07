@@ -90,7 +90,5 @@ Public Class BlockMatching_Grid : Inherits TaskParent
         dst1(rect) = dst1(rect).Threshold(10, 10, cv.ThresholdTypes.Trunc)
         colorizer.Run(dst1)
         dst2(rect) = colorizer.dst2(rect)
-        dst3 = task.rightView.Resize(src.Size())
-
     End Sub
 End Class

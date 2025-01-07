@@ -69,6 +69,7 @@ Public Class Horizon_Basics : Inherits TaskParent
             End If
         End If
         SetTrueText(strOut, 3)
+        activeTask = True ' algorithms called by task algorithms don't get marked active
     End Sub
 End Class
 

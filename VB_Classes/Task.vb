@@ -628,15 +628,9 @@ Public Class VBtask : Implements IDisposable
                 algorithmStack.Push(3)
             End If
 
-            If task.heartBeatLT Then
-                algorithm_ms(0) = waitingForInput
-                algorithm_ms(1) = inputBufferCopy
-                algorithm_ms(2) = returnCopyTime
-            Else
-                algorithm_ms(0) += waitingForInput
-                algorithm_ms(1) += inputBufferCopy
-                algorithm_ms(2) += returnCopyTime
-            End If
+            algorithm_ms(0) += waitingForInput
+            algorithm_ms(1) += inputBufferCopy
+            algorithm_ms(2) += returnCopyTime
             algorithmTimes(3) = Now  ' starting the main algorithm
         End If
         If task.useRecordedData Then recordedData.Run(task.color.Clone)
@@ -817,6 +811,7 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
         For Each obj In task.algTasks
+            If obj.traceName = "Line_Basics" Then Continue For ' not expected to be active
             If obj.traceName = "Feature_Basics" Then Continue For ' not expected to be active
             If obj.traceName = "RedCloud_Basics" Then Continue For ' not expected to be active
             obj.activeTask = True

@@ -59,6 +59,7 @@ Public Class Gravity_Basics : Inherits TaskParent
 
         task.horizonVec = perp.computePerp(task.gravityVec)
         SetTrueText(strOut, 3)
+        activeTask = True ' algorithms called by task algorithms don't get marked active
     End Sub
 End Class
 
