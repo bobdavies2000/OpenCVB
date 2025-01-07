@@ -7,6 +7,7 @@ Public Class Motion_Basics : Inherits TaskParent
     Public pointcloud As cv.Mat
     Public color As cv.Mat
     Public motionMask As cv.Mat
+    Dim diff As New Diff_Basics
     Public Sub New()
         motionMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         labels(3) = "The difference between the motion-filtered image and the current image.  " +
@@ -25,10 +26,11 @@ Public Class Motion_Basics : Inherits TaskParent
             Next
         End If
 
-        If standaloneTest() Then ' show any differences
-            Static diff As New Diff_Basics
+        ' unusual use of task.displayobject because motion_basics is a task algorithm.
+        If standaloneTest() Or task.displayObject.traceName = "Diff_Basics" Then
             diff.Run(src)
             dst3 = diff.dst2
+            diff.activeTask = True
         End If
         dst2 = motionMask
 

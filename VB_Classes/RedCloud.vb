@@ -1177,7 +1177,7 @@ Public Class RedCloud_UnmatchedCount : Inherits TaskParent
                 End If
             End If
         Next
-        If ShowIntermediate() Then
+        If standaloneTest() Then
             For i = 0 To framecounts.Count - 1
                 SetTrueText(CStr(framecounts(i)), frameLoc(i), 2)
             Next

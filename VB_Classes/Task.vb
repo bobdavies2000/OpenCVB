@@ -348,66 +348,71 @@ Public Class VBtask : Implements IDisposable
     Private Sub buildColors()
         Dim rand = New Random(1)
         Dim bgr(3) As Byte
-        For i = 0 To task.vecColors.Length - 1
+        For i = 0 To vecColors.Length - 1
             rand.NextBytes(bgr)
-            task.vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
-            task.scalarColors(i) = New cv.Scalar(task.vecColors(i)(0),
-                                                  task.vecColors(i)(1),
-                                                  task.vecColors(i)(2))
-            task.oglColors(i) = New cv.Scalar(task.vecColors(i)(0) / 255,
-                                               task.vecColors(i)(1) / 255,
-                                               task.vecColors(i)(2) / 255)
+            vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
+            scalarColors(i) = New cv.Scalar(vecColors(i)(0),
+                                                  vecColors(i)(1),
+                                                  vecColors(i)(2))
+            oglColors(i) = New cv.Scalar(vecColors(i)(0) / 255,
+                                               vecColors(i)(1) / 255,
+                                               vecColors(i)(2) / 255)
         Next
     End Sub
 #End Region
     Private Function finddisplayObject(lookupName As String) As TaskParent
-        For Each obj In task.activeObjects
-            If obj.traceName = lookupName Then Return obj
+        Dim saveObject As Object
+        For Each obj In activeObjects
+            If obj.tracename = lookupName Then
+                saveObject = obj
+                If obj.traceName <> saveObject.labels(2) Then
+                    Return saveObject
+                End If
+            End If
         Next
-        Return Nothing
+        Return saveObject
     End Function
     Private Sub postProcess(src As cv.Mat)
         Try
-            If task.PixelViewer IsNot Nothing Then
-                If task.pixelViewerOn Then
-                    task.PixelViewer.viewerForm.Visible = True
-                    task.PixelViewer.viewerForm.Show()
-                    task.PixelViewer.Run(src)
+            If PixelViewer IsNot Nothing Then
+                If pixelViewerOn Then
+                    PixelViewer.viewerForm.Visible = True
+                    PixelViewer.viewerForm.Show()
+                    PixelViewer.Run(src)
                 Else
-                    task.PixelViewer.viewerForm.Visible = False
+                    PixelViewer.viewerForm.Visible = False
                 End If
             End If
 
             ' mark each task as inactive so we can find which are really working.
-            If task.heartBeat Then
-                For Each obj In task.activeObjects
+            If heartBeat Then
+                For Each obj In activeObjects
                     obj.activeTask = False
                 Next
             End If
 
-            Dim lookupName = task.displayObjectName
-            task.displayObject = finddisplayObject(lookupName)
+            displayObject = finddisplayObject(displayObjectName)
 
-            If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
+            If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
             ' MSER mistakenly can have 1 cell - just ignore it.
-            If task.redCells.Count > 1 Then setSelectedCell()
+            If redCells.Count > 1 Then setSelectedCell()
 
-            If task.redOptions.IdentifyCells.Checked Then
-                ' cannot use rc as it means task.rc here!  Be careful...
-                For Each rcX In task.redCells
+            If redOptions.IdentifyCells.Checked Then
+                ' cannot use rc as it means rc here!  Be careful...
+                For Each rcX In redCells
                     Dim str As New TrueText(CStr(rcX.index), rcX.maxDist, 2)
                     trueData.Add(str)
                     If rcX.index = 20 Then Exit For
                 Next
 
-                task.color.Rectangle(task.rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                task.color(task.rc.rect).SetTo(cv.Scalar.White, rc.mask)
+                color.Rectangle(rc.rect, cv.Scalar.Yellow, lineWidth)
+                color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
             End If
 
-            task.optionsChanged = False
+            optionsChanged = False
             TaskTimer.Enabled = False
-            task.frameCount += 1
+            frameCount += 1
         Catch ex As Exception
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
@@ -416,7 +421,7 @@ Public Class VBtask : Implements IDisposable
         Static WarningIssued As Boolean = False
         If frameCount > 0 And WarningIssued = False Then
             WarningIssued = True
-            Debug.WriteLine("Warning: " + task.algName + " has not completed work on a frame in a second.")
+            Debug.WriteLine("Warning: " + algName + " has not completed work on a frame in a second.")
         End If
     End Sub
     Public Sub OpenGLClose()
@@ -459,15 +464,15 @@ Public Class VBtask : Implements IDisposable
         rows = parms.workingRes.Height
         cols = parms.workingRes.Width
         workingRes = parms.workingRes
-        task.optionsChanged = True
+        optionsChanged = True
 
         dst0 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
         dst1 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
         dst2 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
         dst3 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
 
-        OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
-        OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
+        OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
+        OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", mainFormLocation.Y))
 
         buildColors()
         pythonTaskName = HomeDir + "Python\" + algName
@@ -477,7 +482,7 @@ Public Class VBtask : Implements IDisposable
 
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
-        task.redMap = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+        redMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
 
         callTrace = New List(Of String)
 
@@ -493,21 +498,21 @@ Public Class VBtask : Implements IDisposable
         redC = algTasks(algTaskID.redCloud)
         feat = algTasks(algTaskID.features)
 
-        If task.algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
-        If task.algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
+        If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
+        If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
 
-        ' all the algorithms in the list are task algorithms that are children of the task.algname.
+        ' all the algorithms in the list are task algorithms that are children of the algname.
         For i = 1 To callTrace.Count - 1
-            callTrace(i) = task.algName + "\" + callTrace(i)
+            callTrace(i) = algName + "\" + callTrace(i)
         Next
 
         updateSettings()
-        task.redOptions.Show()
-        task.gOptions.Show()
+        redOptions.Show()
+        gOptions.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 
-        If task.advice = "" Then
-            task.advice = "No advice for " + algName + " yet." + vbCrLf +
+        If advice = "" Then
+            advice = "No advice for " + algName + " yet." + vbCrLf +
                                "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
         End If
 
@@ -541,49 +546,49 @@ Public Class VBtask : Implements IDisposable
         focalLength = focalLengths(parms.cameraIndex)
         baseline = baseLines(parms.cameraIndex)
 
-        task.myStopWatch = Stopwatch.StartNew()
-        task.optionsChanged = True
+        myStopWatch = Stopwatch.StartNew()
+        optionsChanged = True
         Application.DoEvents()
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         allOptions.Close()
         If openGL_hwnd <> 0 Then
-            task.OpenGLClose()
+            OpenGLClose()
             openGL_hwnd = 0
         End If
         TaskTimer.Enabled = False
     End Sub
     Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New TrueText(text, pt, picTag)
-        task.trueData.Add(str)
+        trueData.Add(str)
     End Sub
     Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
         Static ptNew As New cv.Point
         If redCells.Count = 0 Then Exit Sub
-        If task.ClickPoint = ptNew And redCells.Count > 1 Then task.ClickPoint = redCells(1).maxDist
-        Dim index = cellMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        task.rc = redCells(index)
-        If index > 0 And index < task.redCells.Count Then
-            ' task.ClickPoint = redCells(index).maxDist
-            task.rc = redCells(index)
+        If ClickPoint = ptNew And redCells.Count > 1 Then ClickPoint = redCells(1).maxDist
+        Dim index = cellMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
+        rc = redCells(index)
+        If index > 0 And index < redCells.Count Then
+            ' ClickPoint = redCells(index).maxDist
+            rc = redCells(index)
         End If
     End Sub
     Public Sub setSelectedCell()
-        If task.redCells.Count = 0 Then Exit Sub
-        If task.ClickPoint = newPoint And task.redCells.Count > 1 Then
-            task.ClickPoint = task.redCells(1).maxDist
+        If redCells.Count = 0 Then Exit Sub
+        If ClickPoint = newPoint And redCells.Count > 1 Then
+            ClickPoint = redCells(1).maxDist
         End If
-        Dim index = task.redMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        If index > 0 And index < task.redCells.Count Then
-            ' task.ClickPoint = task.redCells(index).maxDist
-            task.rc = task.redCells(index)
+        Dim index = redMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
+        If index > 0 And index < redCells.Count Then
+            ' ClickPoint = redCells(index).maxDist
+            rc = redCells(index)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
-            If task.redCells.Count > 1 Then task.rc = task.redCells(1)
+            If redCells.Count > 1 Then rc = redCells(1)
         End If
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
-        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
+        dst.Line(p1, p2, color, lineWidth, lineType)
     End Sub
     Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
@@ -603,7 +608,7 @@ Public Class VBtask : Implements IDisposable
         Application.DoEvents()
         updateSettings()
 
-        If task.testAllRunning = False Then
+        If testAllRunning = False Then
             If algorithm_ms.Count = 0 Then
                 algorithmNames.Add("waitingForInput")
                 algorithmTimes.Add(Now)
@@ -617,7 +622,7 @@ Public Class VBtask : Implements IDisposable
                 algorithmTimes.Add(Now)
                 algorithm_ms.Add(0)
 
-                algorithmNames.Add(task.algName)
+                algorithmNames.Add(algName)
                 algorithmTimes.Add(Now)
                 algorithm_ms.Add(0)
 
@@ -633,34 +638,35 @@ Public Class VBtask : Implements IDisposable
             algorithm_ms(2) += returnCopyTime
             algorithmTimes(3) = Now  ' starting the main algorithm
         End If
-        If task.useRecordedData Then recordedData.Run(task.color.Clone)
+        If useRecordedData Then recordedData.Run(color.Clone)
 
-        task.redOptions.Sync()
+        redOptions.Sync()
 
-        Dim src = task.color
-        If src.Size <> New cv.Size(task.dst2.Cols, task.dst2.Rows) Then dst2 = dst2.Resize(src.Size)
-        If src.Size <> New cv.Size(task.dst3.Cols, task.dst3.Rows) Then dst3 = dst3.Resize(src.Size)
-        task.bins2D = {task.dst2.Height, task.dst2.Width}
+        Dim src = color
+        If src.Size <> New cv.Size(dst2.Cols, dst2.Rows) Then dst2 = dst2.Resize(src.Size)
+        If src.Size <> New cv.Size(dst3.Cols, dst3.Rows) Then dst3 = dst3.Resize(src.Size)
+        bins2D = {dst2.Height, dst2.Width}
 
         ' If the WorkingRes changes, the previous generation of images needs to be reset.
-        If task.pointCloud.Size <> New cv.Size(cols, rows) Or task.color.Size <> task.dst2.Size Then
-            task.pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
-            task.noDepthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
-            task.depthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
+        If pointCloud.Size <> New cv.Size(cols, rows) Or color.Size <> dst2.Size Then
+            pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
+            noDepthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
+            depthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
         End If
 
         ' run any universal algorithms here
-        task.IMU_RawAcceleration = task.IMU_Acceleration
-        task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
-        task.IMU_AlphaFilter = 0.5 '  task.gOptions.imu_Alpha
+        IMU_RawAcceleration = IMU_Acceleration
+        IMU_RawAngularVelocity = IMU_AngularVelocity
+        IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
+        If displayObject Is Nothing Then displayObject = grid
 
-        grid.runAlg(task.color)
+        grid.runAlg(color)
         algTasks(algTaskID.IMUBasics).runAlg(src)
         gmat.runAlg(src)
 
-        If task.gOptions.RGBFilterActive.Checked Then
+        If gOptions.RGBFilterActive.Checked Then
             Static saveFilterName As String
-            Dim filterName = task.gOptions.RGBFilterList.Text
+            Dim filterName = gOptions.RGBFilterList.Text
             If saveFilterName <> filterName Then
                 saveFilterName = filterName
                 Select Case filterName
@@ -682,121 +688,121 @@ Public Class VBtask : Implements IDisposable
                         rgbFilter = New PhotoShop_WhiteBalance
                 End Select
                 For i = 0 To callTrace.Count - 1
-                    If callTrace(i).StartsWith(task.algName) = False Then
-                        callTrace(i) = task.algName + "\" + callTrace(i)
+                    If callTrace(i).StartsWith(algName) = False Then
+                        callTrace(i) = algName + "\" + callTrace(i)
                     End If
                 Next
             End If
             rgbFilter.runAlg(src)
             src = rgbFilter.dst2
-            leftView = src.Clone ' task.color is always the left view
+            leftView = src.Clone ' color is always the left view
 
             rgbFilter.runalg(rightView) ' apply the rgb filter to the right view as well.
             rightView = rgbFilter.dst2
         End If
 
-        If task.gOptions.CreateGif.Checked Then
+        If gOptions.CreateGif.Checked Then
             heartBeat = False
-            task.optionsChanged = False
+            optionsChanged = False
         Else
-            task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
+            heartBeat = heartBeat Or debugSyncUI Or optionsChanged Or mouseClickFlag
         End If
 
-        If task.paused = False Then
-            task.frameHistoryCount = task.gOptions.FrameHistory.Value
+        If paused = False Then
+            frameHistoryCount = gOptions.FrameHistory.Value
 
-            If task.useGravityPointcloud Then
-                If task.pointCloud.Size <> src.Size Then
-                    task.pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
+            If useGravityPointcloud Then
+                If pointCloud.Size <> src.Size Then
+                    pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
                 End If
 
                 '******* this is the gravity rotation *******
-                task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).
+                pointCloud = (pointCloud.Reshape(1, src.Rows * src.Cols) * gMatrix).
                                        ToMat.Reshape(3, src.Rows)
             End If
 
-            If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
+            If pcSplit Is Nothing Then pcSplit = pointCloud.Split
 
-            task.gOptions.unFiltered.Checked = True
+            gOptions.unFiltered.Checked = True
         End If
 
         algTasks(algTaskID.motion).Run(src)
-        task.motionMask = algTasks(algTaskID.motion).motionMask
+        motionMask = algTasks(algTaskID.motion).motionMask
 
-        If task.gOptions.UseMotionColor.Checked Then
-            task.color = algTasks(algTaskID.motion).color.Clone
+        If gOptions.UseMotionColor.Checked Then
+            color = algTasks(algTaskID.motion).color.Clone
             Dim rectList As List(Of cv.Rect) = algTasks(algTaskID.motion).measure.motionRects
-            task.motionRects = New List(Of cv.Rect)(rectList)
+            motionRects = New List(Of cv.Rect)(rectList)
         End If
 
-        If task.gOptions.UseMotionDepth.Checked Then
-            task.pointCloud = algTasks(algTaskID.motion).pointcloud.Clone
+        If gOptions.UseMotionDepth.Checked Then
+            pointCloud = algTasks(algTaskID.motion).pointcloud.Clone
         End If
 
-        task.pcSplit = task.pointCloud.Split
+        pcSplit = pointCloud.Split
 
-        If task.optionsChanged Then task.maxDepthMask.SetTo(0)
-        task.pcSplit(2) = task.pcSplit(2)
+        If optionsChanged Then maxDepthMask.SetTo(0)
+        pcSplit(2) = pcSplit(2)
 
-        If task.gOptions.TruncateDepth.Checked Then
-            task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters,
+        If gOptions.TruncateDepth.Checked Then
+            pcSplit(2) = pcSplit(2).Threshold(MaxZmeters, MaxZmeters,
                                                         cv.ThresholdTypes.Trunc)
-            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
         ' The stereolabs camera has some weird -inf and inf values in the Y-plane.  
-        If task.cameraName = "StereoLabs ZED 2/2i" Then
-            Dim mask = task.pcSplit(1).InRange(-100, 100)
-            task.pcSplit(1).SetTo(0, Not mask)
+        If cameraName = "StereoLabs ZED 2/2i" Then
+            Dim mask = pcSplit(1).InRange(-100, 100)
+            pcSplit(1).SetTo(0, Not mask)
         End If
 
-        task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        task.depthMask = task.depthMask.ConvertScaleAbs()
+        depthMask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        depthMask = depthMask.ConvertScaleAbs()
 
-        task.noDepthMask = Not task.depthMask
+        noDepthMask = Not depthMask
 
-        If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
-            Dim xRatio = task.xRangeDefault / task.xRange
-            Dim yRatio = task.yRangeDefault / task.yRange
-            task.pcSplit(0) *= xRatio
-            task.pcSplit(1) *= yRatio
+        If xRange <> xRangeDefault Or yRange <> yRangeDefault Then
+            Dim xRatio = xRangeDefault / xRange
+            Dim yRatio = yRangeDefault / yRange
+            pcSplit(0) *= xRatio
+            pcSplit(1) *= yRatio
 
-            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
         ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
-        If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(task.pcSplit(2))
+        If cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(pcSplit(2))
 
         algTasks(algTaskID.colorizer).Run(src)
-        task.depthRGB = algTasks(algTaskID.colorizer).dst2
+        depthRGB = algTasks(algTaskID.colorizer).dst2
 
         TaskTimer.Enabled = True
 
-        If task.pixelViewerOn And PixelViewer Is Nothing Then
+        If pixelViewerOn And PixelViewer Is Nothing Then
             PixelViewer = New Pixel_Viewer
             For i = 1 To callTrace.Count - 1
                 If callTrace(i).Contains("Pixel_Viewer") Then
-                    callTrace(i) = task.algName + "\" + callTrace(i)
+                    callTrace(i) = algName + "\" + callTrace(i)
                     Exit For
                 End If
             Next
         End If
 
-        If task.gOptions.CreateGif.Checked Then
-            If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
+        If gOptions.CreateGif.Checked Then
+            If gifCreator Is Nothing Then gifCreator = New Gif_OpenCVB
             gifCreator.runAlg(src)
-            If task.gifBuild Then
-                task.gifBuild = False
-                If task.gifImages.Count = 0 Then
+            If gifBuild Then
+                gifBuild = False
+                If gifImages.Count = 0 Then
                     MsgBox("Collect images first and then click 'Build GIF...'")
                 Else
-                    For i = 0 To task.gifImages.Count - 1
-                        Dim fileName As New FileInfo(task.HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
-                        task.gifImages(i).Save(fileName.FullName)
+                    For i = 0 To gifImages.Count - 1
+                        Dim fileName As New FileInfo(HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                        gifImages(i).Save(fileName.FullName)
                     Next
 
-                    task.gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(task.HomeDir + "GifBuilder\bin\x64\Release\net48\")
+                    gifImages.Clear()
+                    Dim dirInfo As New DirectoryInfo(HomeDir + "GifBuilder\bin\x64\Release\net48\")
                     Dim dirData = dirInfo.GetDirectories()
                     Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then
@@ -804,13 +810,13 @@ Public Class VBtask : Implements IDisposable
                     Else
                         Dim gifProcess As New Process
                         gifProcess.StartInfo.FileName = gifExe.FullName
-                        gifProcess.StartInfo.WorkingDirectory = task.HomeDir + "Temp/"
+                        gifProcess.StartInfo.WorkingDirectory = HomeDir + "Temp/"
                         gifProcess.Start()
                     End If
                 End If
             End If
         End If
-        For Each obj In task.algTasks
+        For Each obj In algTasks
             If obj.traceName = "Line_Basics" Then Continue For ' not expected to be active
             If obj.traceName = "Feature_Basics" Then Continue For ' not expected to be active
             If obj.traceName = "RedCloud_Basics" Then Continue For ' not expected to be active
@@ -820,74 +826,74 @@ Public Class VBtask : Implements IDisposable
 
         algTasks(algTaskID.gravityHorizon).runAlg(src)
 
-        Dim saveOptionsChanged = task.optionsChanged
-        If task.paused = False Then
+        Dim saveOptionsChanged = optionsChanged
+        If paused = False Then
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
-            task.firstPass = False
-            task.heartBeatLT = False
+            firstPass = False
+            heartBeatLT = False
 
             postProcess(src)
 
-            If task.gOptions.displayDst0.Checked Then
-                dst0 = Check8uC3(task.displayObject.dst0)
+            If gOptions.displayDst0.Checked Then
+                dst0 = Check8uC3(displayObject.dst0)
             Else
-                dst0 = task.color
+                dst0 = color
             End If
-            If task.gOptions.displayDst1.Checked Then
-                dst1 = Check8uC3(task.displayObject.dst1)
+            If gOptions.displayDst1.Checked Then
+                dst1 = Check8uC3(displayObject.dst1)
             Else
-                dst1 = task.depthRGB
+                dst1 = depthRGB
             End If
 
             dst2 = Check8uC3(displayObject.dst2)
             dst3 = Check8uC3(displayObject.dst3)
 
             ' make sure that any outputs from the algorithm are the right size.nearest
-            If dst0.Size <> task.workingRes And dst0.Width > 0 Then
-                dst0 = dst0.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst0.Size <> workingRes And dst0.Width > 0 Then
+                dst0 = dst0.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If dst1.Size <> task.workingRes And dst1.Width > 0 Then
-                dst1 = dst1.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst1.Size <> workingRes And dst1.Width > 0 Then
+                dst1 = dst1.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If dst2.Size <> task.workingRes And dst2.Width > 0 Then
-                dst2 = dst2.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst2.Size <> workingRes And dst2.Width > 0 Then
+                dst2 = dst2.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If dst3.Size <> task.workingRes And dst3.Width > 0 Then
-                dst3 = dst3.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst3.Size <> workingRes And dst3.Width > 0 Then
+                dst3 = dst3.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
 
-            If task.gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, task.gridMask)
+            If gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, gridMask)
 
-            If task.redOptions.DisplayCellStats.Checked Then
-                If task.redC IsNot Nothing Then
-                    For Each tt In task.redC.trueData
+            If redOptions.DisplayCellStats.Checked Then
+                If redC IsNot Nothing Then
+                    For Each tt In redC.trueData
                         trueData.Add(tt)
                     Next
                 End If
             End If
 
-            If task.gOptions.showMotionMask.Checked Then
-                For Each roi In task.motionRects
-                    dst0.Rectangle(roi, cv.Scalar.White, task.lineWidth)
+            If gOptions.showMotionMask.Checked Then
+                For Each roi In motionRects
+                    dst0.Rectangle(roi, cv.Scalar.White, lineWidth)
                 Next
             End If
 
-            If task.gOptions.CrossHairs.Checked Then
-                If task.paused = False Then
-                    DrawLine(dst0, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
-                    DrawLine(dst0, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
+            If gOptions.CrossHairs.Checked Then
+                If paused = False Then
+                    DrawLine(dst0, horizonVec.p1, horizonVec.p2, cv.Scalar.White)
+                    DrawLine(dst0, gravityVec.p1, gravityVec.p2, cv.Scalar.White)
                 End If
             End If
 
-            If task.displayObject.activeTask = False And task.heartBeat = False Then
+            If displayObject.activeTask = False And heartBeat = False Then
                 Dim str As New TrueText("This task is not active at this time.",
                                         New cv.Point(dst2.Width / 2, 0), 3)
-                task.displayObject.trueData.Add(str)
+                displayObject.trueData.Add(str)
             End If
 
-            task.trueData = New List(Of TrueText)(task.displayObject.trueData)
-            task.displayObject.trueData.Clear()
-            task.labels = task.displayObject.labels
+            trueData = New List(Of TrueText)(displayObject.trueData)
+            displayObject.trueData.Clear()
+            labels = displayObject.labels
         End If
         Return saveOptionsChanged
     End Function

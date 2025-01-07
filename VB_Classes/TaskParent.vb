@@ -530,7 +530,7 @@ Public Class TaskParent : Implements IDisposable
     End Sub
 
     Public Function standaloneTest() As Boolean
-        If standalone Or ShowIntermediate() Then Return True
+        If standalone Or task.displayObject.traceName = traceName Then Return True
         Return False
     End Function
     Public Sub UpdateAdvice(advice As String)
@@ -591,11 +591,6 @@ Public Class TaskParent : Implements IDisposable
     Public Sub getRedCloud(src As cv.Mat)
         task.redC.Run(src)
     End Sub
-    Public Function ShowIntermediate() As Boolean
-        If task.displayObject Is Nothing Then Return False
-        If task.displayObject.traceName = traceName Then Return True
-        Return False
-    End Function
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))
