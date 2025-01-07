@@ -81,6 +81,7 @@ Public Class VBtask : Implements IDisposable
     Public color As cv.Mat
     Public leftView As cv.Mat
     Public rightView As cv.Mat
+    Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
     Public pointCloud As cv.Mat
     Public pcSplit() As cv.Mat
     Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.

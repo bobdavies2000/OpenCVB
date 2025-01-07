@@ -156,16 +156,16 @@ Module UI_Generator
             sw.Close()
 
             ' CPP_Enum.h
-            sw = New StreamWriter(HomeDir.FullName + "CPP_Native/CPP_Enum.h")
-            sw.WriteLine("// this file is automatically created by UI_Generator.vb")
-            sw.WriteLine("#pragma once")
-            sw.WriteLine("enum ccListFunctions")
-            sw.WriteLine("{")
-            For Each alg In ccList.Keys
-                sw.WriteLine("_" + alg + ",")
-            Next
-            sw.WriteLine("};")
-            sw.Close()
+            'sw = New StreamWriter(HomeDir.FullName + "CPP_Native/CPP_Enum.h")
+            'sw.WriteLine("// this file is automatically created by UI_Generator.vb")
+            'sw.WriteLine("#pragma once")
+            'sw.WriteLine("enum ccListFunctions")
+            'sw.WriteLine("{")
+            'For Each alg In ccList.Keys
+            '    sw.WriteLine("_" + alg + ",")
+            'Next
+            'sw.WriteLine("};")
+            'sw.Close()
 
 
 

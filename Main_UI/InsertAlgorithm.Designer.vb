@@ -76,10 +76,11 @@ Partial Class InsertAlgorithm
         Me.AddCSharp.TabIndex = 6
         Me.AddCSharp.Text = "Add C# Algorithm"
         Me.AddCSharp.UseVisualStyleBackColor = True
+        Me.AddCSharp.Visible = False
         '
         'AddOpenGL
         '
-        Me.AddOpenGL.Location = New System.Drawing.Point(18, 373)
+        Me.AddOpenGL.Location = New System.Drawing.Point(18, 180)
         Me.AddOpenGL.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.AddOpenGL.Name = "AddOpenGL"
         Me.AddOpenGL.Size = New System.Drawing.Size(330, 38)
@@ -89,13 +90,14 @@ Partial Class InsertAlgorithm
         '
         'AddCPP
         '
-        Me.AddCPP.Location = New System.Drawing.Point(18, 285)
+        Me.AddCPP.Location = New System.Drawing.Point(18, 385)
         Me.AddCPP.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.AddCPP.Name = "AddCPP"
         Me.AddCPP.Size = New System.Drawing.Size(330, 38)
         Me.AddCPP.TabIndex = 8
         Me.AddCPP.Text = "Add Unmanaged (Native) C++ Algorithm (Old Style)"
         Me.AddCPP.UseVisualStyleBackColor = True
+        Me.AddCPP.Visible = False
         '
         'AddPyStream
         '
@@ -106,16 +108,18 @@ Partial Class InsertAlgorithm
         Me.AddPyStream.TabIndex = 9
         Me.AddPyStream.Text = "Add PyStream Algorithm"
         Me.AddPyStream.UseVisualStyleBackColor = True
+        Me.AddPyStream.Visible = False
         '
         'Add_AI_Generated
         '
-        Me.Add_AI_Generated.Location = New System.Drawing.Point(18, 190)
+        Me.Add_AI_Generated.Location = New System.Drawing.Point(18, 268)
         Me.Add_AI_Generated.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Add_AI_Generated.Name = "Add_AI_Generated"
         Me.Add_AI_Generated.Size = New System.Drawing.Size(330, 38)
         Me.Add_AI_Generated.TabIndex = 10
         Me.Add_AI_Generated.Text = "Add Managed AI-Generated C++ Algorithm"
         Me.Add_AI_Generated.UseVisualStyleBackColor = True
+        Me.Add_AI_Generated.Visible = False
         '
         'Label2
         '
@@ -130,27 +134,29 @@ Partial Class InsertAlgorithm
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(25, 165)
+        Me.Label3.Location = New System.Drawing.Point(25, 243)
         Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(426, 20)
         Me.Label3.TabIndex = 12
         Me.Label3.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_CPP'"
+        Me.Label3.Visible = False
         '
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(25, 260)
+        Me.Label4.Location = New System.Drawing.Point(25, 360)
         Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(457, 20)
+        Me.Label4.Size = New System.Drawing.Size(426, 20)
         Me.Label4.TabIndex = 13
         Me.Label4.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_CPP'"
+        Me.Label4.Visible = False
         '
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(25, 348)
+        Me.Label5.Location = New System.Drawing.Point(25, 155)
         Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(456, 20)
@@ -166,6 +172,7 @@ Partial Class InsertAlgorithm
         Me.Label6.Size = New System.Drawing.Size(417, 20)
         Me.Label6.TabIndex = 15
         Me.Label6.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_CS'"
+        Me.Label6.Visible = False
         '
         'Label7
         '
@@ -176,6 +183,7 @@ Partial Class InsertAlgorithm
         Me.Label7.Size = New System.Drawing.Size(436, 20)
         Me.Label7.TabIndex = 16
         Me.Label7.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_PS.py'"
+        Me.Label7.Visible = False
         '
         'InsertAlgorithm
         '

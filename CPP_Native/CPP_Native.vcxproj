@@ -20,15 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CPP_Native\PragmaLibs.h" />
-    <ClInclude Include="CPP_Externs.h" />
-    <ClInclude Include="CPP_Enum.h" />
-    <ClInclude Include="CPP_Parent.h" />
-    <ClInclude Include="CPP_NativeClasses.h" />
-    <ClInclude Include="Options.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CPP_Algorithms.cpp" />
     <ClCompile Include="CPP_IncludeOnly.cpp" />
-    <ClCompile Include="CPP_Non-AI.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

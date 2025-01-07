@@ -2,7 +2,7 @@
 Imports System.Globalization
 Imports System.IO
 Imports System.Text.RegularExpressions
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes
 Imports System.Management
@@ -24,6 +24,7 @@ Module opencv_module
         Dim Right As Integer
         Dim Bottom As Integer
     End Structure
+    Public leftRightGray As Boolean = True ' test to see if we can always use grayscale left/right views.
 End Module
 Public Class Main_UI
     Public Shared settings As jsonClass.ApplicationStorage
@@ -54,7 +55,7 @@ Public Class Main_UI
     Public DevicesChanged As Boolean
     Dim camPic(4 - 1) As PictureBox
     Dim camLabel(camPic.Count - 1) As Label
-    Dim dst(camPic.Count - 1) As cvb.Mat
+    Dim dst(camPic.Count - 1) As cv.Mat
 
     Dim paintNewImages As Boolean
     Dim newCameraImages As Boolean
@@ -62,7 +63,7 @@ Public Class Main_UI
     Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Integer
     Dim DrawingRectangle As Boolean
-    Dim drawRect As New cvb.Rect
+    Dim drawRect As New cv.Rect
     Dim drawRectPic As Integer
     Dim externalPythonInvocation As Boolean
     Dim frameCount As Integer
@@ -72,12 +73,12 @@ Public Class Main_UI
     Dim LastX As Integer
     Dim LastY As Integer
     Dim mouseClickFlag As Boolean
-    Dim ClickPoint As New cvb.Point
+    Dim ClickPoint As New cv.Point
     Dim mousePicTag As Integer
-    Dim mouseDownPoint As New cvb.Point
-    Dim mouseMovePoint As New cvb.Point
+    Dim mouseDownPoint As New cv.Point
+    Dim mouseMovePoint As New cv.Point
     Dim mouseGridCell As Integer
-    Dim mousePoint As New cvb.Point
+    Dim mousePoint As New cv.Point
     Dim activeMouseDown As Boolean
 
     Dim myBrush = New SolidBrush(Color.White)
@@ -94,10 +95,10 @@ Public Class Main_UI
     Dim totalBytesOfMemoryUsed As Integer
     Dim trueData As New List(Of TrueText)
 
-    Dim uiColor As cvb.Mat
-    Dim uiLeft As cvb.Mat
-    Dim uiRight As cvb.Mat
-    Dim uiPointCloud As cvb.Mat
+    Dim uiColor As cv.Mat
+    Dim uiLeft As cv.Mat
+    Dim uiRight As cv.Mat
+    Dim uiPointCloud As cv.Mat
 
     Dim pauseAlgorithmThread As Boolean
     Dim logAlgorithms As StreamWriter
@@ -113,7 +114,7 @@ Public Class Main_UI
 
     Public treeViewRequest As String
     Public treeViewRefresh As Boolean
-    Dim pixelViewerRect As cvb.Rect
+    Dim pixelViewerRect As cv.Rect
     Dim pixelViewerOn As Boolean
     Dim pixelViewTag As Integer
 
@@ -243,13 +244,13 @@ Public Class Main_UI
 
             Select Case .WorkingRes.Height
                 Case 270, 540, 1080
-                    .captureRes = New cvb.Size(1920, 1080)
+                    .captureRes = New cv.Size(1920, 1080)
                     If .camera1920x1080Support(.cameraIndex) = False Then
-                        .captureRes = New cvb.Size(1280, 720)
-                        .WorkingRes = New cvb.Size(320, 180)
+                        .captureRes = New cv.Size(1280, 720)
+                        .WorkingRes = New cv.Size(320, 180)
                     End If
                 Case 180, 360, 720
-                    .captureRes = New cvb.Size(1280, 720)
+                    .captureRes = New cv.Size(1280, 720)
                 Case 376, 188, 94
                     If settings.cameraName <> "StereoLabs ZED 2/2i" Then
                         MsgBox("The json settings don't appear to be correct!" + vbCrLf +
@@ -259,12 +260,12 @@ Public Class Main_UI
                         fileinfo.Delete()
                         End
                     End If
-                    .captureRes = New cvb.Size(672, 376)
+                    .captureRes = New cv.Size(672, 376)
                 Case 120, 240, 480
-                    .captureRes = New cvb.Size(640, 480)
+                    .captureRes = New cv.Size(640, 480)
                     If .camera640x480Support(.cameraIndex) = False Then
-                        .captureRes = New cvb.Size(1280, 720)
-                        .WorkingRes = New cvb.Size(320, 180)
+                        .captureRes = New cv.Size(1280, 720)
+                        .WorkingRes = New cv.Size(320, 180)
                     End If
             End Select
 
@@ -275,12 +276,12 @@ Public Class Main_UI
                 .locationMain.Item2 = 1321
                 .locationMain.Item3 = 870
                 If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 1096
-                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cvb.Size(640, 480) Else .displayRes = New cvb.Size(640, 360)
+                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(640, 480) Else .displayRes = New cv.Size(640, 360)
             ElseIf .snap320 Then
                 .locationMain.Item2 = 683
                 .locationMain.Item3 = 510
                 If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 616
-                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cvb.Size(320, 240) Else .displayRes = New cvb.Size(320, 180)
+                If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(320, 240) Else .displayRes = New cv.Size(320, 180)
             End If
 
             Dim border As Integer = 6
@@ -321,7 +322,7 @@ Public Class Main_UI
             If Width < 200 Then Width = 200
             Dim height = TreeViewDialog.Height
             If height < 200 Then height = 200
-            settings.treeLocation = New cvb.Vec4f(TreeViewDialog.Left, TreeViewDialog.Top,
+            settings.treeLocation = New cv.Vec4f(TreeViewDialog.Left, TreeViewDialog.Top,
                                                   Width, height)
             settings.treeButton = True
         Else
@@ -333,10 +334,10 @@ Public Class Main_UI
             settings.groupComboText = GroupCombo.Text
         End If
 
-        settings.locationMain = New cvb.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
+        settings.locationMain = New cv.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
         If camPic(0) IsNot Nothing Then
             ' used only when .snapCustom is true
-            settings.displayRes = New cvb.Size(camPic(0).Width, camPic(0).Height)
+            settings.displayRes = New cv.Size(camPic(0).Width, camPic(0).Height)
         End If
         If settings.translatorMode = "" Then settings.translatorMode = "VB.Net to C#"
 
@@ -348,7 +349,7 @@ Public Class Main_UI
         If e.KeyValue = Keys.Up Then upArrow = True
         If e.KeyValue = Keys.Down Then downArrow = True
     End Sub
-    Public Function validateRect(r As cvb.Rect, width As Integer, height As Integer) As cvb.Rect
+    Public Function validateRect(r As cv.Rect, width As Integer, height As Integer) As cv.Rect
         If r.Width < 0 Then r.Width = 1
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
@@ -700,8 +701,8 @@ Public Class Main_UI
 
         ' when switching resolution, best to reset these as the move from higher to lower res
         ' could mean the point is no longer valid.
-        ClickPoint = New cvb.Point
-        mousePoint = New cvb.Point
+        ClickPoint = New cv.Point
+        mousePoint = New cv.Point
 
         StartTask()
 
@@ -722,41 +723,41 @@ Public Class Main_UI
     Private Sub setWorkingRes()
         Select Case settings.WorkingResIndex
             Case 0
-                settings.WorkingRes = New cvb.Size(1920, 1080)
-                settings.captureRes = New cvb.Size(1920, 1080)
+                settings.WorkingRes = New cv.Size(1920, 1080)
+                settings.captureRes = New cv.Size(1920, 1080)
             Case 1
-                settings.WorkingRes = New cvb.Size(960, 540)
-                settings.captureRes = New cvb.Size(1920, 1080)
+                settings.WorkingRes = New cv.Size(960, 540)
+                settings.captureRes = New cv.Size(1920, 1080)
             Case 2
-                settings.WorkingRes = New cvb.Size(480, 270)
-                settings.captureRes = New cvb.Size(1920, 1080)
+                settings.WorkingRes = New cv.Size(480, 270)
+                settings.captureRes = New cv.Size(1920, 1080)
             Case 3
-                settings.WorkingRes = New cvb.Size(1280, 720)
-                settings.captureRes = New cvb.Size(1280, 720)
+                settings.WorkingRes = New cv.Size(1280, 720)
+                settings.captureRes = New cv.Size(1280, 720)
             Case 4
-                settings.WorkingRes = New cvb.Size(640, 360)
-                settings.captureRes = New cvb.Size(1280, 720)
+                settings.WorkingRes = New cv.Size(640, 360)
+                settings.captureRes = New cv.Size(1280, 720)
             Case 5
-                settings.WorkingRes = New cvb.Size(320, 180)
-                settings.captureRes = New cvb.Size(1280, 720)
+                settings.WorkingRes = New cv.Size(320, 180)
+                settings.captureRes = New cv.Size(1280, 720)
             Case 6
-                settings.WorkingRes = New cvb.Size(640, 480)
-                settings.captureRes = New cvb.Size(640, 480)
+                settings.WorkingRes = New cv.Size(640, 480)
+                settings.captureRes = New cv.Size(640, 480)
             Case 7
-                settings.WorkingRes = New cvb.Size(320, 240)
-                settings.captureRes = New cvb.Size(640, 480)
+                settings.WorkingRes = New cv.Size(320, 240)
+                settings.captureRes = New cv.Size(640, 480)
             Case 8
-                settings.WorkingRes = New cvb.Size(160, 120)
-                settings.captureRes = New cvb.Size(640, 480)
+                settings.WorkingRes = New cv.Size(160, 120)
+                settings.captureRes = New cv.Size(640, 480)
             Case 9
-                settings.WorkingRes = New cvb.Size(672, 376)
-                settings.captureRes = New cvb.Size(672, 376)
+                settings.WorkingRes = New cv.Size(672, 376)
+                settings.captureRes = New cv.Size(672, 376)
             Case 10
-                settings.WorkingRes = New cvb.Size(336, 188)
-                settings.captureRes = New cvb.Size(672, 376)
+                settings.WorkingRes = New cv.Size(336, 188)
+                settings.captureRes = New cv.Size(672, 376)
             Case 11
-                settings.WorkingRes = New cvb.Size(168, 94)
-                settings.captureRes = New cvb.Size(672, 376)
+                settings.WorkingRes = New cv.Size(168, 94)
+                settings.captureRes = New cv.Size(672, 376)
         End Select
     End Sub
 
@@ -780,24 +781,6 @@ Public Class Main_UI
                        "The currently selected group does not contain " + item.Text + vbCrLf + "Change the group to <All> to guarantee access.")
         Else
             jumpToAlgorithm(item.Text)
-        End If
-    End Sub
-    Private Sub BackButton_Click(sender As Object, e As EventArgs) Handles BackButton.Click
-        If arrowIndex = 0 Then
-            arrowList.Clear()
-            For i = 0 To algHistory.Count - 1
-                arrowList.Add(algHistory.ElementAt(i))
-            Next
-        End If
-        arrowIndex = Math.Min(arrowList.Count - 1, arrowIndex + 1)
-        jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
-    End Sub
-    Private Sub ForwardButton_Click(sender As Object, e As EventArgs) Handles ForwardButton.Click
-        If arrowIndex = 0 Then
-            jumpToAlgorithm(AvailableAlgorithms.Items(Math.Min(AvailableAlgorithms.Items.Count - 1, AvailableAlgorithms.SelectedIndex + 1)))
-        Else
-            arrowIndex = Math.Max(0, arrowIndex - 1)
-            jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
         End If
     End Sub
     Private Sub setupAlgorithmHistory()
@@ -1124,7 +1107,6 @@ Public Class Main_UI
             jsonWrite()
         End If
 
-        AvailableAlgorithms.Width = 600
         AvailableAlgorithms.ComboBox.Select()
         AlgorithmDesc.Top = ToolStrip1.Top
         AlgorithmDesc.Left = ToolStrip1.Left + GroupCombo.Bounds.Right
@@ -1262,6 +1244,65 @@ Public Class Main_UI
             settings.cameraIndex = saveCameraIndex
         End If
     End Sub
+    Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
+        Dim ratio = task.dst2.Width / camPic(0).Width
+        Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+        If r.Width = 0 Or r.Height = 0 Then Exit Sub
+        Dim img = dst(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
+        cv.Cv2.ImShow("DrawRect Region " + CStr(magIndex), img)
+    End Sub
+    Private Sub camSwitch()
+        CameraSwitching.Visible = True
+        CameraSwitching.Text = settings.cameraName + " initializing"
+        CamSwitchProgress.Visible = True
+        CamSwitchProgress.Left = CameraSwitching.Left
+        CamSwitchProgress.Top = CameraSwitching.Top + CameraSwitching.Height
+        CamSwitchProgress.Height = CameraSwitching.Height / 2
+        CameraSwitching.BringToFront()
+        CamSwitchProgress.BringToFront()
+        uiColor = Nothing
+        CamSwitchTimer.Enabled = True
+    End Sub
+    Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
+        If settings Is Nothing Then
+            CamSwitchProgress.Visible = False
+            CameraSwitching.Visible = False
+            Exit Sub
+        End If
+        If settings.cameraName <> "" Then
+            If CamSwitchProgress.Visible Then
+                Static frames As Integer
+                Dim slideCount As Integer = 10
+                CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
+                If frames >= slideCount Then frames = 0
+                frames += 1
+            End If
+        Else
+            CamSwitchProgress.Visible = False
+            CameraSwitching.Visible = False
+        End If
+    End Sub
+    Private Sub GroupButtonList_Click(sender As Object, e As EventArgs) Handles GroupButtonList.Click
+        Groups.homeDir = HomeDir
+        Groups.ShowDialog()
+        If groupButtonSelection = "" Then Exit Sub
+        If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
+        For Each alg In AvailableAlgorithms.Items
+            If alg.startswith(groupButtonSelection) Then
+                AvailableAlgorithms.Text = alg
+                Exit For
+            End If
+        Next
+
+        jsonWrite()
+        StartTask()
+        updateAlgorithmHistory()
+        groupButtonSelection = ""
+    End Sub
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles Magnify.Click
+        MagnifyTimer.Enabled = True
+        magIndex += 1
+    End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' don't start another algorithm until the current one has finished 
         If algorithmQueueCount <> 0 Then
@@ -1313,8 +1354,8 @@ Public Class Main_UI
 
             ' when switching resolution, best to reset these as the move from higher to lower res
             ' could mean the point is no longer valid.
-            ClickPoint = New cvb.Point
-            mousePoint = New cvb.Point
+            ClickPoint = New cv.Point
+            mousePoint = New cv.Point
         End If
 
         Static saveLastAlgorithm = AvailableAlgorithms.Text
@@ -1336,7 +1377,7 @@ Public Class Main_UI
 
         If pixelViewerOn And mousePicTag = pic.Tag Then
             Dim r = pixelViewerRect
-            Dim rect = New cvb.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
+            Dim rect = New cv.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
                                        CInt(r.Width * ratio), CInt(r.Height * ratio))
             g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
         End If
@@ -1358,7 +1399,7 @@ Public Class Main_UI
                         CamSwitchTimer.Enabled = False
                     End If
                     If uiColor.Width > 0 And dst(0) IsNot Nothing Then
-                        Dim camSize = New cvb.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                        Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                         For i = 0 To dst.Count - 1
                             Dim tmp = dst(i).Resize(camSize)
                             cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
@@ -1436,12 +1477,12 @@ Public Class Main_UI
     Private Sub CameraTask()
         restartCameraRequest = True
 
-        Static saveWorkingRes As cvb.Size, saveCameraName As String = settings.cameraName
+        Static saveWorkingRes As cv.Size, saveCameraName As String = settings.cameraName
 
-        uiColor = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
-        uiLeft = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
-        uiRight = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_8UC3)
-        uiPointCloud = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_32FC3)
+        uiColor = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+        uiLeft = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+        uiRight = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+        uiPointCloud = New cv.Mat(settings.WorkingRes, cv.MatType.CV_32FC3)
 
         While 1
             If restartCameraRequest Or settings.cameraName <> saveCameraName Or settings.WorkingRes <> saveWorkingRes Then
@@ -1465,7 +1506,7 @@ Public Class Main_UI
                         uiRight = camera.uiRight.clone
                         ' a problem with the K4A interface was corrected here...
                         If camera.uipointcloud Is Nothing Then
-                            camera.uipointcloud = New cvb.Mat(settings.WorkingRes, cvb.MatType.CV_32FC3)
+                            camera.uipointcloud = New cv.Mat(settings.WorkingRes, cv.MatType.CV_32FC3)
                         End If
                         uiPointCloud = camera.uiPointCloud.clone
 
@@ -1518,7 +1559,7 @@ Public Class Main_UI
         parms.cameraIndex = settings.cameraIndex
 
         parms.main_hwnd = Me.Handle
-        parms.mainFormLocation = New cvb.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+        parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
 
         parms.workingRes = settings.WorkingRes
         parms.captureRes = settings.captureRes
@@ -1558,7 +1599,7 @@ Public Class Main_UI
         SyncLock algorithmThreadLock
             algorithmQueueCount -= 1
             AlgorithmTestAllCount += 1
-            drawRect = New cvb.Rect
+            drawRect = New cv.Rect
             task = New VBtask(parms)
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
@@ -1586,18 +1627,18 @@ Public Class Main_UI
                                       CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
             End If
             ' Adjust drawrect for the ratio of the actual size and WorkingRes.
-            If task.drawRect <> New cvb.Rect Then
+            If task.drawRect <> New cv.Rect Then
                 ' relative size of algorithm size image to displayed image
                 Dim ratio = camPic(0).Width / task.dst2.Width
-                drawRect = New cvb.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
+                drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
                                             task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
 
             Dim saveWorkingRes = settings.WorkingRes
             task.labels = {"", "", "", ""}
-            mousePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
+            mousePoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
 
-            Dim saveDrawRect As cvb.Rect
+            Dim saveDrawRect As cv.Rect
 
             While 1
                 Dim waitTime = Now
@@ -1623,8 +1664,18 @@ Public Class Main_UI
 
                         SyncLock cameraLock
                             task.color = camera.uiColor
-                            task.leftView = camera.uiLeft
-                            task.rightView = camera.uiRight
+                            If leftRightGray Then
+                                If camera.uiLeft.Channels <> 1 Then
+                                    task.leftView = camera.uiLeft.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                                    task.rightView = camera.uiRight.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+                                    task.leftView = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                                    task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                                End If
+                            Else
+                                task.leftView = camera.uiLeft
+                                task.rightView = camera.uiRight
+                            End If
                             task.pointCloud = camera.uiPointCloud
 
                             If frameCount < 10 Then
@@ -1664,8 +1715,8 @@ Public Class Main_UI
                             GrabRectangleData = False
                             ' relative size of algorithm size image to displayed image
                             Dim ratio = task.dst2.Width / camPic(0).Width
-                            Dim tmpDrawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                            task.drawRect = New cvb.Rect
+                            Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                            task.drawRect = New cv.Rect
                             If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
                                 If saveDrawRect <> tmpDrawRect Then
                                     task.optionsChanged = True
@@ -1695,8 +1746,8 @@ Public Class Main_UI
                         If mousePoint.Y >= task.dst2.Height Then mousePoint.Y = task.dst2.Height - 1
 
                         task.mouseMovePoint = mousePoint
-                        If task.mouseMovePoint = New cvb.Point(0, 0) Then
-                            task.mouseMovePoint = New cvb.Point(task.dst2.Width / 2, task.dst2.Height / 2)
+                        If task.mouseMovePoint = New cv.Point(0, 0) Then
+                            task.mouseMovePoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2)
                         End If
                         task.mousePicTag = mousePicTag
                         If mouseClickFlag Then
@@ -1726,7 +1777,7 @@ Public Class Main_UI
                         Catch ex As Exception
                         End Try
                     Else
-                        mousePoint = New cvb.Point(0, 0)
+                        mousePoint = New cv.Point(0, 0)
                     End If
                 End SyncLock
                 Dim returnTime = Now
@@ -1737,10 +1788,10 @@ Public Class Main_UI
                     drawRect = task.drawRect
                     ' relative size of algorithm size image to displayed image
                     Dim ratio = camPic(0).Width / task.dst2.Width
-                    drawRect = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                    drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                 End If
                 If task.drawRectClear Then
-                    drawRect = New cvb.Rect
+                    drawRect = New cv.Rect
                     task.drawRect = drawRect
                     task.drawRectClear = False
                 End If
@@ -1807,65 +1858,6 @@ Public Class Main_UI
 
         If parms.algName.EndsWith(".py") Then killThread("python")
         frameCount = 0
-    End Sub
-    Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
-        Dim ratio = task.dst2.Width / camPic(0).Width
-        Dim r = New cvb.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-        If r.Width = 0 Or r.Height = 0 Then Exit Sub
-        Dim img = dst(drawRectPic)(r).Resize(New cvb.Size(drawRect.Width * 5, drawRect.Height * 5))
-        cvb.Cv2.ImShow("DrawRect Region " + CStr(magIndex), img)
-    End Sub
-    Private Sub camSwitch()
-        CameraSwitching.Visible = True
-        CameraSwitching.Text = settings.cameraName + " initializing"
-        CamSwitchProgress.Visible = True
-        CamSwitchProgress.Left = CameraSwitching.Left
-        CamSwitchProgress.Top = CameraSwitching.Top + CameraSwitching.Height
-        CamSwitchProgress.Height = CameraSwitching.Height / 2
-        CameraSwitching.BringToFront()
-        CamSwitchProgress.BringToFront()
-        uiColor = Nothing
-        CamSwitchTimer.Enabled = True
-    End Sub
-    Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
-        If settings Is Nothing Then
-            CamSwitchProgress.Visible = False
-            CameraSwitching.Visible = False
-            Exit Sub
-        End If
-        If settings.cameraName <> "" Then
-            If CamSwitchProgress.Visible Then
-                Static frames As Integer
-                Dim slideCount As Integer = 10
-                CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
-                If frames >= slideCount Then frames = 0
-                frames += 1
-            End If
-        Else
-            CamSwitchProgress.Visible = False
-            CameraSwitching.Visible = False
-        End If
-    End Sub
-    Private Sub GroupButtonList_Click(sender As Object, e As EventArgs) Handles GroupButtonList.Click
-        Groups.homeDir = HomeDir
-        Groups.ShowDialog()
-        If groupButtonSelection = "" Then Exit Sub
-        If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
-        For Each alg In AvailableAlgorithms.Items
-            If alg.startswith(groupButtonSelection) Then
-                AvailableAlgorithms.Text = alg
-                Exit For
-            End If
-        Next
-
-        jsonWrite()
-        StartTask()
-        updateAlgorithmHistory()
-        groupButtonSelection = ""
-    End Sub
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles Magnify.Click
-        MagnifyTimer.Enabled = True
-        magIndex += 1
     End Sub
 End Class
 

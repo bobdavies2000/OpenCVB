@@ -25,8 +25,6 @@ Partial Class Main_UI
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main_UI))
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.BackButton = New System.Windows.Forms.ToolStripButton()
-        Me.ForwardButton = New System.Windows.Forms.ToolStripButton()
         Me.PausePlayButton = New System.Windows.Forms.ToolStripButton()
         Me.OptionsButton = New System.Windows.Forms.ToolStripButton()
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
@@ -38,8 +36,8 @@ Partial Class Main_UI
         Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
         Me.Advice = New System.Windows.Forms.ToolStripButton()
         Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
-        Me.GroupButtonList = New System.Windows.Forms.ToolStripButton()
         Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
+        Me.GroupButtonList = New System.Windows.Forms.ToolStripButton()
         Me.GroupCombo = New System.Windows.Forms.ToolStripComboBox()
         Me.AlgorithmDesc = New System.Windows.Forms.TextBox()
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
@@ -64,30 +62,12 @@ Partial Class Main_UI
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackButton, Me.ForwardButton, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(1583, 34)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
-        '
-        'BackButton
-        '
-        Me.BackButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.BackButton.Image = CType(resources.GetObject("BackButton.Image"), System.Drawing.Image)
-        Me.BackButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.BackButton.Name = "BackButton"
-        Me.BackButton.Size = New System.Drawing.Size(34, 29)
-        Me.BackButton.Text = "Back to Previous Algorithm"
-        '
-        'ForwardButton
-        '
-        Me.ForwardButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ForwardButton.Image = CType(resources.GetObject("ForwardButton.Image"), System.Drawing.Image)
-        Me.ForwardButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ForwardButton.Name = "ForwardButton"
-        Me.ForwardButton.Size = New System.Drawing.Size(34, 29)
-        Me.ForwardButton.Text = "Forward to the next algorithm"
         '
         'PausePlayButton
         '
@@ -161,6 +141,7 @@ Partial Class Main_UI
         Me.ComplexityButton.Name = "ComplexityButton"
         Me.ComplexityButton.Size = New System.Drawing.Size(34, 29)
         Me.ComplexityButton.Text = "Measure an algorithm's complexity"
+        Me.ComplexityButton.Visible = False
         '
         'TranslateButton
         '
@@ -170,6 +151,7 @@ Partial Class Main_UI
         Me.TranslateButton.Name = "TranslateButton"
         Me.TranslateButton.Size = New System.Drawing.Size(34, 29)
         Me.TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
+        Me.TranslateButton.Visible = False
         '
         'Advice
         '
@@ -179,6 +161,7 @@ Partial Class Main_UI
         Me.Advice.Name = "Advice"
         Me.Advice.Size = New System.Drawing.Size(34, 29)
         Me.Advice.Text = "Show any advice on options for the current algorithm"
+        Me.Advice.Visible = False
         '
         'RecentList
         '
@@ -191,6 +174,17 @@ Partial Class Main_UI
         Me.RecentList.Size = New System.Drawing.Size(68, 29)
         Me.RecentList.Text = "Recent"
         '
+        'AvailableAlgorithms
+        '
+        Me.AvailableAlgorithms.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.AvailableAlgorithms.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.AvailableAlgorithms.AutoSize = False
+        Me.AvailableAlgorithms.DropDownHeight = 500
+        Me.AvailableAlgorithms.IntegralHeight = False
+        Me.AvailableAlgorithms.MaxDropDownItems = 100
+        Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
+        Me.AvailableAlgorithms.Size = New System.Drawing.Size(400, 34)
+        '
         'GroupButtonList
         '
         Me.GroupButtonList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
@@ -200,16 +194,6 @@ Partial Class Main_UI
         Me.GroupButtonList.Size = New System.Drawing.Size(45, 29)
         Me.GroupButtonList.Text = "A-Z"
         Me.GroupButtonList.ToolTipText = "Jump to Algorithm Group"
-        '
-        'AvailableAlgorithms
-        '
-        Me.AvailableAlgorithms.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
-        Me.AvailableAlgorithms.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.AvailableAlgorithms.DropDownHeight = 500
-        Me.AvailableAlgorithms.IntegralHeight = False
-        Me.AvailableAlgorithms.MaxDropDownItems = 100
-        Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
-        Me.AvailableAlgorithms.Size = New System.Drawing.Size(315, 34)
         '
         'GroupCombo
         '
@@ -338,8 +322,6 @@ Partial Class Main_UI
     End Sub
 
     Friend WithEvents ToolStrip1 As ToolStrip
-    Friend WithEvents BackButton As ToolStripButton
-    Friend WithEvents ForwardButton As ToolStripButton
     Friend WithEvents PausePlayButton As ToolStripButton
     Friend WithEvents OptionsButton As ToolStripButton
     Friend WithEvents TestAllButton As ToolStripButton

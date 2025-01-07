@@ -2,6 +2,7 @@
 #include "CPP_NativeClasses.h"
 #include "CPP_Enum.h"
 
+#if 0 
 namespace CPP_Native
 {
     Grid_Basics_CC* gridBasics;
@@ -34,7 +35,6 @@ namespace CPP_Native
 
         task->HighlightColor = HighlightColors[task->frameCount % HighlightColors.size()];
 
-#if 0 
         switch (function)
         {
         case _AddWeighted_Basics_CC:
@@ -189,7 +189,6 @@ namespace CPP_Native
         { task->alg = new Hist_DepthSimple_CC(); task->alg->traceName = "Hist_DepthSimple_CC"; break; }
         // end of switch - don't remove...
         }
-#endif
         task->alg->standalone = true;
         task->font = FONT_HERSHEY_SIMPLEX; // fontSize is set below...
         task->fontColor = Scalar(255, 255, 255);
@@ -449,4 +448,5 @@ namespace CPP_Native
         return 0;
     }
 }
+#endif
 
