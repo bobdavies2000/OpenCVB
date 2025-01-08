@@ -550,33 +550,6 @@ End Class
 
 
 
-
-
-
-
-Public Class Motion_RedCloud : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "Motion detected in the cells below"
-        desc = "Use RedCloud to define where there is motion"
-    End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
-
-        dst3.SetTo(0)
-        For Each rc In task.redCells
-            If rc.motionPixels > 0 Then dst3(rc.rect).SetTo(rc.naturalColor, rc.mask)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Diff : Inherits TaskParent
     Public Sub New()

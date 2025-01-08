@@ -25,12 +25,6 @@ Public Class Horizon_Basics : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(1) Else dst0 = src
 
-        Dim resolution = task.quarterRes
-        If dst0.Size <> resolution Then
-            dst0 = dst0.Resize(resolution, 0, 0, cv.InterpolationFlags.Nearest)
-            resizeRatio = CInt(dst2.Height / resolution.Height)
-        End If
-
         dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         dst0.SetTo(task.MaxZmeters, Not dst1)

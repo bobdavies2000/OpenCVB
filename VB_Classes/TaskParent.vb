@@ -524,7 +524,7 @@ Public Class TaskParent : Implements IDisposable
             If task.displayObject.traceName = traceName Then acceptTrueText = True
         End If
         If acceptTrueText Then
-            Dim str As New TrueText(text, New cv.Point(0, 0), picTag)
+            Dim str As New TrueText(text, pt, picTag)
             trueData.Add(str)
         End If
     End Sub

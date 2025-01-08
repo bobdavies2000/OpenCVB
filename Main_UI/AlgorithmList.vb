@@ -1185,7 +1185,6 @@ End Enum
 	If algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
 	If algorithmName = "Motion_PointCloud" Then return new Motion_PointCloud
 	If algorithmName = "Motion_RectTest" Then return new Motion_RectTest
-	If algorithmName = "Motion_RedCloud" Then return new Motion_RedCloud
 	If algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
 	If algorithmName = "Motion_TopFeatureFail" Then return new Motion_TopFeatureFail
 	If algorithmName = "Motion_TopFeatures" Then return new Motion_TopFeatures
@@ -1572,7 +1571,6 @@ End Enum
 	If algorithmName = "RedCloud_MaxDist_CPP" Then return new RedCloud_MaxDist_CPP
 	If algorithmName = "RedCloud_MeterByMeter" Then return new RedCloud_MeterByMeter
 	If algorithmName = "RedCloud_MostlyColor" Then return new RedCloud_MostlyColor
-	If algorithmName = "RedCloud_MotionBGsubtract" Then return new RedCloud_MotionBGsubtract
 	If algorithmName = "RedCloud_NaturalColor" Then return new RedCloud_NaturalColor
 	If algorithmName = "RedCloud_OnlyColorAlt" Then return new RedCloud_OnlyColorAlt
 	If algorithmName = "RedCloud_OnlyColorHist3D" Then return new RedCloud_OnlyColorHist3D
@@ -1588,8 +1586,6 @@ End Enum
 	If algorithmName = "RedCloud_ReduceTest" Then return new RedCloud_ReduceTest
 	If algorithmName = "RedCloud_Reduction" Then return new RedCloud_Reduction
 	If algorithmName = "RedCloud_ShapeCorrelation" Then return new RedCloud_ShapeCorrelation
-	If algorithmName = "RedCloud_StructuredH" Then return new RedCloud_StructuredH
-	If algorithmName = "RedCloud_StructuredV" Then return new RedCloud_StructuredV
 	If algorithmName = "RedCloud_Tiers" Then return new RedCloud_Tiers
 	If algorithmName = "RedCloud_TiersBinarize" Then return new RedCloud_TiersBinarize
 	If algorithmName = "RedCloud_TopX" Then return new RedCloud_TopX

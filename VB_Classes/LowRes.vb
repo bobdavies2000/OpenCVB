@@ -461,7 +461,7 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
             distances(i) = distance3D(colors(i), vec)
             If distances(i) > options.colorDifferenceThreshold Then
                 If standaloneTest() Then
-                    SetTrueText(Format(distances(i), fmt1), New cv.Point(roi.X, roi.Y), 3)
+                    SetTrueText(Format(distances(i), fmt1), roi.Location, 3)
                 End If
                 colors(i) = vec
                 For Each index In task.gridNeighbors(i)
@@ -526,7 +526,9 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
         Next
 
         motionDetected = False
-        If task.frameCount < 3 Then ' some of the grid configurations are not compatible between cameras.
+        ' some configurations are not compatible when switching cameras.
+        ' Use the whole image for the first few images.
+        If task.frameCount < 3 Then
             src.CopyTo(dst3)
             motionRects.Clear()
             motionRects.Add(New cv.Rect(0, 0, dst2.Width, dst2.Height))

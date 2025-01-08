@@ -16,7 +16,6 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
             strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf + "rc.color = " + rc.color.ToString() + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
-            strOut += "rc.motionPixels = " + CStr(rc.motionPixels) + vbCrLf
 
             strOut += If(rc.depthPixels > 0, "Cell is marked as depthCell " + vbCrLf, "")
             If rc.depthPixels > 0 Then
@@ -330,7 +329,7 @@ Public Class Cell_Generate : Inherits TaskParent
             rc.mask = src(rc.rect).InRange(i + 1, i + 1)
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            rc.motionPixels = task.motionMask(rc.rect).CountNonZero
+            rc.motionFlag = task.motionMask(rc.rect).CountNonZero > 0
             rc.floodPoint = floodPoints(i)
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)

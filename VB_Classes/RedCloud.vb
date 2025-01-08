@@ -6,7 +6,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Dim redCPP As New RedCloud_CPP
     Dim color As New Color8U_Basics
     Public Sub New()
-        labels(3) = "The 'tracking' color (shown below) is unique for each cell and switches when a cell is split or lost."
         task.gOptions.setHistogramBins(40)
         inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         UpdateAdvice(traceName + ": there are dedicated options for RedCloud algorithms." + vbCrLf +
@@ -26,9 +25,17 @@ Public Class RedCloud_Basics : Inherits TaskParent
         cellGen.floodPoints = redCPP.floodPoints
         cellGen.Run(redCPP.dst2)
 
-        dst2 = cellGen.dst2
+        dst1 = cellGen.dst2
 
         labels(2) = cellGen.labels(2)
+
+        If task.heartBeat Then
+            dst2 = dst1.Clone
+        Else
+            For Each rc In task.redCells
+                If rc.motionFlag Then dst2(rc.rect).SetTo(rc.naturalColor, rc.mask)
+            Next
+        End If
 
         If task.redOptions.DisplayCellStats.Checked Then
             Static stats As Cell_Basics
@@ -43,11 +50,26 @@ Public Class RedCloud_Basics : Inherits TaskParent
         End If
 
         If standaloneTest() Then
-            dst3.SetTo(0)
-            For i = 0 To Math.Min(task.redOptions.identifyCount, task.redCells.Count) - 1
-                Dim rc = task.redCells(i)
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
-            Next
+            If task.heartBeat Then
+                dst3.SetTo(0)
+                For i = 0 To Math.Min(task.redOptions.identifyCount, task.redCells.Count) - 1
+                    Dim rc = task.redCells(i)
+                    dst3(rc.rect).SetTo(rc.color, rc.mask)
+                Next
+            Else
+                Dim count As Integer
+                For i = 0 To task.redCells.Count - 1
+                    Dim rc = task.redCells(i)
+                    If rc.motionFlag Then
+                        dst3(rc.rect).SetTo(rc.color, rc.mask)
+                        count += 1
+                        If count >= task.redOptions.identifyCount Then Exit For
+                    End If
+                Next
+                labels(3) = CStr(count) + " largest cells shown below in the 'tracking' color " +
+                            "which changes when the cell is split or lost."
+            End If
+
         End If
     End Sub
 End Class
@@ -1059,91 +1081,6 @@ End Class
 
 
 
-Public Class RedCloud_StructuredH : Inherits TaskParent
-    Dim motion As New RedCloud_MotionBGsubtract
-    Dim transform As New Structured_TransformH
-    Dim histTop As New Projection_HistTop
-    Public Sub New()
-        If standalone Then
-            task.redOptions.setIdentifyCells(False)
-            task.gOptions.setDisplay1()
-            task.gOptions.setDisplay1()
-        End If
-        desc = "Display the RedCloud cells found with a horizontal slice through the cellMap."
-    End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
-        Dim sliceMask = transform.createSliceMaskH()
-        dst0 = src
-
-        motion.Run(sliceMask.Clone)
-
-        If task.heartBeat Then dst1.SetTo(0)
-        dst1.SetTo(white, sliceMask)
-        labels = motion.labels
-
-        dst2.SetTo(0)
-        For Each rc In motion.redCells
-            If rc.motionFlag Then DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-        Next
-
-        Dim pc As New cv.Mat(task.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
-        task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        histTop.Run(pc)
-        dst3 = histTop.dst2
-
-        dst2.SetTo(white, sliceMask)
-        dst0.SetTo(white, sliceMask)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCloud_StructuredV : Inherits TaskParent
-    Dim motion As New RedCloud_MotionBGsubtract
-    Dim transform As New Structured_TransformV
-    Dim histSide As New Projection_HistSide
-    Public Sub New()
-        If standalone Then
-            task.redOptions.setIdentifyCells(False)
-            task.gOptions.setDisplay1()
-            task.gOptions.setDisplay1()
-        End If
-        desc = "Display the RedCloud cells found with a vertical slice through the cellMap."
-    End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
-        Dim sliceMask = transform.createSliceMaskV()
-        dst0 = src
-
-        motion.Run(sliceMask.Clone)
-
-        If task.heartBeat Then dst1.SetTo(0)
-        dst1.SetTo(white, sliceMask)
-        labels = motion.labels
-        SetTrueText("Move mouse in image to see impact.", 3)
-
-        dst2.SetTo(0)
-        For Each rc In motion.redCells
-            If rc.motionFlag Then DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-        Next
-
-        Dim pc As New cv.Mat(task.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
-        task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        histSide.Run(pc)
-        dst3 = histSide.dst2
-
-        dst2.SetTo(white, sliceMask)
-        dst0.SetTo(white, sliceMask)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 
@@ -1672,45 +1609,6 @@ Public Class RedCloud_NaturalColor : Inherits TaskParent
         dst2 = DisplayCells()
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class RedCloud_MotionBGsubtract : Inherits TaskParent
-    Public bgSub As New BGSubtract_Basics
-    Public redCells As New List(Of rcData)
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        task.gOptions.pixelDiffThreshold = 25
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Use absDiff to build a mask of cells that changed."
-    End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
-        bgSub.Run(src)
-        dst3 = bgSub.dst2
-
-        dst2 = getRedCloud(src, labels(2))
-
-        redCells.Clear()
-        dst1.SetTo(0)
-        For Each rc In task.redCells
-            Dim tmp As cv.Mat = rc.mask And bgSub.dst2(rc.rect)
-            If tmp.CountNonZero Then
-                dst1(rc.rect).SetTo(rc.color, rc.mask)
-                rc.motionFlag = True
-            End If
-            redCells.Add(rc)
-        Next
-
-    End Sub
-End Class
-
-
 
 
 
