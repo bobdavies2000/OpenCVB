@@ -25,6 +25,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
 
         labels(2) = "(clkwise) original, imgStage, imgGeneration, magnitude"
         labels(3) = "Current result"
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes"
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
@@ -97,8 +98,8 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        If task.displayObject IsNot Nothing Then
-            SetTrueText("There are too many operations inside GeneticDrawing_Basics to break down the intermediate results")
+        If task.displayObject.traceName = traceName Then
+            SetTrueText("There are too many operations inside GeneticDrawing_Basics to break down the displayObject results")
             Exit Sub
         End If
 
@@ -106,7 +107,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
         If task.drawRect.Width > 0 Then r = task.drawRect
         If restartRequested Then
             restartRequested = False
-            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
             imgStage = dst3.Clone
             generation = 0
             stage = 0
@@ -215,6 +216,7 @@ Public Class GeneticDrawing_Color : Inherits TaskParent
             split(i) = gDraw(i).dst3
         Next
 
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         cv.Cv2.Merge(split, dst3)
 
         For i = 0 To split.Count - 1

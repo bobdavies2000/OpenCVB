@@ -20,11 +20,11 @@ Public Class Extrinsics_Basics : Inherits TaskParent
 
         Dim pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         If standaloneTest() Then
-            DrawCircle(dst2, pt, task.DotSize, white)
-            DrawCircle(dst3, pt, task.DotSize, white)
-            DrawCircle(dst2, pt, task.DotSize - 2, cv.Scalar.Black)
-            DrawCircle(dst3, pt, task.DotSize - 2, cv.Scalar.Black)
-            DrawCircle(task.color, pt, task.DotSize, white)
+            DrawCircle(dst2, pt, task.DotSize + 2, white)
+            DrawCircle(dst3, pt, task.DotSize + 2, white)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
+            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Black)
+            DrawCircle(task.color, pt, task.DotSize + 2, white)
         End If
     End Sub
 End Class
