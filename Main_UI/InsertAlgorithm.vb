@@ -2,17 +2,12 @@
 Public Class InsertAlgorithm
     Dim VBoutputName As FileInfo
     Dim CPPoutputName As FileInfo
-    Dim CSOutputName As FileInfo
-    Dim PyStreamOutputName As FileInfo
     Dim IncludeOnlyOutputName As FileInfo
     Dim OpenGLOutputName As FileInfo
 
     Dim sw As StreamWriter
     Dim vbSnippet() As String
     Dim cppSnippet() As String
-    Dim cppAISnippet() As String
-    Dim CSSnippet() As String
-    Dim pyStream() As String
     Public Enum algType
         addVB = 1
         addCPP = 2
@@ -56,21 +51,9 @@ Public Class InsertAlgorithm
                 VBoutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\OpenGL.vb")
                 OpenGLOutputName = New FileInfo(Main_UI.HomeDir.FullName + "OpenGL\OpenGLFunction\OpenGLFunction.cpp")
                 ret = MsgBox("Would you like to add the algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + "_VB" +
-                             vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "OpenGL C++ File: " + 
-                             OpenGLOutputName.Name + vbCrLf + vbCrLf + " and to:" + vbCrLf + vbCrLf + 
+                             vbCrLf + vbCrLf + " to: " + vbCrLf + vbCrLf + "OpenGL C++ File: " +
+                             OpenGLOutputName.Name + vbCrLf + vbCrLf + " and to:" + vbCrLf + vbCrLf +
                              VBoutputName.Name, MsgBoxStyle.OkCancel)
-
-            Case algType.addCS
-                CSOutputName = New FileInfo(Main_UI.HomeDir.FullName + "CS_Classes\CS_Non_AI.cs")
-
-                ret = MsgBox("Would you like to add the CSharp algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
-                             " to:" + vbCrLf + vbCrLf + CSOutputName.Name, MsgBoxStyle.OkCancel)
-
-            Case algType.addPyStream
-                PyStreamOutputName = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\" + AlgorithmName.Text + "_PS.py")
-
-                ret = MsgBox("Would you like to add the PyStream algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
-                             " to: " + vbCrLf + vbCrLf + "Python File: " + PyStreamOutputName.Name, MsgBoxStyle.OkCancel)
 
         End Select
 
@@ -115,10 +98,6 @@ Public Class InsertAlgorithm
     Private Sub AddAlgorithm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AlgorithmName.Text = Main_UI.AvailableAlgorithms.Text
         vbSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "\OpenCVB.snippets\a VB_Class.snippet")
-        cppSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\UnManaged (Native) C++ Class - both VB and C++.snippet")
-        cppAISnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\Managed C++ Class - AI_Generated.snippet")
-        CSSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "OpenCVB.snippets\a CSharp Class.snippet")
-        pyStream = File.ReadAllLines(Main_UI.HomeDir.FullName + "Python\AddWeighted_PS.py")
     End Sub
     Private Sub AddCPP_Click(sender As Object, e As EventArgs) Handles AddCPP.Click
         If AlgorithmName.Text.EndsWith("_cpp") Then AlgorithmName.Text = AlgorithmName.Text.Substring(1, Len(AlgorithmName.Text) - 4) + "_CPP"
@@ -261,54 +240,6 @@ Public Class InsertAlgorithm
         MsgBox("Edit the new algorithm " + AlgorithmName.Text + " in: " + vbCrLf + vbCrLf + "OpenGL.vb (project VB_Classes)" + vbCrLf + vbCrLf + "and in: " + vbCrLf + vbCrLf +
                "OpenGL_Functions.cpp (project OpenGL/OpenGL_Functions) ")
     End Sub
-    Private Sub AddCSharp_Click(sender As Object, e As EventArgs) Handles AddCSharp.Click
-        If nextAlgorithm(algType.addCS) = False Then Exit Sub
-
-        Dim ret = MsgBox("The algorithm " + AlgorithmName.Text + " will be added to Non_AI.cs" + vbCrLf + vbCrLf +
-                         "Is this OK?", MsgBoxStyle.OkCancel)
-        If ret = MsgBoxResult.Cancel Then Exit Sub
-        sw = New StreamWriter(CSOutputName.FullName, True)
-        Dim trigger As Boolean
-        For i = 0 To CSSnippet.Count - 1
-            Dim line = CSSnippet(i)
-            If InStr(line, "public") Then trigger = True
-            line = line.Replace("AnyName_Basics_CS", AlgorithmName.Text)
-            If InStr(line, "End Class") Then
-                sw.Write(line)
-                Exit For
-            End If
-            If trigger Then sw.WriteLine(line)
-        Next
-        sw.Close()
-
-        MsgBox(AlgorithmName.Text + " has been appended to CS_Non_AI.cs (move it ahead of the final '}')" + vbCrLf + "in 'CS_Classes' project")
-        Me.Close()
-    End Sub
-    Private Sub AddPyStream_Click(sender As Object, e As EventArgs) Handles AddPyStream.Click
-        If nextAlgorithm(algType.addPyStream) = False Then Exit Sub
-
-        Dim pyFile = New FileInfo(Main_UI.HomeDir.FullName + "VB_Classes\" + AlgorithmName.Text + "_PS.py")
-        Dim alreadyPresent As Boolean
-        If pyFile.Exists Then
-            Dim ret = MsgBox(pyFile.FullName + " exists." + vbCrLf + "Do you want to overwrite it?", MsgBoxStyle.OkCancel, "Add PyStream Algorithm")
-            If ret = MsgBoxResult.Cancel Then Exit Sub
-            alreadyPresent = True
-        End If
-        sw = New StreamWriter(pyFile.FullName)
-        For i = 0 To pyStream.Count - 1
-            Dim line = pyStream(i)
-            If InStr(line, "AddWeighted_PS.py") Then line = line.Replace("AddWeighted_PS.py", pyFile.Name)
-            sw.WriteLine(line)
-        Next
-        sw.Close()
-        If alreadyPresent = False Then
-            MsgBox(pyFile.Name + " has been prepared." + vbCrLf + vbCrLf + "Add '" + pyFile.Name + "' to the VB_Classes project." + vbCrLf +
-               "Once added, restart OpenCVB and it will appear.")
-        Else
-            MsgBox(pyFile.Name + " is ready to run.")
-        End If
-        Me.Close()
-    End Sub
     Private Sub InsertAlgorithm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Me.Close()
     End Sub
@@ -326,8 +257,8 @@ Public Class InsertAlgorithm
         Dim trigger As Boolean
         sw = New StreamWriter(CPPoutputName.FullName, True)
         sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf)
-        For i = 0 To cppAISnippet.Count - 1
-            Dim line = cppAISnippet(i)
+        For i = 0 To cppSnippet.Count - 1
+            Dim line = cppSnippet(i)
             If line.Trim.StartsWith("class") Then trigger = True
             If trigger Then
                 If InStr(line, "Anyname") Then line = line.Replace("Anyname", AlgorithmName.Text)

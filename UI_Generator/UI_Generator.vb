@@ -110,34 +110,6 @@ Module UI_Generator
                             allButPython.Add(classname, line)
                             allList.Add(classname, line)
                         End If
-                    ElseIf line.StartsWith("public class ") Then ' C# algorithms
-                        If line.EndsWith(" : TaskParent") Then
-                            Dim split As String() = Regex.Split(line, "\W+")
-                            classname = split(2)
-                            ' Enable code here to get C# back.
-                            'csList.Add(classname, line)
-                            'allButPython.Add(classname, line)
-                            'allList.Add(classname, line)
-                        End If
-                    ElseIf line.StartsWith("class") Then ' C++ Native algorithms
-                        If line.Contains(" : public CPP_Parent") Then
-                            Dim split = line.Split(" ")
-                            classname = split(1)
-                            cppList.Add(classname, line)
-                            cppNative.Add(classname, line)
-                            allButPython.Add(classname, line)
-                            allList.Add(classname, line)
-                            ccList.Add(classname, line)
-                        End If
-                    ElseIf line.StartsWith("public ref class ") Then ' Managed C++ algorithms.
-                        If line.EndsWith(" : public TaskParent") Then
-                            Dim split = line.Split(" ")
-                            classname = split(3)
-                            cppList.Add(classname, line)
-                            cppManaged.Add(classname, line)
-                            allButPython.Add(classname, line)
-                            allList.Add(classname, line)
-                        End If
                     End If
                 Next
             Next
@@ -310,7 +282,6 @@ Module UI_Generator
             Dim sw = New StreamWriter(HomeDir.FullName + "Data/GroupButtonList.txt")
             Dim lastGroup As String = ""
             For Each alg In allList.Keys
-                If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
                 If alg.EndsWith(".py") Then Continue For
                 Dim split = alg.Split("_")
                 If lastGroup <> split(0) Then sw.WriteLine(split(0))
@@ -321,15 +292,12 @@ Module UI_Generator
             sw = New StreamWriter(HomeDir.FullName + "Data/GroupComboBox.txt")
             sw.Write("(" + CStr(allList.Count) + ") < All >")
             For Each alg In allList.Keys
-                If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
-                If alg.EndsWith("_CC") Then Continue For
                 sw.Write("," + alg)
             Next
             sw.WriteLine()
 
             'sw.Write("(" + CStr(allButPython.Count) + ") < All but Python >")
             'For Each alg In allButPython.Keys
-            '    If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
             '    sw.Write("," + alg)
             'Next
             'sw.WriteLine()
@@ -344,11 +312,14 @@ Module UI_Generator
             'Next
             'sw.WriteLine()
 
-            'sw.Write("(" + CStr(cppList.Count) + ") < All C++ >")
-            'For Each alg In cppList.Keys
-            '    if alg.EndsWith("_CC") = False Then sw.Write("," + alg)
-            'Next
-            'sw.WriteLine()
+            For Each alg In allList.Keys
+                If alg.EndsWith("_CPP") Then cppList.Add(alg, alg)
+            Next
+            sw.Write("(" + CStr(cppList.Count) + ") < All C++ >")
+            For Each alg In allList.Keys
+                If alg.EndsWith("_CPP") Then sw.Write("," + alg)
+            Next
+            sw.WriteLine()
 
             sw.Write("(" + CStr(opengl.Count) + ") < All OpenGL >")
             For Each alg In opengl.Keys

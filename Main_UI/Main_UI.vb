@@ -511,9 +511,6 @@ Public Class Main_UI
         refreshTreeView()
         jsonWrite()
     End Sub
-    Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
-        Translator.Show()
-    End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If Trim(AvailableAlgorithms.Text) = "" Then
             Dim incr = 1

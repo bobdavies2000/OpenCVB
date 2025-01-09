@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Imports System.Windows.Forms
+Imports System
 Imports System.Drawing
 Imports System.Runtime.InteropServices
 Public Class TrueText
@@ -606,26 +606,6 @@ Public Class TaskParent : Implements IDisposable
         Next
         Return srcPoints
     End Function
-    Public Sub Dispose() Implements IDisposable.Dispose
-        If allOptions IsNot Nothing Then allOptions.Close()
-        If task.pythonTaskName.EndsWith(".py") Then
-            Dim proc = Process.GetProcesses()
-            For i = 0 To proc.Count - 1
-                If proc(i).ProcessName.ToLower.Contains("pythonw") Then Continue For
-                If proc(i).ProcessName.ToLower.Contains("python") Then
-                    If proc(i).HasExited = False Then proc(i).Kill()
-                End If
-            Next
-        End If
-        For Each algorithm In task.activeObjects
-            Dim type As Type = algorithm.GetType()
-            If type.GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
-        Next
-        sliders.Dispose()
-        check.Dispose()
-        radio.Dispose()
-        combo.Dispose()
-    End Sub
     Public Sub processFrame(src As cv.Mat)
         If dst2.Size <> src.Size And task.frameCount < 10 Then Exit Sub
         task.MainUI_Algorithm.Run(src)
@@ -718,5 +698,7 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Overridable Sub runAlg(src As cv.Mat)
         ' every algorithm overrides this Sub 
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
 End Class

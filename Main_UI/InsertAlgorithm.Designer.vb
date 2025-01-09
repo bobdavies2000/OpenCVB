@@ -25,17 +25,17 @@ Partial Class InsertAlgorithm
         Me.AlgorithmName = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.AddVB = New System.Windows.Forms.Button()
-        Me.AddCSharp = New System.Windows.Forms.Button()
         Me.AddOpenGL = New System.Windows.Forms.Button()
-        Me.AddCPP = New System.Windows.Forms.Button()
-        Me.AddPyStream = New System.Windows.Forms.Button()
         Me.Add_AI_Generated = New System.Windows.Forms.Button()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
-        Me.Label4 = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.AddCPP = New System.Windows.Forms.Button()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.AddCSharp = New System.Windows.Forms.Button()
         Me.Label7 = New System.Windows.Forms.Label()
+        Me.AddPyStream = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'AlgorithmName
@@ -59,7 +59,7 @@ Partial Class InsertAlgorithm
         '
         'AddVB
         '
-        Me.AddVB.Location = New System.Drawing.Point(18, 102)
+        Me.AddVB.Location = New System.Drawing.Point(18, 135)
         Me.AddVB.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.AddVB.Name = "AddVB"
         Me.AddVB.Size = New System.Drawing.Size(330, 38)
@@ -67,20 +67,9 @@ Partial Class InsertAlgorithm
         Me.AddVB.Text = "Add VB.Net Algorithm"
         Me.AddVB.UseVisualStyleBackColor = True
         '
-        'AddCSharp
-        '
-        Me.AddCSharp.Location = New System.Drawing.Point(18, 464)
-        Me.AddCSharp.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.AddCSharp.Name = "AddCSharp"
-        Me.AddCSharp.Size = New System.Drawing.Size(330, 38)
-        Me.AddCSharp.TabIndex = 6
-        Me.AddCSharp.Text = "Add C# Algorithm"
-        Me.AddCSharp.UseVisualStyleBackColor = True
-        Me.AddCSharp.Visible = False
-        '
         'AddOpenGL
         '
-        Me.AddOpenGL.Location = New System.Drawing.Point(18, 180)
+        Me.AddOpenGL.Location = New System.Drawing.Point(18, 213)
         Me.AddOpenGL.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.AddOpenGL.Name = "AddOpenGL"
         Me.AddOpenGL.Size = New System.Drawing.Size(330, 38)
@@ -88,43 +77,20 @@ Partial Class InsertAlgorithm
         Me.AddOpenGL.Text = "Add OpenGL Algorithm"
         Me.AddOpenGL.UseVisualStyleBackColor = True
         '
-        'AddCPP
-        '
-        Me.AddCPP.Location = New System.Drawing.Point(18, 385)
-        Me.AddCPP.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.AddCPP.Name = "AddCPP"
-        Me.AddCPP.Size = New System.Drawing.Size(330, 38)
-        Me.AddCPP.TabIndex = 8
-        Me.AddCPP.Text = "Add Unmanaged (Native) C++ Algorithm (Old Style)"
-        Me.AddCPP.UseVisualStyleBackColor = True
-        Me.AddCPP.Visible = False
-        '
-        'AddPyStream
-        '
-        Me.AddPyStream.Location = New System.Drawing.Point(18, 559)
-        Me.AddPyStream.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.AddPyStream.Name = "AddPyStream"
-        Me.AddPyStream.Size = New System.Drawing.Size(330, 38)
-        Me.AddPyStream.TabIndex = 9
-        Me.AddPyStream.Text = "Add PyStream Algorithm"
-        Me.AddPyStream.UseVisualStyleBackColor = True
-        Me.AddPyStream.Visible = False
-        '
         'Add_AI_Generated
         '
-        Me.Add_AI_Generated.Location = New System.Drawing.Point(18, 268)
+        Me.Add_AI_Generated.Location = New System.Drawing.Point(18, 301)
         Me.Add_AI_Generated.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Add_AI_Generated.Name = "Add_AI_Generated"
         Me.Add_AI_Generated.Size = New System.Drawing.Size(330, 38)
         Me.Add_AI_Generated.TabIndex = 10
         Me.Add_AI_Generated.Text = "Add Managed AI-Generated C++ Algorithm"
         Me.Add_AI_Generated.UseVisualStyleBackColor = True
-        Me.Add_AI_Generated.Visible = False
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(25, 80)
+        Me.Label2.Location = New System.Drawing.Point(25, 113)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(386, 20)
@@ -134,13 +100,22 @@ Partial Class InsertAlgorithm
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(25, 243)
+        Me.Label3.Location = New System.Drawing.Point(25, 276)
         Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(426, 20)
         Me.Label3.TabIndex = 12
         Me.Label3.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_CPP'"
-        Me.Label3.Visible = False
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(25, 188)
+        Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(456, 20)
+        Me.Label5.TabIndex = 14
+        Me.Label5.Text = "Enter above 'Edge_Canny', appears as 'OpenGL_Edge_Canny'"
         '
         'Label4
         '
@@ -153,15 +128,16 @@ Partial Class InsertAlgorithm
         Me.Label4.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_CPP'"
         Me.Label4.Visible = False
         '
-        'Label5
+        'AddCPP
         '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(25, 155)
-        Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(456, 20)
-        Me.Label5.TabIndex = 14
-        Me.Label5.Text = "Enter above 'Edge_Canny', appears as 'OpenGL_Edge_Canny'"
+        Me.AddCPP.Location = New System.Drawing.Point(18, 385)
+        Me.AddCPP.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.AddCPP.Name = "AddCPP"
+        Me.AddCPP.Size = New System.Drawing.Size(330, 38)
+        Me.AddCPP.TabIndex = 8
+        Me.AddCPP.Text = "Add Unmanaged (Native) C++ Algorithm (Old Style)"
+        Me.AddCPP.UseVisualStyleBackColor = True
+        Me.AddCPP.Visible = False
         '
         'Label6
         '
@@ -174,6 +150,17 @@ Partial Class InsertAlgorithm
         Me.Label6.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_CS'"
         Me.Label6.Visible = False
         '
+        'AddCSharp
+        '
+        Me.AddCSharp.Location = New System.Drawing.Point(18, 464)
+        Me.AddCSharp.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.AddCSharp.Name = "AddCSharp"
+        Me.AddCSharp.Size = New System.Drawing.Size(330, 38)
+        Me.AddCSharp.TabIndex = 6
+        Me.AddCSharp.Text = "Add C# Algorithm"
+        Me.AddCSharp.UseVisualStyleBackColor = True
+        Me.AddCSharp.Visible = False
+        '
         'Label7
         '
         Me.Label7.AutoSize = True
@@ -184,6 +171,17 @@ Partial Class InsertAlgorithm
         Me.Label7.TabIndex = 16
         Me.Label7.Text = "Enter above 'Edge_Canny', appears as 'Edge_Canny_PS.py'"
         Me.Label7.Visible = False
+        '
+        'AddPyStream
+        '
+        Me.AddPyStream.Location = New System.Drawing.Point(18, 559)
+        Me.AddPyStream.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.AddPyStream.Name = "AddPyStream"
+        Me.AddPyStream.Size = New System.Drawing.Size(330, 38)
+        Me.AddPyStream.TabIndex = 9
+        Me.AddPyStream.Text = "Add PyStream Algorithm"
+        Me.AddPyStream.UseVisualStyleBackColor = True
+        Me.AddPyStream.Visible = False
         '
         'InsertAlgorithm
         '
@@ -215,15 +213,15 @@ Partial Class InsertAlgorithm
     Friend WithEvents AlgorithmName As TextBox
     Friend WithEvents Label1 As Label
     Friend WithEvents AddVB As Button
-    Friend WithEvents AddCSharp As Button
     Friend WithEvents AddOpenGL As Button
-    Friend WithEvents AddCPP As Button
-    Friend WithEvents AddPyStream As Button
     Friend WithEvents Add_AI_Generated As Button
     Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
-    Friend WithEvents Label4 As Label
     Friend WithEvents Label5 As Label
+    Friend WithEvents Label4 As Label
+    Friend WithEvents AddCPP As Button
     Friend WithEvents Label6 As Label
+    Friend WithEvents AddCSharp As Button
     Friend WithEvents Label7 As Label
+    Friend WithEvents AddPyStream As Button
 End Class

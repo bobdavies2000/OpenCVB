@@ -33,7 +33,6 @@ Partial Class Main_UI
         Me.Magnify = New System.Windows.Forms.ToolStripButton()
         Me.BluePlusButton = New System.Windows.Forms.ToolStripButton()
         Me.ComplexityButton = New System.Windows.Forms.ToolStripButton()
-        Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
         Me.Advice = New System.Windows.Forms.ToolStripButton()
         Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
         Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
@@ -62,7 +61,7 @@ Partial Class Main_UI
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.TranslateButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.BluePlusButton, Me.ComplexityButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(1583, 34)
@@ -142,16 +141,6 @@ Partial Class Main_UI
         Me.ComplexityButton.Size = New System.Drawing.Size(34, 29)
         Me.ComplexityButton.Text = "Measure an algorithm's complexity"
         Me.ComplexityButton.Visible = False
-        '
-        'TranslateButton
-        '
-        Me.TranslateButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), System.Drawing.Image)
-        Me.TranslateButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TranslateButton.Name = "TranslateButton"
-        Me.TranslateButton.Size = New System.Drawing.Size(34, 29)
-        Me.TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
-        Me.TranslateButton.Visible = False
         '
         'Advice
         '
@@ -329,7 +318,6 @@ Partial Class Main_UI
     Friend WithEvents PixelViewerButton As ToolStripButton
     Friend WithEvents BluePlusButton As ToolStripButton
     Friend WithEvents ComplexityButton As ToolStripButton
-    Friend WithEvents TranslateButton As ToolStripButton
     Friend WithEvents Advice As ToolStripButton
     Friend WithEvents AvailableAlgorithms As ToolStripComboBox
     Friend WithEvents GroupCombo As ToolStripComboBox

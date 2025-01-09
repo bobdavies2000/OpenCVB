@@ -2,22 +2,13 @@
 <CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
 	<CodeSnippet Format="1.0.0">
 		<Header>
-			<Title>CPP_Class - new C++</Title>
+			<Title>CPP_Class - new C++ and VB Class</Title>
 		</Header>
 		<Snippet>
 			<Code Language="VB">
 				<![CDATA[
-
-'//#include <cstdlib>
-'//#include <cstdio>
-'//#include <iostream>
-'//#include <algorithm>
-'//#include <opencv2/core.hpp>
-'//#include <opencv2/imgproc.hpp>
-'//#include <opencv2/highgui.hpp>
-
-'//using namespace std;
-'//using namespace cv;
+				
+'// Place this c++ code in CPP_NativeClasses.h				
 '//class Anyname
 '//{
 '//private:
@@ -49,14 +40,14 @@
 '//		return (int *) cPtr->dst.data; 
 '//}
 
-Public Class Anyname_CPP_VB : Inherits TaskParent
+Public Class Anyname_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = Anyname_Open()
 	    labels = {"", "", "Grayscale image of src", "dst3Label"}
         UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "description"
 	  End Sub
-    Public Sub RunAlg(src as cv.Mat)
+    Public Overrides Sub RunAlg(src as cv.Mat)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -72,6 +63,7 @@ Public Class Anyname_CPP_VB : Inherits TaskParent
     End Sub
 End Class
 
+' place this code in TaskExterns.vb
 Module Anyname_CPP_Module
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Anyname_Open() As IntPtr

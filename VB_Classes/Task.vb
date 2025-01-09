@@ -4,6 +4,7 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
 Imports System.Runtime.InteropServices
+Imports System.Windows.Controls
 
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
@@ -552,14 +553,6 @@ Public Class VBtask : Implements IDisposable
         optionsChanged = True
         Application.DoEvents()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        allOptions.Close()
-        If openGL_hwnd <> 0 Then
-            OpenGLClose()
-            openGL_hwnd = 0
-        End If
-        TaskTimer.Enabled = False
-    End Sub
     Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New TrueText(text, pt, picTag)
         trueData.Add(str)
@@ -899,4 +892,18 @@ Public Class VBtask : Implements IDisposable
         End If
         Return saveOptionsChanged
     End Function
+    Public Sub Dispose() Implements IDisposable.Dispose
+        allOptions.Close()
+        If openGL_hwnd <> 0 Then
+            OpenGLClose()
+            openGL_hwnd = 0
+        End If
+        TaskTimer.Enabled = False
+        For Each algorithm In task.activeObjects
+            Dim type As Type = algorithm.GetType()
+            If type.GetMethod("Close") IsNot Nothing Then
+                algorithm.Close()  ' Close any unmanaged classes...
+            End If
+        Next
+    End Sub
 End Class
