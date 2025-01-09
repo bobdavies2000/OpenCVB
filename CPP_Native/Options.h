@@ -610,7 +610,8 @@ public:
 class Options_Blur {
 public:
 	int kernelSize =  3;
-	double sigma =  1.5;
+	double sigmaX =  1.5;
+	double sigmaY =  1.5;
 	void RunOpt() {}
 	Options_Blur() {
 	}

@@ -260,28 +260,6 @@ End Class
 
 
 
-Public Class OpenGL_ReducedSideView : Inherits TaskParent
-    Dim sideView As New PointCloud_ReducedSideView
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
-    End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
-        sideView.Run(src)
-        dst2 = sideView.dst2
-        task.ogl.pointCloudInput = sideView.dst3
-        task.ogl.Run(task.color)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = sideView.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class OpenGL_Rebuilt : Inherits TaskParent
     Dim rebuild As New Structured_Rebuild
     Public Sub New()
@@ -1166,31 +1144,6 @@ Public Class OpenGL_FlatSurfaces : Inherits TaskParent
         task.ogl.Run(src)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class OpenGL_GradientPhase : Inherits TaskParent
-    Dim gradient As New Gradient_Depth
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        desc = "Show the depth gradient Phase in OpenGL"
-    End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
-        gradient.Run(src)
-        dst2 = gradient.dst2
-        dst3 = gradient.dst3
-        dst1 = Convert32f_To_8UC3(gradient.dst3)
-        labels = gradient.labels
-
-        task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(dst1)
-    End Sub
-End Class
-
-
 
 
 

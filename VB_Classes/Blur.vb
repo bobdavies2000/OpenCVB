@@ -8,7 +8,8 @@ Public Class Blur_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         Options.RunOpt()
-        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(Options.kernelSize, Options.kernelSize), Options.sigma, Options.sigma)
+        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(Options.kernelSize, Options.kernelSize),
+                            Options.sigmaX, Options.sigmaY)
     End Sub
 End Class
 

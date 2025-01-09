@@ -42,7 +42,6 @@ Convex
 Corners
 Correlation
 Covariance
-CPP
 CSV
 DCT
 Delaunay
@@ -190,7 +189,6 @@ Random
 Rectangle
 RecursiveBilateralFilter
 RedCloud
-RedColor
 RedTrack
 Reduction
 Reliable

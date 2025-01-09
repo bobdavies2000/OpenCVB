@@ -3,83 +3,6 @@
 Imports VB_Classes
 'Imports CPP_Managed
 Public Class algorithmList
-Public Enum ccFunctionNames
-_AddWeighted_Basics_CC
-_AddWeighted_DepthAccumulate_CC
-_ApproxPoly_Basics_CC
-_ApproxPoly_FindandDraw_CC
-_ApproxPoly_Hull_CC
-_Area_MinRect_CC
-_BackProject_Basics_CC
-_Bezier_Basics_CC
-_BGSubtract_Basics_CC
-_Bin4Way_Regions_CC
-_Bin4Way_RegionsCombine_CC
-_Binarize_Simple_CC
-_Blur_Basics_CC
-_Color_Basics_CC
-_Contour_Largest_CC
-_Convex_Basics_CC
-_Delaunay_Basics_CC
-_Delaunay_Generations_CC
-_Delaunay_GenerationsNoKNN_CC
-_Depth_Colorizer_CC
-_Depth_PointCloud_CC
-_Depth_PointCloud_IMU_CC
-_Diff_Basics_CC
-_Distance_Basics_CC
-_Edge_Basics_CC
-_Edge_Canny_CC
-_Edge_MotionFrames_CC
-_Edge_Preserving_CC
-_Edge_Scharr_CC
-_Edge_Segments_CC
-_Edge_Sobel_CC
-_EdgeDraw_Basics_CC
-_Feature_Agast_CC
-_Feature_AKaze_CC
-_Feature_Stable_CC
-_Feature_StableSorted_CC
-_FeatureLess_Basics_CC
-_FeatureLess_Edge_CC
-_FeatureLess_History_CC
-_FPoly_TopFeatures_CC
-_Grid_Basics_CC
-_Hist_Basics_CC
-_Hist_DepthSimple_CC
-_Hist_Kalman_CC
-_Hist_RedOptions_CC
-_History_Basics_CC
-_Hull_Basics_CC
-_IMU_GMatrix_CC
-_IMU_GMatrix_QT_CC
-_Kalman_Basics_CC
-_KNN_Basics_CC
-_KNN_NoDups_CC
-_Line_FastDetect_CC
-_Mat_4Click_CC
-_Mat_4to1_CC
-_Mesh_Basics_CC
-_Mesh_Features_CC
-_Motion_BGSub_CC
-_Palette_Basics_CC
-_Palette_Random_CC
-_Plot_Histogram_CC
-_Plot_Histogram2D_CC
-_Random_Basics_CC
-_Random_Enumerable_CC
-_Rectangle_Basics_CC
-_Rectangle_Rotated_CC
-_RedCloud_Flood_CC
-_RedCloud_Reduce_CC
-_RedColor_FeatureLess_CC
-_RedColor_FeatureLessCore_CC
-_Remap_Basics_CC
-_Resize_Basics_CC
-_Resize_Preserve_CC
-_Stable_Basics_CC
-_Stable_BasicsCount_CC
-End Enum
 	Public Function createAlgorithm(algorithmName as string) as Object
 	If algorithmName = "AddWeighted_Accumulate" Then return new AddWeighted_Accumulate
 	If algorithmName = "AddWeighted_Basics" Then return new AddWeighted_Basics
@@ -332,7 +255,6 @@ End Enum
 	If algorithmName = "Covariance_Basics" Then return new Covariance_Basics
 	If algorithmName = "Covariance_Images" Then return new Covariance_Images
 	If algorithmName = "Covariance_Test" Then return new Covariance_Test
-	If algorithmName = "CPP_ManagedTask" Then return new CPP_ManagedTask
 	If algorithmName = "CSV_Basics" Then return new CSV_Basics
 	If algorithmName = "DCT_Basics" Then return new DCT_Basics
 	If algorithmName = "DCT_Depth" Then return new DCT_Depth
@@ -1271,7 +1193,6 @@ End Enum
 	If algorithmName = "OpenGL_FlatStudy3" Then return new OpenGL_FlatStudy3
 	If algorithmName = "OpenGL_FlatSurfaces" Then return new OpenGL_FlatSurfaces
 	If algorithmName = "OpenGL_FPolyCloud" Then return new OpenGL_FPolyCloud
-	If algorithmName = "OpenGL_GradientPhase" Then return new OpenGL_GradientPhase
 	If algorithmName = "OpenGL_GravityAverage" Then return new OpenGL_GravityAverage
 	If algorithmName = "OpenGL_GravityKalman" Then return new OpenGL_GravityKalman
 	If algorithmName = "OpenGL_GravityTransform" Then return new OpenGL_GravityTransform
@@ -1304,7 +1225,6 @@ End Enum
 	If algorithmName = "OpenGL_RedCloudCell" Then return new OpenGL_RedCloudCell
 	If algorithmName = "OpenGL_RedCloudSpectrum" Then return new OpenGL_RedCloudSpectrum
 	If algorithmName = "OpenGL_RedTrack" Then return new OpenGL_RedTrack
-	If algorithmName = "OpenGL_ReducedSideView" Then return new OpenGL_ReducedSideView
 	If algorithmName = "OpenGL_ReducedXYZ" Then return new OpenGL_ReducedXYZ
 	If algorithmName = "OpenGL_Reduction" Then return new OpenGL_Reduction
 	If algorithmName = "OpenGL_Sierpinski" Then return new OpenGL_Sierpinski

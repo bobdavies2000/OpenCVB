@@ -206,7 +206,6 @@
     <Compile Include="Coherence.vb" />
     <Compile Include="Convex.vb" />
     <Compile Include="Correlation.vb" />
-    <Compile Include="CPP.vb" />
     <Compile Include="Crypto.vb" />
     <Compile Include="FPoly.vb" />
     <Compile Include="Gif.vb" />

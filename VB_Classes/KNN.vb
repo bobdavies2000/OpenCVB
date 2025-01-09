@@ -732,9 +732,10 @@ Public Class KNN_MinDistance : Inherits TaskParent
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        task.feat.Run(src)
-
-        If standalone Then inputPoints = task.features
+        If standalone Then
+            task.feat.Run(src)
+            inputPoints = task.features
+        End If
 
         Static minSlider = optiBase.FindSlider("Min Distance to next")
         Dim minDistance = minSlider.value

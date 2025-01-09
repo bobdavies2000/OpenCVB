@@ -1432,6 +1432,7 @@ Public Class Line_Info : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         labels(2) = task.lines.labels(2)
+        If standaloneTest() Then task.lines.Run(src)
 
         dst2 = src
         For Each lp In task.lpList

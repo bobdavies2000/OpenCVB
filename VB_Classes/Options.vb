@@ -2403,18 +2403,22 @@ End Class
 
 Public Class Options_Blur : Inherits OptionParent
     Public kernelSize As Integer = 3
-    Public sigma As Double = 1.5
+    Public sigmaX As Double = 1.5
+    Public sigmaY As Double = 1.5
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Blur Kernel Size", 0, 32, kernelSize)
-            sliders.setupTrackBar("Blur Sigma", 1, 10, sigma * 2)
+            sliders.setupTrackBar("Blur SigmaX", 1, 10, sigmaX * 2)
+            sliders.setupTrackBar("Blur SigmaY", 1, 10, sigmaY * 2)
         End If
     End Sub
     Public Sub RunOpt()
         Static kernelSlider = FindSlider("Blur Kernel Size")
-        Static sigmaSlider = FindSlider("Blur Sigma")
+        Static sigmaXSlider = FindSlider("Blur SigmaX")
+        Static sigmaYSlider = FindSlider("Blur SigmaY")
         kernelSize = kernelSlider.Value Or 1
-        sigma = sigmaSlider.value * 0.5
+        sigmaX = sigmaXSlider.value * 0.5
+        sigmaY = sigmaYSlider.value * 0.5
     End Sub
 End Class
 

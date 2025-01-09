@@ -130,7 +130,8 @@ Public Class Corners_ShiTomasi_CPP : Inherits TaskParent
         Dim data(src.Total - 1) As Byte
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
         Marshal.Copy(src.Data, data, 0, data.Length)
-        Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols, options.blocksize, options.aperture)
+        Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols,
+                                         options.blocksize, options.aperture)
         handle.Free()
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr).Clone

@@ -177,11 +177,11 @@ Module UI_Generator
             sw.WriteLine("'Imports CPP_Managed")
 
             sw.WriteLine("Public Class algorithmList")
-            sw.WriteLine("Public Enum ccFunctionNames")
-            For Each alg In ccList.Keys
-                sw.WriteLine("_" + alg)
-            Next
-            sw.WriteLine("End Enum")
+            'sw.WriteLine("Public Enum ccFunctionNames")
+            'For Each alg In ccList.Keys
+            '    sw.WriteLine("_" + alg)
+            'Next
+            'sw.WriteLine("End Enum")
 
             sw.WriteLine(vbTab + "Public Function createAlgorithm(algorithmName as string) as Object")
             ' Enable code here to get python back.
@@ -323,7 +323,6 @@ Module UI_Generator
             For Each alg In allList.Keys
                 If alg = "CPP_Basics" Or alg = "cpp_Task" Then Continue For
                 If alg.EndsWith("_CC") Then Continue For
-                If alg.EndsWith("_CPP") Then Continue For
                 sw.Write("," + alg)
             Next
             sw.WriteLine()
