@@ -157,7 +157,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
     Public options As New Options_Boundary
     Dim kalmanHist As New Hist_Kalman
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(256)
+        If standalone Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -194,7 +194,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
         valleyOrder.Clear()
         Dim lastEntry As Integer
         For i = 0 To desiredBoundaries - 1
-            valleyOrder.Add(lastEntry, valleys(i) - 1)
+            valleyOrder.Add(lastEntry, valleys(i))
             lastEntry = valleys(i)
         Next
         If valleys(desiredBoundaries - 1) <> histList.Count - 1 Then
@@ -220,7 +220,7 @@ Public Class OpAuto_Peaks2D : Inherits TaskParent
     Public clusterPoints As New List(Of cv.Point2f)
     Dim heatmap As New HeatMap_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(256)
+        If standalone Then task.gOptions.setHistogramBins(256)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -261,7 +261,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
     Dim options As New Options_Boundary
     Dim hist2d As New Hist2D_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(256)
+        If standalone Then task.gOptions.setHistogramBins(256)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub

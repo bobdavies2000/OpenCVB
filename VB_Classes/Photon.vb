@@ -37,7 +37,7 @@ Public Class Photon_Test : Inherits TaskParent
     Dim counts(4 - 1) As List(Of Integer)
     Dim mats As New Mat_4to1
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         For i = 0 To counts.Count - 1
             counts(i) = New List(Of Integer)
         Next

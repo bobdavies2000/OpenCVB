@@ -8,7 +8,7 @@ Public Class Fuzzy_Basics : Inherits TaskParent
     Public Sub New()
         Dim floodRadio = optibase.findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         task.redOptions.setBitReductionBar(32)
         cPtr = Fuzzy_Open()
         optibase.findRadio("CComp").Checked = True

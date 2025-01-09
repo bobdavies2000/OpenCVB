@@ -329,8 +329,8 @@ End Class
 Public Class Spectrum_Mask : Inherits TaskParent
     Dim gSpec As New Spectrum_Gray
     Public Sub New()
-        If standaloneTest() Then strOut = "Select a cell to see its depth spectrum"
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then strOut = "Select a cell to see its depth spectrum"
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Create a mask from the Spectrum ranges"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

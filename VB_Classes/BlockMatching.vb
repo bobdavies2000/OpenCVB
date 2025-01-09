@@ -4,7 +4,7 @@ Public Class BlockMatching_Basics : Inherits TaskParent
     Dim colorizer As New Depth_Colorizer_CPP
     Dim options As New Options_BlockMatching
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels(2) = "Block matching disparity colorized like depth"
         labels(3) = "Right Image (used with left image)"
         desc = "Use OpenCV's block matching on left and right views"

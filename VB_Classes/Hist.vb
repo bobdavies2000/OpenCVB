@@ -14,7 +14,7 @@ Public Class Hist_Basics : Inherits TaskParent
     Public autoDisplay As Boolean
     Dim splitIndex As Integer
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(255)
+        If standalone Then task.gOptions.setHistogramBins(255)
         desc = "Create a histogram (no Kalman)"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -81,7 +81,7 @@ End Class
 Public Class Hist_Grayscale : Inherits TaskParent
     Public hist As New Hist_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(255)
+        If standalone Then task.gOptions.setHistogramBins(255)
         desc = "Create a histogram of the grayscale image"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -268,7 +268,7 @@ End Class
 Public Class Hist_Frustrum : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         task.gOptions.setGravityUsage(False)
         desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
@@ -808,8 +808,8 @@ End Class
 Public Class Hist_Lab : Inherits TaskParent
     Dim hist As New Hist_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"Lab Colors ", "Lab Channel 0", "Lab Channel 1", "Lab Channel 2"}
         desc = "Create a histogram from a BGR image converted to LAB."
     End Sub
@@ -839,7 +839,7 @@ Public Class Hist_PointCloudXYZ : Inherits TaskParent
     Public plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "Histogram of the X channel", "Histogram of the Y channel", "Histogram of the Z channel"}
         desc = "Show individual channel of the point cloud data as a histogram."
     End Sub
@@ -1323,7 +1323,9 @@ Public Class Hist_Kalman : Inherits TaskParent
         hist.Run(src)
         dst3 = hist.dst2.Clone
 
-        If hist.histogram.Rows = 0 Then hist.histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
+        If hist.histogram.Rows = 0 Then
+            hist.histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
+        End If
 
         If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
         For i = 0 To task.histogramBins - 1

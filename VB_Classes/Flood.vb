@@ -18,7 +18,7 @@ End Class
 Public Class Flood_CellStatsPlot : Inherits TaskParent
     Public Sub New()
         task.redOptions.DisplayCellStats.Checked = True
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         task.gOptions.setHistogramBins(1000)
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"

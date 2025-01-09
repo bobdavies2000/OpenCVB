@@ -133,7 +133,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
     Public runRedCloud As Boolean = False
     Public Sub New()
         cPtr = Neighbors_Open()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Find the neighbors in a selected RedCloud cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

@@ -892,7 +892,7 @@ Public Class Depth_InRange : Inherits TaskParent
     Public classCount As Integer = 1
     Public Sub New()
         labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         dst3 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U)
         desc = "Create the selected number of depth ranges "
     End Sub

@@ -140,7 +140,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
     Public Sub New()
         gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
-        If standaloneTest() Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
+        If standalone Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
@@ -195,7 +195,7 @@ End Class
 Public Class Grid_BasicsTest : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
-        If standaloneTest() Then desc = "Validation test for Grid_Basics algorithm"
+        If standalone Then desc = "Validation test for Grid_Basics algorithm"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         Dim mean = cv.Cv2.Mean(src)
@@ -234,7 +234,7 @@ End Class
 Public Class Grid_List : Inherits TaskParent
     Public Sub New()
         labels(2) = "Adjust grid width/height to increase thread count."
-        If standaloneTest() Then desc = "List the active threads"
+        If standalone Then desc = "List the active threads"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         Parallel.ForEach(Of cv.Rect)(task.gridRects,

@@ -3,7 +3,7 @@ Public Class Resize_Basics : Inherits TaskParent
     Public newSize As cv.Size
     Public options As New Options_Resize
     Public Sub New()
-        If standaloneTest() Then task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
+        If standalone Then task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
         desc = "Resize with different options and compare them"
         labels(2) = "Rectangle highlight above resized"
     End Sub

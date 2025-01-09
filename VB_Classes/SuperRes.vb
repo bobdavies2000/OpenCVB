@@ -90,7 +90,7 @@ Public Class SuperRes_SubPixelZoom : Inherits TaskParent
     Dim zoom As New Pixel_SubPixel
     Dim video As New SuperRes_Input
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

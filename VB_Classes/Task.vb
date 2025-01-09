@@ -151,7 +151,7 @@ Public Class VBtask : Implements IDisposable
     Public heartBeat As Boolean
     Public heartBeatLT As Boolean = True ' long term heartbeat - every X seconds.
     Public quarterBeat As Boolean
-    Public quarter(4) As Boolean
+    Public quarter(4 - 1) As Boolean
     Public midHeartBeat As Boolean
     Public almostHeartBeat As Boolean
     Public msWatch As Integer
@@ -493,6 +493,7 @@ Public Class VBtask : Implements IDisposable
                     New RedCloud_Basics}
 
         gmat = algTasks(algTaskID.gMat)
+        displayObject = gmat
         lines = algTasks(algTaskID.lines)
         grid = algTasks(algTaskID.grid)
         palette = algTasks(algTaskID.palette)

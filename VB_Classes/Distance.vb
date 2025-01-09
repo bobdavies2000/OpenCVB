@@ -182,7 +182,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
     Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
     Dim lastredCells As New List(Of rcData)
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         task.redOptions.setUseColorOnly(True)
         task.redOptions.HistBinBar3D.Value = 5
         labels(1) = "3D Histogram distance for each of the cells at left"

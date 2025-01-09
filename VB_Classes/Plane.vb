@@ -500,7 +500,7 @@ Public Class Plane_Verticals : Inherits TaskParent
     Dim solo As New PointCloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
                   "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
                   "Thresholded heatmap top view mask"}
@@ -534,7 +534,7 @@ Public Class Plane_Horizontals : Inherits TaskParent
     Dim solo As New PointCloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
                   "Heatmap side view", "Single frame backprojection areas in the heatmap",
                   "Thresholded heatmap side view mask"}
@@ -572,7 +572,7 @@ Public Class Plane_FloorStudy : Inherits TaskParent
     Public planeY As Single
     Dim options = New Options_PlaneFloor()
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "", "", ""}
         desc = "Find the floor plane (if present)"
     End Sub

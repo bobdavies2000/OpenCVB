@@ -541,7 +541,7 @@ End Class
 Public Class Edge_ColorGap_VB : Inherits TaskParent
     Dim options As New Options_Edges3
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
 
         labels = {"", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges"}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -585,7 +585,7 @@ End Class
 Public Class Edge_DepthGap_Native : Inherits TaskParent
     Dim options As New Options_DepthEdges
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
 
         labels = {"", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges"}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -937,8 +937,8 @@ End Class
 Public Class Edge_SobelCustomLeftRight : Inherits TaskParent
     Dim custom As New Edge_SobelCustom
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
         desc = "Show Sobel edge detection for both left and right images"
     End Sub

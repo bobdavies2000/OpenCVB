@@ -414,7 +414,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 200
         dotSlider = optiBase.FindSlider("Average distance multiplier")
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"
     End Sub

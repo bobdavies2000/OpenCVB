@@ -124,7 +124,7 @@ End Class
 Public Class Model_CellZoom : Inherits TaskParent
     Dim oglData As New Model_RedCloud
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "", "RedCloud_Hull output", "Selected cell in 3D"}
         desc = "Zoom in on the selected RedCloud cell in the OpenGL output"
     End Sub

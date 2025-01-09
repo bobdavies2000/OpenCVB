@@ -90,8 +90,8 @@ Public Class Image_CellStats : Inherits TaskParent
     Dim stats As New Cell_Basics
     Public Sub New()
         images.images.images.options.imageSeries = False
-        If standaloneTest() Then task.gOptions.setDisplay0()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay0()
+        If standalone Then task.gOptions.setDisplay1()
         task.redOptions.setUseColorOnly(True)
         desc = "Display the statistics for the selected cell"
     End Sub
@@ -122,9 +122,9 @@ Public Class Image_MSER : Inherits TaskParent
     Dim core As New MSER_Detect
     Dim options As New Options_Images
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-       optiBase.findslider("MSER Min Area").Value = 15
-       optiBase.findslider("MSER Max Area").Value = 200000
+        If standalone Then task.gOptions.setDisplay1()
+        optiBase.findslider("MSER Min Area").Value = 15
+        optiBase.FindSlider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

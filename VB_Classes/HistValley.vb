@@ -256,7 +256,7 @@ Public Class HistValley_Test : Inherits TaskParent
     Public options As New Options_Boundary
     Dim kalmanHist As New Hist_Kalman
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(256)
+        If standalone Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -497,15 +497,15 @@ Public Class HistValley_Colors : Inherits TaskParent
     Dim auto As New OpAuto_Valley
     Dim splitIndex As Integer
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(256)
-        If standaloneTest() Then optiBase.FindSlider("Desired boundary count").Value = 10
+        If standalone Then task.gOptions.setHistogramBins(256)
+        If standalone Then optiBase.FindSlider("Desired boundary count").Value = 10
         desc = "Find the histogram valleys for each of the colors."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
         src = src.ExtractChannel(splitIndex)
-        hist.hist.plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
-
+        hist.hist.plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue,
+                                          cv.Scalar.Green, cv.Scalar.Red)
         hist.Run(src)
         dst2 = hist.dst2
 
@@ -513,9 +513,9 @@ Public Class HistValley_Colors : Inherits TaskParent
 
         For i = 0 To auto.valleyOrder.Count - 1
             Dim entry = auto.valleyOrder.ElementAt(i)
-            Dim cClass = CSng(CInt(255 / (i + 1)))
-            Dim index = If(i Mod 2, cClass, 255 - cClass)
-            For j = entry.Key To entry.Value
+            Dim cClass = CSng(CInt(auto.valleyOrder.Count / (i + 1)))
+            Dim index = If(i Mod 2, cClass, auto.valleyOrder.Count - cClass)
+            For j = entry.Key To Math.Min(entry.Value, hist.hist.histogram.Rows) - 1
                 hist.hist.histogram.Set(Of Single)(j, 0, index)
             Next
             Dim col = dst2.Width * entry.Value / task.histogramBins
@@ -534,8 +534,8 @@ Public Class HistValley_GrayKalman : Inherits TaskParent
     Dim auto As New OpAuto_Valley
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(256)
-        If standaloneTest() Then optiBase.FindSlider("Desired boundary count").Value = 4
+        If standalone Then task.gOptions.setHistogramBins(256)
+        If standalone Then optiBase.FindSlider("Desired boundary count").Value = 4
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -573,7 +573,7 @@ End Class
 Public Class HistValley_GrayScale1 : Inherits TaskParent
     Dim hist As New Hist_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(256)
+        If standalone Then task.gOptions.setHistogramBins(256)
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

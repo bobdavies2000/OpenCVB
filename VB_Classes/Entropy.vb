@@ -48,7 +48,7 @@ Public Class Entropy_Highest : Inherits TaskParent
     Public eMaxRect As cv.Rect
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setGridSize(CInt(dst2.Width / 10))
+        If standalone Then task.gOptions.setGridSize(CInt(dst2.Width / 10))
         labels(2) = "Highest entropy marked with red rectangle"
         desc = "Find the highest entropy section of the color image."
     End Sub

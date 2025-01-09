@@ -211,7 +211,7 @@ Public Class Corners_BasicsCentroids : Inherits TaskParent
     Dim fast As New Corners_Basics
     Dim fastCenters() As cv.Point2f
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setGridSize(16)
+        If standalone Then task.gOptions.setGridSize(16)
         desc = "Use a thread grid to find the centroids in each grid element"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

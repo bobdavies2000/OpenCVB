@@ -297,7 +297,7 @@ Public Class Match_PointSlope : Inherits TaskParent
     Dim strOut1 As String
     Dim strOut2 As String
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "Output of Lines_PointSlope", "Matched lines", "correlationMats"}
         desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop."
     End Sub
@@ -435,7 +435,7 @@ Public Class Match_DrawRect : Inherits TaskParent
     Public Sub New()
         inputRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        If standaloneTest() Then labels(3) = "Probabilities (draw rectangle to test again)"
+        If standalone Then labels(3) = "Probabilities (draw rectangle to test again)"
         labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
         desc = "Find the requested template in task.drawrect in an image"
     End Sub

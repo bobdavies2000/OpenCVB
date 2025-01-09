@@ -6,8 +6,8 @@ Public Class WarpModel_Basics : Inherits TaskParent
     Dim ecc As New WarpModel_ECC
     Dim options As New Options_WarpModel
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image"}
         desc = "Align the BGR inputs raw images from the Prokudin examples."
     End Sub
@@ -141,8 +141,7 @@ Public Class WarpModel_Input : Inherits TaskParent
     Dim sobel As New Edge_Sobel
     Dim options As New Options_WarpModel
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image"}
         desc = "Import the misaligned input."
     End Sub

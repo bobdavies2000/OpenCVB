@@ -65,7 +65,7 @@ End Class
 '    Public colorFmt As New Color_Basics
 '    Public bpCol As Integer, bpRow As Integer
 '    Public Sub New()
-'        If standaloneTest() Then task.gOptions.setGridSize(5)
+'        If standalone Then task.gOptions.setGridSize(5)
 '        UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
 '        desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
 '    End Sub
@@ -110,7 +110,7 @@ Public Class BackProject2D_Compare : Inherits TaskParent
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Hue (upper left), sat (upper right), highlighted backprojection (bottom left)"
-        If standaloneTest() Then task.gOptions.setGridSize(10)
+        If standalone Then task.gOptions.setGridSize(10)
         desc = "Compare the hue and brightness images and the results of the Hist_backprojection2d"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -317,7 +317,7 @@ Public Class BackProject2D_RowCol : Inherits TaskParent
     Dim options As New Options_BackProject2D
     Public Sub New()
         optiBase.FindRadio("HSV").Checked = True
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         task.gOptions.setGridSize(10)
         desc = "Backproject the whole row or column of the 2D histogram"
     End Sub

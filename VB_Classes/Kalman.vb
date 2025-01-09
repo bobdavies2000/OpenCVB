@@ -209,7 +209,7 @@ Public Class Kalman_CVMat : Inherits TaskParent
     Public Sub New()
         ReDim basics.kInput(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
-        If standaloneTest() Then labels(2) = "Rectangle moves smoothly to random locations"
+        If standalone Then labels(2) = "Rectangle moves smoothly to random locations"
         desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

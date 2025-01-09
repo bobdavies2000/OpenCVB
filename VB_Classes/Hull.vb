@@ -6,7 +6,7 @@ Public Class Hull_Basics : Inherits TaskParent
     Public useRandomPoints As Boolean
     Public Sub New()
         labels = {"", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", ""}
-        If standaloneTest() Then random.range = New cv.Rect(100, 100, 50, 50)
+        If standalone Then random.range = New cv.Rect(100, 100, 50, 50)
         desc = "Given a list of points, create a hull that encloses them."
     End Sub
     Private Function vbFloat2Int(ptList2f As List(Of cv.Point2f)) As List(Of cv.Point)

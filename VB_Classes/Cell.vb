@@ -3,7 +3,7 @@ Public Class Cell_Basics : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setHistogramBins(20)
+        If standalone Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
@@ -185,8 +185,8 @@ End Class
 
 Public Class Cell_Binarize : Inherits TaskParent
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Binarized image", "", "Relative gray image"}

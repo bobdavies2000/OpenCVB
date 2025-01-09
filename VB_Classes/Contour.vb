@@ -370,7 +370,7 @@ Public Class Contour_Sorted : Inherits TaskParent
     Dim options As New Options_Contours
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "", "Contours in the detected motion", "Diff output - detected motion"}
         task.gOptions.pixelDiffThreshold = 25
         desc = "Display the contours from largest to smallest in the motion output"

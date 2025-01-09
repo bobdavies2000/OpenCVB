@@ -3,8 +3,8 @@ Imports System.IO
 Public Class LaneFinder_Basics : Inherits TaskParent
     Dim lane As New LaneFinder_SlopeIntercept
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -25,8 +25,8 @@ Public Class LaneFinder_Videos : Inherits TaskParent
     Public video As New Video_Basics
     Dim options As New Options_LaneFinder
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
 
         Dim inputfile = New FileInfo(task.HomeDir + options.inputName)
         video.options.fileInfo = New FileInfo(inputfile.FullName)

@@ -33,7 +33,7 @@ Public Class Sort_RectAndMask : Inherits TaskParent
     Public rect As cv.Rect
     Public Sub New()
         labels(3) = "Original input to sort"
-        If standaloneTest() Then task.drawRect = New cv.Rect(10, 10, 50, 5)
+        If standalone Then task.drawRect = New cv.Rect(10, 10, 50, 5)
         desc = "Sort the grayscale image portion in a rect while allowing for a mask."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -98,9 +98,9 @@ Public Class Sort_1Channel : Inherits TaskParent
     Public rangeStart As New List(Of Integer)
     Public rangeEnd As New List(Of Integer)
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        optibase.findRadio("Sort all pixels descending").Checked = True
-        If standaloneTest() Then task.gOptions.setGridSize(10)
+        If standalone Then task.gOptions.setDisplay1()
+        optiBase.findRadio("Sort all pixels descending").Checked = True
+        If standalone Then task.gOptions.setGridSize(10)
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
@@ -158,8 +158,8 @@ Public Class Sort_3Channel : Inherits TaskParent
     Dim dups As New ML_RemoveDups_CPP
     Dim bgra As cv.Mat
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        optibase.findRadio("Sort all pixels descending").Checked = True
+        If standalone Then task.gOptions.setDisplay1()
+        optiBase.findRadio("Sort all pixels descending").Checked = True
         labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
         desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
     End Sub

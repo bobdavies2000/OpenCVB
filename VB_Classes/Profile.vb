@@ -100,7 +100,7 @@ Public Class Profile_Rotation : Inherits TaskParent
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
     Dim options As New Options_IMU
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setGravityUsage(False)
+        If standalone Then task.gOptions.setGravityUsage(False)
         labels(2) = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation."
         desc = "Build the rotation matrix around the Y-axis"
     End Sub
@@ -138,7 +138,7 @@ Public Class Profile_Derivative : Inherits TaskParent
     Public sides As New Profile_Basics
     Dim saveTrueText As New List(Of TrueText)
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
@@ -296,7 +296,7 @@ Public Class Profile_OpenGL : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
-        If standaloneTest() Then task.gOptions.setGravityUsage(False)
+        If standalone Then task.gOptions.setGravityUsage(False)
         task.ogl = New OpenGL_Basics
         task.ogl.options.PointSizeSlider.Value = 10
         task.ogl.oglFunction = oCase.pcPointsAlone
@@ -336,7 +336,7 @@ Public Class Profile_Kalman : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(12 - 1)
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
         desc = "Use Kalman to smooth the results of the contour key points"
     End Sub

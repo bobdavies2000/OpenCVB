@@ -87,7 +87,7 @@ Public Class Line3D_Draw : Inherits TaskParent
     Dim plot As New Plot_OverTimeScalar
     Dim toggleFirstSecond As Boolean
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         plot.plotCount = 2
 
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

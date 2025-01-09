@@ -622,7 +622,7 @@ Public Class Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Dim lines As New Line_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "", "Lines for the current color class", "Color Class input"}
         desc = "Review lines in all the different color classes"
     End Sub
@@ -1243,7 +1243,7 @@ Public Class Line_PointSlope : Inherits TaskParent
     Const searchCount As Integer = 100
     Public Sub New()
         knn.options.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
