@@ -867,11 +867,13 @@ Public Class VBtask : Implements IDisposable
 
             ' if there were no cycles spent on this routine, then it was inactive.
             ' if any active algorithm has an index = -1, make sure it is running .Run, not .runAlg
-            Dim index = algorithmNames.IndexOf(displayObject.traceName)
-            If index = -1 Then
-                Dim str As New TrueText("This task is not active at this time.",
+            If task.testAllRunning = False Then ' no Treeview when running test all...
+                Dim index = algorithmNames.IndexOf(displayObject.traceName)
+                If index = -1 Then
+                    Dim str As New TrueText("This task is not active at this time.",
                                         New cv.Point(dst2.Width / 2, 0), 3)
-                displayObject.trueData.Add(str)
+                    displayObject.trueData.Add(str)
+                End If
             End If
 
             trueData = New List(Of TrueText)(displayObject.trueData)
