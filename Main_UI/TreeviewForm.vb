@@ -30,13 +30,13 @@ Public Class TreeviewForm
         Return Nothing
     End Function
     Dim titleStr = " - Click on any node to review the algorithm's output."
-    Public Sub updateTree()
-        If Main_UI.callTrace.Count = 0 Then Exit Sub
+    Public Sub updateTree(callTrace As List(Of String))
+        If callTrace.Count = 0 Then Exit Sub
         moduleList.Clear()
 
         Dim tv = TreeView1
         tv.Nodes.Clear()
-        Dim rootcall = Trim(Main_UI.callTrace(0))
+        Dim rootcall = Trim(callTrace(0))
         Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
         Me.Text = title + titleStr
         Dim n = tv.Nodes.Add(title)
@@ -46,8 +46,8 @@ Public Class TreeviewForm
         For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
             Dim alldone = True
 
-            For i = 1 To Main_UI.callTrace.Count - 1
-                Dim fullname = Main_UI.callTrace(i)
+            For i = 1 To callTrace.Count - 1
+                Dim fullname = callTrace(i)
                 Dim split() = fullname.Split("\")
                 If split.Count = nodeLevel + 3 Then
                     alldone = False
@@ -73,7 +73,7 @@ Public Class TreeviewForm
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
 
-        For Each sn In Main_UI.callTrace
+        For Each sn In callTrace
             If sn = "" Then Exit For
             Dim split() = sn.Split("\")
             If split.Length > 1 Then treeData.Add(split(split.Length - 2))
@@ -87,11 +87,12 @@ Public Class TreeviewForm
         If Main_UI.testAllRunning Then Exit Sub ' don't update the treeview when doing overnight testing.
         SyncLock callTraceLock
             If Main_UI.callTrace Is Nothing Then Exit Sub
-            If Main_UI.callTrace.Count > 0 Then
-                Dim firstEntry = Main_UI.callTrace(0)
+            Dim callTrace = New List(Of String)(Main_UI.callTrace)
+            If callTrace.Count > 0 Then
+                Dim firstEntry = callTrace(0)
                 If Len(firstEntry) Then
                     firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
-                    If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree()
+                    If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree(callTrace)
                 End If
             End If
         End SyncLock

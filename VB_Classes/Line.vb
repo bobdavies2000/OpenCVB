@@ -512,13 +512,11 @@ Public Class Line_Perpendicular : Inherits TaskParent
         desc = "Find the line perpendicular to the line created by the points provided."
     End Sub
     Public Function computePerp(lp As linePoints) As linePoints
-        SetTrueText("Computing the perpendicular")
         midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
 
         Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
 
         Dim b = midPoint.Y - m * midPoint.X
-        activeTask = True ' algorithms called by task algorithms don't get marked active
         Return New linePoints(New cv.Point2f(-b / m, 0), New cv.Point2f((dst2.Height - b) / m, dst2.Height))
     End Function
     Public Overrides Sub runAlg(src As cv.Mat)

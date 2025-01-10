@@ -30,7 +30,6 @@ Public Class Motion_Basics : Inherits TaskParent
         If standaloneTest() Or task.displayObject.traceName = "Diff_Basics" Then
             diff.Run(src)
             dst3 = diff.dst2
-            diff.activeTask = True
         End If
         dst2 = motionMask
 

@@ -32,7 +32,6 @@ Public Class TaskParent : Implements IDisposable
     Public cPtr As IntPtr
     Public trueData As New List(Of TrueText)
     Public strOut As String
-    Public activeTask As Boolean
     Public Sub New()
         traceName = Me.GetType.Name
         If task.callTrace.Count = 0 Then task.callTrace.Add(task.algName + "\")
@@ -63,7 +62,6 @@ Public Class TaskParent : Implements IDisposable
         task.callTrace.Add(callStack)
 
         task.activeObjects.Add(Me)
-        activeTask = True
 
         If task.recordTimings Then
             If standalone And task.testAllRunning = False Then
@@ -689,7 +687,6 @@ Public Class TaskParent : Implements IDisposable
         If task.testAllRunning = False Then measureStartRun(traceName)
 
         If task.paused = False Then
-            activeTask = True
             trueData.Clear()
             runAlg(src)
         End If

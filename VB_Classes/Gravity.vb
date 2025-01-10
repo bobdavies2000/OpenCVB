@@ -59,7 +59,6 @@ Public Class Gravity_Basics : Inherits TaskParent
 
         task.horizonVec = perp.computePerp(task.gravityVec)
         SetTrueText(strOut, 3)
-        activeTask = True ' algorithms called by task algorithms don't get marked active
     End Sub
 End Class
 
@@ -169,9 +168,9 @@ Public Class Gravity_Horizon : Inherits TaskParent
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        gravity.runAlg(src)
+        gravity.Run(src)
 
-        horizon.runAlg(src)
+        horizon.Run(src)
         If task.firstPass Then lastVec = horizon.vec
         If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
         If lastVec IsNot Nothing And horizon.vec.p1.Y = 0 Then horizon.vec = lastVec

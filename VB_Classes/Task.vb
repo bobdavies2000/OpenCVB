@@ -386,15 +386,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            ' mark each task as inactive so we can find which are really working.
-            If heartBeat Then
-                For Each obj In activeObjects
-                    obj.activeTask = False
-                Next
-            End If
-
             displayObject = finddisplayObject(displayObjectName)
-
             If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
             ' MSER mistakenly can have 1 cell - just ignore it.
@@ -655,9 +647,9 @@ Public Class VBtask : Implements IDisposable
         IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
         If displayObject Is Nothing Then displayObject = grid
 
-        grid.runAlg(color)
-        algTasks(algTaskID.IMUBasics).runAlg(src)
-        gmat.runAlg(src)
+        grid.Run(color)
+        algTasks(algTaskID.IMUBasics).Run(src)
+        gmat.Run(src)
 
         If gOptions.RGBFilterActive.Checked Then
             Static saveFilterName As String
@@ -688,11 +680,11 @@ Public Class VBtask : Implements IDisposable
                     End If
                 Next
             End If
-            rgbFilter.runAlg(src)
+            rgbFilter.Run(src)
             src = rgbFilter.dst2
             leftView = src.Clone ' color is always the left view
 
-            rgbFilter.runalg(rightView) ' apply the rgb filter to the right view as well.
+            rgbFilter.Run(rightView) ' apply the rgb filter to the right view as well.
             rightView = rgbFilter.dst2
         End If
 
@@ -785,7 +777,7 @@ Public Class VBtask : Implements IDisposable
 
         If gOptions.CreateGif.Checked Then
             If gifCreator Is Nothing Then gifCreator = New Gif_OpenCVB
-            gifCreator.runAlg(src)
+            gifCreator.Run(src)
             If gifBuild Then
                 gifBuild = False
                 If gifImages.Count = 0 Then
@@ -811,15 +803,8 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
         End If
-        For Each obj In algTasks
-            If obj.traceName = "Line_Basics" Then Continue For ' not expected to be active
-            If obj.traceName = "Feature_Basics" Then Continue For ' not expected to be active
-            If obj.traceName = "RedCloud_Basics" Then Continue For ' not expected to be active
-            obj.activeTask = True
-        Next
-        algTasks(algTaskID.palette).activeTask = False ' usually it is inactive
 
-        algTasks(algTaskID.gravityHorizon).runAlg(src)
+        algTasks(algTaskID.gravityHorizon).Run(src)
 
         Dim saveOptionsChanged = optionsChanged
         If paused = False Then
@@ -880,7 +865,10 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If displayObject.activeTask = False And heartBeat = False Then
+            ' if there were no cycles spent on this routine, then it was inactive.
+            ' if any active algorithm has an index = -1, make sure it is running .Run, not .runAlg
+            Dim index = algorithmNames.IndexOf(displayObject.traceName)
+            If index = -1 Then
                 Dim str As New TrueText("This task is not active at this time.",
                                         New cv.Point(dst2.Width / 2, 0), 3)
                 displayObject.trueData.Add(str)
