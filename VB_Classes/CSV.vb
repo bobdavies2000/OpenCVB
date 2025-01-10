@@ -30,34 +30,3 @@ Public Class CSV_Basics : Inherits TaskParent
         If standaloneTest() Then SetTrueText(inputFile + " is now loaded into the csv.array")
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-'Public Class CSV_Excel : Inherits TaskParent
-'    Public inputFile As String
-'    Public dataTable As DataTable
-'    Public Sub New()
-'        inputFile = task.HomeDir + "Data\examples.xls" ' default input file when run standaloneTest()
-'        desc = "Read an Excel file"
-'    End Sub
-'    Public Overrides sub runAlg(src As cv.Mat)
-'        Dim reader As IExcelDataReader
-'        Dim stream = File.Open(inputFile, FileMode.Open, FileAccess.Read)
-'        reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream)
-'        Dim conf = New ExcelDataSetConfiguration
-'        Dim configureDataTable = New ExcelDataTableConfiguration
-
-'        Dim dataSet = reader.AsDataSet(conf)
-'        dataTable = dataSet.Tables(0)
-'        If standaloneTest() Then Dim array = dataTable.ToJagged(Of Double)("Column0", "Column1")
-'        SetTrueText("Input file: " + inputFile + vbCrLf + "Can now be read with the following:" + vbCrLf + vbCrLf +
-'                    "dim array = excel.dataTable.ToJagged(of Double)(column1 label, column2 label)")
-'        reader.Close()
-'    End Sub
-'End Class
