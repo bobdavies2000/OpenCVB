@@ -1175,7 +1175,7 @@ End Class
 
 
 Public Class FCS_RedCloud : Inherits TaskParent
-    Dim redCombo As New RedColor_Combine
+    Dim redCombo As New RedCloud_Combine
     Dim fcs As New FCS_Basics
     Dim knnMin As New KNN_MinDistance
     Public Sub New()

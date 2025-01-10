@@ -1458,6 +1458,8 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
 	If algorithmName = "RedCloud_BasicsHist" Then return new RedCloud_BasicsHist
 	If algorithmName = "RedCloud_BasicsTest" Then return new RedCloud_BasicsTest
+	If algorithmName = "RedCloud_Combine" Then return new RedCloud_Combine
+	If algorithmName = "RedCloud_Depth" Then return new RedCloud_Depth
 	If algorithmName = "RedCloud_World" Then return new RedCloud_World
 	If algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ
 	If algorithmName = "RedCloud_YZ" Then return new RedCloud_YZ
@@ -1469,14 +1471,11 @@ Public Class algorithmList
 	If algorithmName = "RedColor_CellsAtDepth" Then return new RedColor_CellsAtDepth
 	If algorithmName = "RedColor_CellStatsPlot" Then return new RedColor_CellStatsPlot
 	If algorithmName = "RedColor_ColorAndDepth" Then return new RedColor_ColorAndDepth
-	If algorithmName = "RedColor_Combine" Then return new RedColor_Combine
 	If algorithmName = "RedColor_Consistent" Then return new RedColor_Consistent
 	If algorithmName = "RedColor_Consistent1" Then return new RedColor_Consistent1
-	If algorithmName = "RedColor_Consistent2" Then return new RedColor_Consistent2
 	If algorithmName = "RedColor_ContourUpdate" Then return new RedColor_ContourUpdate
 	If algorithmName = "RedColor_CPP" Then return new RedColor_CPP
 	If algorithmName = "RedColor_DelaunayGuidedFeatures" Then return new RedColor_DelaunayGuidedFeatures
-	If algorithmName = "RedColor_Depth" Then return new RedColor_Depth
 	If algorithmName = "RedColor_DepthOutline" Then return new RedColor_DepthOutline
 	If algorithmName = "RedColor_Equations" Then return new RedColor_Equations
 	If algorithmName = "RedColor_Features" Then return new RedColor_Features
@@ -1496,7 +1495,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_MaxDist_CPP" Then return new RedColor_MaxDist_CPP
 	If algorithmName = "RedColor_MeterByMeter" Then return new RedColor_MeterByMeter
 	If algorithmName = "RedColor_MostlyColor" Then return new RedColor_MostlyColor
-	If algorithmName = "RedColor_NaturalColor" Then return new RedColor_NaturalColor
 	If algorithmName = "RedColor_OnlyColorAlt" Then return new RedColor_OnlyColorAlt
 	If algorithmName = "RedColor_OnlyColorHist3D" Then return new RedColor_OnlyColorHist3D
 	If algorithmName = "RedColor_OutlineColor" Then return new RedColor_OutlineColor

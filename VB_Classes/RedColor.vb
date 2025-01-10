@@ -5,6 +5,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public cellGen As New Cell_Generate
     Dim redCPP As New RedColor_CPP
     Dim color As New Color8U_Basics
+    Public topXOnly As Boolean
     Public Sub New()
         task.gOptions.setHistogramBins(40)
         inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -28,16 +29,9 @@ Public Class RedColor_Basics : Inherits TaskParent
         cellGen.Run(redCPP.dst2)
 
         dst1 = cellGen.dst2
+        dst2 = dst1.Clone
 
         labels(2) = cellGen.labels(2)
-
-        If task.heartBeat Then
-            dst2 = dst1.Clone
-        Else
-            For Each rc In task.redCells
-                If rc.motionFlag Then dst2(rc.rect).SetTo(rc.naturalColor, rc.mask)
-            Next
-        End If
 
         If task.redOptions.DisplayCellStats.Checked Then
             Static stats As Cell_Basics
@@ -51,27 +45,15 @@ Public Class RedColor_Basics : Inherits TaskParent
             dst1 = stats.dst1
         End If
 
-        If standaloneTest() Then
-            If task.heartBeat Then
-                dst3.SetTo(0)
-                For i = 0 To Math.Min(task.redOptions.identifyCount, task.redCells.Count) - 1
-                    Dim rc = task.redCells(i)
-                    dst3(rc.rect).SetTo(rc.color, rc.mask)
-                Next
-            Else
-                Dim count As Integer
-                For i = 0 To task.redCells.Count - 1
-                    Dim rc = task.redCells(i)
-                    If rc.motionFlag Then
-                        dst3(rc.rect).SetTo(rc.color, rc.mask)
-                        count += 1
-                        If count >= task.redOptions.identifyCount Then Exit For
-                    End If
-                Next
-                labels(3) = CStr(count) + " largest cells shown below in the 'tracking' color " +
-                            "which changes when the cell is split or lost."
-            End If
+        If standaloneTest() Or topXOnly Then
+            dst3.SetTo(0)
+            For i = 0 To Math.Min(task.redOptions.identifyCount, task.redCells.Count) - 1
+                Dim rc = task.redCells(i)
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+            Next
 
+            labels(3) = "The " + CStr(task.redOptions.identifyCount) + " largest cells shown below " +
+                        " in the 'tracking' color which changes when the cell is split or lost."
         End If
     End Sub
 End Class
@@ -153,15 +135,13 @@ Public Class RedColor_FindCells : Inherits TaskParent
 
         dst2 = getRedColor(src, labels(2))
 
-        Dim count As Integer
-        dst3.SetTo(0)
-        Dim cppData(dst1.Total - 1) As Byte
-        Marshal.Copy(dst1.Data, cppData, 0, cppData.Length)
+        Dim cppData(task.redMap.Total - 1) As Byte
+        Marshal.Copy(task.redMap.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = RedColor_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleSrc.Free()
 
-        count = RedColor_FindCells_TotalCount(cPtr)
+        Dim count = RedColor_FindCells_TotalCount(cPtr)
         If count = 0 Then Exit Sub
 
         Dim cellsFound(count - 1) As Integer
@@ -170,6 +150,7 @@ Public Class RedColor_FindCells : Inherits TaskParent
         cellList = cellsFound.ToList
         dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        dst3.SetTo(0)
         For Each index In cellList
             If task.redCells.Count <= index Then Continue For
             Dim rc = task.redCells(index)
@@ -217,12 +198,14 @@ Public Class RedColor_Equations : Inherits TaskParent
     Dim eq As New Plane_Equation
     Public redCells As New List(Of rcData)
     Public Sub New()
+        task.redC.topXOnly = True
         labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
         desc = "Show the estimated plane equations for all the cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = getRedColor(src, labels(2))
+            getRedColor(src, labels(2))
+            dst2 = task.redC.dst3
             redCells = New List(Of rcData)(task.redCells)
         End If
 
@@ -906,28 +889,35 @@ End Class
 
 Public Class RedColor_Flippers : Inherits TaskParent
     Public Sub New()
+        task.redC.topXOnly = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
-        desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
+        desc = "Identify the cells that are changing color because they were split or lost."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2))
+        dst3 = getRedColor(src, labels(3))
+        Static lastMap As cv.Mat = DisplayTrackingCells()
 
-        Static lastMap As cv.Mat = task.redMap.Clone
-        dst2.SetTo(0)
         Dim unMatched As Integer
         Dim unMatchedPixels As Integer
+        Dim flipCells As New List(Of rcData)
+        dst2.SetTo(0)
+        Dim currMap = DisplayTrackingCells()
         For Each rc In task.redCells
             Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            If lastColor <> rc.color Then
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            If lastColor <> currColor Then
                 unMatched += 1
                 unMatchedPixels += rc.pixels
+                flipCells.Add(rc)
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
             End If
         Next
-        lastMap = task.redC.dst3.Clone
+
+        lastMap = currMap.Clone
 
         If task.heartBeat Then
-            labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."
+            labels(2) = CStr(unMatched) + " of " + CStr(task.redCells.Count) + " cells changed " +
+                        " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
         End If
     End Sub
 End Class
@@ -1309,16 +1299,65 @@ End Class
 
 
 
-Public Class RedColor_Depth : Inherits TaskParent
-    Dim flood As New Flood_Basics
+
+
+Public Class RedColor_Consistent : Inherits TaskParent
+    Dim redC As New Bin3Way_RedCloud
+    Dim diff As New Diff_Basics
+    Dim cellmaps As New List(Of cv.Mat)
+    Dim cellLists As New List(Of List(Of rcData))
+    Dim diffs As New List(Of cv.Mat)
     Public Sub New()
-        task.redOptions.UseDepth.Checked = True
-        desc = "Create RedCloud output using only depth."
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.gOptions.pixelDiffThreshold = 1
+        desc = "Remove RedCloud results that are inconsistent with the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        flood.Run(src)
-        dst2 = flood.dst2
-        labels(2) = flood.labels(2)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        diff.Run(task.redMap)
+        dst1 = diff.dst2
+
+        cellLists.Add(New List(Of rcData)(task.redCells))
+        cellmaps.Add(task.redMap And Not dst1)
+        diffs.Add(dst1.Clone)
+
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        For i = 0 To cellLists.Count - 1
+            For Each rc In cellLists(i)
+                Dim present As Boolean = True
+                For j = 0 To cellmaps.Count - 1
+                    Dim val = cellmaps(i).Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    If val = 0 Then
+                        present = False
+                        Exit For
+                    End If
+                Next
+                If present Then
+                    rc.index = task.redCells.Count
+                    task.redCells.Add(rc)
+                End If
+            Next
+        Next
+
+        dst2.SetTo(0)
+        task.redMap.SetTo(0)
+        For Each rc In task.redCells
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+
+        For Each mat In diffs
+            dst2.SetTo(0, mat)
+        Next
+
+        If cellmaps.Count > task.gOptions.FrameHistory.Value Then
+            cellmaps.RemoveAt(0)
+            cellLists.RemoveAt(0)
+            diffs.RemoveAt(0)
+        End If
     End Sub
 End Class
 
@@ -1390,150 +1429,6 @@ Public Class RedColor_Consistent1 : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class RedColor_Consistent2 : Inherits TaskParent
-    Dim redC As New Bin3Way_RedCloud
-    Dim diff As New Diff_Basics
-    Dim cellmaps As New List(Of cv.Mat)
-    Dim cellLists As New List(Of List(Of rcData))
-    Dim diffs As New List(Of cv.Mat)
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gOptions.pixelDiffThreshold = 1
-        desc = "Remove RedCloud results that are inconsistent with the previous frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        diff.Run(task.redMap)
-        dst1 = diff.dst2
-
-        cellLists.Add(New List(Of rcData)(task.redCells))
-        cellmaps.Add(task.redMap And Not dst1)
-        diffs.Add(dst1.Clone)
-
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        For i = 0 To cellLists.Count - 1
-            For Each rc In cellLists(i)
-                Dim present As Boolean = True
-                For j = 0 To cellmaps.Count - 1
-                    Dim val = cellmaps(i).Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                    If val = 0 Then
-                        present = False
-                        Exit For
-                    End If
-                Next
-                If present Then
-                    rc.index = task.redCells.Count
-                    task.redCells.Add(rc)
-                End If
-            Next
-        Next
-
-        dst2.SetTo(0)
-        task.redMap.SetTo(0)
-        For Each rc In task.redCells
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
-        Next
-
-        For Each mat In diffs
-            dst2.SetTo(0, mat)
-        Next
-
-        If cellmaps.Count > task.gOptions.FrameHistory.Value Then
-            cellmaps.RemoveAt(0)
-            cellLists.RemoveAt(0)
-            diffs.RemoveAt(0)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class RedColor_Consistent : Inherits TaskParent
-    Dim redC As New Bin3Way_RedCloud
-    Dim cellmaps As New List(Of cv.Mat)
-    Dim cellLists As New List(Of List(Of rcData))
-    Dim lastImage As cv.Mat = redC.dst2.Clone
-    Public Sub New()
-        desc = "Remove RedCloud results that are inconsistent with the previous frame(s)."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redC.Run(src)
-
-        cellLists.Add(New List(Of rcData)(task.redCells))
-        cellmaps.Add(task.redMap.Clone)
-
-        Dim newCells As New List(Of rcData)
-        newCells.Add(New rcData)
-        For Each rc In task.redCells
-            Dim maxDStable = rc.maxDStable
-            Dim count As Integer = 0
-            Dim sizes As New List(Of Integer)
-            Dim redData As New List(Of rcData)
-            For i = 0 To cellmaps.Count - 1
-                Dim index = cellmaps(i).Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
-                If cellLists(i)(index).maxDStable = maxDStable Then
-                    count = count + 1
-                    sizes.Add(cellLists(i)(index).pixels)
-                    redData.Add(cellLists(i)(index))
-                Else
-                    Exit For
-                End If
-            Next
-            If count = cellmaps.Count Then
-                Dim index = sizes.IndexOf(sizes.Max)
-                rc = redData(index)
-                Dim color = lastImage.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
-                If color <> black Then rc.color = color
-                rc.index = newCells.Count
-                newCells.Add(rc)
-            End If
-        Next
-
-        task.redCells = New List(Of rcData)(newCells)
-        dst2 = DisplayCells()
-        lastImage = dst2.Clone
-
-        If cellmaps.Count > task.gOptions.FrameHistory.Value Then
-            cellmaps.RemoveAt(0)
-            cellLists.RemoveAt(0)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedColor_NaturalColor : Inherits TaskParent
-    Public Sub New()
-        desc = "Display the RedCloud results with the mean color of the cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        getRedColor(src)
-        labels(2) = task.redC.labels(2)
-        dst2 = DisplayCells()
-    End Sub
-End Class
 
 
 

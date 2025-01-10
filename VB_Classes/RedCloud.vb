@@ -220,3 +220,22 @@ Public Class RedCloud_Combine : Inherits TaskParent
         labels(2) = CStr(combinedCells.Count) + " cells were found.  Dots indicate maxDist points."
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Depth : Inherits TaskParent
+    Dim flood As New Flood_Basics
+    Public Sub New()
+        task.redOptions.UseDepth.Checked = True
+        desc = "Create RedCloud output using only depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        flood.Run(src)
+        dst2 = flood.dst2
+        labels(2) = flood.labels(2)
+    End Sub
+End Class

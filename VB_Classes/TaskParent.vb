@@ -357,6 +357,15 @@ Public Class TaskParent : Implements IDisposable
         Next
         Return dst
     End Function
+    Public Function DisplayTrackingCells() As cv.Mat
+        Dim dst As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        task.redMap.SetTo(0)
+        For Each rc In task.redCells
+            dst(rc.rect).SetTo(rc.color, rc.mask)
+            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+        Return dst
+    End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
         Dim img As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         Dim binCount = hist.Height
