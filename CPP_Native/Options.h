@@ -1763,9 +1763,7 @@ public:
 };
 class Options_RedColorEx {
 public:
-	int range =  30;
 	int reduceAmt =  250;
-	double threshold =  0.95;
 	void RunOpt() {}
 	Options_RedColorEx() {
 	}

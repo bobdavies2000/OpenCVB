@@ -6566,23 +6566,15 @@ End Class
 
 
 Public Class Options_RedColorEx : Inherits OptionParent
-    Public range As Integer = 30
     Public reduceAmt As Integer = 250
-    Dim threshold As Double = 0.95
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Grayscale range around mean", 0, 100, range)
             sliders.setupTrackBar("RedCloud_Basics Reduction", 1, 2500, reduceAmt)
-            sliders.setupTrackBar("Percent featureLess threshold", 1, 100, threshold * 100)
         End If
     End Sub
     Public Sub RunOpt()
-        Static rangeSlider = FindSlider("Grayscale range around mean")
         Static reductionSlider = FindSlider("RedCloud_Basics Reduction")
-        Static thresholdSlider = FindSlider("Percent featureLess threshold")
-        threshold = thresholdSlider.Value / 100.0
         reduceAmt = reductionSlider.value
-        range = rangeSlider.value
     End Sub
 End Class
 

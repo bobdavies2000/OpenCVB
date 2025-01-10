@@ -758,7 +758,11 @@ Public Class VBtask : Implements IDisposable
         End If
 
         ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
-        If cameraName.StartsWith("StereoLabs") Then cv.Cv2.PatchNaNs(pcSplit(2))
+        If cameraName.StartsWith("StereoLabs") Then
+            cv.Cv2.PatchNaNs(pcSplit(0))
+            cv.Cv2.PatchNaNs(pcSplit(1))
+            cv.Cv2.PatchNaNs(pcSplit(2))
+        End If
 
         algTasks(algTaskID.colorizer).Run(src)
         depthRGB = algTasks(algTaskID.colorizer).dst2

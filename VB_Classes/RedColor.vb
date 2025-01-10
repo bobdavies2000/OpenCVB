@@ -1789,57 +1789,6 @@ End Class
 
 
 
-Public Class RedColor_FeatureLessReduce : Inherits TaskParent
-    Dim devGrid As New FeatureROI_Basics
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-    Dim addw As New AddWeighted_Basics
-    Dim options As New Options_RedColorEx
-    Public Sub New()
-        desc = "Remove any cells which are in a featureless region - they are part " +
-               "of the neighboring (and often surrounding) region."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        devGrid.Run(src)
-
-        dst2 = getRedColor(src, labels(2))
-
-        dst3.SetTo(0)
-        redCells.Clear()
-        For Each rc In task.redCells
-            Dim tmp = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            devGrid.dst3(rc.rect).CopyTo(tmp, rc.mask)
-            Dim count = tmp.CountNonZero
-            If count / rc.pixels < options.threshold Then
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
-                rc.index = redCells.Count
-                redCells.Add(rc)
-                cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            End If
-        Next
-
-        addw.src2 = devGrid.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(dst2)
-        dst2 = addw.dst2
-
-        labels(3) = $"{redCells.Count} cells after removing featureless cells that were part " +
-                     "of their surrounding.  " +
-                    $"{task.redCells.Count - redCells.Count} were removed."
-
-        task.setSelectedCell()
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class RedColor_Features : Inherits TaskParent
     Dim options As New Options_RedCloudFeatures
     Public Sub New()

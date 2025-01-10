@@ -37,9 +37,10 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
         Dim mm As mmData = GetMinMax(dst0)
         dst0 = (dst0 - mm.minVal)
-        dst2 = dst0 * 255 / mm.maxVal
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst3 = dst0 * 255 / (mm.maxVal - mm.minVal)
+        dst3.ConvertTo(dst3, cv.MatType.CV_8U)
         mm = GetMinMax(dst0)
+
 
         labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " + CStr(options.reduceAmt)
     End Sub

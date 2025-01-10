@@ -1476,7 +1476,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_Depth" Then return new RedColor_Depth
 	If algorithmName = "RedColor_DepthOutline" Then return new RedColor_DepthOutline
 	If algorithmName = "RedColor_Equations" Then return new RedColor_Equations
-	If algorithmName = "RedColor_FeatureLessReduce" Then return new RedColor_FeatureLessReduce
 	If algorithmName = "RedColor_Features" Then return new RedColor_Features
 	If algorithmName = "RedColor_FindCells" Then return new RedColor_FindCells
 	If algorithmName = "RedColor_Flippers" Then return new RedColor_Flippers
