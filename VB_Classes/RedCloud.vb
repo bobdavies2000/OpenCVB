@@ -41,8 +41,9 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
         mm = GetMinMax(dst0)
 
-
-        labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " + CStr(options.reduceAmt)
+        dst2 = getRedColor(dst3, strOut)
+        labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " +
+                    CStr(options.reduceAmt)
     End Sub
 End Class
 
@@ -53,21 +54,21 @@ End Class
 
 
 Public Class RedCloud_BasicsHist : Inherits TaskParent
-    Dim reduce As New RedCloud_Basics
+    Dim rCloud As New RedCloud_Basics
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
         desc = "Display the histogram of the RedCloud_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        reduce.Run(src)
-        dst2 = reduce.dst2
+        rCloud.Run(src)
+        dst2 = rCloud.dst2
         Dim mm = GetMinMax(dst2, task.depthMask)
         plot.minRange = mm.minVal
         plot.maxRange = mm.maxVal
         plot.Run(dst2)
         dst3 = plot.dst2
-        labels(2) = reduce.labels(2)
+        labels(2) = rCloud.labels(2)
     End Sub
 End Class
 
@@ -77,13 +78,145 @@ End Class
 
 
 Public Class RedCloud_BasicsTest : Inherits TaskParent
-    Dim redInput As New RedCloud_Basics
+    Dim rCloud As New RedCloud_Basics
     Public Sub New()
         desc = "Run RedCloud with the depth reduction."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        redInput.Run(src)
+        rCloud.Run(src)
 
-        dst2 = getRedColor(redInput.dst2, labels(2))
+        dst2 = getRedColor(rCloud.dst2, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_YZ : Inherits TaskParent
+    Dim stats As New Cell_Basics
+    Dim rCloud As New RedCloud_Basics
+    Public Sub New()
+        task.redOptions.YZReduction.Checked = True
+        desc = "Build horizontal RedCloud cells"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        rCloud.Run(src)
+
+        stats.Run(src)
+        dst0 = stats.dst0
+        dst1 = stats.dst1
+        dst2 = stats.dst2
+        SetTrueText(stats.strOut, 3)
+
+        rCloud.Run(src)
+        dst2 = ShowPalette(rCloud.dst3)
+        labels(2) = rCloud.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_XZ : Inherits TaskParent
+    Dim stats As New Cell_Basics
+    Dim rCloud As New RedCloud_Basics
+    Public Sub New()
+        task.redOptions.XZReduction.Checked = True
+        desc = "Build vertical RedCloud cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        stats.Run(src)
+        dst0 = stats.dst0
+        dst1 = stats.dst1
+        dst2 = stats.dst2
+        SetTrueText(stats.strOut, 3)
+
+        rCloud.Run(src)
+        dst2 = ShowPalette(rCloud.dst3)
+        labels(2) = rCloud.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_World : Inherits TaskParent
+    Dim rCloud As New RedCloud_Basics
+    Dim world As New Depth_World
+    Public Sub New()
+        optiBase.FindSlider("RedCloud_Basics Reduction").Value = 1000
+        labels(3) = "Generated pointcloud"
+        desc = "Display the output of a generated pointcloud as RedCloud cells"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        world.Run(src)
+        task.pcSplit = world.dst2.Split()
+
+        rCloud.Run(src)
+        dst2 = rCloud.dst3
+        labels(2) = rCloud.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_Combine : Inherits TaskParent
+    Dim color8U As New Color8U_Basics
+    Public guided As New GuidedBP_Depth
+    Public combinedCells As New List(Of rcData)
+    Dim maxDepth As New Depth_MaxMask
+    Dim rCloud As New RedCloud_Basics
+    Public Sub New()
+        desc = "Combine the color and cloud as indicated in the RedOptions panel."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        maxDepth.Run(src)
+        If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
+            task.redC.inputMask.SetTo(0)
+            If src.Channels() = 3 Then
+                color8U.Run(src)
+                dst2 = color8U.dst2.Clone
+            Else
+                dst2 = src
+            End If
+        Else
+            task.redC.inputMask = task.noDepthMask
+            dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        End If
+
+        If task.redOptions.UseDepth.Checked Or task.redOptions.UseGuidedProjection.Checked Then
+            Select Case task.redOptions.depthInputIndex
+                Case 0 ' "GuidedBP_Depth"
+                    guided.Run(src)
+                    If color8U.classCount > 0 Then guided.dst2 += color8U.classCount
+                    guided.dst2.CopyTo(dst2, task.depthMask)
+                Case 1 ' "RedCloud_Basics"
+                    rCloud.Run(task.pointCloud)
+                    If color8U.classCount > 0 Then rCloud.dst2 += color8U.classCount
+                    rCloud.dst2.CopyTo(dst2, task.depthMask)
+            End Select
+        End If
+
+        dst2 = getRedColor(dst2, labels(2))
+
+        combinedCells.Clear()
+        Dim drawRectOnlyRun As Boolean
+        If task.drawRect.Width * task.drawRect.Height > 10 Then drawRectOnlyRun = True
+        For Each rc In task.redCells
+            If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
+            combinedCells.Add(rc)
+        Next
+        labels(2) = CStr(combinedCells.Count) + " cells were found.  Dots indicate maxDist points."
     End Sub
 End Class

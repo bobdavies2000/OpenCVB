@@ -1458,6 +1458,9 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
 	If algorithmName = "RedCloud_BasicsHist" Then return new RedCloud_BasicsHist
 	If algorithmName = "RedCloud_BasicsTest" Then return new RedCloud_BasicsTest
+	If algorithmName = "RedCloud_World" Then return new RedCloud_World
+	If algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ
+	If algorithmName = "RedCloud_YZ" Then return new RedCloud_YZ
 	If algorithmName = "RedColor_Basics" Then return new RedColor_Basics
 	If algorithmName = "RedColor_BProject3D" Then return new RedColor_BProject3D
 	If algorithmName = "RedColor_BrightnessLevel" Then return new RedColor_BrightnessLevel
@@ -1512,9 +1515,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_UnmatchedCount" Then return new RedColor_UnmatchedCount
 	If algorithmName = "RedColor_UnstableCells" Then return new RedColor_UnstableCells
 	If algorithmName = "RedColor_UnstableHulls" Then return new RedColor_UnstableHulls
-	If algorithmName = "RedColor_World" Then return new RedColor_World
-	If algorithmName = "RedColor_XZ" Then return new RedColor_XZ
-	If algorithmName = "RedColor_YZ" Then return new RedColor_YZ
 	If algorithmName = "RedTrack_Basics" Then return new RedTrack_Basics
 	If algorithmName = "RedTrack_Features" Then return new RedTrack_Features
 	If algorithmName = "RedTrack_FeaturesKNN" Then return new RedTrack_FeaturesKNN

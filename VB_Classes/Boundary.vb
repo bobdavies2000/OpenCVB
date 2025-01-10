@@ -6,7 +6,7 @@ Public Class Boundary_Basics : Inherits TaskParent
     Public contours As New List(Of List(Of cv.Point))
     Public runRedCPP As Boolean = True
     Dim color8U As New Color8U_Basics
-    Dim prep As New RedCloud_Basics
+    Dim rCloud As New RedCloud_Basics
     Dim guided As New GuidedBP_Depth
     Public Sub New()
         task.redOptions.setColorSource("Bin4Way_Regions")
@@ -19,8 +19,8 @@ Public Class Boundary_Basics : Inherits TaskParent
                 color8U.Run(src)
                 dst1 = color8U.dst2
             ElseIf task.redOptions.UseDepth.Checked Then
-                prep.Run(src)
-                dst1 = prep.dst2
+                rCloud.Run(src)
+                dst1 = rCloud.dst2
             Else
                 guided.Run(src)
                 dst1 = guided.dst2
