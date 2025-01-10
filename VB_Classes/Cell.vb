@@ -308,7 +308,7 @@ Public Class Cell_Generate : Inherits TaskParent
             src = task.redMap Or bounds.dst2
             If task.firstPass Then task.redMap.SetTo(0)
 
-            Static redCPP As New RedCloud_CPP
+            Static redCPP As New RedColor_CPP
             redCPP = bounds.bRects.bounds.redCPP
 
             If redCPP.classCount = 0 Then Exit Sub ' no data to process.
@@ -325,7 +325,7 @@ Public Class Cell_Generate : Inherits TaskParent
         For i = 0 To rectList.Count - 1
             Dim rc As New rcData
             rc.rect = rectList(i)
-            If rc.rect.Size = dst2.Size Then Continue For ' RedCloud_Basics finds a cell this big.  
+            If rc.rect.Size = dst2.Size Then Continue For ' RedColor_Basics finds a cell this big.  
             rc.mask = src(rc.rect).InRange(i + 1, i + 1)
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)

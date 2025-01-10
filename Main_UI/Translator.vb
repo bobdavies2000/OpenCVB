@@ -313,11 +313,11 @@ Public Class Translator
         Next
 
         'If Main_UI.settings.translatorMode = "C# to C++" Then Main_UI.setupNewCPPalgorithm(className)
-        TranslatorResults.rtb.Clear()
-        For Each line In outputLines
-            TranslatorResults.rtb.Text += line + vbCrLf
-        Next
-        TranslatorResults.Show()
+        'TranslatorResults.rtb.Clear()
+        'For Each line In outputLines
+        '    TranslatorResults.rtb.Text += line + vbCrLf
+        'Next
+        'TranslatorResults.Show()
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         XYLoc.Text = "X = " + CStr(Cursor.Position.X) + ", Y = " + CStr(Cursor.Position.Y)

@@ -1147,14 +1147,14 @@ public:
 
 
 
-class RedCloud_Reduce_CC : public CPP_Parent {
+class RedCloud_Basics_CC : public CPP_Parent {
 public:
     int classCount;
     int givenClassCount = 0;
     int reduceAmt = 250;
-    RedCloud_Reduce_CC() : CPP_Parent() {
+    RedCloud_Basics_CC() : CPP_Parent() {
         //if (standalone) {
-        //    task.redOptions.RedCloud_Reduce.Checked = true;
+        //    task.redOptions.RedCloud_Basics.Checked = true;
         //}
         desc = "Reduction transform for the point cloud";
     }
@@ -1983,12 +1983,12 @@ public:
 
 
 
-class RedCloud_Flood_CC : public CPP_Parent
+class RedColor_Flood_CC : public CPP_Parent
 {
 private:
 public:
     Mat inputMask;
-    RedCloud_Reduce_CC* prepData;
+    RedCloud_Basics_CC* prepData;
     int option_loDiff = 0;
     int option_hiDiff = 0;
     int option_minSizeCell = 75;
@@ -1997,8 +1997,8 @@ public:
     int totalCount;
     vector<Rect>rects;
     vector<int> sizes;
-    RedCloud_Flood_CC() : CPP_Parent() {
-        prepData = new RedCloud_Reduce_CC();
+    RedColor_Flood_CC() : CPP_Parent() {
+        prepData = new RedCloud_Basics_CC();
         desc = "Perform the RedCloud low level FloodFill";
     }
     rcData buildZeroEntry() {
@@ -2603,7 +2603,7 @@ public:
     ~RedColor_FeatureLessCore_CC() {
 
         if (cPtr) {
-            RedCloud_Close(cPtr);
+            RedColor_Close(cPtr);
             delete cPtr;
         }
     }
@@ -2615,13 +2615,13 @@ public:
         void* imagePtr;
         Mat* srcPtr = &src;
         if (inputMask.empty()) {
-            imagePtr = RedCloud_Run(cPtr, (int*)srcPtr->data, 0, src.rows, src.cols);
+            imagePtr = RedColor_Run(cPtr, (int*)srcPtr->data, 0, src.rows, src.cols);
         }
         else {
             Mat* maskPtr = &inputMask;
-            imagePtr = RedCloud_Run(cPtr, (int*)srcPtr->data, (uchar*)maskPtr->data, src.rows, src.cols);
+            imagePtr = RedColor_Run(cPtr, (int*)srcPtr->data, (uchar*)maskPtr->data, src.rows, src.cols);
         }
-        int classCount = RedCloud_Count(cPtr);
+        int classCount = RedColor_Count(cPtr);
 
         dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
         dst3 = vbPalette(dst2 * 255 / classCount);
@@ -2633,8 +2633,8 @@ public:
         if (classCount <= 1) {
             return;
         }
-        Mat rectData(classCount, 1, CV_32SC4, RedCloud_Rects(cPtr));
-        Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
+        Mat rectData(classCount, 1, CV_32SC4, RedColor_Rects(cPtr));
+        Mat floodPointData(classCount, 1, CV_32SC2, RedColor_FloodPoints(cPtr));
         sortedCells.clear();
 
         for (int i = 0; i < classCount; i++) {

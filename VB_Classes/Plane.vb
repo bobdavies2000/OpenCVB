@@ -85,7 +85,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
     Public Sub New()
         labels = {"RedCloud Cell contours", "", "RedCloud cells", ""}
         addW.src2 = dst2.Clone
-        desc = "Find all the cells from a RedCloud_Basics output that are likely to be flat"
+        desc = "Find all the cells from a RedColor_Basics output that are likely to be flat"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         plane.Run(src)

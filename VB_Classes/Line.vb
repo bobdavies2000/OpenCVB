@@ -1060,7 +1060,7 @@ Public Class Line_Cells : Inherits TaskParent
     Dim lines As New Line_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
-        desc = "Identify all lines in the RedCloud_Basics cell boundaries"
+        desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         dst2 = getRedCloud(src, labels(2))
@@ -1082,9 +1082,9 @@ End Class
 
 Public Class Line_VerticalHorizontalCells : Inherits TaskParent
     Dim lines As New FeatureLine_Finder
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedColor_Hulls
     Public Sub New()
-        labels(2) = "RedCloud_Hulls output with lines highlighted"
+        labels(2) = "RedColor_Hulls output with lines highlighted"
         desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)

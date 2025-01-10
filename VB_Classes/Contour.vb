@@ -921,7 +921,7 @@ End Class
 
 
 
-Public Class RedCloud_Cells : Inherits TaskParent
+Public Class RedColor_Cells : Inherits TaskParent
     Public cellmap As New cv.Mat
     Public redCells As New List(Of rcData)
     Public Sub New()

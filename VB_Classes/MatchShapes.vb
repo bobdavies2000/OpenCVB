@@ -70,9 +70,9 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
     Public bestCell As Integer
     Dim rc As New rcData
     Dim options As New Options_MatchShapes
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedColor_Hulls
     Public Sub New()
-        labels = {"", "", "Output of RedCloud_Hulls", "Cells similar to selected cell"}
+        labels = {"", "", "Output of RedColor_Hulls", "Cells similar to selected cell"}
         desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -123,7 +123,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
     Public rc As New rcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
-    Dim addTour As New RedCloud_ContourUpdate
+    Dim addTour As New RedColor_ContourUpdate
     Public Sub New()
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
         desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
@@ -182,10 +182,10 @@ End Class
 
 Public Class MatchShapes_Hulls : Inherits TaskParent
     Dim options As New Options_MatchShapes
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedColor_Hulls
     Public Sub New()
        optiBase.findslider("Match Threshold %").Value = 3
-        labels = {"", "", "Output of RedCloud_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
+        labels = {"", "", "Output of RedColor_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -219,7 +219,7 @@ Public Class MatchShapes_Contours : Inherits TaskParent
     Dim options As New Options_MatchShapes
     Public Sub New()
        optiBase.findslider("Match Threshold %").Value = 3
-        labels = {"", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
+        labels = {"", "", "Output of RedColor_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

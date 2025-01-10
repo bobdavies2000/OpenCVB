@@ -3,7 +3,7 @@ Public Class Tessallate_Basics : Inherits TaskParent
     Public points As New List(Of cv.Point3f)
     Public colors As New List(Of cv.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
-    Public hulls As New RedCloud_Hulls
+    Public hulls As New RedColor_Hulls
     Public Sub New()
         task.gOptions.setGridSize(30)
         desc = "Prepare the list of 2D triangles"
@@ -149,7 +149,7 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
     Public depthList As New List(Of List(Of Single))
     Public colorList As New List(Of cv.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedColor_Hulls
     Const depthListMaxCount As Integer = 10
     Public Sub New()
         task.gOptions.setGridSize(20)
@@ -318,7 +318,7 @@ Public Class Tessallate_Bricks : Inherits TaskParent
     Public oglData As New List(Of cv.Point3f)
     Public depths As New List(Of Single)
     Public options As New Options_OpenGLFunctions
-    Public hulls As New RedCloud_Hulls
+    Public hulls As New RedColor_Hulls
     Dim depthMinList As New List(Of List(Of Single))
     Dim depthMaxList As New List(Of List(Of Single))
     Dim myListMax = 10

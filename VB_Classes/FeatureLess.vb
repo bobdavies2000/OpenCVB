@@ -235,7 +235,7 @@ End Class
 
 
 Public Class FeatureLess_Groups : Inherits TaskParent
-    Dim redCPP As New RedCloud_CPP
+    Dim redCPP As New RedColor_CPP
     Dim fless As New FeatureLess_Basics
     Public classCount As Integer
     Public Sub New()

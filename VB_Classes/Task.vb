@@ -127,7 +127,7 @@ Public Class VBtask : Implements IDisposable
     Public rgbFilter As Object
     Public ogl As OpenGL_Basics
     Public feat As Feature_Basics
-    Public redC As RedCloud_Basics
+    Public redC As RedColor_Basics
 
     Public centerRect As cv.Rect
 
@@ -483,7 +483,7 @@ Public Class VBtask : Implements IDisposable
         ' add any algorithm tasks to this list.
         algTasks = {New IMU_GMatrix, New IMU_Basics, New Line_Basics, New Grid_Basics, New Depth_Palette,
                     New Motion_Basics, New Gravity_Horizon, New Palette_LoadColorMap, New Feature_Basics,
-                    New RedCloud_Basics}
+                    New RedColor_Basics}
 
         gmat = algTasks(algTaskID.gMat)
         displayObject = gmat

@@ -432,7 +432,7 @@ End Class
 Public Class MSER_RedCloud : Inherits TaskParent
     Dim mBase As New MSER_Basics
     Public Sub New()
-        desc = "Use the MSER_Basics output as input to RedCloud_Basics"
+        desc = "Use the MSER_Basics output as input to RedColor_Basics"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         mBase.Run(src)
@@ -451,7 +451,7 @@ End Class
 
 Public Class MSER_Mask_CPP : Inherits TaskParent
     Dim options As New Options_MSER
-    Dim redC As New RedCloud_Cells
+    Dim redC As New RedColor_Cells
     Public classCount As Integer
     Public Sub New()
         task.redOptions.setUseColorOnly(True)

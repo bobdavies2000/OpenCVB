@@ -2900,6 +2900,26 @@
   <metadata name="CamSwitchTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>1014, 12</value>
   </metadata>
+  <data name="TranslateButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAAGIAAABXCAYAAAD/EpAQAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAMaSURBVHhe7ZVNbhNBEEZ9Aq4L7HIAFo4AwUnYZ5kQg5AQ
+        iB3KDxCSWLBAQBK7mDZtybK+uH+mq7p6pp70ZI9suav6LTyhkvz5TPT3tPO88wvRzdfOb50Xnd+93bP7
+        bPWdDVff7Vx95l0/j4CyIYxs2gpx+CDextAbAl1uXxWjKwS6PC6VUT8EuiRpFVAvBLqQ2lakTgh0CZqs
+        gGwItLRWhZEJgRZtRSH4Q6DlWlMA3hBoqVZlJiLE0r8mgBYZikxEhFj410jQ8EOTgXCI5Y1/EwEaeqgW
+        Jhxi8du/CYCGHboFCYTo/h8Wv/z7AGjQoVuQQIju/+Hup3+/AzTkWCzE7hDLO6LbuX+4BzTc2CxARIgr
+        /wBAQ43VngRC3HYhLv3DFmiYsduDwH/EDtAgY7cHeSHQEOZ/M2EJMZlMBifaE5pJegh0+IZoiaGI9oVm
+        YCESRPtCM0gLgQ7dEi0wFNG+95pI8RBOtETroj2DJhAfAh1UyWIXxW0CFoLTBCwEt5HEhUAHVNRCKNFC
+        KHGcIdCPV7apEM4ILISEEVgICSOwEBJGYCGkDLA7BPpBBVoIJVoIJVoIJVoIJVoIJVoIJVoIJVoIJVoI
+        JVoIJVoIJY4vhAP9aGWbCxGBhZAwAgshYQQWQsIIwiEc6Mcr2lSISCwEt5FYCG4jsRDcRhIXwoEOqWQz
+        IRKwEJwmEB/CgQ6roIVAh1WwiRCJpIVwoEOFtRAOdKiw6kNkkB7CgQ4XVHWITCxEaTPJC+FAQwipNkQP
+        LERJe5AfwoGGEVBliJ70C+FAQzGrLkQB+odwoOEYVRWiEBair4UoE8KBhmRSTYiClAvhQMMyqCJEYcqG
+        cKChC1s9BAPlQzjQ8AWtGoIJnhBr0CKFFI/ADG8IB1qqNQXgD+FAy7WiEDIh1qBFtSqMbAgHWlqbFZAP
+        sQZdQG0rUi/EGnQh0iqgfohN0CVxqghdITZBF9dXxegNsQ262IBvXk3p08FTOjue0tnRlE4On9HJ0Qs6
+        ff2Szo/36WK2R5ezx3Q1e0TXbx/S3Pluj67f79P8w3P68fGJP5wbon8quhcukLHQtAAAAABJRU5ErkJg
+        gg==
+</value>
+  </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAEAsq4QAAAAAAD4UQAAFgAAACgAAACyAAAAXAEAAAEABAAAAAAA2E4AAAAAAAAAAAAAAAAAAAAA

@@ -2,7 +2,7 @@
 Public Class Triangle_Basics : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedColor_Hulls output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -40,10 +40,10 @@ End Class
 
 
 Public Class Triangle_HullContour : Inherits TaskParent
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedColor_Hulls
     Public Sub New()
         task.gOptions.setDisplay1()
-        labels = {"", "Selected cell", "RedCloud_Basics output", "Selected contour"}
+        labels = {"", "Selected cell", "RedColor_Basics output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -77,7 +77,7 @@ End Class
 Public Class Triangle_RedCloud : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -116,7 +116,7 @@ End Class
 Public Class Triangle_Cell : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
@@ -169,7 +169,7 @@ End Class
 Public Class Triangle_Mask : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+        labels = {"", "", "RedColor_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 

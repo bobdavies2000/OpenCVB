@@ -1,12 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Boundary_Basics : Inherits TaskParent
-    Public redCPP As New RedCloud_CPP
+    Public redCPP As New RedColor_CPP
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public contours As New List(Of List(Of cv.Point))
     Public runRedCPP As Boolean = True
     Dim color8U As New Color8U_Basics
-    Dim prep As New RedCloud_Reduce
+    Dim prep As New RedCloud_Basics
     Dim guided As New GuidedBP_Depth
     Public Sub New()
         task.redOptions.setColorSource("Bin4Way_Regions")

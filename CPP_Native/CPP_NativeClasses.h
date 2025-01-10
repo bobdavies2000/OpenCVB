@@ -87,29 +87,29 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport) RedCloud* RedCloud_Open()
+extern "C" __declspec(dllexport) RedCloud* RedColor_Open()
 {
     return new RedCloud();
 }
 
-extern "C" __declspec(dllexport) int RedCloud_Count(RedCloud* cPtr)
+extern "C" __declspec(dllexport) int RedColor_Count(RedCloud* cPtr)
 {
     return (int)cPtr->cellRects.size();
 }
 
-extern "C" __declspec(dllexport) int* RedCloud_Rects(RedCloud* cPtr)
+extern "C" __declspec(dllexport) int* RedColor_Rects(RedCloud* cPtr)
 {
     return (int*)&cPtr->cellRects[0];
 }
 
-extern "C" __declspec(dllexport) int* RedCloud_FloodPoints(RedCloud* cPtr)
+extern "C" __declspec(dllexport) int* RedColor_FloodPoints(RedCloud* cPtr)
 {
     return (int*)&cPtr->floodPoints[0];
 }
 
-extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud* cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int* RedColor_Close(RedCloud* cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
-RedCloud_Run(RedCloud* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols)
+RedColor_Run(RedCloud* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
 
@@ -1930,12 +1930,12 @@ int* Random_DiscreteDistribution_Run(Random_DiscreteDistribution* cPtr, int rows
 
 
 
-class RedCloud_FindCells
+class RedColor_FindCells
 {
 private:
 public:
     vector <int> cellList;
-    RedCloud_FindCells() {}
+    RedColor_FindCells() {}
     void RunCPP(Mat src)
     {
         cellList.clear();
@@ -1951,18 +1951,18 @@ public:
     }
 };
 extern "C" __declspec(dllexport)
-RedCloud_FindCells* RedCloud_FindCells_Open() {
-    RedCloud_FindCells* cPtr = new RedCloud_FindCells();
+RedColor_FindCells* RedColor_FindCells_Open() {
+    RedColor_FindCells* cPtr = new RedColor_FindCells();
     return cPtr;
 }
 extern "C" __declspec(dllexport)
-void RedCloud_FindCells_Close(RedCloud_FindCells* cPtr)
+void RedColor_FindCells_Close(RedColor_FindCells* cPtr)
 {
     delete cPtr;
 }
-extern "C" __declspec(dllexport) int RedCloud_FindCells_TotalCount(RedCloud_FindCells* cPtr) { return int(cPtr->cellList.size()); }
+extern "C" __declspec(dllexport) int RedColor_FindCells_TotalCount(RedColor_FindCells* cPtr) { return int(cPtr->cellList.size()); }
 extern "C" __declspec(dllexport)
-int* RedCloud_FindCells_RunCPP(RedCloud_FindCells* cPtr, int* dataPtr, int rows, int cols)
+int* RedColor_FindCells_RunCPP(RedColor_FindCells* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->RunCPP(Mat(rows, cols, CV_8UC1, dataPtr));
     if (cPtr->cellList.size() == 0) return 0;

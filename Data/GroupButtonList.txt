@@ -189,6 +189,7 @@ Random
 Rectangle
 RecursiveBilateralFilter
 RedCloud
+RedColor
 RedTrack
 Reduction
 Reliable

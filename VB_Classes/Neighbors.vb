@@ -103,7 +103,7 @@ End Class
 
 Public Class Neighbors_ColorOnly : Inherits TaskParent
     Dim corners As New Neighbors_Intersects
-    Dim redC As New RedCloud_Cells
+    Dim redC As New RedColor_Cells
     Public Sub New()
         desc = "Find neighbors in a color only RedCloud cellMap"
     End Sub

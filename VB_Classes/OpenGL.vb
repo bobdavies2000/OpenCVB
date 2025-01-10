@@ -739,7 +739,7 @@ End Class
 
 Public Class OpenGL_DrawHulls : Inherits TaskParent
     Public options As New Options_OpenGLFunctions
-    Public hulls As New RedCloud_Hulls
+    Public hulls As New RedColor_Hulls
     Dim ogl As New OpenGL_Basics
     Public Sub New()
         ogl.oglFunction = oCase.drawCells
@@ -1130,7 +1130,7 @@ End Class
 
 
 Public Class OpenGL_FlatSurfaces : Inherits TaskParent
-    Dim flat As New RedCloud_LikelyFlatSurfaces
+    Dim flat As New RedColor_LikelyFlatSurfaces
     Public Sub New()
         labels(2) = "Display the point cloud pixels that appear to be vertical and horizontal regions."
         task.ogl.oglFunction = oCase.pointCloudAndRGB

@@ -30,9 +30,9 @@ Public Class OptionsRedCloud
                                        "Binarize_DepthTiers", "FeatureLess_Basics", "Hist3DColor_Basics",
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
                                        "PCA_NColor_CPP"}
-    Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub OptionsRedColor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
-        Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
+        Me.Text = "Options mostly for RedColor_Basics but other related algorithms too."
 
         ' The following lines control the pointcloud histograms for X and Y, and the camera location.
 
@@ -282,7 +282,7 @@ Public Class OptionsRedCloud
         task.optionsChanged = True
         depthInputIndex = 0
     End Sub
-    Private Sub RedCloud_Reduce_CheckedChanged(sender As Object, e As EventArgs)
+    Private Sub RedCloud_Basics_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
         depthInputIndex = 1
     End Sub

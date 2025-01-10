@@ -60,7 +60,7 @@ End Class
 
 Public Class Image_RedCloudColor : Inherits TaskParent
     Public images As New Image_Series
-    Public redC As New RedCloud_Cells
+    Public redC As New RedColor_Cells
     Public Sub New()
         task.gOptions.setDisplay1()
         desc = "Use RedCloud on a photo instead of the video stream."

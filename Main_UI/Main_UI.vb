@@ -1580,6 +1580,13 @@ Public Class Main_UI
 
         Debug.WriteLine("Main_UI.StartTask completed.")
     End Sub
+    Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
+        ' Translator.Show()
+        MsgBox("To translate any VB.Net algorithm to C# or C++ or Python, use" + vbCrLf +
+                "Codeconvert.ai.  There are touchups expected to be " + vbCrLf +
+                "needed and a future version will include the touchups here." + vbCrLf +
+                "There is touchup code in Translator.vb if you want to get started.")
+    End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
         If parms.algName = "" Then Exit Sub
         algorithmQueueCount += 1

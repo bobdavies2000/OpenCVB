@@ -1587,7 +1587,7 @@ public:
 };
 class Options_MeanSubtraction {
 public:
-	double scaleVal =  1;
+	double scaleVal =  16;
 	void RunOpt() {}
 	Options_MeanSubtraction() {
 	}
@@ -1761,13 +1761,13 @@ public:
 	Options_RBF() {
 	}
 };
-class Options_RedCloudOther {
+class Options_RedColorEx {
 public:
 	int range =  30;
 	int reduceAmt =  250;
 	double threshold =  0.95;
 	void RunOpt() {}
-	Options_RedCloudOther() {
+	Options_RedColorEx() {
 	}
 };
 class Options_RedCloudFeatures {

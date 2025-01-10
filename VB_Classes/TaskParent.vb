@@ -697,5 +697,9 @@ Public Class TaskParent : Implements IDisposable
         ' every algorithm overrides this Sub 
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        check.Dispose()
+        combo.Dispose()
+        radio.Dispose()
+        sliders.Dispose()
     End Sub
 End Class

@@ -138,6 +138,7 @@
     <Compile Include="Complexity.vb" />
     <Compile Include="OptionParent.vb" />
     <Compile Include="PCdiff.vb" />
+    <Compile Include="RedCloud.vb" />
     <Compile Include="Reliable.vb" />
     <Compile Include="ScatterMatrix.vb" />
     <Compile Include="Derivative.vb" />
@@ -198,7 +199,7 @@
     </Compile>
     <Compile Include="Projection.vb" />
     <Compile Include="PyrFilter.vb" />
-    <Compile Include="RedCloud.vb" />
+    <Compile Include="RedColor.vb" />
     <Compile Include="RedTrack.vb" />
     <Compile Include="ROI.vb" />
     <Compile Include="BackProject.vb" />
