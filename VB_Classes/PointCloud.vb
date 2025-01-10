@@ -82,7 +82,7 @@ Public Class PointCloud_Basics : Inherits TaskParent
         Return ptlist
     End Function
 
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src
@@ -123,7 +123,7 @@ Public Class PointCloud_Point3f : Inherits TaskParent
     Public Sub New()
         desc = "Display the point cloud CV_32FC3 format"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = task.pointCloud
     End Sub
 End Class
@@ -150,7 +150,7 @@ Public Class PointCloud_Spin : Inherits TaskParent
         task.gOptions.setGravityUsage(False)
         desc = "Spin the point cloud exercise"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static xCheck = optiBase.FindCheckBox("Spin pointcloud on X-axis")
         Static yCheck = optiBase.FindCheckBox("Spin pointcloud on Y-axis")
         Static zCheck = optiBase.FindCheckBox("Spin pointcloud on Z-axis")
@@ -197,7 +197,7 @@ Public Class PointCloud_Spin2 : Inherits TaskParent
         labels = {"", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes."}
         desc = "Spin the RedCloud output exercise"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         spin.Run(src)
@@ -222,7 +222,7 @@ Public Class PointCloud_Continuous_VB : Inherits TaskParent
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show where the pointcloud is continuous"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static thresholdSlider =optiBase.findslider("Threshold of continuity in mm")
         Dim threshold = thresholdSlider.Value / 1000
 
@@ -261,7 +261,7 @@ Public Class PointCloud_SetupSide : Inherits TaskParent
         labels(2) = "Layout markers for side view"
         desc = "Create the colorized mat used for side projections"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim distanceRatio As Single = 1
         If src.Channels() <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -336,7 +336,7 @@ Public Class PointCloud_SetupTop : Inherits TaskParent
         labels(2) = "Layout markers for top view"
         desc = "Create the colorize the mat for a topdown projections"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim distanceRatio As Single = 1
         If src.Channels() <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -401,7 +401,7 @@ Public Class PointCloud_Raw_CPP : Inherits TaskParent
         desc = "Project the depth data onto a top view And side view."
         cPtr = SimpleProjectionOpen()
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.firstPass Then ReDim depthBytes(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1)
 
         Marshal.Copy(task.pcSplit(2).Data, depthBytes, 0, depthBytes.Length)
@@ -432,7 +432,7 @@ Public Class PointCloud_Raw : Inherits TaskParent
         desc = "Project the depth data onto a top view And side view - Using only VB code (too slow.)"
         cPtr = SimpleProjectionOpen()
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim range As Single = task.MaxZmeters
 
         ' this VB.Net version is much slower than the optimized C++ version below.
@@ -476,7 +476,7 @@ Public Class PointCloud_Solo : Inherits TaskParent
         labels(3) = "Histogram after filtering For Single-only histogram bins"
         desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst0.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs
         dst3 = heat.dst1.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs
@@ -496,7 +496,7 @@ Public Class PointCloud_SoloRegions : Inherits TaskParent
         labels(3) = "Histogram after filtering For Single-only histogram bins"
         desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         solo.Run(src)
         dst2 = solo.dst2
         dst3 = solo.dst3
@@ -521,7 +521,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits TaskParent
     Public Sub New()
         desc = "Find the horizontal surfaces With a projects Of the SideView histogram."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst3
 
@@ -566,7 +566,7 @@ Public Class PointCloud_SurfaceH : Inherits TaskParent
         labels(3) = "Histogram Of Each Of " + CStr(task.histogramBins) + " bins aligned With the sideview"
         desc = "Find the horizontal surfaces With a projects Of the SideView histogram."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst2
         Dim hist = New cv.Mat(dst2.Height, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -615,7 +615,7 @@ Public Class PointCloud_NeighborV : Inherits TaskParent
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within Y mm's"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -641,7 +641,7 @@ Public Class PointCloud_Visualize : Inherits TaskParent
         labels = {"", "", "Pointcloud visualized", ""}
         desc = "Display the pointcloud as a BGR image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim pcSplit = {task.pcSplit(0).ConvertScaleAbs(255), task.pcSplit(1).ConvertScaleAbs(255), task.pcSplit(2).ConvertScaleAbs(255)}
         cv.Cv2.Merge(pcSplit, dst2)
     End Sub
@@ -661,7 +661,7 @@ Public Class PointCloud_PCpointsMask : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then pcPoints = New cv.Mat(task.gridRows, task.gridCols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
 
         dst2.SetTo(0)
@@ -701,7 +701,7 @@ Public Class PointCloud_PCPoints : Inherits TaskParent
         setPointCloudGrid()
         desc = "Reduce the point cloud to a manageable number points in 3D using the mean value"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim rw = task.gridRects(0).Width / 2, rh = task.gridRects(0).Height / 2
         Dim red32 = New cv.Point3f(0, 0, 1), blue32 = New cv.Point3f(1, 0, 0), white32 = New cv.Point3f(1, 1, 1)
         Dim red = cv.Scalar.Red, blue = cv.Scalar.Blue
@@ -738,7 +738,7 @@ Public Class PointCloud_PCPointsPlane : Inherits TaskParent
         setPointCloudGrid()
         desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         pcBasics.Run(src)
 
         pcPoints.Clear()
@@ -767,7 +767,7 @@ Public Class PointCloud_Inspector : Inherits TaskParent
         task.mouseMovePoint.X = dst2.Width / 2
         desc = "Inspect x, y, and z values in a row or column"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim yLines = 20
         Dim cLine = task.mouseMovePoint.X
 
@@ -809,7 +809,7 @@ Public Class PointCloud_Average : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         desc = "Average all 3 elements of the point cloud - not just depth."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         pcHistory.Add(task.pointCloud)
         If pcHistory.Count >= task.frameHistoryCount Then pcHistory.RemoveAt(0)
 
@@ -836,7 +836,7 @@ Public Class PointCloud_FrustrumTop : Inherits TaskParent
         labels(3) = "Draw the frustrum from the top view"
         desc = "Draw the top view of the frustrum"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         frustrum.Run(src)
 
         heat.Run(frustrum.dst3.Resize(dst2.Size))
@@ -863,7 +863,7 @@ Public Class PointCloud_FrustrumSide : Inherits TaskParent
         labels(2) = "Draw the frustrum from the side view"
         desc = "Draw the side view of the frustrum"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         frustrum.Run(src)
         heat.Run(frustrum.dst3.Resize(dst2.Size))
 
@@ -891,7 +891,7 @@ Public Class PointCloud_Histograms : Inherits TaskParent
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
         desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         task.redOptions.Sync() ' make sure settings are consistent
 
         cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
@@ -957,7 +957,7 @@ Public Class PointCloud_ReduceSplit2 : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.")
         desc = "Reduce the task.pcSplit(2) for use in several algorithms."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = task.pcSplit(2) * 1000
         dst2.ConvertTo(dst2, cv.MatType.CV_32S)
         reduction.Run(dst2)
@@ -986,7 +986,7 @@ Public Class PointCloud_ReducedTopView : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
         desc = "Create a stable side view of the point cloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         split2.Run(task.pointCloud)
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
@@ -1006,7 +1006,7 @@ Public Class PointCloud_ReducedSideView : Inherits TaskParent
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         split2.Run(Nothing)
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
@@ -1027,7 +1027,7 @@ Public Class PointCloud_ReducedViews : Inherits TaskParent
         labels = {"", "", "Reduced side view", "Reduced top view"}
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         split2.Run(Nothing)
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
@@ -1055,7 +1055,7 @@ Public Class PointCloud_XRangeTest : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.")
         desc = "Test adjusting the X-Range value to squeeze a histogram into dst2."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         split2.Run(src)
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
@@ -1079,7 +1079,7 @@ Public Class PointCloud_YRangeTest : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.")
         desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         split2.Run(src)
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
@@ -1097,7 +1097,7 @@ Public Class PointCloud_Split : Inherits TaskParent
     Public Sub New()
         desc = "Attempting to debug pointcloud problem - display the 3 components"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst1 = task.pcSplit(0)
         dst2 = task.pcSplit(1)
         dst3 = task.pcSplit(2)
@@ -1121,7 +1121,7 @@ Public Class PointCloud_Infinities : Inherits TaskParent
     Public Sub New()
         desc = "Find out if pointcloud has an nan's or inf's."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim infTotal(2) As Integer
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1

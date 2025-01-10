@@ -7,7 +7,7 @@ Public Class Sides_Basics : Inherits TaskParent
         labels = {"", "", "RedCloud output", "Selected Cell showing the various extrema."}
         desc = "Find the 6 extrema and the 4 farthest points in each quadrant for the selected RedCloud cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
         dst3 = sides.dst3
@@ -36,7 +36,7 @@ Public Class Sides_Profile : Inherits TaskParent
         labels = {"", "", "RedColor_Basics Output", "Selected Cell"}
         desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         sides.Run(src)
@@ -58,7 +58,7 @@ Public Class Sides_Corner : Inherits TaskParent
         labels = {"", "", "RedColor_Basics output", ""}
         desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         sides.Run(src)
@@ -80,7 +80,7 @@ Public Class Sides_ColorC : Inherits TaskParent
         labels = {"", "", "RedColor Output", "Cell Extrema"}
         desc = "Find the extrema - top/bottom, left/right, near/far - points for a RedColor Cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         sides.Run(src)

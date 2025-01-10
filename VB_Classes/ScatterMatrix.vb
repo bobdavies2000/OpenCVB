@@ -72,7 +72,7 @@ Public Class ScatterMatrix_Example : Inherits TaskParent
         SetTrueText(strOut, 2)
     End Sub
 
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         ' Compute the mean vector
         Dim meanVector() As Double = ComputeMeanVector(data)
 

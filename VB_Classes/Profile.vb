@@ -14,7 +14,7 @@ Public Class Profile_Basics : Inherits TaskParent
     Private Function point3fToString(v As cv.Point3f) As String
         Return Format(v.X, fmt3) + vbTab + Format(v.Y, fmt3) + vbTab + Format(v.Z, fmt3)
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
         Dim rc = task.rc
         If rc.depthPixels = 0 Then
@@ -104,7 +104,7 @@ Public Class Profile_Rotation : Inherits TaskParent
         labels(2) = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation."
         desc = "Build the rotation matrix around the Y-axis"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             Static ySlider = optiBase.FindSlider("Rotate pointcloud around Y-axis")
             ySlider.value += 1
@@ -142,7 +142,7 @@ Public Class Profile_Derivative : Inherits TaskParent
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rc
@@ -209,7 +209,7 @@ Public Class Profile_ConcentrationSide : Inherits TaskParent
         labels = {"", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", ""}
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         profile.Run(src)
         dst1 = profile.dst1
         dst2 = profile.dst2
@@ -238,7 +238,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
         task.gOptions.setDisplay1()
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Static ySlider = optiBase.FindSlider("Rotate pointcloud around Y-axis (degrees)")
@@ -302,7 +302,7 @@ Public Class Profile_OpenGL : Inherits TaskParent
         task.ogl.oglFunction = oCase.pcPointsAlone
         desc = "Visualize just the RedCloud cell contour in OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
         dst3 = sides.dst3
@@ -340,7 +340,7 @@ Public Class Profile_Kalman : Inherits TaskParent
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
         desc = "Use Kalman to smooth the results of the contour key points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         sides.Run(src)
         dst1 = sides.dst2
         dst2 = sides.dst3

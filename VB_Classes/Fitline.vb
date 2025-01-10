@@ -10,7 +10,7 @@ Public Class FitLine_Basics : Inherits TaskParent
         labels(3) = "FitLine_Basics input"
         desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If not task.heartBeat Then Exit Sub
         options.RunOpt()
 
@@ -60,7 +60,7 @@ Public Class FitLine_Basics3D : Inherits TaskParent
         If m = 0 Then pt2 = New cv.Point(x, dst.Rows) Else pt2 = New cv.Point((dst.Rows - b) / m, dst.Rows)
         dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType, 0)
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If Not task.heartBeat Then Exit Sub
         hlines.Run(src)
         dst3 = hlines.dst3

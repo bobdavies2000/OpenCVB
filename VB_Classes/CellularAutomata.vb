@@ -37,7 +37,7 @@ Public Class CellularAutomata_Basics : Inherits TaskParent
         Next
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.heartBeat Then
@@ -100,7 +100,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
        optiBase.findslider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         desc = "Use OpenCV to implement the Game of Life"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If random.options.count <> savePointCount Or age = 0 Then
             random.Run(src)
             age = 0
@@ -167,7 +167,7 @@ Public Class CellularAutomata_LifeColor : Inherits TaskParent
         labels(2) = "Births are blue, deaths are red"
         desc = "Game of Life but with color added"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim lastBoard = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         game.Run(src)
         dst1 = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -195,7 +195,7 @@ Public Class CellularAutomata_LifePopulation : Inherits TaskParent
     Public Sub New()
         desc = "Show Game of Life display with plot of population"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         game.Run(src)
         dst2 = game.dst2
 
@@ -218,7 +218,7 @@ Public Class CellularAutomata_MultiPoint : Inherits TaskParent
         cell.index = 4 ' this one is nice...
         desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim tmp = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
         tmp.Set(0, val1, 1)
         tmp.Set(0, val2, 1)
@@ -253,7 +253,7 @@ Public Class CellularAutomata_All256 : Inherits TaskParent
         Next
         Return outstr
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
             cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)

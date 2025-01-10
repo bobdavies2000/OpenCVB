@@ -10,7 +10,7 @@ Public Class Bin2Way_Basics : Inherits TaskParent
         labels = {"", "", "Image separated into 2 segments from darkest and lightest", "Histogram Of grayscale image"}
         desc = "Split an image into 2 parts - darkest and lightest,"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim bins = task.histogramBins
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
@@ -53,7 +53,7 @@ Public Class Bin2Way_KMeans : Inherits TaskParent
         labels = {"", "", "Darkest (upper left),lightest (upper right)", "Selected image from dst2"}
         desc = "Use kmeans with each of the 2-way split images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bin2.Run(src)
 
@@ -81,7 +81,7 @@ Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
     Public Sub New()
         desc = "Use RedCloud with the darkest regions"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then bin2.Run(src)
 
         flood.inputMask = Not bin2.mats.mat(0)
@@ -103,7 +103,7 @@ Public Class Bin2Way_RedCloudLightest : Inherits TaskParent
     Public Sub New()
         desc = "Use RedCloud with the lightest regions"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then bin2.Run(src)
 
         flood.inputMask = Not bin2.mats.mat(3)
@@ -122,7 +122,7 @@ Public Class Bin2Way_RecurseOnce : Inherits TaskParent
     Public Sub New()
         desc = "Keep splitting an image between light and dark"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         bin2.fraction = src.Total / 2
@@ -164,7 +164,7 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
         flood.showSelected = False
         desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then

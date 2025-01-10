@@ -10,7 +10,7 @@ Public Class FCS_Basics : Inherits TaskParent
         labels(1) = "The feature point of each cell."
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         task.feat.Run(src)
@@ -71,7 +71,7 @@ Public Class FCS_ViewLeft : Inherits TaskParent
     Public Sub New()
         desc = "Build an FCS for left view."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(task.leftView)
         dst2 = fcs.dst2
         dst3 = fcs.dst3
@@ -93,7 +93,7 @@ Public Class FCS_ViewRight : Inherits TaskParent
     Public Sub New()
         desc = "Build an FCS for right view."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(task.rightView)
         dst2 = fcs.dst2
         dst3 = fcs.dst3
@@ -124,7 +124,7 @@ Public Class FCS_Motion : Inherits TaskParent
         labels(1) = "Plot of % of cells that moved - move camera to see value."
         desc = "Highlight the motion of each feature identified in the current and previous frame"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = fcs.dst1
 
@@ -182,7 +182,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Using all the feature points with motion, determine any with a common direction."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcsM.Run(src)
         mats.mat(2) = fcsM.dst2
         mats.mat(3) = fcsM.dst3
@@ -238,7 +238,7 @@ Public Class FCS_FloodFill : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use color to connect FCS cells - visualize the data mostly."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         flood.Run(src)
         dst2 = flood.dst2
 
@@ -282,7 +282,7 @@ Public Class FCS_Periphery : Inherits TaskParent
     Public Sub New()
         desc = "Display the cells which are on the periphery of the image"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = fcs.dst2
 
@@ -321,7 +321,7 @@ Public Class FCS_Edges : Inherits TaskParent
     Public Sub New()
         desc = "Use edges to connect feature points to their neighbors."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = src
 
@@ -348,7 +348,7 @@ End Class
 '    Public Sub New()
 '        desc = "Track each feature with FCS"
 '    End Sub
-'    Public Overrides sub runAlg(src As cv.Mat)
+'    Public Overrides sub RunAlg(src As cv.Mat)
 '        options.RunOpt()
 
 '        fcs.Run(src)
@@ -418,7 +418,7 @@ End Class
 '        If standalone Then task.gOptions.setDisplay0()
 '        desc = "Track all the feature points and show their ID"
 '    End Sub
-'    Public Overrides sub runAlg(src As cv.Mat)
+'    Public Overrides sub RunAlg(src As cv.Mat)
 '        dst0 = src.Clone
 '        fcs.Run(src)
 '        dst2 = fcs.dst2
@@ -452,7 +452,7 @@ End Class
 '        labels(3) = "The age of each feature point cell."
 '        desc = "Try to improve the match count to the previous frame using correlation"
 '    End Sub
-'    Public Overrides sub runAlg(src As cv.Mat)
+'    Public Overrides sub RunAlg(src As cv.Mat)
 '        options.RunOpt()
 
 '        edges.Run(src)
@@ -562,7 +562,7 @@ Public Class FCS_Neighbors : Inherits TaskParent
         If r.BottomRight.Y >= dst2.Height Then r.Y = dst2.Height - szNew
         Return r
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = fcs.dst2
 
@@ -598,7 +598,7 @@ Public Class FCS_NoTracking : Inherits TaskParent
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
@@ -647,7 +647,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.feat.Run(src)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
@@ -739,7 +739,7 @@ Public Class FCS_TravelDistance : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Display the travel distance "
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = fcs.dst2
         dst2.SetTo(0, task.fpOutline)
@@ -775,7 +775,7 @@ Public Class FCS_Info : Inherits TaskParent
     Public Sub New()
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.feat.Run(src)
         Dim fp = fpSelection
         If fp Is Nothing Then fp = task.fpSelected
@@ -830,7 +830,7 @@ Public Class FCS_InfoTest : Inherits TaskParent
     Public Sub New()
         desc = "Invoke FCS_Basics and display the contents of the selected feature point cell"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = fcs.dst2
 
@@ -858,7 +858,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
         task.gOptions.setHistogramBins(20)
         desc = "Use cell depth to break down the layers in an image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = fcs.dst2
         labels(2) = fcs.labels(2)
@@ -941,7 +941,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         Next
         Return dataList
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static dimensionSlider = optiBase.FindSlider("KNN Dimension")
         dimension = dimensionSlider.value
 
@@ -1001,7 +1001,7 @@ Public Class FCS_Tracker : Inherits TaskParent
         labels(3) = "dst2 is a tracking color while dst3 is the color mean"
         desc = "Track the selected cell"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst1 = fcs.dst2
         labels(2) = fcs.labels(2)
@@ -1039,7 +1039,7 @@ Public Class FCS_Lines1 : Inherits TaskParent
         labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
         desc = "Use lines as input to FCS."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
 
         task.features.Clear()
@@ -1078,7 +1078,7 @@ Public Class FCS_Lines : Inherits TaskParent
         labels(3) = "Cell boundaries with the age (in frames) for each cell."
         desc = "Use lines as input to FCS."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static minSlider = optiBase.FindSlider("Min Distance to next")
         Dim minDistance = minSlider.value
         lines.Run(src)
@@ -1121,7 +1121,7 @@ Public Class FCS_WithAge : Inherits TaskParent
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the age of each cell."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = fcs.dst2
         labels(2) = fcs.labels(2)
@@ -1145,7 +1145,7 @@ Public Class FCS_BestAge : Inherits TaskParent
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the top X oldest (best) cells."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
         dst2 = fcs.dst2
         labels(2) = fcs.labels(2)
@@ -1181,7 +1181,7 @@ Public Class FCS_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Use the RedCloud maxDist points as feature points in an FCS display."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         redCombo.Run(src)
         dst3 = redCombo.dst2
         labels(2) = redCombo.labels(2)
@@ -1211,7 +1211,7 @@ Public Class FCS_RedCloud1 : Inherits TaskParent
         labels(1) = "Output of FCS_Basics."
         desc = "Isolate FCS cells for each redCell."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then getRedColor(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)

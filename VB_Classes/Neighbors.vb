@@ -7,7 +7,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Find all the neighbors with KNN"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standalone Or runRedCloud Then dst2 = getRedColor(src, labels(2))
@@ -31,9 +31,9 @@ Public Class Neighbors_Basics : Inherits TaskParent
             For Each index In task.rc.nabs
                 Dim pt = task.redCells(index).maxDStable
                 If pt = task.rc.maxDStable Then
-                    DrawCircle(dst2,pt, task.DotSize, black)
+                    DrawCircle(dst2, pt, task.DotSize, black)
                 Else
-                    DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
+                    DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
                     ptCount += 1
                     If ptCount > options.xNeighbors Then Exit For
                 End If
@@ -53,7 +53,7 @@ Public Class Neighbors_Intersects : Inherits TaskParent
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
             dst2 = getRedColor(src, labels(2))
             src = task.redMap
@@ -84,8 +84,8 @@ Public Class Neighbors_Intersects : Inherits TaskParent
         If standaloneTest() Then
             dst3 = task.color.Clone
             For Each pt In nPoints
-                DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
-                DrawCircle(dst3,pt, task.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             Next
         End If
 
@@ -106,12 +106,12 @@ Public Class Neighbors_ColorOnly : Inherits TaskParent
     Public Sub New()
         desc = "Find neighbors in a redColor cellMap"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         corners.Run(task.redMap.Clone())
         For Each pt In corners.nPoints
-            DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
         Next
 
         labels(2) = task.redC.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"
@@ -134,7 +134,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Find the neighbors in a selected RedCloud cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
             dst2 = getRedColor(src, labels(2))
 

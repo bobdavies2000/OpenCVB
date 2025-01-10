@@ -17,7 +17,7 @@ Public Class Pixel_Viewer : Inherits TaskParent
     Public Sub New()
         desc = "Display pixels under the cursor"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             task.dst0 = task.color.Clone
             task.dst1 = task.depthRGB.Clone
@@ -191,7 +191,7 @@ Public Class Pixel_GetSet : Inherits TaskParent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
@@ -256,8 +256,8 @@ Public Class Pixel_Measure : Inherits TaskParent
         Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
         Return halfLineInMeters * 2 / dst2.Width
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static distanceSlider =optiBase.findslider("Distance in mm")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static distanceSlider = optiBase.FindSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.Value)
         SetTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
                     Format(mmPP * src.Width / 1000, fmt2) + " meters wide" + vbCrLf +
@@ -280,7 +280,7 @@ Public Class Pixel_SampleColor : Inherits TaskParent
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 Dim w = 25, h = 25
@@ -317,7 +317,7 @@ Public Class Pixel_SampleColor : Inherits TaskParent
             dst2 = src
             dst2.Rectangle(random.range, white, 1)
             For Each pt In random.PointList
-                DrawCircle(dst2,pt, task.DotSize, white)
+                DrawCircle(dst2, pt, task.DotSize, white)
             Next
             labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
             SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
@@ -337,13 +337,13 @@ Public Class Pixel_Unstable : Inherits TaskParent
     Dim unstable As New List(Of cv.Mat)
     Dim lastImage As cv.Mat
     Public unstablePixels As New cv.Mat
-    Dim kSlider =optiBase.findslider("KMeans k")
+    Dim kSlider = optiBase.FindSlider("KMeans k")
     Public Sub New()
         task.gOptions.setPixelDifference(2)
         labels(2) = "KMeans_Basics output"
         desc = "Detect where pixels are unstable"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         k = kSlider.Value
 
         km.Run(src)
@@ -387,10 +387,10 @@ Public Class Pixel_Zoom : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom Factor", 2, 16, 4)
         labels(2) = "To zoom move the mouse over the image"
-        zoomSlider =optiBase.findslider("Zoom Factor")
+        zoomSlider = optiBase.FindSlider("Zoom Factor")
         desc = "Zoom into the pixels under the mouse in dst2"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoomSlider.Value)
 
@@ -416,7 +416,7 @@ Public Class Pixel_SubPixel : Inherits TaskParent
     Public Sub New()
         desc = "Show how to use the GetRectSubPix OpenCV API"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoom.zoomSlider.Value)
 
@@ -445,7 +445,7 @@ Public Class Pixel_NeighborsHorizontal : Inherits TaskParent
     Public Sub New()
         desc = "Manual step through depth data to find horizontal neighbors within x mm's"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -487,7 +487,7 @@ Public Class Pixel_NeighborsVertical : Inherits TaskParent
     Public Sub New()
         desc = "Manual step through depth data to find vertical neighbors within x mm's"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -526,7 +526,7 @@ Public Class Pixel_NeighborsMaskH : Inherits TaskParent
     Public Sub New()
         desc = "Show where horizontal neighbor depth values are within X mm's"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -553,7 +553,7 @@ Public Class Pixel_NeighborsMaskV : Inherits TaskParent
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -583,7 +583,7 @@ Public Class Pixel_NeighborsMask : Inherits TaskParent
     Public Sub New()
         desc = "Show the mask for both the horizontal and vertical neighbors"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         maskH.Run(src)
         dst2 = maskH.dst2
 
@@ -600,10 +600,10 @@ End Class
 Public Class Pixel_NeighborsPatchNeighbors : Inherits TaskParent
     Public options As New Options_Neighbors
     Public Sub New()
-       optiBase.findslider("Minimum offset to neighbor pixel").Value = 1
+        optiBase.FindSlider("Minimum offset to neighbor pixel").Value = 1
         desc = "Update depth values for neighbors where they are within X mm's"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -658,7 +658,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         labels = {"", "RedColor_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         getRedColor(src)
         Dim maxRegion = 20
 
@@ -700,7 +700,7 @@ Public Class Pixel_Unique_CPP : Inherits TaskParent
         cPtr = Pixels_Vector_Open()
         desc = "Create the list of pixels in a RedCloud Cell"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         src = src.Resize(task.lowRes)
         If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -731,7 +731,7 @@ Public Class Pixel_Vectors : Inherits TaskParent
         labels = {"", "", "RedColor_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         pixelVector.Clear()
@@ -755,7 +755,7 @@ Public Class Pixel_Mapper : Inherits TaskParent
     Public Sub New()
         desc = "Resize the input to a small image, convert to gray, and map gray to color"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             Dim nSize = New cv.Size(src.Width / 8, src.Height / 8)
             dst1 = src.Resize(nSize)
@@ -807,7 +807,7 @@ Public Class Pixel_MapLeftRight : Inherits TaskParent
         labels = {"", "", "Left view with averaged color", "Right view with averaged color"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 
@@ -829,7 +829,7 @@ Public Class Pixel_MapDistance : Inherits TaskParent
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 
@@ -890,7 +890,7 @@ Public Class Pixel_Sampler : Inherits TaskParent
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 If task.drawRect <> New cv.Rect Then
@@ -965,7 +965,7 @@ Public Class Pixel_Display : Inherits TaskParent
         labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."
         desc = "Find the pixels within the drawrect and display their stats."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
         If task.heartBeat Then
             Dim mean As cv.Scalar, stdev As cv.Scalar
@@ -990,7 +990,7 @@ Public Class Pixel_ColorGuess : Inherits TaskParent
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         mapper.Run(src)
         dst2 = mapper.dst2
 

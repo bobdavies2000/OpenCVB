@@ -12,7 +12,7 @@ Public Class ImageOffset_Basics : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         desc = "Compute various differences between neighboring pixels"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
@@ -67,7 +67,7 @@ Public Class ImageOffset_SliceH : Inherits TaskParent
         labels(2) = "Upper left is pointcloud X, upper right pointcloud Y, bottom left pointcloud Z"
         desc = "Visualize a slice through the ImageOffsets_Basics images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         iOff.Run(src)
@@ -129,7 +129,7 @@ Public Class ImageOffset_SliceV : Inherits TaskParent
         labels(2) = "Upper left is pointcloud X, upper right pointcloud Y, bottom left pointcloud Z"
         desc = "Visualize a slice through the ImageOffsets_Basics images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         iOff.Run(src)
@@ -182,6 +182,6 @@ Public Class ImageOffset_Cloud : Inherits TaskParent
     Public Sub New()
         desc = "Create a pointcloud with the results of the imageOffset slices"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
     End Sub
 End Class

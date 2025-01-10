@@ -10,7 +10,7 @@ Public Class MSER_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
         Dim boxInput = New List(Of cv.Rect)(detect.boxes)
         Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -75,7 +75,7 @@ Public Class MSER_Detect : Inherits TaskParent
     Public Sub New()
         desc = "Run the core MSER (Maximally Stable Extremal Region) algorithm"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.Clone
@@ -121,7 +121,7 @@ Public Class MSER_SyntheticInput : Inherits TaskParent
     Public Sub New()
         desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, cv.Scalar.All(0))
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
@@ -154,7 +154,7 @@ Public Class MSER_LeftRight : Inherits TaskParent
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics output for right camera"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         left.Run(task.leftView)
         dst2 = left.dst2
         labels(2) = left.labels(2)
@@ -177,7 +177,7 @@ Public Class MSER_Left : Inherits TaskParent
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         mBase.Run(task.leftView)
         dst2 = mBase.dst2
         dst3 = mBase.dst3
@@ -198,7 +198,7 @@ Public Class MSER_Right : Inherits TaskParent
         labels = {"", "", "MSER_Basics output for right camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         mBase.Run(task.rightView)
         dst2 = mBase.dst2
         dst3 = mBase.dst3
@@ -219,7 +219,7 @@ Public Class MSER_Hulls : Inherits TaskParent
     Public Sub New()
         desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         mBase.Run(src)
@@ -254,7 +254,7 @@ Public Class MSER_TestSynthetic : Inherits TaskParent
         labels = {"", "", "Synthetic input", "Output from MSER (Maximally Stable Extremal Region)"}
         desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         synth.Run(src)
@@ -279,7 +279,7 @@ Public Class MSER_Grayscale : Inherits TaskParent
         optiBase.FindCheckBox("Use grayscale input").Checked = True
         desc = "Run MSER (Maximally Stable Extremal Region) with grayscale input"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
 
         mBase.Run(reduction.dst3)
@@ -301,7 +301,7 @@ Public Class MSER_ReducedRGB : Inherits TaskParent
         optiBase.FindCheckBox("Use grayscale input").Checked = False
         desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
 
         mBase.Run(reduction.dst2)
@@ -324,7 +324,7 @@ Public Class MSER_ROI : Inherits TaskParent
     Public Sub New()
         desc = "Identify the main regions of interest with MSER (Maximally Stable Extremal Region)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.Clone
@@ -391,7 +391,7 @@ Public Class MSER_TestExample : Inherits TaskParent
         image = cv.Cv2.ImRead(task.HomeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         mser = cv.MSER.Create()
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim regions()() As cv.Point
@@ -434,7 +434,7 @@ Public Class MSER_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Use the MSER_Basics output as input to RedColor_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         mBase.Run(src)
 
         getRedColor(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -459,7 +459,7 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "MSER in a nutshell: intensity threshold, stability, maximize region, adaptive threshold."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If task.optionsChanged Then
             MSER_Close(cPtr)
@@ -501,7 +501,7 @@ Public Class MSER_Binarize : Inherits TaskParent
     Public Sub New()
         desc = "Instead of a BGR src, try using the color output of Bin4Way_Regions"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bin4.Run(src)
         dst2 = ShowPalette(bin4.dst2 * 255 / 4)
 
@@ -520,7 +520,7 @@ Public Class MSER_Basics1 : Inherits TaskParent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = getRedColor(src, labels(2))
@@ -537,7 +537,7 @@ Public Class MSER_BasicsNew : Inherits TaskParent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
 
         Dim boxInput = New List(Of cv.Rect)(detect.boxes)
@@ -573,7 +573,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -637,7 +637,7 @@ Public Class MSER_CPP : Inherits TaskParent
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "C++ version of MSER basics."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If task.optionsChanged Then
             MSER_Close(cPtr)

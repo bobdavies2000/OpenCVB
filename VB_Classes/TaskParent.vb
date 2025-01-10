@@ -688,12 +688,12 @@ Public Class TaskParent : Implements IDisposable
 
         If task.paused = False Then
             trueData.Clear()
-            runAlg(src)
+            RunAlg(src)
         End If
 
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
-    Public Overridable Sub runAlg(src As cv.Mat)
+    Public Overridable Sub RunAlg(src As cv.Mat)
         ' every algorithm overrides this Sub 
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

@@ -6568,7 +6568,7 @@ End Class
 Public Class Options_RedColorEx : Inherits OptionParent
     Public range As Integer = 30
     Public reduceAmt As Integer = 250
-    Public threshold As Double = 0.95
+    Dim threshold As Double = 0.95
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Grayscale range around mean", 0, 100, range)

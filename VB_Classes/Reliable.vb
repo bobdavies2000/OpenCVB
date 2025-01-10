@@ -7,7 +7,7 @@ Public Class Reliable_Basics : Inherits TaskParent
         task.gOptions.setDisplay1()
         desc = "Identify each grid element with unreliable data or motion."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
 
         bgs.Run(src)
         dst2 = bgs.dst2
@@ -29,7 +29,7 @@ Public Class Reliable_Depth : Inherits TaskParent
         labels = {"", "", "Mask of Reliable depth data", "Task.DepthRGB after removing unreliable depth (compare with above.)"}
         desc = "Provide only depth that has been present over the last framehistory frames."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         rDepth.Run(task.noDepthMask)
         dst2 = rDepth.dst2
 
@@ -50,7 +50,7 @@ Public Class Reliable_MaxDepth : Inherits TaskParent
     Public Sub New()
         desc = "Create a mas"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         Dim split() As cv.Mat
         If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
@@ -91,7 +91,7 @@ Public Class Reliable_RGB : Inherits TaskParent
         labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
         desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Pixel Difference threshold'"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst3 = src.Clone
         dst2.SetTo(0)
         For i = 0 To diff.Count - 1

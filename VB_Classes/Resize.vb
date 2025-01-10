@@ -7,7 +7,7 @@ Public Class Resize_Basics : Inherits TaskParent
         desc = "Resize with different options and compare them"
         labels(2) = "Rectangle highlight above resized"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
 
         If task.drawRect.Width <> 0 Then
@@ -32,7 +32,7 @@ Public Class Resize_Smaller : Inherits TaskParent
     Public Sub New()
         desc = "Resize by a percentage of the image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         optGrid.RunOpt()
 
@@ -54,7 +54,7 @@ Public Class Resize_Proportional : Inherits TaskParent
     Public Sub New()
         desc = "Resize the input but keep the results proportional to the original."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             options.RunOpt()
             dst2 = options.runRedCloud(labels(2))

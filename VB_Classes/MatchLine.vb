@@ -20,7 +20,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
         End Select
         Return New cv.Point2f(r.TopLeft.X, r.BottomRight.Y)
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
         Dim correlationMin = match.options.correlationMin
@@ -75,7 +75,7 @@ Public Class MatchLine_Longest : Inherits TaskParent
     Public Sub New()
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         knn.Run(src.Clone)
         matchLine.lpInput = New linePoints(knn.lastPair.p1, knn.lastPair.p2)
 
@@ -97,7 +97,7 @@ Public Class MatchLine_Horizon : Inherits TaskParent
     Public Sub New()
         desc = "Verify the horizon using MatchTemplate."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         'If matchLine.match.correlation < matchLine.match.options.correlationThreshold Then matchLine.lpInput = task.horizonVec
         If task.quarterBeat Then matchLine.lpInput = task.horizonVec
         matchLine.Run(src)
@@ -115,7 +115,7 @@ Public Class MatchLine_Gravity : Inherits TaskParent
     Public Sub New()
         desc = "Verify the gravity vector using MatchTemplate."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.quarterBeat Then matchLine.lpInput = task.gravityVec
         matchLine.Run(src)
         dst2 = matchLine.dst2

@@ -10,7 +10,7 @@ Public Class BlurMotion_Basics : Inherits TaskParent
         blurAngleSlider =optiBase.findslider("Motion Blur Angle")
         desc = "Use Filter2D to create a motion blur"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If standaloneTest() Then
             blurAngleSlider.Value = If(blurAngleSlider.Value < blurAngleSlider.Maximum, blurAngleSlider.Value + 1, blurAngleSlider.Minimum)
@@ -113,7 +113,7 @@ Public Class BlurMotion_Deblur : Inherits TaskParent
         labels(2) = "Blurred Image Input"
         labels(3) = "Deblurred Image Output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         mblur.Options.RunOpt()
 
         If task.heartBeat Then mblur.options.redoCheckBox.Checked = True

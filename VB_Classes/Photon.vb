@@ -6,7 +6,7 @@ Public Class Photon_Basics : Inherits TaskParent
         labels = {"", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences"}
         desc = "With no motion the camera values will show the random photon differences.  Are they random?"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static lastImage As cv.Mat = src
         cv.Cv2.Absdiff(src, lastImage, dst1)
 
@@ -44,7 +44,7 @@ Public Class Photon_Test : Inherits TaskParent
         labels = {"", "", "5 color levels from reduction (black not shown)", "Selected distribution"}
         desc = ""
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         task.redOptions.setBitReductionBar(64) ' for now...
         Dim reduce = 64
 
@@ -94,7 +94,7 @@ Public Class Photon_Subtraction : Inherits TaskParent
         labels = {"", "", "Points where B, G, or R differ", "Histogram showing distribution of differences"}
         desc = "Same as Photon_Basics but without ignoring sign."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         src = src.Reshape(1, src.Rows * 3)
         src.ConvertTo(src, cv.MatType.CV_32F)
 
@@ -127,7 +127,7 @@ Public Class Photon_Distance3D : Inherits TaskParent
         task.gOptions.UseMotionColor.Checked = False
         desc = "Plot a histogram of the 3D distance of each picture from the previous image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lowRes.Run(src)
 
         Dim currColors As New List(Of cv.Vec3b)

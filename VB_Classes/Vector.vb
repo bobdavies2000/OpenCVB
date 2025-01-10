@@ -5,7 +5,7 @@ Public Class Vector_Magnitude : Inherits TaskParent
         desc = "Compute Euclidian and Manhattan Distance on a single vector."
         labels(2) = "Vector Magnitude"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim cVector() As Single = {1, 4, 4, 8}
         strOut = "p1 = (" + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ")" + vbTab + " p2 = (" + CStr(cVector(2)) + ", " + CStr(cVector(3)) + ")" + vbCrLf + vbCrLf
         Dim coordinates As cv.Mat = cv.Mat.FromPixelData(1, 4, cv.MatType.CV_32F, cVector)

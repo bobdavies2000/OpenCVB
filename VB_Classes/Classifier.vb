@@ -6,7 +6,7 @@ Public Class Classifier_Basics_CPP : Inherits TaskParent
         cPtr = OEX_Points_Classifier_Open()
         desc = "OpenCV Example Points_Classifier"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then task.gOptions.debugChecked = True
@@ -80,7 +80,7 @@ Public Class Classifier_Bayesian : Inherits TaskParent
         cPtr = OEX_Points_Classifier_Open()
         desc = "Run the Bayesian classifier with the input."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim sampleCount As Integer, methodIndex = 0
         If src.Type <> cv.MatType.CV_32FC2 Then
             options.RunOpt()
@@ -118,7 +118,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         SetTrueText("Review the neighbors_Precise algorithm")

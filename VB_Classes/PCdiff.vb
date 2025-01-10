@@ -5,7 +5,7 @@ Public Class PCdiff_Basics : Inherits TaskParent
         task.gOptions.PixelDiffBar.Value = 10
         desc = "Find depth regions where neighboring pixels are close in depth"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If standalone Then src = task.pcSplit(2)
 
@@ -51,7 +51,7 @@ Public Class PCdiff_Edges : Inherits TaskParent
         task.gOptions.DebugSlider.Maximum = 2
         desc = "Find any significant differences in neighboring pixels of the pointcloud."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static index As Integer = -1
 
         If task.heartBeatLT Then
@@ -85,7 +85,7 @@ Public Class PCdiff_Basics1 : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         desc = "Compute various differences between neighboring pixels"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
@@ -137,7 +137,7 @@ Public Class PCdiff_Filter : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3)
         desc = "Filter the pointcloud to isolate only pixels within X mm's of it neighbor"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         pcDiff.Run(src)
 
         Dim delta = task.gOptions.pixelDiffThreshold / 1000
@@ -171,7 +171,7 @@ Public Class PCdiff_Points : Inherits TaskParent
                           "Pixels removed to make clean breaks in the depth data"}
         desc = "Review the filtered PCdiff output."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         filter.Run(src)
         task.pcSplit = filter.dst3.Split()
 
@@ -212,7 +212,7 @@ Public Class PCdiff_GuidedBP : Inherits TaskParent
     Public Sub New()
         desc = "Isolate the objects found in the contiguous depth"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         points.Run(src)
 
         cv.Cv2.Merge(task.pcSplit, task.pointCloud)

@@ -6,7 +6,7 @@ Public Class Spectrum_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges of the depth and color."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = options.runRedCloud(labels(2))
 
         dSpec.Run(src)
@@ -32,7 +32,7 @@ Public Class Spectrum_X : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -56,7 +56,7 @@ Public Class Spectrum_Y : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -80,7 +80,7 @@ Public Class Spectrum_Z : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
@@ -108,7 +108,7 @@ Public Class Spectrum_Cloud : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -139,7 +139,7 @@ Public Class Spectrum_GrayAndCloud : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -166,7 +166,7 @@ Public Class Spectrum_RGB : Inherits TaskParent
     Public Sub New()
         desc = "Create a spectrum of the RGB values for a given RedCloud cell."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
@@ -202,7 +202,7 @@ Public Class Spectrum_CellZoom : Inherits TaskParent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         breakdown.options.RunOpt()
 
         dst2 = breakdown.options.runRedCloud(labels(2))
@@ -234,7 +234,7 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
     Public Sub New()
         desc = "Breakdown a cell if possible."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             options.RunOpt()
             dst2 = options.runRedCloud(labels(2))
@@ -302,7 +302,7 @@ Public Class Spectrum_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Breakdown each cell in redCells."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         breakdown.options.RunOpt()
         dst2 = breakdown.options.runRedCloud(labels(2))
 
@@ -333,7 +333,7 @@ Public Class Spectrum_Mask : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Create a mask from the Spectrum ranges"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         gSpec.Run(src)
         dst1 = gSpec.dst2
         labels(2) = gSpec.labels(2)
@@ -353,7 +353,7 @@ Public Class Spectrum_Gray : Inherits TaskParent
     Public Sub New()
         desc = "Given a RedCloud cell, create a spectrum that contains the color ranges."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then dst2 = options.runRedCloud(labels(2))

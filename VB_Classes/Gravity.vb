@@ -21,7 +21,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
         DrawLine(dst3, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
 
         dst0 = dst0.Abs()
@@ -91,7 +91,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
         Next
         Return New cv.Point
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
@@ -127,7 +127,7 @@ Public Class Gravity_HorizonCompare : Inherits TaskParent
         horizon.autoDisplay = True
         desc = "Collect results from Horizon_Basics with Gravity_Basics"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
         Dim g1 = task.gravityVec
         Dim h1 = task.gravityVec
@@ -167,7 +167,7 @@ Public Class Gravity_Horizon : Inherits TaskParent
         labels(2) = "Gravity vector in yellow and Horizon vector in red."
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
         horizon.Run(src)

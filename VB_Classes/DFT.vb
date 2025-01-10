@@ -30,7 +30,7 @@ Public Class DFT_Basics : Inherits TaskParent
         labels(2) = "Image after inverse DFT"
         labels(3) = "DFT_Basics Spectrum Magnitude"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         grayMat = src
         If src.Channels() = 3 Then grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -83,7 +83,7 @@ Public Class DFT_Inverse : Inherits TaskParent
         labels(2) = "Image after Inverse DFT"
         desc = "Take the inverse of the Discrete Fourier Transform."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -123,7 +123,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits TaskParent
         labels(2) = "Image with Butterworth Low Pass Filter Applied"
         labels(3) = "Same filter with radius / 2"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         dft.Run(src)
 
@@ -169,7 +169,7 @@ Public Class DFT_ButterworthDepth : Inherits TaskParent
         labels(2) = "Image with Butterworth Low Pass Filter Applied"
         labels(3) = "Same filter with radius / 2"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         bfilter.Run(task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = bfilter.dst2
         dst3 = bfilter.dst3
@@ -202,7 +202,7 @@ Public Class DFT_Shapes : Inherits TaskParent
         labels = {"Inverse of the DFT - the same grayscale input.", "", "Input to the DFT", "Discrete Fourier Transform Output"}
         desc = "Show the spectrum magnitude for some standard shapes"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Static frm = optiBase.FindFrm("Options_DFTShape Radio Buttons")

@@ -23,7 +23,7 @@ Public Class HOG_Basics : Inherits TaskParent
             dst2.Rectangle(r.TopLeft, r.BottomRight, cv.Scalar.Red, 3, cv.LineTypes.Link8, 0)
         Next rect
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim hog As New cv.HOGDescriptor()

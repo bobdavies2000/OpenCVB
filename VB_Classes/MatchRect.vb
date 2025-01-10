@@ -7,7 +7,7 @@ Public Class MatchRect_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then match.correlation = 0
         If match.correlation < match.options.correlationMin Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
@@ -36,7 +36,7 @@ Public Class MatchRect_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Track a RedCloud cell using MatchTemplate."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
         task.ClickPoint = task.rc.maxDist
 

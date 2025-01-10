@@ -9,7 +9,7 @@ Public Class Foreground_Basics : Inherits TaskParent
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the first KMeans class with depth over 1 meter and use it to define foreground"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         simK.Run(src)
         classCount = simK.classCount
 
@@ -54,13 +54,13 @@ End Class
 Public Class Foreground_KMeans : Inherits TaskParent
     Dim km As New KMeans_Image
     Public Sub New()
-       optiBase.findslider("KMeans k").Value = 2
+        optiBase.FindSlider("KMeans k").Value = 2
         labels = {"", "", "Foreground Mask", "Background Mask"}
         dst2 = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Separate foreground and background using Kmeans with k=2."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.optionsChanged = True
 
         km.Run(task.pcSplit(2))
@@ -95,7 +95,7 @@ Public Class Foreground_Contours : Inherits TaskParent
     Public Sub New()
         desc = "Create contours for the foreground mask"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fore.Run(src)
 
         contours.Run(fore.dst2)
@@ -115,7 +115,7 @@ Public Class Foreground_Hist3D : Inherits TaskParent
         labels = {"", "", "Foreground", "Background"}
         desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hcloud.Run(src)
 
         dst2.SetTo(0)
@@ -135,7 +135,7 @@ Public Class Foreground_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Isolate foreground from background, then segment each with RedCloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fore.Run(src)
         dst2 = fore.dst2
         labels(2) = fore.labels(2)
@@ -160,7 +160,7 @@ Public Class Foreground_CellsFore : Inherits TaskParent
         task.redOptions.setIdentifyCells(False)
         desc = "Get the foreground cells"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         getRedColor(src)
 
         fore.Run(src)
@@ -183,7 +183,7 @@ Public Class Foreground_CellsBack : Inherits TaskParent
         task.redOptions.setIdentifyCells(False)
         desc = "Get the background cells"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         getRedColor(src)
 
         fore.Run(src)

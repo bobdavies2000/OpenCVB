@@ -11,7 +11,7 @@ Public Class Cluster_Basics : Inherits TaskParent
         optiBase.FindSlider("Min Distance to next").Value = 10
         desc = "Group the points based on their proximity to each other."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         task.feat.Run(src)
@@ -83,7 +83,7 @@ Public Class Cluster_Hulls : Inherits TaskParent
     Public Sub New()
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
         cluster.ptInput = task.featurePoints

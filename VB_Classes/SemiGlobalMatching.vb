@@ -7,7 +7,7 @@ Public Class SemiGlobalMatching_CPP : Inherits TaskParent
     Public Sub New()
         desc = "Find depth using the semi-global matching algorithm."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.frameCount < 10 Then Exit Sub
         If task.cameraName = "Azure Kinect 4K" Then
             SetTrueText("The left and right views are identical with the Microsoft K4A 4 Azure camera.")

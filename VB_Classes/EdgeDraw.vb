@@ -6,7 +6,7 @@ Public Class EdgeDraw_Basics : Inherits TaskParent
         labels = {"", "", "EdgeDraw_Basics output", ""}
         desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total - 1) As Byte
@@ -37,7 +37,7 @@ Public Class EdgeDraw_Segments : Inherits TaskParent
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total - 1) As Byte
@@ -75,7 +75,7 @@ Public Class EdgeDraw_LeftRight : Inherits TaskParent
     Public Sub New()
         desc = "Find edges is the left and right images using EdgeDraw..."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         edges.Run(task.leftView)
         dst2 = edges.dst2.Clone
 
@@ -96,7 +96,7 @@ Public Class EdgeDraw_LeftRightVertical : Inherits TaskParent
     Public Sub New()
         desc = "Find edges is the left and right images using EdgeDraw after verticalizing the images."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         vert.Run(task.leftView)
         edges.Run(vert.dst2)
         dst2 = edges.dst2.Clone
@@ -120,7 +120,7 @@ Public Class EdgeDraw_SplitMean : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "find the edges in a 4-way color split of the image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         binary.Run(src)
 
         dst2.SetTo(0)

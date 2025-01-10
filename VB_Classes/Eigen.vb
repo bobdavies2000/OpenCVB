@@ -6,7 +6,7 @@ Public Class Eigen_Basics : Inherits TaskParent
         labels(2) = "EigenVec (solution)"
         labels(3) = "Relationship between Eigen Vec and Vals"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim a() As Double = {1.96, -6.49, -0.47, -7.2, -0.65,
                              -6.49, 3.8, -6.39, 1.5, -6.34,
                              -0.47, -6.39, 4.17, -1.51, 2.67,
@@ -61,7 +61,7 @@ Public Class Eigen_FitLineInput : Inherits TaskParent
         labels(2) = "Use sliders to adjust the width and intensityf of the line"
         desc = "Generate a noisy line in a field of random data."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
         If task.heartBeat Then
             If task.testAllRunning = False Then options.recompute = False
@@ -127,7 +127,7 @@ Public Class Eigen_Fitline : Inherits TaskParent
         labels(3) = "Raw input (use sliders below to explore)"
         desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         noisyLine.options.recompute = True
         noisyLine.Run(src)
 

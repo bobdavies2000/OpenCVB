@@ -15,7 +15,7 @@ Public Class Entropy_Basics : Inherits TaskParent
         If r.Y + r.Height >= task.dst2.Height Then r.Y = task.dst2.Height - r.Height - 1
         Return r
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim stdSize = 30
         If task.drawRect = New cv.Rect Then
             task.drawRect = New cv.Rect(30, 30, stdSize, stdSize) ' arbitrary rectangle
@@ -52,7 +52,7 @@ Public Class Entropy_Highest : Inherits TaskParent
         labels(2) = "Highest entropy marked with red rectangle"
         desc = "Find the highest entropy section of the color image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim entropyList(task.gridRects.Count - 1) As Single
         Dim maxEntropy As Single = Single.MinValue
@@ -103,7 +103,7 @@ Public Class Entropy_FAST : Inherits TaskParent
         labels = {"", "", "Output of Corners_FAST, input to entropy calculation", "Lighter color is higher entropy, highlight shows highest"}
         desc = "Use FAST markings to add to entropy"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         fast.Run(src)
 
         entropy.Run(fast.dst2)
@@ -130,7 +130,7 @@ Public Class Entropy_Rectangle : Inherits TaskParent
         Next
         Return channelEntropy
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim dimensions() = New Integer() {task.histogramBins}
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
@@ -175,7 +175,7 @@ Public Class Entropy_SubDivisions : Inherits TaskParent
         Next
         desc = "Find the highest entropy in each quadrant"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
         For i = 0 To task.subDivisionCount - 1
             entropies(i).Clear()
@@ -233,7 +233,7 @@ Public Class Entropy_BinaryImage : Inherits TaskParent
     Public Sub New()
         desc = "Measure entropy in a binary image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         binary.Run(src)
         dst2 = binary.dst2
         labels(2) = binary.labels(2)

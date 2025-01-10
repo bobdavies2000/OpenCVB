@@ -9,7 +9,7 @@ Public Class Color8U_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim index = task.redOptions.colorInputIndex
         If task.optionsChanged Or classifier Is Nothing Then
             Select Case index
@@ -68,7 +68,7 @@ Public Class Color8U_Sweep : Inherits TaskParent
     Public Sub New()
         desc = "Sweep through all the Color8U_Basics algorithms..."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then
             Dim index = task.redOptions.ColorSource.SelectedIndex + 1
             If index >= task.redOptions.ColorSource.Items.Count Then index = 0
@@ -94,7 +94,7 @@ Public Class Color8U_Grayscale : Inherits TaskParent
         labels = {"", "", "Color_Grayscale", ""}
         desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Channels = 1 Then
@@ -132,7 +132,7 @@ Public Class Color8U_Depth : Inherits TaskParent
         labels = {"", "", "Color Reduction Edges", "Depth Range Edges"}
         desc = "Add depth regions edges to the color Reduction image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
         dst2 = reduction.dst2
         classCount = reduction.classCount
@@ -162,7 +162,7 @@ Public Class Color8U_KMeans : Inherits TaskParent
         labels(0) = "Recombined channels in other images."
         desc = "Run KMeans on each of the 3 color channels"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         colorFmt.Run(src)
         dst0 = colorFmt.dst2
 
@@ -198,7 +198,7 @@ Public Class Color8U_RedHue : Inherits TaskParent
         labels = {"", "", "Pixels with Red Hue", ""}
         desc = "Find all the reddish pixels in the image - indicate some life form."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
@@ -221,7 +221,7 @@ Public Class Color8U_Complementary : Inherits TaskParent
         labels = {"", "", "Current image in complementary colors", "HSV version of the current image but hue is flipped to complementary value."}
         desc = "Display the current image in complementary colors"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim split = hsv.Split()
         split(0) += 90 Mod 180
@@ -245,7 +245,7 @@ Public Class Color8U_ComplementaryTest : Inherits TaskParent
         labels = {"", "", "Original Image", "Color_Complementary version looks identical to the correct version at the link above "}
         desc = "Create the complementary images for Gilles Tran's 'Glasses' image for comparison"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         images.options.fileNameForm.filename.Text = task.HomeDir + "Data/Glasses by Gilles Tran.png"
         images.Run(src)
         dst2 = images.dst2
@@ -267,7 +267,7 @@ Public Class Color8U_InRange : Inherits TaskParent
         labels = {"", "", "Original", "After InRange processing"}
         desc = "Use inRange to isolate colors from the background"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = cv.Cv2.ImRead(task.HomeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
         dst1 = dst2.InRange(105, 165) ' should make this a slider and experiment further...
         dst3 = dst2.Clone
@@ -288,7 +288,7 @@ Public Class Color8U_TopX : Inherits TaskParent
     Public Sub New()
         desc = "Classify every BGR pixel into some common colors"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim input = src
@@ -335,7 +335,7 @@ Public Class Color8U_Common : Inherits TaskParent
         Next
         desc = "Classify every BGR pixel into some common colors"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
                 Dim distances As New List(Of Single)
@@ -364,7 +364,7 @@ Public Class Color8U_Smoothing : Inherits TaskParent
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
         desc = "Merge that last X BGR frames to smooth out differences."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         frames.Run(src)
         dst2 = frames.dst2
         labels(2) = "The image below is the average of " + CStr(frames.saveFrames.Count) + " the last BGR frames"
@@ -381,7 +381,7 @@ Public Class Color8U_Hue : Inherits TaskParent
     Public Sub New()
         desc = "Isolate those regions in the image that have a reddish hue."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim loBins As cv.Scalar = New cv.Scalar(0, 40, 32)
         Dim hiBins As cv.Scalar = New cv.Scalar(180, 255, 255)
@@ -401,7 +401,7 @@ Public Class Color8U_BlackAndWhite : Inherits TaskParent
         labels = {"", "", "Mask to identify all 'black' regions", "Mask identifies all 'white' regions"}
         desc = "Create masks for black and white"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -422,7 +422,7 @@ Public Class Color8U_MotionFiltered : Inherits TaskParent
     Public Sub New()
         desc = "Prepare a Color8U_Basics image using the task.motionMask"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.motionMask.CountNonZero Then
             src.SetTo(0, Not task.motionMask)
             color8U.Run(src)
@@ -446,7 +446,7 @@ Public Class Color8U_Edges : Inherits TaskParent
     Public Sub New()
         desc = "Find edges in the Color8U_Basics output"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         color8u.Run(src)
         dst2 = color8u.dst3
 

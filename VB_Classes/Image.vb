@@ -8,7 +8,7 @@ Public Class Image_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Load an image into OpenCVB"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         src = options.fullsizeImage
@@ -41,7 +41,7 @@ Public Class Image_Series : Inherits TaskParent
         images.options.imageSeries = True
         desc = "Display a new image from the directory every heartbeat"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         ' to work on a specific file, specify it here.
         ' options.fileInputName = new fileinfo(task.HomeDir + "Images/train/103041.jpg")
         images.Run(images.options.fullsizeImage)
@@ -64,7 +64,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
         task.gOptions.setDisplay1()
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         images.Run(src)
         dst0 = images.dst2.Clone
         dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -90,7 +90,7 @@ Public Class Image_CellStats : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Display the statistics for the selected cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.pointCloud.SetTo(0)
         task.pcSplit = task.pointCloud.Split()
 
@@ -118,11 +118,11 @@ Public Class Image_MSER : Inherits TaskParent
     Dim options As New Options_Images
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        optiBase.findslider("MSER Min Area").Value = 15
+        optiBase.FindSlider("MSER Min Area").Value = 15
         optiBase.FindSlider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         images.Run(options.fullsizeImage)
@@ -140,12 +140,12 @@ End Class
 
 
 Public Class Image_Icon : Inherits TaskParent
-    Dim inputImage As bitmap
+    Dim inputImage As Bitmap
     Public Sub New()
         inputImage = New Bitmap(task.HomeDir + "/Main_UI/Data/OpenCVB.bmp")
         desc = "Create an icon from an image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If inputImage Is Nothing Then Exit Sub
         Dim iconHandle As IntPtr = inputImage.GetHicon()
         Dim icon As Icon = Icon.FromHandle(iconHandle)

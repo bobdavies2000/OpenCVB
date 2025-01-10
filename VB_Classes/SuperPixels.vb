@@ -4,7 +4,7 @@ Public Class SuperPixel_Basics : Inherits TaskParent
     Public Sub New()
         desc = "A Better superpixel algorithm"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         dst3 = src
@@ -26,7 +26,7 @@ Public Class SuperPixel_Basics_CPP : Inherits TaskParent
         labels(3) = "Superpixel label data (0-255)"
         desc = "Sub-divide the image into super pixels."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -71,7 +71,7 @@ Public Class SuperPixel_BinarizedImage : Inherits TaskParent
        optiBase.findslider("Number of SuperPixels").Value = 20 ' find the top 20 super pixels.
         desc = "Create SuperPixels from a binary image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         binarize.Run(src)
 
         pixels.Run(binarize.dst2)
@@ -91,7 +91,7 @@ Public Class SuperPixel_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         pixels.Run(task.depthRGB)
         dst2 = pixels.dst2
         dst3 = pixels.dst3
@@ -109,7 +109,7 @@ Public Class SuperPixel_WithCanny : Inherits TaskParent
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         edges.Run(src)
         src = task.color.Clone()
         src.SetTo(white, edges.dst2)
@@ -133,7 +133,7 @@ Public Class SuperPixel_WithLineDetector : Inherits TaskParent
         labels(3) = "Input to superpixel basics."
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst3 = lines.dst2
         pixels.Run(dst3)

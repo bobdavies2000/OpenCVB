@@ -8,7 +8,7 @@ Public Class Dither_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use local options to control which method is used.")
         desc = "Explore all the varieties of dithering"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
 
         Dim w = dst2.Width

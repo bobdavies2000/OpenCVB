@@ -10,7 +10,7 @@ Public Class Moments_Basics : Inherits TaskParent
         labels(2) = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the provided mask file."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             fore.Run(src)
             dst2 = fore.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -43,7 +43,7 @@ Public Class Moments_CentroidKalman : Inherits TaskParent
         labels(2) = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         fore.Run(src)
         dst2 = fore.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim m = cv.Cv2.Moments(fore.dst2, True)

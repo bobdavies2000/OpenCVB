@@ -41,7 +41,7 @@ Public Class LineCoin_Basics : Inherits TaskParent
         If lpLists.Count >= task.frameHistoryCount Then lpLists.RemoveAt(0)
         Return lpList
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then lpLists.Clear()
 
         longLines.Run(src)
@@ -71,7 +71,7 @@ Public Class LineCoin_HistoryIntercept : Inherits TaskParent
         dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "find lines with coincident slopes and intercepts."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then mpLists.Clear()
 
         coin.Run(src)
@@ -92,7 +92,7 @@ Public Class LineCoin_Parallel : Inherits TaskParent
     Public Sub New()
         desc = "Find the lines that are coincident in the parallel lines"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         parallel.Run(src)
 
         coinList.Clear()

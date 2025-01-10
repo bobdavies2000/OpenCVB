@@ -5,7 +5,7 @@ Public Class LeftRight_Basics : Inherits TaskParent
         labels = {"", "", "Left camera image", If(task.cameraName = "Azure Kinect 4K", "No right image", "Right camera image")}
         desc = "Display the left and right views as they came from the camera."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.leftView
         dst3 = task.rightView
     End Sub
@@ -22,7 +22,7 @@ Public Class LeftRight_CompareRaw : Inherits TaskParent
     Public Sub New()
         desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim r1 = New cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight)
@@ -46,7 +46,7 @@ Public Class LeftRight_Palettized : Inherits TaskParent
         labels(2) = "Left Image"
         labels(3) = "Right Image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = ShowPalette(task.leftView)
         dst3 = ShowPalette(task.rightView)
     End Sub
@@ -63,11 +63,11 @@ Public Class LeftRight_BRISK : Inherits TaskParent
     Dim brisk As New BRISK_Basics
     Dim options As New Options_Features
     Public Sub New()
-       optiBase.findslider("Min Distance").Value = 20
+        optiBase.FindSlider("Min Distance").Value = 20
         labels = {"", "", "Left Image", "Right Image"}
         desc = "Add color to the 8-bit infrared images."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         brisk.Run(task.leftView)
         dst2 = brisk.dst2.Clone
 
@@ -89,7 +89,7 @@ Public Class LeftRight_Edges : Inherits TaskParent
         labels(2) = "Left Image"
         labels(3) = "Right Image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.leftView)
         dst2 = edges.dst2
 
@@ -109,7 +109,7 @@ Public Class LeftRight_Reduction : Inherits TaskParent
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Reduce both the left and right color images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(task.leftView)
         dst2 = reduction.dst2.Clone
 
@@ -133,7 +133,7 @@ Public Class LeftRight_Markers : Inherits TaskParent
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Use the left/right reductions to find hard markers - neighboring pixels of identical values"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         redView.Run(src)
         dst2 = redView.reduction.dst3.Clone
         dst3 = redView.reduction.dst3.Clone
@@ -192,7 +192,7 @@ Public Class LeftRight_Markers1 : Inherits TaskParent
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Use the left/right reductions to find markers - neighboring pixels of identical values"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         redView.Run(src)
         dst0 = redView.dst2
         dst1 = redView.dst3
@@ -240,12 +240,12 @@ End Class
 
 
 Public Class LeftRight_Lines : Inherits TaskParent
-    Dim lines as new Line_Basics
+    Dim lines As New Line_Basics
     Public Sub New()
         labels = {"", "", "Left camera lines", "Right camera lines"}
         desc = "Find the lines in the Left and Right images."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static leftLines As New List(Of linePoints)
         Static rightLines As New List(Of linePoints)
 
@@ -271,7 +271,7 @@ Public Class LeftRight_RedCloudRight : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Segment the right view image with RedCloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         getRedColor(task.rightView, labels(2))
 
         For i = 0 To task.redCells.Count - 1
@@ -295,7 +295,7 @@ Public Class LeftRight_RedCloudLeft : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Segment the left view image with RedCloud"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         getRedColor(task.leftView, labels(2))
 
         For i = 0 To task.redCells.Count - 1
@@ -321,7 +321,7 @@ Public Class LeftRight_RedCloudBoth : Inherits TaskParent
     Public Sub New()
         desc = "Match cells in the left view to the right view - something is flipped here..."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         stRight.Run(src)
         dst2 = stRight.dst2
         labels(2) = "Left view - " + stRight.labels(2)
@@ -342,7 +342,7 @@ Public Class LeftRight_LowRes : Inherits TaskParent
     Public Sub New()
         desc = "Get the lowRes image for the left and right views - duplicate of LowRes_LeftRight (help finding it)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lowRes.Run(task.leftView)
         dst2 = lowRes.dst2
 
@@ -362,7 +362,7 @@ Public Class LeftRight_Motion : Inherits TaskParent
     Public Sub New()
         desc = "Get the lowRes image for the left and right views"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lowResL.Run(task.leftView)
         dst2 = lowResL.dst2
 

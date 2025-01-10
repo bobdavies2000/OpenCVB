@@ -7,12 +7,16 @@ Public Class RedCloud_Basics : Inherits TaskParent
         task.redOptions.UseDepth.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
+        Dim split(3 - 1) As cv.Mat
+        split(0) = New cv.Mat
+        split(1) = New cv.Mat
+        split(2) = New cv.Mat
 
-        task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / options.reduceAmt)
-
-        Dim split = dst0.Split()
+        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / options.reduceAmt)
+        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / options.reduceAmt)
+        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / options.reduceAmt)
 
         Select Case task.redOptions.PointCloudReduction
             Case 0 ' "X Reduction"
@@ -33,7 +37,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
         Dim mm As mmData = GetMinMax(dst0)
         dst0 = (dst0 - mm.minVal)
-        dst2 = dst0 * 255 / (mm.maxVal - mm.minVal)
+        dst2 = dst0 * 255 / mm.maxVal
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         mm = GetMinMax(dst0)
 
@@ -54,7 +58,7 @@ Public Class RedCloud_BasicsHist : Inherits TaskParent
         plot.createHistogram = True
         desc = "Display the histogram of the RedCloud_Basics output"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         reduce.Run(src)
         dst2 = reduce.dst2
         Dim mm = GetMinMax(dst2, task.depthMask)
@@ -76,7 +80,7 @@ Public Class RedCloud_BasicsTest : Inherits TaskParent
     Public Sub New()
         desc = "Run RedCloud with the depth reduction."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         redInput.Run(src)
 
         dst2 = getRedColor(redInput.dst2, labels(2))

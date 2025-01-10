@@ -53,7 +53,7 @@ Public Class Sound_Basics : Inherits TaskParent
 
         desc = "Load an audio file, play it, and convert to PCM"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         Dim sender As New Object, e As New EventArgs
         Static fileinfo = New FileInfo(fileNameForm.filename.Text)
@@ -146,7 +146,7 @@ Public Class Sound_SignalGenerator : Inherits TaskParent
 
         desc = "Generate sound with a sine waveform."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         Static wgenSlider =optiBase.findslider("Sine Wave Frequency")
         Static DecibelSlider =optiBase.findslider("Decibels")
@@ -218,7 +218,7 @@ Public Class Sound_Display : Inherits TaskParent
 
         desc = "Display a sound buffer in several styles"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         If standaloneTest() Then soundSource.Run(src)
         If fileStarted = False Then
@@ -321,7 +321,7 @@ Public Class Sound_GenWaveDisplay : Inherits TaskParent
     Public Sub New()
         desc = "Display the generated sound waves"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         plotSound.soundSource.Run(src)
         plotSound.Run(src)
@@ -345,7 +345,7 @@ Public Class Sound_WaveDisplay : Inherits TaskParent
         plotSound.soundSource = New Sound_Basics
         desc = "Display the generated sound waves"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         plotSound.soundSource.Run(src)
         plotSound.Run(src)

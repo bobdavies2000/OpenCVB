@@ -13,7 +13,7 @@ Public Class Pendulum_Basics : Inherits TaskParent
         labels = {"", "", "A double pendulum representation", "Trace of the pendulum end points (p1 and p2)"}
         desc = "Build a double pendulum"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim accumulator As Single

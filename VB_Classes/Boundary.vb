@@ -13,7 +13,7 @@ Public Class Boundary_Basics : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then
             If task.redOptions.UseColorOnly.Checked Then
                 color8U.Run(src)
@@ -61,7 +61,7 @@ Public Class Boundary_Tiers : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Add the depth tiers to the cell boundaries"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         cells.Run(src)
         dst3 = cells.dst2
 
@@ -91,7 +91,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
     Public Sub New()
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         bounds.Run(src)
@@ -149,7 +149,7 @@ Public Class Boundary_RemovedRects : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         bRects.Run(src)
         dst2 = bRects.bounds.dst2.Clone
         dst3 = bRects.dst2
@@ -176,7 +176,7 @@ Public Class Boundary_Overlap : Inherits TaskParent
         dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Determine if 2 contours overlap"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         bounds.Run(src)
         dst3 = bounds.dst2
         Dim overlapping As Boolean

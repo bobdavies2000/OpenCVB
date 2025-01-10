@@ -29,7 +29,7 @@
 '        If depth = 0 Then Return 0
 '        Return task.baseline * 1000 * task.focalLength / depth
 '    End Function
-'    Public Overrides sub runAlg(src As cv.Mat)
+'    Public Overrides sub RunAlg(src As cv.Mat)
 '        If task.cameraName = "Azure Kinect 4K" Then
 '            SetTrueText("Kinect for Azure does not have a left and right view to compute disparities", 2)
 '            Exit Sub

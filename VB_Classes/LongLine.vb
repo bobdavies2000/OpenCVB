@@ -28,7 +28,7 @@ Public Class LongLine_Basics : Inherits TaskParent
         End If
         Return New linePoints(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.Clone
@@ -60,7 +60,7 @@ Public Class LongLine_Core : Inherits TaskParent
     Public Sub New()
         desc = "Isolate the longest X lines."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
         If task.lpList.Count = 0 Then Exit Sub
@@ -89,7 +89,7 @@ Public Class LongLine_Depth : Inherits TaskParent
         plot.dst2 = dst3
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         longLine.Run(src.Clone)
         dst1 = src
 
@@ -141,7 +141,7 @@ Public Class LongLine_Consistent : Inherits TaskParent
         longest.lineCount = 4
         desc = "Isolate the line that is consistently among the longest lines present in the image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         longest.Run(src)
         If longest.lpList.Count = 0 Then Exit Sub
@@ -178,7 +178,7 @@ Public Class LongLine_Point : Inherits TaskParent
     Public Sub New()
         desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         longLine.Run(src)
         dst2 = longLine.dst2
 
@@ -204,7 +204,7 @@ Public Class LongLine_Match : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         longest.Run(src)
@@ -246,7 +246,7 @@ Public Class LongLine_ExtendTest : Inherits TaskParent
         desc = "Test linePoints constructor with random values to make sure lines are extended properly"
     End Sub
 
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             Dim p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -275,7 +275,7 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
         labels = {"", "", "Image output from Line_Core", "The extended line for each line found in Line_Core"}
         desc = "Create a list of all the extended lines in an image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
 
@@ -301,7 +301,7 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
         labels = {"", "", "Image output from Line_Core", "Parallel extended lines"}
         desc = "Use KNN to find which lines are near each other and parallel"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         extendAll.Run(src)
         dst3 = extendAll.dst2
 
@@ -378,7 +378,7 @@ Public Class LongLine_Extend : Inherits TaskParent
         labels = {"", "", "Original Line", "Original line Extended"}
         desc = "Given 2 points, extend the line to the edges of the image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
             p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -411,7 +411,7 @@ Public Class LongLine_NoDepth : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find any lines in regions without depth."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lineHist.Run(src)
         dst2 = lineHist.dst2
         dst2.SetTo(0, task.depthMask)
@@ -434,7 +434,7 @@ Public Class LongLine_History : Inherits TaskParent
     Public Sub New()
         desc = "Find the longest lines and toss any that are intermittant."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
 

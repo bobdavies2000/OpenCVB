@@ -5,7 +5,7 @@ Public Class Extrinsics_Basics : Inherits TaskParent
         If standalone Then task.gOptions.DotSizeSlider.Value = 5
         desc = "MatchShapes: Show the alignment of the BGR image to the left and right camera images."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = task.leftView
         dst3 = task.rightView
 
@@ -43,7 +43,7 @@ Public Class Extrinsics_Display : Inherits TaskParent
         labels = {"", "", "Left Image", "Right Image"}
         desc = "MatchShapes: Build overlays for the left and right images on the BGR image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         optTrans.RunOpt()
 

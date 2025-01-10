@@ -7,7 +7,7 @@ Public Class FREAK_Basics : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Find keypoints using FREAK algorithm"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         orb.Run(src)
         dst1 = orb.dst2
 

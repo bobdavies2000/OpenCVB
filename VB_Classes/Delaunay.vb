@@ -12,7 +12,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
             randEnum.Run(src)
             inputPoints = New List(Of cv.Point2f)(randEnum.points)
@@ -69,7 +69,7 @@ Public Class Delaunay_Contours : Inherits TaskParent
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
@@ -101,7 +101,7 @@ Public Class Delaunay_SubDiv : Inherits TaskParent
        optiBase.findslider("Random Pixel Count").Value = 100
         desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then If Not task.heartBeat Then Exit Sub
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         random.Run(src)
@@ -152,7 +152,7 @@ Public Class Delaunay_Subdiv2D : Inherits TaskParent
         labels(3) = "Voronoi facets for the same subdiv2D"
         desc = "Generate random points and divide the image around those points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If Not task.heartBeat Then Exit Sub ' too fast otherwise...
         dst2.SetTo(0)
         Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
@@ -209,7 +209,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits TaskParent
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region."}
         desc = "Create a region in an image for each point provided without using KNN."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
             random.Run(src)
             inputPoints = New List(Of cv.Point2f)(random.PointList)
@@ -263,7 +263,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
        optiBase.findslider("Random Pixel Count").Value = 10
         desc = "Create a region in an image for each point provided"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then Random.Run(src)
             inputPoints = New List(Of cv.Point2f)(random.PointList)
@@ -317,7 +317,7 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
         labels(3) = "Inconsistent colors in dst2 are duplicate randomCellColor output."
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
             randEnum.Run(src)
             inputPoints = New List(Of cv.Point2f)(randEnum.points)
@@ -373,7 +373,7 @@ Public Class Delaunay_Points : Inherits TaskParent
        optiBase.findslider("Points to use in Feature Poly").Value = 2
         desc = "This algorithm explores what happens when Delaunay is used on 2 points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static ptSlider = optiBase.FindSlider("Points to use in Feature Poly")
 
         task.feat.Run(src)

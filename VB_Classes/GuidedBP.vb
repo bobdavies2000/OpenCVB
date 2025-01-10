@@ -35,7 +35,7 @@ Public Class GuidedBP_Basics : Inherits TaskParent
             SetTrueText(CStr(index), pt, dstindex)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         ptHot.Run(src)
         dst2 = ptHot.dst2
         dst3 = ptHot.dst3
@@ -85,7 +85,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits TaskParent
 
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         ptHot.Run(src)
         dst2 = ptHot.dst2
         dst3 = ptHot.dst3
@@ -112,7 +112,7 @@ Public Class GuidedBP_PlanesPlot : Inherits TaskParent
         labels = {"", "", "Side view", "Plot of nonzero rows in the side view"}
         desc = "Plot the likely floor or ceiling areas."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         histSide.Run(src)
         dst2 = histSide.dst3
 
@@ -159,7 +159,7 @@ Public Class GuidedBP_Lookup : Inherits TaskParent
         task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         guided.Run(src)
         dst2 = guided.dst2
         labels(2) = guided.labels(2)
@@ -182,7 +182,7 @@ Public Class GuidedBP_Depth : Inherits TaskParent
         task.gOptions.setHistogramBins(16)
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         hist.Run(src)
@@ -269,7 +269,7 @@ Public Class GuidedBP_HotPoints : Inherits TaskParent
         mask(floodRect).CopyTo(view)
         Return rectList
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         histTop.Run(src.Clone)
         topRects = hotPoints(histTop.dst3)
         dst2 = ShowPalette(histTop.dst3 * 255 / topRects.Count)
@@ -298,7 +298,7 @@ Public Class GuidedBP_MultiSlice : Inherits TaskParent
     Public Sub New()
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         Dim stepSize = options.stepSize
 
@@ -351,7 +351,7 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Identify each segment in the X and Y point cloud data"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         guide.Run(src)
 
         redCx.Run(guide.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -390,7 +390,7 @@ Public Class GuidedBP_Regions : Inherits TaskParent
         labels(3) = "Click a quadrant in the left image and see it below."
         desc = "Identify the top X regions in the GuidedBP_RedCloud output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         redC.Run(src)
@@ -449,7 +449,7 @@ Public Class GuidedBP_Points : Inherits TaskParent
     Public Sub New()
         desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         hotPoints.Run(src)
 
         hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
@@ -486,7 +486,7 @@ Public Class GuidedBP_Top : Inherits TaskParent
         topMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Correlate the hot points with the previous generation using a Map"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         ptHot.Run(src)
         dst2 = ptHot.dst2
 
@@ -512,7 +512,7 @@ Public Class GuidedBP_TopView : Inherits TaskParent
     Public Sub New()
         desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         hotPoints.Run(src)
 

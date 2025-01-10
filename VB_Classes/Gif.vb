@@ -26,7 +26,7 @@ Public Class Gif_Basics : Inherits TaskParent
             If gifFile.Exists Then My.Computer.FileSystem.DeleteFile(gifFile.FullName)
         End If
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src
@@ -59,7 +59,7 @@ Public Class Gif_OpenGL : Inherits TaskParent
     Public Sub New()
         desc = "Create a GIF for the Model_RedCloud output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         input.Run(src)
 
         dst2 = input.dst3
@@ -87,7 +87,7 @@ Public Class Gif_OpenGLwithColor : Inherits TaskParent
     Public Sub New()
         desc = "Create a GIF for the Model_RedCloud output and color image at the same time."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         input.Run(src)
 
         Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
@@ -158,7 +158,7 @@ Public Class Gif_OpenCVB : Inherits TaskParent
             snapCheck.checked = False
         End If
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         SetTrueText("Results are best when the main form is set to an 'auto-sized' setting.", 3)
         Static snapCheck = optiBase.FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
 

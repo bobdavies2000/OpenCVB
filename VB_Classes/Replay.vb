@@ -90,7 +90,7 @@ Public Class Replay_Record : Inherits TaskParent
 
         desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If task.useRecordedData And recordingFilename.Exists = False Then
             SetTrueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", New cv.Point(10, 125))
@@ -179,7 +179,7 @@ Public Class Replay_Play : Inherits TaskParent
 
         desc = "Playback a file recorded by OpenCVB"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If recordingFilename.Exists = False Then SetTrueText("File not found: " + recordingFilename.FullName, New cv.Point(10, 125))
         If fileNameForm.fileStarted And recordingFilename.Exists Then
@@ -251,7 +251,7 @@ Public Class Replay_OpenGL : Inherits TaskParent
     Public Sub New()
         desc = "Replay a recorded session with OpenGL"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         replay.Run(src)
         ogl.pointCloudInput = task.pointCloud
         ogl.Run(task.color)

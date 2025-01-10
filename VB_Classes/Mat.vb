@@ -4,7 +4,7 @@ Public Class Mat_Repeat : Inherits TaskParent
     Public Sub New()
         desc = "Use the repeat method to replicate data."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst2 = small.Repeat(10, 10)
         small = task.depthRGB.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
@@ -26,7 +26,7 @@ Public Class Mat_PointToMat : Inherits TaskParent
         labels(3) = "Random_Basics points after format change with indexer"
         desc = "Convert point2f into a mat of points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         random.Run(src)
         dst2.SetTo(0)
         For Each pt In random.PointList
@@ -54,7 +54,7 @@ Public Class Mat_MatToPoint : Inherits TaskParent
         desc = "Convert a mat into a vector of points."
         labels(2) = "Reconstructed BGR Image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim points(src.Total - 1) As cv.Vec3b
         Dim vec As New cv.Vec3b
         Dim index As Integer = 0
@@ -83,7 +83,7 @@ Public Class Mat_Transpose : Inherits TaskParent
         labels(2) = "Color Image Transposed"
         labels(3) = "Color Image Transposed back (artifacts)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim trColor = src.T()
         dst2 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
         Dim trBack = dst2.T()
@@ -103,7 +103,7 @@ Public Class Mat_Tricks : Inherits TaskParent
         labels(3) = "Mat transposed around the diagonal"
         desc = "Show some Mat tricks."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
         Dim roi = New cv.Rect(0, 0, mat.Width, mat.Height)
         dst2(roi) = mat
@@ -122,7 +122,7 @@ Public Class Mat_RowColRange : Inherits TaskParent
         labels(2) = "BitwiseNot of RowRange and ColRange"
         desc = "Perform operation on a range of cols and/or Rows."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
         dst2 = src
@@ -143,7 +143,7 @@ Public Class Mat_Managed : Inherits TaskParent
         labels(2) = "Color change is in the managed cv.vec3b array"
         desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
         If task.heartBeat Then
             If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
@@ -165,7 +165,7 @@ Public Class Mat_MultiplyReview : Inherits TaskParent
     Public Sub New()
         desc = "Review matrix multiplication"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
         strOut = "Matrix a" + vbCrLf
@@ -223,7 +223,7 @@ Public Class Mat_Inverse : Inherits TaskParent
     Public Sub New()
         desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Or validateInverse Then
@@ -295,7 +295,7 @@ Public Class Mat_Inverse_4D : Inherits TaskParent
         Next
         Return outstr
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If input.Width <> input.Height Then
             SetTrueText("The input matrix must be square!")
             Exit Sub
@@ -320,7 +320,7 @@ End Class
 '    Public Sub New()
 '        desc = "Convert a Mat to the expected Array2D for a DLib API"
 '    End Sub
-'    Public Overrides sub runAlg(src As cv.Mat)
+'    Public Overrides sub RunAlg(src As cv.Mat)
 '        Dim array(src.Total * src.ElemSize - 1) As Byte
 '        Marshal.Copy(src.Data, array, 0, array.Length)
 
@@ -348,7 +348,7 @@ End Class
 '    Public Sub New()
 '        desc = "Convert a Dlib Array2D to an OpenCV Mat"
 '    End Sub
-'    Public Overrides sub runAlg(src As cv.Mat)
+'    Public Overrides sub RunAlg(src As cv.Mat)
 
 '        If dGray IsNot Nothing Then
 '            dst2 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -382,7 +382,7 @@ Public Class Mat_2to1 : Inherits TaskParent
         labels(2) = ""
         desc = "Fill a Mat with 2 images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim nSize = New cv.Size(task.dst2.Width, task.dst2.Height / 2)
         Dim roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -423,7 +423,7 @@ Public Class Mat_4Click : Inherits TaskParent
         labels(3) = "Click a quadrant in dst2 to view it in dst3"
         desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         mat = mats.mat
         mats.Run(src)
         dst2 = mats.dst2.Clone
@@ -471,7 +471,7 @@ Public Class Mat_4to1 : Inherits TaskParent
                           task.rightView)
         mat = {task.color.Clone, task.depthRGB.Clone, tmpLeft, tmpRight}
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim nSize = New cv.Size(dst2.Width / 2, dst2.Height / 2)
         Dim roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
@@ -503,7 +503,7 @@ Public Class Mat_ToList : Inherits TaskParent
     Public Sub New()
         desc = "Convert a Mat to List of points in 2 ways to measure which is better"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
         autoX.Run(histTop.histogram)

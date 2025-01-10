@@ -4,7 +4,7 @@ Public Class Polylines_IEnumerableExample : Inherits TaskParent
     Public Sub New()
         desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim points = Enumerable.Range(0, options.polyCount).Select(Of cv.Point)(
@@ -32,7 +32,7 @@ Public Class Polylines_Random : Inherits TaskParent
         labels(2) = "To zoom move the mouse over the image"
         desc = "Create a random procedural image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.frameCount Mod (task.fpsRate * 3) = 0 Then ' every x frames.
             Dim h = src.Height, w = src.Width
             Dim autorand As New Random

@@ -7,7 +7,7 @@ Public Class Density_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use local options to control separation of points in 3D.")
         desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -35,7 +35,7 @@ Public Class Density_Phase : Inherits TaskParent
     Public Sub New()
         desc = "Display gradient phase and 2D density side by side."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         gradient.Run(src)
         dst3 = Convert32f_To_8UC3(gradient.dst3)
 
@@ -56,7 +56,7 @@ Public Class Density_Count_CPP : Inherits TaskParent
         cPtr = Density_Count_Open()
         desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -85,7 +85,7 @@ Public Class Density_Mask : Inherits TaskParent
     Public Sub New()
         desc = "Measure a mask's size in any image and track the biggest regions."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         src.SetTo(0, task.noDepthMask)
 

@@ -6,7 +6,7 @@ Public Class Coherence_Basics : Inherits TaskParent
         labels(2) = "Coherence - draw rectangle to apply"
         desc = "Find lines that are artistically coherent in the image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim side As Integer
@@ -80,7 +80,7 @@ Public Class Coherence_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Find coherent lines in the depth image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         coherent.Run(task.depthRGB)
         dst2 = coherent.dst2
     End Sub

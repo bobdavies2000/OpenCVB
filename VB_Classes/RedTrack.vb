@@ -4,7 +4,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
         If New cv.Size(task.dst2.Width, task.dst2.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         getRedColor(src)
         labels(2) = task.redC.labels(3)
         dst2.SetTo(0)
@@ -27,7 +27,7 @@ Public Class RedTrack_Lines : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
 
         If task.heartBeat Then dst3.SetTo(0)
@@ -70,7 +70,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
         Next
         Return bestIndex
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         track.Run(src)
         dst2 = task.dst2
         If task.redCells.Count = 0 Then
@@ -122,7 +122,7 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
         labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.feat.Run(src)
         dst2 = task.feat.dst2
 
@@ -157,7 +157,7 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
         desc = "Use KNN to find good features to track"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static distSlider = optiBase.FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
@@ -194,7 +194,7 @@ Public Class RedTrack_Points : Inherits TaskParent
         labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
 
         dst3.SetTo(0)
@@ -224,7 +224,7 @@ Public Class RedTrack_Features : Inherits TaskParent
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
         desc = "Similar to RedTrack_KNNPoints"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then dst2.SetTo(0)
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, 255)

@@ -72,7 +72,7 @@ Public Class PongWars_Basics : Inherits TaskParent
 
         If task.heartBeat Then labels(2) = $"Pong War: day {dayScore} | night {nightScore}"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         iteration += 1
         If iteration Mod 1000 = 0 Then
             debug.writeline("iteration " & iteration)
@@ -126,7 +126,7 @@ Public Class PongWars_Two : Inherits TaskParent
     Public Sub New()
         desc = "Running 2 pong wars at once.  Randomness inserted with starting location."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         pong1.Run(src)
         dst2 = pong1.dst2.Clone
         labels(2) = pong1.labels(2)

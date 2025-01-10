@@ -5,7 +5,7 @@ Public Class Volume_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Build a box containing all the 3D points of a RedCloud cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = getRedColor(src, labels(2))
             rc = task.rc

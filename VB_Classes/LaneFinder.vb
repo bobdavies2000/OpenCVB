@@ -7,7 +7,7 @@ Public Class LaneFinder_Basics : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lane.Run(src)
         dst0 = lane.dst0
         dst1 = lane.dst1
@@ -32,7 +32,7 @@ Public Class LaneFinder_Videos : Inherits TaskParent
         video.options.fileInfo = New FileInfo(inputfile.FullName)
         desc = "Read in the videos showing road conditions."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -57,7 +57,7 @@ Public Class LaneFinder_Edges : Inherits TaskParent
     Public Sub New()
         desc = "Using the videos provided, find the lane markers."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         input.Run(src)
         dst0 = input.dst2
         edges.Run(dst0)
@@ -79,7 +79,7 @@ Public Class LaneFinder_HLSColor : Inherits TaskParent
         labels = {"HLS color conversion", "InRange White", "InRange Yellow", "Combined InRange White and InRange Yellow results"}
         desc = "Isolate the colors for the white and yellow"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         input.Run(src)
         dst0 = input.dst2.CvtColor(cv.ColorConversionCodes.BGR2HLS)
         dst1 = dst0.InRange(New cv.Scalar(0, 200, 0), New cv.Scalar(255, 255, 255))
@@ -103,7 +103,7 @@ Public Class LaneFinder_ROI : Inherits TaskParent
         labels = {"Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline"}
         desc = "Define the ROI for the location of the lanes"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         hls.Run(src)
 
         If task.optionsChanged Then
@@ -146,7 +146,7 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
     Public Sub New()
         desc = "Use the Hough lines found to build a slope intercept format line."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         hough.Run(src)
         dst0 = hough.dst0
         dst1 = hough.dst2

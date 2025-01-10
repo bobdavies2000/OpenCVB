@@ -23,7 +23,7 @@ Public Class Bezier_Basics : Inherits TaskParent
                 Math.Pow(t, 3) * points(i + 3).Y
         Return New cv.Point(x, y)
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim p1 As cv.Point
         For i = 0 To points.Count - 4 Step 3
             For j = 0 To 100
@@ -50,7 +50,7 @@ Public Class Bezier_Example : Inherits TaskParent
     Public Sub New()
         desc = "Draw a Bezier curve based with the 4 input points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         Dim p1 As cv.Point
         For i = 0 To 100 - 1

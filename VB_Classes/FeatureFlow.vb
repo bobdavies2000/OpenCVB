@@ -32,7 +32,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
             End If
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         task.feat.Run(src)
 
         labels = task.feat.labels
@@ -62,7 +62,7 @@ Public Class FeatureFlow_Dense : Inherits TaskParent
         desc = "Use dense optical flow algorithm  "
     End Sub
 
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         options.RunOpt()
         Static lastGray As cv.Mat = src.Clone
@@ -90,7 +90,7 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
     Public Sub New()
         desc = "Show the optical flow of a sparse matrix."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src.Clone()
@@ -141,7 +141,7 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Find features using optical flow in both the left and right images."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         pyrLeft.Run(task.leftView)
         pyrRight.Run(task.rightView)
 
@@ -208,7 +208,7 @@ Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
         Next
         Return dst
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         pyrLeft.Run(task.leftView)
         Dim tmpLeft As New List(Of cv.Point)
         For i = 0 To pyrLeft.features.Count - 1
@@ -300,7 +300,7 @@ Public Class FeatureFlow_LeftRight : Inherits TaskParent
         Next
         Return dst
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         flowHist.Run(src)
 
         Dim tmpLeft As New SortedList(Of Integer, List(Of cv.Point))

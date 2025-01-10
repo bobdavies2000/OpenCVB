@@ -5,7 +5,7 @@ Public Class FrameRate_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Compare each frame to its last to figure out which frames really changed for each invocation."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static lastImages() As cv.Mat = {task.color.Clone, task.leftview.Clone,
                                          task.rightview.Clone, task.depthRGB.Clone}
         For i = 0 To frameCounts.Count - 1
@@ -41,7 +41,7 @@ Public Class FrameRate_BasicsGray : Inherits TaskParent
     Public Sub New()
         desc = "Compare each frame to its last to figure out which frames really changed for each invocation."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static lastImages() As cv.Mat = {task.color.Clone, task.leftview.Clone,
                                          task.rightview.Clone, task.depthRGB.Clone}
         For i = 0 To frameCounts.Count - 1

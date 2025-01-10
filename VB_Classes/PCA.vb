@@ -56,7 +56,7 @@ Public Class PCA_Basics : Inherits TaskParent
         pcaStr += vbCrLf
         Return pcaStr
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then dst2 = getRedColor(src, labels(2))
 
         Dim rc = task.rc
@@ -93,7 +93,7 @@ Public Class PCA_CellMask : Inherits TaskParent
         pca.runRedCloud = True
         desc = "Find the Principal Component Analysis vector for all the 3D points in a RedCloud cell."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         pca.Run(src)
         dst2 = pca.dst2
         labels(2) = pca.labels(2)
@@ -130,8 +130,8 @@ Public Class PCA_Reconstruct : Inherits TaskParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Retained Variance", 1, 100, 95)
         desc = "Reconstruct a video stream as a composite of X images."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        Static retainSlider =optiBase.findslider("Retained Variance")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static retainSlider = optiBase.FindSlider("Retained Variance")
         Dim index = task.frameCount Mod images.Length
         images(index) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
@@ -162,7 +162,7 @@ Public Class PCA_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         pca.Run(task.depthRGB)
         dst2 = pca.dst2
     End Sub
@@ -194,7 +194,7 @@ Public Class PCA_DrawImage : Inherits TaskParent
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
         img.Line(p, q, color, task.lineWidth, task.lineType)
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = image.Resize(dst2.Size())
         Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex
@@ -245,7 +245,7 @@ Public Class PCA_Prep_CPP : Inherits TaskParent
         cPtr = PCA_Prep_Open()
         desc = "Take some pointcloud data and return the non-zero points in a point3f vector"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -292,10 +292,10 @@ Public Class PCA_Palettize : Inherits TaskParent
     Public nColor As New PCA_NColor
     Public options As New Options_PCA_NColor
     Public Sub New()
-       optiBase.findslider("Desired number of colors").Value = 256
+        optiBase.FindSlider("Desired number of colors").Value = 256
         desc = "Create a palette for the input image but don't use it."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
@@ -829,7 +829,7 @@ Public Class PCA_NColor : Inherits TaskParent
         custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3)
         desc = "Use PCA to build a palettized CV_8U image from the input using a palette."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
@@ -870,12 +870,12 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         cPtr = PCA_NColor_Open()
-       optiBase.findslider("Desired number of colors").Value = 8
+        optiBase.FindSlider("Desired number of colors").Value = 8
         UpdateAdvice(traceName + ": Adjust the 'Desired number of colors' between 1 and 256")
         labels = {"", "", "Palettized (CV_8U) version of color image.", ""}
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         classCount = palettize.options.desiredNcolors
@@ -912,10 +912,10 @@ Public Class PCA_NColorPalettize : Inherits TaskParent
     Dim nColor As New PCA_NColor
     Dim rgb(dst1.Total * dst1.ElemSize - 1) As Byte
     Public Sub New()
-       optiBase.findslider("Desired number of colors").Value = 8
+        optiBase.FindSlider("Desired number of colors").Value = 8
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net which is very fast.
 
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)

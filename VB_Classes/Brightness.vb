@@ -4,7 +4,7 @@ Public Class Brightness_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Implement a brightness effect"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
 
         dst2 = src.ConvertScaleAbs(Options.brightness, Options.contrast)
@@ -24,7 +24,7 @@ Public Class Brightness_HSV : Inherits TaskParent
         labels(3) = "HSV image"
         desc = "Implement the brightness effect for HSV images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
@@ -57,7 +57,7 @@ Public Class Brightness_Grid : Inherits TaskParent
     Public Sub New()
         desc = "Adjust the brightness to get all gray levels below X (here 200) - no whiteout."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static alphaSlider =optiBase.findslider("Alpha (contrast)")
 
         bright.Run(src)

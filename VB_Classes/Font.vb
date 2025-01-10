@@ -5,7 +5,7 @@ Public Class Font_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Display different font options available in OpenCV"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If Not task.heartBeat Then Exit Sub
         Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
                                  cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
@@ -39,7 +39,7 @@ Public Class Font_FlowMsgs : Inherits TaskParent
     Public Sub New()
         desc = "Show TrueType text flowing through an image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
@@ -88,7 +88,7 @@ Public Class Font_FlowText : Inherits TaskParent
     Public Sub New()
         desc = "Show TrueType text flowing through an image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             strOut = "-------------------------------------------------------------------------------------------------------------------" + vbCrLf
             strOut += "To get text to flow across an image in any algorithm, add Font_FlowText to your algorithm." + vbCrLf

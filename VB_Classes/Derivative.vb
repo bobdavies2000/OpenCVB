@@ -8,7 +8,7 @@ Public Class Derivative_Basics : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Compute the gradient in the Z depth and maintain the units for depth."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         subD.Run(task.pcSplit(2))
 
         Dim ranges = {New cv.Rangef(-subD.options.mmThreshold - 0.00001, subD.options.mmThreshold + 0.00001)}
@@ -78,7 +78,7 @@ Public Class Derivative_Subtract : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
         desc = "Subtract neighboring cells in the point cloud depth."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -103,7 +103,7 @@ Public Class Derivative_Sobel : Inherits TaskParent
         UpdateAdvice(traceName + ": gOptions histogram Bins and several local options are important.")
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(options.channel)
@@ -157,7 +157,7 @@ Public Class Derivative_Sobel1 : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Display the derivative of the selected depth dimension."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim channel = deriv.options.channel
         Dim chanName As String = "X"
         If channel <> 0 Then
@@ -193,7 +193,7 @@ Public Class Derivative_Laplacian : Inherits TaskParent
     Public Sub New()
         desc = "Create a histogram and backprojection for the second derivative of depth in the selected dimension."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim channel = deriv.options.channel
@@ -229,7 +229,7 @@ Public Class Derivative_Classes : Inherits TaskParent
         dst.SetTo(0, task.noDepthMask)
         Return derivClassCount
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         deriv.Run(task.pcSplit(deriv.options.channel).Sobel(cv.MatType.CV_32F, 1, 0, deriv.options.kernelSize))
         classCountX = derivClassCount(dst2)
         labels(2) = $"Backprojection of X dimension of task.pcSplit({deriv.options.channel})"

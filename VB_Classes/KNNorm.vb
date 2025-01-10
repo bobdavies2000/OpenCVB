@@ -9,7 +9,7 @@ Public Class KNNorm_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Default normalized KNN with dimension N"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim qRows = CInt(queryInput.Count / options.knnDimension)
         Dim queryData = cv.Mat.FromPixelData(qRows, options.knnDimension, cv.MatType.CV_32F, queryInput.ToArray)
         Dim queryMat As cv.Mat = queryData.Clone
@@ -65,7 +65,7 @@ Public Class KNNorm_TestDim2 : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then
                 queryInput.Clear()
@@ -129,7 +129,7 @@ Public Class KNNorm_TestDim3 : Inherits TaskParent
             DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then
                 queryInput.Clear()
@@ -195,7 +195,7 @@ Public Class KNNorm_TestDim4 : Inherits TaskParent
             DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then
                 queryInput.Clear()

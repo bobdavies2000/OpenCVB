@@ -6,7 +6,7 @@ Public Class SLR_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Segmented Linear Regression example"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         slrCore.Run(src)
 
         If task.firstPass And standalone Then
@@ -41,7 +41,7 @@ Public Class SLR_Core : Inherits TaskParent
     Public Sub New()
         desc = "The core algorithm for Segmented Linear Regression"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If inputX.Count = 0 Then
@@ -80,7 +80,7 @@ Public Class SLR_Plot : Inherits TaskParent
         desc = "Segmented Linear Regression example"
     End Sub
 
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If task.firstPass And standalone Then
             Static slrInput As New SLR_PlotTest()
@@ -143,7 +143,7 @@ Public Class SLR_PlotTest : Inherits TaskParent
             End If
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         plot.srcX = dataX
         plot.srcY = dataY
         plot.Run(src)
@@ -162,7 +162,7 @@ Public Class SLR_TrendImages : Inherits TaskParent
     Public Sub New()
         desc = "Find trends by filling in short histogram gaps for depth or 1-channel images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim split = src.Split()
@@ -208,7 +208,7 @@ Public Class SLR_SurfaceH : Inherits TaskParent
     Public Sub New()
         desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         surface.Run(src)
         dst2 = surface.dst3
     End Sub
@@ -241,7 +241,7 @@ Public Class SLR_Trends : Inherits TaskParent
         dst.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         lastPoint = p1
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         labels(2) = "Grayscale histogram - yellow line shows trend"
         hist.plot.backColor = cv.Scalar.Red
         hist.Run(src)

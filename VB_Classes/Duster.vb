@@ -5,7 +5,7 @@ Public Class Duster_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Removed blowback (stray 3D points between objects) in the pointcloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dust.Run(src)
 
         For i = 1 To dust.classCount
@@ -35,7 +35,7 @@ Public Class Duster_MaskZ : Inherits TaskParent
         labels(3) = "Any flickering below is from changes in the sorted order of the clusters.  It should not be a problem."
         desc = "Build a histogram that finds the clusters of depth data"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         hist.bins = options.bins
 
@@ -97,7 +97,7 @@ Public Class Duster_BasicsY : Inherits TaskParent
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dust.Run(src)
 
         For i = 1 To dust.classCount
@@ -124,7 +124,7 @@ Public Class Duster_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         duster.Run(src)
         dst1 = duster.dust.dst2.InRange(1, 1)
 

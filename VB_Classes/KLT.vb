@@ -10,7 +10,7 @@ Public Class KLT_Basics : Inherits TaskParent
         term = New cv.TermCriteria(cv.CriteriaTypes.Eps Or cv.CriteriaTypes.Count, 10, 1.0)
         desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
 
         If options.nightMode Then dst2.SetTo(0) Else src.CopyTo(dst2)
@@ -67,7 +67,7 @@ Public Class KLT_OpticalFlow : Inherits TaskParent
     Public Sub New()
         desc = "KLT optical flow - needs more work"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         klt.Run(src)
         If task.frameCount > 0 And lastpoints IsNot Nothing And klt.ptInput IsNot Nothing Then
             dst2 = klt.dst2

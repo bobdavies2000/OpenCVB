@@ -6,7 +6,7 @@ Public Class FLANN_Test : Inherits TaskParent
         desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         labels(2) = "FLANN Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         ' creates data set
         Using features As New cv.Mat(10000, 2, cv.MatType.CV_32FC1)
             cv.Cv2.Randu(features, 0, msRNG.Next(9900, 10000))
@@ -57,7 +57,7 @@ Public Class FLANN_Basics : Inherits TaskParent
         desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         labels(2) = "Red is query, Nearest points blue"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(src) ' fill result1 with random points in x and y range of the image.

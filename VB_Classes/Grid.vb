@@ -5,7 +5,7 @@ Public Class Grid_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Create a grid of squares covering the entire image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.mouseClickFlag And Not task.firstPass Then
             task.gridROIclicked = task.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
@@ -142,7 +142,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
         gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
         If standalone Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -197,7 +197,7 @@ Public Class Grid_BasicsTest : Inherits TaskParent
         labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
         If standalone Then desc = "Validation test for Grid_Basics algorithm"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim mean = cv.Cv2.Mean(src)
 
         dst2.SetTo(0)
@@ -236,7 +236,7 @@ Public Class Grid_List : Inherits TaskParent
         labels(2) = "Adjust grid width/height to increase thread count."
         If standalone Then desc = "List the active threads"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Parallel.ForEach(Of cv.Rect)(task.gridRects,
          Sub(roi)
              dst3(roi).SetTo(0)
@@ -273,7 +273,7 @@ Public Class Grid_FPS : Inherits TaskParent
     Public Sub New()
         desc = "Provide a service that lets any algorithm control its frame rate"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim fps = CInt(task.fpsRate / options.desiredFPS)
@@ -302,7 +302,7 @@ Public Class Grid_Neighbors : Inherits TaskParent
         labels = {"", "", "Grid_Basics output", ""}
         desc = "Click any grid element to see its neighbors"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.gridRows <> CInt(dst2.Height / 10) Then
             task.gOptions.setGridSize(CInt(dst2.Height / 10))
             task.gridRows = task.gridSize
@@ -354,7 +354,7 @@ Public Class Grid_Special : Inherits TaskParent
         desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
                 "  Specify the Y size."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
             gridWidth = task.gridSize
             gridRects.Clear()
@@ -426,7 +426,7 @@ Public Class Grid_MinMaxDepth : Inherits TaskParent
         UpdateAdvice(traceName + ": goptions 'grid Square Size' has direct impact.")
         desc = "Find the min and max depth within each grid roi."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If minMaxLocs.Count <> task.gridRects.Count Then ReDim minMaxLocs(task.gridRects.Count - 1)
         If minMaxVals.Count <> task.gridRects.Count Then ReDim minMaxVals(task.gridRects.Count - 1)
         Dim mm As mmData
@@ -463,7 +463,7 @@ Public Class Grid_TrackCenter : Inherits TaskParent
 
         desc = "Track a cell near the center of the grid"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If match.correlation < match.options.correlationMin Or task.gOptions.debugChecked Then
             task.gOptions.debugChecked = False
             Dim index = task.gridMap32S.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
@@ -500,7 +500,7 @@ Public Class Grid_ShowMap : Inherits TaskParent
     Public Sub New()
         desc = "Verify that task.gridMap32S is laid out correctly"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = ShowPalette(task.gridMap32S * 255 / task.gridRects.Count)
     End Sub
 End Class

@@ -29,7 +29,7 @@ Public Class DNN_Test : Inherits TaskParent
         labels(3) = "Input Image"
         desc = "Download and use a Caffe database"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
 
         Dim image = cv.Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg")
         dst3 = image.Resize(dst3.Size())
@@ -86,7 +86,7 @@ Public Class DNN_Basics : Inherits TaskParent
         desc = "Use OpenCV's dnn from Caffe file."
         labels(2) = "Cropped Input Image - must be square!"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If dnnPrepared Then
@@ -179,7 +179,7 @@ Public Class DNN_SuperRes : Inherits TaskParent
         labels(2) = "Output of a resize using OpenCV"
         desc = "Get better super-resolution through a DNN"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If saveModelFile <> options.superResModelFileName Then
             saveModelFile = options.superResModelFileName
@@ -219,7 +219,7 @@ Public Class DNN_SuperResize : Inherits TaskParent
         labels(3) = "dst3 = dst2 - src or no difference - honors original"
         desc = "Compare superRes reduced to original size"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         super.Run(src)
         Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Dim tmp As New cv.Mat

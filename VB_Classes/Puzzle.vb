@@ -12,7 +12,7 @@ Public Class Puzzle_Basics : Inherits TaskParent
         Dim r As Random = New Random()
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         unscrambled.Clear()
         Dim inputROI As New List(Of cv.Rect)
         For j = 0 To task.gridRects.Count - 1
@@ -52,7 +52,7 @@ Public Class Puzzle_Solver : Inherits TaskParent
         labels = {"", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)"}
         desc = "Solve the puzzle using matchTemplate"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Or options.startPuzzle Then
@@ -90,7 +90,7 @@ Public Class Puzzle_SolverDynamic : Inherits TaskParent
         labels = {"", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical."}
         desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         puzzle.puzzle.image = src.Clone
         puzzle.grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         puzzle.Run(src)

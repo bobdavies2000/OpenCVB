@@ -7,7 +7,7 @@ Public Class Encode_Basics : Inherits TaskParent
         labels(2) = "absDiff with original"
         labels(3) = "Original decompressed"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If task.firstPass Then optiBase.FindSlider("Encode Output Scaling").Value = 10
 
@@ -35,7 +35,7 @@ Public Class Encode_Scaling : Inherits TaskParent
     Public Sub New()
         desc = "JPEG Encoder"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}

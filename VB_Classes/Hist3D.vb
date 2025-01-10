@@ -9,7 +9,7 @@ Public Class Hist3D_Basics : Inherits TaskParent
         labels = {"", "", "Sum of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", ""}
         desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         hColor.Run(src)
@@ -41,7 +41,7 @@ Public Class Hist3D_BuildHistogram : Inherits TaskParent
     Public Sub New()
         desc = "Build a guided 3D histogram from the 3D histogram supplied in src."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             task.gOptions.setHistogramBins(100)
             plot.Run(src)
@@ -93,7 +93,7 @@ Public Class Hist3D_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Run RedColor_Basics on the combined Hist3D color/cloud output."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hist3D.Run(src)
         dst2 = hist3D.dst3
         labels(2) = hist3D.labels(3)
@@ -114,7 +114,7 @@ Public Class Hist3D_RedColor : Inherits TaskParent
     Public Sub New()
         desc = "Use the Hist3D color classes to segment the image with RedColor_Basics"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hColor.Run(src)
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
@@ -136,7 +136,7 @@ Public Class Hist3D_DepthWithMask : Inherits TaskParent
     Public Sub New()
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             fore.Run(src)
             depthMask = fore.dst2 Or task.noDepthMask
@@ -168,7 +168,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
     Public Sub New()
         desc = "Classify each pixel using a 3D histogram backprojection."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 3 Then src = task.color
         Dim bins = task.redOptions.HistBinBar3D.Value
         cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
@@ -203,7 +203,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
         labels = {"", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2"}
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(src)
 
         pixel.Run(src)
@@ -228,7 +228,7 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
     Public Sub New()
         desc = "Classify each pixel with a 3D histogram backprojection and run RedColor_Basics on the output."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         pixel.Run(src)
 
         dst2 = getRedColor(pixel.dst2, labels(2))
@@ -249,7 +249,7 @@ Public Class Hist3D_PixelDiffMask : Inherits TaskParent
     Public Sub New()
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         pixel.Run(src)
         Static lastImage As cv.Mat = pixel.dst2.Clone
         cv.Cv2.Absdiff(lastImage, pixel.dst2, dst3)
@@ -284,7 +284,7 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
         Next
         Return Math.Sqrt(accum)
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         pixels.Run(src)
         dst2 = task.redMap
         dst3 = dst2.InRange(0, 0)

@@ -5,7 +5,7 @@ Public Class Triangle_Basics : Inherits TaskParent
         labels = {"", "", "RedColor_Hulls output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         If task.redCells.Count <= 1 Then Exit Sub
@@ -46,7 +46,7 @@ Public Class Triangle_HullContour : Inherits TaskParent
         labels = {"", "Selected cell", "RedColor_Basics output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
         If task.redCells.Count <= 1 Then Exit Sub
@@ -80,7 +80,7 @@ Public Class Triangle_RedCloud : Inherits TaskParent
         labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         If task.redCells.Count <= 1 Then Exit Sub
@@ -119,7 +119,7 @@ Public Class Triangle_Cell : Inherits TaskParent
         labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
         If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
@@ -173,7 +173,7 @@ Public Class Triangle_Mask : Inherits TaskParent
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
         If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc

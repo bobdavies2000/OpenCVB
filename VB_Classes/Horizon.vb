@@ -22,7 +22,7 @@ Public Class Horizon_Basics : Inherits TaskParent
 
         DrawLine(dst2, vec.p1, vec.p2, 255)
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(1) Else dst0 = src
 
         dst0 = dst0.Abs()
@@ -81,7 +81,7 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim xRatio = dst0.Width / task.quarterRes.Width
         Dim yRatio = dst0.Height / task.quarterRes.Height
 
@@ -157,7 +157,7 @@ Public Class Horizon_FindNonZeroOld : Inherits TaskParent
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim xRatio = dst0.Width / task.quarterRes.Width
         Dim yRatio = dst0.Height / task.quarterRes.Height
         Dim splitX = task.pcSplit(0)
@@ -235,7 +235,7 @@ Public Class Horizon_Validate : Inherits TaskParent
     Public Sub New()
         desc = "Validate the horizon points using Match_Basics"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim templatePad = match.options.templatePad
         Dim templateSize = match.options.templateSize
 
@@ -273,7 +273,7 @@ Public Class Horizon_Regress : Inherits TaskParent
     Public Sub New()
         desc = "Collect the horizon points and run a linear regression on all the points."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         horizon.Run(src)
 
         For i = 0 To horizon.points.Count - 1
@@ -296,7 +296,7 @@ Public Class Horizon_ExternalTest : Inherits TaskParent
     Public Sub New()
         desc = "Supply the point cloud input to Horizon_Basics"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = PrepareDepthInput(1)
         horizon.Run(dst0)
         dst2 = horizon.dst2
@@ -315,7 +315,7 @@ Public Class Horizon_Perpendicular : Inherits TaskParent
         labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
         desc = "Find the gravity vector using the perpendicular to the horizon."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
         DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
 
@@ -339,7 +339,7 @@ Public Class Horizon_Simple : Inherits TaskParent
     Public Sub New()
         desc = "Find the horizon with the perpendicular to gravity"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then dst2 = src.Clone
 
         task.horizonVec = perp.computePerp(task.gravityVec)

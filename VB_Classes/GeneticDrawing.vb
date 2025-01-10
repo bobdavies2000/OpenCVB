@@ -95,7 +95,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
         mats.mat(3) = runDNAseq(DNAseq)
         totalError = calculateError(mats.mat(3))
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.displayObject.traceName = traceName Then
@@ -203,7 +203,7 @@ Public Class GeneticDrawing_Color : Inherits TaskParent
         labels(2) = "Intermediate results - original+2 partial+Mag"
         desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Static restartCheck = optiBase.FindCheckBox("Restart the algorithm with the current settings")
         Dim split() As cv.Mat
         split = src.Split()
@@ -252,7 +252,7 @@ Public Class GeneticDrawing_Photo : Inherits TaskParent
 
         desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
 
         Static fileInputName = New FileInfo(fileNameForm.filename.Text)
         If inputFileName <> fileInputName.FullName Or task.optionsChanged Then

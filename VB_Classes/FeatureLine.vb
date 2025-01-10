@@ -6,7 +6,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and track a line using the end points"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         task.lines.Run(src)
@@ -38,7 +38,7 @@ Public Class FeatureLine_Detector : Inherits TaskParent
         labels = {"", "", "Longest line present.", ""}
         desc = "Find and track a line using the end points"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
         Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
@@ -88,7 +88,7 @@ Public Class FeatureLine_VerticalVerify : Inherits TaskParent
     Public Sub New()
         desc = "Select a line or group of lines and track the result"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         linesVH.Run(src)
 
         verify.gCells = New List(Of gravityLine)(linesVH.gCells)
@@ -113,7 +113,7 @@ Public Class FeatureLine_VH : Inherits TaskParent
         labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"
         desc = "Find and track all the horizontal or vertical lines"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim templatePad = options.templatePad
@@ -186,7 +186,7 @@ Public Class FeatureLine_Tutorial1 : Inherits TaskParent
         labels(3) = "The highlighted lines are also lines in 3D."
         desc = "Find all the lines in the image and determine which are in the depth data."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
 
@@ -223,7 +223,7 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
     Public Sub New()
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         lines.Run(src)
@@ -278,7 +278,7 @@ Public Class FeatureLine_LongestVerticalKNN : Inherits TaskParent
         If distance1 < 0.75 * p1.DistanceTo(p2) Then Return True ' it the longest vertical * 0.75 > current lastPair, then use the longest vertical...
         Return False
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         gLines.Run(src)
         If gLines.sortedVerticals.Count = 0 Then
             SetTrueText("No vertical lines were present", 3)
@@ -320,7 +320,7 @@ Public Class FeatureLine_LongestV_Tutorial1 : Inherits TaskParent
     Public Sub New()
         desc = "Use FeatureLine_Finder to find all the vertical lines and show the longest."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         lines.Run(src)
 
@@ -352,7 +352,7 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits TaskParent
     Public Sub New()
         desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Basics4D to track each line."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         lines.Run(src)
         dst1 = lines.dst3
@@ -411,7 +411,7 @@ Public Class FeatureLine_VerticalLongLine : Inherits TaskParent
     Public Sub New()
         desc = "Use FeatureLine_Finder data to identify the longest lines and show its angle."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             dst2 = src.Clone
             lines.Run(src)
@@ -456,7 +456,7 @@ Public Class FeatureLine_DetailsAll : Inherits TaskParent
         flow.dst = 3
         desc = "Use FeatureLine_Finder data to collect vertical lines and measure accuracy of each."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             dst2 = src.Clone
             lines.Run(src)
@@ -527,7 +527,7 @@ Public Class FeatureLine_LongestKNN : Inherits TaskParent
     Public Sub New()
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         dst2 = src
 
@@ -570,7 +570,7 @@ Public Class FeatureLine_Longest : Inherits TaskParent
         labels(2) = "Longest line end points are highlighted "
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         dst2 = src.Clone
         Dim correlationMin = match1.options.correlationMin
@@ -621,7 +621,7 @@ Public Class FeatureLine_Finder : Inherits TaskParent
     Public Sub New()
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst3 = src.Clone

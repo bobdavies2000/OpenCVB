@@ -8,7 +8,7 @@ Public Class LowRes_Basics : Inherits TaskParent
         labels(3) = "Low resolution version of the depth data."
         desc = "Build the low-res image and accompanying map, rect list, and mask."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lrColor.Run(src)
         dst2 = lrColor.dst2.Clone
         task.lowResColor = lrColor.dst3.Clone
@@ -29,7 +29,7 @@ Public Class LowRes_Color : Inherits TaskParent
         labels = {"", "", "Grid of mean color values", "Resized task.lowResColor"}
         desc = "The bare minimum needed to make the LowRes image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         For Each roi In task.gridRects
             Dim mean = src(roi).Mean()
@@ -49,7 +49,7 @@ Public Class LowRes_Depth : Inherits TaskParent
         labels = {"", "", "Grid of mean depth values", "Resized task.lowResDepth"}
         desc = "The bare minimum needed to make the LowRes image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
         dst2 = src.Clone
         Dim index As Integer
@@ -78,7 +78,7 @@ Public Class LowRes_Features : Inherits TaskParent
         labels(3) = "Featureless areas"
         desc = "Identify the cells with features"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
 
@@ -142,7 +142,7 @@ Public Class LowRes_Edges : Inherits TaskParent
         optiBase.FindRadio("Laplacian").Checked = True
         desc = "Add edges to features"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static stateList As New List(Of Single)
 
         lowRes.Run(src)
@@ -223,7 +223,7 @@ Public Class LowRes_Boundaries : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Find the boundary cells between feature and featureless cells."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
         dst1 = task.featureMask.Clone
         dst3 = feat.dst2
@@ -275,7 +275,7 @@ Public Class LowRes_MLColor : Inherits TaskParent
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bounds.Run(src)
         Dim edgeMask = bounds.feat.edges.dst2
 
@@ -348,7 +348,7 @@ Public Class LowRes_MLColorDepth : Inherits TaskParent
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bounds.Run(src)
         Dim edgeMask = bounds.feat.edges.dst2
 
@@ -420,7 +420,7 @@ Public Class LowRes_DepthMask : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Create a mask of the cells that are mostly depth - remove speckles in no depth regions"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         For Each roi In task.gridRects
             Dim count = task.pcSplit(2)(roi).CountNonZero()
@@ -442,7 +442,7 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
     Public Sub New()
         desc = "Measure how much color changes with and without motion."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         lowRes.Run(src)
@@ -500,7 +500,7 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
         labels(3) = "A composite of an earlier image and the motion from the latest input"
         desc = "Show all the grid cells above the motionless value (an option)."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then dst0 = src.Clone
 
         If task.optionsChanged Then motionRects = New List(Of cv.Rect)
@@ -560,7 +560,7 @@ Public Class LowRes_MeasureValidate : Inherits TaskParent
                     "Contrast this with BGSubtract."
         desc = "Validate the image provided by LowRes_MeasureMotion"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = src.Clone
         measure.Run(src)
         dst2 = measure.dst3.Clone
@@ -592,7 +592,7 @@ Public Class LowRes_LeftRight : Inherits TaskParent
     Public Sub New()
         desc = "Get the lowRes grid image for the left and right views"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lowRes.Run(task.leftView)
         dst2 = lowRes.dst2
 

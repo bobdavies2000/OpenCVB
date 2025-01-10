@@ -6,7 +6,7 @@ Public Class Plane_Basics : Inherits TaskParent
         labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
         desc = "Find the regions that are mostly vertical and mostly horizontal."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim topHist As New cv.Mat, sideHist As New cv.Mat, topBackP As New cv.Mat, sideBackP As New cv.Mat
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, topHist, 2,
                         {dst2.Height, dst2.Width}, task.rangesTop)
@@ -49,7 +49,7 @@ Public Class Plane_From3Points : Inherits TaskParent
                                          Format(Math.Abs(eq(2)), fmt3) + "*z = " +
                                          Format(eq(3), fmt3) + vbCrLf
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim v1 = input(1) - input(0)
         Dim v2 = input(1) - input(2)
         cross = crossProduct(v1, v2)
@@ -87,7 +87,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
         addW.src2 = dst2.Clone
         desc = "Find all the cells from a RedColor_Basics output that are likely to be flat"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         plane.Run(src)
 
         dst2 = plane.dst2
@@ -152,7 +152,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
             Next
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         plane.Run(src)
         dst2 = plane.dst2
 
@@ -182,7 +182,7 @@ Public Class Plane_EqCorrelation : Inherits TaskParent
     Public Sub New()
         desc = "Classify equations based on the correlation of their coefficients"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         plane.Run(src)
         dst2 = plane.dst2
 
@@ -263,7 +263,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         Next
         Return fitPoints
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = getRedColor(src, labels(2))
@@ -306,7 +306,7 @@ Public Class Plane_Points : Inherits TaskParent
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         Dim rc = task.rc
@@ -374,7 +374,7 @@ Public Class Plane_Histogram : Inherits TaskParent
         labels = {"", "", "Histogram of Y-Values of the point cloud after masking", "Mask used to isolate histogram input"}
         desc = "Create a histogram plot of the Y-values in the backprojection of solo points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         solo.Run(src)
         dst3 = solo.dst3
 
@@ -427,7 +427,7 @@ Public Class Plane_Equation : Inherits TaskParent
     Public Sub New()
         desc = "Compute the coefficients for an estimated plane equation given the rc contour"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = getRedColor(src, labels(2))
             rc = task.rc
@@ -506,7 +506,7 @@ Public Class Plane_Verticals : Inherits TaskParent
                   "Thresholded heatmap top view mask"}
         desc = "Use a heatmap to isolate vertical walls - incomplete!"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         solo.Run(src)
         dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
@@ -540,7 +540,7 @@ Public Class Plane_Horizontals : Inherits TaskParent
                   "Thresholded heatmap side view mask"}
         desc = "Use the solo points to isolate horizontal surfaces - floor or ceiling or table tops."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         solo.Run(src)
         dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
@@ -576,7 +576,7 @@ Public Class Plane_FloorStudy : Inherits TaskParent
         labels = {"", "", "", ""}
         desc = "Find the floor plane (if present)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         slice.Run(src)

@@ -31,7 +31,7 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         Next
         Return maxIndex
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         match.RunOpt()
 
@@ -75,7 +75,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
         labels = {"", "", "Output of RedColor_Hulls", "Cells similar to selected cell"}
         desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then
@@ -128,7 +128,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
         desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim myStandalone = standaloneTest() Or runStandalone
@@ -188,7 +188,7 @@ Public Class MatchShapes_Hulls : Inherits TaskParent
         labels = {"", "", "Output of RedColor_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         hulls.Run(src)
@@ -222,7 +222,7 @@ Public Class MatchShapes_Contours : Inherits TaskParent
         labels = {"", "", "Output of RedColor_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = getRedColor(src, labels(2))

@@ -7,7 +7,7 @@ Public Class Stable_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Maintain the generation counts around the feature points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             good.Run(src)
             facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
@@ -63,7 +63,7 @@ Public Class Stable_BasicsCount : Inherits TaskParent
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         basics.Run(src)
         dst2 = basics.dst2
@@ -97,7 +97,7 @@ Public Class Stable_Lines : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Track the line end points found in the BGR image and keep those that are stable."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lines.Run(src)
 
         basics.facetGen.inputPoints.Clear()
@@ -136,7 +136,7 @@ Public Class Stable_FAST : Inherits TaskParent
        optiBase.findslider("FAST Threshold").Value = 100
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         fast.Run(src)
 
         basics.facetGen.inputPoints.Clear()
@@ -173,7 +173,7 @@ Public Class Stable_GoodFeatures : Inherits TaskParent
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst3 = basics.dst3
         If task.features.Count = 0 Then Exit Sub ' nothing to work on...
 

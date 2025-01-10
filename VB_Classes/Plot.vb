@@ -11,7 +11,7 @@ Public Class Plot_Basics : Inherits TaskParent
         labels(3) = "Same Data but using OpenCV C++ plot"
         desc = "Plot data provided in src Mat"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(src)
         dst2 = hist.dst2
@@ -38,7 +38,7 @@ Public Class Plot_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         'src.SetTo(task.MaxZmeters, task.maxDepthMask)
 
@@ -77,7 +77,7 @@ Public Class Plot_Histogram2D : Inherits TaskParent
         labels = {"", "", "2D Histogram", ""}
         desc = "Plot a 2D histgram from the input Mat"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim histogram = src.Clone
         If standaloneTest() Then
             colorFmt.Run(src)
@@ -109,7 +109,7 @@ Public Class Plot_OverTimeSingle : Inherits TaskParent
         labels(2) = "Plot_OverTime "
         desc = "Plot an input variable over time"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = dst2.Resize(task.quarterRes)
         If standaloneTest() Then plotData = task.color.Mean(task.depthMask)(0)
 
@@ -163,7 +163,7 @@ Public Class Plot_OverTimeScalar : Inherits TaskParent
         Next
         desc = "Plot the requested number of entries in the cv.scalar input"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then plotData = task.color.Mean()
 
         For i = 0 To Math.Min(plotCount, 4) - 1
@@ -211,7 +211,7 @@ Public Class Plot_OverTime : Inherits TaskParent
         End Select
         task.gOptions.DotSizeSlider.Value = task.gOptions.LineWidth.Value
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
@@ -297,7 +297,7 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
         task.gOptions.LineWidth.Value = 1
         task.gOptions.DotSizeSlider.Value = 2
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
@@ -380,7 +380,7 @@ Public Class Plot_Beats : Inherits TaskParent
         plot.maxScale = 5
         desc = "Plot the beats."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         plot.plotData(0) = If(task.heartBeat, 1, -1)
         plot.plotData(1) = If(task.midHeartBeat, 2, -1)
         plot.plotData(2) = If(task.quarterBeat, 3, -1)
@@ -412,7 +412,7 @@ Public Class Plot_Basics_CPP : Inherits TaskParent
         cPtr = PlotOpenCV_Open()
         desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim handleX = GCHandle.Alloc(srcX.ToArray, GCHandleType.Pinned)
         Dim handleY = GCHandle.Alloc(srcY.ToArray, GCHandleType.Pinned)
 
@@ -449,7 +449,7 @@ Public Class Plot_Dots : Inherits TaskParent
         Next
         desc = "Plot the requested points..."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim maxX = srcX.Max, minX = srcX.Min, maxY = srcY.Max, minY = srcY.Min
         If wipeSlate Then dst2.SetTo(0)
         For i = 0 To srcX.Count - 1
@@ -481,7 +481,7 @@ Public Class Plot_Histogram : Inherits TaskParent
     Public Sub New()
         desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Or createHistogram Then
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             ranges = {New cv.Rangef(minRange, maxRange)}
@@ -539,7 +539,7 @@ Public Class Plot_Points : Inherits TaskParent
         Next
         desc = "Plot the requested points..."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         output.Clear()
         For i = 0 To input.Count - 1

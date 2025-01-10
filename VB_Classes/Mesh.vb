@@ -6,7 +6,7 @@ Public Class Mesh_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Build triangles from the ptList input of points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = src
@@ -48,7 +48,7 @@ Public Class Mesh_Features : Inherits TaskParent
         UpdateAdvice(traceName + ": Use 'Options_Features' to update results.")
         desc = "Build triangles from feature points"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.features.Count < 3 Then Exit Sub
         mesh.ptList = task.features
         mesh.Run(src)

@@ -7,7 +7,7 @@ Public Class Covariance_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use the local options to control the number of points.")
         desc = "Calculate the covariance of random depth data points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst3.SetTo(0)
         If standaloneTest() Then
             random.Run(src)
@@ -52,7 +52,7 @@ Public Class Covariance_Test : Inherits TaskParent
     Public Sub New()
         desc = "Test the covariance basics algorithm."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}
         Dim samples = cv.Mat.FromPixelData(10, 2, cv.MatType.CV_64F, testInput)
         covar.Run(samples)
@@ -75,7 +75,7 @@ Public Class Covariance_Images : Inherits TaskParent
     Public Sub New()
         desc = "Calculate the covariance of 2 images"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.optionsChanged Then gray.ConvertTo(last32f, cv.MatType.CV_32F)
         dst2 = gray

@@ -7,7 +7,7 @@ Public Class Line_Basics : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lineCore.Run(src)
         dst2 = lineCore.dst2
 
@@ -36,7 +36,7 @@ Public Class Line_Core : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         lines.Run(src.Clone)
@@ -112,7 +112,7 @@ Public Class Line_Detector : Inherits TaskParent
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
                "rectangle (provided externally)"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
@@ -145,7 +145,7 @@ Public Class Line_Rects : Inherits TaskParent
     Public Sub New()
         desc = "Show the rectangle for each line"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.lines.Run(src)
 
         dst2 = task.lines.dst2
@@ -177,7 +177,7 @@ Public Class Line_InterceptsUI : Inherits TaskParent
         labels(2) = "Use mouse in right image to highlight lines"
         desc = "An alternative way to highlight line segments with common slope"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst3.SetTo(0)
 
@@ -268,7 +268,7 @@ Public Class Line_Intercepts : Inherits TaskParent
         labels(2) = "Highlight line x- and y-intercepts.  Move mouse over the image."
         desc = "Show lines with similar y-intercepts"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         lines.Run(src)
@@ -337,7 +337,7 @@ Public Class Line_InDepthAndBGR : Inherits TaskParent
         labels(3) = "Lines in BGR confirmed in the point cloud"
         desc = "Find the BGR lines and confirm they are present in the cloud data."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
         If task.lpList.Count = 0 Then Exit Sub
@@ -404,7 +404,7 @@ Public Class Line_Movement : Inherits TaskParent
         labels = {"", "", "Line Movement", ""}
         desc = "Show the movement of the line provided"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             Static k1 = p1
             Static k2 = p2
@@ -469,7 +469,7 @@ Public Class Line_GCloud : Inherits TaskParent
 
         Return gc
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim maxAngle = angleSlider.Value
@@ -519,7 +519,7 @@ Public Class Line_Perpendicular : Inherits TaskParent
         Dim b = midPoint.Y - m * midPoint.X
         Return New linePoints(New cv.Point2f(-b / m, 0), New cv.Point2f((dst2.Height - b) / m, dst2.Height))
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then input = task.gravityVec
         dst2.SetTo(0)
         DrawLine(dst2, input.p1, input.p2, white)
@@ -544,7 +544,7 @@ Public Class Line_ViewSide : Inherits TaskParent
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
         desc = "Find lines in the hotspots for the side view."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histSide.Run(src)
 
         autoY.Run(histSide.histogram)
@@ -569,7 +569,7 @@ Public Class Line_ViewTop : Inherits TaskParent
         labels = {"", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View."}
         desc = "Find lines in the hotspots for the Top View."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
         autoX.Run(histTop.histogram)
@@ -596,7 +596,7 @@ Public Class Line_FromContours : Inherits TaskParent
         UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
         desc = "Find the lines in the contours."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
         contours.Run(reduction.dst2)
         dst2 = contours.dst2.Clone
@@ -624,7 +624,7 @@ Public Class Line_ColorClass : Inherits TaskParent
         labels = {"", "", "Lines for the current color class", "Color Class input"}
         desc = "Review lines in all the different color classes"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
         dst1 = color8U.dst3
 
@@ -653,7 +653,7 @@ Public Class Line_TimeView : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Collect lines over time"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
 
         If task.optionsChanged Then frameList.Clear()
@@ -702,7 +702,7 @@ Public Class Line_RegionsVB : Inherits TaskParent
 
         desc = "Use the reduction values between lines to identify regions."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static noVertCheck = optiBase.FindCheckBox("Run horizontal without vertical step")
         Static verticalCheck = optiBase.FindCheckBox("Show intermediate vertical step results.")
         reduction.Run(src)
@@ -790,7 +790,7 @@ Public Class Line_Nearest : Inherits TaskParent
         labels(2) = "Yellow line is input line, white dot is the input point, and the white line is the nearest path to the input line."
         desc = "Find the nearest point on a line"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
             lp.p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             lp.p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -848,7 +848,7 @@ Public Class Line_Intersection : Inherits TaskParent
     Public Sub New()
         desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -886,7 +886,7 @@ Public Class Line_KNN : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use KNN to find the nearest point to an endpoint and connect the 2 lines with a line."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.feat.Run(src)
 
         swarm.options.RunOpt()
@@ -918,7 +918,7 @@ Public Class Line_Vertical : Inherits TaskParent
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         lines.Run(src)
         dst3 = lines.dst2
@@ -956,7 +956,7 @@ Public Class Line_Horizontal : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         desc = "Find all the Horizontal lines with horizon vector"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         lines.Run(src)
 
@@ -999,7 +999,7 @@ Public Class Line_VerticalHorizontal : Inherits TaskParent
         labels(3) = "Vertical lines are in yellow and horizontal lines in red."
         desc = "Highlight both vertical and horizontal lines"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         verts.Run(src)
         horiz.Run(src)
@@ -1040,7 +1040,7 @@ Public Class Line_Canny : Inherits TaskParent
         labels(3) = "Input to Line_Basics"
         desc = "Find lines in the Canny output"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         canny.Run(src)
         dst3 = canny.dst2.Clone
 
@@ -1062,7 +1062,7 @@ Public Class Line_Cells : Inherits TaskParent
     Public Sub New()
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         lines.Run(dst2.Clone)
@@ -1087,7 +1087,7 @@ Public Class Line_VerticalHorizontalCells : Inherits TaskParent
         labels(2) = "RedColor_Hulls output with lines highlighted"
         desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
 
@@ -1119,7 +1119,7 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
         task.gOptions.LineWidth.Value = 2
         desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim pixelDiff = task.gOptions.pixelDiffThreshold
 
         dst2 = src.Clone
@@ -1188,7 +1188,7 @@ Public Class Line_DisplayInfoOld : Inherits TaskParent
         labels(2) = "When running standaloneTest(), a pair of random points is used to test the algorithm."
         desc = "Display the line provided in mp"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
         If standaloneTest() And task.heartBeat Then
             Dim tc As tCell
@@ -1245,7 +1245,7 @@ Public Class Line_PointSlope : Inherits TaskParent
         labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = src
 
@@ -1315,7 +1315,7 @@ Public Class Line_TopX : Inherits TaskParent
         labels(3) = "The top X lines by length..."
         desc = "Isolate the top X lines by length - lines are already sorted by length."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
         labels(2) = lines.labels(2)
@@ -1356,7 +1356,7 @@ Public Class Line_Matching : Inherits TaskParent
             End If
         End If
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         dst2 = src.Clone
 
@@ -1428,7 +1428,7 @@ Public Class Line_Info : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Display details about the line selected."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         labels(2) = task.lines.labels(2)
         If standaloneTest() Then task.lines.Run(src)
 
@@ -1476,7 +1476,7 @@ Public Class Line_ViewRight : Inherits TaskParent
     Public Sub New()
         desc = "Find lines in the right image"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(task.rightView)
         dst2 = lines.dst2
         labels(2) = lines.labels(2)
@@ -1494,7 +1494,7 @@ Public Class Line_LeftRight : Inherits TaskParent
         task.gOptions.displayDst1.Checked = True
         desc = "Show lines in both the right and left images."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.lines.Run(src) ' the default is the left view.
 
         dst2 = task.lines.dst2.Clone

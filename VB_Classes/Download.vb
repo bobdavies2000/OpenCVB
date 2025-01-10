@@ -13,7 +13,7 @@ Public Class Download_Databases : Inherits TaskParent
     Public Sub New()
         desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         'Dim fileToDecompress = New FileInfo(task.HomeDir + "Data/" + filename)

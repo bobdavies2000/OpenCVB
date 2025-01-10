@@ -10,7 +10,7 @@ Public Class Interpolate_Basics : Inherits TaskParent
                     "Local option 'Line length' affects the lines found.")
         desc = "Resize image using all available interpolation methods in OpenCV"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         iOptions.RunOpt()
         Static saveSliderValue As Integer = iOptions.interpolationThreshold
@@ -52,7 +52,7 @@ Public Class Interpolate_Kalman : Inherits TaskParent
     Public Sub New()
         desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         inter.Run(src)
 
         dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -121,7 +121,7 @@ Public Class Interpolate_Lines : Inherits TaskParent
        optiBase.findslider("Interpolation threshold").Value = 100
         desc = "Detect lines in interpolation results."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         inter.Run(src)
         dst1 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size)
         dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, cv.ThresholdTypes.Binary)
@@ -147,7 +147,7 @@ Public Class Interpolate_Difference : Inherits TaskParent
     Public Sub New()
         desc = "Highlight the difference between the interpolation results and the current image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         inter.Run(src)
         dst2 = inter.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         labels(2) = inter.labels(3)
@@ -175,7 +175,7 @@ Public Class Interpolate_QuarterBeat : Inherits TaskParent
     Public Sub New()
         desc = "Highlight the image differences after every quarter second."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.quarterBeat Then
             diff.Run(src)
             dst3 = diff.dst2

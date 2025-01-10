@@ -10,7 +10,7 @@ Public Class TransformationMatrix_Basics : Inherits TaskParent
         labels = {"", "", "View from above the camera", "View from side of the camera"}
         desc = "Show the contents of the transformation matrix"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.transformationMatrix IsNot Nothing Then

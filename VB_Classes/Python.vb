@@ -36,7 +36,7 @@ Public Class Python_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Access Python from OpenCVB - contains the startPython interface"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         SetTrueText("There is no output from " + traceName + ".  It contains the interface to python.")
     End Sub
 End Class
@@ -60,7 +60,7 @@ Public Class Python_Run : Inherits TaskParent
         End If
         desc = "Run Python app: " + pythonApp.Name
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If pyStream IsNot Nothing Then
             pyStream.Run(src)
             dst2 = pyStream.dst2
@@ -105,7 +105,7 @@ Public Class Python_MemMap : Inherits TaskParent
             desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
@@ -164,7 +164,7 @@ Public Class Python_Stream : Inherits TaskParent
         labels(2) = "Output of Python Backend"
         desc = "General purpose class to pipe BGR and Depth to Python scripts."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then
             SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub

@@ -7,7 +7,7 @@ Public Class Bitmap_ToMat : Inherits TaskParent
         labels(3) = "Convert Mat to bitmap and then back to Mat"
         desc = "Convert a color and grayscale bitmap to a cv.Mat"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim bitmap = New Bitmap(task.HomeDir + "opencv/Samples/Data/lena.jpg")
         dst2 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
 

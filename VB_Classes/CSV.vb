@@ -10,7 +10,7 @@ Public Class CSV_Basics : Inherits TaskParent
         inputFile = fileInput.FullName
         desc = "Read and prepare a .csv file"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim readText() As String = File.ReadAllLines(inputFile) ' user supplies the inputfile name.
         Dim variables = readText(0).Split(",")
         ReDim array(readText.Length - 1, variables.Length - 1)

@@ -12,7 +12,7 @@ Public Class CComp_Basics : Inherits TaskParent
         labels(2) = "Input to ConnectedComponenetsEx"
         desc = "Draw bounding boxes around BGR binarized connected Components"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         rects.Clear()
@@ -24,7 +24,7 @@ Public Class CComp_Basics : Inherits TaskParent
         dst2 = input.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
-        connectedComponents.renderblobs(dst3)
+        connectedComponents.RenderBlobs(dst3)
 
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
@@ -59,7 +59,7 @@ Public Class CComp_Shapes : Inherits TaskParent
         labels(3) = "RectView, LabelView, Binary, grayscale"
         desc = "Use connected components to isolate objects in image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
@@ -99,7 +99,7 @@ Public Class CComp_Both : Inherits TaskParent
         labels = {"", "", "Connected components in both the lighter and darker halves", "Connected components in the darker half of the image"}
         desc = "Prepare the connected components for both above and below the threshold"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         ccomp.options.RunOpt()
 
         Dim light = src.Threshold(ccomp.options.light, 255, cv.ThresholdTypes.Binary)
@@ -122,7 +122,7 @@ Public Class CComp_Hulls : Inherits TaskParent
     Public Sub New()
         desc = "Create connected components using RedCloud Hulls"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         ccomp.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = ccomp.dst3
         ccomp.dst1.ConvertTo(dst1, cv.MatType.CV_8U)
@@ -150,7 +150,7 @@ Public Class CComp_Stats : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use a threshold slider on the CComp input"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
         options.RunOpt()
 

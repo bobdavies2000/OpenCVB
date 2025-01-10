@@ -10,7 +10,7 @@ Public Class Blob_Basics : Inherits TaskParent
         desc = "Isolate and list blobs with specified options"
     End Sub
 
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If standaloneTest() Then
@@ -56,7 +56,7 @@ Public Class Blob_Input : Inherits TaskParent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Generate data to test Blob Detector."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         rotatedRect.Run(src)
         Mats.mat(0) = rotatedRect.dst2
 
@@ -84,7 +84,7 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
         labels(3) = "Largest blob, centroid in yellow"
         desc = "Use connected components to find blobs."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
             dst2 = input.dst2

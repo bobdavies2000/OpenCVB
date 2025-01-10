@@ -8,7 +8,7 @@ Public Class Depth_Basics : Inherits TaskParent
         UpdateAdvice(traceName + ": use global option to control 'Max Depth'.")
         desc = "Colorize the depth data into task.depthRGB"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.pcSplit(2)
 
         task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
@@ -34,7 +34,7 @@ Public Class Depth_Display : Inherits TaskParent
         labels = {"task.pcSplit(2)", "task.pointcloud", "task.depthMask", "task.noDepthMask"}
         desc = "Display the task.pcSplit(2), task.pointcloud, task.depthMask, and task.noDepthMask"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = task.pcSplit(2)
         dst1 = task.pointCloud
         dst2 = task.depthMask
@@ -59,7 +59,7 @@ Public Class Depth_FirstLastDistance : Inherits TaskParent
         DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
         SetTrueText(text, pt, 3)
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim mm As mmData = GetMinMax(task.pcSplit(2), task.depthMask)
         task.depthRGB.CopyTo(dst2)
 
@@ -84,7 +84,7 @@ Public Class Depth_HolesRect : Inherits TaskParent
         labels(2) = "The 10 largest contours in the depth holes."
         desc = "Identify the minimum rectangles of contours of the depth shadow"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         shadow.Run(src)
 
         Dim contours As cv.Point()()
@@ -123,7 +123,7 @@ Public Class Depth_MeanStdev_MT : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then meanSeries = New cv.Mat(task.gridRects.Count, task.frameHistoryCount, cv.MatType.CV_32F, cv.Scalar.All(0))
 
         Dim index = task.frameCount Mod task.frameHistoryCount
@@ -196,7 +196,7 @@ Public Class Depth_MeanStdevPlot : Inherits TaskParent
     Public Sub New()
         desc = "Plot the mean and stdev of the depth image"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim mean As cv.Scalar, stdev As cv.Scalar
         Dim depthMask As cv.Mat = task.depthMask
         cv.Cv2.MeanStdDev(task.pcSplit(2), mean, stdev, depthMask)
@@ -224,7 +224,7 @@ Public Class Depth_Uncertainty : Inherits TaskParent
         labels(3) = "Mask of areas with stable depth"
         desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         retina.Run(task.depthRGB)
@@ -243,7 +243,7 @@ Public Class Depth_Colorizer_CPP : Inherits TaskParent
         cPtr = Depth_Colorizer_Open()
         desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
@@ -272,7 +272,7 @@ Public Class Depth_LocalMinMax_MT : Inherits TaskParent
                   "Highlight is min, red is max.  Lines would indicate planes are present."}
         desc = "Find min and max depth in each segment."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             src.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
@@ -322,7 +322,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
         If p.Y >= dst2.Height Then p.Y = dst2.Height - 1
         Return p
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
 
         dst2 = src.Clone()
@@ -382,7 +382,7 @@ Public Class Depth_ColorMap : Inherits TaskParent
     Public Sub New()
         desc = "Display the depth as a color map"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         cv.Cv2.ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, options.alpha, options.beta)
@@ -403,7 +403,7 @@ Public Class Depth_NotMissing : Inherits TaskParent
         labels(3) = "Stable (non-zero) Depth"
         desc = "Collect X frames, compute stable depth using the BGR and Depth image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then src = task.depthRGB
         bgSub.Run(src)
         dst2 = bgSub.dst2
@@ -427,7 +427,7 @@ Public Class Depth_Median : Inherits TaskParent
         median.rangeMin = 0
         desc = "Divide the depth image ahead and behind the median."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         median.Run(task.pcSplit(2))
 
         Dim mask As cv.Mat
@@ -456,7 +456,7 @@ Public Class Depth_SmoothingMat : Inherits TaskParent
         labels(3) = "Depth pixels after smoothing"
         desc = "Use depth rate of change to smooth the depth values in close range"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Static lastDepth = task.pcSplit(2)
@@ -489,7 +489,7 @@ Public Class Depth_Smoothing : Inherits TaskParent
         labels(3) = "Mask of depth that is smooth"
         desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         smooth.Run(task.pcSplit(2))
         Dim input = smooth.dst2.Normalize(0, 255, cv.NormTypes.MinMax)
         input.ConvertTo(mats.mat(0), cv.MatType.CV_8UC1)
@@ -521,7 +521,7 @@ Public Class Depth_HolesOverTime : Inherits TaskParent
         labels(3) = "Latest hole mask"
         desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
             images.Clear()
             dst0.SetTo(0)
@@ -560,7 +560,7 @@ Public Class Depth_Holes : Inherits TaskParent
         element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
         desc = "Identify holes in the depth image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static borderSlider =optiBase.findslider("Amount of dilation of borderMask")
         Static holeSlider =optiBase.findslider("Amount of dilation of holeMask")
         dst2 = task.pcSplit(2).Threshold(0.01, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
@@ -585,7 +585,7 @@ Public Class Depth_Dilate : Inherits TaskParent
     Public Sub New()
         desc = "Dilate the depth data to fill holes."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dilate.Run(task.pcSplit(2))
         dst2 = dilate.dst2
     End Sub
@@ -607,7 +607,7 @@ Public Class Depth_ForegroundHead : Inherits TaskParent
         labels(2) = "Blue is current, red is kalman, green is trusted"
         desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fgnd.Run(src)
 
         trustworthy = False
@@ -647,7 +647,7 @@ Public Class Depth_RGBShadow : Inherits TaskParent
     Public Sub New()
         desc = "Merge the BGR and Depth Shadow"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
         dst2.SetTo(0, task.noDepthMask)
     End Sub
@@ -665,7 +665,7 @@ Public Class Depth_BGSubtract : Inherits TaskParent
         labels = {"", "", "Latest task.noDepthMask", "BGSubtract output for the task.noDepthMask"}
         desc = "Create a mask for the missing depth across multiple frame"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.noDepthMask
 
         bgSub.Run(dst2)
@@ -688,7 +688,7 @@ Public Class Depth_Averaging : Inherits TaskParent
         labels(3) = "32-bit format depth data"
         desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         avg.Run(src)
 
@@ -711,7 +711,7 @@ Public Class Depth_MaxMask : Inherits TaskParent
         labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
         desc = "Display the task.maxDepthMask and its contour containing depth that is greater than maxdepth (global setting)"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
 
         task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
@@ -743,7 +743,7 @@ Public Class Depth_ForegroundOverTime : Inherits TaskParent
         task.frameHistoryCount = 5
         desc = "Create a fused foreground mask over x number of frames (task.frameHistoryCount)"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then lastFrames.Clear()
@@ -780,7 +780,7 @@ Public Class Depth_ForegroundBlob : Inherits TaskParent
         labels(2) = "Mask for the largest foreground blob"
         desc = "Use InRange to define foreground and find the largest blob in the foreground"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         cv.Cv2.InRange(task.pcSplit(2), 0.01, options.maxForegroundDepthInMeters, dst2)
@@ -835,7 +835,7 @@ Public Class Depth_Foreground : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask for the objects in the foreground"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim dst1 = task.pcSplit(2).Threshold(options.maxForegroundDepthInMeters, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
@@ -868,7 +868,7 @@ Public Class Depth_Grid : Inherits TaskParent
         labels = {"", "", "White regions below are likely depth edges where depth changes rapidly", "Depth 32f display"}
         desc = "Find boundaries in depth to separate featureless regions."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = task.pcSplit(2)
         dst2 = task.gridMask.Clone
         For Each roi In task.gridRects
@@ -896,7 +896,7 @@ Public Class Depth_InRange : Inherits TaskParent
         dst3 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U)
         desc = "Create the selected number of depth ranges "
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim regMats As New List(Of cv.Mat)
@@ -951,7 +951,7 @@ Public Class Depth_Regions : Inherits TaskParent
     Public Sub New()
         desc = "Separate the scene into a specified number of regions by depth"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = task.pcSplit(2).Threshold(task.gOptions.maxDepth, task.gOptions.maxDepth, cv.ThresholdTypes.Binary)
         dst0 = (task.pcSplit(2) / task.gOptions.maxDepth) * 255 / classCount
         dst0.ConvertTo(dst2, cv.MatType.CV_8U)
@@ -976,7 +976,7 @@ Public Class Depth_Colorizer_VB : Inherits TaskParent
     Public Sub New()
         desc = "Colorize the depth based on the near and far colors."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         If src.Size <> task.lowRes Then src = src.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
 
@@ -1008,7 +1008,7 @@ Public Class Depth_PunchIncreasing : Inherits TaskParent
         depth.Increasing = True
         desc = "Identify where depth is increasing - retreating from the camera."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         depth.Run(src)
         dst2 = depth.dst2
     End Sub
@@ -1029,7 +1029,7 @@ Public Class Depth_PunchDecreasing : Inherits TaskParent
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fore.Run(src)
         dst1.SetTo(0)
         task.pcSplit(2).CopyTo(dst1, fore.dst2)
@@ -1063,7 +1063,7 @@ Public Class Depth_PunchBlob : Inherits TaskParent
     Public Sub New()
         desc = "Identify the punch with a rectangle around the largest blob"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         depthInc.Run(src)
         dst2 = depthInc.dst2
 
@@ -1107,7 +1107,7 @@ Public Class Depth_PunchBlobNew : Inherits TaskParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for punch", 0, 255, 250)
         desc = "Identify a punch using both depth and color"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static thresholdSlider =optiBase.findslider("Threshold for punch")
         Dim threshold = thresholdSlider.value
 
@@ -1137,7 +1137,7 @@ Public Class Depth_Contour : Inherits TaskParent
         labels(2) = "task.depthMask contour"
         desc = "Create and display the task.depthMask output as a contour."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         contour.Run(task.depthMask)
 
         dst2.SetTo(0)
@@ -1163,7 +1163,7 @@ Public Class Depth_Outline : Inherits TaskParent
         labels(2) = "Contour separating depth from no depth"
         desc = "Provide a line that separates depth from no depth throughout the image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then src = task.depthMask
         contour.Run(src)
 
@@ -1191,7 +1191,7 @@ Public Class Depth_StableAverage : Inherits TaskParent
         optibase.findRadio("Use farthest distance").Checked = True
         desc = "Use Depth_StableMax to remove the artifacts from the Depth_Averaging"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static unchangedRadio = optibase.findRadio("Use unchanged depth input")
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         extrema.Run(src)
@@ -1221,7 +1221,7 @@ Public Class Depth_StableMin : Inherits TaskParent
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
         desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
 
         If task.heartBeat Then
@@ -1257,7 +1257,7 @@ Public Class Depth_StableMinMax : Inherits TaskParent
         labels(3) = "32-bit StableDepth"
         desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
@@ -1292,7 +1292,7 @@ Public Class Depth_WorldXYMT : Inherits TaskParent
         labels(3) = "dst3 = pointcloud"
         desc = "Create OpenGL point cloud from depth data (slow)"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
 
         dst3 = New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
@@ -1333,7 +1333,7 @@ Public Class Depth_WorldXYZ : Inherits TaskParent
         labels(3) = "dst3 = pointcloud"
         desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
         If depthUnitsMeters = False Then src = (src * 0.001).ToMat
         dst2 = New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
@@ -1364,7 +1364,7 @@ Public Class Depth_World : Inherits TaskParent
         labels = {"", "", "Merged templates and depth32f - should be similar to upper right image", ""}
         desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.vb for comparable calculations"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.firstPass Then template.Run(src) ' intrinsics arrive with the first buffers.
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -1399,7 +1399,7 @@ Public Class Depth_Tiers : Inherits TaskParent
         UpdateAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
         desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -1431,7 +1431,7 @@ Public Class Depth_TierCount : Inherits TaskParent
         labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
         desc = "Determine the 'K' value for the best number of clusters for the depth"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         valley.Run(src)
         dst2 = valley.dst2
 
@@ -1458,7 +1458,7 @@ Public Class Depth_Flatland : Inherits TaskParent
         labels(3) = "Grayscale version"
         desc = "Attempt to stabilize the depth image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst2 = task.depthRGB / options.reductionFactor
@@ -1482,7 +1482,7 @@ Public Class Depth_StableMax : Inherits TaskParent
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
         desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
 
         If task.heartBeat Then
@@ -1511,7 +1511,7 @@ Public Class Depth_MinMaxNone : Inherits TaskParent
     Public Sub New()
         desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         Dim split() As cv.Mat
         If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
@@ -1548,7 +1548,7 @@ Public Class Depth_InfinityCheck : Inherits TaskParent
     Public Sub New()
         desc = "Check the pointcloud depth for infinities"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static plane As Integer = 0
         Static warnings As New List(Of String)
         Static infWarnings As Integer
@@ -1600,7 +1600,7 @@ Public Class Depth_PaletteOld : Inherits TaskParent
     Public Sub New()
         desc = "Use a palette to display depth from the raw depth data."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         ' couldn't do this in the constructor because it uses Gradient_ForDepth and is called in task.
         If customColorMap Is Nothing Then
             gColor.gradientWidth = 255
@@ -1640,7 +1640,7 @@ Public Class Depth_Palette : Inherits TaskParent
         customColorMap.Set(Of cv.Vec3b)(0, 0, black.ToVec3b)
         desc = "Use a palette to display depth from the raw depth data."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         Dim depthNorm As cv.Mat = (src * 255 / task.MaxZmeters)
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)

@@ -9,7 +9,7 @@ Public Class Corners_Basics : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U)
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         optionCorner.RunOpt()
         options.RunOpt()
 
@@ -48,7 +48,7 @@ Public Class Corners_Harris : Inherits TaskParent
         desc = "Find corners using Eigen values and vectors"
         labels(3) = "Corner Eigen values"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -96,7 +96,7 @@ Public Class Corners_PreCornerDetect : Inherits TaskParent
     Public Sub New()
         desc = "Use PreCornerDetect to find features in the image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -122,7 +122,7 @@ Public Class Corners_ShiTomasi_CPP : Inherits TaskParent
         desc = "Find corners using Eigen values and vectors"
         labels(3) = "Corner Eigen values using ShiTomasi which is also what is used in GoodFeatures."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -152,7 +152,7 @@ Public Class Corners_BasicsCentroid : Inherits TaskParent
         ReDim kalman.kInput(1) ' 2 elements - cv.point
         desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         fast.Run(src)
         dst2 = fast.dst2
         dst3.SetTo(0)
@@ -182,7 +182,7 @@ Public Class Corners_BasicsStablePoints : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find and save only the stable points in the FAST output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         fast.Run(src)
 
         Dim newPts As New List(Of cv.Point)
@@ -215,7 +215,7 @@ Public Class Corners_BasicsCentroids : Inherits TaskParent
         If standalone Then task.gOptions.setGridSize(16)
         desc = "Use a thread grid to find the centroids in each grid element"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
         fast.Run(src)
@@ -252,7 +252,7 @@ Public Class Corners_Harris_CPP : Inherits TaskParent
         cPtr = Harris_Features_Open()
         desc = "Use Harris feature detectors to identify interesting points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -288,7 +288,7 @@ Public Class Corners_HarrisDetector_CPP : Inherits TaskParent
     Public Sub New()
         desc = "Use Harris detector to identify interesting points."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If cPtr = 0 Then cPtr = Harris_Detector_Open()
         options.RunOpt()
 
@@ -329,7 +329,7 @@ Public Class Corners_RedCloud : Inherits TaskParent
         labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
         desc = "Find the corners for each RedCloud cell."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = getRedColor(src, labels(2))
 
         corners.Run(task.redMap)
@@ -351,7 +351,7 @@ Public Class Corners_SubPix : Inherits TaskParent
         labels(2) = "Output of PreCornerDetect"
         desc = "Use PreCornerDetect to refine the feature points to sub-pixel accuracy."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         task.feat.Run(src)
 

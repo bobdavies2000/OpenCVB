@@ -14,7 +14,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         labels(2) = "Current frame - rectangle input to matchTemplate"
         desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim resetImage As Boolean
@@ -97,7 +97,7 @@ Public Class Stabilizer_BasicsRandomInput : Inherits TaskParent
         labels(3) = "Image after shift"
         desc = "Generate images that have been arbitrarily shifted"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim input = src
@@ -148,7 +148,7 @@ Public Class Stabilizer_BasicsTest : Inherits TaskParent
         labels(2) = "Unstable input to Stabilizer_Basics"
         desc = "Test the Stabilizer_Basics with random movement"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
 
         random.Run(src)
         stable.Run(random.dst3.Clone)
@@ -175,7 +175,7 @@ Public Class Stabilizer_OpticalFlow : Inherits TaskParent
         desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         labels(2) = "Stabilized Image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.optionsChanged Then
             errScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 1)
@@ -282,7 +282,7 @@ Public Class Stabilizer_VerticalIMU : Inherits TaskParent
     Public Sub New()
         desc = "Use the IMU angular velocity to determine if the camera is moving or stable."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         angleXValue.Add(task.accRadians.X)
         angleYValue.Add(task.accRadians.Y)
 
@@ -342,7 +342,7 @@ Public Class Stabilizer_CornerPoints : Inherits TaskParent
             features.Add(New cv.Point2f(kp.Pt.X + r.X, kp.Pt.Y + r.Y))
         Next
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
             Dim size = task.gridSize
             ul = New cv.Rect(0, 0, size, size)

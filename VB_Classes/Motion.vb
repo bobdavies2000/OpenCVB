@@ -14,7 +14,7 @@ Public Class Motion_Basics : Inherits TaskParent
                     "Highlighted pixels may often be nearly identical."
         desc = "Isolate all motion in the scene"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         measure.Run(src)
         color = measure.dst3.Clone
         labels(2) = measure.labels(2)
@@ -58,7 +58,7 @@ Public Class Motion_BasicsTest : Inherits TaskParent
         task.gOptions.showMotionMask.Checked = True
         desc = "Display the difference between task.color and src to verify Motion_Basics is working"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.UseMotionColor.Checked Then
             SetTrueText("Uncheck 'Use Motion-Constructed images' to validate Motion_Basics", 3)
             Exit Sub
@@ -87,7 +87,7 @@ Public Class Motion_BGSub : Inherits TaskParent
         UpdateAdvice(traceName + ": redOptions are used as well as BGSubtract options.")
         desc = "Use floodfill to find all the real motion in an image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bgSub.Run(src)
         motion.Run(bgSub.dst2)
         dst2 = motion.dst2
@@ -108,7 +108,7 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
         task.redOptions.setIdentifyCells(False)
         desc = "The option-free version of Motion_BGSub"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then
             bgSub.Run(src)
             src = bgSub.dst2
@@ -154,7 +154,7 @@ Public Class Motion_ThruCorrelation : Inherits TaskParent
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Detect motion through the correlation coefficient"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static ccSlider = optiBase.FindSlider("Correlation threshold X1000")
         Static padSlider = optiBase.FindSlider("Pad size in pixels for the search area")
         Static stdevSlider = optiBase.FindSlider("Stdev threshold for using correlation")
@@ -211,7 +211,7 @@ Public Class Motion_PixelDiff : Inherits TaskParent
         desc = "Count the number of changed pixels in the current frame and accumulate them.  If either exceeds thresholds, then set flag = true.  " +
                     "To get the Options Slider, use " + traceName + "QT"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame As cv.Mat = src
@@ -246,7 +246,7 @@ Public Class Motion_Grid_MP : Inherits TaskParent
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect Motion in the color image using multi-threading - slower than single-threaded!"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static correlationSlider = optiBase.FindSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -281,7 +281,7 @@ Public Class Motion_Grid : Inherits TaskParent
         UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect Motion in the color image.  Rectangles outlines didn't have high correlation."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static correlationSlider = optiBase.FindSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -353,7 +353,7 @@ Public Class Motion_Intersect : Inherits TaskParent
         Next
         Return motionRect
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static color = src.Clone
         Static lastMotionRect As cv.Rect = task.motionRect
         Dim motionFlag = False
@@ -420,7 +420,7 @@ Public Class Motion_RectTest : Inherits TaskParent
         labels(3) = "The white spots show the difference of the constructed image from the current image."
         desc = "Track the RGB image using Motion_Enclosing to isolate the motion"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         motion.Run(src)
         Dim r = motion.motionRect
         If task.heartBeat Or r.Width * r.Height > src.Total / 2 Or task.frameCount < 50 Then
@@ -464,7 +464,7 @@ Public Class Motion_HistoryTest : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Detect motion using the last X images"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         diff.Run(src)
@@ -490,7 +490,7 @@ Public Class Motion_Enclosing : Inherits TaskParent
         labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
         desc = "Build an enclosing rectangle for the motion"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
@@ -532,7 +532,7 @@ Public Class Motion_Grayscale : Inherits TaskParent
                   "Diff of input and latest accumulated grayscale image"}
         desc = "Display the grayscale image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If standaloneTest() Then
@@ -556,7 +556,7 @@ Public Class Motion_Diff : Inherits TaskParent
         labels = {"", "", "Unstable mask", "Pixel difference"}
         desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Or dst1.Channels <> 1 Then
             dst1 = src.Clone
@@ -580,7 +580,7 @@ Public Class Motion_PointCloud : Inherits TaskParent
         labels = {"", "", "Pointcloud updated only with motion mask", "Diff of dst2 and latest pointcloud"}
         desc = "Display the pointcloud after updating only with the motion mask.  Resync every heartbeat."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then dst2 = task.pointCloud
         task.pointCloud.CopyTo(dst2, task.motionMask)
 
@@ -600,7 +600,7 @@ Public Class Motion_FromEdge : Inherits TaskParent
     Public Sub New()
         desc = "Detect motion from pixels less that max value in an accumulation."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         cAccum.Run(src)
 
         Dim mm = GetMinMax(cAccum.dst2)
@@ -622,7 +622,7 @@ Public Class Motion_FromEdgeColorize : Inherits TaskParent
         labels = {"", "", "Canny edges accumulated", "Colorized version of dst2 - blue indicates motion."}
         desc = "Colorize the output of Edge_CannyAccum to show values off the peak value which indicate motion."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         cAccum.Run(src)
         dst2 = cAccum.dst2
         dst3 = ShowPalette(dst2)
@@ -640,7 +640,7 @@ Public Class Motion_EdgeStability : Inherits TaskParent
         labels(3) = "High population cells"
         desc = "Measure the stability of edges in each grid Rect"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lowRes.Run(src)
         dst2 = lowRes.edges.dst2
 
@@ -687,7 +687,7 @@ Public Class Motion_FPolyRect : Inherits TaskParent
         match.searchRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         desc = "Confirm the FPoly_LineRect matched the previous image."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.feat.Run(src)
 
         fRect.Run(src)
@@ -725,7 +725,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
         labels(3) = "MatchTemplate output for centerRect - center is black"
         desc = "Build a center rectangle and track it with MatchTemplate."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         ' set a low threshold to make the results more visible.
@@ -798,7 +798,7 @@ Public Class Motion_CenterKalman : Inherits TaskParent
         labels(3) = "Template for motion matchTemplate.  Shake the camera to see Kalman impact."
         desc = "Kalmanize the output of center rotation"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.firstPass Then centerRect = task.centerRect
         dst2 = src.Clone
         motion.Run(src)
@@ -843,7 +843,7 @@ Public Class Motion_CenterLeftRight : Inherits TaskParent
         If standalone Then task.gOptions.setDisplay1()
         desc = "Calculate translation and rotation for both left and right images"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         CenterC.Run(src)
         dst1 = CenterC.dst2
         labels(1) = CenterC.labels(2)
@@ -899,7 +899,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         desc = "Find the approximate rotation angle using the diamond shape " +
                "from the thresholded MatchTemplate output."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim dCount = dst2.CountNonZero
@@ -962,7 +962,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         labels(2) = "Track the feature rect (small one) in each larger rectangle"
         desc = "Find the top feature cells and track them in the next frame."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim half As Integer = CInt(task.gridSize / 2)
 
         If task.heartBeatLT Then
@@ -1045,7 +1045,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
             dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
         Next
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         half = CInt(task.gridSize / 2)
 
         dst1 = src.Clone

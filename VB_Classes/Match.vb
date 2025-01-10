@@ -17,7 +17,7 @@ Public Class Match_Basics : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If standalone Then
             If task.gOptions.debugChecked Then
@@ -66,7 +66,7 @@ Public Class Match_BasicsTest : Inherits TaskParent
         labels = {"", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below"}
         desc = "Test the Match_Basics algorithm"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If (task.firstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
             Dim r = If(task.firstPass, New cv.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
             match.template = src(r)
@@ -104,7 +104,7 @@ Public Class Match_RandomTest : Inherits TaskParent
         flow.parentData = Me
         desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If standaloneTest() Then
             Static saveSampleCount = options.featurePoints
@@ -159,7 +159,7 @@ Public Class Match_BestEntropy : Inherits TaskParent
         labels(3) = "Red is the best template to match (highest entropy)"
         desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             entropy.Run(src)
             task.drawRect = entropy.eMaxRect
@@ -193,7 +193,7 @@ Public Class Match_Motion : Inherits TaskParent
         dst3 = mask.Clone
         desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         optionsMatch.RunOpt()
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
@@ -253,7 +253,7 @@ Public Class Match_Lines : Inherits TaskParent
         labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
         Static lastPt As New List(Of linePoints)(task.lpList)
@@ -301,7 +301,7 @@ Public Class Match_PointSlope : Inherits TaskParent
         labels = {"", "Output of Lines_PointSlope", "Matched lines", "correlationMats"}
         desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         Dim sz = task.gridSize
 
@@ -395,7 +395,7 @@ Public Class Match_TraceRedC : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then dst2.SetTo(0)
         getRedColor(src)
 
@@ -439,7 +439,7 @@ Public Class Match_DrawRect : Inherits TaskParent
         labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
         desc = "Find the requested template in task.drawrect in an image"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static lastImage As cv.Mat = src.Clone
         If task.mouseClickFlag And task.drawRect.Width <> 0 Then
             inputRect = ValidateRect(task.drawRect)
@@ -497,7 +497,7 @@ Public Class Match_tCell : Inherits TaskParent
         If tc.template Is Nothing Then tc.template = src(tc.rect).Clone
         Return tc
     End Function
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rSize = cellSlider.Value
         If standaloneTest() And task.heartBeat Then
             options.RunOpt()
@@ -543,7 +543,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
     Public Sub New()
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static cellSlider = optiBase.FindSlider("MatchTemplate Cell Size")
         Static corrSlider = optiBase.FindSlider("Feature Correlation Threshold")
         Dim minCorrelation = corrSlider.Value / 100
@@ -614,7 +614,7 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
         labels(3) = "Shake camera to see tracking of the highlighted features"
         desc = "Track the GoodFeatures with KNN"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static distSlider = optiBase.FindSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
 
@@ -660,7 +660,7 @@ Public Class Match_Point : Inherits TaskParent
         labels(2) = "Rectangle shown is the search rectangle."
         desc = "Track the selected point"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             SetTrueText("Set the target mat and the pt then run to track an individual point." + vbCrLf +
                         "After running, the pt is updated with the new location and correlation with the updated correlation." + vbCrLf +
@@ -698,7 +698,7 @@ Public Class Match_Points : Inherits TaskParent
         labels(2) = "Rectangle shown is the search rectangle."
         desc = "Track the selected points"
     End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.firstPass Then mPoint.target = src.Clone
 
         If standaloneTest() Then

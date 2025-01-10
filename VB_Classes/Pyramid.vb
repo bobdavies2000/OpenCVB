@@ -5,7 +5,7 @@ Public Class Pyramid_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If options.zoom <> 0 Then
@@ -34,7 +34,7 @@ Public Class Pyramid_Filter : Inherits TaskParent
     Public Sub New()
         desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         laplace.Run(src)
         dst2 = laplace.dst2
     End Sub

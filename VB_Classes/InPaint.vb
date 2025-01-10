@@ -17,7 +17,7 @@ Public Class InPaint_Basics : Inherits TaskParent
         DrawLine(mask, p1, p2, cv.Scalar.All(255))
         Return mask
     End Function
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
         src.CopyTo(dst2)
         Dim mask As cv.Mat = drawRandomLine(dst2)
@@ -37,7 +37,7 @@ Public Class InPaint_Noise : Inherits TaskParent
         desc = "Create noise in an image and then use inPaint to remove it."
         labels(3) = "Repaired Image"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
         noise.Run(src) ' create some noise in the result1 image.
         dst2 = noise.dst2
@@ -58,7 +58,7 @@ Public Class InPaint_Depth : Inherits TaskParent
         labels(3) = "32-bit depth repaired with inpainting"
         desc = "Use Navier-Stokes to fill in the holes in the depth"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         dst2 = src.Clone
@@ -79,7 +79,7 @@ Public Class InPaint_PointCloud : Inherits TaskParent
         labels(3) = "Pointcloud after inpaint"
         desc = "Use Navier-Stokes to fill in the holes in the depth"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         dst2 = task.pointCloud.Clone
 
