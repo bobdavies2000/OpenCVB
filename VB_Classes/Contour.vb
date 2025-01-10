@@ -419,7 +419,7 @@ Public Class Contour_Outline : Inherits TaskParent
         desc = "Create a simplified contour of the selected cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
         Dim ptList As List(Of cv.Point) = rc.contour
 
         dst3.SetTo(0)
@@ -453,9 +453,9 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
     Public Sub New()
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = getRedCloud(src, labels(2))
+            dst2 = getRedColor(src, labels(2))
             rc = task.rc
             DrawContour(dst2(rc.rect), rc.contour, white, -1)
         End If
@@ -549,7 +549,7 @@ Public Class Contour_Compare : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         Dim tmp = task.rc.mask.Clone
 
@@ -579,7 +579,7 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = getRedCloud(src, labels(2))
+            dst2 = getRedColor(src, labels(2))
             rc = task.rc
         End If
 
@@ -626,7 +626,7 @@ Public Class Contour_RedCloudEdges : Inherits TaskParent
         desc = "Intersect the cell contours and the edges in the image."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getRedCloud(src)
+        getRedColor(src)
         labels(2) = task.redC.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
         dst2.SetTo(0)
@@ -652,7 +652,7 @@ Public Class Contour_RedCloud : Inherits TaskParent
         desc = "Show all the contours found in the RedCloud output"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         dst3.SetTo(0)
         For Each rc In task.redCells
@@ -697,7 +697,7 @@ Public Class Contour_Smoothing : Inherits TaskParent
         desc = "Compare contours of the selected cell. Cells are offset to help comparison."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         Dim rc = task.rc
 
@@ -914,24 +914,5 @@ Public Class Contour_FromPoints : Inherits TaskParent
 
         dst3.SetTo(0)
         DrawContour(dst3, hull, white, -1)
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedColor_Cells : Inherits TaskParent
-    Public cellmap As New cv.Mat
-    Public redCells As New List(Of rcData)
-    Public Sub New()
-        task.redOptions.setUseColorOnly(True)
-        desc = "Create RedCloud output using only color"
-    End Sub
-    Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
-
-        cellmap = task.redMap
-        redCells = task.redCells
     End Sub
 End Class

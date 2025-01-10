@@ -437,7 +437,7 @@ Public Class MSER_RedCloud : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         mBase.Run(src)
 
-        getRedCloud(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        getRedColor(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub
@@ -451,17 +451,15 @@ End Class
 
 Public Class MSER_Mask_CPP : Inherits TaskParent
     Dim options As New Options_MSER
-    Dim redC As New RedColor_Cells
     Public classCount As Integer
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         optiBase.FindCheckBox("Use grayscale input").Checked = False
         options.RunOpt()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "MSER in a nutshell: intensity threshold, stability, maximize region, adaptive threshold."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         options.RunOpt()
         If task.optionsChanged Then
             MSER_Close(cPtr)
@@ -485,9 +483,7 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
         labels(3) = CStr(classCount) + " regions identified"
 
         src.SetTo(white, dst3)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        dst2 = getRedColor(src, labels(2))
     End Sub
     Public Sub Close()
         MSER_Close(cPtr)
@@ -505,7 +501,7 @@ Public Class MSER_Binarize : Inherits TaskParent
     Public Sub New()
         desc = "Instead of a BGR src, try using the color output of Bin4Way_Regions"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         bin4.Run(src)
         dst2 = ShowPalette(bin4.dst2 * 255 / 4)
 
@@ -524,10 +520,10 @@ Public Class MSER_Basics1 : Inherits TaskParent
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
     End Sub
 End Class
 

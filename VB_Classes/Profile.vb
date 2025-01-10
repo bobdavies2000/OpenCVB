@@ -15,7 +15,7 @@ Public Class Profile_Basics : Inherits TaskParent
         Return Format(v.X, fmt3) + vbTab + Format(v.Y, fmt3) + vbTab + Format(v.Z, fmt3)
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
         Dim rc = task.rc
         If rc.depthPixels = 0 Then
             strOut = "There is no depth data for that cell."

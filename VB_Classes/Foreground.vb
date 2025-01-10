@@ -158,11 +158,10 @@ Public Class Foreground_CellsFore : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.setIdentifyCells(False)
-        task.redOptions.setUseColorOnly(True)
         desc = "Get the foreground cells"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
+        getRedColor(src)
 
         fore.Run(src)
         dst3 = fore.dst3
@@ -182,11 +181,10 @@ Public Class Foreground_CellsBack : Inherits TaskParent
     Public redCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.setIdentifyCells(False)
-        task.redOptions.setUseColorOnly(True)
         desc = "Get the background cells"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        getRedCloud(src)
+        getRedColor(src)
 
         fore.Run(src)
         dst3 = Not fore.dst2 And task.depthMask

@@ -1063,7 +1063,7 @@ Public Class Line_Cells : Inherits TaskParent
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         lines.Run(dst2.Clone)
         dst3 = lines.dst2

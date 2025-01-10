@@ -659,7 +659,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
+        getRedColor(src)
         Dim maxRegion = 20
 
         If task.heartBeat Then
@@ -697,11 +697,10 @@ End Class
 
 Public Class Pixel_Unique_CPP : Inherits TaskParent
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         cPtr = Pixels_Vector_Open()
         desc = "Create the list of pixels in a RedCloud Cell"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         src = src.Resize(task.lowRes)
         If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -732,8 +731,8 @@ Public Class Pixel_Vectors : Inherits TaskParent
         labels = {"", "", "RedColor_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+    Public Overrides Sub runAlg(src As cv.Mat)
+        dst2 = getRedColor(src, labels(2))
 
         pixelVector.Clear()
         For Each cell In task.redCells

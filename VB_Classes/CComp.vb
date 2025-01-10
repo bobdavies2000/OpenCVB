@@ -94,20 +94,19 @@ End Class
 
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Both : Inherits TaskParent
-    Dim above As New CComp_Stats
-    Dim below As New CComp_Stats
+    Dim ccomp As New CComp_Stats
     Public Sub New()
         labels = {"", "", "Connected components in both the lighter and darker halves", "Connected components in the darker half of the image"}
         desc = "Prepare the connected components for both above and below the threshold"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        above.options.RunOpt()
+        ccomp.options.RunOpt()
 
-        Dim light = src.Threshold(above.options.light, 255, cv.ThresholdTypes.Binary)
-        below.Run(light)
-        dst2 = below.dst3
-        dst1 = below.dst1
-        labels(3) = above.labels(3)
+        Dim light = src.Threshold(ccomp.options.light, 255, cv.ThresholdTypes.Binary)
+        ccomp.Run(light)
+        dst2 = ccomp.dst3
+        dst1 = ccomp.dst1
+        labels(3) = ccomp.labels(3)
     End Sub
 End Class
 

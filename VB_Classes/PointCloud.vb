@@ -198,7 +198,7 @@ Public Class PointCloud_Spin2 : Inherits TaskParent
         desc = "Spin the RedCloud output exercise"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         spin.Run(src)
         task.pointCloud = spin.dst2

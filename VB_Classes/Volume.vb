@@ -7,7 +7,7 @@ Public Class Volume_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = getRedCloud(src, labels(2))
+            dst2 = getRedColor(src, labels(2))
             rc = task.rc
         End If
 

@@ -60,23 +60,19 @@ End Class
 
 Public Class Image_RedCloudColor : Inherits TaskParent
     Public images As New Image_Series
-    Public redC As New RedColor_Cells
     Public Sub New()
         task.gOptions.setDisplay1()
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         images.Run(src)
         dst0 = images.dst2.Clone
         dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        redC.Run(dst0)
-        dst2 = redC.dst2
+        dst2 = getRedColor(src, labels(2))
 
         Dim mask = task.redMap.InRange(0, 0)
         dst2.SetTo(cv.Scalar.Black, mask)
-
-        labels(2) = redC.labels(2)
     End Sub
 End Class
 
@@ -92,7 +88,6 @@ Public Class Image_CellStats : Inherits TaskParent
         images.images.images.options.imageSeries = False
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
-        task.redOptions.setUseColorOnly(True)
         desc = "Display the statistics for the selected cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

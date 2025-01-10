@@ -266,7 +266,7 @@ Public Class Plane_CellColor : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         options.RunOpt()
 
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         dst3.SetTo(0)
         Dim newCells As New List(Of rcData)
@@ -307,7 +307,7 @@ Public Class Plane_Points : Inherits TaskParent
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         Dim rc = task.rc
         labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
@@ -429,7 +429,7 @@ Public Class Plane_Equation : Inherits TaskParent
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = getRedCloud(src, labels(2))
+            dst2 = getRedColor(src, labels(2))
             rc = task.rc
             If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")
         End If

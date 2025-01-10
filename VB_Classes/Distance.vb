@@ -183,7 +183,6 @@ Public Class Distance_RedCloud : Inherits TaskParent
     Dim lastredCells As New List(Of rcData)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        task.redOptions.setUseColorOnly(True)
         task.redOptions.HistBinBar3D.Value = 5
         labels(1) = "3D Histogram distance for each of the cells at left"
         desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
@@ -196,7 +195,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
         Return Math.Sqrt(result)
     End Function
     Public Overrides sub runAlg(src As cv.Mat)
-        getRedCloud(src)
+        getRedColor(src)
 
         pixelVector.Clear()
         distances.Clear()

@@ -1463,7 +1463,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_BrightnessLevel" Then return new RedColor_BrightnessLevel
 	If algorithmName = "RedColor_CCompColor" Then return new RedColor_CCompColor
 	If algorithmName = "RedColor_CellChanges" Then return new RedColor_CellChanges
-	If algorithmName = "RedColor_Cells" Then return new RedColor_Cells
 	If algorithmName = "RedColor_CellsAtDepth" Then return new RedColor_CellsAtDepth
 	If algorithmName = "RedColor_CellStatsPlot" Then return new RedColor_CellStatsPlot
 	If algorithmName = "RedColor_ColorAndDepth" Then return new RedColor_ColorAndDepth

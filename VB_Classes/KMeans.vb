@@ -219,7 +219,6 @@ Public Class KMeans_Edges : Inherits TaskParent
     Public km As New KMeans_Image
     Public classCount As Integer
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub
@@ -231,7 +230,7 @@ Public Class KMeans_Edges : Inherits TaskParent
         dst3 = km.dst2 + 1
         classCount = km.classCount
 
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
     End Sub
 End Class
 

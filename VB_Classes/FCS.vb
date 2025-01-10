@@ -1212,7 +1212,7 @@ Public Class FCS_RedCloud1 : Inherits TaskParent
         desc = "Isolate FCS cells for each redCell."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If standalone Then getRedCloud(src)
+        If standalone Then getRedColor(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 

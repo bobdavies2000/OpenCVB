@@ -16,7 +16,7 @@ Public Class Projection_Basics : Inherits TaskParent
             src = histTop.dst2
 
             task.redC.inputMask = Not histTop.dst3
-            dst2 = getRedCloud(histTop.dst3, labels(2))
+            dst2 = getRedColor(histTop.dst3, labels(2))
             redCellInput = task.redCells
         End If
 
@@ -186,7 +186,7 @@ Public Class Projection_Top : Inherits TaskParent
         histTop.Run(src)
 
         task.redC.inputMask = Not histTop.dst3
-        getRedCloud(histTop.dst3)
+        getRedColor(histTop.dst3)
 
         objects.redCellInput = task.redCells
         objects.dst2 = task.redC.dst2
@@ -217,7 +217,7 @@ Public Class Projection_Side : Inherits TaskParent
         histSide.Run(src)
 
         task.redC.inputMask = Not histSide.dst3
-        getRedCloud(histSide.dst3)
+        getRedColor(histSide.dst3)
 
         objects.redCellInput = task.redCells
         objects.dst2 = task.redC.dst2
@@ -360,7 +360,7 @@ Public Class Projection_Cell : Inherits TaskParent
         desc = "Create a top and side projection of the selected cell"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         heat.Run(src)
         dst1 = heat.dst2.Clone

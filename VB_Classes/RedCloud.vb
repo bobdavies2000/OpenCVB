@@ -79,6 +79,6 @@ Public Class RedCloud_BasicsTest : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         redInput.Run(src)
 
-        dst2 = getRedCloud(redInput.dst2, labels(2))
+        dst2 = getRedColor(redInput.dst2, labels(2))
     End Sub
 End Class

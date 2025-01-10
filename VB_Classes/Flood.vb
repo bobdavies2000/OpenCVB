@@ -5,7 +5,7 @@ Public Class Flood_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If src.Channels = 1 Then task.redC.inputMask = src
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
         dst1 = task.redC.dst1
         SetTrueText(task.redC.strOut, 3)
     End Sub
@@ -24,7 +24,7 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
         dst1 = task.redC.dst1
         SetTrueText(task.redC.strOut, 3)
 
@@ -49,7 +49,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         desc = "Find cells that have only one neighbor.  They are likely to be contained in another cell."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        If standalone Then dst2 = getRedCloud(src, labels(2))
+        If standalone Then dst2 = getRedColor(src, labels(2))
 
         Dim removeCells As New List(Of Integer)
         For i = task.redCells.Count - 1 To task.redOptions.identifyCount Step -1

@@ -91,7 +91,6 @@ End Class
 Public Class Hist3D_RedCloud : Inherits TaskParent
     Dim hist3D As New Hist3D_Basics
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         desc = "Run RedColor_Basics on the combined Hist3D color/cloud output."
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
@@ -99,7 +98,7 @@ Public Class Hist3D_RedCloud : Inherits TaskParent
         dst2 = hist3D.dst3
         labels(2) = hist3D.labels(3)
 
-        dst3 = getRedCloud(hist3D.dst2, labels(3))
+        dst3 = getRedColor(hist3D.dst2, labels(3))
     End Sub
 End Class
 
@@ -113,14 +112,13 @@ End Class
 Public Class Hist3D_RedColor : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         desc = "Use the Hist3D color classes to segment the image with RedColor_Basics"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         hColor.Run(src)
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
-        dst2 = getRedCloud(hColor.dst2, labels(2))
+        dst2 = getRedColor(hColor.dst2, labels(2))
         If task.redCells.Count > 0 Then dst2(task.rc.rect).SetTo(white, task.rc.mask)
     End Sub
 End Class
@@ -138,7 +136,7 @@ Public Class Hist3D_DepthWithMask : Inherits TaskParent
     Public Sub New()
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If standaloneTest() Then
             fore.Run(src)
             depthMask = fore.dst2 Or task.noDepthMask
@@ -170,7 +168,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
     Public Sub New()
         desc = "Classify each pixel using a 3D histogram backprojection."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         If src.Channels() <> 3 Then src = task.color
         Dim bins = task.redOptions.HistBinBar3D.Value
         cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
@@ -205,7 +203,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
         labels = {"", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2"}
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         redC.Run(src)
 
         pixel.Run(src)
@@ -230,10 +228,10 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
     Public Sub New()
         desc = "Classify each pixel with a 3D histogram backprojection and run RedColor_Basics on the output."
     End Sub
-    Public Overrides sub runAlg(src As cv.Mat)
+    Public Overrides Sub runAlg(src As cv.Mat)
         pixel.Run(src)
 
-        dst2 = getRedCloud(pixel.dst2, labels(2))
+        dst2 = getRedColor(pixel.dst2, labels(2))
 
         If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(white, task.rc.mask)
@@ -249,7 +247,6 @@ End Class
 Public Class Hist3D_PixelDiffMask : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)

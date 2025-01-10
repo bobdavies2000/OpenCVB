@@ -105,7 +105,7 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
         Next
         delaunay.Run(src)
 
-        dst2 = getRedCloud(delaunay.dst3, labels(2))
+        dst2 = getRedColor(delaunay.dst3, labels(2))
 
         dst3.SetTo(0)
         For Each lp In task.lpList

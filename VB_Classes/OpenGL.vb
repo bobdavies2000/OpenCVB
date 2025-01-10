@@ -437,7 +437,7 @@ Public Class OpenGL_StructuredCloud : Inherits TaskParent
     Public Overrides Sub runAlg(src As cv.Mat)
         sCloud.Run(src)
 
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
         task.ogl.pointCloudInput = sCloud.dst2
         task.ogl.Run(dst2)
         task.ogl.options.PointSizeSlider.Value = task.gridSize
@@ -813,7 +813,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
 
         options2.RunOpt()
 
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
         Dim rcx = task.rc
 
         Dim polygonCount As Integer
@@ -995,7 +995,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
         dst3 = task.redC.dst3
 
         Dim pcPoints As New List(Of cv.Point3f)
@@ -1472,7 +1472,7 @@ Public Class OpenGL_RedCloud : Inherits TaskParent
         desc = "Display all the RedCloud cells in OpenGL"
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(dst2)
@@ -1844,7 +1844,7 @@ Public Class OpenGL_ColorBin4Way : Inherits TaskParent
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         dst1.SetTo(0)
         task.color(task.rc.rect).CopyTo(dst1(task.rc.rect), task.rc.mask)

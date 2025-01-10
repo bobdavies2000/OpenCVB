@@ -38,7 +38,6 @@ End Class
 Public Class Reduction_Floodfill : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         labels(2) = "Reduced input to floodfill"
         task.redOptions.setBitReductionBar(32)
         desc = "Use the reduction output as input to floodfill to get masks of cells."
@@ -46,7 +45,7 @@ Public Class Reduction_Floodfill : Inherits TaskParent
     Public Overrides sub runAlg(src As cv.Mat)
         reduction.Run(src)
         dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
-        dst3 = getRedCloud(reduction.dst2, labels(3))
+        dst3 = getRedColor(reduction.dst2, labels(3))
     End Sub
 End Class
 

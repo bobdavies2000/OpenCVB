@@ -112,7 +112,6 @@ End Class
 Public Class Classifier_BayesianTest : Inherits TaskParent
     Dim nabs As New Neighbors_Precise
     Public Sub New()
-        task.redOptions.setUseColorOnly(True)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask of the neighbors to the selected cell", "RedColor_Basics output", "Classifier_Bayesian output"}
         If standalone Then task.gOptions.setDisplay1()
@@ -120,7 +119,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
     Public Overrides sub runAlg(src As cv.Mat)
-        dst2 = getRedCloud(src, labels(2))
+        dst2 = getRedColor(src, labels(2))
 
         SetTrueText("Review the neighbors_Precise algorithm")
         'nabs.redCells = task.redCells

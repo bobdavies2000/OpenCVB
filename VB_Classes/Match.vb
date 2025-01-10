@@ -397,7 +397,7 @@ Public Class Match_TraceRedC : Inherits TaskParent
     End Sub
     Public Overrides Sub runAlg(src As cv.Mat)
         If task.heartBeat Then dst2.SetTo(0)
-        getRedCloud(src)
+        getRedColor(src)
 
         If task.optionsChanged Then frameList.Clear()
 

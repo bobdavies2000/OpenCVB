@@ -582,12 +582,12 @@ Public Class TaskParent : Implements IDisposable
         task.palette.Run(input)
         Return task.palette.dst2.Clone
     End Function
-    Public Function getRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
+    Public Function getRedColor(src As cv.Mat, ByRef label As String) As cv.Mat
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
-    Public Sub getRedCloud(src As cv.Mat)
+    Public Sub getRedColor(src As cv.Mat)
         task.redC.Run(src)
     End Sub
     Public Function InitRandomRect(margin As Integer) As cv.Rect
@@ -697,9 +697,5 @@ Public Class TaskParent : Implements IDisposable
         ' every algorithm overrides this Sub 
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        check.Dispose()
-        combo.Dispose()
-        radio.Dispose()
-        sliders.Dispose()
     End Sub
 End Class
