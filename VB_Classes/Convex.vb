@@ -155,7 +155,7 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
         Dim hull = cv.Cv2.ConvexHull(c, False)
         Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
         dst2.SetTo(0)
-        DrawContour(dst2, hull.ToList, rc.color, -1)
+        DrawContour(dst2, hull.ToList, rc.colorTrack, -1)
 
         Try
             Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)

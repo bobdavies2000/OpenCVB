@@ -91,6 +91,7 @@ Public Class RedCloud_BasicsHist1 : Inherits TaskParent
     Dim mm As mmData
     Public Sub New()
         task.gOptions.setHistogramBins(64)
+        task.redOptions.ColorMean.Checked = True
         labels(3) = "Plot of the depth of the tracking cells (in grayscale), zero to task.maxZmeters in depth"
         plot.createHistogram = True
         desc = "Display the histogram of the RedCloud_Basics output"
@@ -98,7 +99,7 @@ Public Class RedCloud_BasicsHist1 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         rCloud.Run(src)
         If task.heartBeat Then
-            dst2 = DisplayTrackingCells.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = DisplayCells().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             mm = GetMinMax(dst2, task.depthMask)
 
             plot.minRange = mm.minVal

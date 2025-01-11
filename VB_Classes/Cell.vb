@@ -14,7 +14,7 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
             strOut += "rc.age = " + CStr(rc.age) + vbCrLf
             strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
-            strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf + "rc.color = " + rc.color.ToString() + vbCrLf
+            strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf + "rc.colorTrack = " + rc.colorTrack.ToString() + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
             strOut += If(rc.depthPixels > 0, "Cell is marked as depthCell " + vbCrLf, "")
@@ -32,13 +32,11 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut += "Z = " + Format(rc.minVec.Z, fmt2) + "/" + Format(rc.maxVec.Z, fmt2)
             strOut += "/" + Format(rc.maxVec.Z - rc.minVec.Z, fmt2) + vbCrLf + vbCrLf
 
-            strOut += "Cell Mean in 3D: x/y/z = " + vbTab + Format(rc.depthMean(0), fmt2) + vbTab
-            strOut += Format(rc.depthMean(1), fmt2) + vbTab + Format(rc.depthMean(2), fmt2) + vbCrLf
+            strOut += "Cell Depth in 3D: x/y/z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
 
-            strOut += "Color Mean  RGB: " + vbTab + Format(rc.colorMean(0), fmt1) + vbTab + Format(rc.colorMean(1), fmt1) + vbTab
+            strOut += "Color Mean  RGB: " + vbTab + Format(rc.colorMean(0), fmt1) + vbTab
+            strOut += Format(rc.colorMean(1), fmt1) + vbTab
             strOut += Format(rc.colorMean(2), fmt1) + vbCrLf
-            strOut += "Color Stdev RGB: " + vbTab + Format(rc.colorStdev(0), fmt1) + vbTab + Format(rc.colorStdev(1), fmt1) + vbTab
-            strOut += Format(rc.colorStdev(2), fmt1) + vbCrLf
 
             Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
@@ -75,7 +73,7 @@ Public Class Cell_PixelCountCompare : Inherits TaskParent
         For Each rc In task.redCells
             If rc.depthPixels <> 0 Then
                 If rc.pixels <> rc.depthPixels Then
-                    dst3(rc.rect).SetTo(rc.color, rc.mask)
+                    dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
                     Dim pt = New cv.Point(rc.maxDist.X - 10, rc.maxDist.Y)
                     If task.gOptions.debugChecked Then
                         strOut = CStr(rc.pixels) + "/" + CStr(rc.depthPixels)
@@ -115,7 +113,7 @@ Public Class Cell_ValidateColorCells : Inherits TaskParent
                 Dim pc = rc.depthPixels / rc.pixels
                 percentDepth.Add(pc)
 
-                If pc < 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
+                If pc < 0.5 Then dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
             End If
         Next
 
@@ -334,36 +332,35 @@ Public Class Cell_Generate : Inherits TaskParent
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
                 rc.age = lrc.age + 1
-                rc.color = lrc.color
+                rc.colorTrack = lrc.colorTrack
+                rc.colorMean = lrc.colorMean
+                rc.colorDepth = lrc.colorDepth
+                rc.colorGray32 = lrc.colorGray32
                 If rc.motionFlag = False Then
                     rc.depthMean = lrc.depthMean
                     rc.depthMask = lrc.depthMask
                     rc.depthPixels = lrc.depthPixels
-                    rc.depthStdev = lrc.depthStdev
                     rc.minVec = lrc.minVec
                     rc.maxVec = lrc.maxVec
                     rc.minLoc = lrc.minLoc
                     rc.maxLoc = lrc.maxLoc
                 End If
-                If usedColors.Contains(rc.color) Then
+                If usedColors.Contains(rc.colorTrack) Then
                     rc.age = 1 ' a new cell was found that was previously part of another.
-                    rc.color = randomCellColor()
+                    rc.colorTrack = randomCellColor()
                 End If
                 retained += 1
             Else
                 rc.age = 1
-                rc.color = randomCellColor()
+                rc.colorTrack = randomCellColor()
             End If
 
-            usedColors.Add(rc.color)
+            usedColors.Add(rc.colorTrack)
             initialList.Add(rc)
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For Each rc In initialList
-            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
-
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
             If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
@@ -375,16 +372,20 @@ Public Class Cell_Generate : Inherits TaskParent
             If rc.pixels = 0 Then Continue For
 
             If rc.motionFlag Then
+                Dim colorStdev As cv.Scalar
+                cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, colorStdev, rc.mask)
                 rc.depthMask = rc.mask.Clone
                 rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
                 rc.depthPixels = rc.depthMask.CountNonZero
 
-                If rc.depthPixels Then
+                If rc.depthPixels / rc.pixels > 0.5 Then
                     task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
                     task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
                     task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
 
-                    cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+                    Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+                    cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
+                    rc.depthMean = depthMean(2)
                 End If
             End If
             sortedCells.Add(rc.pixels, rc)

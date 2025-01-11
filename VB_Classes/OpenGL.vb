@@ -766,7 +766,7 @@ Public Class OpenGL_DrawHulls : Inherits TaskParent
             If rc.index = rcx.index Then
                 oglData.Add(New cv.Point3f(1, 1, 1))
             Else
-                oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
+                oglData.Add(New cv.Point3f(rc.colorTrack(2) / 255, rc.colorTrack(1) / 255, rc.colorTrack(0) / 255))
             End If
             Dim hullPoints = 0
             For Each pt In rc.hull
@@ -821,7 +821,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
         Dim lastDepth As cv.Scalar
         oglData.Add(New cv.Point3f)
         For Each rc In task.redCells
-            Dim d = rc.depthMean(2)
+            Dim d = rc.depthMean
             If d = 0 Then Continue For
 
             Dim dataIndex = oglData.Count
@@ -829,7 +829,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
             If rc.index = rcx.index Then
                 oglData.Add(New cv.Point3f(1, 1, 1))
             Else
-                oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
+                oglData.Add(New cv.Point3f(rc.colorTrack(2) / 255, rc.colorTrack(1) / 255, rc.colorTrack(0) / 255))
             End If
             lastDepth = rc.depthMean
             For Each pt In rc.contour

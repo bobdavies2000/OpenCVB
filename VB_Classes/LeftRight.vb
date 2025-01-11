@@ -266,21 +266,14 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudRight : Inherits TaskParent
+Public Class LeftRight_RedColorRight : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Segment the right view image with RedCloud"
+        desc = "Segment the right view image with RedColor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        getRedColor(task.rightView, labels(2))
-
-        For i = 0 To task.redCells.Count - 1
-            Dim rc = task.redCells(i)
-            cv.Cv2.MeanStdDev(task.rightView(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
-            task.redCells(i) = rc
-            dst2(rc.rect).SetTo(rc.naturalColor(0), rc.mask)
-        Next
+        fLess.Run(task.rightView)
+        dst2 = getRedColor(fLess.dst2, labels(2))
     End Sub
 End Class
 
@@ -290,21 +283,14 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudLeft : Inherits TaskParent
+Public Class LeftRight_RedColorLeft : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Segment the left view image with RedCloud"
+        desc = "Segment the left view image with RedColor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        getRedColor(task.leftView, labels(2))
-
-        For i = 0 To task.redCells.Count - 1
-            Dim rc = task.redCells(i)
-            cv.Cv2.MeanStdDev(task.leftView(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
-            task.redCells(i) = rc
-            dst2(rc.rect).SetTo(rc.naturalColor(0), rc.mask)
-        Next
+        fLess.Run(task.leftView)
+        dst2 = getRedColor(fLess.dst2, labels(2))
     End Sub
 End Class
 
@@ -315,20 +301,36 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudBoth : Inherits TaskParent
-    Dim stLeft As New LeftRight_RedCloudRight
-    Dim stRight As New LeftRight_RedCloudLeft
+Public Class LeftRight_RedColorBoth : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        desc = "Match cells in the left view to the right view - something is flipped here..."
+        desc = "Display the RedColor_Basics output for both the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        stRight.Run(src)
-        dst2 = stRight.dst2
-        labels(2) = "Left view - " + stRight.labels(2)
+        Static leftCells As New List(Of rcData)
+        Static rightCells As New List(Of rcData)
+        Static leftMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Static rightMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
-        stLeft.Run(src)
-        dst3 = stLeft.dst2
-        labels(3) = "Right view - " + stLeft.labels(2)
+        task.redCells = New List(Of rcData)(leftCells)
+        task.redMap = leftMap.Clone
+
+        fLess.Run(task.leftView)
+        dst2 = getRedColor(fLess.dst2, labels(2))
+        labels(2) = "Left view - " + labels(2)
+
+        leftCells = New List(Of rcData)(task.redCells)
+        leftMap = task.redMap.Clone
+
+        task.redCells = New List(Of rcData)(rightCells)
+        task.redMap = rightMap.Clone
+
+        fLess.Run(task.rightView)
+        dst3 = getRedColor(fLess.dst2, labels(3))
+        labels(3) = "Right view - " + labels(3)
+
+        rightCells = New List(Of rcData)(task.redCells)
+        rightMap = task.redMap.Clone
     End Sub
 End Class
 

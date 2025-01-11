@@ -255,9 +255,6 @@ Public Class FCS_FloodFill : Inherits TaskParent
             fp.rcIndex = task.redMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
 
             task.fpList(i) = fp
-
-            'Dim rc = task.redCells(fp.rcIndex)
-            'dst3(fp.rect).SetTo(rc.naturalColor, fp.mask)
             DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
         Next
         dst3.SetTo(cv.Scalar.White, task.fpOutline)
@@ -704,8 +701,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             End If
 
             cv.Cv2.MeanStdDev(task.pcSplit(2)(fp.rect), depthMean, stdev, fp.mask)
-            fp.depthMean = depthMean(0)
-            fp.depthStdev = stdev(0)
+            fp.depthMean = depthMean(2)
             Dim mask As cv.Mat = fp.mask And task.depthMask(fp.rect)
             Dim mm = GetMinMax(task.pcSplit(2)(fp.rect), mask)
             fp.depthMin = mm.minVal
@@ -928,16 +924,14 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
     Public Sub New()
         task.gOptions.debugSyncUI.Checked = True
         If standalone Then task.gOptions.setDisplay1()
-        optiBase.FindSlider("KNN Dimension").Value = 10
+        optiBase.FindSlider("KNN Dimension").Value = 6
         desc = "Can we distinguish each feature point cell with color, depth, and grid."
     End Sub
     Private Function buildEntry(fp As fpData) As List(Of Single)
         Dim dataList As New List(Of Single)
         For i = 0 To dimension - 1
             dataList.Add(Choose(i + 1, fp.depthMean, fp.depthMin, fp.depthMax,
-                                       fp.colorMean(0), fp.colorMean(1), fp.colorMean(2),
-                                       fp.depthStdev, fp.colorStdev(0), fp.colorStdev(1),
-                                       fp.colorStdev(2)))
+                                       fp.colorMean(0), fp.colorMean(1), fp.colorMean(2)))
         Next
         Return dataList
     End Function

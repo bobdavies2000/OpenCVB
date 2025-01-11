@@ -702,8 +702,10 @@ Public Class ML_LearnRegions : Inherits TaskParent
             Dim pt = ptList(i)
             Dim regionID = CInt(output.Get(Of Single)(i, 0))
             Dim rc = regions.redCellsX(regionID)
-            dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, rc.naturalColor)
-            dst3.Set(Of cv.Vec3b)(pt.Y, pt.X, rc.naturalColor)
+            Dim color As cv.Vec3b = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1),
+                                                 rc.colorMean(2))
+            dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
+            dst3.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
         Next
     End Sub
 End Class

@@ -177,10 +177,10 @@ Public Class Neighbors_Precise : Inherits TaskParent
         '        If nabList(task.rc.index).Count > 0 Then
         '            strOut += "Neighbors: "
         '            dst1.SetTo(0)
-        '            dst1(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
+        '            dst1(task.rc.rect).SetTo(task.rc.colorTrack, task.rc.mask)
         '            For Each index In nabList(task.rc.index)
         '                Dim rc = redCells(index)
-        '                dst1(rc.rect).SetTo(rc.color, rc.mask)
+        '                dst1(rc.rect).SetTo(rc.colorTrack, rc.mask)
         '                strOut += CStr(index) + ","
         '            Next
         '            strOut += vbCrLf

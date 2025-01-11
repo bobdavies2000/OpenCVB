@@ -22,8 +22,8 @@ Public Class Triangle_Basics : Inherits TaskParent
 
         Dim c3D = task.pointCloud.Get(Of cv.Point3f)(task.rc.maxDist.Y, task.rc.maxDist.X)
         triangles.Clear()
-        Dim color3D As New cv.Point3f(task.rc.color(2) / 255, task.rc.color(1) / 255,
-                                       task.rc.color(0) / 255)
+        Dim color3D As New cv.Point3f(task.rc.colorTrack(2) / 255, task.rc.colorTrack(1) / 255,
+                                       task.rc.colorTrack(0) / 255)
         For i = 0 To pt3D.Count - 1
             triangles.Add(color3D)
             triangles.Add(c3D)
@@ -96,7 +96,7 @@ Public Class Triangle_RedCloud : Inherits TaskParent
             Next
 
             Dim c3D = task.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
-            Dim color3D As New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255)
+            Dim color3D As New cv.Point3f(rc.colorTrack(2) / 255, rc.colorTrack(1) / 255, rc.colorTrack(0) / 255)
             For i = 0 To pt3D.Count - 1
                 triangles.Add(color3D)
                 triangles.Add(c3D)
@@ -149,7 +149,7 @@ Public Class Triangle_Cell : Inherits TaskParent
 
         Dim c3D = task.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
         triangles.Clear()
-        Dim color3D As New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255)
+        Dim color3D As New cv.Point3f(rc.colorTrack(2) / 255, rc.colorTrack(1) / 255, rc.colorTrack(0) / 255)
         For i = 0 To pt3D.Count - 1
             triangles.Add(color3D)
             triangles.Add(c3D)

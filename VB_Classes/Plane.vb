@@ -95,7 +95,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
 
         Dim flatCount = 0
         For Each rc In task.redCells
-            If rc.depthMean(2) < 1.0 Then Continue For ' close objects look like planes.
+            If rc.depthMean < 1.0 Then Continue For ' close objects look like planes.
             Dim RMSerror As Double = 0
             Dim pixelCount = 0
             For y = 0 To rc.rect.Height - 1
@@ -486,7 +486,7 @@ Public Class Plane_Equation : Inherits TaskParent
         If standaloneTest() Then
             SetTrueText(strOut, 3)
             dst3.SetTo(0)
-            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawContour(dst3(rc.rect), rc.contour, rc.colorTrack, -1)
         End If
     End Sub
 End Class

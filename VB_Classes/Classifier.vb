@@ -175,7 +175,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         'For i = 0 To maskList.Count - 1
         '    If results(i) > 0 Then
         '        Dim rc = task.redCells(maskList(i))
-        '        dst3(rc.rect).SetTo(rc.color, rc.mask)
+        '        dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
         '        zeroOutput = False
         '    End If
         'Next

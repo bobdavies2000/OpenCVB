@@ -357,27 +357,20 @@ Public Class TaskParent : Implements IDisposable
         Select Case colorSelection
             Case 0
                 For Each rc In task.redCells
-                    dst(rc.rect).SetTo(rc.naturalColor, rc.mask)
+                    dst(rc.rect).SetTo(rc.colorMean, rc.mask)
                 Next
             Case 1
                 For Each rc In task.redCells
-                    dst(rc.rect).SetTo(rc.color, rc.mask)
+                    dst(rc.rect).SetTo(rc.colorTrack, rc.mask)
                 Next
             Case 2
                 For Each rc In task.redCells
-                    Dim depth = If(rc.depthMean(2) > task.MaxZmeters, task.MaxZmeters, rc.depthMean(2))
+                    Dim depth = If(rc.depthMean > task.MaxZmeters, task.MaxZmeters, rc.depthMean)
                     Dim color As cv.Scalar = task.scalarColors(CInt(255 * depth / task.MaxZmeters))
                     dst(rc.rect).SetTo(color, rc.mask)
                 Next
         End Select
 
-        Return dst
-    End Function
-    Public Function DisplayTrackingCells() As cv.Mat
-        Dim dst As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        For Each rc In task.redCells
-            dst(rc.rect).SetTo(rc.color, rc.mask)
-        Next
         Return dst
     End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat

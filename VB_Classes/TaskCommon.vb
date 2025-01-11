@@ -227,7 +227,6 @@ Public Class fpData ' feature point
     Public depthMean As Single
     Public depthMin As Single
     Public depthMax As Single
-    Public depthStdev As Single
     Public colorMean As cv.Scalar
     Public colorTracking As cv.Scalar
     Public colorStdev As cv.Scalar
@@ -410,17 +409,14 @@ Public Class rcData
     Public floodPoint As cv.Point
     Public age As Integer
 
-    Public naturalColor As New cv.Vec3b
-    Public color As New cv.Scalar
+    Public colorTrack As New cv.Scalar
     Public colorDepth As cv.Scalar
+    Public colorMean As cv.Scalar
+    Public colorGray32 As cv.Scalar
 
     Public depthPixels As Integer
     Public depthMask As cv.Mat
-    Public depthMean As cv.Scalar
-    Public depthStdev As cv.Scalar
-
-    Public colorMean As cv.Scalar
-    Public colorStdev As cv.Scalar
+    Public depthMean As Single
 
     Public minVec As cv.Point3f
     Public maxVec As cv.Point3f

@@ -9,7 +9,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
         labels(2) = task.redC.labels(3)
         dst2.SetTo(0)
         For Each rc As rcData In task.redCells
-            DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+            DrawContour(dst2(rc.rect), rc.contour, rc.colorTrack, -1)
             If rc.index = task.rc.index Then DrawContour(dst2(rc.rect), rc.contour, white, -1)
         Next
     End Sub
@@ -234,7 +234,7 @@ Public Class RedTrack_Features : Inherits TaskParent
         dst3.SetTo(0)
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
-            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawContour(dst3(rc.rect), rc.contour, rc.colorTrack, -1)
             If rc.contour.Count > 0 Then SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
         Next
         SetTrueText("Move camera to see the value of this algorithm", 2)

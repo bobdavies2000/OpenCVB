@@ -18,7 +18,7 @@ Public Class VBtask : Implements IDisposable
     Public gridRects As List(Of cv.Rect)
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9
-    Public gridMask As cv.Mat
+    Public gridMask As New cv.Mat
     Public gridMap32S As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
@@ -29,10 +29,10 @@ Public Class VBtask : Implements IDisposable
     Public fpListLast As New List(Of fpData)
     Public fpIDlist As New List(Of Single)
 
-    Public fpMap As cv.Mat
-    Public fpMapLast As cv.Mat
+    Public fpMap As New cv.Mat
+    Public fpMapLast As New cv.Mat
 
-    Public fpOutline As cv.Mat
+    Public fpOutline As New cv.Mat
     Public fpSelected As fpData
     Public fPointMinDistance As Integer
     Public fpCorners(3) As Integer
@@ -45,17 +45,17 @@ Public Class VBtask : Implements IDisposable
     Public features As New List(Of cv.Point2f)
     Public featurePoints As New List(Of cv.Point)
 
-    Public featureMask As cv.Mat
-    Public fLessMask As cv.Mat
+    Public featureMask As New cv.Mat
+    Public fLessMask As New cv.Mat
     Public featureRects As New List(Of cv.Rect)
     Public fLessRects As New List(Of cv.Rect)
     Public flessBoundary As New cv.Mat
-    Public lowResColor As cv.Mat
-    Public lowResDepth As cv.Mat
+    Public lowResColor As New cv.Mat
+    Public lowResDepth As New cv.Mat
 
     Public motionRect As New cv.Rect ' get rid of this...
     Public motionRects As New List(Of cv.Rect)
-    Public motionMask As cv.Mat
+    Public motionMask As New cv.Mat
     Public motionPercent As Single
     Public MotionLabel As String = " "
 
@@ -65,10 +65,10 @@ Public Class VBtask : Implements IDisposable
     Public workingRes As cv.Size
     Public TaskTimer As New System.Timers.Timer(1000)
 
-    Public dst0 As cv.Mat
-    Public dst1 As cv.Mat
-    Public dst2 As cv.Mat
-    Public dst3 As cv.Mat
+    Public dst0 As New cv.Mat
+    Public dst1 As New cv.Mat
+    Public dst2 As New cv.Mat
+    Public dst3 As New cv.Mat
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
@@ -79,19 +79,19 @@ Public Class VBtask : Implements IDisposable
     Public cvFontSize As Single = 0.8
     Public cvFontThickness As Integer = 1
 
-    Public color As cv.Mat
-    Public leftView As cv.Mat
-    Public rightView As cv.Mat
+    Public color As New cv.Mat
+    Public leftView As New cv.Mat
+    Public rightView As New cv.Mat
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
-    Public pointCloud As cv.Mat
+    Public pointCloud As New cv.Mat
     Public pcSplit() As cv.Mat
-    Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
+    Public gMatrix As New cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public IMU_Rotation As System.Numerics.Quaternion
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
-    Public srcThread As cv.Mat
+    Public srcThread As New cv.Mat
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.

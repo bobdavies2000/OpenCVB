@@ -43,14 +43,14 @@ Public Class MSER_Basics : Inherits TaskParent
             If rc.indexLast <> 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
                 rc.maxDStable = lrc.maxDStable
-                rc.color = lrc.color
+                rc.colorTrack = lrc.colorTrack
                 matched.Add(rc.indexLast, rc.indexLast)
             Else
                 rc.maxDStable = rc.maxDist
             End If
 
-            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.naturalColor = New cv.Vec3b(CByte(rc.colorMean(0)), CByte(rc.colorMean(1)), CByte(rc.colorMean(2)))
+            Dim colorStdev As cv.Scalar
+            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, colorStdev, rc.mask)
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
@@ -230,7 +230,7 @@ Public Class MSER_Hulls : Inherits TaskParent
         For Each rc In mBase.mserCells
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
-            DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
+            DrawContour(dst3(rc.rect), rc.hull, rc.colorTrack, -1)
         Next
 
         If task.heartBeat Then labels(2) = CStr(mBase.mserCells.Count) + " Regions with average size " + If(mBase.mserCells.Count > 0,
@@ -604,13 +604,14 @@ Public Class MSER_Basics2 : Inherits TaskParent
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
-            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            Dim colorStdev As cv.Scalar
+            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, colorStdev, rc.mask)
+            rc.colorTrack = task.scalarColors(i Mod 255)
             If rc.indexLast <> 0 Then matchCount += 1
 
             redCells.Add(rc)
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            dst2(rc.rect).SetTo(rc.colorTrack, rc.mask)
         Next
 
         If task.heartBeat Then labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
