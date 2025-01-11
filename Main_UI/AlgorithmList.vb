@@ -1457,6 +1457,7 @@ Public Class algorithmList
 	If algorithmName = "RecursiveBilateralFilter_CPP" Then return new RecursiveBilateralFilter_CPP
 	If algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
 	If algorithmName = "RedCloud_BasicsHist" Then return new RedCloud_BasicsHist
+	If algorithmName = "RedCloud_BasicsHist1" Then return new RedCloud_BasicsHist1
 	If algorithmName = "RedCloud_BasicsTest" Then return new RedCloud_BasicsTest
 	If algorithmName = "RedCloud_Combine" Then return new RedCloud_Combine
 	If algorithmName = "RedCloud_Depth" Then return new RedCloud_Depth
@@ -1464,6 +1465,7 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ
 	If algorithmName = "RedCloud_YZ" Then return new RedCloud_YZ
 	If algorithmName = "RedColor_Basics" Then return new RedColor_Basics
+	If algorithmName = "RedColor_BasicsHist" Then return new RedColor_BasicsHist
 	If algorithmName = "RedColor_BProject3D" Then return new RedColor_BProject3D
 	If algorithmName = "RedColor_BrightnessLevel" Then return new RedColor_BrightnessLevel
 	If algorithmName = "RedColor_CCompColor" Then return new RedColor_CCompColor
@@ -1471,6 +1473,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_CellsAtDepth" Then return new RedColor_CellsAtDepth
 	If algorithmName = "RedColor_CellStatsPlot" Then return new RedColor_CellStatsPlot
 	If algorithmName = "RedColor_ColorAndDepth" Then return new RedColor_ColorAndDepth
+	If algorithmName = "RedColor_Coloring" Then return new RedColor_Coloring
 	If algorithmName = "RedColor_Consistent" Then return new RedColor_Consistent
 	If algorithmName = "RedColor_Consistent1" Then return new RedColor_Consistent1
 	If algorithmName = "RedColor_ContourUpdate" Then return new RedColor_ContourUpdate

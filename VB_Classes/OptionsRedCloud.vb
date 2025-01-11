@@ -108,6 +108,7 @@ Public Class OptionsRedCloud
 
         task.redOptions.setBitReductionBar(5)
         minCellSizeSlider.Value = 500
+        ColorMean.Checked = True
 
         Me.Left = 0
         Me.Top = 0

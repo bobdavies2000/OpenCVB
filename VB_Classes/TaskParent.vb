@@ -340,29 +340,43 @@ Public Class TaskParent : Implements IDisposable
     Public Function RebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
         task.redCells.Clear()
         task.redCells.Add(New rcData)
+        task.redMap.SetTo(0)
         For Each rc In sortedCells.Values
             rc.index = task.redCells.Count
             task.redCells.Add(rc)
+            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
             If rc.index >= 255 Then Exit For
         Next
 
         Return DisplayCells()
     End Function
     Public Function DisplayCells() As cv.Mat
-        Dim dst As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        task.redMap.SetTo(0)
-        For Each rc In task.redCells
-            dst(rc.rect).SetTo(rc.naturalColor, rc.mask)
-            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
-        Next
+        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        Dim colorSelection = If(task.redOptions.ColorMean.Checked, 0, 1)
+        If colorSelection > 0 Then colorSelection = If(task.redOptions.ColorTracking.Checked, 1, 2)
+        Select Case colorSelection
+            Case 0
+                For Each rc In task.redCells
+                    dst(rc.rect).SetTo(rc.naturalColor, rc.mask)
+                Next
+            Case 1
+                For Each rc In task.redCells
+                    dst(rc.rect).SetTo(rc.color, rc.mask)
+                Next
+            Case 2
+                For Each rc In task.redCells
+                    Dim depth = If(rc.depthMean(2) > task.MaxZmeters, task.MaxZmeters, rc.depthMean(2))
+                    Dim color As cv.Scalar = task.scalarColors(CInt(255 * depth / task.MaxZmeters))
+                    dst(rc.rect).SetTo(color, rc.mask)
+                Next
+        End Select
+
         Return dst
     End Function
     Public Function DisplayTrackingCells() As cv.Mat
         Dim dst As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        task.redMap.SetTo(0)
         For Each rc In task.redCells
             dst(rc.rect).SetTo(rc.color, rc.mask)
-            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
         Return dst
     End Function

@@ -335,6 +335,16 @@ Public Class Cell_Generate : Inherits TaskParent
                 Dim lrc = task.redCells(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.color = lrc.color
+                If rc.motionFlag = False Then
+                    rc.depthMean = lrc.depthMean
+                    rc.depthMask = lrc.depthMask
+                    rc.depthPixels = lrc.depthPixels
+                    rc.depthStdev = lrc.depthStdev
+                    rc.minVec = lrc.minVec
+                    rc.maxVec = lrc.maxVec
+                    rc.minLoc = lrc.minLoc
+                    rc.maxLoc = lrc.maxLoc
+                End If
                 If usedColors.Contains(rc.color) Then
                     rc.age = 1 ' a new cell was found that was previously part of another.
                     rc.color = randomCellColor()
@@ -364,18 +374,19 @@ Public Class Cell_Generate : Inherits TaskParent
             rc.pixels = rc.mask.CountNonZero
             If rc.pixels = 0 Then Continue For
 
-            rc.depthMask = rc.mask.Clone
-            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-            rc.depthPixels = rc.depthMask.CountNonZero
+            If rc.motionFlag Then
+                rc.depthMask = rc.mask.Clone
+                rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+                rc.depthPixels = rc.depthMask.CountNonZero
 
-            If rc.depthPixels Then
-                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
-                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
-                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+                If rc.depthPixels Then
+                    task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
 
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+                    cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+                End If
             End If
-
             sortedCells.Add(rc.pixels, rc)
         Next
 

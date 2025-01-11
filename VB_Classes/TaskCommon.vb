@@ -410,8 +410,9 @@ Public Class rcData
     Public floodPoint As cv.Point
     Public age As Integer
 
-    Public color As New cv.Scalar
     Public naturalColor As New cv.Vec3b
+    Public color As New cv.Scalar
+    Public colorDepth As cv.Scalar
 
     Public depthPixels As Integer
     Public depthMask As cv.Mat

@@ -57,16 +57,54 @@ Public Class RedCloud_BasicsHist : Inherits TaskParent
     Dim rCloud As New RedCloud_Basics
     Dim plot As New Plot_Histogram
     Public Sub New()
+        task.gOptions.setHistogramBins(64)
+        labels(3) = "Plot of the depth of the tracking cells (in grayscale), zero to task.maxZmeters in depth"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         plot.createHistogram = True
         desc = "Display the histogram of the RedCloud_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         rCloud.Run(src)
-        dst2 = rCloud.dst2
-        Dim mm = GetMinMax(dst2, task.depthMask)
-        plot.minRange = mm.minVal
-        plot.maxRange = mm.maxVal
-        plot.Run(dst2)
+        If task.heartBeat Then
+            dst2.SetTo(0)
+            For Each rc In task.redCells
+                dst2(rc.rect).SetTo(rc.depthMean, rc.mask)
+            Next
+            Dim mm = GetMinMax(dst2, task.depthMask)
+
+            plot.minRange = mm.minVal
+            plot.maxRange = mm.maxVal
+            plot.Run(dst2)
+        End If
+        dst3 = plot.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_BasicsHist1 : Inherits TaskParent
+    Dim rCloud As New RedCloud_Basics
+    Dim plot As New Plot_Histogram
+    Dim mm As mmData
+    Public Sub New()
+        task.gOptions.setHistogramBins(64)
+        labels(3) = "Plot of the depth of the tracking cells (in grayscale), zero to task.maxZmeters in depth"
+        plot.createHistogram = True
+        desc = "Display the histogram of the RedCloud_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        rCloud.Run(src)
+        If task.heartBeat Then
+            dst2 = DisplayTrackingCells.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            mm = GetMinMax(dst2, task.depthMask)
+
+            plot.minRange = mm.minVal
+            plot.maxRange = mm.maxVal
+            plot.Run(dst2)
+        End If
         dst3 = plot.dst2
         labels(2) = rCloud.labels(2)
     End Sub

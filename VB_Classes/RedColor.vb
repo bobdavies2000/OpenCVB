@@ -64,6 +64,22 @@ End Class
 
 
 
+Public Class RedColor_Coloring : Inherits TaskParent
+    Public Sub New()
+        desc = "Demo the different ways to color the output of RedColor_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = getRedColor(src, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+
 Public Class RedColor_Reduction : Inherits TaskParent
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
@@ -1734,5 +1750,38 @@ Public Class RedColor_LeftRight : Inherits TaskParent
         dst2 = redC.dst2
         dst3 = redC.dst3
         labels = redC.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedColor_BasicsHist : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        task.gOptions.setHistogramBins(64)
+        labels(3) = "Plot of the depth of the tracking cells (in grayscale), zero to task.maxZmeters in depth"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        plot.createHistogram = True
+        desc = "Display the histogram of the RedCloud_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        getRedColor(src, labels(2))
+
+        If task.heartBeat Then
+            dst2.SetTo(0)
+            For Each rc In task.redCells
+                dst2(rc.rect).SetTo(rc.depthMean, rc.mask)
+            Next
+            Dim mm = GetMinMax(dst2)
+
+            plot.minRange = mm.minVal
+            plot.maxRange = mm.maxVal
+            plot.Run(dst2)
+        End If
+        dst3 = plot.dst2
     End Sub
 End Class
