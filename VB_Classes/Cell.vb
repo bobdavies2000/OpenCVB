@@ -378,7 +378,7 @@ Public Class Cell_Generate : Inherits TaskParent
                 rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
                 rc.depthPixels = rc.depthMask.CountNonZero
 
-                If rc.depthPixels / rc.pixels > 0.5 Then
+                If rc.depthPixels / rc.pixels > 0.1 Then
                     task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
                     task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
                     task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
@@ -386,6 +386,12 @@ Public Class Cell_Generate : Inherits TaskParent
                     Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
                     cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
                     rc.depthMean = depthMean(2)
+
+                    Dim depth = If(rc.depthMean > task.MaxZmeters, task.MaxZmeters, rc.depthMean)
+                    Dim index = CInt(255 * depth / task.MaxZmeters)
+
+                    rc.colorDepth = task.scalarColors(index)
+                    rc.colorGray32 = New cv.Scalar(index, index, index)
                 End If
             End If
             sortedCells.Add(rc.pixels, rc)

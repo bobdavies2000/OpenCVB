@@ -64,20 +64,6 @@ End Class
 
 
 
-Public Class RedColor_Coloring : Inherits TaskParent
-    Public Sub New()
-        desc = "Demo the different ways to color the output of RedColor_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2))
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class RedColor_Reduction : Inherits TaskParent
@@ -891,51 +877,6 @@ Public Class RedColor_CCompColor : Inherits TaskParent
         labels(3) = ccomp.labels(2)
 
         dst2 = getRedColor(dst3, labels(2))
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class RedColor_Flippers : Inherits TaskParent
-    Public Sub New()
-        task.redC.topXOnly = True
-        task.redOptions.ColorMean.Checked = True
-        labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
-        desc = "Identify the cells that are changing color because they were split or lost."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = getRedColor(src, labels(3))
-        Static lastMap As cv.Mat = DisplayCells()
-
-        Dim unMatched As Integer
-        Dim unMatchedPixels As Integer
-        Dim flipCells As New List(Of rcData)
-        dst2.SetTo(0)
-        Dim currMap = DisplayCells()
-        For Each rc In task.redCells
-            Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            If lastColor <> currColor Then
-                unMatched += 1
-                unMatchedPixels += rc.pixels
-                flipCells.Add(rc)
-                dst2(rc.rect).SetTo(rc.colorTrack, rc.mask)
-            End If
-        Next
-
-        lastMap = currMap.Clone
-
-        If task.heartBeat Then
-            labels(2) = CStr(unMatched) + " of " + CStr(task.redCells.Count) + " cells changed " +
-                        " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
-        End If
     End Sub
 End Class
 
@@ -1784,5 +1725,95 @@ Public Class RedColor_BasicsHist : Inherits TaskParent
             plot.Run(dst2)
         End If
         dst3 = plot.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class RedColor_Flippers : Inherits TaskParent
+    Public flipCells As New List(Of rcData)
+    Public nonFlipCells As New List(Of rcData)
+    Public Sub New()
+        task.redC.topXOnly = True
+        task.redOptions.ColorTracking.Checked = True
+        labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
+        desc = "Identify the cells that are changing color because they were split or lost."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = getRedColor(src, labels(3))
+        Static lastMap As cv.Mat = DisplayCells()
+
+        Dim unMatched As Integer
+        Dim unMatchedPixels As Integer
+        flipCells.Clear()
+        nonFlipCells.Clear()
+        dst2.SetTo(0)
+        Dim currMap = DisplayCells()
+        For Each rc In task.redCells
+            Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            If lastColor <> currColor Then
+                unMatched += 1
+                unMatchedPixels += rc.pixels
+                flipCells.Add(rc)
+                dst2(rc.rect).SetTo(rc.colorTrack, rc.mask)
+            Else
+                nonFlipCells.Add(rc)
+            End If
+        Next
+
+        lastMap = currMap.Clone
+
+        If task.heartBeat Then
+            labels(2) = CStr(unMatched) + " of " + CStr(task.redCells.Count) + " cells changed " +
+                        " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_FlipTest : Inherits TaskParent
+    Dim flipper As New RedColor_Flippers
+    Public Sub New()
+        desc = "Display nonFlipped cells"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lastCells As New List(Of rcData)(task.redCells)
+        flipper.Run(src)
+        dst3 = flipper.dst2
+
+        dst2.SetTo(0)
+        Dim ptmaxDstable As New List(Of cv.Point)
+        For Each rc In flipper.nonFlipCells
+            dst2(rc.rect).SetTo(rc.colorTrack, rc.mask)
+            ptmaxDstable.Add(rc.maxDStable)
+        Next
+
+        Dim count As Integer
+        For Each rc In flipper.flipCells
+            Dim lrc = lastCells(rc.indexLast)
+            Dim index = ptmaxDstable.IndexOf(lrc.maxDStable)
+            If index > 0 Then
+                Dim rcNabe = flipper.nonFlipCells(index)
+                dst2(rc.rect).SetTo(rcNabe.colorTrack, rc.mask)
+                count += 1
+            End If
+        Next
+        If task.heartBeat Then
+            labels(2) = CStr(flipper.flipCells.Count) + " cells flipped and " + CStr(count) + " cells " +
+                        " were flipped back to the main cell."
+            labels(3) = flipper.labels(2)
+        End If
     End Sub
 End Class

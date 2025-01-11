@@ -429,7 +429,6 @@ Public Class rcData
     Public index As Integer
     Public indexLast As Integer
 
-    Public nab As Integer
     Public container As Integer
 
     Public contour As New List(Of cv.Point)

@@ -354,6 +354,7 @@ Public Class TaskParent : Implements IDisposable
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         Dim colorSelection = If(task.redOptions.ColorMean.Checked, 0, 1)
         If colorSelection > 0 Then colorSelection = If(task.redOptions.ColorTracking.Checked, 1, 2)
+        If colorSelection = 2 Then colorSelection = If(task.redOptions.ColorTrackingDepth.Checked, 2, 3)
         Select Case colorSelection
             Case 0
                 For Each rc In task.redCells
@@ -365,9 +366,11 @@ Public Class TaskParent : Implements IDisposable
                 Next
             Case 2
                 For Each rc In task.redCells
-                    Dim depth = If(rc.depthMean > task.MaxZmeters, task.MaxZmeters, rc.depthMean)
-                    Dim color As cv.Scalar = task.scalarColors(CInt(255 * depth / task.MaxZmeters))
-                    dst(rc.rect).SetTo(color, rc.mask)
+                    dst(rc.rect).SetTo(rc.colorDepth, rc.mask)
+                Next
+            Case 3
+                For Each rc In task.redCells
+                    dst(rc.rect).SetTo(rc.colorGray32, rc.mask)
                 Next
         End Select
 

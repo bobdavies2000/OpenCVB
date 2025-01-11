@@ -1473,7 +1473,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_CellsAtDepth" Then return new RedColor_CellsAtDepth
 	If algorithmName = "RedColor_CellStatsPlot" Then return new RedColor_CellStatsPlot
 	If algorithmName = "RedColor_ColorAndDepth" Then return new RedColor_ColorAndDepth
-	If algorithmName = "RedColor_Coloring" Then return new RedColor_Coloring
 	If algorithmName = "RedColor_Consistent" Then return new RedColor_Consistent
 	If algorithmName = "RedColor_Consistent1" Then return new RedColor_Consistent1
 	If algorithmName = "RedColor_ContourUpdate" Then return new RedColor_ContourUpdate
@@ -1484,6 +1483,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_Features" Then return new RedColor_Features
 	If algorithmName = "RedColor_FindCells" Then return new RedColor_FindCells
 	If algorithmName = "RedColor_Flippers" Then return new RedColor_Flippers
+	If algorithmName = "RedColor_FlipTest" Then return new RedColor_FlipTest
 	If algorithmName = "RedColor_FloodPoint" Then return new RedColor_FloodPoint
 	If algorithmName = "RedColor_FourColor" Then return new RedColor_FourColor
 	If algorithmName = "RedColor_FPS" Then return new RedColor_FPS

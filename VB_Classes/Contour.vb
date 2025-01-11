@@ -646,26 +646,6 @@ End Class
 
 
 
-Public Class Contour_RedCloud : Inherits TaskParent
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Show all the contours found in the RedCloud output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2))
-
-        dst3.SetTo(0)
-        For Each rc In task.redCells
-            If rc.index > 1 Then Exit For
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Contour_CompareToFeatureless : Inherits TaskParent
@@ -914,5 +894,25 @@ Public Class Contour_FromPoints : Inherits TaskParent
 
         dst3.SetTo(0)
         DrawContour(dst3, hull, white, -1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contour_RedCloud : Inherits TaskParent
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Show all the contours found in the RedCloud output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = getRedColor(src, labels(2))
+
+        dst3.SetTo(0)
+        For Each rc In task.redCells
+            If rc.index > 1 Then Exit For
+            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+        Next
     End Sub
 End Class

@@ -71,9 +71,10 @@ Partial Class OptionsRedCloud
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
-        Me.ColorDepth = New System.Windows.Forms.RadioButton()
+        Me.ColorTrackingDepth = New System.Windows.Forms.RadioButton()
         Me.ColorTracking = New System.Windows.Forms.RadioButton()
         Me.ColorMean = New System.Windows.Forms.RadioButton()
+        Me.ColorDepth = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -561,7 +562,7 @@ Partial Class OptionsRedCloud
         'ColorSourceLabel
         '
         Me.ColorSourceLabel.AutoSize = True
-        Me.ColorSourceLabel.Location = New System.Drawing.Point(1042, 198)
+        Me.ColorSourceLabel.Location = New System.Drawing.Point(1042, 208)
         Me.ColorSourceLabel.Name = "ColorSourceLabel"
         Me.ColorSourceLabel.Size = New System.Drawing.Size(105, 20)
         Me.ColorSourceLabel.TabIndex = 10
@@ -570,7 +571,7 @@ Partial Class OptionsRedCloud
         'ColorSource
         '
         Me.ColorSource.FormattingEnabled = True
-        Me.ColorSource.Location = New System.Drawing.Point(1170, 198)
+        Me.ColorSource.Location = New System.Drawing.Point(1170, 208)
         Me.ColorSource.Name = "ColorSource"
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 11
@@ -610,25 +611,26 @@ Partial Class OptionsRedCloud
         'ColoringGroup
         '
         Me.ColoringGroup.Controls.Add(Me.ColorDepth)
+        Me.ColoringGroup.Controls.Add(Me.ColorTrackingDepth)
         Me.ColoringGroup.Controls.Add(Me.ColorTracking)
         Me.ColoringGroup.Controls.Add(Me.ColorMean)
-        Me.ColoringGroup.Location = New System.Drawing.Point(1351, 307)
+        Me.ColoringGroup.Location = New System.Drawing.Point(1338, 40)
         Me.ColoringGroup.Name = "ColoringGroup"
-        Me.ColoringGroup.Size = New System.Drawing.Size(220, 129)
+        Me.ColoringGroup.Size = New System.Drawing.Size(220, 155)
         Me.ColoringGroup.TabIndex = 78
         Me.ColoringGroup.TabStop = False
         Me.ColoringGroup.Text = "Coloring Options"
         '
-        'ColorDepth
+        'ColorTrackingDepth
         '
-        Me.ColorDepth.AutoSize = True
-        Me.ColorDepth.Location = New System.Drawing.Point(15, 89)
-        Me.ColorDepth.Name = "ColorDepth"
-        Me.ColorDepth.Size = New System.Drawing.Size(119, 24)
-        Me.ColorDepth.TabIndex = 4
-        Me.ColorDepth.TabStop = True
-        Me.ColorDepth.Text = "Depth Color"
-        Me.ColorDepth.UseVisualStyleBackColor = True
+        Me.ColorTrackingDepth.AutoSize = True
+        Me.ColorTrackingDepth.Location = New System.Drawing.Point(15, 89)
+        Me.ColorTrackingDepth.Name = "ColorTrackingDepth"
+        Me.ColorTrackingDepth.Size = New System.Drawing.Size(183, 24)
+        Me.ColorTrackingDepth.TabIndex = 4
+        Me.ColorTrackingDepth.TabStop = True
+        Me.ColorTrackingDepth.Text = "Depth Tracking Color"
+        Me.ColorTrackingDepth.UseVisualStyleBackColor = True
         '
         'ColorTracking
         '
@@ -651,6 +653,17 @@ Partial Class OptionsRedCloud
         Me.ColorMean.TabStop = True
         Me.ColorMean.Text = "Mean color"
         Me.ColorMean.UseVisualStyleBackColor = True
+        '
+        'ColorDepth
+        '
+        Me.ColorDepth.AutoSize = True
+        Me.ColorDepth.Location = New System.Drawing.Point(16, 122)
+        Me.ColorDepth.Name = "ColorDepth"
+        Me.ColorDepth.Size = New System.Drawing.Size(119, 24)
+        Me.ColorDepth.TabIndex = 5
+        Me.ColorDepth.TabStop = True
+        Me.ColorDepth.Text = "Depth Color"
+        Me.ColorDepth.UseVisualStyleBackColor = True
         '
         'OptionsRedCloud
         '
@@ -746,7 +759,8 @@ Partial Class OptionsRedCloud
     Friend WithEvents Label1 As Windows.Forms.Label
     Friend WithEvents labelCellSize As Windows.Forms.Label
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
-    Friend WithEvents ColorDepth As Windows.Forms.RadioButton
+    Friend WithEvents ColorTrackingDepth As Windows.Forms.RadioButton
     Friend WithEvents ColorTracking As Windows.Forms.RadioButton
     Friend WithEvents ColorMean As Windows.Forms.RadioButton
+    Friend WithEvents ColorDepth As Windows.Forms.RadioButton
 End Class
