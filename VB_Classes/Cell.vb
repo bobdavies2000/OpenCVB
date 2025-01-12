@@ -360,9 +360,13 @@ Public Class Cell_Generate : Inherits TaskParent
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim colorSelection = If(task.redOptions.ColorMean.Checked, 0, 1)
+        If colorSelection > 0 Then colorSelection = If(task.redOptions.ColorTracking.Checked, 1, 2)
+        If colorSelection = 2 Then colorSelection = If(task.redOptions.ColorTrackingDepth.Checked, 2, 3)
+
         For Each rc In initialList
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            DrawContour(rc.mask, rc.contour, 255, -1)
+            DrawContour(rc.mask, rc.contour, rc.colorTrack, -1)
             If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
             rc.maxDStable = rc.maxDist
@@ -387,13 +391,16 @@ Public Class Cell_Generate : Inherits TaskParent
                     cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
                     rc.depthMean = depthMean(2)
 
-                    Dim depth = If(rc.depthMean > task.MaxZmeters, task.MaxZmeters, rc.depthMean)
-                    Dim index = CInt(255 * depth / task.MaxZmeters)
+                    If Single.IsNaN(depthMean(2)) = False And depthMean(2) >= 0 Then
+                        Dim depth = If(rc.depthMean > task.MaxZmeters, task.MaxZmeters, rc.depthMean)
+                        Dim index = CInt(255 * depth / task.MaxZmeters)
 
-                    rc.colorDepth = task.scalarColors(index)
-                    rc.colorGray32 = New cv.Scalar(index, index, index)
+                        rc.colorDepth = task.scalarColors(index)
+                        rc.colorGray32 = New cv.Scalar(index, index, index)
+                    End If
                 End If
             End If
+            rc.colorCurr = selectColor(rc, colorSelection)
             sortedCells.Add(rc.pixels, rc)
         Next
 

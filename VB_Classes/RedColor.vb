@@ -53,8 +53,9 @@ Public Class RedColor_Basics : Inherits TaskParent
             Next
 
             labels(3) = "The " + CStr(task.redOptions.identifyCount) + " largest cells shown below " +
-                        " in the 'tracking' color which changes when the cell is split or lost."
+                        " with the tracking color which changes when the cell is split or lost."
         End If
+        task.setSelectedCell()
     End Sub
 End Class
 
@@ -1815,5 +1816,40 @@ Public Class RedColor_FlipTest : Inherits TaskParent
                         " were flipped back to the main cell."
             labels(3) = flipper.labels(2)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_Contour : Inherits TaskParent
+    Public Sub New()
+        task.redOptions.ColorTracking.Checked = True
+        desc = "Add the contour to the cell mask in the RedColor_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = getRedColor(src, labels(2))
+
+        dst2.SetTo(0)
+        For Each rc In task.redCells
+            For i = 1 To 8
+                Dim deltaX = Choose(i, -1, 1, 0, 0, -1, 1, -1, 1)
+                Dim deltaY = Choose(i, 0, 0, -1, 1, -1, 1, 1, -1)
+                Dim contour As New List(Of cv.Point)
+                For Each pt In rc.contour
+                    pt.X += deltaX
+                    pt.Y += deltaY
+                    pt = validatePoint(pt)
+                    contour.Add(pt)
+                Next
+                If i < 8 Then
+                    DrawContour(dst2(rc.rect), contour, rc.colorCurr, task.lineWidth)
+                Else
+                    DrawContour(dst2(rc.rect), contour, rc.colorCurr, -1)
+                End If
+            Next
+        Next
     End Sub
 End Class

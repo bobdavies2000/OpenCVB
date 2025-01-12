@@ -413,6 +413,7 @@ Public Class rcData
     Public colorDepth As cv.Scalar
     Public colorMean As cv.Scalar
     Public colorGray32 As cv.Scalar
+    Public colorCurr As cv.Scalar
 
     Public depthPixels As Integer
     Public depthMask As cv.Mat

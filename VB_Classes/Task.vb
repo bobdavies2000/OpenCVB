@@ -85,7 +85,8 @@ Public Class VBtask : Implements IDisposable
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
     Public pointCloud As New cv.Mat
     Public pcSplit() As cv.Mat
-    Public gMatrix As New cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
+    ' transformation matrix to convert point cloud to be vertical according to gravity.
+    Public gMatrix As New cv.Mat
     Public IMU_Rotation As System.Numerics.Quaternion
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
@@ -479,6 +480,7 @@ Public Class VBtask : Implements IDisposable
         redMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
 
         callTrace = New List(Of String)
+        task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
 
         ' add any algorithm tasks to this list.
         algTasks = {New IMU_GMatrix, New IMU_Basics, New Line_Basics, New Grid_Basics, New Depth_Palette,
@@ -569,6 +571,7 @@ Public Class VBtask : Implements IDisposable
         If index > 0 And index < redCells.Count Then
             ' ClickPoint = redCells(index).maxDist
             rc = redCells(index)
+            task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
             If redCells.Count > 1 Then rc = redCells(1)

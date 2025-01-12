@@ -1475,6 +1475,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_ColorAndDepth" Then return new RedColor_ColorAndDepth
 	If algorithmName = "RedColor_Consistent" Then return new RedColor_Consistent
 	If algorithmName = "RedColor_Consistent1" Then return new RedColor_Consistent1
+	If algorithmName = "RedColor_Contour" Then return new RedColor_Contour
 	If algorithmName = "RedColor_ContourUpdate" Then return new RedColor_ContourUpdate
 	If algorithmName = "RedColor_CPP" Then return new RedColor_CPP
 	If algorithmName = "RedColor_DelaunayGuidedFeatures" Then return new RedColor_DelaunayGuidedFeatures

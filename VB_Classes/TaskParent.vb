@@ -345,34 +345,32 @@ Public Class TaskParent : Implements IDisposable
             rc.index = task.redCells.Count
             task.redCells.Add(rc)
             task.redMap(rc.rect).SetTo(rc.index, rc.mask)
+
             If rc.index >= 255 Then Exit For
         Next
 
         Return DisplayCells()
     End Function
-    Public Function DisplayCells() As cv.Mat
-        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-        Dim colorSelection = If(task.redOptions.ColorMean.Checked, 0, 1)
-        If colorSelection > 0 Then colorSelection = If(task.redOptions.ColorTracking.Checked, 1, 2)
-        If colorSelection = 2 Then colorSelection = If(task.redOptions.ColorTrackingDepth.Checked, 2, 3)
+    Public Function selectColor(rc As rcData, colorSelection As Integer) As cv.Scalar
+        Dim color As cv.Scalar
         Select Case colorSelection
             Case 0
-                For Each rc In task.redCells
-                    dst(rc.rect).SetTo(rc.colorMean, rc.mask)
-                Next
+                color = rc.colorMean
             Case 1
-                For Each rc In task.redCells
-                    dst(rc.rect).SetTo(rc.colorTrack, rc.mask)
-                Next
+                color = rc.colorTrack
             Case 2
-                For Each rc In task.redCells
-                    dst(rc.rect).SetTo(rc.colorDepth, rc.mask)
-                Next
+                color = rc.colorDepth
             Case 3
-                For Each rc In task.redCells
-                    dst(rc.rect).SetTo(rc.colorGray32, rc.mask)
-                Next
+                color = rc.colorGray32
         End Select
+        Return color
+    End Function
+    Public Function DisplayCells() As cv.Mat
+        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+
+        For Each rc In task.redCells
+            dst(rc.rect).SetTo(rc.colorCurr, rc.mask)
+        Next
 
         Return dst
     End Function
