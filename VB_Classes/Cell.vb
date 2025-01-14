@@ -299,22 +299,9 @@ Public Class Cell_Generate : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static bounds As Boundary_RemovedRects
-            If bounds Is Nothing Then bounds = New Boundary_RemovedRects
-            bounds.Run(src)
-            task.rcMap = bounds.bRects.bounds.dst2
-            src = task.rcMap Or bounds.dst2
-            If task.firstPass Then task.rcMap.SetTo(0)
-
-            Static redCPP As New RedColor_CPP
-            redCPP = bounds.bRects.bounds.redCPP
-
-            If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-            classCount = redCPP.classCount
-            rectList = redCPP.rectList
-            floodPoints = redCPP.floodPoints
-            removeContour = False
-            src = redCPP.dst2
+            SetTrueText("Run RedColor_Basics or RedCloud_Basics to test Cell_Generate." + vbCrLf +
+                        "Cell_Generate uses both to build the task.rclist and both use Cell_Generate.")
+            Exit Sub
         End If
 
         Dim retained As Integer = 0

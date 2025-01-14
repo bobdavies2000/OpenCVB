@@ -1,51 +1,26 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Boundary_Basics : Inherits TaskParent
     Public redCPP As New RedColor_CPP
-    Public rects As New List(Of cv.Rect)
-    Public masks As New List(Of cv.Mat)
-    Public contours As New List(Of List(Of cv.Point))
-    Public runRedCPP As Boolean = True
     Dim color8U As New Color8U_Basics
-    Dim rCloud As New RedCloud_Basics
-    Dim guided As New GuidedBP_Depth
     Public Sub New()
+        task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.setColorSource("Bin4Way_Regions")
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then
-            If task.redOptions.UseColorOnly.Checked Then
-                color8U.Run(src)
-                dst1 = color8U.dst2
-            ElseIf task.redOptions.UseDepth.Checked Then
-                rCloud.Run(src)
-                dst1 = rCloud.dst2
-            Else
-                guided.Run(src)
-                dst1 = guided.dst2
-            End If
-        End If
+        color8U.Run(src)
+        dst2 = runRedC(color8U.dst2, labels(2))
 
-        If runRedCPP Then
-            redCPP.Run(dst1)
+        redCPP.Run(dst1)
 
-            dst2.SetTo(0)
-            rects.Clear()
-            masks.Clear()
-            contours.Clear()
-            For i = 1 To redCPP.classCount - 1
-                Dim rect = redCPP.rectList(i - 1)
-                Dim mask = redCPP.dst2(rect).InRange(i, i)
-                Dim contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone)
-                DrawContour(dst2(rect), contour, 255, task.lineWidth)
-                rects.Add(rect)
-                masks.Add(mask)
-                contours.Add(contour)
-            Next
+        dst3.SetTo(0)
+        For i = 1 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
+            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+        Next
 
-            labels(2) = $"{redCPP.classCount} cells were found."
-        End If
+        labels(3) = $"{task.rcList.Count} cells were found."
     End Sub
 End Class
 
@@ -97,30 +72,32 @@ Public Class Boundary_Rectangles : Inherits TaskParent
         bounds.Run(src)
 
         dst2.SetTo(0)
-        For Each r In bounds.rects
-            dst2.Rectangle(r, task.HighlightColor, task.lineWidth)
+        For Each rc In task.rcList
+            dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
         Next
-        labels(2) = $"{bounds.rects.Count} rectangles before contain test"
+        labels(2) = $"{task.rcList.Count} rectangles before contain test"
 
         rects.Clear()
+        For i = 0 To CInt(task.rcList.Count * options.percentRect) - 1
+            rects.Add(task.rcList(i).rect)
+        Next
+
         smallRects.Clear()
         smallContours.Clear()
-        For i = 0 To bounds.rects.Count * options.percentRect - 1
-            rects.Add(bounds.rects(i))
-        Next
-        For i = bounds.rects.Count - 1 To CInt(bounds.rects.Count * options.percentRect) Step -1
-            Dim r = bounds.rects(i)
+        For i = task.rcList.Count - 1 To CInt(task.rcList.Count * options.percentRect) Step -1
+            task.rc = task.rcList(i)
+            Dim r = task.rc.rect
             Dim contained As Boolean = False
-            For Each rect In bounds.rects
-                If r = rect Then Continue For
-                If rect.Contains(r) Then
+            For Each rc In task.rcList
+                If r = rc.rect Then Continue For
+                If rc.rect.Contains(r) Then
                     contained = True
                     Exit For
                 End If
             Next
 
             If contained Then
-                smallContours.Add(bounds.contours(i))
+                smallContours.Add(task.rc.contour)
                 smallRects.Add(r)
             Else
                 rects.Add(r)
@@ -154,13 +131,13 @@ Public Class Boundary_RemovedRects : Inherits TaskParent
         dst2 = bRects.bounds.dst2.Clone
         dst3 = bRects.dst2
         dst1 = bRects.dst3
-        labels(3) = $"{bRects.bounds.rects.Count} cells before contain test"
+        labels(3) = $"{task.rcList.Count} cells before contain test"
 
         For i = 0 To bRects.smallRects.Count - 1
             DrawContour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, task.lineWidth)
         Next
         labels(1) = labels(2)
-        labels(2) = $"{bRects.bounds.rects.Count - bRects.smallRects.Count} cells after contain test"
+        labels(2) = $"{task.rcList.Count - bRects.smallRects.Count} cells after contain test"
     End Sub
 End Class
 
@@ -170,38 +147,38 @@ End Class
 
 
 
-Public Class Boundary_Overlap : Inherits TaskParent
-    Dim bounds As New Boundary_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Determine if 2 contours overlap"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        bounds.Run(src)
-        dst3 = bounds.dst2
-        Dim overlapping As Boolean
-        For i = 0 To bounds.contours.Count - 1
-            Dim tour = bounds.contours(i)
-            Dim rect = bounds.rects(i)
-            For j = i + 1 To bounds.contours.Count - 1
-                Dim r = bounds.rects(j)
-                If r.IntersectsWith(rect) Then
-                    dst2.SetTo(0)
-                    Dim c1 = tour.Count
-                    Dim c2 = bounds.contours(j).Count
-                    DrawContour(dst2(rect), tour, 127, task.lineWidth)
-                    DrawContour(dst2(r), bounds.contours(j), 255, task.lineWidth)
-                    Dim count = dst2.CountNonZero
-                    If count <> c1 + c2 Then
-                        overlapping = True
-                        Exit For
-                    End If
-                End If
-            Next
-            If overlapping Then Exit For
-        Next
-    End Sub
-End Class
+'Public Class Boundary_Overlap : Inherits TaskParent
+'    Dim bounds As New Boundary_Basics
+'    Public Sub New()
+'        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+'        desc = "Determine if 2 contours overlap"
+'    End Sub
+'    Public Overrides sub RunAlg(src As cv.Mat)
+'        bounds.Run(src)
+'        dst3 = bounds.dst2
+'        Dim overlapping As Boolean
+'        For i = 0 To bounds.contours.Count - 1
+'            Dim tour = bounds.contours(i)
+'            Dim rect = bounds.rects(i)
+'            For j = i + 1 To bounds.contours.Count - 1
+'                Dim r = bounds.rects(j)
+'                If r.IntersectsWith(rect) Then
+'                    dst2.SetTo(0)
+'                    Dim c1 = tour.Count
+'                    Dim c2 = bounds.contours(j).Count
+'                    DrawContour(dst2(rect), tour, 127, task.lineWidth)
+'                    DrawContour(dst2(r), bounds.contours(j), 255, task.lineWidth)
+'                    Dim count = dst2.CountNonZero
+'                    If count <> c1 + c2 Then
+'                        overlapping = True
+'                        Exit For
+'                    End If
+'                End If
+'            Next
+'            If overlapping Then Exit For
+'        Next
+'    End Sub
+'End Class
 
 
 
@@ -218,6 +195,33 @@ Public Class Boundary_RedCloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         rCloud.Run(src)
         dst2 = runRedC(rCloud.dst2, labels(2))
+
+        dst3.SetTo(0)
+        For i = 1 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
+            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+        Next
+
+        labels(3) = $"{task.rcList.Count} cells were found."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Boundary_GuidedBP : Inherits TaskParent
+    Public redCPP As New RedColor_CPP
+    Dim guided As New GuidedBP_Depth
+    Public Sub New()
+        task.redOptions.IdentifyCountBar.Value = 100
+        task.gOptions.HistBinBar.Value = 100
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        guided.Run(src)
+        dst2 = runRedC(guided.dst2, labels(2))
 
         dst3.SetTo(0)
         For i = 1 To task.rcList.Count - 1
