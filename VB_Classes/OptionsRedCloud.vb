@@ -128,7 +128,6 @@ Public Class OptionsRedCloud
         task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
 
         task.projectionThreshold = ProjectionThresholdBar.Value
-        identifyCount = IdentifyCountBar.Value
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)

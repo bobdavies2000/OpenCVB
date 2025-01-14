@@ -4,7 +4,6 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As New cv.Mat
     Public cellGen As New Cell_Generate
     Dim redCPP As New RedColor_CPP
-    Public topXOnly As Boolean
     Public Sub New()
         task.gOptions.setHistogramBins(40)
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -44,7 +43,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             dst1 = stats.dst1
         End If
 
-        If standaloneTest() Or topXOnly Then
+        If standaloneTest() Then
             dst3.SetTo(0)
             For i = 1 To Math.Min(task.redOptions.identifyCount + 1, task.redCells.Count) - 1
                 Dim rc = task.redCells(i)
@@ -260,7 +259,7 @@ Public Class RedColor_Equations : Inherits TaskParent
     Dim eq As New Plane_Equation
     Public redCells As New List(Of rcData)
     Public Sub New()
-        task.redC.topXOnly = True
+        task.redOptions.identifyCount = 5
         labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
         desc = "Show the estimated plane equations for all the cells."
     End Sub
@@ -1674,7 +1673,7 @@ Public Class RedColor_Flippers : Inherits TaskParent
     Public flipCells As New List(Of rcData)
     Public nonFlipCells As New List(Of rcData)
     Public Sub New()
-        task.redC.topXOnly = True
+        task.redOptions.identifyCount = 255
         task.redOptions.ColorTracking.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the cells that are changing color because they were split or lost."
