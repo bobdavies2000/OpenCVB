@@ -118,7 +118,7 @@ Public Class Bin3Way_RedCloudDarkest : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then bin3.Run(src)
 
-        flood.inputMask = Not bin3.bin3.mats.mat(0)
+        flood.inputRemoved = Not bin3.bin3.mats.mat(0)
         flood.Run(bin3.bin3.mats.mat(0))
         dst2 = flood.dst2
     End Sub
@@ -139,7 +139,7 @@ Public Class Bin3Way_RedCloudLightest : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then bin3.Run(src)
 
-        flood.inputMask = Not bin3.bin3.mats.mat(2)
+        flood.inputRemoved = Not bin3.bin3.mats.mat(2)
         flood.Run(bin3.bin3.mats.mat(2))
         dst2 = flood.dst2
     End Sub
@@ -154,13 +154,13 @@ Public Class Bin3Way_RedCloudOther : Inherits TaskParent
     Dim flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        flood.inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        flood.inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use RedCloud with the regions that are neither lightest or darkest"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then bin3.Run(src)
 
-        flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
+        flood.inputRemoved = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
 
         color8U.Run(src)
         flood.Run(color8U.dst2)
@@ -199,11 +199,11 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
             task.redMap = cellMaps(i)
             task.redCells = redCells(i)
             If i = 2 Then
-                flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
+                flood.inputRemoved = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
                 color8U.Run(src)
                 flood.Run(color8U.dst2)
             Else
-                flood.inputMask = Not bin3.bin3.mats.mat(i)
+                flood.inputRemoved = Not bin3.bin3.mats.mat(i)
                 flood.Run(bin3.bin3.mats.mat(i))
             End If
             cellMaps(i) = task.redMap.Clone
@@ -255,7 +255,7 @@ Public Class Bin3Way_RedCloud : Inherits TaskParent
         For i = options.startRegion To options.endRegion
             task.redMap = cellMaps(i)
             task.redCells = redCells(i)
-            flood.inputMask = Not bin3.bin3.mats.mat(i)
+            flood.inputRemoved = Not bin3.bin3.mats.mat(i)
             flood.Run(bin3.bin3.mats.mat(i))
             cellMaps(i) = task.redMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)

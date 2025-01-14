@@ -645,7 +645,7 @@ Public Class Bin4Way_RedCloud : Inherits TaskParent
         For i = options.startRegion To options.endRegion
             task.redMap = cellMaps(i)
             task.redCells = redCells(i)
-            flood.inputMask = Not bin2.mats.mat(i)
+            flood.inputRemoved = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))
             cellMaps(i) = task.redMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)

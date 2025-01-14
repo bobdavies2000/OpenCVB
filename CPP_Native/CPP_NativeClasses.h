@@ -47,8 +47,8 @@ public:
     vector<Point> floodPoints;
 
     RedCloud() {}
-    void RunCPP(Mat inputMask) {
-        Mat maskCopy = inputMask.clone();
+    void RunCPP(Mat inputRemoved) {
+        Mat maskCopy = inputRemoved.clone();
         Rect rect;
 
         multimap<int, Point, greater<int>> sizeSorted;
@@ -58,10 +58,10 @@ public:
         {
             for (int x = 0; x < src.cols; x++)
             {
-                if (inputMask.at<unsigned char>(y, x) == 0)
+                if (inputRemoved.at<unsigned char>(y, x) == 0)
                 {
                     pt = Point(x, y);
-                    int count = floodFill(src, inputMask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+                    int count = floodFill(src, inputRemoved, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
                     if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
                 }
             }
@@ -82,7 +82,7 @@ public:
                 fill++;
             }
         }
-        Rect r = Rect(1, 1, inputMask.cols - 2, inputMask.rows - 2);
+        Rect r = Rect(1, 1, inputRemoved.cols - 2, inputRemoved.rows - 2);
         maskCopy(r).copyTo(result);
     }
 };
@@ -113,10 +113,10 @@ RedColor_Run(RedCloud* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
 
-    Mat inputMask = Mat(rows, cols, CV_8U, maskPtr);
+    Mat inputRemoved = Mat(rows, cols, CV_8U, maskPtr);
 
-    copyMakeBorder(inputMask, inputMask, 1, 1, 1, 1, BORDER_CONSTANT, 0);
-    cPtr->RunCPP(inputMask);
+    copyMakeBorder(inputRemoved, inputRemoved, 1, 1, 1, 1, BORDER_CONSTANT, 0);
+    cPtr->RunCPP(inputRemoved);
 
     return (int*)cPtr->result.data;
 }
@@ -3327,9 +3327,9 @@ RedCloudMaxDist_Run(RedCloudMaxDist* cPtr, int* dataPtr, unsigned char* maskPtr,
     Rect r = Rect(1, 1, cols, rows);
     if (maskPtr != 0)
     {
-        Mat inputMask;
-        inputMask = Mat(rows, cols, CV_8U, maskPtr);
-        inputMask.copyTo(cPtr->mask(r));
+        Mat inputRemoved;
+        inputRemoved = Mat(rows, cols, CV_8U, maskPtr);
+        inputRemoved.copyTo(cPtr->mask(r));
     }
     cPtr->maskCopy = cPtr->mask.clone();
     if (cPtr->maxList.size() > 0)

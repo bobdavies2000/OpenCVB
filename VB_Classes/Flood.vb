@@ -4,7 +4,7 @@ Public Class Flood_Basics : Inherits TaskParent
         desc = "Build the RedCloud cells with the grayscale input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels = 1 Then task.redC.inputMask = src
+        If src.Channels = 1 Then task.redC.inputRemoved = src
         dst2 = runRedC(src, labels(2))
         dst1 = task.redC.dst1
         SetTrueText(task.redC.strOut, 3)
@@ -85,25 +85,25 @@ End Class
 
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cv.Mat
-    Public inputMask As cv.Mat
+    Public inputRemoved As cv.Mat
     Public cellGen As New Cell_Generate
     Dim redCPP As New RedColor_CPP
-    Public buildInputMask As Boolean
+    Public buildinputRemoved As Boolean
     Public showSelected As Boolean = True
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        labels(3) = "The inputMask used to limit how much of the image is processed."
+        labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Or buildInputMask Then
+        If standalone Or buildinputRemoved Then
             color8U.Run(src)
-            inputMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+            inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
             src = color8U.dst2
         End If
 
-        dst3 = inputMask
-        redCPP.inputMask = inputMask
+        dst3 = inputRemoved
+        redCPP.inputRemoved = inputRemoved
         redCPP.Run(src)
 
         cellGen.classCount = redCPP.classCount
@@ -147,7 +147,7 @@ Public Class Flood_Tiers : Inherits TaskParent
 
         color8U.Run(src)
 
-        flood.inputMask = dst1
+        flood.inputRemoved = dst1
         flood.Run(color8U.dst2)
 
         dst2 = flood.dst2

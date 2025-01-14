@@ -84,7 +84,7 @@ Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then bin2.Run(src)
 
-        flood.inputMask = Not bin2.mats.mat(0)
+        flood.inputRemoved = Not bin2.mats.mat(0)
         flood.Run(bin2.mats.mat(0))
         dst2 = flood.dst2
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified"
@@ -106,7 +106,7 @@ Public Class Bin2Way_RedCloudLightest : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then bin2.Run(src)
 
-        flood.inputMask = Not bin2.mats.mat(3)
+        flood.inputRemoved = Not bin2.mats.mat(3)
         flood.Run(bin2.mats.mat(3))
         dst2 = flood.dst2
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified"
@@ -126,20 +126,20 @@ Public Class Bin2Way_RecurseOnce : Inherits TaskParent
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         bin2.fraction = src.Total / 2
-        bin2.hist.inputMask = New cv.Mat
+        bin2.hist.inputOnlyMask = New cv.Mat
         bin2.Run(src)
         Dim darkestMask = bin2.mats.mat(0).Clone
         Dim lightestMask = bin2.mats.mat(1).Clone
 
         bin2.fraction = src.Total / 4
-        bin2.hist.inputMask = darkestMask
+        bin2.hist.inputOnlyMask = darkestMask
         bin2.Run(src)
 
         mats.mat(0) = bin2.mats.mat(0)
         mats.mat(1) = bin2.mats.mat(1) And Not lightestMask
 
         bin2.fraction = src.Total / 4
-        bin2.hist.inputMask = lightestMask
+        bin2.hist.inputOnlyMask = lightestMask
         bin2.Run(src)
         mats.mat(2) = bin2.mats.mat(0) And Not darkestMask
         mats.mat(3) = bin2.mats.mat(1)
@@ -180,7 +180,7 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
         For i = options.startRegion To options.endRegion
             task.redMap = cellMaps(i)
             task.redCells = redCells(i)
-            flood.inputMask = Not bin2.mats.mat(i)
+            flood.inputRemoved = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))
             cellMaps(i) = task.redMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)

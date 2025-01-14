@@ -499,7 +499,7 @@ Public Class Motion_Enclosing : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        task.redC.inputMask = Not dst2
+        task.redC.inputRemoved = Not dst2
         runRedC(dst2)
 
         motionRect = New cv.Rect

@@ -15,7 +15,7 @@ Public Class Projection_Basics : Inherits TaskParent
             histTop.Run(src)
             src = histTop.dst2
 
-            task.redC.inputMask = Not histTop.dst3
+            task.redC.inputRemoved = Not histTop.dst3
             dst2 = runRedC(histTop.dst3, labels(2))
             redCellInput = task.redCells
         End If
@@ -185,7 +185,7 @@ Public Class Projection_Top : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
-        task.redC.inputMask = Not histTop.dst3
+        task.redC.inputRemoved = Not histTop.dst3
         runRedC(histTop.dst3)
 
         objects.redCellInput = task.redCells
@@ -216,7 +216,7 @@ Public Class Projection_Side : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         histSide.Run(src)
 
-        task.redC.inputMask = Not histSide.dst3
+        task.redC.inputRemoved = Not histSide.dst3
         runRedC(histSide.dst3)
 
         objects.redCellInput = task.redCells

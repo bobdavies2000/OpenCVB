@@ -131,7 +131,7 @@ Public Class Duster_RedCloud : Inherits TaskParent
         dst3.SetTo(0)
         src.CopyTo(dst3, dst1)
 
-        task.redC.inputMask = Not dst1
+        task.redC.inputRemoved = Not dst1
         dst2 = runRedC(src, labels(2))
     End Sub
 End Class

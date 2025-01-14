@@ -233,7 +233,7 @@ Public Class Swarm_Flood : Inherits TaskParent
         color8U.Run(src)
 
         flood.cellGen.removeContour = False
-        flood.inputMask = swarm.dst2
+        flood.inputRemoved = swarm.dst2
         flood.Run(color8U.dst2)
         dst2 = flood.dst2
 
@@ -260,7 +260,7 @@ Public Class Swarm_Flood2 : Inherits TaskParent
         lines.Run(src)
         color8U.Run(src)
 
-        flood.inputMask = lines.dst3
+        flood.inputRemoved = lines.dst3
         flood.Run(color8U.dst2)
         Return flood.dst2
     End Function

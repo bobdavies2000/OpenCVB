@@ -784,11 +784,11 @@ Public Class BackProject_MaskList : Inherits TaskParent
         For i = 0 To bins - 2
             Dim minVal = i * incr
             Dim maxVal = (i + 1) * incr
-            histS.inputMask = gray.InRange(minVal, maxVal)
+            histS.inputOnlyMask = gray.InRange(minVal, maxVal)
             histS.Run(task.pcSplit(2))
             histList.Add(New List(Of Single)(histS.histList))
             histogramList.Add(histS.histogram.Clone)
-            inputMatList.Add(histS.inputMask.Clone)
+            inputMatList.Add(histS.inputOnlyMask.Clone)
         Next
         Dim index = Math.Min(bins, task.gOptions.DebugSlider.Value)
         If index >= inputMatList.Count Then index = inputMatList.Count - 1

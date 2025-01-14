@@ -1987,7 +1987,7 @@ class RedColor_Flood_CC : public CPP_Parent
 {
 private:
 public:
-    Mat inputMask;
+    Mat inputRemoved;
     RedCloud_Basics_CC* prepData;
     int option_loDiff = 0;
     int option_hiDiff = 0;
@@ -2020,7 +2020,7 @@ public:
             src = prepData->dst2;
         }
 
-        if (inputMask.rows == 0) dst2 = task->noDepthMask; else dst2 = inputMask;
+        if (inputRemoved.rows == 0) dst2 = task->noDepthMask; else dst2 = inputRemoved;
         rects.clear();
         sizes.clear();
 
@@ -2588,7 +2588,7 @@ Mat vbPalette(Mat input)
 class RedColor_FeatureLessCore_CC : public CPP_Parent {
 public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
-    Mat inputMask;
+    Mat inputRemoved;
     FeatureLess_Basics_CC* fLess;
     RedCloud* cPtr;
     RedColor_FeatureLessCore_CC() : CPP_Parent() {
@@ -2596,8 +2596,8 @@ public:
         fLess = new FeatureLess_Basics_CC();
         cPtr = new RedCloud();
         advice = "In redOptions the 'Desired RedCloud Cells' slider has a big impact.";
-        inputMask = Mat(dst2.size(), CV_8U);
-        inputMask.setTo(0);
+        inputRemoved = Mat(dst2.size(), CV_8U);
+        inputRemoved.setTo(0);
         desc = "Another minimalist approach to building RedCloud color-based cells.";
     }
     ~RedColor_FeatureLessCore_CC() {
@@ -2614,11 +2614,11 @@ public:
         }
         void* imagePtr;
         Mat* srcPtr = &src;
-        if (inputMask.empty()) {
+        if (inputRemoved.empty()) {
             imagePtr = RedColor_Run(cPtr, (int*)srcPtr->data, 0, src.rows, src.cols);
         }
         else {
-            Mat* maskPtr = &inputMask;
+            Mat* maskPtr = &inputRemoved;
             imagePtr = RedColor_Run(cPtr, (int*)srcPtr->data, (uchar*)maskPtr->data, src.rows, src.cols);
         }
         int classCount = RedColor_Count(cPtr);
@@ -3514,7 +3514,7 @@ public:
     cv::Mat histogram;
     Plot_Histogram_CC plotHist;
     mmData mm;
-    cv::Mat inputMask;
+    cv::Mat inputRemoved;
     float ranges[2];
     Hist_DepthSimple_CC() : CPP_Parent()
     {

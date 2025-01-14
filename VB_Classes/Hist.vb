@@ -7,7 +7,7 @@ Public Class Hist_Basics : Inherits TaskParent
     Public ranges() As cv.Rangef
 
     Public histArray() As Single
-    Public inputMask As New cv.Mat
+    Public inputOnlyMask As New cv.Mat
     Public fixedRanges() As cv.Rangef
     Public bins As Integer
     Public removeMax As Boolean
@@ -34,9 +34,9 @@ Public Class Hist_Basics : Inherits TaskParent
 
         ' ranges are exclusive in OpenCV!!!
         If bins = 0 Then
-            cv.Cv2.CalcHist({src}, {splitIndex}, inputMask, histogram, 1, {task.histogramBins}, ranges)
+            cv.Cv2.CalcHist({src}, {splitIndex}, inputOnlyMask, histogram, 1, {task.histogramBins}, ranges)
         Else
-            cv.Cv2.CalcHist({src}, {splitIndex}, inputMask, histogram, 1, {bins}, ranges)
+            cv.Cv2.CalcHist({src}, {splitIndex}, inputOnlyMask, histogram, 1, {bins}, ranges)
         End If
 
         If removeMax Then
@@ -1348,7 +1348,7 @@ Public Class Hist_DepthSimple : Inherits TaskParent
     Public histogram As New cv.Mat
     Dim plotHist As New Plot_Histogram
     Dim mm As mmData
-    Public inputMask As New cv.Mat
+    Public inputOnlyMask As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
         labels(2) = "Histogram of depth from 0 to maxZMeters."
@@ -1361,7 +1361,7 @@ Public Class Hist_DepthSimple : Inherits TaskParent
             ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
         End If
 
-        cv.Cv2.CalcHist({task.pcSplit(2)}, {0}, inputMask, histogram, 1, {task.histogramBins}, ranges)
+        cv.Cv2.CalcHist({task.pcSplit(2)}, {0}, inputOnlyMask, histogram, 1, {task.histogramBins}, ranges)
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 

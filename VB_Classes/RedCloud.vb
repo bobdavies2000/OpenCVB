@@ -222,7 +222,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         maxDepth.Run(src)
         If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
-            task.redC.inputMask.SetTo(0)
+            task.redC.inputRemoved.SetTo(0)
             If src.Channels() = 3 Then
                 color8U.Run(src)
                 dst2 = color8U.dst2.Clone
@@ -230,7 +230,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
                 dst2 = src
             End If
         Else
-            task.redC.inputMask = task.noDepthMask
+            task.redC.inputRemoved = task.noDepthMask
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         End If
 
