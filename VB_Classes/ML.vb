@@ -622,8 +622,8 @@ Public Class ML_LearnZfromXGray : Inherits TaskParent
         Dim ptList As New List(Of cv.Point3f)
         Dim mlInput As New List(Of cv.Vec3f)
         Dim mResponse As New List(Of Single)
-        For y = 0 To regions.redMapX.Height - 1
-            For x = 0 To regions.redMapX.Width - 1
+        For y = 0 To regions.rcMapX.Height - 1
+            For x = 0 To regions.rcMapX.Width - 1
                 Dim zVal = task.pcSplit(2).Get(Of Single)(y, x)
                 Dim val = CSng(gray.Get(Of Byte)(y, x))
                 If zVal = 0 Then
@@ -668,14 +668,14 @@ Public Class ML_LearnRegions : Inherits TaskParent
         dst1 = color8U.dst3
 
         Dim graySrc = If(dst1.Channels = 1, dst1, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)) ' input to ML
-        Dim regionX = regions.redMapX ' Target variable
+        Dim regionX = regions.rcMapX ' Target variable
 
         Dim ptList As New List(Of cv.Point3f)
         Dim mlInput As New List(Of cv.Vec3f)
         Dim mResponse As New List(Of Single)
 
-        For y = 0 To regions.redMapX.Height - 1
-            For x = 0 To regions.redMapX.Width - 1
+        For y = 0 To regions.rcMapX.Height - 1
+            For x = 0 To regions.rcMapX.Width - 1
                 Dim gray = CSng(graySrc.Get(Of Byte)(y, x))
                 Dim region = CSng(regionX.Get(Of Byte)(y, x))
                 If region = 0 Then
@@ -701,7 +701,7 @@ Public Class ML_LearnRegions : Inherits TaskParent
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
             Dim regionID = CInt(output.Get(Of Single)(i, 0))
-            Dim rc = regions.redCellsX(regionID)
+            Dim rc = regions.rcListX(regionID)
             Dim color As cv.Vec3b = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1),
                                                  rc.colorMean(2))
             dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, color)

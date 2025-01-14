@@ -344,10 +344,10 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
     Dim guide As New GuidedBP_MultiSlice
     Public redCx As New RedColor_Basics
     Public redCy As New RedColor_Basics
-    Public redCellsX As New List(Of rcData)
-    Public redCellsY As New List(Of rcData)
-    Public redMapX As New cv.Mat
-    Public redMapY As New cv.Mat
+    Public rcListX As New List(Of rcData)
+    Public rcListY As New List(Of rcData)
+    Public rcMapX As New cv.Mat
+    Public rcMapY As New cv.Mat
     Public Sub New()
         desc = "Identify each segment in the X and Y point cloud data"
     End Sub
@@ -355,16 +355,16 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
         guide.Run(src)
 
         redCx.Run(guide.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        redMapX = task.redMap.Clone
+        rcMapX = task.rcMap.Clone
         dst2 = redCx.dst2
-        redCellsX = New List(Of rcData)(task.redCells)
-        labels(2) = CStr(task.redCells.Count) + " cells were found in vertical segments"
+        rcListX = New List(Of rcData)(task.rcList)
+        labels(2) = CStr(task.rcList.Count) + " cells were found in vertical segments"
 
         redCx.Run(guide.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        redMapY = task.redMap.Clone
+        rcMapY = task.rcMap.Clone
         dst3 = redCx.dst2
-        redCellsY = New List(Of rcData)(task.redCells)
-        labels(3) = CStr(task.redCells.Count) + " cells were found in horizontal segments"
+        rcListY = New List(Of rcData)(task.rcList)
+        labels(3) = CStr(task.rcList.Count) + " cells were found in horizontal segments"
     End Sub
 End Class
 
@@ -379,10 +379,10 @@ Public Class GuidedBP_Regions : Inherits TaskParent
     Public redC As New GuidedBP_RedCloud
     Public mats As New Mat_4Click
     Dim options As New Options_BP_Regions
-    Public redCellsX As New List(Of rcData)
-    Public redCellsY As New List(Of rcData)
-    Public redMapX As New cv.Mat
-    Public redMapY As New cv.Mat
+    Public rcListX As New List(Of rcData)
+    Public rcListY As New List(Of rcData)
+    Public rcMapX As New cv.Mat
+    Public rcMapY As New cv.Mat
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
@@ -395,11 +395,11 @@ Public Class GuidedBP_Regions : Inherits TaskParent
 
         redC.Run(src)
 
-        redMapX = redC.redMapX.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
-        redMapY = redC.redMapY.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
+        rcMapX = redC.rcMapX.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
+        rcMapY = redC.rcMapY.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
         If standaloneTest() Then
-            dst0 = ShowPalette(redMapX * 255 / options.cellCount)
-            dst1 = ShowPalette(redMapY * 255 / options.cellCount)
+            dst0 = ShowPalette(rcMapX * 255 / options.cellCount)
+            dst1 = ShowPalette(rcMapY * 255 / options.cellCount)
         End If
 
         mats.mat(0) = redC.dst2
@@ -408,18 +408,18 @@ Public Class GuidedBP_Regions : Inherits TaskParent
         mats.mat(2).SetTo(0)
         mats.mat(3).SetTo(0)
 
-        redCellsX.Clear()
-        redCellsY.Clear()
+        rcListX.Clear()
+        rcListY.Clear()
 
-        For i = 1 To Math.Min(options.cellCount, redC.redCellsX.Count) - 1
-            Dim rc = redC.redCellsX(i)
+        For i = 1 To Math.Min(options.cellCount, redC.rcListX.Count) - 1
+            Dim rc = redC.rcListX(i)
             mats.mat(2)(rc.rect).SetTo(rc.colorMean, rc.mask)
-            redCellsX.Add(rc)
+            rcListX.Add(rc)
         Next
-        For i = 1 To Math.Min(options.cellCount, redC.redCellsY.Count) - 1
-            Dim rc = redC.redCellsY(i)
+        For i = 1 To Math.Min(options.cellCount, redC.rcListY.Count) - 1
+            Dim rc = redC.rcListY(i)
             mats.mat(3)(rc.rect).SetTo(rc.colorMean, rc.mask)
-            redCellsY.Add(rc)
+            rcListY.Add(rc)
         Next
 
         mats.Run(src)

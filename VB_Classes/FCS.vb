@@ -252,7 +252,7 @@ Public Class FCS_FloodFill : Inherits TaskParent
             Dim fp = task.fpList(i)
             DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
             DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
-            fp.rcIndex = task.redMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
+            fp.rcIndex = task.rcMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
 
             task.fpList(i) = fp
             DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
@@ -1181,7 +1181,7 @@ Public Class FCS_RedCloud : Inherits TaskParent
         labels(2) = redCombo.labels(2)
 
         knnMin.inputPoints.Clear()
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             knnMin.inputPoints.Add(rc.maxDist)
         Next
         knnMin.Run(src)

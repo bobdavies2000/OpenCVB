@@ -630,7 +630,7 @@ Public Class Contour_RedCloudEdges : Inherits TaskParent
         labels(2) = task.redC.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
         dst2.SetTo(0)
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             DrawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
@@ -910,7 +910,7 @@ Public Class Contour_RedCloud : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             If rc.index > 1 Then Exit For
             DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next

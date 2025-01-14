@@ -149,7 +149,7 @@ Module TaskExterns
                                       fontThickness As Integer, clickX As Integer,
                                       clickY As Integer, clickFlag As Boolean, picTag As Integer,
                                       moveX As Integer, moveY As Integer, paletteIndex As Integer,
-                                      desiredCells As Integer, midHeartBeat As Boolean,
+                                      desircList As Integer, midHeartBeat As Boolean,
                                       quarterBeat As Boolean, colorInputIndex As Integer, depthInputIndex As Integer,
                                       xRangeDefault As Single, yRangeDefault As Single)
     End Sub

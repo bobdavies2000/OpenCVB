@@ -34,7 +34,7 @@ Public Class Tessallate_Basics : Inherits TaskParent
         points.Clear()
         colors.Clear()
         Dim listOfPoints = New List(Of List(Of cv.Point))
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             If rc.contour Is Nothing Then Continue For
             If rc.contour.Count < 5 Then Continue For
             Dim corners(4 - 1) As cv.Point
@@ -57,7 +57,7 @@ Public Class Tessallate_Basics : Inherits TaskParent
         For i = 0 To colors.Count - 1
             cv.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
         Next
-        labels(2) = CStr(colors.Count) + " triangles from " + CStr(task.redCells.Count) + " RedCloud cells"
+        labels(2) = CStr(colors.Count) + " triangles from " + CStr(task.rcList.Count) + " RedCloud cells"
     End Sub
 End Class
 
@@ -118,10 +118,10 @@ Public Class Tessallate_QuadSimple : Inherits TaskParent
             Dim roi = task.gridRects(i)
 
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then Continue For
-            Dim rc = task.redCells(index)
+            Dim rc = task.rcList(index)
 
             dst3(roi).SetTo(rc.colorTrack)
             SetTrueText(Format(rc.depthMean, fmt1), New cv.Point(roi.X, roi.Y))
@@ -178,7 +178,7 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
             Dim roi = task.gridRects(i)
 
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
                 depthList(i).Clear()
@@ -186,7 +186,7 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
                 Continue For
             End If
 
-            Dim rc = task.redCells(index)
+            Dim rc = task.rcList(index)
             If rc.depthMean = 0 Then Continue For
 
             If colorList(i) <> rc.colorTrack Then depthList(i).Clear()
@@ -257,7 +257,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
             Dim roi = task.gridRects(i)
 
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
                 depthList1(i).Clear()
@@ -266,7 +266,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
                 Continue For
             End If
 
-            Dim rc = task.redCells(index)
+            Dim rc = task.rcList(index)
             If rc.depthMean = 0 Then Continue For
 
             If colorList(i) <> rc.colorTrack Then
@@ -349,11 +349,11 @@ Public Class Tessallate_Bricks : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
             Dim center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-            Dim index = task.redMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
             Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
             If index >= 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
-                Dim rc = task.redCells(index)
+                Dim rc = task.rcList(index)
                 depthMin = If(depthMax > rc.depthMean, rc.depthMean, depthMin)
 
                 If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then

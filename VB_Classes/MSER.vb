@@ -39,9 +39,9 @@ Public Class MSER_Basics : Inherits TaskParent
             rc.floodPoint = floodPoints(index)
             rc.maxDist = GetMaxDist(rc)
 
-            rc.indexLast = task.redMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast <> 0 And rc.indexLast < task.redCells.Count Then
-                Dim lrc = task.redCells(rc.indexLast)
+            rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If rc.indexLast <> 0 And rc.indexLast < task.rcList.Count Then
+                Dim lrc = task.rcList(rc.indexLast)
                 rc.maxDStable = lrc.maxDStable
                 rc.colorTrack = lrc.colorTrack
                 matched.Add(rc.indexLast, rc.indexLast)
@@ -56,7 +56,7 @@ Public Class MSER_Basics : Inherits TaskParent
 
         dst2 = RebuildCells(sortedCells)
 
-        labels(2) = CStr(task.redCells.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
+        labels(2) = CStr(task.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
     End Sub
 End Class
 
@@ -585,7 +585,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
             boxes.Add(r.Width * r.Height, i)
         Next
 
-        Dim redCells As New List(Of rcData)({New rcData})
+        Dim rcList As New List(Of rcData)({New rcData})
         dst1.SetTo(0)
         dst2.SetTo(0)
         Dim lastMap = cellMap.Clone
@@ -593,7 +593,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
         Dim matchCount As Integer
         For i = 0 To floodPoints.Count - 1
             Dim rc As New rcData
-            rc.index = redCells.Count
+            rc.index = rcList.Count
             rc.floodPoint = floodPoints(i)
             Dim val = dst3.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X)
             rc.rect = boxInput(boxes.ElementAt(i).Value)
@@ -609,7 +609,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
             rc.colorTrack = task.scalarColors(i Mod 255)
             If rc.indexLast <> 0 Then matchCount += 1
 
-            redCells.Add(rc)
+            rcList.Add(rc)
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.colorTrack, rc.mask)
         Next

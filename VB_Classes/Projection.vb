@@ -2,7 +2,7 @@
 Imports System.Windows.Forms
 Public Class Projection_Basics : Inherits TaskParent
     Public redCellInput As New List(Of rcData)
-    Public redCells As New List(Of rcData)
+    Public rcList As New List(Of rcData)
     Public viewType As String = "Top"
     Public objectList As New List(Of cv.Vec4f)
     Public showRectangles As Boolean = True
@@ -17,7 +17,7 @@ Public Class Projection_Basics : Inherits TaskParent
 
             task.redC.inputRemoved = Not histTop.dst3
             dst2 = runRedC(histTop.dst3, labels(2))
-            redCellInput = task.redCells
+            redCellInput = task.rcList
         End If
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -31,11 +31,11 @@ Public Class Projection_Basics : Inherits TaskParent
             check2 += rc.pixels
         Next
 
-        redCells.Clear()
-        redCells.Add(New rcData)
+        rcList.Clear()
+        rcList.Add(New rcData)
         For Each rc In sortedCells.Values
-            rc.index = redCells.Count
-            redCells.Add(rc)
+            rc.index = rcList.Count
+            rcList.Add(rc)
         Next
 
         Dim otherCount As Integer
@@ -48,7 +48,7 @@ Public Class Projection_Basics : Inherits TaskParent
         objectList.Clear()
         Dim xy1 As Single, xy2 As Single, z1 As Single, z2 As Single
         If task.heartBeat Then strOut = ""
-        For Each rc In redCells
+        For Each rc In rcList
             If rc.index = 0 Then Continue For
             If rc.index <= task.redOptions.identifyCount Then
                 If viewType = "Side" Then
@@ -75,18 +75,18 @@ Public Class Projection_Basics : Inherits TaskParent
         If task.heartBeat Then
             Dim check1 = src.Sum()(0)
             Dim depthCount = task.pcSplit(2).CountNonZero
-            strOut += CStr(redCells.Count - task.redOptions.identifyCount - 1) + " other objects " + vbTab + CStr(otherCount) + " pixels" + vbCrLf
+            strOut += CStr(rcList.Count - task.redOptions.identifyCount - 1) + " other objects " + vbTab + CStr(otherCount) + " pixels" + vbCrLf
             strOut += "Sum above   " + vbTab + CStr(check2) + " pixels" + " (losses from histogram ranges?)" + vbCrLf
             strOut += "Sum of src  " + vbTab + CStr(check1) + " pixels" + " (losses from RedCloud.)" + vbCrLf
             strOut += "Actual count" + vbTab + CStr(depthCount) + " pixels" + vbCrLf
         End If
         SetTrueText(strOut, 3)
         If showRectangles Then
-            For i = 0 To Math.Min(redCells.Count, task.redOptions.identifyCount) - 1
-                dst2.Rectangle(redCells(i).rect, task.HighlightColor, task.lineWidth)
+            For i = 0 To Math.Min(rcList.Count, task.redOptions.identifyCount) - 1
+                dst2.Rectangle(rcList(i).rect, task.HighlightColor, task.lineWidth)
             Next
         End If
-        labels(2) = CStr(redCells.Count) + " objects were found in the " + viewType + " view."
+        labels(2) = CStr(rcList.Count) + " objects were found in the " + viewType + " view."
     End Sub
 End Class
 
@@ -188,7 +188,7 @@ Public Class Projection_Top : Inherits TaskParent
         task.redC.inputRemoved = Not histTop.dst3
         runRedC(histTop.dst3)
 
-        objects.redCellInput = task.redCells
+        objects.redCellInput = task.rcList
         objects.dst2 = task.redC.dst2
         objects.labels(2) = task.redC.labels(2)
         objects.Run(histTop.dst2)
@@ -219,7 +219,7 @@ Public Class Projection_Side : Inherits TaskParent
         task.redC.inputRemoved = Not histSide.dst3
         runRedC(histSide.dst3)
 
-        objects.redCellInput = task.redCells
+        objects.redCellInput = task.rcList
         objects.dst2 = task.redC.dst2
         objects.labels(2) = task.redC.labels(2)
         objects.Run(histSide.dst2)
@@ -293,7 +293,7 @@ Public Class Projection_Object : Inherits TaskParent
             Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
             Dim mask = task.pointCloud.InRange(lower, upper)
 
-            Dim rc = top.objects.redCells(task.gOptions.debugSliderValue + 1) ' the biggest by default...
+            Dim rc = top.objects.rcList(task.gOptions.debugSliderValue + 1) ' the biggest by default...
             dst0.SetTo(0)
             dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -326,8 +326,8 @@ Public Class Projection_Floor : Inherits TaskParent
         labels(2) = isolate.labels(2)
         labels(3) = isolate.labels(3)
 
-        If objSlider.value + 1 >= isolate.side.objects.redCells.Count Then Exit Sub
-        Dim rc = isolate.top.objects.redCells(objSlider.Value + 1) ' the biggest by default...
+        If objSlider.value + 1 >= isolate.side.objects.rcList.Count Then Exit Sub
+        Dim rc = isolate.top.objects.rcList(objSlider.Value + 1) ' the biggest by default...
         Dim rowList As New List(Of Integer)
         For y = 0 To rc.rect.Height - 1
             rowList.Add(dst2(rc.rect).Row(y).CountNonZero() + rc.rect.Y)

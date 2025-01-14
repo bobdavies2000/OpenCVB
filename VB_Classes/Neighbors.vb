@@ -13,14 +13,14 @@ Public Class Neighbors_Basics : Inherits TaskParent
         If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
 
         knn.queries.Clear()
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             knn.queries.Add(rc.maxDStable)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
 
-        For i = 0 To task.redCells.Count - 1
-            Dim rc = task.redCells(i)
+        For i = 0 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
             rc.nabs = knn.neighbors(i)
         Next
 
@@ -29,7 +29,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
             dst3.SetTo(0)
             Dim ptCount As Integer
             For Each index In task.rc.nabs
-                Dim pt = task.redCells(index).maxDStable
+                Dim pt = task.rcList(index).maxDStable
                 If pt = task.rc.maxDStable Then
                     DrawCircle(dst2, pt, task.DotSize, black)
                 Else
@@ -56,7 +56,7 @@ Public Class Neighbors_Intersects : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
             dst2 = runRedC(src, labels(2))
-            src = task.redMap
+            src = task.rcMap
         End If
 
         Dim samples(src.Total - 1) As Byte
@@ -109,7 +109,7 @@ Public Class Neighbors_ColorOnly : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        corners.Run(task.redMap.Clone())
+        corners.Run(task.rcMap.Clone())
         For Each pt In corners.nPoints
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
         Next
@@ -127,7 +127,7 @@ End Class
 Public Class Neighbors_Precise : Inherits TaskParent
     Public nabList As New List(Of List(Of Integer))
     Dim stats As New Cell_Basics
-    Public redCells As List(Of rcData)
+    Public rcList As List(Of rcData)
     Public runRedCloud As Boolean = False
     Public Sub New()
         cPtr = Neighbors_Open()
@@ -138,8 +138,8 @@ Public Class Neighbors_Precise : Inherits TaskParent
         If standaloneTest() Or runRedCloud Then
             dst2 = runRedC(src, labels(2))
 
-            src = task.redMap
-            redCells = task.redCells
+            src = task.rcMap
+            rcList = task.rcList
         End If
 
         Dim mapData(src.Total - 1) As Byte
@@ -152,23 +152,23 @@ Public Class Neighbors_Precise : Inherits TaskParent
         'If nabCount > 0 Then
         '    Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbors_NabList(cPtr))
         '    nabList.Clear()
-        '    For i = 0 To redCells.Count - 1
+        '    For i = 0 To rcList.Count - 1
         '        nabList.Add(New List(Of Integer))
         '    Next
-        '    redCells(i).nab = nabList.Min()
+        '    rcList(i).nab = nabList.Min()
         '    For i = 0 To nabCount - 1
         '        Dim pt = nabData.Get(Of cv.Point)(i, 0)
         '        If nabList(pt.X).Contains(pt.Y) = False And pt.Y <> 0 Then
         '            nabList(pt.X).Add(pt.Y)
-        '            redCells(pt.X).nabs.Add(pt.Y)
+        '            rcList(pt.X).nabs.Add(pt.Y)
         '        End If
         '        If nabList(pt.Y).Contains(pt.X) = False And pt.X <> 0 Then
         '            nabList(pt.Y).Add(pt.X)
-        '            redCells(pt.Y).nabs.Add(pt.X)
+        '            rcList(pt.Y).nabs.Add(pt.X)
         '        End If
         '    Next
         '    nabList(0).Clear() ' neighbors to zero are not interesting (yet?)
-        '    redCells(0).nabs.Clear() ' not interesting.
+        '    rcList(0).nabs.Clear() ' not interesting.
 
         '    If task.heartBeat And standaloneTest() Then
         '        stats.Run(task.color)
@@ -179,7 +179,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
         '            dst1.SetTo(0)
         '            dst1(task.rc.rect).SetTo(task.rc.colorTrack, task.rc.mask)
         '            For Each index In nabList(task.rc.index)
-        '                Dim rc = redCells(index)
+        '                Dim rc = rcList(index)
         '                dst1(rc.rect).SetTo(rc.colorTrack, rc.mask)
         '                strOut += CStr(index) + ","
         '            Next

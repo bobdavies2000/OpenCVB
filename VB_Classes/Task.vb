@@ -10,12 +10,14 @@ Imports System.Windows.Controls
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public redC As RedColor_Basics
-    Public redL As RedCloud_Basics
-
-    Public rl As New rcData
     Public rc As New rcData
-    Public redCells As New List(Of rcData)
-    Public redMap As cv.Mat
+    Public rcList As New List(Of rcData)
+    Public rcMap As cv.Mat
+
+    Public cl As New rcData
+    Public redCloud As RedCloud_Basics
+    Public clList As New List(Of rcData)
+    Public clMap As cv.Mat
 
     Public lpList As New List(Of linePoints)
 
@@ -395,11 +397,11 @@ Public Class VBtask : Implements IDisposable
             If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
             ' MSER mistakenly can have 1 cell - just ignore it.
-            If redCells.Count > 1 Then setSelectedCell()
+            If rcList.Count > 1 Then setSelectedCell()
 
             If redOptions.IdentifyCells.Checked Then
                 ' cannot use rc as it means rc here!  Be careful...
-                For Each rcX In redCells
+                For Each rcX In rcList
                     Dim str As New TrueText(CStr(rcX.index), rcX.maxDist, 2)
                     trueData.Add(str)
                     If rcX.index = 20 Then Exit For
@@ -481,7 +483,7 @@ Public Class VBtask : Implements IDisposable
 
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
-        redMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+        rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -555,30 +557,30 @@ Public Class VBtask : Implements IDisposable
         Dim str As New TrueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
-    Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+    Public Sub setSelectedCell(ByRef rcList As List(Of rcData), ByRef cellMap As cv.Mat)
         Static ptNew As New cv.Point
-        If redCells.Count = 0 Then Exit Sub
-        If ClickPoint = ptNew And redCells.Count > 1 Then ClickPoint = redCells(1).maxDist
+        If rcList.Count = 0 Then Exit Sub
+        If ClickPoint = ptNew And rcList.Count > 1 Then ClickPoint = rcList(1).maxDist
         Dim index = cellMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
-        rc = redCells(index)
-        If index > 0 And index < redCells.Count Then
-            ' ClickPoint = redCells(index).maxDist
-            rc = redCells(index)
+        rc = rcList(index)
+        If index > 0 And index < rcList.Count Then
+            ' ClickPoint = rcList(index).maxDist
+            rc = rcList(index)
         End If
     End Sub
     Public Sub setSelectedCell()
-        If redCells.Count = 0 Then Exit Sub
-        If ClickPoint = newPoint And redCells.Count > 1 Then
-            ClickPoint = redCells(1).maxDist
+        If rcList.Count = 0 Then Exit Sub
+        If ClickPoint = newPoint And rcList.Count > 1 Then
+            ClickPoint = rcList(1).maxDist
         End If
-        Dim index = redMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
-        If index > 0 And index < redCells.Count Then
-            ' ClickPoint = redCells(index).maxDist
-            rc = redCells(index)
+        Dim index = rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
+        If index > 0 And index < rcList.Count Then
+            ' ClickPoint = rcList(index).maxDist
+            rc = rcList(index)
             task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
-            If redCells.Count > 1 Then rc = redCells(1)
+            If rcList.Count > 1 Then rc = rcList(1)
         End If
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)

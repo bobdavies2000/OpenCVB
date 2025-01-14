@@ -180,7 +180,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
     Public pixelVector As New List(Of List(Of Single))
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
     Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-    Dim lastredCells As New List(Of rcData)
+    Dim lastrcList As New List(Of rcData)
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         task.redOptions.HistBinBar3D.Value = 5
@@ -199,8 +199,8 @@ Public Class Distance_RedCloud : Inherits TaskParent
 
         pixelVector.Clear()
         distances.Clear()
-        For i = 0 To task.redCells.Count - 1
-            Dim rc = task.redCells(i)
+        For i = 0 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
             hColor.inputMask = rc.mask
             hColor.Run(src(rc.rect))
 
@@ -217,7 +217,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
                 If index Mod 6 = 5 Then strOut += vbCrLf
                 index += 1
 
-                Dim rc = task.redCells(el.Value)
+                Dim rc = task.rcList(el.Value)
                 SetTrueText(CStr(el.Value), rc.maxDist)
             Next
 
@@ -228,18 +228,18 @@ Public Class Distance_RedCloud : Inherits TaskParent
                 strOut += Format(el.Key, fmt1) + vbTab
                 If index Mod 6 = 5 Then strOut += vbCrLf
                 index += 1
-                Dim rc = lastredCells(el.Value)
+                Dim rc = lastrcList(el.Value)
                 SetTrueText(el.Value, New cv.Point(rc.maxDist.X, rc.maxDist.Y + 10))
             Next
 
             For Each el In distances
-                Dim rc = task.redCells(el.Value)
+                Dim rc = task.rcList(el.Value)
                 SetTrueText(CStr(el.Value), rc.maxDist)
             Next
         End If
 
         For Each el In lastDistances
-            Dim rp = lastredCells(el.Value)
+            Dim rp = lastrcList(el.Value)
             SetTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
         Next
 
@@ -248,7 +248,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
         For i = 0 To distances.Count - 1
-            Dim rp = task.redCells(distances.ElementAt(i).Value)
+            Dim rp = task.rcList(distances.ElementAt(i).Value)
             task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
             dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
         Next
@@ -259,7 +259,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastredCells = New List(Of rcData)(task.redCells)
+        lastrcList = New List(Of rcData)(task.rcList)
     End Sub
 End Class
 

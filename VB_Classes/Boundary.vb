@@ -13,7 +13,7 @@ Public Class Boundary_Basics : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then
             If task.redOptions.UseColorOnly.Checked Then
                 color8U.Run(src)
@@ -89,7 +89,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
     Public smallContours As New List(Of List(Of cv.Point))
     Dim options As New Options_BoundaryRect
     Public Sub New()
-        desc = "Build the boundaries for redCells and remove interior rectangles"
+        desc = "Build the boundaries for rcList and remove interior rectangles"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
@@ -147,7 +147,7 @@ Public Class Boundary_RemovedRects : Inherits TaskParent
     Public bRects As New Boundary_Rectangles
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        desc = "Build the boundaries for redCells and remove interior rectangles"
+        desc = "Build the boundaries for rcList and remove interior rectangles"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         bRects.Run(src)
@@ -200,5 +200,31 @@ Public Class Boundary_Overlap : Inherits TaskParent
             Next
             If overlapping Then Exit For
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Boundary_RedCloud : Inherits TaskParent
+    Dim rCloud As New RedCloud_PrepData
+    Public Sub New()
+        task.redOptions.IdentifyCountBar.Value = 100
+        task.gOptions.MaxDepthBar.Value = 20
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Find the RedCloud cell contours"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        rCloud.Run(src)
+        dst2 = runRedC(rCloud.dst2, labels(2))
+
+        dst3.SetTo(0)
+        For i = 1 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
+            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+        Next
+
+        labels(3) = $"{task.rcList.Count} cells were found."
     End Sub
 End Class

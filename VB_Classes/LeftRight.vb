@@ -313,25 +313,25 @@ Public Class LeftRight_RedColorBoth : Inherits TaskParent
         Static rightMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
         ' update the right image first so selectedCell works properly.
-        task.redCells = New List(Of rcData)(rightCells)
-        task.redMap = rightMap.Clone
+        task.rcList = New List(Of rcData)(rightCells)
+        task.rcMap = rightMap.Clone
 
         fLess.Run(task.rightView)
         dst3 = runRedC(fLess.dst2, labels(3))
         labels(3) = "Right view - " + labels(3)
 
-        rightCells = New List(Of rcData)(task.redCells)
-        rightMap = task.redMap.Clone
+        rightCells = New List(Of rcData)(task.rcList)
+        rightMap = task.rcMap.Clone
 
-        task.redCells = New List(Of rcData)(leftCells)
-        task.redMap = leftMap.Clone
+        task.rcList = New List(Of rcData)(leftCells)
+        task.rcMap = leftMap.Clone
 
         fLess.Run(task.leftView)
         dst2 = runRedC(fLess.dst2, labels(2))
         labels(2) = "Left view - " + labels(2)
 
-        leftCells = New List(Of rcData)(task.redCells)
-        leftMap = task.redMap.Clone
+        leftCells = New List(Of rcData)(task.rcList)
+        leftMap = task.rcMap.Clone
     End Sub
 End Class
 

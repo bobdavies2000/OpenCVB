@@ -8,8 +8,8 @@ Public Class Triangle_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        If task.redCells.Count <= 1 Then Exit Sub
-        task.rc = task.redCells(1)
+        If task.rcList.Count <= 1 Then Exit Sub
+        task.rc = task.rcList(1)
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
@@ -49,7 +49,7 @@ Public Class Triangle_HullContour : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
-        If task.redCells.Count <= 1 Then Exit Sub
+        If task.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rc
 
         rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
@@ -83,11 +83,11 @@ Public Class Triangle_RedCloud : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        If task.redCells.Count <= 1 Then Exit Sub
-        task.rc = task.redCells(1)
+        If task.rcList.Count <= 1 Then Exit Sub
+        task.rc = task.rcList(1)
 
         triangles.Clear()
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             Dim pt3D As New List(Of cv.Point3f)
             For Each pt In rc.contour
                 pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
@@ -121,7 +121,7 @@ Public Class Triangle_Cell : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
-        If task.redCells.Count <= 1 Then Exit Sub
+        If task.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 
@@ -175,7 +175,7 @@ Public Class Triangle_Mask : Inherits TaskParent
 
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
-        If task.redCells.Count <= 1 Then Exit Sub
+        If task.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 

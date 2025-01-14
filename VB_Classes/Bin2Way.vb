@@ -87,7 +87,7 @@ Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
         flood.inputRemoved = Not bin2.mats.mat(0)
         flood.Run(bin2.mats.mat(0))
         dst2 = flood.dst2
-        If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified"
+        If task.heartBeat Then labels(2) = CStr(task.rcList.Count) + " cells were identified"
     End Sub
 End Class
 
@@ -103,13 +103,13 @@ Public Class Bin2Way_RedCloudLightest : Inherits TaskParent
     Public Sub New()
         desc = "Use RedCloud with the lightest regions"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then bin2.Run(src)
 
         flood.inputRemoved = Not bin2.mats.mat(3)
         flood.Run(bin2.mats.mat(3))
         dst2 = flood.dst2
-        If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified"
+        If task.heartBeat Then labels(2) = CStr(task.rcList.Count) + " cells were identified"
     End Sub
 End Class
 
@@ -122,7 +122,7 @@ Public Class Bin2Way_RecurseOnce : Inherits TaskParent
     Public Sub New()
         desc = "Keep splitting an image between light and dark"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         bin2.fraction = src.Total / 2
@@ -158,18 +158,18 @@ End Class
 Public Class Bin2Way_RedCloud : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
-    Dim cellMaps(3) As cv.Mat, redCells(3) As List(Of rcData)
+    Dim cellMaps(3) As cv.Mat, rcList(3) As List(Of rcData)
     Dim options As New Options_Bin2WayRedCloud
     Public Sub New()
         flood.showSelected = False
         desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
-            For i = 0 To redCells.Count - 1
-                redCells(i) = New List(Of rcData)
+            For i = 0 To rcList.Count - 1
+                rcList(i) = New List(Of rcData)
                 cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
@@ -178,13 +178,13 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
-            task.redMap = cellMaps(i)
-            task.redCells = redCells(i)
+            task.rcMap = cellMaps(i)
+            task.rcList = rcList(i)
             flood.inputRemoved = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))
-            cellMaps(i) = task.redMap.Clone
-            redCells(i) = New List(Of rcData)(task.redCells)
-            For Each rc In task.redCells
+            cellMaps(i) = task.rcMap.Clone
+            rcList(i) = New List(Of rcData)(task.rcList)
+            For Each rc In task.rcList
                 If rc.index = 0 Then Continue For
                 sortedCells.Add(rc.pixels, rc)
             Next
@@ -192,6 +192,6 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
 
         dst2 = RebuildCells(sortedCells)
 
-        If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
+        If task.heartBeat Then labels(2) = CStr(task.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class

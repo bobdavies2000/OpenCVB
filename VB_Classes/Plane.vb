@@ -94,7 +94,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
         If task.heartBeat Then addW.src2.SetTo(0)
 
         Dim flatCount = 0
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             If rc.depthMean < 1.0 Then Continue For ' close objects look like planes.
             Dim RMSerror As Double = 0
             Dim pixelCount = 0
@@ -157,7 +157,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
         dst2 = plane.dst2
 
         dst3.SetTo(0)
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             If plane.options.reuseRawDepthData = False Then buildCloudPlane(rc)
         Next
         If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
@@ -271,7 +271,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         dst3.SetTo(0)
         Dim newCells As New List(Of rcData)
         Dim rcX = task.rc
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
                 rc.eq = fitDepthPlane(buildMaskPointEq(rc))
@@ -285,7 +285,7 @@ Public Class Plane_CellColor : Inherits TaskParent
                                               Math.Abs(255 * rc.eq(1)),
                                               Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
-        task.redCells = New List(Of rcData)(newCells)
+        task.rcList = New List(Of rcData)(newCells)
     End Sub
 End Class
 

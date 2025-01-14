@@ -101,7 +101,7 @@ Public Class RedCloud_BasicsHist : Inherits TaskParent
         rCloud.Run(src)
         If task.heartBeat Then
             dst2.SetTo(0)
-            For Each rc In task.redCells
+            For Each rc In task.rcList
                 dst2(rc.rect).SetTo(rc.depthMean, rc.mask)
             Next
             Dim mm = GetMinMax(dst2, task.depthMask)
@@ -286,7 +286,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
         combinedCells.Clear()
         Dim drawRectOnlyRun As Boolean
         If task.drawRect.Width * task.drawRect.Height > 10 Then drawRectOnlyRun = True
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
             combinedCells.Add(rc)
         Next

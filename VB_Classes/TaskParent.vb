@@ -338,13 +338,13 @@ Public Class TaskParent : Implements IDisposable
         Return r
     End Function
     Public Function RebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        task.redMap.SetTo(0)
+        task.rcList.Clear()
+        task.rcList.Add(New rcData)
+        task.rcMap.SetTo(0)
         For Each rc In sortedCells.Values
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-            task.redMap(rc.rect).SetTo(rc.index, rc.mask)
+            rc.index = task.rcList.Count
+            task.rcList.Add(rc)
+            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
 
             If rc.index >= 255 Then Exit For
         Next
@@ -368,7 +368,7 @@ Public Class TaskParent : Implements IDisposable
     Public Function DisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             dst(rc.rect).SetTo(rc.colorCurr, rc.mask)
         Next
 

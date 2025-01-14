@@ -119,7 +119,7 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
         dst2 = runRedC(hColor.dst2, labels(2))
-        If task.redCells.Count > 0 Then dst2(task.rc.rect).SetTo(white, task.rc.mask)
+        If task.rcList.Count > 0 Then dst2(task.rc.rect).SetTo(white, task.rc.mask)
     End Sub
 End Class
 
@@ -208,7 +208,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
 
         pixel.Run(src)
 
-        For Each cell In task.redCells
+        For Each cell In task.rcList
             cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst2(cell.rect), task.redOptions.rangesBGR)
         Next
 
@@ -233,7 +233,7 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
 
         dst2 = runRedC(pixel.dst2, labels(2))
 
-        If task.redCells.Count > 0 Then
+        If task.rcList.Count > 0 Then
             dst2(task.rc.rect).SetTo(white, task.rc.mask)
         End If
     End Sub
@@ -286,11 +286,11 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         pixels.Run(src)
-        dst2 = task.redMap
+        dst2 = task.rcMap
         dst3 = dst2.InRange(0, 0)
         If pixels.pixelVector.Count = 0 Then Exit Sub
         dst1.SetTo(0)
-        dst0 = task.redMap
+        dst0 = task.rcMap
         For Each roi In task.gridRects
             If dst3(roi).CountNonZero Then
                 Dim candidates As New List(Of Integer)
@@ -309,10 +309,10 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
                         Dim vec = pixels.pixelVector(index - 1)
                         distances.Add(distanceN(vec, hVector.histArray))
                     Next
-                    Dim cell = pixels.redCells(candidates(distances.IndexOf(distances.Min)) - 1)
+                    Dim cell = pixels.rcList(candidates(distances.IndexOf(distances.Min)) - 1)
                     dst1(roi).SetTo(cell.colorTrack, dst3(roi))
                 ElseIf candidates.Count = 1 Then
-                    Dim cell = pixels.redCells(candidates(0) - 1)
+                    Dim cell = pixels.rcList(candidates(0) - 1)
                     dst1(roi).SetTo(cell.colorTrack, dst3(roi))
                 End If
             End If

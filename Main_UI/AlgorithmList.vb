@@ -144,6 +144,7 @@ Public Class algorithmList
 	If algorithmName = "Boundary_Basics" Then return new Boundary_Basics
 	If algorithmName = "Boundary_Overlap" Then return new Boundary_Overlap
 	If algorithmName = "Boundary_Rectangles" Then return new Boundary_Rectangles
+	If algorithmName = "Boundary_RedCloud" Then return new Boundary_RedCloud
 	If algorithmName = "Boundary_RemovedRects" Then return new Boundary_RemovedRects
 	If algorithmName = "Boundary_Tiers" Then return new Boundary_Tiers
 	If algorithmName = "Brightness_Basics" Then return new Brightness_Basics

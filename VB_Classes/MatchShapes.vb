@@ -80,7 +80,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
 
         If standaloneTest() Then
             hulls.Run(task.color)
-            If task.redCells.Count = 0 Then Exit Sub
+            If task.rcList.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
             rc = task.rc
         End If
@@ -89,7 +89,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
         similarCells.Clear()
 
         Dim minMatch As Single = Single.MaxValue
-        For Each rc2 In task.redCells
+        For Each rc2 In task.rcList
             If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
             If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
@@ -117,7 +117,7 @@ End Class
 
 
 Public Class MatchShapes_Nearby : Inherits TaskParent
-    Public redCells As New List(Of rcData)
+    Public rcList As New List(Of rcData)
     Public similarCells As New List(Of rcData)
     Public bestCell As Integer
     Public rc As New rcData
@@ -135,8 +135,8 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
 
         If myStandalone Then
             dst2 = runRedC(task.color, labels(2)).Clone
-            If task.redCells.Count = 0 Then Exit Sub
-            addTour.redCells = New List(Of rcData)(task.redCells)
+            If task.rcList.Count = 0 Then Exit Sub
+            addTour.rcList = New List(Of rcData)(task.rcList)
             addTour.Run(src)
             rc = task.rc
         End If
@@ -151,8 +151,8 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
 
         Dim minMatch As Single = Single.MaxValue
         bestCell = -1
-        For i = 0 To addTour.redCells.Count - 1
-            Dim rc2 = addTour.redCells(i)
+        For i = 0 To addTour.rcList.Count - 1
+            Dim rc2 = addTour.rcList(i)
             If rc2.contour Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rc.contour, rc2.contour, options.matchOption)
             If matchVal < options.matchThreshold Then
@@ -197,7 +197,7 @@ Public Class MatchShapes_Hulls : Inherits TaskParent
 
         Dim rcX = task.rc
 
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
             If matchVal < options.matchThreshold Then DrawContour(dst3(rc.rect), rc.hull, white, -1)
@@ -230,7 +230,7 @@ Public Class MatchShapes_Contours : Inherits TaskParent
 
         Dim rcX = task.rc
 
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             If rc.contour Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
             If matchVal < options.matchThreshold Then DrawContour(dst3(rc.rect), rc.contour, white, -1)

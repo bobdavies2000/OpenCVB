@@ -29,8 +29,8 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
         SetTrueText(task.redC.strOut, 3)
 
         If task.ClickPoint = newPoint Then
-            If task.redCells.Count > 1 Then
-                task.rc = task.redCells(1)
+            If task.rcList.Count > 1 Then
+                task.rc = task.rcList(1)
                 task.ClickPoint = task.rc.maxDist
             End If
         End If
@@ -52,13 +52,13 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         If standalone Then dst2 = runRedC(src, labels(2))
 
         Dim removeCells As New List(Of Integer)
-        For i = task.redCells.Count - 1 To task.redOptions.identifyCount Step -1
-            Dim rc = task.redCells(i)
+        For i = task.rcList.Count - 1 To task.redOptions.identifyCount Step -1
+            Dim rc = task.rcList(i)
             Dim nabs As New List(Of Integer)
             Dim contains As New List(Of Integer)
-            Dim count = Math.Min(task.redOptions.identifyCount, task.redCells.Count)
+            Dim count = Math.Min(task.redOptions.identifyCount, task.rcList.Count)
             For j = 0 To count - 1
-                Dim rcBig = task.redCells(j)
+                Dim rcBig = task.rcList(j)
                 If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
                 If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
             Next
@@ -67,7 +67,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each index In removeCells
-            Dim rc = task.redCells(index)
+            Dim rc = task.rcList(index)
             dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
         Next
 
@@ -113,8 +113,8 @@ Public Class Flood_BasicsMask : Inherits TaskParent
 
         dst2 = cellGen.dst2
 
-        Dim cellCount = Math.Min(task.redOptions.identifyCount, task.redCells.Count)
-        If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below."
+        Dim cellCount = Math.Min(task.redOptions.identifyCount, task.rcList.Count)
+        If task.heartBeat Then labels(2) = $"{task.rcList.Count} cells identified and the largest {cellCount} are numbered below."
 
         If showSelected Then task.setSelectedCell()
     End Sub
@@ -165,7 +165,7 @@ End Class
 
 Public Class Flood_Motion : Inherits TaskParent
     Dim flood As New Flood_Basics
-    Dim redCells As New List(Of rcData)
+    Dim rcList As New List(Of rcData)
     Dim cellMap As New cv.Mat
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
@@ -176,25 +176,25 @@ Public Class Flood_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             flood.Run(src)
-            redCells = New List(Of rcData)(task.redCells)
-            cellMap = task.redMap.Clone
+            rcList = New List(Of rcData)(task.rcList)
+            cellMap = task.rcMap.Clone
             dst2 = flood.dst2.Clone
             dst3 = flood.dst2.Clone
             labels(2) = flood.labels(2)
             labels(3) = flood.labels(2)
 
             maxDists.Clear()
-            For Each rc In redCells
+            For Each rc In rcList
                 maxDists.Add(rc.maxDist)
                 maxIndex.Add(rc.index)
             Next
         Else
             flood.Run(src)
             dst1.SetTo(0)
-            For i = 0 To task.redCells.Count - 1
-                Dim rc = task.redCells(i)
+            For i = 0 To task.rcList.Count - 1
+                Dim rc = task.rcList(i)
                 If maxDists.Contains(rc.maxDist) Then
-                    Dim lrc = redCells(maxIndex(maxDists.IndexOf(rc.maxDist)))
+                    Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
                     dst1(lrc.rect).SetTo(lrc.colorTrack, lrc.mask)
                 End If
             Next
@@ -212,7 +212,7 @@ End Class
 Public Class Flood_Motion1 : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim motion As New Motion_Basics
-    Dim redCells As New List(Of rcData)
+    Dim rcList As New List(Of rcData)
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
     Public Sub New()
@@ -221,14 +221,14 @@ Public Class Flood_Motion1 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             flood.Run(src)
-            redCells = New List(Of rcData)(task.redCells)
+            rcList = New List(Of rcData)(task.rcList)
             dst2 = flood.dst2.Clone
             dst3 = flood.dst2.Clone
             labels(2) = flood.labels(2)
             labels(3) = flood.labels(2)
 
             maxDists.Clear()
-            For Each rc In redCells
+            For Each rc In rcList
                 maxDists.Add(rc.maxDist)
                 maxIndex.Add(rc.index)
             Next
@@ -236,10 +236,10 @@ Public Class Flood_Motion1 : Inherits TaskParent
             flood.Run(src)
             motion.Run(flood.dst2)
 
-            For i = 0 To task.redCells.Count - 1
-                Dim rc = task.redCells(i)
+            For i = 0 To task.rcList.Count - 1
+                Dim rc = task.rcList(i)
                 If maxDists.Contains(rc.maxDist) Then
-                    Dim lrc = redCells(maxIndex(maxDists.IndexOf(rc.maxDist)))
+                    Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
                     dst1(lrc.rect).SetTo(lrc.colorTrack, lrc.mask)
                 End If
             Next
@@ -277,9 +277,9 @@ Public Class Flood_MaxDistPoints : Inherits TaskParent
         dst2 = cellGen.dst2
 
         redCPP.maxList.Clear()
-        For i = 1 To task.redCells.Count - 1
-            redCPP.maxList.Add(task.redCells(i).maxDist.X)
-            redCPP.maxList.Add(task.redCells(i).maxDist.Y)
+        For i = 1 To task.rcList.Count - 1
+            redCPP.maxList.Add(task.rcList(i).maxDist.X)
+            redCPP.maxList.Add(task.rcList(i).maxDist.Y)
         Next
 
         task.setSelectedCell()

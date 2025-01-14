@@ -8,7 +8,7 @@ Public Class SuperPixel_Basics : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst3 = src
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             DrawContour(dst3(rc.rect), rc.contour, white, task.lineWidth)
         Next
     End Sub

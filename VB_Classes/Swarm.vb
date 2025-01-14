@@ -204,7 +204,7 @@ Public Class Swarm_Percentage : Inherits TaskParent
         dst3.SetTo(0)
         Dim pixels As Integer
         Dim count As Integer
-        For Each rc In task.redCells
+        For Each rc In task.rcList
             dst3(rc.rect).SetTo(rc.colorMean, rc.mask)
             pixels += rc.pixels
             count += 1
