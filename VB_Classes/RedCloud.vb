@@ -1,49 +1,58 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
-    Public classCount As Integer
-    Dim options As New Options_RedColorEx
     Public Sub New()
+        If standalone Then task.gOptions.HistBinBar.Value = 255
         task.redOptions.UseDepth.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
         Dim split(3 - 1) As cv.Mat
         split(0) = New cv.Mat
         split(1) = New cv.Mat
         split(2) = New cv.Mat
 
-        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / options.reduceAmt)
-        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / options.reduceAmt)
-        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / options.reduceAmt)
+        Dim reduceAmt = task.redOptions.rcReductionSlider.Value
+        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
+        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
+        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
 
         Select Case task.redOptions.PointCloudReduction
-            Case 0 ' "X Reduction"
-                dst0 = (split(0) * options.reduceAmt).ToMat
-            Case 1 ' "Y Reduction"
-                dst0 = (split(1) * options.reduceAmt).ToMat
-            Case 2 ' "Z Reduction"
-                dst0 = (split(2) * options.reduceAmt).ToMat
-            Case 3 ' "XY Reduction"
-                dst0 = (split(0) * options.reduceAmt + split(1) * options.reduceAmt).ToMat
-            Case 4 ' "XZ Reduction"
-                dst0 = (split(0) * options.reduceAmt + split(2) * options.reduceAmt).ToMat
-            Case 5 ' "YZ Reduction"
-                dst0 = (split(1) * options.reduceAmt + split(2) * options.reduceAmt).ToMat
-            Case 6 ' "XYZ Reduction"
-                dst0 = (split(0) * options.reduceAmt + split(1) * options.reduceAmt + split(2) * options.reduceAmt).ToMat
+            Case 0 ' X Reduction
+                dst0 = (split(0) * reduceAmt).ToMat
+            Case 1 ' Y Reduction
+                dst0 = (split(1) * reduceAmt).ToMat
+            Case 2 ' Z Reduction
+                dst0 = (split(2) * reduceAmt).ToMat
+            Case 3 ' XY Reduction
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).ToMat
+            Case 4 ' XZ Reduction
+                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).ToMat
+            Case 5 ' YZ Reduction
+                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).ToMat
+            Case 6 ' XYZ Reduction
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).ToMat
         End Select
 
         Dim mm As mmData = GetMinMax(dst0)
-        dst0 = (dst0 - mm.minVal)
-        dst3 = dst0 * 255 / (mm.maxVal - mm.minVal)
-        dst3.ConvertTo(dst3, cv.MatType.CV_8U)
-        mm = GetMinMax(dst0)
+        dst2 = (dst0 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        dst2 = runRedC(dst3, strOut)
+        dst2.SetTo(0, task.noDepthMask)
+        mm = GetMinMax(dst2)
+
+        If standaloneTest() Then
+            Static plot As New Plot_Histogram
+            If task.heartBeat Then
+                plot.createHistogram = True
+                plot.maxRange = mm.maxVal
+                plot.Run(dst2)
+                dst3 = plot.dst2
+                labels(3) = CStr(mm.maxVal) + " different levels in the prepared data."
+            End If
+        End If
+
         labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " +
-                    CStr(options.reduceAmt)
+                    CStr(reduceAmt)
     End Sub
 End Class
 

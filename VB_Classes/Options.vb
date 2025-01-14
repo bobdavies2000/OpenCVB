@@ -6566,24 +6566,6 @@ End Class
 
 
 
-Public Class Options_RedColorEx : Inherits OptionParent
-    Public reduceAmt As Integer = 250
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("RedCloud_Basics Reduction", 1, 2500, reduceAmt)
-        End If
-    End Sub
-    Public Sub RunOpt()
-        Static reductionSlider = FindSlider("RedCloud_Basics Reduction")
-        reduceAmt = reductionSlider.value
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Options_RedCloudFeatures : Inherits OptionParent
     Public selection As Integer = 3
     Public labelName As String = "Correlation Y to Z"

@@ -1761,13 +1761,6 @@ public:
 	Options_RBF() {
 	}
 };
-class Options_RedColorEx {
-public:
-	int reduceAmt =  250;
-	void RunOpt() {}
-	Options_RedColorEx() {
-	}
-};
 class Options_RedCloudFeatures {
 public:
 	int selection =  3;

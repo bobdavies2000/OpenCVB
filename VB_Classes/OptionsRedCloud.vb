@@ -25,7 +25,6 @@ Public Class OptionsRedCloud
     Public useDepthChecked As Boolean
     Public identifyCount As Integer
     Public histBins3D As Integer
-    Public minCellSize As Integer
     Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions",
                                        "Binarize_DepthTiers", "FeatureLess_Basics", "Hist3DColor_Basics",
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
@@ -107,8 +106,10 @@ Public Class OptionsRedCloud
         End Select
 
         task.redOptions.setBitReductionBar(5)
-        minCellSizeSlider.Value = 500
         ColorMean.Checked = True
+
+        rcReductionSlider.Value = 50
+        Label3.Text = CStr(rcReductionSlider.Value)
 
         Me.Left = 0
         Me.Top = 0
@@ -421,8 +422,8 @@ Public Class OptionsRedCloud
     Public Sub setSimpleReductionBarMax(val As Integer)
         SimpleReductionBar.Maximum = val
     End Sub
-    Private Sub minCellSizeSlider_ValueChanged(sender As Object, e As EventArgs) Handles minCellSizeSlider.ValueChanged
-        minCellSize = minCellSizeSlider.Value
-        labelCellSize.Text = CStr(minCellSize)
+    Private Sub rcReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles rcReductionSlider.ValueChanged
+        task.optionsChanged = True
+        Label3.Text = CStr(rcReductionSlider.Value)
     End Sub
 End Class
