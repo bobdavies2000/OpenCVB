@@ -1820,9 +1820,10 @@ Public Class RedColor_TopX : Inherits TaskParent
         End If
         labels(2) = "The Top " + CStr(topXcells.Count) + " largest cells in RedCells."
 
-        'dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        'dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        'dst1.SetTo(0, task.motionMask)
-        'task.redC.inputRemoved = dst1
+        dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        task.redC.inputRemoved = dst1
+
+
     End Sub
 End Class

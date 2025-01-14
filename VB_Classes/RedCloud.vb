@@ -1,16 +1,33 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
+    Dim prep As New RedCloud_PrepData
     Public Sub New()
-        If standalone Then task.gOptions.HistBinBar.Value = 255
+        task.redOptions.IdentifyCountBar.Value = 255
+        task.redOptions.rcReductionSlider.Value = 100
+        task.redOptions.ColorTracking.Checked = True
+        desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+
+        dst2 = runRedC(prep.dst2, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_PrepData : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Public Sub New()
         task.redOptions.UseDepth.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split(3 - 1) As cv.Mat
-        split(0) = New cv.Mat
-        split(1) = New cv.Mat
-        split(2) = New cv.Mat
-
+        Dim split() As cv.Mat = {New cv.Mat, New cv.Mat, New cv.Mat}
         Dim reduceAmt = task.redOptions.rcReductionSlider.Value
         task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
@@ -38,16 +55,24 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         dst2.SetTo(0, task.noDepthMask)
-        mm = GetMinMax(dst2)
 
         If standaloneTest() Then
-            Static plot As New Plot_Histogram
             If task.heartBeat Then
+                mm = GetMinMax(dst2)
                 plot.createHistogram = True
+                plot.removeZeroEntry = False
                 plot.maxRange = mm.maxVal
                 plot.Run(dst2)
                 dst3 = plot.dst2
-                labels(3) = CStr(mm.maxVal) + " different levels in the prepared data."
+
+                For i = 0 To plot.histArray.Count - 1
+                    plot.histArray(i) = i
+                Next
+
+                Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
+                cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
+                dst3 = ShowPalette(dst1 * 255 / task.gOptions.HistBinBar.Value)
+                labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
             End If
         End If
 

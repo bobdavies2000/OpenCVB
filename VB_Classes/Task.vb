@@ -9,6 +9,14 @@ Imports System.Windows.Controls
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
+    Public redC As RedColor_Basics
+    Public redL As RedCloud_Basics
+
+    Public rl As New rcData
+    Public rc As New rcData
+    Public redCells As New List(Of rcData)
+    Public redMap As cv.Mat
+
     Public lpList As New List(Of linePoints)
 
     Public gridSize As Integer
@@ -85,6 +93,7 @@ Public Class VBtask : Implements IDisposable
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
     Public pointCloud As New cv.Mat
     Public pcSplit() As cv.Mat
+
     ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public gMatrix As New cv.Mat
     Public IMU_Rotation As System.Numerics.Quaternion
@@ -110,27 +119,12 @@ Public Class VBtask : Implements IDisposable
     Public lines As Line_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
-    Public Enum algTaskID ' match names in algTasks below...
-        gMat = 0
-        IMUBasics = 1
-        lines = 2
-        grid = 3
-        colorizer = 4
-        motion = 5
-        gravityHorizon = 6
-        palette = 7
-        features = 8
-        redCloud = 9
-    End Enum
 
     ' add any task algorithms here
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Object
     Public ogl As OpenGL_Basics
     Public feat As Feature_Basics
-    Public redC As RedColor_Basics
-
-    Public centerRect As cv.Rect
 
     Public pythonPipeIn As NamedPipeServerStream
     Public pythonPipeOut As NamedPipeServerStream
@@ -221,6 +215,8 @@ Public Class VBtask : Implements IDisposable
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
 
+    Public centerRect As cv.Rect ' image center - potential use for motion.
+
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
     Public drawRectUpdated As Boolean
@@ -286,10 +282,6 @@ Public Class VBtask : Implements IDisposable
 
     Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 
-    Public rc As New rcData
-    Public redCells As New List(Of rcData)
-    Public redMap As cv.Mat
-
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
     Public xRange As Single
     Public yRange As Single
@@ -299,6 +291,18 @@ Public Class VBtask : Implements IDisposable
     Public metersPerPixel As Single
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
+    Public Enum algTaskID ' match names in algTasks below...
+        gMat = 0
+        IMUBasics = 1
+        lines = 2
+        grid = 3
+        colorizer = 4
+        motion = 5
+        gravityHorizon = 6
+        palette = 7
+        features = 8
+        redCloud = 9
+    End Enum
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat

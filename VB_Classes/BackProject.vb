@@ -32,7 +32,8 @@ Public Class BackProject_Basics : Inherits TaskParent
 
         '     Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
         '     cv.Cv2.CalcBackProject({input}, {0}, histK.hist.histogram, dst0, ranges)
-        ' for single dimension histograms, backprojection is the same as inrange (and this works for backproject_FeatureLess below)
+        ' for single dimension histograms, backprojection is the same as inrange
+        ' (and this works for backproject_FeatureLess below)
         dst0 = input.InRange(minRange, maxRange)
 
         Dim actualCount = dst0.CountNonZero

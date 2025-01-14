@@ -449,7 +449,7 @@ Public Class Draw_RotatedRect : Inherits TaskParent
         If standalone Then
             Static angle As Single = -10
             rr = New cv.RotatedRect(New cv.Point2f(dst2.Width / 2, dst2.Height / 2),
-                                     task.centerRect.Size, angle)
+                                    task.centerRect.Size, angle)
             angle += 1
             If angle > 10 Then angle = -10
         End If

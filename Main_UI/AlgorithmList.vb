@@ -1462,6 +1462,7 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_BasicsTest" Then return new RedCloud_BasicsTest
 	If algorithmName = "RedCloud_Combine" Then return new RedCloud_Combine
 	If algorithmName = "RedCloud_Depth" Then return new RedCloud_Depth
+	If algorithmName = "RedCloud_PrepData" Then return new RedCloud_PrepData
 	If algorithmName = "RedCloud_World" Then return new RedCloud_World
 	If algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ
 	If algorithmName = "RedCloud_YZ" Then return new RedCloud_YZ
