@@ -57,7 +57,7 @@ Public Class PCA_Basics : Inherits TaskParent
         Return pcaStr
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Or runRedCloud Then dst2 = getRedColor(src, labels(2))
+        If standaloneTest() Or runRedCloud Then dst2 = runRedC(src, labels(2))
 
         Dim rc = task.rc
         Dim inputPoints As New List(Of cv.Point3f)

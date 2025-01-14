@@ -5,7 +5,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        getRedColor(src)
+        runRedC(src)
         labels(2) = task.redC.labels(3)
         dst2.SetTo(0)
         For Each rc As rcData In task.redCells
@@ -38,7 +38,7 @@ Public Class RedTrack_Lines : Inherits TaskParent
             If index > 10 Then Exit For
         Next
 
-        dst2 = getRedColor(dst3, labels(2))
+        dst2 = runRedC(dst3, labels(2))
     End Sub
 End Class
 
@@ -230,7 +230,7 @@ Public Class RedTrack_Features : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, 255)
         Next
 
-        getRedColor(dst2)
+        runRedC(dst2)
         dst3.SetTo(0)
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For

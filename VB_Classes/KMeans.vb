@@ -230,7 +230,7 @@ Public Class KMeans_Edges : Inherits TaskParent
         dst3 = km.dst2 + 1
         classCount = km.classCount
 
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
     End Sub
 End Class
 

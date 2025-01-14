@@ -6052,14 +6052,15 @@ End Class
 
 Public Class Options_MeanSubtraction : Inherits OptionParent
     Public scaleVal As Double = 16
+    Public scaleSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Scaling Factor = mean/scaling factor X100", 1, 500, scaleVal)
         End If
+        scaleSlider = FindSlider("Scaling Factor = mean/scaling factor X100")
     End Sub
     Public Sub RunOpt()
-        Static scaleSlider = FindSlider("Scaling Factor = mean/scaling factor X100")
-        scaleVal = scaleSlider.value
+        scaleVal = scaleSlider.Value
     End Sub
 End Class
 

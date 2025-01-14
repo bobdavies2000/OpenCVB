@@ -43,7 +43,7 @@ Public Class Hull_Contour : Inherits TaskParent
         desc = "Compare the hull to the contour of a RedCloud cell"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
         Dim rc = task.rc

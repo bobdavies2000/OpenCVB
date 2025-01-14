@@ -41,7 +41,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
         mm = GetMinMax(dst0)
 
-        dst2 = getRedColor(dst3, strOut)
+        dst2 = runRedC(dst3, strOut)
         labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " +
                     CStr(options.reduceAmt)
     End Sub
@@ -124,7 +124,7 @@ Public Class RedCloud_BasicsTest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         rCloud.Run(src)
 
-        dst2 = getRedColor(rCloud.dst2, labels(2))
+        dst2 = runRedC(rCloud.dst2, labels(2))
     End Sub
 End Class
 
@@ -247,7 +247,7 @@ Public Class RedCloud_Combine : Inherits TaskParent
             End Select
         End If
 
-        dst2 = getRedColor(dst2, labels(2))
+        dst2 = runRedC(dst2, labels(2))
 
         combinedCells.Clear()
         Dim drawRectOnlyRun As Boolean

@@ -33,6 +33,8 @@ Public Class Color8U_Basics : Inherits TaskParent
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Reduction_Basics
                 Case 9
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New PCA_NColor_CPP
+                Case 10
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New MeanSubtraction_Gray
             End Select
             classifier = colorMethods(index)
         End If

@@ -10,7 +10,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If standalone Or runRedCloud Then dst2 = getRedColor(src, labels(2))
+        If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
 
         knn.queries.Clear()
         For Each rc In task.redCells
@@ -55,7 +55,7 @@ Public Class Neighbors_Intersects : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
-            dst2 = getRedColor(src, labels(2))
+            dst2 = runRedC(src, labels(2))
             src = task.redMap
         End If
 
@@ -107,7 +107,7 @@ Public Class Neighbors_ColorOnly : Inherits TaskParent
         desc = "Find neighbors in a redColor cellMap"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
 
         corners.Run(task.redMap.Clone())
         For Each pt In corners.nPoints
@@ -136,7 +136,7 @@ Public Class Neighbors_Precise : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            dst2 = getRedColor(src, labels(2))
+            dst2 = runRedC(src, labels(2))
 
             src = task.redMap
             redCells = task.redCells

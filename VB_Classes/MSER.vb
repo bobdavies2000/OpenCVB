@@ -437,7 +437,7 @@ Public Class MSER_RedCloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         mBase.Run(src)
 
-        getRedColor(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        runRedC(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub
@@ -483,7 +483,7 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
         labels(3) = CStr(classCount) + " regions identified"
 
         src.SetTo(white, dst3)
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
     End Sub
     Public Sub Close()
         MSER_Close(cPtr)
@@ -523,7 +523,7 @@ Public Class MSER_Basics1 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
     End Sub
 End Class
 

@@ -110,7 +110,7 @@ Public Class Tessallate_QuadSimple : Inherits TaskParent
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
         oglData.Clear()
         dst3.SetTo(0)
 
@@ -232,7 +232,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
         desc = "Prepare to tessellate the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
 
         oglOptions.RunOpt()
         Dim ptM = oglOptions.moveAmount

@@ -116,7 +116,7 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
 
         dst2 = src
 
-        getRedColor(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        runRedC(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
         If task.redCells.Count < 2 Then
             rectList.Clear()
         Else
@@ -500,7 +500,7 @@ Public Class Motion_Enclosing : Inherits TaskParent
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         task.redC.inputMask = Not dst2
-        getRedColor(dst2)
+        runRedC(dst2)
 
         motionRect = New cv.Rect
         If task.redCells.Count < 2 Then Exit Sub

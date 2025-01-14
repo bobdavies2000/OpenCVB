@@ -1062,6 +1062,7 @@ Public Class algorithmList
 	If algorithmName = "MeanShift_Basics" Then return new MeanShift_Basics
 	If algorithmName = "MeanShift_Depth" Then return new MeanShift_Depth
 	If algorithmName = "MeanSubtraction_Basics" Then return new MeanSubtraction_Basics
+	If algorithmName = "MeanSubtraction_Gray" Then return new MeanSubtraction_Gray
 	If algorithmName = "MeanSubtraction_LeftRight" Then return new MeanSubtraction_LeftRight
 	If algorithmName = "Mesh_Basics" Then return new Mesh_Basics
 	If algorithmName = "Mesh_Features" Then return new Mesh_Features
@@ -1513,7 +1514,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_Tiers" Then return new RedColor_Tiers
 	If algorithmName = "RedColor_TiersBinarize" Then return new RedColor_TiersBinarize
 	If algorithmName = "RedColor_TopX" Then return new RedColor_TopX
-	If algorithmName = "RedColor_TopXHulls" Then return new RedColor_TopXHulls
 	If algorithmName = "RedColor_UnmatchedCount" Then return new RedColor_UnmatchedCount
 	If algorithmName = "RedColor_UnstableCells" Then return new RedColor_UnstableCells
 	If algorithmName = "RedColor_UnstableHulls" Then return new RedColor_UnstableHulls

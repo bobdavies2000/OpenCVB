@@ -227,7 +227,7 @@ Public Class LUT_RedCloud : Inherits TaskParent
         desc = "Use LUT on the grayscale image after masking with rc.mask"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2)).Clone
+        dst2 = runRedC(src, labels(2)).Clone
 
         dst3.SetTo(0)
         Dim rc = task.rc

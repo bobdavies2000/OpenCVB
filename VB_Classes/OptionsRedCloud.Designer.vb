@@ -71,10 +71,10 @@ Partial Class OptionsRedCloud
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
+        Me.ColorDepth = New System.Windows.Forms.RadioButton()
         Me.ColorTrackingDepth = New System.Windows.Forms.RadioButton()
         Me.ColorTracking = New System.Windows.Forms.RadioButton()
         Me.ColorMean = New System.Windows.Forms.RadioButton()
-        Me.ColorDepth = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -619,7 +619,18 @@ Partial Class OptionsRedCloud
         Me.ColoringGroup.Size = New System.Drawing.Size(220, 155)
         Me.ColoringGroup.TabIndex = 78
         Me.ColoringGroup.TabStop = False
-        Me.ColoringGroup.Text = "Coloring Options"
+        Me.ColoringGroup.Text = "Output Color Options"
+        '
+        'ColorDepth
+        '
+        Me.ColorDepth.AutoSize = True
+        Me.ColorDepth.Location = New System.Drawing.Point(16, 122)
+        Me.ColorDepth.Name = "ColorDepth"
+        Me.ColorDepth.Size = New System.Drawing.Size(119, 24)
+        Me.ColorDepth.TabIndex = 5
+        Me.ColorDepth.TabStop = True
+        Me.ColorDepth.Text = "Depth Color"
+        Me.ColorDepth.UseVisualStyleBackColor = True
         '
         'ColorTrackingDepth
         '
@@ -653,17 +664,6 @@ Partial Class OptionsRedCloud
         Me.ColorMean.TabStop = True
         Me.ColorMean.Text = "Mean color"
         Me.ColorMean.UseVisualStyleBackColor = True
-        '
-        'ColorDepth
-        '
-        Me.ColorDepth.AutoSize = True
-        Me.ColorDepth.Location = New System.Drawing.Point(16, 122)
-        Me.ColorDepth.Name = "ColorDepth"
-        Me.ColorDepth.Size = New System.Drawing.Size(119, 24)
-        Me.ColorDepth.TabIndex = 5
-        Me.ColorDepth.TabStop = True
-        Me.ColorDepth.Text = "Depth Color"
-        Me.ColorDepth.UseVisualStyleBackColor = True
         '
         'OptionsRedCloud
         '

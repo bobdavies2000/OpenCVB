@@ -160,7 +160,7 @@ Public Class TreeviewForm
                 Next
 
                 PercentTime.Text += vbCrLf + Format(otherTime, "00.0%") + " " + CStr(otherCount) +
-                                    " algorithms all < 1.0%" + vbCrLf
+                                    " algorithms each < 1.0%" + vbCrLf
             End If
         End SyncLock
     End Sub

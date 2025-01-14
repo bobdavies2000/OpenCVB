@@ -599,12 +599,12 @@ Public Class TaskParent : Implements IDisposable
         task.palette.Run(input)
         Return task.palette.dst2.Clone
     End Function
-    Public Function getRedColor(src As cv.Mat, ByRef label As String) As cv.Mat
+    Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
-    Public Sub getRedColor(src As cv.Mat)
+    Public Sub runRedC(src As cv.Mat)
         task.redC.Run(src)
     End Sub
     Public Function InitRandomRect(margin As Integer) As cv.Rect

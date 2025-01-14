@@ -45,7 +45,7 @@ Public Class Line3D_Correlation : Inherits TaskParent
         Return correlation.Get(Of Single)(0, 0)
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        If standalone Then getRedColor(src)
+        If standalone Then runRedC(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 

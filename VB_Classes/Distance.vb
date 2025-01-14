@@ -195,7 +195,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
         Return Math.Sqrt(result)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        getRedColor(src)
+        runRedC(src)
 
         pixelVector.Clear()
         distances.Clear()

@@ -958,7 +958,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         desc = "Assign each delaunay point to a RedCell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then getRedColor(src)
+        If standalone Then runRedC(src)
 
         delaunay.inputPoints = task.features
         delaunay.Run(src)
@@ -1004,7 +1004,7 @@ Public Class Feature_GridPoints : Inherits TaskParent
         desc = "Assign each corner of a grid rect to a RedCell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then getRedColor(src)
+        If standalone Then runRedC(src)
 
         For Each pt In task.gridPoints
             Dim index = task.redMap.Get(Of Byte)(pt.Y, pt.X)

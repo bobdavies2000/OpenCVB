@@ -161,7 +161,7 @@ Public Class Foreground_CellsFore : Inherits TaskParent
         desc = "Get the foreground cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        getRedColor(src)
+        runRedC(src)
 
         fore.Run(src)
         dst3 = fore.dst3
@@ -184,7 +184,7 @@ Public Class Foreground_CellsBack : Inherits TaskParent
         desc = "Get the background cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        getRedColor(src)
+        runRedC(src)
 
         fore.Run(src)
         dst3 = Not fore.dst2 And task.depthMask

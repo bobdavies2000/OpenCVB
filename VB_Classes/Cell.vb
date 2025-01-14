@@ -46,7 +46,7 @@ Public Class Cell_Basics : Inherits TaskParent
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Or runRedCloud Then dst2 = getRedColor(src, labels(2))
+        If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
         statsString()
         SetTrueText(strOut, 3)
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
@@ -66,7 +66,7 @@ Public Class Cell_PixelCountCompare : Inherits TaskParent
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
         Dim missCount As Integer
@@ -102,7 +102,7 @@ Public Class Cell_ValidateColorCells : Inherits TaskParent
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = getRedColor(src, labels(2))
+        dst2 = runRedC(src, labels(2))
 
         dst1.SetTo(0)
         dst3.SetTo(0)
@@ -151,7 +151,7 @@ Public Class Cell_Distance : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Or task.quarterBeat Then
-            dst2 = getRedColor(src, labels(2))
+            dst2 = runRedC(src, labels(2))
             dst0 = task.color
 
             Dim depthDistance As New List(Of Single)
@@ -193,7 +193,7 @@ Public Class Cell_Binarize : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = src
         If task.heartBeat Or task.quarterBeat Then
-            getRedColor(src)
+            runRedC(src)
             dst2 = task.redC.dst2
             labels(2) = task.redC.labels(2)
 
@@ -268,7 +268,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            dst2 = getRedColor(src, labels(2))
+            dst2 = runRedC(src, labels(2))
             If task.ClickPoint = newPoint Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)
