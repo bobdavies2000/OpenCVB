@@ -297,7 +297,6 @@ End Class
 
 Public Class Spectrum_RedCloud : Inherits TaskParent
     Dim breakdown As New Spectrum_Breakdown
-    Public rcList As New List(Of rcData)
     Public Sub New()
         desc = "Breakdown each cell in rcList."
     End Sub
@@ -305,14 +304,12 @@ Public Class Spectrum_RedCloud : Inherits TaskParent
         breakdown.options.RunOpt()
         dst2 = runRedC(src, labels(2))
 
-        rcList.Clear()
         dst3.SetTo(0)
-        For Each rc In task.rcList
-            task.rc = rc
+        For i = 0 To task.rcList.Count - 1
+            task.rc = task.rcList(i)
             breakdown.Run(src)
-            rc = task.rc
-            rcList.Add(rc)
-            dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
+            task.rcList(i) = task.rc
+            dst3(task.rc.rect).SetTo(task.rc.colorTrack, task.rc.mask)
         Next
         breakdown.Run(src)
     End Sub

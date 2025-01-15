@@ -243,16 +243,15 @@ End Class
 
 
 Public Class Edge_Consistent : Inherits TaskParent
-    Dim edges As New Bin4Way_Sobel
+    Dim edges As New Edge_Basics
     Dim saveFrames As New List(Of cv.Mat)
     Public Sub New()
-        optiBase.FindSlider("Sobel kernel Size").Value = 5
         desc = "Edges that are consistent for x number of frames"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
 
-        edges.Run(src)
+        edges.Run(src.Clone)
 
         Dim tmp = If(edges.dst2.Channels() = 1, edges.dst2.Clone, edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         saveFrames.Add(tmp)
@@ -263,8 +262,11 @@ Public Class Edge_Consistent : Inherits TaskParent
             dst2 = saveFrames(i) And dst2
         Next
 
-        dst3.SetTo(0)
-        src.CopyTo(dst3, Not edges.dst3)
+        dst3 = src
+        dst3.SetTo(cv.Scalar.Black, dst2)
+
+        Static frm = optiBase.FindFrm("Options_Edge_Basics Radio Buttons")
+        frm.left = task.gOptions.Width / 2
     End Sub
 End Class
 
@@ -710,7 +712,7 @@ Public Class Edge_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim edge As New Edge_Basics
     Public Sub New()
-        task.redOptions.setSimpleReductionBar(1)
+        task.redOptions.SimpleReductionBar.Value = 1
         labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
         desc = "Find edges in the reduction image."
     End Sub

@@ -21,8 +21,6 @@ Public Class OptionsRedCloud
     Public ranges() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
-    Public useColorOnlyChecked As Boolean
-    Public useDepthChecked As Boolean
     Public identifyCount As Integer
     Public histBins3D As Integer
     Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions",
@@ -90,7 +88,6 @@ Public Class OptionsRedCloud
         PointCloudReduction = 3
         XYReduction.Checked = True
         histBinList = {task.histogramBins, task.histogramBins}
-        UseColorOnly.Checked = True
 
         For i = 0 To colorMethods.Count - 1
             Dim method = colorMethods(i)
@@ -177,7 +174,6 @@ Public Class OptionsRedCloud
 
         SimpleReductionBar.Enabled = Not BitwiseReduction.Checked
         BitwiseReductionBar.Enabled = BitwiseReduction.Checked
-        RedCloudOnly.Enabled = Not UseColorOnly.Checked
     End Sub
 
 
@@ -296,16 +292,6 @@ Public Class OptionsRedCloud
     Private Sub UseGuidedProjection_CheckedChanged(sender As Object, e As EventArgs) Handles UseGuidedProjection.CheckedChanged
         task.optionsChanged = True
     End Sub
-    Private Sub UseDepth_CheckedChanged(sender As Object, e As EventArgs) Handles UseDepth.CheckedChanged
-        task.optionsChanged = True
-        useDepthChecked = UseDepth.Checked
-    End Sub
-    Private Sub UseColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseColorOnly.CheckedChanged
-        task.optionsChanged = True
-        useColorOnlyChecked = UseColorOnly.Checked
-    End Sub
-
-
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
         task.optionsChanged = True
@@ -328,15 +314,6 @@ Public Class OptionsRedCloud
     Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged
         task.optionsChanged = True
     End Sub
-    Public Sub setUseColorOnly(newVal As Boolean)
-        UseColorOnly.Checked = newVal
-    End Sub
-    Public Function getUseColorOnly() As Boolean
-        Return UseColorOnly.Checked
-    End Function
-    Public Function getUseGuidedProjection() As Boolean
-        Return UseGuidedProjection.Checked
-    End Function
     Public Sub setSimpleReductionBar(newVal As Integer)
         SimpleReductionBar.Value = newVal
     End Sub
@@ -403,12 +380,6 @@ Public Class OptionsRedCloud
     End Function
     Public Sub setHistBins3D(val As Integer)
         HistBinBar3D.Value = val
-    End Sub
-    Public Function getUseDepth() As Boolean
-        Return UseDepth.Checked
-    End Function
-    Public Sub setUseDepth(val As Boolean)
-        UseDepth.Checked = val
     End Sub
     Public Sub setXYReduction(val As Boolean)
         XYReduction.Checked = val
