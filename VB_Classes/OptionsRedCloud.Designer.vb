@@ -54,8 +54,6 @@ Partial Class OptionsRedCloud
         Me.ZReduction = New System.Windows.Forms.RadioButton()
         Me.YReduction = New System.Windows.Forms.RadioButton()
         Me.XReduction = New System.Windows.Forms.RadioButton()
-        Me.RedCloudType = New System.Windows.Forms.GroupBox()
-        Me.UseGuidedProjection = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.rcReductionSlider = New System.Windows.Forms.TrackBar()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -65,14 +63,12 @@ Partial Class OptionsRedCloud
         Me.IdentifyCountLabel = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
-        Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
-        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
-        Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
         Me.ColorDepth = New System.Windows.Forms.RadioButton()
         Me.ColorTrackingDepth = New System.Windows.Forms.RadioButton()
         Me.ColorTracking = New System.Windows.Forms.RadioButton()
         Me.ColorMean = New System.Windows.Forms.RadioButton()
+        Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -83,7 +79,6 @@ Partial Class OptionsRedCloud
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
-        Me.RedCloudType.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.rcReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -437,27 +432,6 @@ Partial Class OptionsRedCloud
         Me.XReduction.Text = "X Reduction"
         Me.XReduction.UseVisualStyleBackColor = True
         '
-        'RedCloudType
-        '
-        Me.RedCloudType.Controls.Add(Me.UseGuidedProjection)
-        Me.RedCloudType.Location = New System.Drawing.Point(1020, 34)
-        Me.RedCloudType.Name = "RedCloudType"
-        Me.RedCloudType.Size = New System.Drawing.Size(302, 135)
-        Me.RedCloudType.TabIndex = 8
-        Me.RedCloudType.TabStop = False
-        Me.RedCloudType.Text = "RedCloud Run Type"
-        '
-        'UseGuidedProjection
-        '
-        Me.UseGuidedProjection.AutoSize = True
-        Me.UseGuidedProjection.Location = New System.Drawing.Point(28, 100)
-        Me.UseGuidedProjection.Name = "UseGuidedProjection"
-        Me.UseGuidedProjection.Size = New System.Drawing.Size(261, 24)
-        Me.UseGuidedProjection.TabIndex = 4
-        Me.UseGuidedProjection.TabStop = True
-        Me.UseGuidedProjection.Text = "Use guided backprojection input"
-        Me.UseGuidedProjection.UseVisualStyleBackColor = True
-        '
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.rcReductionSlider)
@@ -551,45 +525,13 @@ Partial Class OptionsRedCloud
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 11
         '
-        'DisplayCellStats
-        '
-        Me.DisplayCellStats.AutoSize = True
-        Me.DisplayCellStats.Location = New System.Drawing.Point(1048, 247)
-        Me.DisplayCellStats.Name = "DisplayCellStats"
-        Me.DisplayCellStats.Size = New System.Drawing.Size(158, 24)
-        Me.DisplayCellStats.TabIndex = 74
-        Me.DisplayCellStats.Text = "Display Cell Stats"
-        Me.DisplayCellStats.UseVisualStyleBackColor = True
-        '
-        'CheckBox1
-        '
-        Me.CheckBox1.AutoSize = True
-        Me.CheckBox1.Checked = True
-        Me.CheckBox1.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox1.Location = New System.Drawing.Point(1049, 307)
-        Me.CheckBox1.Name = "CheckBox1"
-        Me.CheckBox1.Size = New System.Drawing.Size(172, 24)
-        Me.CheckBox1.TabIndex = 77
-        Me.CheckBox1.Text = "Exact matches only"
-        Me.CheckBox1.UseVisualStyleBackColor = True
-        '
-        'IdentifyCells
-        '
-        Me.IdentifyCells.AutoSize = True
-        Me.IdentifyCells.Location = New System.Drawing.Point(1049, 277)
-        Me.IdentifyCells.Name = "IdentifyCells"
-        Me.IdentifyCells.Size = New System.Drawing.Size(200, 24)
-        Me.IdentifyCells.TabIndex = 75
-        Me.IdentifyCells.Text = "Identify RedCloud Cells"
-        Me.IdentifyCells.UseVisualStyleBackColor = True
-        '
         'ColoringGroup
         '
         Me.ColoringGroup.Controls.Add(Me.ColorDepth)
         Me.ColoringGroup.Controls.Add(Me.ColorTrackingDepth)
         Me.ColoringGroup.Controls.Add(Me.ColorTracking)
         Me.ColoringGroup.Controls.Add(Me.ColorMean)
-        Me.ColoringGroup.Location = New System.Drawing.Point(1338, 40)
+        Me.ColoringGroup.Location = New System.Drawing.Point(1046, 23)
         Me.ColoringGroup.Name = "ColoringGroup"
         Me.ColoringGroup.Size = New System.Drawing.Size(220, 155)
         Me.ColoringGroup.TabIndex = 78
@@ -640,19 +582,26 @@ Partial Class OptionsRedCloud
         Me.ColorMean.Text = "Mean color"
         Me.ColorMean.UseVisualStyleBackColor = True
         '
+        'DisplayCellStats
+        '
+        Me.DisplayCellStats.AutoSize = True
+        Me.DisplayCellStats.Location = New System.Drawing.Point(1061, 272)
+        Me.DisplayCellStats.Name = "DisplayCellStats"
+        Me.DisplayCellStats.Size = New System.Drawing.Size(158, 24)
+        Me.DisplayCellStats.TabIndex = 80
+        Me.DisplayCellStats.Text = "Display Cell Stats"
+        Me.DisplayCellStats.UseVisualStyleBackColor = True
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1585, 604)
-        Me.Controls.Add(Me.ColoringGroup)
-        Me.Controls.Add(Me.CheckBox1)
-        Me.Controls.Add(Me.IdentifyCells)
         Me.Controls.Add(Me.DisplayCellStats)
+        Me.Controls.Add(Me.ColoringGroup)
         Me.Controls.Add(Me.ColorSource)
         Me.Controls.Add(Me.ColorSourceLabel)
         Me.Controls.Add(Me.GroupBox2)
-        Me.Controls.Add(Me.RedCloudType)
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.ReductionSliders)
         Me.Controls.Add(Me.ReductionTypeGroup)
@@ -673,8 +622,6 @@ Partial Class OptionsRedCloud
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RedCloudOnly.ResumeLayout(False)
         Me.RedCloudOnly.PerformLayout()
-        Me.RedCloudType.ResumeLayout(False)
-        Me.RedCloudType.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.rcReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -714,8 +661,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents XYZReduction As System.Windows.Forms.RadioButton
     Friend WithEvents YZReduction As System.Windows.Forms.RadioButton
     Friend WithEvents NoReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents RedCloudType As System.Windows.Forms.GroupBox
-    Friend WithEvents UseGuidedProjection As System.Windows.Forms.RadioButton
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents LabelHistogramBins As System.Windows.Forms.Label
     Friend WithEvents HistBinBar3D As System.Windows.Forms.TrackBar
@@ -725,9 +670,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents LabelIdentify As System.Windows.Forms.Label
     Friend WithEvents IdentifyCountBar As System.Windows.Forms.TrackBar
     Friend WithEvents IdentifyCountLabel As System.Windows.Forms.Label
-    Friend WithEvents DisplayCellStats As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox1 As System.Windows.Forms.CheckBox
-    Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
     Friend WithEvents ColorTrackingDepth As Windows.Forms.RadioButton
     Friend WithEvents ColorTracking As Windows.Forms.RadioButton
@@ -736,4 +678,5 @@ Partial Class OptionsRedCloud
     Friend WithEvents rcReductionSlider As Windows.Forms.TrackBar
     Friend WithEvents Label1 As Windows.Forms.Label
     Friend WithEvents Label3 As Windows.Forms.Label
+    Friend WithEvents DisplayCellStats As Windows.Forms.CheckBox
 End Class

@@ -289,10 +289,6 @@ Public Class OptionsRedCloud
         histBins3D = HistBinBar3D.Value * HistBinBar3D.Value * HistBinBar3D.Value
     End Sub
 
-    Private Sub UseGuidedProjection_CheckedChanged(sender As Object, e As EventArgs) Handles UseGuidedProjection.CheckedChanged
-        task.optionsChanged = True
-    End Sub
-
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
         task.optionsChanged = True
         colorInputName = ColorSource.Text
@@ -306,12 +302,11 @@ Public Class OptionsRedCloud
     End Sub
 
 
-    Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs) Handles DisplayCellStats.CheckedChanged
+    Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs)
         task.gOptions.displayDst1.Checked = DisplayCellStats.Checked
-        task.redOptions.IdentifyCells.Checked = True
         task.optionsChanged = True
     End Sub
-    Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged
+    Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
     Public Sub setSimpleReductionBar(newVal As Integer)
@@ -342,12 +337,6 @@ Public Class OptionsRedCloud
     Public Sub setColorSource(source As String)
         ColorSource.SelectedItem = source
     End Sub
-    Public Sub setIdentifyCells(val As Boolean)
-        IdentifyCells.Checked = val
-    End Sub
-    Public Function getIdentifyCells() As Boolean
-        Return IdentifyCells.Checked
-    End Function
     Public Function getIdentifyCount() As Boolean
         Return IdentifyCountBar.Value
     End Function

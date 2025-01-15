@@ -611,7 +611,6 @@ End Class
 Public Class ML_LearnZfromXGray : Inherits TaskParent
     Dim regions As New GuidedBP_Regions
     Public Sub New()
-        task.redOptions.IdentifyCells.Checked = False
         desc = "This runs and is helpful to understanding how to use rtree.  Learn Z from X, Y, and grayscale of the RedCloud cells."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -657,7 +656,6 @@ Public Class ML_LearnRegions : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.gOptions.setDisplay1()
-        task.redOptions.IdentifyCells.Checked = False
         labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
         desc = "Learn region from X, Y, and grayscale for the RedCloud cells."
     End Sub

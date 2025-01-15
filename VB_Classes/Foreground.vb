@@ -157,7 +157,6 @@ Public Class Foreground_CellsFore : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
     Public rcList As New List(Of rcData)
     Public Sub New()
-        task.redOptions.setIdentifyCells(False)
         desc = "Get the foreground cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -180,7 +179,6 @@ Public Class Foreground_CellsBack : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
     Public rcList As New List(Of rcData)
     Public Sub New()
-        task.redOptions.setIdentifyCells(False)
         desc = "Get the background cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

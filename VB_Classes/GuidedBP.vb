@@ -386,7 +386,6 @@ Public Class GuidedBP_Regions : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.setDisplay0()
         If standalone Then task.gOptions.setDisplay1()
-        task.redOptions.IdentifyCells.Checked = False
         labels(3) = "Click a quadrant in the left image and see it below."
         desc = "Identify the top X regions in the GuidedBP_RedCloud output"
     End Sub

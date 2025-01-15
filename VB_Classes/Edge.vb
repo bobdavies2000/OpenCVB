@@ -1106,7 +1106,6 @@ Public Class Edge_RedCloud : Inherits TaskParent
     Public Sub New()
         labels(2) = "Canny Edges (0), RedCloud output (1), RedCloud Edges(2), 0 And'd with 2"
         labels(3) = "Cell boundaries that are also real edges."
-        task.redOptions.setIdentifyCells(False)
         desc = "Identify cell boundaries that are also edges."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
