@@ -28,10 +28,12 @@ Public Class RedCloud_PrepData : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim split() As cv.Mat = {New cv.Mat, New cv.Mat, New cv.Mat}
+        Dim input() As cv.Mat = task.pcSplit
+        If src.Type = cv.MatType.CV_32FC3 Then input = src.Split
         Dim reduceAmt = task.redOptions.rcReductionSlider.Value
-        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
-        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
-        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
+        input(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
+        input(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
+        input(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
 
         Select Case task.redOptions.PointCloudReduction
             Case 0 ' X Reduction
@@ -174,6 +176,7 @@ Public Class RedCloud_YZ : Inherits TaskParent
     Dim stats As New Cell_Basics
     Dim rCloud As New RedCloud_Basics
     Public Sub New()
+        task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.YZReduction.Checked = True
         desc = "Build horizontal RedCloud cells"
     End Sub
@@ -187,7 +190,7 @@ Public Class RedCloud_YZ : Inherits TaskParent
         SetTrueText(stats.strOut, 3)
 
         rCloud.Run(src)
-        dst2 = ShowPalette(rCloud.dst3)
+        dst2 = rCloud.dst2
         labels(2) = rCloud.labels(2)
     End Sub
 End Class
@@ -201,6 +204,7 @@ Public Class RedCloud_XZ : Inherits TaskParent
     Dim stats As New Cell_Basics
     Dim rCloud As New RedCloud_Basics
     Public Sub New()
+        task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.XZReduction.Checked = True
         desc = "Build vertical RedCloud cells."
     End Sub
@@ -212,7 +216,7 @@ Public Class RedCloud_XZ : Inherits TaskParent
         SetTrueText(stats.strOut, 3)
 
         rCloud.Run(src)
-        dst2 = ShowPalette(rCloud.dst3)
+        dst2 = rCloud.dst2
         labels(2) = rCloud.labels(2)
     End Sub
 End Class
@@ -223,20 +227,20 @@ End Class
 
 
 Public Class RedCloud_World : Inherits TaskParent
-    Dim rCloud As New RedCloud_Basics
     Dim world As New Depth_World
+    Dim prep As New RedCloud_PrepData
     Public Sub New()
-        optiBase.FindSlider("RedCloud_Basics Reduction").Value = 1000
+        task.redOptions.IdentifyCountBar.Value = 100
+        task.redOptions.rcReductionSlider.Value = 1000
         labels(3) = "Generated pointcloud"
         desc = "Display the output of a generated pointcloud as RedCloud cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         world.Run(src)
-        task.pcSplit = world.dst2.Split()
 
-        rCloud.Run(src)
-        dst2 = rCloud.dst3
-        labels(2) = rCloud.labels(2)
+        prep.Run(world.dst2)
+
+        dst2 = runRedC(prep.dst2, labels(2))
     End Sub
 End Class
 
