@@ -1384,44 +1384,43 @@ Public Class Hist_CloudSegments : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public trimHist As New cv.Mat
     Dim options As New Options_Outliers
-    Public reductionVal As String = "X"
+    Dim index As Integer = 2
+    Dim mm As mmData
     Public Sub New()
         task.redOptions.UseDepth.Checked = True
         If standalone Then task.redOptions.XReduction.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        task.gOptions.FrameHistory.Value = 10
         plot.createHistogram = True
+        plot.removeZeroEntry = False
         desc = "Find the segments of X, Y, and Z values from the point cloud."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim index As Integer
-        Dim mm As mmData
-        If reductionVal = "X" Then
-            index = 0
-            mm.minVal = -task.xRange
-            mm.maxVal = task.xRange
-        End If
-        If reductionVal = "Y" Then
-            index = 1
-            mm.minVal = -task.yRange
-            mm.maxVal = task.yRange
-        End If
-        If reductionVal = "Z" Then
-            index = 2
-            mm.minVal = 0
-            mm.maxVal = task.MaxZmeters
+        If standalone Then
+            If task.heartBeatLT Or task.optionsChanged Then
+                index += 1
+                If index > 2 Then index = 0
+            End If
         End If
 
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(index)
-        src = (src - mm.minVal).ToMat
+        If task.heartBeat Then
+            mm = GetMinMax(src)
+            If index < 2 Then
+                mm.minVal -= 1
+                mm.maxVal += 1
+                src = (src - mm.minVal).ToMat
+            End If
+        End If
 
         Dim incr = (mm.maxVal - mm.minVal) / task.histogramBins
         plot.minRange = mm.minVal
         plot.maxRange = mm.maxVal
         plot.Run(src)
         dst2 = plot.dst2.Clone
+
+        labels(2) = "Plot of " + Choose(index + 1, "X", "Y", "Z") + " data in point cloud"
         labels(3) = "Min = " + Format(mm.minVal, fmt1) + " max = " + Format(mm.maxVal, fmt1)
 
         dst1.SetTo(0)
@@ -1430,7 +1429,7 @@ Public Class Hist_CloudSegments : Inherits TaskParent
             dst1.SetTo(i + 1, mask)
         Next
         dst1.SetTo(0, task.noDepthMask)
-        dst3 = ShowPalette(dst1 * 255 / task.histogramBins)
+        dst3 = ShowPalette((dst1 + 1) * 255 / task.histogramBins)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

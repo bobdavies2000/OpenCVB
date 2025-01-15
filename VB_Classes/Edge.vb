@@ -1249,8 +1249,7 @@ Public Class Edge_DiffX_CPP : Inherits TaskParent
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        segments.reductionVal = "X"
-        segments.Run(src)
+        segments.Run(task.pcSplit(0))
         src = segments.dst1 ' the byte version of the segmented image.
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -1261,8 +1260,6 @@ Public Class Edge_DiffX_CPP : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         dst3 = segments.dst3
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Sub Close()
         Edge_DiffX_Close(cPtr)
@@ -1282,8 +1279,7 @@ Public Class Edge_DiffY_CPP : Inherits TaskParent
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        segments.reductionVal = "Y"
-        segments.Run(src)
+        segments.Run(task.pcSplit(1))
         src = segments.dst1 ' the byte version of the segmented image.
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -1294,8 +1290,6 @@ Public Class Edge_DiffY_CPP : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         dst3 = segments.dst3
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Sub Close()
         Edge_DiffY_Close(cPtr)
@@ -1315,8 +1309,7 @@ Public Class Edge_DiffZ_CPP : Inherits TaskParent
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        segments.reductionVal = "Z"
-        segments.Run(src)
+        segments.Run(task.pcSplit(2))
         src = segments.dst1 ' the byte version of the segmented image.
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -1327,8 +1320,6 @@ Public Class Edge_DiffZ_CPP : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         dst3 = segments.dst3
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Sub Close()
         Edge_DiffY_Close(cPtr)
