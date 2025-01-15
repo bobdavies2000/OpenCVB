@@ -57,7 +57,7 @@ Public Class Resize_Proportional : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             options.RunOpt()
-            dst2 = options.runRedCloud(labels(2))
+            dst2 = runRedC(src, labels(2))
             src = src(task.rc.rect)
         End If
 

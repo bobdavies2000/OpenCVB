@@ -1460,8 +1460,6 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_BasicsHist" Then return new RedCloud_BasicsHist
 	If algorithmName = "RedCloud_BasicsHist1" Then return new RedCloud_BasicsHist1
 	If algorithmName = "RedCloud_BasicsTest" Then return new RedCloud_BasicsTest
-	If algorithmName = "RedCloud_Combine" Then return new RedCloud_Combine
-	If algorithmName = "RedCloud_Depth" Then return new RedCloud_Depth
 	If algorithmName = "RedCloud_PrepData" Then return new RedCloud_PrepData
 	If algorithmName = "RedCloud_World" Then return new RedCloud_World
 	If algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ
@@ -1474,7 +1472,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_CellChanges" Then return new RedColor_CellChanges
 	If algorithmName = "RedColor_CellsAtDepth" Then return new RedColor_CellsAtDepth
 	If algorithmName = "RedColor_CellStatsPlot" Then return new RedColor_CellStatsPlot
-	If algorithmName = "RedColor_ColorAndDepth" Then return new RedColor_ColorAndDepth
 	If algorithmName = "RedColor_Consistent" Then return new RedColor_Consistent
 	If algorithmName = "RedColor_Consistent1" Then return new RedColor_Consistent1
 	If algorithmName = "RedColor_Contour" Then return new RedColor_Contour

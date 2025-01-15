@@ -23,7 +23,6 @@ End Class
 Public Class RedCloud_PrepData : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
-        task.redOptions.UseDepth.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -241,78 +240,5 @@ Public Class RedCloud_World : Inherits TaskParent
         prep.Run(world.dst2)
 
         dst2 = runRedC(prep.dst2, labels(2))
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedCloud_Combine : Inherits TaskParent
-    Dim color8U As New Color8U_Basics
-    Public guided As New GuidedBP_Depth
-    Public combinedCells As New List(Of rcData)
-    Dim maxDepth As New Depth_MaxMask
-    Dim rCloud As New RedCloud_Basics
-    Public Sub New()
-        desc = "Combine the color and cloud as indicated in the RedOptions panel."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        maxDepth.Run(src)
-        If task.redOptions.UseColorOnly.Checked Or task.redOptions.UseGuidedProjection.Checked Then
-            task.redC.inputRemoved.SetTo(0)
-            If src.Channels() = 3 Then
-                color8U.Run(src)
-                dst2 = color8U.dst2.Clone
-            Else
-                dst2 = src
-            End If
-        Else
-            task.redC.inputRemoved = task.noDepthMask
-            dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        End If
-
-        If task.redOptions.UseDepth.Checked Or task.redOptions.UseGuidedProjection.Checked Then
-            Select Case task.redOptions.depthInputIndex
-                Case 0 ' "GuidedBP_Depth"
-                    guided.Run(src)
-                    If color8U.classCount > 0 Then guided.dst2 += color8U.classCount
-                    guided.dst2.CopyTo(dst2, task.depthMask)
-                Case 1 ' "RedCloud_Basics"
-                    rCloud.Run(task.pointCloud)
-                    If color8U.classCount > 0 Then rCloud.dst2 += color8U.classCount
-                    rCloud.dst2.CopyTo(dst2, task.depthMask)
-            End Select
-        End If
-
-        dst2 = runRedC(dst2, labels(2))
-
-        combinedCells.Clear()
-        Dim drawRectOnlyRun As Boolean
-        If task.drawRect.Width * task.drawRect.Height > 10 Then drawRectOnlyRun = True
-        For Each rc In task.rcList
-            If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
-            combinedCells.Add(rc)
-        Next
-        labels(2) = CStr(combinedCells.Count) + " cells were found.  Dots indicate maxDist points."
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_Depth : Inherits TaskParent
-    Dim flood As New Flood_Basics
-    Public Sub New()
-        task.redOptions.UseDepth.Checked = True
-        desc = "Create RedCloud output using only depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        flood.Run(src)
-        dst2 = flood.dst2
-        labels(2) = flood.labels(2)
     End Sub
 End Class

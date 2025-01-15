@@ -189,6 +189,7 @@ Public Class Boundary_RedCloud : Inherits TaskParent
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100
         task.gOptions.MaxDepthBar.Value = 20
+        task.redOptions.ColorTracking.Checked = True
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the RedCloud cell contours"
     End Sub

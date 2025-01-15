@@ -1487,7 +1487,6 @@ End Class
 Public Class OpenGL_RedCloudSpectrum : Inherits TaskParent
     Dim redS As New Spectrum_RedCloud
     Public Sub New()
-        task.redOptions.UseDepth.Checked = True
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCloud cells after Spectrum filtering."
     End Sub
@@ -1516,7 +1515,7 @@ Public Class OpenGL_RedCloudCell : Inherits TaskParent
         desc = " Isolate a RedCloud cell - after filtering by Spectrum_Depth - in an OpenGL display"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = specZ.options.runRedCloud(labels(2))
+        dst2 = runRedC(src, labels(2))
 
         specZ.Run(src)
         SetTrueText(specZ.strOut, 3)

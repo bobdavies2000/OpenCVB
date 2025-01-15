@@ -3050,10 +3050,6 @@ Public Class Options_Spectrum : Inherits OptionParent
             sliders.setupTrackBar("Sample count threshold", 1, 50, sampleThreshold)
         End If
     End Sub
-    Public Function runRedCloud(ByRef label As String) As cv.Mat
-        label = task.redC.labels(2)
-        Return task.redC.dst2
-    End Function
     Public Function buildDepthRanges(input As cv.Mat, typeSpec As String)
         Dim ranges As New List(Of rangeData)
         Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 

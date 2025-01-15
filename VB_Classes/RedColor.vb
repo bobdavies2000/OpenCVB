@@ -1390,59 +1390,6 @@ End Class
 
 
 
-
-Public Class RedColor_ColorAndDepth : Inherits TaskParent
-    Dim flood As New Flood_Basics
-    Dim floodPC As New Flood_Basics
-    Dim colorCells As New List(Of rcData)
-    Dim colorMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-    Dim depthCells As New List(Of rcData)
-    Dim depthMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-    Dim mousePicTag = task.mousePicTag
-    Public Sub New()
-        task.redOptions.setIdentifyCells(False)
-        desc = "Run Flood_Basics and use the cells to map the depth cells"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        task.redOptions.UseColorOnly.Checked = True
-
-        task.rcList = New List(Of rcData)(colorCells)
-        task.rcMap = colorMap.Clone
-        flood.Run(src)
-        dst2 = flood.dst2
-        colorCells = New List(Of rcData)(task.rcList)
-        colorMap = task.rcMap.Clone
-        labels(2) = flood.labels(2)
-
-        task.redOptions.UseDepth.Checked = True
-
-        task.rcList = New List(Of rcData)(depthCells)
-        task.rcMap = depthMap.Clone
-        floodPC.Run(src)
-        dst3 = floodPC.dst2
-        depthCells = New List(Of rcData)(task.rcList)
-        depthMap = task.rcMap.Clone
-        labels(3) = floodPC.labels(2)
-
-        If task.mouseClickFlag Then mousePicTag = task.mousePicTag
-        Select Case mousePicTag
-            Case 1
-                ' setSelectedCell()
-            Case 2
-                task.setSelectedCell(colorCells, colorMap)
-            Case 3
-                task.setSelectedCell(depthCells, depthMap)
-        End Select
-        dst2.Rectangle(task.rc.rect, task.HighlightColor, task.lineWidth)
-        dst3(task.rc.rect).SetTo(white, task.rc.mask)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedColor_MaxDist_CPP : Inherits TaskParent
     Public classCount As Integer
     Public RectList As New List(Of cv.Rect)
