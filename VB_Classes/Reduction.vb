@@ -16,11 +16,11 @@ Public Class Reduction_Basics : Inherits TaskParent
             dst2 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
             dst2 = dst2 / zeroBits
         ElseIf task.redOptions.reductionType = "Use Simple Reduction" Then
-            Dim reductionVal = task.redOptions.getSimpleReductionBar()
+            Dim reductionVal = task.redOptions.SimpleReductionBar.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
             dst2 = src / reductionVal
-            labels(2) = "Reduced image - factor = " + CStr(task.redOptions.getSimpleReductionBar())
+            labels(2) = "Reduced image - factor = " + CStr(task.redOptions.SimpleReductionBar.Value)
         Else
             dst2 = src
             labels(2) = "No reduction requested"

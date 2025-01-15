@@ -8,7 +8,7 @@ Public Class Stripes_Basics : Inherits TaskParent
         desc = "Create stripes throughout the image with reduction"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim reductionVal = task.redOptions.getSimpleReductionBar()
+        Dim reductionVal = task.redOptions.SimpleReductionBar.Value
 
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(0)
         Dim depth32f As cv.Mat = src * 1000

@@ -4,7 +4,7 @@ Public Class Boundary_Basics : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100
-        task.redOptions.setColorSource("Bin4Way_Regions")
+        task.redOptions.ColorSource.SelectedItem = "Bin4Way_Regions"
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub

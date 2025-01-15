@@ -306,21 +306,6 @@ Public Class OptionsRedCloud
         task.gOptions.displayDst1.Checked = DisplayCellStats.Checked
         task.optionsChanged = True
     End Sub
-    Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
-    Public Sub setSimpleReductionBar(newVal As Integer)
-        SimpleReductionBar.Value = newVal
-    End Sub
-    Public Sub setHistBinBar3D(newVal As Integer)
-        HistBinBar3D.Value = newVal
-    End Sub
-    Public Function getSimpleReductionBar() As Integer
-        Return SimpleReductionBar.Value
-    End Function
-    Public Function getHistBinBar3D() As Integer
-        Return HistBinBar3D.Value
-    End Function
     Public Sub checkSimpleReduction(newVal As Boolean)
         UseSimpleReduction.Checked = newVal
     End Sub
@@ -334,12 +319,6 @@ Public Class OptionsRedCloud
     Public Sub checkBitReduction(newVal As Boolean)
         BitwiseReduction.Checked = newVal
     End Sub
-    Public Sub setColorSource(source As String)
-        ColorSource.SelectedItem = source
-    End Sub
-    Public Function getIdentifyCount() As Boolean
-        Return IdentifyCountBar.Value
-    End Function
     Public Sub setProjection(val As Integer)
         ProjectionThresholdBar.Value = val
     End Sub
