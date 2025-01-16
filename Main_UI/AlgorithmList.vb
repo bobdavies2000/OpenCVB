@@ -164,7 +164,6 @@ Public Class algorithmList
 	If algorithmName = "Cell_Basics" Then return new Cell_Basics
 	If algorithmName = "Cell_BasicsPlot" Then return new Cell_BasicsPlot
 	If algorithmName = "Cell_Binarize" Then return new Cell_Binarize
-	If algorithmName = "Cell_clGenerate" Then return new Cell_clGenerate
 	If algorithmName = "Cell_Distance" Then return new Cell_Distance
 	If algorithmName = "Cell_FloodFill" Then return new Cell_FloodFill
 	If algorithmName = "Cell_PixelCountCompare" Then return new Cell_PixelCountCompare

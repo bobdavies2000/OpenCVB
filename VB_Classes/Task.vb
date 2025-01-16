@@ -14,11 +14,6 @@ Public Class VBtask : Implements IDisposable
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
 
-    Public cl As New rcData
-    Public redCloud As RedCloud_Basics
-    Public clList As New List(Of rcData)
-    Public clMap As cv.Mat
-
     Public lpList As New List(Of linePoints)
 
     Public gridSize As Integer

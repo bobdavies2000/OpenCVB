@@ -3,30 +3,24 @@ Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedCloud_PrepData
     Public clCPP As New RedCloud_CPP
-    Public clGen As New Cell_clGenerate
     Public Sub New()
-        task.redOptions.IdentifyCountBar.Value = 255
         task.redOptions.rcReductionSlider.Value = 100
-        task.redOptions.ColorTracking.Checked = True
-        task.clMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
 
+        dst2 = runRedC(src, labels(2))
+
+        dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
         clCPP.Run(prep.dst2)
 
-        If clCPP.classCount = 0 Then Exit Sub ' no data to process.
-        clGen.classCount = clCPP.classCount
-        clGen.rectList = clCPP.rectList
-        clGen.floodPoints = clCPP.floodPoints
-        clGen.Run(clCPP.dst2)
-
-        dst2 = clGen.dst2
-
-        labels(2) = clGen.labels(2)
-        task.clList = New List(Of rcData)(task.rcList)
-        task.clMap = task.rcMap.Clone
+        dst0.SetTo(0)
+        clCPP.dst2.CopyTo(dst0, dst1)
+        dst3 = ShowPalette(dst0)
     End Sub
 End Class
 
@@ -293,6 +287,9 @@ Public Class RedCloud_CPP : Inherits TaskParent
     Public identifyCount As Integer
     Public Sub New()
         cPtr = RedColor_Open()
+        task.gOptions.DebugSlider.Minimum = 1
+        task.gOptions.DebugSlider.Maximum = 5000
+        task.gOptions.DebugSlider.Value = 500
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Run the C++ RedCloud interface with or without a mask"
     End Sub
@@ -330,10 +327,16 @@ Public Class RedCloud_CPP : Inherits TaskParent
         Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length)
 
         rectList.Clear()
+        Dim minSize = task.gOptions.DebugSlider.Value
+        'Dim cPoint = New cv.Point(50, 87)
         For i = 0 To classCount * 4 - 4 Step 4
-            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
+            'If r.Contains(cPoint) Then Dim k = 0
+            If r.Width * r.Height < minSize Then Continue For
+            rectList.Add(r)
         Next
 
+        classCount = rectList.Count
         floodPoints.Clear()
         For i = 0 To classCount * 2 - 2 Step 2
             floodPoints.Add(New cv.Point(ptList(i), ptList(i + 1)))
