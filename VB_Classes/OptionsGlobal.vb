@@ -78,7 +78,6 @@ Public Class OptionsGlobal
                 task.densityMetric = 40
                 task.FASTthreshold = 25
                 task.fPointMinDistance = 75
-                'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 960
                 GridSlider.Value = 40
                 task.cvFontSize = 2.0
@@ -110,7 +109,6 @@ Public Class OptionsGlobal
                 task.densityMetric = 150
                 task.FASTthreshold = 40
                 task.fPointMinDistance = 50
-                'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 640
                 GridSlider.Value = 24
                 task.cvFontSize = 1.5
@@ -171,6 +169,7 @@ Public Class OptionsGlobal
                 task.fPointMinDistance = 7
         End Select
 
+        task.rcMinSize = task.dst2.Width * task.dst2.Height * 0.005
         task.depthThresholdPercent = 0.01
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize

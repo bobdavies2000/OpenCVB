@@ -2,25 +2,60 @@
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedCloud_PrepData
-    Public clCPP As New RedCloud_CPP
+    Public redMask As New RedCloud_Masks
     Public Sub New()
         task.redOptions.rcReductionSlider.Value = 100
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.gOptions.displayDst1.Checked = True
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-
         dst2 = runRedC(src, labels(2))
-
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        clCPP.Run(prep.dst2)
+        prep.Run(src)
+        redMask.Run(prep.dst2)
 
-        dst0.SetTo(0)
-        clCPP.dst2.CopyTo(dst0, dst1)
-        dst3 = ShowPalette(dst0)
+        dst0 = redMask.dst2
+        dst0.SetTo(0, Not dst1)
+        Dim cellMask = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        Dim depthMeans As New List(Of Single)
+        Dim matList(task.rcList.Count - 1) As List(Of Integer)
+        Dim maskList As New List(Of cv.Mat)
+        For i = 0 To redMask.masks.Count - 1
+            Dim mask = redMask.masks(i)
+            Dim r = redMask.rectList(i)
+            mask = cellMask(r) And mask
+            mask.SetTo(0, task.noDepthMask(r))
+
+            Dim depthMean = task.pcSplit(2)(r).Mean(mask)
+            depthMeans.Add(depthMean)
+
+            maskList.Add(mask)
+            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+
+            Dim index = task.rcMap(r).Get(Of Byte)(mm.maxLoc.Y, mm.maxLoc.X)
+            If matList(index) Is Nothing Then matList(index) = New List(Of Integer)
+            matList(index).Add(i)
+        Next
+
+        dst1 = dst2.Clone
+        For i = 0 To matList.Count - 1
+            Dim meanList As New List(Of Single)
+            If matList(i) Is Nothing Then Continue For
+            For j = 0 To matList(i).Count - 1
+                Dim index = matList(i)(j)
+                meanList.Add(depthMeans(index))
+                Dim r = redMask.rectList(index)
+                dst1(r).SetTo(task.scalarColors(i), maskList(index))
+            Next
+            Dim k = 0
+        Next
+        dst3 = ShowPalette(dst0 * 255 / redMask.classCount)
+        labels(3) = redMask.labels(3)
     End Sub
 End Class
 
@@ -266,8 +301,7 @@ Public Class RedCloud_ColorAndCloud : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        redL.clCPP.identifyCount = 20 ' make sure we cover the mask
-        redL.clCPP.inputRemoved = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        redL.redMask.inputRemoved = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         redL.Run(src)
 
         dst3 = redL.dst2
@@ -279,17 +313,14 @@ End Class
 
 
 
-Public Class RedCloud_CPP : Inherits TaskParent
+Public Class RedCloud_Masks : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
-    Public floodPoints As New List(Of cv.Point)
-    Public identifyCount As Integer
+    Public masks As New List(Of cv.Mat)
+    Public depth As New List(Of Single)
     Public Sub New()
         cPtr = RedColor_Open()
-        task.gOptions.DebugSlider.Minimum = 1
-        task.gOptions.DebugSlider.Maximum = 5000
-        task.gOptions.DebugSlider.Value = 500
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Run the C++ RedCloud interface with or without a mask"
     End Sub
@@ -307,42 +338,46 @@ Public Class RedCloud_CPP : Inherits TaskParent
         Marshal.Copy(inputRemoved.Data, maskData, 0, maskData.Length)
         Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedColor_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols)
+        Dim imagePtr = RedColor_Run(cPtr, handleInput.AddrOfPinnedObject(),
+                                    handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, task.rcMinSize)
         handleMask.Free()
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
-        If task.optionsChanged Then
-            identifyCount = task.redOptions.IdentifyCountBar.Value
-        End If
-        classCount = Math.Min(RedColor_Count(cPtr), identifyCount)
+        classCount = Math.Min(RedColor_Count(cPtr), 255)
         If classCount = 0 Then Exit Sub ' no data to process.
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedColor_Rects(cPtr))
-        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2, RedColor_FloodPoints(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-        Dim ptList(classCount * 2) As Integer
-        Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length)
 
         rectList.Clear()
-        Dim minSize = task.gOptions.DebugSlider.Value
-        'Dim cPoint = New cv.Point(50, 87)
         For i = 0 To classCount * 4 - 4 Step 4
             Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
-            'If r.Contains(cPoint) Then Dim k = 0
-            If r.Width * r.Height < minSize Then Continue For
+            ' If r.Size = dst2.Size Then Continue For ' RedColor_Run finds a cell this big.  
+            If r.Width * r.Height < task.rcMinSize Then Continue For
             rectList.Add(r)
         Next
 
-        classCount = rectList.Count
-        floodPoints.Clear()
-        For i = 0 To classCount * 2 - 2 Step 2
-            floodPoints.Add(New cv.Point(ptList(i), ptList(i + 1)))
+        masks.Clear()
+        dst1.SetTo(0)
+        Dim map = task.redC.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        map = map.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        For i = 0 To rectList.Count - 1
+            Dim rect = rectList(i)
+            Dim mask = dst2(rect).InRange(i + 1, i + 1)
+            Dim contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            DrawContour(mask, contour, 255, -1)
+            masks.Add(mask.Clone)
+
+            Dim test As cv.Mat = map(rect) And mask
+            If test.countnonzero Then dst1(rect).SetTo(255, mask)
         Next
 
-        If standalone Then dst3 = ShowPalette(dst2 * 255 / classCount)
+        classCount = rectList.Count
+
+        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
 
         If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
         If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."

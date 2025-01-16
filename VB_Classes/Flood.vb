@@ -271,7 +271,6 @@ Public Class Flood_MaxDistPoints : Inherits TaskParent
         cellGen.classCount = redCPP.classCount
         cellGen.rectList = redCPP.RectList
         cellGen.floodPoints = redCPP.floodPoints
-        cellGen.removeContour = False
         cellGen.Run(redCPP.dst2)
 
         dst2 = cellGen.dst2

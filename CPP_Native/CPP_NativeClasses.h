@@ -47,7 +47,7 @@ public:
     vector<Point> floodPoints;
 
     RedCloud() {}
-    void RunCPP(Mat inputRemoved) {
+    void RunCPP(Mat inputRemoved, int minSize) {
         Mat maskCopy = inputRemoved.clone();
         Rect rect;
 
@@ -74,12 +74,15 @@ public:
         {
             if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
             {
-                cellRects.push_back(rect);
-                floodPoints.push_back(it->second);
+                if (rect.width * rect.height > minSize)
+                {
+                    cellRects.push_back(rect);
+                    floodPoints.push_back(it->second);
 
-                if (fill >= 255)
-                    break; // just taking up to the top X largest objects found.
-                fill++;
+                    if (fill >= 255)
+                        break; // just taking up to the top X largest objects found.
+                    fill++;
+                }
             }
         }
         Rect r = Rect(1, 1, inputRemoved.cols - 2, inputRemoved.rows - 2);
@@ -109,14 +112,14 @@ extern "C" __declspec(dllexport) int* RedColor_FloodPoints(RedCloud* cPtr)
 
 extern "C" __declspec(dllexport) int* RedColor_Close(RedCloud* cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
-RedColor_Run(RedCloud* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols)
+RedColor_Run(RedCloud* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int minSize)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
 
     Mat inputRemoved = Mat(rows, cols, CV_8U, maskPtr);
 
     copyMakeBorder(inputRemoved, inputRemoved, 1, 1, 1, 1, BORDER_CONSTANT, 0);
-    cPtr->RunCPP(inputRemoved);
+    cPtr->RunCPP(inputRemoved, minSize);
 
     return (int*)cPtr->result.data;
 }

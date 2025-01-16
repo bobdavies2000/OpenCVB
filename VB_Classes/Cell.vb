@@ -291,7 +291,6 @@ Public Class Cell_rcGenerate : Inherits TaskParent
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)
-    Public removeContour As Boolean
     Public Sub New()
         task.rcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.rcList = New List(Of rcData)
@@ -353,8 +352,7 @@ Public Class Cell_rcGenerate : Inherits TaskParent
 
         For Each rc In initialList
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            DrawContour(rc.mask, rc.contour, rc.colorTrack, -1)
-            If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
+            DrawContour(rc.mask, rc.contour, 255, -1)
 
             rc.maxDStable = rc.maxDist
 

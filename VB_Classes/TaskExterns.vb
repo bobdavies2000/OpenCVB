@@ -918,8 +918,9 @@ Module TaskExterns
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedColor_Count(cPtr As IntPtr) As Integer
     End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedColor_Run(
-                cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedColor_Run(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr,
+                                 rows As Integer, cols As Integer, minSize As Integer) As IntPtr
     End Function
 
 

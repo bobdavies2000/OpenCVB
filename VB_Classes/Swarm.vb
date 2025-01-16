@@ -232,7 +232,6 @@ Public Class Swarm_Flood : Inherits TaskParent
 
         color8U.Run(src)
 
-        flood.cellGen.removeContour = False
         flood.inputRemoved = swarm.dst2
         flood.Run(color8U.dst2)
         dst2 = flood.dst2
@@ -253,7 +252,6 @@ Public Class Swarm_Flood2 : Inherits TaskParent
     Public flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        flood.cellGen.removeContour = False
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
     Public Function runRedCloud(src As cv.Mat) As cv.Mat

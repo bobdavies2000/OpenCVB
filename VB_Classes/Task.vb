@@ -13,6 +13,7 @@ Public Class VBtask : Implements IDisposable
     Public rc As New rcData
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
+    Public rcMinSize As Integer ' the minimum cell size for RedCloud_Basics/RedCloud_Masks
 
     Public lpList As New List(Of linePoints)
 

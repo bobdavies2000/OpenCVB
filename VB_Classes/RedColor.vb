@@ -87,7 +87,8 @@ Public Class RedColor_CPP : Inherits TaskParent
         Marshal.Copy(inputRemoved.Data, maskData, 0, maskData.Length)
         Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedColor_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols)
+        Dim imagePtr = RedColor_Run(cPtr, handleInput.AddrOfPinnedObject(),
+                                    handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
         handleMask.Free()
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
