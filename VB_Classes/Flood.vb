@@ -86,7 +86,7 @@ End Class
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cv.Mat
     Public inputRemoved As cv.Mat
-    Public cellGen As New Cell_Generate
+    Public cellGen As New Cell_rcGenerate
     Dim redCPP As New RedColor_CPP
     Public buildinputRemoved As Boolean
     Public showSelected As Boolean = True
@@ -257,7 +257,7 @@ End Class
 
 Public Class Flood_MaxDistPoints : Inherits TaskParent
     Dim redCPP As New RedColor_MaxDist_CPP
-    Public cellGen As New Cell_Generate
+    Public cellGen As New Cell_rcGenerate
     Dim color8U As New Color8U_Basics
     Public Sub New()
         labels(3) = "Contour boundaries - input to RedColor_Basics"

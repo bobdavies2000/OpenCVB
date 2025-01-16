@@ -164,10 +164,11 @@ Public Class algorithmList
 	If algorithmName = "Cell_Basics" Then return new Cell_Basics
 	If algorithmName = "Cell_BasicsPlot" Then return new Cell_BasicsPlot
 	If algorithmName = "Cell_Binarize" Then return new Cell_Binarize
+	If algorithmName = "Cell_clGenerate" Then return new Cell_clGenerate
 	If algorithmName = "Cell_Distance" Then return new Cell_Distance
 	If algorithmName = "Cell_FloodFill" Then return new Cell_FloodFill
-	If algorithmName = "Cell_Generate" Then return new Cell_Generate
 	If algorithmName = "Cell_PixelCountCompare" Then return new Cell_PixelCountCompare
+	If algorithmName = "Cell_rcGenerate" Then return new Cell_rcGenerate
 	If algorithmName = "Cell_ValidateColorCells" Then return new Cell_ValidateColorCells
 	If algorithmName = "CellularAutomata_All256" Then return new CellularAutomata_All256
 	If algorithmName = "CellularAutomata_Basics" Then return new CellularAutomata_Basics
@@ -1460,6 +1461,8 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_BasicsHist" Then return new RedCloud_BasicsHist
 	If algorithmName = "RedCloud_BasicsHist1" Then return new RedCloud_BasicsHist1
 	If algorithmName = "RedCloud_BasicsTest" Then return new RedCloud_BasicsTest
+	If algorithmName = "RedCloud_ColorAndCloud" Then return new RedCloud_ColorAndCloud
+	If algorithmName = "RedCloud_CPP" Then return new RedCloud_CPP
 	If algorithmName = "RedCloud_PrepData" Then return new RedCloud_PrepData
 	If algorithmName = "RedCloud_World" Then return new RedCloud_World
 	If algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ

@@ -2,16 +2,31 @@
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedCloud_PrepData
+    Public clCPP As New RedCloud_CPP
+    Public clGen As New Cell_clGenerate
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 255
         task.redOptions.rcReductionSlider.Value = 100
         task.redOptions.ColorTracking.Checked = True
+        task.clMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
 
-        dst2 = runRedC(prep.dst2, labels(2))
+        clCPP.Run(prep.dst2)
+
+        If clCPP.classCount = 0 Then Exit Sub ' no data to process.
+        clGen.classCount = clCPP.classCount
+        clGen.rectList = clCPP.rectList
+        clGen.floodPoints = clCPP.floodPoints
+        clGen.Run(clCPP.dst2)
+
+        dst2 = clGen.dst2
+
+        labels(2) = clGen.labels(2)
+        task.clList = New List(Of rcData)(task.rcList)
+        task.clMap = task.rcMap.Clone
     End Sub
 End Class
 
@@ -240,5 +255,96 @@ Public Class RedCloud_World : Inherits TaskParent
         prep.Run(world.dst2)
 
         dst2 = runRedC(prep.dst2, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_ColorAndCloud : Inherits TaskParent
+    Dim redL As New RedCloud_Basics
+    Public Sub New()
+        desc = "Use the results of RedColor_Basics to create a mask for use with RedCloud_Basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static saveIDcount = task.redOptions.IdentifyCountBar.Value
+        dst2 = runRedC(src, labels(2))
+
+        dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        redL.clCPP.identifyCount = 20 ' make sure we cover the mask
+        redL.clCPP.inputRemoved = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        redL.Run(src)
+
+        dst3 = redL.dst2
+        labels(3) = redL.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_CPP : Inherits TaskParent
+    Public inputRemoved As cv.Mat
+    Public classCount As Integer
+    Public rectList As New List(Of cv.Rect)
+    Public floodPoints As New List(Of cv.Point)
+    Public identifyCount As Integer
+    Public Sub New()
+        cPtr = RedColor_Open()
+        inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Run the C++ RedCloud interface with or without a mask"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static color As New Color8U_Basics
+            color.Run(src)
+            src = color.dst2
+        End If
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim maskData(src.Total - 1) As Byte
+        Marshal.Copy(inputRemoved.Data, maskData, 0, maskData.Length)
+        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+        Dim imagePtr = RedColor_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols)
+        handleMask.Free()
+        handleInput.Free()
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        If task.optionsChanged Then
+            identifyCount = task.redOptions.IdentifyCountBar.Value
+        End If
+        classCount = Math.Min(RedColor_Count(cPtr), identifyCount)
+        If classCount = 0 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedColor_Rects(cPtr))
+        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2, RedColor_FloodPoints(cPtr))
+
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+        Dim ptList(classCount * 2) As Integer
+        Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length)
+
+        rectList.Clear()
+        For i = 0 To classCount * 4 - 4 Step 4
+            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+        Next
+
+        floodPoints.Clear()
+        For i = 0 To classCount * 2 - 2 Step 2
+            floodPoints.Add(New cv.Point(ptList(i), ptList(i + 1)))
+        Next
+
+        If standalone Then dst3 = ShowPalette(dst2 * 255 / classCount)
+
+        If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
+        If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedColor_Close(cPtr)
     End Sub
 End Class

@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As New cv.Mat
-    Public cellGen As New Cell_Generate
+    Public cellGen As New Cell_rcGenerate
     Dim redCPP As New RedColor_CPP
     Public Sub New()
         task.gOptions.setHistogramBins(40)
@@ -19,6 +19,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         End If
 
         redCPP.inputRemoved = inputRemoved
+        redCPP.identifyCount = task.redOptions.IdentifyCountBar.Value
         redCPP.Run(src)
 
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
@@ -66,6 +67,7 @@ Public Class RedColor_CPP : Inherits TaskParent
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)
+    Public identifyCount As Integer
     Public Sub New()
         cPtr = RedColor_Open()
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -90,7 +92,7 @@ Public Class RedColor_CPP : Inherits TaskParent
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
-        classCount = Math.Min(RedColor_Count(cPtr), task.redOptions.identifyCount * 2)
+        classCount = Math.Min(RedColor_Count(cPtr), identifyCount * 2)
         If classCount = 0 Then Exit Sub ' no data to process.
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedColor_Rects(cPtr))

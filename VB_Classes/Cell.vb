@@ -287,7 +287,7 @@ End Class
 
 
 
-Public Class Cell_Generate : Inherits TaskParent
+Public Class Cell_rcGenerate : Inherits TaskParent
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)
@@ -299,8 +299,8 @@ Public Class Cell_Generate : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            SetTrueText("Run RedColor_Basics or RedCloud_Basics to test Cell_Generate." + vbCrLf +
-                        "Cell_Generate uses both to build the task.rclist and both use Cell_Generate.")
+            SetTrueText("Run RedColor_Basics to test Cell_rcGenerate." + vbCrLf +
+                        "Cell_rcGenerate builds the task.rclist.")
             Exit Sub
         End If
 
@@ -397,6 +397,125 @@ Public Class Cell_Generate : Inherits TaskParent
         If retained > 0 Then saveRetained = retained
         If task.heartBeat Then
             labels(2) = CStr(task.rcList.Count) + " total cells (shown with mean or 'natural' color and " +
+                        CStr(saveRetained) + " matched to previous frame"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Cell_clGenerate : Inherits TaskParent
+    Public classCount As Integer
+    Public rectList As New List(Of cv.Rect)
+    Public floodPoints As New List(Of cv.Point)
+    Public removeContour As Boolean
+    Public Sub New()
+        task.clMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.clList = New List(Of rcData)
+        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            SetTrueText("Run RedCloud_Basics to test Cell_clGenerate." + vbCrLf +
+                        "Cell_clGenerate builds the task.cllist.")
+            Exit Sub
+        End If
+
+        Dim retained As Integer = 0
+        Dim initialList As New List(Of rcData)
+        Dim usedColors = New List(Of cv.Scalar)({black})
+        For i = 0 To rectList.Count - 1
+            Dim cl As New rcData
+            cl.rect = rectList(i)
+            If cl.rect.Size = dst2.Size Then Continue For ' RedColor_Basics finds a cell this big.  
+            cl.mask = src(cl.rect).InRange(i + 1, i + 1)
+            cl.maxDist = GetMaxDist(cl)
+            cl.indexLast = task.clMap.Get(Of Byte)(cl.maxDist.Y, cl.maxDist.X)
+            cl.motionFlag = task.motionMask(cl.rect).CountNonZero > 0
+            cl.floodPoint = floodPoints(i)
+            If cl.indexLast > 0 And cl.indexLast < task.clList.Count Then
+                Dim lcl = task.clList(cl.indexLast)
+                cl.age = lcl.age + 1
+                cl.colorTrack = lcl.colorTrack
+                cl.colorMean = lcl.colorMean
+                cl.colorDepth = lcl.colorDepth
+                cl.colorGray32 = lcl.colorGray32
+                If cl.motionFlag = False Then
+                    cl.depthMean = lcl.depthMean
+                    cl.depthMask = lcl.depthMask
+                    cl.depthPixels = lcl.depthPixels
+                    cl.minVec = lcl.minVec
+                    cl.maxVec = lcl.maxVec
+                    cl.minLoc = lcl.minLoc
+                    cl.maxLoc = lcl.maxLoc
+                End If
+                If usedColors.Contains(cl.colorTrack) Then
+                    cl.age = 1 ' a new cell was found that was previously part of another.
+                    cl.colorTrack = randomCellColor()
+                End If
+                retained += 1
+            Else
+                cl.age = 1
+                cl.colorTrack = randomCellColor()
+            End If
+
+            usedColors.Add(cl.colorTrack)
+            initialList.Add(cl)
+        Next
+
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim colorSelection = If(task.redOptions.ColorMean.Checked, 0, 1)
+        If colorSelection > 0 Then colorSelection = If(task.redOptions.ColorTracking.Checked, 1, 2)
+        If colorSelection = 2 Then colorSelection = If(task.redOptions.ColorTrackingDepth.Checked, 2, 3)
+
+        For Each cl In initialList
+            cl.contour = ContourBuild(cl.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            DrawContour(cl.mask, cl.contour, cl.colorTrack, -1)
+            If removeContour Then DrawContour(cl.mask, cl.contour, 0, 2) ' no overlap with neighbors.
+
+            cl.maxDStable = cl.maxDist
+
+            ' the number of pixels - may have changed with the infill or contour.
+            cl.pixels = cl.mask.CountNonZero
+            If cl.pixels = 0 Then Continue For
+
+            If cl.motionFlag Then
+                Dim colorStdev As cv.Scalar
+                cv.Cv2.MeanStdDev(task.color(cl.rect), cl.colorMean, colorStdev, cl.mask)
+                cl.depthMask = cl.mask.Clone
+                cl.depthMask.SetTo(0, task.noDepthMask(cl.rect))
+                cl.depthPixels = cl.depthMask.CountNonZero
+
+                If cl.depthPixels / cl.pixels > 0.1 Then
+                    task.pcSplit(0)(cl.rect).MinMaxLoc(cl.minVec.X, cl.maxVec.X, cl.minLoc, cl.maxLoc, cl.depthMask)
+                    task.pcSplit(1)(cl.rect).MinMaxLoc(cl.minVec.Y, cl.maxVec.Y, cl.minLoc, cl.maxLoc, cl.depthMask)
+                    task.pcSplit(2)(cl.rect).MinMaxLoc(cl.minVec.Z, cl.maxVec.Z, cl.minLoc, cl.maxLoc, cl.depthMask)
+
+                    Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+                    cv.Cv2.MeanStdDev(task.pointCloud(cl.rect), depthMean, depthStdev, cl.depthMask)
+                    cl.depthMean = depthMean(2)
+
+                    If Single.IsNaN(depthMean(2)) = False And depthMean(2) >= 0 Then
+                        Dim depth = If(cl.depthMean > task.MaxZmeters, task.MaxZmeters, cl.depthMean)
+                        Dim index = CInt(255 * depth / task.MaxZmeters)
+
+                        cl.colorDepth = task.scalarColors(index)
+                        cl.colorGray32 = New cv.Scalar(index, index, index)
+                    End If
+                End If
+            End If
+            cl.colorCurr = selectColor(cl, colorSelection)
+            sortedCells.Add(cl.pixels, cl)
+        Next
+
+        dst2 = RebuildCells(sortedCells)
+
+        Static saveRetained As Integer = retained
+        If retained > 0 Then saveRetained = retained
+        If task.heartBeat Then
+            labels(2) = CStr(task.clList.Count) + " total cells (shown with mean or 'natural' color and " +
                         CStr(saveRetained) + " matched to previous frame"
         End If
     End Sub
