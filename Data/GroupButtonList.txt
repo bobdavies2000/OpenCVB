@@ -190,6 +190,7 @@ Rectangle
 RecursiveBilateralFilter
 RedCloud
 RedColor
+RedMasks
 RedTrack
 Reduction
 Reliable

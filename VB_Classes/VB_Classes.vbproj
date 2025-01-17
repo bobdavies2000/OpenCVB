@@ -139,6 +139,7 @@
     <Compile Include="OptionParent.vb" />
     <Compile Include="PCdiff.vb" />
     <Compile Include="RedCloud.vb" />
+    <Compile Include="RedMask.vb" />
     <Compile Include="Reliable.vb" />
     <Compile Include="ScatterMatrix.vb" />
     <Compile Include="Derivative.vb" />
