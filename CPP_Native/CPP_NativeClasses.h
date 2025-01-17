@@ -3304,11 +3304,6 @@ extern "C" __declspec(dllexport) int* RedCloudMaxDist_Rects(RedCloudMaxDist* cPt
     return (int*)&cPtr->cellRects[0];
 }
 
-extern "C" __declspec(dllexport) int* RedCloudMaxDist_FloodPoints(RedCloudMaxDist* cPtr)
-{
-    return (int*)&cPtr->floodPoints[0];
-}
-
 extern "C" __declspec(dllexport) void
 RedCloudMaxDist_SetPoints(RedCloudMaxDist* cPtr, int count, int* dataPtr)
 {

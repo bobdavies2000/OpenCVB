@@ -216,7 +216,9 @@ Public Class Reduction_BGR : Inherits TaskParent
 
         For i = 0 To 2
             reduction.Run(split(i))
-            If standaloneTest() Then mats.mat(i) = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
+            If standaloneTest() Then
+                mats.mat(i) = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
+            End If
         Next
 
         mats.mat(3) = (mats.mat(0) + mats.mat(1) + mats.mat(2))

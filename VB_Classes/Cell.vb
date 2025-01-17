@@ -290,7 +290,6 @@ End Class
 Public Class Cell_rcGenerate : Inherits TaskParent
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
-    Public floodPoints As New List(Of cv.Point)
     Public Sub New()
         task.rcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.rcList = New List(Of rcData)
@@ -314,7 +313,6 @@ Public Class Cell_rcGenerate : Inherits TaskParent
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             rc.motionFlag = task.motionMask(rc.rect).CountNonZero > 0
-            rc.floodPoint = floodPoints(i)
             If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1

@@ -36,7 +36,6 @@ Public Class MSER_Basics : Inherits TaskParent
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
 
-            rc.floodPoint = floodPoints(index)
             rc.maxDist = GetMaxDist(rc)
 
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -51,9 +50,11 @@ Public Class MSER_Basics : Inherits TaskParent
 
             Dim colorStdev As cv.Scalar
             cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, colorStdev, rc.mask)
+            rc.colorCurr = rc.colorMean
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
+        task.rcList = New List(Of rcData)(sortedCells.Values)
         dst2 = RebuildCells(sortedCells)
 
         labels(2) = CStr(task.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
@@ -172,16 +173,15 @@ End Class
 
 
 Public Class MSER_Left : Inherits TaskParent
-    Dim mBase As New MSER_Basics
+    Dim mser As New MSER_Basics
     Public Sub New()
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        mBase.Run(task.leftView)
-        dst2 = mBase.dst2
-        dst3 = mBase.dst3
-        labels(2) = mBase.labels(2)
+        mser.Run(task.leftView)
+        dst2 = mser.dst2
+        labels(2) = mser.labels(2)
     End Sub
 End Class
 
@@ -193,16 +193,15 @@ End Class
 
 
 Public Class MSER_Right : Inherits TaskParent
-    Dim mBase As New MSER_Basics
+    Dim mser As New MSER_Basics
     Public Sub New()
         labels = {"", "", "MSER_Basics output for right camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        mBase.Run(task.rightView)
-        dst2 = mBase.dst2
-        dst3 = mBase.dst3
-        labels(2) = mBase.labels(2)
+        mser.Run(task.rightView)
+        dst2 = mser.dst2
+        labels(2) = mser.labels(2)
     End Sub
 End Class
 
@@ -215,26 +214,27 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
 Public Class MSER_Hulls : Inherits TaskParent
     Dim options As New Options_MSER
-    Dim mBase As New MSER_Basics
+    Dim mser As New MSER_Basics
     Public Sub New()
         desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        mBase.Run(src)
-        dst2 = mBase.dst2
+        mser.Run(src)
+        dst2 = mser.dst2
 
         Dim pixels As Integer
         dst3.SetTo(0)
-        For Each rc In mBase.mserCells
+        For Each rc In task.rcList
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
             DrawContour(dst3(rc.rect), rc.hull, rc.colorTrack, -1)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(mBase.mserCells.Count) + " Regions with average size " + If(mBase.mserCells.Count > 0,
-                                          CStr(CInt(pixels / mBase.mserCells.Count)), "0")
+        If task.heartBeat Then labels(2) = CStr(task.rcList.Count) + " Regions with average size " +
+                                           If(task.rcList.Count > 0,
+                                           CStr(CInt(pixels / task.rcList.Count)), "0")
     End Sub
 End Class
 
@@ -248,7 +248,7 @@ End Class
 Public Class MSER_TestSynthetic : Inherits TaskParent
     Dim options As New Options_MSER
     Dim synth As New MSER_SyntheticInput
-    Dim mBase As New MSER_Basics
+    Dim mser As New MSER_Basics
     Public Sub New()
         optiBase.FindCheckBox("Use grayscale input").Checked = True
         labels = {"", "", "Synthetic input", "Output from MSER (Maximally Stable Extremal Region)"}
@@ -260,8 +260,8 @@ Public Class MSER_TestSynthetic : Inherits TaskParent
         synth.Run(src)
         dst2 = synth.dst2.Clone()
 
-        mBase.Run(dst2)
-        dst3 = mBase.dst3
+        mser.Run(dst2)
+        dst3 = mser.dst2
     End Sub
 End Class
 
@@ -273,7 +273,7 @@ End Class
 
 
 Public Class MSER_Grayscale : Inherits TaskParent
-    Dim mBase As New MSER_Basics
+    Dim mser As New MSER_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         optiBase.FindCheckBox("Use grayscale input").Checked = True
@@ -282,9 +282,9 @@ Public Class MSER_Grayscale : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
 
-        mBase.Run(reduction.dst3)
-        dst2 = mBase.dst2
-        labels(2) = mBase.labels(2)
+        mser.Run(reduction.dst3)
+        dst2 = mser.dst2
+        labels(2) = mser.labels(2)
     End Sub
 End Class
 
@@ -295,8 +295,8 @@ End Class
 
 
 Public Class MSER_ReducedRGB : Inherits TaskParent
-    Dim mBase As New MSER_Basics
-    Dim reduction As New Reduction_BGR
+    Dim mser As New MSER_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
         optiBase.FindCheckBox("Use grayscale input").Checked = False
         desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
@@ -304,9 +304,9 @@ Public Class MSER_ReducedRGB : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
 
-        mBase.Run(reduction.dst2)
-        dst2 = mBase.dst3
-        labels(2) = mBase.labels(2)
+        mser.Run(reduction.dst3)
+        dst2 = mser.dst2
+        labels(2) = mser.labels(2)
     End Sub
 End Class
 
@@ -430,14 +430,14 @@ End Class
 
 
 Public Class MSER_RedCloud : Inherits TaskParent
-    Dim mBase As New MSER_Basics
+    Dim mser As New MSER_Basics
     Public Sub New()
         desc = "Use the MSER_Basics output as input to RedColor_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        mBase.Run(src)
+        mser.Run(src)
 
-        runRedC(mBase.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        runRedC(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub
@@ -594,8 +594,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
         For i = 0 To floodPoints.Count - 1
             Dim rc As New rcData
             rc.index = rcList.Count
-            rc.floodPoint = floodPoints(i)
-            Dim val = dst3.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X)
+            Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
             rc.rect = boxInput(boxes.ElementAt(i).Value)
             rc.mask = dst3(rc.rect).InRange(val, val)
             dst1(rc.rect).SetTo(rc.index, rc.mask)

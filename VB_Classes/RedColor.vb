@@ -25,7 +25,6 @@ Public Class RedColor_Basics : Inherits TaskParent
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
         cellGen.classCount = redCPP.classCount
         cellGen.rectList = redCPP.rectList
-        cellGen.floodPoints = redCPP.floodPoints
         cellGen.Run(redCPP.dst2)
 
         dst2 = cellGen.dst2
@@ -66,7 +65,6 @@ Public Class RedColor_CPP : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
-    Public floodPoints As New List(Of cv.Point)
     Public identifyCount As Integer
     Public Sub New()
         cPtr = RedColor_Open()
@@ -97,21 +95,13 @@ Public Class RedColor_CPP : Inherits TaskParent
         If classCount = 0 Then Exit Sub ' no data to process.
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedColor_Rects(cPtr))
-        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2, RedColor_FloodPoints(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-        Dim ptList(classCount * 2) As Integer
-        Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length)
 
         rectList.Clear()
         For i = 0 To classCount * 4 - 4 Step 4
             rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-        Next
-
-        floodPoints.Clear()
-        For i = 0 To classCount * 2 - 2 Step 2
-            floodPoints.Add(New cv.Point(ptList(i), ptList(i + 1)))
         Next
 
         If standalone Then dst3 = ShowPalette(dst2 * 255 / classCount)
@@ -758,32 +748,6 @@ End Class
 
 
 
-
-
-Public Class RedColor_FloodPoint : Inherits TaskParent
-    Dim stats As New Cell_Basics
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        desc = "Verify that floodpoints correctly determine if depth is present."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-
-        dst1 = task.depthRGB
-        For Each rc In task.rcList
-            DrawCircle(dst1, rc.floodPoint, task.DotSize, white)
-            DrawCircle(dst2, rc.floodPoint, task.DotSize, cv.Scalar.Yellow)
-        Next
-        stats.Run(src)
-        SetTrueText(stats.strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedColor_CellStatsPlot : Inherits TaskParent
     Dim cells As New Cell_BasicsPlot
     Public Sub New()
@@ -1396,7 +1360,6 @@ End Class
 Public Class RedColor_MaxDist_CPP : Inherits TaskParent
     Public classCount As Integer
     Public RectList As New List(Of cv.Rect)
-    Public floodPoints As New List(Of cv.Point)
     Public maxList As New List(Of Integer)
     Dim color8U As New Color8U_Basics
     Public Sub New()
@@ -1431,18 +1394,12 @@ Public Class RedColor_MaxDist_CPP : Inherits TaskParent
         If classCount = 0 Then Exit Sub ' no data to process.
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
-        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2, RedCloudMaxDist_FloodPoints(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-        Dim ptList(classCount * 2) As Integer
-        Marshal.Copy(floodPointData.Data, ptList, 0, ptList.Length)
 
         For i = 0 To rects.Length - 4 Step 4
             RectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-        Next
-        For i = 0 To ptList.Length - 2 Step 2
-            floodPoints.Add(New cv.Point(ptList(i), ptList(i + 1)))
         Next
     End Sub
     Public Sub Close()

@@ -108,7 +108,6 @@ Public Class Flood_BasicsMask : Inherits TaskParent
 
         cellGen.classCount = redCPP.classCount
         cellGen.rectList = redCPP.rectList
-        cellGen.floodPoints = redCPP.floodPoints
         cellGen.Run(redCPP.dst2)
 
         dst2 = cellGen.dst2
@@ -261,7 +260,7 @@ Public Class Flood_MaxDistPoints : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public Sub New()
         labels(3) = "Contour boundaries - input to RedColor_Basics"
-        desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
+        desc = "Build the RedCloud cells by providing the maxDist to the RedCell C++ code."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
@@ -270,7 +269,6 @@ Public Class Flood_MaxDistPoints : Inherits TaskParent
 
         cellGen.classCount = redCPP.classCount
         cellGen.rectList = redCPP.RectList
-        cellGen.floodPoints = redCPP.floodPoints
         cellGen.Run(redCPP.dst2)
 
         dst2 = cellGen.dst2

@@ -406,7 +406,6 @@ Public Class rcData
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public pixels As Integer
-    Public floodPoint As cv.Point
     Public age As Integer
 
     Public colorTrack As New cv.Scalar

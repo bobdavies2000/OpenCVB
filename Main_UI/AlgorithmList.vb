@@ -1160,7 +1160,6 @@ Public Class algorithmList
 	If algorithmName = "OilPaint_ManualVB" Then return new OilPaint_ManualVB
 	If algorithmName = "OilPaint_Pointilism" Then return new OilPaint_Pointilism
 	If algorithmName = "OpAuto_FloorCeiling" Then return new OpAuto_FloorCeiling
-	If algorithmName = "OpAuto_MSER" Then return new OpAuto_MSER
 	If algorithmName = "OpAuto_Peaks2D" Then return new OpAuto_Peaks2D
 	If algorithmName = "OpAuto_Peaks2DGrid" Then return new OpAuto_Peaks2DGrid
 	If algorithmName = "OpAuto_PixelDifference" Then return new OpAuto_PixelDifference
@@ -1485,7 +1484,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_FindCells" Then return new RedColor_FindCells
 	If algorithmName = "RedColor_Flippers" Then return new RedColor_Flippers
 	If algorithmName = "RedColor_FlipTest" Then return new RedColor_FlipTest
-	If algorithmName = "RedColor_FloodPoint" Then return new RedColor_FloodPoint
 	If algorithmName = "RedColor_FourColor" Then return new RedColor_FourColor
 	If algorithmName = "RedColor_FPS" Then return new RedColor_FPS
 	If algorithmName = "RedColor_Gaps" Then return new RedColor_Gaps
