@@ -38,7 +38,7 @@ using namespace ml;
 
 #include "CPP_Parent.h"
 //#include "CPP_Unused.h"
-class RedCloud
+class RedMask
 {
 private:
 public:
@@ -46,7 +46,7 @@ public:
     vector<Rect>cellRects;
     vector<Point> floodPoints;
 
-    RedCloud() {}
+    RedMask() {}
     void RunCPP(Mat inputRemoved, int minSize) {
         Mat maskCopy = inputRemoved.clone();
         Rect rect;
@@ -90,29 +90,29 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport) RedCloud* RedColor_Open()
+extern "C" __declspec(dllexport) RedMask* RedMask_Open()
 {
-    return new RedCloud();
+    return new RedMask();
 }
 
-extern "C" __declspec(dllexport) int RedColor_Count(RedCloud* cPtr)
+extern "C" __declspec(dllexport) int RedMask_Count(RedMask* cPtr)
 {
     return (int)cPtr->cellRects.size();
 }
 
-extern "C" __declspec(dllexport) int* RedColor_Rects(RedCloud* cPtr)
+extern "C" __declspec(dllexport) int* RedMask_Rects(RedMask* cPtr)
 {
     return (int*)&cPtr->cellRects[0];
 }
 
-extern "C" __declspec(dllexport) int* RedColor_FloodPoints(RedCloud* cPtr)
+extern "C" __declspec(dllexport) int* RedMask_FloodPoints(RedMask* cPtr)
 {
     return (int*)&cPtr->floodPoints[0];
 }
 
-extern "C" __declspec(dllexport) int* RedColor_Close(RedCloud* cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int* RedMask_Close(RedMask* cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
-RedColor_Run(RedCloud* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int minSize)
+RedMask_Run(RedMask* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int minSize)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
 

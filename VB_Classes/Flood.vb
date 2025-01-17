@@ -86,8 +86,8 @@ End Class
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cv.Mat
     Public inputRemoved As cv.Mat
-    Public cellGen As New Cell_rcGenerate
-    Dim redCPP As New RedColor_CPP
+    Public cellGen As New Cell_Generate
+    Dim redMask As New RedMask_Basics
     Public buildinputRemoved As Boolean
     Public showSelected As Boolean = True
     Dim color8U As New Color8U_Basics
@@ -103,12 +103,11 @@ Public Class Flood_BasicsMask : Inherits TaskParent
         End If
 
         dst3 = inputRemoved
-        redCPP.inputRemoved = inputRemoved
-        redCPP.Run(src)
+        redMask.inputRemoved = inputRemoved
+        redMask.Run(src)
 
-        cellGen.classCount = redCPP.classCount
-        cellGen.rectList = redCPP.rectList
-        cellGen.Run(redCPP.dst2)
+        cellGen.maskList = redMask.maskList
+        cellGen.Run(redMask.dst2)
 
         dst2 = cellGen.dst2
 
@@ -245,42 +244,5 @@ Public Class Flood_Motion1 : Inherits TaskParent
             dst3 = flood.dst2
             labels(3) = flood.labels(2)
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Flood_MaxDistPoints : Inherits TaskParent
-    Dim redCPP As New RedColor_MaxDist_CPP
-    Public cellGen As New Cell_rcGenerate
-    Dim color8U As New Color8U_Basics
-    Public Sub New()
-        labels(3) = "Contour boundaries - input to RedColor_Basics"
-        desc = "Build the RedCloud cells by providing the maxDist to the RedCell C++ code."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        color8U.Run(src)
-        redCPP.Run(color8U.dst2)
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-
-        cellGen.classCount = redCPP.classCount
-        cellGen.rectList = redCPP.RectList
-        cellGen.Run(redCPP.dst2)
-
-        dst2 = cellGen.dst2
-
-        redCPP.maxList.Clear()
-        For i = 1 To task.rcList.Count - 1
-            redCPP.maxList.Add(task.rcList(i).maxDist.X)
-            redCPP.maxList.Add(task.rcList(i).maxDist.Y)
-        Next
-
-        task.setSelectedCell()
-
-        labels(2) = cellGen.labels(2)
     End Sub
 End Class

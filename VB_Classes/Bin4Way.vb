@@ -655,7 +655,7 @@ Public Class Bin4Way_RedCloud : Inherits TaskParent
             Next
         Next
 
-        dst2 = RebuildCells(sortedCells)
+        dst2 = RebuildRCMap(sortedCells)
 
         If task.heartBeat Then labels(2) = CStr(task.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub

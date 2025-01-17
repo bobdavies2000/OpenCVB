@@ -217,7 +217,7 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
             Next
         Next
 
-        dst2 = RebuildCells(sortedCells)
+        dst2 = RebuildRCMap(sortedCells)
 
         If task.heartBeat Then labels(2) = CStr(task.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub
@@ -239,7 +239,7 @@ Public Class Bin3Way_RedCloud : Inherits TaskParent
         flood.showSelected = False
         desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -265,7 +265,7 @@ Public Class Bin3Way_RedCloud : Inherits TaskParent
             Next
         Next
 
-        dst2 = RebuildCells(sortedCells)
+        dst2 = RebuildRCMap(sortedCells)
 
         If task.heartBeat Then labels(2) = CStr(task.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub

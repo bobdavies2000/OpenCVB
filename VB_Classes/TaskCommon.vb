@@ -400,6 +400,18 @@ End Structure
 
 
 
+Public Class maskData
+    Public rect As cv.Rect
+    Public mask As cv.Mat
+    Public contour As New List(Of cv.Point)
+    Public index As Integer
+    Public maxDist As cv.Point
+    Public pixels As Integer
+    Public depthMean As Single
+End Class
+
+
+
 
 
 Public Class rcData

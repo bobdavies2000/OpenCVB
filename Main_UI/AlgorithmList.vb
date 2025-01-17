@@ -166,8 +166,8 @@ Public Class algorithmList
 	If algorithmName = "Cell_Binarize" Then return new Cell_Binarize
 	If algorithmName = "Cell_Distance" Then return new Cell_Distance
 	If algorithmName = "Cell_FloodFill" Then return new Cell_FloodFill
+	If algorithmName = "Cell_Generate" Then return new Cell_Generate
 	If algorithmName = "Cell_PixelCountCompare" Then return new Cell_PixelCountCompare
-	If algorithmName = "Cell_rcGenerate" Then return new Cell_rcGenerate
 	If algorithmName = "Cell_ValidateColorCells" Then return new Cell_ValidateColorCells
 	If algorithmName = "CellularAutomata_All256" Then return new CellularAutomata_All256
 	If algorithmName = "CellularAutomata_Basics" Then return new CellularAutomata_Basics
@@ -568,7 +568,6 @@ Public Class algorithmList
 	If algorithmName = "Flood_BasicsMask" Then return new Flood_BasicsMask
 	If algorithmName = "Flood_CellStatsPlot" Then return new Flood_CellStatsPlot
 	If algorithmName = "Flood_ContainedCells" Then return new Flood_ContainedCells
-	If algorithmName = "Flood_MaxDistPoints" Then return new Flood_MaxDistPoints
 	If algorithmName = "Flood_Motion" Then return new Flood_Motion
 	If algorithmName = "Flood_Motion1" Then return new Flood_Motion1
 	If algorithmName = "Flood_Tiers" Then return new Flood_Tiers

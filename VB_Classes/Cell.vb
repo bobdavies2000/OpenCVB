@@ -287,9 +287,8 @@ End Class
 
 
 
-Public Class Cell_rcGenerate : Inherits TaskParent
-    Public classCount As Integer
-    Public rectList As New List(Of cv.Rect)
+Public Class Cell_Generate : Inherits TaskParent
+    Public maskList As New List(Of maskData)
     Public Sub New()
         task.rcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.rcList = New List(Of rcData)
@@ -297,22 +296,24 @@ Public Class Cell_rcGenerate : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            SetTrueText("Run RedColor_Basics to test Cell_rcGenerate." + vbCrLf +
-                        "Cell_rcGenerate builds the task.rclist.")
-            Exit Sub
+            Static redMask As New RedMask_Basics
+            redMask.Run(src)
+            maskList = redMask.maskList
         End If
 
         Dim retained As Integer = 0
         Dim initialList As New List(Of rcData)
         Dim usedColors = New List(Of cv.Scalar)({black})
-        For i = 0 To rectList.Count - 1
+        For i = 0 To maskList.Count - 1
             Dim rc As New rcData
-            rc.rect = rectList(i)
+            rc.rect = maskList(i).rect
             If rc.rect.Size = dst2.Size Then Continue For ' RedColor_Basics finds a cell this big.  
-            rc.mask = src(rc.rect).InRange(i + 1, i + 1)
-            rc.maxDist = GetMaxDist(rc)
+            rc.mask = maskList(i).mask
+            rc.maxDist = maskList(i).maxDist
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             rc.motionFlag = task.motionMask(rc.rect).CountNonZero > 0
+            rc.contour = maskList(i).contour
+            rc.pixels = maskList(i).mask.CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
@@ -349,12 +350,8 @@ Public Class Cell_rcGenerate : Inherits TaskParent
         If colorSelection = 2 Then colorSelection = If(task.redOptions.ColorTrackingDepth.Checked, 2, 3)
 
         For Each rc In initialList
-            rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            DrawContour(rc.mask, rc.contour, 255, -1)
-
             rc.maxDStable = rc.maxDist
 
-            ' the number of pixels - may have changed with the infill or contour.
             rc.pixels = rc.mask.CountNonZero
             If rc.pixels = 0 Then Continue For
 
@@ -387,7 +384,7 @@ Public Class Cell_rcGenerate : Inherits TaskParent
             sortedCells.Add(rc.pixels, rc)
         Next
 
-        dst2 = RebuildCells(sortedCells)
+        dst2 = RebuildRCMap(sortedCells)
 
         Static saveRetained As Integer = retained
         If retained > 0 Then saveRetained = retained

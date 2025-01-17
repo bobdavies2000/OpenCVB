@@ -337,7 +337,7 @@ Public Class TaskParent : Implements IDisposable
         If r.Height <= 0 Then r.Height = 1
         Return r
     End Function
-    Public Function RebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
+    Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
         task.rcList.Clear()
         task.rcList.Add(New rcData)
         task.rcMap.SetTo(0)
@@ -406,6 +406,16 @@ Public Class TaskParent : Implements IDisposable
         ' ranges are exclusive in OpenCV 
         Return {New cv.Rangef(mmX.minVal - histDelta, mmX.maxVal + histDelta),
                 New cv.Rangef(mmY.minVal - histDelta, mmY.maxVal + histDelta)}
+    End Function
+    Public Function GetMaxDist(ByRef md As maskData) As cv.Point
+        Dim mask = md.mask.Clone
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        mm.maxLoc.X += md.rect.X
+        mm.maxLoc.Y += md.rect.Y
+
+        Return mm.maxLoc
     End Function
     Public Function GetMaxDist(ByRef rc As rcData) As cv.Point
         Dim mask = rc.mask.Clone

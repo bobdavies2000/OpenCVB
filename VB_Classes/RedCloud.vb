@@ -22,39 +22,32 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
         Dim depthMeans As New List(Of Single)
         Dim matList(task.rcList.Count - 1) As List(Of Integer)
-        Dim maskList As New List(Of cv.Mat)
-        For i = 0 To redMask.masks.Count - 1
-            Dim mask = redMask.masks(i)
-            Dim r = redMask.rectList(i)
-            mask = cellMask(r) And mask
-            mask.SetTo(0, task.noDepthMask(r))
+        Dim maskList As New List(Of maskData)
+        For i = 0 To redMask.maskList.Count - 1
+            Dim md = redMask.maskList(i)
+            md.mask = cellMask(md.rect) And md.mask
+            md.mask.SetTo(0, task.noDepthMask(md.rect))
+            md.depthMean = task.pcSplit(2)(md.rect).Mean(md.mask)
 
-            Dim depthMean = task.pcSplit(2)(r).Mean(mask)
-            depthMeans.Add(depthMean)
-
-            maskList.Add(mask)
-            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-            Dim mm As mmData = GetMinMax(distance32f)
-
-            Dim index = task.rcMap(r).Get(Of Byte)(mm.maxLoc.Y, mm.maxLoc.X)
-            If matList(index) Is Nothing Then matList(index) = New List(Of Integer)
-            matList(index).Add(i)
+            md.index = task.rcMap.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
+            maskList.Add(md)
+            ' If matList(md.index) Is Nothing Then matList(md.index) = New List(Of Integer)
+            'matList(md.index).Add(i)
         Next
 
         dst1 = dst2.Clone
         For i = 0 To matList.Count - 1
             Dim meanList As New List(Of Single)
             If matList(i) Is Nothing Then Continue For
-            For j = 0 To matList(i).Count - 1
-                Dim index = matList(i)(j)
-                meanList.Add(depthMeans(index))
-                Dim r = redMask.rectList(index)
-                dst1(r).SetTo(task.scalarColors(i), maskList(index))
-            Next
-            Dim k = 0
+            'For j = 0 To matList(i).Count - 1
+            '    Dim index = matList(i)(j)
+            '    meanList.Add(depthMeans(index))
+            '    Dim r = redMask.rectList(index)
+            '    dst1(r).SetTo(task.scalarColors(i), maskList(index))
+            'Next
+            'Dim k = 0
         Next
-        dst3 = ShowPalette(dst0 * 255 / redMask.classCount)
+        dst3 = ShowPalette(dst0 * 255 / redMask.maskList.Count)
         labels(3) = redMask.labels(3)
     End Sub
 End Class

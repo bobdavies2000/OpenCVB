@@ -55,7 +55,7 @@ Public Class MSER_Basics : Inherits TaskParent
         Next
 
         task.rcList = New List(Of rcData)(sortedCells.Values)
-        dst2 = RebuildCells(sortedCells)
+        dst2 = RebuildRCMap(sortedCells)
 
         labels(2) = CStr(task.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
     End Sub
