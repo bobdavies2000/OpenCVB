@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As New cv.Mat
     Public cellGen As New Cell_rcGenerate
-    Dim redCPP As New RedColor_CPP
+    Dim redMask As New RedMask_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(40)
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -18,14 +18,13 @@ Public Class RedColor_Basics : Inherits TaskParent
             src = color.dst2
         End If
 
-        redCPP.inputRemoved = inputRemoved
-        redCPP.identifyCount = task.redOptions.IdentifyCountBar.Value
-        redCPP.Run(src)
+        redMask.inputRemoved = inputRemoved
+        redMask.Run(src)
 
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-        cellGen.classCount = redCPP.classCount
-        cellGen.rectList = redCPP.rectList
-        cellGen.Run(redCPP.dst2)
+        If redMask.classCount = 0 Then Exit Sub ' no data to process.
+        cellGen.classCount = redMask.classCount
+        cellGen.rectList = redMask.rectList
+        cellGen.Run(redMask.dst2)
 
         dst2 = cellGen.dst2
 
@@ -39,24 +38,24 @@ Public Class RedColor_Basics : Inherits TaskParent
             End If
             stats.Run(src)
             strOut = stats.strOut
-            SetTrueText(strOut, newPoint, 1)
+            SetTrueText(strOut, newPoint, 3)
             dst1 = stats.dst1
         End If
 
         If standaloneTest() Then
             dst3.SetTo(0)
-            For i = 1 To Math.Min(task.redOptions.identifyCount + 1, task.rcList.Count) - 1
-                Dim rc = task.rcList(i)
-                dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
-            Next
-
+            If task.redOptions.DisplayCellStats.Checked = False Then
+                For i = 1 To Math.Min(task.redOptions.identifyCount + 1, task.rcList.Count) - 1
+                    Dim rc = task.rcList(i)
+                    dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
+                Next
+            End If
             labels(3) = "The " + CStr(task.redOptions.identifyCount) + " largest cells shown below " +
                         " with the tracking color which changes when the cell is split or lost."
         End If
         task.setSelectedCell()
     End Sub
 End Class
-
 
 
 
@@ -1730,7 +1729,5 @@ Public Class RedColor_TopX : Inherits TaskParent
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         task.redC.inputRemoved = dst1
-
-
     End Sub
 End Class

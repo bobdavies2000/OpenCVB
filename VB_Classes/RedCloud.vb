@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedCloud_PrepData
-    Public redMask As New RedMasks_Basics
+    Public redMask As New RedMask_Basics
     Public Sub New()
         task.redOptions.rcReductionSlider.Value = 100
         task.gOptions.displayDst1.Checked = True

@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class RedMasks_Basics : Inherits TaskParent
+Public Class RedMask_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
@@ -71,5 +71,22 @@ Public Class RedMasks_Basics : Inherits TaskParent
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedColor_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedMask_Both : Inherits TaskParent
+    Dim redMask As New RedMask_Basics
+    Public Sub New()
+        desc = "Create masks for both color and color"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redMask.Run(src)
+
+
     End Sub
 End Class

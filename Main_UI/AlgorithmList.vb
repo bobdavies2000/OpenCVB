@@ -1514,7 +1514,8 @@ Public Class algorithmList
 	If algorithmName = "RedColor_UnmatchedCount" Then return new RedColor_UnmatchedCount
 	If algorithmName = "RedColor_UnstableCells" Then return new RedColor_UnstableCells
 	If algorithmName = "RedColor_UnstableHulls" Then return new RedColor_UnstableHulls
-	If algorithmName = "RedMasks_Basics" Then return new RedMasks_Basics
+	If algorithmName = "RedMask_Basics" Then return new RedMask_Basics
+	If algorithmName = "RedMask_Both" Then return new RedMask_Both
 	If algorithmName = "RedTrack_Basics" Then return new RedTrack_Basics
 	If algorithmName = "RedTrack_Features" Then return new RedTrack_Features
 	If algorithmName = "RedTrack_FeaturesKNN" Then return new RedTrack_FeaturesKNN
