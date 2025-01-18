@@ -491,6 +491,7 @@ Public Enum gifTypes
     gifdst3 = 3
     openCVBwindow = 4
     openGLwindow = 5
+    EntireScreen = 6
 End Enum
 
 

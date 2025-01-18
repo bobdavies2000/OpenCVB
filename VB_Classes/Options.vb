@@ -2743,12 +2743,13 @@ Public Class Options_Gif : Inherits OptionParent
     Public dst3Radio As RadioButton
     Public Opencvwindow As RadioButton
     Public OpenGLwindow As RadioButton
+    Public EntireScreen As RadioButton
     Public Sub New()
         If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
-            check.addCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
-            check.addCheckBox("Build GIF file in <Opencv Home Directory>\Temp\myGIF.gif")
-            check.addCheckBox("Restart - clear all previous images.")
+            check.addCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
+            check.addCheckBox("Step 2: Build GIF file in <Opencv Home Directory>\Temp\myGIF.gif")
+            check.addCheckBox("Optional: Restart - clear all previous images.")
         End If
 
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2757,27 +2758,31 @@ Public Class Options_Gif : Inherits OptionParent
             radio.addRadio("Capture dst1")
             radio.addRadio("Capture dst2")
             radio.addRadio("Capture dst3")
-            radio.addRadio("Capture entire Opencv window")
+            radio.addRadio("Capture entire OpenCVB app window")
             radio.addRadio("Capture OpenGL window")
+            radio.addRadio("Capture entire screen")
             radio.check(4).Checked = True
         End If
-        buildCheck = FindCheckBox("Build GIF file in <Opencv Home Directory>\Temp\myGIF.gif")
-        restartCheck = FindCheckBox("Restart - clear all previous images.")
+        buildCheck = FindCheckBox("Step 2: Build GIF file in <Opencv Home Directory>\Temp\myGIF.gif")
+        restartCheck = FindCheckBox("Optional: Restart - clear all previous images.")
 
         dst0Radio = findRadio("Capture dst0")
         dst1Radio = findRadio("Capture dst1")
         dst2Radio = findRadio("Capture dst2")
         dst3Radio = findRadio("Capture dst3")
-        Opencvwindow = findRadio("Capture entire Opencv window")
+        Opencvwindow = findRadio("Capture entire OpenCVB app window")
         OpenGLwindow = findRadio("Capture OpenGL window")
+        EntireScreen = findRadio("Capture entire screen")
     End Sub
     Public Sub RunOpt()
         Static frmCheck = FindFrm(traceName + " CheckBoxes")
         Static frmRadio = FindFrm(traceName + " Radio Buttons")
-        frmCheck.Left = task.gOptions.Width / 2
-        frmCheck.top = task.gOptions.Height / 2
-        frmRadio.left = task.gOptions.Width * 2 / 3
-        frmRadio.top = task.gOptions.Height * 2 / 3
+        If task.firstPass Or task.optionsChanged Then
+            frmCheck.Left = task.gOptions.Width / 2
+            frmCheck.top = task.gOptions.Height / 2
+            frmRadio.left = task.gOptions.Width * 2 / 3
+            frmRadio.top = task.gOptions.Height * 2 / 3
+        End If
 
         If dst0Radio.Checked Then task.gifCaptureIndex = 0
         If dst1Radio.Checked Then task.gifCaptureIndex = 1
@@ -2785,6 +2790,7 @@ Public Class Options_Gif : Inherits OptionParent
         If dst3Radio.Checked Then task.gifCaptureIndex = 3
         If Opencvwindow.Checked Then task.gifCaptureIndex = 4
         If OpenGLwindow.Checked Then task.gifCaptureIndex = 5
+        If EntireScreen.Checked Then task.gifCaptureIndex = 6
 
         task.gifBuild = buildCheck.Checked
 

@@ -1423,35 +1423,6 @@ End Class
 
 
 
-Public Class Depth_TierCount : Inherits TaskParent
-    Public valley As New HistValley_Depth1
-    Public classCount As Integer
-    Dim kValues As New List(Of Integer)
-    Public Sub New()
-        labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
-        desc = "Determine the 'K' value for the best number of clusters for the depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        valley.Run(src)
-        dst2 = valley.dst2
-
-        kValues.Add(valley.valleyOrder.Count)
-
-        classCount = CInt(kValues.Average)
-        If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
-
-        SetTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
-                    CStr(valley.valleyOrder.Count), 3)
-        labels(2) = "There are " + CStr(classCount)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Depth_Flatland : Inherits TaskParent
     Dim options As New Options_FlatLand
     Public Sub New()
@@ -1645,5 +1616,69 @@ Public Class Depth_Palette : Inherits TaskParent
         Dim depthNorm As cv.Mat = (src * 255 / task.MaxZmeters)
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
         cv.Cv2.ApplyColorMap(depthNorm, dst2, customColorMap)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_TierCount : Inherits TaskParent
+    Public valley As New HistValley_Depth1
+    Public classCount As Integer
+    Dim kValues As New List(Of Integer)
+    Public Sub New()
+        labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
+        desc = "Determine the 'K' value for the best number of clusters for the depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        valley.Run(src)
+        dst2 = valley.dst2
+
+        kValues.Add(valley.valleyOrder.Count)
+
+        classCount = CInt(kValues.Average)
+        If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
+
+        SetTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
+                    CStr(valley.valleyOrder.Count), 3)
+        labels(2) = "There are " + CStr(classCount)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_CellTiers : Inherits TaskParent
+    Public valley As New HistValley_Count
+    Public Sub New()
+        desc = "Find the number of valleys (tiers) in a RedCloud cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        valley.standaloneFlag = standalone
+        For i = 1 To Math.Min(10, task.rcList.Count - 1)
+            Dim rc = task.rcList(i)
+            Dim depthData = task.pcSplit(2)(rc.rect).Clone
+            depthData.SetTo(0, Not rc.mask)
+
+            valley.Run(depthData)
+            If i = task.gOptions.DebugSlider.Value And standalone Then
+                dst3 = valley.dst2.Clone
+                labels(3) = valley.strOut
+                task.ClickPoint = rc.maxDist
+                task.setSelectedCell()
+            End If
+            If task.heartBeat Then SetTrueText(CStr(valley.classCount) + " classes", rc.maxDist)
+        Next
+
+        Static saveTrueText As New List(Of TrueText)
+        If task.heartBeat Then saveTrueText = New List(Of TrueText)(trueData)
+        trueData = New List(Of TrueText)(saveTrueText)
     End Sub
 End Class

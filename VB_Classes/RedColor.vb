@@ -41,17 +41,8 @@ Public Class RedColor_Basics : Inherits TaskParent
             dst1 = stats.dst1
         End If
 
-        If standaloneTest() Then
-            dst3.SetTo(0)
-            If task.redOptions.DisplayCellStats.Checked = False Then
-                For i = 1 To Math.Min(task.redOptions.identifyCount + 1, task.rcList.Count) - 1
-                    Dim rc = task.rcList(i)
-                    dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
-                Next
-            End If
-            labels(3) = "The " + CStr(task.redOptions.identifyCount) + " largest cells shown below " +
-                        " with the tracking color which changes when the cell is split or lost."
-        End If
+        labels(3) = "The " + CStr(task.redOptions.identifyCount) + " largest cells shown below " +
+                    " with the tracking color which changes when the cell is split or lost."
         task.setSelectedCell()
     End Sub
 End Class

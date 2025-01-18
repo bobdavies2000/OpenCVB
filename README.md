@@ -1,31 +1,42 @@
-# Recent Changes – December 2024
+# January 2025 – Dropping C\#, Lines and Task Algorithms
 
--   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
--   RedCloud algorithm default is the featureless option (see below.)
-    -   RedCloud results are validated using the tracking color and age.
--   The OpenCVSharp NuGet packages updated to November 2024 release.
--   Install batch file was updated to accommodate .Net 3.5 optional install.
-    -   The prompt to confirm reading the instructions now works.
-    -   Any install problems are high priority given these recent changes.
--   Features are widely used and are prepared for each frame automatically.
-    -   Feature points are provided in both floating point and integer form.
--   Added a new version of KNN that normalizes the input data – KNNorm.vb.
--   Motion mask is used in more algorithms.
-    -   Every frame is optionally updated only where motion occurred.
-    -   Motion-filtered images for depth and RGB are provided by default.
-    -   Motion-filtered depth is not robust but RGB images are.
--   Switching to the C++ versions of the camera interfaces is simplified.
-    -   Toggle which camera interface is active using comments in getCamera.
--   A global option determines if the depth is truncated at ‘maxDepth’.
-    -   The default is to use all data but it can optionally truncate at X meters.
--   The ‘A-Z’ group selection button is moved next to the algorithm combo box.
-    -   See the toolbar in the latest screen shot below for RedCloud_Basics.
--   Managed C++ code is disabled for now – not much value there for now.
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   OpenCVB now uses OpenCV 4.120, the latest version of OpenCV.
+    -   Delete the opencv directory and run ‘Update_All.bat’ to upgrade.
+    -   To remain on an older version, update the ‘PragmaLibs.h’.
+-   OpenCVB’s focus is VB.Net as translation to C\# and C++ has been demonstrated.
+    -   If a C\# or C++ version is needed, use the CodeConvert.ai to translate.
+    -   OpenCVB’s interface to CodeConvert.ai has been removed.
+        -   CodeConvert.ai reworked their website and it stopped working.
+    -   Drop in algorithm count is due to removing translations.
+-   Options derive from ‘OptionParent’ and no longer count as algorithms.
+    -   Options previously derived from TaskParent and counted.
+    -   Moving to OptionParent also contributed to the reduced algorithm count.
+-   The Line.vb algorithms were reviewed and improved.
+    -   Lines, once computed, are available to all algorithms in task.lpList.
+    -   Lines are now collected across frames using the motion mask.
+        -   Existing lines in regions with motion are tossed.
+        -   New lines in the motion mask are all added.
+-   Lines are built from the left and right images with binocular cameras.
+    -   Lines provide the ability to confirm distance with uniform depth patterns.
+-   ‘Task algorithms’ are algorithms that are present on every run.
+    -   Task algorithms provide IMU, motion, horizon, lines or grid elements.
+    -   Task algorithms appear in the TreeView output (previously hidden.)
+    -   Click on any TreeView element to see the algorithm’s contribution.
+    -   Overhead for each algorithm is also shown along with wait times.
+    -   Inactive algorithms, when selected, display the ‘inactive’ message.
+    -   Selecting a TreeView entry shows algorithm’s images, labels, and TrueText.
+-   Main form toolbar is simplified – low use buttons removed or hidden.
+
+    ![](media/735c5a18926512d0a5a4d53d3208e5da.png)
+
+-   The “Blue +” button to create new algorithms is limited to VB.Net, C++, and OpenGL.
+-   Left and Right camera images are now always grayscale (some were color.)
 -   A log of previous changes is included at the bottom of this document.
 
-![A collage of images of a room Description automatically generated](media/928bcaa46cf6abb063c6824e9086236e.png)
+![](media/893013652590bac4fa557520f5e13e4a.gif)
 
-**RedCloud_Basics:** *All the RedCloud algorithms were reviewed and updated with the best segmentation approach – featureless regions built with Edge_Draw. Edge_Draw is an OpenCV user-contribution and is better suited to detect edges than conventional alternatives like Canny or Sobel. The lower left image uses the mean color of the pixels to paint the entire cell while the lower right image uses a random ‘tracking’ color which changes whenever the cell is split or lost.*
+**RedColor_Basics:** *OpenCVB’s TreeView (at right above) shows all the algorithms that contribute to the output of the requested algorithm – in this case RedColor_Basics. If a branch in the tree is clicked, the intermediate output that was provided to the parent of the selected branch is displayed. As each algorithm is selected, it is highlighted (albeit faintly here) and the algorithm’s output including labels and TrueText is shown. This capability enables a further understanding of how the algorithm was constructed.*
 
 # Introduction
 
@@ -1321,7 +1332,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   Flood.vb algorithms were improved and some algorithms were removed.
 -   Several methods to identify peaks and valleys in histograms were tested.
     -   See any algorithms starting with ‘HistValley’.
--   EdgeToEdgeLine function in linePoints structure was added.
+-   EdgeToEdgeLine function in pointPair structure was added.
     -   Line is defined in terms of an edge-to-edge pair of points.
 -   A log of previous changes is included at the bottom of this document.
 
@@ -1442,7 +1453,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   The breakdown of the suffix for any algorithm is as follows:
     -   AddWeighted_Basics – no suffix means it is VB.Net code only.
     -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
-    -   AddWeighted_Basics_CPP – C++ code with a VB.Net interface.
+    -   AddWeighted_Basics_CPP_VB – C++ code with a VB.Net interface.
     -   AddWeighted_Basics_CPP_CS – C++ code with a C\# interface.
     -   AddWeighted_Basics_MT_CPP – a multi-threaded C++ algorithm.
     -   AddWeighted_Basics_CPP – “_CPP” suffix means it is C++ code.
@@ -1477,7 +1488,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A screenshot of a computer program Description automatically generated](media/b2dafcc91cee598b2abfca8ce921a5b4.png)
 
-**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
+**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP_VB. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
 
 # Recent Changes – September 2024
 
@@ -1502,7 +1513,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   The breakdown of the suffix for any algorithm is as follows:
     -   AddWeighted_Basics – no suffix means it is VB.Net code only.
     -   AddWeighted_Basics_CS – “_CS” suffix means it is C\# code only.
-    -   AddWeighted_Basics_CPP – native C++ code with a VB.Net wrapper.
+    -   AddWeighted_Basics_CPP_VB – native C++ code with a VB.Net wrapper.
     -   AddWeighted_Basics_CPP_CS – native C++ code with a C\# wrapper.
     -   AddWeighted_Basics_CPP – “_CPP” suffix means C++/CLR (managed) code.
     -   AddWeighted_Basics_CC – “_CC” suffix means it is Native C++ code.
@@ -1638,3 +1649,32 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![](media/baa4fe87e03b08a9288be72cdb139c41.png)
 
 **“A-Z” Toolbar Button:** *There are almost 250 algorithm groups in OpenCVB, and the “A-Z” toolbar button allows speedy access to any of the groups. Clicking on any of grid entries will land the user at the first algorithm in the group in one click. Accessing a specific algorithm in that group is a click away in the pulldown of the list of available algorithms.*
+
+# Recent Changes – December 2024
+
+-   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
+-   RedCloud algorithm default is the featureless option (see below.)
+    -   RedCloud results are validated using the tracking color and age.
+-   The OpenCVSharp NuGet packages updated to November 2024 release.
+-   Install batch file was updated to accommodate .Net 3.5 optional install.
+    -   The prompt to confirm reading the instructions now works.
+    -   Any install problems are high priority given these recent changes.
+-   Features are widely used and are prepared for each frame automatically.
+    -   Feature points are provided in both floating point and integer form.
+-   Added a new version of KNN that normalizes the input data – KNNorm.vb.
+-   Motion mask is used in more algorithms.
+    -   Every frame is optionally updated only where motion occurred.
+    -   Motion-filtered images for depth and RGB are provided by default.
+    -   Motion-filtered depth is not robust but RGB images are.
+-   Switching to the C++ versions of the camera interfaces is simplified.
+    -   Toggle which camera interface is active using comments in getCamera.
+-   A global option determines if the depth is truncated at ‘maxDepth’.
+    -   The default is to use all data but it can optionally truncate at X meters.
+-   The ‘A-Z’ group selection button is moved next to the algorithm combo box.
+    -   See the toolbar in the latest screen shot below for RedCloud_Basics.
+-   Managed C++ code is disabled for now – not much value there for now.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of a room Description automatically generated](media/928bcaa46cf6abb063c6824e9086236e.png)
+
+**RedCloud_Basics:** *All the RedCloud algorithms were reviewed and updated with the best segmentation approach – featureless regions built with Edge_Draw. Edge_Draw is an OpenCV user-contribution and is better suited to detect edges than conventional alternatives like Canny or Sobel. The lower left image uses the mean color of the pixels to paint the entire cell while the lower right image uses a random ‘tracking’ color which changes whenever the cell is split or lost.*

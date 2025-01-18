@@ -271,18 +271,18 @@ End Class
 
 Public Class KMeans_TierCount : Inherits TaskParent
     Dim km As New KMeans_Basics
-    Dim kCount As New Depth_TierCount
+    Dim tiers As New Depth_TierCount
     Public classCount As Integer
     Public Sub New()
         desc = "Use the Histogram valleys to find the best 'K' value for the current depth data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        kCount.Run(src)
+        tiers.Run(src)
         Static kSlider = optiBase.FindSlider("KMeans k")
-        If kSlider.value <> kCount.classCount Then
-            kSlider.value = Math.Max(kCount.classCount, kSlider.minimum)
+        If kSlider.value <> tiers.classCount Then
+            kSlider.value = Math.Max(tiers.classCount, kSlider.minimum)
         End If
-        classCount = kCount.classCount
+        classCount = tiers.classCount
 
         km.Run(task.pcSplit(2))
         dst2 = km.dst2 * 255 / km.classCount

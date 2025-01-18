@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports NAudio.Gui
 Public Class HistValley_Basics : Inherits TaskParent
     Dim hist As New Hist_Basics
     Dim options As New Options_Boundary
@@ -11,7 +12,7 @@ Public Class HistValley_Basics : Inherits TaskParent
         labels(2) = "Histogram of the grayscale image.  White lines mark local minimum above threshold.  Yellow horizontal = histogram mean."
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         Dim vCount = options.desiredBoundaries
         Dim minDistance = options.peakDistance
@@ -349,10 +350,10 @@ Public Class HistValley_OptionsAuto : Inherits TaskParent
         If src.Type = cv.MatType.CV_32F Then histogram += 1
 
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, kalman.hist.ranges)
-        If dst1.Type <> cv.MatType.CV_8U Then
-            dst1.SetTo(0, task.noDepthMask)
-            dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-        End If
+        'If dst1.Type <> cv.MatType.CV_8U Then
+        '    dst1.SetTo(0, task.noDepthMask)
+        '    dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        'End If
 
         dst3 = ShowPalette(dst1)
         labels(3) = CStr(auto.valleyOrder.Count + 1) + " colors in the back projection"
@@ -538,7 +539,7 @@ Public Class HistValley_GrayKalman : Inherits TaskParent
         If standalone Then optiBase.FindSlider("Desired boundary count").Value = 4
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         hist.Run(src)
@@ -576,7 +577,7 @@ Public Class HistValley_GrayScale1 : Inherits TaskParent
         If standalone Then task.gOptions.setHistogramBins(256)
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         hist.Run(src)
@@ -618,5 +619,71 @@ Public Class HistValley_GrayScale1 : Inherits TaskParent
             Dim col = minEntries(i) * wPlot
             dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), white, task.lineWidth + 1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class HistValley_Count : Inherits TaskParent
+    Public classCount As Integer
+    Dim plot As New Plot_Histogram
+    Public standaloneFlag As Boolean
+    Public Sub New()
+        plot.addLabels = False
+        plot.removeZeroEntry = False
+        task.gOptions.HistBinBar.Value = 10
+        labels(2) = "Horizontal line in the plot is the valley threshold X% of the mean value"
+        desc = "Count the number of peaks and valleys in the depth data provided."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If task.firstPass Then standalone = standaloneTest() ' to be consistent below and allow override.
+
+        Dim mm = GetMinMax(src)
+        Dim ranges = {New cv.Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
+        Dim histogram As New cv.Mat
+        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+
+        If standaloneFlag And task.heartBeat Then
+            plot.Run(histogram)
+            histogram = plot.histogram ' reflect any updates to the 0 entry...  
+            dst2 = plot.dst2
+        End If
+
+        Dim histArray(histogram.Total - 1) As Single
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+        Dim histList = histArray.ToList()
+        Dim maxVal = histList.Max
+        Dim threshold = histList.Average * 0.4 ' valleys are 40% of the mean value.
+        classCount = 0 ' zeros are always a class.
+
+        Dim state As Boolean
+        Dim incr = dst2.Width / histogram.Rows
+        For i = 0 To histogram.Rows - 1
+            Dim count = histList(i)
+            If state = False And count > threshold Then
+                classCount += 1
+                state = True
+                Dim p1 = New cv.Point(i * incr, 0)
+                Dim p2 = New cv.Point(i * incr, dst2.Height)
+                If standaloneFlag And task.heartBeat Then dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth)
+            ElseIf state = True And count < threshold Then
+                state = False
+            End If
+        Next
+
+        If standaloneFlag And task.heartBeat Then
+            Dim y = dst2.Height * (maxVal - threshold) / maxVal
+            dst2.Line(New cv.Point(0, y), New cv.Point(dst2.Width, y), cv.Scalar.White, task.lineWidth)
+        End If
+        If task.heartBeat Then strOut = CStr(classCount) + " depth classes were found - " +
+                                        "marked by vertical lines."
+        SetTrueText(strOut, 3)
+
+        ReDim histArray(0)
     End Sub
 End Class

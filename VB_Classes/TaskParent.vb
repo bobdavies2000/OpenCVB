@@ -1,7 +1,8 @@
 Imports cv = OpenCvSharp
-Imports System
 Imports System.Drawing
 Imports System.Runtime.InteropServices
+Imports System.Drawing.Imaging
+Imports System.Windows.Forms
 Public Class TrueText
     Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String
@@ -90,6 +91,18 @@ Public Class TaskParent : Implements IDisposable
                 task.algorithmStack.Push(3)
             End If
         End If
+    End Sub
+    Public Shared Function CaptureScreen() As Bitmap
+        Dim screenBounds As Rectangle = Screen.PrimaryScreen.Bounds
+        Dim screenshot As New Bitmap(screenBounds.Width, screenBounds.Height, PixelFormat.Format32bppArgb)
+        Using g As Graphics = Graphics.FromImage(screenshot)
+            g.CopyFromScreen(screenBounds.X, screenBounds.Y, 0, 0, screenBounds.Size, CopyPixelOperation.SourceCopy)
+        End Using
+        Return screenshot
+    End Function
+    Public Shared Sub SaveScreenshot(screenshot As Bitmap, filePath As String)
+        ' Save the bitmap to a file (e.g., PNG)
+        screenshot.Save(filePath, ImageFormat.Png)
     End Sub
     Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
         Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)

@@ -276,6 +276,7 @@ Public Class algorithmList
 	If algorithmName = "Depth_Averaging" Then return new Depth_Averaging
 	If algorithmName = "Depth_Basics" Then return new Depth_Basics
 	If algorithmName = "Depth_BGSubtract" Then return new Depth_BGSubtract
+	If algorithmName = "Depth_CellTiers" Then return new Depth_CellTiers
 	If algorithmName = "Depth_Colorizer_CPP" Then return new Depth_Colorizer_CPP
 	If algorithmName = "Depth_Colorizer_VB" Then return new Depth_Colorizer_VB
 	If algorithmName = "Depth_ColorMap" Then return new Depth_ColorMap
@@ -756,6 +757,7 @@ Public Class algorithmList
 	If algorithmName = "HistPeak2D_TopAndSide" Then return new HistPeak2D_TopAndSide
 	If algorithmName = "HistValley_Basics" Then return new HistValley_Basics
 	If algorithmName = "HistValley_Colors" Then return new HistValley_Colors
+	If algorithmName = "HistValley_Count" Then return new HistValley_Count
 	If algorithmName = "HistValley_Depth" Then return new HistValley_Depth
 	If algorithmName = "HistValley_Depth1" Then return new HistValley_Depth1
 	If algorithmName = "HistValley_Diff" Then return new HistValley_Diff
@@ -1457,6 +1459,7 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
 	If algorithmName = "RedCloud_BasicsHist" Then return new RedCloud_BasicsHist
 	If algorithmName = "RedCloud_BasicsHist1" Then return new RedCloud_BasicsHist1
+	If algorithmName = "RedCloud_BasicsNew" Then return new RedCloud_BasicsNew
 	If algorithmName = "RedCloud_BasicsTest" Then return new RedCloud_BasicsTest
 	If algorithmName = "RedCloud_ColorAndCloud" Then return new RedCloud_ColorAndCloud
 	If algorithmName = "RedCloud_PrepData" Then return new RedCloud_PrepData
