@@ -1,6 +1,14 @@
-# January 2025 – Dropping C\#, Lines and Task Algorithms
+# January 2025 – Task Algorithms, Upgraded Toolbar, and Translation Changes
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   ‘Task algorithms’ are algorithms that are present on every run.
+    -   Task algorithms provide IMU, motion, horizon, lines or grid elements.
+    -   Task algorithms appear in the TreeView output (previously hidden.)
+    -   Click on any TreeView element to see the algorithm’s contribution.
+        -   See the GIF image below to see how this works.
+    -   Overhead for each algorithm is also shown along with wait times.
+    -   Inactive algorithms, when selected, display the ‘inactive’ message.
+    -   Selecting a TreeView entry shows algorithm’s images, labels, and TrueText.
 -   OpenCVB now uses OpenCV 4.120, the latest version of OpenCV.
     -   Delete the opencv directory and run ‘Update_All.bat’ to upgrade.
     -   To remain on an older version, update the ‘PragmaLibs.h’.
@@ -10,8 +18,8 @@
         -   CodeConvert.ai reworked their website and it stopped working.
     -   Drop in algorithm count is due to removing translations.
 -   Options derive from ‘OptionParent’ and no longer count as algorithms.
-    -   Options previously derived from TaskParent and counted.
-    -   Moving to OptionParent also contributed to the reduced algorithm count.
+    -   Options previously derived from TaskParent and added to the count.
+    -   Moving to OptionParent means options do not add to the algorithm count.
 -   The Line.vb algorithms were reviewed and improved.
     -   Lines, once computed, are available to all algorithms in task.lpList.
     -   Lines are now collected across frames using the motion mask.
@@ -19,13 +27,6 @@
         -   New lines in the motion mask are all added.
 -   Lines are built from the left and right images with binocular cameras.
     -   Lines provide the ability to confirm distance with uniform depth patterns.
--   ‘Task algorithms’ are algorithms that are present on every run.
-    -   Task algorithms provide IMU, motion, horizon, lines or grid elements.
-    -   Task algorithms appear in the TreeView output (previously hidden.)
-    -   Click on any TreeView element to see the algorithm’s contribution.
-    -   Overhead for each algorithm is also shown along with wait times.
-    -   Inactive algorithms, when selected, display the ‘inactive’ message.
-    -   Selecting a TreeView entry shows algorithm’s images, labels, and TrueText.
 -   Main form toolbar is simplified – low use buttons removed or hidden.
 
     ![](media/735c5a18926512d0a5a4d53d3208e5da.png)
@@ -36,7 +37,7 @@
 
 ![](media/893013652590bac4fa557520f5e13e4a.gif)
 
-**RedColor_Basics:** *OpenCVB’s TreeView (at right above) shows all the algorithms that contribute to the output of the requested algorithm – in this case RedColor_Basics. If a branch in the tree is clicked, the intermediate output that was provided to the parent of the selected branch is displayed. As each algorithm is selected, it is highlighted (albeit faintly here) and the algorithm’s output including labels and TrueText is shown. This capability enables a further understanding of how the algorithm was constructed.*
+**RedColor_Basics:** *OpenCVB’s TreeView (at right above) shows all the algorithms that contribute to the output of the requested algorithm – in this case RedColor_Basics. As each algorithm in the tree is selected, it is highlighted (albeit faintly here) and the algorithm’s output is shown (now including labels and TrueText.) This capability enables a further understanding of how the algorithm was constructed. Task algorithms are run on every frame and are included in the TreeView even though they are not explicitly called by the algorithm. The frame rate of 99 fps is not a mistake. The Stereolabs Gemini camera runs at that rate when capturing 640x480 images.*
 
 # Introduction
 
