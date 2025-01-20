@@ -160,7 +160,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
                     minMatch = matchVal
                     bestCell = similarCells.Count
                 End If
-                DrawContour(dst3(rc2.rect), rc2.contour, rc2.colorTrack, -1)
+                DrawContour(dst3(rc2.rect), rc2.contour, rc2.color, -1)
                 similarCells.Add(rc2)
             End If
         Next

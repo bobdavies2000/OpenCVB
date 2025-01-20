@@ -766,7 +766,7 @@ Public Class OpenGL_DrawHulls : Inherits TaskParent
             If rc.index = rcx.index Then
                 oglData.Add(New cv.Point3f(1, 1, 1))
             Else
-                oglData.Add(New cv.Point3f(rc.colorTrack(2) / 255, rc.colorTrack(1) / 255, rc.colorTrack(0) / 255))
+                oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
             End If
             Dim hullPoints = 0
             For Each pt In rc.hull
@@ -829,7 +829,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
             If rc.index = rcx.index Then
                 oglData.Add(New cv.Point3f(1, 1, 1))
             Else
-                oglData.Add(New cv.Point3f(rc.colorTrack(2) / 255, rc.colorTrack(1) / 255, rc.colorTrack(0) / 255))
+                oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
             End If
             lastDepth = rc.depthMean
             For Each pt In rc.contour
@@ -1001,7 +1001,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
         Dim pcPoints As New List(Of cv.Point3f)
         Dim blue As New cv.Point3f(0, 0, 1), red As New cv.Point3f(1, 0, 0), green As New cv.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
         For Each rc In task.rcList
-            If rc.maxVec.Z > 0 Then
+            If rc.maxDepthVec.Z > 0 Then
                 eq.rc = rc
                 eq.Run(src)
                 rc = eq.rc

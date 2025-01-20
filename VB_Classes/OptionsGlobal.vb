@@ -9,7 +9,8 @@ Public Class OptionsGlobal
     Public heartBeatSeconds = 1
     Public RGBfilters As String() = {"Blur_Basics", "Brightness_Basics", "Contrast_Basics",
                                      "Dilate_Basics", "Erode_Basics", "Filter_Laplacian",
-                                     "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"}
+                                     "MeanSubtraction_Basics", "PhotoShop_SharpenDetail",
+                                     "PhotoShop_WhiteBalance"}
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 

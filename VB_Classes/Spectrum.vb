@@ -309,7 +309,7 @@ Public Class Spectrum_RedCloud : Inherits TaskParent
             task.rc = task.rcList(i)
             breakdown.Run(src)
             task.rcList(i) = task.rc
-            dst3(task.rc.rect).SetTo(task.rc.colorTrack, task.rc.mask)
+            dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
         Next
         breakdown.Run(src)
     End Sub

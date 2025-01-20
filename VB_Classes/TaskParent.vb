@@ -361,20 +361,19 @@ Public Class TaskParent : Implements IDisposable
 
             If rc.index >= 255 Then Exit For
         Next
-
         Return DisplayCells()
     End Function
     Public Function selectColor(rc As rcData, colorSelection As Integer) As cv.Scalar
         Dim color As cv.Scalar
         Select Case colorSelection
             Case 0
-                color = rc.colorMean
+                Dim colorStdev As cv.Scalar
+                cv.Cv2.MeanStdDev(task.color(rc.rect), color, colorStdev, rc.mask)
             Case 1
-                color = rc.colorTrack
+                color = rc.color
             Case 2
-                color = rc.colorDepth
-            Case 3
-                color = rc.colorGray32
+                Dim index = CInt(255 * rc.depthMean / task.MaxZmeters)
+                color = task.scalarColors(index)
         End Select
         Return color
     End Function
@@ -382,7 +381,7 @@ Public Class TaskParent : Implements IDisposable
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
         For Each rc In task.rcList
-            dst(rc.rect).SetTo(rc.colorCurr, rc.mask)
+            dst(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
         Return dst

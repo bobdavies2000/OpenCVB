@@ -683,7 +683,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         dst2.SetTo(0)
         For Each cell In task.rcList
             task.color(cell.rect).CopyTo(dst2(cell.rect), cell.mask)
-            dst1(cell.rect).SetTo(cell.colorTrack, cell.mask)
+            dst1(cell.rect).SetTo(cell.color, cell.mask)
             If cell.index <= maxRegion Then SetTrueText(CStr(cell.index), cell.maxDist, 2)
         Next
         labels(2) = task.redC.labels(2)

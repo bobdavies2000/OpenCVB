@@ -699,11 +699,12 @@ Public Class ML_LearnRegions : Inherits TaskParent
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
             Dim regionID = CInt(output.Get(Of Single)(i, 0))
-            Dim rc = regions.rcListX(regionID)
-            Dim color As cv.Vec3b = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1),
-                                                 rc.colorMean(2))
-            dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
-            dst3.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
+            If regionID < regions.rcListX.Count Then
+                Dim rc = regions.rcListX(regionID)
+                Dim color As cv.Vec3b = New cv.Vec3b(rc.color(0), rc.color(1), rc.color(2))
+                dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
+                dst3.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
+            End If
         Next
     End Sub
 End Class

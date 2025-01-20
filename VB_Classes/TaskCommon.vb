@@ -420,18 +420,16 @@ Public Class rcData
     Public pixels As Integer
     Public age As Integer
 
-    Public colorTrack As New cv.Scalar
-    Public colorDepth As cv.Scalar
-    Public colorMean As cv.Scalar
-    Public colorGray32 As cv.Scalar
-    Public colorCurr As cv.Scalar
+    Public color As cv.Scalar
+
+    Public mdList As New List(Of maskData)
 
     Public depthPixels As Integer
     Public depthMask As cv.Mat
     Public depthMean As Single
 
-    Public minVec As cv.Point3f
-    Public maxVec As cv.Point3f
+    Public minDepthVec As cv.Point3f
+    Public maxDepthVec As cv.Point3f
     Public minLoc As cv.Point
     Public maxLoc As cv.Point
 

@@ -310,10 +310,10 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
                         distances.Add(distanceN(vec, hVector.histArray))
                     Next
                     Dim cell = pixels.rcList(candidates(distances.IndexOf(distances.Min)) - 1)
-                    dst1(roi).SetTo(cell.colorTrack, dst3(roi))
+                    dst1(roi).SetTo(cell.color, dst3(roi))
                 ElseIf candidates.Count = 1 Then
                     Dim cell = pixels.rcList(candidates(0) - 1)
-                    dst1(roi).SetTo(cell.colorTrack, dst3(roi))
+                    dst1(roi).SetTo(cell.color, dst3(roi))
                 End If
             End If
         Next

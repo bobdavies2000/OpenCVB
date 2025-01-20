@@ -147,7 +147,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
                     Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                     ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                     pt.Z = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
-                    If rc.minVec.Z <= pt.Z And rc.maxVec.Z >= pt.Z Then dst3(rc.rect).Set(Of cv.Point3f)(y, x, pt)
+                    If rc.minDepthVec.Z <= pt.Z And rc.maxDepthVec.Z >= pt.Z Then dst3(rc.rect).Set(Of cv.Point3f)(y, x, pt)
                 End If
             Next
         Next
@@ -486,7 +486,7 @@ Public Class Plane_Equation : Inherits TaskParent
         If standaloneTest() Then
             SetTrueText(strOut, 3)
             dst3.SetTo(0)
-            DrawContour(dst3(rc.rect), rc.contour, rc.colorTrack, -1)
+            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
         End If
     End Sub
 End Class

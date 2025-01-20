@@ -3,60 +3,66 @@ Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedCloud_PrepData
     Public redMask As New RedMask_Basics
-    Dim redC As New RedColor_Basics
     Public Sub New()
         task.redOptions.rcReductionSlider.Value = 100
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = runRedC(src, labels(2))
 
         prep.Run(src)
         redMask.Run(prep.dst2)
+        dst1 = redMask.dst2
 
-        dst0 = redMask.dst2
-        dst0.SetTo(0, Not dst1)
-        Dim cellMask = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        Dim colorList(task.rcList.Count - 1) As List(Of Integer)
-        Dim maskList As New List(Of maskData)
-        For i = 0 To redMask.maskList.Count - 1
-            Dim md = redMask.maskList(i)
-            md.mask = cellMask(md.rect) And md.mask
-            md.mask.SetTo(0, task.noDepthMask(md.rect))
-            md.depthMean = task.pcSplit(2)(md.rect).Mean(md.mask)
-
-            md.index = task.rcMap.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
-            maskList.Add(md)
-            If colorList(md.index) Is Nothing Then colorList(md.index) = New List(Of Integer)
-            colorList(md.index).Add(i)
+        For Each md In redMask.maskList
+            Dim index = task.rcMap.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
+            task.rcList(index).mdList.Add(md)
         Next
 
-        dst1 = dst2.Clone
-        For i = 0 To colorList.Count - 1
-            If colorList(i) Is Nothing Then Continue For
-            If colorList(i).Count = 1 Then
-                Dim rc = task.rcList(i)
-                rc.depthMean = maskList(i).depthMean
-                rc.depthMask = maskList(i).mask
-                rc.depthPixels = rc.depthMask.CountNonZero
-            End If
-            Dim meanList As New List(Of Single)
-            For j = 0 To colorList(i).Count - 1
-                Dim index = colorList(i)(j)
-                Dim md = redMask.maskList(index)
-                meanList.Add(md.depthMean)
-                dst1(md.rect).SetTo(task.scalarColors(i), md.mask)
+        dst3.SetTo(0)
+        For Each rc In task.rcList
+            For Each md In rc.mdList
+                dst3(md.rect).SetTo(rc.color, md.mask)
             Next
         Next
-        dst3 = ShowPalette(dst0 * 255 / redMask.maskList.Count)
-        labels(3) = redMask.labels(3)
+        'dst0 = redMask.dst2
+        'dst0.SetTo(0, Not dst1)
+        'Dim cellMask = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        'Dim colorList(task.rcList.Count - 1) As List(Of Integer)
+        'Dim maskList As New List(Of maskData)
+        'For i = 0 To redMask.maskList.Count - 1
+        '    Dim md = redMask.maskList(i)
+        '    md.mask = cellMask(md.rect) And md.mask
+        '    md.mask.SetTo(0, task.noDepthMask(md.rect))
+        '    md.depthMean = task.pcSplit(2)(md.rect).Mean(md.mask)
+
+        '    md.index = task.rcMap.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
+        '    maskList.Add(md)
+        '    If colorList(md.index) Is Nothing Then colorList(md.index) = New List(Of Integer)
+        '    colorList(md.index).Add(i)
+        'Next
+
+        'dst1 = dst2.Clone
+        'For i = 0 To colorList.Count - 1
+        '    If colorList(i) Is Nothing Then Continue For
+        '    Dim meanList As New List(Of Single)
+        '    If colorList(i).Count = 1 Then
+        '        Dim rc = task.rcList(i)
+        '        For j = 0 To colorList(i).Count - 1
+        '            Dim index = colorList(i)(j)
+        '            Dim md = maskList(index)
+        '            rc.depthMean = md.depthMean
+        '            rc.depthMask = md.mask
+        '            rc.depthPixels += rc.depthMask.CountNonZero
+        '            meanList.Add(md.depthMean)
+        '            dst1(md.rect).SetTo(task.scalarColors(i), md.mask)
+        '        Next
+        '    End If
+        'Next
+        'dst3 = ShowPalette(dst0 * 255 / redMask.maskList.Count)
+        'labels(3) = redMask.labels(3)
     End Sub
 End Class
 
@@ -285,28 +291,6 @@ Public Class RedCloud_World : Inherits TaskParent
         prep.Run(world.dst2)
 
         dst2 = runRedC(prep.dst2, labels(2))
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedCloud_ColorAndCloud : Inherits TaskParent
-    Dim redL As New RedCloud_Basics
-    Public Sub New()
-        desc = "Use the results of RedColor_Basics to create a mask for use with RedCloud_Basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static saveIDcount = task.redOptions.IdentifyCountBar.Value
-        dst2 = runRedC(src, labels(2))
-
-        dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        redL.redMask.inputRemoved = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        redL.Run(src)
-
-        dst3 = redL.dst2
-        labels(3) = redL.labels(2)
     End Sub
 End Class
 

@@ -1461,7 +1461,6 @@ Public Class algorithmList
 	If algorithmName = "RedCloud_BasicsHist1" Then return new RedCloud_BasicsHist1
 	If algorithmName = "RedCloud_BasicsNew" Then return new RedCloud_BasicsNew
 	If algorithmName = "RedCloud_BasicsTest" Then return new RedCloud_BasicsTest
-	If algorithmName = "RedCloud_ColorAndCloud" Then return new RedCloud_ColorAndCloud
 	If algorithmName = "RedCloud_PrepData" Then return new RedCloud_PrepData
 	If algorithmName = "RedCloud_World" Then return new RedCloud_World
 	If algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ

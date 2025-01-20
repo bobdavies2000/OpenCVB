@@ -678,6 +678,8 @@ Public Class VBtask : Implements IDisposable
                         rgbFilter = New PhotoShop_SharpenDetail
                     Case "PhotoShop_WhiteBalance"
                         rgbFilter = New PhotoShop_WhiteBalance
+                    Case "MeanSubtraction_Basics"
+                        rgbFilter = New MeanSubtraction_Basics
                 End Select
                 For i = 0 To callTrace.Count - 1
                     If callTrace(i).StartsWith(algName) = False Then
@@ -687,7 +689,9 @@ Public Class VBtask : Implements IDisposable
             End If
             rgbFilter.Run(src)
             src = rgbFilter.dst2
-            leftView = src.Clone ' color is always the left view
+            ' src is always color and leftview is always grayscale
+            leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            task.color = rgbFilter.dst2
 
             rgbFilter.Run(rightView) ' apply the rgb filter to the right view as well.
             rightView = rgbFilter.dst2

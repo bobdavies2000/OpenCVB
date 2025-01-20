@@ -167,7 +167,7 @@ Public Class Foreground_CellsFore : Inherits TaskParent
         dst2.SetTo(0)
         For Each rc In task.rcList
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
-            If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.colorTrack, rc.mask)
+            If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
     End Sub
 End Class
@@ -189,7 +189,7 @@ Public Class Foreground_CellsBack : Inherits TaskParent
         dst2.SetTo(0)
         For Each rc In task.rcList
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
-            If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.colorTrack, rc.mask)
+            If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
     End Sub
 End Class

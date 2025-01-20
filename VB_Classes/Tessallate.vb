@@ -13,7 +13,7 @@ Public Class Tessallate_Basics : Inherits TaskParent
         Dim ptCenter = getWorldCoordinates(New cv.Point3f(center.X, center.Y, rc.depthMean))
         Dim pt2 = getWorldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depthMean))
 
-        colors.Add(rc.colorTrack)
+        colors.Add(rc.color)
         points.Add(New cv.Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z))
         points.Add(New cv.Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z))
         points.Add(New cv.Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z))
@@ -123,13 +123,13 @@ Public Class Tessallate_QuadSimple : Inherits TaskParent
             If index <= 0 Then Continue For
             Dim rc = task.rcList(index)
 
-            dst3(roi).SetTo(rc.colorTrack)
+            dst3(roi).SetTo(rc.color)
             SetTrueText(Format(rc.depthMean, fmt1), New cv.Point(roi.X, roi.Y))
 
             Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean))
             Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean))
 
-            oglData.Add(New cv.Point3f(rc.colorTrack(2) / 255, rc.colorTrack(1) / 255, rc.colorTrack(0) / 255))
+            oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
             oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
             oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
             oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
@@ -189,10 +189,10 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
             Dim rc = task.rcList(index)
             If rc.depthMean = 0 Then Continue For
 
-            If colorList(i) <> rc.colorTrack Then depthList(i).Clear()
+            If colorList(i) <> rc.color Then depthList(i).Clear()
 
             depthList(i).Add(rc.depthMean)
-            colorList(i) = rc.colorTrack
+            colorList(i) = rc.color
 
             If depthList(i).Count > 0 Then
                 dst3(roi).SetTo(colorList(i))
@@ -201,7 +201,7 @@ Public Class Tessallate_QuadHulls : Inherits TaskParent
                 Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, depth))
                 Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
 
-                oglData.Add(New cv.Point3f(rc.colorTrack(2) / 255, rc.colorTrack(1) / 255, rc.colorTrack(0) / 255))
+                oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
                 oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
                 oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
                 oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
@@ -269,7 +269,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
             Dim rc = task.rcList(index)
             If rc.depthMean = 0 Then Continue For
 
-            If colorList(i) <> rc.colorTrack Then
+            If colorList(i) <> rc.color Then
                 depthList1(i).Clear()
                 depthList2(i).Clear()
             End If
@@ -281,7 +281,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
             'depthMin /= 1000
             depthList1(i).Add(mm.minVal / 1000)
             depthList2(i).Add(mm.maxVal / 1000)
-            colorList(i) = rc.colorTrack
+            colorList(i) = rc.color
 
             Dim d1 = depthList1(i).Average
             Dim d2 = depthList2(i).Average
@@ -292,7 +292,7 @@ Public Class Tessallate_QuadMinMax : Inherits TaskParent
                 Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, depth))
                 Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
 
-                Dim color = rc.colorTrack
+                Dim color = rc.color
                 dst3(roi).SetTo(color)
                 oglData.Add(New cv.Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
                 oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
@@ -363,7 +363,7 @@ Public Class Tessallate_Bricks : Inherits TaskParent
                     depthMin = depthMinList(i).Average
                     Dim avg = depthMaxList(i).Average - depthMin
                     depthMax = depthMin + If(avg < 0.2, avg, 0.2) ' trim the max depth - often unreliable 
-                    Dim color = rc.colorTrack
+                    Dim color = rc.color
                     oglData.Add(New cv.Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
                     For j = 0 To 4 - 1
                         Dim x = Choose(j + 1, roi.X, roi.X + roi.Width, roi.X + roi.Width, roi.X)

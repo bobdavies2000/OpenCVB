@@ -412,12 +412,12 @@ Public Class GuidedBP_Regions : Inherits TaskParent
 
         For i = 1 To Math.Min(options.cellCount, redC.rcListX.Count) - 1
             Dim rc = redC.rcListX(i)
-            mats.mat(2)(rc.rect).SetTo(rc.colorMean, rc.mask)
+            mats.mat(2)(rc.rect).SetTo(rc.color, rc.mask)
             rcListX.Add(rc)
         Next
         For i = 1 To Math.Min(options.cellCount, redC.rcListY.Count) - 1
             Dim rc = redC.rcListY(i)
-            mats.mat(3)(rc.rect).SetTo(rc.colorMean, rc.mask)
+            mats.mat(3)(rc.rect).SetTo(rc.color, rc.mask)
             rcListY.Add(rc)
         Next
 

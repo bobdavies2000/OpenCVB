@@ -68,7 +68,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         dst3.SetTo(0)
         For Each index In removeCells
             Dim rc = task.rcList(index)
-            dst3(rc.rect).SetTo(rc.colorTrack, rc.mask)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
         If task.heartBeat Then
@@ -193,7 +193,7 @@ Public Class Flood_Motion : Inherits TaskParent
                 Dim rc = task.rcList(i)
                 If maxDists.Contains(rc.maxDist) Then
                     Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
-                    dst1(lrc.rect).SetTo(lrc.colorTrack, lrc.mask)
+                    dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
                 End If
             Next
             dst3 = flood.dst2
@@ -238,7 +238,7 @@ Public Class Flood_Motion1 : Inherits TaskParent
                 Dim rc = task.rcList(i)
                 If maxDists.Contains(rc.maxDist) Then
                     Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
-                    dst1(lrc.rect).SetTo(lrc.colorTrack, lrc.mask)
+                    dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
                 End If
             Next
             dst3 = flood.dst2
