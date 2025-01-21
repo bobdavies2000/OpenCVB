@@ -298,7 +298,7 @@ Public Class Cell_Generate : Inherits TaskParent
         If standalone Then
             Static redMask As New RedMask_Basics
             redMask.Run(src)
-            maskList = redMask.maskList
+            maskList = redMask.mdList
         End If
 
         Dim mm = GetMinMax(task.rcMap)

@@ -21,8 +21,8 @@ Public Class RedColor_Basics : Inherits TaskParent
         redMask.inputRemoved = inputRemoved
         redMask.Run(src)
 
-        If redMask.maskList.Count = 0 Then Exit Sub ' no data to process.
-        cellGen.maskList = redMask.maskList
+        If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+        cellGen.maskList = redMask.mdList
         cellGen.Run(redMask.dst2)
 
         dst2 = cellGen.dst2

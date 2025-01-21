@@ -12,42 +12,50 @@ Public Class RedCloud_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
+        Dim redColorMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        redColorMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ImShow("redColorMask", redColorMask)
 
         prep.Run(src)
-        redMask.Run(prep.dst2)
+        redMask.Run(prep.dst2 And redColorMask)
         Dim mm = GetMinMax(redMask.dst2)
         dst1 = ShowPalette(255 * redMask.dst2 / mm.maxVal)
         dst1.SetTo(0, task.noDepthMask)
-        labels(1) = CStr(redMask.maskList.Count) + " maskData cells were found in the point cloud."
+        labels(1) = CStr(redMask.mdList.Count) + " maskData cells were found in the point cloud."
 
-        Dim identCount As Integer
-        rcMask.SetTo(0)
-        For Each md In redMask.maskList
-            Dim index = task.rcMap.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
-            DrawCircle(dst1, md.maxDist, task.DotSize, cv.Scalar.White, -1)
-            DrawCircle(dst2, md.maxDist, task.DotSize, task.HighlightColor, -1)
-            'Dim rc = task.rcList(index)
-            'If rc.rect.Width * rc.rect.Height > md.rect.Width * md.rect.Height Then
-            '    rcMask(rc.rect).SetTo(255, rc.mask)
-            '    rcMask(md.rect) = rcMask(md.rect) And md.mask
-            '    rc.mask =
-            'Else
-            '    rcMask(rc.rect)
-            'End If
-            ' dst0(rc.rect).SetTo(255, rc.mask)
-            If index = 1 And md.depthMean > 0 Then
-                task.rcList(index).mdList.Add(md)
-                identCount += 1
+        For i = 0 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
+            rcMask.SetTo(0)
+            rcMask(rc.rect).SetTo(255, rc.mask)
+            rc.mdList = New List(Of maskData)
+            For Each md In redMask.mdList
+                Dim index = rcMask.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
+                If index > 0 Then rc.mdList.Add(md)
+            Next
+            If rc.mdList.Count > 0 Then
+                'Dim mdMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+                If rc.index = 1 Then cv.Cv2.ImShow("rcmask before", rcMask.Clone)
+                For j = 0 To rc.mdList.Count - 1
+                    Dim md = rc.mdList(j)
+                    rcMask(md.rect) = rcMask(md.rect) And md.mask
+                    md.mask = rcMask(md.rect).Clone
+                    rc.mdList(j) = md
+                Next
+                If rc.index = 1 Then dst3 = rcMask.Clone
+                task.rcList(i) = rc
             End If
         Next
 
-        ' dst3.SetTo(0)
         For Each rc In task.rcList
             For Each md In rc.mdList
-                dst3(md.rect).SetTo(rc.color, md.mask)
+                DrawCircle(dst1, md.maxDist, task.DotSize, task.HighlightColor)
             Next
         Next
-
+        'For Each rc In task.rcList
+        '    For Each md In rc.mdList
+        '        dst3(md.rect).SetTo(rc.color, md.mask)
+        '    Next
+        'Next
     End Sub
 End Class
 
@@ -305,14 +313,14 @@ Public Class RedCloud_BasicsNew : Inherits TaskParent
         prep.dst2.SetTo(0, dst1)
         redMask.Run(prep.dst2)
 
-        cellGen.maskList = New List(Of maskData)(redMask.maskList)
+        cellGen.maskList = New List(Of maskData)(redMask.mdList)
         cellGen.Run(redMask.dst2)
         ' dst2 = cellGen.dst2
         cv.Cv2.ImShow("cellGen.dst2", cellGen.dst2)
 
-        dst3 = ShowPalette(redMask.dst2 * 255 / redMask.maskList.Count)
+        dst3 = ShowPalette(redMask.dst2 * 255 / redMask.mdList.Count)
         If task.heartBeat Then
-            labels(3) = CStr(redMask.maskList.Count) + " cells were identified using " +
+            labels(3) = CStr(redMask.mdList.Count) + " cells were identified using " +
                         "the reduced pointcloud data."
         End If
 

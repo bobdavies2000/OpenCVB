@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedMask_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
-    Public maskList As New List(Of maskData)
+    Public mdList As New List(Of maskData)
     Public Sub New()
         cPtr = RedMask_Open()
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -48,7 +48,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             ptlist.Add(New cv.Point(ptData(i), ptData(i + 1)))
         Next
 
-        maskList.Clear()
+        mdList.Clear()
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         For i = 0 To classCount - 1
             Dim md As New maskData
@@ -64,10 +64,10 @@ Public Class RedMask_Basics : Inherits TaskParent
             md.maxDist = GetMaxDist(md)
             cv.Cv2.MeanStdDev(task.pointCloud(md.rect), depthMean, depthStdev, md.mask)
             md.depthMean = depthMean(2)
-            maskList.Add(md)
+            mdList.Add(md)
         Next
 
-        classCount = maskList.Count
+        classCount = mdList.Count
 
         If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
 
