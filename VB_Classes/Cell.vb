@@ -312,7 +312,7 @@ Public Class Cell_Generate : Inherits TaskParent
             rc.motionFlag = task.motionMask(rc.rect).CountNonZero > 0
             rc.contour = mdList(i).contour
             rc.pixels = mdList(i).mask.CountNonZero
-            If rc.indexLast > 0 Then
+            If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.color = lrc.color
