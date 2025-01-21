@@ -6,10 +6,10 @@ if errorlevel 1 goto errorNoPython
 :: Reaching here means Python is installed.
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
 
-echo "OpenCVB requires that .Net Framework 3.5 be installed."
-echo "You need to check before installing OpenCVB."
-echo "When you close the optionalfeatures window, OpenCVB will install."
-start /wait optionalfeatures.exe
+rem echo "OpenCVB requires that .Net Framework 3.5 be installed."
+rem echo "You need to check before installing OpenCVB."
+rem echo "When you close the optionalfeatures window, OpenCVB will install."
+rem start /wait optionalfeatures.exe
 @echo off
 
 if not exist librealsense (
@@ -107,8 +107,6 @@ if not exist zed-csharp-api\StereoLabs.zed\Build (
 msbuild.exe UI_Generator/UI_Generator.vcxproj /p:Configuration=Release
 msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Debug
 msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Release
-msbuild.exe OpenCVB.sln /p:Configuration=Debug
-
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."
