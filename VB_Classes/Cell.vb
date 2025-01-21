@@ -14,15 +14,18 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
             strOut += "rc.age = " + CStr(rc.age) + vbCrLf
             strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
-            strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf + "rc.color = " + rc.color.ToString() + vbCrLf
+            strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf
+            strOut += "rc.color = " + vbTab + CStr(CInt(rc.color(0))) + vbTab + CStr(CInt(rc.color(1)))
+            strOut += vbTab + CStr(CInt(rc.color(2))) + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
             strOut += If(rc.depthPixels > 0, "Cell is marked as depthCell " + vbCrLf, "")
+            strOut += "Pixels " + Format(rc.pixels, "###,###") + vbCrLf + "depth pixels "
             If rc.depthPixels > 0 Then
-                strOut += "depth pixels " + CStr(rc.pixels) + vbCrLf + "rc.depthPixels = " + CStr(rc.depthPixels) +
-                      " or " + Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
+                strOut += Format(rc.depthPixels, "###,###") + " or " +
+                          Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
             Else
-                strOut += "depth pixels " + CStr(rc.pixels) + " - no depth data" + vbCrLf
+                strOut += Format(rc.pixels, "###,###") + " - no depth data" + vbCrLf
             End If
 
             strOut += "Depth Min/Max/Range: X = " + Format(rc.minDepthVec.X, fmt1) + "/" + Format(rc.maxDepthVec.X, fmt1)
@@ -32,11 +35,7 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut += "Z = " + Format(rc.minDepthVec.Z, fmt2) + "/" + Format(rc.maxDepthVec.Z, fmt2)
             strOut += "/" + Format(rc.maxDepthVec.Z - rc.minDepthVec.Z, fmt2) + vbCrLf + vbCrLf
 
-            strOut += "Cell Depth in 3D: x/y/z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
-
-            strOut += "Color Mean  RGB: " + vbTab + Format(rc.color(0), fmt1) + vbTab
-            strOut += Format(rc.color(1), fmt1) + vbTab
-            strOut += Format(rc.color(2), fmt1) + vbCrLf
+            strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
 
             Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
@@ -354,11 +353,11 @@ Public Class Cell_Generate : Inherits TaskParent
             If rc.pixels = 0 Then Continue For
             If rc.age = 1 Then rc.maxDStable = rc.maxDist
 
-            If rc.motionFlag Then
-                rc.depthMask = rc.mask.Clone
-                rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-                rc.depthPixels = rc.depthMask.CountNonZero
+            rc.depthMask = rc.mask.Clone
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
 
+            If rc.motionFlag Then
                 If rc.depthPixels / rc.pixels > 0.1 Then
                     task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minDepthVec.X, rc.maxDepthVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
                     task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minDepthVec.Y, rc.maxDepthVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
