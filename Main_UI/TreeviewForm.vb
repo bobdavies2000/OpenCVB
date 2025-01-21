@@ -125,17 +125,17 @@ Public Class TreeviewForm
                 Dim otherCount As Integer
                 For i = 0 To algorithm_ms.Count - 1
                     Dim percent = algorithm_ms(i) / sumTime
-                    If percent < 0.01 Then
-                        otherTime += percent
-                        otherCount += 1
+                    If percent < 0 Then percent = 0
+                    Dim str = Format(percent, "00.0%") + " " + Main_UI.algorithmNames(i)
+                    If Main_UI.algorithmNames(i).Contains("waitingForInput") Then
+                        saveWaitTime = str + "  <<<<<<<<<< "
                     Else
-                        If percent < 0 Then percent = 0
-                        Dim str = Format(percent, "00.0%") + " " + Main_UI.algorithmNames(i)
-                        If Main_UI.algorithmNames(i).Contains("waitingForInput") Then
-                            str += "  <<<<<<<<<< "
-                            saveWaitTime = str
+                        If percent < 0.01 Then
+                            otherTime += percent
+                            otherCount += 1
+                        Else
+                            PercentTimes.Add(percent, Str)
                         End If
-                        PercentTimes.Add(percent, str)
                     End If
                 Next
 
@@ -153,8 +153,8 @@ Public Class TreeviewForm
                     If index >= 0 Then timeDataTree(index) = str.Substring(0, 5) + " " + timeDataTree(index)
                 Next
 
-                PercentTime.Text += "---------------- Tree order display: " + vbCrLf
                 PercentTime.Text += saveWaitTime + vbCrLf
+                PercentTime.Text += "---------------- Tree order display: " + vbCrLf
                 For Each sn In timeDataTree
                     If sn.Contains("%") Then PercentTime.Text += sn + vbCrLf
                 Next

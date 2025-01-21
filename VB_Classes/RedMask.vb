@@ -49,6 +49,7 @@ Public Class RedMask_Basics : Inherits TaskParent
         Next
 
         maskList.Clear()
+        Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         For i = 0 To classCount - 1
             Dim md As New maskData
             md.rect = rectlist(i)
@@ -61,6 +62,8 @@ Public Class RedMask_Basics : Inherits TaskParent
             DrawContour(md.mask, md.contour, 255, -1)
             md.pixels = md.mask.CountNonZero
             md.maxDist = GetMaxDist(md)
+            cv.Cv2.MeanStdDev(task.pointCloud(md.rect), depthMean, depthStdev, md.mask)
+            md.depthMean = depthMean(2)
             maskList.Add(md)
         Next
 

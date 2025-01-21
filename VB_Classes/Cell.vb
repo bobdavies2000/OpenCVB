@@ -316,8 +316,7 @@ Public Class Cell_Generate : Inherits TaskParent
             rc.motionFlag = task.motionMask(rc.rect).CountNonZero > 0
             rc.contour = maskList(i).contour
             rc.pixels = maskList(i).mask.CountNonZero
-            If rc.indexLast >= task.rcList.Count Then Dim k = 0
-            If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then
+            If rc.indexLast > 0 Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.color = lrc.color
