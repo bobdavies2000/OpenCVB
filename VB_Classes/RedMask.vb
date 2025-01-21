@@ -83,21 +83,3 @@ Public Class RedMask_Basics : Inherits TaskParent
         If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class RedMask_Both : Inherits TaskParent
-    Dim redMask As New RedMask_Basics
-    Public Sub New()
-        desc = "Create masks for both color and color"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redMask.Run(src)
-
-
-    End Sub
-End Class
-

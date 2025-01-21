@@ -915,8 +915,8 @@ Public Class algorithmList
 	If algorithmName = "LeftRight_Motion" Then return new LeftRight_Motion
 	If algorithmName = "LeftRight_Palettized" Then return new LeftRight_Palettized
 	If algorithmName = "LeftRight_RedColorBoth" Then return new LeftRight_RedColorBoth
-	If algorithmName = "LeftRight_RedColorLeft" Then return new LeftRight_RedColorLeft
-	If algorithmName = "LeftRight_RedColorRight" Then return new LeftRight_RedColorRight
+	If algorithmName = "LeftRight_RedLeft" Then return new LeftRight_RedLeft
+	If algorithmName = "LeftRight_RedRight" Then return new LeftRight_RedRight
 	If algorithmName = "LeftRight_Reduction" Then return new LeftRight_Reduction
 	If algorithmName = "Line_Basics" Then return new Line_Basics
 	If algorithmName = "Line_Canny" Then return new Line_Canny
@@ -1513,7 +1513,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_UnstableCells" Then return new RedColor_UnstableCells
 	If algorithmName = "RedColor_UnstableHulls" Then return new RedColor_UnstableHulls
 	If algorithmName = "RedMask_Basics" Then return new RedMask_Basics
-	If algorithmName = "RedMask_Both" Then return new RedMask_Both
 	If algorithmName = "RedTrack_Basics" Then return new RedTrack_Basics
 	If algorithmName = "RedTrack_Features" Then return new RedTrack_Features
 	If algorithmName = "RedTrack_FeaturesKNN" Then return new RedTrack_FeaturesKNN

@@ -266,14 +266,18 @@ End Class
 
 
 
-Public Class LeftRight_RedColorRight : Inherits TaskParent
+Public Class LeftRight_RedRight : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
+    Public redMask As New RedMask_Basics
     Public Sub New()
-        desc = "Segment the right view image with RedColor"
+        desc = "Segment the right view image with RedMask_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = task.rightView.Clone
         fLess.Run(task.rightView)
-        dst2 = runRedC(fLess.dst2, labels(2))
+        redMask.Run(fLess.dst2)
+        dst2 = ShowPalette(redMask.dst2 * 255 / redMask.mdList.Count)
+        labels(2) = redMask.labels(2)
     End Sub
 End Class
 
@@ -283,14 +287,18 @@ End Class
 
 
 
-Public Class LeftRight_RedColorLeft : Inherits TaskParent
+Public Class LeftRight_RedLeft : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
+    Public redMask As New RedMask_Basics
     Public Sub New()
-        desc = "Segment the left view image with RedColor"
+        desc = "Segment the left view image with RedMask_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = task.leftView.Clone
         fLess.Run(task.leftView)
-        dst2 = runRedC(fLess.dst2, labels(2))
+        redMask.Run(fLess.dst2)
+        dst2 = ShowPalette(redMask.dst2 * 255 / redMask.mdList.Count)
+        labels(2) = redMask.labels(2)
     End Sub
 End Class
 
@@ -302,36 +310,25 @@ End Class
 
 
 Public Class LeftRight_RedColorBoth : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim redLeft As New LeftRight_RedLeft
+    Dim redRight As New LeftRight_RedRight
     Public Sub New()
-        desc = "Display the RedColor_Basics output for both the left and right images."
+        desc = "Display the RedMask_Basics output for both the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static leftCells As New List(Of rcData)
-        Static rightCells As New List(Of rcData)
-        Static leftMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Static rightMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        redLeft.Run(src)
+        dst2 = redLeft.dst2.Clone
+        For Each md In redLeft.redMask.mdList
+            DrawContour(dst2(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
+            DrawCircle(dst2, md.maxDist, task.DotSize, task.HighlightColor)
+        Next
 
-        ' update the right image first so selectedCell works properly.
-        task.rcList = New List(Of rcData)(rightCells)
-        task.rcMap = rightMap.Clone
-
-        fLess.Run(task.rightView)
-        dst3 = runRedC(fLess.dst2, labels(3))
-        labels(3) = "Right view - " + labels(3)
-
-        rightCells = New List(Of rcData)(task.rcList)
-        rightMap = task.rcMap.Clone
-
-        task.rcList = New List(Of rcData)(leftCells)
-        task.rcMap = leftMap.Clone
-
-        fLess.Run(task.leftView)
-        dst2 = runRedC(fLess.dst2, labels(2))
-        labels(2) = "Left view - " + labels(2)
-
-        leftCells = New List(Of rcData)(task.rcList)
-        leftMap = task.rcMap.Clone
+        redRight.Run(src)
+        dst3 = redRight.dst2
+        For Each md In redRight.redMask.mdList
+            DrawContour(dst3(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
+            DrawCircle(dst3, md.maxDist, task.DotSize, task.HighlightColor)
+        Next
     End Sub
 End Class
 
@@ -343,14 +340,18 @@ End Class
 Public Class LeftRight_LowRes : Inherits TaskParent
     Dim lowRes As New LowRes_LeftRight
     Public Sub New()
+        task.gOptions.GridSlider.Value = 8
+        task.gOptions.displayDst0.Checked = True
+        task.gOptions.displayDst1.Checked = True
+        labels = {"", "", "Left image at low resolution", "Right image at low resolution"}
         desc = "Get the lowRes image for the left and right views - duplicate of LowRes_LeftRight (help finding it)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0 = task.leftView
+        dst1 = task.rightView
         lowRes.Run(task.leftView)
-        dst2 = lowRes.dst2
-
-        lowRes.Run(task.rightView)
-        dst3 = lowRes.dst2
+        dst2 = lowRes.dst2.Clone
+        dst3 = lowRes.dst3.Clone
     End Sub
 End Class
 

@@ -594,9 +594,9 @@ Public Class LowRes_LeftRight : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lowRes.Run(task.leftView)
-        dst2 = lowRes.dst2
+        dst2 = lowRes.dst2.Clone
 
         lowRes.Run(task.rightView)
-        dst3 = lowRes.dst2
+        dst3 = lowRes.dst2.Clone
     End Sub
 End Class

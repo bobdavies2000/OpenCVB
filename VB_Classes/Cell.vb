@@ -287,7 +287,7 @@ End Class
 
 
 Public Class Cell_Generate : Inherits TaskParent
-    Public maskList As New List(Of maskData)
+    Public mdList As New List(Of maskData)
     Public Sub New()
         task.rcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.rcList = New List(Of rcData)
@@ -297,24 +297,21 @@ Public Class Cell_Generate : Inherits TaskParent
         If standalone Then
             Static redMask As New RedMask_Basics
             redMask.Run(src)
-            maskList = redMask.mdList
+            mdList = redMask.mdList
         End If
-
-        Dim mm = GetMinMax(task.rcMap)
-        If mm.maxVal <> task.rcList.Count - 1 Then Dim k = 0
 
         Dim initialList As New List(Of rcData)
         Dim usedColors = New List(Of cv.Scalar)({black})
-        For i = 0 To maskList.Count - 1
+        For i = 0 To mdList.Count - 1
             Dim rc As New rcData
-            rc.rect = maskList(i).rect
+            rc.rect = mdList(i).rect
             If rc.rect.Size = dst2.Size Then Continue For ' RedColor_Basics finds a cell this big.  
-            rc.mask = maskList(i).mask
-            rc.maxDist = maskList(i).maxDist
+            rc.mask = mdList(i).mask
+            rc.maxDist = mdList(i).maxDist
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             rc.motionFlag = task.motionMask(rc.rect).CountNonZero > 0
-            rc.contour = maskList(i).contour
-            rc.pixels = maskList(i).mask.CountNonZero
+            rc.contour = mdList(i).contour
+            rc.pixels = mdList(i).mask.CountNonZero
             If rc.indexLast > 0 Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
