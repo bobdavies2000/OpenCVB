@@ -97,7 +97,7 @@ Public Class InsertAlgorithm
     End Sub
     Private Sub AddAlgorithm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AlgorithmName.Text = Main_UI.AvailableAlgorithms.Text
-        vbSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "\OpenCVB.snippets\a VB_Class.snippet")
+        vbSnippet = File.ReadAllLines(Main_UI.HomeDir.FullName + "\OpenCVB.snippets\VB Class.snippet")
     End Sub
     Private Sub AddCPP_Click(sender As Object, e As EventArgs) Handles AddCPP.Click
         If AlgorithmName.Text.EndsWith("_cpp") Then AlgorithmName.Text = AlgorithmName.Text.Substring(1, Len(AlgorithmName.Text) - 4) + "_CPP"

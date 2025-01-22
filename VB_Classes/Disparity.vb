@@ -2,25 +2,38 @@
 Public Class Disparity_GoodCells : Inherits TaskParent
     Dim grid As New Grid_Basics
     Public gridList As New List(Of cv.Rect)
+    Dim options As New Options_Disparity
     Public Sub New()
         grid.myGrid = True ' private grid
-        grid.inputGridSize = 8
-        desc = "Create the grid of cells which will be used to find disparity"
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        labels(3) = "Depth image for cells with good visibility"
+        desc = "Create the grid of cells with good visibility and can be used to find disparity"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then grid.Run(src)
+        options.RunOpt()
 
-        Dim size = grid.inputGridSize * grid.inputGridSize, emptyRect As New cv.Rect
+        If task.optionsChanged Then
+            grid.inputGridSize = options.cellSize
+            grid.Run(src)
+        End If
+
+        Dim emptyRect As New cv.Rect
         Dim goodRects As Integer
         gridList.Clear()
+        Dim mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For Each r In grid.gridRects
-            If task.pcSplit(2)(r).CountNonZero = size Then
+            If task.pcSplit(2)(r).CountNonZero = r.Width * r.Height Then
                 gridList.Add(r)
                 goodRects += 1
+                mask(r).SetTo(255)
             Else
                 gridList.Add(emptyRect)
             End If
         Next
+
+        mask.SetTo(0, Not task.motionMask) ' no need to copy where there is no motion
+        dst3.SetTo(0, task.motionMask)
+        task.pointCloud.CopyTo(dst3, mask)
 
         If standaloneTest() Then
             dst2 = src

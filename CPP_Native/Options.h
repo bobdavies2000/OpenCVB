@@ -2066,6 +2066,7 @@ public:
 };
 class Options_LowRes {
 public:
+	int colorDifferenceThreshold =  4;
 	void RunOpt() {}
 	Options_LowRes() {
 	}
@@ -2176,5 +2177,12 @@ public:
 	bool useBRISK = false;
 	void RunOpt() {}
 	Options_Features() {
+	}
+};
+class Options_Disparity {
+public:
+	int cellSize =  8;
+	void RunOpt() {}
+	Options_Disparity() {
 	}
 };

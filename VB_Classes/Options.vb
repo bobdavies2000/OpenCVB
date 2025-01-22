@@ -7562,17 +7562,14 @@ End Class
 
 
 Public Class Options_LowRes : Inherits OptionParent
-    Public colorDifferenceThreshold As Integer
+    Public colorDifferenceThreshold As Integer = 4
     Public Sub New()
-        Dim thresholdVal = 3
-        If task.cameraName.StartsWith("StereoLabs ZED 2") Then thresholdVal = 4
-
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Color difference threshold", 0, 100, thresholdVal)
+            sliders.setupTrackBar("LowRes Color difference threshold", 0, 100, colorDifferenceThreshold)
         End If
     End Sub
     Public Sub RunOpt()
-        Static diffSlider = FindSlider("Color difference threshold")
+        Static diffSlider = FindSlider("LowRes Color difference threshold")
         colorDifferenceThreshold = diffSlider.value
     End Sub
 End Class
@@ -7975,5 +7972,23 @@ Public Class Options_Features : Inherits OptionParent
         featurePoints = featureSlider.value
         quality = qualitySlider.Value / 100
         minDistance = distSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Disparity : Inherits OptionParent
+    Public cellSize As Integer = 8
+    Public Sub New()
+        If task.workingRes.Width >= 1280 Then cellSize = 16
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Disparity Cell Size", 1, 100, cellSize)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static cellSlider = FindSlider("Disparity Cell Size")
+        cellSize = cellSlider.value
     End Sub
 End Class

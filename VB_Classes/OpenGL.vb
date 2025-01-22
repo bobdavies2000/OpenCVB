@@ -2199,3 +2199,26 @@ Public Class OpenGL_DrawLines3D : Inherits TaskParent
         task.ogl.Run(task.color)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class OpenGL_DisparityTest : Inherits TaskParent
+    Dim disp As New Disparity_GoodCells
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Visualize the high visibility cells found by Disparity_GoodCells"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        disp.Run(src)
+        dst2 = disp.dst2
+        dst3 = disp.dst3
+
+        task.ogl.pointCloudInput = disp.dst3
+
+        task.ogl.Run(src)
+    End Sub
+End Class

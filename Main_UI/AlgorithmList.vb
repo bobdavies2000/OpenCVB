@@ -1183,6 +1183,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_ColorReduced3D" Then return new OpenGL_ColorReduced3D
 	If algorithmName = "OpenGL_Contours" Then return new OpenGL_Contours
 	If algorithmName = "OpenGL_Density2D" Then return new OpenGL_Density2D
+	If algorithmName = "OpenGL_DisparityTest" Then return new OpenGL_DisparityTest
 	If algorithmName = "OpenGL_DrawCube" Then return new OpenGL_DrawCube
 	If algorithmName = "OpenGL_DrawHulls" Then return new OpenGL_DrawHulls
 	If algorithmName = "OpenGL_DrawLines3D" Then return new OpenGL_DrawLines3D
