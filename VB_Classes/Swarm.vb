@@ -7,10 +7,10 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public directionAvg As Single
     Public distanceMax As Single
     Public options As New Options_Swarm
+    Public optionsEx As New Options_Features
     Dim cornerHistory As New List(Of List(Of cv.Point2f))
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 1000
-        ' optiBase.findslider("Blocksize").Value = 1
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
