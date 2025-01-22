@@ -3,6 +3,7 @@ Imports System.Threading
 Imports System.Windows.Forms
 Public Class Match_Basics : Inherits TaskParent
     Public options As New Options_Features
+    Public optionsEx As New Options_Features
 
     Public template As cv.Mat ' Provide this
     Public searchRect As New cv.Rect ' Provide this 

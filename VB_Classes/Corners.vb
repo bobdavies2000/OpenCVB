@@ -353,7 +353,7 @@ Public Class Corners_SubPix : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
-        task.feat.Run(src)
+        runFeature(src)
 
         dst2 = src.Clone
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

@@ -309,7 +309,7 @@ End Class
 
 
 
-Public Class LeftRight_RedColorBoth : Inherits TaskParent
+Public Class LeftRight_RedMask : Inherits TaskParent
     Dim redLeft As New LeftRight_RedLeft
     Dim redRight As New LeftRight_RedRight
     Public Sub New()
@@ -319,14 +319,14 @@ Public Class LeftRight_RedColorBoth : Inherits TaskParent
         redLeft.Run(src)
         dst2 = redLeft.dst2.Clone
         For Each md In redLeft.redMask.mdList
-            DrawContour(dst2(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
+            'DrawContour(dst2(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
             DrawCircle(dst2, md.maxDist, task.DotSize, task.HighlightColor)
         Next
 
         redRight.Run(src)
         dst3 = redRight.dst2
         For Each md In redRight.redMask.mdList
-            DrawContour(dst3(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
+            'DrawContour(dst3(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
             DrawCircle(dst3, md.maxDist, task.DotSize, task.HighlightColor)
         Next
     End Sub

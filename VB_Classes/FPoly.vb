@@ -15,7 +15,7 @@ Public Class FPoly_Basics : Inherits TaskParent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(src)
+        runFeature(src)
 
         If task.firstPass Then sides.prevImage = src.Clone
         sides.options.RunOpt()
@@ -250,7 +250,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
         If task.firstPass Then resyncImage = src.Clone
         options.RunOpt()
 
-        task.feat.Run(src)
+        runFeature(src)
 
         topFeatures.Run(src)
         dst2 = topFeatures.dst2
@@ -1003,7 +1003,7 @@ Public Class FPoly_Center : Inherits TaskParent
             Exit Sub
         End If
 
-        task.feat.Run(src)
+        runFeature(src)
 
         Static thresholdSlider = optiBase.FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
@@ -1223,7 +1223,7 @@ Public Class FPoly_Core : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         optionsCore.RunOpt()
-        task.feat.Run(src)
+        runFeature(src)
 
         stable.Run(src)
         dst3 = stable.basics.dst3
@@ -1274,7 +1274,7 @@ Public Class FPoly_TopFeatures : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
-        task.feat.Run(src)
+        runFeature(src)
 
         stable.Run(src)
         dst2 = stable.dst2
@@ -1306,7 +1306,7 @@ Public Class FPoly_Line : Inherits TaskParent
         desc = "Identify the longest line in task.topFeatures"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(src)
+        runFeature(src)
         topFeatures.Run(src)
         dst2.SetTo(0)
         Dim pts = task.topFeatures

@@ -914,8 +914,8 @@ Public Class algorithmList
 	If algorithmName = "LeftRight_Markers1" Then return new LeftRight_Markers1
 	If algorithmName = "LeftRight_Motion" Then return new LeftRight_Motion
 	If algorithmName = "LeftRight_Palettized" Then return new LeftRight_Palettized
-	If algorithmName = "LeftRight_RedColorBoth" Then return new LeftRight_RedColorBoth
 	If algorithmName = "LeftRight_RedLeft" Then return new LeftRight_RedLeft
+	If algorithmName = "LeftRight_RedMask" Then return new LeftRight_RedMask
 	If algorithmName = "LeftRight_RedRight" Then return new LeftRight_RedRight
 	If algorithmName = "LeftRight_Reduction" Then return new LeftRight_Reduction
 	If algorithmName = "Line_Basics" Then return new Line_Basics

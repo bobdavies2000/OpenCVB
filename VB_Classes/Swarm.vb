@@ -37,7 +37,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.feat.Run(src)
+        runFeature(src)
         dst3 = task.feat.dst2
 
         If task.optionsChanged Then cornerHistory.Clear()

@@ -13,7 +13,7 @@ Public Class FCS_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.feat.Run(src)
+        runFeature(src)
 
         task.fpListLast = New List(Of fpData)(task.fpList)
         task.fpMapLast = task.fpMap.Clone
@@ -128,7 +128,7 @@ Public Class FCS_Motion : Inherits TaskParent
         fcs.Run(src)
         dst2 = fcs.dst1
 
-        task.feat.Run(src)
+        runFeature(src)
         For Each fp In task.fpList
             DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
         Next
@@ -645,7 +645,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(src)
+        runFeature(src)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
@@ -772,7 +772,7 @@ Public Class FCS_Info : Inherits TaskParent
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(src)
+        runFeature(src)
         Dim fp = fpSelection
         If fp Is Nothing Then fp = task.fpSelected
         If task.fpList.Count = 0 Then

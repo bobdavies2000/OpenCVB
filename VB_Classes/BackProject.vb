@@ -190,7 +190,7 @@ Public Class BackProject_FullLines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
 
-        task.lines.Run(backP.dst3)
+        runLines(backP.dst3)
         labels(2) = task.lines.labels(2)
         dst2 = src
         dst3.SetTo(0)

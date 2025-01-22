@@ -146,7 +146,7 @@ Public Class Line_Rects : Inherits TaskParent
         desc = "Show the rectangle for each line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
+        runLines(src)
 
         dst2 = task.lines.dst2
 
@@ -887,7 +887,7 @@ Public Class Line_KNN : Inherits TaskParent
         desc = "Use KNN to find the nearest point to an endpoint and connect the 2 lines with a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(src)
+        runFeature(src)
 
         swarm.options.RunOpt()
         lines.Run(src)
@@ -1430,7 +1430,7 @@ Public Class Line_Info : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         labels(2) = task.lines.labels(2)
-        If standaloneTest() Then task.lines.Run(src)
+        If standaloneTest() Then runLines(src)
 
         dst2 = src
         For Each lp In task.lpList
@@ -1495,7 +1495,7 @@ Public Class Line_LeftRight : Inherits TaskParent
         desc = "Show lines in both the right and left images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src) ' the default is the left view.
+        runLines(src) ' the default is the left view.
 
         dst2 = task.lines.dst2.Clone
         labels(2) = "Left view" + task.lines.labels(2)

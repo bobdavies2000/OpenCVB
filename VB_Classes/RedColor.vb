@@ -1511,7 +1511,7 @@ End Class
 
 
 Public Class RedColor_LeftRight : Inherits TaskParent
-    Dim redLR As New LeftRight_RedColorBoth
+    Dim redLR As New LeftRight_RedMask
     Public Sub New()
         desc = "Run RedCloud on the left and right images.  Duplicate of LeftRight_RedCloudBoth"
     End Sub

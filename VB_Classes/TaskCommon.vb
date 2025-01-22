@@ -31,6 +31,28 @@ Public Module vbc
         thisObj = withThisObj
         withThisObj = tempObj
     End Sub
+    Public Function DisplayCells() As cv.Mat
+        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+
+        For Each rc In task.rcList
+            dst(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        Return dst
+    End Function
+    Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
+        task.rcList.Clear()
+        task.rcList.Add(New rcData)
+        task.rcMap.SetTo(0)
+        For Each rc In sortedCells.Values
+            rc.index = task.rcList.Count
+            task.rcList.Add(rc)
+            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+
+            If rc.index >= 255 Then Exit For
+        Next
+        Return DisplayCells()
+    End Function
     Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
         Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
         If Input.Channels() = 1 Then

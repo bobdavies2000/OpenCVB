@@ -112,17 +112,19 @@ Public Class VBtask : Implements IDisposable
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
 
+    ' add any algorithm tasks to this list.
     Public algTasks() As Object
+
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
+    Public feat As Feature_Basics
 
     ' add any task algorithms here
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Object
     Public ogl As OpenGL_Basics
-    Public feat As Feature_Basics
 
     Public pythonPipeIn As NamedPipeServerStream
     Public pythonPipeOut As NamedPipeServerStream
@@ -292,14 +294,11 @@ Public Class VBtask : Implements IDisposable
     Public Enum algTaskID ' match names in algTasks below...
         gMat = 0
         IMUBasics = 1
-        lines = 2
-        grid = 3
-        colorizer = 4
-        motion = 5
-        gravityHorizon = 6
-        palette = 7
-        features = 8
-        redCloud = 9
+        grid = 2
+        colorizer = 3
+        motion = 4
+        gravityHorizon = 5
+        palette = 6
     End Enum
     Public Structure inBuffer
         Dim color As cv.Mat
@@ -483,19 +482,13 @@ Public Class VBtask : Implements IDisposable
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-
-        ' add any algorithm tasks to this list.
-        algTasks = {New IMU_GMatrix, New IMU_Basics, New Line_Basics, New Grid_Basics, New Depth_Palette,
-                    New Motion_Basics, New Gravity_Horizon, New Palette_LoadColorMap, New Feature_Basics,
-                    New RedColor_Basics}
+        algTasks = {New IMU_GMatrix, New IMU_Basics, New Grid_Basics, New Depth_Palette,
+                    New Motion_Basics, New Gravity_Horizon, New Palette_LoadColorMap}
 
         gmat = algTasks(algTaskID.gMat)
         displayObject = gmat
-        lines = algTasks(algTaskID.lines)
         grid = algTasks(algTaskID.grid)
         palette = algTasks(algTaskID.palette)
-        redC = algTasks(algTaskID.redCloud)
-        feat = algTasks(algTaskID.features)
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics

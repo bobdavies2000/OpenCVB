@@ -3,6 +3,7 @@ Imports System.Drawing
 Imports System.Runtime.InteropServices
 Imports System.Drawing.Imaging
 Imports System.Windows.Forms
+Imports VB_Classes.VBtask
 Public Class TrueText
     Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String
@@ -350,19 +351,6 @@ Public Class TaskParent : Implements IDisposable
         If r.Height <= 0 Then r.Height = 1
         Return r
     End Function
-    Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        task.rcList.Clear()
-        task.rcList.Add(New rcData)
-        task.rcMap.SetTo(0)
-        For Each rc In sortedCells.Values
-            rc.index = task.rcList.Count
-            task.rcList.Add(rc)
-            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
-
-            If rc.index >= 255 Then Exit For
-        Next
-        Return DisplayCells()
-    End Function
     Public Function selectColor(rc As rcData, colorSelection As Integer) As cv.Scalar
         Dim color As cv.Scalar
         Select Case colorSelection
@@ -376,15 +364,6 @@ Public Class TaskParent : Implements IDisposable
                 color = task.scalarColors(index)
         End Select
         Return color
-    End Function
-    Public Function DisplayCells() As cv.Mat
-        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-
-        For Each rc In task.rcList
-            dst(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-
-        Return dst
     End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
         Dim img As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
@@ -622,12 +601,22 @@ Public Class TaskParent : Implements IDisposable
         Return task.palette.dst2.Clone
     End Function
     Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
+        If task.redC Is Nothing Then task.redC = New RedColor_Basics
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
     Public Sub runRedC(src As cv.Mat)
+        If task.redC Is Nothing Then task.redC = New RedColor_Basics
         task.redC.Run(src)
+    End Sub
+    Public Sub runFeature(src As cv.Mat)
+        If task.feat Is Nothing Then task.feat = New Feature_Basics
+        task.feat.Run(src)
+    End Sub
+    Public Sub runLines(src As cv.Mat)
+        If task.lines Is Nothing Then task.lines = New Line_Basics
+        task.lines.Run(src)
     End Sub
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),

@@ -446,7 +446,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
         Return histSum / histList.Count
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(src)
+        runFeature(src)
 
         If task.firstPass Then lastImage = src.Clone
         Dim multiplier = dotSlider.Value
@@ -685,7 +685,7 @@ Public Class KNN_TrackEach : Inherits TaskParent
         desc = "Track each good feature with KNN and match the features from frame to frame"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(src)
+        runFeature(src)
 
         Dim minDistance = task.feat.options.minDistance
         ' if there was no motion, use minDistance to eliminate the unstable points.
@@ -733,7 +733,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            task.feat.Run(src)
+            runFeature(src)
             inputPoints = task.features
         End If
 

@@ -9,7 +9,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.lines.Run(src)
+        runLines(src)
 
         dst3.SetTo(0)
         For Each lp In task.lines.lpSorted
