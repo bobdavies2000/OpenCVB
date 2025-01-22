@@ -33,7 +33,7 @@ Public Class Polylines_Random : Inherits TaskParent
         desc = "Create a random procedural image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.frameCount Mod (task.fpsRate * 3) = 0 Then ' every x frames.
+        If task.frameCount Mod (task.fpsAlgorithm * 3) = 0 Then ' every x frames.
             Dim h = src.Height, w = src.Width
             Dim autorand As New Random
             Dim points2f(10000) As cv.Point2f

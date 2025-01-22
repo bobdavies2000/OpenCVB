@@ -483,7 +483,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
         lastImage = src.Clone
 
         motionTrack.Add(New cv.Point2f(shiftX + dst2.Width / 2, shiftY + dst2.Height / 2))
-        If motionTrack.Count > task.fpsRate Then motionTrack.RemoveAt(0)
+        If motionTrack.Count > task.fpsAlgorithm Then motionTrack.RemoveAt(0)
         Dim lastpt = motionTrack(0)
         For Each pt In motionTrack
             DrawLine(dst2, pt, lastpt, white)

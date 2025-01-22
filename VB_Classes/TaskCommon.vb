@@ -83,7 +83,7 @@ Public Module vbc
         Return outMat
     End Function
     Public Sub updateSettings()
-        task.fpsRate = If(task.frameCount < 30, 30, task.fpsRate)
+        task.fpsAlgorithm = If(task.frameCount < 30, 30, task.fpsAlgorithm)
         If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
 
         ' update the time measures
@@ -114,7 +114,7 @@ Public Module vbc
             End If
         End If
 
-        Dim frameDuration = 1000 / task.fpsRate
+        Dim frameDuration = 1000 / task.fpsAlgorithm
         task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
 
         If (task.msWatch - task.msLast) > 1000 Then

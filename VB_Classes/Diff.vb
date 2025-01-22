@@ -196,7 +196,7 @@ Public Class Diff_Identical : Inherits TaskParent
 
         If task.heartBeat Then
             labels(2) = CStr(noMotionFrames) + " frames since the last heartbeat with no motion " +
-                        " or " + Format(noMotionFrames / task.fpsRate, "0%")
+                        " or " + Format(noMotionFrames / task.fpsAlgorithm, "0%")
             flowText.Add(labels(2))
             noMotionFrames = 0
             If flowText.Count > 20 Then flowText.RemoveAt(0)

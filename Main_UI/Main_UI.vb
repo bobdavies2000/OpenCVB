@@ -1802,9 +1802,9 @@ Public Class Main_UI
                 pixelViewTag = task.pixelViewTag
 
                 If Single.IsNaN(algorithmFPSrate) Then
-                    task.fpsRate = 0
+                    task.fpsAlgorithm = 0
                 Else
-                    task.fpsRate = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
+                    task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
                 If task.paused = False Then
@@ -1830,9 +1830,9 @@ Public Class Main_UI
                     algorithmRefresh = True
                 End If
 
-                If task.fpsRate = 0 Then task.fpsRate = 1
+                If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 
-                If frameCount Mod task.fpsRate = 0 Or callTrace.Count <> task.callTrace.Count Then
+                If frameCount Mod task.fpsAlgorithm = 0 Or callTrace.Count <> task.callTrace.Count Then
                     SyncLock callTraceLock
                         If callTrace.Count <> task.callTrace.Count Then treeViewRefresh = True
                         callTrace = New List(Of String)(task.callTrace)

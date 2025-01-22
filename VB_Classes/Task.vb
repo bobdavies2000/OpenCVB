@@ -250,7 +250,8 @@ Public Class VBtask : Implements IDisposable
     Public cameraName As String
     Public calibData As cameraInfo
     Public HomeDir As String
-    Public fpsRate As Integer
+    Public fpsAlgorithm As Integer
+    Public fpsCamera As Integer
     Public densityMetric As Integer ' how dense is the pointcloud in z - heuristic.
     Public FASTthreshold As Integer
 
@@ -298,7 +299,6 @@ Public Class VBtask : Implements IDisposable
         colorizer = 3
         motion = 4
         gravityHorizon = 5
-        palette = 6
     End Enum
     Public Structure inBuffer
         Dim color As cv.Mat
@@ -341,6 +341,7 @@ Public Class VBtask : Implements IDisposable
         Public main_hwnd As IntPtr
 
         Public fpsRate As Integer
+        Public fpsHostCamera As Integer
         Public workingRes As cv.Size
         Public captureRes As cv.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
         Public displayRes As cv.Size
@@ -448,7 +449,8 @@ Public Class VBtask : Implements IDisposable
         cameraName = parms.cameraName
         testAllRunning = parms.testAllRunning
         showConsoleLog = parms.showConsoleLog
-        fpsRate = parms.fpsRate
+        fpsAlgorithm = parms.fpsRate
+        fpsCamera = parms.fpsHostCamera
         calibData = parms.cameraInfo
         HomeDir = parms.HomeDir
         main_hwnd = parms.main_hwnd
@@ -483,12 +485,11 @@ Public Class VBtask : Implements IDisposable
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         algTasks = {New IMU_GMatrix, New IMU_Basics, New Grid_Basics, New Depth_Palette,
-                    New Motion_Basics, New Gravity_Horizon, New Palette_LoadColorMap}
+                    New Motion_Basics, New Gravity_Horizon}
 
         gmat = algTasks(algTaskID.gMat)
         displayObject = gmat
         grid = algTasks(algTaskID.grid)
-        palette = algTasks(algTaskID.palette)
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics

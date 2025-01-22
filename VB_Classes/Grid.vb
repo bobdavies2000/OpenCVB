@@ -299,7 +299,7 @@ Public Class Grid_FPS : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim fps = CInt(task.fpsRate / options.desiredFPS)
+        Dim fps = CInt(task.fpsAlgorithm / options.desiredFPS)
         If fps = 0 Then fps = 1
         heartBeat = (task.frameCount Mod fps) = 0
         If heartBeat Then
