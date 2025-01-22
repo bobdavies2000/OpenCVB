@@ -346,6 +346,7 @@ Public Class algorithmList
 	If algorithmName = "Dilate_Basics" Then return new Dilate_Basics
 	If algorithmName = "Dilate_Erode" Then return new Dilate_Erode
 	If algorithmName = "Dilate_OpenClose" Then return new Dilate_OpenClose
+	If algorithmName = "Disparity_GoodCells" Then return new Disparity_GoodCells
 	If algorithmName = "Distance_Background" Then return new Distance_Background
 	If algorithmName = "Distance_Basics" Then return new Distance_Basics
 	If algorithmName = "Distance_BinaryImage" Then return new Distance_BinaryImage

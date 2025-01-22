@@ -1,4 +1,42 @@
 ﻿Imports cv = OpenCvSharp
+Public Class Disparity_GoodCells : Inherits TaskParent
+    Dim grid As New Grid_Basics
+    Public gridList As New List(Of cv.Rect)
+    Public Sub New()
+        grid.myGrid = True ' private grid
+        grid.inputGridSize = 8
+        desc = "Create the grid of cells which will be used to find disparity"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then grid.Run(src)
+
+        Dim size = grid.inputGridSize * grid.inputGridSize, emptyRect As New cv.Rect
+        Dim goodRects As Integer
+        gridList.Clear()
+        For Each r In grid.gridRects
+            If task.pcSplit(2)(r).CountNonZero = size Then
+                gridList.Add(r)
+                goodRects += 1
+            Else
+                gridList.Add(emptyRect)
+            End If
+        Next
+
+        If standaloneTest() Then
+            dst2 = src
+            For Each r In gridList
+                If r.Width = 0 Then Continue For
+                dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
+            Next
+            If task.heartBeat Then labels(2) = CStr(goodRects) + " grid cells have the maximum depth pixels."
+        End If
+    End Sub
+End Class
+
+
+
+
+
 'The Function relating() depth To disparity Is
 
 'Z = B * f / disparity
