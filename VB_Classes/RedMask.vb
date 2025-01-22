@@ -14,6 +14,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             color.Run(src)
             src = color.dst2
         End If
+        task.rcMinSize = 0
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
@@ -62,13 +63,11 @@ Public Class RedMask_Basics : Inherits TaskParent
             DrawContour(md.mask, md.contour, 255, -1)
             md.pixels = md.mask.CountNonZero
             md.maxDist = GetMaxDist(md)
-            md.depthmask = md.mask
-            md.depthmask.SetTo(0, task.noDepthMask(md.rect))
             cv.Cv2.MeanStdDev(task.pointCloud(md.rect), depthMean, depthStdev, md.mask)
             md.depthMean = depthMean(2)
-            task.pcSplit(0)(md.rect).MinMaxLoc(md.minDepthVec.X, md.maxDepthVec.X, md.minLoc, md.maxLoc, md.depthmask)
-            task.pcSplit(1)(md.rect).MinMaxLoc(md.minDepthVec.Y, md.maxDepthVec.Y, md.minLoc, md.maxLoc, md.depthmask)
-            task.pcSplit(2)(md.rect).MinMaxLoc(md.minDepthVec.Z, md.maxDepthVec.Z, md.minLoc, md.maxLoc, md.depthmask)
+            task.pcSplit(0)(md.rect).MinMaxLoc(md.minDepthVec.X, md.maxDepthVec.X, md.minLoc, md.maxLoc, md.mask)
+            task.pcSplit(1)(md.rect).MinMaxLoc(md.minDepthVec.Y, md.maxDepthVec.Y, md.minLoc, md.maxLoc, md.mask)
+            task.pcSplit(2)(md.rect).MinMaxLoc(md.minDepthVec.Z, md.maxDepthVec.Z, md.minLoc, md.maxLoc, md.mask)
             mdList.Add(md)
         Next
 

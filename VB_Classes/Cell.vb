@@ -59,41 +59,6 @@ End Class
 
 
 
-Public Class Cell_PixelCountCompare : Inherits TaskParent
-    Public Sub New()
-        task.gOptions.debugChecked = True
-        desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-
-        dst3.SetTo(0)
-        Dim missCount As Integer
-        For Each rc In task.rcList
-            If rc.depthPixels <> 0 Then
-                If rc.pixels <> rc.depthPixels Then
-                    dst3(rc.rect).SetTo(rc.color, rc.mask)
-                    Dim pt = New cv.Point(rc.maxDist.X - 10, rc.maxDist.Y)
-                    If task.gOptions.debugChecked Then
-                        strOut = CStr(rc.pixels) + "/" + CStr(rc.depthPixels)
-                    Else
-                        strOut = Format(rc.depthPixels / rc.pixels, "0%")
-                    End If
-                    If missCount < task.redOptions.identifyCount Then SetTrueText(strOut, pt, 3)
-                    missCount += 1
-                End If
-            End If
-        Next
-        If task.heartBeat Then labels(3) = "There were " + CStr(missCount) + " cells containing depth - showing rc.pixels/rc.depthpixels"
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Cell_ValidateColorCells : Inherits TaskParent
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"

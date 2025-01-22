@@ -41,7 +41,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             dst1 = stats.dst1
         End If
 
-        labels(3) = "The " + CStr(task.redOptions.identifyCount) + " largest cells shown below " +
+        labels(3) = "The " + CStr(task.redOptions.IdentifyCountBar.Value) + " largest cells shown below " +
                     " with the tracking color which changes when the cell is split or lost."
         task.setSelectedCell()
     End Sub
@@ -241,7 +241,7 @@ Public Class RedColor_Equations : Inherits TaskParent
     Dim eq As New Plane_Equation
     Public rcList As New List(Of rcData)
     Public Sub New()
-        task.redOptions.identifyCount = 5
+        task.redOptions.IdentifyCountBar.Value = 5
         labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
         desc = "Show the estimated plane equations for all the cells."
     End Sub
@@ -1172,14 +1172,14 @@ Public Class RedColor_GenCellContains : Inherits TaskParent
         contains.Run(src)
 
         dst2.SetTo(0)
-        Dim count = Math.Min(task.redOptions.identifyCount, task.rcList.Count)
+        Dim count = Math.Min(task.redOptions.IdentifyCountBar.Value, task.rcList.Count)
         For i = 0 To count - 1
             Dim rc = task.rcList(i)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
         Next
 
-        For i = task.redOptions.identifyCount To task.rcList.Count - 1
+        For i = task.redOptions.IdentifyCountBar.Value To task.rcList.Count - 1
             Dim rc = task.rcList(i)
             dst2(rc.rect).SetTo(task.rcList(rc.container).color, rc.mask)
         Next
@@ -1569,7 +1569,7 @@ Public Class RedColor_Flippers : Inherits TaskParent
     Public flipCells As New List(Of rcData)
     Public nonFlipCells As New List(Of rcData)
     Public Sub New()
-        task.redOptions.identifyCount = 255
+        task.redOptions.IdentifyCountBar.Value = 255
         task.redOptions.ColorTracking.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the cells that are changing color because they were split or lost."
@@ -1698,7 +1698,7 @@ Public Class RedColor_TopX : Inherits TaskParent
 
         If task.heartBeat Or task.optionsChanged Then
             topXcells.Clear()
-            For i = 1 To Math.Min(task.redOptions.identifyCount + 1, task.rcList.Count) - 1
+            For i = 1 To Math.Min(task.redOptions.IdentifyCountBar.Value + 1, task.rcList.Count) - 1
                 Dim rc = task.rcList(i)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 topXcells.Add(rc.maxDist)

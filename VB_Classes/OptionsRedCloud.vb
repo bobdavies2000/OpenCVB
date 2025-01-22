@@ -21,7 +21,6 @@ Public Class OptionsRedCloud
     Public ranges() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
-    Public identifyCount As Integer
     Public histBins3D As Integer
     Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions",
                                        "Binarize_DepthTiers", "FeatureLess_Basics", "Hist3DColor_Basics",
@@ -193,7 +192,6 @@ Public Class OptionsRedCloud
     End Sub
     Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountBar.ValueChanged
         task.optionsChanged = True
-        identifyCount = IdentifyCountBar.Value
         LabelIdentify.Text = CStr(IdentifyCountBar.Value)
     End Sub
 

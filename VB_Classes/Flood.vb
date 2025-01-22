@@ -52,11 +52,11 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         If standalone Then dst2 = runRedC(src, labels(2))
 
         Dim removeCells As New List(Of Integer)
-        For i = task.rcList.Count - 1 To task.redOptions.identifyCount Step -1
+        For i = task.rcList.Count - 1 To task.redOptions.IdentifyCountBar.Value Step -1
             Dim rc = task.rcList(i)
             Dim nabs As New List(Of Integer)
             Dim contains As New List(Of Integer)
-            Dim count = Math.Min(task.redOptions.identifyCount, task.rcList.Count)
+            Dim count = Math.Min(task.redOptions.IdentifyCountBar.Value, task.rcList.Count)
             For j = 0 To count - 1
                 Dim rcBig = task.rcList(j)
                 If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
@@ -111,7 +111,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
 
         dst2 = cellGen.dst2
 
-        Dim cellCount = Math.Min(task.redOptions.identifyCount, task.rcList.Count)
+        Dim cellCount = Math.Min(task.redOptions.IdentifyCountBar.Value, task.rcList.Count)
         If task.heartBeat Then labels(2) = $"{task.rcList.Count} cells identified and the largest {cellCount} are numbered below."
 
         If showSelected Then task.setSelectedCell()
