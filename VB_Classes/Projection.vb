@@ -50,7 +50,7 @@ Public Class Projection_Basics : Inherits TaskParent
         If task.heartBeat Then strOut = ""
         For Each rc In rcList
             If rc.index = 0 Then Continue For
-            If rc.index <= task.redOptions.IdentifyCountBar.Value Then
+            If rc.index <= task.redOptions.identifySlider.Value Then
                 If viewType = "Side" Then
                     xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
                     xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
@@ -75,14 +75,14 @@ Public Class Projection_Basics : Inherits TaskParent
         If task.heartBeat Then
             Dim check1 = src.Sum()(0)
             Dim depthCount = task.pcSplit(2).CountNonZero
-            strOut += CStr(rcList.Count - task.redOptions.IdentifyCountBar.Value - 1) + " other objects " + vbTab + CStr(otherCount) + " pixels" + vbCrLf
+            strOut += CStr(rcList.Count - task.redOptions.identifySlider.Value - 1) + " other objects " + vbTab + CStr(otherCount) + " pixels" + vbCrLf
             strOut += "Sum above   " + vbTab + CStr(check2) + " pixels" + " (losses from histogram ranges?)" + vbCrLf
             strOut += "Sum of src  " + vbTab + CStr(check1) + " pixels" + " (losses from RedCloud.)" + vbCrLf
             strOut += "Actual count" + vbTab + CStr(depthCount) + " pixels" + vbCrLf
         End If
         SetTrueText(strOut, 3)
         If showRectangles Then
-            For i = 0 To Math.Min(rcList.Count, task.redOptions.IdentifyCountBar.Value) - 1
+            For i = 0 To Math.Min(rcList.Count, task.redOptions.identifySlider.Value) - 1
                 dst2.Rectangle(rcList(i).rect, task.HighlightColor, task.lineWidth)
             Next
         End If

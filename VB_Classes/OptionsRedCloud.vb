@@ -72,7 +72,7 @@ Public Class OptionsRedCloud
 
         XRangeBar.Value = task.xRange * 200
         YRangeSlider.Value = task.yRange * 400
-        IdentifyCountBar.Value = 5
+        identifySlider.Value = 5
 
         task.xRangeDefault = task.xRange
         task.yRangeDefault = task.yRange
@@ -128,7 +128,7 @@ Public Class OptionsRedCloud
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.maxZmeters)
+        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
         rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
 
         channelCount = 1
@@ -190,9 +190,9 @@ Public Class OptionsRedCloud
         task.optionsChanged = True
         SideLabel.Text = CStr(ProjectionThresholdBar.Value)
     End Sub
-    Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountBar.ValueChanged
+    Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles identifySlider.ValueChanged
         task.optionsChanged = True
-        LabelIdentify.Text = CStr(IdentifyCountBar.Value)
+        LabelIdentify.Text = CStr(identifySlider.Value)
     End Sub
 
 
