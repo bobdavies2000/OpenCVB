@@ -533,21 +533,11 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Sub SetTrueTextBase(text As String, pt As cv.Point, picTag As Integer)
         If text Is Nothing Then Return
-        Dim acceptTrueText As Boolean
-        If task.displayObject Is Nothing Then
-            If traceName = task.algName Then acceptTrueText = True
-        Else
-            If task.displayObject.traceName = traceName Then acceptTrueText = True
-        End If
-        If acceptTrueText Then
-            Dim str As New TrueText(text, pt, picTag)
-            trueData.Add(str)
-        End If
+        Dim str As New TrueText(text, pt, picTag)
+        trueData.Add(str)
     End Sub
-
     Public Function standaloneTest() As Boolean
-        If task.displayObject Is Nothing Then Return False
-        If standalone Or task.displayObject.traceName = traceName Then Return True
+        If standalone Or task.displayObjectName = traceName Then Return True
         Return False
     End Function
     Public Sub UpdateAdvice(advice As String)
@@ -597,8 +587,16 @@ Public Class TaskParent : Implements IDisposable
             Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
             input = tmp
         End If
+        If task.palette Is Nothing Then task.palette = New Palette_LoadColorMap
         task.palette.Run(input)
         Return task.palette.dst2.Clone
+    End Function
+    Public Function runRedC(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
+        If task.redC Is Nothing Then task.redC = New RedColor_Basics
+        task.redC.inputRemoved = removeMask
+        task.redC.Run(src)
+        label = task.redC.labels(2)
+        Return task.redC.dst2
     End Function
     Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
         If task.redC Is Nothing Then task.redC = New RedColor_Basics

@@ -98,7 +98,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If task.displayObject.traceName = traceName Then
+        If task.displayObjectName = traceName Then
             SetTrueText("There are too many operations inside GeneticDrawing_Basics to break down the displayObject results")
             Exit Sub
         End If

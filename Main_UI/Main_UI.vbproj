@@ -14,10 +14,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TreeviewForm.Designer.vb" />
+    <Compile Remove="TreeviewForm.vb" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="C:\Users\bobda\.nuget\packages\opencvsharp4.runtime.win\4.10.0.20240616\build\net48\..\..\runtimes\win-x64\native\OpenCvSharpExtern.dll" />
     <Content Remove="C:\Users\bobda\.nuget\packages\opencvsharp4.runtime.win\4.10.0.20240616\build\net48\..\..\runtimes\win-x64\native\opencv_videoio_ffmpeg4100_64.dll" />
     <Content Remove="C:\Users\bobda\.nuget\packages\opencvsharp4.runtime.win\4.10.0.20240616\build\net48\..\..\runtimes\win-x86\native\OpenCvSharpExtern.dll" />
     <Content Remove="C:\Users\bobda\.nuget\packages\opencvsharp4.runtime.win\4.10.0.20240616\build\net48\..\..\runtimes\win-x86\native\opencv_videoio_ffmpeg4100.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="TreeviewForm.resx" />
   </ItemGroup>
 
   <ItemGroup>

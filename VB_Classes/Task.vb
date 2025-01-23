@@ -97,6 +97,7 @@ Public Class VBtask : Implements IDisposable
     Public IMU_Rotation As System.Numerics.Quaternion
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
+    Public idealDepthMask As New cv.Mat
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
     Public srcThread As New cv.Mat
@@ -199,6 +200,7 @@ Public Class VBtask : Implements IDisposable
 
     Public gOptions As OptionsGlobal
     Public redOptions As OptionsRedCloud
+    Public treeView As TreeviewForm
 
     Public paletteIndex As Integer
 
@@ -230,7 +232,6 @@ Public Class VBtask : Implements IDisposable
     Public desc As String
     Public advice As String = ""
     Public displayObjectName As String
-    Public displayObject As TaskParent
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
 
@@ -365,7 +366,7 @@ Public Class VBtask : Implements IDisposable
         Next
     End Sub
 #End Region
-    Private Function finddisplayObject(lookupName As String) As TaskParent
+    Private Function findDisplayObject(lookupName As String) As TaskParent
         Dim saveObject As Object
         For Each obj In activeObjects
             If obj.tracename = lookupName Then
@@ -389,7 +390,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            displayObject = finddisplayObject(displayObjectName)
+            Dim displayObject = finddisplayObject(displayObjectName)
             If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
             ' MSER mistakenly can have 1 cell - just ignore it.
@@ -446,6 +447,7 @@ Public Class VBtask : Implements IDisposable
         gridRects = New List(Of cv.Rect)
         firstPass = True
         algName = parms.algName
+        displayObjectName = algName
         cameraName = parms.cameraName
         testAllRunning = parms.testAllRunning
         showConsoleLog = parms.showConsoleLog
@@ -480,6 +482,8 @@ Public Class VBtask : Implements IDisposable
 
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
+        If testAllRunning = False Then treeView = New TreeviewForm
+
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
 
         callTrace = New List(Of String)
@@ -488,7 +492,6 @@ Public Class VBtask : Implements IDisposable
                     New Motion_Basics, New Gravity_Horizon}
 
         gmat = algTasks(algTaskID.gMat)
-        displayObject = gmat
         grid = algTasks(algTaskID.grid)
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
@@ -502,6 +505,7 @@ Public Class VBtask : Implements IDisposable
         updateSettings()
         redOptions.Show()
         gOptions.Show()
+        If testAllRunning = False Then treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 
         If advice = "" Then
@@ -644,7 +648,6 @@ Public Class VBtask : Implements IDisposable
         IMU_RawAcceleration = IMU_Acceleration
         IMU_RawAngularVelocity = IMU_AngularVelocity
         IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
-        If displayObject Is Nothing Then displayObject = grid
 
         grid.Run(color)
         algTasks(algTaskID.IMUBasics).Run(src)
@@ -821,6 +824,7 @@ Public Class VBtask : Implements IDisposable
 
             postProcess(src)
 
+            Dim displayObject = findDisplayObject(task.displayObjectName)
             If gOptions.displayDst0.Checked Then
                 dst0 = Check8uC3(displayObject.dst0)
             Else

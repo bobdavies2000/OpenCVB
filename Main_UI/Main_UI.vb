@@ -12,7 +12,6 @@ Imports System.ComponentModel
 #Region "Globals"
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
-    Public callTraceLock As New Mutex(True, "callTraceLock")
     Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks.
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
@@ -83,7 +82,6 @@ Public Class Main_UI
 
     Dim myBrush = New SolidBrush(Color.White)
     Dim groupList As New List(Of String)
-    Public TreeViewDialog As TreeviewForm
     Public algorithmFPSrate As Single
     Dim fpsListA As New List(Of Single)
     Dim fpsListC As New List(Of Single)
@@ -102,9 +100,6 @@ Public Class Main_UI
 
     Dim pauseAlgorithmThread As Boolean
     Dim logAlgorithms As StreamWriter
-    Public callTrace As New List(Of String)
-    Public algorithm_ms As New List(Of Single)
-    Public algorithmNames As New List(Of String)
 
     Const MAX_RECENT = 50
     Dim algHistory As New List(Of String)
@@ -112,8 +107,6 @@ Public Class Main_UI
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
     Dim arrowIndex As Integer
 
-    Public treeViewRequest As String
-    Public treeViewRefresh As Boolean
     Dim pixelViewerRect As cv.Rect
     Dim pixelViewerOn As Boolean
     Dim pixelViewTag As Integer
@@ -313,22 +306,9 @@ Public Class Main_UI
 
             optionsForm = New Options
             optionsForm.defineCameraResolutions(settings.cameraIndex)
-            refreshTreeView()
         End With
     End Sub
     Public Sub jsonWrite()
-        If TreeViewDialog IsNot Nothing Then
-            Dim Width = TreeViewDialog.Width
-            If Width < 200 Then Width = 200
-            Dim height = TreeViewDialog.Height
-            If height < 200 Then height = 200
-            settings.treeLocation = New cv.Vec4f(TreeViewDialog.Left, TreeViewDialog.Top,
-                                                  Width, height)
-            settings.treeButton = True
-        Else
-            settings.treeButton = False
-        End If
-
         If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
             settings.MainUI_AlgName = AvailableAlgorithms.Text
             settings.groupComboText = GroupCombo.Text
@@ -489,26 +469,8 @@ Public Class Main_UI
     Private Sub BluePlusButton_Click(sender As Object, e As EventArgs) Handles BluePlusButton.Click
         Dim OKcancel = InsertAlgorithm.ShowDialog()
     End Sub
-    Private Sub refreshTreeView()
-        If TreeViewDialog IsNot Nothing Then TreeViewDialog.Dispose()
-        If testAllRunning Then Exit Sub ' don't show treeview during testing...
-        TreeViewDialog = New TreeviewForm
-        If settings.treeButton Then
-            TreeViewDialog.Show()
-            TreeViewDialog.Left = settings.treeLocation.Item0
-            TreeViewDialog.Top = settings.treeLocation.Item1
-            TreeViewDialog.Width = settings.treeLocation.Item2
-            TreeViewDialog.Height = settings.treeLocation.Item3
-        Else
-            If TreeViewDialog IsNot Nothing Then
-                TreeViewDialog.Dispose()
-                TreeViewDialog = Nothing
-            End If
-        End If
-    End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         settings.treeButton = Not settings.treeButton
-        refreshTreeView()
         jsonWrite()
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
@@ -667,7 +629,6 @@ Public Class Main_UI
             TestAllButton.Text = "Test All"
         End If
         testAllRunning = TestAllTimer.Enabled
-        If testAllRunning = False Then refreshTreeView()
     End Sub
     Private Sub ComplexityTimer_Tick(sender As Object, e As EventArgs) Handles ComplexityTimer.Tick
         While 1
@@ -1151,13 +1112,6 @@ Public Class Main_UI
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
 
-        If testAllRunning Then
-            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Dispose()
-        Else
-            If treeViewRefresh Then refreshTreeView()
-            treeViewRefresh = False
-        End If
-
         If pauseAlgorithmThread = False Then
             Dim timeNow As DateTime = Now
             Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
@@ -1532,14 +1486,6 @@ Public Class Main_UI
     End Sub
     Private Sub StartTask()
         Debug.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
-        SyncLock callTraceLock
-            If TreeViewDialog IsNot Nothing Then
-                callTrace.Clear()
-                algorithm_ms.Clear()
-                algorithmNames.Clear()
-                TreeViewDialog.PercentTime.Text = ""
-            End If
-        End SyncLock
         testAllRunning = TestAllButton.Text = "Stop Test"
         saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
 
@@ -1566,10 +1512,6 @@ Public Class Main_UI
         trueData = New List(Of TrueText)
 
         PausePlayButton.Image = PausePlay
-
-        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
-        ' Clicking on availablealgorithms indicates they are done with using the treeview.
-        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
@@ -1615,8 +1557,6 @@ Public Class Main_UI
             ' then remove the json file and restart, click the OpenCVB options button,
             ' and click 'Update Algorithm XRef' (it is toward the bottom of the options form.)
             textDesc = task.MainUI_Algorithm.desc
-
-            treeViewRequest = parms.algName
 
             If ComplexityTimer.Enabled = False Then
                 Debug.WriteLine(CStr(Now))
@@ -1704,8 +1644,6 @@ Public Class Main_UI
                         Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
                         Dim spanCopy = New TimeSpan(elapsedCopyTicks)
                         task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-
-                        task.displayObjectName = treeViewRequest
 
                         If testAllRunning Then
                             task.pixelViewerOn = False
@@ -1831,15 +1769,6 @@ Public Class Main_UI
                 End If
 
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
-
-                If frameCount Mod task.fpsAlgorithm = 0 Or callTrace.Count <> task.callTrace.Count Then
-                    SyncLock callTraceLock
-                        If callTrace.Count <> task.callTrace.Count Then treeViewRefresh = True
-                        callTrace = New List(Of String)(task.callTrace)
-                        algorithm_ms = New List(Of Single)(task.algorithm_ms)
-                        algorithmNames = New List(Of String)(task.algorithmNames)
-                    End SyncLock
-                End If
 
                 Dim elapsedTicks = Now.Ticks - returnTime.Ticks
                 Dim span = New TimeSpan(elapsedTicks)

@@ -2210,14 +2210,15 @@ Public Class OpenGL_DisparityTest : Inherits TaskParent
     Dim disp As New Disparity_GoodCells
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
+        dst3 = task.pointCloud.Clone
         desc = "Visualize the high visibility cells found by Disparity_GoodCells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         disp.Run(src)
         dst2 = disp.dst2
-        dst3 = disp.dst3
 
-        task.ogl.pointCloudInput = disp.dst3
+        task.pointCloud.CopyTo(dst3, task.idealDepthMask)
+        task.ogl.pointCloudInput = dst3
 
         task.ogl.Run(src)
     End Sub

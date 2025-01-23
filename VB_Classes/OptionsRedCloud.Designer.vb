@@ -59,7 +59,7 @@ Partial Class OptionsRedCloud
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.LabelIdentify = New System.Windows.Forms.Label()
-        Me.identifySlider = New System.Windows.Forms.TrackBar()
+        Me.IdentifyCountBar = New System.Windows.Forms.TrackBar()
         Me.IdentifyCountLabel = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
@@ -81,7 +81,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.rcReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.identifySlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -438,7 +438,7 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.Controls.Add(Me.Label1)
         Me.GroupBox2.Controls.Add(Me.Label3)
         Me.GroupBox2.Controls.Add(Me.LabelIdentify)
-        Me.GroupBox2.Controls.Add(Me.identifySlider)
+        Me.GroupBox2.Controls.Add(Me.IdentifyCountBar)
         Me.GroupBox2.Controls.Add(Me.IdentifyCountLabel)
         Me.GroupBox2.Controls.Add(Me.ProjectionThresholdBar)
         Me.GroupBox2.Controls.Add(Me.Label8)
@@ -488,16 +488,16 @@ Partial Class OptionsRedCloud
         Me.LabelIdentify.TabIndex = 32
         Me.LabelIdentify.Text = "Label1"
         '
-        'identifySlider
+        'IdentifyCountBar
         '
-        Me.identifySlider.Location = New System.Drawing.Point(180, 30)
-        Me.identifySlider.Maximum = 255
-        Me.identifySlider.Minimum = 1
-        Me.identifySlider.Name = "identifySlider"
-        Me.identifySlider.Size = New System.Drawing.Size(482, 69)
-        Me.identifySlider.TabIndex = 31
-        Me.identifySlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.identifySlider.Value = 10
+        Me.IdentifyCountBar.Location = New System.Drawing.Point(180, 30)
+        Me.IdentifyCountBar.Maximum = 255
+        Me.IdentifyCountBar.Minimum = 1
+        Me.IdentifyCountBar.Name = "IdentifyCountBar"
+        Me.IdentifyCountBar.Size = New System.Drawing.Size(482, 69)
+        Me.IdentifyCountBar.TabIndex = 31
+        Me.IdentifyCountBar.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.IdentifyCountBar.Value = 10
         '
         'IdentifyCountLabel
         '
@@ -625,7 +625,7 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.rcReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.identifySlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
         Me.ResumeLayout(False)
@@ -668,7 +668,7 @@ Partial Class OptionsRedCloud
     Friend WithEvents ColorSourceLabel As System.Windows.Forms.Label
     Friend WithEvents ColorSource As System.Windows.Forms.ComboBox
     Friend WithEvents LabelIdentify As System.Windows.Forms.Label
-    Friend WithEvents identifySlider As System.Windows.Forms.TrackBar
+    Friend WithEvents IdentifyCountBar As System.Windows.Forms.TrackBar
     Friend WithEvents IdentifyCountLabel As System.Windows.Forms.Label
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
     Friend WithEvents ColorTrackingDepth As Windows.Forms.RadioButton

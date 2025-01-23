@@ -170,7 +170,7 @@ Public Class RedCloud_YZ : Inherits TaskParent
     Dim stats As New Cell_Basics
     Dim rCloud As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.identifySlider.Value = 100
+        task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.YZReduction.Checked = True
         task.gOptions.displayDst1.Checked = True
         desc = "Build horizontal RedCloud cells"
@@ -196,7 +196,7 @@ Public Class RedCloud_XZ : Inherits TaskParent
     Dim stats As New Cell_Basics
     Dim rCloud As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.identifySlider.Value = 100
+        task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.XZReduction.Checked = True
         task.gOptions.displayDst1.Checked = True
         desc = "Build vertical RedCloud cells."
@@ -222,7 +222,7 @@ Public Class RedCloud_World : Inherits TaskParent
     Dim world As New Depth_World
     Dim prep As New RedCloud_PrepData
     Public Sub New()
-        task.redOptions.identifySlider.Value = 100
+        task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.rcReductionSlider.Value = 1000
         task.gOptions.displayDst1.Checked = True
         labels(3) = "Generated pointcloud"

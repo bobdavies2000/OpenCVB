@@ -7,6 +7,7 @@ Public Class Disparity_GoodCells : Inherits TaskParent
         grid.myGrid = True ' private grid
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         labels(3) = "Depth image for cells with good visibility"
+        task.idealDepthMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create the grid of cells with good visibility and can be used to find disparity"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -31,11 +32,12 @@ Public Class Disparity_GoodCells : Inherits TaskParent
             End If
         Next
 
+        mask.CopyTo(task.idealDepthMask, task.motionMask)
         mask.SetTo(0, Not task.motionMask) ' no need to copy where there is no motion
-        dst3.SetTo(0, task.motionMask)
-        task.pointCloud.CopyTo(dst3, mask)
 
-        If standaloneTest() Then
+        If traceName = task.algName Then
+            dst3.SetTo(0, task.motionMask)
+            task.pointCloud.CopyTo(dst3, mask)
             dst2 = src
             For Each r In gridList
                 If r.Width = 0 Then Continue For

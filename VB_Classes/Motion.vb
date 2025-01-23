@@ -27,7 +27,7 @@ Public Class Motion_Basics : Inherits TaskParent
         End If
 
         ' unusual use of task.displayobject because motion_basics is a task algorithm.
-        If standaloneTest() Or task.displayObject.traceName = "Diff_Basics" Then
+        If standaloneTest() Or task.displayObjectName = "Diff_Basics" Then
             diff.Run(src)
             dst3 = diff.dst2
         End If
@@ -498,8 +498,7 @@ Public Class Motion_Enclosing : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        task.redC.inputRemoved = Not dst2
-        runRedC(dst2)
+        dst3 = runRedC(dst2, labels(2), Not dst2)
 
         motionRect = New cv.Rect
         If task.rcList.Count < 2 Then Exit Sub

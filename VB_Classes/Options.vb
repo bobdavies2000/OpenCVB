@@ -7982,7 +7982,8 @@ End Class
 Public Class Options_Disparity : Inherits OptionParent
     Public cellSize As Integer = 8
     Public Sub New()
-        If task.workingRes.Width >= 1280 Then cellSize = 16
+        If task.workingRes.Width = 1280 Then cellSize = 16
+        If task.workingRes.Width = 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Disparity Cell Size", 1, 100, cellSize)
         End If
