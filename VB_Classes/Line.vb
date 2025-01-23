@@ -1429,8 +1429,8 @@ Public Class Line_Info : Inherits TaskParent
         desc = "Display details about the line selected."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        labels(2) = task.lines.labels(2)
         If standaloneTest() Then runLines(src)
+        labels(2) = task.lines.labels(2)
 
         dst2 = src
         For Each lp In task.lpList

@@ -731,11 +731,14 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public inputPoints As New List(Of cv.Point2f)
     Public outputPoints2f As New List(Of cv.Point2f)
     Public outputPoints As New List(Of cv.Point)
+    Dim options As New Options_FeatureGather
     Public Sub New()
         If standalone Then optiBase.findRadio("Agast Features").Checked = True
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
         If standalone Then
             runFeature(src)
             inputPoints = task.features

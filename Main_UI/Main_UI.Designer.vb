@@ -28,9 +28,9 @@ Partial Class Main_UI
         Me.PausePlayButton = New System.Windows.Forms.ToolStripButton()
         Me.OptionsButton = New System.Windows.Forms.ToolStripButton()
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
-        Me.TreeButton = New System.Windows.Forms.ToolStripButton()
         Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
         Me.Magnify = New System.Windows.Forms.ToolStripButton()
+        Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
         Me.BluePlusButton = New System.Windows.Forms.ToolStripButton()
         Me.ComplexityButton = New System.Windows.Forms.ToolStripButton()
         Me.Advice = New System.Windows.Forms.ToolStripButton()
@@ -53,7 +53,6 @@ Partial Class Main_UI
         Me.CameraSwitching = New System.Windows.Forms.Label()
         Me.CamSwitchProgress = New System.Windows.Forms.PictureBox()
         Me.CamSwitchTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.CamSwitchProgress, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -62,7 +61,7 @@ Partial Class Main_UI
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.Magnify, Me.TranslateButton, Me.BluePlusButton, Me.ComplexityButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.PixelViewerButton, Me.Magnify, Me.TranslateButton, Me.BluePlusButton, Me.ComplexityButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(1583, 34)
@@ -96,15 +95,6 @@ Partial Class Main_UI
         Me.TestAllButton.Size = New System.Drawing.Size(34, 29)
         Me.TestAllButton.Text = "Test All Algorithms"
         '
-        'TreeButton
-        '
-        Me.TreeButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TreeButton.Image = CType(resources.GetObject("TreeButton.Image"), System.Drawing.Image)
-        Me.TreeButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TreeButton.Name = "TreeButton"
-        Me.TreeButton.Size = New System.Drawing.Size(34, 29)
-        Me.TreeButton.Text = "Treeview to see performance and explore algorithm stack"
-        '
         'PixelViewerButton
         '
         Me.PixelViewerButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
@@ -123,6 +113,15 @@ Partial Class Main_UI
         Me.Magnify.Size = New System.Drawing.Size(34, 29)
         Me.Magnify.Text = "Magnify - click then draw a rectangle"
         Me.Magnify.ToolTipText = "Magnify - draw a rectangle then click"
+        '
+        'TranslateButton
+        '
+        Me.TranslateButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), System.Drawing.Image)
+        Me.TranslateButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TranslateButton.Name = "TranslateButton"
+        Me.TranslateButton.Size = New System.Drawing.Size(34, 29)
+        Me.TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
         '
         'BluePlusButton
         '
@@ -284,15 +283,6 @@ Partial Class Main_UI
         '
         Me.CamSwitchTimer.Enabled = True
         '
-        'TranslateButton
-        '
-        Me.TranslateButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), System.Drawing.Image)
-        Me.TranslateButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TranslateButton.Name = "TranslateButton"
-        Me.TranslateButton.Size = New System.Drawing.Size(34, 29)
-        Me.TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
-        '
         'Main_UI
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -324,7 +314,6 @@ Partial Class Main_UI
     Friend WithEvents PausePlayButton As ToolStripButton
     Friend WithEvents OptionsButton As ToolStripButton
     Friend WithEvents TestAllButton As ToolStripButton
-    Friend WithEvents TreeButton As ToolStripButton
     Friend WithEvents PixelViewerButton As ToolStripButton
     Friend WithEvents BluePlusButton As ToolStripButton
     Friend WithEvents ComplexityButton As ToolStripButton

@@ -469,10 +469,6 @@ Public Class Main_UI
     Private Sub BluePlusButton_Click(sender As Object, e As EventArgs) Handles BluePlusButton.Click
         Dim OKcancel = InsertAlgorithm.ShowDialog()
     End Sub
-    Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
-        settings.treeButton = Not settings.treeButton
-        jsonWrite()
-    End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If Trim(AvailableAlgorithms.Text) = "" Then
             Dim incr = 1

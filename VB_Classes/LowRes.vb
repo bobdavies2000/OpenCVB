@@ -72,6 +72,7 @@ End Class
 
 Public Class LowRes_Features : Inherits TaskParent
     Dim lowRes As New LowRes_Basics
+    Dim options As New Options_Features
     Public Sub New()
         optiBase.FindSlider("Min Distance to next").Value = 3
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -79,6 +80,8 @@ Public Class LowRes_Features : Inherits TaskParent
         desc = "Identify the cells with features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
 
