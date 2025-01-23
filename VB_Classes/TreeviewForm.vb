@@ -152,8 +152,8 @@ Public Class TreeviewForm
         Me.Top = GetSetting("OpenCVB", "treeViewTop", "treeViewTop", Me.Top)
         Me.Width = GetSetting("OpenCVB", "treeViewWidth", "treeViewWidth", Me.Width)
         Me.Height = GetSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
-        PercentTime.Width = 225
-        PercentTime.Left = 225
+        PercentTime.Width = 250
+        PercentTime.Left = 250
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", Me.Left)

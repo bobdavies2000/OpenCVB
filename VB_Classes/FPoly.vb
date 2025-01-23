@@ -6,6 +6,7 @@ Public Class FPoly_Basics : Inherits TaskParent
     Public maskChangePercent As Single
     Dim topFeatures As New FPoly_TopFeatures
     Public sides As New FPoly_Sides
+    Dim options As New Options_Features
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
@@ -15,6 +16,8 @@ Public Class FPoly_Basics : Inherits TaskParent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
         runFeature(src)
 
         If task.firstPass Then sides.prevImage = src.Clone
@@ -236,6 +239,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Dim topFeatures As New FPoly_TopFeatures
     Public options As New Options_FPoly
     Public center As Object
+    Dim optionsEx As New Options_Features
     Public Sub New()
         center = New FPoly_Center
         optiBase.FindSlider("Feature Sample Size").Value = 30
@@ -249,6 +253,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.firstPass Then resyncImage = src.Clone
         options.RunOpt()
+        optionsEx.RunOpt()
 
         runFeature(src)
 
@@ -1214,6 +1219,7 @@ Public Class FPoly_Core : Inherits TaskParent
     Public threshold As Integer
     Dim options As New Options_FPoly
     Dim optionsCore As New Options_FPolyCore
+    Dim optionsEx As New Options_Features
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         optiBase.FindSlider("Feature Sample Size").Value = 20
@@ -1223,6 +1229,8 @@ Public Class FPoly_Core : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
         optionsCore.RunOpt()
+        optionsEx.RunOpt()
+
         runFeature(src)
 
         stable.Run(src)

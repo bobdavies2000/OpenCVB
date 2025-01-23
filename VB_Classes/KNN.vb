@@ -411,6 +411,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Dim lastImage As cv.Mat
     Dim dotSlider As TrackBar
     Dim options As New Options_KNN
+    Dim optionsEx As New Options_Features
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 200
         dotSlider = optiBase.FindSlider("Average distance multiplier")
@@ -446,6 +447,9 @@ Public Class KNN_TrackMean : Inherits TaskParent
         Return histSum / histList.Count
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+        optionsEx.RunOpt()
+
         runFeature(src)
 
         If task.firstPass Then lastImage = src.Clone

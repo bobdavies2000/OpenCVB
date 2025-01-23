@@ -36,6 +36,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
+        optionsEx.RunOpt()
 
         runFeature(src)
         dst3 = task.feat.dst2

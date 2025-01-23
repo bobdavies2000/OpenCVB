@@ -6,9 +6,9 @@ Public Class Disparity_GoodCells : Inherits TaskParent
     Public Sub New()
         grid.myGrid = True ' private grid
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        labels(3) = "Depth image for cells with good visibility"
+        labels(3) = "Depth image for cells with ideal visibility"
         task.idealDepthMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Create the grid of cells with good visibility and can be used to find disparity"
+        desc = "Create the grid of cells with ideal visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()

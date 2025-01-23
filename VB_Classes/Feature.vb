@@ -711,9 +711,7 @@ Public Class Feature_RedCloud : Inherits TaskParent
         desc = "Show the feature points in the RedCloud output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.redC.Run(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        dst2 = runRedC(src, labels(2))
 
         For Each pt In task.featurePoints
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
