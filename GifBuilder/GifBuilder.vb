@@ -18,7 +18,7 @@ Module GifBuilder
         End If
 
         Try
-            CreateAnimatedGif(imageFiles, outputGifPath, 3000) ' 3 seconds delay
+            CreateAnimatedGif(imageFiles, outputGifPath, 1000) ' 1 seconds delay
         Catch ex As Exception
             Console.WriteLine("Error creating GIF: " & ex.Message)
         End Try
