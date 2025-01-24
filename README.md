@@ -1,43 +1,21 @@
-# January 2025 – Task Algorithms, Upgraded Toolbar, and Translation Changes
+# January 2025 (Part 2) – GifBuilder updates, RGBFilter, Ideal Depth.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   ‘Task algorithms’ are algorithms that are present on every run.
-    -   Task algorithms provide IMU, motion, horizon, lines or grid elements.
-    -   Task algorithms appear in the TreeView output (previously hidden.)
-    -   Click on any TreeView element to see the algorithm’s contribution.
-        -   See the GIF image below to see how this works.
-    -   Overhead for each algorithm is also shown along with wait times.
-    -   Inactive algorithms, when selected, display the ‘inactive’ message.
-    -   Selecting a TreeView entry shows algorithm’s images, labels, and TrueText.
--   OpenCVB now uses OpenCV 4.120, the latest version of OpenCV.
-    -   Delete the opencv directory and run ‘Update_All.bat’ to upgrade.
-    -   To remain on an older version, update the ‘PragmaLibs.h’.
--   OpenCVB’s focus is VB.Net as translation to C\# and C++ has been demonstrated.
-    -   If a C\# or C++ version is needed, use the CodeConvert.ai to translate.
-    -   OpenCVB’s interface to CodeConvert.ai has been removed.
-        -   CodeConvert.ai reworked their website and it stopped working.
-    -   Drop in algorithm count is due to removing translations.
--   Options derive from ‘OptionParent’ and no longer count as algorithms.
-    -   Options previously derived from TaskParent and added to the count.
-    -   Moving to OptionParent means options do not add to the algorithm count.
--   The Line.vb algorithms were reviewed and improved.
-    -   Lines, once computed, are available to all algorithms in task.lpList.
-    -   Lines are now collected across frames using the motion mask.
-        -   Existing lines in regions with motion are tossed.
-        -   New lines in the motion mask are all added.
--   Lines are built from the left and right images with binocular cameras.
-    -   Lines provide the ability to confirm distance with uniform depth patterns.
--   Main form toolbar is simplified – low use buttons removed or hidden.
-
-    ![](media/735c5a18926512d0a5a4d53d3208e5da.png)
-
--   The “Blue +” button to create new algorithms is limited to VB.Net, C++, and OpenGL.
--   Left and Right camera images are now always grayscale (some were color.)
+-   GifBuilder was reworked to capture the screen and use AnimatedGif.
+-   RGBFilter available once again – filter the RGB input with any of the following:
+    -   Blur, Brightness, Contrast, Dilate, Erode, Laplacian,
+    -   Mean Subtraction, Sharpen, or White Balance.
+    -   RGBFilter is another task algorithm – run without explicit invocation.
+-   Cells with “ideal” depth are those filled with depth pixels.
+    -   See example output below showing 8x8 cells covering the depth image.
+-   TreeView form was moved into the VB_Classes where the data is produced.
+    -   Allowed code to be simpler in the Main_UI form.
+    -   TreeView button is no longer needed in Main_UI
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/893013652590bac4fa557520f5e13e4a.gif)
+![](media/bb5d73299a9f700cd4fb75a8d1e3f4e6.gif)
 
-**RedColor_Basics:** *OpenCVB’s TreeView (at right above) shows all the algorithms that contribute to the output of the requested algorithm – in this case RedColor_Basics. As each algorithm in the tree is selected, it is highlighted (albeit faintly here) and the algorithm’s output is shown (now including labels and TrueText.) This capability enables a further understanding of how the algorithm was constructed. Task algorithms are run on every frame and are included in the TreeView even though they are not explicitly called by the algorithm. The frame rate of 99 fps is not a mistake. The Stereolabs Gemini camera runs at that rate when capturing 640x480 images.*
+**Disparity_GoodCells:** *The cells marked in the lower left image have ideal depth data with 100% of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
 
 # Introduction
 
@@ -1679,3 +1657,44 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of a room Description automatically generated](media/928bcaa46cf6abb063c6824e9086236e.png)
 
 **RedCloud_Basics:** *All the RedCloud algorithms were reviewed and updated with the best segmentation approach – featureless regions built with Edge_Draw. Edge_Draw is an OpenCV user-contribution and is better suited to detect edges than conventional alternatives like Canny or Sobel. The lower left image uses the mean color of the pixels to paint the entire cell while the lower right image uses a random ‘tracking’ color which changes whenever the cell is split or lost.*
+
+# January 2025 – Task Algorithms, Upgraded Toolbar, and Translation Changes
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   ‘Task algorithms’ are algorithms that are present on every run.
+    -   Task algorithms provide IMU, motion, horizon, lines or grid elements.
+    -   Task algorithms appear in the TreeView output (previously hidden.)
+    -   Click on any TreeView element to see the algorithm’s contribution.
+        -   See the GIF image below to see how this works.
+    -   Overhead for each algorithm is also shown along with wait times.
+    -   Inactive algorithms, when selected, display the ‘inactive’ message.
+    -   Selecting a TreeView entry shows algorithm’s images, labels, and TrueText.
+-   OpenCVB now uses OpenCV 4.120, the latest version of OpenCV.
+    -   Delete the opencv directory and run ‘Update_All.bat’ to upgrade.
+    -   To remain on an older version, update the ‘PragmaLibs.h’.
+-   OpenCVB’s focus is VB.Net as translation to C\# and C++ has been demonstrated.
+    -   If a C\# or C++ version is needed, use the CodeConvert.ai to translate.
+    -   OpenCVB’s interface to CodeConvert.ai has been removed.
+        -   CodeConvert.ai reworked their website and it stopped working.
+    -   Drop in algorithm count is due to removing translations.
+-   Options derive from ‘OptionParent’ and no longer count as algorithms.
+    -   Options previously derived from TaskParent and added to the count.
+    -   Moving to OptionParent means options do not add to the algorithm count.
+-   The Line.vb algorithms were reviewed and improved.
+    -   Lines, once computed, are available to all algorithms in task.lpList.
+    -   Lines are now collected across frames using the motion mask.
+        -   Existing lines in regions with motion are tossed.
+        -   New lines in the motion mask are all added.
+-   Lines are built from the left and right images with binocular cameras.
+    -   Lines provide the ability to confirm distance with uniform depth patterns.
+-   Main form toolbar is simplified – low use buttons removed or hidden.
+
+    ![A screenshot of a computer Description automatically generated](media/735c5a18926512d0a5a4d53d3208e5da.png)
+
+-   The “Blue +” button to create new algorithms is limited to VB.Net, C++, and OpenGL.
+-   Left and Right camera images are now always grayscale (some were color.)
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer Description automatically generated](media/893013652590bac4fa557520f5e13e4a.gif)
+
+**RedColor_Basics:** *OpenCVB’s TreeView (at right above) shows all the algorithms that contribute to the output of the requested algorithm – in this case RedColor_Basics. As each algorithm in the tree is selected, it is highlighted (albeit faintly here) and the algorithm’s output is shown (now including labels and TrueText.) This capability enables a further understanding of how the algorithm was constructed. Task algorithms are run on every frame and are included in the TreeView even though they are not explicitly called by the algorithm. The frame rate of 99 fps is not a mistake. The Stereolabs Gemini camera runs at that rate when capturing 640x480 images.*
