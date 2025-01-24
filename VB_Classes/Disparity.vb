@@ -1,4 +1,157 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Web.UI
+Imports cv = OpenCvSharp
+
+Public Class Disparity_Basics : Inherits TaskParent
+    Public correlations As New List(Of Single), means As New List(Of Single), stdevs As New List(Of Single)
+    Public searchRect As cv.Rect, rect As cv.Rect
+    Public bestCorrelation As Single, MeanDiff As Single, StdevDiff As Single
+    Public Sub New()
+        labels(2) = "Select an ideal depth cell to find its match in the right view."
+        desc = "Given an ideal depth cell, find the match in the right view image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView
+        Dim firstRect As cv.Rect
+        For Each r In task.ideal.gridList
+            If r.Width = 0 Then Continue For
+            dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
+            If firstRect.Width = 0 Or firstRect.X = 0 Then firstRect = r
+        Next
+
+        Dim val = task.ideal.grid.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        rect = task.ideal.grid.gridRects(val)
+        If rect.X = 0 Then rect = firstRect
+        dst2.Rectangle(rect, task.lineWidth, task.HighlightColor)
+
+        rect.Width = 32
+        rect.Height = 32 ' to improve accuracy.
+
+        Dim correlation As New cv.Mat
+        Dim opt = cv.TemplateMatchModes.CCoeffNormed
+        correlations.Clear()
+        means.Clear()
+        stdevs.Clear()
+
+        Dim meanT As Single, stdevT As Single, mean As Single, stdev As Single
+        rect = ValidateRect(rect)
+        cv.Cv2.MeanStdDev(dst2(rect), meanT, stdevT)
+        dst3 = task.rightView.Clone
+        Dim rr = rect
+        Dim pcCorrs As New List(Of Single), maxPCcorr As Single
+        For i = 1 To rr.X
+            rr.X -= 1
+            cv.Cv2.MeanStdDev(dst3(rect), mean, stdev)
+            means.Add(Math.Abs(mean - meanT))
+            stdevs.Add(Math.Abs(stdev - stdevT))
+            cv.Cv2.MatchTemplate(dst2(rect), dst3(rr), correlation, opt)
+            correlations.Add(correlation.Get(Of Single)(0, 0))
+            cv.Cv2.MatchTemplate(task.pcSplit(2)(rect), task.pcSplit(2)(rr), correlation, opt)
+            pcCorrs.Add(correlation.Get(Of Single)(0, 0))
+        Next
+        bestCorrelation = correlations.Max
+        MeanDiff = means.Min
+        StdevDiff = stdevs.Min
+
+        searchRect = New cv.Rect(0, rect.Y, rect.X + task.idealCellSize, task.idealCellSize)
+
+        dst3.Rectangle(searchRect, task.lineWidth, task.HighlightColor)
+        If standalone Then
+            Dim index = correlations.IndexOf(bestCorrelation)
+            rr = New cv.Rect(rect.X - index, rect.Y, task.idealCellSize, task.idealCellSize)
+            dst3.Rectangle(rr, 255, task.lineWidth)
+
+            MeanDiff = means(index)
+            StdevDiff = stdevs(index)
+            maxPCcorr = pcCorrs(index)
+        End If
+
+        If task.heartBeat Then
+            labels(3) = "Max correlation = " + Format(bestCorrelation, fmt3) + "  " +
+                        "Min mean difference = " + Format(MeanDiff, fmt3) + "  " +
+                        "Min stdev difference = " + Format(StdevDiff, fmt3) + "  " +
+                        "Max PC correlation = " + Format(maxPCcorr, fmt3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Disparity_MatchMean : Inherits TaskParent
+    Dim disparity As New Disparity_Basics
+    Public Sub New()
+        desc = "Find and display the best cell with the smallest mean difference to the selected cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        disparity.Run(src)
+        dst2 = disparity.dst2
+        dst3 = disparity.dst3
+
+        Dim rect = disparity.rect
+        Dim r = rect
+
+        Dim index = disparity.means.IndexOf(disparity.MeanDiff)
+        r.X = rect.X - index
+
+        dst3.Rectangle(r, 255, task.lineWidth)
+        labels(3) = disparity.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Disparity_MatchStdev : Inherits TaskParent
+    Dim disparity As New Disparity_Basics
+    Public Sub New()
+        desc = "Find and display the best cell with the smallest stdev difference to the selected cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        disparity.Run(src)
+        dst2 = disparity.dst2
+        dst3 = disparity.dst3
+
+        Dim rect = disparity.rect
+        Dim r = rect
+
+        Dim index = disparity.stdevs.IndexOf(disparity.StdevDiff)
+        r.X = rect.X - index
+
+        dst3.Rectangle(r, 255, task.lineWidth)
+        labels(3) = disparity.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Disparity_SearchRect : Inherits TaskParent
+    Dim match As New Match_Basics
+    Public Sub New()
+        task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        desc = "Given an ideal depth cell, find the match in the right view image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim val = task.ideal.grid.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        dst2 = task.leftView
+        Dim rect = task.ideal.grid.gridRects(val)
+        dst2.Rectangle(rect, task.lineWidth, task.HighlightColor)
+
+        match.template = dst2(rect)
+        match.searchRect = New cv.Rect(0, rect.Y, rect.X + rect.Width, rect.Height)
+        match.Run(task.rightView)
+        dst3 = task.rightView
+        dst3.Rectangle(match.matchRect, 255, task.lineWidth)
+        labels(3) = "Correlation = " + Format(match.correlation, fmt3)
+    End Sub
+End Class
 
 
 

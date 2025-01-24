@@ -2,9 +2,7 @@
 Imports System.Threading
 Public Class Grid_Basics : Inherits TaskParent
     Public gridRects As New List(Of cv.Rect)
-    Public myGrid As Boolean ' if true, use the inputGridsize value.  Otherwise task.gridsize
-    Public inputGridSize As Integer
-
+    Public myGrid As Boolean ' if true, use the task.idealCellSize value.  Otherwise task.gridsize
     Public gridMask As cv.Mat
     Public gridMap32S As cv.Mat
     Public gridIndex As New List(Of Integer)
@@ -31,7 +29,7 @@ Public Class Grid_Basics : Inherits TaskParent
             gridNeighbors.Clear()
             gridPoints.Clear()
             If myGrid = True Then
-                gridSize = inputGridSize
+                gridSize = task.idealCellSize
             Else
                 gridSize = task.gOptions.GridSlider.Value
                 updateTask = True

@@ -346,6 +346,10 @@ Public Class algorithmList
 	If algorithmName = "Dilate_Basics" Then return new Dilate_Basics
 	If algorithmName = "Dilate_Erode" Then return new Dilate_Erode
 	If algorithmName = "Dilate_OpenClose" Then return new Dilate_OpenClose
+	If algorithmName = "Disparity_Basics" Then return new Disparity_Basics
+	If algorithmName = "Disparity_MatchMean" Then return new Disparity_MatchMean
+	If algorithmName = "Disparity_MatchStdev" Then return new Disparity_MatchStdev
+	If algorithmName = "Disparity_SearchRect" Then return new Disparity_SearchRect
 	If algorithmName = "Distance_Background" Then return new Distance_Background
 	If algorithmName = "Distance_Basics" Then return new Distance_Basics
 	If algorithmName = "Distance_BinaryImage" Then return new Distance_BinaryImage

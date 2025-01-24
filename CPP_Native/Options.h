@@ -2066,7 +2066,7 @@ public:
 };
 class Options_LowRes {
 public:
-	int colorDifferenceThreshold =  4;
+	int colorDifferenceThreshold =  6;
 	void RunOpt() {}
 	Options_LowRes() {
 	}

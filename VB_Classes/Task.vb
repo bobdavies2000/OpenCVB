@@ -30,6 +30,7 @@ Public Class VBtask : Implements IDisposable
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
     Public gridPoints As New List(Of cv.Point) ' the list of each gridRect corner 
+    Public idealCellSize As Integer
 
     Public fpList As New List(Of fpData)
     Public fpListLast As New List(Of fpData)
@@ -113,19 +114,21 @@ Public Class VBtask : Implements IDisposable
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
 
-    ' add any algorithm tasks to this list.
-    Public algTasks() As Object
-
+    ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
+    Public ideal As Depth_Ideal
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
-
-    ' add any task algorithms here
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Object
     Public ogl As OpenGL_Basics
+    Public gravityHorizon As Gravity_Horizon
+    Public imuBasics As IMU_Basics
+    Public motionBasics As Motion_Basics
+    Public colorizer As Depth_Palette
+    ' end of task algorithms
 
     Public pythonPipeIn As NamedPipeServerStream
     Public pythonPipeOut As NamedPipeServerStream
@@ -293,14 +296,6 @@ Public Class VBtask : Implements IDisposable
     Public metersPerPixel As Single
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
-    Public Enum algTaskID ' match names in algTasks below...
-        gMat = 0
-        IMUBasics = 1
-        grid = 2
-        colorizer = 3
-        motion = 4
-        gravityHorizon = 5
-    End Enum
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -488,11 +483,14 @@ Public Class VBtask : Implements IDisposable
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        algTasks = {New IMU_GMatrix, New IMU_Basics, New Grid_Basics, New Depth_Palette,
-                    New Motion_Basics, New Gravity_Horizon}
 
-        gmat = algTasks(algTaskID.gMat)
-        grid = algTasks(algTaskID.grid)
+        gmat = New IMU_GMatrix
+        grid = New Grid_Basics
+        ideal = New Depth_Ideal
+        gravityHorizon = New Gravity_Horizon
+        imuBasics = New IMU_Basics
+        motionBasics = New Motion_Basics
+        colorizer = New Depth_Palette
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -650,7 +648,7 @@ Public Class VBtask : Implements IDisposable
         IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
 
         grid.Run(color)
-        algTasks(algTaskID.IMUBasics).Run(src)
+        imuBasics.Run(src)
         gmat.Run(src)
 
         If gOptions.RGBFilterActive.Checked Then
@@ -719,18 +717,16 @@ Public Class VBtask : Implements IDisposable
             gOptions.unFiltered.Checked = True
         End If
 
-        algTasks(algTaskID.motion).Run(src)
-        motionMask = algTasks(algTaskID.motion).motionMask
+        motionBasics.Run(src)
+        motionMask = motionBasics.motionMask
 
         If gOptions.UseMotionColor.Checked Then
-            color = algTasks(algTaskID.motion).color.Clone
-            Dim rectList As List(Of cv.Rect) = algTasks(algTaskID.motion).measure.motionRects
+            color = motionBasics.color.Clone
+            Dim rectList As List(Of cv.Rect) = motionBasics.measure.motionRects
             motionRects = New List(Of cv.Rect)(rectList)
         End If
 
-        If gOptions.UseMotionDepth.Checked Then
-            pointCloud = algTasks(algTaskID.motion).pointcloud.Clone
-        End If
+        If gOptions.UseMotionDepth.Checked Then pointCloud = motionBasics.pointcloud.Clone
 
         pcSplit = pointCloud.Split
 
@@ -770,8 +766,8 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.PatchNaNs(pcSplit(2))
         End If
 
-        algTasks(algTaskID.colorizer).Run(src)
-        depthRGB = algTasks(algTaskID.colorizer).dst2
+        colorizer.Run(src)
+        depthRGB = colorizer.dst2
 
         TaskTimer.Enabled = True
 
@@ -814,7 +810,8 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        algTasks(algTaskID.gravityHorizon).Run(src)
+        gravityHorizon.Run(src)
+        ideal.Run(src)
 
         Dim saveOptionsChanged = optionsChanged
         If paused = False Then

@@ -8,7 +8,7 @@ Public Class Match_Basics : Inherits TaskParent
     Public template As cv.Mat ' Provide this
     Public searchRect As New cv.Rect ' Provide this 
 
-    Public mmData As mmData
+    Public mm As mmData
     Public correlation As Single ' Resulting Correlation coefficient
     Public matchCenter As cv.Point
     Public matchRect As New cv.Rect
@@ -33,19 +33,19 @@ Public Class Match_Basics : Inherits TaskParent
         Else
             cv.Cv2.MatchTemplate(template, src(searchRect), dst0, options.matchOption)
         End If
-        mmData = GetMinMax(dst0)
+        mm = GetMinMax(dst0)
 
-        correlation = mmData.maxVal
+        correlation = mm.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
         Dim w = template.Width, h = template.Height
         If searchRect.Width = 0 Then
-            matchCenter = New cv.Point(mmData.maxLoc.X + w / 2, mmData.maxLoc.Y + h / 2)
-            matchRect = New cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h)
+            matchCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
+            matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         Else
-            matchCenter = New cv.Point(searchRect.X + mmData.maxLoc.X + w / 2, searchRect.Y + mmData.maxLoc.Y + h / 2)
-            matchRect = New cv.Rect(searchRect.X + mmData.maxLoc.X, searchRect.Y + mmData.maxLoc.Y, w, h)
+            matchCenter = New cv.Point(searchRect.X + mm.maxLoc.X + w / 2, searchRect.Y + mm.maxLoc.Y + h / 2)
+            matchRect = New cv.Rect(searchRect.X + mm.maxLoc.X, searchRect.Y + mm.maxLoc.Y, w, h)
         End If
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             DrawCircle(dst2, matchCenter, task.DotSize, white)
             dst3 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)

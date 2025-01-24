@@ -499,8 +499,7 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
     Public motionDetected As Boolean
     Public motionRects As New List(Of cv.Rect)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
-        labels(3) = "A composite of an earlier image and the motion from the latest input"
+        labels(3) = "A composite of an earlier image and the motion since that input"
         desc = "Show all the grid cells above the motionless value (an option)."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -512,7 +511,7 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
         dst2 = measure.dst2
         labels(2) = measure.labels(3)
 
-        Dim threshold = measure.options.colorDifferenceThreshold
+        Dim threshold = If(task.heartBeat, 0, measure.options.colorDifferenceThreshold)
 
         motionRects.Clear()
         Dim indexList As New List(Of Integer)

@@ -7563,7 +7563,7 @@ End Class
 
 
 Public Class Options_LowRes : Inherits OptionParent
-    Public colorDifferenceThreshold As Integer = 4
+    Public colorDifferenceThreshold As Integer = 6
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("LowRes Color difference threshold", 0, 100, colorDifferenceThreshold)
