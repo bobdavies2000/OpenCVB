@@ -38,8 +38,7 @@ Public Class Swarm_Basics : Inherits TaskParent
         options.RunOpt()
         optionsEx.RunOpt()
 
-        runFeature(src)
-        dst3 = task.feat.dst2
+        dst3 = runFeature(src)
 
         If task.optionsChanged Then cornerHistory.Clear()
 
@@ -101,9 +100,8 @@ Public Class Swarm_RightFeatures : Inherits TaskParent
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(task.rightView)
+        dst2 = runFeature(task.rightView).Clone
         rightList = New List(Of cv.Point2f)(task.features)
-        dst2 = task.feat.dst2.Clone
     End Sub
 End Class
 
@@ -117,10 +115,9 @@ Public Class Swarm_LeftFeatures : Inherits TaskParent
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Double the votes on motion by collecting features for both left and right images."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        task.feat.Run(task.leftView)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runFeature(task.leftView).Clone
         leftList = New List(Of cv.Point2f)(task.features)
-        dst2 = task.feat.dst2.Clone
     End Sub
 End Class
 

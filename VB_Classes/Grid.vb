@@ -128,6 +128,8 @@ Public Class Grid_Basics : Inherits TaskParent
 
             If updateTask Then
                 task.gridSize = gridSize
+                task.gridRows = gridRows
+                task.gridCols = gridCols
                 task.gridMask = gridMask
                 task.gridMap32S = gridMap32S
                 task.gridIndex = New List(Of Integer)(gridIndex)

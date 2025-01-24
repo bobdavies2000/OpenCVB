@@ -608,10 +608,11 @@ Public Class TaskParent : Implements IDisposable
         If task.redC Is Nothing Then task.redC = New RedColor_Basics
         task.redC.Run(src)
     End Sub
-    Public Sub runFeature(src As cv.Mat)
+    Public Function runFeature(src As cv.Mat) As cv.Mat
         If task.feat Is Nothing Then task.feat = New Feature_Basics
         task.feat.Run(src)
-    End Sub
+        Return task.feat.dst2
+    End Function
     Public Sub runLines(src As cv.Mat)
         If task.lines Is Nothing Then task.lines = New Line_Basics
         task.lines.Run(src)

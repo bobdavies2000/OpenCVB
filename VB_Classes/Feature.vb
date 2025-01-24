@@ -335,9 +335,7 @@ Public Class Feature_Delaunay : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        runFeature(src)
-
-        dst2 = task.feat.dst2
+        dst2 = runFeature(src)
         labels(2) = task.feat.labels(2)
 
         delaunay.Run(src)
@@ -403,8 +401,7 @@ Public Class Feature_Points : Inherits TaskParent
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
-        dst2 = task.feat.dst2
+        dst2 = runFeature(src)
         If task.heartBeat Then dst3.SetTo(0)
 
         For Each pt In task.features
@@ -610,9 +607,8 @@ Public Class Feature_GridPopulation : Inherits TaskParent
         desc = "Find the feature population for each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
+        dst2 = runFeature(src)
 
-        dst2 = task.feat.dst2
         labels(2) = task.feat.labels(2)
 
         dst3.SetTo(0)
@@ -729,9 +725,8 @@ Public Class Feature_WithDepth : Inherits TaskParent
         desc = "Show the feature points that have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
+        dst2 = runFeature(src)
 
-        dst2 = task.feat.dst2
         dst3 = src
         Dim depthCount As Integer
         For Each pt In task.featurePoints
