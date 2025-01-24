@@ -1,52 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Disparity_GoodCells : Inherits TaskParent
-    Dim grid As New Grid_Basics
-    Public gridList As New List(Of cv.Rect)
-    Dim options As New Options_Disparity
-    Public Sub New()
-        grid.myGrid = True ' private grid
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        labels(3) = "Depth image for cells with ideal visibility"
-        task.idealDepthMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Create the grid of cells with ideal visibility"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
 
-        If task.optionsChanged Then
-            grid.inputGridSize = options.cellSize
-            grid.Run(src)
-        End If
-
-        Dim emptyRect As New cv.Rect
-        Dim goodRects As Integer
-        gridList.Clear()
-        Dim mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        For Each r In grid.gridRects
-            If task.pcSplit(2)(r).CountNonZero = r.Width * r.Height Then
-                gridList.Add(r)
-                goodRects += 1
-                mask(r).SetTo(255)
-            Else
-                gridList.Add(emptyRect)
-            End If
-        Next
-
-        mask.CopyTo(task.idealDepthMask, task.motionMask)
-        mask.SetTo(0, Not task.motionMask) ' no need to copy where there is no motion
-
-        If traceName = task.algName Then
-            dst3.SetTo(0, task.motionMask)
-            task.pointCloud.CopyTo(dst3, mask)
-            dst2 = src
-            For Each r In gridList
-                If r.Width = 0 Then Continue For
-                dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
-            Next
-            If task.heartBeat Then labels(2) = CStr(goodRects) + " grid cells have the maximum depth pixels."
-        End If
-    End Sub
-End Class
 
 
 

@@ -292,6 +292,7 @@ Public Class algorithmList
 	If algorithmName = "Depth_Holes" Then return new Depth_Holes
 	If algorithmName = "Depth_HolesOverTime" Then return new Depth_HolesOverTime
 	If algorithmName = "Depth_HolesRect" Then return new Depth_HolesRect
+	If algorithmName = "Depth_Ideal" Then return new Depth_Ideal
 	If algorithmName = "Depth_InfinityCheck" Then return new Depth_InfinityCheck
 	If algorithmName = "Depth_InRange" Then return new Depth_InRange
 	If algorithmName = "Depth_LocalMinMax_MT" Then return new Depth_LocalMinMax_MT
@@ -345,7 +346,6 @@ Public Class algorithmList
 	If algorithmName = "Dilate_Basics" Then return new Dilate_Basics
 	If algorithmName = "Dilate_Erode" Then return new Dilate_Erode
 	If algorithmName = "Dilate_OpenClose" Then return new Dilate_OpenClose
-	If algorithmName = "Disparity_GoodCells" Then return new Disparity_GoodCells
 	If algorithmName = "Distance_Background" Then return new Distance_Background
 	If algorithmName = "Distance_Basics" Then return new Distance_Basics
 	If algorithmName = "Distance_BinaryImage" Then return new Distance_BinaryImage

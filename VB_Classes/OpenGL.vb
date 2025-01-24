@@ -2207,7 +2207,7 @@ End Class
 
 
 Public Class OpenGL_DisparityTest : Inherits TaskParent
-    Dim disp As New Disparity_GoodCells
+    Dim disp As New Depth_Ideal
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         dst3 = task.pointCloud.Clone

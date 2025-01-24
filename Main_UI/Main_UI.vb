@@ -1700,6 +1700,7 @@ Public Class Main_UI
                 Dim spanWait = New TimeSpan(elapsedWaitTicks)
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
+                task.fpsCamera = fpsCamera
 
                 Dim optionsChange = task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
 

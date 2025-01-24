@@ -51,7 +51,6 @@ Derivative
 DFT
 Diff
 Dilate
-Disparity
 Distance
 Dither
 DNN
