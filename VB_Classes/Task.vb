@@ -786,26 +786,22 @@ Public Class VBtask : Implements IDisposable
             gifCreator.Run(src)
             If gifBuild Then
                 gifBuild = False
-                If gifImages.Count = 0 Then
-                    MsgBox("Collect images first and then click 'Build GIF...'")
-                Else
-                    For i = 0 To gifImages.Count - 1
-                        Dim fileName As New FileInfo(HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
-                        gifImages(i).Save(fileName.FullName)
-                    Next
+                For i = 0 To gifImages.Count - 1
+                    Dim fileName As New FileInfo(HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                    gifImages(i).Save(fileName.FullName)
+                Next
 
-                    gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(HomeDir + "GifBuilder\bin\x64\Debug\")
-                    Dim dirData = dirInfo.GetDirectories()
-                    Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
-                    If gifExe.Exists = False Then
-                        MsgBox("GifBuilder.exe was not found!")
-                    Else
-                        Dim gifProcess As New Process
-                        gifProcess.StartInfo.FileName = gifExe.FullName
-                        gifProcess.StartInfo.WorkingDirectory = HomeDir + "Temp/"
-                        gifProcess.Start()
-                    End If
+                gifImages.Clear()
+                Dim dirInfo As New DirectoryInfo(HomeDir + "GifBuilder\bin\x64\Debug\")
+                Dim dirData = dirInfo.GetDirectories()
+                Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
+                If gifExe.Exists = False Then
+                    MsgBox("GifBuilder.exe was not found!")
+                Else
+                    Dim gifProcess As New Process
+                    gifProcess.StartInfo.FileName = gifExe.FullName
+                    gifProcess.StartInfo.WorkingDirectory = HomeDir + "Temp/"
+                    gifProcess.Start()
                 End If
             End If
         End If

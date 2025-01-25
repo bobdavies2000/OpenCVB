@@ -7,15 +7,14 @@
     -   Mean Subtraction, Sharpen, or White Balance.
     -   RGBFilter is another task algorithm – run without explicit invocation.
 -   Cells with “ideal” depth are those filled with depth pixels.
-    -   See example output below showing 8x8 cells covering the depth image.
+    -   Ideal depth is clearly visible from both the left and right cameras.
+    -   See example output below showing cells covering the depth image.
 -   TreeView form was moved into the VB_Classes where the data is produced.
     -   Allowed code to be simpler in the Main_UI form.
     -   TreeView button is no longer needed in Main_UI
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/bb5d73299a9f700cd4fb75a8d1e3f4e6.gif)
-
-**Disparity_GoodCells:** *The cells marked in the lower left image have ideal depth data with 100% of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
+**![](media/1c85b62195b05f1695bd32287f38eac8.gif)Depth_Ideal :** *The cells marked in the lower left image have ideal depth data with a high percentage of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
 
 # Introduction
 

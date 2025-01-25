@@ -3,14 +3,15 @@ Imports AnimatedGif
 Module GifBuilder
     Sub Main()
         Dim strFileSize As String = ""
-        Dim imgDir As New DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory + "../../../../Temp/")
+        Dim imgDir As New DirectoryInfo(CurDir)
         Dim imgList As FileInfo() = imgDir.GetFiles("*.bmp")
         Dim imageFiles As New List(Of String)
         For Each img In imgList
             imageFiles.Add(img.FullName)
         Next
 
-        Dim outputGifPath As String = "../../../../Temp/myGif.gif"
+        MsgBox(CStr(imageFiles.Count) + " bitmap files found." + vbCrLf + "Click OK to continue.")
+        Dim outputGifPath As String = "myGif.gif"
 
         If imgList.Count = 0 Then
             MsgBox("Use the Global Option 'Create GIF of current algorithm' to create input images to GifBuilder.")
@@ -54,5 +55,6 @@ Module GifBuilder
             ' Finalize the GIF encoding (important to close the stream properly)
             encoder.Dispose()
         End Try
+        MsgBox("The myGif.gif file should be present in " + CurDir())
     End Sub
 End Module

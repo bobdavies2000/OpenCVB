@@ -1693,7 +1693,7 @@ Public Class Depth_Ideal : Inherits TaskParent
     Public Sub New()
         grid.myGrid = True ' private grid
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        labels(3) = "Depth image for cells with ideal visibility"
+        labels(3) = "Pointcloud image for cells with ideal visibility"
         task.idealDepthMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create the grid of cells with ideal visibility"
     End Sub
