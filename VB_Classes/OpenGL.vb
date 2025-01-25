@@ -691,7 +691,7 @@ Public Class OpenGL_FPolyCloud : Inherits TaskParent
     Dim fpolyPC As New FPoly_PointCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display the pointcloud after FPoly_PointCloud identifies the changes depth pixels"
     End Sub
@@ -1031,7 +1031,7 @@ Public Class OpenGL_Profile : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Dim ogl As New OpenGL_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         If standalone Then task.gOptions.setGravityUsage(False)
         ogl.oglFunction = oCase.pcPointsAlone
         labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
@@ -1081,7 +1081,7 @@ Public Class OpenGL_ProfileSweep : Inherits TaskParent
     Dim options As New Options_IMU
     Dim testCase As Integer = 0
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Test the X-, Y-, and Z-axis rotation in sequence"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

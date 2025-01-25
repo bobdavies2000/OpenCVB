@@ -4,7 +4,7 @@ Public Class Derivative_Basics : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.removeZeroEntry = False
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Compute the gradient in the Z depth and maintain the units for depth."
     End Sub
@@ -153,8 +153,8 @@ End Class
 Public Class Derivative_Sobel1 : Inherits TaskParent
     Dim deriv As New Derivative_Sobel
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Display the derivative of the selected depth dimension."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

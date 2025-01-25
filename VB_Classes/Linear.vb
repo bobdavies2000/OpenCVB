@@ -84,7 +84,7 @@ Public Class Linear_Visualize : Inherits TaskParent
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = True
 
-        'If standalone Then task.gOptions.setDisplay1()
+        'If standalone Then task.gOptions.displaydst1.checked = true
         'labels(1) = "Mask of differences > deltaZ (only last shown)"
         labels(3) = "Histograms showing the range of pointcloud differences for X, Y, and Z"
         desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
@@ -147,7 +147,7 @@ Public Class Linear_Input : Inherits TaskParent
     Public pc As cv.Mat
     Public options As New Options_LinearInput
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
 
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = True

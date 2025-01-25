@@ -5,7 +5,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
     Public mpCorrelation As New List(Of Single)
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
@@ -138,7 +138,7 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
     Dim ptRight As New List(Of cv.Point)
     Public ptlist As New List(Of cv.Point)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Find features using optical flow in both the left and right images."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

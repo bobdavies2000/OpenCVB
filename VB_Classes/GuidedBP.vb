@@ -384,8 +384,8 @@ Public Class GuidedBP_Regions : Inherits TaskParent
     Public rcMapX As New cv.Mat
     Public rcMapY As New cv.Mat
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "Click a quadrant in the left image and see it below."
         desc = "Identify the top X regions in the GuidedBP_RedCloud output"
     End Sub

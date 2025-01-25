@@ -154,7 +154,7 @@ Public Class HeatMap_Cell : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim heat As New HeatMap_Hot
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Display the heat map for the selected cell"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

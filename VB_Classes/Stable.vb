@@ -94,7 +94,7 @@ Public Class Stable_Lines : Inherits TaskParent
     Public basics As New Stable_Basics
     Dim lines as new Line_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Track the line end points found in the BGR image and keep those that are stable."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

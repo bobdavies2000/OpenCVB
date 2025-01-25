@@ -370,7 +370,7 @@ Public Class Contour_Sorted : Inherits TaskParent
     Dim options As New Options_Contours
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "", "Contours in the detected motion", "Diff output - detected motion"}
         task.gOptions.pixelDiffThreshold = 25
         desc = "Display the contours from largest to smallest in the motion output"
@@ -620,7 +620,7 @@ End Class
 Public Class Contour_RedCloudEdges : Inherits TaskParent
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."

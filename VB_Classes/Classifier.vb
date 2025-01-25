@@ -114,7 +114,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask of the neighbors to the selected cell", "RedColor_Basics output", "Classifier_Bayesian output"}
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub

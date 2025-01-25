@@ -298,7 +298,7 @@ Public Class Match_PointSlope : Inherits TaskParent
     Dim strOut1 As String
     Dim strOut2 As String
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Output of Lines_PointSlope", "Matched lines", "correlationMats"}
         desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop."
     End Sub

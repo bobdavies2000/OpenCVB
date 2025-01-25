@@ -6,7 +6,7 @@ Public Class Bin4Way_Basics : Inherits TaskParent
     Dim diff(3) As Diff_Basics
     Dim labelStr(3) As String, points(3) As cv.Point
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         For i = 0 To diff.Count - 1
             diff(i) = New Diff_Basics
@@ -207,7 +207,7 @@ Public Class Bin4Way_UnstableEdges : Inherits TaskParent
     Dim blur As New Blur_Basics
     Dim unstable As New Bin4Way_Unstable
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Find unstable pixels but remove those that are also edges."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -413,7 +413,7 @@ Public Class Bin4Way_SplitGaps : Inherits TaskParent
             diff(i) = New Diff_Basics
             mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         Next
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
         desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values"
@@ -523,7 +523,7 @@ Public Class Bin4Way_BasicsColors : Inherits TaskParent
     Dim quart As New Bin4Way_Basics
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Test Bin4Way_Basics with different src inputs."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

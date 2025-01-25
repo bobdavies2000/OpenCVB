@@ -73,7 +73,7 @@ End Class
 Public Class Horizon_FindNonZero : Inherits TaskParent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gravityVec = New linePoints(New cv.Point2f(dst2.Width / 2, 0),
                                          New cv.Point2f(dst2.Width / 2, dst2.Height))
@@ -150,7 +150,7 @@ Public Class Horizon_FindNonZeroOld : Inherits TaskParent
     Public Sub New()
         task.gOptions.setGravityUsage(False)
         task.redOptions.YRangeSlider.Value = 3
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gravityVec = New linePoints(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New linePoints(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))

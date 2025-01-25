@@ -386,7 +386,7 @@ Public Class MSER_TestExample : Inherits TaskParent
     Public Sub New()
         labels(2) = "Contour regions from MSER"
         labels(3) = "Box regions from MSER"
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Maximally Stable Extremal Regions example - still image"
         image = cv.Cv2.ImRead(task.HomeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         mser = cv.MSER.Create()

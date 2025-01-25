@@ -10,7 +10,7 @@ Public Class FPoly_Basics : Inherits TaskParent
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
@@ -244,7 +244,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
         center = New FPoly_Center
         optiBase.FindSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
                       "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
@@ -460,7 +460,7 @@ End Class
 Public Class FPoly_Stablizer : Inherits TaskParent
     Public fGrid As New FPoly_Core
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Movement amount - dot is current anchor point", "SyncImage aligned to current image - slide camera left or right",
                   "current image with distance map"}
         desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)"
@@ -507,7 +507,7 @@ Public Class FPoly_StartPoints : Inherits TaskParent
     Dim fGrid As New FPoly_Core
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 255)
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Track the feature grid points back to the last sync point"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -708,7 +708,7 @@ Public Class FPoly_WarpAffineImage : Inherits TaskParent
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -833,7 +833,7 @@ Public Class FPoly_Image : Inherits TaskParent
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FPoly_Basics"
@@ -908,7 +908,7 @@ End Class
 Public Class FPoly_ImageMask : Inherits TaskParent
     Public fImage As New FPoly_Image
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         task.gOptions.pixelDiffThreshold = 10
         desc = "Build the image mask of the differences between the current frame and resync image"
     End Sub
@@ -933,7 +933,7 @@ Public Class FPoly_PointCloud : Inherits TaskParent
     Public fMask As New FPoly_ImageMask
     Public fPolyCloud As cv.Mat
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Update changed point cloud pixels as indicated by the FPoly_ImageMask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -995,7 +995,7 @@ Public Class FPoly_Center : Inherits TaskParent
     Public fPD As fPolyData
     Dim newPoly As List(Of cv.Point2f)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Layout of feature polygons after just translation - red line is used in sine computation",
                       "Layout of the starting (white) and current (yellow) feature polygons",
                       "Layout of feature polygons after rotation and translation"}
@@ -1091,7 +1091,7 @@ Public Class FPoly_EdgeRemoval : Inherits TaskParent
     Dim fMask As New FPoly_ImageMask
     Dim edges As New Edge_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Remove edges from the FPoly_ImageMask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1117,7 +1117,7 @@ Public Class FPoly_ImageNew : Inherits TaskParent
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FPoly_Basics"
@@ -1185,8 +1185,8 @@ Public Class FPoly_LeftRight : Inherits TaskParent
     Dim leftPoly As New FPoly_Basics
     Dim rightPoly As New FPoly_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"Left image", "Right image", "FPoly output for left image", "FPoly output for right image"}
         desc = "Measure camera motion through the left and right images using FPoly"
     End Sub

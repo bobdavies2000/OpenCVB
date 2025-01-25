@@ -5,7 +5,7 @@ Imports System.IO
 '    Dim plot1D As New Plot_Histogram2D
 '    Dim histogram As New cv.Mat
 '    Public Sub New()
-'        If standaloneTest() Then task.gOptions.setDisplay1()
+'        If standaloneTest() Then task.gOptions.displaydst1.checked = true
 '        labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
 '        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
 '    End Sub

@@ -121,7 +121,7 @@ End Class
 
 Public Class ML_BasicsOld : Inherits TaskParent
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
         desc = "Predict depth from color to fill in the depth shadow areas"
     End Sub
@@ -655,7 +655,7 @@ Public Class ML_LearnRegions : Inherits TaskParent
     Dim regions As New GuidedBP_Regions
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.gOptions.setDisplay1()
+        task.gOptions.displaydst1.checked = true
         labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
         desc = "Learn region from X, Y, and grayscale for the RedCloud cells."
     End Sub

@@ -6,7 +6,7 @@ Public Class FCS_Basics : Inherits TaskParent
     Dim match As New Match_Basics
     Dim options As New Options_FCSMatch
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "The feature point of each cell."
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
@@ -120,7 +120,7 @@ Public Class FCS_Motion : Inherits TaskParent
         plot.maxScale = 100
         plot.minScale = 0
         plot.plotCount = 1
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Plot of % of cells that moved - move camera to see value."
         desc = "Highlight the motion of each feature identified in the current and previous frame"
     End Sub
@@ -179,7 +179,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         plothist.createHistogram = True
         plothist.addLabels = False
         task.gOptions.setHistogramBins(64) ' should this be an odd number.
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Using all the feature points with motion, determine any with a common direction."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -412,7 +412,7 @@ End Class
 'Public Class FCS_MatchNeighbors : Inherits TaskParent
 '    Dim fcs As New FCS_MatchDepthColor
 '    Public Sub New()
-'        If standalone Then task.gOptions.setDisplay0()
+'        If standalone Then task.gOptions.displaydst0.checked = true
 '        desc = "Track all the feature points and show their ID"
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)
@@ -445,7 +445,7 @@ End Class
 '    Dim match As New Match_Basics
 '    Dim options As New Options_FCSMatch
 '    Public Sub New()
-'        If standalone Then task.gOptions.setDisplay1()
+'        If standalone Then task.gOptions.displaydst1.checked = true
 '        labels(3) = "The age of each feature point cell."
 '        desc = "Try to improve the match count to the previous frame using correlation"
 '    End Sub
@@ -732,7 +732,7 @@ End Class
 Public Class FCS_TravelDistance : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Display the travel distance "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -850,7 +850,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
         plot.addLabels = False
         plot.removeZeroEntry = True
         plot.createHistogram = True
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         task.gOptions.setHistogramBins(20)
         desc = "Use cell depth to break down the layers in an image."
     End Sub
@@ -923,7 +923,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
     Dim dimension As Integer
     Public Sub New()
         task.gOptions.debugSyncUI.Checked = True
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         optiBase.FindSlider("KNN Dimension").Value = 6
         desc = "Can we distinguish each feature point cell with color, depth, and grid."
     End Sub
@@ -991,7 +991,7 @@ End Class
 Public Class FCS_Tracker : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "dst2 is a tracking color while dst3 is the color mean"
         desc = "Track the selected cell"
     End Sub
@@ -1201,7 +1201,7 @@ End Class
 Public Class FCS_RedCloud1 : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Output of FCS_Basics."
         desc = "Isolate FCS cells for each redCell."
     End Sub

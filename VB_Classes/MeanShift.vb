@@ -5,7 +5,7 @@ Public Class MeanShift_Basics : Inherits TaskParent
     Public trackbox As New cv.Rect
     Dim histogram As New cv.Mat
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels(2) = "Draw anywhere to start mean shift tracking."
         desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track."
     End Sub

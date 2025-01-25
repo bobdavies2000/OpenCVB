@@ -42,7 +42,7 @@ End Class
 Public Class Triangle_HullContour : Inherits TaskParent
     Dim hulls As New RedColor_Hulls
     Public Sub New()
-        task.gOptions.setDisplay1()
+        task.gOptions.displaydst1.checked = true
         labels = {"", "Selected cell", "RedColor_Basics output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub

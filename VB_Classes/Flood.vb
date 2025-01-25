@@ -21,7 +21,7 @@ End Class
 Public Class Flood_CellStatsPlot : Inherits TaskParent
     Public Sub New()
         task.redOptions.DisplayCellStats.Checked = True
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         task.gOptions.setHistogramBins(1000)
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
@@ -171,7 +171,7 @@ Public Class Flood_Motion : Inherits TaskParent
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

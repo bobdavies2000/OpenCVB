@@ -351,7 +351,7 @@ Public Class Projection_Cell : Inherits TaskParent
     Dim heatCell As New HeatMap_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         task.gOptions.unFiltered.Checked = True
         labels = {"", "Top View projection of the selected cell", "RedColor_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
         desc = "Create a top and side projection of the selected cell"
@@ -387,7 +387,7 @@ Public Class Projection_Derivative : Inherits TaskParent
     Dim heatDeriv As New HeatMap_Basics
     Dim deriv As New Derivative_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Create a top and side projection the best derivative data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

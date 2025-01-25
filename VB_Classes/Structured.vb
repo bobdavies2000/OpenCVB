@@ -152,7 +152,7 @@ End Class
 Public Class Structured_Depth : Inherits TaskParent
     Dim sliceH As New Structured_SliceH
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)"}
         desc = "Use the structured depth to enhance the depth away from the centerline."
     End Sub
@@ -422,7 +422,7 @@ Public Class Structured_TilesQuad : Inherits TaskParent
     Dim hulls As New RedColor_Hulls
     Public Sub New()
         task.gOptions.setGridSize(10)
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         labels = {"", "RedCloud cells", "Simplified depth map - CV_32FC3", "Simplified depth map with RedCloud cell colors"}
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
@@ -473,7 +473,7 @@ Public Class Structured_CountTop : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Dim counts As New List(Of Single)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub
@@ -940,7 +940,7 @@ Public Class Structured_CountSide : Inherits TaskParent
     Public Sub New()
         rotate.rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Width / 2)
         rotate.rotateAngle = -90
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub

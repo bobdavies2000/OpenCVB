@@ -4,7 +4,7 @@ Imports OpenCvSharp.XFeatures2D
 Public Class FREAK_Basics : Inherits TaskParent
     Dim orb As New ORB_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Find keypoints using FREAK algorithm"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

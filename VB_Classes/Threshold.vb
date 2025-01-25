@@ -59,8 +59,8 @@ Public Class Threshold_Definitions : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim options As New Options_ThresholdDef
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst0.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub

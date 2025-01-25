@@ -268,7 +268,7 @@ End Class
 Public Class Hist_Frustrum : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         task.gOptions.setGravityUsage(False)
         desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
@@ -712,7 +712,7 @@ Public Class Hist_CompareNumber : Inherits TaskParent
     Dim comp As New Hist_CompareGray
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standaloneTest() Then task.gOptions.displaydst1.checked = true
         plot.plotCount = 2
 
         labels = {"", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms"}
@@ -808,8 +808,8 @@ End Class
 Public Class Hist_Lab : Inherits TaskParent
     Dim hist As New Hist_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"Lab Colors ", "Lab Channel 0", "Lab Channel 1", "Lab Channel 2"}
         desc = "Create a histogram from a BGR image converted to LAB."
     End Sub
@@ -839,7 +839,7 @@ Public Class Hist_PointCloudXYZ : Inherits TaskParent
     Public plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Histogram of the X channel", "Histogram of the Y channel", "Histogram of the Z channel"}
         desc = "Show individual channel of the point cloud data as a histogram."
     End Sub

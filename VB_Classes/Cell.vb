@@ -106,8 +106,8 @@ End Class
 
 Public Class Cell_Distance : Inherits TaskParent
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
@@ -147,8 +147,8 @@ End Class
 
 Public Class Cell_Binarize : Inherits TaskParent
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Binarized image", "", "Relative gray image"}
@@ -216,7 +216,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         If standalone Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
     End Sub

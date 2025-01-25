@@ -316,18 +316,6 @@ Public Class OptionsGlobal
     Public Function getMaxDepthBar() As Integer
         Return MaxDepthBar.Value
     End Function
-    Public Sub setDisplay0()
-        displayDst0.Checked = True
-    End Sub
-    Public Sub setDisplay1()
-        displayDst1.Checked = True
-    End Sub
-    Public Function getDisplay0() As Boolean
-        Return displayDst0.Checked
-    End Function
-    Public Function getDisplay1() As Boolean
-        Return displayDst1.Checked
-    End Function
     Public Sub setHistogramBins(val As Integer)
         HistBinBar.Value = val
     End Sub

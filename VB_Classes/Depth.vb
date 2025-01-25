@@ -29,8 +29,8 @@ End Class
 
 Public Class Depth_Display : Inherits TaskParent
     Public Sub New()
-        task.gOptions.setDisplay1()
-        task.gOptions.setDisplay1()
+        task.gOptions.displayDst1.Checked = True
+        task.gOptions.displayDst1.Checked = True
         labels = {"task.pcSplit(2)", "task.pointcloud", "task.depthMask", "task.noDepthMask"}
         desc = "Display the task.pcSplit(2), task.pointcloud, task.depthMask, and task.noDepthMask"
     End Sub
@@ -561,8 +561,8 @@ Public Class Depth_Holes : Inherits TaskParent
         desc = "Identify holes in the depth image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static borderSlider =optiBase.findslider("Amount of dilation of borderMask")
-        Static holeSlider =optiBase.findslider("Amount of dilation of holeMask")
+        Static borderSlider = optiBase.FindSlider("Amount of dilation of borderMask")
+        Static holeSlider = optiBase.FindSlider("Amount of dilation of holeMask")
         dst2 = task.pcSplit(2).Threshold(0.01, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         dst2 = dst2.Dilate(element, Nothing, holeSlider.Value)
         dst3 = dst2.Dilate(element, Nothing, borderSlider.Value)
@@ -892,7 +892,7 @@ Public Class Depth_InRange : Inherits TaskParent
     Public classCount As Integer = 1
     Public Sub New()
         labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst3 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U)
         desc = "Create the selected number of depth ranges "
     End Sub

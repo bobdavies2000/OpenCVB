@@ -273,7 +273,7 @@ Public Class LowRes_MLColor : Inherits TaskParent
     Dim ml As New ML_Basics
     Dim bounds As New LowRes_Boundaries
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
@@ -346,7 +346,7 @@ Public Class LowRes_MLColorDepth : Inherits TaskParent
     Dim ml As New ML_Basics
     Dim bounds As New LowRes_Boundaries
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
@@ -556,7 +556,7 @@ Public Class LowRes_MeasureValidate : Inherits TaskParent
     Dim measure As New LowRes_MeasureMotion
     Public Sub New()
         task.gOptions.setPixelDifference(50)
-        task.gOptions.setDisplay1()
+        task.gOptions.displayDst1.Checked = True
         labels(1) = "Every pixel is slightly different except where motion is detected."
         labels(3) = "Differences are individual pixels - not significant. " +
                     "Contrast this with BGSubtract."

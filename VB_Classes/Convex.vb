@@ -111,7 +111,7 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
     Dim convex As New Convex_RedCloud
     Dim contours As New Contour_Largest
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedColor_Basics"}
         desc = "Find the convexityDefects in the selected RedCloud cell"
     End Sub

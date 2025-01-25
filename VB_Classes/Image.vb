@@ -61,7 +61,7 @@ End Class
 Public Class Image_RedCloudColor : Inherits TaskParent
     Public images As New Image_Series
     Public Sub New()
-        task.gOptions.setDisplay1()
+        task.gOptions.displaydst1.checked = true
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -86,8 +86,8 @@ Public Class Image_CellStats : Inherits TaskParent
     Dim stats As New Cell_Basics
     Public Sub New()
         images.images.images.options.imageSeries = False
-        If standalone Then task.gOptions.setDisplay0()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst0.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Display the statistics for the selected cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -117,7 +117,7 @@ Public Class Image_MSER : Inherits TaskParent
     Dim core As New MSER_Detect
     Dim options As New Options_Images
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         optiBase.FindSlider("MSER Min Area").Value = 15
         optiBase.FindSlider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."

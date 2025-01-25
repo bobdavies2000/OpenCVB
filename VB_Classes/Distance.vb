@@ -182,7 +182,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
     Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
     Dim lastrcList As New List(Of rcData)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         task.redOptions.HistBinBar3D.Value = 5
         labels(1) = "3D Histogram distance for each of the cells at left"
         desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
@@ -271,7 +271,7 @@ Public Class Distance_BinaryImage : Inherits TaskParent
     Dim binary As New Binarize_Simple
     Dim distance As New Distance_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Measure the fragmentation of a binary image by using the distance transform"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

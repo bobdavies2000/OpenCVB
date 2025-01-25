@@ -126,8 +126,8 @@ End Class
 Public Class LeftRight_Markers : Inherits TaskParent
     Dim redView As New LeftRight_Reduction
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = true
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}

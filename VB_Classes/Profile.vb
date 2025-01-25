@@ -138,7 +138,7 @@ Public Class Profile_Derivative : Inherits TaskParent
     Public sides As New Profile_Basics
     Dim saveTrueText As New List(Of TrueText)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
@@ -235,7 +235,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
     Dim peakRotation As Integer
     Public Sub New()
         task.gOptions.setGravityUsage(False)
-        task.gOptions.setDisplay1()
+        task.gOptions.displaydst1.checked = true
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -336,7 +336,7 @@ Public Class Profile_Kalman : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(12 - 1)
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
         desc = "Use Kalman to smooth the results of the contour key points"
     End Sub

@@ -123,7 +123,7 @@ End Class
 Public Class Boundary_RemovedRects : Inherits TaskParent
     Public bRects As New Boundary_Rectangles
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Build the boundaries for rcList and remove interior rectangles"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

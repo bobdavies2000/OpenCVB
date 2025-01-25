@@ -159,8 +159,8 @@ Public Class Color8U_KMeans : Inherits TaskParent
     Public km2 As New KMeans_Basics
     Public colorFmt As New Color_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standaloneTest() Then task.gOptions.displaydst1.checked = true
+        If standaloneTest() Then task.gOptions.displaydst1.checked = true
         labels(0) = "Recombined channels in other images."
         desc = "Run KMeans on each of the 3 color channels"
     End Sub

@@ -81,7 +81,7 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
     Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
     Dim options As New Options_ROI
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "", "Area of Interest", ""}
         dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         task.gOptions.pixelDiffThreshold = 30

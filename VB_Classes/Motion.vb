@@ -315,7 +315,7 @@ Public Class Motion_Intersect : Inherits TaskParent
     Dim minCount = 4
     Dim reconstructedRGB As Integer
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
         desc = "Track the max rectangle that covers all the motion until there is no motion in it."
@@ -838,7 +838,7 @@ Public Class Motion_CenterLeftRight : Inherits TaskParent
     Dim leftC As New Motion_CenterRect
     Dim rightC As New Motion_CenterRect
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Calculate translation and rotation for both left and right images"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

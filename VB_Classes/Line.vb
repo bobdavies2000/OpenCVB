@@ -620,7 +620,7 @@ Public Class Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Dim lines As New Line_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "", "Lines for the current color class", "Color Class input"}
         desc = "Review lines in all the different color classes"
     End Sub
@@ -1241,7 +1241,7 @@ Public Class Line_PointSlope : Inherits TaskParent
     Const searchCount As Integer = 100
     Public Sub New()
         knn.options.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
@@ -1422,7 +1422,7 @@ End Class
 Public Class Line_Info : Inherits TaskParent
     Public lpInput As New List(Of linePoints)
     Public Sub New()
-        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.displaydst1.checked = true
         labels(2) = "Click on the oversized line to get details about the line"
         labels(3) = "Details from the point cloud for the selected line"
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
