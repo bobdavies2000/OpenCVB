@@ -3,9 +3,11 @@ Imports System.Runtime.InteropServices
 Public Class RedMask_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public mdList As New List(Of maskData)
+    Dim mask255 As cv.Mat
     Public Sub New()
         cPtr = RedMask_Open()
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        mask255 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

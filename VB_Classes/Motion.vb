@@ -1074,3 +1074,31 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+Public Class Motion_RightView : Inherits TaskParent
+    Public measure As New LowRes_MeasureMotion
+    Dim motion As New Motion_Basics
+    Public rightView As cv.Mat
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Create motion mask for the right view image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        measure.Run(task.rightView)
+        rightView = measure.dst3.Clone
+        labels(2) = measure.labels(2)
+
+        dst2.SetTo(0)
+        If measure.motionDetected Then
+            For Each roi In measure.motionRects
+                dst2(roi).SetTo(255)
+            Next
+        End If
+        dst3 = task.rightView
+    End Sub
+End Class

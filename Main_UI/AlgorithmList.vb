@@ -1124,6 +1124,7 @@ Public Class algorithmList
 	If algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
 	If algorithmName = "Motion_PointCloud" Then return new Motion_PointCloud
 	If algorithmName = "Motion_RectTest" Then return new Motion_RectTest
+	If algorithmName = "Motion_RightView" Then return new Motion_RightView
 	If algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
 	If algorithmName = "Motion_TopFeatureFail" Then return new Motion_TopFeatureFail
 	If algorithmName = "Motion_TopFeatures" Then return new Motion_TopFeatures
