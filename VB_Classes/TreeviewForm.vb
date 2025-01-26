@@ -88,7 +88,9 @@ Public Class TreeviewForm
     End Class
     Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         Dim algorithm_ms = New List(Of Single)(task.algorithm_ms)
-        If task.displayObjectName = task.algName Then
+        Static saveCount As Integer
+        If task.callTrace.Count <> saveCount Then
+            saveCount = task.callTrace.Count
             updateTree(New List(Of String)(task.callTrace))
         End If
 

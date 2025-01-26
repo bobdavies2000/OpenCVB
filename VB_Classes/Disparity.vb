@@ -1,30 +1,27 @@
-﻿Imports System.Web.UI
-Imports cv = OpenCvSharp
-
+﻿Imports cv = OpenCvSharp
 Public Class Disparity_Basics : Inherits TaskParent
     Public correlations As New List(Of Single), means As New List(Of Single), stdevs As New List(Of Single)
     Public searchRect As cv.Rect, rect As cv.Rect
     Public bestCorrelation As Single, MeanDiff As Single, StdevDiff As Single
+    Public leftView As cv.Mat, rightView As cv.Mat
     Public Sub New()
+        If Math.Abs(task.workingRes.Width - 672) < 10 Then task.gOptions.LineWidth.Value = 2
         labels(2) = "Select an ideal depth cell to find its match in the right view."
         desc = "Given an ideal depth cell, find the match in the right view image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView
-        Dim firstRect As cv.Rect
-        For Each r In task.ideal.gridList
-            If r.Width = 0 Then Continue For
-            dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
-            If firstRect.Width = 0 Or firstRect.X = 0 Then firstRect = r
+        Dim leftInput As cv.Mat, rightInput As cv.Mat
+        If leftView Is Nothing Then leftInput = task.leftView Else leftInput = leftView
+        If rightView Is Nothing Then rightInput = task.rightView Else rightInput = rightView
+
+        dst2 = leftInput
+        For Each r In task.ideal.gridRects
+            dst2.Rectangle(r, 255, task.lineWidth)
         Next
 
-        Dim val = task.ideal.grid.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        rect = task.ideal.grid.gridRects(val)
-        If rect.X = 0 Then rect = firstRect
-        dst2.Rectangle(rect, task.lineWidth, task.HighlightColor)
-
-        rect.Width = 32
-        rect.Height = 32 ' to improve accuracy.
+        Dim val = task.ideal.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        rect = task.ideal.gridRectsAll(val)
+        dst2.Rectangle(rect, 255, task.lineWidth + 1)
 
         Dim correlation As New cv.Mat
         Dim opt = cv.TemplateMatchModes.CCoeffNormed
@@ -35,41 +32,42 @@ Public Class Disparity_Basics : Inherits TaskParent
         Dim meanT As Single, stdevT As Single, mean As Single, stdev As Single
         rect = ValidateRect(rect)
         cv.Cv2.MeanStdDev(dst2(rect), meanT, stdevT)
-        dst3 = task.rightView.Clone
+        dst3 = rightInput.Clone
         Dim rr = rect
-        Dim pcCorrs As New List(Of Single), maxPCcorr As Single
-        For i = 1 To rr.X
+        Dim maxDisparity As Integer = 64
+        For i = 1 To maxDisparity
             rr.X -= 1
+            If rr.X = 0 Then Exit For
+            If dst3(rr).CountNonZero = 0 Then Continue For
             cv.Cv2.MeanStdDev(dst3(rect), mean, stdev)
             means.Add(Math.Abs(mean - meanT))
             stdevs.Add(Math.Abs(stdev - stdevT))
             cv.Cv2.MatchTemplate(dst2(rect), dst3(rr), correlation, opt)
             correlations.Add(correlation.Get(Of Single)(0, 0))
             cv.Cv2.MatchTemplate(task.pcSplit(2)(rect), task.pcSplit(2)(rr), correlation, opt)
-            pcCorrs.Add(correlation.Get(Of Single)(0, 0))
         Next
-        bestCorrelation = correlations.Max
-        MeanDiff = means.Min
-        StdevDiff = stdevs.Min
-
-        searchRect = New cv.Rect(0, rect.Y, rect.X + task.idealCellSize, task.idealCellSize)
-
-        dst3.Rectangle(searchRect, task.lineWidth, task.HighlightColor)
-        If standalone Then
-            Dim index = correlations.IndexOf(bestCorrelation)
-            rr = New cv.Rect(rect.X - index, rect.Y, task.idealCellSize, task.idealCellSize)
-            dst3.Rectangle(rr, 255, task.lineWidth)
-
-            MeanDiff = means(index)
-            StdevDiff = stdevs(index)
-            maxPCcorr = pcCorrs(index)
+        If correlations.Count = 0 Then
+            labels(2) = "The selected cell has no data - skipping..."
+            Exit Sub
         End If
+        bestCorrelation = correlations.Max
+
+        searchRect = New cv.Rect(rect.X - maxDisparity, rect.Y,
+                                 rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
+
+        dst3.Rectangle(searchRect, 255, task.lineWidth)
+        Dim index = correlations.IndexOf(bestCorrelation)
+        rr = New cv.Rect(rect.X - index, rect.Y, rect.Width, rect.Height)
+        dst3.Rectangle(rr, 255, task.lineWidth + 1)
+
+        MeanDiff = means(index)
+        StdevDiff = stdevs(index)
 
         If task.heartBeat Then
             labels(3) = "Max correlation = " + Format(bestCorrelation, fmt3) + "  " +
-                        "Min mean difference = " + Format(MeanDiff, fmt3) + "  " +
-                        "Min stdev difference = " + Format(StdevDiff, fmt3) + "  " +
-                        "Max PC correlation = " + Format(maxPCcorr, fmt3)
+                        "Pixel disparity = " + CStr(index) + "  " +
+                        "Mean difference at Max correlation = " + Format(MeanDiff, fmt3) + "  " +
+                        "Stdev difference at Max correlation = " + Format(StdevDiff, fmt3)
         End If
     End Sub
 End Class
@@ -96,7 +94,11 @@ Public Class Disparity_MatchMean : Inherits TaskParent
         r.X = rect.X - index
 
         dst3.Rectangle(r, 255, task.lineWidth)
-        labels(3) = disparity.labels(3)
+        If task.heartBeat Then
+            labels(3) = "Correlation at best Mean = " + Format(disparity.bestCorrelation, fmt3) + "  " +
+                        "Mean difference = " + Format(disparity.MeanDiff, fmt3) + "  " +
+                        "Stdev difference at best mean = " + Format(disparity.StdevDiff, fmt3)
+        End If
     End Sub
 End Class
 
@@ -121,35 +123,11 @@ Public Class Disparity_MatchStdev : Inherits TaskParent
         r.X = rect.X - index
 
         dst3.Rectangle(r, 255, task.lineWidth)
-        labels(3) = disparity.labels(3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Disparity_SearchRect : Inherits TaskParent
-    Dim match As New Match_Basics
-    Public Sub New()
-        task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        desc = "Given an ideal depth cell, find the match in the right view image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim val = task.ideal.grid.gridMap32S.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        dst2 = task.leftView
-        Dim rect = task.ideal.grid.gridRects(val)
-        dst2.Rectangle(rect, task.lineWidth, task.HighlightColor)
-
-        match.template = dst2(rect)
-        match.searchRect = New cv.Rect(0, rect.Y, rect.X + rect.Width, rect.Height)
-        match.Run(task.rightView)
-        dst3 = task.rightView
-        dst3.Rectangle(match.matchRect, 255, task.lineWidth)
-        labels(3) = "Correlation = " + Format(match.correlation, fmt3)
+        If task.heartBeat Then
+            labels(3) = "Correlation at best Stdev = " + Format(disparity.bestCorrelation, fmt3) + "  " +
+                        "Mean difference at Stdev mean = " + Format(disparity.MeanDiff, fmt3) + "  " +
+                        "Stdev difference = " + Format(disparity.StdevDiff, fmt3)
+        End If
     End Sub
 End Class
 
@@ -243,3 +221,97 @@ End Class
 '        SetTrueText(strOut, New cv.Point(0, dst2.Height / 3), 3)
 '    End Sub
 'End Class
+
+
+
+
+
+
+
+Public Class Disparity_Color8u : Inherits TaskParent
+    Dim color8u As New Color8U_LeftRight
+    Dim disparity As New Disparity_Basics
+    Public Sub New()
+        desc = "Measure the impact of the color8u transforms on the ideal depth cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        color8u.Run(src)
+
+        disparity.leftView = color8u.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        disparity.rightView = color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        disparity.Run(color8u.dst2)
+        dst2 = disparity.dst2
+        dst3 = disparity.dst3
+        labels = disparity.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Disparity_SearchRect : Inherits TaskParent
+    Dim match As New Match_Basics
+    Public Sub New()
+        task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        desc = "Given an ideal depth cell, find the match in the right view image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView
+        For Each r In task.ideal.gridRects
+            If r.Height >= 8 Then dst2.Rectangle(r, 255, task.lineWidth)
+        Next
+        Dim val = task.ideal.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim rect = task.ideal.gridRectsAll(val)
+
+        match.template = dst2(rect)
+        Dim maxDisparity As Integer = 128
+        match.searchRect = New cv.Rect(Math.Max(0, rect.X - maxDisparity), rect.Y,
+                                 rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
+        match.Run(task.rightView)
+        dst3 = task.rightView
+        If match.searchRect.Height >= 8 Then
+            dst2.Rectangle(rect, 255, task.lineWidth)
+            dst3.Rectangle(match.searchRect, 255, task.lineWidth)
+            dst3.Rectangle(match.matchRect, 255, task.lineWidth + 1)
+        Else
+            dst2(rect).CopyTo(dst3(match.matchRect))
+            dst2.Rectangle(rect, 255, task.lineWidth)
+        End If
+        labels(3) = "Correlation = " + Format(match.correlation, fmt3) + " with disparity = " +
+                     CStr(rect.X - match.matchRect.X) + " pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Disparity_Features : Inherits TaskParent
+    Dim featNo As New Feature_NoMotion
+    Public Sub New()
+        optiBase.findRadio("FAST Features").Checked = True
+        optiBase.FindSlider("Disparity Cell Width").Value = 8
+        optiBase.FindSlider("Disparity Cell Height").Value = 8
+        desc = "Use features in ideal depth regions to confirm depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        featNo.Run(task.leftView)
+        dst2 = featNo.dst3.Clone
+        labels(2) = featNo.labels(2)
+
+        'For Each r In task.ideal.gridRects
+        '    dst2.Rectangle(r, 255, task.lineWidth)
+        'Next
+
+        featNo.Run(task.rightView)
+        dst3 = featNo.dst3
+        labels(3) = featNo.labels(2)
+    End Sub
+End Class

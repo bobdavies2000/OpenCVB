@@ -199,6 +199,7 @@ Public Class algorithmList
 	If algorithmName = "Color8U_Hue" Then return new Color8U_Hue
 	If algorithmName = "Color8U_InRange" Then return new Color8U_InRange
 	If algorithmName = "Color8U_KMeans" Then return new Color8U_KMeans
+	If algorithmName = "Color8U_LeftRight" Then return new Color8U_LeftRight
 	If algorithmName = "Color8U_MotionFiltered" Then return new Color8U_MotionFiltered
 	If algorithmName = "Color8U_RedHue" Then return new Color8U_RedHue
 	If algorithmName = "Color8U_Smoothing" Then return new Color8U_Smoothing
@@ -347,6 +348,8 @@ Public Class algorithmList
 	If algorithmName = "Dilate_Erode" Then return new Dilate_Erode
 	If algorithmName = "Dilate_OpenClose" Then return new Dilate_OpenClose
 	If algorithmName = "Disparity_Basics" Then return new Disparity_Basics
+	If algorithmName = "Disparity_Color8u" Then return new Disparity_Color8u
+	If algorithmName = "Disparity_Features" Then return new Disparity_Features
 	If algorithmName = "Disparity_MatchMean" Then return new Disparity_MatchMean
 	If algorithmName = "Disparity_MatchStdev" Then return new Disparity_MatchStdev
 	If algorithmName = "Disparity_SearchRect" Then return new Disparity_SearchRect
@@ -498,6 +501,7 @@ Public Class algorithmList
 	If algorithmName = "Feature_LucasKanade" Then return new Feature_LucasKanade
 	If algorithmName = "Feature_Matching" Then return new Feature_Matching
 	If algorithmName = "Feature_Methods" Then return new Feature_Methods
+	If algorithmName = "Feature_NoMotion" Then return new Feature_NoMotion
 	If algorithmName = "Feature_NoMotionTest" Then return new Feature_NoMotionTest
 	If algorithmName = "Feature_Points" Then return new Feature_Points
 	If algorithmName = "Feature_PointTracker" Then return new Feature_PointTracker

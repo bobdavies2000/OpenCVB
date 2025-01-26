@@ -1022,3 +1022,34 @@ Public Class Feature_GridPoints : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+Public Class Feature_NoMotion : Inherits TaskParent
+    Public options As New Options_Features
+    Dim method As New Feature_Methods
+    Public featurePoints As New List(Of cv.Point)
+    Public Sub New()
+        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find good features to track in a BGR image using the motion mask+"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+        dst2 = src.Clone
+
+        method.Run(src)
+
+        featurePoints = New List(Of cv.Point)(method.featurePoints)
+
+        dst3.SetTo(0)
+        For Each pt In featurePoints
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+        Next
+
+        labels(2) = method.labels(2)
+    End Sub
+End Class

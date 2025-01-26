@@ -5540,31 +5540,6 @@ End Class
 
 
 
-Public Class Options_Grid : Inherits OptionParent
-    Public desiredFPS As Integer = 2
-    Public width As Integer = 32
-    Public height As Integer = 32
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Desired FPS rate", 1, 10, desiredFPS)
-            sliders.setupTrackBar("Grid Cell Width", 1, task.cols, width)
-            sliders.setupTrackBar("Grid Cell Height", 1, task.rows, height)
-        End If
-    End Sub
-    Public Sub RunOpt()
-        Static widthSlider = FindSlider("Grid Cell Width")
-        Static heightSlider = FindSlider("Grid Cell Height")
-        Static fpsSlider = FindSlider("Desired FPS rate")
-        desiredFPS = fpsSlider.value
-        width = widthSlider.value
-        height = heightSlider.value
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Options_Histogram : Inherits OptionParent
     Public minGray As Integer = 50
@@ -7980,17 +7955,44 @@ End Class
 
 
 
-Public Class Options_Disparity : Inherits OptionParent
-    Public cellSize As Integer = 8
+
+Public Class Options_Grid : Inherits OptionParent
+    Public width As Integer = 32
+    Public height As Integer = 8
     Public Sub New()
-        If task.workingRes.Width = 1280 Then cellSize = 16
-        If task.workingRes.Width = 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Disparity Cell Size", 1, 100, cellSize)
+            sliders.setupTrackBar("Grid Cell Width", 1, task.cols, width)
+            sliders.setupTrackBar("Grid Cell Height", 1, task.rows, height)
         End If
     End Sub
     Public Sub RunOpt()
-        Static cellSlider = FindSlider("Disparity Cell Size")
-        cellSize = cellSlider.value
+        Static widthSlider = FindSlider("Grid Cell Width")
+        Static heightSlider = FindSlider("Grid Cell Height")
+        width = widthSlider.value
+        height = heightSlider.value
+    End Sub
+End Class
+
+
+
+
+Public Class Options_IdealSize : Inherits OptionParent
+    Public width As Integer = 64
+    Public height As Integer = 16
+    Public depthThreshold As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Disparity Cell Width", 1, 100, width)
+            sliders.setupTrackBar("Disparity Cell Height", 1, 100, height)
+            sliders.setupTrackBar("Disparity Depth Threshold", 1, 100, 90)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static wSlider = FindSlider("Disparity Cell Width")
+        Static hSlider = FindSlider("Disparity Cell Height")
+        Static depthSlider = FindSlider("Disparity Depth Threshold")
+        width = wSlider.value
+        height = hSlider.value
+        depthThreshold = depthSlider.value / 100
     End Sub
 End Class

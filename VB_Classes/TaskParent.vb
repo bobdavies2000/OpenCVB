@@ -613,6 +613,12 @@ Public Class TaskParent : Implements IDisposable
         task.feat.Run(src)
         Return task.feat.dst2
     End Function
+    Public Function runFeature(src As cv.Mat, ByRef labels As String) As cv.Mat
+        If task.feat Is Nothing Then task.feat = New Feature_Basics
+        task.feat.Run(src)
+        labels = task.feat.labels(2)
+        Return task.feat.dst2
+    End Function
     Public Sub runLines(src As cv.Mat)
         If task.lines Is Nothing Then task.lines = New Line_Basics
         task.lines.Run(src)

@@ -1442,15 +1442,6 @@ public:
 	Options_Gradient() {
 	}
 };
-class Options_Grid {
-public:
-	int desiredFPS =  2;
-	int width =  32;
-	int height =  32;
-	void RunOpt() {}
-	Options_Grid() {
-	}
-};
 class Options_Histogram {
 public:
 	int minGray =  50;
@@ -2179,10 +2170,19 @@ public:
 	Options_Features() {
 	}
 };
-class Options_Disparity {
+class Options_Grid {
 public:
-	int cellSize =  8;
+	int width =  32;
+	int height =  8;
 	void RunOpt() {}
-	Options_Disparity() {
+	Options_Grid() {
+	}
+};
+class Options_IdealSize {
+public:
+	int width =  64;
+	int height =  16;
+	void RunOpt() {}
+	Options_IdealSize() {
 	}
 };

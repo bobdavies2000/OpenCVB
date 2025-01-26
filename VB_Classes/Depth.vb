@@ -1688,41 +1688,46 @@ End Class
 
 
 Public Class Depth_Ideal : Inherits TaskParent
-    Public grid As New Grid_Basics
-    Public gridList As New List(Of cv.Rect)
+    Public grid As New Grid_Rectangles
+    Public gridRects As New List(Of cv.Rect)
+    Public gridRectsAll(0) As cv.Rect
+    Public options As New Options_IdealSize
     Public Sub New()
-        grid.myGrid = True ' private grid
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         labels(3) = "Pointcloud image for cells with ideal visibility"
         task.idealDepthMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create the grid of cells with ideal visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
         If task.optionsChanged Then grid.Run(src)
 
         Dim emptyRect As New cv.Rect
         Dim goodRects As Integer
-        gridList.Clear()
-        Dim mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        For Each r In grid.gridRects
-            If task.pcSplit(2)(r).CountNonZero >= 0.75 * r.Width * r.Height Then
-                gridList.Add(r)
+        gridRects.Clear()
+        If task.heartBeatLT Or gridRectsAll.Count <> grid.gridRects.Count Then
+            ReDim gridRectsAll(grid.gridRects.Count - 1)
+        End If
+        Dim w = options.width, h = options.height
+        For i = 0 To grid.gridRects.Count - 1
+            Dim r = grid.gridRects(i)
+            gridRectsAll(i) = r
+            If r.X = 0 Then Continue For ' it is unlikely that the left-hugging rect could be matched.
+            If task.pcSplit(2)(r).CountNonZero >= options.depthThreshold * w * h Then
+                gridRects.Add(r)
                 goodRects += 1
-                mask(r).SetTo(255)
-            Else
-                gridList.Add(emptyRect)
             End If
         Next
 
-        mask.CopyTo(task.idealDepthMask, task.motionMask)
-        mask.SetTo(0, Not task.motionMask) ' no need to copy where there is no motion
+        grid.gridMask.CopyTo(task.idealDepthMask, task.motionMask)
+        grid.gridMask.SetTo(0, Not task.motionMask) ' no need to copy where there is no motion
 
-        If traceName = task.algName Or standaloneTest() Then
+        If standaloneTest() Then
             dst3.SetTo(0, task.motionMask)
-            task.pointCloud.CopyTo(dst3, mask)
+            task.pointCloud.CopyTo(dst3, grid.gridMask)
             dst2 = src
-            For Each r In gridList
-                If r.Width = 0 Then Continue For
+            For Each r In gridRects
                 dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
             Next
             If task.heartBeat Then labels(2) = CStr(goodRects) + " grid cells have the maximum depth pixels."

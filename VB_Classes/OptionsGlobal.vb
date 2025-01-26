@@ -65,7 +65,6 @@ Public Class OptionsGlobal
 
         ShowAllOptions.Checked = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
 
-        task.idealCellSize = 32
         task.DotSize = 1
         task.cvFontThickness = 1
         task.fPointMinDistance = 10
