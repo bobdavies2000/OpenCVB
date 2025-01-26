@@ -2,8 +2,9 @@
 Public Class Disparity_Basics : Inherits TaskParent
     Public correlations As New List(Of Single), means As New List(Of Single), stdevs As New List(Of Single)
     Public searchRect As cv.Rect, rect As cv.Rect
+    Public resultRect As cv.Rect
     Public bestCorrelation As Single, MeanDiff As Single, StdevDiff As Single
-    Public leftView As cv.Mat, rightView As cv.Mat
+    Public rightView As cv.Mat
     Public Sub New()
         If Math.Abs(task.workingRes.Width - 672) < 10 Then task.gOptions.LineWidth.Value = 2
         labels(2) = "Select an ideal depth cell to find its match in the right view."
@@ -11,8 +12,13 @@ Public Class Disparity_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim leftInput As cv.Mat, rightInput As cv.Mat
-        If leftView Is Nothing Then leftInput = task.leftView Else leftInput = leftView
-        If rightView Is Nothing Then rightInput = task.rightView Else rightInput = rightView
+        If rightView Is Nothing Then
+            leftInput = task.leftView 
+            rightInput = task.rightView
+        Else
+            rightInput = rightView
+            leftInput = src
+        End If
 
         dst2 = leftInput
         For Each r In task.ideal.gridRects
@@ -32,12 +38,13 @@ Public Class Disparity_Basics : Inherits TaskParent
         Dim meanT As Single, stdevT As Single, mean As Single, stdev As Single
         rect = ValidateRect(rect)
         cv.Cv2.MeanStdDev(dst2(rect), meanT, stdevT)
+
         dst3 = rightInput.Clone
         Dim rr = rect
-        Dim maxDisparity As Integer = 64
+        Dim maxDisparity As Integer = 128
         For i = 1 To maxDisparity
             rr.X -= 1
-            If rr.X = 0 Then Exit For
+            If rr.X <= 0 Then Exit For
             If dst3(rr).CountNonZero = 0 Then Continue For
             cv.Cv2.MeanStdDev(dst3(rect), mean, stdev)
             means.Add(Math.Abs(mean - meanT))
@@ -57,8 +64,8 @@ Public Class Disparity_Basics : Inherits TaskParent
 
         dst3.Rectangle(searchRect, 255, task.lineWidth)
         Dim index = correlations.IndexOf(bestCorrelation)
-        rr = New cv.Rect(rect.X - index, rect.Y, rect.Width, rect.Height)
-        dst3.Rectangle(rr, 255, task.lineWidth + 1)
+        resultRect = New cv.Rect(rect.X - index, rect.Y, rect.Width, rect.Height)
+        dst3.Rectangle(resultRect, 255, task.lineWidth + 1)
 
         MeanDiff = means(index)
         StdevDiff = stdevs(index)
@@ -237,9 +244,9 @@ Public Class Disparity_Color8u : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8u.Run(src)
 
-        disparity.leftView = color8u.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = color8u.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         disparity.rightView = color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        disparity.Run(color8u.dst2)
+        disparity.Run(dst1)
         dst2 = disparity.dst2
         dst3 = disparity.dst3
         labels = disparity.labels
@@ -296,14 +303,14 @@ End Class
 Public Class Disparity_Features : Inherits TaskParent
     Dim featNo As New Feature_NoMotion
     Public Sub New()
-        optiBase.findRadio("FAST Features").Checked = True
+        optiBase.findRadio("GoodFeatures (ShiTomasi) grid").Checked = True
         optiBase.FindSlider("Disparity Cell Width").Value = 8
         optiBase.FindSlider("Disparity Cell Height").Value = 8
         desc = "Use features in ideal depth regions to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         featNo.Run(task.leftView)
-        dst2 = featNo.dst3.Clone
+        dst2 = featNo.dst2.Clone
         labels(2) = featNo.labels(2)
 
         'For Each r In task.ideal.gridRects
@@ -311,7 +318,121 @@ Public Class Disparity_Features : Inherits TaskParent
         'Next
 
         featNo.Run(task.rightView)
-        dst3 = featNo.dst3
+        dst3 = featNo.dst2
         labels(3) = featNo.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Disparity_Edges : Inherits TaskParent
+    Dim edges As New EdgeDraw_Basics
+    Dim disparity As New Disparity_Basics
+    Public Sub New()
+        desc = "Use features in ideal depth regions to confirm depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.leftView)
+        dst2 = edges.dst2.Clone
+
+        edges.Run(task.rightView)
+        dst3 = edges.dst2.Clone
+
+        disparity.rightView = dst3
+        disparity.Run(dst2)
+        dst2 = disparity.dst2
+        dst3 = disparity.dst3
+        labels = disparity.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Disparity_LowRes : Inherits TaskParent
+    Dim lowres As New LowRes_LeftRight
+    Dim disparity As New Disparity_Basics
+    Public Sub New()
+        task.gOptions.displayDst1.Checked = True
+        desc = "Use features in ideal depth regions to confirm depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.rightView
+        lowres.Run(src)
+        disparity.rightView = lowres.dst3
+        disparity.Run(lowres.dst2)
+        dst2 = disparity.dst2
+        dst3 = disparity.dst3
+        labels = disparity.labels
+
+        task.color.Rectangle(disparity.rect, 255, task.lineWidth)
+        dst1.Rectangle(disparity.resultRect, 255, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Disparity_Validate : Inherits TaskParent
+    Dim disparity As New Disparity_Basics
+    Public Sub New()
+        task.gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "To validate Disparity_Basics, just shift the left image right.  Should always match."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim w = dst2.Width * 9 / 10
+        Dim r1 = New cv.Rect(0, 0, w, dst2.Height)
+        Dim r2 = New cv.Rect(dst2.Width / 10, 0, w, dst2.Height)
+        dst1(r2) = task.leftView(r1)
+        disparity.rightView = dst1(r2)
+        disparity.Run(task.leftView)
+        dst2 = disparity.dst2
+        dst3 = disparity.dst3
+        labels = disparity.labels
+
+        task.color.Rectangle(disparity.rect, 255, task.lineWidth)
+        dst1.Rectangle(disparity.resultRect, 255, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Disparity_RedMask : Inherits TaskParent
+    Dim disparity As New Disparity_Basics
+    Dim leftCells As New LeftRight_RedLeftGray
+    Dim rightCells As New LeftRight_RedRightGray
+    Public Sub New()
+        task.gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "To validate Disparity_Basics, just shift the left image right.  Should always match."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.rightView
+        leftCells.Run(src)
+        rightCells.Run(src)
+
+        disparity.rightView = rightCells.dst2
+        disparity.Run(leftCells.dst2)
+        dst2 = disparity.dst2
+        dst3 = disparity.dst3
+        labels = disparity.labels
+
+        task.color.Rectangle(disparity.rect, 255, task.lineWidth)
+        dst1.Rectangle(disparity.resultRect, 255, task.lineWidth)
     End Sub
 End Class

@@ -82,3 +82,29 @@ Public Class RedMask_Basics : Inherits TaskParent
         If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class RedMask_Redraw : Inherits TaskParent
+    Public redMask As New RedMask_Basics
+    Public Sub New()
+        desc = "Redraw the image using the mean color of each cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redMask.Run(src)
+
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim color As cv.Scalar
+        Dim emptyVec As New cv.Vec3b
+        For Each md In redMask.mdList
+            Dim c = src.Get(Of cv.Vec3b)(md.maxDist.Y, md.maxDist.X)
+            color = New cv.Scalar(c.Item0, c.Item1, c.Item2)
+            dst2(md.rect).SetTo(color, md.mask)
+        Next
+        labels(2) = redMask.labels(2)
+    End Sub
+End Class
