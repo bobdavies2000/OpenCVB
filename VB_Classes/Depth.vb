@@ -1716,8 +1716,11 @@ Public Class Depth_Ideal : Inherits TaskParent
             gridRectsAll(i) = r
             If r.X = 0 Then Continue For ' it is unlikely that the left-hugging rect could be matched.
             If task.pcSplit(2)(r).CountNonZero >= options.depthThreshold * w * h Then
-                gridRects.Add(r)
-                goodRects += 1
+                Dim mm = GetMinMax(task.pcSplit(2)(r))
+                If (mm.maxVal - mm.minVal) * 100 <= options.rangeThreshold Then
+                    gridRects.Add(r)
+                    goodRects += 1
+                End If
             End If
         Next
 
@@ -1739,8 +1742,9 @@ End Class
 
 
 
-Public Class Depth_ToDisparity : Inherits TaskParent
+Public Class Depth_Disparity : Inherits TaskParent
     Public means As New List(Of Single)
+    Public mats As New Mat_4to1
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1750,28 +1754,41 @@ Public Class Depth_ToDisparity : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = task.leftView
         dst1 = task.rightView
+        mats.mat(0) = task.leftView
+        mats.mat(1) = task.rightView
         Dim depths As New List(Of Single)
         Dim camInfo = task.calibData
-        dst2 = task.ideal.dst2
-        dst3 = task.rightView.Clone
+        mats.mat(2) = task.ideal.dst2
+        mats.mat(3) = task.rightView.Clone
         For Each roi In task.ideal.gridRects
             Dim mean = task.pcSplit(2)(roi).Mean(task.depthMask(roi))
             roi.X -= camInfo.baseline * camInfo.fx / mean(0)
-            dst3.Rectangle(roi, 255, task.lineWidth)
+            mats.mat(3).Rectangle(roi, 255, task.lineWidth)
         Next
 
         If task.drawRect.Width > 0 Then
-            dst0.Rectangle(task.drawRect, 255, task.lineWidth)
-            dst1.Rectangle(task.drawRect, 255, task.lineWidth)
-            Dim rect = task.drawRect
-            Dim center = New cv.Point(rect.Width / 2, rect.Height / 2)
-            Dim depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))
+            mats.mat(0).Rectangle(task.drawRect, 255, task.lineWidth)
+            mats.mat(1).Rectangle(task.drawRect, 255, task.lineWidth)
+            Static dw As cv.Rect = task.drawRect
+            Static disparities As New List(Of Single)
+            If task.drawRect.X <> dw.X Or task.drawRect.Y <> dw.Y Then
+                disparities.Clear()
+                dw = task.drawRect
+            End If
+            Dim depth = task.pcSplit(2)(dw).Mean(task.depthMask(dw))
             If depth(0) > 0 Then
                 Dim disp = 0.12 * camInfo.fx / depth(0)
-                rect.X -= disp
-                dst1.Rectangle(rect, 255, task.lineWidth)
+                disparities.Add(disp)
+                Dim rect = dw
+                rect.X -= disparities.Average
+                mats.mat(1).Rectangle(rect, 255, task.lineWidth)
             End If
+            If disparities.Count > 20 Then disparities.RemoveAt(0)
         End If
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
     End Sub
 End Class
 
@@ -1780,13 +1797,32 @@ End Class
 
 
 
-Public Class Depth_ToDisparityValues : Inherits TaskParent
-    Dim toDisp As New Depth_ToDisparity
+Public Class Depth_DispCellPlot : Inherits TaskParent
+    Dim toDisp As New Depth_Disparity
+    Dim plot As New Plot_Histogram
     Public Sub New()
+        plot.createHistogram = True
         desc = "Reconstruction the depth using the disparity cell overlap"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         toDisp.Run(src)
+        dst2 = toDisp.mats.mat(3)
 
+        Dim index = task.ideal.grid.gridMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim roi As cv.Rect
+        If task.ideal.grid.gridRects.Count = 0 Or task.optionsChanged Then Exit Sub
+        If index = 0 Or index >= task.ideal.gridRects.Count Then
+            roi = task.ideal.gridRects(task.ideal.gridRects.Count / 2)
+            task.ClickPoint = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
+        Else
+            roi = task.ideal.gridRects(index)
+        End If
+
+        If task.heartBeat Then
+            plot.Run(task.pcSplit(2)(roi))
+            dst3 = plot.dst2
+            labels(3) = "X values vary from " + Format(plot.minRange, fmt3) +
+                        " to " + Format(plot.maxRange, fmt3)
+        End If
     End Sub
 End Class

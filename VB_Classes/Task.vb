@@ -247,7 +247,6 @@ Public Class VBtask : Implements IDisposable
     Public hFov As Single
     Public vFov As Single
     Public focalLength As Single ' distance between cameras
-    Public baseline As Single ' in meters
 
     Public algName As String
     Public cameraName As String
@@ -486,10 +485,10 @@ Public Class VBtask : Implements IDisposable
 
         gmat = New IMU_GMatrix
         grid = New Grid_Basics
-        ideal = New Depth_Ideal
         gravityHorizon = New Gravity_Horizon
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
+        ideal = New Depth_Ideal
         colorizer = New Depth_Palette
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
@@ -539,7 +538,6 @@ Public Class VBtask : Implements IDisposable
         vFov = vFOVangles(parms.cameraIndex)  ' these are default values in case the calibration data is unavailable
         hFov = hFOVangles(parms.cameraIndex)
         focalLength = focalLengths(parms.cameraIndex)
-        baseline = baseLines(parms.cameraIndex)
 
         myStopWatch = Stopwatch.StartNew()
         optionsChanged = True

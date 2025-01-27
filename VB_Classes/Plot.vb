@@ -484,6 +484,9 @@ Public Class Plot_Histogram : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Or createHistogram Then
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim mm = GetMinMax(src)
+            minRange = mm.minVal
+            maxRange = mm.maxVal
             ranges = {New cv.Rangef(minRange, maxRange)}
             cv.Cv2.CalcHist({src}, {0}, New cv.Mat(), histogram, 1, {task.histogramBins}, ranges)
         Else

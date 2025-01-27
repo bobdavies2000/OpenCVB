@@ -2182,7 +2182,7 @@ class Options_IdealSize {
 public:
 	int width =  8;
 	int height =  8;
-	float depthThreshold =  0.9;
+	float depthThreshold =  1;
 	void RunOpt() {}
 	Options_IdealSize() {
 	}
