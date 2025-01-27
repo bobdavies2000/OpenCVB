@@ -351,11 +351,12 @@ Public Class algorithmList
 	If algorithmName = "Disparity_Color8u" Then return new Disparity_Color8u
 	If algorithmName = "Disparity_Edges" Then return new Disparity_Edges
 	If algorithmName = "Disparity_Features" Then return new Disparity_Features
+	If algorithmName = "Disparity_Inverse" Then return new Disparity_Inverse
 	If algorithmName = "Disparity_LowRes" Then return new Disparity_LowRes
+	If algorithmName = "Disparity_Manual" Then return new Disparity_Manual
 	If algorithmName = "Disparity_MatchMean" Then return new Disparity_MatchMean
 	If algorithmName = "Disparity_MatchStdev" Then return new Disparity_MatchStdev
 	If algorithmName = "Disparity_RedMask" Then return new Disparity_RedMask
-	If algorithmName = "Disparity_SearchRect" Then return new Disparity_SearchRect
 	If algorithmName = "Disparity_Validate" Then return new Disparity_Validate
 	If algorithmName = "Distance_Background" Then return new Distance_Background
 	If algorithmName = "Distance_Basics" Then return new Distance_Basics
@@ -1121,6 +1122,7 @@ Public Class algorithmList
 	If algorithmName = "Motion_Grid_MP" Then return new Motion_Grid_MP
 	If algorithmName = "Motion_HistoryTest" Then return new Motion_HistoryTest
 	If algorithmName = "Motion_Intersect" Then return new Motion_Intersect
+	If algorithmName = "Motion_LeftRight" Then return new Motion_LeftRight
 	If algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
 	If algorithmName = "Motion_PointCloud" Then return new Motion_PointCloud
 	If algorithmName = "Motion_RectTest" Then return new Motion_RectTest

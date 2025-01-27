@@ -26,12 +26,9 @@ Public Class Motion_Basics : Inherits TaskParent
             Next
         End If
 
-        ' unusual use of task.displayobject because motion_basics is a task algorithm.
-        If standaloneTest() Or task.displayObjectName = "Diff_Basics" Then
-            diff.Run(src)
-            dst3 = diff.dst2
-        End If
-        dst2 = motionMask
+        diff.Run(src)
+        dst3 = diff.dst2
+        If standaloneTest() Then dst2 = motionMask
 
         If task.gOptions.UseMotionDepth.Checked Then
             If task.heartBeatLT Or depthRGB.Rows = 0 Then
@@ -1081,7 +1078,6 @@ End Class
 
 Public Class Motion_RightView : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
-    Dim motion As New Motion_Basics
     Public rightView As cv.Mat
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -1099,6 +1095,24 @@ Public Class Motion_RightView : Inherits TaskParent
                 dst2(roi).SetTo(255)
             Next
         End If
-        dst3 = task.rightView
+        diff.Run(task.rightView)
+        dst3 = diff.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_LeftRight : Inherits TaskParent
+    Dim rMotion As New Motion_RightView
+    Public Sub New()
+        desc = "Capture the left and right motion"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.motionBasics.dst3
+        rMotion.Run(src)
+        dst3 = rMotion.dst3
     End Sub
 End Class
