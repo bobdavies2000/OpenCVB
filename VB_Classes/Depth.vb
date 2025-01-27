@@ -1761,6 +1761,8 @@ Public Class Depth_ToDisparity : Inherits TaskParent
         Next
 
         If task.drawRect.Width > 0 Then
+            dst0.Rectangle(task.drawRect, 255, task.lineWidth)
+            dst1.Rectangle(task.drawRect, 255, task.lineWidth)
             Dim rect = task.drawRect
             Dim center = New cv.Point(rect.Width / 2, rect.Height / 2)
             Dim depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))

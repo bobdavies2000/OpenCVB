@@ -524,7 +524,7 @@ Public Class Main_UI
                 drawRect.Width = 0
                 drawRect.Height = 0
                 mouseDownPoint.X = e.X
-                mouseDownPoint.Y = e.Y - 1 ' -1 added to sync with DrawRect.
+                mouseDownPoint.Y = e.Y
             End If
         Catch ex As Exception
             Debug.WriteLine("Error in camPic_MouseDown: " + ex.Message)
@@ -536,7 +536,7 @@ Public Class Main_UI
             If activeMouseDown Then Exit Sub
             If DrawingRectangle Then
                 mouseMovePoint.X = e.X
-                mouseMovePoint.Y = e.Y - 1 ' -1 added to sync with DrawRect.
+                mouseMovePoint.Y = e.Y
                 If mouseMovePoint.X < 0 Then mouseMovePoint.X = 0
                 If mouseMovePoint.Y < 0 Then mouseMovePoint.Y = 0
                 drawRectPic = pic.Tag
@@ -1331,7 +1331,8 @@ Public Class Main_UI
         If drawRect.Width > 0 And drawRect.Height > 0 Then
             g.DrawRectangle(myWhitePen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
             If pic.Tag = 2 Then
-                g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y, drawRect.Width, drawRect.Height)
+                g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y,
+                                drawRect.Width - 1, drawRect.Height - 1)
             End If
         End If
 
