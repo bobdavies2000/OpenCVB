@@ -419,7 +419,7 @@ End Class
 
 
 
-'Z = B * f / disparity
+'Z = B * f / disparity  - we are using here: disparity = B * f / Z
 'where:
 
 ' Z Is the depth in meters
@@ -435,12 +435,27 @@ End Class
 ' The Function() relating depth To disparity Is only valid For a calibrated stereo setup.
 Public Class Disparity_Inverse : Inherits TaskParent
     Public Sub New()
+        task.drawRect = New cv.Rect(dst2.Width / 2 - 10, dst2.Height / 2 - 10, 20, 20)
         desc = "Use the depth to find the disparity"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView
+        dst3 = task.rightView
         ' assuming StereoLabs Zed 2i camera for now.
         ' disparity = B * f / depth
-        ' Dim disp = 0.12 * intri
+        Dim camInfo = task.calibData
+        If task.drawRect.Width > 0 Then
+            Dim white As New cv.Vec3b(255, 255, 255)
+            For y = 0 To task.drawRect.Height - 1
+                For x = 0 To task.drawRect.Width - 1
+                    Dim depth = task.pcSplit(2)(task.drawRect).Get(Of Single)(y, x)
+                    If depth > 0 Then
+                        Dim disp = 0.12 * camInfo.fx / depth
+                        dst3(task.drawRect).Set(Of cv.Vec3b)(y, x - disp, white)
+                    End If
+                Next
+            Next
+        End If
     End Sub
 End Class
 

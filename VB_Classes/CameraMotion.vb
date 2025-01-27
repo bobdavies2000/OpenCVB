@@ -19,8 +19,8 @@ Public Class CameraMotion_Basics : Inherits TaskParent
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        translationX = task.gOptions.DebugSliderValue ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
-        translationY = task.gOptions.DebugSliderValue ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
+        translationX = task.gOptions.DebugSlider.Value ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
+        translationY = task.gOptions.DebugSlider.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
         If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
         If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
             horizonVec = New linePoints(New cv.Point2f, New cv.Point2f(336, 0))

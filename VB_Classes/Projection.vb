@@ -284,13 +284,13 @@ Public Class Projection_Object : Inherits TaskParent
         dst3 = top.dst2
         labels(3) = top.labels(2)
 
-        Dim index = task.gOptions.debugSliderValue
+        Dim index = task.gOptions.DebugSlider.Value
         If index < top.objects.objectList.Count Then
             Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
             Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
             Dim mask = task.pointCloud.InRange(lower, upper)
 
-            Dim rc = top.objects.rcList(task.gOptions.debugSliderValue + 1) ' the biggest by default...
+            Dim rc = top.objects.rcList(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
             dst0.SetTo(0)
             dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))

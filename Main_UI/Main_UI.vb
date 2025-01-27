@@ -76,7 +76,6 @@ Public Class Main_UI
     Dim mousePicTag As Integer
     Dim mouseDownPoint As New cv.Point
     Dim mouseMovePoint As New cv.Point
-    Dim mouseGridCell As Integer
     Dim mousePoint As New cv.Point
     Dim activeMouseDown As Boolean
 
@@ -561,8 +560,7 @@ Public Class Main_UI
             mousePoint.Y = e.Y
             mousePoint *= settings.WorkingRes.Width / camPic(0).Width
 
-            XYLoc.Text = mousePoint.ToString + ", grid cell = " + CStr(mouseGridCell) +
-                             ", last click point at: " + ClickPoint.ToString
+            XYLoc.Text = mousePoint.ToString + ", last click point at: " + ClickPoint.ToString
 
         Catch ex As Exception
             Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
@@ -1709,10 +1707,8 @@ Public Class Main_UI
 
                 SyncLock mouseLock
                     If mousePoint.X < task.gridMap32S.Width And mousePoint.Y < task.gridMap32S.Height Then
-                        Try
-                            mouseGridCell = task.gridMap32S.Get(Of Integer)(mousePoint.Y, mousePoint.X)
-                        Catch ex As Exception
-                        End Try
+                        If mousePoint.X < 0 Then mousePoint.X = 0
+                        If mousePoint.Y < 0 Then mousePoint.Y = 0
                     Else
                         mousePoint = New cv.Point(0, 0)
                     End If

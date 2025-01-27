@@ -143,7 +143,7 @@ Public Class LeftRight_Markers : Inherits TaskParent
 
         ' find combinations in the left image - they are markers.
         Dim impList As New List(Of List(Of Integer))
-        Dim lineLen = task.gOptions.DebugSliderValue
+        Dim lineLen = task.gOptions.DebugSlider.Value
         For y = 0 To left.Height - 1
             Dim important As New List(Of Integer)
             Dim impCounts As New List(Of Integer)
@@ -199,7 +199,7 @@ Public Class LeftRight_Markers1 : Inherits TaskParent
 
         ' find combinations in the left image - they are markers.
         Dim impList As New List(Of List(Of Integer))
-        Dim lineLen = task.gOptions.DebugSliderValue
+        Dim lineLen = task.gOptions.DebugSlider.Value
         For y = 0 To dst2.Height - 1
             Dim important As New List(Of Integer)
             Dim impCounts As New List(Of Integer)

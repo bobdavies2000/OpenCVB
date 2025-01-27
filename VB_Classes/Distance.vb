@@ -285,6 +285,6 @@ Public Class Distance_BinaryImage : Inherits TaskParent
             distance.Run(dst2)
         End If
         dst3 = distance.dst2
-        dst1 = dst3.Threshold(task.gOptions.DebugSliderValue, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst3.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

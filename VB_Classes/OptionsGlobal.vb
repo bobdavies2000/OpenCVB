@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class OptionsGlobal
     Public maxDepth As Integer
     Public debugChecked As Boolean
-    Public DebugSliderValue As Integer
     Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
@@ -264,8 +263,7 @@ Public Class OptionsGlobal
         SaveSetting("Opencv", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
     End Sub
     Private Sub tempSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
-        TempSliderLabel.Text = CStr(DebugSlider.Value)
-        DebugSliderValue = DebugSlider.Value
+        task.optionsChanged = True
     End Sub
     Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
         task.optionsChanged = True
