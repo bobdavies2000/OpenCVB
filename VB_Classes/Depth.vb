@@ -1740,6 +1740,7 @@ End Class
 
 
 Public Class Depth_ToDisparity : Inherits TaskParent
+    Public means As New List(Of Single)
     Public Sub New()
         task.gOptions.displayDst0.Checked = True
         task.gOptions.displayDst1.Checked = True
@@ -1755,7 +1756,7 @@ Public Class Depth_ToDisparity : Inherits TaskParent
         dst3 = task.rightView.Clone
         For Each roi In task.ideal.gridRects
             Dim mean = task.pcSplit(2)(roi).Mean(task.depthMask(roi))
-            roi.X -= 0.12 * camInfo.fx / mean(0)
+            roi.X -= camInfo.baseline * camInfo.fx / mean(0)
             dst3.Rectangle(roi, 255, task.lineWidth)
         Next
 
@@ -1769,5 +1770,21 @@ Public Class Depth_ToDisparity : Inherits TaskParent
                 dst1.Rectangle(rect, 255, task.lineWidth)
             End If
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_ToDisparityValues : Inherits TaskParent
+    Dim toDisp As New Depth_ToDisparity
+    Public Sub New()
+        desc = "Reconstruction the depth using the disparity cell overlap"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        toDisp.Run(src)
+
     End Sub
 End Class

@@ -307,9 +307,9 @@ Public Class VBtask : Implements IDisposable
         Public ppy As Single
         Public fx As Single
         Public fy As Single
-        Dim v_fov As Single ' vertical field of view in degrees.
-        Dim h_fov As Single ' horizontal field of view in degrees.
-        Dim d_fov As Single ' diagonal field of view in degrees.
+        Public v_fov As Single ' vertical field of view in degrees.
+        Public h_fov As Single ' horizontal field of view in degrees.
+        Public d_fov As Single ' diagonal field of view in degrees.
     End Structure
 
     Public Structure algParms

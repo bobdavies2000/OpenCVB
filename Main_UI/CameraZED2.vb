@@ -22,10 +22,17 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         Dim camInfo As sl.CameraInformation = zed.GetCameraInformation
 
+        cameraInfo.baseline = camInfo.cameraConfiguration.calibrationParameters.Trans.X
         cameraInfo.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx
         cameraInfo.ppy = camInfo.cameraConfiguration.calibrationParameters.leftCam.cy
         cameraInfo.fx = camInfo.cameraConfiguration.calibrationParameters.leftCam.fx
         cameraInfo.fy = camInfo.cameraConfiguration.calibrationParameters.leftCam.fy
+        cameraInfo.h_fov = camInfo.cameraConfiguration.calibrationParameters.leftCam.hFOV
+        cameraInfo.v_fov = camInfo.cameraConfiguration.calibrationParameters.leftCam.vFOV
+
+        Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+        cameraInfo.fx /= ratio
+        cameraInfo.fy /= ratio
 
         Dim posTrack As New sl.PositionalTrackingParameters
         posTrack.enableAreaMemory = True
