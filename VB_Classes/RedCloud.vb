@@ -167,7 +167,7 @@ Public Class RedCloud_YZ : Inherits TaskParent
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.YZReduction.Checked = True
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build horizontal RedCloud cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -193,7 +193,7 @@ Public Class RedCloud_XZ : Inherits TaskParent
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.XZReduction.Checked = True
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build vertical RedCloud cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -219,7 +219,7 @@ Public Class RedCloud_World : Inherits TaskParent
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.rcReductionSlider.Value = 1000
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "Generated pointcloud"
         desc = "Display the output of a generated pointcloud as RedCloud cells"
     End Sub

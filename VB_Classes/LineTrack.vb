@@ -93,7 +93,7 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
     Public lines As New Line_Basics
     Public delaunay As New Delaunay_Basics
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the line regions with RedCloud"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

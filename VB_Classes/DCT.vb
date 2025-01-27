@@ -145,7 +145,7 @@ Public Class DCT_Surfaces_debug : Inherits TaskParent
     Public Sub New()
         flow.parentData = Me
         labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
-        task.gOptions.displayDst0.Checked = False
+        If standalone Then task.gOptions.displayDst0.Checked = False
         desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

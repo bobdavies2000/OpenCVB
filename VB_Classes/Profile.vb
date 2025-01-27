@@ -235,7 +235,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
     Dim peakRotation As Integer
     Public Sub New()
         task.gOptions.setGravityUsage(False)
-        task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

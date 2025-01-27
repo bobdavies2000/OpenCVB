@@ -32,7 +32,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         If task.redOptions.DisplayCellStats.Checked Then
             Static stats As Cell_Basics
             If stats Is Nothing Then
-                task.gOptions.displaydst1.checked = true
+                task.gOptions.displayDst1.Checked = True
                 stats = New Cell_Basics
             End If
             stats.Run(src)
@@ -370,8 +370,7 @@ End Class
 Public Class RedColor_FPS : Inherits TaskParent
     Dim fps As New Grid_FPS
     Public Sub New()
-        task.gOptions.displaydst1.checked = true
-        task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Display RedCloud output at a fixed frame rate"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

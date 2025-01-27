@@ -61,7 +61,7 @@ End Class
 Public Class Image_RedCloudColor : Inherits TaskParent
     Public images As New Image_Series
     Public Sub New()
-        task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -30,8 +30,8 @@ End Class
 
 Public Class Depth_Display : Inherits TaskParent
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"task.pcSplit(2)", "task.pointcloud", "task.depthMask", "task.noDepthMask"}
         desc = "Display the task.pcSplit(2), task.pointcloud, task.depthMask, and task.noDepthMask"
     End Sub
@@ -1742,8 +1742,8 @@ End Class
 Public Class Depth_ToDisparity : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()
-        task.gOptions.displayDst0.Checked = True
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Map each ideal depth cell to the inverse of its mean depth."
     End Sub

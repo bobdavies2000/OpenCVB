@@ -341,7 +341,7 @@ Public Class Disparity_LowRes : Inherits TaskParent
     Dim lowres As New LowRes_LeftRight
     Dim disparity As New Disparity_Basics
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use features in ideal depth regions to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -395,7 +395,7 @@ Public Class Disparity_RedMask : Inherits TaskParent
     Dim leftCells As New LeftRight_RedLeftGray
     Dim rightCells As New LeftRight_RedRightGray
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "To validate Disparity_Basics, just shift the left image right.  Should always match."
     End Sub
@@ -470,7 +470,7 @@ Public Class Disparity_Color8u : Inherits TaskParent
     Dim color8u As New Color8U_LeftRight
     Dim disparity As New Disparity_Basics
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         desc = "Measure the impact of the color8u transforms on the ideal depth cells."
     End Sub

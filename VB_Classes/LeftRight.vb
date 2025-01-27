@@ -269,8 +269,8 @@ Public Class LeftRight_LowRes : Inherits TaskParent
     Dim lowRes As New LowRes_LeftRight
     Public Sub New()
         task.gOptions.GridSlider.Value = 8
-        task.gOptions.displayDst0.Checked = True
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Left image at low resolution", "Right image at low resolution"}
         desc = "Get the lowRes image for the left and right views - duplicate of LowRes_LeftRight (help finding it)"
     End Sub
