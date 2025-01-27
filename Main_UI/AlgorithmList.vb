@@ -321,6 +321,7 @@ Public Class algorithmList
 	If algorithmName = "Depth_StableMinMax" Then return new Depth_StableMinMax
 	If algorithmName = "Depth_TierCount" Then return new Depth_TierCount
 	If algorithmName = "Depth_Tiers" Then return new Depth_Tiers
+	If algorithmName = "Depth_ToDisparity" Then return new Depth_ToDisparity
 	If algorithmName = "Depth_Uncertainty" Then return new Depth_Uncertainty
 	If algorithmName = "Depth_World" Then return new Depth_World
 	If algorithmName = "Depth_WorldXYMT" Then return new Depth_WorldXYMT

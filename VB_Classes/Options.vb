@@ -7977,14 +7977,16 @@ End Class
 
 
 Public Class Options_IdealSize : Inherits OptionParent
-    Public width As Integer = 64
-    Public height As Integer = 16
-    Public depthThreshold As Single
+    Public width As Integer = 8
+    Public height As Integer = 8
+    Public depthThreshold As Single = 0.9
     Public Sub New()
+        If task.dst2.Width >= 1280 Then width = 16
+        If task.dst2.Width >= 1920 Then width = 32
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Disparity Cell Width", 1, 100, width)
             sliders.setupTrackBar("Disparity Cell Height", 1, 100, height)
-            sliders.setupTrackBar("Disparity Depth Threshold", 1, 100, 90)
+            sliders.setupTrackBar("Disparity Depth Threshold", 1, 100, 100 * depthThreshold)
         End If
     End Sub
     Public Sub RunOpt()

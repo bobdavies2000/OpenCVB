@@ -6,7 +6,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Dim rcMask As cv.Mat
     Public Sub New()
         task.redOptions.rcReductionSlider.Value = 100
-        If standalone Then task.gOptions.displayDst1.Checked = True
         rcMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
@@ -18,8 +17,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
         prep.Run(src)
         redMask.Run(prep.dst2 And redColorMask)
         Dim mm = GetMinMax(redMask.dst2)
-        dst1 = ShowPalette(255 * redMask.dst2 / mm.maxVal)
-        dst1.SetTo(0, task.noDepthMask)
+        dst3 = ShowPalette(255 * redMask.dst2 / mm.maxVal)
+        dst3.SetTo(0, task.noDepthMask)
         labels(1) = CStr(redMask.mdList.Count) + " maskData cells were found in the point cloud."
 
         If task.heartBeat Then strOut = ""
@@ -33,7 +32,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 If index > 0 Then rc.mdList.Add(md)
             Next
             If rc.mdList.Count > 0 Then
-                'Dim mdMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
                 For j = 0 To rc.mdList.Count - 1
                     Dim md = rc.mdList(j)
                     rcMask(md.rect) = rcMask(md.rect) And md.mask
@@ -47,17 +45,14 @@ Public Class RedCloud_Basics : Inherits TaskParent
             End If
         Next
 
-        For Each rc In task.rcList
-            For Each md In rc.mdList
-                DrawCircle(dst1, md.maxDist, task.DotSize, task.HighlightColor)
+        If standaloneTest() Then
+            For Each rc In task.rcList
+                For Each md In rc.mdList
+                    DrawCircle(dst3, md.maxDist, task.DotSize, task.HighlightColor)
+                Next
             Next
-        Next
+        End If
         SetTrueText(strOut, 3)
-        'For Each rc In task.rcList
-        '    For Each md In rc.mdList
-        '        dst3(md.rect).SetTo(rc.color, md.mask)
-        '    Next
-        'Next
     End Sub
 End Class
 

@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
+Imports System.Dynamic
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_Basics : Inherits TaskParent
@@ -1035,7 +1036,7 @@ Public Class Depth_PunchDecreasing : Inherits TaskParent
         task.pcSplit(2).CopyTo(dst1, fore.dst2)
 
         Static lastDepth = dst1
-        Static mmSlider =optiBase.findslider("Threshold in millimeters")
+        Static mmSlider = optiBase.FindSlider("Threshold in millimeters")
         Dim mmThreshold = mmSlider.Value / 1000
         If Increasing Then
             cv.Cv2.Subtract(dst1, lastDepth, dst2)
@@ -1108,7 +1109,7 @@ Public Class Depth_PunchBlobNew : Inherits TaskParent
         desc = "Identify a punch using both depth and color"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider =optiBase.findslider("Threshold for punch")
+        Static thresholdSlider = optiBase.FindSlider("Threshold for punch")
         Dim threshold = thresholdSlider.value
 
         Static lastColor As cv.Mat = task.color.Clone
@@ -1188,11 +1189,11 @@ Public Class Depth_StableAverage : Inherits TaskParent
     Dim dAvg As New Depth_Averaging
     Dim extrema As New Depth_StableMinMax
     Public Sub New()
-        optibase.findRadio("Use farthest distance").Checked = True
+        optiBase.findRadio("Use farthest distance").Checked = True
         desc = "Use Depth_StableMax to remove the artifacts from the Depth_Averaging"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static unchangedRadio = optibase.findRadio("Use unchanged depth input")
+        Static unchangedRadio = optiBase.findRadio("Use unchanged depth input")
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         extrema.Run(src)
 
@@ -1723,14 +1724,50 @@ Public Class Depth_Ideal : Inherits TaskParent
         grid.gridMask.CopyTo(task.idealDepthMask, task.motionMask)
         grid.gridMask.SetTo(0, Not task.motionMask) ' no need to copy where there is no motion
 
-        If standaloneTest() Then
-            dst3.SetTo(0, task.motionMask)
-            task.pointCloud.CopyTo(dst3, grid.gridMask)
-            dst2 = src
-            For Each r In gridRects
-                dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
-            Next
-            If task.heartBeat Then labels(2) = CStr(goodRects) + " grid cells have the maximum depth pixels."
+        dst3.SetTo(0, task.motionMask)
+        task.pointCloud.CopyTo(dst3, grid.gridMask)
+        dst2 = src
+        For Each r In gridRects
+            dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
+        Next
+        If task.heartBeat Then labels(2) = CStr(goodRects) + " grid cells have the maximum depth pixels."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_ToDisparity : Inherits TaskParent
+    Public Sub New()
+        task.gOptions.displayDst0.Checked = True
+        task.gOptions.displayDst1.Checked = True
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Map each ideal depth cell to the inverse of its mean depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0 = task.leftView
+        dst1 = task.rightView
+        Dim depths As New List(Of Single)
+        Dim camInfo = task.calibData
+        dst2 = task.ideal.dst2
+        dst3 = task.rightView.Clone
+        For Each roi In task.ideal.gridRects
+            Dim mean = task.pcSplit(2)(roi).Mean(task.depthMask(roi))
+            roi.X -= 0.12 * camInfo.fx / mean(0)
+            dst3.Rectangle(roi, 255, task.lineWidth)
+        Next
+
+        If task.drawRect.Width > 0 Then
+            Dim rect = task.drawRect
+            Dim center = New cv.Point(rect.Width / 2, rect.Height / 2)
+            Dim depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))
+            If depth(0) > 0 Then
+                Dim disp = 0.12 * camInfo.fx / depth(0)
+                rect.X -= disp
+                dst1.Rectangle(rect, 255, task.lineWidth)
+            End If
         End If
     End Sub
 End Class

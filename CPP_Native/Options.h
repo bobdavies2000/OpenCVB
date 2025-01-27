@@ -2180,8 +2180,9 @@ public:
 };
 class Options_IdealSize {
 public:
-	int width =  64;
-	int height =  16;
+	int width =  8;
+	int height =  8;
+	float depthThreshold =  0.9;
 	void RunOpt() {}
 	Options_IdealSize() {
 	}

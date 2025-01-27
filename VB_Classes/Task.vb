@@ -302,6 +302,7 @@ Public Class VBtask : Implements IDisposable
         Dim pointCloud As cv.Mat
     End Structure
     Public Structure cameraInfo
+        Public baseline As Single
         Public ppx As Single
         Public ppy As Single
         Public fx As Single
