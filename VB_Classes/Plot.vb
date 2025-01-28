@@ -481,13 +481,24 @@ Public Class Plot_Histogram : Inherits TaskParent
     Public Sub New()
         desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim min = minRange
+        Dim max = maxRange
         If standaloneTest() Or createHistogram Then
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim mm = GetMinMax(src)
-            minRange = mm.minVal
-            maxRange = mm.maxVal
-            ranges = {New cv.Rangef(minRange, maxRange)}
+            If minRange = 0 And maxRange = 0 Then
+                Dim mm = GetMinMax(src)
+                min = mm.minVal
+                max = mm.maxVal
+                If min = 0 And max = 0 Then
+                    If src.Type = cv.MatType.CV_32F Then
+                        max = task.MaxZmeters
+                    Else
+                        max = 255
+                    End If
+                End If
+            End If
+            ranges = {New cv.Rangef(min, max)}
             cv.Cv2.CalcHist({src}, {0}, New cv.Mat(), histogram, 1, {task.histogramBins}, ranges)
         Else
             histogram = src

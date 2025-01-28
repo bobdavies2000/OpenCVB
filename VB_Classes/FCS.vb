@@ -701,7 +701,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             End If
 
             cv.Cv2.MeanStdDev(task.pcSplit(2)(fp.rect), depthMean, stdev, fp.mask)
-            fp.depthMean = depthMean(2)
+            fp.depthMean = depthMean(0)
             Dim mask As cv.Mat = fp.mask And task.depthMask(fp.rect)
             Dim mm = GetMinMax(task.pcSplit(2)(fp.rect), mask)
             fp.depthMin = mm.minVal

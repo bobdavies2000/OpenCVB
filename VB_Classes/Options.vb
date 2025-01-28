@@ -7625,7 +7625,7 @@ Public Class Options_OpenGLFunctions : Inherits OptionParent
         Static ZmoveSlider = FindSlider("OpenGL shift fwd/back (Z-axis) X100")
         Static PointSizeSlider = FindSlider("OpenGL Point Size")
 
-        pointSize = PointSizeSlider.valu
+        pointSize = PointSizeSlider.value
         moveAmount = New cv.Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
     End Sub
 End Class
