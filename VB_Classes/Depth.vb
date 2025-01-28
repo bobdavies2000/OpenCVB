@@ -1730,7 +1730,7 @@ Public Class Depth_Ideal : Inherits TaskParent
         dst3.SetTo(0, task.motionMask)
         task.pointCloud.CopyTo(dst3, gridMask)
 
-        dst2 = src
+        dst2 = src.Clone
         For Each r In gridRects
             dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
         Next

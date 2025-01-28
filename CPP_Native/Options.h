@@ -2089,7 +2089,7 @@ public:
 class Options_OpenGL {
 public:
 	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
-	double FOV =  75;
+	double FOV =  35;
 	double yaw =  -3;
 	double pitch =  3;
 	double roll =  0;

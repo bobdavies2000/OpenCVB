@@ -7637,7 +7637,7 @@ End Class
 
 Public Class Options_OpenGL : Inherits OptionParent
     Public moveAmount As cv.Scalar = New cv.Scalar(0, 0, 0)
-    Public FOV As Double = 75
+    Public FOV As Double = 35
     Public yaw As Double = -3
     Public pitch As Double = 3
     Public roll As Double = 0

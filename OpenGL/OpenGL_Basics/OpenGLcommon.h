@@ -278,8 +278,6 @@ static void readPipeAndMemMap()
 	scaleXYZ.y = (float)sharedMem[27];
 	scaleXYZ.z = (float)sharedMem[28];
 
-	printf("Scale X = %f\n", scaleXYZ.x);
-
 	timeConversionUnits = (float)sharedMem[29];
 	imuAlphaFactor = (float)sharedMem[30];
 	imageLabelBufferSize = (int)sharedMem[31];
