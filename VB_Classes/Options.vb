@@ -7608,9 +7608,9 @@ Public Class Options_OpenGLFunctions : Inherits OptionParent
     Public zNear As Double = 0
     Public zFar As Double = 20.0
     Public zTrans As Double = 0.5
-    Public eye As cv.Vec3f = New cv.Vec3f(0, 0, -40)
-    Public scaleXYZ As cv.Vec3f = New cv.Vec3f(10, 10, 1)
-    Public PointSizeSlider As TrackBar
+    Public eye As cv.Vec3f = New cv.Vec3f(4, 20, -2)
+    Public scaleXYZ As cv.Vec3f = New cv.Vec3f(15, 30, 1)
+    Public pointSize As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("OpenGL shift left/right (X-axis) X100", -300, 300, 0)
@@ -7618,13 +7618,14 @@ Public Class Options_OpenGLFunctions : Inherits OptionParent
             sliders.setupTrackBar("OpenGL shift fwd/back (Z-axis) X100", -300, 300, 0)
             sliders.setupTrackBar("OpenGL Point Size", 1, 20, 2)
         End If
-        PointSizeSlider = FindSlider("OpenGL Point Size")
     End Sub
     Public Sub RunOpt()
         Static XmoveSlider = FindSlider("OpenGL shift left/right (X-axis) X100")
         Static YmoveSlider = FindSlider("OpenGL shift up/down (Y-axis) X100")
         Static ZmoveSlider = FindSlider("OpenGL shift fwd/back (Z-axis) X100")
+        Static PointSizeSlider = FindSlider("OpenGL Point Size")
 
+        pointSize = PointSizeSlider.valu
         moveAmount = New cv.Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
     End Sub
 End Class
@@ -7635,24 +7636,25 @@ End Class
 
 
 Public Class Options_OpenGL : Inherits OptionParent
+    Public moveAmount As cv.Scalar = New cv.Scalar(0, 0, 0)
     Public FOV As Double = 75
     Public yaw As Double = -3
     Public pitch As Double = 3
     Public roll As Double = 0
     Public zNear As Double = 0
     Public zFar As Double = 20
-    Public pointSize As Integer = 2
+    Public pointSize As Integer = 5
     Public zTrans As Double = 0.5
-    Public eye As cv.Vec3f = New cv.Vec3f(0, 0, -40)
-    Public scaleXYZ As cv.Vec3f = New cv.Vec3f(10, 10, 1)
+    Public eye As cv.Vec3f = New cv.Vec3f(4, 20, -2)
+    Public scaleXYZ As cv.Vec3f = New cv.Vec3f(15, 30, 1)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("OpenGL yaw (degrees)", -180, 180, yaw)
             sliders.setupTrackBar("OpenGL pitch (degrees)", -180, 180, pitch)
             sliders.setupTrackBar("OpenGL roll (degrees)", -180, 180, roll)
 
-            sliders.setupTrackBar("OpenGL Eye X X100", -180, 180, eye(0))
-            sliders.setupTrackBar("OpenGL Eye Y X100", -180, 180, eye(1))
+            sliders.setupTrackBar("OpenGL Eye X X100", -180, 180, eye(1))
+            sliders.setupTrackBar("OpenGL Eye Y X100", -180, 180, eye(0))
             sliders.setupTrackBar("OpenGL Eye Z X100", -180, 180, eye(2))
 
             sliders.setupTrackBar("OpenGL Scale X X10", 1, 100, scaleXYZ(0))
@@ -7665,6 +7667,10 @@ Public Class Options_OpenGL : Inherits OptionParent
             sliders.setupTrackBar("zTrans (X100)", -1000, 1000, zTrans * 100)
 
             sliders.setupTrackBar("OpenGL FOV", 1, 180, FOV)
+
+            sliders.setupTrackBar("OpenGL shift left/right (X-axis) X100", -300, 300, 0)
+            sliders.setupTrackBar("OpenGL shift up/down (Y-axis) X100", -300, 300, 0)
+            sliders.setupTrackBar("OpenGL shift fwd/back (Z-axis) X100", -300, 300, 0)
             If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
                 FindSlider("OpenGL yaw (degrees)").Value = 135
             End If
@@ -7684,6 +7690,9 @@ Public Class Options_OpenGL : Inherits OptionParent
         Static zFarSlider = FindSlider("OpenGL zFar")
         Static zTransSlider = FindSlider("zTrans (X100)")
         Static fovSlider = FindSlider("OpenGL FOV")
+        Static XmoveSlider = FindSlider("OpenGL shift left/right (X-axis) X100")
+        Static YmoveSlider = FindSlider("OpenGL shift up/down (Y-axis) X100")
+        Static ZmoveSlider = FindSlider("OpenGL shift fwd/back (Z-axis) X100")
         Static PointSizeSlider = FindSlider("OpenGL Point Size")
 
         FOV = fovSlider.Value
@@ -7698,6 +7707,7 @@ Public Class Options_OpenGL : Inherits OptionParent
 
         eye = New cv.Vec3f(eyeXSlider.Value, eyeYSlider.Value, eyeZSlider.Value)
         scaleXYZ = New cv.Vec3f(scaleXSlider.Value, scaleYSlider.Value, scaleZSlider.Value)
+        moveAmount = New cv.Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
     End Sub
 End Class
 

@@ -1332,7 +1332,7 @@ Public Class Main_UI
             g.DrawRectangle(myWhitePen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
             If pic.Tag = 2 Then
                 g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y,
-                                drawRect.Width - 1, drawRect.Height - 1)
+                                drawRect.Width, drawRect.Height)
             End If
         End If
 

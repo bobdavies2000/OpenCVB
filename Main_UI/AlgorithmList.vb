@@ -283,7 +283,7 @@ Public Class algorithmList
 	If algorithmName = "Depth_Contour" Then return new Depth_Contour
 	If algorithmName = "Depth_Dilate" Then return new Depth_Dilate
 	If algorithmName = "Depth_Disparity" Then return new Depth_Disparity
-	If algorithmName = "Depth_DispCellPlot" Then return new Depth_DispCellPlot
+	If algorithmName = "Depth_DisparityCellPlot" Then return new Depth_DisparityCellPlot
 	If algorithmName = "Depth_Display" Then return new Depth_Display
 	If algorithmName = "Depth_FirstLastDistance" Then return new Depth_FirstLastDistance
 	If algorithmName = "Depth_Flatland" Then return new Depth_Flatland
@@ -1221,6 +1221,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_Grid" Then return new OpenGL_Grid
 	If algorithmName = "OpenGL_HistDepth3D" Then return new OpenGL_HistDepth3D
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D
+	If algorithmName = "OpenGL_IdealDepth" Then return new OpenGL_IdealDepth
 	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
 	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
 	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY

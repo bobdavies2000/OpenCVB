@@ -1691,12 +1691,13 @@ End Class
 Public Class Depth_Ideal : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public gridRects As New List(Of cv.Rect)
-    Public gridRectsAll(0) As cv.Rect
     Public options As New Options_IdealSize
+    Public depth32f As cv.Mat
+    Public gridMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public gridMeans As New List(Of Single)
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         labels(3) = "Pointcloud image for cells with ideal visibility"
-        task.idealDepthMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create the grid of cells with ideal visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1707,28 +1708,28 @@ Public Class Depth_Ideal : Inherits TaskParent
         Dim emptyRect As New cv.Rect
         Dim goodRects As Integer
         gridRects.Clear()
-        If task.heartBeatLT Or gridRectsAll.Count <> grid.gridRects.Count Then
-            ReDim gridRectsAll(grid.gridRects.Count - 1)
-        End If
+        gridMeans.Clear()
         Dim w = options.width, h = options.height
-        For i = 0 To grid.gridRects.Count - 1
-            Dim r = grid.gridRects(i)
-            gridRectsAll(i) = r
-            If r.X = 0 Then Continue For ' it is unlikely that the left-hugging rect could be matched.
-            If task.pcSplit(2)(r).CountNonZero >= options.depthThreshold * w * h Then
-                Dim mm = GetMinMax(task.pcSplit(2)(r))
+        depth32f = task.pcSplit(2).Clone
+        gridMask.SetTo(0)
+        For Each roi In grid.gridRectsAll
+            If roi.X = 0 Then Continue For ' it is unlikely that the left-hugging rect could be matched.
+            If task.pcSplit(2)(roi).CountNonZero >= options.depthThreshold * w * h Then
+                Dim mm = GetMinMax(task.pcSplit(2)(roi))
                 If (mm.maxVal - mm.minVal) * 100 <= options.rangeThreshold Then
-                    gridRects.Add(r)
+                    gridRects.Add(roi)
+                    gridMask(roi).SetTo(255)
                     goodRects += 1
+                    Dim depth = task.pcSplit(2)(roi).Mean(task.depthMask(roi))
+                    gridMeans.Add(depth)
+                    depth32f(roi).SetTo(depth)
                 End If
             End If
         Next
 
-        grid.gridMask.CopyTo(task.idealDepthMask, task.motionMask)
-        grid.gridMask.SetTo(0, Not task.motionMask) ' no need to copy where there is no motion
-
         dst3.SetTo(0, task.motionMask)
-        task.pointCloud.CopyTo(dst3, grid.gridMask)
+        task.pointCloud.CopyTo(dst3, gridMask)
+
         dst2 = src
         For Each r In gridRects
             dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
@@ -1748,7 +1749,6 @@ Public Class Depth_Disparity : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Map each ideal depth cell to the inverse of its mean depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1788,7 +1788,7 @@ Public Class Depth_Disparity : Inherits TaskParent
 
         mats.Run(empty)
         dst2 = mats.dst2
-        dst3 = mats.dst3
+        dst3 = mats.mat(3)
     End Sub
 End Class
 
@@ -1797,7 +1797,7 @@ End Class
 
 
 
-Public Class Depth_DispCellPlot : Inherits TaskParent
+Public Class Depth_DisparityCellPlot : Inherits TaskParent
     Dim toDisp As New Depth_Disparity
     Dim plot As New Plot_Histogram
     Public Sub New()
@@ -1810,7 +1810,7 @@ Public Class Depth_DispCellPlot : Inherits TaskParent
 
         Dim index = task.ideal.grid.gridMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         Dim roi As cv.Rect
-        If task.ideal.grid.gridRects.Count = 0 Or task.optionsChanged Then Exit Sub
+        If task.ideal.gridRects.Count = 0 Or task.optionsChanged Then Exit Sub
         If index = 0 Or index >= task.ideal.gridRects.Count Then
             roi = task.ideal.gridRects(task.ideal.gridRects.Count / 2)
             task.ClickPoint = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)

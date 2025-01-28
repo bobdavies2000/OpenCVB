@@ -14,7 +14,7 @@ Public Class Disparity_Basics : Inherits TaskParent
             If r.Height >= 8 Then dst2.Rectangle(r, 255, task.lineWidth)
         Next
         Dim val = task.ideal.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        rect = task.ideal.gridRectsAll(val)
+        rect = task.ideal.grid.gridRectsAll(val)
 
         match.template = dst2(rect)
         Dim maxDisparity As Integer = 128
@@ -69,7 +69,7 @@ Public Class Disparity_Manual : Inherits TaskParent
         Next
 
         Dim val = task.ideal.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        rect = task.ideal.gridRectsAll(val)
+        rect = task.ideal.grid.gridRectsAll(val)
         dst2.Rectangle(rect, 255, task.lineWidth + 1)
 
         Dim correlation As New cv.Mat
@@ -488,7 +488,7 @@ Public Class Disparity_Color8u : Inherits TaskParent
         dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
 
         Dim val = task.ideal.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        Dim rect = task.ideal.gridRectsAll(val)
+        Dim rect = task.ideal.grid.gridRectsAll(val)
         dst2.Rectangle(rect, 255, task.lineWidth + 1)
     End Sub
 End Class

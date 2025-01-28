@@ -150,7 +150,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
     Public tilesPerCol As Integer
     Public gridMask As cv.Mat
     Public gridMap As cv.Mat
-    Public gridRects As New List(Of cv.Rect)
+    Public gridRectsAll As New List(Of cv.Rect)
     Public Sub New()
         gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
@@ -160,7 +160,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
         Dim w = task.ideal.options.width
         Dim h = task.ideal.options.height
         If task.optionsChanged Then
-            gridRects.Clear()
+            gridRectsAll.Clear()
             For y = 0 To dst2.Height - 1 Step h
                 For x = 0 To dst2.Width - 1 Step w
                     Dim roi = New cv.Rect(x, y, w, h)
@@ -169,7 +169,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
-                        gridRects.Add(roi)
+                        gridRectsAll.Add(roi)
                     End If
                 Next
             Next
@@ -184,15 +184,15 @@ Public Class Grid_Rectangles : Inherits TaskParent
                 gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
 
-            For i = 0 To gridRects.Count - 1
-                Dim roi = gridRects(i)
+            For i = 0 To gridRectsAll.Count - 1
+                Dim roi = gridRectsAll(i)
                 gridMap.Rectangle(roi, i, -1)
             Next
         End If
         If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(white, gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(tilesPerRow) + "X" +
+            labels(2) = "Grid_Basics " + CStr(gridRectsAll.Count) + " (" + CStr(tilesPerRow) + "X" +
                          CStr(tilesPerCol) + ") " + CStr(w) + "X" + CStr(h) + " regions"
         End If
         If task.mouseClickFlag Then

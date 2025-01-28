@@ -11,12 +11,12 @@ Public Class OpenGL_Basics : Inherits TaskParent
     Public dataInput As New cv.Mat
     Public pointCloudInput As cv.Mat
     Public oglFunction As Integer = 0 ' the default function is to display a point cloud.
-    Public options As Options_OpenGLFunctions
+    Public options As New Options_OpenGL
     Dim rgbBuffer(0) As Byte
     Dim dataBuffer(0) As Byte
     Dim pointCloudBuffer(0) As Byte
     Public Sub New()
-        If task.algName.Contains("OpenGL") Or task.algName.Contains("Model") Then options = New Options_OpenGLFunctions
+        'If task.algName.Contains("OpenGL") Or task.algName.Contains("Model") Then options = New Options_OpenGLFunctions
         task.OpenGLTitle = "OpenGL_Functions"
         UpdateAdvice(traceName + ": 'Show All' to see all the OpenGL options.")
         pointCloudInput = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
@@ -37,7 +37,7 @@ Public Class OpenGL_Basics : Inherits TaskParent
         Dim memMapValues() As Double =
             {task.frameCount, dst2.Width, dst2.Height, rgbBufferSize,
             dataBufferSize, options.FOV, options.yaw, options.pitch, options.roll,
-            options.zNear, options.zFar, options.PointSizeSlider.Value, dataInput.Width, dataInput.Height,
+            options.zNear, options.zFar, options.pointSize, dataInput.Width, dataInput.Height,
             task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z,
             task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z, task.IMU_TimeStamp,
             1, options.eye(0) / 100, options.eye(1) / 100, options.eye(2) / 100, options.zTrans,
@@ -177,7 +177,7 @@ Public Class OpenGL_BasicsSliders : Inherits TaskParent
         task.ogl.options.roll = options.roll
         task.ogl.options.zNear = options.zNear
         task.ogl.options.zFar = options.zFar
-        task.ogl.options.PointSizeSlider.Value = options.pointSize
+        task.ogl.options.pointSize = options.pointSize
         task.ogl.options.zTrans = options.zTrans
         task.ogl.options.eye = options.eye
         task.ogl.options.scaleXYZ = options.scaleXYZ
@@ -440,7 +440,6 @@ Public Class OpenGL_StructuredCloud : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
         task.ogl.pointCloudInput = sCloud.dst2
         task.ogl.Run(dst2)
-        task.ogl.options.PointSizeSlider.Value = task.gridSize
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
@@ -465,7 +464,6 @@ Public Class OpenGL_Tiles : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        task.ogl.options.PointSizeSlider.Value = task.gridSize
     End Sub
 End Class
 
@@ -1653,7 +1651,7 @@ Public Class OpenGL_HistDepth3D : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.Histogram3D
         task.OpenGLTitle = "OpenGL_Functions"
-        task.ogl.options.PointSizeSlider.Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the 3D histogram of the depth in OpenGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1752,7 +1750,7 @@ Public Class OpenGL_Color3D : Inherits TaskParent
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        task.ogl.options.PointSizeSlider.Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         desc = "Plot the results of a 3D histogram of the BGR data "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1810,7 +1808,7 @@ Public Class OpenGL_ColorRaw : Inherits TaskParent
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        task.ogl.options.PointSizeSlider.Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         desc = "Plot the results of a 3D histogram of the BGR data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -1838,7 +1836,7 @@ Public Class OpenGL_ColorBin4Way : Inherits TaskParent
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        task.ogl.options.PointSizeSlider.Value = 10
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8UC3, white)
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub
@@ -2207,19 +2205,43 @@ End Class
 
 
 Public Class OpenGL_DisparityTest : Inherits TaskParent
-    Dim disp As New Depth_Ideal
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         dst3 = task.pointCloud.Clone
         desc = "Visualize the high visibility cells found by Disparity_GoodCells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        disp.Run(src)
-        dst2 = disp.dst2
+        dst2 = task.ideal.dst2
 
-        task.pointCloud.CopyTo(dst3, task.idealDepthMask)
-        task.ogl.pointCloudInput = dst3
+        If task.toggleOnOff Then
+            dst3.SetTo(0)
+            task.pointCloud.CopyTo(dst3, task.ideal.gridMask)
+            task.ogl.pointCloudInput = dst3
+        Else
+            task.ogl.pointCloudInput = task.pointCloud
+        End If
 
+        task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_IdealDepth : Inherits TaskParent
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Display the enhanced depth produced by Depth_Ideal"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.ideal.dst2
+        If task.toggleOnOff Then
+            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), task.ideal.depth32f}, task.ogl.pointCloudInput)
+        Else
+            task.ogl.pointCloudInput = task.pointCloud
+        End If
         task.ogl.Run(src)
     End Sub
 End Class

@@ -97,7 +97,6 @@ Public Class VBtask : Implements IDisposable
     Public IMU_Rotation As System.Numerics.Quaternion
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
-    Public idealDepthMask As New cv.Mat
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
     Public srcThread As New cv.Mat
