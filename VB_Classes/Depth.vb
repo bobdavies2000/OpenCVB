@@ -1688,62 +1688,6 @@ End Class
 
 
 
-Public Class Depth_Ideal : Inherits TaskParent
-    Public grid As New Grid_Rectangles
-    Public gridRects As New List(Of cv.Rect)
-    Public options As New Options_IdealSize
-    Public depth32f As cv.Mat
-    Public gridMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public gridMeans As New List(Of Single)
-    Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        labels(3) = "Pointcloud image for cells with ideal visibility"
-        desc = "Create the grid of cells with ideal visibility"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        If task.optionsChanged Then grid.Run(src)
-
-        Dim emptyRect As New cv.Rect
-        Dim goodRects As Integer
-        gridRects.Clear()
-        gridMeans.Clear()
-        Dim w = options.width, h = options.height
-        depth32f = task.pcSplit(2).Clone
-        gridMask.SetTo(0)
-        For Each roi In grid.gridRectsAll
-            If roi.X = 0 Then Continue For ' it is unlikely that the left-hugging rect could be matched.
-            If task.pcSplit(2)(roi).CountNonZero >= options.depthThreshold * w * h Then
-                Dim mm = GetMinMax(task.pcSplit(2)(roi))
-                If (mm.maxVal - mm.minVal) * 100 <= options.rangeThreshold Then
-                    gridRects.Add(roi)
-                    gridMask(roi).SetTo(255)
-                    goodRects += 1
-                    Dim depth = task.pcSplit(2)(roi).Mean(task.depthMask(roi))
-                    gridMeans.Add(depth)
-
-                    For y = 1 To roi.Height - 1
-                        depth32f(roi).Row(0).CopyTo(depth32f(roi).Row(y))
-                    Next
-                End If
-            End If
-        Next
-
-        dst3.SetTo(0, task.motionMask)
-        task.pointCloud.CopyTo(dst3, gridMask)
-
-        dst2 = src.Clone
-        For Each r In gridRects
-            dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
-        Next
-        If task.heartBeat Then labels(2) = CStr(goodRects) + " grid cells have the maximum depth pixels."
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Depth_Disparity : Inherits TaskParent
@@ -1827,5 +1771,70 @@ Public Class Depth_DisparityCellPlot : Inherits TaskParent
             labels(3) = "X values vary from " + Format(plot.minRange, fmt3) +
                         " to " + Format(plot.maxRange, fmt3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_Ideal : Inherits TaskParent
+    Public grid As New Grid_Rectangles
+    Public gridRects As New List(Of cv.Rect)
+    Public options As New Options_IdealSize
+    Public depth32f As cv.Mat
+    Public gridMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public gridMeans As New List(Of Single)
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        labels(3) = "Pointcloud image for cells with ideal visibility"
+        desc = "Create the grid of cells with ideal visibility"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim emptyRect As New cv.Rect
+        options.RunOpt()
+        grid.Run(src)
+
+        Dim newRects As New List(Of cv.Rect)
+        Dim motionCells As New List(Of cv.Rect)
+        For Each roi In gridRects
+            If task.motionMask(roi).CountNonZero = 0 Then newRects.Add(roi)
+        Next
+
+        depth32f = task.pcSplit(2).Clone
+        Dim cellPixels = options.cellSize * options.cellSize
+        For Each roi In grid.gridRectsAll
+            If roi.X = 0 Then Continue For ' it is unlikely that a left-hugging rect could be matched.
+            If task.motionMask(roi).CountNonZero > 0 Then
+                If depth32f(roi).CountNonZero >= options.depthThreshold * cellPixels Then
+                    Dim mm = GetMinMax(depth32f(roi))
+                    If (mm.maxVal - mm.minVal) * 100 <= options.rangeThreshold Then newRects.Add(roi)
+                End If
+            End If
+        Next
+
+        gridRects = New List(Of cv.Rect)(newRects)
+        gridMeans.Clear()
+        gridMask.SetTo(0)
+        For Each roi In gridRects
+            gridMask(roi).SetTo(255)
+            Dim depth = depth32f(roi).Mean(task.depthMask(roi))
+            gridMeans.Add(depth)
+
+            ' duplicate the top row of the roi in all the rows of the roi
+            For y = 1 To roi.Height - 1
+                depth32f(roi).Row(0).CopyTo(depth32f(roi).Row(y))
+            Next
+        Next
+
+        depth32f.SetTo(0, Not gridMask)
+        dst3.SetTo(0)
+        task.pointCloud.CopyTo(dst3, gridMask)
+
+        dst2 = src.Clone
+        For Each r In gridRects
+            dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
+        Next
+        If task.heartBeat Then labels(2) = CStr(gridRects.Count) + " grid cells have the maximum depth pixels."
     End Sub
 End Class

@@ -157,13 +157,12 @@ Public Class Grid_Rectangles : Inherits TaskParent
         If standalone Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim w = task.ideal.options.width
-        Dim h = task.ideal.options.height
+        Dim cellSize = task.ideal.options.cellSize
         If task.optionsChanged Then
             gridRectsAll.Clear()
-            For y = 0 To dst2.Height - 1 Step h
-                For x = 0 To dst2.Width - 1 Step w
-                    Dim roi = New cv.Rect(x, y, w, h)
+            For y = 0 To dst2.Height - 1 Step cellSize
+                For x = 0 To dst2.Width - 1 Step cellSize
+                    Dim roi = New cv.Rect(x, y, cellSize, cellSize)
                     If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
                     If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
@@ -175,11 +174,11 @@ Public Class Grid_Rectangles : Inherits TaskParent
             Next
 
             gridMask.SetTo(0)
-            For x = w To dst2.Width - 1 Step w
+            For x = 0 To dst2.Width - 1 Step cellSize
                 Dim p1 = New cv.Point(CInt(x), 0), p2 = New cv.Point(CInt(x), dst2.Height)
                 gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
-            For y = h To dst2.Height - 1 Step h
+            For y = 0 To dst2.Height - 1 Step cellSize
                 Dim p1 = New cv.Point(0, CInt(y)), p2 = New cv.Point(dst2.Width, CInt(y))
                 gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
@@ -192,8 +191,9 @@ Public Class Grid_Rectangles : Inherits TaskParent
         If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(white, gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridRectsAll.Count) + " (" + CStr(tilesPerRow) + "X" +
-                         CStr(tilesPerCol) + ") " + CStr(w) + "X" + CStr(h) + " regions"
+            labels(2) = "Grid_Basics " + CStr(gridRectsAll.Count) + " tiles, " + CStr(tilesPerRow) +
+                        " cols by " + CStr(tilesPerCol) + " rows, with " +
+                        CStr(cellSize) + "X" + CStr(cellSize) + " cells"
         End If
         If task.mouseClickFlag Then
             task.gridROIclicked = gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)

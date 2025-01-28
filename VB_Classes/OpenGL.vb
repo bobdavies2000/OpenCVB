@@ -2234,12 +2234,15 @@ End Class
 Public Class OpenGL_IdealDepth : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
+        task.gOptions.DebugCheckBox.Checked = True
         desc = "Display the enhanced depth produced by Depth_Ideal"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.ideal.dst2
-        If task.toggleOnOff Then
-            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), task.ideal.depth32f}, task.ogl.pointCloudInput)
+        If task.gOptions.DebugCheckBox.Checked Then
+            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), task.ideal.depth32f},
+                         task.ogl.pointCloudInput)
+            dst3 = task.ideal.dst3
         Else
             task.ogl.pointCloudInput = task.pointCloud
         End If
