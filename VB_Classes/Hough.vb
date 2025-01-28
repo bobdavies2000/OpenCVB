@@ -374,7 +374,7 @@ Public Class Hough_Probabilistic : Inherits TaskParent
         edges.Run(src)
 
         Static segments As cv.LineSegmentPoint()
-        If task.gOptions.debugChecked Then
+        If task.gOptions.DebugCheckBox.Checked Then
             src.CopyTo(dst2)
             dst2.SetTo(white, edges.dst2)
             dst3.SetTo(0)

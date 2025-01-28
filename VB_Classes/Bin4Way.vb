@@ -219,7 +219,7 @@ Public Class Bin4Way_UnstableEdges : Inherits TaskParent
         dst2 = unstable.dst2
         dst3 = unstable.dst3
 
-        If task.gOptions.debugChecked = False Then dst3.SetTo(0, dst1)
+        If task.gOptions.DebugCheckBox.Checked = False Then dst3.SetTo(0, dst1)
     End Sub
 End Class
 

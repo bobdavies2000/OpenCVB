@@ -13,7 +13,7 @@ Public Class Match_Basics : Inherits TaskParent
     Public matchCenter As cv.Point
     Public matchRect As New cv.Rect
     Public Sub New()
-        If standalone Then task.gOptions.debugChecked = True
+        If standalone Then task.gOptions.DebugCheckBox.Checked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
@@ -21,8 +21,8 @@ Public Class Match_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If standalone Then
-            If task.gOptions.debugChecked Then
-                task.gOptions.debugChecked = False
+            If task.gOptions.DebugCheckBox.Checked Then
+                task.gOptions.DebugCheckBox.Checked = False
                 Dim inputRect = If(task.firstPass, New cv.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
                 template = src(inputRect)
             End If

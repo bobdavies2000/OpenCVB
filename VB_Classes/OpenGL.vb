@@ -1450,7 +1450,7 @@ Public Class OpenGL_NoSolo : Inherits TaskParent
         hotSide.Run(src)
         dst2 = dst2 Or hotSide.dst3
 
-        If task.gOptions.debugChecked = False Then task.pointCloud.SetTo(0, dst2)
+        If task.gOptions.DebugCheckBox.Checked = False Then task.pointCloud.SetTo(0, dst2)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         SetTrueText("Toggle the solo points on and off using the 'DebugCheckBox' global option.", 3)
@@ -2208,12 +2208,13 @@ Public Class OpenGL_IdealTest : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         dst3 = task.pointCloud.Clone
+        task.gOptions.DebugCheckBox.Checked = True
         desc = "Visualize the high visibility cells found by Disparity_GoodCells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.ideal.dst2
 
-        If task.toggleOnOff Then
+        If task.gOptions.DebugCheckBox.Checked Then
             dst3.SetTo(0)
             task.pointCloud.CopyTo(dst3, task.ideal.gridMask)
             task.ogl.pointCloudInput = dst3
@@ -2242,7 +2243,6 @@ Public Class OpenGL_IdealDepth : Inherits TaskParent
         Else
             task.ogl.pointCloudInput = task.pointCloud
         End If
-        dst3 = task.color.Clone
-        task.ogl.Run(dst3)
+        task.ogl.Run(task.color)
     End Sub
 End Class

@@ -112,7 +112,7 @@ Public Class LowRes_Features : Inherits TaskParent
             If rects.Contains(r) Then task.featureRects.Add(r) Else task.fLessRects.Add(r)
         Next
 
-        If task.gOptions.debugChecked Then
+        If task.gOptions.DebugCheckBox.Checked Then
             For Each pt In task.features
                 DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
             Next

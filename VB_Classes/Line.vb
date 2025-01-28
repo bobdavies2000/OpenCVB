@@ -1506,7 +1506,7 @@ Public Class Line_LeftRight : Inherits TaskParent
         labels(3) = "Right View: " + lineCore.labels(2)
 
         If standalone Then
-            If task.gOptions.debugChecked Then
+            If task.gOptions.DebugCheckBox.Checked Then
                 dst2.SetTo(0, task.noDepthMask)
                 dst3.SetTo(0, task.noDepthMask)
             End If

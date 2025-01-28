@@ -9,11 +9,11 @@ Public Class Classifier_Basics_CPP : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If task.optionsChanged Then task.gOptions.debugChecked = True
+        If task.optionsChanged Then task.gOptions.DebugCheckBox.Checked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex,
                                                     dst2.Rows, dst2.Cols,
-                                                    If(task.gOptions.debugChecked, 1, 0))
-        task.gOptions.debugChecked = False
+                                                    If(task.gOptions.DebugCheckBox.Checked, 1, 0))
+        task.gOptions.DebugCheckBox.Checked = False
         dst1 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
 
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
@@ -89,10 +89,10 @@ Public Class Classifier_Bayesian : Inherits TaskParent
         Else
             sampleCount = src.Rows
         End If
-        If task.optionsChanged Then task.gOptions.debugChecked = True
+        If task.optionsChanged Then task.gOptions.DebugCheckBox.Checked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
-If(task.gOptions.debugChecked, 1, 0))
-        task.gOptions.debugChecked = False
+        If(task.gOptions.DebugCheckBox.Checked, 1, 0))
+        task.gOptions.DebugCheckBox.Checked = False
         dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr)
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)

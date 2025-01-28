@@ -43,7 +43,6 @@ int main(int argc, char* argv[])
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		gluLookAt(Eye.x, Eye.y, Eye.z, 0, 0, 10, 0, -1, 0);
-		//glScalef(scaleXYZ.x, scaleXYZ.y, scaleXYZ.z);
 
 		glTranslatef(0, 0, +1.5f + MyState.offset_y * 0.05f);
 		glRotated(MyState.pitch, 1, 0, 0);

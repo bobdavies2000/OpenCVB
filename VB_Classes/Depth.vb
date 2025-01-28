@@ -1529,7 +1529,7 @@ Public Class Depth_InfinityCheck : Inherits TaskParent
             If plane > 2 Then plane = 0
         End If
 
-        If task.gOptions.debugChecked Then
+        If task.gOptions.DebugCheckBox.Checked Then
             Dim mask = task.pcSplit(plane).InRange(-100, 100)
             task.pcSplit(plane).SetTo(0, Not mask)
         End If
@@ -1722,7 +1722,10 @@ Public Class Depth_Ideal : Inherits TaskParent
                     goodRects += 1
                     Dim depth = task.pcSplit(2)(roi).Mean(task.depthMask(roi))
                     gridMeans.Add(depth)
-                    depth32f(roi).SetTo(depth)
+
+                    For y = 1 To roi.Height - 1
+                        depth32f(roi).Row(0).CopyTo(depth32f(roi).Row(y))
+                    Next
                 End If
             End If
         Next

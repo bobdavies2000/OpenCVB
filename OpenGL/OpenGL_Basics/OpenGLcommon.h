@@ -426,7 +426,6 @@ static void DrawBox(float x, float y, float z, float dx, float dy, float dz)
 static void drawPointCloud()
 {
 	glBegin(GL_POINTS);
-
 	// draw the 3D scene
 	int pcIndex = 0; GLfloat* pc = (GLfloat*)pointCloudInput; GLfloat pt[] = { 0, 0 };
 	for (int y = 0; y < imageHeight; ++y)
