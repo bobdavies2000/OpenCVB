@@ -1202,7 +1202,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_ColorReduced3D" Then return new OpenGL_ColorReduced3D
 	If algorithmName = "OpenGL_Contours" Then return new OpenGL_Contours
 	If algorithmName = "OpenGL_Density2D" Then return new OpenGL_Density2D
-	If algorithmName = "OpenGL_DisparityTest" Then return new OpenGL_DisparityTest
 	If algorithmName = "OpenGL_DrawCube" Then return new OpenGL_DrawCube
 	If algorithmName = "OpenGL_DrawHulls" Then return new OpenGL_DrawHulls
 	If algorithmName = "OpenGL_DrawLines3D" Then return new OpenGL_DrawLines3D
@@ -1222,6 +1221,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_HistDepth3D" Then return new OpenGL_HistDepth3D
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D
 	If algorithmName = "OpenGL_IdealDepth" Then return new OpenGL_IdealDepth
+	If algorithmName = "OpenGL_IdealTest" Then return new OpenGL_IdealTest
 	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
 	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
 	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY

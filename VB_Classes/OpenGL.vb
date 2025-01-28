@@ -2204,7 +2204,7 @@ End Class
 
 
 
-Public Class OpenGL_DisparityTest : Inherits TaskParent
+Public Class OpenGL_IdealTest : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         dst3 = task.pointCloud.Clone
@@ -2242,6 +2242,7 @@ Public Class OpenGL_IdealDepth : Inherits TaskParent
         Else
             task.ogl.pointCloudInput = task.pointCloud
         End If
-        task.ogl.Run(src)
+        dst3 = task.color.Clone
+        task.ogl.Run(dst3)
     End Sub
 End Class

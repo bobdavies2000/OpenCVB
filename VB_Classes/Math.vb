@@ -200,19 +200,19 @@ Public Class Math_Template : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         For i = 0 To dst2.Width - 1
-            dst2.Set(Of Single)(0, i, i)
+            dst2.Set(Of Single)(0, i, i) ' row with 0, 1, 2, 3....
         Next
 
         For i = 1 To dst2.Height - 1
-            dst2.Row(0).CopyTo(dst2.Row(i))
+            dst2.Row(0).CopyTo(dst2.Row(i)) ' duplicate above row
         Next
 
         For i = 0 To dst2.Height - 1
-            dst3.Set(Of Single)(i, 0, i)
+            dst3.Set(Of Single)(i, 0, i) ' col with 0, 1, 2, 3...
         Next
 
         For i = 1 To dst2.Width - 1
-            dst3.Col(0).CopyTo(dst3.Col(i))
+            dst3.Col(0).CopyTo(dst3.Col(i)) ' duplicate above col
         Next
 
         dst2 -= task.calibData.ppx

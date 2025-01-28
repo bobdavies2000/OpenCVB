@@ -33,6 +33,8 @@ Public Class CameraZED2 : Inherits GenericCamera
         Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
         cameraInfo.fx /= ratio
         cameraInfo.fy /= ratio
+        cameraInfo.ppx /= ratio
+        cameraInfo.ppy /= ratio
 
         Dim posTrack As New sl.PositionalTrackingParameters
         posTrack.enableAreaMemory = True
