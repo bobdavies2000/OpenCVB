@@ -19,52 +19,38 @@ Public Class IdealD_Basics : Inherits TaskParent
         options.RunOpt()
         grid.Run(src)
 
-        task.diListAll.Clear()
+        If task.optionsChanged Then
+            task.diListAll.Clear()
+            For Each r In grid.gridRectsAll
+                Dim di As New depthIdeal
+                di.lRect = r
+                di.index = task.diListAll.Count
+                task.diListAll.Add(di)
+            Next
+        End If
+
         depth32f = task.pcSplit(2).Clone
-        cv.Cv2.ImShow("motionmask", task.motionMask)
-        Dim c1 As Integer, c2 As Integer
-        For Each r In grid.gridRectsAll
-            Dim di As New depthIdeal
-            di.lRect = r
-            If task.motionMask(di.lRect).CountNonZero Then di.motionFlag = True
-            If di.motionFlag = False Then
-                c1 += 1
-            End If
-            di.depth = depth32f(di.lRect).Mean(task.depthMask(di.lRect))
-            di.age = 1
-            di.index = task.diListAll.Count
-            task.diListAll.Add(di)
-        Next
-
-        Dim diListNew As New List(Of depthIdeal)
-        For Each di In task.diList
-            If task.diListAll(di.index).motionFlag = False Then
-                di.age += 1
-                diListNew.Add(di)
-            End If
-        Next
-
         Dim camInfo = task.calibData
-        For Each di In task.diListAll
-            If di.motionFlag Then
-                c2 += 1
-                di.motionFlag = False
-                di.age = 1
-                If di.depth > 0 Then
-                    Dim r = di.lRect
-                    r.X -= camInfo.baseline * camInfo.fx / di.depth
-                    di.rRect = r
-                End If
-                di.mm = GetMinMax(depth32f(di.lRect))
-                di.pixels = task.depthMask(di.lRect).CountNonZero
-                diListNew.Add(di)
+        For i = 0 To task.diListAll.Count - 1
+            Dim di = task.diListAll(i)
+            di.age = If(task.motionMask(di.lRect).CountNonZero > 0, 1, di.age + 1)
+            di.depth = depth32f(di.lRect).Mean(task.depthMask(di.lRect))
+            If di.depth > 0 Then
+                Dim r = di.lRect
+                r.X -= camInfo.baseline * camInfo.fx / di.depth
+                di.rRect = r
+                di.matched = True
+            Else
+                di.matched = False
             End If
+            di.mm = GetMinMax(depth32f(di.lRect), task.depthMask(di.lRect))
+            di.pixels = task.depthMask(di.lRect).CountNonZero
+            task.diListAll(i) = di
         Next
 
-        task.diList = New List(Of depthIdeal)(diListNew)
         diMeans.Clear()
         diMap.SetTo(0)
-        For Each di In task.diList
+        For Each di In task.diListAll
             diMap(di.lRect).SetTo(255)
             diMeans.Add(di.depth)
 
@@ -77,13 +63,23 @@ Public Class IdealD_Basics : Inherits TaskParent
         dst3.SetTo(0)
         task.pointCloud.CopyTo(dst3, diMap)
 
-        If standaloneTest() Then
-            dst2 = src.Clone
-            For Each di In task.diList
-                dst2.Rectangle(di.lRect, cv.Scalar.White, task.lineWidth)
-            Next
-        End If
         If task.heartBeat Then labels(2) = CStr(task.diList.Count) + " grid cells have the ideal depth."
+        dst2 = src.Clone
+        task.diList.Clear()
+        Dim cellPixels As Single = options.cellSize * options.cellSize
+        For Each di In task.diListAll
+            If di.age > 5 Then
+                If di.pixels / cellPixels >= options.percentThreshold Then
+                    If di.mm.maxVal - di.mm.minVal <= options.rangeThresholdmm Then
+                        If di.matched Then
+                            task.diList.Add(di)
+                            dst2.Rectangle(di.lRect, cv.Scalar.White, task.lineWidth)
+                            dst3.Rectangle(di.rRect, cv.Scalar.White, task.lineWidth)
+                        End If
+                    End If
+                End If
+            End If
+        Next
     End Sub
 End Class
 

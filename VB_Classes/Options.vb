@@ -7989,23 +7989,23 @@ End Class
 Public Class Options_IdealSize : Inherits OptionParent
     Public cellSize As Integer = 8
     Public height As Integer = 8
-    Public depthThreshold As Single = 1
-    Public rangeThreshold As Integer ' in centimeters
+    Public percentThreshold As Single = 1
+    Public rangeThresholdmm As Single
     Public Sub New()
         If task.dst2.Width >= 1280 Then cellSize = 16
         If task.dst2.Width >= 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Disparity Cell Size", 1, 100, cellSize)
-            sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * depthThreshold)
-            sliders.setupTrackBar("Cell Depth Range (cm's)", 1, 200, 10)
+            sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * percentThreshold)
+            sliders.setupTrackBar("Cell Depth Range (mm's)", 1, 200, 100)
         End If
     End Sub
     Public Sub RunOpt()
         Static sizeSlider = FindSlider("Disparity Cell Size")
         Static depthSlider = FindSlider("Percent Depth Threshold")
-        Static rangeSlider = FindSlider("Cell Depth Range (cm's)")
+        Static rangeSlider = FindSlider("Cell Depth Range (mm's)")
         cellSize = sizeSlider.value
-        depthThreshold = depthSlider.value / 100
-        rangeThreshold = rangeSlider.value
+        percentThreshold = depthSlider.value / 100
+        rangeThresholdmm = rangeSlider.value / 1000
     End Sub
 End Class
