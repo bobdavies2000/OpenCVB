@@ -442,6 +442,7 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
     Public distances() As Single
     Public options As New Options_LowRes
     Public motionList As New List(Of Integer)
+    Dim percentList As New List(Of Single)
     Public Sub New()
         desc = "Measure how much color changes with and without motion."
     End Sub
@@ -476,7 +477,6 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
         Next
 
         If task.heartBeat Or task.optionsChanged Then
-            Static percentList As New List(Of Single)
             percentList.Add(motionList.Count / task.gridRects.Count)
             If percentList.Count > 3 Then percentList.RemoveAt(0)
             task.motionPercent = percentList.Average

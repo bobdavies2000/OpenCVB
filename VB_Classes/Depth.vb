@@ -1690,16 +1690,18 @@ End Class
 
 
 
-Public Class Depth_Disparity : Inherits TaskParent
+Public Class Depth_IdealRightView : Inherits TaskParent
     Public means As New List(Of Single)
     Public mats As New Mat_4to1
     Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Map each ideal depth cell to the inverse of its mean depth."
+        labels = {"Draw below to see match in right image", "Right view image", "", ""}
+        labels(2) = "Left view, right view, ideal depth (left), ideal depth (right)"
+        labels(3) = "Right view with ideal depth cells marked."
+        task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
+        desc = "Map each ideal depth cell into the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = task.leftView
         dst1 = task.rightView
         mats.mat(0) = task.leftView
         mats.mat(1) = task.rightView
@@ -1744,8 +1746,8 @@ End Class
 
 
 
-Public Class Depth_DisparityCellPlot : Inherits TaskParent
-    Dim toDisp As New Depth_Disparity
+Public Class Depth_IdealCellPlot : Inherits TaskParent
+    Dim toDisp As New Depth_IdealRightView
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
@@ -1797,12 +1799,17 @@ Public Class Depth_Ideal : Inherits TaskParent
 
         Dim newRects As New List(Of cv.Rect)
         Dim motionCells As New List(Of cv.Rect)
+        Dim cellPixels = options.cellSize * options.cellSize
         For Each roi In gridRects
-            If task.motionMask(roi).CountNonZero = 0 Then newRects.Add(roi)
+            If task.motionMask(roi).CountNonZero = 0 Then
+                ' make sure the cell still has depth.
+                If task.pcSplit(2)(roi).CountNonZero >= options.depthThreshold * cellPixels Then
+                    newRects.Add(roi)
+                End If
+            End If
         Next
 
         depth32f = task.pcSplit(2).Clone
-        Dim cellPixels = options.cellSize * options.cellSize
         For Each roi In grid.gridRectsAll
             If roi.X = 0 Then Continue For ' it is unlikely that a left-hugging rect could be matched.
             If task.motionMask(roi).CountNonZero > 0 Then

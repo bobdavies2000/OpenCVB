@@ -282,8 +282,6 @@ Public Class algorithmList
 	If algorithmName = "Depth_ColorMap" Then return new Depth_ColorMap
 	If algorithmName = "Depth_Contour" Then return new Depth_Contour
 	If algorithmName = "Depth_Dilate" Then return new Depth_Dilate
-	If algorithmName = "Depth_Disparity" Then return new Depth_Disparity
-	If algorithmName = "Depth_DisparityCellPlot" Then return new Depth_DisparityCellPlot
 	If algorithmName = "Depth_Display" Then return new Depth_Display
 	If algorithmName = "Depth_FirstLastDistance" Then return new Depth_FirstLastDistance
 	If algorithmName = "Depth_Flatland" Then return new Depth_Flatland
@@ -296,6 +294,8 @@ Public Class algorithmList
 	If algorithmName = "Depth_HolesOverTime" Then return new Depth_HolesOverTime
 	If algorithmName = "Depth_HolesRect" Then return new Depth_HolesRect
 	If algorithmName = "Depth_Ideal" Then return new Depth_Ideal
+	If algorithmName = "Depth_IdealCellPlot" Then return new Depth_IdealCellPlot
+	If algorithmName = "Depth_IdealRightView" Then return new Depth_IdealRightView
 	If algorithmName = "Depth_InfinityCheck" Then return new Depth_InfinityCheck
 	If algorithmName = "Depth_InRange" Then return new Depth_InRange
 	If algorithmName = "Depth_LocalMinMax_MT" Then return new Depth_LocalMinMax_MT

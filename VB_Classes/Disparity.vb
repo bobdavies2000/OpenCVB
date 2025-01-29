@@ -285,8 +285,7 @@ Public Class Disparity_Features : Inherits TaskParent
     Dim featNo As New Feature_NoMotion
     Public Sub New()
         optiBase.findRadio("GoodFeatures (ShiTomasi) grid").Checked = True
-        optiBase.FindSlider("Disparity Cell Width").Value = 8
-        optiBase.FindSlider("Disparity Cell Height").Value = 8
+        optiBase.FindSlider("Disparity Cell Size").Value = 8
         desc = "Use features in ideal depth regions to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
