@@ -422,11 +422,15 @@ End Structure
 
 
 
-Public Class idealData
+Public Class depthIdeal
     Public lRect As cv.Rect
     Public rRect As cv.Rect
     Public depth As Single
     Public age As Integer
+    Public pixels As Integer
+    Public mm As mmData
+    Public motionFlag As Boolean
+    Public index As Integer
 End Class
 
 

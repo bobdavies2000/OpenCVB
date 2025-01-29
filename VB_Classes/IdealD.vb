@@ -1,14 +1,14 @@
 ﻿Imports System.Dynamic
 Imports System.Windows.Controls
+Imports System.Windows.Documents
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class IdealD_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
-    Public gridRects As New List(Of cv.Rect)
     Public options As New Options_IdealSize
+    Public diMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public diMeans As New List(Of Single)
     Public depth32f As cv.Mat
-    Public gridMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public gridMeans As New List(Of Single)
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         labels(3) = "Pointcloud image for cells with ideal visibility"
@@ -19,51 +19,71 @@ Public Class IdealD_Basics : Inherits TaskParent
         options.RunOpt()
         grid.Run(src)
 
-        Dim newRects As New List(Of cv.Rect)
-        Dim cellPixels = options.cellSize * options.cellSize
-        For Each roi In gridRects
-            If task.motionMask(roi).CountNonZero = 0 Then
-                ' make sure the cell still has depth.
-                If task.pcSplit(2)(roi).CountNonZero >= options.depthThreshold * cellPixels Then
-                    newRects.Add(roi)
-                End If
-            End If
-        Next
-
+        task.diListAll.Clear()
         depth32f = task.pcSplit(2).Clone
-        For Each roi In grid.gridRectsAll
-            If roi.X = 0 Then Continue For ' it is unlikely that a left-hugging rect could be matched.
-            If task.motionMask(roi).CountNonZero > 0 Then
-                If depth32f(roi).CountNonZero >= options.depthThreshold * cellPixels Then
-                    Dim mm = GetMinMax(depth32f(roi))
-                    If (mm.maxVal - mm.minVal) * 100 <= options.rangeThreshold Then newRects.Add(roi)
-                End If
+        cv.Cv2.ImShow("motionmask", task.motionMask)
+        Dim c1 As Integer, c2 As Integer
+        For Each r In grid.gridRectsAll
+            Dim di As New depthIdeal
+            di.lRect = r
+            If task.motionMask(di.lRect).CountNonZero Then di.motionFlag = True
+            If di.motionFlag = False Then
+                c1 += 1
+            End If
+            di.depth = depth32f(di.lRect).Mean(task.depthMask(di.lRect))
+            di.age = 1
+            di.index = task.diListAll.Count
+            task.diListAll.Add(di)
+        Next
+
+        Dim diListNew As New List(Of depthIdeal)
+        For Each di In task.diList
+            If task.diListAll(di.index).motionFlag = False Then
+                di.age += 1
+                diListNew.Add(di)
             End If
         Next
 
-        gridRects = New List(Of cv.Rect)(newRects)
-        gridMeans.Clear()
-        gridMask.SetTo(0)
-        For Each roi In gridRects
-            gridMask(roi).SetTo(255)
-            Dim depth = depth32f(roi).Mean(task.depthMask(roi))
-            gridMeans.Add(depth)
+        Dim camInfo = task.calibData
+        For Each di In task.diListAll
+            If di.motionFlag Then
+                c2 += 1
+                di.motionFlag = False
+                di.age = 1
+                If di.depth > 0 Then
+                    Dim r = di.lRect
+                    r.X -= camInfo.baseline * camInfo.fx / di.depth
+                    di.rRect = r
+                End If
+                di.mm = GetMinMax(depth32f(di.lRect))
+                di.pixels = task.depthMask(di.lRect).CountNonZero
+                diListNew.Add(di)
+            End If
+        Next
+
+        task.diList = New List(Of depthIdeal)(diListNew)
+        diMeans.Clear()
+        diMap.SetTo(0)
+        For Each di In task.diList
+            diMap(di.lRect).SetTo(255)
+            diMeans.Add(di.depth)
 
             ' duplicate the top row of the roi in all the rows of the roi
-            For y = 1 To roi.Height - 1
-                depth32f(roi).Row(0).CopyTo(depth32f(roi).Row(y))
+            For y = 1 To di.lRect.Height - 1
+                depth32f(di.lRect).Row(0).CopyTo(depth32f(di.lRect).Row(y))
             Next
         Next
 
-        depth32f.SetTo(0, Not gridMask)
         dst3.SetTo(0)
-        task.pointCloud.CopyTo(dst3, gridMask)
+        task.pointCloud.CopyTo(dst3, diMap)
 
-        dst2 = src.Clone
-        For Each r In gridRects
-            dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
-        Next
-        If task.heartBeat Then labels(2) = CStr(gridRects.Count) + " grid cells have the maximum depth pixels."
+        If standaloneTest() Then
+            dst2 = src.Clone
+            For Each di In task.diList
+                dst2.Rectangle(di.lRect, cv.Scalar.White, task.lineWidth)
+            Next
+        End If
+        If task.heartBeat Then labels(2) = CStr(task.diList.Count) + " grid cells have the ideal depth."
     End Sub
 End Class
 
@@ -92,10 +112,8 @@ Public Class IdealD_RightView : Inherits TaskParent
         Dim camInfo = task.calibData
         mats.mat(2) = task.idealD.dst2
         mats.mat(3) = task.rightView.Clone
-        For Each roi In task.idealD.gridRects
-            Dim mean = task.pcSplit(2)(roi).Mean(task.depthMask(roi))
-            roi.X -= camInfo.baseline * camInfo.fx / mean(0)
-            mats.mat(3).Rectangle(roi, 255, task.lineWidth)
+        For Each di In task.diList
+            mats.mat(3).Rectangle(di.rRect, 255, task.lineWidth)
         Next
 
         If task.drawRect.Width > 0 Then
@@ -130,28 +148,30 @@ End Class
 
 
 Public Class IdealD_CellPlot : Inherits TaskParent
-    Dim toDisp As New IdealD_RightView
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        desc = "Reconstruction the depth using the disparity cell overlap"
+        desc = "Plot a histogram of an ideal depth cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        toDisp.Run(src)
-        dst2 = toDisp.mats.mat(3)
+        dst2 = src.Clone
+        Dim di As depthIdeal
+        For Each di In task.diList
+            dst2.Rectangle(di.lRect, 255, task.lineWidth)
+        Next
 
         Dim index = task.idealD.grid.gridMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        Dim roi As cv.Rect
-        If task.idealD.gridRects.Count = 0 Or task.optionsChanged Then Exit Sub
-        If index = 0 Or index >= task.idealD.gridRects.Count Then
-            roi = task.idealD.gridRects(task.idealD.gridRects.Count / 2)
-            task.ClickPoint = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
+        If task.diList.Count = 0 Or task.optionsChanged Then Exit Sub
+
+        If index = 0 Or index >= task.diList.Count Then
+            di = task.diList(task.diList.Count / 2)
+            task.ClickPoint = New cv.Point(di.lRect.X + di.lRect.Width / 2, di.lRect.Y + di.lRect.Height / 2)
         Else
-            roi = task.idealD.gridRects(index)
+            di = task.diList(index)
         End If
 
         If task.heartBeat Then
-            plot.Run(task.pcSplit(2)(roi))
+            plot.Run(task.pcSplit(2)(di.lRect))
             dst3 = plot.dst2
             labels(3) = "X values vary from " + Format(plot.minRange, fmt3) +
                         " to " + Format(plot.maxRange, fmt3)
@@ -165,8 +185,7 @@ End Class
 
 
 Public Class IdealD_FullDepth : Inherits TaskParent
-    Public idList As New List(Of idealData)
-    Dim depth32f As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public idList As New List(Of depthIdeal)
     Public Sub New()
         desc = "Create the disparity rectangles for all cells with depth."
     End Sub
@@ -174,46 +193,9 @@ Public Class IdealD_FullDepth : Inherits TaskParent
         dst2 = task.leftView.Clone
         dst3 = task.rightView.Clone
 
-        If task.optionsChanged Then Exit Sub
-
-        Dim newRects As New List(Of idealData)
-        depth32f = task.pcSplit(2).Clone
-        For Each id In idList
-            If task.motionMask(id.lRect).CountNonZero = 0 Then
-                ' make sure the cell still has depth.
-                If depth32f(id.lRect).CountNonZero > 0 Then
-                    id.age += 1
-                    newRects.Add(id)
-                End If
-            End If
-        Next
-
-        Dim threshold = task.idealD.options.rangeThreshold
-        Dim camInfo = task.calibData
-        For Each roi In task.idealD.grid.gridRectsAll
-            If task.motionMask(roi).CountNonZero > 0 Then
-                If depth32f(roi).CountNonZero > 0 Then
-                    Dim mm = GetMinMax(depth32f(roi))
-                    If (mm.maxVal - mm.minVal) * 100 <= threshold Then
-                        Dim mean = depth32f(roi).Mean(task.depthMask(roi))
-                        If mean(0) > 0 Then
-                            Dim id As New idealData
-                            id.lRect = roi
-                            roi.X -= camInfo.baseline * camInfo.fx / mean(0)
-                            id.rRect = roi
-                            id.age = 1
-                            id.depth = mean(0)
-                            newRects.Add(id)
-                        End If
-                    End If
-                End If
-            End If
-        Next
-
-        idList = New List(Of idealData)(newRects)
-        For Each id In idList
-            dst2.Rectangle(id.lRect, 255, task.lineWidth)
-            dst3.Rectangle(id.rRect, 255, task.lineWidth)
+        For Each di In task.diList
+            dst2.Rectangle(di.lRect, 255, task.lineWidth)
+            dst3.Rectangle(di.rRect, 255, task.lineWidth)
         Next
     End Sub
 End Class

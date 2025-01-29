@@ -2216,7 +2216,7 @@ Public Class OpenGL_IdealTest : Inherits TaskParent
 
         If task.gOptions.DebugCheckBox.Checked Then
             dst3.SetTo(0)
-            task.pointCloud.CopyTo(dst3, task.idealD.gridMask)
+            task.pointCloud.CopyTo(dst3, task.idealD.diMap)
             task.ogl.pointCloudInput = dst3
         Else
             task.ogl.pointCloudInput = task.pointCloud

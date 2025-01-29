@@ -15,7 +15,9 @@ Public Class VBtask : Implements IDisposable
     Public rcMap As cv.Mat
     Public rcMinSize As Integer ' the minimum cell size for RedCloud_Basics/RedCloud_Masks
 
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of linePoints) ' line pair list
+    Public diListAll As New List(Of depthIdeal)
+    Public diList As New List(Of depthIdeal)
 
     Public gridSize As Integer
     Public gridRows As Integer
@@ -383,7 +385,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            Dim displayObject = finddisplayObject(displayObjectName)
+            Dim displayObject = findDisplayObject(displayObjectName)
             If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
             ' MSER mistakenly can have 1 cell - just ignore it.
