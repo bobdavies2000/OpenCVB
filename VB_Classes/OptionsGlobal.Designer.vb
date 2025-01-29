@@ -46,7 +46,7 @@ Partial Class OptionsGlobal
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
-        Me.UseMotionColor = New System.Windows.Forms.CheckBox()
+        Me.UseMotion = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.HighlightColor = New System.Windows.Forms.ComboBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
@@ -353,7 +353,7 @@ Partial Class OptionsGlobal
         'MotionBox
         '
         Me.MotionBox.Controls.Add(Me.showMotionMask)
-        Me.MotionBox.Controls.Add(Me.UseMotionColor)
+        Me.MotionBox.Controls.Add(Me.UseMotion)
         Me.MotionBox.Location = New System.Drawing.Point(6, 322)
         Me.MotionBox.Name = "MotionBox"
         Me.MotionBox.Size = New System.Drawing.Size(356, 119)
@@ -371,17 +371,17 @@ Partial Class OptionsGlobal
         Me.showMotionMask.Text = "Show motion cells"
         Me.showMotionMask.UseVisualStyleBackColor = True
         '
-        'UseMotionColor
+        'UseMotion
         '
-        Me.UseMotionColor.AutoSize = True
-        Me.UseMotionColor.Checked = True
-        Me.UseMotionColor.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.UseMotionColor.Location = New System.Drawing.Point(14, 56)
-        Me.UseMotionColor.Name = "UseMotionColor"
-        Me.UseMotionColor.Size = New System.Drawing.Size(215, 24)
-        Me.UseMotionColor.TabIndex = 76
-        Me.UseMotionColor.Text = "Use Motion-Filtered Color"
-        Me.UseMotionColor.UseVisualStyleBackColor = True
+        Me.UseMotion.AutoSize = True
+        Me.UseMotion.Checked = True
+        Me.UseMotion.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.UseMotion.Location = New System.Drawing.Point(14, 56)
+        Me.UseMotion.Name = "UseMotion"
+        Me.UseMotion.Size = New System.Drawing.Size(177, 24)
+        Me.UseMotion.TabIndex = 76
+        Me.UseMotion.Text = "Use Motion-Filtering"
+        Me.UseMotion.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -818,7 +818,7 @@ Partial Class OptionsGlobal
     Friend WithEvents CrossHairs As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
-    Friend WithEvents UseMotionColor As Windows.Forms.CheckBox
+    Friend WithEvents UseMotion As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
     Friend WithEvents TruncateDepth As Windows.Forms.CheckBox
 End Class

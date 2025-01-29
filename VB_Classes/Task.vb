@@ -717,12 +717,10 @@ Public Class VBtask : Implements IDisposable
         motionBasics.Run(src)
         motionMask = motionBasics.motionMask
 
-        If gOptions.UseMotionColor.Checked Then
+        If gOptions.UseMotion.Checked Then
             color = motionBasics.color.Clone
             motionRects = New List(Of cv.Rect)(motionBasics.measure.motionRects)
         End If
-
-        'If gOptions.UseMotionDepth.Checked Then pointCloud = motionBasics.pointcloud.Clone
 
         pcSplit = pointCloud.Split
 

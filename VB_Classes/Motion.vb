@@ -3,8 +3,6 @@ Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
-    Public depthRGB As New cv.Mat
-    Public pointcloud As cv.Mat
     Public color As cv.Mat
     Public motionMask As cv.Mat
     Dim diff As New Diff_Basics
@@ -29,14 +27,6 @@ Public Class Motion_Basics : Inherits TaskParent
         diff.Run(src)
         dst3 = diff.dst2
         If standaloneTest() Then dst2 = motionMask
-
-        If task.heartBeatLT Or depthRGB.Rows = 0 Then
-            depthRGB = task.depthRGB.Clone
-            pointcloud = task.pointCloud.Clone
-        Else
-            task.depthRGB.CopyTo(depthRGB, motionMask)
-            task.pointCloud.CopyTo(pointcloud, motionMask)
-        End If
     End Sub
 End Class
 
@@ -49,12 +39,12 @@ Public Class Motion_BasicsTest : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim measure As New LowRes_MeasureMotion
     Public Sub New()
-        task.gOptions.UseMotionColor.Checked = False
+        task.gOptions.UseMotion.Checked = False
         task.gOptions.showMotionMask.Checked = True
         desc = "Display the difference between task.color and src to verify Motion_Basics is working"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.UseMotionColor.Checked Then
+        If task.gOptions.UseMotion.Checked Then
             SetTrueText("Uncheck 'Use Motion-Constructed images' to validate Motion_Basics", 3)
             Exit Sub
         End If
