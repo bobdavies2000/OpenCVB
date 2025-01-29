@@ -3064,7 +3064,7 @@ Public Class Options_Spectrum : Inherits OptionParent
 
         Dim rc = task.rc
         Dim mask = rc.mask.Clone
-        mask.SetTo(0, task.noDepthMask(rc.rect))
+        mask.SetTo(0, task.noDepthMask(rc.roi))
         For y = 0 To input.Height - 1
             For x = 0 To input.Width - 1
                 If mask.Get(Of Byte)(y, x) > 0 Then
@@ -7996,14 +7996,14 @@ Public Class Options_IdealSize : Inherits OptionParent
         If task.dst2.Width >= 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Disparity Cell Size", 1, 100, cellSize)
-            sliders.setupTrackBar("Disparity Depth Threshold", 1, 100, 100 * depthThreshold)
-            sliders.setupTrackBar("Disparity Cell depth range (cm's)", 1, 100, 10)
+            sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * depthThreshold)
+            sliders.setupTrackBar("Cell Depth Range (cm's)", 1, 200, 10)
         End If
     End Sub
     Public Sub RunOpt()
         Static sizeSlider = FindSlider("Disparity Cell Size")
-        Static depthSlider = FindSlider("Disparity Depth Threshold")
-        Static rangeSlider = FindSlider("Disparity Cell depth range (cm's)")
+        Static depthSlider = FindSlider("Percent Depth Threshold")
+        Static rangeSlider = FindSlider("Cell Depth Range (cm's)")
         cellSize = sizeSlider.value
         depthThreshold = depthSlider.value / 100
         rangeThreshold = rangeSlider.value

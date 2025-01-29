@@ -55,21 +55,21 @@ Public Class RedMask_Basics : Inherits TaskParent
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         For i = 0 To classCount - 1
             Dim md As New maskData
-            md.rect = rectlist(i)
-            If md.rect.Size = dst2.Size Then Continue For
-            If md.rect.Width * md.rect.Height < task.rcMinSize Then Continue For
+            md.roi = rectlist(i)
+            If md.roi.Size = dst2.Size Then Continue For
+            If md.roi.Width * md.roi.Height < task.rcMinSize Then Continue For
             Dim pt = ptlist(i)
             Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
-            md.mask = dst2(md.rect).InRange(val, val)
+            md.mask = dst2(md.roi).InRange(val, val)
             md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(md.mask, md.contour, 255, -1)
             md.pixels = md.mask.CountNonZero
             md.maxDist = GetMaxDist(md)
-            cv.Cv2.MeanStdDev(task.pointCloud(md.rect), depthMean, depthStdev, md.mask)
+            cv.Cv2.MeanStdDev(task.pointCloud(md.roi), depthMean, depthStdev, md.mask)
             md.depthMean = depthMean(2)
-            task.pcSplit(0)(md.rect).MinMaxLoc(md.minDepthVec.X, md.maxDepthVec.X, md.minLoc, md.maxLoc, md.mask)
-            task.pcSplit(1)(md.rect).MinMaxLoc(md.minDepthVec.Y, md.maxDepthVec.Y, md.minLoc, md.maxLoc, md.mask)
-            task.pcSplit(2)(md.rect).MinMaxLoc(md.minDepthVec.Z, md.maxDepthVec.Z, md.minLoc, md.maxLoc, md.mask)
+            task.pcSplit(0)(md.roi).MinMaxLoc(md.minDepthVec.X, md.maxDepthVec.X, md.minLoc, md.maxLoc, md.mask)
+            task.pcSplit(1)(md.roi).MinMaxLoc(md.minDepthVec.Y, md.maxDepthVec.Y, md.minLoc, md.maxLoc, md.mask)
+            task.pcSplit(2)(md.roi).MinMaxLoc(md.minDepthVec.Z, md.maxDepthVec.Z, md.minLoc, md.maxLoc, md.mask)
             mdList.Add(md)
         Next
 
@@ -105,7 +105,7 @@ Public Class RedMask_Redraw : Inherits TaskParent
         For Each md In redMask.mdList
             Dim c = src.Get(Of cv.Vec3b)(md.maxDist.Y, md.maxDist.X)
             color = New cv.Scalar(c.Item0, c.Item1, c.Item2)
-            dst2(md.rect).SetTo(color, md.mask)
+            dst2(md.roi).SetTo(color, md.mask)
         Next
         labels(2) = redMask.labels(2)
     End Sub

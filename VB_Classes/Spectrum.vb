@@ -37,7 +37,7 @@ Public Class Spectrum_X : Inherits TaskParent
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
         If task.heartBeat And task.rc.index > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rc.rect).Clone, " pointcloud X ")
+            Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rc.roi).Clone, " pointcloud X ")
             strOut = options.strOut
         End If
         SetTrueText(strOut, 3)
@@ -61,7 +61,7 @@ Public Class Spectrum_Y : Inherits TaskParent
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
         If task.heartBeat And task.rc.index > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rc.rect).Clone, " pointcloud Y ")
+            Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rc.roi).Clone, " pointcloud Y ")
             strOut = options.strOut
         End If
         SetTrueText(strOut, 3)
@@ -84,7 +84,7 @@ Public Class Spectrum_Z : Inherits TaskParent
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
         If task.heartBeat And task.rc.index > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rc.rect).Clone, " pointcloud Z ")
+            Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rc.roi).Clone, " pointcloud Z ")
             strOut = options.strOut
         End If
         SetTrueText(strOut, 3)
@@ -243,11 +243,11 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
         Dim ranges As List(Of rangeData), input As cv.Mat
         If rc.depthPixels / rc.pixels < 0.5 Then
             input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            src(rc.rect).CopyTo(input, rc.mask)
+            src(rc.roi).CopyTo(input, rc.mask)
             input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
             input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-            task.pcSplit(2)(rc.rect).CopyTo(input, rc.mask)
+            task.pcSplit(2)(rc.roi).CopyTo(input, rc.mask)
         End If
         ranges = options.buildColorRanges(input, "GrayScale")
 
@@ -309,7 +309,7 @@ Public Class Spectrum_RedCloud : Inherits TaskParent
             task.rc = task.rcList(i)
             breakdown.Run(src)
             task.rcList(i) = task.rc
-            dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
+            dst3(task.rc.roi).SetTo(task.rc.color, task.rc.mask)
         Next
         breakdown.Run(src)
     End Sub
@@ -354,7 +354,7 @@ Public Class Spectrum_Gray : Inherits TaskParent
 
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
-        Dim input = src(task.rc.rect)
+        Dim input = src(task.rc.roi)
         If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ranges = options.buildColorRanges(input, typeSpec)
         strOut = options.strOut

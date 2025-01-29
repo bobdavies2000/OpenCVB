@@ -24,7 +24,7 @@ Public Class Profile_Basics : Inherits TaskParent
         If rc.contour.Count < 4 Then Exit Sub
 
         dst3.SetTo(0)
-        DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawContour(dst3(rc.roi), rc.contour, cv.Scalar.Yellow)
 
         Dim sortLeft As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim sortTop As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -34,7 +34,7 @@ Public Class Profile_Basics : Inherits TaskParent
         rc.contour3D = New List(Of cv.Point3f)
         For i = 0 To rc.contour.Count - 1
             Dim pt = rc.contour(i)
-            Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+            Dim vec = task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)
             If Single.IsNaN(vec.Z) Or Single.IsInfinity(vec.Z) Then Continue For
             If vec.Z Then
                 sortLeft.Add(pt.X, i)
@@ -56,9 +56,9 @@ Public Class Profile_Basics : Inherits TaskParent
         corners.Clear()
         cornersRaw.Clear()
 
-        corners.Add(New cv.Point(rc.rect.X + rc.contour(0).X, rc.rect.Y + rc.contour(0).Y)) ' show the first contour point...
+        corners.Add(New cv.Point(rc.roi.X + rc.contour(0).X, rc.roi.Y + rc.contour(0).Y)) ' show the first contour point...
         cornersRaw.Add(rc.contour(0)) ' show the first contour point...
-        corners3D.Add(task.pointCloud.Get(Of cv.Point3f)(rc.rect.Y + rc.contour(0).Y, rc.rect.X + rc.contour(0).X))
+        corners3D.Add(task.pointCloud.Get(Of cv.Point3f)(rc.roi.Y + rc.contour(0).Y, rc.roi.X + rc.contour(0).X))
 
         For i = 0 To 6 - 1
             Dim index = Choose(i + 1, 0, sortLeft.Count - 1, 0, sortTop.Count - 1, 0, sortFront.Count - 1)
@@ -66,8 +66,8 @@ Public Class Profile_Basics : Inherits TaskParent
             If ptList.Count > 0 Then
                 Dim pt = rc.contour(ptList.ElementAt(index).Value)
                 cornersRaw.Add(pt)
-                corners.Add(New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y))
-                corners3D.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
+                corners.Add(New cv.Point(rc.roi.X + pt.X, rc.roi.Y + pt.Y))
+                corners3D.Add(task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X))
             End If
         Next
 
@@ -148,8 +148,8 @@ Public Class Profile_Derivative : Inherits TaskParent
         Dim rc = task.rc
 
         Dim offset As Integer = 30
-        Dim rsizeX = (dst2.Width - offset * 2) / rc.rect.Width
-        Dim rsizeY = (dst2.Height - offset * 2) / rc.rect.Height
+        Dim rsizeX = (dst2.Width - offset * 2) / rc.roi.Width
+        Dim rsizeY = (dst2.Height - offset * 2) / rc.roi.Height
         saveTrueText.Clear()
         task.trueData.Clear()
         dst3.SetTo(0)
@@ -158,7 +158,7 @@ Public Class Profile_Derivative : Inherits TaskParent
         If rc.index > 0 Then
             For i = 0 To rc.contour.Count - 1
                 Dim pt = rc.contour(i)
-                Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+                Dim vec = task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)
                 pt = New cv.Point(pt.X * rsizeX + offset, pt.Y * rsizeY + offset)
                 Dim t = If(rc.maxDepthVec.Z = 0, 0, (vec.Z - rc.minDepthVec.Z) / (rc.maxDepthVec.Z - rc.minDepthVec.Z))
                 If vec.Z > 0 And t > 0 Then
@@ -356,7 +356,7 @@ Public Class Profile_Kalman : Inherits TaskParent
 
         If rc.index > 0 Then
             dst3.SetTo(0)
-            DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+            DrawContour(dst3(rc.roi), rc.contour, cv.Scalar.Yellow)
             For i = 0 To sides.corners.Count - 1
                 Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
                 DrawCircle(dst3,pt, task.DotSize + 2, sides.cornerColors(i))

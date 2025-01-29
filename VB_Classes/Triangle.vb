@@ -14,7 +14,7 @@ Public Class Triangle_Basics : Inherits TaskParent
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
         For Each pt In task.rc.contour
-            pt = New cv.Point(pt.X + task.rc.rect.X, pt.Y + task.rc.rect.Y)
+            pt = New cv.Point(pt.X + task.rc.roi.X, pt.Y + task.rc.roi.Y)
             Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             pt3D.Add(vec)
@@ -46,7 +46,7 @@ Public Class Triangle_HullContour : Inherits TaskParent
         labels = {"", "Selected cell", "RedColor_Basics output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
         If task.rcList.Count <= 1 Then Exit Sub
@@ -56,13 +56,13 @@ Public Class Triangle_HullContour : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each pt In rc.contour
-            pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+            pt = New cv.Point(pt.X + rc.roi.X, pt.Y + rc.roi.Y)
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
         Next
 
         dst1.SetTo(0)
         For Each pt In rc.hull
-            pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+            pt = New cv.Point(pt.X + rc.roi.X, pt.Y + rc.roi.Y)
             DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
         Next
     End Sub
@@ -80,7 +80,7 @@ Public Class Triangle_RedCloud : Inherits TaskParent
         labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
         If task.rcList.Count <= 1 Then Exit Sub
@@ -90,7 +90,7 @@ Public Class Triangle_RedCloud : Inherits TaskParent
         For Each rc In task.rcList
             Dim pt3D As New List(Of cv.Point3f)
             For Each pt In rc.contour
-                pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+                pt = New cv.Point(pt.X + rc.roi.X, pt.Y + rc.roi.Y)
                 Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
                 If vec.Z > 0 Then pt3D.Add(vec)
             Next
@@ -119,7 +119,7 @@ Public Class Triangle_Cell : Inherits TaskParent
         labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         If task.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rc
@@ -127,22 +127,22 @@ Public Class Triangle_Cell : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
-        Dim aspectRect = rc.rect.Width / rc.rect.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
+        Dim aspectRect = rc.roi.Width / rc.roi.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
         Dim xFactor As Single, yFactor As Single
         If aspectRect > aspect Then
-            cellRect = New cv.Rect(0, 0, dst2.Width, rc.rect.Height * dst2.Width / rc.rect.Width)
+            cellRect = New cv.Rect(0, 0, dst2.Width, rc.roi.Height * dst2.Width / rc.roi.Width)
             xFactor = dst2.Width
-            yFactor = rc.rect.Height * dst2.Width / rc.rect.Width
+            yFactor = rc.roi.Height * dst2.Width / rc.roi.Width
         Else
-            cellRect = New cv.Rect(0, 0, rc.rect.Width * dst2.Height / rc.rect.Height, dst2.Height)
-            xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
+            cellRect = New cv.Rect(0, 0, rc.roi.Width * dst2.Height / rc.roi.Height, dst2.Height)
+            xFactor = rc.roi.Width * dst2.Height / rc.roi.Height
             yFactor = dst2.Height
         End If
         dst3.Rectangle(cellRect, white, task.lineWidth)
 
         For Each pt In rc.contour
-            Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
-            pt = New cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height)
+            Dim vec = task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)
+            pt = New cv.Point(xFactor * pt.X / rc.roi.Width, yFactor * pt.Y / rc.roi.Height)
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             pt3D.Add(vec)
         Next
@@ -173,7 +173,7 @@ Public Class Triangle_Mask : Inherits TaskParent
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         If task.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rc
@@ -181,32 +181,32 @@ Public Class Triangle_Mask : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
-        Dim aspectRect = rc.rect.Width / rc.rect.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
+        Dim aspectRect = rc.roi.Width / rc.roi.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
         Dim xFactor As Single, yFactor As Single
         If aspectRect > aspect Then
-            cellRect = New cv.Rect(0, 0, dst2.Width, rc.rect.Height * dst2.Width / rc.rect.Width)
+            cellRect = New cv.Rect(0, 0, dst2.Width, rc.roi.Height * dst2.Width / rc.roi.Width)
             xFactor = dst2.Width
-            yFactor = rc.rect.Height * dst2.Width / rc.rect.Width
+            yFactor = rc.roi.Height * dst2.Width / rc.roi.Width
         Else
-            cellRect = New cv.Rect(0, 0, rc.rect.Width * dst2.Height / rc.rect.Height, dst2.Height)
-            xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
+            cellRect = New cv.Rect(0, 0, rc.roi.Width * dst2.Height / rc.roi.Height, dst2.Height)
+            xFactor = rc.roi.Width * dst2.Height / rc.roi.Height
             yFactor = dst2.Height
         End If
         dst3.Rectangle(cellRect, white, task.lineWidth)
 
         triangles.Clear()
-        For y = 0 To rc.rect.Height - 1
-            For x = 0 To rc.rect.Width - 1
+        For y = 0 To rc.roi.Height - 1
+            For x = 0 To rc.roi.Width - 1
                 If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
-                Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
-                Dim pt = New cv.Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height)
+                Dim vec = task.pointCloud(rc.roi).Get(Of cv.Point3f)(y, x)
+                Dim pt = New cv.Point2f(xFactor * x / rc.roi.Width, yFactor * y / rc.roi.Height)
                 DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
                 pt3D.Add(vec)
             Next
         Next
 
-        Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
-                                      yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
+        Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.roi.X) / rc.roi.Width,
+                                      yFactor * (rc.maxDist.Y - rc.roi.Y) / rc.roi.Height)
         DrawCircle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red)
         labels(2) = task.redC.labels(2)
     End Sub

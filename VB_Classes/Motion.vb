@@ -30,14 +30,12 @@ Public Class Motion_Basics : Inherits TaskParent
         dst3 = diff.dst2
         If standaloneTest() Then dst2 = motionMask
 
-        If task.gOptions.UseMotionDepth.Checked Then
-            If task.heartBeatLT Or depthRGB.Rows = 0 Then
-                depthRGB = task.depthRGB.Clone
-                pointcloud = task.pointCloud.Clone
-            Else
-                task.depthRGB.CopyTo(depthRGB, motionMask)
-                task.pointCloud.CopyTo(pointcloud, motionMask)
-            End If
+        If task.heartBeatLT Or depthRGB.Rows = 0 Then
+            depthRGB = task.depthRGB.Clone
+            pointcloud = task.pointCloud.Clone
+        Else
+            task.depthRGB.CopyTo(depthRGB, motionMask)
+            task.pointCloud.CopyTo(pointcloud, motionMask)
         End If
     End Sub
 End Class
@@ -116,10 +114,10 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
         If task.rcList.Count < 2 Then
             rectList.Clear()
         Else
-            Dim nextRect = task.rcList.ElementAt(1).rect
+            Dim nextRect = task.rcList.ElementAt(1).roi
             For i = 2 To task.rcList.Count - 1
                 Dim rc = task.rcList.ElementAt(i)
-                nextRect = nextRect.Union(rc.rect)
+                nextRect = nextRect.Union(rc.roi)
             Next
         End If
 
@@ -499,10 +497,10 @@ Public Class Motion_Enclosing : Inherits TaskParent
 
         motionRect = New cv.Rect
         If task.rcList.Count < 2 Then Exit Sub
-        motionRect = task.rcList.ElementAt(1).rect
+        motionRect = task.rcList.ElementAt(1).roi
         For i = 2 To task.rcList.Count - 1
-            Dim cell = task.rcList.ElementAt(i)
-            motionRect = motionRect.Union(cell.rect)
+            Dim rc = task.rcList.ElementAt(i)
+            motionRect = motionRect.Union(rc.roi)
         Next
 
         If motionRect.Width > dst2.Width / 2 And motionRect.Height > dst2.Height / 2 Then

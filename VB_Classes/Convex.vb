@@ -63,7 +63,7 @@ Public Class Convex_RedCloud : Inherits TaskParent
             convex.Run(src)
 
             dst3.SetTo(0)
-            dst3(task.rc.rect) = convex.dst2(New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height))
+            dst3(task.rc.roi) = convex.dst2(New cv.Rect(0, 0, task.rc.roi.Width, task.rc.roi.Height))
             DrawCircle(dst3, task.rc.maxDist, task.DotSize, white)
         End If
     End Sub

@@ -62,7 +62,7 @@ Public Class PCA_Basics : Inherits TaskParent
         Dim rc = task.rc
         Dim inputPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
-            Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+            Dim vec = task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)
             If vec.Z > 0 Then inputPoints.Add(vec)
         Next
 
@@ -100,7 +100,7 @@ Public Class PCA_CellMask : Inherits TaskParent
 
         Dim rc = task.rc
         If rc.maxDepthVec.Z > 0 Then
-            pcaPrep.Run(task.pointCloud(rc.rect).Clone)
+            pcaPrep.Run(task.pointCloud(rc.roi).Clone)
 
             If pcaPrep.inputData.Rows > 0 Then
                 pca.pca_analysis = New cv.PCA(pcaPrep.inputData, New cv.Mat, cv.PCA.Flags.DataAsRow)

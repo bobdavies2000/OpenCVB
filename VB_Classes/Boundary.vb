@@ -17,7 +17,7 @@ Public Class Boundary_Basics : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To task.rcList.Count - 1
             Dim rc = task.rcList(i)
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawContour(dst3(rc.roi), rc.contour, 255, task.lineWidth)
         Next
 
         labels(3) = $"{task.rcList.Count} cells were found."
@@ -73,24 +73,24 @@ Public Class Boundary_Rectangles : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each rc In task.rcList
-            dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(rc.roi, task.HighlightColor, task.lineWidth)
         Next
         labels(2) = $"{task.rcList.Count} rectangles before contain test"
 
         rects.Clear()
         For i = 0 To CInt(task.rcList.Count * options.percentRect) - 1
-            rects.Add(task.rcList(i).rect)
+            rects.Add(task.rcList(i).roi)
         Next
 
         smallRects.Clear()
         smallContours.Clear()
         For i = task.rcList.Count - 1 To CInt(task.rcList.Count * options.percentRect) Step -1
             task.rc = task.rcList(i)
-            Dim r = task.rc.rect
+            Dim r = task.rc.roi
             Dim contained As Boolean = False
             For Each rc In task.rcList
-                If r = rc.rect Then Continue For
-                If rc.rect.Contains(r) Then
+                If r = rc.roi Then Continue For
+                If rc.roi.Contains(r) Then
                     contained = True
                     Exit For
                 End If
@@ -200,7 +200,7 @@ Public Class Boundary_RedCloud : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To task.rcList.Count - 1
             Dim rc = task.rcList(i)
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawContour(dst3(rc.roi), rc.contour, 255, task.lineWidth)
         Next
 
         labels(3) = $"{task.rcList.Count} cells were found."
@@ -227,7 +227,7 @@ Public Class Boundary_GuidedBP : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To task.rcList.Count - 1
             Dim rc = task.rcList(i)
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawContour(dst3(rc.roi), rc.contour, 255, task.lineWidth)
         Next
 
         labels(3) = $"{task.rcList.Count} cells were found."

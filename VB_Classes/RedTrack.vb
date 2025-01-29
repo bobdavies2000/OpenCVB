@@ -9,8 +9,8 @@ Public Class RedTrack_Basics : Inherits TaskParent
         labels(2) = task.redC.labels(3)
         dst2.SetTo(0)
         For Each rc As rcData In task.rcList
-            DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If rc.index = task.rc.index Then DrawContour(dst2(rc.rect), rc.contour, white, -1)
+            DrawContour(dst2(rc.roi), rc.contour, rc.color, -1)
+            If rc.index = task.rc.index Then DrawContour(dst2(rc.roi), rc.contour, white, -1)
         Next
     End Sub
 End Class
@@ -80,7 +80,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
         Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each rc In task.rcList
             If rc.index = 0 Then Continue For
-            xList.Add(rc.rect.X, rc.index)
+            xList.Add(rc.roi.X, rc.index)
         Next
 
         Dim minLeft As Integer = xList.Count / 4
@@ -231,9 +231,9 @@ Public Class RedTrack_Features : Inherits TaskParent
         runRedC(dst2)
         dst3.SetTo(0)
         For Each rc In task.rcList
-            If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
-            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-            If rc.contour.Count > 0 Then SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
+            If rc.roi.X = 0 And rc.roi.Y = 0 Then Continue For
+            DrawContour(dst3(rc.roi), rc.contour, rc.color, -1)
+            If rc.contour.Count > 0 Then SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.roi.X, rc.roi.Y), 3)
         Next
         SetTrueText("Move camera to see the value of this algorithm", 2)
         SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3)

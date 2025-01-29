@@ -115,7 +115,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public ideal As Depth_Ideal
+    Public idealD As IdealD_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
@@ -397,8 +397,8 @@ Public Class VBtask : Implements IDisposable
             '        If rcX.index = 20 Then Exit For
             '    Next
 
-            '    color.Rectangle(rc.rect, cv.Scalar.Yellow, lineWidth)
-            '    color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            '    color.Rectangle(rc.roi, cv.Scalar.Yellow, lineWidth)
+            '    color(rc.roi).SetTo(cv.Scalar.White, rc.mask)
             'End If
 
             optionsChanged = False
@@ -487,7 +487,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Horizon
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        ideal = New Depth_Ideal
+        idealD = New IdealD_Basics
         colorizer = New Depth_Palette
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
@@ -566,7 +566,7 @@ Public Class VBtask : Implements IDisposable
         If index > 0 And index < rcList.Count Then
             ' ClickPoint = rcList(index).maxDist
             rc = rcList(index)
-            task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            task.color(rc.roi).SetTo(cv.Scalar.White, rc.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
             If rcList.Count > 1 Then rc = rcList(1)
@@ -719,11 +719,10 @@ Public Class VBtask : Implements IDisposable
 
         If gOptions.UseMotionColor.Checked Then
             color = motionBasics.color.Clone
-            Dim rectList As List(Of cv.Rect) = motionBasics.measure.motionRects
-            motionRects = New List(Of cv.Rect)(rectList)
+            motionRects = New List(Of cv.Rect)(motionBasics.measure.motionRects)
         End If
 
-        If gOptions.UseMotionDepth.Checked Then pointCloud = motionBasics.pointcloud.Clone
+        'If gOptions.UseMotionDepth.Checked Then pointCloud = motionBasics.pointcloud.Clone
 
         pcSplit = pointCloud.Split
 
@@ -804,7 +803,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         gravityHorizon.Run(src)
-        ideal.Run(src)
+        idealD.Run(src)
 
         Dim saveOptionsChanged = optionsChanged
         If paused = False Then

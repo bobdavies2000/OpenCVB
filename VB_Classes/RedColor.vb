@@ -148,8 +148,8 @@ Public Class RedColor_Hulls : Inherits TaskParent
                 Catch ex As Exception
                     defectCount += 1
                 End Try
-                DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
-                DrawContour(task.rcMap(rc.rect), rc.hull, rc.index, -1)
+                DrawContour(dst3(rc.roi), rc.hull, rc.color, -1)
+                DrawContour(task.rcMap(rc.roi), rc.hull, rc.index, -1)
             End If
             rcList.Add(rc)
         Next
@@ -197,8 +197,8 @@ Public Class RedColor_FindCells : Inherits TaskParent
         For Each index In cellList
             If task.rcList.Count <= index Then Continue For
             Dim rc = task.rcList(index)
-            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
+            DrawContour(dst3(rc.roi), rc.contour, rc.color, -1)
+            dst3(rc.roi).SetTo(rc.color, rc.mask)
         Next
         labels(3) = CStr(count) + " cells were found using the motion mask"
     End Sub
@@ -327,8 +327,8 @@ Public Class RedColor_CellsAtDepth : Inherits TaskParent
         dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
         For i = 0 To slotList(histIndex).Count - 1
             Dim rc = task.rcList(slotList(histIndex)(i))
-            DrawContour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
-            DrawContour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
+            DrawContour(dst2(rc.roi), rc.contour, cv.Scalar.Yellow)
+            DrawContour(task.color(rc.roi), rc.contour, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -420,7 +420,7 @@ Public Class RedColor_PlaneColor : Inherits TaskParent
                     rc.eq = build3PointEquation(rc)
                 End If
             End If
-            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
+            dst3(rc.roi).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
                                               Math.Abs(255 * rc.eq(1)),
                                               Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
@@ -445,14 +445,14 @@ Public Class RedColor_PlaneFromContour : Inherits TaskParent
         Dim rc = task.rc
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
-            If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
+            If pt.X >= rc.roi.Width Or pt.Y >= rc.roi.Height Then Continue For
             If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
-            fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
+            fitPoints.Add(task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X))
         Next
         rc.eq = fitDepthPlane(fitPoints)
         If standaloneTest() Then
             dst3.SetTo(0)
-            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
+            dst3(rc.roi).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
         End If
     End Sub
 End Class
@@ -475,15 +475,15 @@ Public Class RedColor_PlaneFromMask : Inherits TaskParent
 
         Dim rc = task.rc
         Dim fitPoints As New List(Of cv.Point3f)
-        For y = 0 To rc.rect.Height - 1
-            For x = 0 To rc.rect.Width - 1
-                If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
+        For y = 0 To rc.roi.Height - 1
+            For x = 0 To rc.roi.Width - 1
+                If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.roi).Get(Of cv.Point3f)(y, x))
             Next
         Next
         rc.eq = fitDepthPlane(fitPoints)
         If standaloneTest() Then
             dst3.SetTo(0)
-            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
+            dst3(rc.roi).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
         End If
     End Sub
 End Class
@@ -554,15 +554,15 @@ Public Class RedColor_LikelyFlatSurfaces : Inherits TaskParent
         hCells.Clear()
         For Each rc In task.rcList
             If rc.depthMean >= task.MaxZmeters Then Continue For
-            Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
+            Dim tmp As cv.Mat = verts.dst2(rc.roi) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then
-                DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+                DrawContour(dst2(rc.roi), rc.contour, rc.color, -1)
                 vCells.Add(rc)
             End If
-            tmp = verts.dst3(rc.rect) And rc.mask
+            tmp = verts.dst3(rc.roi) And rc.mask
             Dim count = tmp.CountNonZero
             If count / rc.pixels > 0.5 Then
-                DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+                DrawContour(dst3(rc.roi), rc.contour, rc.color, -1)
                 hCells.Add(rc)
             End If
         Next
@@ -596,7 +596,7 @@ Public Class RedColor_PlaneEq3D : Inherits TaskParent
         End If
 
         dst3.SetTo(0)
-        DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+        DrawContour(dst3(rc.roi), rc.contour, rc.color, -1)
 
         SetTrueText(eq.strOut, 3)
     End Sub
@@ -651,9 +651,9 @@ Public Class RedColor_UnstableCells : Inherits TaskParent
         Dim currList As New List(Of cv.Point)
         For Each rc In task.rcList
             If prevList.Contains(rc.maxDStable) = False Then
-                DrawContour(dst1(rc.rect), rc.contour, white, -1)
-                DrawContour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
-                DrawContour(dst3(rc.rect), rc.contour, white, -1)
+                DrawContour(dst1(rc.roi), rc.contour, white, -1)
+                DrawContour(dst1(rc.roi), rc.contour, cv.Scalar.Black)
+                DrawContour(dst3(rc.roi), rc.contour, white, -1)
             End If
             currList.Add(rc.maxDStable)
         Next
@@ -687,9 +687,9 @@ Public Class RedColor_UnstableHulls : Inherits TaskParent
         For Each rc In task.rcList
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             If prevList.Contains(rc.maxDStable) = False Then
-                DrawContour(dst1(rc.rect), rc.hull, white, -1)
-                DrawContour(dst1(rc.rect), rc.hull, cv.Scalar.Black)
-                DrawContour(dst3(rc.rect), rc.hull, white, -1)
+                DrawContour(dst1(rc.roi), rc.hull, white, -1)
+                DrawContour(dst1(rc.roi), rc.hull, cv.Scalar.Black)
+                DrawContour(dst3(rc.roi), rc.hull, white, -1)
             End If
             currList.Add(rc.maxDStable)
         Next
@@ -769,7 +769,7 @@ Public Class RedColor_MostlyColor : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each rc In task.rcList
-            If rc.depthPixels / rc.pixels > 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
+            If rc.depthPixels / rc.pixels > 0.5 Then dst3(rc.roi).SetTo(rc.color, rc.mask)
         Next
     End Sub
 End Class
@@ -936,24 +936,24 @@ Public Class RedColor_OnlyColorAlt : Inherits TaskParent
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Scalar)({black})
         Dim unmatched As Integer
-        For Each cell In task.rcList
-            Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
+        For Each rc In task.rcList
+            Dim index = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If index < lastCells.Count Then
-                cell.color = lastColors.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X).ToVec3f
+                rc.color = lastColors.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X).ToVec3f
             Else
                 unmatched += 1
             End If
-            If usedColors.Contains(cell.color) Then
+            If usedColors.Contains(rc.color) Then
                 unmatched += 1
-                cell.color = randomCellColor()
+                rc.color = randomCellColor()
             End If
-            usedColors.Add(cell.color)
+            usedColors.Add(rc.color)
 
-            If task.rcMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
-                cell.index = task.rcList.Count
-                newCells.Add(cell)
-                task.rcMap(cell.rect).SetTo(cell.index, cell.mask)
-                dst3(cell.rect).SetTo(cell.color, cell.mask)
+            If task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) = 0 Then
+                rc.index = task.rcList.Count
+                newCells.Add(rc)
+                task.rcMap(rc.roi).SetTo(rc.index, rc.mask)
+                dst3(rc.roi).SetTo(rc.color, rc.mask)
             End If
         Next
 
@@ -996,7 +996,7 @@ Public Class RedColor_UnmatchedCount : Inherits TaskParent
             If rc.indexLast <> 0 Then
                 Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If val = 0 Then
-                    dst3(rc.rect).SetTo(255, rc.mask)
+                    dst3(rc.roi).SetTo(255, rc.mask)
                     unMatchedCells += 1
                     frameLoc.Add(rc.maxDist)
                     framecounts.Add(myFrameCount)
@@ -1049,7 +1049,7 @@ Public Class RedColor_ContourUpdate : Inherits TaskParent
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
             rcList(i) = rc
-            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawContour(dst3(rc.roi), rc.contour, rc.color, -1)
         Next
     End Sub
 End Class
@@ -1173,13 +1173,13 @@ Public Class RedColor_GenCellContains : Inherits TaskParent
         Dim count = Math.Min(task.redOptions.IdentifyCountBar.Value, task.rcList.Count)
         For i = 0 To count - 1
             Dim rc = task.rcList(i)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            dst2(rc.roi).SetTo(rc.color, rc.mask)
+            dst2.Rectangle(rc.roi, task.HighlightColor, task.lineWidth)
         Next
 
         For i = task.redOptions.IdentifyCountBar.Value To task.rcList.Count - 1
             Dim rc = task.rcList(i)
-            dst2(rc.rect).SetTo(task.rcList(rc.container).color, rc.mask)
+            dst2(rc.roi).SetTo(task.rcList(rc.container).color, rc.mask)
         Next
     End Sub
 End Class
@@ -1256,8 +1256,8 @@ Public Class RedColor_Consistent : Inherits TaskParent
         dst2.SetTo(0)
         task.rcMap.SetTo(0)
         For Each rc In task.rcList
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.roi).SetTo(rc.color, rc.mask)
+            task.rcMap(rc.roi).SetTo(rc.index, rc.mask)
         Next
 
         For Each mat In diffs
@@ -1324,8 +1324,8 @@ Public Class RedColor_Consistent1 : Inherits TaskParent
         dst2.SetTo(0)
         task.rcMap.SetTo(0)
         For Each rc In task.rcList
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.roi).SetTo(rc.color, rc.mask)
+            task.rcMap(rc.roi).SetTo(rc.index, rc.mask)
         Next
 
         For Each mat In diffs
@@ -1430,23 +1430,23 @@ Public Class RedColor_Features : Inherits TaskParent
                 dst2.Circle(pt, task.DotSize, task.HighlightColor, -1, cv.LineTypes.AntiAlias)
                 labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
             Case 1
-                dst3(rc.rect).SetTo(vbNearFar((rc.depthMean) / task.MaxZmeters), rc.mask)
+                dst3(rc.roi).SetTo(vbNearFar((rc.depthMean) / task.MaxZmeters), rc.mask)
                 labels(3) = "rc.depthMean Is highlighted in dst2"
                 labels(3) = "Mean depth for the cell Is " + Format(rc.depthMean, fmt3)
             Case 2
-                cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.roi), task.pcSplit(2)(rc.roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                 correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
                 labels(3) = "High correlation X to Z Is yellow, low correlation X to Z Is blue"
             Case 3
-                cv.Cv2.MatchTemplate(task.pcSplit(1)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                cv.Cv2.MatchTemplate(task.pcSplit(1)(rc.roi), task.pcSplit(2)(rc.roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                 correlationYtoZ = correlationMat.Get(Of Single)(0, 0)
                 labels(3) = "High correlation Y to Z Is yellow, low correlation Y to Z Is blue"
         End Select
         If options.selection = 2 Or options.selection = 3 Then
-            dst3(rc.rect).SetTo(vbNearFar(If(options.selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
-            SetTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.rect.X, rc.rect.Y), 3)
+            dst3(rc.roi).SetTo(vbNearFar(If(options.selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
+            SetTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.roi.X, rc.roi.Y), 3)
         End If
-        DrawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawContour(dst0(rc.roi), rc.contour, cv.Scalar.Yellow)
         SetTrueText(labels(3), 3)
         labels(2) = "Highlighted feature = " + options.labelName
     End Sub
@@ -1470,12 +1470,12 @@ Public Class RedColor_Gaps : Inherits TaskParent
         dst3 = frames.dst2
 
         If task.rcList.Count > 0 Then
-            dst2(task.rc.rect).SetTo(white, task.rc.mask)
+            dst2(task.rc.roi).SetTo(white, task.rc.mask)
         End If
 
         If task.rcList.Count > 0 Then
             Dim rc = task.rcList(0) ' index can now be zero.
-            dst3(rc.rect).SetTo(0, rc.mask)
+            dst3(rc.roi).SetTo(0, rc.mask)
         End If
         Dim count = dst3.CountNonZero
         labels(3) = "Unclassified pixel count = " + CStr(count) + " or " + Format(count / src.Total, "0%")
@@ -1542,7 +1542,7 @@ Public Class RedColor_BasicsHist : Inherits TaskParent
         If task.heartBeat Then
             dst2.SetTo(0)
             For Each rc In task.rcList
-                dst2(rc.rect).SetTo(rc.depthMean, rc.mask)
+                dst2(rc.roi).SetTo(rc.depthMean, rc.mask)
             Next
             Dim mm = GetMinMax(dst2)
 
@@ -1589,7 +1589,7 @@ Public Class RedColor_Flippers : Inherits TaskParent
                 unMatched += 1
                 unMatchedPixels += rc.pixels
                 flipCells.Add(rc)
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                dst2(rc.roi).SetTo(rc.color, rc.mask)
             Else
                 nonFlipCells.Add(rc)
             End If
@@ -1622,7 +1622,7 @@ Public Class RedColor_FlipTest : Inherits TaskParent
         dst2.SetTo(0)
         Dim ptmaxDstable As New List(Of cv.Point)
         For Each rc In flipper.nonFlipCells
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            dst2(rc.roi).SetTo(rc.color, rc.mask)
             ptmaxDstable.Add(rc.maxDStable)
         Next
 
@@ -1632,7 +1632,7 @@ Public Class RedColor_FlipTest : Inherits TaskParent
             Dim index = ptmaxDstable.IndexOf(lrc.maxDStable)
             If index > 0 Then
                 Dim rcNabe = flipper.nonFlipCells(index)
-                dst2(rc.rect).SetTo(rcNabe.color, rc.mask)
+                dst2(rc.roi).SetTo(rcNabe.color, rc.mask)
                 count += 1
             End If
         Next
@@ -1670,9 +1670,9 @@ Public Class RedColor_Contour : Inherits TaskParent
                     contour.Add(pt)
                 Next
                 If i < 8 Then
-                    DrawContour(dst2(rc.rect), contour, rc.color, task.lineWidth)
+                    DrawContour(dst2(rc.roi), contour, rc.color, task.lineWidth)
                 Else
-                    DrawContour(dst2(rc.rect), contour, rc.color, -1)
+                    DrawContour(dst2(rc.roi), contour, rc.color, -1)
                 End If
             Next
         Next
@@ -1698,7 +1698,7 @@ Public Class RedColor_TopX : Inherits TaskParent
             topXcells.Clear()
             For i = 1 To Math.Min(task.redOptions.IdentifyCountBar.Value + 1, task.rcList.Count) - 1
                 Dim rc = task.rcList(i)
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                dst2(rc.roi).SetTo(rc.color, rc.mask)
                 topXcells.Add(rc.maxDist)
             Next
         Else
@@ -1706,7 +1706,7 @@ Public Class RedColor_TopX : Inherits TaskParent
             For Each pt In topXcells
                 Dim index = task.rcMap.Get(Of Byte)(pt.Y, pt.X)
                 Dim rc = task.rcList(index)
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                dst2(rc.roi).SetTo(rc.color, rc.mask)
                 DrawCircle(dst2, rc.maxDist, task.DotSize, task.HighlightColor)
                 maxList.Add(rc.maxDist)
             Next

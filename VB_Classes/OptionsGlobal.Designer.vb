@@ -45,7 +45,6 @@ Partial Class OptionsGlobal
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
-        Me.UseMotionDepth = New System.Windows.Forms.CheckBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
         Me.UseMotionColor = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -353,7 +352,6 @@ Partial Class OptionsGlobal
         '
         'MotionBox
         '
-        Me.MotionBox.Controls.Add(Me.UseMotionDepth)
         Me.MotionBox.Controls.Add(Me.showMotionMask)
         Me.MotionBox.Controls.Add(Me.UseMotionColor)
         Me.MotionBox.Location = New System.Drawing.Point(6, 322)
@@ -362,16 +360,6 @@ Partial Class OptionsGlobal
         Me.MotionBox.TabIndex = 76
         Me.MotionBox.TabStop = False
         Me.MotionBox.Text = "Motion"
-        '
-        'UseMotionDepth
-        '
-        Me.UseMotionDepth.AutoSize = True
-        Me.UseMotionDepth.Location = New System.Drawing.Point(14, 89)
-        Me.UseMotionDepth.Name = "UseMotionDepth"
-        Me.UseMotionDepth.Size = New System.Drawing.Size(222, 24)
-        Me.UseMotionDepth.TabIndex = 77
-        Me.UseMotionDepth.Text = "Use Motion-Filtered Depth"
-        Me.UseMotionDepth.UseVisualStyleBackColor = True
         '
         'showMotionMask
         '
@@ -832,6 +820,5 @@ Partial Class OptionsGlobal
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
     Friend WithEvents UseMotionColor As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
-    Friend WithEvents UseMotionDepth As Windows.Forms.CheckBox
     Friend WithEvents TruncateDepth As Windows.Forms.CheckBox
 End Class

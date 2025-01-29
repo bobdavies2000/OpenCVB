@@ -665,26 +665,26 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         If task.heartBeat Then
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
-            For Each cell In task.rcList
-                hColor.inputMask = cell.mask
-                hColor.Run(src(cell.rect))
+            For Each rc In task.rcList
+                hColor.inputMask = rc.mask
+                hColor.Run(src(rc.roi))
                 pixelVector.Add(hColor.histArray.ToList)
-                strOut += "(" + CStr(cell.index) + ") "
+                strOut += "(" + CStr(rc.index) + ") "
                 For Each count In hColor.histArray
                     strOut += CStr(count) + ","
                 Next
                 strOut += vbCrLf
-                If cell.index >= maxRegion Then Exit For
+                If rc.index >= maxRegion Then Exit For
             Next
         End If
         SetTrueText(strOut, 3)
 
         dst1.SetTo(0)
         dst2.SetTo(0)
-        For Each cell In task.rcList
-            task.color(cell.rect).CopyTo(dst2(cell.rect), cell.mask)
-            dst1(cell.rect).SetTo(cell.color, cell.mask)
-            If cell.index <= maxRegion Then SetTrueText(CStr(cell.index), cell.maxDist, 2)
+        For Each rc In task.rcList
+            task.color(rc.roi).CopyTo(dst2(rc.roi), rc.mask)
+            dst1(rc.roi).SetTo(rc.color, rc.mask)
+            If rc.index <= maxRegion Then SetTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
         labels(2) = task.redC.labels(2)
         labels(1) = task.redC.labels(3)
@@ -735,9 +735,9 @@ Public Class Pixel_Vectors : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         pixelVector.Clear()
-        For Each cell In task.rcList
-            hVector.inputMask = cell.mask
-            hVector.Run(src(cell.rect))
+        For Each rc In task.rcList
+            hVector.inputMask = rc.mask
+            hVector.Run(src(rc.roi))
             pixelVector.Add(hVector.histArray)
         Next
         rcList = task.rcList

@@ -13,8 +13,8 @@ Public Class Cell_Basics : Inherits TaskParent
             Dim gridID = task.gridMap32S.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
             strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
             strOut += "rc.age = " + CStr(rc.age) + vbCrLf
-            strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
-            strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf
+            strOut += "rc.roi: " + CStr(rc.roi.X) + ", " + CStr(rc.roi.Y) + ", "
+            strOut += CStr(rc.roi.Width) + ", " + CStr(rc.roi.Height) + vbCrLf
             strOut += "rc.color = " + vbTab + CStr(CInt(rc.color(0))) + vbTab + CStr(CInt(rc.color(1)))
             strOut += vbTab + CStr(CInt(rc.color(2))) + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
@@ -38,7 +38,7 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
 
             Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-            task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
+            task.pcSplit(2)(task.rc.roi).CopyTo(tmp, task.rc.mask)
             plot.rc = task.rc
             plot.Run(tmp)
             dst1 = plot.dst2
@@ -72,12 +72,12 @@ Public Class Cell_ValidateColorCells : Inherits TaskParent
         dst3.SetTo(0)
         Dim percentDepth As New List(Of Single)
         For Each rc In task.rcList
-            If rc.depthPixels > 0 Then dst1(rc.rect).SetTo(255, rc.mask)
+            If rc.depthPixels > 0 Then dst1(rc.roi).SetTo(255, rc.mask)
             If rc.depthPixels > 0 And rc.index > 0 Then
                 Dim pc = rc.depthPixels / rc.pixels
                 percentDepth.Add(pc)
 
-                If pc < 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
+                If pc < 0.5 Then dst3(rc.roi).SetTo(rc.color, rc.mask)
             End If
         Next
 
@@ -120,9 +120,9 @@ Public Class Cell_Distance : Inherits TaskParent
 
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
-            Dim selectedMean As cv.Scalar = src(task.rc.rect).Mean(task.rc.mask)
+            Dim selectedMean As cv.Scalar = src(task.rc.roi).Mean(task.rc.mask)
             For Each rc In task.rcList
-                colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
+                colorDistance.Add(distance3D(selectedMean, src(rc.roi).Mean(rc.mask)))
                 depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
             Next
 
@@ -131,8 +131,8 @@ Public Class Cell_Distance : Inherits TaskParent
             Dim maxColorDistance = colorDistance.Max()
             For i = 0 To task.rcList.Count - 1
                 Dim rc = task.rcList(i)
-                dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / task.MaxZmeters, rc.mask)
-                dst3(rc.rect).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
+                dst1(rc.roi).SetTo(255 - depthDistance(i) * 255 / task.MaxZmeters, rc.mask)
+                dst3(rc.roi).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
             Next
         End If
     End Sub
@@ -165,7 +165,7 @@ Public Class Cell_Binarize : Inherits TaskParent
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             For Each rc In task.rcList
                 Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
-                cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
+                cv.Cv2.MeanStdDev(gray(rc.roi), grayMean, grayStdev, rc.mask)
                 grayMeans.Add(grayMean(0))
             Next
             Dim min = grayMeans.Min
@@ -175,8 +175,8 @@ Public Class Cell_Binarize : Inherits TaskParent
             dst3.SetTo(0)
             For Each rc In task.rcList
                 Dim color = (grayMeans(rc.index) - min) * 255 / (max - min)
-                dst3(rc.rect).SetTo(color, rc.mask)
-                dst1(rc.rect).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
+                dst3(rc.roi).SetTo(color, rc.mask)
+                dst1(rc.roi).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
             Next
         End If
     End Sub
@@ -222,7 +222,7 @@ Public Class Cell_BasicsPlot : Inherits TaskParent
     End Sub
     Public Sub statsString(src As cv.Mat)
         Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
+        task.pcSplit(2)(task.rc.roi).CopyTo(tmp, task.rc.mask)
         plot.rc = task.rc
         plot.Run(tmp)
         dst1 = plot.dst2
@@ -269,12 +269,12 @@ Public Class Cell_Generate : Inherits TaskParent
         Dim usedColors = New List(Of cv.Scalar)({black})
         For i = 0 To mdList.Count - 1
             Dim rc As New rcData
-            rc.rect = mdList(i).rect
-            If rc.rect.Size = dst2.Size Then Continue For ' RedColor_Basics finds a cell this big.  
+            rc.roi = mdList(i).roi
+            If rc.roi.Size = dst2.Size Then Continue For ' RedColor_Basics finds a cell this big.  
             rc.mask = mdList(i).mask
             rc.maxDist = mdList(i).maxDist
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            rc.motionFlag = task.motionMask(rc.rect).CountNonZero > 0
+            rc.motionFlag = task.motionMask(rc.roi).CountNonZero > 0
             rc.contour = mdList(i).contour
             rc.pixels = mdList(i).mask.CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then
@@ -316,16 +316,16 @@ Public Class Cell_Generate : Inherits TaskParent
             If rc.age = 1 Then rc.maxDStable = rc.maxDist
 
             rc.depthMask = rc.mask.Clone
-            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.roi))
             rc.depthPixels = rc.depthMask.CountNonZero
 
             If rc.motionFlag Then
                 If rc.depthPixels / rc.pixels > 0.1 Then
-                    task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minDepthVec.X, rc.maxDepthVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
-                    task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minDepthVec.Y, rc.maxDepthVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
-                    task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minDepthVec.Z, rc.maxDepthVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(0)(rc.roi).MinMaxLoc(rc.minDepthVec.X, rc.maxDepthVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(1)(rc.roi).MinMaxLoc(rc.minDepthVec.Y, rc.maxDepthVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(2)(rc.roi).MinMaxLoc(rc.minDepthVec.Z, rc.maxDepthVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
 
-                    cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
+                    cv.Cv2.MeanStdDev(task.pointCloud(rc.roi), depthMean, depthStdev, rc.depthMask)
                     rc.depthMean = depthMean(2)
                     If Single.IsNaN(rc.depthMean) Or rc.depthMean < 0 Then rc.depthMean = 0
                 End If

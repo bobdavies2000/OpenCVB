@@ -35,7 +35,7 @@ Public Module vbc
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
         For Each rc In task.rcList
-            dst(rc.rect).SetTo(rc.color, rc.mask)
+            dst(rc.roi).SetTo(rc.color, rc.mask)
         Next
 
         Return dst
@@ -47,7 +47,7 @@ Public Module vbc
         For Each rc In sortedCells.Values
             rc.index = task.rcList.Count
             task.rcList.Add(rc)
-            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.rcMap(rc.roi).SetTo(rc.index, rc.mask)
 
             If rc.index >= 255 Then Exit For
         Next
@@ -422,8 +422,18 @@ End Structure
 
 
 
+Public Class idealData
+    Public lRect As cv.Rect
+    Public rRect As cv.Rect
+    Public depth As Single
+    Public age As Integer
+End Class
+
+
+
+
 Public Class maskData
-    Public rect As cv.Rect
+    Public roi As cv.Rect
     Public mask As cv.Mat
     Public contour As New List(Of cv.Point)
     Public index As Integer
@@ -442,7 +452,7 @@ End Class
 
 
 Public Class rcData
-    Public rect As cv.Rect
+    Public roi As cv.Rect
     Public mask As cv.Mat
     Public pixels As Integer
     Public age As Integer
@@ -483,7 +493,7 @@ Public Class rcData
         index = 0
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         depthMask = mask
-        rect = New cv.Rect(0, 0, 1, 1)
+        roi = New cv.Rect(0, 0, 1, 1)
     End Sub
 End Class
 

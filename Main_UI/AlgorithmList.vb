@@ -293,9 +293,6 @@ Public Class algorithmList
 	If algorithmName = "Depth_Holes" Then return new Depth_Holes
 	If algorithmName = "Depth_HolesOverTime" Then return new Depth_HolesOverTime
 	If algorithmName = "Depth_HolesRect" Then return new Depth_HolesRect
-	If algorithmName = "Depth_Ideal" Then return new Depth_Ideal
-	If algorithmName = "Depth_IdealCellPlot" Then return new Depth_IdealCellPlot
-	If algorithmName = "Depth_IdealRightView" Then return new Depth_IdealRightView
 	If algorithmName = "Depth_InfinityCheck" Then return new Depth_InfinityCheck
 	If algorithmName = "Depth_InRange" Then return new Depth_InRange
 	If algorithmName = "Depth_LocalMinMax_MT" Then return new Depth_LocalMinMax_MT
@@ -810,6 +807,10 @@ Public Class algorithmList
 	If algorithmName = "Hough_Sudoku1" Then return new Hough_Sudoku1
 	If algorithmName = "Hull_Basics" Then return new Hull_Basics
 	If algorithmName = "Hull_Contour" Then return new Hull_Contour
+	If algorithmName = "IdealD_Basics" Then return new IdealD_Basics
+	If algorithmName = "IdealD_CellPlot" Then return new IdealD_CellPlot
+	If algorithmName = "IdealD_FullDepth" Then return new IdealD_FullDepth
+	If algorithmName = "IdealD_RightView" Then return new IdealD_RightView
 	If algorithmName = "Image_Basics" Then return new Image_Basics
 	If algorithmName = "Image_CellStats" Then return new Image_CellStats
 	If algorithmName = "Image_Icon" Then return new Image_Icon

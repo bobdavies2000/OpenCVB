@@ -28,9 +28,9 @@ Public Class MSER_Basics : Inherits TaskParent
         For i = 0 To boxes.Count - 1
             Dim index = boxes.ElementAt(i).Value
             Dim rc As New rcData
-            rc.rect = boxInput(index)
+            rc.roi = boxInput(index)
             Dim val = dst0.Get(Of Byte)(floodPoints(index).Y, floodPoints(index).X)
-            rc.mask = dst0(rc.rect).InRange(val, val)
+            rc.mask = dst0(rc.roi).InRange(val, val)
             rc.pixels = detect.maskCounts(index)
 
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
@@ -49,7 +49,7 @@ Public Class MSER_Basics : Inherits TaskParent
             End If
 
             Dim colorStdev As cv.Scalar, colormean As cv.Scalar
-            cv.Cv2.MeanStdDev(task.color(rc.rect), colormean, colorStdev, rc.mask)
+            cv.Cv2.MeanStdDev(task.color(rc.roi), colormean, colorStdev, rc.mask)
             rc.color = colormean
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
@@ -229,7 +229,7 @@ Public Class MSER_Hulls : Inherits TaskParent
         For Each rc In task.rcList
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
-            DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
+            DrawContour(dst3(rc.roi), rc.hull, rc.color, -1)
         Next
 
         If task.heartBeat Then labels(2) = CStr(task.rcList.Count) + " Regions with average size " +
@@ -595,9 +595,9 @@ Public Class MSER_Basics2 : Inherits TaskParent
             Dim rc As New rcData
             rc.index = rcList.Count
             Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
-            rc.rect = boxInput(boxes.ElementAt(i).Value)
-            rc.mask = dst3(rc.rect).InRange(val, val)
-            dst1(rc.rect).SetTo(rc.index, rc.mask)
+            rc.roi = boxInput(boxes.ElementAt(i).Value)
+            rc.mask = dst3(rc.roi).InRange(val, val)
+            dst1(rc.roi).SetTo(rc.index, rc.mask)
             rc.pixels = detect.maskCounts(i)
 
             rc.maxDist = GetMaxDist(rc)
@@ -607,8 +607,8 @@ Public Class MSER_Basics2 : Inherits TaskParent
             If rc.indexLast <> 0 Then matchCount += 1
 
             rcList.Add(rc)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            cellMap(rc.roi).SetTo(rc.index, rc.mask)
+            dst2(rc.roi).SetTo(rc.color, rc.mask)
         Next
 
         If task.heartBeat Then labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"

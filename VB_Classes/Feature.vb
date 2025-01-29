@@ -978,7 +978,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
 
         If standalone Then
             Dim rc = task.rcList(task.rc.index)
-            task.color.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            task.color.Rectangle(rc.roi, task.HighlightColor, task.lineWidth)
             For Each pt In rc.ptFacets
                 DrawCircle(task.color, pt, task.DotSize, task.HighlightColor)
             Next
@@ -1015,7 +1015,7 @@ Public Class Feature_GridPoints : Inherits TaskParent
 
         If standalone Then
             Dim rc = task.rcList(task.rc.index)
-            dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(rc.roi, task.HighlightColor, task.lineWidth)
             For Each pt In rc.ptList
                 DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             Next

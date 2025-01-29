@@ -23,8 +23,8 @@ Public Class Projection_Basics : Inherits TaskParent
         Dim check2 As Integer
         For i = 0 To redCellInput.Count - 1
             Dim rc = redCellInput(i)
-            Dim tmp = New cv.Mat(rc.rect.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-            src(rc.rect).CopyTo(tmp, rc.mask)
+            Dim tmp = New cv.Mat(rc.roi.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+            src(rc.roi).CopyTo(tmp, rc.mask)
             rc.pixels = tmp.Sum()
             sortedCells.Add(rc.pixels, rc)
             check2 += rc.pixels
@@ -51,15 +51,15 @@ Public Class Projection_Basics : Inherits TaskParent
             If rc.index = 0 Then Continue For
             If rc.index <= task.redOptions.IdentifyCountBar.Value Then
                 If viewType = "Side" Then
-                    xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
-                    xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
-                    z1 = (ranges(1).End - ranges(1).Start) * rc.rect.X / dst2.Width
-                    z2 = (ranges(1).End - ranges(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width
+                    xy1 = (ranges(0).End - ranges(0).Start) * rc.roi.Y / dst2.Height + ranges(0).Start
+                    xy2 = (ranges(0).End - ranges(0).Start) * (rc.roi.Y + rc.roi.Height) / dst2.Height + ranges(0).Start
+                    z1 = (ranges(1).End - ranges(1).Start) * rc.roi.X / dst2.Width
+                    z2 = (ranges(1).End - ranges(1).Start) * (rc.roi.X + rc.roi.Width) / dst2.Width
                 Else
-                    xy1 = (ranges(1).End - ranges(1).Start) * rc.rect.X / dst2.Width + ranges(1).Start
-                    xy2 = (ranges(1).End - ranges(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width + ranges(1).Start
-                    z1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height
-                    z2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height
+                    xy1 = (ranges(1).End - ranges(1).Start) * rc.roi.X / dst2.Width + ranges(1).Start
+                    xy2 = (ranges(1).End - ranges(1).Start) * (rc.roi.X + rc.roi.Width) / dst2.Width + ranges(1).Start
+                    z1 = (ranges(0).End - ranges(0).Start) * rc.roi.Y / dst2.Height
+                    z2 = (ranges(0).End - ranges(0).Start) * (rc.roi.Y + rc.roi.Height) / dst2.Height
                 End If
                 objectList.Add(New cv.Vec4f(xy1, xy2, z1, z2))
                 If task.heartBeat Then
@@ -82,7 +82,7 @@ Public Class Projection_Basics : Inherits TaskParent
         SetTrueText(strOut, 3)
         If showRectangles Then
             For i = 0 To Math.Min(rcList.Count, task.redOptions.IdentifyCountBar.Value) - 1
-                dst2.Rectangle(rcList(i).rect, task.HighlightColor, task.lineWidth)
+                dst2.Rectangle(rcList(i).roi, task.HighlightColor, task.lineWidth)
             Next
         End If
         labels(2) = CStr(rcList.Count) + " objects were found in the " + viewType + " view."
@@ -292,7 +292,7 @@ Public Class Projection_Object : Inherits TaskParent
 
             Dim rc = top.objects.rcList(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
             dst0.SetTo(0)
-            dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst0(rc.roi) = top.histTop.dst2(rc.roi).Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
             dst1.SetTo(0)
@@ -326,8 +326,8 @@ Public Class Projection_Floor : Inherits TaskParent
         If objSlider.value + 1 >= isolate.side.objects.rcList.Count Then Exit Sub
         Dim rc = isolate.top.objects.rcList(objSlider.Value + 1) ' the biggest by default...
         Dim rowList As New List(Of Integer)
-        For y = 0 To rc.rect.Height - 1
-            rowList.Add(dst2(rc.rect).Row(y).CountNonZero() + rc.rect.Y)
+        For y = 0 To rc.roi.Height - 1
+            rowList.Add(dst2(rc.roi).Row(y).CountNonZero() + rc.roi.Y)
         Next
 
         Dim maxRow = rowList.Max
@@ -366,7 +366,7 @@ Public Class Projection_Cell : Inherits TaskParent
         Dim rc = task.rc
 
         dst0.SetTo(0)
-        task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
+        task.pointCloud(rc.roi).CopyTo(dst0(rc.roi), rc.mask)
 
         heatCell.Run(dst0)
         Dim maskTop = heatCell.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)

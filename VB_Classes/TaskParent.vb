@@ -239,11 +239,11 @@ Public Class TaskParent : Implements IDisposable
         Return New cv.Scalar(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
     End Function
     Public Function validContourPoint(rc As rcData, pt As cv.Point, offset As Integer) As cv.Point
-        If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
+        If pt.X < rc.roi.Width And pt.Y < rc.roi.Height Then Return pt
         Dim count = rc.contour.Count
         For i = offset + 1 To rc.contour.Count - 1
             pt = rc.contour(i Mod count)
-            If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
+            If pt.X < rc.roi.Width And pt.Y < rc.roi.Height Then Return pt
         Next
         Return New cv.Point
     End Function
@@ -254,9 +254,9 @@ Public Class TaskParent : Implements IDisposable
         Dim p2 = validContourPoint(rc, rc.contour(offset * 1), offset * 1)
         Dim p3 = validContourPoint(rc, rc.contour(offset * 2), offset * 2)
 
-        Dim v1 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
-        Dim v2 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
-        Dim v3 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
+        Dim v1 = task.pointCloud(rc.roi).Get(Of cv.Point3f)(p1.Y, p1.X)
+        Dim v2 = task.pointCloud(rc.roi).Get(Of cv.Point3f)(p2.Y, p2.X)
+        Dim v3 = task.pointCloud(rc.roi).Get(Of cv.Point3f)(p3.Y, p3.X)
 
         Dim cross = crossProduct(v1 - v2, v2 - v3)
         Dim k = -(v1.X * cross.X + v1.Y * cross.Y + v1.Z * cross.Z)
@@ -356,7 +356,7 @@ Public Class TaskParent : Implements IDisposable
         Select Case colorSelection
             Case 0
                 Dim colorStdev As cv.Scalar
-                cv.Cv2.MeanStdDev(task.color(rc.rect), color, colorStdev, rc.mask)
+                cv.Cv2.MeanStdDev(task.color(rc.roi), color, colorStdev, rc.mask)
             Case 1
                 color = rc.color
             Case 2
@@ -403,8 +403,8 @@ Public Class TaskParent : Implements IDisposable
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
         Dim mm As mmData = GetMinMax(distance32f)
-        mm.maxLoc.X += md.rect.X
-        mm.maxLoc.Y += md.rect.Y
+        mm.maxLoc.X += md.roi.X
+        mm.maxLoc.Y += md.roi.Y
 
         Return mm.maxLoc
     End Function
@@ -413,8 +413,8 @@ Public Class TaskParent : Implements IDisposable
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
         Dim mm As mmData = GetMinMax(distance32f)
-        mm.maxLoc.X += rc.rect.X
-        mm.maxLoc.Y += rc.rect.Y
+        mm.maxLoc.X += rc.roi.X
+        mm.maxLoc.Y += rc.roi.Y
 
         Return mm.maxLoc
     End Function

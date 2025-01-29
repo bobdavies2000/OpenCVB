@@ -144,7 +144,7 @@ Public Class Foreground_RedCloud : Inherits TaskParent
         dst3 = back.dst2
         labels(3) = back.labels(2)
         If task.rcList.Count > 0 Then
-            dst2(task.rc.rect).SetTo(white, task.rc.mask)
+            dst2(task.rc.roi).SetTo(white, task.rc.mask)
         End If
     End Sub
 End Class
@@ -166,8 +166,8 @@ Public Class Foreground_CellsFore : Inherits TaskParent
         dst3 = fore.dst3
         dst2.SetTo(0)
         For Each rc In task.rcList
-            Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
-            If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Dim tmp As cv.Mat = dst3(rc.roi) And rc.mask
+            If tmp.CountNonZero Then dst2(rc.roi).SetTo(rc.color, rc.mask)
         Next
     End Sub
 End Class
@@ -188,8 +188,8 @@ Public Class Foreground_CellsBack : Inherits TaskParent
         dst3 = Not fore.dst2 And task.depthMask
         dst2.SetTo(0)
         For Each rc In task.rcList
-            Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
-            If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Dim tmp As cv.Mat = dst3(rc.roi) And rc.mask
+            If tmp.CountNonZero Then dst2(rc.roi).SetTo(rc.color, rc.mask)
         Next
     End Sub
 End Class

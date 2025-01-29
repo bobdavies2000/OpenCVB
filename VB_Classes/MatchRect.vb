@@ -12,7 +12,7 @@ Public Class MatchRect_Basics : Inherits TaskParent
         If match.correlation < match.options.correlationMin Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
                 dst2 = runRedC(src, labels(2)).Clone
-                rectInput = task.rc.rect
+                rectInput = task.rc.roi
             End If
             rectSave = rectInput
             match.template = src(rectInput).Clone
@@ -40,7 +40,7 @@ Public Class MatchRect_RedCloud : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
         task.ClickPoint = task.rc.maxDist
 
-        If task.heartBeat Then matchRect.rectInput = task.rc.rect
+        If task.heartBeat Then matchRect.rectInput = task.rc.roi
 
         matchRect.Run(src)
         If standalone Then

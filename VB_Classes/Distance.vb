@@ -202,7 +202,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
         For i = 0 To task.rcList.Count - 1
             Dim rc = task.rcList(i)
             hColor.inputMask = rc.mask
-            hColor.Run(src(rc.rect))
+            hColor.Run(src(rc.roi))
 
             Dim nextD = distanceFromZero(hColor.histArray.ToList)
             distances.Add(nextD, i)
@@ -249,8 +249,8 @@ Public Class Distance_RedCloud : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To distances.Count - 1
             Dim rp = task.rcList(distances.ElementAt(i).Value)
-            task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
-            dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
+            task.color(rp.roi).CopyTo(dst2(rp.roi), rp.mask)
+            dst3(rp.roi).SetTo(task.scalarColors(i), rp.mask)
         Next
         labels(2) = task.redC.labels(3)
 

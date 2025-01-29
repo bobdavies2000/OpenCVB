@@ -112,6 +112,7 @@ Homography
 Horizon
 Hough
 Hull
+IdealD
 Image
 ImageOffset
 ImShow

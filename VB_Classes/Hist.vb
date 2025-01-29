@@ -1214,7 +1214,7 @@ Public Class Hist_Depth : Inherits TaskParent
         plot.maxRange = task.MaxZmeters
         If rc IsNot Nothing Then
             If rc.index = 0 Then Exit Sub
-            src = task.pcSplit(2)(rc.rect).Clone
+            src = task.pcSplit(2)(rc.roi).Clone
         Else
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
             mm = GetMinMax(src)
@@ -1270,7 +1270,7 @@ Public Class Hist_Cell : Inherits TaskParent
         If hist.rc.index = 0 Or hist.rc.maxDepthVec.Z = 0 Then Exit Sub
 
         dst0.SetTo(0)
-        task.pcSplit(2)(hist.rc.rect).CopyTo(dst0)
+        task.pcSplit(2)(hist.rc.roi).CopyTo(dst0)
 
         hist.Run(dst0)
         dst3 = hist.dst2

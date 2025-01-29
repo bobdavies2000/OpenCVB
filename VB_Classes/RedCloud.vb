@@ -25,7 +25,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         For i = 0 To task.rcList.Count - 1
             Dim rc = task.rcList(i)
             rcMask.SetTo(0)
-            rcMask(rc.rect).SetTo(255, rc.mask)
+            rcMask(rc.roi).SetTo(255, rc.mask)
             rc.mdList = New List(Of maskData)
             For Each md In redMask.mdList
                 Dim index = rcMask.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
@@ -34,8 +34,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
             If rc.mdList.Count > 0 Then
                 For j = 0 To rc.mdList.Count - 1
                     Dim md = rc.mdList(j)
-                    rcMask(md.rect) = rcMask(md.rect) And md.mask
-                    md.mask = rcMask(md.rect).Clone
+                    rcMask(md.roi) = rcMask(md.roi) And md.mask
+                    md.mask = rcMask(md.roi).Clone
                     rc.mdList(j) = md
                     If rc.index = task.gOptions.DebugSlider.Value And task.heartBeat Then
                         strOut += Format(md.minDepthVec.Z, fmt1) + vbTab + Format(md.maxDepthVec.Z, fmt1) + vbCrLf
@@ -139,8 +139,8 @@ Public Class RedCloud_BasicsHist : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         If task.heartBeat Then
-            Dim depth As cv.Mat = task.pcSplit(2)(task.rc.rect)
-            depth.SetTo(0, task.noDepthMask(task.rc.rect))
+            Dim depth As cv.Mat = task.pcSplit(2)(task.rc.roi)
+            depth.SetTo(0, task.noDepthMask(task.rc.roi))
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)

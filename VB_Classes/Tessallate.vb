@@ -40,9 +40,9 @@ Public Class Tessallate_Basics : Inherits TaskParent
             Dim corners(4 - 1) As cv.Point
             For i = 0 To corners.Count - 1
                 Dim pt = rc.contour(i * rc.contour.Count / 4)
-                corners(i) = New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
+                corners(i) = New cv.Point(rc.roi.X + pt.X, rc.roi.Y + pt.Y)
             Next
-            Dim center = New cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
+            Dim center = New cv.Point(rc.roi.X + rc.roi.Width / 2, rc.roi.Y + rc.roi.Height / 2)
             DrawLine(dst2, corners(0), center, white)
             DrawLine(dst2, corners(1), center, white)
             DrawLine(dst2, corners(2), center, white)
