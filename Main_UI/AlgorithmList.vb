@@ -807,11 +807,12 @@ Public Class algorithmList
 	If algorithmName = "Hough_Sudoku1" Then return new Hough_Sudoku1
 	If algorithmName = "Hull_Basics" Then return new Hull_Basics
 	If algorithmName = "Hull_Contour" Then return new Hull_Contour
-	If algorithmName = "IdealD_Basics" Then return new IdealD_Basics
-	If algorithmName = "IdealD_BasicsNew" Then return new IdealD_BasicsNew
-	If algorithmName = "IdealD_CellPlot" Then return new IdealD_CellPlot
-	If algorithmName = "IdealD_FullDepth" Then return new IdealD_FullDepth
-	If algorithmName = "IdealD_RightView" Then return new IdealD_RightView
+	If algorithmName = "Ideal_Basics" Then return new Ideal_Basics
+	If algorithmName = "Ideal_CellPlot" Then return new Ideal_CellPlot
+	If algorithmName = "Ideal_FullDepth" Then return new Ideal_FullDepth
+	If algorithmName = "Ideal_InstantUpdate" Then return new Ideal_InstantUpdate
+	If algorithmName = "Ideal_RightView" Then return new Ideal_RightView
+	If algorithmName = "Ideal_ShapeTopRow" Then return new Ideal_ShapeTopRow
 	If algorithmName = "Image_Basics" Then return new Image_Basics
 	If algorithmName = "Image_CellStats" Then return new Image_CellStats
 	If algorithmName = "Image_Icon" Then return new Image_Icon
@@ -1223,7 +1224,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_HistDepth3D" Then return new OpenGL_HistDepth3D
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D
 	If algorithmName = "OpenGL_IdealDepth" Then return new OpenGL_IdealDepth
-	If algorithmName = "OpenGL_IdealTest" Then return new OpenGL_IdealTest
 	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
 	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
 	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY
@@ -1252,6 +1252,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_RedTrack" Then return new OpenGL_RedTrack
 	If algorithmName = "OpenGL_ReducedXYZ" Then return new OpenGL_ReducedXYZ
 	If algorithmName = "OpenGL_Reduction" Then return new OpenGL_Reduction
+	If algorithmName = "OpenGL_Shaper" Then return new OpenGL_Shaper
 	If algorithmName = "OpenGL_Sierpinski" Then return new OpenGL_Sierpinski
 	If algorithmName = "OpenGL_SoloPointsRemoved" Then return new OpenGL_SoloPointsRemoved
 	If algorithmName = "OpenGL_StableMinMax" Then return new OpenGL_StableMinMax

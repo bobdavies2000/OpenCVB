@@ -16,8 +16,8 @@ Public Class VBtask : Implements IDisposable
     Public rcMinSize As Integer ' the minimum cell size for RedCloud_Basics/RedCloud_Masks
 
     Public lpList As New List(Of linePoints) ' line pair list
-    Public diList As New List(Of depthIdeal)
-    Public diListAll As New List(Of depthIdeal)
+    Public idList As New List(Of depthIdeal)
+    Public idListAll As New List(Of depthIdeal)
 
     Public gridSize As Integer
     Public gridRows As Integer
@@ -117,7 +117,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public idealD As IdealD_Basics
+    Public idealD As Ideal_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
@@ -489,7 +489,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Horizon
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        idealD = New IdealD_Basics
+        idealD = New Ideal_Basics
         colorizer = New Depth_Palette
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics

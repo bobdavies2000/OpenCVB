@@ -10,8 +10,8 @@ Public Class Disparity_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.leftView
-        For Each di In task.diList
-            If di.lRect.Height >= 8 Then dst2.Rectangle(di.lRect, 255, task.lineWidth)
+        For Each id In task.idList
+            If id.lRect.Height >= 8 Then dst2.Rectangle(id.lRect, 255, task.lineWidth)
         Next
         Dim val = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         rect = task.idealD.grid.gridRectsAll(val)
@@ -64,8 +64,8 @@ Public Class Disparity_Manual : Inherits TaskParent
         End If
 
         dst2 = leftInput
-        For Each di In task.diList
-            dst2.Rectangle(di.lRect, 255, task.lineWidth)
+        For Each id In task.idList
+            dst2.Rectangle(id.lRect, 255, task.lineWidth)
         Next
 
         Dim val = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)

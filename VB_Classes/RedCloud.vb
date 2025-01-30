@@ -16,10 +16,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
         prep.Run(src)
         redMask.Run(prep.dst2 And redColorMask)
-        Dim mm = GetMinMax(redMask.dst2)
-        dst3 = ShowPalette(255 * redMask.dst2 / mm.maxVal)
-        dst3.SetTo(0, task.noDepthMask)
-        labels(1) = CStr(redMask.mdList.Count) + " maskData cells were found in the point cloud."
+        labels(1) = CStr(redMask.mdList.Count) + " maskData cells found in the point cloud."
 
         If task.heartBeat Then strOut = ""
         For i = 0 To task.rcList.Count - 1
@@ -45,13 +42,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
             End If
         Next
 
-        If standaloneTest() Then
-            For Each rc In task.rcList
-                For Each md In rc.mdList
-                    DrawCircle(dst3, md.maxDist, task.DotSize, task.HighlightColor)
-                Next
-            Next
-        End If
         SetTrueText(strOut, 3)
     End Sub
 End Class

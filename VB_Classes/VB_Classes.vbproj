@@ -118,7 +118,7 @@
     <Compile Include="Concept.vb" />
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />
-    <Compile Include="IdealD.vb" />
+    <Compile Include="Ideal.vb" />
     <Compile Include="ImageOffset.vb" />
     <Compile Include="KNN.vb" />
     <Compile Include="KNNorm.vb" />
@@ -452,6 +452,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsContainer.resx">
       <DependentUpon>OptionsContainer.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsFileName.resx">
       <DependentUpon>OptionsFileName.vb</DependentUpon>

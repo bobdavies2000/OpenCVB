@@ -2204,7 +2204,8 @@ End Class
 
 
 
-Public Class OpenGL_IdealTest : Inherits TaskParent
+Public Class OpenGL_IdealDepth : Inherits TaskParent
+    Dim shape As New Ideal_ShapeTopRow
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         dst3 = task.pointCloud.Clone
@@ -2212,11 +2213,13 @@ Public Class OpenGL_IdealTest : Inherits TaskParent
         desc = "Visualize the high visibility cells found by Disparity_GoodCells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        shape.Run(src)
+
         dst2 = task.idealD.dst2
 
         If task.gOptions.DebugCheckBox.Checked Then
             dst3.SetTo(0)
-            task.pointCloud.CopyTo(dst3, task.idealD.diMap)
+            task.pointCloud.CopyTo(dst3, shape.idMap)
             task.ogl.pointCloudInput = dst3
         Else
             task.ogl.pointCloudInput = task.pointCloud
@@ -2231,17 +2234,19 @@ End Class
 
 
 
-Public Class OpenGL_IdealDepth : Inherits TaskParent
+Public Class OpenGL_Shaper : Inherits TaskParent
+    Dim shape As New Ideal_ShapeTopRow
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         task.gOptions.DebugCheckBox.Checked = True
         desc = "Display the enhanced depth produced by Depth_Ideal"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        shape.Run(src)
+
         dst2 = task.idealD.dst2
         If task.gOptions.DebugCheckBox.Checked Then
-            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), task.idealD.depth32f},
-                         task.ogl.pointCloudInput)
+            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), shape.depth32f}, task.ogl.pointCloudInput)
             dst3 = task.idealD.dst3
         Else
             task.ogl.pointCloudInput = task.pointCloud
