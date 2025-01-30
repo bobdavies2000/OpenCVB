@@ -511,7 +511,8 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
         dst2 = measure.dst2
         labels(2) = measure.labels(3)
 
-        Dim threshold = If(task.heartBeat, 0, measure.options.colorDifferenceThreshold)
+        Dim threshold = If(task.heartBeat, measure.options.colorDifferenceThreshold - 1,
+                                           measure.options.colorDifferenceThreshold)
 
         motionRects.Clear()
         Dim indexList As New List(Of Integer)

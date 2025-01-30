@@ -2185,6 +2185,7 @@ public:
 	int cellSize =  8;
 	int height =  8;
 	float percentThreshold =  1;
+	int cellAge =  5;
 	void RunOpt() {}
 	Options_IdealSize() {
 	}

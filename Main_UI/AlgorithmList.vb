@@ -808,6 +808,7 @@ Public Class algorithmList
 	If algorithmName = "Hull_Basics" Then return new Hull_Basics
 	If algorithmName = "Hull_Contour" Then return new Hull_Contour
 	If algorithmName = "IdealD_Basics" Then return new IdealD_Basics
+	If algorithmName = "IdealD_BasicsSlow" Then return new IdealD_BasicsSlow
 	If algorithmName = "IdealD_CellPlot" Then return new IdealD_CellPlot
 	If algorithmName = "IdealD_FullDepth" Then return new IdealD_FullDepth
 	If algorithmName = "IdealD_RightView" Then return new IdealD_RightView
