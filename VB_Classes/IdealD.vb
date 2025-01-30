@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class IdealD_Basics : Inherits TaskParent
+Public Class IdealD_BasicsNew : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_IdealSize
     Public diMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -7,7 +7,7 @@ Public Class IdealD_Basics : Inherits TaskParent
     Public depth32f As cv.Mat
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        labels(3) = "Pointcloud image for cells with ideal visibility"
+        labels(3) = "Right View image cells with ideal visibility"
         desc = "Create the grid of cells with ideal visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -24,10 +24,6 @@ Public Class IdealD_Basics : Inherits TaskParent
         Dim maxPixels As Single = options.cellSize * options.cellSize
         For Each di In task.diList
             If task.motionMask(di.lRect).CountNonZero Then Continue For
-            Dim pixels = task.depthMask(di.lRect).CountNonZero
-            If pixels / maxPixels < options.percentThreshold Then Continue For
-            If di.mm.maxVal - di.mm.minVal > options.rangeThresholdmm Then Continue For
-
             di.age += 1
             di.depth = depth32f(di.lRect).Mean(task.depthMask(di.lRect))
             If di.depth > 0 Then
@@ -101,7 +97,7 @@ End Class
 
 
 
-Public Class IdealD_BasicsSlow : Inherits TaskParent
+Public Class IdealD_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_IdealSize
     Public diMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
