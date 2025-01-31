@@ -12,7 +12,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         edges.Run(src)
         dst2.SetTo(0)
         dst2.SetTo(1, edges.dst2)
-        If standaloneTest() Then dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
+        dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
     End Sub
 End Class
 
@@ -198,10 +198,10 @@ Public Class FeatureLess_LeftRight : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         fLess.Run(task.leftView)
-        dst2 = fLess.dst2.Clone
+        dst2 = fLess.dst3.Clone
 
         fLess.Run(task.rightView)
-        dst3 = fLess.dst2
+        dst3 = fLess.dst3
     End Sub
 End Class
 

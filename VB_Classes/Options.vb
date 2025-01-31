@@ -8026,6 +8026,7 @@ Public Class Options_IdealShape : Inherits OptionParent
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Duplicate top row")
+            radio.addRadio("Ideal Cell Outline")
             radio.check(0).Checked = True
         End If
     End Sub

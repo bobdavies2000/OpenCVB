@@ -274,6 +274,7 @@ End Class
 Public Class Ideal_Shape : Inherits TaskParent
     Dim options As New Options_IdealShape
     Public Sub New()
+        task.idOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Modify the depth32f input with the selected options"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -288,6 +289,14 @@ Public Class Ideal_Shape : Inherits TaskParent
                         dst2(id.lRect).Row(0).CopyTo(dst2(id.lRect).Row(y))
                     Next
                 Next
+            Case 1 ' Cell outline
+                ' create a mask that outlines the ideal cells
+                task.idOutline.SetTo(0)
+                For Each id In task.idList
+                    Dim r = New cv.Rect(id.lRect.X, id.lRect.Y, id.lRect.Width + 1, id.lRect.Height + 1)
+                    task.idOutline.Rectangle(r, 255, 1)
+                Next
+                dst2.SetTo(0, Not task.idOutline)
         End Select
     End Sub
 End Class
