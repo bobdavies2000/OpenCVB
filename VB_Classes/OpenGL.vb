@@ -2226,7 +2226,7 @@ Public Class OpenGL_IdealDepth : Inherits TaskParent
 
         If task.gOptions.DebugCheckBox.Checked Then
             dst3.SetTo(0)
-            task.pointCloud.CopyTo(dst3, shape.idMap)
+            task.pointCloud.CopyTo(dst3, shape.idMask)
             task.ogl.pointCloudInput = dst3
         Else
             task.ogl.pointCloudInput = task.pointCloud
