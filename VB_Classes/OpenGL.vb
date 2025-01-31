@@ -43,7 +43,8 @@ Public Class OpenGL_Basics : Inherits TaskParent
             task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z, task.IMU_TimeStamp,
             1, options.eye(0) / 100, options.eye(1) / 100, options.eye(2) / 100, options.zTrans,
             options.scaleXYZ(0) / 10, options.scaleXYZ(1) / 10, options.scaleXYZ(2) / 10, timeConversionUnits, imuAlphaFactor,
-            task.OpenGLTitle.Length, pointCloudInput.Width, pointCloudInput.Height, oglFunction, showXYZaxis}
+            task.OpenGLTitle.Length, pointCloudInput.Width, pointCloudInput.Height, oglFunction, showXYZaxis,
+            options.pcBufferCount}
         Return memMapValues
     End Function
     Private Sub MemMapUpdate()

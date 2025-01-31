@@ -119,22 +119,22 @@ static std::wstring s2ws(const std::string& s)
 	delete[] buf;
 	return r;
 }
- 
+
 static HANDLE pipe;
 static int MemMapBufferSize;
-static GLFWwindow * win;
-static double *sharedMem;
+static GLFWwindow* win;
+static double* sharedMem;
 static state app_state;
 
 static float3* dataBuffer = 0;
 static int dataBufferSize = 0;
 static int savedataBufferSize = -1;
 
-static uint8_t *rgbBuffer = 0;
+static uint8_t* rgbBuffer = 0;
 static int rgbBufferSize = 0;
 static int saveRGBBufferSize = -1;
 
-static float3 *pointCloudInput;
+static float3* pointCloudInput;
 static int pcBufferSize = 0;
 static int savePCBufferSize = -1;
 
@@ -172,7 +172,10 @@ static float3 scaleXYZ;
 static float zTrans;
 static int oglFunction; // defines the work to be done in the case statement in OpenGL_Functions
 static bool showAxes; // options.showXYZaxis
+static int pcBufferCount = 10;
+std::vector<float3*> pcBuffers;
 static HWND myHwnd;
+
 
 static int initializeNamedPipeAndMemMap(int argc, char * argv[])
 {
@@ -302,6 +305,20 @@ static void readPipeAndMemMap()
 	showAxes = (bool)sharedMem[35];
 	ReadFile(pipe, imageLabel, imageLabelBufferSize, &dwRead, NULL);
 	imageLabel[imageLabelBufferSize] = 0;
+
+	pcBufferCount = (int)sharedMem[36];
+	if (pcBuffers.size() == 0 || pcBuffers.size() != pcBufferCount)
+	{
+		for (size_t i = 0; i < pcBuffers.size(); i++)
+		{
+			if (pcBuffers[i] != 0) delete[] pcBuffers[i];
+		}
+		pcBuffers.clear();
+		for (int i = 0; i < pcBufferCount; i++)
+		{
+			pcBuffers.push_back(new float3[pcBufferSize]);
+		}
+	}
 }
 
 static int ackBuffers()
@@ -422,25 +439,16 @@ static void DrawBox(float x, float y, float z, float dx, float dy, float dz)
 	glEnd();
 }
 
-const int bufferCount = 10;
-float3* pcBuffers[10] = { 0 };
 int bufferIndex = 0;
 static void drawPointCloud()
 {
 	glBegin(GL_POINTS);
-	if (pcBuffers[bufferIndex] == 0)
-	{
-		for (int i = 0; i < bufferCount; i++)
-		{
-			pcBuffers[i] = (float3*)malloc((int)pcBufferSize);
-			memset(pcBuffers[i], 0, (int)pcBufferSize);
-		}
-	}
+
 	memcpy(pcBuffers[bufferIndex], pointCloudInput, pcBufferSize);
 	bufferIndex++;
-	if (bufferIndex >= bufferCount) bufferIndex = 0;
+	if (bufferIndex >= pcBuffers.size()) bufferIndex = 0;
 	// draw the 3D scene
-	for (int i = 0; i < bufferCount; i++)
+	for (size_t i = 0; i < pcBuffers.size(); i++)
 	{
 		int pcIndex = 0; 
 		GLfloat* pc = (GLfloat*)pcBuffers[i]; 
@@ -449,7 +457,7 @@ static void drawPointCloud()
 		{
 			for (int x = 0; x < imageWidth; ++x)
 			{
-				if (pc[pcIndex + 2] > 0.1f)
+				if ((float)pc[pcIndex + 2] > 0.1f)
 				{
 					glVertex3fv(&pc[pcIndex]);
 					pt[0] = GLfloat((x + 0.5f) / imageWidth);

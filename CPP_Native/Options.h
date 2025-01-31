@@ -2088,6 +2088,7 @@ public:
 };
 class Options_OpenGL {
 public:
+	int pcBufferCount =  10;
 	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
 	double FOV =  35;
 	double yaw =  -3;

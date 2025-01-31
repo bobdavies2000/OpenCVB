@@ -7637,6 +7637,7 @@ End Class
 
 
 Public Class Options_OpenGL : Inherits OptionParent
+    Public pcBufferCount As Integer = 10
     Public moveAmount As cv.Scalar = New cv.Scalar(0, 0, 0)
     Public FOV As Double = 35
     Public yaw As Double = -3
@@ -7650,6 +7651,7 @@ Public Class Options_OpenGL : Inherits OptionParent
     Public scaleXYZ As cv.Vec3f = New cv.Vec3f(15, 30, 1)
     Public Sub New()
         If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("OpenCVB OpenGL buffer count", 1, 100, pcBufferCount)
             sliders.setupTrackBar("OpenGL yaw (degrees)", -180, 180, yaw)
             sliders.setupTrackBar("OpenGL pitch (degrees)", -180, 180, pitch)
             sliders.setupTrackBar("OpenGL roll (degrees)", -180, 180, roll)
@@ -7695,6 +7697,7 @@ Public Class Options_OpenGL : Inherits OptionParent
         Static YmoveSlider = FindSlider("OpenGL shift up/down (Y-axis) X100")
         Static ZmoveSlider = FindSlider("OpenGL shift fwd/back (Z-axis) X100")
         Static PointSizeSlider = FindSlider("OpenGL Point Size")
+        Static pcBufferSlider = FindSlider("OpenCVB OpenGL buffer count")
 
         FOV = fovSlider.Value
         yaw = yawSlider.Value
@@ -7709,6 +7712,7 @@ Public Class Options_OpenGL : Inherits OptionParent
         eye = New cv.Vec3f(eyeXSlider.Value, eyeYSlider.Value, eyeZSlider.Value)
         scaleXYZ = New cv.Vec3f(scaleXSlider.Value, scaleYSlider.Value, scaleZSlider.Value)
         moveAmount = New cv.Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
+        pcBufferCount = pcBufferSlider.value
     End Sub
 End Class
 

@@ -290,6 +290,9 @@ Public Class Ideal_Shape : Inherits TaskParent
                     Next
                 Next
             Case 1 ' Cell outline
+                If task.ogl.options.pcBufferCount <> 1 Then
+                    optiBase.FindSlider("OpenCVB OpenGL buffer count").Value = 1
+                End If
                 ' create a mask that outlines the ideal cells
                 task.idOutline.SetTo(0)
                 For Each id In task.idList
