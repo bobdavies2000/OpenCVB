@@ -10,7 +10,6 @@ Module GifBuilder
             imageFiles.Add(img.FullName)
         Next
 
-        MsgBox(CStr(imageFiles.Count) + " bitmap files found." + vbCrLf + "Click OK to continue.")
         Dim outputGifPath As String = "myGif.gif"
 
         If imgList.Count = 0 Then

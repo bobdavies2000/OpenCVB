@@ -812,6 +812,7 @@ Public Class algorithmList
 	If algorithmName = "Ideal_FullDepth" Then return new Ideal_FullDepth
 	If algorithmName = "Ideal_InstantUpdate" Then return new Ideal_InstantUpdate
 	If algorithmName = "Ideal_RightView" Then return new Ideal_RightView
+	If algorithmName = "Ideal_Shape" Then return new Ideal_Shape
 	If algorithmName = "Ideal_ShapeTopRow" Then return new Ideal_ShapeTopRow
 	If algorithmName = "Image_Basics" Then return new Image_Basics
 	If algorithmName = "Image_CellStats" Then return new Image_CellStats

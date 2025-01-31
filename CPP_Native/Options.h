@@ -2190,3 +2190,9 @@ public:
 	Options_IdealSize() {
 	}
 };
+class Options_IdealShape {
+public:
+	void RunOpt() {}
+	Options_IdealShape() {
+	}
+};

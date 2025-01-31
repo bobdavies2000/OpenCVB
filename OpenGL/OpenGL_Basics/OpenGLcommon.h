@@ -422,24 +422,42 @@ static void DrawBox(float x, float y, float z, float dx, float dy, float dz)
 	glEnd();
 }
 
-
+const int bufferCount = 10;
+float3* pcBuffers[10] = { 0 };
+int bufferIndex = 0;
 static void drawPointCloud()
 {
 	glBegin(GL_POINTS);
-	// draw the 3D scene
-	int pcIndex = 0; GLfloat* pc = (GLfloat*)pointCloudInput; GLfloat pt[] = { 0, 0 };
-	for (int y = 0; y < imageHeight; ++y)
+	if (pcBuffers[bufferIndex] == 0)
 	{
-		for (int x = 0; x < imageWidth; ++x)
+		for (int i = 0; i < bufferCount; i++)
 		{
-			if (pc[pcIndex + 2] > 0.1)
+			pcBuffers[i] = (float3*)malloc((int)pcBufferSize);
+			memset(pcBuffers[i], 0, (int)pcBufferSize);
+		}
+	}
+	memcpy(pcBuffers[bufferIndex], pointCloudInput, pcBufferSize);
+	bufferIndex++;
+	if (bufferIndex >= bufferCount) bufferIndex = 0;
+	// draw the 3D scene
+	for (int i = 0; i < bufferCount; i++)
+	{
+		int pcIndex = 0; 
+		GLfloat* pc = (GLfloat*)pcBuffers[i]; 
+		GLfloat pt[] = { 0, 0 };
+		for (int y = 0; y < imageHeight; ++y)
+		{
+			for (int x = 0; x < imageWidth; ++x)
 			{
-				glVertex3fv(&pc[pcIndex]);
-				pt[0] = GLfloat((x + 0.5f) / imageWidth);
-				pt[1] = GLfloat((y + 0.5f) / imageHeight);
-				glTexCoord2fv(pt);
+				if (pc[pcIndex + 2] > 0.1f)
+				{
+					glVertex3fv(&pc[pcIndex]);
+					pt[0] = GLfloat((x + 0.5f) / imageWidth);
+					pt[1] = GLfloat((y + 0.5f) / imageHeight);
+					glTexCoord2fv(pt);
+				}
+				pcIndex += 3;
 			}
-			pcIndex += 3;
 		}
 	}
 	glEnd();

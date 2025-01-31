@@ -4,7 +4,6 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports System.Windows.Controls
 
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
@@ -426,7 +425,6 @@ Public Class VBtask : Implements IDisposable
             SaveSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", wRect.Y)
             SaveSetting("Opencv", "OpenGLtaskWidth", "OpenGLtaskWidth", wRect.Width)
             openGLPipe.Close()
-            openGL_hwnd = 0
         End If
     End Sub
     Public Sub New()
@@ -884,10 +882,7 @@ Public Class VBtask : Implements IDisposable
     End Function
     Public Sub Dispose() Implements IDisposable.Dispose
         allOptions.Close()
-        If openGL_hwnd <> 0 Then
-            OpenGLClose()
-            openGL_hwnd = 0
-        End If
+        If openGL_hwnd <> 0 Then OpenGLClose()
         TaskTimer.Enabled = False
         For Each algorithm In task.activeObjects
             Dim type As Type = algorithm.GetType()

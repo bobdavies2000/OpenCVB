@@ -11,6 +11,7 @@
     <PackageIcon>OpenCVB.ico</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+    <AssemblyName>OpenCVB</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

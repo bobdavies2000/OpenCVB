@@ -3,6 +3,7 @@ Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
 Imports System.Windows.Forms
+Imports OpenCvSharp
 
 Public Class Options_Annealing : Inherits OptionParent
     Public cityCount As Integer = 25
@@ -8011,5 +8012,30 @@ Public Class Options_IdealSize : Inherits OptionParent
         percentThreshold = depthSlider.value / 100
         rangeThresholdmm = rangeSlider.value / 1000
         cellAge = ageSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_IdealShape : Inherits OptionParent
+    Public shapeChoice As Integer
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Duplicate top row")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                shapeChoice = i
+                Exit For
+            End If
+        Next
     End Sub
 End Class

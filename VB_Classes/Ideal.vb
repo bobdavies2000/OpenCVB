@@ -20,6 +20,7 @@ Public Class Ideal_Basics : Inherits TaskParent
         Dim maxPixels As Single = options.cellSize * options.cellSize
         For Each id In task.idList
             If task.motionMask(id.lRect).CountNonZero Then Continue For
+            id.motionFlag = False
             id.age += 1
             idListNew.Add(id)
         Next
@@ -30,11 +31,13 @@ Public Class Ideal_Basics : Inherits TaskParent
             If pixels / maxPixels < options.percentThreshold Then Continue For
             Dim mm = GetMinMax(depth32f(rect), task.depthMask(rect))
             If mm.maxVal - mm.minVal > options.rangeThresholdmm Then Continue For
+
             Dim id As New depthIdeal
             id.lRect = rect
             id.depth = depth32f(id.lRect).Mean(task.depthMask(id.lRect))
             id.rRect = id.lRect
             id.rRect.X -= camInfo.baseline * camInfo.fx / id.depth
+            id.motionFlag = True
 
             idListNew.Add(id)
         Next
@@ -238,27 +241,53 @@ End Class
 
 
 Public Class Ideal_ShapeTopRow : Inherits TaskParent
-    Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public idMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public idMeans As New List(Of Single)
     Public depth32f As cv.Mat
+    Public shapeChoice As New Ideal_Shape
     Public Sub New()
         desc = "Shape the ideal depth cells using different techniques."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         idMeans.Clear()
         idMap.SetTo(0)
-        depth32f = task.pcSplit(2)
-        For Each id In task.idList
-            idMap(id.lRect).SetTo(255)
+        For i = 0 To task.idList.Count - 1
+            Dim id = task.idList(i)
+            idMap(id.lRect).SetTo(i)
+            idMask(id.lRect).SetTo(255)
             idMeans.Add(id.depth)
-
-            ' duplicate the top row of the roi in all the rows of the roi
-            For y = 1 To id.lRect.Height - 1
-                depth32f(id.lRect).Row(0).CopyTo(depth32f(id.lRect).Row(y))
-            Next
         Next
 
-        dst3.SetTo(0)
-        task.pointCloud.CopyTo(dst3, idMap)
+        shapeChoice.Run(task.pcSplit(2))
+        depth32f = shapeChoice.dst2
+
+        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), depth32f}, dst3)
+        dst3.SetTo(0, Not idMask)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Ideal_Shape : Inherits TaskParent
+    Dim options As New Options_IdealShape
+    Public Sub New()
+        desc = "Modify the depth32f input with the selected options"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        dst2 = src
+        Select Case options.shapeChoice
+            Case 0 ' Duplicate top row
+                For Each id In task.idList
+                    ' duplicate the top row of the roi in all the rows of the roi
+                    For y = 1 To id.lRect.Height - 1
+                        dst2(id.lRect).Row(0).CopyTo(dst2(id.lRect).Row(y))
+                    Next
+                Next
+        End Select
     End Sub
 End Class

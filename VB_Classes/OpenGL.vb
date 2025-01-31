@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Drawing
+Imports System.Threading
 Imports cvext = OpenCvSharp.Extensions
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
@@ -65,9 +66,15 @@ Public Class OpenGL_Basics : Inherits TaskParent
 
         Dim windowWidth = 720
         Dim windowHeight = 720 * 240 / 320
-        startInfo.Arguments = CStr(windowWidth) + " " + CStr(windowHeight) + " " + CStr(memMapbufferSize) + " " + task.pipeName
+        startInfo.Arguments = CStr(windowWidth) + " " + CStr(windowHeight) + " " + CStr(memMapbufferSize) + " " +
+                              task.pipeName
         If task.showConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
-        Process.Start(startInfo)
+        Dim proc = Process.Start(startInfo)
+        While task.openGL_hwnd = 0
+            task.openGL_hwnd = proc.MainWindowHandle
+            If task.openGL_hwnd <> 0 Then Exit While
+            Thread.Sleep(100)
+        End While
 
         memMapPtr = Marshal.AllocHGlobal(memMapbufferSize)
         Dim memMapFile As MemoryMappedFile = MemoryMappedFile.CreateOrOpen("OpenCVBControl", memMapbufferSize)
@@ -2246,8 +2253,7 @@ Public Class OpenGL_Shaper : Inherits TaskParent
 
         dst2 = task.idealD.dst2
         If task.gOptions.DebugCheckBox.Checked Then
-            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), shape.depth32f}, task.ogl.pointCloudInput)
-            dst3 = task.idealD.dst3
+            task.ogl.pointCloudInput = shape.dst3
         Else
             task.ogl.pointCloudInput = task.pointCloud
         End If

@@ -427,6 +427,7 @@ Public Class depthIdeal
     Public rRect As cv.Rect
     Public depth As Single
     Public age As Integer
+    Public motionFlag As Boolean
     Public mm As mmData
 End Class
 
