@@ -54,7 +54,7 @@ int main(int argc, char * argv[])
 
 		glColor3f(1, 1, 1);
 
-		drawPointCloud();
+		drawPointCloudRGB();
 		glDisable(GL_TEXTURE_2D);
 
 		glEnable(GL_BLEND);

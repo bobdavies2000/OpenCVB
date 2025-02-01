@@ -65,15 +65,15 @@ int main(int argc, char* argv[])
 		bool drawFloorNeeded = true;
 		switch (oglFunction) 
 		{
-			case 0: // oCase.pointCloudAndRGB - default case draws the pointcloud with the RGB providing texture.
+			case 0: // oCase.drawPointCloudRGB - default case draws the pointcloud with the RGB providing texture.
 			{
-				drawPointCloud();
+				drawPointCloudRGB();
 				glDisable(GL_TEXTURE_2D);
 				break;
 			}
-			case 1: // drawLineAndCloud - draw vertical lines oCase.drawLineAndCloud
+			case 1: // oCase.drawLineAndCloud - draw vertical lines oCase.drawLineAndCloud
 			{
-				drawPointCloud();
+				drawPointCloudRGB();
 				glDisable(GL_TEXTURE_2D);
 
 				// draw lines provided in the data buffer
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 			}
 			case 2: // oCase.drawFloor - draw floor plane oCase.drawFloor
 			{
-				drawPointCloud();
+				drawPointCloudRGB();
 				glDisable(GL_TEXTURE_2D);
 
 				// draw and texture the floor --------------------------------------------------------------------------------------------------------
@@ -309,7 +309,7 @@ int main(int argc, char* argv[])
 			case 11: // oglFunction = 11  oCase.floorStudy
 			{
 				drawFloorNeeded = false;
-				drawPointCloud();
+				drawPointCloudRGB();
 				glDisable(GL_TEXTURE_2D);
 				glColor4f(0.0f, 0.0f, 1.0f, 0.7f); // floor
 				drawFlatPlane(data[0]);
@@ -460,6 +460,13 @@ int main(int argc, char* argv[])
 				glEnd();
 				break;
 			}
+		case 20: // oCase.drawPointCloudRGB - can also try oCase.drawAvgPointCloudRGB
+			{
+				drawAvgPointCloud();
+				glDisable(GL_TEXTURE_2D);
+				break;
+			}
+
 		} // end of the switch statement
 
 		glEnable(GL_BLEND);

@@ -813,7 +813,6 @@ Public Class algorithmList
 	If algorithmName = "Ideal_InstantUpdate" Then return new Ideal_InstantUpdate
 	If algorithmName = "Ideal_RightView" Then return new Ideal_RightView
 	If algorithmName = "Ideal_Shape" Then return new Ideal_Shape
-	If algorithmName = "Ideal_ShapeTopRow" Then return new Ideal_ShapeTopRow
 	If algorithmName = "Image_Basics" Then return new Image_Basics
 	If algorithmName = "Image_CellStats" Then return new Image_CellStats
 	If algorithmName = "Image_Icon" Then return new Image_Icon
@@ -1225,6 +1224,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_HistDepth3D" Then return new OpenGL_HistDepth3D
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D
 	If algorithmName = "OpenGL_IdealDepth" Then return new OpenGL_IdealDepth
+	If algorithmName = "OpenGL_Idealizer" Then return new OpenGL_Idealizer
 	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
 	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
 	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY
@@ -1253,7 +1253,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_RedTrack" Then return new OpenGL_RedTrack
 	If algorithmName = "OpenGL_ReducedXYZ" Then return new OpenGL_ReducedXYZ
 	If algorithmName = "OpenGL_Reduction" Then return new OpenGL_Reduction
-	If algorithmName = "OpenGL_Shaper" Then return new OpenGL_Shaper
 	If algorithmName = "OpenGL_Sierpinski" Then return new OpenGL_Sierpinski
 	If algorithmName = "OpenGL_SoloPointsRemoved" Then return new OpenGL_SoloPointsRemoved
 	If algorithmName = "OpenGL_StableMinMax" Then return new OpenGL_StableMinMax

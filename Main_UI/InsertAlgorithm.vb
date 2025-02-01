@@ -185,7 +185,7 @@ Public Class InsertAlgorithm
                 sw.WriteLine(vbTab + vbTab + "}")
                 sw.WriteLine(vbTab + "case " + CStr(maxCase + 1) + ":" + " // oglFunction = oCase.function" + CStr(maxCase + 1))
                 sw.WriteLine(vbTab + vbTab + "{")
-                sw.WriteLine(vbTab + vbTab + vbTab + "drawPointCloud();")
+                sw.WriteLine(vbTab + vbTab + vbTab + "drawPointCloudRGB();")
                 sw.WriteLine(vbTab + vbTab + vbTab + "glDisable(GL_TEXTURE_2D);")
                 sw.WriteLine(vbTab + vbTab + vbTab + "// add code here...")
                 sw.WriteLine(vbTab + vbTab + vbTab + "break;")

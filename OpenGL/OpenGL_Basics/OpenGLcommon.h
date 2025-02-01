@@ -174,6 +174,8 @@ static int oglFunction; // defines the work to be done in the case statement in 
 static bool showAxes; // options.showXYZaxis
 static int pcBufferCount = 10;
 std::vector<float3*> pcBuffers;
+static int pcActualCount = 0;
+int bufferIndex = 0;
 static HWND myHwnd;
 
 
@@ -307,17 +309,14 @@ static void readPipeAndMemMap()
 	imageLabel[imageLabelBufferSize] = 0;
 
 	pcBufferCount = (int)sharedMem[36];
-	if (pcBuffers.size() == 0 || pcBuffers.size() != pcBufferCount)
+	if (pcBuffers.size() != pcBufferCount)
 	{
 		for (size_t i = 0; i < pcBuffers.size(); i++)
 		{
 			if (pcBuffers[i] != 0) delete[] pcBuffers[i];
 		}
 		pcBuffers.clear();
-		for (int i = 0; i < pcBufferCount; i++)
-		{
-			pcBuffers.push_back(new float3[pcBufferSize]);
-		}
+		bufferIndex = 0;
 	}
 }
 
@@ -409,71 +408,10 @@ static void DrawWireFrame(float x, float y, float z, float dx, float dy, float d
 
 	glEnd();
 }
-static void DrawBox(float x, float y, float z, float dx, float dy, float dz)
-{
-	glBegin(GL_POLYGON);
-	glVertex3f(x, y - dy, z);
-	glVertex3f(x, y, z);
-	glVertex3f(x - dx, y, z);
-	glVertex3f(x - dx, y - dy, z);
-
-	glVertex3f(x, y - dy, z - dz);
-	glVertex3f(x, y, z - dz);
-	glVertex3f(x, y, z);
-	glVertex3f(x, y - dy, z);
-
-	glVertex3f(x - dx, y - dy, z);
-	glVertex3f(x - dx, y, z);
-	glVertex3f(x - dx, y, z - dz);
-	glVertex3f(x - dx, y - dy, z - dz);
-
-	glVertex3f(x, y, z);
-	glVertex3f(x, y, z - dz);
-	glVertex3f(x - dx, y, z - dz);
-	glVertex3f(x - dx, y, z);
-
-	glVertex3f(x, y - dy, z - dz);
-	glVertex3f(x, y - dy, z);
-	glVertex3f(x - dx, y - dy, z);
-	glVertex3f(x - dx, y - dy, z - dz);
-	glEnd();
-}
-
-int bufferIndex = 0;
-static void drawPointCloud()
-{
-	glBegin(GL_POINTS);
-
-	memcpy(pcBuffers[bufferIndex], pointCloudInput, pcBufferSize);
-	bufferIndex++;
-	if (bufferIndex >= pcBuffers.size()) bufferIndex = 0;
-	// draw the 3D scene
-	for (size_t i = 0; i < pcBuffers.size(); i++)
-	{
-		int pcIndex = 0; 
-		GLfloat* pc = (GLfloat*)pcBuffers[i]; 
-		GLfloat pt[] = { 0, 0 };
-		for (int y = 0; y < imageHeight; ++y)
-		{
-			for (int x = 0; x < imageWidth; ++x)
-			{
-				if ((float)pc[pcIndex + 2] > 0.1f)
-				{
-					glVertex3fv(&pc[pcIndex]);
-					pt[0] = GLfloat((x + 0.5f) / imageWidth);
-					pt[1] = GLfloat((y + 0.5f) / imageHeight);
-					glTexCoord2fv(pt);
-				}
-				pcIndex += 3;
-			}
-		}
-	}
-	glEnd();
-}
 
 
 
-void SaveWindowPosition(HWND hwnd) 
+void SaveWindowPosition(HWND hwnd)
 {
 	WINDOWPLACEMENT wp;
 	wp.length = sizeof(WINDOWPLACEMENT);
@@ -508,4 +446,115 @@ void LoadWindowPosition(HWND hwnd) {
 		}
 		RegCloseKey(hKey);
 	}
+}
+
+static void DrawBox(float x, float y, float z, float dx, float dy, float dz)
+{
+	glBegin(GL_POLYGON);
+	glVertex3f(x, y - dy, z);
+	glVertex3f(x, y, z);
+	glVertex3f(x - dx, y, z);
+	glVertex3f(x - dx, y - dy, z);
+
+	glVertex3f(x, y - dy, z - dz);
+	glVertex3f(x, y, z - dz);
+	glVertex3f(x, y, z);
+	glVertex3f(x, y - dy, z);
+
+	glVertex3f(x - dx, y - dy, z);
+	glVertex3f(x - dx, y, z);
+	glVertex3f(x - dx, y, z - dz);
+	glVertex3f(x - dx, y - dy, z - dz);
+
+	glVertex3f(x, y, z);
+	glVertex3f(x, y, z - dz);
+	glVertex3f(x - dx, y, z - dz);
+	glVertex3f(x - dx, y, z);
+
+	glVertex3f(x, y - dy, z - dz);
+	glVertex3f(x, y - dy, z);
+	glVertex3f(x - dx, y - dy, z);
+	glVertex3f(x - dx, y - dy, z - dz);
+	glEnd();
+}
+
+static void drawPointCloudRGB()
+{
+	glBegin(GL_POINTS);
+
+	if (pcBuffers.size() <= bufferIndex)
+	{
+		pcBuffers.push_back(new float3[pcBufferSize]);
+	}
+
+	memcpy(pcBuffers[bufferIndex], pointCloudInput, pcBufferSize);
+	bufferIndex++;
+
+	if (bufferIndex >= pcBuffers.size()) bufferIndex = 0;
+	// draw the 3D scene
+	for (size_t i = 0; i < pcBuffers.size(); i++)
+	{
+		int pcIndex = 0;
+		GLfloat* pc = (GLfloat*)pcBuffers[i];
+		GLfloat pt[] = { 0, 0 };
+		for (int y = 0; y < imageHeight; ++y)
+		{
+			for (int x = 0; x < imageWidth; ++x)
+			{
+				if ((float)pc[pcIndex + 2] > 0.1f)
+				{
+					glVertex3fv(&pc[pcIndex]);
+					pt[0] = GLfloat((x + 0.5f) / imageWidth);
+					pt[1] = GLfloat((y + 0.5f) / imageHeight);
+					glTexCoord2fv(pt);
+				}
+				pcIndex += 3;
+			}
+		}
+	}
+	glEnd();
+}
+
+static void drawAvgPointCloud()
+{
+	glBegin(GL_POINTS);
+
+	if (pcBuffers.size() <= bufferIndex)
+	{
+		pcBuffers.push_back(new float3[pcBufferSize]);
+	}
+	
+	memcpy(pcBuffers[bufferIndex], pointCloudInput, pcBufferSize);
+	bufferIndex++;
+
+	if (bufferIndex >= pcBuffers.size()) bufferIndex = 0;
+	Mat avg = Mat(imageHeight, imageWidth, CV_32FC3);
+	avg.setTo(0);
+
+	for (size_t i = 0; i < pcBuffers.size(); i++)
+	{
+		avg += Mat(imageHeight, imageWidth, CV_32FC3, pcBuffers[i]);
+
+	}
+	avg *= 1.0f / pcBuffers.size();
+
+	// draw the 3D scene
+	int pcIndex = 0;
+	GLfloat* pc = (GLfloat*)avg.data;
+	GLfloat pt[] = { 0, 0 };
+	for (int y = 0; y < imageHeight; ++y)
+	{
+		for (int x = 0; x < imageWidth; ++x)
+		{
+			if ((float)pc[pcIndex + 2] > 0.1f)
+			{
+				glVertex3fv(&pc[pcIndex]);
+				pt[0] = GLfloat((x + 0.5f) / imageWidth);
+				pt[1] = GLfloat((y + 0.5f) / imageHeight);
+				glTexCoord2fv(pt);
+			}
+			pcIndex += 3;
+		}
+	}
+	glEnd();
 }

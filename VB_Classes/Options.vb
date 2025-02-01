@@ -8029,9 +8029,11 @@ Public Class Options_IdealShape : Inherits OptionParent
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
+            radio.addRadio("Unchanged Depth")
             radio.addRadio("Duplicate top row")
             radio.addRadio("Ideal Cell Outline")
-            radio.check(0).Checked = True
+            radio.addRadio("Set cell to mean depth")
+            radio.check(2).Checked = True
         End If
     End Sub
     Public Sub RunOpt()

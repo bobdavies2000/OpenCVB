@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Drawing
+Imports cv = OpenCvSharp
 Public Class Ideal_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_IdealSize
@@ -237,21 +238,22 @@ End Class
 
 
 
-
-
-
-Public Class Ideal_ShapeTopRow : Inherits TaskParent
+Public Class Ideal_Shape : Inherits TaskParent
     Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public idMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public idMeans As New List(Of Single)
-    Public depth32f As cv.Mat
-    Public shapeChoice As New Ideal_Shape
+    Public idOutline As New cv.Mat
+    Dim options As New Options_IdealShape
     Public Sub New()
+        idOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Shape the ideal depth cells using different techniques."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
         idMeans.Clear()
         idMap.SetTo(0)
+        idMask.SetTo(0)
         For i = 0 To task.idList.Count - 1
             Dim id = task.idList(i)
             idMap(id.lRect).SetTo(i)
@@ -259,47 +261,38 @@ Public Class Ideal_ShapeTopRow : Inherits TaskParent
             idMeans.Add(id.depth)
         Next
 
-        shapeChoice.Run(task.pcSplit(2))
-        depth32f = shapeChoice.dst2
-
-        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), depth32f}, dst3)
-        dst3.SetTo(0, Not idMask)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Ideal_Shape : Inherits TaskParent
-    Dim options As New Options_IdealShape
-    Public Sub New()
-        task.idOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Modify the depth32f input with the selected options"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        dst2 = src
+        dst2 = task.pcSplit(2)
         Select Case options.shapeChoice
-            Case 0 ' Duplicate top row
+            Case 0
+                ' do nothing to the depth data.
+            Case 1 ' Duplicate top row
                 For Each id In task.idList
                     ' duplicate the top row of the roi in all the rows of the roi
                     For y = 1 To id.lRect.Height - 1
                         dst2(id.lRect).Row(0).CopyTo(dst2(id.lRect).Row(y))
                     Next
                 Next
-            Case 1 ' Cell outline
-                If task.ogl.options.pcBufferCount <> 1 Then
-                    optiBase.FindSlider("OpenCVB OpenGL buffer count").Value = 1
-                End If
+            Case 2 ' Cell outline
+                'If task.ogl.options.pcBufferCount <> 1 Then
+                '    optiBase.FindSlider("OpenCVB OpenGL buffer count").Value = 1
+                'End If
                 ' create a mask that outlines the ideal cells
-                task.idOutline.SetTo(0)
+                idOutline.SetTo(0)
                 For Each id In task.idList
                     Dim r = New cv.Rect(id.lRect.X, id.lRect.Y, id.lRect.Width + 1, id.lRect.Height + 1)
-                    task.idOutline.Rectangle(r, 255, 1)
+                    idOutline.Rectangle(r, 255, 1)
                 Next
-                dst2.SetTo(0, Not task.idOutline)
+                dst2.SetTo(0, Not idOutline)
+
+            Case 3 ' Set cell to mean depth
+                For Each id In task.idList
+                    dst2(id.lRect).SetTo(id.depth)
+                Next
         End Select
+
+        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst2}, dst3)
+        dst3.SetTo(0, Not idMask)
+
+        If standaloneTest() Then dst1 = idMask
     End Sub
 End Class
