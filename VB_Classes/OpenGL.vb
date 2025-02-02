@@ -2216,7 +2216,7 @@ End Class
 
 
 
-Public Class OpenGL_Idealizer : Inherits TaskParent
+Public Class OpenGL_IdealShape : Inherits TaskParent
     Dim shape As New Ideal_Shape
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB

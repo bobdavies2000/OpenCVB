@@ -309,7 +309,7 @@ static void readPipeAndMemMap()
 	imageLabel[imageLabelBufferSize] = 0;
 
 	pcBufferCount = (int)sharedMem[36];
-	if (pcBuffers.size() != pcBufferCount)
+	if (pcBuffers.size() > pcBufferCount)
 	{
 		for (size_t i = 0; i < pcBuffers.size(); i++)
 		{
@@ -482,15 +482,15 @@ static void drawPointCloudRGB()
 {
 	glBegin(GL_POINTS);
 
-	if (pcBuffers.size() <= bufferIndex)
+	if (pcBuffers.size() + 1 <= pcBufferCount )
 	{
 		pcBuffers.push_back(new float3[pcBufferSize]);
 	}
 
 	memcpy(pcBuffers[bufferIndex], pointCloudInput, pcBufferSize);
 	bufferIndex++;
-
 	if (bufferIndex >= pcBuffers.size()) bufferIndex = 0;
+
 	// draw the 3D scene
 	for (size_t i = 0; i < pcBuffers.size(); i++)
 	{
@@ -519,7 +519,7 @@ static void drawAvgPointCloud()
 {
 	glBegin(GL_POINTS);
 
-	if (pcBuffers.size() <= bufferIndex)
+	if (pcBuffers.size() + 1 <= pcBufferCount )
 	{
 		pcBuffers.push_back(new float3[pcBufferSize]);
 	}

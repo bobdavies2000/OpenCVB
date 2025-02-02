@@ -7998,7 +7998,7 @@ Public Class Options_IdealSize : Inherits OptionParent
     Public rangeThresholdmm As Single
     Public cellAge As Integer = 5
     Public Sub New()
-        If task.dst2.Width >= 1280 Then cellSize = 16
+        If task.dst2.Width >= 1280 Then cellSize = 24
         If task.dst2.Width >= 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Disparity Cell Size", 1, 100, cellSize)
