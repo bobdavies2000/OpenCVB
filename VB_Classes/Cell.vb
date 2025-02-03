@@ -29,11 +29,11 @@ Public Class Cell_Basics : Inherits TaskParent
             End If
 
             strOut += "Cloud Min/Max/Range: X = " + Format(rc.mmX.minVal, fmt1) + "/" + Format(rc.mmX.maxVal, fmt1)
-            strOut += "/" + Format(rc.mmX.maxVal - rc.mmX.minVal, fmt1) + vbTab
+            strOut += "/" + Format(rc.mmX.range, fmt1) + vbTab
             strOut += "Y = " + Format(rc.mmY.minVal, fmt1) + "/" + Format(rc.mmY.maxVal, fmt1)
-            strOut += "/" + Format(rc.mmY.maxVal - rc.mmY.minVal, fmt1) + vbTab
+            strOut += "/" + Format(rc.mmY.range, fmt1) + vbTab
             strOut += "Z = " + Format(rc.mmZ.minVal, fmt2) + "/" + Format(rc.mmZ.maxVal, fmt2)
-            strOut += "/" + Format(rc.mmZ.maxVal - rc.mmZ.minVal, fmt2) + vbCrLf + vbCrLf
+            strOut += "/" + Format(rc.mmZ.range, fmt2) + vbCrLf + vbCrLf
 
             strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
 

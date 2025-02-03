@@ -183,6 +183,7 @@ Public Structure mmData
     Dim maxVal As Double
     Dim minLoc As cv.Point
     Dim maxLoc As cv.Point
+    Dim range As Double
 End Structure
 
 
@@ -478,10 +479,6 @@ Public Class rcData
     Public depthMask As cv.Mat
     Public depthMean As Single
 
-    'Public minDepthVec As cv.Point3f
-    'Public maxDepthVec As cv.Point3f
-    'Public minLoc As cv.Point
-    'Public maxLoc As cv.Point
     Public mmX As mmData
     Public mmY As mmData
     Public mmZ As mmData

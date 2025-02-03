@@ -522,7 +522,7 @@ Public Class TaskParent : Implements IDisposable
                 mm.maxVal = Double.MaxValue
             End If
         End If
-
+        mm.range = mm.maxVal - mm.minVal
         Return mm
     End Function
     Public Sub SetTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
