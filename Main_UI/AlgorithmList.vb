@@ -813,6 +813,7 @@ Public Class algorithmList
 	If algorithmName = "Ideal_InstantUpdate" Then return new Ideal_InstantUpdate
 	If algorithmName = "Ideal_RightView" Then return new Ideal_RightView
 	If algorithmName = "Ideal_Shape" Then return new Ideal_Shape
+	If algorithmName = "Ideal_ShapeTop" Then return new Ideal_ShapeTop
 	If algorithmName = "Image_Basics" Then return new Image_Basics
 	If algorithmName = "Image_CellStats" Then return new Image_CellStats
 	If algorithmName = "Image_Icon" Then return new Image_Icon
@@ -1225,6 +1226,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D
 	If algorithmName = "OpenGL_IdealDepth" Then return new OpenGL_IdealDepth
 	If algorithmName = "OpenGL_IdealShape" Then return new OpenGL_IdealShape
+	If algorithmName = "OpenGL_IdealTriangles" Then return new OpenGL_IdealTriangles
 	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
 	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
 	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY
@@ -1433,8 +1435,8 @@ Public Class algorithmList
 	If algorithmName = "Projection_Lines" Then return new Projection_Lines
 	If algorithmName = "Projection_Object" Then return new Projection_Object
 	If algorithmName = "Projection_ObjectIsolate" Then return new Projection_ObjectIsolate
-	If algorithmName = "Projection_Side" Then return new Projection_Side
-	If algorithmName = "Projection_Top" Then return new Projection_Top
+	If algorithmName = "Projection_ViewSide" Then return new Projection_ViewSide
+	If algorithmName = "Projection_ViewTop" Then return new Projection_ViewTop
 	If algorithmName = "Puzzle_Basics" Then return new Puzzle_Basics
 	If algorithmName = "Puzzle_Solver" Then return new Puzzle_Solver
 	If algorithmName = "Puzzle_SolverDynamic" Then return new Puzzle_SolverDynamic
@@ -1730,6 +1732,7 @@ Public Class algorithmList
 	If algorithmName = "Triangle_Basics" Then return new Triangle_Basics
 	If algorithmName = "Triangle_Cell" Then return new Triangle_Cell
 	If algorithmName = "Triangle_HullContour" Then return new Triangle_HullContour
+	If algorithmName = "Triangle_IdealShapes" Then return new Triangle_IdealShapes
 	If algorithmName = "Triangle_Mask" Then return new Triangle_Mask
 	If algorithmName = "Triangle_RedCloud" Then return new Triangle_RedCloud
 	If algorithmName = "Vector_Magnitude" Then return new Vector_Magnitude

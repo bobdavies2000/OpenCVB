@@ -428,8 +428,10 @@ Public Class depthIdeal
     Public rRect As cv.Rect
     Public depth As Single
     Public age As Integer
-    Public motionFlag As Boolean
     Public mm As mmData
+    Public index As Integer
+    Public color As cv.Point3f
+    Public pcFrag As cv.Mat
 End Class
 
 

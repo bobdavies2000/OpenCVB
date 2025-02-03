@@ -95,50 +95,6 @@ End Class
 
 
 
-Public Class Projection_HistSide : Inherits TaskParent
-    Public histogram As New cv.Mat
-    Public Sub New()
-        labels = {"", "", "Top view with histogram counts", "ZY (Side View) - mask"}
-        UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
-        desc = "Create a 2D side view for ZY histogram of depth"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
-        histogram.Col(0).SetTo(0)
-
-        dst2 = histogram.ConvertScaleAbs
-        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Projection_HistTop : Inherits TaskParent
-    Public histogram As New cv.Mat
-    Public Sub New()
-        labels = {"", "", "Top view with histogram counts", "XZ (Top View) - mask"}
-        UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
-        desc = "Create a 2D top view for XZ histogram of depth"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
-        histogram.Row(0).SetTo(0)
-
-        dst2 = histogram.ConvertScaleAbs
-        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Projection_Lines : Inherits TaskParent
@@ -174,75 +130,16 @@ End Class
 
 
 
-
-Public Class Projection_Top : Inherits TaskParent
-    Public histTop As New Projection_HistTop
-    Public objects As New Projection_Basics
-    Public Sub New()
-        desc = "Find all the masks, rects, and counts in the top down view."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        histTop.Run(src)
-
-        dst2 = runRedC(histTop.dst3, labels(2), Not histTop.dst3)
-
-        objects.redCellInput = task.rcList
-        objects.dst2 = task.redC.dst2
-        objects.labels(2) = task.redC.labels(2)
-        objects.Run(histTop.dst2)
-
-        dst2 = objects.dst2
-        labels(2) = task.redC.labels(2)
-        SetTrueText(objects.strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Projection_Side : Inherits TaskParent
-    Public histSide As New Projection_HistSide
-    Public objects As New Projection_Basics
-    Public Sub New()
-        objects.viewType = "Side"
-        desc = "Find all the masks, rects, and counts in the side view."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        histSide.Run(src)
-
-        dst2 = runRedC(histSide.dst3, labels(2), Not histSide.dst3)
-
-        objects.redCellInput = task.rcList
-        objects.dst2 = task.redC.dst2
-        objects.labels(2) = task.redC.labels(2)
-        objects.Run(histSide.dst2)
-
-        dst2 = objects.dst2
-        labels(2) = task.redC.labels(2)
-        SetTrueText(objects.strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Projection_ObjectIsolate : Inherits TaskParent
-    Public top As New Projection_Top
-    Public side As New Projection_Side
+    Public top As New Projection_ViewTop
+    Public side As New Projection_ViewSide
     Dim options As New Options_Projection
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         side.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         top.Run(src)
@@ -270,8 +167,8 @@ End Class
 
 
 Public Class Projection_Object : Inherits TaskParent
-    Dim top As New Projection_Top
-    Dim side As New Projection_Side
+    Dim top As New Projection_ViewTop
+    Dim side As New Projection_ViewSide
     Public Sub New()
         task.gOptions.setDebugSlider(0) ' pick the biggest object...
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -387,10 +284,10 @@ Public Class Projection_Derivative : Inherits TaskParent
     Dim heatDeriv As New HeatMap_Basics
     Dim deriv As New Derivative_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = True
         desc = "Create a top and side projection the best derivative data"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         deriv.Run(src)
         dst1 = deriv.dst3
         labels(1) = deriv.labels(3)
@@ -409,5 +306,110 @@ Public Class Projection_Derivative : Inherits TaskParent
         Dim side = heatDeriv.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst2.SetTo(cv.Scalar.White, top)
         dst3.SetTo(cv.Scalar.White, side)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Projection_ViewTop : Inherits TaskParent
+    Public histTop As New Projection_HistTop
+    Public objects As New Projection_Basics
+    Public Sub New()
+        desc = "Find all the masks, rects, and counts in the top down view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        histTop.Run(src)
+
+        dst2 = runRedC(histTop.dst3, labels(2), Not histTop.dst3)
+
+        objects.redCellInput = task.rcList
+        objects.dst2 = task.redC.dst2
+        objects.labels(2) = task.redC.labels(2)
+        objects.Run(histTop.dst2)
+
+        dst2 = objects.dst2
+        labels(2) = task.redC.labels(2)
+        SetTrueText(objects.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Projection_ViewSide : Inherits TaskParent
+    Public histSide As New Projection_HistSide
+    Public objects As New Projection_Basics
+    Public Sub New()
+        objects.viewType = "Side"
+        desc = "Find all the masks, rects, and counts in the side view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        histSide.Run(src)
+
+        dst2 = runRedC(histSide.dst3, labels(2), Not histSide.dst3)
+
+        objects.redCellInput = task.rcList
+        objects.dst2 = task.redC.dst2
+        objects.labels(2) = task.redC.labels(2)
+        objects.Run(histSide.dst2)
+
+        dst2 = objects.dst2
+        labels(2) = task.redC.labels(2)
+        SetTrueText(objects.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Projection_HistSide : Inherits TaskParent
+    Public histogram As New cv.Mat
+    Public Sub New()
+        labels = {"", "", "Top view with histogram counts", "ZY (Side View) - mask"}
+        UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
+        desc = "Create a 2D side view for ZY histogram of depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        histogram.Col(0).SetTo(0)
+
+        dst2 = histogram.ConvertScaleAbs
+        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Projection_HistTop : Inherits TaskParent
+    Public histogram As New cv.Mat
+    Public Sub New()
+        labels = {"", "", "Top view with histogram counts", "XZ (Top View) - mask"}
+        UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
+        desc = "Create a 2D top view for XZ histogram of depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
+        histogram.Row(0).SetTo(0)
+
+        dst2 = histogram.ConvertScaleAbs
+        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
     End Sub
 End Class

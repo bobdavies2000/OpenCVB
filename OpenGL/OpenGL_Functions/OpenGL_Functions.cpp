@@ -120,15 +120,16 @@ int main(int argc, char* argv[])
 				glDisable(GL_TEXTURE_2D);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				glBegin(GL_TRIANGLES);
+				GLfloat *color = 0;
 				for (int i = 0; i < dataCount; i++)
 				{
 					if (i % 4 == 0)
 					{
-						index = i;
+						color = (GLfloat*)&dataBuff[index];
 					}
 					else
 					{
-						glColor3fv((GLfloat*)&dataBuff[index]);
+						glColor3fv(color);
 						glVertex3fv((GLfloat*)&dataBuff[i]);
 					}
 				}

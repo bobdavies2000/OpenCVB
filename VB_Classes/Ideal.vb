@@ -3,6 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Ideal_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_IdealSize
+    Public cellSize As Integer
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         labels(3) = "Right View image cells with ideal visibility"
@@ -11,6 +12,7 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim emptyRect As New cv.Rect
         options.RunOpt()
+        cellSize = options.cellSize
         grid.Run(src)
 
         If task.optionsChanged Then task.idList.Clear()
@@ -21,11 +23,12 @@ Public Class Ideal_Basics : Inherits TaskParent
         Dim maxPixels As Single = options.cellSize * options.cellSize
         For Each id In task.idList
             If task.motionMask(id.lRect).CountNonZero Then Continue For
-            id.motionFlag = False
             id.age += 1
+            id.index = idListNew.Count
             idListNew.Add(id)
         Next
 
+        Dim colorStdev As cv.Scalar, colormean As cv.Scalar
         For Each rect In grid.gridRectsAll
             If task.motionMask(rect).CountNonZero = 0 Then Continue For
             Dim pixels = task.depthMask(rect).CountNonZero
@@ -38,7 +41,10 @@ Public Class Ideal_Basics : Inherits TaskParent
             id.depth = depth32f(id.lRect).Mean(task.depthMask(id.lRect))
             id.rRect = id.lRect
             id.rRect.X -= camInfo.baseline * camInfo.fx / id.depth
-            id.motionFlag = True
+            cv.Cv2.MeanStdDev(task.color(id.lRect), colormean, colorStdev, task.depthMask(id.lRect))
+            id.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
+            id.index = idListNew.Count
+            id.pcFrag = task.pointCloud(rect)
 
             idListNew.Add(id)
         Next
@@ -242,10 +248,9 @@ Public Class Ideal_Shape : Inherits TaskParent
     Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public idMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public idMeans As New List(Of Single)
-    Public idOutline As New cv.Mat
     Dim options As New Options_IdealShape
     Public Sub New()
-        idOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         desc = "Shape the ideal depth cells using different techniques."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -261,35 +266,50 @@ Public Class Ideal_Shape : Inherits TaskParent
             idMeans.Add(id.depth)
         Next
 
-        dst2 = task.pcSplit(2)
+        dst2.SetTo(0)
         Select Case options.shapeChoice
             Case 0
                 ' do nothing to the depth data.
+                task.pointCloud.CopyTo(dst2, idMask)
             Case 1 ' Duplicate top row
                 For Each id In task.idList
-                    ' duplicate the top row of the roi in all the rows of the roi
+                    Dim split = id.pcFrag.Split()
                     For y = 1 To id.lRect.Height - 1
-                        dst2(id.lRect).Row(0).CopyTo(dst2(id.lRect).Row(y))
+                        split(2).Row(0).CopyTo(split(2).Row(y))
                     Next
+                    cv.Cv2.Merge(split, id.pcFrag)
+                    id.pcFrag.CopyTo(dst2(id.lRect))
                 Next
-            Case 2 ' Cell outline
-                ' create a mask that outlines the ideal cells
-                idOutline.SetTo(0)
+            Case 2 ' Set cell to mean depth
                 For Each id In task.idList
-                    Dim r = New cv.Rect(id.lRect.X, id.lRect.Y, id.lRect.Width + 1, id.lRect.Height + 1)
-                    idOutline.Rectangle(r, 255, 1)
-                Next
-                dst2.SetTo(0, Not idOutline)
-
-            Case 3 ' Set cell to mean depth
-                For Each id In task.idList
-                    dst2(id.lRect).SetTo(id.depth)
+                    Dim split = id.pcFrag.Split()
+                    split(2).SetTo(id.depth)
+                    cv.Cv2.Merge(split, id.pcFrag)
+                    id.pcFrag.CopyTo(dst2(id.lRect))
                 Next
         End Select
 
-        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst2}, dst3)
-        dst3.SetTo(0, Not idMask)
+        labels(2) = CStr(task.idList.Count) + " ideal depth cells found using '" + options.shapeLabel + "'"
+    End Sub
+End Class
 
-        If standaloneTest() Then dst1 = idMask
+
+
+
+
+
+Public Class Ideal_ShapeTop : Inherits TaskParent
+    Dim shape As New Ideal_Shape
+    Dim histTop As New Projection_HistTop
+    Public Sub New()
+        desc = "Create a top view of the shaped ideal cells"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        shape.Run(src)
+        labels(2) = shape.labels(2)
+
+        histTop.Run(shape.dst3)
+        dst2 = histTop.dst2
+        dst3 = histTop.dst3
     End Sub
 End Class

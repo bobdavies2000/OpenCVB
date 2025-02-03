@@ -1331,10 +1331,10 @@ Public Class OpenGL_TessellateRGB : Inherits TaskParent
         labels = tess.labels
 
         task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
-                                                   tess.triangles.ToArray)
+                                                  tess.triangles.ToArray)
 
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(src)
+        task.ogl.pointCloudInput = empty
+        task.ogl.Run(empty)
     End Sub
 End Class
 
@@ -2191,7 +2191,6 @@ Public Class OpenGL_IdealDepth : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         dst3 = task.pointCloud.Clone
-        task.gOptions.DebugCheckBox.Checked = True
         desc = "Visualize the high visibility cells found by Disparity_GoodCells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2199,13 +2198,9 @@ Public Class OpenGL_IdealDepth : Inherits TaskParent
 
         dst2 = task.idealD.dst2
 
-        If task.gOptions.DebugCheckBox.Checked Then
-            dst3.SetTo(0)
-            task.pointCloud.CopyTo(dst3, shape.idMask)
-            task.ogl.pointCloudInput = dst3
-        Else
-            task.ogl.pointCloudInput = task.pointCloud
-        End If
+        dst3.SetTo(0)
+        task.pointCloud.CopyTo(dst3, shape.idMask)
+        task.ogl.pointCloudInput = dst3
 
         task.ogl.Run(src)
     End Sub
@@ -2220,19 +2215,16 @@ Public Class OpenGL_IdealShape : Inherits TaskParent
     Dim shape As New Ideal_Shape
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
-        task.gOptions.DebugCheckBox.Checked = True
         desc = "Display the enhanced depth produced using the ideal depth only."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         shape.Run(src)
 
         dst2 = task.idealD.dst2
-        If task.gOptions.DebugCheckBox.Checked Then
-            task.ogl.pointCloudInput = shape.dst3
-        Else
-            task.ogl.pointCloudInput = task.pointCloud
-        End If
-        task.ogl.Run(task.color)
+        task.ogl.pointCloudInput = shape.dst2
+
+        task.ogl.Run(src)
+        labels(2) = shape.labels(2)
     End Sub
 End Class
 
@@ -2256,9 +2248,35 @@ Public Class OpenGL_TessellateCell : Inherits TaskParent
         labels = tess.labels
 
         task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
-                                                   tess.triangles.ToArray)
+                                                  tess.triangles.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(tess.dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_IdealTriangles : Inherits TaskParent
+    Dim triangles As New Triangle_IdealShapes
+    Public Sub New()
+        task.ogl.oglFunction = oCase.tessalateTriangles
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Build triangles for every ideal depth cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        triangles.Run(src)
+        dst2 = triangles.dst2
+        labels = triangles.labels
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(triangles.triangles.Count, 1, cv.MatType.CV_32FC3,
+                                                  triangles.triangles.ToArray)
+
+        task.ogl.pointCloudInput = New cv.Mat
+        task.ogl.Run(src)
     End Sub
 End Class

@@ -211,3 +211,44 @@ Public Class Triangle_Mask : Inherits TaskParent
         labels(2) = task.redC.labels(2)
     End Sub
 End Class
+
+
+
+
+
+Public Class Triangle_IdealShapes : Inherits TaskParent
+    Public triangles As New List(Of cv.Point3f)
+    Dim shape As New Ideal_Shape
+    Public Sub New()
+        labels = {"", "", "RedColor_Hulls output", "Selected contour - each pixel has depth"}
+        desc = "Build triangles from the Ideal_Shapes using the corners of the cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        shape.Run(src)
+        labels(2) = shape.labels(2)
+
+        dst2 = src
+        Dim ptLast As cv.Point
+        triangles.Clear()
+        Dim cellSize = task.idealD.cellSize
+        Dim keyPoints = {New cv.Point(0, 0), New cv.Point(0, cellSize), New cv.Point(cellSize, 0),
+                         New cv.Point(0, cellSize), New cv.Point(cellSize, cellSize), New cv.Point(0, cellSize)}
+        For Each id In task.idList
+            Dim r = id.lRect
+            ptLast = New cv.Point(r.TopLeft.X, r.BottomRight.Y)
+            For i = 0 To 5
+                If i Mod 3 = 0 Then triangles.Add(id.color)
+                Dim pt = keyPoints(i)
+                Dim vec = id.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
+                triangles.Add(vec)
+                DrawLine(dst2, pt, ptLast, cv.Scalar.White)
+                ptLast = pt
+            Next
+        Next
+        If task.heartBeat Then
+            labels(3) = CStr(CInt(triangles.Count / 3)) + " triangles generated from " + CStr(task.idList.Count) +
+                        " ideal depth cells. Validation = " + CStr(CInt(triangles.Count / 8)) + " should equal " +
+                        CStr(task.idList.Count)
+        End If
+    End Sub
+End Class

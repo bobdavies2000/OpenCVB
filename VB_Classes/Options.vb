@@ -8001,14 +8001,14 @@ Public Class Options_IdealSize : Inherits OptionParent
         If task.dst2.Width >= 1280 Then cellSize = 24
         If task.dst2.Width >= 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Disparity Cell Size", 1, 100, cellSize)
+            sliders.setupTrackBar("Ideal Cell Size", 1, 100, cellSize)
             sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * percentThreshold)
             sliders.setupTrackBar("Cell Depth Range (mm's)", 1, 200, 100)
             sliders.setupTrackBar("Cell Age Min", 1, 20, cellAge)
         End If
     End Sub
     Public Sub RunOpt()
-        Static sizeSlider = FindSlider("Disparity Cell Size")
+        Static sizeSlider = FindSlider("Ideal Cell Size")
         Static depthSlider = FindSlider("Percent Depth Threshold")
         Static rangeSlider = FindSlider("Cell Depth Range (mm's)")
         Static ageSlider = FindSlider("Cell Age Min")
@@ -8026,12 +8026,12 @@ End Class
 
 Public Class Options_IdealShape : Inherits OptionParent
     Public shapeChoice As Integer
+    Public shapeLabel As String
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Unchanged Depth")
-            radio.addRadio("Duplicate top row")
-            radio.addRadio("Ideal Cell Outline")
+            radio.addRadio("Duplicate top row depth")
             radio.addRadio("Set cell to mean depth")
             radio.check(2).Checked = True
         End If
@@ -8041,6 +8041,7 @@ Public Class Options_IdealShape : Inherits OptionParent
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 shapeChoice = i
+                shapeLabel = frm.check(i).text
                 Exit For
             End If
         Next
