@@ -637,7 +637,6 @@ End Class
 
 Public Class Triangle_IdealShapes : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
-    ' Public tdList As New List(Of triangleData)
     Dim shape As New Ideal_Shape
     Public Sub New()
         labels = {"", "", "RedColor_Hulls output", "Selected contour - each pixel has depth"}
@@ -655,50 +654,20 @@ Public Class Triangle_IdealShapes : Inherits TaskParent
                          New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, cellSize - 1), New cv.Point(cellSize - 1, 0)}
         For Each id In task.idList
             Dim r = id.lRect
+            If id.lRect.Height <> cellSize Or id.lRect.Width <> cellSize Then Continue For
             ptLast = keyPoints(2)
             For i = 0 To 5
                 Dim index = i Mod 3
-                If index = 0 Or index = 3 Then triangles.Add(id.color)
                 Dim pt = keyPoints(i)
                 Dim vec = id.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
+                If index = 0 Or index = 3 Then
+                    triangles.Add(New cv.Point3f(id.color.Z / 255, id.color.Y / 255, id.color.X / 255))
+                End If
                 triangles.Add(vec)
                 DrawLine(dst2(r), ptLast, pt, cv.Scalar.White, task.lineWidth)
                 ptLast = pt
             Next
         Next
-
-
-
-
-
-        'triangles.Clear()
-        'For i = 0 To tdList.Count - 1
-        '    Dim td = tdList(i)
-        '    Dim vec1 = td.facets(0)
-        '    Dim vec2 = td.facets(1)
-        '    Dim vec3 = td.facets(2)
-
-        '    If Math.Abs(vec1.X - vec2.X) <= task.idealD.thresholdRangeZ Or
-        '        Math.Abs(vec1.X - vec3.X) <= task.idealD.thresholdRangeZ Or
-        '        Math.Abs(vec2.X - vec3.X) <= task.idealD.thresholdRangeZ Or
-        '        Math.Abs(vec1.Y - vec2.Y) <= task.idealD.thresholdRangeZ Or
-        '        Math.Abs(vec1.Y - vec3.Y) <= task.idealD.thresholdRangeZ Or
-        '        Math.Abs(vec2.Y - vec3.Y) <= task.idealD.thresholdRangeZ Or
-        '        Math.Abs(vec1.Z - vec2.Z) <= task.idealD.thresholdRangeZ Or
-        '        Math.Abs(vec1.Z - vec3.Z) <= task.idealD.thresholdRangeZ Or
-        '        Math.Abs(vec2.Z - vec3.Z) <= task.idealD.thresholdRangeZ Then
-        '        triangles.Add(td.color)
-        '        triangles.Add(td.facets(0))
-        '        triangles.Add(td.facets(1))
-        '        triangles.Add(td.facets(2))
-        '    Else
-        '        Dim k = 0
-        '    End If
-        'Next
-
-
-
-
 
         If task.heartBeat Then
             labels(3) = CStr(CInt(triangles.Count / 3)) + " triangles generated from " + CStr(task.idList.Count) +

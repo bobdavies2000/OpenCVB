@@ -35,8 +35,16 @@ Public Class Ideal_Basics : Inherits TaskParent
             If task.motionMask(rect).CountNonZero = 0 Then Continue For
             Dim pixels = task.depthMask(rect).CountNonZero
             If pixels / maxPixels < options.percentThreshold Then Continue For
-            Dim mm = GetMinMax(depth32f(rect), task.depthMask(rect))
-            If mm.maxVal - mm.minVal > options.rangeThresholdmm Then Continue For
+
+            Dim rangeCheck = True
+            For i = 0 To 2
+                Dim mm = GetMinMax(task.pcSplit(i)(rect), task.depthMask(rect))
+                If mm.maxVal - mm.minVal > options.rangeThresholdmm Then
+                    rangeCheck = False
+                    Exit For
+                End If
+            Next
+            If rangeCheck = False Then Continue For
 
             Dim id As New depthIdeal
             id.lRect = rect
