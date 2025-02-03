@@ -217,7 +217,6 @@
     <Compile Include="Profile.vb" />
     <Compile Include="Sides.vb" />
     <Compile Include="Spectrum.vb" />
-    <Compile Include="Tessallate.vb" />
     <Compile Include="Thickness.vb" />
     <Compile Include="Threading.vb" />
     <Compile Include="TreeviewForm.Designer.vb">

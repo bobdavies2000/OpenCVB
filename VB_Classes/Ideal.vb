@@ -4,6 +4,7 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_IdealSize
     Public cellSize As Integer
+    Public thresholdRangeZ As Single
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         labels(3) = "Right View image cells with ideal visibility"
@@ -13,6 +14,7 @@ Public Class Ideal_Basics : Inherits TaskParent
         Dim emptyRect As New cv.Rect
         options.RunOpt()
         cellSize = options.cellSize
+        thresholdRangeZ = options.rangeThresholdmm
         grid.Run(src)
 
         If task.optionsChanged Then task.idList.Clear()

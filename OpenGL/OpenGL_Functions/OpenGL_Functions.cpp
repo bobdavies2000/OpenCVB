@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 				glDisable(GL_BLEND);
 				break;
 			}
-			case 3: // oCase.tessalateTriangles - oCase.tessalateTriangles
+			case 3: // oCase.trianglesAndColor - oCase.trianglesAndColor
 			{
 				glDisable(GL_TEXTURE_2D);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -129,6 +129,8 @@ int main(int argc, char* argv[])
 					}
 					else
 					{
+						float3 vec = dataBuff[i];
+						if (vec.x == 0 || vec.y == 0 || vec.z == 0) continue;
 						glColor3fv(color);
 						glVertex3fv((GLfloat*)&dataBuff[i]);
 					}

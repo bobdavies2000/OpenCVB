@@ -153,7 +153,7 @@ Public Enum oCase
     drawPointCloudRGB = 0
     drawLineAndCloud = 1
     drawFloor = 2
-    tessalateTriangles = 3
+    trianglesAndColor = 3
     drawPyramid = 4
     drawCube = 5
     simplePlane = 6

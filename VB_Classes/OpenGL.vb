@@ -326,7 +326,7 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadSimple : Inherits TaskParent
-    Dim tess As New Tessallate_QuadSimple
+    Dim tess As New Triangle_QuadSimple
     Public Sub New()
         task.ogl.oglFunction = oCase.simplePlane
         task.OpenGLTitle = "OpenGL_Functions"
@@ -352,7 +352,7 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadHulls : Inherits TaskParent
-    Dim tess As New Tessallate_QuadHulls
+    Dim tess As New Triangle_QuadHulls
     Public Sub New()
         task.ogl.oglFunction = oCase.simplePlane
         task.OpenGLTitle = "OpenGL_Functions"
@@ -378,7 +378,7 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadMinMax : Inherits TaskParent
-    Dim tess As New Tessallate_QuadMinMax
+    Dim tess As New Triangle_QuadMinMax
     Public Sub New()
         task.ogl.oglFunction = oCase.simplePlane
         task.OpenGLTitle = "OpenGL_Functions"
@@ -402,7 +402,7 @@ End Class
 
 
 Public Class OpenGL_Bricks : Inherits TaskParent
-    Dim tess As New Tessallate_Bricks
+    Dim tess As New Triangle_Bricks
     Public Sub New()
         task.ogl.oglFunction = oCase.minMaxBlocks
         task.OpenGLTitle = "OpenGL_Functions"
@@ -1293,12 +1293,12 @@ End Class
 
 
 
-Public Class OpenGL_Tessellate : Inherits TaskParent
+Public Class OpenGL_Triangles : Inherits TaskParent
     Dim tess As New Triangle_RedCloud
     Public Sub New()
-        task.ogl.oglFunction = oCase.tessalateTriangles
+        task.ogl.oglFunction = oCase.trianglesAndColor
         task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display a tessellated representation of the point cloud"
+        desc = "Display a triangle representation of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         tess.Run(src)
@@ -1317,12 +1317,12 @@ End Class
 
 
 
-Public Class OpenGL_TessellateRGB : Inherits TaskParent
+Public Class OpenGL_TriangleRGB : Inherits TaskParent
     Dim tess As New Triangle_RedCloud
     Public Sub New()
-        task.ogl.oglFunction = oCase.tessalateTriangles
+        task.ogl.oglFunction = oCase.trianglesAndColor
         task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display a tessellated representation of the point cloud"
+        desc = "Display a triangle representation of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         tess.Run(src)
@@ -1333,8 +1333,8 @@ Public Class OpenGL_TessellateRGB : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
                                                   tess.triangles.ToArray)
 
-        task.ogl.pointCloudInput = empty
-        task.ogl.Run(empty)
+        task.ogl.pointCloudInput = New cv.Mat
+        task.ogl.Run(src)
     End Sub
 End Class
 
@@ -2211,7 +2211,7 @@ End Class
 
 
 
-Public Class OpenGL_IdealShape : Inherits TaskParent
+Public Class OpenGL_IdealShapes : Inherits TaskParent
     Dim shape As New Ideal_Shape
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
@@ -2234,12 +2234,12 @@ End Class
 
 
 
-Public Class OpenGL_TessellateCell : Inherits TaskParent
+Public Class OpenGL_TriangleCell : Inherits TaskParent
     Dim tess As New Triangle_Basics
     Public Sub New()
-        task.ogl.oglFunction = oCase.tessalateTriangles
+        task.ogl.oglFunction = oCase.trianglesAndColor
         task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display a tessellated representation of the point cloud"
+        desc = "Display a triangle representation of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         tess.Run(src)
@@ -2261,10 +2261,10 @@ End Class
 
 
 
-Public Class OpenGL_IdealTriangles : Inherits TaskParent
+Public Class OpenGL_TriangleIdeal : Inherits TaskParent
     Dim triangles As New Triangle_IdealShapes
     Public Sub New()
-        task.ogl.oglFunction = oCase.tessalateTriangles
+        task.ogl.oglFunction = oCase.trianglesAndColor
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Build triangles for every ideal depth cell"
     End Sub
