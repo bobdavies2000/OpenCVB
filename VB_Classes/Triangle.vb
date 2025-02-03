@@ -660,9 +660,7 @@ Public Class Triangle_IdealShapes : Inherits TaskParent
                 Dim index = i Mod 3
                 Dim pt = cellPoints(i)
                 Dim vec = id.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
-                If index = 0 Or index = 3 Then
-                    triangles.Add(New cv.Point3f(id.color.Z / 255, id.color.Y / 255, id.color.X / 255))
-                End If
+                If index = 0 Or index = 3 Then triangles.Add(id.color)
                 triangles.Add(vec)
                 DrawLine(dst2(r), ptLast, pt, cv.Scalar.White, task.lineWidth)
                 ptLast = pt

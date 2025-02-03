@@ -62,6 +62,8 @@ int main(int argc, char* argv[])
 		int pairCount = (int)(dataBufferSize / 6);
 		int dataCount = (int)(dataBufferSize / 12); // 12 bytes per float3 entries = number of float3 entries.
 		float3* dataBuff = (float3*)dataBuffer; int index;
+		GLfloat* glData = (GLfloat*)dataBuffer;
+		int glCount = (int)(dataBufferSize / 4);
 		bool drawFloorNeeded = true;
 		switch (oglFunction) 
 		{
@@ -120,23 +122,18 @@ int main(int argc, char* argv[])
 				glDisable(GL_TEXTURE_2D);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				glBegin(GL_TRIANGLES);
-				float3 vec;
-				for (int i = 0; i < dataCount; i += 4)
+				for (int i = 0; i < glCount; i += 12)
 				{
-					vec = dataBuff[i];
-					if (vec.z < 0.1f) continue;
-					glColor3f((GLfloat)vec.x, (GLfloat)vec.y, (GLfloat)vec.z);
-					vec = dataBuff[i + 1];
-					glVertex3f((GLfloat)vec.x, (GLfloat)vec.y, (GLfloat)vec.z);
-					vec = dataBuff[i + 2];
-					glVertex3f((GLfloat)vec.x, (GLfloat)vec.y, (GLfloat)vec.z);
-					vec = dataBuff[i + 3];
-					glVertex3f((GLfloat)vec.x, (GLfloat)vec.y, (GLfloat)vec.z);
+					glColor3f(glData[i + 2] / 255, glData[i + 1] / 255, glData[i] / 255); // BGR to RGB tossed in...
+					glVertex3f(glData[i + 3], glData[i + 4], glData[i + 5]);
+					glVertex3f(glData[i + 6], glData[i + 7], glData[i + 8]);
+					glVertex3f(glData[i + 9], glData[i + 10], glData[i + 11]);
 				}
 
 				glEnd();
 				break;
 			}
+
 			case 4: // oCase.drawPyramid - OpenGL_Pyramid
 			{
 				glBegin(GL_TRIANGLES);
