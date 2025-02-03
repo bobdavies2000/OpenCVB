@@ -437,6 +437,14 @@ End Class
 
 
 
+Public Class triangleData
+    Public color As cv.Point3f
+    Public facets(3) As cv.Point3f
+End Class
+
+
+
+
 Public Class maskData
     Public roi As cv.Rect
     Public mask As cv.Mat
