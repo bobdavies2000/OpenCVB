@@ -99,7 +99,7 @@ Public Class PCA_CellMask : Inherits TaskParent
         labels(2) = pca.labels(2)
 
         Dim rc = task.rc
-        If rc.maxDepthVec.Z > 0 Then
+        If rc.mmZ.maxVal > 0 Then
             pcaPrep.Run(task.pointCloud(rc.roi).Clone)
 
             If pcaPrep.inputData.Rows > 0 Then

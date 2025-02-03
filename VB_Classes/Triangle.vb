@@ -650,15 +650,15 @@ Public Class Triangle_IdealShapes : Inherits TaskParent
         Dim ptLast As cv.Point
         triangles.Clear()
         Dim cellSize = task.idealD.cellSize
-        Dim keyPoints = {New cv.Point(0, 0), New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, 0),
+        Dim cellPoints = {New cv.Point(0, 0), New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, 0),
                          New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, cellSize - 1), New cv.Point(cellSize - 1, 0)}
         For Each id In task.idList
             Dim r = id.lRect
             If id.lRect.Height <> cellSize Or id.lRect.Width <> cellSize Then Continue For
-            ptLast = keyPoints(2)
+            ptLast = cellPoints(2)
             For i = 0 To 5
                 Dim index = i Mod 3
-                Dim pt = keyPoints(i)
+                Dim pt = cellPoints(i)
                 Dim vec = id.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
                 If index = 0 Or index = 3 Then
                     triangles.Add(New cv.Point3f(id.color.Z / 255, id.color.Y / 255, id.color.X / 255))

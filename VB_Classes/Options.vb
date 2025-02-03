@@ -8033,7 +8033,7 @@ Public Class Options_IdealShape : Inherits OptionParent
             radio.addRadio("Unchanged Depth")
             radio.addRadio("Duplicate top row depth")
             radio.addRadio("Set cell to mean depth")
-            radio.check(2).Checked = True
+            radio.check(1).Checked = True
         End If
     End Sub
     Public Sub RunOpt()

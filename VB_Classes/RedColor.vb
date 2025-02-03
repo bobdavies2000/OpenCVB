@@ -589,7 +589,7 @@ Public Class RedColor_PlaneEq3D : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         Dim rc = task.rc
-        If rc.maxDepthVec.Z Then
+        If rc.mmZ.maxVal Then
             eq.rc = rc
             eq.Run(src)
             rc = eq.rc

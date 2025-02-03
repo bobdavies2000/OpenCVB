@@ -478,10 +478,13 @@ Public Class rcData
     Public depthMask As cv.Mat
     Public depthMean As Single
 
-    Public minDepthVec As cv.Point3f
-    Public maxDepthVec As cv.Point3f
-    Public minLoc As cv.Point
-    Public maxLoc As cv.Point
+    'Public minDepthVec As cv.Point3f
+    'Public maxDepthVec As cv.Point3f
+    'Public minLoc As cv.Point
+    'Public maxLoc As cv.Point
+    Public mmX As mmData
+    Public mmY As mmData
+    Public mmZ As mmData
 
     Public maxDist As cv.Point
     Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.

@@ -147,7 +147,9 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
                     Dim pt = task.pointCloud(rc.roi).Get(Of cv.Point3f)(y, x)
                     ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                     pt.Z = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
-                    If rc.minDepthVec.Z <= pt.Z And rc.maxDepthVec.Z >= pt.Z Then dst3(rc.roi).Set(Of cv.Point3f)(y, x, pt)
+                    If rc.mmZ.minVal <= pt.Z And rc.mmZ.maxVal >= pt.Z Then
+                        dst3(rc.roi).Set(Of cv.Point3f)(y, x, pt)
+                    End If
                 End If
             Next
         Next

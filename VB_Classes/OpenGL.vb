@@ -1007,7 +1007,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
         Dim pcPoints As New List(Of cv.Point3f)
         Dim blue As New cv.Point3f(0, 0, 1), red As New cv.Point3f(1, 0, 0), green As New cv.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
         For Each rc In task.rcList
-            If rc.maxDepthVec.Z > 0 Then
+            If rc.mmZ.maxVal > 0 Then
                 eq.rc = rc
                 eq.Run(src)
                 rc = eq.rc
@@ -1309,32 +1309,6 @@ Public Class OpenGL_Triangles : Inherits TaskParent
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(tess.dst2)
         labels = tess.labels
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class OpenGL_TriangleRGB : Inherits TaskParent
-    Dim tess As New Triangle_RedCloud
-    Public Sub New()
-        task.ogl.oglFunction = oCase.trianglesAndColor
-        task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display a triangle representation of the point cloud"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        labels = tess.labels
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
-                                                  tess.triangles.ToArray)
-
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(src)
     End Sub
 End Class
 
@@ -2275,6 +2249,32 @@ Public Class OpenGL_TriangleIdeal : Inherits TaskParent
 
         task.ogl.dataInput = cv.Mat.FromPixelData(triangles.triangles.Count, 1, cv.MatType.CV_32FC3,
                                                   triangles.triangles.ToArray)
+
+        task.ogl.pointCloudInput = New cv.Mat
+        task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_TriangleRGB : Inherits TaskParent
+    Dim tess As New Triangle_RedCloud
+    Public Sub New()
+        task.ogl.oglFunction = oCase.trianglesAndColor
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display a triangle representation of the point cloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        tess.Run(src)
+        dst2 = tess.dst2
+        dst3 = tess.dst3
+        labels = tess.labels
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
+                                                  tess.triangles.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(src)

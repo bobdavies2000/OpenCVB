@@ -28,12 +28,12 @@ Public Class Cell_Basics : Inherits TaskParent
                 strOut += Format(rc.pixels, "###,###") + " - no depth data" + vbCrLf
             End If
 
-            strOut += "Depth Min/Max/Range: X = " + Format(rc.minDepthVec.X, fmt1) + "/" + Format(rc.maxDepthVec.X, fmt1)
-            strOut += "/" + Format(rc.maxDepthVec.X - rc.minDepthVec.X, fmt1) + vbTab
-            strOut += "Y = " + Format(rc.minDepthVec.Y, fmt1) + "/" + Format(rc.maxDepthVec.Y, fmt1)
-            strOut += "/" + Format(rc.maxDepthVec.Y - rc.minDepthVec.Y, fmt1) + vbTab
-            strOut += "Z = " + Format(rc.minDepthVec.Z, fmt2) + "/" + Format(rc.maxDepthVec.Z, fmt2)
-            strOut += "/" + Format(rc.maxDepthVec.Z - rc.minDepthVec.Z, fmt2) + vbCrLf + vbCrLf
+            strOut += "Cloud Min/Max/Range: X = " + Format(rc.mmX.minVal, fmt1) + "/" + Format(rc.mmX.maxVal, fmt1)
+            strOut += "/" + Format(rc.mmX.maxVal - rc.mmX.minVal, fmt1) + vbTab
+            strOut += "Y = " + Format(rc.mmY.minVal, fmt1) + "/" + Format(rc.mmY.maxVal, fmt1)
+            strOut += "/" + Format(rc.mmY.maxVal - rc.mmY.minVal, fmt1) + vbTab
+            strOut += "Z = " + Format(rc.mmZ.minVal, fmt2) + "/" + Format(rc.mmZ.maxVal, fmt2)
+            strOut += "/" + Format(rc.mmZ.maxVal - rc.mmZ.minVal, fmt2) + vbCrLf + vbCrLf
 
             strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
 
@@ -285,10 +285,9 @@ Public Class Cell_Generate : Inherits TaskParent
                     rc.depthMean = lrc.depthMean
                     rc.depthMask = lrc.depthMask
                     rc.depthPixels = lrc.depthPixels
-                    rc.minDepthVec = lrc.minDepthVec
-                    rc.maxDepthVec = lrc.maxDepthVec
-                    rc.minLoc = lrc.minLoc
-                    rc.maxLoc = lrc.maxLoc
+                    rc.mmX = lrc.mmX
+                    rc.mmY = lrc.mmY
+                    rc.mmZ = lrc.mmZ
                     rc.maxDStable = rc.maxDStable
                 End If
                 If usedColors.Contains(rc.color) Then
@@ -321,9 +320,9 @@ Public Class Cell_Generate : Inherits TaskParent
 
             If rc.motionFlag Then
                 If rc.depthPixels / rc.pixels > 0.1 Then
-                    task.pcSplit(0)(rc.roi).MinMaxLoc(rc.minDepthVec.X, rc.maxDepthVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
-                    task.pcSplit(1)(rc.roi).MinMaxLoc(rc.minDepthVec.Y, rc.maxDepthVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
-                    task.pcSplit(2)(rc.roi).MinMaxLoc(rc.minDepthVec.Z, rc.maxDepthVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    rc.mmX = GetMinMax(task.pcSplit(0)(rc.roi), rc.depthMask)
+                    rc.mmY = GetMinMax(task.pcSplit(1)(rc.roi), rc.depthMask)
+                    rc.mmZ = GetMinMax(task.pcSplit(2)(rc.roi), rc.depthMask)
 
                     cv.Cv2.MeanStdDev(task.pointCloud(rc.roi), depthMean, depthStdev, rc.depthMask)
                     rc.depthMean = depthMean(2)

@@ -160,7 +160,7 @@ Public Class Profile_Derivative : Inherits TaskParent
                 Dim pt = rc.contour(i)
                 Dim vec = task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)
                 pt = New cv.Point(pt.X * rsizeX + offset, pt.Y * rsizeY + offset)
-                Dim t = If(rc.maxDepthVec.Z = 0, 0, (vec.Z - rc.minDepthVec.Z) / (rc.maxDepthVec.Z - rc.minDepthVec.Z))
+                Dim t = If(rc.mmZ.maxVal = 0, 0, (vec.Z - rc.mmZ.minVal) / (rc.mmZ.maxVal - rc.mmZ.minVal))
                 If vec.Z > 0 And t > 0 Then
                     Dim b = ((1 - t) * near(0) + t * far(0))
                     Dim g = ((1 - t) * near(1) + t * far(1))
