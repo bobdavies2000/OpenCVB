@@ -225,6 +225,22 @@ int main(int argc, char* argv[])
 				glEnd();
 				break;
 			}
+			//{
+			//	glDisable(GL_TEXTURE_2D);
+			//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			//	glBegin(GL_TRIANGLES);
+			//	for (int i = 0; i < glCount; i += 12)
+			//	{
+			//		glColor3f(glData[i + 2] / 255, glData[i + 1] / 255, glData[i] / 255); // BGR to RGB tossed in...
+			//		glVertex3f(glData[i + 3], glData[i + 4], glData[i + 5]);
+			//		glVertex3f(glData[i + 6], glData[i + 7], glData[i + 8]);
+			//		glVertex3f(glData[i + 9], glData[i + 10], glData[i + 11]);
+			//	}
+
+			//	glEnd();
+			//	break;
+			//}
+			
 			case 7: // oCase.minMaxBlocks 
 			{
 				glDisable(GL_TEXTURE_2D);

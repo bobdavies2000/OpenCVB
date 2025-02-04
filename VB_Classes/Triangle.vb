@@ -275,54 +275,6 @@ End Class
 
 
 
-
-
-Public Class Triangle_QuadSimple : Inherits TaskParent
-    Public oglData As New List(Of cv.Point3f)
-    Public oglOptions As New Options_OpenGLFunctions
-    Public Sub New()
-        task.gOptions.setGridSize(20)
-        desc = "Create a triangle representation of the point cloud with RedCloud data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        oglOptions.RunOpt()
-        Dim ptM = oglOptions.moveAmount
-        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
-
-        dst2 = runRedC(src, labels(2))
-        oglData.Clear()
-        dst3.SetTo(0)
-
-        For i = 0 To task.gridRects.Count - 1
-            Dim roi = task.gridRects(i)
-
-            Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
-
-            If index <= 0 Then Continue For
-            Dim rc = task.rcList(index)
-
-            dst3(roi).SetTo(rc.color)
-            SetTrueText(Format(rc.depthMean, fmt1), New cv.Point(roi.X, roi.Y))
-
-            Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean))
-            Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean))
-
-            oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
-            oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
-            oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
-            oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
-            oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
-        Next
-        labels = {"", "", traceName + " completed with " + Format(oglData.Count / 5, fmt0) + " quad sets (with a 5th element for color)", "Output of Triangle_QuadSimple"}
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Triangle_QuadHulls : Inherits TaskParent
     Public oglData As New List(Of cv.Point3f)
     Public depthList As New List(Of List(Of Single))
@@ -679,5 +631,52 @@ Public Class Triangle_RedCloud : Inherits TaskParent
         '        triangles.Add(pt3D((i + 1) Mod pt3D.Count))
         '    Next
         'Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Triangle_QuadSimple : Inherits TaskParent
+    Public oglData As New List(Of cv.Point3f)
+    Public oglOptions As New Options_OpenGLFunctions
+    Public Sub New()
+        task.gOptions.setGridSize(20)
+        desc = "Create a triangle representation of the point cloud with RedCloud data"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        oglOptions.RunOpt()
+        Dim ptM = oglOptions.moveAmount
+        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
+
+        dst2 = runRedC(src, labels(2))
+        oglData.Clear()
+        dst3.SetTo(0)
+
+        For i = 0 To task.gridRects.Count - 1
+            Dim roi = task.gridRects(i)
+
+            Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
+            Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
+
+            If index <= 0 Then Continue For
+            Dim rc = task.rcList(index)
+
+            dst3(roi).SetTo(rc.color)
+            SetTrueText(Format(rc.depthMean, fmt1), New cv.Point(roi.X, roi.Y))
+
+            Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean))
+            Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean))
+
+            oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
+            oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
+            oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
+            oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
+            oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
+        Next
+        labels = {"", "", traceName + " completed with " + Format(oglData.Count / 5, fmt0) + " quad sets (with a 5th element for color)", "Output of Triangle_QuadSimple"}
     End Sub
 End Class

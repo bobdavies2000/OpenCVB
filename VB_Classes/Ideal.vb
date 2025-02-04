@@ -313,7 +313,18 @@ Public Class Ideal_Shape : Inherits TaskParent
                     idd.pcFrag.CopyTo(dst2(idd.lRect))
                     task.iddList(i) = task.idealD.rebuildTriList(idd)
                 Next
-            Case 2 ' Set cell to mean depth
+            Case 2 ' Duplicate left col
+                For i = 0 To task.iddList.Count - 1
+                    Dim idd = task.iddList(i)
+                    Dim split = idd.pcFrag.Split()
+                    For y = 1 To idd.lRect.Height - 1
+                        split(2).Col(0).CopyTo(split(2).Col(y))
+                    Next
+                    cv.Cv2.Merge(split, idd.pcFrag)
+                    idd.pcFrag.CopyTo(dst2(idd.lRect))
+                    task.iddList(i) = task.idealD.rebuildTriList(idd)
+                Next
+            Case 3 ' Set cell to mean depth
                 For i = 0 To task.iddList.Count - 1
                     Dim idd = task.iddList(i)
                     Dim split = idd.pcFrag.Split()
@@ -343,7 +354,7 @@ Public Class Ideal_ShapeTop : Inherits TaskParent
         shape.Run(src)
         labels(2) = shape.labels(2)
 
-        histTop.Run(shape.dst3)
+        histTop.Run(shape.dst2)
         dst2 = histTop.dst2
         dst3 = histTop.dst3
     End Sub
