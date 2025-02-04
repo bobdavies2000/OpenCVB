@@ -468,8 +468,8 @@ End Class
 Public Class Plot_Histogram : Inherits TaskParent
     Public histogram As New cv.Mat
     Public histArray() As Single
-    Public minRange As Single = 0
-    Public maxRange As Single = 255
+    Public minRange As Single
+    Public maxRange As Single
     Public ranges() As cv.Rangef
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public plotCenter As Single

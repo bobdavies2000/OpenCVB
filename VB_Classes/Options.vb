@@ -7995,27 +7995,19 @@ Public Class Options_IdealSize : Inherits OptionParent
     Public cellSize As Integer = 8
     Public height As Integer = 8
     Public percentThreshold As Single = 1
-    Public rangeThresholdmm As Single
-    Public cellAge As Integer = 5
     Public Sub New()
         If task.dst2.Width >= 1280 Then cellSize = 24
         If task.dst2.Width >= 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Ideal Cell Size", 1, 100, cellSize)
             sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * percentThreshold)
-            sliders.setupTrackBar("Cell Depth Range (mm's)", 1, 200, 100)
-            sliders.setupTrackBar("Cell Age Min", 1, 20, cellAge)
         End If
     End Sub
     Public Sub RunOpt()
         Static sizeSlider = FindSlider("Ideal Cell Size")
         Static depthSlider = FindSlider("Percent Depth Threshold")
-        Static rangeSlider = FindSlider("Cell Depth Range (mm's)")
-        Static ageSlider = FindSlider("Cell Age Min")
         cellSize = sizeSlider.value
         percentThreshold = depthSlider.value / 100
-        rangeThresholdmm = rangeSlider.value / 1000
-        cellAge = ageSlider.value
     End Sub
 End Class
 
@@ -8034,6 +8026,7 @@ Public Class Options_IdealShape : Inherits OptionParent
             radio.addRadio("Duplicate top row depth")
             radio.addRadio("Duplicate left col depth")
             radio.addRadio("Set cell to mean depth")
+            radio.addRadio("Corners at mean depth")
             radio.check(1).Checked = True
         End If
     End Sub

@@ -30,7 +30,6 @@ Public Class Ideal_Basics : Inherits TaskParent
         Dim emptyRect As New cv.Rect
         options.RunOpt()
         cellSize = options.cellSize
-        thresholdRangeZ = options.rangeThresholdmm
         grid.Run(src)
 
         If task.optionsChanged Then
@@ -55,18 +54,10 @@ Public Class Ideal_Basics : Inherits TaskParent
         Dim triList As New List(Of cv.Point3f)
         For Each rect In grid.gridRectsAll
             If task.motionMask(rect).CountNonZero = 0 Then Continue For
+            If rect.Height <> cellSize Or rect.Width <> cellSize Then Continue For ' oddball sizes on the edge.
             Dim pixels = task.depthMask(rect).CountNonZero
             If pixels / maxPixels < options.percentThreshold Then Continue For
 
-            Dim rangeCheck = True
-            For i = 0 To 2
-                Dim mm = GetMinMax(task.pcSplit(i)(rect), task.depthMask(rect))
-                If mm.maxVal - mm.minVal > options.rangeThresholdmm Then
-                    rangeCheck = False
-                    Exit For
-                End If
-            Next
-            If rangeCheck = False Then Continue For
             Dim idd As New idealDepthData
             idd.lRect = rect
             idd.depth = depth32f(idd.lRect).Mean(task.depthMask(idd.lRect))
@@ -101,7 +92,7 @@ End Class
 Public Class Ideal_InstantUpdate : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_IdealSize
-    Public diMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public iddMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public depth32f As cv.Mat
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -140,23 +131,19 @@ Public Class Ideal_InstantUpdate : Inherits TaskParent
         dst2 = src.Clone
         task.iddList.Clear()
         Dim cellPixels As Single = options.cellSize * options.cellSize
-        diMap.SetTo(0)
+        iddMap.SetTo(0)
         For Each idd In task.idListAll
-            If idd.age > options.cellAge Then
-                idd.depth = depth32f(idd.lRect).Mean(task.depthMask(idd.lRect))
-                Dim pixels = task.depthMask(idd.lRect).CountNonZero
-                If pixels / cellPixels >= options.percentThreshold Then
-                    If idd.mm.maxVal - idd.mm.minVal <= options.rangeThresholdmm Then
-                        task.iddList.Add(idd)
-                        dst2.Rectangle(idd.lRect, cv.Scalar.White, task.lineWidth)
-                        diMap(idd.lRect).SetTo(255, task.depthMask(idd.lRect))
-                    End If
-                End If
+            idd.depth = depth32f(idd.lRect).Mean(task.depthMask(idd.lRect))
+            Dim pixels = task.depthMask(idd.lRect).CountNonZero
+            If pixels / cellPixels >= options.percentThreshold Then
+                task.iddList.Add(idd)
+                dst2.Rectangle(idd.lRect, cv.Scalar.White, task.lineWidth)
+                iddMap(idd.lRect).SetTo(255, task.depthMask(idd.lRect))
             End If
         Next
 
         dst3.SetTo(0)
-        task.pointCloud.CopyTo(dst3, diMap)
+        task.pointCloud.CopyTo(dst3, iddMap)
     End Sub
 End Class
 
@@ -224,18 +211,15 @@ Public Class Ideal_CellPlot : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        desc = "Plot a histogram of an ideal depth cell"
+        desc = "Select any cell to plot a histogram of that ideal cell's depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        Dim idd As idealDepthData
-        For Each idd In task.iddList
-            dst2.Rectangle(idd.lRect, 255, task.lineWidth)
-        Next
+        dst2 = task.idealD.dst2
 
         Dim index = task.idealD.grid.gridMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
 
+        Dim idd As idealDepthData
         If index = 0 Or index >= task.iddList.Count Then
             idd = task.iddList(task.iddList.Count / 2)
             task.ClickPoint = New cv.Point(idd.lRect.X + idd.lRect.Width / 2, idd.lRect.Y + idd.lRect.Height / 2)
@@ -244,7 +228,9 @@ Public Class Ideal_CellPlot : Inherits TaskParent
         End If
 
         If task.heartBeat Then
-            plot.Run(task.pcSplit(2)(idd.lRect))
+            plot.minRange = idd.mm.minVal
+            plot.maxRange = idd.mm.maxVal
+            plot.Run(idd.pcFrag)
             dst3 = plot.dst2
             labels(3) = "X values vary from " + Format(plot.minRange, fmt3) +
                         " to " + Format(plot.maxRange, fmt3)
@@ -259,6 +245,7 @@ End Class
 
 Public Class Ideal_FullDepth : Inherits TaskParent
     Public Sub New()
+        optiBase.FindSlider("Percent Depth Threshold").Value = 25
         desc = "Display the disparity rectangles for all cells with depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -325,6 +312,15 @@ Public Class Ideal_Shape : Inherits TaskParent
                     task.iddList(i) = task.idealD.rebuildTriList(idd)
                 Next
             Case 3 ' Set cell to mean depth
+                For i = 0 To task.iddList.Count - 1
+                    Dim idd = task.iddList(i)
+                    Dim split = idd.pcFrag.Split()
+                    split(2).SetTo(idd.depth)
+                    cv.Cv2.Merge(split, idd.pcFrag)
+                    idd.pcFrag.CopyTo(dst2(idd.lRect))
+                    task.iddList(i) = task.idealD.rebuildTriList(idd)
+                Next
+            Case 4 ' Corners at mean depth
                 For i = 0 To task.iddList.Count - 1
                     Dim idd = task.iddList(i)
                     Dim split = idd.pcFrag.Split()
