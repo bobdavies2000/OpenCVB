@@ -62,8 +62,6 @@ int main(int argc, char* argv[])
 		int pairCount = (int)(dataBufferSize / 6);
 		int dataCount = (int)(dataBufferSize / 12); // 12 bytes per float3 entries = number of float3 entries.
 		float3* dataBuff = (float3*)dataBuffer; int index;
-		GLfloat* glData = (GLfloat*)dataBuffer;
-		int glCount = (int)(dataBufferSize / 4);
 		bool drawFloorNeeded = true;
 		switch (oglFunction) 
 		{
@@ -119,6 +117,9 @@ int main(int argc, char* argv[])
 			}
 			case 3: // oCase.trianglesAndColor - oCase.trianglesAndColor
 			{
+				GLfloat* glData = (GLfloat*)dataBuffer;
+				int glCount = (int)(dataBufferSize / 4);
+				
 				glDisable(GL_TEXTURE_2D);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				glBegin(GL_TRIANGLES);
@@ -205,41 +206,44 @@ int main(int argc, char* argv[])
 				break;
 			}
 			case 6: // oCase.simplePlane - OpenGL_QuadSimple
-			{
-				glDisable(GL_TEXTURE_2D);
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				glBegin(GL_QUADS);
-				for (int i = 0; i < dataCount; i++)
-				{
-					if (i % 5 == 0)
-					{
-						index = i;
-					}
-					else
-					{
-						glColor3fv((GLfloat*)&dataBuff[index]);
-						glVertex3fv((GLfloat*)&dataBuff[i]);
-					}
-				}
-
-				glEnd();
-				break;
-			}
 			//{
 			//	glDisable(GL_TEXTURE_2D);
 			//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			//	glBegin(GL_TRIANGLES);
-			//	for (int i = 0; i < glCount; i += 12)
+			//	glBegin(GL_QUADS);
+			//	for (int i = 0; i < dataCount; i++)
 			//	{
-			//		glColor3f(glData[i + 2] / 255, glData[i + 1] / 255, glData[i] / 255); // BGR to RGB tossed in...
-			//		glVertex3f(glData[i + 3], glData[i + 4], glData[i + 5]);
-			//		glVertex3f(glData[i + 6], glData[i + 7], glData[i + 8]);
-			//		glVertex3f(glData[i + 9], glData[i + 10], glData[i + 11]);
+			//		if (i % 5 == 0)
+			//		{
+			//			index = i;
+			//		}
+			//		else
+			//		{
+			//			glColor3fv((GLfloat*)&dataBuff[index]);
+			//			glVertex3fv((GLfloat*)&dataBuff[i]);
+			//		}
 			//	}
 
 			//	glEnd();
 			//	break;
 			//}
+			{
+				GLfloat* quadData = (GLfloat*)dataBuffer;
+				int quadCount = (int)(dataBufferSize / 4);
+				glDisable(GL_TEXTURE_2D);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				glBegin(GL_QUADS);
+				for (int i = 0; i < quadCount; i += 15)
+				{
+					glColor3f(quadData[i + 2] / 255, quadData[i + 1] / 255, quadData[i] / 255); // BGR to RGB tossed in...
+					glVertex3f(quadData[i + 3], quadData[i + 4], quadData[i + 5]);
+					glVertex3f(quadData[i + 6], quadData[i + 7], quadData[i + 8]);
+					glVertex3f(quadData[i + 9], quadData[i + 10], quadData[i + 11]);
+					glVertex3f(quadData[i + 12], quadData[i + 13], quadData[i + 14]);
+				}
+
+				glEnd();
+				break;
+			}
 			
 			case 7: // oCase.minMaxBlocks 
 			{

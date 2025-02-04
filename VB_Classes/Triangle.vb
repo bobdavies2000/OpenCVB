@@ -645,7 +645,7 @@ Public Class Triangle_QuadSimple : Inherits TaskParent
     Public oglOptions As New Options_OpenGLFunctions
     Public Sub New()
         task.gOptions.setGridSize(20)
-        desc = "Create a triangle representation of the point cloud with RedCloud data"
+        desc = "Create a quad representation of the redCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         oglOptions.RunOpt()
@@ -671,12 +671,38 @@ Public Class Triangle_QuadSimple : Inherits TaskParent
             Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean))
             Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean))
 
-            oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
+            oglData.Add(New cv.Point3f(rc.color(0), rc.color(1), rc.color(2)))
             oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
             oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
             oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
             oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
         Next
         labels = {"", "", traceName + " completed with " + Format(oglData.Count / 5, fmt0) + " quad sets (with a 5th element for color)", "Output of Triangle_QuadSimple"}
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Triangle_QuadIdeal : Inherits TaskParent
+    Public quadData As New List(Of cv.Point3f)
+    Public Sub New()
+        task.gOptions.setGridSize(20)
+        desc = "Create a quad representation of the ideal depth data"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        quadData.Clear()
+        dst3.SetTo(0)
+        For Each idd In task.iddList
+            quadData.Add(idd.color)
+            quadData.Add(idd.quad(0))
+            quadData.Add(idd.quad(1))
+            quadData.Add(idd.quad(2))
+            quadData.Add(idd.quad(3))
+        Next
+        labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) + " quad cells"
     End Sub
 End Class

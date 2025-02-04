@@ -1,5 +1,6 @@
 ﻿Imports System.Drawing
 Imports OpenCvSharp
+Imports OpenCvSharp.Features2D
 Imports cv = OpenCvSharp
 Public Class Ideal_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
@@ -26,6 +27,22 @@ Public Class Ideal_Basics : Inherits TaskParent
         Next
         Return idd
     End Function
+    Public Sub quadCorners()
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+
+            Dim topLeft = getWorldCoordinates(New cv.Point3f(idd.lRect.X, idd.lRect.Y, idd.depth))
+            Dim botRight = getWorldCoordinates(New cv.Point3f(idd.lRect.X + idd.lRect.Width,
+                                                              idd.lRect.Y + idd.lRect.Height, idd.depth))
+
+            idd.quad.Add(New cv.Point3f(topLeft.X, topLeft.Y, idd.depth))
+            idd.quad.Add(New cv.Point3f(botRight.X, topLeft.Y, idd.depth))
+            idd.quad.Add(New cv.Point3f(botRight.X, botRight.Y, idd.depth))
+            idd.quad.Add(New cv.Point3f(topLeft.X, botRight.Y, idd.depth))
+
+            task.iddList(i) = task.idealD.rebuildTriList(idd)
+        Next
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim emptyRect As New cv.Rect
         options.RunOpt()
@@ -72,6 +89,7 @@ Public Class Ideal_Basics : Inherits TaskParent
         Next
 
         task.iddList = New List(Of idealDepthData)(idListNew)
+        quadCorners()
 
         dst2 = src.Clone
         dst3 = task.rightView.Clone
@@ -274,7 +292,6 @@ Public Class Ideal_Shape : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         Dim cellsize = task.idealD.cellSize
-        Dim cellPoints() As cv.Point
 
         idMeans.Clear()
         idMap.SetTo(0)
@@ -323,22 +340,7 @@ Public Class Ideal_Shape : Inherits TaskParent
                     task.iddList(i) = task.idealD.rebuildTriList(idd)
                 Next
             Case 4 ' Corners at mean depth
-                cellPoints = {New cv.Point(0, 0), New cv.Point(0, cellsize - 1),
-                              New cv.Point(cellsize - 1, 0), New cv.Point(cellsize - 1, cellsize - 1)}
-                For i = 0 To task.iddList.Count - 1
-                    Dim idd = task.iddList(i)
-                    For j = 0 To 3
-                        Dim pt As cv.Point = cellPoints(j)
-                        Dim vec = idd.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
-                        If vec.Z = 0 Then
-                            vec = getWorldCoordinates(New cv.Point3f(pt.X, pt.Y, idd.depth))
-                        End If
-                        idd.pcFrag.Set(Of cv.Point3f)(pt.Y, pt.X, vec)
-                        idd.quad.Add(vec)
-                    Next
-                    idd.pcFrag.CopyTo(dst2(idd.lRect))
-                    task.iddList(i) = task.idealD.rebuildTriList(idd)
-                Next
+                ' corners are now built in Ideal_Basics so nothing needs to be done here.
         End Select
 
         labels(2) = CStr(task.iddList.Count) + " ideal depth cells found using '" + options.shapeLabel + "'"

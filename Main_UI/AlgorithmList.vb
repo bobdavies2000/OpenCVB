@@ -1245,6 +1245,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_ProfileSweep" Then return new OpenGL_ProfileSweep
 	If algorithmName = "OpenGL_Pyramid" Then return new OpenGL_Pyramid
 	If algorithmName = "OpenGL_QuadHulls" Then return new OpenGL_QuadHulls
+	If algorithmName = "OpenGL_QuadIdeal" Then return new OpenGL_QuadIdeal
 	If algorithmName = "OpenGL_QuadMinMax" Then return new OpenGL_QuadMinMax
 	If algorithmName = "OpenGL_QuadSimple" Then return new OpenGL_QuadSimple
 	If algorithmName = "OpenGL_Rebuilt" Then return new OpenGL_Rebuilt
@@ -1732,6 +1733,7 @@ Public Class algorithmList
 	If algorithmName = "Triangle_IdealShapes" Then return new Triangle_IdealShapes
 	If algorithmName = "Triangle_Mask" Then return new Triangle_Mask
 	If algorithmName = "Triangle_QuadHulls" Then return new Triangle_QuadHulls
+	If algorithmName = "Triangle_QuadIdeal" Then return new Triangle_QuadIdeal
 	If algorithmName = "Triangle_QuadMinMax" Then return new Triangle_QuadMinMax
 	If algorithmName = "Triangle_QuadSimple" Then return new Triangle_QuadSimple
 	If algorithmName = "Triangle_RedCloud" Then return new Triangle_RedCloud

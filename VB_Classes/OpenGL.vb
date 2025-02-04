@@ -324,31 +324,6 @@ End Class
 
 
 
-'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
-Public Class OpenGL_QuadSimple : Inherits TaskParent
-    Dim tess As New Triangle_QuadSimple
-    Public Sub New()
-        task.ogl.oglFunction = oCase.simplePlane
-        task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Create a simple plane in each roi of the RedCloud data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        labels = tess.labels
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
-
-        task.ogl.pointCloudInput = New cv.Mat()
-        task.ogl.Run(dst3)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadHulls : Inherits TaskParent
@@ -2278,5 +2253,57 @@ Public Class OpenGL_TriangleRGB : Inherits TaskParent
 
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+
+'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
+Public Class OpenGL_QuadSimple : Inherits TaskParent
+    Dim tess As New Triangle_QuadSimple
+    Public Sub New()
+        task.ogl.oglFunction = oCase.simplePlane
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Create a simple plane in each roi of the RedCloud data"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        tess.Run(src)
+        dst2 = tess.dst2
+        dst3 = tess.dst3
+        labels = tess.labels
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
+
+        task.ogl.pointCloudInput = New cv.Mat()
+        task.ogl.Run(dst3)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
+Public Class OpenGL_QuadIdeal : Inherits TaskParent
+    Dim quad As New Triangle_QuadIdeal
+    Public Sub New()
+        task.ogl.oglFunction = oCase.simplePlane
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Create a simple plane in each of ideal depth cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        quad.Run(src)
+        dst2 = quad.dst2
+        labels = quad.labels
+        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
+
+        task.ogl.pointCloudInput = New cv.Mat()
+        task.ogl.Run(dst3)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
