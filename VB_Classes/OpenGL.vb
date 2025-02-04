@@ -327,18 +327,18 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadHulls : Inherits TaskParent
-    Dim tess As New Triangle_QuadHulls
+    Dim quad As New Quad_Hulls
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        labels = tess.labels
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
+        quad.Run(src)
+        dst2 = quad.dst2
+        dst3 = quad.dst3
+        labels = quad.labels
+        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
@@ -353,18 +353,18 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadMinMax : Inherits TaskParent
-    Dim tess As New Triangle_QuadMinMax
+    Dim quad As New Quad_MinMax
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Reflect the min and max for each roi of the RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        labels = tess.labels
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
+        quad.Run(src)
+        dst2 = quad.dst2
+        dst3 = quad.dst3
+        labels = quad.labels
+        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
@@ -376,23 +376,23 @@ End Class
 
 
 
-Public Class OpenGL_Bricks : Inherits TaskParent
-    Dim tess As New Triangle_Bricks
+Public Class OpenGL_QuadBricks : Inherits TaskParent
+    Dim quad As New Quad_Bricks
     Public Sub New()
         task.ogl.oglFunction = oCase.minMaxBlocks
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create blocks in each roi using the min and max depth values"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
-        dst2 = tess.dst3
-        dst3 = tess.hulls.dst3
+        quad.Run(src)
+        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
+        dst2 = quad.dst2
+        labels(2) = quad.labels(2)
 
         Dim index As Integer
         For Each roi In task.gridRects
-            If index < tess.depths.Count Then
-                SetTrueText(Format(tess.depths(index), fmt1) + vbCrLf + Format(tess.depths(index + 1), fmt1), New cv.Point(roi.X, roi.Y), 2)
+            If index < quad.depths.Count Then
+                SetTrueText(Format(quad.depths(index), fmt1) + vbCrLf + Format(quad.depths(index + 1), fmt1), New cv.Point(roi.X, roi.Y), 2)
             End If
             index += 2
         Next
@@ -1241,30 +1241,6 @@ Public Class OpenGL_CloudHistory : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class OpenGL_Triangles : Inherits TaskParent
-    Dim tess As New Triangle_RedCloud
-    Public Sub New()
-        task.ogl.oglFunction = oCase.trianglesAndColor
-        task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display a triangle representation of the point cloud"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3, tess.triangles.ToArray)
-
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(tess.dst2)
-        labels = tess.labels
-    End Sub
-End Class
 
 
 
@@ -2188,31 +2164,6 @@ End Class
 
 
 
-Public Class OpenGL_TriangleRGB : Inherits TaskParent
-    Dim tess As New Triangle_RedCloud
-    Public Sub New()
-        task.ogl.oglFunction = oCase.trianglesAndColor
-        task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display a triangle representation of the point cloud"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        labels = tess.labels
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
-                                                  tess.triangles.ToArray)
-
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(src)
-    End Sub
-End Class
-
-
-
-
-
 
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
@@ -2243,9 +2194,11 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadIdeal : Inherits TaskParent
-    Dim quad As New Triangle_QuadIdeal
+    Dim quad As New Quad_Ideal
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
+        optiBase.FindSlider("Ideal Cell Size").Value = 4
+        optiBase.FindSlider("Percent Depth Threshold").Value = 25
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each of ideal depth cells."
     End Sub
@@ -2258,6 +2211,7 @@ Public Class OpenGL_QuadIdeal : Inherits TaskParent
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        labels(2) = quad.labels(2)
     End Sub
 End Class
 
@@ -2282,7 +2236,6 @@ Public Class OpenGL_QuadGridTiles : Inherits TaskParent
         labels = tiles.labels
     End Sub
 End Class
-
 
 
 

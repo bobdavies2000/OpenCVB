@@ -1197,7 +1197,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_BPFilteredBoth" Then return new OpenGL_BPFilteredBoth
 	If algorithmName = "OpenGL_BPFilteredSideView" Then return new OpenGL_BPFilteredSideView
 	If algorithmName = "OpenGL_BPFilteredTopView" Then return new OpenGL_BPFilteredTopView
-	If algorithmName = "OpenGL_Bricks" Then return new OpenGL_Bricks
 	If algorithmName = "OpenGL_CloudHistory" Then return new OpenGL_CloudHistory
 	If algorithmName = "OpenGL_CloudMisses" Then return new OpenGL_CloudMisses
 	If algorithmName = "OpenGL_Color3D" Then return new OpenGL_Color3D
@@ -1244,6 +1243,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_Profile" Then return new OpenGL_Profile
 	If algorithmName = "OpenGL_ProfileSweep" Then return new OpenGL_ProfileSweep
 	If algorithmName = "OpenGL_Pyramid" Then return new OpenGL_Pyramid
+	If algorithmName = "OpenGL_QuadBricks" Then return new OpenGL_QuadBricks
 	If algorithmName = "OpenGL_QuadGridTiles" Then return new OpenGL_QuadGridTiles
 	If algorithmName = "OpenGL_QuadHulls" Then return new OpenGL_QuadHulls
 	If algorithmName = "OpenGL_QuadIdeal" Then return new OpenGL_QuadIdeal
@@ -1264,8 +1264,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_Tiles" Then return new OpenGL_Tiles
 	If algorithmName = "OpenGL_TriangleCell" Then return new OpenGL_TriangleCell
 	If algorithmName = "OpenGL_TriangleIdeal" Then return new OpenGL_TriangleIdeal
-	If algorithmName = "OpenGL_TriangleRGB" Then return new OpenGL_TriangleRGB
-	If algorithmName = "OpenGL_Triangles" Then return new OpenGL_Triangles
 	If algorithmName = "OpenGL_VerticalOrHorizontal" Then return new OpenGL_VerticalOrHorizontal
 	If algorithmName = "OpenGL_VerticalSingle" Then return new OpenGL_VerticalSingle
 	If algorithmName = "OpenGL_ViewObjects" Then return new OpenGL_ViewObjects
@@ -1451,7 +1449,11 @@ Public Class algorithmList
 	If algorithmName = "Python_Stream" Then return new Python_Stream
 	If algorithmName = "QRcode_Basics" Then return new QRcode_Basics
 	If algorithmName = "Quad_Basics" Then return new Quad_Basics
+	If algorithmName = "Quad_Bricks" Then return new Quad_Bricks
 	If algorithmName = "Quad_GridTiles" Then return new Quad_GridTiles
+	If algorithmName = "Quad_Hulls" Then return new Quad_Hulls
+	If algorithmName = "Quad_Ideal" Then return new Quad_Ideal
+	If algorithmName = "Quad_MinMax" Then return new Quad_MinMax
 	If algorithmName = "Quadrant_Basics" Then return new Quadrant_Basics
 	If algorithmName = "Quaterion_Basics" Then return new Quaterion_Basics
 	If algorithmName = "Quaterion_IMUPrediction" Then return new Quaterion_IMUPrediction
@@ -1728,15 +1730,10 @@ Public Class algorithmList
 	If algorithmName = "TransformationMatrix_Basics" Then return new TransformationMatrix_Basics
 	If algorithmName = "Triangle_Basics" Then return new Triangle_Basics
 	If algorithmName = "Triangle_Basics2D" Then return new Triangle_Basics2D
-	If algorithmName = "Triangle_Bricks" Then return new Triangle_Bricks
 	If algorithmName = "Triangle_Cell" Then return new Triangle_Cell
 	If algorithmName = "Triangle_HullContour" Then return new Triangle_HullContour
 	If algorithmName = "Triangle_IdealShapes" Then return new Triangle_IdealShapes
 	If algorithmName = "Triangle_Mask" Then return new Triangle_Mask
-	If algorithmName = "Triangle_QuadHulls" Then return new Triangle_QuadHulls
-	If algorithmName = "Triangle_QuadIdeal" Then return new Triangle_QuadIdeal
-	If algorithmName = "Triangle_QuadMinMax" Then return new Triangle_QuadMinMax
-	If algorithmName = "Triangle_RedCloud" Then return new Triangle_RedCloud
 	If algorithmName = "Vector_Magnitude" Then return new Vector_Magnitude
 	If algorithmName = "Video_Basics" Then return new Video_Basics
 	If algorithmName = "Video_CarCComp" Then return new Video_CarCComp
