@@ -100,7 +100,7 @@ Public Class Sort_1Channel : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
         optiBase.findRadio("Sort all pixels descending").Checked = True
-        If standalone Then task.gOptions.setGridSize(10)
+        If standalone Then task.gOptions.GridSlider.Value = 10
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
@@ -117,7 +117,7 @@ Public Class Sort_1Channel : Inherits TaskParent
 
         Dim pixelsPerBlock = CInt(dst3.Total / dst2.Rows)
         Dim sq = Math.Sqrt(pixelsPerBlock)
-        task.gOptions.setGridSize(CInt(Math.Min(sq, 10)))
+        task.gOptions.GridSlider.Value = CInt(Math.Min(sq, 10))
 
         dst0 = sort.dst2.Reshape(1, dst2.Rows)
 
@@ -196,7 +196,7 @@ Public Class Sort_FeatureLess : Inherits TaskParent
     Public Sub New()
         plot.createHistogram = True
         task.gOptions.setHistogramBins(256)
-        task.gOptions.setGridSize(8)
+        task.gOptions.GridSlider.Value = 8
         desc = "Sort all the featureless grayscale pixels."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

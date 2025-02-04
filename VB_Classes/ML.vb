@@ -268,7 +268,7 @@ Public Class ML_FillRGBDepth_MT : Inherits TaskParent
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         task.gOptions.GridSlider.Maximum = dst2.Cols / 2
-        task.gOptions.setGridSize(CInt(dst2.Cols / 2))
+        task.gOptions.GridSlider.Value = CInt(dst2.Cols / 2)
 
         labels = {"", "", "ML filled shadow", ""}
         desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"

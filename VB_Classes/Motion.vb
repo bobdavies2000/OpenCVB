@@ -642,7 +642,7 @@ Public Class Motion_EdgeStability : Inherits TaskParent
                          " and max = " + CStr(pops.Max) + ".  Circled cell has max features."
 
         Dim index = pops.IndexOf(pops.Max)
-        Dim gSize = task.gOptions.getGridSize()
+        Dim gSize = task.gOptions.GridSlider.Value
         Dim pt = New cv.Point(task.featureRects(index).X + gSize / 2, task.featureRects(index).Y + gSize / 2)
         dst2.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
 

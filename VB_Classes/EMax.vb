@@ -109,16 +109,14 @@ Public Class EMax_InputClusters : Inherits TaskParent
     Dim options As New Options_EmaxInputClusters
     Public Sub New()
         labels(2) = "EMax algorithms input samples"
+        task.gOptions.GridSlider.Maximum = dst2.Width
+        task.gOptions.GridSlider.Value = CInt(dst2.Width / 3)
         desc = "Options for EMax algorithms."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If task.firstPass Then
-            task.gOptions.GridSlider.Maximum = dst2.Width
-            task.gOptions.setGridSize(CInt(dst2.Width / 3))
-            task.grid.Run(dst2)
-        End If
+        If task.firstPass Then task.grid.Run(dst2)
 
         If regionCount <> task.gridRects.Count Then task.optionsChanged = True
 

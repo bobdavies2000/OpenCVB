@@ -863,7 +863,7 @@ End Class
 
 Public Class Depth_Grid : Inherits TaskParent
     Public Sub New()
-        task.gOptions.setGridSize(4)
+        task.gOptions.GridSlider.Value = 4
         labels = {"", "", "White regions below are likely depth edges where depth changes rapidly", "Depth 32f display"}
         desc = "Find boundaries in depth to separate featureless regions."
     End Sub

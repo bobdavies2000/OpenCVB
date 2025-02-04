@@ -205,27 +205,7 @@ int main(int argc, char* argv[])
 				glEnd();
 				break;
 			}
-			case 6: // oCase.simplePlane - OpenGL_QuadSimple
-			//{
-			//	glDisable(GL_TEXTURE_2D);
-			//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			//	glBegin(GL_QUADS);
-			//	for (int i = 0; i < dataCount; i++)
-			//	{
-			//		if (i % 5 == 0)
-			//		{
-			//			index = i;
-			//		}
-			//		else
-			//		{
-			//			glColor3fv((GLfloat*)&dataBuff[index]);
-			//			glVertex3fv((GLfloat*)&dataBuff[i]);
-			//		}
-			//	}
-
-			//	glEnd();
-			//	break;
-			//}
+			case 6: // oCase.quadBasics - OpenGL_QuadSimple
 			{
 				GLfloat* quadData = (GLfloat*)dataBuffer;
 				int quadCount = (int)(dataBufferSize / 4);

@@ -329,7 +329,7 @@ End Class
 Public Class OpenGL_QuadHulls : Inherits TaskParent
     Dim tess As New Triangle_QuadHulls
     Public Sub New()
-        task.ogl.oglFunction = oCase.simplePlane
+        task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
@@ -355,7 +355,7 @@ End Class
 Public Class OpenGL_QuadMinMax : Inherits TaskParent
     Dim tess As New Triangle_QuadMinMax
     Public Sub New()
-        task.ogl.oglFunction = oCase.simplePlane
+        task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Reflect the min and max for each roi of the RedCloud data"
     End Sub
@@ -450,27 +450,6 @@ Public Class OpenGL_Tiles : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class OpenGL_TilesQuad : Inherits TaskParent
-    Dim sCloud As New Structured_TilesQuad
-    Public Sub New()
-        task.ogl.oglFunction = oCase.simplePlane
-        task.OpenGLTitle = "OpenGL_Functions"
-        labels = {"", "", "Input from Structured_Tiles", ""}
-        desc = "Display the quads built by Structured_TilesQuad in OpenGL - does NOT use OpenGL's point size"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        sCloud.Run(src)
-        dst2 = sCloud.dst2
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
-        task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
 
 
 
@@ -2183,32 +2162,6 @@ End Class
 
 
 
-Public Class OpenGL_TriangleCell : Inherits TaskParent
-    Dim tess As New Triangle_Basics
-    Public Sub New()
-        task.ogl.oglFunction = oCase.trianglesAndColor
-        task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display a triangle representation of the point cloud"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        labels = tess.labels
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
-                                                  tess.triangles.ToArray)
-
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(tess.dst2)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class OpenGL_TriangleIdeal : Inherits TaskParent
     Dim triangles As New Triangle_IdealShapes
@@ -2264,18 +2217,18 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadSimple : Inherits TaskParent
-    Dim tess As New Triangle_QuadSimple
+    Dim quad As New Quad_Basics
     Public Sub New()
-        task.ogl.oglFunction = oCase.simplePlane
+        task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        labels = tess.labels
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.oglData.Count, 1, cv.MatType.CV_32FC3, tess.oglData.ToArray)
+        quad.Run(src)
+        dst2 = quad.dst2
+        dst3 = quad.dst3
+        labels = quad.labels
+        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
@@ -2292,7 +2245,7 @@ End Class
 Public Class OpenGL_QuadIdeal : Inherits TaskParent
     Dim quad As New Triangle_QuadIdeal
     Public Sub New()
-        task.ogl.oglFunction = oCase.simplePlane
+        task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each of ideal depth cells."
     End Sub
@@ -2305,5 +2258,53 @@ Public Class OpenGL_QuadIdeal : Inherits TaskParent
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_QuadGridTiles : Inherits TaskParent
+    Dim tiles As New Quad_GridTiles
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display the quads built by Quad_Hulls in OpenGL - doesn't use OpenGL's point size"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        tiles.Run(src)
+        dst2 = tiles.dst2
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(tiles.quadData.Count, 1, cv.MatType.CV_32FC3, tiles.quadData.ToArray)
+        task.ogl.Run(src)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        labels = tiles.labels
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_TriangleCell : Inherits TaskParent
+    Dim tess As New Triangle_Basics
+    Public Sub New()
+        task.ogl.oglFunction = oCase.trianglesAndColor
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Display a triangle representation of the point cloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        tess.Run(src)
+        dst2 = tess.dst2
+        dst3 = tess.dst3
+        labels = tess.labels
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
+                                                  tess.triangles.ToArray)
+
+        task.ogl.pointCloudInput = New cv.Mat
+        task.ogl.Run(tess.dst2)
     End Sub
 End Class

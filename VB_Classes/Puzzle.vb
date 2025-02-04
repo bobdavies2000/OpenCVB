@@ -48,7 +48,7 @@ Public Class Puzzle_Solver : Inherits TaskParent
     Dim puzzleIndex As Integer
     Dim options As New Options_Puzzle
     Public Sub New()
-        If standalone Then task.gOptions.setGridSize(8)
+        If standalone Then task.gOptions.GridSlider.Value = 8
         labels = {"", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)"}
         desc = "Solve the puzzle using matchTemplate"
     End Sub
@@ -86,7 +86,7 @@ End Class
 Public Class Puzzle_SolverDynamic : Inherits TaskParent
     Dim puzzle As New Puzzle_Solver
     Public Sub New()
-        If standalone Then task.gOptions.setGridSize(8)
+        If standalone Then task.gOptions.GridSlider.Value = 8
         labels = {"", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical."}
         desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera."
     End Sub

@@ -1244,6 +1244,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_Profile" Then return new OpenGL_Profile
 	If algorithmName = "OpenGL_ProfileSweep" Then return new OpenGL_ProfileSweep
 	If algorithmName = "OpenGL_Pyramid" Then return new OpenGL_Pyramid
+	If algorithmName = "OpenGL_QuadGridTiles" Then return new OpenGL_QuadGridTiles
 	If algorithmName = "OpenGL_QuadHulls" Then return new OpenGL_QuadHulls
 	If algorithmName = "OpenGL_QuadIdeal" Then return new OpenGL_QuadIdeal
 	If algorithmName = "OpenGL_QuadMinMax" Then return new OpenGL_QuadMinMax
@@ -1261,7 +1262,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_StructuredCloud" Then return new OpenGL_StructuredCloud
 	If algorithmName = "OpenGL_TextureShuffle" Then return new OpenGL_TextureShuffle
 	If algorithmName = "OpenGL_Tiles" Then return new OpenGL_Tiles
-	If algorithmName = "OpenGL_TilesQuad" Then return new OpenGL_TilesQuad
 	If algorithmName = "OpenGL_TriangleCell" Then return new OpenGL_TriangleCell
 	If algorithmName = "OpenGL_TriangleIdeal" Then return new OpenGL_TriangleIdeal
 	If algorithmName = "OpenGL_TriangleRGB" Then return new OpenGL_TriangleRGB
@@ -1450,6 +1450,8 @@ Public Class algorithmList
 	If algorithmName = "Python_Run" Then return new Python_Run
 	If algorithmName = "Python_Stream" Then return new Python_Stream
 	If algorithmName = "QRcode_Basics" Then return new QRcode_Basics
+	If algorithmName = "Quad_Basics" Then return new Quad_Basics
+	If algorithmName = "Quad_GridTiles" Then return new Quad_GridTiles
 	If algorithmName = "Quadrant_Basics" Then return new Quadrant_Basics
 	If algorithmName = "Quaterion_Basics" Then return new Quaterion_Basics
 	If algorithmName = "Quaterion_IMUPrediction" Then return new Quaterion_IMUPrediction
@@ -1677,7 +1679,6 @@ Public Class algorithmList
 	If algorithmName = "Structured_SurveyH" Then return new Structured_SurveyH
 	If algorithmName = "Structured_SurveyV" Then return new Structured_SurveyV
 	If algorithmName = "Structured_Tiles" Then return new Structured_Tiles
-	If algorithmName = "Structured_TilesQuad" Then return new Structured_TilesQuad
 	If algorithmName = "Structured_TransformH" Then return new Structured_TransformH
 	If algorithmName = "Structured_TransformV" Then return new Structured_TransformV
 	If algorithmName = "SuperPixel_Basics" Then return new SuperPixel_Basics
@@ -1735,7 +1736,6 @@ Public Class algorithmList
 	If algorithmName = "Triangle_QuadHulls" Then return new Triangle_QuadHulls
 	If algorithmName = "Triangle_QuadIdeal" Then return new Triangle_QuadIdeal
 	If algorithmName = "Triangle_QuadMinMax" Then return new Triangle_QuadMinMax
-	If algorithmName = "Triangle_QuadSimple" Then return new Triangle_QuadSimple
 	If algorithmName = "Triangle_RedCloud" Then return new Triangle_RedCloud
 	If algorithmName = "Vector_Magnitude" Then return new Vector_Magnitude
 	If algorithmName = "Video_Basics" Then return new Video_Basics

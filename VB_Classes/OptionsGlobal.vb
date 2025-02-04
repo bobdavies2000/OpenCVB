@@ -336,18 +336,6 @@ Public Class OptionsGlobal
     Public Function getShowGrid() As Boolean
         Return ShowGrid.Checked
     End Function
-    Public Sub setGridSize(val As Integer)
-        GridSlider.Value = val
-    End Sub
-    Public Function getGridSize() As Integer
-        Return GridSlider.Value
-    End Function
-    Public Sub setGridMaximum(val As Integer)
-        GridSlider.Maximum = val
-    End Sub
-    Public Sub setGridMinimum(val As Integer)
-        GridSlider.Minimum = val
-    End Sub
     Public Sub setDebugSlider(val As Integer)
         DebugSlider.Value = val
     End Sub

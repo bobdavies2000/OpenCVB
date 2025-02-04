@@ -330,7 +330,7 @@ Public Class Math_Stdev : Inherits TaskParent
     Dim stdevSlider As New System.Windows.Forms.TrackBar
     Public Sub New()
         stdevSlider =optiBase.findslider("Stdev Threshold")
-        task.gOptions.setGridSize(16)
+        task.gOptions.GridSlider.Value = 16
 
         highStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         lowStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)

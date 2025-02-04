@@ -325,7 +325,7 @@ End Class
 Public Class Structured_Cloud : Inherits TaskParent
     Public options As New Options_StructuredCloud
     Public Sub New()
-        task.gOptions.setGridSize(10)
+        task.gOptions.GridSlider.Value = 10
         desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -360,7 +360,7 @@ Public Class Structured_ROI : Inherits TaskParent
     Public data As New cv.Mat
     Public oglData As New List(Of cv.Point3f)
     Public Sub New()
-        task.gOptions.setGridSize(10)
+        task.gOptions.GridSlider.Value = 10
         desc = "Simplify the point cloud so it can be represented as quads in OpenGL"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -387,10 +387,10 @@ Public Class Structured_Tiles : Inherits TaskParent
     Public oglData As New List(Of cv.Vec3f)
     Dim hulls As New RedColor_Hulls
     Public Sub New()
-        task.gOptions.setGridSize(10)
+        task.gOptions.GridSlider.Value = 10
         desc = "Use the OpenGL point size to represent the point cloud as data"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst3
 
@@ -404,60 +404,6 @@ Public Class Structured_Tiles : Inherits TaskParent
             Dim v = task.pointCloud(roi).Mean(task.depthMask(roi))
             oglData.Add(New cv.Vec3f(v.Val0, v.Val1, v.Val2))
             dst3(roi).SetTo(c)
-        Next
-        labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Structured_TilesQuad : Inherits TaskParent
-    Public oglData As New List(Of cv.Vec3f)
-    Dim options As New Options_OpenGLFunctions
-    Dim hulls As New RedColor_Hulls
-    Public Sub New()
-        task.gOptions.setGridSize(10)
-        If standalone Then task.gOptions.displaydst1.checked = true
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
-        labels = {"", "RedCloud cells", "Simplified depth map - CV_32FC3", "Simplified depth map with RedCloud cell colors"}
-        desc = "Simplify the OpenGL quads without using OpenGL's point size"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        hulls.Run(src)
-        dst2 = hulls.dst2
-
-        oglData.Clear()
-        dst1.SetTo(0)
-        dst3.SetTo(0)
-        Dim vec As cv.Scalar
-        Dim ptM = options.moveAmount
-        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
-        For Each roi In task.gridRects
-            Dim c = dst2.Get(Of cv.Vec3b)(roi.Y, roi.X)
-            If standaloneTest() Then dst3(roi).SetTo(c)
-            If c = black Then Continue For
-
-            oglData.Add(New cv.Vec3f(c(2) / 255, c(1) / 255, c(0) / 255))
-
-            Dim v = task.pointCloud(roi).Mean(task.depthMask(roi))
-            vec = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, v(2))) + shift
-            oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-
-            vec = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y, v(2))) + shift
-            oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-
-            vec = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, v(2))) + shift
-            oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-
-            vec = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y + roi.Height, v(2))) + shift
-            oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-            If standaloneTest() Then dst1(roi).SetTo(v)
         Next
         labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
     End Sub

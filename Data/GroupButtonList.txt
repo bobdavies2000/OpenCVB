@@ -185,6 +185,7 @@ Pyramid
 PyrFilter
 Python
 QRcode
+Quad
 Quadrant
 Quaterion
 Random

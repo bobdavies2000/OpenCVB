@@ -16,14 +16,16 @@ Public Class Triangle_Basics : Inherits TaskParent
         For Each pt In task.rc.contour
             pt = New cv.Point(pt.X + task.rc.roi.X, pt.Y + task.rc.roi.Y)
             Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
+            If vec.Z = 0 Then
+                vec = getWorldCoordinates(New cv.Point3f(pt.X, pt.Y, task.rc.depthMean))
+            End If
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             pt3D.Add(vec)
         Next
 
         Dim c3D = task.pointCloud.Get(Of cv.Point3f)(task.rc.maxDist.Y, task.rc.maxDist.X)
         triangles.Clear()
-        Dim color3D As New cv.Point3f(task.rc.color(2) / 255, task.rc.color(1) / 255,
-                                       task.rc.color(0) / 255)
+        Dim color3D As New cv.Point3f(task.rc.color(0), task.rc.color(1), task.rc.color(2))
         For i = 0 To pt3D.Count - 1
             triangles.Add(color3D)
             triangles.Add(c3D)
@@ -184,7 +186,7 @@ Public Class Triangle_Basics2D : Inherits TaskParent
     Public oglOptions As New Options_OpenGLFunctions
     Public hulls As New RedColor_Hulls
     Public Sub New()
-        task.gOptions.setGridSize(30)
+        task.gOptions.GridSlider.Value = 30
         desc = "Prepare the list of 2D triangles"
     End Sub
     Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As rcData, shift As cv.Point3f) As List(Of cv.Point)
@@ -283,7 +285,7 @@ Public Class Triangle_QuadHulls : Inherits TaskParent
     Dim hulls As New RedColor_Hulls
     Const depthListMaxCount As Integer = 10
     Public Sub New()
-        task.gOptions.setGridSize(20)
+        task.gOptions.GridSlider.Value = 20
         desc = "Create a triangle representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -359,7 +361,7 @@ Public Class Triangle_QuadMinMax : Inherits TaskParent
     Public oglOptions As New Options_OpenGLFunctions
     Const depthListMaxCount As Integer = 10
     Public Sub New()
-        task.gOptions.setGridSize(20)
+        task.gOptions.GridSlider.Value = 20
         desc = "Create a triangle representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -454,7 +456,7 @@ Public Class Triangle_Bricks : Inherits TaskParent
     Dim depthMaxList As New List(Of List(Of Single))
     Dim myListMax = 10
     Public Sub New()
-        task.gOptions.setGridSize(20)
+        task.gOptions.GridSlider.Value = 20
         desc = "Create triangles from each brick in point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -640,46 +642,7 @@ End Class
 
 
 
-Public Class Triangle_QuadSimple : Inherits TaskParent
-    Public oglData As New List(Of cv.Point3f)
-    Public oglOptions As New Options_OpenGLFunctions
-    Public Sub New()
-        task.gOptions.setGridSize(20)
-        desc = "Create a quad representation of the redCloud data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        oglOptions.RunOpt()
-        Dim ptM = oglOptions.moveAmount
-        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
-        dst2 = runRedC(src, labels(2))
-        oglData.Clear()
-        dst3.SetTo(0)
-
-        For i = 0 To task.gridRects.Count - 1
-            Dim roi = task.gridRects(i)
-
-            Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
-
-            If index <= 0 Then Continue For
-            Dim rc = task.rcList(index)
-
-            dst3(roi).SetTo(rc.color)
-            SetTrueText(Format(rc.depthMean, fmt1), New cv.Point(roi.X, roi.Y))
-
-            Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean))
-            Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean))
-
-            oglData.Add(New cv.Point3f(rc.color(0), rc.color(1), rc.color(2)))
-            oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
-            oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
-            oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
-            oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
-        Next
-        labels = {"", "", traceName + " completed with " + Format(oglData.Count / 5, fmt0) + " quad sets (with a 5th element for color)", "Output of Triangle_QuadSimple"}
-    End Sub
-End Class
 
 
 
@@ -690,7 +653,7 @@ End Class
 Public Class Triangle_QuadIdeal : Inherits TaskParent
     Public quadData As New List(Of cv.Point3f)
     Public Sub New()
-        task.gOptions.setGridSize(20)
+        task.gOptions.GridSlider.Value = 20
         desc = "Create a quad representation of the ideal depth data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

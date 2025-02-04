@@ -268,7 +268,7 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
     Dim pixels As New Pixel_Vectors
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()
-        task.gOptions.setGridSize(8)
+        task.gOptions.GridSlider.Value = 8
         desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
     End Sub
     Private Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double

@@ -7,7 +7,7 @@ Public Class SVM_Basics : Inherits TaskParent
     Dim svm As cv.ML.SVM
     Public Sub New()
         desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
-        If standalone Then task.gOptions.setGridSize(8)
+        If standalone Then task.gOptions.GridSlider.Value = 8
         labels = {"", "", "SVM_Basics input data", "Results - white line is ground truth"}
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

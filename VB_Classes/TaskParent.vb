@@ -215,11 +215,11 @@ Public Class TaskParent : Implements IDisposable
         Return New List(Of cv.Point)
     End Function
     Public Sub setPointCloudGrid()
-        task.gOptions.setGridSize(8)
+        task.gOptions.GridSlider.Value = 8
         If task.dst2.Width = 640 Then
-            task.gOptions.setGridSize(16)
+            task.gOptions.GridSlider.Value = 16
         ElseIf task.dst2.Width = 1280 Then
-            task.gOptions.setGridSize(32)
+            task.gOptions.GridSlider.Value = 32
         End If
     End Sub
     Public Function gMatrixToStr(gMatrix As cv.Mat) As String

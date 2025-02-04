@@ -7,7 +7,7 @@ Public Class Texture_Basics : Inherits TaskParent
     Dim texturePop As Integer
     Public tChange As Boolean ' if the texture hasn't changed this will be false.
     Public Sub New()
-        task.gOptions.setGridSize(CInt(dst2.Width / 8))
+        task.gOptions.GridSlider.Value = CInt(dst2.Width / 8)
 
         desc = "find the best sample 256x256 texture of a mask"
     End Sub

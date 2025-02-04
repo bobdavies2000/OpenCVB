@@ -156,7 +156,7 @@ Public Enum oCase
     trianglesAndColor = 3
     drawPyramid = 4
     drawCube = 5
-    simplePlane = 6
+    quadBasics = 6
     minMaxBlocks = 7
     drawTiles = 8
     drawCell = 9

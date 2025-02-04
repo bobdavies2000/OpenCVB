@@ -44,7 +44,7 @@ End Class
 Public Class HeatMap_Grid : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        task.gOptions.setGridSize(5)
+        task.gOptions.GridSlider.Value = 5
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
