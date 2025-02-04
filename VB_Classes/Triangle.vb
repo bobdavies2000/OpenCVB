@@ -74,45 +74,6 @@ End Class
 
 
 
-Public Class Triangle_RedCloud : Inherits TaskParent
-    Public triangles As New List(Of cv.Point3f)
-    Public Sub New()
-        labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
-        desc = "Given a contour, convert that contour to a series of triangles"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-
-        If task.rcList.Count <= 1 Then Exit Sub
-        task.rc = task.rcList(1)
-
-        triangles.Clear()
-        For Each rc In task.rcList
-            Dim pt3D As New List(Of cv.Point3f)
-            For Each pt In rc.contour
-                pt = New cv.Point(pt.X + rc.roi.X, pt.Y + rc.roi.Y)
-                Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
-                If vec.Z > 0 Then pt3D.Add(vec)
-            Next
-
-            Dim c3D = task.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
-            Dim color3D As New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255)
-            For i = 0 To pt3D.Count - 1
-                triangles.Add(color3D)
-                triangles.Add(c3D)
-                triangles.Add(pt3D(i))
-                triangles.Add(pt3D((i + 1) Mod pt3D.Count))
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Triangle_Cell : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
@@ -640,37 +601,83 @@ Public Class Triangle_IdealShapes : Inherits TaskParent
     Dim shape As New Ideal_Shape
     Public Sub New()
         labels = {"", "", "RedColor_Hulls output", "Selected contour - each pixel has depth"}
-        desc = "Build triangles from the Ideal_Shapes using the corners of the cell."
+        desc = "Build triangles from the ideal cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         shape.Run(src)
         labels(2) = shape.labels(2)
 
-        dst2 = src
-        Dim ptLast As cv.Point
+        dst2 = task.idealD.dst2
         triangles.Clear()
         Dim cellSize = task.idealD.cellSize
-        Dim cellPoints = {New cv.Point(0, 0), New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, 0),
-                         New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, cellSize - 1), New cv.Point(cellSize - 1, 0)}
-        For Each id In task.idList
-            Dim r = id.lRect
+        For Each id In task.iddList
             If id.lRect.Height <> cellSize Or id.lRect.Width <> cellSize Then Continue For
-            ptLast = cellPoints(2)
-            For i = 0 To 5
-                Dim index = i Mod 3
-                Dim pt = cellPoints(i)
-                Dim vec = id.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
-                If index = 0 Or index = 3 Then triangles.Add(id.color)
-                triangles.Add(vec)
-                DrawLine(dst2(r), ptLast, pt, cv.Scalar.White, task.lineWidth)
-                ptLast = pt
+            For i = 0 To 1
+                triangles.Add(id.color)
+                triangles.Add(id.triList(i)(0))
+                triangles.Add(id.triList(i)(1))
+                triangles.Add(id.triList(i)(2))
             Next
         Next
 
         If task.heartBeat Then
-            labels(3) = CStr(CInt(triangles.Count / 3)) + " triangles generated from " + CStr(task.idList.Count) +
+            labels(3) = CStr(CInt(triangles.Count / 3)) + " triangles generated from " + CStr(task.iddList.Count) +
                         " ideal depth cells. Validation = " + CStr(CInt(triangles.Count / 8)) + " should equal " +
-                        CStr(task.idList.Count)
+                        CStr(task.iddList.Count)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Triangle_RedCloud : Inherits TaskParent
+    Public triangles As New List(Of cv.Point3f)
+    Dim shapes As New Triangle_IdealShapes
+    Public Sub New()
+        labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
+        desc = "Color the ideal cells with the redCloud data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        'dst2 = runRedC(src, labels(2))
+        'shapes.Run(src)
+
+        'If task.rcList.Count <= 1 Then Exit Sub
+        'task.rc = task.rcList(1)
+
+        'triangles.Clear()
+        'For i = 0 To task.iddList.Count - 1
+        '    Dim id = task.iddList(i)
+        '    Dim index = task.rcMap.Get(Of Byte)(id.lRect.TopLeft.Y, id.lRect.TopLeft.X)
+        '    Dim rc = task.rcList(index)
+        '    triangles.Add(New cv.Point3f(rc.color(0), rc.color(1), rc.color(2))
+        '    triangles.Add()
+        '    triangles.Add(pt3D(i))
+        '    triangles.Add(pt3D((i + 1) Mod pt3D.Count))
+        '    id.color = rc.color
+        '    task.iddList(i) = id
+        'Next
+
+        'For Each rc In task.rcList
+        '    Dim pt3D As New List(Of cv.Point3f)
+        '    For Each pt In rc.contour
+        '        pt = New cv.Point(pt.X + rc.roi.X, pt.Y + rc.roi.Y)
+        '        Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
+        '        If vec.Z > 0 Then pt3D.Add(vec)
+        '    Next
+
+        '    Dim c3D = task.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
+        '    Dim color3D As New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255)
+        '    For i = 0 To pt3D.Count - 1
+        '        triangles.Add(color3D)
+        '        triangles.Add(c3D)
+        '        triangles.Add(pt3D(i))
+        '        triangles.Add(pt3D((i + 1) Mod pt3D.Count))
+        '    Next
+        'Next
     End Sub
 End Class
