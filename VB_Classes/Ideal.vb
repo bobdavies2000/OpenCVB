@@ -273,6 +273,8 @@ Public Class Ideal_Shape : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
+        Dim cellsize = task.idealD.cellSize
+        Dim cellPoints() As cv.Point
 
         idMeans.Clear()
         idMap.SetTo(0)
@@ -321,11 +323,19 @@ Public Class Ideal_Shape : Inherits TaskParent
                     task.iddList(i) = task.idealD.rebuildTriList(idd)
                 Next
             Case 4 ' Corners at mean depth
+                cellPoints = {New cv.Point(0, 0), New cv.Point(0, cellsize - 1),
+                              New cv.Point(cellsize - 1, 0), New cv.Point(cellsize - 1, cellsize - 1)}
                 For i = 0 To task.iddList.Count - 1
                     Dim idd = task.iddList(i)
-                    Dim split = idd.pcFrag.Split()
-                    split(2).SetTo(idd.depth)
-                    cv.Cv2.Merge(split, idd.pcFrag)
+                    For j = 0 To 3
+                        Dim pt As cv.Point = cellPoints(j)
+                        Dim vec = idd.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
+                        If vec.Z = 0 Then
+                            vec = getWorldCoordinates(New cv.Point3f(pt.X, pt.Y, idd.depth))
+                        End If
+                        idd.pcFrag.Set(Of cv.Point3f)(pt.Y, pt.X, vec)
+                        idd.quad.Add(vec)
+                    Next
                     idd.pcFrag.CopyTo(dst2(idd.lRect))
                     task.iddList(i) = task.idealD.rebuildTriList(idd)
                 Next

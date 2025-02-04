@@ -434,6 +434,7 @@ Public Class idealDepthData
     Public color As cv.Point3f
     Public pcFrag As cv.Mat
     Public triList As New List(Of List(Of cv.Point3f))
+    Public quad As New List(Of cv.Point3f)
 End Class
 
 
