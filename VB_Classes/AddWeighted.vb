@@ -84,7 +84,8 @@ Public Class AddWeighted_InfraRed : Inherits TaskParent
     Public Sub New()
         desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.leftView.Width = 0 Or task.rightView.Width = 0 Then Exit Sub ' startup issue on slower machine?
         If task.toggleOnOff Then
             dst1 = task.leftView
             labels(2) = "Left view combined with depthRGB"
