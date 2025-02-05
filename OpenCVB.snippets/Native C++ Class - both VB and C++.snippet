@@ -43,8 +43,6 @@
 Public Class Anyname_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = Anyname_Open()
-	    labels = {"", "", "Grayscale image of src", "dst3Label"}
-        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "description"
 	  End Sub
     Public Overrides Sub RunAlg(src as cv.Mat)
