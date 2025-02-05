@@ -394,7 +394,6 @@ Public Class Quad_Depth : Inherits TaskParent
             dst2.Rectangle(idd.lRect, idd.color, -1)
         Next
 
-
         labels(2) = traceName + " completed with " + CStr(quadData.Count) + " depth cells"
         labels(3) = "Mask of cells with less than " + Format(percentSlider.value / 100, "0%") + " depth pixels (no reliable depth)"
     End Sub
@@ -408,10 +407,8 @@ End Class
 Public Class Quad_DepthShadow : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Grayscale", "dst3Label"}
-        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
-        desc = "description"
+        desc = "Fill the depth shadow with the depth of the nearest tile."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
