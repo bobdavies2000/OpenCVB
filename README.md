@@ -1,20 +1,22 @@
-# January 2025 (Part 2) – GifBuilder updates, RGBFilter, Ideal Depth.
+# February 2025 – Ideal Depth, OpenGL Triangles and Quads.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   GifBuilder was reworked to capture the screen and use AnimatedGif.
--   RGBFilter available once again – filter the RGB input with any of the following:
-    -   Blur, Brightness, Contrast, Dilate, Erode, Laplacian,
-    -   Mean Subtraction, Sharpen, or White Balance.
-    -   RGBFilter is another task algorithm – run without explicit invocation.
--   Cells with “ideal” depth are those filled with depth pixels.
-    -   Ideal depth is clearly visible from both the left and right cameras.
-    -   See example output below showing cells covering the depth image.
--   TreeView form was moved into the VB_Classes where the data is produced.
-    -   Allowed code to be simpler in the Main_UI form.
-    -   TreeView button is no longer needed in Main_UI
+-   Ideal depth is a grid of cells that each contain a healthy amount of depth data.
+    -   The cell’s pixels are clearly visible in both left and right camera views.
+    -   The cell contents enable the census algorithm to match pixels.
+    -   The more pixels that are matched the better the estimate of depth.
+    -   Ideal_Basics matches left and right cells converting depth to disparity.
+        -   disparity = baseLine \* (focal length) / depth.
+-   The OpenGL interface to OpenCVB has improved triangle and quad support.
+    -   Triangles used in OpenGL can be shaped – see OpenGL_IdealShapes.
+    -   OpenGL Quads can better represent the depth data – OpenGL_QuadIdeal.
+-   OpenCVB’s OpenGL interface is improved with multiple point cloud buffers.
+    -   3D cameras produce point clouds that are always slightly different.
+    -   Combining them produces a more solid appearance to the 3D model.
+    -   Below is an example showing the cosmetic difference.
 -   A log of previous changes is included at the bottom of this document.
 
-**![](media/1c85b62195b05f1695bd32287f38eac8.gif)Depth_Ideal :** *The cells marked in the lower left image have ideal depth data with a high percentage of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
+![A screen shot of a computer screen Description automatically generated](media/9f00f342149e24119ff7d554df58f31b.png)  ![A screenshot of a computer screen Description automatically generated](media/ed0ab23749b244a50928420654c93c93.png) **OpenGL Multiple Buffers:** *Since the point cloud is different on every frame (depth is only an approximation), using multiple buffers allows a cosmetic improvement to the appearance of the point cloud. The point cloud on the left is what one buffer looks like while the one on the right uses the last 10 frames. The frame rate for this example was 60 fps at 320x240 with significant magnification (approximately 4X.)*
 
 # Introduction
 
@@ -1697,3 +1699,21 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A screenshot of a computer Description automatically generated](media/893013652590bac4fa557520f5e13e4a.gif)
 
 **RedColor_Basics:** *OpenCVB’s TreeView (at right above) shows all the algorithms that contribute to the output of the requested algorithm – in this case RedColor_Basics. As each algorithm in the tree is selected, it is highlighted (albeit faintly here) and the algorithm’s output is shown (now including labels and TrueText.) This capability enables a further understanding of how the algorithm was constructed. Task algorithms are run on every frame and are included in the TreeView even though they are not explicitly called by the algorithm. The frame rate of 99 fps is not a mistake. The Stereolabs Gemini camera runs at that rate when capturing 640x480 images.*
+
+# January 2025 (Part 2) – GifBuilder updates, RGBFilter, Ideal Depth.
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   GifBuilder was reworked to capture the screen and use AnimatedGif.
+-   RGBFilter available once again – filter the RGB input with any of the following:
+    -   Blur, Brightness, Contrast, Dilate, Erode, Laplacian,
+    -   Mean Subtraction, Sharpen, or White Balance.
+    -   RGBFilter is another task algorithm – run without explicit invocation.
+-   Cells with “ideal” depth are those filled with depth pixels.
+    -   Ideal depth is clearly visible from both the left and right cameras.
+    -   See example output below showing cells covering the depth image.
+-   TreeView form was moved into the VB_Classes where the data is produced.
+    -   Allowed code to be simpler in the Main_UI form.
+    -   TreeView button is no longer needed in Main_UI
+-   A log of previous changes is included at the bottom of this document.
+
+**![A collage of a person using a computer Description automatically generated](media/1c85b62195b05f1695bd32287f38eac8.gif)Depth_Ideal :** *The cells marked in the lower left image have ideal depth data with a high percentage of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
