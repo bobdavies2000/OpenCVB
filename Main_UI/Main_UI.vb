@@ -23,7 +23,6 @@ Module opencv_module
         Dim Right As Integer
         Dim Bottom As Integer
     End Structure
-    Public leftRightGray As Boolean = True ' test to see if we can always use grayscale left/right views.
 End Module
 Public Class Main_UI
     Public Shared settings As jsonClass.ApplicationStorage
@@ -1604,14 +1603,19 @@ Public Class Main_UI
 
                         SyncLock cameraLock
                             task.color = camera.uiColor
-                            If leftRightGray Then
-                                If camera.uiLeft.Channels <> 1 Then
-                                    task.leftView = camera.uiLeft.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                                    task.rightView = camera.uiRight.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                                End If
-                            Else
-                                task.leftView = camera.uiLeft
-                                task.rightView = camera.uiRight
+                            task.leftView = camera.uiLeft
+                            task.rightView = camera.uiRight
+                            If task.leftView.Channels <> 1 Then
+                                task.leftView = task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                            End If
+                            If task.rightView.Channels <> 1 Then
+                                task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                            End If
+                            If task.leftView.Width = 0 Then
+                                task.leftView = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+                            End If
+                            If task.rightView.Width = 0 Then
+                                task.rightView = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
                             End If
                             task.pointCloud = camera.uiPointCloud
 
