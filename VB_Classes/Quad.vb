@@ -371,31 +371,6 @@ End Class
 
 
 
-Public Class Quad_Ideal : Inherits TaskParent
-    Public quadData As New List(Of cv.Point3f)
-    Public Sub New()
-        optiBase.FindSlider("Ideal Cell Size").Value = 4
-        optiBase.FindSlider("Percent Depth Threshold").Value = 25
-        desc = "Create a quad representation of the ideal depth data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
-        quadData.Clear()
-        For Each idd In task.iddList
-            quadData.Add(idd.color)
-            quadData.Add(idd.quad(0))
-            quadData.Add(idd.quad(1))
-            quadData.Add(idd.quad(2))
-            quadData.Add(idd.quad(3))
-            dst2.Rectangle(idd.lRect, task.HighlightColor, task.lineWidth)
-        Next
-        labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) + " quad cells"
-    End Sub
-End Class
-
-
-
-
 Public Class Quad_Depth : Inherits TaskParent
     Public quadData As New List(Of cv.Point3f)
     Public Sub New()
@@ -409,13 +384,34 @@ Public Class Quad_Depth : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static percentSlider = optiBase.FindSlider("Percent Depth Threshold")
         dst2.SetTo(0)
+        quadData.Clear()
         For Each idd In task.iddList
+            quadData.Add(idd.color)
+            quadData.Add(idd.quad(0))
+            quadData.Add(idd.quad(1))
+            quadData.Add(idd.quad(2))
+            quadData.Add(idd.quad(3))
             dst2.Rectangle(idd.lRect, idd.color, -1)
         Next
-        dst3 = Not task.iddMask
-        src.CopyTo(dst2, dst3)
 
-        labels(2) = traceName + " completed with " + CStr(task.iddList.Count) + " depth cells"
-        labels(3) = "Mask of cells with less than " + Format(percentSlider.value / 100, "0%") + " depth pixels"
+
+        labels(2) = traceName + " completed with " + CStr(quadData.Count) + " depth cells"
+        labels(3) = "Mask of cells with less than " + Format(percentSlider.value / 100, "0%") + " depth pixels (no reliable depth)"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Quad_DepthShadow : Inherits TaskParent
+    Public Sub New()
+        labels = {"", "", "Grayscale", "dst3Label"}
+        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
+        desc = "description"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

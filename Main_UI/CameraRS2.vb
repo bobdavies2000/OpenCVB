@@ -1,10 +1,10 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports Intel.RealSense
 Imports System.Text
 Public Class CameraRS2 : Inherits GenericCamera
     Dim pipe As New Pipeline()
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, devName As String, Optional fps As Integer = 30)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""
         Dim ctx As New Context()
         Dim searchName As String = devName
@@ -35,25 +35,25 @@ Public Class CameraRS2 : Inherits GenericCamera
         cameraInfo.fx = myIntrinsics.fx
         cameraInfo.fy = myIntrinsics.fy
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
         Dim ptcloud = New PointCloud()
         Dim cols = captureRes.Width, rows = captureRes.Height
-        Static color As cvb.Mat, leftView As cvb.Mat, rightView As cvb.Mat, pointCloud As cvb.Mat
+        Static color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat
 
         Using frames As FrameSet = pipe.WaitForFrames(5000)
             For Each frame As Intel.RealSense.Frame In frames
                 If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
-                    leftView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data)
+                    leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
                 End If
                 If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
-                    rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC1, frame.Data)
+                    rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
                 End If
                 If frame.Profile.Stream = Stream.Accel Then
-                    IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(frame.Data)
+                    IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
                 End If
                 If frame.Profile.Stream = Stream.Gyro Then
-                    IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(frame.Data)
+                    IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
                     Dim mFrame = frame.As(Of MotionFrame)
                     Static initialTime As Int64 = mFrame.Timestamp
                     IMU_FrameTime = mFrame.Timestamp - initialTime
@@ -62,21 +62,21 @@ Public Class CameraRS2 : Inherits GenericCamera
 
             Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-            color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC3, alignedFrames.ColorFrame.Data)
+            color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, alignedFrames.ColorFrame.Data)
 
             Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
-            pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC3, pcFrame.Data)
+            pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data)
 
-            If color Is Nothing Then color = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            If leftView Is Nothing Then leftView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            If rightView Is Nothing Then rightView = New cvb.Mat(WorkingRes, cvb.MatType.CV_8UC3)
-            If pointCloud Is Nothing Then pointCloud = New cvb.Mat(WorkingRes, cvb.MatType.CV_32FC3)
+            If color Is Nothing Then color = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
+            If leftView Is Nothing Then leftView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
+            If rightView Is Nothing Then rightView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
+            If pointCloud Is Nothing Then pointCloud = New cv.Mat(WorkingRes, cv.MatType.CV_32FC3)
 
             SyncLock cameraLock
-                uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                uiLeft = leftView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End SyncLock
 
             GC.Collect() ' do you think this is unnecessary?  Remove it and check...
@@ -121,16 +121,16 @@ Module RS2_Module_CPP
 End Module
 
 Structure RS2IMUdata
-    Public acceleration As cvb.Point3f
-    Public velocity As cvb.Point3f
-    Public angularVelocity As cvb.Point3f
-    Public angularAcceleration As cvb.Point3f
+    Public acceleration As cv.Point3f
+    Public velocity As cv.Point3f
+    Public angularVelocity As cv.Point3f
+    Public angularAcceleration As cv.Point3f
 End Structure
 Public Class CameraRS2_CPP : Inherits GenericCamera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
 
         Dim devName As StringBuilder = New StringBuilder(deviceName)
@@ -144,30 +144,30 @@ Public Class CameraRS2_CPP : Inherits GenericCamera
         cameraInfo.fx = intrinInfo(2)
         cameraInfo.fy = intrinInfo(3)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         If cPtr = 0 Then Exit Sub
 
         ' if OpenCVB fails here, just unplug and plug in the RealSense camera.
         RS2WaitForFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
         Dim accelFrame = RS2Accel(cPtr)
-        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame)
+        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
         IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
         Dim gyroFrame = RS2Gyro(cPtr)
-        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
+        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
         Static imuStartTime = RS2IMUTimeStamp(cPtr)
         IMU_TimeStamp = RS2IMUTimeStamp(cPtr) - imuStartTime
 
         SyncLock cameraLock
             Dim w = WorkingRes.Width, h = WorkingRes.Height
-            uiColor = cvb.Mat.FromPixelData(h, w, cvb.MatType.CV_8UC3, RS2Color(cPtr)).Clone
-            Dim tmp As cvb.Mat = cvb.Mat.FromPixelData(h, w, cvb.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+            uiColor = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone
+            Dim tmp As cv.Mat = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             uiLeft = tmp * 4 - 35 ' improved brightness specific to RealSense
-            tmp = cvb.Mat.FromPixelData(h, w, cvb.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+            tmp = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             uiRight = tmp * 4 - 35 ' improved brightness specific to RealSense
-            Dim pc = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, RS2PointCloud(cPtr))
-            uiPointCloud = pc.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            Dim pc = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr))
+            uiPointCloud = pc.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
         End SyncLock
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub

@@ -1,12 +1,12 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
 Imports Microsoft.Web.WebView2.Core
 
 Public Class Translator
 #Region "NonVolatile"
-    Dim cursorInPoint As New cvb.Point(250, 750)
-    Dim cursorOutPoint As New cvb.Point(650, 750)
+    Dim cursorInPoint As New cv.Point(250, 750)
+    Dim cursorOutPoint As New cv.Point(650, 750)
     Dim algName As String = ""
     <DllImport("user32.dll")>
     Private Shared Function SetCursorPos(x As Integer, y As Integer) As Boolean
@@ -175,7 +175,7 @@ Public Class Translator
                     If inline.Contains(".GetSubRect(") Then inline = inline.Replace(".GetSubRect(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' .Get(
                     If inline.Contains(".Get(") Then inline = inline.Replace(".Get(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' 
                     inline = inline.Replace(" Run(Mat ", " RunAlg(Mat ")
-                    inline = inline.Replace("cvb.", "cv.")
+                    inline = inline.Replace("cv.", "cv.")
                     inline = inline.Replace("Options_CS_", "Options_")
                     inline = inline.Replace("task.", "vbc.task.")
                     inline = inline.Replace("task.gOptions.FrameHistory.Value", "task.frameHistoryCount")

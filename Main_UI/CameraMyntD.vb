@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Module MyntD_Interface
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function MyntDOpen(width As Integer, height As Integer) As IntPtr
     End Function
@@ -21,7 +21,7 @@ Module MyntD_Interface
     End Function
 End Module
 Public Class CameraMyntD : Inherits GenericCamera
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         cPtr = MyntDOpen(captureRes.Width, captureRes.Height)
         cameraName = deviceName
@@ -35,16 +35,16 @@ Public Class CameraMyntD : Inherits GenericCamera
     Private Sub IMUdataCollection()
         MyntDtaskIMU(cPtr)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         If cPtr = 0 Then Exit Sub
 
         Dim imagePtr = MyntDWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
         Dim acc = MyntDAcceleration(cPtr)
-        IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(acc)
+        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
         IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
 
         Dim ang = MyntDGyro(cPtr)
-        IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(ang)
+        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
         IMU_AngularVelocity *= 0.0174533 ' MyntD gyro is in degrees/sec
 
         Static startTime = MyntDIMU_TimeStamp(cPtr)
@@ -54,10 +54,10 @@ Public Class CameraMyntD : Inherits GenericCamera
         Dim pcPtr = MyntDPointCloud(cPtr)
 
         'If imagePtr <> 0 And rightPtr <> 0 And pcPtr <> 0 Then
-        '    color = New cvb.Mat(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, imagePtr)
-        '    leftView = color.CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        '    rightView = New cvb.Mat(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, rightPtr).CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-        '    pointCloud = New cvb.Mat(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_32FC3, pcPtr)
+        '    color = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, imagePtr)
+        '    leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        '    rightView = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        '    pointCloud = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_32FC3, pcPtr)
         'End If
 
         'MyBase.GetNextFrameCounts(IMU_FrameTime)
@@ -65,21 +65,22 @@ Public Class CameraMyntD : Inherits GenericCamera
         If imagePtr <> 0 And rightPtr <> 0 And pcPtr <> 0 Then
             SyncLock cameraLock
                 If captureRes <> WorkingRes Then
-                    Dim tmp As cvb.Mat
-                    tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC3, imagePtr)
-                    uiColor = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                    uiLeft = uiColor.Clone
+                    Dim tmp As cv.Mat
+                    tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, imagePtr)
+                    uiColor = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    uiLeft = uiColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-                    tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC3, rightPtr).CvtColor(cvb.ColorConversionCodes.BGR2GRAY)
-                    uiRight = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                    tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                    uiRight = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-                    tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, pcPtr)
-                    uiPointCloud = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                    tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcPtr)
+                    uiPointCloud = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
                 Else
-                    uiColor = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC3, imagePtr).Clone
-                    uiLeft = uiColor.Clone
-                    uiRight = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC3, rightPtr).Clone
-                    uiPointCloud = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_32FC3, pcPtr).Clone
+                    uiColor = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, imagePtr).Clone
+                    uiLeft = uiColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                    uiRight = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, rightPtr)
+                    uiRight = uiRight.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                    uiPointCloud = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcPtr).Clone
                 End If
             End SyncLock
             MyBase.GetNextFrameCounts(IMU_FrameTime)

@@ -73,7 +73,7 @@ Public Class InsertAlgorithm
             createVBfile = True
         End If
         sw = New StreamWriter(VBoutputName.FullName, True)
-        If createVBfile Then sw.WriteLine("Imports cvb = OpenCvSharp") Else sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf)
+        If createVBfile Then sw.WriteLine("Imports cv = OpenCvSharp") Else sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf)
         Dim trigger As Boolean
         For i = 0 To vbSnippet.Count - 1
             Dim line = vbSnippet(i)
@@ -114,7 +114,7 @@ Public Class InsertAlgorithm
         Dim cppCode As New List(Of String)
         sw = New StreamWriter(VBoutputName.FullName, True)
         If createVBfile Then
-            sw.WriteLine("Imports cvb = OpenCvSharp")
+            sw.WriteLine("Imports cv = OpenCvSharp")
             sw.WriteLine("Imports System.Runtime.InteropServices")
         Else
             sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf)

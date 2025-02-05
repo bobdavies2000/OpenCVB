@@ -1,24 +1,24 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.Numerics
 Imports VB_Classes
 
 Public Class GenericCamera
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
-    Public IMU_Acceleration As cvb.Point3f
-    Public IMU_AngularAcceleration As cvb.Point3f
-    Public IMU_AngularVelocity As cvb.Point3f
+    Public IMU_Acceleration As cv.Point3f
+    Public IMU_AngularAcceleration As cv.Point3f
+    Public IMU_AngularVelocity As cv.Point3f
     Public IMU_FrameTime As Double
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
     Public cameraFrameCount As Integer
 
-    Public uiColor As cvb.Mat
-    Public uiLeft As cvb.Mat
-    Public uiRight As cvb.Mat
-    Public uiPointCloud As cvb.Mat
+    Public uiColor As cv.Mat
+    Public uiLeft As cv.Mat
+    Public uiRight As cv.Mat
+    Public uiPointCloud As cv.Mat
 
-    Public captureRes As cvb.Size
+    Public captureRes As cv.Size
 
     Public deviceCount As Integer
     Public cameraInfo As VB_Classes.VBtask.cameraInfo
@@ -54,12 +54,12 @@ Public Class GenericCamera
         Dim m33 As Single
     End Structure
     Structure PoseData
-        Public translation As cvb.Point3f
-        Public velocity As cvb.Point3f
-        Public acceleration As cvb.Point3f
+        Public translation As cv.Point3f
+        Public velocity As cv.Point3f
+        Public acceleration As cv.Point3f
         Public rotation As Quaternion
-        Public angularVelocity As cvb.Point3f
-        Public angularAcceleration As cvb.Point3f
+        Public angularVelocity As cv.Point3f
+        Public angularAcceleration As cv.Point3f
         Public trackerConfidence As Integer
         Public mapperConfidence As Integer
     End Structure
@@ -67,7 +67,7 @@ Public Class GenericCamera
         Dim cam As VBtask.cameraInfo
         cameraInfo = cam
     End Sub
-    Public Function getMinMax(mat As cvb.Mat, Optional mask As cvb.Mat = Nothing) As mmData
+    Public Function getMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
             mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)

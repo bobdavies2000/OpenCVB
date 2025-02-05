@@ -60,6 +60,7 @@ Public Class OptionsGlobal
         HighlightColor.Items.Add("White")
         HighlightColor.Items.Add("Red")
         HighlightColor.SelectedIndex = 0
+        ShowQuadDepth.Checked = True
 
         ShowAllOptions.Checked = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
 
@@ -395,5 +396,9 @@ Public Class OptionsGlobal
     End Sub
     Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TruncateDepth.CheckedChanged
         task.optionsChanged = True
+    End Sub
+    Private Sub ShowQuadDepth_CheckedChanged(sender As Object, e As EventArgs) Handles ShowQuadDepth.CheckedChanged
+        task.optionsChanged = True
+
     End Sub
 End Class

@@ -2193,23 +2193,22 @@ End Class
 
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
-Public Class OpenGL_QuadIdeal : Inherits TaskParent
-    Dim quad As New Quad_Ideal
+Public Class OpenGL_QuadDepth : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each of ideal depth cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        quad.Run(src)
-        labels = quad.labels
+        task.quadDepth.Run(src)
 
-        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(task.quadDepth.quadData.Count, 1, cv.MatType.CV_32FC3,
+                                                  task.quadDepth.quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = quad.labels(2)
+        labels = task.quadDepth.labels
     End Sub
 End Class
 

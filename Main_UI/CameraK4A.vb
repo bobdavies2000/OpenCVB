@@ -1,8 +1,8 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports Microsoft.Kinect.KinectSensor
 Public Class CameraK4A : Inherits GenericCamera
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
 
         cPtr = A4KOpen(captureRes.Width, captureRes.Height)
@@ -22,9 +22,9 @@ Public Class CameraK4A : Inherits GenericCamera
     End Sub
     Structure imuData
         Dim placeholderForTemperature As Single
-        Dim imuAccel As cvb.Point3f
+        Dim imuAccel As cv.Point3f
         Dim accelTimeStamp As Long
-        Dim imu_Gyro As cvb.Point3f
+        Dim imu_Gyro As cv.Point3f
     End Structure
     Structure intrinsicsData
         Dim cx As Single            ' Principal point In image, x */
@@ -43,7 +43,7 @@ Public Class CameraK4A : Inherits GenericCamera
         Dim p1 As Single            ' Tangential distortion coefficient 1 */
         Dim metric_radius As Single ' Metric radius */
     End Structure
-    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         Try
             Dim imuFrame As IntPtr
             If cPtr = 0 Then Exit Sub
@@ -74,25 +74,24 @@ Public Class CameraK4A : Inherits GenericCamera
             If cPtr = 0 Then Exit Sub
 
             SyncLock cameraLock
-                uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
-                                                cvb.MatType.CV_8UC3, A4KColor(cPtr)).Clone
+                uiColor = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
+                                               cv.MatType.CV_8UC3, A4KColor(cPtr)).Clone
 
                 ' so depth data fits into 0-255 (approximately)
-                uiLeft = (cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
-                                                cvb.MatType.CV_16U, A4KLeftView(cPtr)) * 0.06).ToMat.
-                                                ConvertScaleAbs().
-                                                CvtColor(cvb.ColorConversionCodes.GRAY2BGR).Clone
+                uiLeft = (cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
+                                               cv.MatType.CV_16U, A4KLeftView(cPtr)) * 0.06).ToMat.
+                                               ConvertScaleAbs()
                 uiRight = uiLeft.Clone
                 If captureRes <> WorkingRes Then
                     Dim ptr = A4KPointCloud(cPtr)
-                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                                    cvb.MatType.CV_16SC3, ptr).
-                                                    Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                    tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
+                    Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                                   cv.MatType.CV_16SC3, ptr).
+                                                   Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    tmp.ConvertTo(uiPointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 Else
-                    Dim tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                                    cvb.MatType.CV_16SC3, A4KPointCloud(cPtr))
-                    tmp.ConvertTo(uiPointCloud, cvb.MatType.CV_32FC3, 0.001) ' convert to meters...
+                    Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                                   cv.MatType.CV_16SC3, A4KPointCloud(cPtr))
+                    tmp.ConvertTo(uiPointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 End If
             End SyncLock
             MyBase.GetNextFrameCounts(IMU_FrameTime)

@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Threading
 
 Module OakD_Module_CPP
@@ -27,24 +27,24 @@ Module OakD_Module_CPP
     End Sub
 End Module
 Structure OakDIMUdata
-    Public acceleration As cvb.Point3f
-    Public velocity As cvb.Point3f
-    Public angularVelocity As cvb.Point3f
-    Public angularAcceleration As cvb.Point3f
+    Public acceleration As cv.Point3f
+    Public velocity As cv.Point3f
+    Public angularVelocity As cv.Point3f
+    Public angularAcceleration As cv.Point3f
 End Structure
 Public Class CameraOakD : Inherits GenericCamera
     Public deviceNum As Integer
-    Public accel As cvb.Point3f
-    Public gyro As cvb.Point3f
-    Dim templateX As cvb.Mat
-    Dim templateY As cvb.Mat
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+    Public accel As cv.Point3f
+    Public gyro As cv.Point3f
+    Dim templateX As cv.Mat
+    Dim templateY As cv.Mat
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         If templateX IsNot Nothing Then Return ' we have already been initialized.
         cameraName = deviceName
         cPtr = OakDOpen(captureRes.Width, captureRes.Height)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         If cPtr = 0 Then Exit Sub
         OakDWaitForFrame(cPtr)
 
@@ -59,8 +59,8 @@ Public Class CameraOakD : Inherits GenericCamera
             cameraInfo.fx = intrinsicsArray(0)
             cameraInfo.fy = intrinsicsArray(4)
 
-            templateX = New cvb.Mat(captureRes, cvb.MatType.CV_32F)
-            templateY = New cvb.Mat(captureRes, cvb.MatType.CV_32F)
+            templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
+            templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)
             For i = 0 To templateX.Width - 1
                 templateX.Set(Of Single)(0, i, i)
             Next
@@ -81,55 +81,55 @@ Public Class CameraOakD : Inherits GenericCamera
         End If
 
         Dim accelFrame = OakDAccel(cPtr)
-        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cvb.Point3f)(accelFrame)
+        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
         IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
         Dim yComponent = IMU_Acceleration.X
         IMU_Acceleration.X = IMU_Acceleration.Y
         IMU_Acceleration.Y = yComponent
 
         Dim gyroFrame = OakDGyro(cPtr)
-        If accelFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(gyroFrame)
+        If accelFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
         Static imuStartTime = OakDIMUTimeStamp(cPtr)
         IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
 
-        Dim depth32f As New cvb.Mat
-        Dim depth16 = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_16U, OakDRawDepth(cPtr))
-        depth16.ConvertTo(depth32f, cvb.MatType.CV_32F)
+        Dim depth32f As New cv.Mat
+        Dim depth16 = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_16U, OakDRawDepth(cPtr))
+        depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
 
         SyncLock cameraLock
             If captureRes <> WorkingRes Then
-                Dim tmp As cvb.Mat
-                tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC3, OakDColor(cPtr))
-                uiColor = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                Dim tmp As cv.Mat
+                tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr))
+                uiColor = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-                tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8U, OakDLeftImage(cPtr))
-                uiLeft = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr))
+                uiLeft = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-                tmp = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8U, OakDRightImage(cPtr))
-                uiRight = tmp.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr))
+                uiRight = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
             Else
-                uiColor = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8UC3, OakDColor(cPtr)).Clone
-                uiLeft = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8U, OakDLeftImage(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
-                uiRight = cvb.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cvb.MatType.CV_8U, OakDRightImage(cPtr)).CvtColor(cvb.ColorConversionCodes.GRAY2BGR)
+                uiColor = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr)).Clone
+                uiLeft = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr))
+                uiRight = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr))
             End If
 
             ' the Oak-D cameras do not produce a point cloud - update if that changes.
-            Dim d32f As cvb.Mat = depth32f * 0.001
-            Dim worldX As New cvb.Mat, worldY As New cvb.Mat
+            Dim d32f As cv.Mat = depth32f * 0.001
+            Dim worldX As New cv.Mat, worldY As New cv.Mat
 
-            cvb.Cv2.Multiply(templateX, d32f, worldX)
+            cv.Cv2.Multiply(templateX, d32f, worldX)
             worldX *= 1 / cameraInfo.fx
 
-            cvb.Cv2.Multiply(templateY, d32f, worldY)
+            cv.Cv2.Multiply(templateY, d32f, worldY)
             worldY *= 1 / cameraInfo.fy
 
-            Dim pc As New cvb.Mat
-            cvb.Cv2.Merge({worldX, worldY, d32f}, pc)
+            Dim pc As New cv.Mat
+            cv.Cv2.Merge({worldX, worldY, d32f}, pc)
             If WorkingRes = captureRes Then
                 uiPointCloud = pc
             Else
-                uiPointCloud = pc.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+                uiPointCloud = pc.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
         End SyncLock
 

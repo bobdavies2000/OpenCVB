@@ -81,6 +81,7 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.ShowQuadDepth = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -352,6 +353,7 @@ Partial Class OptionsGlobal
         '
         'MotionBox
         '
+        Me.MotionBox.Controls.Add(Me.ShowQuadDepth)
         Me.MotionBox.Controls.Add(Me.showMotionMask)
         Me.MotionBox.Controls.Add(Me.UseMotion)
         Me.MotionBox.Location = New System.Drawing.Point(6, 322)
@@ -728,6 +730,16 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'ShowQuadDepth
+        '
+        Me.ShowQuadDepth.AutoSize = True
+        Me.ShowQuadDepth.Location = New System.Drawing.Point(14, 86)
+        Me.ShowQuadDepth.Name = "ShowQuadDepth"
+        Me.ShowQuadDepth.Size = New System.Drawing.Size(166, 24)
+        Me.ShowQuadDepth.TabIndex = 77
+        Me.ShowQuadDepth.Text = "Show Quad Depth"
+        Me.ShowQuadDepth.UseVisualStyleBackColor = True
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -821,4 +833,5 @@ Partial Class OptionsGlobal
     Friend WithEvents UseMotion As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
     Friend WithEvents TruncateDepth As Windows.Forms.CheckBox
+    Friend WithEvents ShowQuadDepth As Windows.Forms.CheckBox
 End Class

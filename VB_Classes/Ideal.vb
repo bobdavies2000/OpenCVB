@@ -18,6 +18,7 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public Function rebuildTriList(idd As idealDepthData) As idealDepthData
         Dim triList = New List(Of cv.Point3f)
         idd.triList.Clear()
+        If idd.pcFrag Is Nothing Then idd.pcFrag = task.pointCloud(idd.lRect).Clone
         For i = 0 To 5
             Dim pt = cellPoints(i)
             Dim vec = idd.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
@@ -84,7 +85,7 @@ Public Class Ideal_Basics : Inherits TaskParent
             cv.Cv2.MeanStdDev(task.color(idd.lRect), colormean, colorStdev, task.depthMask(idd.lRect))
             idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
             idd.index = idListNew.Count
-            idd.pcFrag = task.pointCloud(rect)
+            idd.pcFrag = task.pointCloud(rect).Clone
 
             idListNew.Add(rebuildTriList(idd))
         Next
@@ -182,7 +183,7 @@ End Class
 
 Public Class Ideal_RightView : Inherits TaskParent
     Public means As New List(Of Single)
-    Public mats As New Mat_4to1
+    Public mats As New Mat_4Click
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"Draw below to see match in right image", "Right view image", "", ""}
@@ -192,6 +193,12 @@ Public Class Ideal_RightView : Inherits TaskParent
         desc = "Map each ideal depth cell into the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Or
+            task.cameraName = "Oak-D camera" Then
+            SetTrueText("The " + task.cameraName + " left and right cameras are" + vbCrLf +
+                        " not typically aligned with the RGB camera in OpenCVB." + vbCrLf)
+            Exit Sub
+        End If
         dst1 = task.rightView
         mats.mat(0) = task.leftView
         mats.mat(1) = task.rightView

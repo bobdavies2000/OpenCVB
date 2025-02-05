@@ -1,5 +1,5 @@
 ﻿Imports Newtonsoft.Json
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.IO
 
 Namespace jsonClass
@@ -17,10 +17,10 @@ Namespace jsonClass
         Public camera640x480Support As List(Of Boolean)
         Public camera1920x1080Support As List(Of Boolean)
 
-        Public locationMain As cvb.Vec4f
-        Public locationPixelViewer As cvb.Vec4f
-        Public locationOpenGL As cvb.Vec4f
-        Public locationOptions As cvb.Vec4f
+        Public locationMain As cv.Vec4f
+        Public locationPixelViewer As cv.Vec4f
+        Public locationOpenGL As cv.Vec4f
+        Public locationOptions As cv.Vec4f
 
         Public myntSDKready As Boolean
         Public zedSDKready As Boolean
@@ -30,16 +30,16 @@ Namespace jsonClass
         Public snap320 As Boolean
         Public snapCustom As Boolean
 
-        Public WorkingRes As cvb.Size
+        Public WorkingRes As cv.Size
         Public WorkingResIndex As Integer
-        Public captureRes As cvb.Size
-        Public displayRes As cvb.Size
+        Public captureRes As cv.Size
+        Public displayRes As cv.Size
 
         Public testAllDuration As Integer
         Public showConsoleLog As Boolean
 
         Public treeButton As Boolean
-        Public treeLocation As cvb.Vec4f
+        Public treeLocation As cv.Vec4f
 
         Public fontInfo As Font
         Public desiredFPS As Integer
@@ -66,12 +66,12 @@ Namespace jsonClass
             Dim emptyApp As New ApplicationStorage
             emptyApp.cameraName = ""
             emptyApp.cameraIndex = 0
-            emptyApp.WorkingRes = New cvb.Size(320, 180)
+            emptyApp.WorkingRes = New cv.Size(320, 180)
             emptyApp.snap640 = True
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
-            emptyApp.treeLocation = New cvb.Vec4f(20, 20, 500, 600)
+            emptyApp.treeLocation = New cv.Vec4f(20, 20, 500, 600)
             emptyApp.groupComboText = "< All >"
             emptyApp.translatorMode = "VB.Net to C#"
             SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 30)

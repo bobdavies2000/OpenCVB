@@ -1382,9 +1382,9 @@ Public Class Main_UI
         End If
 
         If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
+        camLabel(1).Text = picLabels(1)
         camLabel(2).Text = picLabels(2)
         camLabel(3).Text = picLabels(3)
-        If picLabels(1) = "" Or testAllRunning Then camLabel(1).Text = "Depth RGB"
     End Sub
     Private Sub startCamera()
         paintNewImages = False
@@ -1460,15 +1460,6 @@ Public Class Main_UI
                     End If
                 End SyncLock
 
-                ' Test the camera frame rate...
-                'Static lastTime = Now
-                'Dim nextTime = Now
-                'Dim elapsedTicks = nextTime.Ticks - lastTime.Ticks
-                'lastTime = nextTime
-                'Dim span = New TimeSpan(elapsedTicks)
-                'If frameCount Mod 100 = 0 Then
-                '    Debug.WriteLine(Format(1000 / span.Milliseconds, fmt0) + " camera frames per second")
-                'End If
             End If
             If cameraTaskHandle Is Nothing Then
                 camera.stopCamera()
@@ -1605,13 +1596,7 @@ Public Class Main_UI
                             task.color = camera.uiColor
                             task.leftView = camera.uiLeft
                             task.rightView = camera.uiRight
-                            ' make sure left and right views are present and single channel.
-                            If task.leftView.Channels <> 1 Then
-                                task.leftView = task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                            End If
-                            If task.rightView.Channels <> 1 Then
-                                task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                            End If
+                            ' make sure left and right views are present
                             If task.leftView.Width = 0 Then
                                 task.leftView = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
                             End If
@@ -1709,6 +1694,7 @@ Public Class Main_UI
                 Dim optionsChange = task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
 
                 picLabels = task.labels
+                If picLabels(1) = "" Then picLabels(1) = "Quad Depth - depth shadow filled with nearest tile."
                 motionLabel = task.MotionLabel
 
                 SyncLock mouseLock

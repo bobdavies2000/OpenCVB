@@ -1,9 +1,9 @@
-﻿Imports cvb = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports sl
 Public Class CameraZED2 : Inherits GenericCamera
     Dim zed As sl.Camera
     Dim init_params As New InitParameters()
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         init_params.sensorsRequired = True
         init_params.depthMode = sl.DEPTH_MODE.ULTRA
@@ -40,7 +40,7 @@ Public Class CameraZED2 : Inherits GenericCamera
         posTrack.enableAreaMemory = True
         zed.EnablePositionalTracking(posTrack)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         Static RuntimeParameters = New RuntimeParameters()
         Dim rows = captureRes.Height, cols = captureRes.Width
         Dim w = WorkingRes.Width, h = WorkingRes.Height
@@ -49,23 +49,25 @@ Public Class CameraZED2 : Inherits GenericCamera
             If rc = 0 Then Exit While
         End While
 
-        Dim color As New cvb.Mat, leftView As New cvb.Mat, rightView As New cvb.Mat, pointCloud As New cvb.Mat
+        Dim color As New cv.Mat, leftView As New cv.Mat, rightView As New cv.Mat, pointCloud As New cv.Mat
         Static colorSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
         Static rightSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
         Static pointCloudSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C4)
 
         zed.RetrieveImage(colorSL, sl.VIEW.LEFT)
-        color = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, colorSL.GetPtr).
-                                      CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+        color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC4, colorSL.GetPtr).
+                                      CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         zed.RetrieveImage(rightSL, sl.VIEW.RIGHT)
-        rightView = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_8UC4, rightSL.GetPtr).
-                                          CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
+        rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC4, rightSL.GetPtr).
+                                          CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        rightView = rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZBGRA) ' tried XYZ but it still comes with BGRA
-        pointCloud = cvb.Mat.FromPixelData(rows, cols, cvb.MatType.CV_32FC4,
-                                           pointCloudSL.GetPtr).CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
-        cvb.Cv2.PatchNaNs(pointCloud) ' This should not be necessary!  What is going on with StereoLabs interface?
+        pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC4,
+                                           pointCloudSL.GetPtr).CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        cv.Cv2.PatchNaNs(pointCloud) ' This should not be necessary!  What is going on with StereoLabs interface?
 
         Dim zed_pose As New sl.Pose
         zed.GetPosition(zed_pose, REFERENCE_FRAME.WORLD)
@@ -75,17 +77,17 @@ Public Class CameraZED2 : Inherits GenericCamera
         SyncLock cameraLock
             Dim acc = sensordata.imu.linearAcceleration
             If acc.X <> 0 And acc.Y <> 0 And acc.Z <> 0 Then
-                IMU_Acceleration = New cvb.Point3f(acc.X, acc.Y, -acc.Z)
+                IMU_Acceleration = New cv.Point3f(acc.X, acc.Y, -acc.Z)
                 Dim gyro = sensordata.imu.angularVelocity
-                IMU_AngularVelocity = New cvb.Point3f(gyro.X, gyro.Y, gyro.Z) * 0.0174533 ' Zed 2 gyro is in degrees/sec 
+                IMU_AngularVelocity = New cv.Point3f(gyro.X, gyro.Y, gyro.Z) * 0.0174533 ' Zed 2 gyro is in degrees/sec 
                 Static IMU_StartTime = sensordata.imu.timestamp
                 IMU_TimeStamp = (sensordata.imu.timestamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
             End If
             If WorkingRes <> captureRes Then
-                uiColor = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                uiLeft = color.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                uiRight = rightView.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
-                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest).Clone
+                uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
             Else
                 uiColor = color.Clone
                 uiLeft = color.Clone

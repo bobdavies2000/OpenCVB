@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Imports cvb = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports Intel.RealSense
 Module Zed2_CPP_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -31,7 +31,7 @@ Module Zed2_CPP_Interface
     End Function
 End Module
 Public Class CameraZED2_CPP : Inherits GenericCamera
-    Public Sub New(WorkingRes As cvb.Size, _captureRes As cvb.Size, deviceName As String)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
 
         ' if OpenCVB fails here, it is likely because you have turned off the StereoLabs support.
@@ -60,40 +60,42 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
         Dim h_fov As Single ' horizontal field of view in degrees.
         Dim d_fov As Single ' diagonal field of view in degrees.
     End Structure
-    Public Sub GetNextFrame(WorkingRes As cvb.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         Zed2WaitForFrame(cPtr)
 
         If cPtr = 0 Then Exit Sub
         Zed2GetData(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         SyncLock cameraLock
-            uiColor = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC4,
+            uiColor = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC4,
                                             Zed2Color(cPtr)).Clone
-            uiColor = uiColor.CvtColor(cvb.ColorConversionCodes.BGRA2BGR).Resize(WorkingRes, 0, 0,
-                                       cvb.InterpolationFlags.Nearest)
+            uiColor = uiColor.CvtColor(cv.ColorConversionCodes.BGRA2BGR).Resize(WorkingRes, 0, 0,
+                                       cv.InterpolationFlags.Nearest)
 
-            uiRight = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width, cvb.MatType.CV_8UC4,
+            uiRight = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC4,
                                             Zed2RightView(cPtr)).Clone
 
-            uiRight = uiColor.CvtColor(cvb.ColorConversionCodes.BGRA2BGR).Resize(WorkingRes, 0, 0,
-                                       cvb.InterpolationFlags.Nearest)
-            uiLeft = uiColor
+            uiRight = uiColor.CvtColor(cv.ColorConversionCodes.BGRA2BGR).Resize(WorkingRes, 0, 0,
+                                       cv.InterpolationFlags.Nearest)
 
-            uiPointCloud = cvb.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                                 cvb.MatType.CV_32FC4, Zed2PointCloud(cPtr)).Clone
-            uiPointCloud = uiPointCloud.CvtColor(cvb.ColorConversionCodes.BGRA2BGR)
-            uiPointCloud = uiPointCloud.Resize(WorkingRes, 0, 0, cvb.InterpolationFlags.Nearest)
+            uiRight = uiRight.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            uiLeft = uiColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+            uiPointCloud = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                           cv.MatType.CV_32FC4, Zed2PointCloud(cPtr)).CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+
+            uiPointCloud = uiPointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
 
             Dim tmp = uiPointCloud.Reshape(1)
-            cvb.Cv2.PatchNaNs(tmp, 0)
+            cv.Cv2.PatchNaNs(tmp, 0)
             uiPointCloud = tmp.Reshape(3)
 
             Dim accPtr = Zed2Acceleration(cPtr)
-            Dim accel = Marshal.PtrToStructure(Of cvb.Point3f)(accPtr)
-            IMU_Acceleration = New cvb.Point3f(accel.X, accel.Y, -accel.Z)
+            Dim accel = Marshal.PtrToStructure(Of cv.Point3f)(accPtr)
+            IMU_Acceleration = New cv.Point3f(accel.X, accel.Y, -accel.Z)
 
             Dim angPtr = Zed2AngularVelocity(cPtr)
-            IMU_AngularVelocity = Marshal.PtrToStructure(Of cvb.Point3f)(angPtr)
+            IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(angPtr)
             IMU_AngularVelocity *= 0.0174533 ' Zed 2 gyro is in degrees/sec
             IMU_AngularVelocity.Z *= -1 ' make it consistent with the other cameras.
 
