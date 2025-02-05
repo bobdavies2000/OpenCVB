@@ -10,6 +10,8 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public cellPoints() As cv.Point
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        task.iddMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Right View image cells with ideal visibility"
         desc = "Create the grid of cells with ideal visibility"
     End Sub
@@ -30,7 +32,6 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public Sub quadCorners()
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-
             Dim topLeft = getWorldCoordinates(New cv.Point3f(idd.lRect.X, idd.lRect.Y, idd.depth))
             Dim botRight = getWorldCoordinates(New cv.Point3f(idd.lRect.X + idd.lRect.Width,
                                                               idd.lRect.Y + idd.lRect.Height, idd.depth))
@@ -90,6 +91,14 @@ Public Class Ideal_Basics : Inherits TaskParent
 
         task.iddList = New List(Of idealDepthData)(idListNew)
         quadCorners()
+
+        task.iddMap.SetTo(0)
+        task.iddMask.SetTo(0)
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            task.iddMap(idd.lRect).SetTo(i)
+            task.iddMask(idd.lRect).SetTo(255)
+        Next
 
         dst2 = src.Clone
         dst3 = task.rightView.Clone
@@ -281,9 +290,6 @@ End Class
 
 
 Public Class Ideal_Shape : Inherits TaskParent
-    Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public idMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public idMeans As New List(Of Single)
     Dim options As New Options_IdealShape
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -293,21 +299,11 @@ Public Class Ideal_Shape : Inherits TaskParent
         options.RunOpt()
         Dim cellsize = task.idealD.cellSize
 
-        idMeans.Clear()
-        idMap.SetTo(0)
-        idMask.SetTo(0)
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
-            idMap(idd.lRect).SetTo(i)
-            idMask(idd.lRect).SetTo(255)
-            idMeans.Add(idd.depth)
-        Next
-
         dst2.SetTo(0)
         Select Case options.shapeChoice
             Case 0
                 ' do nothing to the depth data.
-                task.pointCloud.CopyTo(dst2, idMask)
+                task.pointCloud.CopyTo(dst2, task.iddMask)
             Case 1 ' Duplicate top row
                 For i = 0 To task.iddList.Count - 1
                     Dim idd = task.iddList(i)

@@ -2103,7 +2103,7 @@ Public Class OpenGL_IdealDepth : Inherits TaskParent
         dst2 = task.idealD.dst2
 
         dst3.SetTo(0)
-        task.pointCloud.CopyTo(dst3, shape.idMask)
+        task.pointCloud.CopyTo(dst3, task.iddMask)
         task.ogl.pointCloudInput = dst3
 
         task.ogl.Run(src)
@@ -2197,15 +2197,13 @@ Public Class OpenGL_QuadIdeal : Inherits TaskParent
     Dim quad As New Quad_Ideal
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
-        optiBase.FindSlider("Ideal Cell Size").Value = 4
-        optiBase.FindSlider("Percent Depth Threshold").Value = 25
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each of ideal depth cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         quad.Run(src)
-        dst2 = quad.dst2
         labels = quad.labels
+
         task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()

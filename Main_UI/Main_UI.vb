@@ -1605,6 +1605,7 @@ Public Class Main_UI
                             task.color = camera.uiColor
                             task.leftView = camera.uiLeft
                             task.rightView = camera.uiRight
+                            ' make sure left and right views are present and single channel.
                             If task.leftView.Channels <> 1 Then
                                 task.leftView = task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                             End If

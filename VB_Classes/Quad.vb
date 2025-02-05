@@ -96,30 +96,6 @@ End Class
 
 
 
-Public Class Quad_Ideal : Inherits TaskParent
-    Public quadData As New List(Of cv.Point3f)
-    Public Sub New()
-        task.gOptions.GridSlider.Value = 20
-        desc = "Create a quad representation of the ideal depth data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
-        quadData.Clear()
-        For Each idd In task.iddList
-            quadData.Add(idd.color)
-            quadData.Add(idd.quad(0))
-            quadData.Add(idd.quad(1))
-            quadData.Add(idd.quad(2))
-            quadData.Add(idd.quad(3))
-            dst2.Rectangle(idd.lRect, task.HighlightColor, task.lineWidth)
-        Next
-        labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) + " quad cells"
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -388,5 +364,58 @@ Public Class Quad_Bricks : Inherits TaskParent
         labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " ROI's produced " +
                                 Format(quadData.Count / 25, fmt0) + " six sided bricks with color"
         SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Quad_Ideal : Inherits TaskParent
+    Public quadData As New List(Of cv.Point3f)
+    Public Sub New()
+        optiBase.FindSlider("Ideal Cell Size").Value = 4
+        optiBase.FindSlider("Percent Depth Threshold").Value = 25
+        desc = "Create a quad representation of the ideal depth data"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
+        quadData.Clear()
+        For Each idd In task.iddList
+            quadData.Add(idd.color)
+            quadData.Add(idd.quad(0))
+            quadData.Add(idd.quad(1))
+            quadData.Add(idd.quad(2))
+            quadData.Add(idd.quad(3))
+            dst2.Rectangle(idd.lRect, task.HighlightColor, task.lineWidth)
+        Next
+        labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) + " quad cells"
+    End Sub
+End Class
+
+
+
+
+Public Class Quad_Depth : Inherits TaskParent
+    Public quadData As New List(Of cv.Point3f)
+    Public Sub New()
+        Dim cellSize = 4
+        If task.workingRes.Width >= 1280 Then cellSize = 12
+        If task.workingRes.Width >= 1920 Then cellSize = 24
+        optiBase.FindSlider("Ideal Cell Size").Value = cellSize
+        optiBase.FindSlider("Percent Depth Threshold").Value = 25
+        desc = "Build a depth display based on the quad view"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static percentSlider = optiBase.FindSlider("Percent Depth Threshold")
+        dst2.SetTo(0)
+        For Each idd In task.iddList
+            dst2.Rectangle(idd.lRect, idd.color, -1)
+        Next
+        dst3 = Not task.iddMask
+        src.CopyTo(dst2, dst3)
+
+        labels(2) = traceName + " completed with " + CStr(task.iddList.Count) + " depth cells"
+        labels(3) = "Mask of cells with less than " + Format(percentSlider.value / 100, "0%") + " depth pixels"
     End Sub
 End Class
