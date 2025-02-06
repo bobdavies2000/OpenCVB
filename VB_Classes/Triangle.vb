@@ -291,7 +291,7 @@ Public Class Triangle_IdealShapes : Inherits TaskParent
 
         dst2 = task.idealD.dst2
         triangles.Clear()
-        Dim cellSize = task.idealD.cellSize
+        Dim cellSize = task.iddSize
         For Each id In task.iddList
             If id.lRect.Height <> cellSize Or id.lRect.Width <> cellSize Then Continue For
             For i = 0 To 1

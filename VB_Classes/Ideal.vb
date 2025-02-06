@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Ideal_BasicsNew : Inherits TaskParent
+Public Class Ideal_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_IdealSize
     Public thresholdRangeZ As Single
@@ -11,7 +11,7 @@ Public Class Ideal_BasicsNew : Inherits TaskParent
         desc = "Create the grid of depth cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static quadPoints() As cv.Point
+        Static quadPoints() As cv.Point, rowStarts As New List(Of Integer), rowLength As Integer
         options.RunOpt()
 
         If task.optionsChanged Then
@@ -20,13 +20,17 @@ Public Class Ideal_BasicsNew : Inherits TaskParent
             Dim val = task.iddSize
             quadPoints = {New cv.Point(0, 0), New cv.Point(0, val - 1),
                           New cv.Point(val - 1, val - 1), New cv.Point(0, val - 1)}
+
+            rowStarts.Clear()
             task.iddListAll.Clear()
             For Each rect In grid.gridRectsAll
                 Dim idd As New idealDepthData
                 idd.lRect = rect
                 idd.age = 0
+                If rect.X = 0 Then rowStarts.Add(task.iddListAll.Count)
                 task.iddListAll.Add(idd)
             Next
+            rowLength = CInt(dst2.Width / task.iddSize)
         End If
 
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
@@ -42,6 +46,7 @@ Public Class Ideal_BasicsNew : Inherits TaskParent
                     idd.age = 0
                     idd.depth = 0
                 Else
+                    idd.age = 1
                     idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))
 
                     idd.rRect = idd.lRect
@@ -51,8 +56,11 @@ Public Class Ideal_BasicsNew : Inherits TaskParent
                     idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
                     idd.pcFrag = task.pointCloud(idd.lRect).Clone
 
-                    Dim p0 = getWorldCoordinates(idd.lRect.TopLeft, idd.depth)
-                    Dim p1 = getWorldCoordinates(idd.lRect.BottomRight, idd.depth)
+                    Dim p0 = idd.pcFrag.Get(Of cv.Point3f)(0, 0)
+                    Dim p1 = idd.pcFrag.Get(Of cv.Point3f)(idd.lRect.Height - 1, idd.lRect.Width - 1)
+
+                    If p0.Z = 0 Then p0 = getWorldCoordinates(idd.lRect.TopLeft, idd.depth)
+                    If p1.Z = 0 Then p1 = getWorldCoordinates(idd.lRect.BottomRight, idd.depth)
 
                     idd.quad.Add(New cv.Point3f(p0.X, p0.Y, idd.depth))
                     idd.quad.Add(New cv.Point3f(p1.X, p0.Y, idd.depth))
@@ -66,18 +74,17 @@ Public Class Ideal_BasicsNew : Inherits TaskParent
         task.iddMap.SetTo(0)
         task.iddMask.SetTo(0)
         Dim count As Integer
-        If standalone Then dst2.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To task.iddListAll.Count - 1
             Dim idd = task.iddListAll(i)
             If idd.depth > 0 Then
                 task.iddMap(idd.lRect).SetTo(i)
                 task.iddMask(idd.lRect).SetTo(255)
-                If standalone Then dst2(idd.lRect).SetTo(idd.color)
+                dst2(idd.lRect).SetTo(idd.color)
                 count += 1
             End If
         Next
 
-        If standalone Then dst3 = task.iddMask
         If task.heartBeat Then labels(2) = CStr(count) + " of " + CStr(task.iddListAll.Count) +
                                            " grid cells have the useful depth values."
     End Sub
@@ -85,114 +92,114 @@ End Class
 
 
 
-Public Class Ideal_Basics : Inherits TaskParent
-    Public grid As New Grid_Rectangles
-    Public options As New Options_IdealSize
-    Public cellSize As Integer
-    Public thresholdRangeZ As Single
-    Public cellPoints() As cv.Point
-    Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        task.iddMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Right View image cells with ideal visibility"
-        desc = "Create the grid of cells with ideal visibility"
-    End Sub
-    Public Function rebuildTriList(idd As idealDepthData) As idealDepthData
-        Dim triList = New List(Of cv.Point3f)
-        idd.triList.Clear()
-        If idd.pcFrag Is Nothing Then idd.pcFrag = task.pointCloud(idd.lRect).Clone
-        For i = 0 To 5
-            Dim pt = cellPoints(i)
-            Dim vec = idd.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
-            triList.Add(vec)
-            If i = 2 Or i = 5 Then
-                idd.triList.Add(triList)
-                triList = New List(Of cv.Point3f)
-            End If
-        Next
-        Return idd
-    End Function
-    Public Sub quadCorners()
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
-            Dim topLeft = getWorldCoordinates(New cv.Point3f(idd.lRect.X, idd.lRect.Y, idd.depth))
-            Dim botRight = getWorldCoordinates(New cv.Point3f(idd.lRect.X + idd.lRect.Width,
-                                                              idd.lRect.Y + idd.lRect.Height, idd.depth))
+'Public Class Ideal_BasicsOld : Inherits TaskParent
+'    Public grid As New Grid_Rectangles
+'    Public options As New Options_IdealSize
+'    Public cellSize As Integer
+'    Public thresholdRangeZ As Single
+'    Public cellPoints() As cv.Point
+'    Public Sub New()
+'        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+'        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+'        task.iddMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+'        labels(3) = "Right View image cells with ideal visibility"
+'        desc = "Create the grid of cells with ideal visibility"
+'    End Sub
+'    Public Function rebuildTriList(idd As idealDepthData) As idealDepthData
+'        Dim triList = New List(Of cv.Point3f)
+'        idd.triList.Clear()
+'        If idd.pcFrag Is Nothing Then idd.pcFrag = task.pointCloud(idd.lRect).Clone
+'        For i = 0 To 5
+'            Dim pt = cellPoints(i)
+'            Dim vec = idd.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
+'            triList.Add(vec)
+'            If i = 2 Or i = 5 Then
+'                idd.triList.Add(triList)
+'                triList = New List(Of cv.Point3f)
+'            End If
+'        Next
+'        Return idd
+'    End Function
+'    Public Sub quadCorners()
+'        For i = 0 To task.iddList.Count - 1
+'            Dim idd = task.iddList(i)
+'            Dim topLeft = getWorldCoordinates(New cv.Point3f(idd.lRect.X, idd.lRect.Y, idd.depth))
+'            Dim botRight = getWorldCoordinates(New cv.Point3f(idd.lRect.X + idd.lRect.Width,
+'                                                              idd.lRect.Y + idd.lRect.Height, idd.depth))
 
-            idd.quad.Add(New cv.Point3f(topLeft.X, topLeft.Y, idd.depth))
-            idd.quad.Add(New cv.Point3f(botRight.X, topLeft.Y, idd.depth))
-            idd.quad.Add(New cv.Point3f(botRight.X, botRight.Y, idd.depth))
-            idd.quad.Add(New cv.Point3f(topLeft.X, botRight.Y, idd.depth))
+'            idd.quad.Add(New cv.Point3f(topLeft.X, topLeft.Y, idd.depth))
+'            idd.quad.Add(New cv.Point3f(botRight.X, topLeft.Y, idd.depth))
+'            idd.quad.Add(New cv.Point3f(botRight.X, botRight.Y, idd.depth))
+'            idd.quad.Add(New cv.Point3f(topLeft.X, botRight.Y, idd.depth))
 
-            task.iddList(i) = task.idealD.rebuildTriList(idd)
-        Next
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim emptyRect As New cv.Rect
-        options.RunOpt()
-        cellSize = options.cellSize
-        grid.Run(src)
+'            task.iddList(i) = task.idealD.rebuildTriList(idd)
+'        Next
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        Dim emptyRect As New cv.Rect
+'        options.RunOpt()
+'        cellSize = options.cellSize
+'        grid.Run(src)
 
-        If task.optionsChanged Then
-            cellPoints = {New cv.Point(0, 0), New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, 0),
-                          New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, cellSize - 1),
-                          New cv.Point(cellSize - 1, 0)}
-            task.iddList.Clear()
-        End If
+'        If task.optionsChanged Then
+'            cellPoints = {New cv.Point(0, 0), New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, 0),
+'                          New cv.Point(0, cellSize - 1), New cv.Point(cellSize - 1, cellSize - 1),
+'                          New cv.Point(cellSize - 1, 0)}
+'            task.iddList.Clear()
+'        End If
 
-        Dim depth32f = task.pcSplit(2).Clone
-        Dim camInfo = task.calibData
-        Dim idListNew As New List(Of idealDepthData)
-        Dim maxPixels As Single = options.cellSize * options.cellSize
-        For Each idd In task.iddList
-            If task.motionMask(idd.lRect).CountNonZero Then Continue For
-            idd.age += 1
-            idd.index = idListNew.Count
-            idListNew.Add(idd)
-        Next
+'        Dim depth32f = task.pcSplit(2).Clone
+'        Dim camInfo = task.calibData
+'        Dim idListNew As New List(Of idealDepthData)
+'        Dim maxPixels As Single = options.cellSize * options.cellSize
+'        For Each idd In task.iddList
+'            If task.motionMask(idd.lRect).CountNonZero Then Continue For
+'            idd.age += 1
+'            idd.index = idListNew.Count
+'            idListNew.Add(idd)
+'        Next
 
-        Dim colorStdev As cv.Scalar, colormean As cv.Scalar
-        Dim triList As New List(Of cv.Point3f)
-        For Each rect In grid.gridRectsAll
-            If task.motionMask(rect).CountNonZero = 0 Then Continue For
-            If rect.Height <> cellSize Or rect.Width <> cellSize Then Continue For ' oddball sizes on the edge.
-            Dim pixels = task.depthMask(rect).CountNonZero
-            If pixels / maxPixels < options.percentThreshold Then Continue For
+'        Dim colorStdev As cv.Scalar, colormean As cv.Scalar
+'        Dim triList As New List(Of cv.Point3f)
+'        For Each rect In grid.gridRectsAll
+'            If task.motionMask(rect).CountNonZero = 0 Then Continue For
+'            If rect.Height <> cellSize Or rect.Width <> cellSize Then Continue For ' oddball sizes on the edge.
+'            Dim pixels = task.depthMask(rect).CountNonZero
+'            If pixels / maxPixels < options.percentThreshold Then Continue For
 
-            Dim idd As New idealDepthData
-            idd.lRect = rect
-            idd.depth = depth32f(idd.lRect).Mean(task.depthMask(idd.lRect))
-            idd.rRect = idd.lRect
-            idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
-            cv.Cv2.MeanStdDev(task.color(idd.lRect), colormean, colorStdev, task.depthMask(idd.lRect))
-            idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
-            idd.index = idListNew.Count
-            idd.pcFrag = task.pointCloud(rect).Clone
+'            Dim idd As New idealDepthData
+'            idd.lRect = rect
+'            idd.depth = depth32f(idd.lRect).Mean(task.depthMask(idd.lRect))
+'            idd.rRect = idd.lRect
+'            idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
+'            cv.Cv2.MeanStdDev(task.color(idd.lRect), colormean, colorStdev, task.depthMask(idd.lRect))
+'            idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
+'            idd.index = idListNew.Count
+'            idd.pcFrag = task.pointCloud(rect).Clone
 
-            idListNew.Add(rebuildTriList(idd))
-        Next
+'            idListNew.Add(rebuildTriList(idd))
+'        Next
 
-        task.iddList = New List(Of idealDepthData)(idListNew)
-        quadCorners()
+'        task.iddList = New List(Of idealDepthData)(idListNew)
+'        quadCorners()
 
-        task.iddMap.SetTo(0)
-        task.iddMask.SetTo(0)
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
-            task.iddMap(idd.lRect).SetTo(i)
-            task.iddMask(idd.lRect).SetTo(255)
-        Next
+'        task.iddMap.SetTo(0)
+'        task.iddMask.SetTo(0)
+'        For i = 0 To task.iddList.Count - 1
+'            Dim idd = task.iddList(i)
+'            task.iddMap(idd.lRect).SetTo(i)
+'            task.iddMask(idd.lRect).SetTo(255)
+'        Next
 
-        dst2 = src.Clone
-        dst3 = task.rightView.Clone
-        For Each idd In task.iddList
-            dst2.Rectangle(idd.lRect, cv.Scalar.White, task.lineWidth)
-            dst3.Rectangle(idd.rRect, cv.Scalar.White, task.lineWidth)
-        Next
-        If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the ideal depth."
-    End Sub
-End Class
+'        dst2 = src.Clone
+'        dst3 = task.rightView.Clone
+'        For Each idd In task.iddList
+'            dst2.Rectangle(idd.lRect, cv.Scalar.White, task.lineWidth)
+'            dst3.Rectangle(idd.rRect, cv.Scalar.White, task.lineWidth)
+'        Next
+'        If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the ideal depth."
+'    End Sub
+'End Class
 
 
 
@@ -382,13 +389,33 @@ End Class
 
 Public Class Ideal_Shape : Inherits TaskParent
     Dim options As New Options_IdealShape
+    Dim cellPoints() As cv.Point
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         desc = "Shape the ideal depth cells using different techniques."
     End Sub
+    Public Function rebuildTriList(idd As idealDepthData) As idealDepthData
+        Dim triList = New List(Of cv.Point3f)
+        idd.triList.Clear()
+        ' If idd.pcFrag Is Nothing Then idd.pcFrag = task.pointCloud(idd.lRect).Clone
+        For i = 0 To 5
+            Dim pt = cellPoints(i)
+            Dim vec = idd.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
+            triList.Add(vec)
+            If i = 2 Or i = 5 Then
+                idd.triList.Add(triList)
+                triList = New List(Of cv.Point3f)
+            End If
+        Next
+        Return idd
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-        Dim cellsize = task.idealD.cellSize
+        Dim cellsize = task.iddSize
+
+        cellPoints = {New cv.Point(0, 0), New cv.Point(0, cellsize - 1), New cv.Point(cellsize - 1, 0),
+                      New cv.Point(0, cellsize - 1), New cv.Point(cellsize - 1, cellsize - 1),
+                      New cv.Point(cellsize - 1, 0)}
 
         dst2.SetTo(0)
         Select Case options.shapeChoice
@@ -404,7 +431,7 @@ Public Class Ideal_Shape : Inherits TaskParent
                     Next
                     cv.Cv2.Merge(split, idd.pcFrag)
                     idd.pcFrag.CopyTo(dst2(idd.lRect))
-                    task.iddList(i) = task.idealD.rebuildTriList(idd)
+                    task.iddList(i) = rebuildTriList(idd)
                 Next
             Case 2 ' Duplicate left col
                 For i = 0 To task.iddList.Count - 1
@@ -415,7 +442,7 @@ Public Class Ideal_Shape : Inherits TaskParent
                     Next
                     cv.Cv2.Merge(split, idd.pcFrag)
                     idd.pcFrag.CopyTo(dst2(idd.lRect))
-                    task.iddList(i) = task.idealD.rebuildTriList(idd)
+                    task.iddList(i) = rebuildTriList(idd)
                 Next
             Case 3 ' Set cell to mean depth
                 For i = 0 To task.iddList.Count - 1
@@ -424,33 +451,12 @@ Public Class Ideal_Shape : Inherits TaskParent
                     split(2).SetTo(idd.depth)
                     cv.Cv2.Merge(split, idd.pcFrag)
                     idd.pcFrag.CopyTo(dst2(idd.lRect))
-                    task.iddList(i) = task.idealD.rebuildTriList(idd)
+                    task.iddList(i) = rebuildTriList(idd)
                 Next
             Case 4 ' Corners at mean depth
                 ' corners are now built in Ideal_Basics so nothing needs to be done here.
         End Select
 
         labels(2) = CStr(task.iddList.Count) + " ideal depth cells found using '" + options.shapeLabel + "'"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Ideal_ShapeTop : Inherits TaskParent
-    Dim shape As New Ideal_Shape
-    Dim histTop As New Projection_HistTop
-    Public Sub New()
-        desc = "Create a top view of the shaped ideal cells"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        shape.Run(src)
-        labels(2) = shape.labels(2)
-
-        histTop.Run(shape.dst2)
-        dst2 = histTop.dst2
-        dst3 = histTop.dst3
     End Sub
 End Class

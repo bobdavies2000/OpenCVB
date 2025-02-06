@@ -1694,7 +1694,9 @@ Public Class Main_UI
                 Dim optionsChange = task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
 
                 picLabels = task.labels
-                If picLabels(1) = "" Then picLabels(1) = "Quad Depth - depth shadow filled with nearest tile."
+                If picLabels(1) = "" Then
+                    picLabels(1) = "Quad Depth Cells - " + CStr(task.iddSize) + "X" + CStr(task.iddSize)
+                End If
                 motionLabel = task.MotionLabel
 
                 SyncLock mouseLock

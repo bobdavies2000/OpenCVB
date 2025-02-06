@@ -767,7 +767,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.gOptions.ShowQuadDepth.Checked Then
             quadDepth.Run(src)
-            depthRGB = quadDepth.dst2
+            depthRGB = task.idealD.dst2
         Else
             colorizer.Run(src)
             depthRGB = colorizer.dst2
