@@ -733,11 +733,13 @@ Partial Class OptionsGlobal
         'ShowQuadDepth
         '
         Me.ShowQuadDepth.AutoSize = True
+        Me.ShowQuadDepth.Checked = True
+        Me.ShowQuadDepth.CheckState = System.Windows.Forms.CheckState.Checked
         Me.ShowQuadDepth.Location = New System.Drawing.Point(14, 86)
         Me.ShowQuadDepth.Name = "ShowQuadDepth"
-        Me.ShowQuadDepth.Size = New System.Drawing.Size(166, 24)
+        Me.ShowQuadDepth.Size = New System.Drawing.Size(258, 24)
         Me.ShowQuadDepth.TabIndex = 77
-        Me.ShowQuadDepth.Text = "Show Quad Depth"
+        Me.ShowQuadDepth.Text = "Toggle Quad Depth/DepthRGB"
         Me.ShowQuadDepth.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
