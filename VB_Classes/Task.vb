@@ -130,7 +130,6 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As Depth_Palette
-    Public quadDepth As Quad_Depth
     ' end of task algorithms
 
     Public pythonPipeIn As NamedPipeServerStream
@@ -493,7 +492,6 @@ Public Class VBtask : Implements IDisposable
         motionBasics = New Motion_Basics
         idealD = New Ideal_Basics
         colorizer = New Depth_Palette
-        quadDepth = New Quad_Depth
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -766,7 +764,6 @@ Public Class VBtask : Implements IDisposable
         End If
 
         If task.gOptions.ShowQuadDepth.Checked Then
-            quadDepth.Run(src)
             depthRGB = task.idealD.dst2
         Else
             colorizer.Run(src)

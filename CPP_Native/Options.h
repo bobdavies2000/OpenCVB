@@ -2183,9 +2183,8 @@ public:
 };
 class Options_IdealSize {
 public:
-	int cellSize =  8;
-	int height =  8;
-	float percentThreshold =  1;
+	int cellSize =  4;
+	float percentThreshold =  0.25;
 	void RunOpt() {}
 	Options_IdealSize() {
 	}

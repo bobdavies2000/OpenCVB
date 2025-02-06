@@ -2195,20 +2195,18 @@ End Class
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadDepth : Inherits TaskParent
     Public Sub New()
+        optiBase.FindSlider("OpenCVB OpenGL buffer count").Value = 1
         task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each of ideal depth cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.quadDepth.Run(src)
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(task.quadDepth.quadData.Count, 1, cv.MatType.CV_32FC3,
-                                                  task.quadDepth.quadData.ToArray)
+        task.ogl.dataInput = cv.Mat.FromPixelData(task.idealD.quadData.Count, 1, cv.MatType.CV_32FC3,
+                                                  task.idealD.quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
-        task.ogl.Run(dst3)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels = task.quadDepth.labels
+        task.ogl.Run(src)
+        labels = task.idealD.labels
     End Sub
 End Class
 

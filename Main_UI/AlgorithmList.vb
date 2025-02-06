@@ -1449,8 +1449,6 @@ Public Class algorithmList
 	If algorithmName = "QRcode_Basics" Then return new QRcode_Basics
 	If algorithmName = "Quad_Basics" Then return new Quad_Basics
 	If algorithmName = "Quad_Bricks" Then return new Quad_Bricks
-	If algorithmName = "Quad_Depth" Then return new Quad_Depth
-	If algorithmName = "Quad_DepthShadow" Then return new Quad_DepthShadow
 	If algorithmName = "Quad_GridTiles" Then return new Quad_GridTiles
 	If algorithmName = "Quad_Hulls" Then return new Quad_Hulls
 	If algorithmName = "Quad_MinMax" Then return new Quad_MinMax

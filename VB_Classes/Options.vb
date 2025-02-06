@@ -7992,9 +7992,8 @@ End Class
 
 
 Public Class Options_IdealSize : Inherits OptionParent
-    Public cellSize As Integer = 8
-    Public height As Integer = 8
-    Public percentThreshold As Single = 1
+    Public cellSize As Integer = 4
+    Public percentThreshold As Single = 0.25
     Public Sub New()
         If task.dst2.Width >= 1280 Then cellSize = 24
         If task.dst2.Width >= 1920 Then cellSize = 32
