@@ -16,9 +16,10 @@ Public Class VBtask : Implements IDisposable
 
     Public lpList As New List(Of linePoints) ' line pair list
     Public iddList As New List(Of idealDepthData)
-    Public idListAll As New List(Of idealDepthData)
+    Public iddListAll As New List(Of idealDepthData)
     Public iddMap As New cv.Mat
     Public iddMask As New cv.Mat
+    Public iddSize As Integer
 
     Public gridSize As Integer
     Public gridRows As Integer

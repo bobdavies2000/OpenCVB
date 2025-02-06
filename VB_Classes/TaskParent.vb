@@ -328,6 +328,11 @@ Public Class TaskParent : Implements IDisposable
         Dim y = (p.Y - task.calibData.ppy) / task.calibData.fy
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
+    Public Function getWorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
+        Dim x = (p.X - task.calibData.ppx) / task.calibData.fx
+        Dim y = (p.Y - task.calibData.ppy) / task.calibData.fy
+        Return New cv.Point3f(x * depth, y * depth, depth)
+    End Function
     Public Function getWorldCoordinatesD6(p As cv.Point3f) As cv.Vec6f
         Dim x = CSng((p.X - task.calibData.ppx) / task.calibData.fx)
         Dim y = CSng((p.Y - task.calibData.ppy) / task.calibData.fy)
