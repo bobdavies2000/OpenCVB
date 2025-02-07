@@ -5,6 +5,7 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public thresholdRangeZ As Single
     Public quadData As New List(Of cv.Point3f)
     Public instantUpdate As Boolean
+    Public mouseD As New Ideal_MouseDepth
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -57,8 +58,8 @@ Public Class Ideal_Basics : Inherits TaskParent
                     idd.rRect = idd.lRect
                     idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
 
-                    idd.pcFrag = task.pointCloud(idd.lRect).Clone
                 End If
+                idd.pcFrag = task.pointCloud(idd.lRect).Clone
             End If
             task.iddList(i) = idd
         Next
@@ -91,8 +92,34 @@ Public Class Ideal_Basics : Inherits TaskParent
         dst2 = dst2.SetTo(0, Not task.iddMask)
         If task.heartBeat Then labels(2) = CStr(count) + " of " + CStr(task.iddList.Count) +
                                            " grid cells have the useful depth values."
+
+        mouseD.Run(src)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Ideal_MouseDepth : Inherits TaskParent
+    Public pt As New cv.Point
+    Public Sub New()
+        desc = "Provide the mouse depth at the mouse movement location."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim idd = task.iddList(index)
+        dst2 = task.idealD.dst2
+        pt = idd.lRect.TopLeft
+        If idd.lRect.TopLeft.X > dst2.Width * 0.85 Then pt.X -= dst2.Width * 0.15
+        If idd.lRect.TopLeft.Y < dst2.Height * 0.1 Then pt.Y += dst2.Height * 0.1 Else pt.Y -= idd.lRect.Height * 2
+        strOut = "Depth = " + Format(idd.depth, fmt3)
+        If standaloneTest() Then SetTrueText(strOut, pt, 2)
+    End Sub
+End Class
+
 
 
 
@@ -175,27 +202,27 @@ Public Class Ideal_CellPlot : Inherits TaskParent
         dst2 = task.idealD.dst2
         dst2.SetTo(0, Not task.iddMask)
 
-        Dim index = task.idealD.grid.gridMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim index = task.idealD.grid.gridMap.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim idd As idealDepthData
         If index = 0 Or index >= task.iddList.Count Then
             idd = task.iddList(task.iddList.Count / 2)
-            task.ClickPoint = New cv.Point(idd.lRect.X + idd.lRect.Width / 2, idd.lRect.Y + idd.lRect.Height / 2)
+            task.mouseMovePoint = New cv.Point(idd.lRect.X + idd.lRect.Width / 2, idd.lRect.Y + idd.lRect.Height / 2)
         Else
             idd = task.iddList(index)
         End If
 
-        If task.heartBeat Then
-            Dim split() = idd.pcFrag.Split()
-            Dim mm = GetMinMax(split(2))
+        Dim split() = idd.pcFrag.Split()
+        Dim mm = GetMinMax(split(2))
 
+        If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
             plot.minRange = mm.minVal
             plot.maxRange = mm.maxVal
             plot.Run(split(2))
             dst3 = plot.dst2
             labels(3) = "Depth values vary from " + Format(plot.minRange, fmt3) +
-                        " to " + Format(plot.maxRange, fmt3)
+                            " to " + Format(plot.maxRange, fmt3)
         End If
     End Sub
 End Class

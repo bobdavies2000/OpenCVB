@@ -811,6 +811,7 @@ Public Class algorithmList
 	If algorithmName = "Ideal_CellPlot" Then return new Ideal_CellPlot
 	If algorithmName = "Ideal_FullDepth" Then return new Ideal_FullDepth
 	If algorithmName = "Ideal_InstantUpdate" Then return new Ideal_InstantUpdate
+	If algorithmName = "Ideal_MouseDepth" Then return new Ideal_MouseDepth
 	If algorithmName = "Ideal_RightView" Then return new Ideal_RightView
 	If algorithmName = "Image_Basics" Then return new Image_Basics
 	If algorithmName = "Image_CellStats" Then return new Image_CellStats

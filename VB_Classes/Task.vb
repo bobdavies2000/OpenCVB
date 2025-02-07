@@ -4,6 +4,7 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
 Imports System.Runtime.InteropServices
+Imports System.Windows.Ink
 
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
@@ -854,14 +855,13 @@ Public Class VBtask : Implements IDisposable
                         trueData.Add(tt)
                     Next
                 End If
-            End If
 
-            If gOptions.showMotionMask.Checked Then
-                For Each roi In motionRects
-                    dst0.Rectangle(roi, cv.Scalar.White, lineWidth)
-                Next
+                If gOptions.showMotionMask.Checked Then
+                    For Each roi In motionRects
+                        dst0.Rectangle(roi, cv.Scalar.White, lineWidth)
+                    Next
+                End If
             End If
-
             If gOptions.CrossHairs.Checked Then
                 If paused = False Then
                     DrawLine(dst0, horizonVec.p1, horizonVec.p2, cv.Scalar.White)
