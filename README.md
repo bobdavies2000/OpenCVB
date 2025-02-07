@@ -1,22 +1,32 @@
-# February 2025 – Ideal Depth, OpenGL Triangles and Quads.
+# February 2025 (Part 2) – Improved Depth Display, QuadDepth OpenGL display, and Left/Right Cameras.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   Ideal depth is a grid of cells that each contain a healthy amount of depth data.
-    -   The cell’s pixels are clearly visible in both left and right camera views.
-    -   The cell contents enable the census algorithm to match pixels.
-    -   The more pixels that are matched the better the estimate of depth.
-    -   Ideal_Basics matches left and right cells converting depth to disparity.
-        -   disparity = baseLine \* (focal length) / depth.
--   The OpenGL interface to OpenCVB has improved triangle and quad support.
-    -   Triangles used in OpenGL can be shaped – see OpenGL_IdealShapes.
-    -   OpenGL Quads can better represent the depth data – OpenGL_QuadIdeal.
--   OpenCVB’s OpenGL interface is improved with multiple point cloud buffers.
-    -   3D cameras produce point clouds that are always slightly different.
-    -   Combining them produces a more solid appearance to the 3D model.
-    -   Below is an example showing the cosmetic difference.
+-   The least used OpenCVB image is the “DepthRGB” in the upper right.
+    -   The option to use an alternative “QuadDepth” view is now the default.
+    -   The QuadDepth image is built using the motion mask in OpenCVB.
+        -   Depth data does not change unless there is motion in that cell.
+    -   The conventional display of the depth is still optionally available.
+    -   Mouse movement in the OpenCVB app will display a location’s depth.
+    -   The first GIF image below shows what the output looks like.
+        -   The depth histogram also shown is for the selected cell.
+        -   See the “Ideal_CellPlot” algorithm for more information.
+-   OpenCVB’s OpenGL interface uses ‘quads’ to display rectangles for the scene.
+    -   Each quad has depth and color and the size is controlled with an option.
+    -   See the second GIF display below to understand this further.
+-   The left and right camera images are now always provided in grayscale.
+    -   Some cameras could not provide color left and right images.
+    -   The limited use of left/right images didn’t require color values.
+        -   Future uses may require color so some cameras may be limited.
+    -   Using grayscale images is more efficient for now.
 -   A log of previous changes is included at the bottom of this document.
 
-![A screen shot of a computer screen Description automatically generated](media/9f00f342149e24119ff7d554df58f31b.png)  ![A screenshot of a computer screen Description automatically generated](media/ed0ab23749b244a50928420654c93c93.png) **OpenGL Multiple Buffers:** *Since the point cloud is different on every frame (depth is only an approximation), using multiple buffers allows a cosmetic improvement to the appearance of the point cloud. The point cloud on the left is what one buffer looks like while the one on the right uses the last 10 frames. The frame rate for this example was 60 fps at 320x240 with significant magnification (approximately 4X.)*
+![](media/d86045cbdc8eec1c2a5fe6965baf507e.gif)
+
+**Depth Display:** *The option to use the “QuadDepth” display is shown in the upper right image. In this example, the “Ideal_CellPlot” algorithm shows the histogram of the cell’s depth data at the selected location while the mean depth for the cell is shown in the upper right image. The mouse controls which histogram and mean depth are shown. Mouse movements in all algorithms will show the mean depth in the upper right image for the cell under the mouse.*
+
+![](media/638f97600747b1130688e8061ae8af2a.gif)
+
+**OpenGL_QuadDepth:** *The “QuadDepth” data that is displayed in the upper right image of the output for all the algorithms can also be displayed in OpenGL. Each cell is provided to OpenGL as a quad that is always filled with the mean color for the cell. In the sequence above the last image is zoomed sufficiently to show that each cell is a rectangle, not a set of points.*
 
 # Introduction
 
@@ -24,7 +34,7 @@ There is no better documentation of an algorithm than a working example, especia
 
 A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBZ cameras listed below.
 
-However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized. The output is often self-documenting or a natural representation of the algorithm’s intent.
+However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized. The output is often self-documenting or a natural representation of the algorithm’s in tent.
 
 The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<All but Python\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
 
@@ -1717,3 +1727,23 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   A log of previous changes is included at the bottom of this document.
 
 **![A collage of a person using a computer Description automatically generated](media/1c85b62195b05f1695bd32287f38eac8.gif)Depth_Ideal :** *The cells marked in the lower left image have ideal depth data with a high percentage of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
+
+# February 2025 – Ideal Depth, OpenGL Triangles and Quads.
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   Ideal depth is a grid of cells that each contain a healthy amount of depth data.
+    -   The cell’s pixels are clearly visible in both left and right camera views.
+    -   The cell contents enable the census algorithm to match pixels.
+    -   The more pixels that are matched the better the estimate of depth.
+    -   Ideal_Basics matches left and right cells converting depth to disparity.
+        -   disparity = baseLine \* (focal length) / depth.
+-   The OpenGL interface to OpenCVB has improved triangle and quad support.
+    -   Triangles used in OpenGL can be shaped – see OpenGL_IdealShapes.
+    -   OpenGL Quads can better represent the depth data – OpenGL_QuadIdeal.
+-   OpenCVB’s OpenGL interface is improved with multiple point cloud buffers.
+    -   3D cameras produce point clouds that are always slightly different.
+    -   Combining them produces a more solid appearance to the 3D model.
+    -   Below is an example showing the cosmetic difference.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screen shot of a computer screen Description automatically generated](media/9f00f342149e24119ff7d554df58f31b.png)  ![A screenshot of a computer screen Description automatically generated](media/ed0ab23749b244a50928420654c93c93.png) **OpenGL Multiple Buffers:** *Since the point cloud is different on every frame (depth is only an approximation), using multiple buffers allows a cosmetic improvement to the appearance of the point cloud. The first point cloud is what one buffer looks like while the next uses the last 10 frames. The frame rate for this example was 60 fps at 320x240 with significant magnification (approximately 4X.)*
