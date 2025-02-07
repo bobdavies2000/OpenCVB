@@ -90,6 +90,10 @@ Public Class Ideal_Basics : Inherits TaskParent
             dst2(idd.lRect).SetTo(idd.color)
         Next
 
+        task.iddList.Clear()
+        For Each idd In task.iddListAll
+            If idd.age >= 1 Then task.iddList.Add(idd)
+        Next
         If task.heartBeat Then labels(2) = CStr(count) + " of " + CStr(task.iddListAll.Count) +
                                            " grid cells have the useful depth values."
     End Sub
@@ -137,7 +141,6 @@ Public Class Ideal_InstantUpdate : Inherits TaskParent
             If idd.depth > 0 Then
                 idd.rRect = idd.lRect
                 idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
-                idd.mm = GetMinMax(depth32f(idd.lRect), task.depthMask(idd.lRect))
             End If
             iddListAll(i) = idd
         Next
@@ -176,6 +179,8 @@ Public Class Ideal_RightView : Inherits TaskParent
         labels(2) = "Left view, right view, ideal depth (left), ideal depth (right)"
         labels(3) = "Right view with ideal depth cells marked."
         task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
+        optiBase.FindSlider("Ideal Cell Size").Value = 8
+        optiBase.FindSlider("Percent Depth Threshold").Value = 100
         desc = "Map each ideal depth cell into the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -231,10 +236,13 @@ Public Class Ideal_CellPlot : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
+        plot.addLabels = False
+        labels(2) = "Click anywhere in the image to the histogram of that the depth in that cell."
         desc = "Select any cell to plot a histogram of that ideal cell's depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.idealD.dst2
+        dst2.SetTo(0, Not task.iddMask)
 
         Dim index = task.idealD.grid.gridMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
@@ -248,11 +256,14 @@ Public Class Ideal_CellPlot : Inherits TaskParent
         End If
 
         If task.heartBeat Then
-            plot.minRange = idd.mm.minVal
-            plot.maxRange = idd.mm.maxVal
-            plot.Run(idd.pcFrag)
+            Dim split() = idd.pcFrag.Split()
+            Dim mm = GetMinMax(split(2))
+
+            plot.minRange = mm.minVal
+            plot.maxRange = mm.maxVal
+            plot.Run(split(2))
             dst3 = plot.dst2
-            labels(3) = "X values vary from " + Format(plot.minRange, fmt3) +
+            labels(3) = "Depth values vary from " + Format(plot.minRange, fmt3) +
                         " to " + Format(plot.maxRange, fmt3)
         End If
     End Sub
@@ -276,82 +287,5 @@ Public Class Ideal_FullDepth : Inherits TaskParent
             dst2.Rectangle(idd.lRect, 255, task.lineWidth)
             dst3.Rectangle(idd.rRect, 255, task.lineWidth)
         Next
-    End Sub
-End Class
-
-
-
-
-Public Class Ideal_Shape : Inherits TaskParent
-    Dim options As New Options_IdealShape
-    Dim cellPoints() As cv.Point
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        desc = "Shape the ideal depth cells using different techniques."
-    End Sub
-    Public Function rebuildTriList(idd As idealDepthData) As idealDepthData
-        Dim triList = New List(Of cv.Point3f)
-        idd.triList.Clear()
-        ' If idd.pcFrag Is Nothing Then idd.pcFrag = task.pointCloud(idd.lRect).Clone
-        For i = 0 To 5
-            Dim pt = cellPoints(i)
-            Dim vec = idd.pcFrag.Get(Of cv.Point3f)(pt.Y, pt.X)
-            triList.Add(vec)
-            If i = 2 Or i = 5 Then
-                idd.triList.Add(triList)
-                triList = New List(Of cv.Point3f)
-            End If
-        Next
-        Return idd
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        Dim cellsize = task.iddSize
-
-        cellPoints = {New cv.Point(0, 0), New cv.Point(0, cellsize - 1), New cv.Point(cellsize - 1, 0),
-                      New cv.Point(0, cellsize - 1), New cv.Point(cellsize - 1, cellsize - 1),
-                      New cv.Point(cellsize - 1, 0)}
-
-        dst2.SetTo(0)
-        Select Case options.shapeChoice
-            Case 0
-                ' do nothing to the depth data.
-                task.pointCloud.CopyTo(dst2, task.iddMask)
-            Case 1 ' Duplicate top row
-                For i = 0 To task.iddList.Count - 1
-                    Dim idd = task.iddList(i)
-                    Dim split = idd.pcFrag.Split()
-                    For y = 1 To idd.lRect.Height - 1
-                        split(2).Row(0).CopyTo(split(2).Row(y))
-                    Next
-                    cv.Cv2.Merge(split, idd.pcFrag)
-                    idd.pcFrag.CopyTo(dst2(idd.lRect))
-                    task.iddList(i) = rebuildTriList(idd)
-                Next
-            Case 2 ' Duplicate left col
-                For i = 0 To task.iddList.Count - 1
-                    Dim idd = task.iddList(i)
-                    Dim split = idd.pcFrag.Split()
-                    For y = 1 To idd.lRect.Height - 1
-                        split(2).Col(0).CopyTo(split(2).Col(y))
-                    Next
-                    cv.Cv2.Merge(split, idd.pcFrag)
-                    idd.pcFrag.CopyTo(dst2(idd.lRect))
-                    task.iddList(i) = rebuildTriList(idd)
-                Next
-            Case 3 ' Set cell to mean depth
-                For i = 0 To task.iddList.Count - 1
-                    Dim idd = task.iddList(i)
-                    Dim split = idd.pcFrag.Split()
-                    split(2).SetTo(idd.depth)
-                    cv.Cv2.Merge(split, idd.pcFrag)
-                    idd.pcFrag.CopyTo(dst2(idd.lRect))
-                    task.iddList(i) = rebuildTriList(idd)
-                Next
-            Case 4 ' Corners at mean depth
-                ' corners are now built in Ideal_Basics so nothing needs to be done here.
-        End Select
-
-        labels(2) = CStr(task.iddList.Count) + " ideal depth cells found using '" + options.shapeLabel + "'"
     End Sub
 End Class

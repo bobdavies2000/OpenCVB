@@ -1719,3 +1719,16 @@ Public Class RedColor_TopX : Inherits TaskParent
         task.redC.inputRemoved = dst1
     End Sub
 End Class
+
+
+
+
+
+Public Class RedColor_QuadDepth : Inherits TaskParent
+    Public Sub New()
+        desc = "Use the QuadDepth image as input to RedColor_Basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(task.idealD.dst2, labels(2))
+    End Sub
+End Class

@@ -224,7 +224,6 @@ SuperRes
 SVD
 SVM
 Swarm
-Tessallate
 Texture
 TextureFlow
 Thickness

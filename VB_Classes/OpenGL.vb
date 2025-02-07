@@ -2090,82 +2090,6 @@ End Class
 
 
 
-Public Class OpenGL_IdealDepth : Inherits TaskParent
-    Dim shape As New Ideal_Shape
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
-        dst3 = task.pointCloud.Clone
-        desc = "Visualize the high visibility cells found by Disparity_GoodCells"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        shape.Run(src)
-
-        dst2 = task.idealD.dst2
-
-        dst3.SetTo(0)
-        task.pointCloud.CopyTo(dst3, task.iddMask)
-        task.ogl.pointCloudInput = dst3
-
-        task.ogl.Run(src)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class OpenGL_IdealShapes : Inherits TaskParent
-    Dim shape As New Ideal_Shape
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
-        desc = "Display the enhanced depth produced using the ideal depth only."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        shape.Run(src)
-
-        dst2 = task.idealD.dst2
-        task.ogl.pointCloudInput = shape.dst2
-
-        task.ogl.Run(src)
-        labels(2) = shape.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class OpenGL_TriangleIdeal : Inherits TaskParent
-    Dim triangles As New Triangle_IdealShapes
-    Public Sub New()
-        task.ogl.oglFunction = oCase.trianglesAndColor
-        task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Build triangles for every ideal depth cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        triangles.Run(src)
-        dst2 = triangles.dst2
-        labels = triangles.labels
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(triangles.triangles.Count, 1, cv.MatType.CV_32FC3,
-                                                  triangles.triangles.ToArray)
-
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(src)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadSimple : Inherits TaskParent
     Dim quad As New Quad_Basics
@@ -2201,6 +2125,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         desc = "Create a simple plane in each of ideal depth cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.idealD.dst2
         task.ogl.dataInput = cv.Mat.FromPixelData(task.idealD.quadData.Count, 1, cv.MatType.CV_32FC3,
                                                   task.idealD.quadData.ToArray)
 
@@ -2229,30 +2154,5 @@ Public Class OpenGL_QuadGridTiles : Inherits TaskParent
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels = tiles.labels
-    End Sub
-End Class
-
-
-
-
-
-Public Class OpenGL_TriangleCell : Inherits TaskParent
-    Dim tess As New Triangle_Basics
-    Public Sub New()
-        task.ogl.oglFunction = oCase.trianglesAndColor
-        task.OpenGLTitle = "OpenGL_Functions"
-        desc = "Display a triangle representation of the point cloud"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        tess.Run(src)
-        dst2 = tess.dst2
-        dst3 = tess.dst3
-        labels = tess.labels
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(tess.triangles.Count, 1, cv.MatType.CV_32FC3,
-                                                  tess.triangles.ToArray)
-
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(tess.dst2)
     End Sub
 End Class

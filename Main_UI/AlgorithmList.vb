@@ -812,7 +812,6 @@ Public Class algorithmList
 	If algorithmName = "Ideal_FullDepth" Then return new Ideal_FullDepth
 	If algorithmName = "Ideal_InstantUpdate" Then return new Ideal_InstantUpdate
 	If algorithmName = "Ideal_RightView" Then return new Ideal_RightView
-	If algorithmName = "Ideal_Shape" Then return new Ideal_Shape
 	If algorithmName = "Image_Basics" Then return new Image_Basics
 	If algorithmName = "Image_CellStats" Then return new Image_CellStats
 	If algorithmName = "Image_Icon" Then return new Image_Icon
@@ -1222,8 +1221,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_Grid" Then return new OpenGL_Grid
 	If algorithmName = "OpenGL_HistDepth3D" Then return new OpenGL_HistDepth3D
 	If algorithmName = "OpenGL_HistNorm3D" Then return new OpenGL_HistNorm3D
-	If algorithmName = "OpenGL_IdealDepth" Then return new OpenGL_IdealDepth
-	If algorithmName = "OpenGL_IdealShapes" Then return new OpenGL_IdealShapes
 	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
 	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
 	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY
@@ -1261,8 +1258,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_StructuredCloud" Then return new OpenGL_StructuredCloud
 	If algorithmName = "OpenGL_TextureShuffle" Then return new OpenGL_TextureShuffle
 	If algorithmName = "OpenGL_Tiles" Then return new OpenGL_Tiles
-	If algorithmName = "OpenGL_TriangleCell" Then return new OpenGL_TriangleCell
-	If algorithmName = "OpenGL_TriangleIdeal" Then return new OpenGL_TriangleIdeal
 	If algorithmName = "OpenGL_VerticalOrHorizontal" Then return new OpenGL_VerticalOrHorizontal
 	If algorithmName = "OpenGL_VerticalSingle" Then return new OpenGL_VerticalSingle
 	If algorithmName = "OpenGL_ViewObjects" Then return new OpenGL_ViewObjects
@@ -1533,6 +1528,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_PlaneFromMask" Then return new RedColor_PlaneFromMask
 	If algorithmName = "RedColor_Planes" Then return new RedColor_Planes
 	If algorithmName = "RedColor_PlusTiers" Then return new RedColor_PlusTiers
+	If algorithmName = "RedColor_QuadDepth" Then return new RedColor_QuadDepth
 	If algorithmName = "RedColor_Reduction" Then return new RedColor_Reduction
 	If algorithmName = "RedColor_ShapeCorrelation" Then return new RedColor_ShapeCorrelation
 	If algorithmName = "RedColor_Tiers" Then return new RedColor_Tiers
@@ -1707,7 +1703,6 @@ Public Class algorithmList
 	If algorithmName = "Swarm_LeftRightFeatures" Then return new Swarm_LeftRightFeatures
 	If algorithmName = "Swarm_Percentage" Then return new Swarm_Percentage
 	If algorithmName = "Swarm_RightFeatures" Then return new Swarm_RightFeatures
-	If algorithmName = "Tessallate_Triangles" Then return new Tessallate_Triangles
 	If algorithmName = "Texture_Basics" Then return new Texture_Basics
 	If algorithmName = "TextureFlow_Basics" Then return new TextureFlow_Basics
 	If algorithmName = "TextureFlow_Depth" Then return new TextureFlow_Depth
@@ -1730,7 +1725,6 @@ Public Class algorithmList
 	If algorithmName = "Triangle_Basics2D" Then return new Triangle_Basics2D
 	If algorithmName = "Triangle_Cell" Then return new Triangle_Cell
 	If algorithmName = "Triangle_HullContour" Then return new Triangle_HullContour
-	If algorithmName = "Triangle_IdealShapes" Then return new Triangle_IdealShapes
 	If algorithmName = "Triangle_Mask" Then return new Triangle_Mask
 	If algorithmName = "Vector_Magnitude" Then return new Vector_Magnitude
 	If algorithmName = "Video_Basics" Then return new Video_Basics
