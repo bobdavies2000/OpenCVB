@@ -4,6 +4,7 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public options As New Options_IdealSize
     Public thresholdRangeZ As Single
     Public quadData As New List(Of cv.Point3f)
+    Public instantUpdate As Boolean
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -13,34 +14,31 @@ Public Class Ideal_Basics : Inherits TaskParent
         desc = "Create the grid of depth cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static quadPoints() As cv.Point, rowStarts As New List(Of Integer), rowLength As Integer
+        Static quadPoints() As cv.Point
         options.RunOpt()
 
-        If task.optionsChanged Then
+        If task.optionsChanged Or instantUpdate Then
             task.iddSize = options.cellSize
             grid.Run(src)
             Dim val = task.iddSize
             quadPoints = {New cv.Point(0, 0), New cv.Point(0, val - 1),
                           New cv.Point(val - 1, val - 1), New cv.Point(0, val - 1)}
 
-            rowStarts.Clear()
-            task.iddListAll.Clear()
+            task.iddList.Clear()
             For Each rect In grid.gridRectsAll
                 If rect.Width <> task.iddSize Or rect.Height <> task.iddSize Then Continue For
                 Dim idd As New idealDepthData
                 idd.lRect = rect
                 idd.age = 0
-                If rect.X = 0 Then rowStarts.Add(task.iddListAll.Count)
-                task.iddListAll.Add(idd)
+                task.iddList.Add(idd)
             Next
-            rowLength = CInt(dst2.Width / task.iddSize)
         End If
 
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
         Dim camInfo = task.calibData
         quadData.Clear()
-        For i = 0 To task.iddListAll.Count - 1
-            Dim idd = task.iddListAll(i)
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
             Dim motion = task.motionMask(idd.lRect).CountNonZero
             If motion = 0 And idd.age > 0 Then
                 idd.age += 1
@@ -62,15 +60,15 @@ Public Class Ideal_Basics : Inherits TaskParent
                     idd.pcFrag = task.pointCloud(idd.lRect).Clone
                 End If
             End If
-            task.iddListAll(i) = idd
+            task.iddList(i) = idd
         Next
 
         task.iddMap.SetTo(0)
         task.iddMask.SetTo(0)
         Dim count As Integer
         dst2.SetTo(0)
-        For i = 0 To task.iddListAll.Count - 1
-            Dim idd = task.iddListAll(i)
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
             If idd.depth > 0 Then
                 task.iddMap(idd.lRect).SetTo(i)
                 task.iddMask(idd.lRect).SetTo(255)
@@ -90,79 +88,12 @@ Public Class Ideal_Basics : Inherits TaskParent
             dst2(idd.lRect).SetTo(idd.color)
         Next
 
-        task.iddList.Clear()
-        For Each idd In task.iddListAll
-            If idd.age >= 1 Then task.iddList.Add(idd)
-        Next
-        If task.heartBeat Then labels(2) = CStr(count) + " of " + CStr(task.iddListAll.Count) +
+        dst2 = dst2.SetTo(0, Not task.iddMask)
+        If task.heartBeat Then labels(2) = CStr(count) + " of " + CStr(task.iddList.Count) +
                                            " grid cells have the useful depth values."
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Ideal_InstantUpdate : Inherits TaskParent
-    Public grid As New Grid_Rectangles
-    Public options As New Options_IdealSize
-    Public iddMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public depth32f As cv.Mat
-    Public iddListAll As New List(Of idealDepthData)
-    Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        labels(3) = "Pointcloud image for cells with ideal visibility"
-        desc = "Create the grid of cells with ideal visibility"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim emptyRect As New cv.Rect
-        options.RunOpt()
-        grid.Run(src)
-        If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the ideal depth."
-
-        If task.optionsChanged Then
-            iddListAll.Clear()
-            For Each r In grid.gridRectsAll
-                Dim idd As New idealDepthData
-                idd.lRect = r
-                iddListAll.Add(idd)
-            Next
-        End If
-
-        depth32f = task.pcSplit(2).Clone
-        Dim camInfo = task.calibData
-        For i = 0 To iddListAll.Count - 1
-            Dim idd = iddListAll(i)
-            idd.age = If(task.motionMask(idd.lRect).CountNonZero > 0, 1, idd.age + 1)
-            idd.depth = depth32f(idd.lRect).Mean(task.depthMask(idd.lRect))
-            If idd.depth > 0 Then
-                idd.rRect = idd.lRect
-                idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
-            End If
-            iddListAll(i) = idd
-        Next
-
-        dst2 = src.Clone
-        task.iddList.Clear()
-        Dim cellPixels As Single = options.cellSize * options.cellSize
-        iddMap.SetTo(0)
-        For Each idd In iddListAll
-            idd.depth = depth32f(idd.lRect).Mean(task.depthMask(idd.lRect))
-            Dim pixels = task.depthMask(idd.lRect).CountNonZero
-            If pixels / cellPixels >= options.percentThreshold Then
-                task.iddList.Add(idd)
-                dst2.Rectangle(idd.lRect, cv.Scalar.White, task.lineWidth)
-                iddMap(idd.lRect).SetTo(255, task.depthMask(idd.lRect))
-            End If
-        Next
-
-        dst3.SetTo(0)
-        task.pointCloud.CopyTo(dst3, iddMap)
-    End Sub
-End Class
 
 
 
@@ -175,19 +106,19 @@ Public Class Ideal_RightView : Inherits TaskParent
     Public mats As New Mat_4Click
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"Draw below to see match in right image", "Right view image", "", ""}
-        labels(2) = "Left view, right view, ideal depth (left), ideal depth (right)"
-        labels(3) = "Right view with ideal depth cells marked."
+        labels = {"Draw below To see match In right image", "Right view image", "", ""}
+        labels(2) = "Left view, Right view, ideal depth (left), ideal depth (right)"
+        labels(3) = "Right view With ideal depth cells marked."
         task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
         optiBase.FindSlider("Ideal Cell Size").Value = 8
         optiBase.FindSlider("Percent Depth Threshold").Value = 100
-        desc = "Map each ideal depth cell into the right view."
+        desc = "Map Each ideal depth cell into the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Or
+        If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435I" Or
             task.cameraName = "Oak-D camera" Then
-            SetTrueText("The " + task.cameraName + " left and right cameras are" + vbCrLf +
-                        " not typically aligned with the RGB camera in OpenCVB." + vbCrLf)
+            SetTrueText("The " + task.cameraName + " left And right cameras are" + vbCrLf +
+                        " Not typically aligned With the RGB camera In OpenCVB." + vbCrLf)
             Exit Sub
         End If
         dst1 = task.rightView
@@ -237,8 +168,8 @@ Public Class Ideal_CellPlot : Inherits TaskParent
     Public Sub New()
         plot.createHistogram = True
         plot.addLabels = False
-        labels(2) = "Click anywhere in the image to the histogram of that the depth in that cell."
-        desc = "Select any cell to plot a histogram of that ideal cell's depth"
+        labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
+        desc = "Select any cell To plot a histogram Of that ideal cell's depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.idealD.dst2
@@ -276,7 +207,7 @@ End Class
 
 Public Class Ideal_FullDepth : Inherits TaskParent
     Public Sub New()
-        optiBase.FindSlider("Percent Depth Threshold").Value = 25
+        optiBase.FindSlider("Ideal Cell Size").Value = 12
         desc = "Display the disparity rectangles for all cells with depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -284,8 +215,132 @@ Public Class Ideal_FullDepth : Inherits TaskParent
         dst3 = task.rightView.Clone
 
         For Each idd In task.iddList
-            dst2.Rectangle(idd.lRect, 255, task.lineWidth)
-            dst3.Rectangle(idd.rRect, 255, task.lineWidth)
+            If idd.depth > 0 Then
+                dst2.Rectangle(idd.lRect, 255, task.lineWidth)
+                dst3.Rectangle(idd.rRect, 255, task.lineWidth)
+            End If
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Ideal_InstantUpdate : Inherits TaskParent
+    Public Sub New()
+        task.idealD.instantUpdate = True
+        labels(3) = "Pointcloud image for cells with ideal visibility"
+        desc = "Create the grid of cells with ideal visibility"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have reasonable depth."
+
+        dst2 = task.idealD.dst2
+        labels(2) = task.idealD.labels(2)
+        dst2.SetTo(0, Not task.iddMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Ideal_BasicsNew : Inherits TaskParent
+    Public grid As New Grid_Rectangles
+    Public options As New Options_IdealSize
+    Public thresholdRangeZ As Single
+    Public quadData As New List(Of cv.Point3f)
+    Public instantUpdate As Boolean
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        task.iddMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        optiBase.FindSlider("Percent Depth Threshold").Value = 25
+        labels(3) = "Mask of cells with useful depth values"
+        desc = "Create the grid of depth cells that reduce depth volatility"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static quadPoints() As cv.Point
+        options.RunOpt()
+
+        If task.optionsChanged Or instantUpdate Then
+            task.iddSize = options.cellSize
+            grid.Run(src)
+            Dim val = task.iddSize
+            quadPoints = {New cv.Point(0, 0), New cv.Point(0, val - 1),
+                          New cv.Point(val - 1, val - 1), New cv.Point(0, val - 1)}
+
+            task.iddList.Clear()
+            For Each rect In grid.gridRectsAll
+                If rect.Width <> task.iddSize Or rect.Height <> task.iddSize Then Continue For
+                Dim idd As New idealDepthData
+                idd.lRect = rect
+                idd.age = 0
+                task.iddList.Add(idd)
+            Next
+        End If
+
+        Dim colorStdev As cv.Scalar, colormean As cv.Scalar
+        Dim camInfo = task.calibData
+        quadData.Clear()
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            Dim motion = task.motionMask(idd.lRect).CountNonZero
+            If motion = 0 And idd.age > 0 Then
+                idd.age += 1
+            Else
+                cv.Cv2.MeanStdDev(src(idd.lRect), colormean, colorStdev)
+                idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
+
+                Dim pixelCount = task.depthMask(idd.lRect).CountNonZero
+                If pixelCount / (idd.lRect.Width * idd.lRect.Height) < options.percentThreshold Then
+                    idd.age = 0
+                    idd.depth = 0
+                Else
+                    idd.age = 1
+                    idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))
+
+                    idd.rRect = idd.lRect
+                    idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
+
+                    idd.pcFrag = task.pointCloud(idd.lRect).Clone
+                End If
+            End If
+            task.iddList(i) = idd
+        Next
+
+        task.iddMap.SetTo(0)
+        task.iddMask.SetTo(0)
+        Dim count As Integer
+        dst2.SetTo(0)
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            If idd.depth > 0 Then
+                task.iddMap(idd.lRect).SetTo(i)
+                task.iddMask(idd.lRect).SetTo(255)
+
+                Dim p0 = getWorldCoordinates(idd.lRect.TopLeft, idd.depth)
+                Dim p1 = getWorldCoordinates(idd.lRect.BottomRight, idd.depth)
+
+                quadData.Add(idd.color)
+                quadData.Add(New cv.Point3f(p0.X, p0.Y, idd.depth))
+                quadData.Add(New cv.Point3f(p1.X, p0.Y, idd.depth))
+                quadData.Add(New cv.Point3f(p1.X, p1.Y, idd.depth))
+                quadData.Add(New cv.Point3f(p0.X, p1.Y, idd.depth))
+
+                count += 1
+            End If
+            If idd.color = New cv.Point3f Then Dim k = 0
+            dst2(idd.lRect).SetTo(idd.color)
+        Next
+
+        dst2 = dst2.SetTo(0, Not task.iddMask)
+        If task.heartBeat Then labels(2) = CStr(count) + " of " + CStr(task.iddList.Count) +
+                                           " grid cells have the useful depth values."
     End Sub
 End Class

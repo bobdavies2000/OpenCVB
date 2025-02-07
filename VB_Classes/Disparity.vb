@@ -6,6 +6,7 @@ Public Class Disparity_Basics : Inherits TaskParent
     Public matchRect As cv.Rect
     Public Sub New()
         task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        optiBase.FindSlider("Ideal Cell Size").Value = 32
         desc = "Given an ideal depth cell, find the match in the right view image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -50,6 +51,7 @@ Public Class Disparity_Manual : Inherits TaskParent
     Public rightView As cv.Mat
     Public Sub New()
         If Math.Abs(task.workingRes.Width - 672) < 10 Then task.gOptions.LineWidth.Value = 2
+        optiBase.FindSlider("Ideal Cell Size").Value = 32
         labels(2) = "Select an ideal depth cell to find its match in the right view."
         desc = "Given an ideal depth cell, find the match in the right view image."
     End Sub

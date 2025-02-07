@@ -808,6 +808,7 @@ Public Class algorithmList
 	If algorithmName = "Hull_Basics" Then return new Hull_Basics
 	If algorithmName = "Hull_Contour" Then return new Hull_Contour
 	If algorithmName = "Ideal_Basics" Then return new Ideal_Basics
+	If algorithmName = "Ideal_BasicsNew" Then return new Ideal_BasicsNew
 	If algorithmName = "Ideal_CellPlot" Then return new Ideal_CellPlot
 	If algorithmName = "Ideal_FullDepth" Then return new Ideal_FullDepth
 	If algorithmName = "Ideal_InstantUpdate" Then return new Ideal_InstantUpdate

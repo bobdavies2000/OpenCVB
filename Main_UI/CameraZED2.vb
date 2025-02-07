@@ -85,12 +85,12 @@ Public Class CameraZED2 : Inherits GenericCamera
             End If
             If WorkingRes <> captureRes Then
                 uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiLeft = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
                 uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
                 uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
             Else
                 uiColor = color.Clone
-                uiLeft = color.Clone
+                uiLeft = leftView.Clone
                 uiRight = rightView.Clone
                 uiPointCloud = pointCloud.Clone
             End If
