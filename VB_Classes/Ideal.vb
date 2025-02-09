@@ -3,13 +3,10 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_IdealSize
     Public thresholdRangeZ As Single
-    Public quadData As New List(Of cv.Point3f)
     Public instantUpdate As Boolean
     Public mouseD As New Ideal_MouseDepth
+    Public quad As New Quad_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        task.iddMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         optiBase.FindSlider("Percent Depth Threshold").Value = 25
         labels(3) = "Mask of cells with useful depth values"
         desc = "Create the grid of depth cells that reduce depth volatility"
@@ -37,7 +34,6 @@ Public Class Ideal_Basics : Inherits TaskParent
 
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
         Dim camInfo = task.calibData
-        quadData.Clear()
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             Dim motion = task.motionMask(idd.lRect).CountNonZero
@@ -64,33 +60,9 @@ Public Class Ideal_Basics : Inherits TaskParent
             task.iddList(i) = idd
         Next
 
-        task.iddMap.SetTo(0)
-        task.iddMask.SetTo(0)
-        Dim count As Integer
-        dst2.SetTo(0)
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
-            If idd.depth > 0 Then
-                task.iddMap(idd.lRect).SetTo(i)
-                task.iddMask(idd.lRect).SetTo(255)
-
-                Dim p0 = getWorldCoordinates(idd.lRect.TopLeft, idd.depth)
-                Dim p1 = getWorldCoordinates(idd.lRect.BottomRight, idd.depth)
-
-                quadData.Add(idd.color)
-                quadData.Add(New cv.Point3f(p0.X, p0.Y, idd.depth))
-                quadData.Add(New cv.Point3f(p1.X, p0.Y, idd.depth))
-                quadData.Add(New cv.Point3f(p1.X, p1.Y, idd.depth))
-                quadData.Add(New cv.Point3f(p0.X, p1.Y, idd.depth))
-
-                count += 1
-            End If
-            If idd.color = New cv.Point3f Then Dim k = 0
-            dst2(idd.lRect).SetTo(idd.color)
-        Next
-
-        dst2 = dst2.SetTo(0, Not task.iddMask)
-        If task.heartBeat Then labels(2) = CStr(count) + " of " + CStr(task.iddList.Count) +
+        quad.Run(src)
+        dst2 = quad.dst2
+        If task.heartBeat Then labels(2) = CStr(quad.quadData.Count) + " of " + CStr(task.iddList.Count) +
                                            " grid cells have the useful depth values."
 
         mouseD.Run(src)

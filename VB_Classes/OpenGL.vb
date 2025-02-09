@@ -2092,18 +2092,16 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadSimple : Inherits TaskParent
-    Dim quad As New Quad_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        quad.Run(src)
-        dst2 = quad.dst2
-        dst3 = quad.dst3
-        labels = quad.labels
-        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
+        dst2 = task.depthRGB
+        labels = task.idealD.labels
+        Dim quadData = task.idealD.quad.quadData
+        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
@@ -2126,8 +2124,9 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.idealD.dst2
-        task.ogl.dataInput = cv.Mat.FromPixelData(task.idealD.quadData.Count, 1, cv.MatType.CV_32FC3,
-                                                  task.idealD.quadData.ToArray)
+        Dim quadData = task.idealD.quad.quadData
+        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3,
+                                                  quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)

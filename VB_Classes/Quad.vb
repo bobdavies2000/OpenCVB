@@ -1,42 +1,40 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class Quad_Basics : Inherits TaskParent
     Public quadData As New List(Of cv.Point3f)
     Public Sub New()
-        task.gOptions.GridSlider.Value = 16
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        task.iddMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a quad representation of the redCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim shift As cv.Point3f
-        If Not standalone Then
+        If task.ogl IsNot Nothing Then
             Dim ptM = task.ogl.options.moveAmount
             shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
         End If
 
-        dst2 = runRedC(src, labels(2))
-
+        task.iddMap.SetTo(0)
+        task.iddMask.SetTo(0)
+        dst2.SetTo(0)
         quadData.Clear()
-        dst3.SetTo(0)
-        For i = 0 To task.gridRects.Count - 1
-            Dim roi = task.gridRects(i)
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            If idd.depth > 0 Then
+                task.iddMap(idd.lRect).SetTo(i)
+                task.iddMask(idd.lRect).SetTo(255)
 
-            Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
+                Dim p0 = getWorldCoordinates(idd.lRect.TopLeft, idd.depth)
+                Dim p1 = getWorldCoordinates(idd.lRect.BottomRight, idd.depth)
 
-            If index <= 0 Or index >= task.rcList.Count Then Continue For
-            Dim rc = task.rcList(index)
-
-            dst3(roi).SetTo(rc.color)
-            SetTrueText(Format(rc.depthMean, fmt1), New cv.Point(roi.X, roi.Y))
-
-            Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean))
-            Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean))
-
-            quadData.Add(New cv.Point3f(rc.color(0), rc.color(1), rc.color(2)))
-            quadData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
-            quadData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean + shift.Z))
-            quadData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
-            quadData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean + shift.Z))
+                quadData.Add(idd.color)
+                quadData.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, idd.depth))
+                quadData.Add(New cv.Point3f(p1.X + shift.X, p0.Y + shift.Y, idd.depth))
+                quadData.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, idd.depth))
+                quadData.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, idd.depth))
+            End If
+            If idd.color = New cv.Point3f Then Dim k = 0
+            dst2(idd.lRect).SetTo(idd.color)
         Next
     End Sub
 End Class
