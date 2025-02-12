@@ -1331,16 +1331,6 @@ public:
 	Options_Edges3() {
 	}
 };
-class Options_DepthEdges {
-public:
-	int depthDiff =  200;
-	double depthOffset =  0.001;
-	int depthDist =  5;
-	int mmDepthDiff =  1.0;
-	void RunOpt() {}
-	Options_DepthEdges() {
-	}
-};
 class Options_Edges4 {
 public:
 	int vertPixels =  5;

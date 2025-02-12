@@ -23,6 +23,9 @@ Partial Class OptionsGlobal
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.MinMaxDepth = New System.Windows.Forms.GroupBox()
+        Me.DepthDiffLabel = New System.Windows.Forms.Label()
+        Me.DepthDiffSlider = New System.Windows.Forms.TrackBar()
+        Me.Label6 = New System.Windows.Forms.Label()
         Me.TempSliderLabel = New System.Windows.Forms.Label()
         Me.DebugSlider = New System.Windows.Forms.TrackBar()
         Me.Label11 = New System.Windows.Forms.Label()
@@ -45,6 +48,7 @@ Partial Class OptionsGlobal
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
+        Me.ShowQuadDepth = New System.Windows.Forms.CheckBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
         Me.UseMotion = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -81,8 +85,8 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.ShowQuadDepth = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
+        CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -99,6 +103,9 @@ Partial Class OptionsGlobal
         '
         'MinMaxDepth
         '
+        Me.MinMaxDepth.Controls.Add(Me.DepthDiffLabel)
+        Me.MinMaxDepth.Controls.Add(Me.DepthDiffSlider)
+        Me.MinMaxDepth.Controls.Add(Me.Label6)
         Me.MinMaxDepth.Controls.Add(Me.TempSliderLabel)
         Me.MinMaxDepth.Controls.Add(Me.DebugSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label11)
@@ -124,6 +131,35 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.TabIndex = 0
         Me.MinMaxDepth.TabStop = False
         Me.MinMaxDepth.Text = "Global Sliders"
+        '
+        'DepthDiffLabel
+        '
+        Me.DepthDiffLabel.AutoSize = True
+        Me.DepthDiffLabel.Location = New System.Drawing.Point(696, 297)
+        Me.DepthDiffLabel.Name = "DepthDiffLabel"
+        Me.DepthDiffLabel.Size = New System.Drawing.Size(78, 20)
+        Me.DepthDiffLabel.TabIndex = 59
+        Me.DepthDiffLabel.Text = "DepthDiff"
+        '
+        'DepthDiffSlider
+        '
+        Me.DepthDiffSlider.Location = New System.Drawing.Point(185, 297)
+        Me.DepthDiffSlider.Maximum = 100
+        Me.DepthDiffSlider.Minimum = 1
+        Me.DepthDiffSlider.Name = "DepthDiffSlider"
+        Me.DepthDiffSlider.Size = New System.Drawing.Size(506, 69)
+        Me.DepthDiffSlider.TabIndex = 58
+        Me.DepthDiffSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.DepthDiffSlider.Value = 10
+        '
+        'Label6
+        '
+        Me.Label6.Location = New System.Drawing.Point(26, 297)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(136, 55)
+        Me.Label6.TabIndex = 57
+        Me.Label6.Text = "Depth Difference Threshold (cm's)"
+        Me.Label6.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'TempSliderLabel
         '
@@ -156,7 +192,7 @@ Partial Class OptionsGlobal
         'fHist
         '
         Me.fHist.AutoSize = True
-        Me.fHist.Location = New System.Drawing.Point(696, 309)
+        Me.fHist.Location = New System.Drawing.Point(696, 363)
         Me.fHist.Name = "fHist"
         Me.fHist.Size = New System.Drawing.Size(47, 20)
         Me.fHist.TabIndex = 53
@@ -164,7 +200,7 @@ Partial Class OptionsGlobal
         '
         'FrameHistory
         '
-        Me.FrameHistory.Location = New System.Drawing.Point(185, 309)
+        Me.FrameHistory.Location = New System.Drawing.Point(185, 363)
         Me.FrameHistory.Maximum = 30
         Me.FrameHistory.Minimum = 1
         Me.FrameHistory.Name = "FrameHistory"
@@ -175,7 +211,7 @@ Partial Class OptionsGlobal
         '
         'Label12
         '
-        Me.Label12.Location = New System.Drawing.Point(26, 309)
+        Me.Label12.Location = New System.Drawing.Point(26, 363)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(136, 55)
         Me.Label12.TabIndex = 51
@@ -362,6 +398,18 @@ Partial Class OptionsGlobal
         Me.MotionBox.TabIndex = 76
         Me.MotionBox.TabStop = False
         Me.MotionBox.Text = "Motion"
+        '
+        'ShowQuadDepth
+        '
+        Me.ShowQuadDepth.AutoSize = True
+        Me.ShowQuadDepth.Checked = True
+        Me.ShowQuadDepth.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.ShowQuadDepth.Location = New System.Drawing.Point(14, 86)
+        Me.ShowQuadDepth.Name = "ShowQuadDepth"
+        Me.ShowQuadDepth.Size = New System.Drawing.Size(258, 24)
+        Me.ShowQuadDepth.TabIndex = 77
+        Me.ShowQuadDepth.Text = "Toggle Quad Depth/DepthRGB"
+        Me.ShowQuadDepth.UseVisualStyleBackColor = True
         '
         'showMotionMask
         '
@@ -730,18 +778,6 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'ShowQuadDepth
-        '
-        Me.ShowQuadDepth.AutoSize = True
-        Me.ShowQuadDepth.Checked = True
-        Me.ShowQuadDepth.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ShowQuadDepth.Location = New System.Drawing.Point(14, 86)
-        Me.ShowQuadDepth.Name = "ShowQuadDepth"
-        Me.ShowQuadDepth.Size = New System.Drawing.Size(258, 24)
-        Me.ShowQuadDepth.TabIndex = 77
-        Me.ShowQuadDepth.Text = "Toggle Quad Depth/DepthRGB"
-        Me.ShowQuadDepth.UseVisualStyleBackColor = True
-        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -755,6 +791,7 @@ Partial Class OptionsGlobal
         Me.Text = "All Algorithm Options - Use gOptions variable to access"
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
+        CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).EndInit()
@@ -836,4 +873,7 @@ Partial Class OptionsGlobal
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
     Friend WithEvents TruncateDepth As Windows.Forms.CheckBox
     Friend WithEvents ShowQuadDepth As Windows.Forms.CheckBox
+    Friend WithEvents DepthDiffLabel As Windows.Forms.Label
+    Friend WithEvents DepthDiffSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label6 As Windows.Forms.Label
 End Class

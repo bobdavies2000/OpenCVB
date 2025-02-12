@@ -6,22 +6,17 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public mouseD As New Ideal_MouseDepth
     Public quad As New Quad_Basics
+    Dim bounds As New Quad_Boundaries
     Public Sub New()
         optiBase.FindSlider("Percent Depth Threshold").Value = 25
-        labels(3) = "Mask of cells with useful depth values"
         desc = "Create the grid of depth cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static quadPoints() As cv.Point
         options.RunOpt()
 
         If task.optionsChanged Or instantUpdate Then
             task.iddSize = options.cellSize
             grid.Run(src)
-            Dim val = task.iddSize
-            quadPoints = {New cv.Point(0, 0), New cv.Point(0, val - 1),
-                          New cv.Point(val - 1, val - 1), New cv.Point(0, val - 1)}
-
             task.iddList.Clear()
             For Each rect In grid.gridRectsAll
                 If rect.Width <> task.iddSize Or rect.Height <> task.iddSize Then Continue For
@@ -49,11 +44,10 @@ Public Class Ideal_Basics : Inherits TaskParent
                     idd.depth = 0
                 Else
                     idd.age = 1
-                    idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))
-
+                    idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
+                    If idd.depth > task.MaxZmeters Then idd.depth = task.MaxZmeters
                     idd.rRect = idd.lRect
                     idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
-
                 End If
                 idd.pcFrag = task.pointCloud(idd.lRect).Clone
             End If
@@ -62,10 +56,11 @@ Public Class Ideal_Basics : Inherits TaskParent
 
         quad.Run(src)
         dst2 = quad.dst2
-        If task.heartBeat Then labels(2) = CStr(quad.quadData.Count) + " of " + CStr(task.iddList.Count) +
-                                           " grid cells have the useful depth values."
 
-        mouseD.Run(src)
+        bounds.Run(src)
+        dst3 = bounds.dst2
+
+        If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
     End Sub
 End Class
 
@@ -77,16 +72,20 @@ End Class
 
 Public Class Ideal_MouseDepth : Inherits TaskParent
     Public pt As New cv.Point
+    Public ptReal As New cv.Point
     Public Sub New()
         desc = "Provide the mouse depth at the mouse movement location."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
+        If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
         Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim idd = task.iddList(index)
         dst2 = task.idealD.dst2
+        ptReal = idd.lRect.TopLeft
         pt = idd.lRect.TopLeft
         If idd.lRect.TopLeft.X > dst2.Width * 0.85 Then pt.X -= dst2.Width * 0.15
-        If idd.lRect.TopLeft.Y < dst2.Height * 0.1 Then pt.Y += dst2.Height * 0.1 Else pt.Y -= idd.lRect.Height * 2
+        If idd.lRect.TopLeft.Y < dst2.Height * 0.1 Then pt.Y += dst2.Height * 0.03 Else pt.Y -= idd.lRect.Height * 2
         strOut = "Depth = " + Format(idd.depth, fmt3)
         If standaloneTest() Then SetTrueText(strOut, pt, 2)
     End Sub

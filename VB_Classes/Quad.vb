@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Quad_Basics : Inherits TaskParent
-    Public quadData As New List(Of cv.Point3f)
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -17,21 +16,21 @@ Public Class Quad_Basics : Inherits TaskParent
         task.iddMap.SetTo(0)
         task.iddMask.SetTo(0)
         dst2.SetTo(0)
-        quadData.Clear()
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
+            task.iddMap(idd.lRect).SetTo(i)
             If idd.depth > 0 Then
-                task.iddMap(idd.lRect).SetTo(i)
+                idd.corners.Clear()
                 task.iddMask(idd.lRect).SetTo(255)
 
                 Dim p0 = getWorldCoordinates(idd.lRect.TopLeft, idd.depth)
                 Dim p1 = getWorldCoordinates(idd.lRect.BottomRight, idd.depth)
 
-                quadData.Add(idd.color)
-                quadData.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, idd.depth))
-                quadData.Add(New cv.Point3f(p1.X + shift.X, p0.Y + shift.Y, idd.depth))
-                quadData.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, idd.depth))
-                quadData.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, idd.depth))
+                idd.corners.Add(idd.color)
+                idd.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, idd.depth))
+                idd.corners.Add(New cv.Point3f(p1.X + shift.X, p0.Y + shift.Y, idd.depth))
+                idd.corners.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, idd.depth))
+                idd.corners.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, idd.depth))
             End If
             If idd.color = New cv.Point3f Then Dim k = 0
             dst2(idd.lRect).SetTo(idd.color)
@@ -362,5 +361,107 @@ Public Class Quad_Bricks : Inherits TaskParent
         labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " ROI's produced " +
                                 Format(quadData.Count / 25, fmt0) + " six sided bricks with color"
         SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Quad_Boundaries : Inherits TaskParent
+    Public Sub New()
+        desc = "Find large differences in cell depth that could provide boundaries."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.idealD.dst2.Clone
+        Dim cellSize = task.idealD.options.cellSize
+        Dim width = dst2.Width / cellSize
+        Dim height = dst2.Height / cellSize
+        For i = 0 To task.iddList.Count - width Step width
+            For j = i + 1 To i + width - 1
+                Dim d1 = task.iddList(j).depth
+                Dim d2 = task.iddList(j - 1).depth
+                If Math.Abs(d1 - d2) > task.depthDiffThreshold Then
+                    dst2.Rectangle(task.iddList(j).lRect, task.HighlightColor, -1)
+                End If
+            Next
+        Next
+
+        For i = 0 To width - 1
+            For j = 1 To height - 1
+                Dim d1 = task.iddList(j * width).depth
+                Dim d2 = task.iddList((j - 1) * width).depth
+                If Math.Abs(d1 - d2) > task.depthDiffThreshold Then
+                    dst2.Rectangle(task.iddList(j).lRect, task.HighlightColor, -1)
+                End If
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Quad_CellMerge : Inherits TaskParent
+    Public Sub New()
+        desc = "Merge cells that are close in depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.idealD.dst2.Clone
+        dst3 = task.idealD.dst2.Clone
+
+        Dim cellSize = task.idealD.options.cellSize
+        Dim width = dst2.Width / cellSize
+        Dim height = dst2.Height / cellSize
+        Dim colorIndex As Integer
+        For i = 0 To task.iddList.Count - width Step width
+            Dim colStart As Integer = i, colEnd As Integer = i
+            For j = i + 1 To i + width - 1
+                Dim d1 = task.iddList(j).depth
+                Dim d2 = task.iddList(j - 1).depth
+                If Math.Abs(d1 - d2) > task.depthDiffThreshold Or j = i + width - 1 Then
+                    Dim p1 = task.iddList(colStart).lRect.TopLeft
+                    Dim p2 = task.iddList(colEnd).lRect.BottomRight
+                    dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+                    colorIndex += 1
+                    If colStart Mod width > 0 Then dst2.Rectangle(task.iddList(colStart).lRect, cv.Scalar.Black, -1)
+                    colStart = j
+                    colEnd = j
+                Else
+                    colEnd += 1
+                End If
+            Next
+        Next
+        labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
+                    CStr(task.depthDiffThreshold) + " cm's"
+
+        colorIndex = 0
+        For i = 0 To width - 1
+            Dim rowStart As Integer = i, rowEnd As Integer = rowStart
+            For j = 1 To height - 1
+                Dim d1 = task.iddList(i + j * width).depth
+                Dim d2 = task.iddList(i + (j - 1) * width).depth
+                If Math.Abs(d1 - d2) > task.depthDiffThreshold Or j = height - 1 Then
+                    Dim p1 = task.iddList(rowStart).lRect.TopLeft
+                    Dim p2 = task.iddList(rowEnd).lRect.BottomRight
+                    dst3.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+                    colorIndex += 1
+                    If j < height - 1 Then
+                        dst2.Rectangle(task.iddList(rowEnd).lRect, cv.Scalar.Black, -1)
+                        dst3.Rectangle(task.iddList(rowEnd).lRect, cv.Scalar.Black, -1)
+                    End If
+                    rowStart = i + (j + 1) * width
+                    rowEnd = rowStart
+                Else
+                    rowEnd += width
+                End If
+            Next
+        Next
+
+        labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
+                    CStr(task.depthDiffThreshold) + " cm's"
     End Sub
 End Class

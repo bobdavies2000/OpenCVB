@@ -1732,23 +1732,23 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                If task.paused = False Then
-                    SyncLock trueDataLock
-                        If task.frameCount Mod 50 = 0 Then trueData.Clear()
-                        If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
-                        If task.trueData.Count Then
-                            trueData = New List(Of VB_Classes.TrueText)(task.trueData)
-                        End If
-                        Static ptSave = task.idealD.mouseD.pt
-                        Static strSave = task.idealD.mouseD.strOut
-                        If ptSave <> task.idealD.mouseD.pt Then
-                            ptSave = task.idealD.mouseD.pt
-                            strSave = task.idealD.mouseD.strOut
-                        End If
-                        trueData.Add(New TrueText(strSave, ptSave, 1))
-                        task.trueData.Clear()
-                    End SyncLock
-                End If
+                SyncLock trueDataLock
+                    If task.frameCount Mod 50 = 0 Then trueData.Clear()
+                    If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
+                    If task.trueData.Count Then
+                        trueData = New List(Of VB_Classes.TrueText)(task.trueData)
+                    End If
+                    Static ptSave = task.idealD.mouseD.pt
+                    Static strSave = task.idealD.mouseD.strOut
+                    If ptSave <> task.idealD.mouseD.pt Then
+                        ptSave = task.idealD.mouseD.pt
+                        strSave = task.idealD.mouseD.strOut
+                    End If
+                    trueData.Add(New TrueText(strSave, ptSave, 1))
+                    Debug.WriteLine(task.idealD.mouseD.strOut)
+                    task.depthRGB.Circle(task.idealD.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
+                    task.trueData.Clear()
+                End SyncLock
 
                 If task.algName.StartsWith("Options_") Then
                     task.labels(2) = "Options algorithms have no output"

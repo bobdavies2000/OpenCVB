@@ -174,6 +174,7 @@ Public Class OptionsGlobal
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
+        DepthDiffSlider.Value = 10
 
         Me.Left = 0
         Me.Top = 30
@@ -262,6 +263,10 @@ Public Class OptionsGlobal
     End Sub
     Private Sub tempSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         task.optionsChanged = True
+    End Sub
+    Private Sub DepthDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles DepthDiffSlider.ValueChanged
+        task.optionsChanged = True
+        DepthDiffLabel.Text = CStr(DepthDiffSlider.Value)
     End Sub
     Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
         task.optionsChanged = True
@@ -398,5 +403,9 @@ Public Class OptionsGlobal
     End Sub
     Private Sub ShowQuadDepth_CheckedChanged(sender As Object, e As EventArgs) Handles ShowQuadDepth.CheckedChanged
         task.optionsChanged = True
+    End Sub
+
+    Private Sub FrameHistory_Scroll(sender As Object, e As EventArgs) Handles FrameHistory.Scroll
+
     End Sub
 End Class

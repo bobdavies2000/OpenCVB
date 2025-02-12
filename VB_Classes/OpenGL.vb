@@ -2100,7 +2100,12 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.depthRGB
         labels = task.idealD.labels
-        Dim quadData = task.idealD.quad.quadData
+        Dim quadData As New List(Of cv.Point3f)
+        For Each idd In task.iddList
+            For Each pt In idd.corners
+                quadData.Add(pt)
+            Next
+        Next
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
 
         task.ogl.pointCloudInput = New cv.Mat()
@@ -2124,10 +2129,14 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.idealD.dst2
-        Dim quadData = task.idealD.quad.quadData
-        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3,
-                                                  quadData.ToArray)
-
+        dst3 = task.idealD.dst3
+        Dim quadData As New List(Of cv.Point3f)
+        For Each idd In task.iddList
+            For Each pt In idd.corners
+                quadData.Add(pt)
+            Next
+        Next
+        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
         labels = task.idealD.labels

@@ -407,8 +407,6 @@ Public Class algorithmList
 	If algorithmName = "Edge_DCTfrequency" Then return new Edge_DCTfrequency
 	If algorithmName = "Edge_DCTinput" Then return new Edge_DCTinput
 	If algorithmName = "Edge_DepthAndColor" Then return new Edge_DepthAndColor
-	If algorithmName = "Edge_DepthGap_CPP" Then return new Edge_DepthGap_CPP
-	If algorithmName = "Edge_DepthGap_Native" Then return new Edge_DepthGap_Native
 	If algorithmName = "Edge_Deriche_CPP" Then return new Edge_Deriche_CPP
 	If algorithmName = "Edge_DericheFiltered" Then return new Edge_DericheFiltered
 	If algorithmName = "Edge_DiffX_CPP" Then return new Edge_DiffX_CPP
@@ -1444,7 +1442,9 @@ Public Class algorithmList
 	If algorithmName = "Python_Stream" Then return new Python_Stream
 	If algorithmName = "QRcode_Basics" Then return new QRcode_Basics
 	If algorithmName = "Quad_Basics" Then return new Quad_Basics
+	If algorithmName = "Quad_Boundaries" Then return new Quad_Boundaries
 	If algorithmName = "Quad_Bricks" Then return new Quad_Bricks
+	If algorithmName = "Quad_CellMerge" Then return new Quad_CellMerge
 	If algorithmName = "Quad_GridTiles" Then return new Quad_GridTiles
 	If algorithmName = "Quad_Hulls" Then return new Quad_Hulls
 	If algorithmName = "Quad_MinMax" Then return new Quad_MinMax

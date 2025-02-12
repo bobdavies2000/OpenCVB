@@ -724,10 +724,8 @@ Public Class TaskParent : Implements IDisposable
     Public Sub Run(src As cv.Mat)
         If task.testAllRunning = False Then measureStartRun(traceName)
 
-        If task.paused = False Then
-            trueData.Clear()
-            RunAlg(src)
-        End If
+        trueData.Clear()
+        RunAlg(src)
 
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub

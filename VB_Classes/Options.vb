@@ -5191,38 +5191,6 @@ End Class
 
 
 
-Public Class Options_DepthEdges : Inherits OptionParent
-    Public depthDiff As Integer = 200
-    Public depthOffset As Double = 0.001
-    Public depthDist As Integer = 5
-    Public mmDepthDiff As Integer = 1.0
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold for depth difference", 0, 255, 200)
-            sliders.setupTrackBar("Rect offset X1000", 0, 20, depthOffset * 1000)
-            sliders.setupTrackBar("Input depth distance", 0, 20, depthDist)
-            sliders.setupTrackBar("Input depth difference in mm's", 0, 2000, mmDepthDiff * 1000)
-        End If
-    End Sub
-    Public Sub RunOpt()
-        Static diffSlider = FindSlider("Threshold for depth difference")
-        Static rectSlider = FindSlider("Rect offset X1000")
-        Static distanceSlider = FindSlider("Input depth distance")
-        Static mmDiffSlider = FindSlider("Input depth difference in mm's")
-
-        depthDiff = diffSlider.value
-        depthOffset = rectSlider.value / 1000
-
-        depthDist = distanceSlider.value And 254
-        mmDepthDiff = mmDiffSlider.value / 1000
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Options_Edges4 : Inherits OptionParent
     Public vertPixels As Integer = 5
     Public horizPixels As Integer = 5

@@ -134,6 +134,7 @@ Public Module vbc
         task.MaxZmeters = task.gOptions.maxDepth
         task.metersPerPixel = task.MaxZmeters / task.dst2.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
+        task.depthDiffThreshold = task.gOptions.DepthDiffSlider.Value / 10
     End Sub
 End Module
 
@@ -432,7 +433,7 @@ Public Class idealDepthData
     Public index As Integer
     Public color As cv.Point3f
     Public pcFrag As cv.Mat
-    Public triList As New List(Of List(Of cv.Point3f))
+    Public corners As New List(Of cv.Point3f)
 End Class
 
 
