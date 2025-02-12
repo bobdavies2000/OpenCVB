@@ -14,8 +14,8 @@ Public Class Disparity_Basics : Inherits TaskParent
         For Each idd In task.iddList
             If idd.lRect.Height >= 8 Then dst2.Rectangle(idd.lRect, 255, task.lineWidth)
         Next
-        Dim val = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        rect = task.idealD.grid.gridRectsAll(val)
+        Dim index = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        rect = task.idealD.grid.gridRectsAll(index)
 
         match.template = dst2(rect)
         Dim maxDisparity As Integer = 128
@@ -70,8 +70,8 @@ Public Class Disparity_Manual : Inherits TaskParent
             dst2.Rectangle(idd.lRect, 255, task.lineWidth)
         Next
 
-        Dim val = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        rect = task.idealD.grid.gridRectsAll(val)
+        Dim index = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        rect = task.idealD.grid.gridRectsAll(index)
         dst2.Rectangle(rect, 255, task.lineWidth + 1)
 
         Dim correlation As New cv.Mat
@@ -108,12 +108,12 @@ Public Class Disparity_Manual : Inherits TaskParent
                                  rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
 
         dst3.Rectangle(searchRect, 255, task.lineWidth)
-        Dim index = correlations.IndexOf(bestCorrelation)
-        matchRect = New cv.Rect(rect.X - index, rect.Y, rect.Width, rect.Height)
+        Dim indexCorr = correlations.IndexOf(bestCorrelation)
+        matchRect = New cv.Rect(rect.X - indexCorr, rect.Y, rect.Width, rect.Height)
         dst3.Rectangle(matchRect, 255, task.lineWidth + 1)
 
-        MeanDiff = means(index)
-        StdevDiff = stdevs(index)
+        MeanDiff = means(indexCorr)
+        StdevDiff = stdevs(indexCorr)
 
         If task.heartBeat Then
             labels(3) = "Max correlation = " + Format(bestCorrelation, fmt3) + "  " +
@@ -393,8 +393,8 @@ Public Class Disparity_Color8u : Inherits TaskParent
         task.color.Rectangle(disparity.rect, 255, task.lineWidth)
         dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
 
-        Dim val = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        Dim rect = task.idealD.grid.gridRectsAll(val)
+        Dim index = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim rect = task.idealD.grid.gridRectsAll(index)
         dst2.Rectangle(rect, 255, task.lineWidth + 1)
     End Sub
 End Class

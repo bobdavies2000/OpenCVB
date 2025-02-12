@@ -15,7 +15,7 @@ Module opencv_module
     Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks.
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
-    Public trueDataLock As New Mutex(True, "TrueDataLock")
+    Public trueTextLock As New Mutex(True, "trueTextLock")
     Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
     <StructLayout(LayoutKind.Sequential)> Public Structure RECT
         Dim Left As Integer
@@ -1356,7 +1356,7 @@ Public Class Main_UI
         End SyncLock
 
         ' draw any TrueType font data on the image 
-        SyncLock trueDataLock
+        SyncLock trueTextLock
             For i = 0 To trueData.Count - 1
                 Dim tt = trueData(i)
                 If tt.text Is Nothing Then Continue For
@@ -1691,7 +1691,13 @@ Public Class Main_UI
                 Dim updatedDrawRect = task.drawRect
                 task.fpsCamera = fpsCamera
 
+
+
+
                 Dim optionsChange = task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
+
+
+
 
                 picLabels = task.labels
                 If picLabels(1) = "" Then
@@ -1732,7 +1738,7 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                SyncLock trueDataLock
+                SyncLock trueTextLock
                     If task.frameCount Mod 50 = 0 Then trueData.Clear()
                     If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
                     If task.trueData.Count Then
@@ -1745,7 +1751,6 @@ Public Class Main_UI
                         strSave = task.idealD.mouseD.strOut
                     End If
                     trueData.Add(New TrueText(strSave, ptSave, 1))
-                    Debug.WriteLine(task.idealD.mouseD.strOut)
                     task.depthRGB.Circle(task.idealD.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
                     task.trueData.Clear()
                 End SyncLock

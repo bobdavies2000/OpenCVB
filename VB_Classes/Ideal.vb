@@ -22,6 +22,8 @@ Public Class Ideal_Basics : Inherits TaskParent
                 If rect.Width <> task.iddSize Or rect.Height <> task.iddSize Then Continue For
                 Dim idd As New idealDepthData
                 idd.lRect = rect
+                Dim cellSize = task.idealD.options.cellSize
+                idd.center = New cv.Point(rect.TopLeft.X + cellSize / 2, rect.TopLeft.Y + cellSize / 2)
                 idd.age = 0
                 task.iddList.Add(idd)
             Next
@@ -82,10 +84,10 @@ Public Class Ideal_MouseDepth : Inherits TaskParent
         Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim idd = task.iddList(index)
         dst2 = task.idealD.dst2
-        ptReal = idd.lRect.TopLeft
-        pt = idd.lRect.TopLeft
-        If idd.lRect.TopLeft.X > dst2.Width * 0.85 Then pt.X -= dst2.Width * 0.15
-        If idd.lRect.TopLeft.Y < dst2.Height * 0.1 Then pt.Y += dst2.Height * 0.03 Else pt.Y -= idd.lRect.Height * 2
+        ptReal = idd.center
+        pt = idd.center
+        If pt.X > dst2.Width * 0.85 Then pt.X -= dst2.Width * 0.15
+        If pt.Y < dst2.Height * 0.1 Then pt.Y += dst2.Height * 0.03 Else pt.Y -= idd.lRect.Height * 2
         strOut = "Depth = " + Format(idd.depth, fmt3)
         If standaloneTest() Then SetTrueText(strOut, pt, 2)
     End Sub
@@ -177,7 +179,7 @@ Public Class Ideal_CellPlot : Inherits TaskParent
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim idd As idealDepthData
-        If index = 0 Or index >= task.iddList.Count Then
+        If index < 0 Or index >= task.iddList.Count Then
             idd = task.iddList(task.iddList.Count / 2)
             task.mouseMovePoint = New cv.Point(idd.lRect.X + idd.lRect.Width / 2, idd.lRect.Y + idd.lRect.Height / 2)
         Else

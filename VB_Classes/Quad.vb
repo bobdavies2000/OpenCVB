@@ -427,7 +427,7 @@ Public Class Quad_CellMerge : Inherits TaskParent
                     Dim p2 = task.iddList(colEnd).lRect.BottomRight
                     dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
                     colorIndex += 1
-                    If colStart Mod width > 0 Then dst2.Rectangle(task.iddList(colStart).lRect, cv.Scalar.Black, -1)
+                    'If colStart Mod width > 0 Then dst2.Rectangle(task.iddList(colEnd).lRect, cv.Scalar.Black, -1)
                     colStart = j
                     colEnd = j
                 Else
@@ -449,10 +449,10 @@ Public Class Quad_CellMerge : Inherits TaskParent
                     Dim p2 = task.iddList(rowEnd).lRect.BottomRight
                     dst3.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
                     colorIndex += 1
-                    If j < height - 1 Then
-                        dst2.Rectangle(task.iddList(rowEnd).lRect, cv.Scalar.Black, -1)
-                        dst3.Rectangle(task.iddList(rowEnd).lRect, cv.Scalar.Black, -1)
-                    End If
+                    'If j < height - 1 Then
+                    '    dst2.Rectangle(task.iddList(rowEnd).lRect, cv.Scalar.Black, -1)
+                    '    dst3.Rectangle(task.iddList(rowEnd).lRect, cv.Scalar.Black, -1)
+                    'End If
                     rowStart = i + (j + 1) * width
                     rowEnd = rowStart
                 Else
