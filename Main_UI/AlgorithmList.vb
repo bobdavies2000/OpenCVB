@@ -1223,7 +1223,6 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
 	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
 	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY
-	If algorithmName = "OpenGL_MergedCells" Then return new OpenGL_MergedCells
 	If algorithmName = "OpenGL_Neighbors" Then return new OpenGL_Neighbors
 	If algorithmName = "OpenGL_NoSolo" Then return new OpenGL_NoSolo
 	If algorithmName = "OpenGL_OnlyPlanes" Then return new OpenGL_OnlyPlanes
@@ -1243,6 +1242,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_QuadDepth" Then return new OpenGL_QuadDepth
 	If algorithmName = "OpenGL_QuadGridTiles" Then return new OpenGL_QuadGridTiles
 	If algorithmName = "OpenGL_QuadHulls" Then return new OpenGL_QuadHulls
+	If algorithmName = "OpenGL_QuadMerge" Then return new OpenGL_QuadMerge
 	If algorithmName = "OpenGL_QuadMinMax" Then return new OpenGL_QuadMinMax
 	If algorithmName = "OpenGL_QuadSimple" Then return new OpenGL_QuadSimple
 	If algorithmName = "OpenGL_Rebuilt" Then return new OpenGL_Rebuilt
