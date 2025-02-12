@@ -406,6 +406,8 @@ End Class
 
 
 Public Class Quad_CellMerge : Inherits TaskParent
+    Public connectedH As New List(Of Tuple(Of Integer, Integer))
+    Public connectedV As New List(Of Tuple(Of Integer, Integer))
     Public Sub New()
         desc = "Merge cells that are close in depth"
     End Sub
@@ -417,6 +419,7 @@ Public Class Quad_CellMerge : Inherits TaskParent
         Dim width = dst2.Width / cellSize
         Dim height = dst2.Height / cellSize
         Dim colorIndex As Integer
+        connectedH.Clear()
         For i = 0 To task.iddList.Count - width Step width
             Dim colStart As Integer = i, colEnd As Integer = i
             For j = i + 1 To i + width - 1
@@ -427,7 +430,9 @@ Public Class Quad_CellMerge : Inherits TaskParent
                     Dim p2 = task.iddList(colEnd).lRect.BottomRight
                     dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
                     colorIndex += 1
-                    'If colStart Mod width > 0 Then dst2.Rectangle(task.iddList(colEnd).lRect, cv.Scalar.Black, -1)
+                    If colEnd - colStart > 1 Then
+                        connectedH.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
+                    End If
                     colStart = j
                     colEnd = j
                 Else
@@ -439,6 +444,7 @@ Public Class Quad_CellMerge : Inherits TaskParent
                     CStr(task.depthDiffThreshold) + " cm's"
 
         colorIndex = 0
+        connectedV.Clear()
         For i = 0 To width - 1
             Dim rowStart As Integer = i, rowEnd As Integer = rowStart
             For j = 1 To height - 1
@@ -449,10 +455,9 @@ Public Class Quad_CellMerge : Inherits TaskParent
                     Dim p2 = task.iddList(rowEnd).lRect.BottomRight
                     dst3.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
                     colorIndex += 1
-                    'If j < height - 1 Then
-                    '    dst2.Rectangle(task.iddList(rowEnd).lRect, cv.Scalar.Black, -1)
-                    '    dst3.Rectangle(task.iddList(rowEnd).lRect, cv.Scalar.Black, -1)
-                    'End If
+                    If (rowEnd - rowStart) / width > 1 Then
+                        connectedV.Add(New Tuple(Of Integer, Integer)(rowStart, rowEnd))
+                    End If
                     rowStart = i + (j + 1) * width
                     rowEnd = rowStart
                 Else

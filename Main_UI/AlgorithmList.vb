@@ -1223,6 +1223,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_LinearX" Then return new OpenGL_LinearX
 	If algorithmName = "OpenGL_LinearXY" Then return new OpenGL_LinearXY
 	If algorithmName = "OpenGL_LinearY" Then return new OpenGL_LinearY
+	If algorithmName = "OpenGL_MergedCells" Then return new OpenGL_MergedCells
 	If algorithmName = "OpenGL_Neighbors" Then return new OpenGL_Neighbors
 	If algorithmName = "OpenGL_NoSolo" Then return new OpenGL_NoSolo
 	If algorithmName = "OpenGL_OnlyPlanes" Then return new OpenGL_OnlyPlanes

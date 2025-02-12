@@ -213,6 +213,8 @@ Public Class Stabilizer_OpticalFlow : Inherits TaskParent
                     End If
                 End If
             Next
+
+            If commonPoints.Count = 0 Or lastFeatures.Count = 0 Then Exit Sub ' nothing to work on...
             Dim affine = cv.Cv2.GetAffineTransform(commonPoints.ToArray, lastFeatures.ToArray)
 
             Dim dx = affine.Get(Of Double)(0, 2)

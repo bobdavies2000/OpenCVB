@@ -17,7 +17,6 @@ Public Class OpenGL_Basics : Inherits TaskParent
     Dim dataBuffer(0) As Byte
     Dim pointCloudBuffer(0) As Byte
     Public Sub New()
-        'If task.algName.Contains("OpenGL") Or task.algName.Contains("Model") Then options = New Options_OpenGLFunctions
         task.OpenGLTitle = "OpenGL_Functions"
         UpdateAdvice(traceName + ": 'Show All' to see all the OpenGL options.")
         pointCloudInput = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
@@ -2162,5 +2161,19 @@ Public Class OpenGL_QuadGridTiles : Inherits TaskParent
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels = tiles.labels
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_MergedCells : Inherits TaskParent
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        task.OpenGLTitle = "OpenGL_Functions"
+        desc = "Build connected depth cells and remove cells that are not connected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
     End Sub
 End Class
