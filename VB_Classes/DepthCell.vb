@@ -88,7 +88,8 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         pt = idd.center
         If pt.X > dst2.Width * 0.85 Then pt.X -= dst2.Width * 0.15
         If pt.Y < dst2.Height * 0.1 Then pt.Y += dst2.Height * 0.03 Else pt.Y -= idd.lRect.Height * 2
-        strOut = "Depth = " + Format(idd.depth, fmt3)
+        strOut = Format(idd.depth, fmt1) + "m (" + Format(idd.pixels / (idd.lRect.Width * idd.lRect.Height), "0%") + ")"
+
         If standaloneTest() Then SetTrueText(strOut, pt, 2)
     End Sub
 End Class

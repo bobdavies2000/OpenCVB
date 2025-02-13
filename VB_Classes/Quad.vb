@@ -424,9 +424,6 @@ Public Class Quad_CellConnect : Inherits TaskParent
             For j = i + 1 To i + width - 1
                 Dim idd1 = task.iddList(j)
                 Dim idd2 = task.iddList(j - 1)
-                Dim maxPixels = idd1.lRect.Width * idd1.lRect.Height
-                If idd1.pixels / maxPixels < task.dCell.options.percentThreshold Then Continue For
-                If idd2.pixels / maxPixels < task.dCell.options.percentThreshold Then Continue For
                 If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or j = i + width - 1 Then
                     Dim p1 = task.iddList(colStart).lRect.TopLeft
                     Dim p2 = task.iddList(colEnd).lRect.BottomRight
@@ -443,7 +440,7 @@ Public Class Quad_CellConnect : Inherits TaskParent
             Next
         Next
         labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
-                    CStr(task.depthDiffMeters) + " cm's"
+                    CStr(task.depthDiffMeters) + " meters"
 
         colorIndex = 0
         connectedV.Clear()
@@ -453,12 +450,10 @@ Public Class Quad_CellConnect : Inherits TaskParent
                 If i + j * width < task.iddList.Count Then vList.Add(i + j * width)
             Next
             Dim rowStart As Integer = 0, rowEnd As Integer = 0
-            For j = 1 To height - 1
+            For j = 1 To vList.Count - 1
+                If vList(j) >= task.iddList.Count Then Continue For
                 Dim idd1 = task.iddList(vList(j))
                 Dim idd2 = task.iddList(vList(j - 1))
-                Dim maxPixels = idd1.lRect.Width * idd1.lRect.Height
-                If idd1.pixels / maxPixels < task.dCell.options.percentThreshold Then Continue For
-                If idd2.pixels / maxPixels < task.dCell.options.percentThreshold Then Continue For
                 If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or j = height - 1 Then
                     Dim p1 = task.iddList(vList(rowStart)).lRect.TopLeft
                     Dim p2 = task.iddList(vList(rowEnd)).lRect.BottomRight
@@ -476,6 +471,6 @@ Public Class Quad_CellConnect : Inherits TaskParent
         Next
 
         labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
-                    CStr(task.depthDiffMeters) + " cm's"
+                    CStr(task.depthDiffMeters) + " meters"
     End Sub
 End Class
