@@ -14,10 +14,11 @@ Public Class CameraK4A : Inherits GenericCamera
 
             Dim ptr = A4KIntrinsics(cPtr)
             Dim intrinsicsLeftOutput = Marshal.PtrToStructure(Of intrinsicsData)(ptr)
-            cameraInfo.ppx = intrinsicsLeftOutput.cx
-            cameraInfo.ppy = intrinsicsLeftOutput.cy
-            cameraInfo.fx = intrinsicsLeftOutput.fx
-            cameraInfo.fy = intrinsicsLeftOutput.fy
+            Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+            cameraInfo.ppx = intrinsicsLeftOutput.cx / ratio
+            cameraInfo.ppy = intrinsicsLeftOutput.cy / ratio
+            cameraInfo.fx = intrinsicsLeftOutput.fx / ratio
+            cameraInfo.fy = intrinsicsLeftOutput.fy / ratio
         End If
     End Sub
     Structure imuData

@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 
 		glLoadIdentity();
 
-		glClearColor(0.7f, 0.7f, 0.7f, 1);
+		//glClearColor(0.7f, 0.7f, 0.7f, 1);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		glMatrixMode(GL_PROJECTION);
@@ -52,8 +52,9 @@ int main(int argc, char* argv[])
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, rgb.get_gl_handle());
-		float tex_border_color[] = { 0.8f, 0.8f, 0.8f, 0.8f };
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
+		//float c = 0.1f;
+		//float tex_border_color[] = { c, c, c, 0.0f};
+		//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
 

@@ -37,10 +37,11 @@ Public Class CameraORB : Inherits GenericCamera
 
         Dim myIntrinsics = dev.GetCalibrationCameraParamList()
         Dim param As CameraParam = myIntrinsics.GetCameraParam(0)
-        cameraInfo.fx = param.rgbIntrinsic.fx
-        cameraInfo.fy = param.rgbIntrinsic.fy
-        cameraInfo.ppx = param.rgbIntrinsic.cx
-        cameraInfo.ppy = param.rgbIntrinsic.cy
+        Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+        cameraInfo.fx = param.rgbIntrinsic.fx / ratio
+        cameraInfo.fy = param.rgbIntrinsic.fy / ratio
+        cameraInfo.ppx = param.rgbIntrinsic.cx / ratio
+        cameraInfo.ppy = param.rgbIntrinsic.cy / ratio
 
         Dim gProfiles = gyroSensor.GetStreamProfileList()
         Dim gProfile = gProfiles.GetProfile(0)

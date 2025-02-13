@@ -54,10 +54,11 @@ Public Class CameraOakD : Inherits GenericCamera
             Dim intrin = OakDintrinsics(cPtr)
             Dim intrinsicsArray(9 - 1) As Single
             Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-            cameraInfo.ppx = intrinsicsArray(2)
-            cameraInfo.ppy = intrinsicsArray(5)
-            cameraInfo.fx = intrinsicsArray(0)
-            cameraInfo.fy = intrinsicsArray(4)
+            Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+            cameraInfo.ppx = intrinsicsArray(2) / ratio
+            cameraInfo.ppy = intrinsicsArray(5) / ratio
+            cameraInfo.fx = intrinsicsArray(0) / ratio
+            cameraInfo.fy = intrinsicsArray(4) / ratio
 
             templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
             templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)
