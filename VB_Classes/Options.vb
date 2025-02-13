@@ -7963,10 +7963,10 @@ Public Class Options_DepthCellSize : Inherits OptionParent
     Public cellSize As Integer = 4
     Public percentThreshold As Single = 0.25
     Public Sub New()
-        If task.dst2.Width >= 1280 Then cellSize = 24
+        If task.dst2.Width >= 1280 Then cellSize = 16
         If task.dst2.Width >= 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Depth Cell Size", 1, 100, cellSize)
+            sliders.setupTrackBar("Depth Cell Size", 1, 32, cellSize)
             sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * percentThreshold)
         End If
     End Sub
@@ -7974,6 +7974,13 @@ Public Class Options_DepthCellSize : Inherits OptionParent
         Static sizeSlider = FindSlider("Depth Cell Size")
         Static depthSlider = FindSlider("Percent Depth Threshold")
         cellSize = sizeSlider.value
+        If cellSize < 2 Then cellSize = 2
+        If cellSize > 2 And cellSize < 4 Then cellSize = 4
+        If cellSize > 4 And cellSize <= 8 Then cellSize = 8
+        If cellSize > 8 And cellSize <= 16 Then cellSize = 16
+        If cellSize > 16 Then cellSize = 32
+        If task.dst2.Width <= 336 And cellSize > 16 Then cellSize = 16
+        sizeSlider.value = cellSize ' powers of 2 only.  Otherwise, trouble...
         percentThreshold = depthSlider.value / 100
     End Sub
 End Class

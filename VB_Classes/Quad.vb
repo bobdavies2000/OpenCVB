@@ -415,8 +415,8 @@ Public Class Quad_CellConnect : Inherits TaskParent
         dst3 = task.dCell.dst2.Clone
 
         Dim cellSize = task.dCell.options.cellSize
-        Dim width = dst2.Width / cellSize
-        Dim height = dst2.Height / cellSize
+        Dim width = CInt(dst2.Width / cellSize)
+        Dim height = CInt(dst2.Height / cellSize)
         Dim colorIndex As Integer
         connectedH.Clear()
         For i = 0 To task.iddList.Count - width Step width
@@ -450,7 +450,7 @@ Public Class Quad_CellConnect : Inherits TaskParent
                 vList.Add(i + j * width)
             Next
             Dim rowStart As Integer = 0, rowEnd As Integer = 0
-            For j = 1 To vList.Count - 1
+            For j = 1 To height - 1
                 Dim d1 = task.iddList(vList(j)).depth
                 Dim d2 = task.iddList(vList(j - 1)).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Or j = height - 1 Then

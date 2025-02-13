@@ -75,8 +75,13 @@ Public Class CameraORB : Inherits GenericCamera
         End While
 
         If cameraFrameCount = 0 Then
-            Dim cameraParams As CameraParam = pipe.GetCameraParam()
-            PtCloud.SetCameraParam(cameraParams)
+            Dim param As CameraParam = pipe.GetCameraParam()
+            Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+            param.rgbIntrinsic.fx = param.rgbIntrinsic.fx / ratio
+            param.rgbIntrinsic.fy = param.rgbIntrinsic.fy / ratio
+            param.rgbIntrinsic.cx = param.rgbIntrinsic.cx / ratio
+            param.rgbIntrinsic.cy = param.rgbIntrinsic.cy / ratio
+            PtCloud.SetCameraParam(param)
         End If
 
         Dim cFrame = frames.GetColorFrame
