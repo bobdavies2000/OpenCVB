@@ -324,6 +324,12 @@ Public Class algorithmList
 	If algorithmName = "Depth_World" Then return new Depth_World
 	If algorithmName = "Depth_WorldXYMT" Then return new Depth_WorldXYMT
 	If algorithmName = "Depth_WorldXYZ" Then return new Depth_WorldXYZ
+	If algorithmName = "DepthCell_Basics" Then return new DepthCell_Basics
+	If algorithmName = "DepthCell_FullDepth" Then return new DepthCell_FullDepth
+	If algorithmName = "DepthCell_InstantUpdate" Then return new DepthCell_InstantUpdate
+	If algorithmName = "DepthCell_MouseDepth" Then return new DepthCell_MouseDepth
+	If algorithmName = "DepthCell_Plot" Then return new DepthCell_Plot
+	If algorithmName = "DepthCell_RightView" Then return new DepthCell_RightView
 	If algorithmName = "Derivative_Basics" Then return new Derivative_Basics
 	If algorithmName = "Derivative_Classes" Then return new Derivative_Classes
 	If algorithmName = "Derivative_Laplacian" Then return new Derivative_Laplacian
@@ -805,12 +811,6 @@ Public Class algorithmList
 	If algorithmName = "Hough_Sudoku1" Then return new Hough_Sudoku1
 	If algorithmName = "Hull_Basics" Then return new Hull_Basics
 	If algorithmName = "Hull_Contour" Then return new Hull_Contour
-	If algorithmName = "Ideal_Basics" Then return new Ideal_Basics
-	If algorithmName = "Ideal_CellPlot" Then return new Ideal_CellPlot
-	If algorithmName = "Ideal_FullDepth" Then return new Ideal_FullDepth
-	If algorithmName = "Ideal_InstantUpdate" Then return new Ideal_InstantUpdate
-	If algorithmName = "Ideal_MouseDepth" Then return new Ideal_MouseDepth
-	If algorithmName = "Ideal_RightView" Then return new Ideal_RightView
 	If algorithmName = "Image_Basics" Then return new Image_Basics
 	If algorithmName = "Image_CellStats" Then return new Image_CellStats
 	If algorithmName = "Image_Icon" Then return new Image_Icon

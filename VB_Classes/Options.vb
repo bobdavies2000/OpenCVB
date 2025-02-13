@@ -7959,19 +7959,19 @@ End Class
 
 
 
-Public Class Options_IdealSize : Inherits OptionParent
+Public Class Options_DepthCellSize : Inherits OptionParent
     Public cellSize As Integer = 4
     Public percentThreshold As Single = 0.25
     Public Sub New()
         If task.dst2.Width >= 1280 Then cellSize = 24
         If task.dst2.Width >= 1920 Then cellSize = 32
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Ideal Cell Size", 1, 100, cellSize)
+            sliders.setupTrackBar("Depth Cell Size", 1, 100, cellSize)
             sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * percentThreshold)
         End If
     End Sub
     Public Sub RunOpt()
-        Static sizeSlider = FindSlider("Ideal Cell Size")
+        Static sizeSlider = FindSlider("Depth Cell Size")
         Static depthSlider = FindSlider("Percent Depth Threshold")
         cellSize = sizeSlider.value
         percentThreshold = depthSlider.value / 100
@@ -7983,40 +7983,10 @@ End Class
 
 
 
-Public Class Options_IdealShape : Inherits OptionParent
-    Public shapeChoice As Integer
-    Public shapeLabel As String
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Unchanged Depth")
-            radio.addRadio("Duplicate top row depth")
-            radio.addRadio("Duplicate left col depth")
-            radio.addRadio("Set cell to mean depth")
-            radio.check(1).Checked = True
-        End If
-    End Sub
-    Public Sub RunOpt()
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).Checked Then
-                shapeChoice = i
-                shapeLabel = frm.check(i).text
-                Exit For
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Options_QuadCompare : Inherits OptionParent
     Public displayIndex As Integer
     Public Sub New()
-
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Raw Pointcloud")

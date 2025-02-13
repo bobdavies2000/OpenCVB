@@ -157,7 +157,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
         If standalone Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim cellSize = task.idealD.options.cellSize
+        Dim cellSize = task.dCell.options.cellSize
         If task.optionsChanged Then
             gridRectsAll.Clear()
             For y = 0 To dst2.Height - 1 Step cellSize

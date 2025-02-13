@@ -876,12 +876,12 @@ Public Class FCS_ByDepth : Inherits TaskParent
         Dim depthStart = histIndex * depthIncr
         Dim depthEnd = (histIndex + 1) * depthIncr
 
-        Static depthCells As New List(Of (fpData, Integer))
+        Static fpCells As New List(Of (fpData, Integer))
         Static histIndexSave = histIndex
 
         If histIndexSave <> histIndex Or task.optionsChanged Then
             histIndexSave = histIndex
-            depthCells.Clear()
+            fpCells.Clear()
         End If
         palInput.SetTo(0)
 
@@ -890,12 +890,12 @@ Public Class FCS_ByDepth : Inherits TaskParent
                 Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
                 If val = 0 Then
                     palInput(fp.rect).SetTo(fp.index, fp.mask)
-                    depthCells.Add((fp, task.frameCount))
+                    fpCells.Add((fp, task.frameCount))
                 End If
             End If
         Next
 
-        For Each ele In depthCells
+        For Each ele In fpCells
             Dim fp As fpData = ele.Item1
             SetTrueText(Format(fp.age, fmt0), fp.ptCenter, 0)
             fpCellContour(fp, task.color, 0)
@@ -903,9 +903,9 @@ Public Class FCS_ByDepth : Inherits TaskParent
         dst3 = ShowPalette(palInput * 255 / task.fpList.Count)
 
         Dim removeFrame As Integer = If(task.frameCount > task.frameHistoryCount, task.frameCount - task.frameHistoryCount, -1)
-        For i = depthCells.Count - 1 To 0 Step -1
-            Dim frame = depthCells(i).Item2
-            If frame = removeFrame Then depthCells.RemoveAt(i)
+        For i = fpCells.Count - 1 To 0 Step -1
+            Dim frame = fpCells(i).Item2
+            If frame = removeFrame Then fpCells.RemoveAt(i)
         Next
 
         labels(3) = "Cells with depth between " + Format(depthStart, fmt1) + "m to " + Format(depthEnd, fmt1) + "m"

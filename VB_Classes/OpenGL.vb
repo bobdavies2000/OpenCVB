@@ -2086,7 +2086,7 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.depthRGB
-        labels = task.idealD.labels
+        labels = task.dCell.labels
         Dim quadData As New List(Of cv.Point3f)
         For Each idd In task.iddList
             If idd.corners.Count Then quadData.Add(idd.color)
@@ -2115,8 +2115,8 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         desc = "Create a simple plane in each of depth cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.idealD.dst2
-        dst3 = task.idealD.dst3
+        dst2 = task.dCell.dst2
+        dst3 = task.dCell.dst3
         Dim quadData As New List(Of cv.Point3f)
         For Each idd In task.iddList
             If idd.corners.Count Then quadData.Add(idd.color)
@@ -2127,7 +2127,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels = task.idealD.labels
+        labels = task.dCell.labels
     End Sub
 End Class
 
@@ -2142,12 +2142,12 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         desc = "Build connected depth cells and remove cells that are not connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.idealD.dst2
-        dst3 = task.idealD.dst3
+        dst2 = task.dCell.dst2
+        dst3 = task.dCell.dst3
 
         Dim quadData As New List(Of cv.Point3f)
-        Dim idd1 As idealDepthData, idd2 As idealDepthData
-        For Each tup In task.idealD.merge.connectedH
+        Dim idd1 As depthCell, idd2 As depthCell
+        For Each tup In task.dCell.merge.connectedH
             For i = tup.Item1 + 1 To tup.Item2 - 1
                 idd1 = task.iddList(i - 1)
                 idd2 = task.iddList(i)
@@ -2168,8 +2168,8 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
             End If
         Next
 
-        Dim width = dst2.Width / task.idealD.options.cellSize
-        For Each tup In task.idealD.merge.connectedV
+        Dim width = dst2.Width / task.dCell.options.cellSize
+        For Each tup In task.dCell.merge.connectedV
             For i = tup.Item1 To tup.Item2 - width Step width
                 idd1 = task.iddList(i)
                 idd2 = task.iddList(i + width)
@@ -2193,7 +2193,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels = task.idealD.labels
+        labels = task.dCell.labels
     End Sub
 End Class
 

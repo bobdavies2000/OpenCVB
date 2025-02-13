@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Ideal_Basics : Inherits TaskParent
+Public Class DepthCell_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
-    Public options As New Options_IdealSize
+    Public options As New Options_DepthCellSize
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean
-    Public mouseD As New Ideal_MouseDepth
+    Public mouseD As New DepthCell_MouseDepth
     Public quad As New Quad_Basics
     Public merge As New Quad_CellConnect
     Public Sub New()
@@ -20,9 +20,9 @@ Public Class Ideal_Basics : Inherits TaskParent
             task.iddList.Clear()
             For Each rect In grid.gridRectsAll
                 If rect.Width <> task.iddSize Or rect.Height <> task.iddSize Then Continue For
-                Dim idd As New idealDepthData
+                Dim idd As New depthCell
                 idd.lRect = rect
-                Dim cellSize = task.idealD.options.cellSize
+                Dim cellSize = task.dCell.options.cellSize
                 idd.center = New cv.Point(rect.TopLeft.X + cellSize / 2, rect.TopLeft.Y + cellSize / 2)
                 idd.age = 0
                 task.iddList.Add(idd)
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class Ideal_MouseDepth : Inherits TaskParent
+Public Class DepthCell_MouseDepth : Inherits TaskParent
     Public pt As New cv.Point
     Public ptReal As New cv.Point
     Public Sub New()
@@ -83,7 +83,7 @@ Public Class Ideal_MouseDepth : Inherits TaskParent
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
         Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim idd = task.iddList(index)
-        dst2 = task.idealD.dst2
+        dst2 = task.dCell.dst2
         ptReal = idd.center
         pt = idd.center
         If pt.X > dst2.Width * 0.85 Then pt.X -= dst2.Width * 0.15
@@ -101,18 +101,18 @@ End Class
 
 
 
-Public Class Ideal_RightView : Inherits TaskParent
+Public Class DepthCell_RightView : Inherits TaskParent
     Public means As New List(Of Single)
     Public mats As New Mat_4Click
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"Draw below To see match In right image", "Right view image", "", ""}
-        labels(2) = "Left view, Right view, ideal depth (left), ideal depth (right)"
-        labels(3) = "Right view With ideal depth cells marked."
+        labels(2) = "Left view, Right view, Depth cell (left), depth cell (right)"
+        labels(3) = "Right view With depth cells marked."
         task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
-        optiBase.FindSlider("Ideal Cell Size").Value = 8
+        optiBase.FindSlider("Depth Cell Size").Value = 8
         optiBase.FindSlider("Percent Depth Threshold").Value = 100
-        desc = "Map Each ideal depth cell into the right view."
+        desc = "Map Each depth cell into the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435I" Or
@@ -126,7 +126,7 @@ Public Class Ideal_RightView : Inherits TaskParent
         mats.mat(1) = task.rightView
         Dim depths As New List(Of Single)
         Dim camInfo = task.calibData
-        mats.mat(2) = task.idealD.dst2
+        mats.mat(2) = task.dCell.dst2
         mats.mat(3) = task.rightView.Clone
         For Each idd In task.iddList
             mats.mat(3).Rectangle(idd.rRect, 255, task.lineWidth)
@@ -163,22 +163,22 @@ End Class
 
 
 
-Public Class Ideal_CellPlot : Inherits TaskParent
+Public Class DepthCell_Plot : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
         plot.addLabels = False
         labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
-        desc = "Select any cell To plot a histogram Of that ideal cell's depth"
+        desc = "Select any cell To plot a histogram Of that cell's depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.idealD.dst2
+        dst2 = task.dCell.dst2
         dst2.SetTo(0, Not task.iddMask)
 
-        Dim index = task.idealD.grid.gridMap.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.dCell.grid.gridMap.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
 
-        Dim idd As idealDepthData
+        Dim idd As depthCell
         If index < 0 Or index >= task.iddList.Count Then
             idd = task.iddList(task.iddList.Count / 2)
             task.mouseMovePoint = New cv.Point(idd.lRect.X + idd.lRect.Width / 2, idd.lRect.Y + idd.lRect.Height / 2)
@@ -205,9 +205,9 @@ End Class
 
 
 
-Public Class Ideal_FullDepth : Inherits TaskParent
+Public Class DepthCell_FullDepth : Inherits TaskParent
     Public Sub New()
-        optiBase.FindSlider("Ideal Cell Size").Value = 12
+        optiBase.FindSlider("Depth Cell Size").Value = 12
         desc = "Display the disparity rectangles for all cells with depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -230,17 +230,17 @@ End Class
 
 
 
-Public Class Ideal_InstantUpdate : Inherits TaskParent
+Public Class DepthCell_InstantUpdate : Inherits TaskParent
     Public Sub New()
-        task.idealD.instantUpdate = True
-        labels(3) = "Pointcloud image for cells with ideal visibility"
-        desc = "Create the grid of cells with ideal visibility"
+        task.dCell.instantUpdate = True
+        labels(3) = "Pointcloud image for cells with good visibility"
+        desc = "Create the grid of depth cells with good visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have reasonable depth."
 
-        dst2 = task.idealD.dst2
-        labels(2) = task.idealD.labels(2)
+        dst2 = task.dCell.dst2
+        labels(2) = task.dCell.labels(2)
         dst2.SetTo(0, Not task.iddMask)
     End Sub
 End Class

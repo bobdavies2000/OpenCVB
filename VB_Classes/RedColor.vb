@@ -1729,6 +1729,6 @@ Public Class RedColor_QuadDepth : Inherits TaskParent
         desc = "Use the QuadDepth image as input to RedColor_Basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(task.idealD.dst2, labels(2))
+        dst2 = runRedC(task.dCell.dst2, labels(2))
     End Sub
 End Class

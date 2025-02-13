@@ -372,8 +372,8 @@ Public Class Quad_Boundaries : Inherits TaskParent
         desc = "Find large differences in cell depth that could provide boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.idealD.dst2.Clone
-        Dim cellSize = task.idealD.options.cellSize
+        dst2 = task.dCell.dst2.Clone
+        Dim cellSize = task.dCell.options.cellSize
         Dim width = dst2.Width / cellSize
         Dim height = dst2.Height / cellSize
         For i = 0 To task.iddList.Count - width Step width
@@ -411,10 +411,10 @@ Public Class Quad_CellConnect : Inherits TaskParent
         desc = "Connect cells that are close in depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.idealD.dst2.Clone
-        dst3 = task.idealD.dst2.Clone
+        dst2 = task.dCell.dst2.Clone
+        dst3 = task.dCell.dst2.Clone
 
-        Dim cellSize = task.idealD.options.cellSize
+        Dim cellSize = task.dCell.options.cellSize
         Dim width = dst2.Width / cellSize
         Dim height = dst2.Height / cellSize
         Dim colorIndex As Integer

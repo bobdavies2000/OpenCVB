@@ -19,7 +19,7 @@ Public Class Cell_Basics : Inherits TaskParent
             strOut += vbTab + CStr(CInt(rc.color(2))) + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
-            strOut += If(rc.depthPixels > 0, "Cell is marked as depthCell " + vbCrLf, "")
+            strOut += If(rc.depthPixels > 0, "Cell is marked as having depth" + vbCrLf, "")
             strOut += "Pixels " + Format(rc.pixels, "###,###") + vbCrLf + "depth pixels "
             If rc.depthPixels > 0 Then
                 strOut += Format(rc.depthPixels, "###,###") + " or " +

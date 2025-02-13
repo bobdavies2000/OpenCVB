@@ -47,6 +47,7 @@ DCT
 Delaunay
 Density
 Depth
+DepthCell
 Derivative
 DFT
 Diff
@@ -112,7 +113,6 @@ Homography
 Horizon
 Hough
 Hull
-Ideal
 Image
 ImageOffset
 ImShow

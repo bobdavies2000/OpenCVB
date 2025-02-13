@@ -1744,14 +1744,14 @@ Public Class Main_UI
                     If task.trueData.Count Then
                         trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                     End If
-                    Static ptSave = task.idealD.mouseD.pt
-                    Static strSave = task.idealD.mouseD.strOut
-                    If ptSave <> task.idealD.mouseD.pt Then
-                        ptSave = task.idealD.mouseD.pt
-                        strSave = task.idealD.mouseD.strOut
+                    Static ptSave = task.dCell.mouseD.pt
+                    Static strSave = task.dCell.mouseD.strOut
+                    If ptSave <> task.dCell.mouseD.pt Then
+                        ptSave = task.dCell.mouseD.pt
+                        strSave = task.dCell.mouseD.strOut
                     End If
                     trueData.Add(New TrueText(strSave, ptSave, 1))
-                    task.depthRGB.Circle(task.idealD.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
+                    task.depthRGB.Circle(task.dCell.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
                     task.trueData.Clear()
                 End SyncLock
 

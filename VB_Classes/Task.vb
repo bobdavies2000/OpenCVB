@@ -16,7 +16,7 @@ Public Class VBtask : Implements IDisposable
     Public rcMinSize As Integer ' the minimum cell size for RedCloud_Basics/RedCloud_Masks
 
     Public lpList As New List(Of linePoints) ' line pair list
-    Public iddList As New List(Of idealDepthData)
+    Public iddList As New List(Of depthCell)
     Public iddMap As New cv.Mat
     Public iddMask As New cv.Mat
     Public iddSize As Integer
@@ -120,7 +120,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public idealD As Ideal_Basics
+    Public dCell As DepthCell_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
@@ -491,7 +491,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Horizon
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        idealD = New Ideal_Basics
+        dCell = New DepthCell_Basics
         colorizer = New Depth_Palette
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
@@ -765,7 +765,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         If task.gOptions.ShowQuadDepth.Checked Then
-            depthRGB = task.idealD.dst2
+            depthRGB = task.dCell.dst2
         Else
             colorizer.Run(src)
             depthRGB = colorizer.dst2
@@ -809,10 +809,10 @@ Public Class VBtask : Implements IDisposable
         End If
 
         gravityHorizon.Run(src)
-        idealD.Run(src)
+        dCell.Run(src)
 
         Dim saveOptionsChanged = optionsChanged
-        task.idealD.mouseD.Run(src)
+        task.dCell.mouseD.Run(src)
         If paused = False Then
 
 

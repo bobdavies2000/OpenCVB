@@ -118,7 +118,7 @@
     <Compile Include="Concept.vb" />
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />
-    <Compile Include="Ideal.vb" />
+    <Compile Include="DepthCell.vb" />
     <Compile Include="ImageOffset.vb" />
     <Compile Include="KNN.vb" />
     <Compile Include="KNNorm.vb" />

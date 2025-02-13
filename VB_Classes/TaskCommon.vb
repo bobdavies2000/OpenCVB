@@ -425,7 +425,7 @@ End Structure
 
 
 
-Public Class idealDepthData
+Public Class depthCell
     Public lRect As cv.Rect
     Public rRect As cv.Rect
     Public depth As Single

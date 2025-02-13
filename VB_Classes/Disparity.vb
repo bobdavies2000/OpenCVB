@@ -6,16 +6,16 @@ Public Class Disparity_Basics : Inherits TaskParent
     Public matchRect As cv.Rect
     Public Sub New()
         task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        optiBase.FindSlider("Ideal Cell Size").Value = 32
-        desc = "Given an ideal depth cell, find the match in the right view image."
+        optiBase.FindSlider("Depth Cell Size").Value = 32
+        desc = "Given a depth cell, find the match in the right view image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.leftView
         For Each idd In task.iddList
             If idd.lRect.Height >= 8 Then dst2.Rectangle(idd.lRect, 255, task.lineWidth)
         Next
-        Dim index = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        rect = task.idealD.grid.gridRectsAll(index)
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        rect = task.dCell.grid.gridRectsAll(index)
 
         match.template = dst2(rect)
         Dim maxDisparity As Integer = 128
@@ -51,9 +51,9 @@ Public Class Disparity_Manual : Inherits TaskParent
     Public rightView As cv.Mat
     Public Sub New()
         If Math.Abs(task.workingRes.Width - 672) < 10 Then task.gOptions.LineWidth.Value = 2
-        optiBase.FindSlider("Ideal Cell Size").Value = 32
-        labels(2) = "Select an ideal depth cell to find its match in the right view."
-        desc = "Given an ideal depth cell, find the match in the right view image."
+        optiBase.FindSlider("Depth Cell Size").Value = 32
+        labels(2) = "Select a depth cell to find its match in the right view."
+        desc = "Given a depth cell, find the match in the right view image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim leftInput As cv.Mat, rightInput As cv.Mat
@@ -70,8 +70,8 @@ Public Class Disparity_Manual : Inherits TaskParent
             dst2.Rectangle(idd.lRect, 255, task.lineWidth)
         Next
 
-        Dim index = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        rect = task.idealD.grid.gridRectsAll(index)
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        rect = task.dCell.grid.gridRectsAll(index)
         dst2.Rectangle(rect, 255, task.lineWidth + 1)
 
         Dim correlation As New cv.Mat
@@ -193,14 +193,14 @@ Public Class Disparity_Features : Inherits TaskParent
     Dim featNo As New Feature_NoMotion
     Public Sub New()
         optiBase.findRadio("GoodFeatures (ShiTomasi) grid").Checked = True
-        desc = "Use features in ideal depth regions to confirm depth."
+        desc = "Use features in depth cells to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         featNo.Run(task.leftView)
         dst2 = featNo.dst2.Clone
         labels(2) = featNo.labels(2)
 
-        'For Each r In task.idealD.gridRects
+        'For Each r In task.dCell.gridRects
         '    dst2.Rectangle(r, 255, task.lineWidth)
         'Next
 
@@ -220,7 +220,7 @@ Public Class Disparity_Edges : Inherits TaskParent
     Dim edges As New EdgeDraw_Basics
     Dim disparity As New Disparity_Basics
     Public Sub New()
-        desc = "Use features in ideal depth regions to confirm depth."
+        desc = "Use features in depth cells to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.leftView)
@@ -248,7 +248,7 @@ Public Class Disparity_LowRes : Inherits TaskParent
     Dim disparity As New Disparity_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use features in ideal depth regions to confirm depth."
+        desc = "Use features in depth cells to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = task.rightView
@@ -378,7 +378,7 @@ Public Class Disparity_Color8u : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        desc = "Measure the impact of the color8u transforms on the ideal depth cells."
+        desc = "Measure the impact of the color8u transforms on the depth cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = task.rightView.Clone
@@ -393,8 +393,8 @@ Public Class Disparity_Color8u : Inherits TaskParent
         task.color.Rectangle(disparity.rect, 255, task.lineWidth)
         dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
 
-        Dim index = task.idealD.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        Dim rect = task.idealD.grid.gridRectsAll(index)
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim rect = task.dCell.grid.gridRectsAll(index)
         dst2.Rectangle(rect, 255, task.lineWidth + 1)
     End Sub
 End Class

@@ -2171,18 +2171,12 @@ public:
 	Options_Grid() {
 	}
 };
-class Options_IdealSize {
+class Options_DepthCellSize {
 public:
 	int cellSize =  4;
 	float percentThreshold =  0.25;
 	void RunOpt() {}
-	Options_IdealSize() {
-	}
-};
-class Options_IdealShape {
-public:
-	void RunOpt() {}
-	Options_IdealShape() {
+	Options_DepthCellSize() {
 	}
 };
 class Options_QuadCompare {
