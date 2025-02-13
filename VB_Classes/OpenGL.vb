@@ -2119,6 +2119,9 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         dst3 = task.dCell.dst3
         Dim quadData As New List(Of cv.Point3f)
         For Each idd In task.iddList
+            If idd.pixels / (idd.lRect.Width * idd.lRect.Height) < task.dCell.options.percentThreshold Then
+                Continue For
+            End If
             If idd.corners.Count Then quadData.Add(idd.color)
             For Each pt In idd.corners
                 quadData.Add(pt)
@@ -2127,7 +2130,8 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels = task.dCell.labels
+        labels(2) = task.dCell.labels(2)
+        labels(3) = "There were " + CStr(quadData.Count / 5) + " quads found."
     End Sub
 End Class
 

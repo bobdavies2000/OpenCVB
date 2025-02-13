@@ -432,6 +432,7 @@ Public Class depthCell
     Public age As Integer
     Public index As Integer
     Public color As cv.Point3f
+    Public pixels As Integer
     Public pcFrag As cv.Mat
     Public corners As New List(Of cv.Point3f)
     Public center As cv.Point

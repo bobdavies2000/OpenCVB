@@ -422,9 +422,12 @@ Public Class Quad_CellConnect : Inherits TaskParent
         For i = 0 To task.iddList.Count - width Step width
             Dim colStart As Integer = i, colEnd As Integer = i
             For j = i + 1 To i + width - 1
-                Dim d1 = task.iddList(j).depth
-                Dim d2 = task.iddList(j - 1).depth
-                If Math.Abs(d1 - d2) > task.depthDiffMeters Or j = i + width - 1 Then
+                Dim idd1 = task.iddList(j)
+                Dim idd2 = task.iddList(j - 1)
+                Dim maxPixels = idd1.lRect.Width * idd1.lRect.Height
+                If idd1.pixels / maxPixels < task.dCell.options.percentThreshold Then Continue For
+                If idd2.pixels / maxPixels < task.dCell.options.percentThreshold Then Continue For
+                If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or j = i + width - 1 Then
                     Dim p1 = task.iddList(colStart).lRect.TopLeft
                     Dim p2 = task.iddList(colEnd).lRect.BottomRight
                     dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
@@ -447,13 +450,16 @@ Public Class Quad_CellConnect : Inherits TaskParent
         For i = 0 To width - 1
             Dim vList As New List(Of Integer)
             For j = 0 To height - 1
-                vList.Add(i + j * width)
+                If i + j * width < task.iddList.Count Then vList.Add(i + j * width)
             Next
             Dim rowStart As Integer = 0, rowEnd As Integer = 0
             For j = 1 To height - 1
-                Dim d1 = task.iddList(vList(j)).depth
-                Dim d2 = task.iddList(vList(j - 1)).depth
-                If Math.Abs(d1 - d2) > task.depthDiffMeters Or j = height - 1 Then
+                Dim idd1 = task.iddList(vList(j))
+                Dim idd2 = task.iddList(vList(j - 1))
+                Dim maxPixels = idd1.lRect.Width * idd1.lRect.Height
+                If idd1.pixels / maxPixels < task.dCell.options.percentThreshold Then Continue For
+                If idd2.pixels / maxPixels < task.dCell.options.percentThreshold Then Continue For
+                If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or j = height - 1 Then
                     Dim p1 = task.iddList(vList(rowStart)).lRect.TopLeft
                     Dim p2 = task.iddList(vList(rowEnd)).lRect.BottomRight
                     dst3.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)

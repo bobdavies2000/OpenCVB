@@ -40,8 +40,8 @@ Public Class DepthCell_Basics : Inherits TaskParent
                 cv.Cv2.MeanStdDev(src(idd.lRect), colormean, colorStdev)
                 idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
 
-                Dim pixelCount = task.depthMask(idd.lRect).CountNonZero
-                If pixelCount / (idd.lRect.Width * idd.lRect.Height) < options.percentThreshold Then
+                idd.pixels = task.depthMask(idd.lRect).CountNonZero
+                If idd.pixels / (idd.lRect.Width * idd.lRect.Height) < options.percentThreshold Then
                     idd.age = 0
                     idd.depth = 0
                 Else
