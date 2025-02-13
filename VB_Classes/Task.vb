@@ -34,7 +34,7 @@ Public Class VBtask : Implements IDisposable
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
     Public gridPoints As New List(Of cv.Point) ' the list of each gridRect corner 
-    Public depthDiffThreshold As Integer ' depth cells > than this value are depth edges - cm's
+    Public depthDiffMeters As Single ' depth cells > than this value are depth edges - in meters
 
     Public fpList As New List(Of fpData)
     Public fpListLast As New List(Of fpData)

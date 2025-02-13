@@ -1239,10 +1239,11 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_ProfileSweep" Then return new OpenGL_ProfileSweep
 	If algorithmName = "OpenGL_Pyramid" Then return new OpenGL_Pyramid
 	If algorithmName = "OpenGL_QuadBricks" Then return new OpenGL_QuadBricks
+	If algorithmName = "OpenGL_QuadCompare" Then return new OpenGL_QuadCompare
+	If algorithmName = "OpenGL_QuadConnect" Then return new OpenGL_QuadConnect
 	If algorithmName = "OpenGL_QuadDepth" Then return new OpenGL_QuadDepth
 	If algorithmName = "OpenGL_QuadGridTiles" Then return new OpenGL_QuadGridTiles
 	If algorithmName = "OpenGL_QuadHulls" Then return new OpenGL_QuadHulls
-	If algorithmName = "OpenGL_QuadMerge" Then return new OpenGL_QuadMerge
 	If algorithmName = "OpenGL_QuadMinMax" Then return new OpenGL_QuadMinMax
 	If algorithmName = "OpenGL_QuadSimple" Then return new OpenGL_QuadSimple
 	If algorithmName = "OpenGL_Rebuilt" Then return new OpenGL_Rebuilt
@@ -1445,7 +1446,7 @@ Public Class algorithmList
 	If algorithmName = "Quad_Basics" Then return new Quad_Basics
 	If algorithmName = "Quad_Boundaries" Then return new Quad_Boundaries
 	If algorithmName = "Quad_Bricks" Then return new Quad_Bricks
-	If algorithmName = "Quad_CellMerge" Then return new Quad_CellMerge
+	If algorithmName = "Quad_CellConnect" Then return new Quad_CellConnect
 	If algorithmName = "Quad_GridTiles" Then return new Quad_GridTiles
 	If algorithmName = "Quad_Hulls" Then return new Quad_Hulls
 	If algorithmName = "Quad_MinMax" Then return new Quad_MinMax

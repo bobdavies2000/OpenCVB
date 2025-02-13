@@ -6,7 +6,7 @@ Public Class Ideal_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public mouseD As New Ideal_MouseDepth
     Public quad As New Quad_Basics
-    Dim merge As New Quad_CellMerge
+    Public merge As New Quad_CellConnect
     Public Sub New()
         optiBase.FindSlider("Percent Depth Threshold").Value = 25
         desc = "Create the grid of depth cells that reduce depth volatility"

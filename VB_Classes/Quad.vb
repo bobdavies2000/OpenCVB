@@ -26,13 +26,12 @@ Public Class Quad_Basics : Inherits TaskParent
                 Dim p0 = getWorldCoordinates(idd.lRect.TopLeft, idd.depth)
                 Dim p1 = getWorldCoordinates(idd.lRect.BottomRight, idd.depth)
 
-                idd.corners.Add(idd.color)
+                ' clockwise around starting in upper left.
                 idd.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, idd.depth))
                 idd.corners.Add(New cv.Point3f(p1.X + shift.X, p0.Y + shift.Y, idd.depth))
                 idd.corners.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, idd.depth))
                 idd.corners.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, idd.depth))
             End If
-            If idd.color = New cv.Point3f Then Dim k = 0
             dst2(idd.lRect).SetTo(idd.color)
         Next
     End Sub
@@ -381,7 +380,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
             For j = i + 1 To i + width - 1
                 Dim d1 = task.iddList(j).depth
                 Dim d2 = task.iddList(j - 1).depth
-                If Math.Abs(d1 - d2) > task.depthDiffThreshold Then
+                If Math.Abs(d1 - d2) > task.depthDiffMeters Then
                     dst2.Rectangle(task.iddList(j).lRect, task.HighlightColor, -1)
                 End If
             Next
@@ -391,7 +390,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
             For j = 1 To height - 1
                 Dim d1 = task.iddList(j * width).depth
                 Dim d2 = task.iddList((j - 1) * width).depth
-                If Math.Abs(d1 - d2) > task.depthDiffThreshold Then
+                If Math.Abs(d1 - d2) > task.depthDiffMeters Then
                     dst2.Rectangle(task.iddList(j).lRect, task.HighlightColor, -1)
                 End If
             Next
@@ -405,11 +404,11 @@ End Class
 
 
 
-Public Class Quad_CellMerge : Inherits TaskParent
+Public Class Quad_CellConnect : Inherits TaskParent
     Public connectedH As New List(Of Tuple(Of Integer, Integer))
     Public connectedV As New List(Of Tuple(Of Integer, Integer))
     Public Sub New()
-        desc = "Merge cells that are close in depth"
+        desc = "Connect cells that are close in depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.idealD.dst2.Clone
@@ -425,7 +424,7 @@ Public Class Quad_CellMerge : Inherits TaskParent
             For j = i + 1 To i + width - 1
                 Dim d1 = task.iddList(j).depth
                 Dim d2 = task.iddList(j - 1).depth
-                If Math.Abs(d1 - d2) > task.depthDiffThreshold Or j = i + width - 1 Then
+                If Math.Abs(d1 - d2) > task.depthDiffMeters Or j = i + width - 1 Then
                     Dim p1 = task.iddList(colStart).lRect.TopLeft
                     Dim p2 = task.iddList(colEnd).lRect.BottomRight
                     dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
@@ -441,32 +440,36 @@ Public Class Quad_CellMerge : Inherits TaskParent
             Next
         Next
         labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
-                    CStr(task.depthDiffThreshold) + " cm's"
+                    CStr(task.depthDiffMeters) + " cm's"
 
         colorIndex = 0
         connectedV.Clear()
         For i = 0 To width - 1
-            Dim rowStart As Integer = i, rowEnd As Integer = rowStart
-            For j = 1 To height - 1
-                Dim d1 = task.iddList(i + j * width).depth
-                Dim d2 = task.iddList(i + (j - 1) * width).depth
-                If Math.Abs(d1 - d2) > task.depthDiffThreshold Or j = height - 1 Then
-                    Dim p1 = task.iddList(rowStart).lRect.TopLeft
-                    Dim p2 = task.iddList(rowEnd).lRect.BottomRight
+            Dim vList As New List(Of Integer)
+            For j = 0 To height - 1
+                vList.Add(i + j * width)
+            Next
+            Dim rowStart As Integer = 0, rowEnd As Integer = 0
+            For j = 1 To vList.Count - 1
+                Dim d1 = task.iddList(vList(j)).depth
+                Dim d2 = task.iddList(vList(j - 1)).depth
+                If Math.Abs(d1 - d2) > task.depthDiffMeters Or j = height - 1 Then
+                    Dim p1 = task.iddList(vList(rowStart)).lRect.TopLeft
+                    Dim p2 = task.iddList(vList(rowEnd)).lRect.BottomRight
                     dst3.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
                     colorIndex += 1
-                    If (rowEnd - rowStart) / width > 1 Then
-                        connectedV.Add(New Tuple(Of Integer, Integer)(rowStart, rowEnd))
+                    If rowEnd - rowStart > 1 Then
+                        connectedV.Add(New Tuple(Of Integer, Integer)(vList(rowStart), vList(rowEnd)))
                     End If
-                    rowStart = i + (j + 1) * width
-                    rowEnd = rowStart
+                    rowStart = j
+                    rowEnd = j
                 Else
-                    rowEnd += width
+                    rowEnd += 1
                 End If
             Next
         Next
 
         labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
-                    CStr(task.depthDiffThreshold) + " cm's"
+                    CStr(task.depthDiffMeters) + " cm's"
     End Sub
 End Class

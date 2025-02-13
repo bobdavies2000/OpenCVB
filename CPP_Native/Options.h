@@ -2185,3 +2185,9 @@ public:
 	Options_IdealShape() {
 	}
 };
+class Options_QuadCompare {
+public:
+	void RunOpt() {}
+	Options_QuadCompare() {
+	}
+};

@@ -134,7 +134,7 @@ Public Module vbc
         task.MaxZmeters = task.gOptions.maxDepth
         task.metersPerPixel = task.MaxZmeters / task.dst2.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
-        task.depthDiffThreshold = task.gOptions.DepthDiffSlider.Value / 10
+        task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 100
     End Sub
 End Module
 

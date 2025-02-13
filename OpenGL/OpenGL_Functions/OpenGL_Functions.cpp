@@ -212,7 +212,7 @@ int main(int argc, char* argv[])
 				glDisable(GL_TEXTURE_2D);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				glBegin(GL_QUADS);
-				for (int i = 0; i < quadCount; i += 15)
+				for (int i = 0; i < quadCount - 15; i += 15)
 				{
 					glColor3f(quadData[i + 2] / 255, quadData[i + 1] / 255, quadData[i] / 255); // BGR to RGB tossed in...
 					glVertex3f(quadData[i + 3], quadData[i + 4], quadData[i + 5]);

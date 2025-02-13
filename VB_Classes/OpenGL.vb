@@ -5,6 +5,7 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.Threading
 Imports cvext = OpenCvSharp.Extensions
+Imports System.Runtime.CompilerServices
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim startInfo As New ProcessStartInfo
@@ -82,7 +83,7 @@ Public Class OpenGL_Basics : Inherits TaskParent
 
         task.openGLPipe.WaitForConnection()
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then pointCloudInput = task.pointCloud
 
         ' adjust the point cloud if present and the 'move' sliders are non-zero
@@ -2054,6 +2055,27 @@ End Class
 
 
 
+Public Class OpenGL_QuadGridTiles : Inherits TaskParent
+    Dim tiles As New Quad_GridTiles
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        desc = "Display the quads built by Quad_Hulls in OpenGL - doesn't use OpenGL's point size"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        tiles.Run(src)
+        dst2 = tiles.dst2
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(tiles.quadData.Count, 1, cv.MatType.CV_32FC3,
+                                                  tiles.quadData.ToArray)
+        task.ogl.Run(src)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        labels = tiles.labels
+    End Sub
+End Class
+
+
+
+
 
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
@@ -2067,6 +2089,7 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
         labels = task.idealD.labels
         Dim quadData As New List(Of cv.Point3f)
         For Each idd In task.iddList
+            If idd.corners.Count Then quadData.Add(idd.color)
             For Each pt In idd.corners
                 quadData.Add(pt)
             Next
@@ -2089,13 +2112,14 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
     Public Sub New()
         optiBase.FindSlider("OpenCVB OpenGL buffer count").Value = 1
         task.ogl.oglFunction = oCase.quadBasics
-        desc = "Create a simple plane in each of ideal depth cells."
+        desc = "Create a simple plane in each of depth cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.idealD.dst2
         dst3 = task.idealD.dst3
         Dim quadData As New List(Of cv.Point3f)
         For Each idd In task.iddList
+            If idd.corners.Count Then quadData.Add(idd.color)
             For Each pt In idd.corners
                 quadData.Add(pt)
             Next
@@ -2111,20 +2135,65 @@ End Class
 
 
 
-Public Class OpenGL_QuadGridTiles : Inherits TaskParent
-    Dim tiles As New Quad_GridTiles
+
+Public Class OpenGL_QuadConnect : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
-        desc = "Display the quads built by Quad_Hulls in OpenGL - doesn't use OpenGL's point size"
+        desc = "Build connected depth cells and remove cells that are not connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        tiles.Run(src)
-        dst2 = tiles.dst2
+        dst2 = task.idealD.dst2
+        dst3 = task.idealD.dst3
 
-        task.ogl.dataInput = cv.Mat.FromPixelData(tiles.quadData.Count, 1, cv.MatType.CV_32FC3, tiles.quadData.ToArray)
+        Dim quadData As New List(Of cv.Point3f)
+        Dim idd1 As idealDepthData, idd2 As idealDepthData
+        For Each tup In task.idealD.merge.connectedH
+            For i = tup.Item1 + 1 To tup.Item2 - 1
+                idd1 = task.iddList(i - 1)
+                idd2 = task.iddList(i)
+                If idd1.depth = 0 Or idd2.depth = 0 Then Continue For
+
+                quadData.Add(idd1.color)
+                quadData.Add(idd1.corners(0))
+                quadData.Add(idd2.corners(0))
+                quadData.Add(idd2.corners(3))
+                quadData.Add(idd1.corners(3))
+            Next
+            If idd2.depth > 0 Then
+                quadData.Add(idd2.color)
+                quadData.Add(idd2.corners(0))
+                quadData.Add(idd2.corners(1))
+                quadData.Add(idd2.corners(2))
+                quadData.Add(idd2.corners(3))
+            End If
+        Next
+
+        Dim width = dst2.Width / task.idealD.options.cellSize
+        For Each tup In task.idealD.merge.connectedV
+            For i = tup.Item1 To tup.Item2 - width Step width
+                idd1 = task.iddList(i)
+                idd2 = task.iddList(i + width)
+                If idd1.depth = 0 Or idd2.depth = 0 Then Continue For
+
+                quadData.Add(idd1.color)
+                quadData.Add(idd1.corners(0))
+                quadData.Add(idd1.corners(1))
+                quadData.Add(idd2.corners(1))
+                quadData.Add(idd2.corners(0))
+            Next
+            If idd2.depth > 0 Then
+                quadData.Add(idd2.color)
+                quadData.Add(idd2.corners(0))
+                quadData.Add(idd2.corners(1))
+                quadData.Add(idd2.corners(2))
+                quadData.Add(idd2.corners(3))
+            End If
+        Next
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+        task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels = tiles.labels
+        labels = task.idealD.labels
     End Sub
 End Class
 
@@ -2132,11 +2201,31 @@ End Class
 
 
 
-Public Class OpenGL_QuadMerge : Inherits TaskParent
+Public Class OpenGL_QuadCompare : Inherits TaskParent
+    Dim options As New Options_QuadCompare
+    Dim quadD As New OpenGL_QuadDepth
+    Dim quadC As New OpenGL_QuadConnect
     Public Sub New()
-        task.ogl.oglFunction = oCase.quadBasics
-        desc = "Build connected depth cells and remove cells that are not connected."
+        desc = "Compare different representations of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        Select Case options.displayIndex
+            Case 0
+                task.ogl.oglFunction = oCase.drawPointCloudRGB
+                task.ogl.pointCloudInput = task.pointCloud
+                task.ogl.Run(src)
+            Case 1
+                task.ogl.oglFunction = oCase.quadBasics
+                quadD.Run(src)
+                dst2 = quadD.dst2
+                dst3 = quadD.dst3
+            Case 2
+                task.ogl.oglFunction = oCase.quadBasics
+                quadC.Run(src)
+                dst2 = quadC.dst2
+                dst3 = quadC.dst3
+        End Select
     End Sub
 End Class
