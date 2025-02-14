@@ -148,11 +148,9 @@ End Class
 Public Class Grid_Rectangles : Inherits TaskParent
     Public tilesPerRow As Integer
     Public tilesPerCol As Integer
-    Public gridMask As cv.Mat
     Public gridMap As cv.Mat
     Public gridRectsAll As New List(Of cv.Rect)
     Public Sub New()
-        gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
         If standalone Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
@@ -162,25 +160,13 @@ Public Class Grid_Rectangles : Inherits TaskParent
             gridRectsAll.Clear()
             For y = 0 To dst2.Height - 1 Step cellSize
                 For x = 0 To dst2.Width - 1 Step cellSize
-                    Dim roi = New cv.Rect(x, y, cellSize, cellSize)
-                    If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
-                    If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
+                    Dim roi = ValidateRect(New cv.Rect(x, y, cellSize, cellSize))
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
                         gridRectsAll.Add(roi)
                     End If
                 Next
-            Next
-
-            gridMask.SetTo(0)
-            For x = 0 To dst2.Width - 1 Step cellSize
-                Dim p1 = New cv.Point(CInt(x), 0), p2 = New cv.Point(CInt(x), dst2.Height)
-                gridMask.Line(p1, p2, 255, task.lineWidth)
-            Next
-            For y = 0 To dst2.Height - 1 Step cellSize
-                Dim p1 = New cv.Point(0, CInt(y)), p2 = New cv.Point(dst2.Width, CInt(y))
-                gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
 
             For i = 0 To gridRectsAll.Count - 1
@@ -190,7 +176,6 @@ Public Class Grid_Rectangles : Inherits TaskParent
         End If
         If standaloneTest() Then
             task.color.CopyTo(dst2)
-            dst2.SetTo(white, gridMask)
             labels(2) = "Grid_Basics " + CStr(gridRectsAll.Count) + " tiles, " + CStr(tilesPerRow) +
                         " cols by " + CStr(tilesPerCol) + " rows, with " +
                         CStr(cellSize) + "X" + CStr(cellSize) + " cells"

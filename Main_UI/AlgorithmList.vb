@@ -354,13 +354,11 @@ Public Class algorithmList
 	If algorithmName = "Dilate_OpenClose" Then return new Dilate_OpenClose
 	If algorithmName = "Disparity_Basics" Then return new Disparity_Basics
 	If algorithmName = "Disparity_Color8u" Then return new Disparity_Color8u
+	If algorithmName = "Disparity_Correlation" Then return new Disparity_Correlation
 	If algorithmName = "Disparity_Edges" Then return new Disparity_Edges
 	If algorithmName = "Disparity_Features" Then return new Disparity_Features
 	If algorithmName = "Disparity_Inverse" Then return new Disparity_Inverse
 	If algorithmName = "Disparity_LowRes" Then return new Disparity_LowRes
-	If algorithmName = "Disparity_Manual" Then return new Disparity_Manual
-	If algorithmName = "Disparity_MatchMean" Then return new Disparity_MatchMean
-	If algorithmName = "Disparity_MatchStdev" Then return new Disparity_MatchStdev
 	If algorithmName = "Disparity_RedMask" Then return new Disparity_RedMask
 	If algorithmName = "Disparity_Validate" Then return new Disparity_Validate
 	If algorithmName = "Distance_Background" Then return new Distance_Background

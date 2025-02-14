@@ -436,6 +436,7 @@ Public Class depthCell
     Public pcFrag As cv.Mat
     Public corners As New List(Of cv.Point3f)
     Public center As cv.Point
+    Public correlation As Single
 End Class
 
 

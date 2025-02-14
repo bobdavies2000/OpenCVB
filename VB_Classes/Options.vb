@@ -7960,13 +7960,14 @@ End Class
 
 
 Public Class Options_DepthCellSize : Inherits OptionParent
-    Public cellSize As Integer = 4
+    Public cellSize As Integer = 8
     Public percentThreshold As Single = 0.25
     Public Sub New()
-        If task.dst2.Width >= 1280 Then cellSize = 16
-        If task.dst2.Width >= 1920 Then cellSize = 32
+        If task.dst2.Width >= 640 Then cellSize = 16
+        If task.dst2.Width >= 1280 Then cellSize = 32
+        If task.dst2.Width >= 1920 Then cellSize = 64
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Depth Cell Size", 1, 32, cellSize)
+            sliders.setupTrackBar("Depth Cell Size", 1, 64, cellSize)
             sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * percentThreshold)
         End If
     End Sub

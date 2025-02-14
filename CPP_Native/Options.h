@@ -2173,7 +2173,7 @@ public:
 };
 class Options_DepthCellSize {
 public:
-	int cellSize =  4;
+	int cellSize =  8;
 	float percentThreshold =  0.25;
 	void RunOpt() {}
 	Options_DepthCellSize() {

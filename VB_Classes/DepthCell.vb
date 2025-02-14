@@ -19,7 +19,6 @@ Public Class DepthCell_Basics : Inherits TaskParent
             grid.Run(src)
             task.iddList.Clear()
             For Each rect In grid.gridRectsAll
-                If rect.Width <> task.iddSize Or rect.Height <> task.iddSize Then Continue For
                 Dim idd As New depthCell
                 idd.lRect = rect
                 Dim cellSize = task.dCell.options.cellSize
@@ -50,6 +49,13 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     If idd.depth > task.MaxZmeters Then idd.depth = task.MaxZmeters
                     idd.rRect = idd.lRect
                     idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
+                    If idd.rRect.X < 0 Then idd.rRect = New cv.Rect ' not a valid rectangle
+                    If idd.rRect.Width > 0 Then
+                        Dim correlationMat As New cv.Mat
+                        cv.Cv2.MatchTemplate(dst2(idd.lRect), dst3(idd.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+
+                        idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                    End If
                 End If
                 idd.pcFrag = task.pointCloud(idd.lRect).Clone
             End If
@@ -86,8 +92,11 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         dst2 = task.dCell.dst2
         ptReal = idd.center
         pt = idd.center
-        If pt.X > dst2.Width * 0.85 Then pt.X -= dst2.Width * 0.15
-        If pt.Y < dst2.Height * 0.1 Then pt.Y += dst2.Height * 0.03 Else pt.Y -= idd.lRect.Height * 2
+        If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
+            pt.X -= dst2.Width * 0.15
+        Else
+            pt.Y -= idd.lRect.Height * 2
+        End If
         strOut = Format(idd.depth, fmt1) + "m (" + Format(idd.pixels / (idd.lRect.Width * idd.lRect.Height), "0%") + ")"
 
         If standaloneTest() Then SetTrueText(strOut, pt, 2)
