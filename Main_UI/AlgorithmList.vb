@@ -934,7 +934,7 @@ Public Class algorithmList
 	If algorithmName = "LeftRight_RedRight" Then return new LeftRight_RedRight
 	If algorithmName = "LeftRight_RedRightGray" Then return new LeftRight_RedRightGray
 	If algorithmName = "LeftRight_Reduction" Then return new LeftRight_Reduction
-	If algorithmName = "LeftRight_RGBAlign" Then return new LeftRight_RGBAlign
+	If algorithmName = "LeftRight_RGBAlignLeft" Then return new LeftRight_RGBAlignLeft
 	If algorithmName = "Line_Basics" Then return new Line_Basics
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Cells" Then return new Line_Cells

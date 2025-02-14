@@ -420,16 +420,32 @@ End Class
 
 
 
-Public Class LeftRight_RGBAlign : Inherits TaskParent
+Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
+    Dim addw As New AddWeighted_Basics
+    Dim options As New Options_RGBAlign
     Public Sub New()
-        desc = "Use this algorithm to align the left image with the RGB image for some cameras"
+        desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.cameraName = "StereoLabs ZED 2/2i" Then
-            SetTrueText("StereoLabs ZED 2/2i left cameras are already aligned to the RGB camera.")
+        If task.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+            SetTrueText("This is just a crude way to align the left and rgb images." + vbCrLf +
+                        "The parameters are set for only the Intel D435i camera.")
             Exit Sub
         End If
 
+        options.RunOpt()
 
+        Dim w = dst0.Width
+        Dim h = dst0.Height
+        Dim xD = options.xDisp
+        Dim yD = options.yDisp
+        Dim xS = options.xShift
+        Dim yS = options.yShift
+        Dim rect = New cv.Rect(xD + xS, yD + yS, w - xD * 2, h - yD * 2)
+        dst2 = task.leftView(rect).Resize(dst0.Size)
+
+        addw.src2 = dst2
+        addw.Run(src)
+        dst3 = addw.dst2
     End Sub
 End Class

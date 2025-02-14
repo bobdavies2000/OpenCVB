@@ -8014,3 +8014,34 @@ Public Class Options_QuadCompare : Inherits OptionParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_RGBAlign : Inherits OptionParent
+    Public xDisp As Integer
+    Public yDisp As Integer
+    Public xShift As Integer
+    Public yShift As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("X Displacement", 0, 100, 46)
+            sliders.setupTrackBar("Y Displacement", 0, 100, 26)
+            sliders.setupTrackBar("X Shift", -50, 50, -3)
+            sliders.setupTrackBar("Y Shift", -50, 50, 3)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static XSlider = FindSlider("X Displacement")
+        Static YSlider = FindSlider("Y Displacement")
+        Static xShiftSlider = FindSlider("X Shift")
+        Static yShiftSlider = FindSlider("Y Shift")
+        xDisp = XSlider.value
+        yDisp = YSlider.value
+        xShift = xShiftSlider.value
+        yShift = yShiftSlider.value
+    End Sub
+End Class
+

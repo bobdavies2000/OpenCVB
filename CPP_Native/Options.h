@@ -2185,3 +2185,9 @@ public:
 	Options_QuadCompare() {
 	}
 };
+class Options_RGBAlign {
+public:
+	void RunOpt() {}
+	Options_RGBAlign() {
+	}
+};
