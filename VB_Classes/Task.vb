@@ -347,7 +347,7 @@ Public Class VBtask : Implements IDisposable
 
         Public algName As String
 
-        Public cameraInfo As cameraInfo
+        Public calibData As cameraInfo
     End Structure
     Private Sub buildColors()
         Dim rand = New Random(1)
@@ -450,7 +450,7 @@ Public Class VBtask : Implements IDisposable
         showConsoleLog = parms.showConsoleLog
         fpsAlgorithm = parms.fpsRate
         fpsCamera = parms.fpsHostCamera
-        calibData = parms.cameraInfo
+        calibData = parms.calibData
         HomeDir = parms.HomeDir
         main_hwnd = parms.main_hwnd
         useRecordedData = parms.useRecordedData
@@ -535,8 +535,8 @@ Public Class VBtask : Implements IDisposable
 
         ' NOTE: I can't find the VFOV for the Oak-D or Oak-D Lite cameras.
         ' The 62 is based on Pythagorean theorem and knowing the 71.8 HFOV and the 81.3 DFOV.
-        If parms.cameraInfo.v_fov <> 0 Then vFOVangles(parms.cameraIndex) = parms.cameraInfo.v_fov
-        If parms.cameraInfo.h_fov <> 0 Then hFOVangles(parms.cameraIndex) = parms.cameraInfo.h_fov
+        If parms.calibData.v_fov <> 0 Then vFOVangles(parms.cameraIndex) = parms.calibData.v_fov
+        If parms.calibData.h_fov <> 0 Then hFOVangles(parms.cameraIndex) = parms.calibData.h_fov
 
         vFov = vFOVangles(parms.cameraIndex)  ' these are default values in case the calibration data is unavailable
         hFov = hFOVangles(parms.cameraIndex)

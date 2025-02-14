@@ -43,13 +43,13 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
             Dim serialNumber = Zed2SerialNumber(cPtr)
         End If
         Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsZed)(Zed2Intrinsics(cPtr))
-        cameraInfo.ppx = intrinsics.cx
-        cameraInfo.ppy = intrinsics.cy
-        cameraInfo.fx = intrinsics.fx
-        cameraInfo.fy = intrinsics.fy
-        cameraInfo.v_fov = intrinsics.v_fov
-        cameraInfo.h_fov = intrinsics.h_fov
-        cameraInfo.d_fov = intrinsics.d_fov
+        calibData.ppx = intrinsics.cx
+        calibData.ppy = intrinsics.cy
+        calibData.fx = intrinsics.fx
+        calibData.fy = intrinsics.fy
+        calibData.v_fov = intrinsics.v_fov
+        calibData.h_fov = intrinsics.h_fov
+        calibData.d_fov = intrinsics.d_fov
     End Sub
     Structure intrinsicsZed
         Dim cx As Single ' Principal point In image, x */

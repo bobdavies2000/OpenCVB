@@ -21,7 +21,7 @@ Public Class GenericCamera
     Public captureRes As cv.Size
 
     Public deviceCount As Integer
-    Public cameraInfo As VB_Classes.VBtask.cameraInfo
+    Public calibData As VB_Classes.VBtask.cameraInfo
     Public colorBytes() As Byte
     Public vertices() As Byte
     Public depthBytes() As Byte
@@ -65,7 +65,7 @@ Public Class GenericCamera
     End Structure
     Public Sub New()
         Dim cam As VBtask.cameraInfo
-        cameraInfo = cam
+        calibData = cam
     End Sub
     Public Function getMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData

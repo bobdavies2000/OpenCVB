@@ -31,10 +31,11 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim StreamColor = profiles.GetStream(Stream.Color)
         Dim myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-        cameraInfo.ppx = myIntrinsics.ppx / ratio
-        cameraInfo.ppy = myIntrinsics.ppy / ratio
-        cameraInfo.fx = myIntrinsics.fx / ratio
-        cameraInfo.fy = myIntrinsics.fy / ratio
+        calibData.baseline = 0.052 ' where can I get this for this camera?
+        calibData.ppx = myIntrinsics.ppx / ratio
+        calibData.ppy = myIntrinsics.ppy / ratio
+        calibData.fx = myIntrinsics.fx / ratio
+        calibData.fy = myIntrinsics.fy / ratio
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
@@ -140,10 +141,12 @@ Public Class CameraRS2_CPP : Inherits GenericCamera
         Dim intrin = RS2intrinsics(cPtr)
         Dim intrinInfo(4 - 1) As Single
         Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
-        cameraInfo.ppx = intrinInfo(0)
-        cameraInfo.ppy = intrinInfo(1)
-        cameraInfo.fx = intrinInfo(2)
-        cameraInfo.fy = intrinInfo(3)
+
+        calibData.baseline = 0.052 ' where can I get this for this camera?
+        calibData.ppx = intrinInfo(0)
+        calibData.ppy = intrinInfo(1)
+        calibData.fx = intrinInfo(2)
+        calibData.fy = intrinInfo(3)
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         If cPtr = 0 Then Exit Sub

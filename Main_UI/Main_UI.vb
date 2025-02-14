@@ -1522,7 +1522,7 @@ Public Class Main_UI
 
         While 1
             If camera IsNot Nothing Then
-                parms.cameraInfo = camera.cameraInfo
+                parms.calibData = camera.calibData
                 Exit While
             End If
         End While
@@ -1607,13 +1607,14 @@ Public Class Main_UI
 
                             If frameCount < 10 Then
                                 Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
-                                task.calibData.ppx = task.dst2.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
-                                task.calibData.ppy = task.dst2.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
-                                task.calibData.fx = camera.cameraInfo.fx
-                                task.calibData.fy = camera.cameraInfo.fy
-                                task.calibData.v_fov = camera.cameraInfo.v_fov
-                                task.calibData.h_fov = camera.cameraInfo.h_fov
-                                task.calibData.d_fov = camera.cameraInfo.d_fov
+                                task.calibData.ppx = task.dst2.Width / 2 ' camera.calibData.ppx / sizeRatio
+                                task.calibData.ppy = task.dst2.Height / 2 ' camera.calibData.ppy / sizeRatio
+                                task.calibData.baseline = camera.calibData.baseline
+                                task.calibData.fx = camera.calibData.fx
+                                task.calibData.fy = camera.calibData.fy
+                                task.calibData.v_fov = camera.calibData.v_fov
+                                task.calibData.h_fov = camera.calibData.h_fov
+                                task.calibData.d_fov = camera.calibData.d_fov
                             End If
                             task.transformationMatrix = camera.transformationMatrix
                             task.IMU_TimeStamp = camera.IMU_TimeStamp

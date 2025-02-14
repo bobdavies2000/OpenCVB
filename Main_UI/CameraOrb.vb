@@ -38,10 +38,10 @@ Public Class CameraORB : Inherits GenericCamera
         Dim myIntrinsics = dev.GetCalibrationCameraParamList()
         Dim param As CameraParam = myIntrinsics.GetCameraParam(0)
         Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-        cameraInfo.fx = param.rgbIntrinsic.fx / ratio
-        cameraInfo.fy = param.rgbIntrinsic.fy / ratio
-        cameraInfo.ppx = param.rgbIntrinsic.cx / ratio
-        cameraInfo.ppy = param.rgbIntrinsic.cy / ratio
+        calibData.fx = param.rgbIntrinsic.fx / ratio
+        calibData.fy = param.rgbIntrinsic.fy / ratio
+        calibData.ppx = param.rgbIntrinsic.cx / ratio
+        calibData.ppy = param.rgbIntrinsic.cy / ratio
 
         Dim gProfiles = gyroSensor.GetStreamProfileList()
         Dim gProfile = gProfiles.GetProfile(0)
@@ -174,10 +174,10 @@ Public Class CameraORB_CPP : Inherits GenericCamera
         Dim intrin = ORBIntrinsics(cPtr)
         Dim intrinInfo(4 - 1) As Single
         Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
-        cameraInfo.ppx = intrinInfo(0)
-        cameraInfo.ppy = intrinInfo(1)
-        cameraInfo.fx = intrinInfo(2)
-        cameraInfo.fy = intrinInfo(3)
+        calibData.ppx = intrinInfo(0)
+        calibData.ppy = intrinInfo(1)
+        calibData.fx = intrinInfo(2)
+        calibData.fy = intrinInfo(3)
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Static color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat

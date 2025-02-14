@@ -55,10 +55,10 @@ Public Class CameraOakD : Inherits GenericCamera
             Dim intrinsicsArray(9 - 1) As Single
             Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
             Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-            cameraInfo.ppx = intrinsicsArray(2) / ratio
-            cameraInfo.ppy = intrinsicsArray(5) / ratio
-            cameraInfo.fx = intrinsicsArray(0) / ratio
-            cameraInfo.fy = intrinsicsArray(4) / ratio
+            calibData.ppx = intrinsicsArray(2) / ratio
+            calibData.ppy = intrinsicsArray(5) / ratio
+            calibData.fx = intrinsicsArray(0) / ratio
+            calibData.fy = intrinsicsArray(4) / ratio
 
             templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
             templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)
@@ -77,8 +77,8 @@ Public Class CameraOakD : Inherits GenericCamera
             For i = 1 To templateY.Width - 1
                 templateY.Col(0).CopyTo(templateY.Col(i))
             Next
-            templateX -= cameraInfo.ppx
-            templateY -= cameraInfo.ppy
+            templateX -= calibData.ppx
+            templateY -= calibData.ppy
         End If
 
         Dim accelFrame = OakDAccel(cPtr)
@@ -120,10 +120,10 @@ Public Class CameraOakD : Inherits GenericCamera
             Dim worldX As New cv.Mat, worldY As New cv.Mat
 
             cv.Cv2.Multiply(templateX, d32f, worldX)
-            worldX *= 1 / cameraInfo.fx
+            worldX *= 1 / calibData.fx
 
             cv.Cv2.Multiply(templateY, d32f, worldY)
-            worldY *= 1 / cameraInfo.fy
+            worldY *= 1 / calibData.fy
 
             Dim pc As New cv.Mat
             cv.Cv2.Merge({worldX, worldY, d32f}, pc)
