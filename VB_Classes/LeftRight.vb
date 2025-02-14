@@ -416,3 +416,20 @@ Public Class LeftRight_RedLeftGray : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class LeftRight_RGBAlign : Inherits TaskParent
+    Public Sub New()
+        desc = "Use this algorithm to align the left image with the RGB image for some cameras"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.cameraName = "StereoLabs ZED 2/2i" Then
+            SetTrueText("StereoLabs ZED 2/2i left cameras are already aligned to the RGB camera.")
+            Exit Sub
+        End If
+
+
+    End Sub
+End Class

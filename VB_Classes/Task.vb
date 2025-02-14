@@ -250,7 +250,6 @@ Public Class VBtask : Implements IDisposable
 
     Public hFov As Single
     Public vFov As Single
-    Public focalLength As Single ' distance between cameras
 
     Public algName As String
     Public cameraName As String
@@ -530,8 +529,6 @@ Public Class VBtask : Implements IDisposable
         ' order of cameras is the same as the order above... see cameraNames above
         Dim vFOVangles() As Single = {59, 59, 72, 58, 42.5, 57, 57, 62, 68} ' all values from the specification - this is usually overridden by calibration data.
         Dim hFOVangles() As Single = {90, 90, 104, 105, 69.4, 86, 86, 69, 94} ' all values from the specification - this is usually overridden by calibration data.
-        Dim focalLengths() As Single = {5.5, 5.5, 3.4, 1.88, 4.81, 2.31, 2.31, 2.45, 2.45}
-        Dim baseLines() As Single = {0.074, 0.074, 0.073, 0.055, 0.052, 0.06, 0.06, 0.048, 0.048} ' in meters
 
         ' NOTE: I can't find the VFOV for the Oak-D or Oak-D Lite cameras.
         ' The 62 is based on Pythagorean theorem and knowing the 71.8 HFOV and the 81.3 DFOV.
@@ -540,7 +537,6 @@ Public Class VBtask : Implements IDisposable
 
         vFov = vFOVangles(parms.cameraIndex)  ' these are default values in case the calibration data is unavailable
         hFov = hFOVangles(parms.cameraIndex)
-        focalLength = focalLengths(parms.cameraIndex)
 
         myStopWatch = Stopwatch.StartNew()
         optionsChanged = True

@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports Intel.RealSense
+Imports System.Dynamic
 Module Zed2_CPP_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Open(width As Integer, height As Integer) As IntPtr
@@ -43,6 +44,7 @@ Public Class CameraZED2_CPP : Inherits GenericCamera
             Dim serialNumber = Zed2SerialNumber(cPtr)
         End If
         Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsZed)(Zed2Intrinsics(cPtr))
+        calibData.baseline = 0.119
         calibData.ppx = intrinsics.cx
         calibData.ppy = intrinsics.cy
         calibData.fx = intrinsics.fx

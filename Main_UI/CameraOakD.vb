@@ -55,6 +55,7 @@ Public Class CameraOakD : Inherits GenericCamera
             Dim intrinsicsArray(9 - 1) As Single
             Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
             Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+            calibData.baseline = 0.075
             calibData.ppx = intrinsicsArray(2) / ratio
             calibData.ppy = intrinsicsArray(5) / ratio
             calibData.fx = intrinsicsArray(0) / ratio

@@ -174,6 +174,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
         Dim intrin = ORBIntrinsics(cPtr)
         Dim intrinInfo(4 - 1) As Single
         Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
+        calibData.baseline = 0.05
         calibData.ppx = intrinInfo(0)
         calibData.ppy = intrinInfo(1)
         calibData.fx = intrinInfo(2)
