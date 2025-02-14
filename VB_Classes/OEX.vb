@@ -206,7 +206,7 @@ Public Class OEX_delaunay2 : Inherits TaskParent
             Dim e As Integer = e0
             Do
                 Dim org As cv.Point, dst As cv.Point
-                If subdiv.EdgeOrg(e, org) > 0 AndAlso subdiv.EdgeDst(e, dst) > 0 Then
+                If subdiv.EdgeOrg(e, org) > 0 And subdiv.EdgeDst(e, dst) > 0 Then
                     img.Line(org, dst, activeColor, task.lineWidth + 3, task.lineType, 0)
                 End If
 

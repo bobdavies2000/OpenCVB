@@ -697,7 +697,7 @@ Public Class SLR
             Dim lessPrev As Boolean = (yPrev < yCurr)
             Dim lessNext As Boolean = (yNext < yCurr)
 
-            If lessPrev AndAlso lessNext Then
+            If lessPrev And lessNext Then
                 vecMaxIndicesRes.Add(ix)
                 ix += 1
             End If

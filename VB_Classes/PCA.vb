@@ -471,10 +471,10 @@ Public Class PCA_NColor : Inherits TaskParent
         cut = GetOtsuThreshold2(buff, (entry.start * 3), entry.nCount, comp)
 
         While low < high
-            While low < high AndAlso Project(buff, ((entry.start + low) * 3), comp) < cut
+            While low < high And Project(buff, ((entry.start + low) * 3), comp) < cut
                 low += 1
             End While
-            While low < high AndAlso Project(buff, ((entry.start + high) * 3), comp) >= cut
+            While low < high And Project(buff, ((entry.start + high) * 3), comp) >= cut
                 high -= 1
             End While
             If low < high Then

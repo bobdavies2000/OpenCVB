@@ -36,7 +36,7 @@ Public Class PongWars_Basics : Inherits TaskParent
             Dim i As Integer = Math.Floor(checkX / sqWidth)
             Dim j As Integer = Math.Floor(checkY / sqHeight)
 
-            If i >= 0 AndAlso i < numSquaresX AndAlso j >= 0 AndAlso j < numSquaresY Then
+            If i >= 0 And i < numSquaresX And j >= 0 And j < numSquaresY Then
                 If squares(i, j) <> sqClass Then
                     squares(i, j) = sqClass
 
