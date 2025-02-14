@@ -31,11 +31,29 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim StreamColor = profiles.GetStream(Stream.Color)
         Dim myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-        calibData.baseline = 0.052 ' where can I get this for this camera?
         calibData.ppx = myIntrinsics.ppx / ratio
         calibData.ppy = myIntrinsics.ppy / ratio
         calibData.fx = myIntrinsics.fx / ratio
         calibData.fy = myIntrinsics.fy / ratio
+
+        Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
+        Dim streamRight = profiles.GetStream(Stream.Infrared, 2)
+
+        Dim leftIntrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
+        Dim leftExtrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
+
+        Dim rightIntrinsics = streamRight.As(Of VideoStreamProfile)().GetIntrinsics()
+        Dim rightExtrinsics = streamRight.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
+
+        ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
+        Dim baselineLeftToRGB As Single = System.Math.Sqrt(System.Math.Pow(leftExtrinsics.translation(0), 2) +
+                                                           System.Math.Pow(leftExtrinsics.translation(1), 2) +
+                                                           System.Math.Pow(leftExtrinsics.translation(2), 2))
+
+        ' Calculate the baseline (distance between the right and RGB cameras) using the translation vector
+        Dim baselineRightToRGB As Single = System.Math.Sqrt(System.Math.Pow(rightExtrinsics.translation(0), 2) +
+                                                            System.Math.Pow(rightExtrinsics.translation(1), 2) +
+                                                            System.Math.Pow(rightExtrinsics.translation(2), 2))
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
