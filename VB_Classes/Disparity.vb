@@ -224,7 +224,7 @@ Public Class Disparity_Inverse : Inherits TaskParent
                 For x = 0 To task.drawRect.Width - 1
                     Dim depth = task.pcSplit(2)(task.drawRect).Get(Of Single)(y, x)
                     If depth > 0 Then
-                        Dim disp = 0.12 * camInfo.fx / depth
+                        Dim disp = 0.12 * camInfo.rgbIntrinsics.fx / depth
                         dst3(task.drawRect).Set(Of cv.Vec3b)(y, x - disp, white)
                     End If
                 Next

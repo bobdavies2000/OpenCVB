@@ -20,7 +20,8 @@ Public Class DepthCell_Basics : Inherits TaskParent
             task.iddList.Clear()
             For Each rect In grid.gridRectsAll
                 Dim idd As New depthCell
-                idd.lRect = rect
+                If rect.BottomRight.Y = 180 Then Dim k = 0
+                idd.lRect = ValidateRect(rect)
                 Dim cellSize = task.dCell.options.cellSize
                 idd.center = New cv.Point(rect.TopLeft.X + cellSize / 2, rect.TopLeft.Y + cellSize / 2)
                 idd.age = 0
@@ -30,6 +31,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
 
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
         Dim camInfo = task.calibData
+        Dim irTopLeft As New cv.Point3f, irBottomRight As cv.Point3f
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             Dim motion = task.motionMask(idd.lRect).CountNonZero
@@ -48,7 +50,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
                     If idd.depth > task.MaxZmeters Then idd.depth = task.MaxZmeters
                     idd.rRect = idd.lRect
-                    idd.rRect.X -= camInfo.baseline * camInfo.fx / idd.depth
+                    idd.rRect.X -= camInfo.baselineLeftToRGB * camInfo.rgbIntrinsics.fx / idd.depth
                     If idd.rRect.X < 0 Then idd.rRect = New cv.Rect ' not a valid rectangle
                     If idd.rRect.Width > 0 Then
                         Dim correlationMat As New cv.Mat
@@ -56,6 +58,31 @@ Public Class DepthCell_Basics : Inherits TaskParent
 
                         idd.correlation = correlationMat.Get(Of Single)(0, 0)
                     End If
+
+                    Dim rgbTopLeft = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
+                    Dim rgbBottomRight = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.BottomRight.Y, idd.lRect.BottomRight.X)
+
+                    irTopLeft.X = camInfo.rotationLeft(0) * rgbBottomRight.X +
+                                  camInfo.rotationLeft(1) * rgbBottomRight.Y +
+                                  camInfo.rotationLeft(2) * rgbBottomRight.Z + camInfo.translationLeft(0)
+                    irTopLeft.Y = camInfo.rotationLeft(3) * rgbBottomRight.X +
+                                  camInfo.rotationLeft(4) * rgbBottomRight.Y +
+                                  camInfo.rotationLeft(5) * rgbBottomRight.Z + camInfo.translationLeft(1)
+                    irTopLeft.Z = camInfo.rotationLeft(6) * rgbBottomRight.X +
+                                  camInfo.rotationLeft(7) * rgbBottomRight.Y +
+                                  camInfo.rotationLeft(8) * rgbBottomRight.Z + camInfo.translationLeft(2)
+
+                    irBottomRight.X = camInfo.rotationLeft(0) * rgbBottomRight.X +
+                                      camInfo.rotationLeft(1) * rgbBottomRight.Y +
+                                      camInfo.rotationLeft(2) * rgbBottomRight.Z + camInfo.translationLeft(0)
+                    irBottomRight.Y = camInfo.rotationLeft(3) * rgbBottomRight.X +
+                                      camInfo.rotationLeft(4) * rgbBottomRight.Y +
+                                      camInfo.rotationLeft(5) * rgbBottomRight.Z + camInfo.translationLeft(1)
+                    irBottomRight.Z = camInfo.rotationLeft(6) * rgbBottomRight.X +
+                                      camInfo.rotationLeft(7) * rgbBottomRight.Y +
+                                      camInfo.rotationLeft(8) * rgbBottomRight.Z + camInfo.translationLeft(2)
+
+                    ' idd.irTopLeft = camInfo.
                 End If
                 idd.pcFrag = task.pointCloud(idd.lRect).Clone
             End If
@@ -153,7 +180,7 @@ Public Class DepthCell_RightView : Inherits TaskParent
             End If
             Dim depth = task.pcSplit(2)(dw).Mean(task.depthMask(dw))
             If depth(0) > 0 Then
-                Dim disp = 0.12 * camInfo.fx / depth(0)
+                Dim disp = 0.12 * camInfo.rgbIntrinsics.fx / depth(0)
                 disparities.Add(disp)
                 Dim rect = dw
                 rect.X -= disparities.Average

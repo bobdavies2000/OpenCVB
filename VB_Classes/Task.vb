@@ -303,12 +303,26 @@ Public Class VBtask : Implements IDisposable
         Dim rightView As cv.Mat
         Dim pointCloud As cv.Mat
     End Structure
-    Public Structure cameraInfo
-        Public baseline As Single
+    Public Structure intrinsicData
         Public ppx As Single
         Public ppy As Single
         Public fx As Single
         Public fy As Single
+    End Structure
+    Public Structure cameraInfo
+        Public baselineLeftToRGB As Single
+        Public baselineRightToRGB As Single
+
+        Public rgbIntrinsics As intrinsicData
+        Public leftIntrinsics As intrinsicData
+        Public rightIntrinsics As intrinsicData
+
+        Public translationLeft() As Single
+        Public rotationLeft() As Single
+
+        Public rotationRight() As Single
+        Public translationRight() As Single
+
         Public v_fov As Single ' vertical field of view in degrees.
         Public h_fov As Single ' horizontal field of view in degrees.
         Public d_fov As Single ' diagonal field of view in degrees.

@@ -4,6 +4,14 @@ Imports Intel.RealSense
 Imports System.Text
 Public Class CameraRS2 : Inherits GenericCamera
     Dim pipe As New Pipeline()
+    Private Function copyIntrinsics(input As Intrinsics, ratio As Single) As VB_Classes.VBtask.intrinsicData
+        Dim output As New VB_Classes.VBtask.intrinsicData
+        output.ppx = input.ppx / ratio
+        output.ppy = input.ppy / ratio
+        output.fx = input.fx / ratio
+        output.fy = input.fy / ratio
+        Return output
+    End Function
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""
         Dim ctx As New Context()
@@ -28,16 +36,13 @@ Public Class CameraRS2 : Inherits GenericCamera
         cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
 
         Dim profiles = pipe.Start(cfg)
-        Dim StreamColor = profiles.GetStream(Stream.Color)
-        Dim myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
-        Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-        calibData.ppx = myIntrinsics.ppx / ratio
-        calibData.ppy = myIntrinsics.ppy / ratio
-        calibData.fx = myIntrinsics.fx / ratio
-        calibData.fy = myIntrinsics.fy / ratio
-
         Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
         Dim streamRight = profiles.GetStream(Stream.Infrared, 2)
+        Dim StreamColor = profiles.GetStream(Stream.Color)
+        Dim myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+
+        Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+        calibData.rgbIntrinsics = copyIntrinsics(myIntrinsics, ratio)
 
         Dim leftIntrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim leftExtrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
@@ -45,15 +50,38 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim rightIntrinsics = streamRight.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim rightExtrinsics = streamRight.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
 
+        ReDim calibData.translationLeft(3 - 1)
+        ReDim calibData.translationRight(3 - 1)
+        ReDim calibData.rotationLeft(9 - 1)
+        ReDim calibData.rotationRight(9 - 1)
+
+        For i = 0 To 3 - 1
+            calibData.translationLeft(i) = leftExtrinsics.translation(i)
+            calibData.translationRight(i) = rightExtrinsics.translation(i)
+        Next
+        For i = 0 To 9 - 1
+            calibData.rotationLeft(i) = leftExtrinsics.rotation(i)
+            calibData.rotationRight(i) = rightExtrinsics.rotation(i)
+        Next
+
         ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
-        Dim baselineLeftToRGB As Single = System.Math.Sqrt(System.Math.Pow(leftExtrinsics.translation(0), 2) +
-                                                           System.Math.Pow(leftExtrinsics.translation(1), 2) +
-                                                           System.Math.Pow(leftExtrinsics.translation(2), 2))
+        calibData.baselineLeftToRGB = System.Math.Sqrt(System.Math.Pow(calibData.translationLeft(0), 2) +
+                                                       System.Math.Pow(calibData.translationLeft(1), 2) +
+                                                       System.Math.Pow(calibData.translationLeft(2), 2))
 
         ' Calculate the baseline (distance between the right and RGB cameras) using the translation vector
-        Dim baselineRightToRGB As Single = System.Math.Sqrt(System.Math.Pow(rightExtrinsics.translation(0), 2) +
-                                                            System.Math.Pow(rightExtrinsics.translation(1), 2) +
-                                                            System.Math.Pow(rightExtrinsics.translation(2), 2))
+        calibData.baselineRightToRGB = System.Math.Sqrt(System.Math.Pow(calibData.translationRight(0), 2) +
+                                                        System.Math.Pow(calibData.translationRight(1), 2) +
+                                                        System.Math.Pow(calibData.translationRight(2), 2))
+
+
+
+
+        ' testing
+        calibData.baselineLeftToRGB = calibData.baselineRightToRGB - calibData.baselineLeftToRGB
+
+
+
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
@@ -160,11 +188,11 @@ Public Class CameraRS2_CPP : Inherits GenericCamera
         Dim intrinInfo(4 - 1) As Single
         Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
 
-        calibData.baseline = 0.052 ' where can I get this for this camera?
-        calibData.ppx = intrinInfo(0)
-        calibData.ppy = intrinInfo(1)
-        calibData.fx = intrinInfo(2)
-        calibData.fy = intrinInfo(3)
+        calibData.baselineLeftToRGB = 0.052 ' where can I get this for this camera?
+        calibData.rgbIntrinsics.ppx = intrinInfo(0)
+        calibData.rgbIntrinsics.ppy = intrinInfo(1)
+        calibData.rgbIntrinsics.fx = intrinInfo(2)
+        calibData.rgbIntrinsics.fy = intrinInfo(3)
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         If cPtr = 0 Then Exit Sub

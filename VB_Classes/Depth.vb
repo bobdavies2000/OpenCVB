@@ -1369,10 +1369,10 @@ Public Class Depth_World : Inherits TaskParent
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         cv.Cv2.Multiply(template.dst2, src, dst0)
-        dst0 *= 1 / task.calibData.fx
+        dst0 *= 1 / task.calibData.rgbIntrinsics.fx
 
         cv.Cv2.Multiply(template.dst3, src, dst1)
-        dst1 *= 1 / task.calibData.fy
+        dst1 *= 1 / task.calibData.rgbIntrinsics.fy
 
         cv.Cv2.Merge({dst0, dst1, src}, dst2)
         If standaloneTest() Then

@@ -324,18 +324,18 @@ Public Class TaskParent : Implements IDisposable
         Return Math.Abs(v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z)
     End Function
     Public Function getWorldCoordinates(p As cv.Point3f) As cv.Point3f
-        Dim x = (p.X - task.calibData.ppx) / task.calibData.fx
-        Dim y = (p.Y - task.calibData.ppy) / task.calibData.fy
+        Dim x = (p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx
+        Dim y = (p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
     Public Function getWorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
-        Dim x = (p.X - task.calibData.ppx) / task.calibData.fx
-        Dim y = (p.Y - task.calibData.ppy) / task.calibData.fy
+        Dim x = (p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx
+        Dim y = (p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy
         Return New cv.Point3f(x * depth, y * depth, depth)
     End Function
     Public Function getWorldCoordinatesD6(p As cv.Point3f) As cv.Vec6f
-        Dim x = CSng((p.X - task.calibData.ppx) / task.calibData.fx)
-        Dim y = CSng((p.Y - task.calibData.ppy) / task.calibData.fy)
+        Dim x = CSng((p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx)
+        Dim y = CSng((p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)
     End Function
     Public Function validatePoint(pt As cv.Point2f) As cv.Point
@@ -348,8 +348,8 @@ Public Class TaskParent : Implements IDisposable
     Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X + r.Width >= task.dst2.Width * ratio Then r.Width = task.dst2.Width * ratio - r.X
-        If r.Y + r.Height >= task.dst2.Height * ratio Then r.Height = task.dst2.Height * ratio - r.Y
+        If r.X + r.Width >= task.dst2.Width * ratio Then r.Width = task.dst2.Width * ratio - r.X - 1
+        If r.Y + r.Height >= task.dst2.Height * ratio Then r.Height = task.dst2.Height * ratio - r.Y - 1
         If r.X >= task.dst2.Width * ratio Then r.X = dst2.Width - 1
         If r.Y >= task.dst2.Height * ratio Then r.Y = dst2.Height - 1
         If r.Width <= 0 Then r.Width = 1

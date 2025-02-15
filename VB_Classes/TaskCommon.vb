@@ -437,6 +437,8 @@ Public Class depthCell
     Public corners As New List(Of cv.Point3f)
     Public center As cv.Point
     Public correlation As Single
+    Public irTopLeft As cv.Point2f ' lrect.TopLeft in the Left image
+    Public irBottomRight As cv.Point2f ' lrect.BottomRight in the Left image.
 End Class
 
 

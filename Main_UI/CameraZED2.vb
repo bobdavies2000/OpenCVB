@@ -22,19 +22,19 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         Dim camInfo As sl.CameraInformation = zed.GetCameraInformation
 
-        calibData.baseline = camInfo.cameraConfiguration.calibrationParameters.Trans.X
-        calibData.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx
-        calibData.ppy = camInfo.cameraConfiguration.calibrationParameters.leftCam.cy
-        calibData.fx = camInfo.cameraConfiguration.calibrationParameters.leftCam.fx
-        calibData.fy = camInfo.cameraConfiguration.calibrationParameters.leftCam.fy
+        calibData.baselineLeftToRGB = camInfo.cameraConfiguration.calibrationParameters.Trans.X
+        calibData.rgbIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx
+        calibData.rgbIntrinsics.ppy = camInfo.cameraConfiguration.calibrationParameters.leftCam.cy
+        calibData.rgbIntrinsics.fx = camInfo.cameraConfiguration.calibrationParameters.leftCam.fx
+        calibData.rgbIntrinsics.fy = camInfo.cameraConfiguration.calibrationParameters.leftCam.fy
         calibData.h_fov = camInfo.cameraConfiguration.calibrationParameters.leftCam.hFOV
         calibData.v_fov = camInfo.cameraConfiguration.calibrationParameters.leftCam.vFOV
 
         Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-        calibData.fx /= ratio
-        calibData.fy /= ratio
-        calibData.ppx /= ratio
-        calibData.ppy /= ratio
+        calibData.rgbIntrinsics.fx /= ratio
+        calibData.rgbIntrinsics.fy /= ratio
+        calibData.rgbIntrinsics.ppx /= ratio
+        calibData.rgbIntrinsics.ppy /= ratio
 
         Dim posTrack As New sl.PositionalTrackingParameters
         posTrack.enableAreaMemory = True

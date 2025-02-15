@@ -338,6 +338,13 @@ Public Class Main_UI
         If r.Y + r.Height > height Then r.Height = height - r.Y - 1
         Return r
     End Function
+    Public Function validatePoint(pt As cv.Point2f) As cv.Point
+        If pt.X < 0 Then pt.X = 0
+        If pt.X > camPic(0).Width Then pt.X = camPic(0).Width - 1
+        If pt.Y < 0 Then pt.Y = 0
+        If pt.Y > camPic(0).Height Then pt.Y = camPic(0).Height - 1
+        Return pt
+    End Function
     Public Function USBenumeration() As List(Of String)
         Static usblist As New List(Of String)
         Dim info As ManagementObject
@@ -1605,17 +1612,8 @@ Public Class Main_UI
                             End If
                             task.pointCloud = camera.uiPointCloud
 
-                            If frameCount < 10 Then
-                                Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
-                                task.calibData.ppx = task.dst2.Width / 2 ' camera.calibData.ppx / sizeRatio
-                                task.calibData.ppy = task.dst2.Height / 2 ' camera.calibData.ppy / sizeRatio
-                                task.calibData.baseline = camera.calibData.baseline
-                                task.calibData.fx = camera.calibData.fx
-                                task.calibData.fy = camera.calibData.fy
-                                task.calibData.v_fov = camera.calibData.v_fov
-                                task.calibData.h_fov = camera.calibData.h_fov
-                                task.calibData.d_fov = camera.calibData.d_fov
-                            End If
+                            If frameCount < 10 Then task.calibData = camera.calibdata
+
                             task.transformationMatrix = camera.transformationMatrix
                             task.IMU_TimeStamp = camera.IMU_TimeStamp
                             task.IMU_Acceleration = camera.IMU_Acceleration
@@ -1675,6 +1673,7 @@ Public Class Main_UI
                         If task.mouseMovePoint = New cv.Point(0, 0) Then
                             task.mouseMovePoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2)
                         End If
+                        task.mouseMovePoint = validatePoint(task.mouseMovePoint)
                         task.mousePicTag = mousePicTag
                         If mouseClickFlag Then
                             task.mouseClickFlag = mouseClickFlag

@@ -64,8 +64,8 @@ Public Class GenericCamera
         Public mapperConfidence As Integer
     End Structure
     Public Sub New()
-        Dim cam As VBtask.cameraInfo
-        calibData = cam
+        'Dim cam As VBtask.cameraInfo
+        'calibData = cam
     End Sub
     Public Function getMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
