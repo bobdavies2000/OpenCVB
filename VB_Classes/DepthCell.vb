@@ -61,31 +61,6 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     Else
                         idd.rRect = New cv.Rect
                     End If
-
-                    'Dim rgbTopLeft = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
-                    'Dim rgbBottomRight = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.BottomRight.Y, idd.lRect.BottomRight.X)
-
-                    'irTopLeft.X = camInfo.rotationLeft(0) * rgbBottomRight.X +
-                    '              camInfo.rotationLeft(1) * rgbBottomRight.Y +
-                    '              camInfo.rotationLeft(2) * rgbBottomRight.Z + camInfo.translationLeft(0)
-                    'irTopLeft.Y = camInfo.rotationLeft(3) * rgbBottomRight.X +
-                    '              camInfo.rotationLeft(4) * rgbBottomRight.Y +
-                    '              camInfo.rotationLeft(5) * rgbBottomRight.Z + camInfo.translationLeft(1)
-                    'irTopLeft.Z = camInfo.rotationLeft(6) * rgbBottomRight.X +
-                    '              camInfo.rotationLeft(7) * rgbBottomRight.Y +
-                    '              camInfo.rotationLeft(8) * rgbBottomRight.Z + camInfo.translationLeft(2)
-
-                    'irBottomRight.X = camInfo.rotationLeft(0) * rgbBottomRight.X +
-                    '                  camInfo.rotationLeft(1) * rgbBottomRight.Y +
-                    '                  camInfo.rotationLeft(2) * rgbBottomRight.Z + camInfo.translationLeft(0)
-                    'irBottomRight.Y = camInfo.rotationLeft(3) * rgbBottomRight.X +
-                    '                  camInfo.rotationLeft(4) * rgbBottomRight.Y +
-                    '                  camInfo.rotationLeft(5) * rgbBottomRight.Z + camInfo.translationLeft(1)
-                    'irBottomRight.Z = camInfo.rotationLeft(6) * rgbBottomRight.X +
-                    '                  camInfo.rotationLeft(7) * rgbBottomRight.Y +
-                    '                  camInfo.rotationLeft(8) * rgbBottomRight.Z + camInfo.translationLeft(2)
-
-                    ' idd.irTopLeft = camInfo.
                 End If
                 idd.pcFrag = task.pointCloud(idd.lRect).Clone
             End If
@@ -120,8 +95,8 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim idd = task.iddList(index)
         dst2 = task.dCell.dst2
-        ptReal = idd.center
-        pt = idd.center
+        ptReal = idd.lRect.TopLeft
+        pt = idd.lRect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
             pt.X -= dst2.Width * 0.15
         Else
@@ -383,3 +358,48 @@ Public Class DepthCell_CorrelationMask : Inherits TaskParent
 End Class
 
 
+
+
+
+
+Public Class DepthCell_RGBtoLeft : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "Left View resized to approximately match the RGB view - see sliders to adjust"
+        desc = "Translate the RGB to left view for all cameras except Stereolabs where left is RGB."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim camInfo = task.calibData, correlationMat As New cv.Mat
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim idd As depthCell
+        If index > 0 And index < task.iddList.Count Then
+            idd = task.iddList(index)
+        Else
+            idd = task.iddList(task.iddList.Count / 2)
+        End If
+
+        Dim rgbTop = idd.lRect.TopLeft, ir3D As cv.Point3f, irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
+
+        If pcTop.Z > 0 Then
+                ir3D.X = 1000 * (camInfo.rotationLeft(0) * pcTop.X +
+                             camInfo.rotationLeft(1) * pcTop.Y +
+                             camInfo.rotationLeft(2) * pcTop.Z + camInfo.translationLeft(0))
+                ir3D.Y = 1000 * (camInfo.rotationLeft(3) * pcTop.X +
+                             camInfo.rotationLeft(4) * pcTop.Y +
+                             camInfo.rotationLeft(5) * pcTop.Z + camInfo.translationLeft(1))
+                ir3D.Z = 1000 * (camInfo.rotationLeft(6) * pcTop.X +
+                             camInfo.rotationLeft(7) * pcTop.Y +
+                             camInfo.rotationLeft(8) * pcTop.Z + camInfo.translationLeft(2))
+                irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
+                irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
+            labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
+        End If
+
+        dst2 = task.leftView
+        Dim r = New cv.Rect(irPt.X, irPt.Y, idd.lRect.Width, idd.lRect.Height)
+        dst2.Rectangle(r, 255, task.lineWidth)
+
+        dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
+        ' SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
+    End Sub
+End Class

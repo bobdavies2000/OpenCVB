@@ -50,6 +50,9 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim rightIntrinsics = streamRight.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim rightExtrinsics = streamRight.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
 
+        calibData.leftIntrinsics = copyIntrinsics(leftIntrinsics, ratio)
+        calibData.rightIntrinsics = copyIntrinsics(rightIntrinsics, ratio)
+
         ReDim calibData.translationLeft(3 - 1)
         ReDim calibData.translationRight(3 - 1)
         ReDim calibData.rotationLeft(9 - 1)
@@ -74,14 +77,7 @@ Public Class CameraRS2 : Inherits GenericCamera
                                                         System.Math.Pow(calibData.translationRight(1), 2) +
                                                         System.Math.Pow(calibData.translationRight(2), 2))
 
-
-
-
-        ' testing
-        calibData.baselineLeftToRGB = calibData.baselineRightToRGB - calibData.baselineLeftToRGB
-
-
-
+        calibData.baselineLeftToRight = calibData.baselineRightToRGB - calibData.baselineLeftToRGB
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
@@ -122,8 +118,8 @@ Public Class CameraRS2 : Inherits GenericCamera
 
             SyncLock cameraLock
                 uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+                uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
                 uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End SyncLock
 
@@ -212,10 +208,10 @@ Public Class CameraRS2_CPP : Inherits GenericCamera
         SyncLock cameraLock
             Dim w = WorkingRes.Width, h = WorkingRes.Height
             uiColor = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone
-            Dim tmp As cv.Mat = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            uiLeft = tmp * 4 - 35 ' improved brightness specific to RealSense
-            tmp = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            uiRight = tmp * 4 - 35 ' improved brightness specific to RealSense
+            Dim tmp As cv.Mat = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8U, RS2LeftRaw(cPtr))
+            uiLeft = tmp * 6 ' improved brightness specific to RealSense
+            tmp = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8U, RS2RightRaw(cPtr))
+            uiRight = tmp * 6 ' improved brightness specific to RealSense
             Dim pc = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr))
             uiPointCloud = pc.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
         End SyncLock

@@ -332,6 +332,7 @@ Public Class algorithmList
 	If algorithmName = "DepthCell_InstantUpdate" Then return new DepthCell_InstantUpdate
 	If algorithmName = "DepthCell_MouseDepth" Then return new DepthCell_MouseDepth
 	If algorithmName = "DepthCell_Plot" Then return new DepthCell_Plot
+	If algorithmName = "DepthCell_RGBtoLeft" Then return new DepthCell_RGBtoLeft
 	If algorithmName = "DepthCell_RightView" Then return new DepthCell_RightView
 	If algorithmName = "Derivative_Basics" Then return new Derivative_Basics
 	If algorithmName = "Derivative_Classes" Then return new Derivative_Classes

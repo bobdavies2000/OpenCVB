@@ -312,6 +312,7 @@ Public Class VBtask : Implements IDisposable
     Public Structure cameraInfo
         Public baselineLeftToRGB As Single
         Public baselineRightToRGB As Single
+        Public baselineLeftToRight As Single
 
         Public rgbIntrinsics As intrinsicData
         Public leftIntrinsics As intrinsicData

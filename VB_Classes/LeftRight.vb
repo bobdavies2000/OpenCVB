@@ -421,7 +421,7 @@ End Class
 
 
 Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
+    Public addw As New AddWeighted_Basics
     Dim options As New Options_RGBAlign
     Public Sub New()
         desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
