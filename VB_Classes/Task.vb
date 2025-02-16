@@ -310,7 +310,7 @@ Public Class VBtask : Implements IDisposable
         Public fy As Single
     End Structure
     Public Structure cameraInfo
-        Public baselineLeftToRGB As Single
+        Public baseline As Single
         Public baselineRightToRGB As Single
         Public baselineLeftToRight As Single
 

@@ -22,7 +22,7 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         Dim camInfo As sl.CameraInformation = zed.GetCameraInformation
 
-        calibData.baselineLeftToRGB = camInfo.cameraConfiguration.calibrationParameters.Trans.X
+        calibData.baseline = camInfo.cameraConfiguration.calibrationParameters.Trans.X
         calibData.rgbIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx
         calibData.rgbIntrinsics.ppy = camInfo.cameraConfiguration.calibrationParameters.leftCam.cy
         calibData.rgbIntrinsics.fx = camInfo.cameraConfiguration.calibrationParameters.leftCam.fx

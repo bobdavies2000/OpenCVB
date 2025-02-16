@@ -8,7 +8,6 @@ Public Class CameraORB : Inherits GenericCamera
     Dim gyroSensor As Sensor
     Dim orbMutex As New Mutex(True, "orbMutex")
     Dim acceleration As cv.Point3f, angularVelocity As cv.Point3f, timeStamp As Int64
-    Dim timeStampList As New List(Of Int64)
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         Dim ctx As New Context
@@ -34,14 +33,6 @@ Public Class CameraORB : Inherits GenericCamera
 
         gyroSensor = dev.GetSensorList.GetSensor(SensorType.OB_SENSOR_GYRO)
         accelSensor = dev.GetSensorList.GetSensor(SensorType.OB_SENSOR_ACCEL)
-
-        Dim myIntrinsics = dev.GetCalibrationCameraParamList()
-        Dim param As CameraParam = myIntrinsics.GetCameraParam(0)
-        Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-        calibData.rgbIntrinsics.fx = param.rgbIntrinsic.fx / ratio
-        calibData.rgbIntrinsics.fy = param.rgbIntrinsic.fy / ratio
-        calibData.rgbIntrinsics.ppx = param.rgbIntrinsic.cx / ratio
-        calibData.rgbIntrinsics.ppy = param.rgbIntrinsic.cy / ratio
 
         Dim gProfiles = gyroSensor.GetStreamProfileList()
         Dim gProfile = gProfiles.GetProfile(0)
@@ -77,10 +68,8 @@ Public Class CameraORB : Inherits GenericCamera
         If cameraFrameCount = 0 Then
             Dim param As CameraParam = pipe.GetCameraParam()
             Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-            param.rgbIntrinsic.fx = param.rgbIntrinsic.fx / ratio
-            param.rgbIntrinsic.fy = param.rgbIntrinsic.fy / ratio
-            param.rgbIntrinsic.cx = param.rgbIntrinsic.cx / ratio
-            param.rgbIntrinsic.cy = param.rgbIntrinsic.cy / ratio
+            calibData.rgbIntrinsics = copyIntrinsics(param.rgbIntrinsic, ratio)
+            calibData.baseline = 0.095 ' I don't see how to get this from their API's - this is just what the spec says.
             PtCloud.SetCameraParam(param)
         End If
 
@@ -174,7 +163,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
         Dim intrin = ORBIntrinsics(cPtr)
         Dim intrinInfo(4 - 1) As Single
         Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
-        calibData.baselineLeftToRGB = 0.05
+        calibData.baseline = 0.05
         calibData.rgbIntrinsics.ppx = intrinInfo(0)
         calibData.rgbIntrinsics.ppy = intrinInfo(1)
         calibData.rgbIntrinsics.fx = intrinInfo(2)

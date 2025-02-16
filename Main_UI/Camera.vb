@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Numerics
 Imports VB_Classes
+Imports Intel.RealSense
+Imports Orbbec
 
 Public Class GenericCamera
     Public transformationMatrix() As Single
@@ -63,9 +65,23 @@ Public Class GenericCamera
         Public trackerConfidence As Integer
         Public mapperConfidence As Integer
     End Structure
+    Public Function copyIntrinsics(input As Intrinsics, ratio As Single) As VB_Classes.VBtask.intrinsicData
+        Dim output As New VB_Classes.VBtask.intrinsicData
+        output.ppx = input.ppx / ratio
+        output.ppy = input.ppy / ratio
+        output.fx = input.fx / ratio
+        output.fy = input.fy / ratio
+        Return output
+    End Function
+    Public Function copyIntrinsics(input As CameraIntrinsic, ratio As Single) As VB_Classes.VBtask.intrinsicData
+        Dim output As New VB_Classes.VBtask.intrinsicData
+        output.ppx = input.cx / ratio
+        output.ppy = input.cy / ratio
+        output.fx = input.fx / ratio
+        output.fy = input.fy / ratio
+        Return output
+    End Function
     Public Sub New()
-        'Dim cam As VBtask.cameraInfo
-        'calibData = cam
     End Sub
     Public Function getMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData

@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Threading
+Imports Intel.RealSense
 
 Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
@@ -13,7 +14,8 @@ Module OakD_Module_CPP
     End Function
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDLeftImage(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDintrinsics(cPtr As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDintrinsics(cPtr As IntPtr, camera As Integer) As IntPtr
     End Function
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDRawDepth(cPtr As IntPtr) As IntPtr
     End Function
@@ -38,6 +40,14 @@ Public Class CameraOakD : Inherits GenericCamera
     Public gyro As cv.Point3f
     Dim templateX As cv.Mat
     Dim templateY As cv.Mat
+    Private Function copyOakIntrinsics(input() As Single, ratio As Single) As VB_Classes.VBtask.intrinsicData
+        Dim output As New VB_Classes.VBtask.intrinsicData
+        output.ppx = input(2) / ratio
+        output.ppy = input(5) / ratio
+        output.fx = input(0) / ratio
+        output.fy = input(4) / ratio
+        Return output
+    End Function
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         If templateX IsNot Nothing Then Return ' we have already been initialized.
@@ -51,15 +61,20 @@ Public Class CameraOakD : Inherits GenericCamera
         Static FirstPass = True
         If (FirstPass) Then
             FirstPass = False
-            Dim intrin = OakDintrinsics(cPtr)
+            Dim intrin = OakDintrinsics(cPtr, 1)
             Dim intrinsicsArray(9 - 1) As Single
             Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
             Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-            calibData.baselineLeftToRGB = 0.075
-            calibData.rgbIntrinsics.ppx = intrinsicsArray(2) / ratio
-            calibData.rgbIntrinsics.ppy = intrinsicsArray(5) / ratio
-            calibData.rgbIntrinsics.fx = intrinsicsArray(0) / ratio
-            calibData.rgbIntrinsics.fy = intrinsicsArray(4) / ratio
+            calibData.baseline = 0.075
+            calibData.rgbIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+
+            intrin = OakDintrinsics(cPtr, 2)
+            Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
+            calibData.leftIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+
+            intrin = OakDintrinsics(cPtr, 3)
+            Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
+            calibData.rightIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
 
             templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
             templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)
@@ -70,9 +85,6 @@ Public Class CameraOakD : Inherits GenericCamera
             For i = 1 To templateX.Height - 1
                 templateX.Row(0).CopyTo(templateX.Row(i))
                 templateY.Set(Of Single)(i, 0, i)
-            Next
-
-            For i = 0 To templateX.Height - 1
             Next
 
             For i = 1 To templateY.Width - 1

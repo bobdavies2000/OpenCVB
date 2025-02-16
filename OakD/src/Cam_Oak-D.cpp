@@ -215,9 +215,20 @@ int* OakDOpen(int w, int h)
 }
 
 extern "C" __declspec(dllexport)
-int* OakDintrinsics(OakDCamera* cPtr)
+int* OakDintrinsics(OakDCamera* cPtr, int camera)
 {
-	std::vector<std::vector<float>> intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_A, 1280, 720);
+	std::vector<std::vector<float>> intrin;
+	if (camera == 1)
+	{
+		intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_A, 1280, 720);
+	}
+	else {
+		if (camera == 2)
+			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_B, 1280, 720);
+		else
+			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_C, 1280, 720);
+	}
+	
 	int i = 0;
 	for (auto row : intrin)  for (auto val : row) cPtr->intrinsics[i++] = val;
 	return (int*)&cPtr->intrinsics;

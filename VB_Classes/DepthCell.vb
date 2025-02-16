@@ -52,10 +52,10 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     idd.depth = task.pcSplit(2).Get(Of Single)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
                     idd.rRect = idd.lRect
                     If idd.depth > 0 Then
-                        idd.rRect.X -= camInfo.baselineLeftToRGB * camInfo.rgbIntrinsics.fx / idd.depthMean
+                        idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / idd.depth
                         idd.rRect = ValidateRect(idd.rRect)
                         cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
-                                                 cv.TemplateMatchModes.CCoeffNormed)
+                                             cv.TemplateMatchModes.CCoeffNormed)
 
                         idd.correlation = correlationMat.Get(Of Single)(0, 0)
                     Else
@@ -274,21 +274,10 @@ Public Class DepthCell_Correlation : Inherits TaskParent
         dst3 = task.rightView
         Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
-        Static saveIndex As Integer, saveCorrelation As Single
         Dim idd = task.iddList(index)
-        If saveIndex <> index Then
-            saveIndex = index
-
-            If idd.depth > 0 Then
-                Dim correlationMat As New cv.Mat
-                cv.Cv2.MatchTemplate(dst2(idd.lRect), dst3(idd.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-
-                saveCorrelation = correlationMat.Get(Of Single)(0, 0)
-            End If
-        End If
-        dst2.Circle(idd.center, task.DotSize, 255, -1)
-        SetTrueText("Correlation " + Format(saveCorrelation, fmt3), task.dCell.mouseD.pt, 2)
-        labels(3) = "Correlation of the left depth cell to the right is " + Format(saveCorrelation, fmt3)
+        dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
+        SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
+        labels(3) = "Correlation of the left depth cell to the right is " + Format(idd.correlation, fmt3)
 
         dst2.Rectangle(idd.lRect, 255, task.lineWidth)
         dst3.Rectangle(idd.rRect, 255, task.lineWidth)
@@ -364,7 +353,7 @@ End Class
 
 Public Class DepthCell_RGBtoLeft : Inherits TaskParent
     Public Sub New()
-        labels(3) = "Left View resized to approximately match the RGB view - see sliders to adjust"
+        labels(3) = "Right camera image..."
         desc = "Translate the RGB to left view for all cameras except Stereolabs where left is RGB."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -377,25 +366,30 @@ Public Class DepthCell_RGBtoLeft : Inherits TaskParent
             idd = task.iddList(task.iddList.Count / 2)
         End If
 
-        Dim rgbTop = idd.lRect.TopLeft, ir3D As cv.Point3f, irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
-
-        If pcTop.Z > 0 Then
+        Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        Dim rgbTop = idd.lRect.TopLeft, ir3D As cv.Point3f
+        If task.cameraName.StartsWith("Intel") Then
+            Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
+            If pcTop.Z > 0 Then
                 ir3D.X = 1000 * (camInfo.rotationLeft(0) * pcTop.X +
-                             camInfo.rotationLeft(1) * pcTop.Y +
-                             camInfo.rotationLeft(2) * pcTop.Z + camInfo.translationLeft(0))
+                                     camInfo.rotationLeft(1) * pcTop.Y +
+                                     camInfo.rotationLeft(2) * pcTop.Z + camInfo.translationLeft(0))
                 ir3D.Y = 1000 * (camInfo.rotationLeft(3) * pcTop.X +
-                             camInfo.rotationLeft(4) * pcTop.Y +
-                             camInfo.rotationLeft(5) * pcTop.Z + camInfo.translationLeft(1))
+                                     camInfo.rotationLeft(4) * pcTop.Y +
+                                     camInfo.rotationLeft(5) * pcTop.Z + camInfo.translationLeft(1))
                 ir3D.Z = 1000 * (camInfo.rotationLeft(6) * pcTop.X +
-                             camInfo.rotationLeft(7) * pcTop.Y +
-                             camInfo.rotationLeft(8) * pcTop.Z + camInfo.translationLeft(2))
+                                     camInfo.rotationLeft(7) * pcTop.Y +
+                                     camInfo.rotationLeft(8) * pcTop.Z + camInfo.translationLeft(2))
                 irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
                 irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
-            labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
+            End If
+        Else
+            irPt = idd.lRect.TopLeft ' the above cameras are already have RGB aligned to the left image.
         End If
+        labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
 
         dst2 = task.leftView
+        dst3 = task.rightView
         Dim r = New cv.Rect(irPt.X, irPt.Y, idd.lRect.Width, idd.lRect.Height)
         dst2.Rectangle(r, 255, task.lineWidth)
 

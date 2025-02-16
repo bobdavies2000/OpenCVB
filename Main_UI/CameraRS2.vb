@@ -4,14 +4,6 @@ Imports Intel.RealSense
 Imports System.Text
 Public Class CameraRS2 : Inherits GenericCamera
     Dim pipe As New Pipeline()
-    Private Function copyIntrinsics(input As Intrinsics, ratio As Single) As VB_Classes.VBtask.intrinsicData
-        Dim output As New VB_Classes.VBtask.intrinsicData
-        output.ppx = input.ppx / ratio
-        output.ppy = input.ppy / ratio
-        output.fx = input.fx / ratio
-        output.fy = input.fy / ratio
-        Return output
-    End Function
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""
         Dim ctx As New Context()
@@ -68,7 +60,7 @@ Public Class CameraRS2 : Inherits GenericCamera
         Next
 
         ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
-        calibData.baselineLeftToRGB = System.Math.Sqrt(System.Math.Pow(calibData.translationLeft(0), 2) +
+        calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translationLeft(0), 2) +
                                                        System.Math.Pow(calibData.translationLeft(1), 2) +
                                                        System.Math.Pow(calibData.translationLeft(2), 2))
 
@@ -77,7 +69,7 @@ Public Class CameraRS2 : Inherits GenericCamera
                                                         System.Math.Pow(calibData.translationRight(1), 2) +
                                                         System.Math.Pow(calibData.translationRight(2), 2))
 
-        calibData.baselineLeftToRight = calibData.baselineRightToRGB - calibData.baselineLeftToRGB
+        calibData.baselineLeftToRight = calibData.baselineRightToRGB - calibData.baseline
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
@@ -184,7 +176,7 @@ Public Class CameraRS2_CPP : Inherits GenericCamera
         Dim intrinInfo(4 - 1) As Single
         Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
 
-        calibData.baselineLeftToRGB = 0.052 ' where can I get this for this camera?
+        calibData.baseline = 0.052 ' where can I get this for this camera?
         calibData.rgbIntrinsics.ppx = intrinInfo(0)
         calibData.rgbIntrinsics.ppy = intrinInfo(1)
         calibData.rgbIntrinsics.fx = intrinInfo(2)
