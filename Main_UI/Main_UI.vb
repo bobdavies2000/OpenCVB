@@ -1752,6 +1752,7 @@ Public Class Main_UI
                     End If
                     trueData.Add(New TrueText(strSave, ptSave, 1))
                     task.depthRGB.Circle(task.dCell.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
+                    task.color.Circle(task.dCell.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
                     task.trueData.Clear()
                 End SyncLock
 

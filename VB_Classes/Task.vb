@@ -826,7 +826,11 @@ Public Class VBtask : Implements IDisposable
         If paused = False Then
 
 
+
+
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
+
+
 
 
 

@@ -175,7 +175,10 @@ Public Class Grid_Rectangles : Inherits TaskParent
             Next
         End If
         If standaloneTest() Then
-            task.color.CopyTo(dst2)
+            gridMap.ConvertTo(dst1, cv.MatType.CV_32F)
+            Dim mm = GetMinMax(dst1)
+            dst1 = dst1 * 255 / mm.maxVal
+            dst1.ConvertTo(dst2, cv.MatType.CV_8U)
             labels(2) = "Grid_Basics " + CStr(gridRectsAll.Count) + " tiles, " + CStr(tilesPerRow) +
                         " cols by " + CStr(tilesPerCol) + " rows, with " +
                         CStr(cellSize) + "X" + CStr(cellSize) + " cells"

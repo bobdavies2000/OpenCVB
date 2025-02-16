@@ -2210,6 +2210,7 @@ Public Class OpenGL_QuadCompare : Inherits TaskParent
     Dim quadD As New OpenGL_QuadDepth
     Dim quadC As New OpenGL_QuadConnect
     Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
         desc = "Compare different representations of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2231,5 +2232,62 @@ Public Class OpenGL_QuadCompare : Inherits TaskParent
                 dst2 = quadC.dst2
                 dst3 = quadC.dst3
         End Select
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_CorrelationMask : Inherits TaskParent
+    Dim corrMask As New DepthCell_CorrelationMask
+    Public Sub New()
+        desc = "Show only the pointcloud portions that have a correlation greater than the threshold."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        corrMask.Run(src)
+        dst2 = corrMask.dst2
+        dst3 = corrMask.dst3
+        labels = corrMask.labels
+
+        task.ogl.pointCloudInput = corrMask.dst2
+        task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_QuadCorrelationMask : Inherits TaskParent
+    Dim corrMask As New DepthCell_CorrelationMask
+    Dim ogl As New OpenGL_QuadCompare
+    Public Sub New()
+        desc = "Show only the pointcloud portions that have a correlation greater than the threshold."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        corrMask.Run(src)
+        dst2 = corrMask.dst2
+        dst3 = corrMask.dst3
+        labels = corrMask.labels
+
+        Dim minCorr = task.dCell.options.correlationThreshold
+        Dim count As Integer
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            If idd.correlation < minCorr Then
+                idd.depth = 0
+                task.iddList(i) = idd
+            End If
+            If idd.depth = 0 Then count += 1
+        Next
+        task.pointCloud = corrMask.dst2
+        If count < task.iddList.Count Then
+            ogl.Run(src)
+        Else
+            SetTrueText("With a correlation threshold of " + Format(minCorr, fmt3) + " there are no remaining cells.", 3)
+        End If
     End Sub
 End Class

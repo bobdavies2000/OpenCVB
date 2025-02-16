@@ -325,6 +325,9 @@ Public Class algorithmList
 	If algorithmName = "Depth_WorldXYMT" Then return new Depth_WorldXYMT
 	If algorithmName = "Depth_WorldXYZ" Then return new Depth_WorldXYZ
 	If algorithmName = "DepthCell_Basics" Then return new DepthCell_Basics
+	If algorithmName = "DepthCell_Correlation" Then return new DepthCell_Correlation
+	If algorithmName = "DepthCell_CorrelationMap" Then return new DepthCell_CorrelationMap
+	If algorithmName = "DepthCell_CorrelationMask" Then return new DepthCell_CorrelationMask
 	If algorithmName = "DepthCell_FullDepth" Then return new DepthCell_FullDepth
 	If algorithmName = "DepthCell_InstantUpdate" Then return new DepthCell_InstantUpdate
 	If algorithmName = "DepthCell_MouseDepth" Then return new DepthCell_MouseDepth
@@ -354,7 +357,6 @@ Public Class algorithmList
 	If algorithmName = "Dilate_OpenClose" Then return new Dilate_OpenClose
 	If algorithmName = "Disparity_Basics" Then return new Disparity_Basics
 	If algorithmName = "Disparity_Color8u" Then return new Disparity_Color8u
-	If algorithmName = "Disparity_Correlation" Then return new Disparity_Correlation
 	If algorithmName = "Disparity_Edges" Then return new Disparity_Edges
 	If algorithmName = "Disparity_Features" Then return new Disparity_Features
 	If algorithmName = "Disparity_Inverse" Then return new Disparity_Inverse
@@ -1200,6 +1202,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_ColorRaw" Then return new OpenGL_ColorRaw
 	If algorithmName = "OpenGL_ColorReduced3D" Then return new OpenGL_ColorReduced3D
 	If algorithmName = "OpenGL_Contours" Then return new OpenGL_Contours
+	If algorithmName = "OpenGL_CorrelationMask" Then return new OpenGL_CorrelationMask
 	If algorithmName = "OpenGL_Density2D" Then return new OpenGL_Density2D
 	If algorithmName = "OpenGL_DrawCube" Then return new OpenGL_DrawCube
 	If algorithmName = "OpenGL_DrawHulls" Then return new OpenGL_DrawHulls
@@ -1240,6 +1243,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_QuadBricks" Then return new OpenGL_QuadBricks
 	If algorithmName = "OpenGL_QuadCompare" Then return new OpenGL_QuadCompare
 	If algorithmName = "OpenGL_QuadConnect" Then return new OpenGL_QuadConnect
+	If algorithmName = "OpenGL_QuadCorrelationMask" Then return new OpenGL_QuadCorrelationMask
 	If algorithmName = "OpenGL_QuadDepth" Then return new OpenGL_QuadDepth
 	If algorithmName = "OpenGL_QuadGridTiles" Then return new OpenGL_QuadGridTiles
 	If algorithmName = "OpenGL_QuadHulls" Then return new OpenGL_QuadHulls

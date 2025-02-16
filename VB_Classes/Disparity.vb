@@ -267,38 +267,3 @@ Public Class Disparity_Color8u : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Disparity_Correlation : Inherits TaskParent
-    Public Sub New()
-        desc = "Compute a depth cell inverse (disparity) and compute the resulting correlation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView
-        dst3 = task.rightView
-        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Static saveIndex As Integer, correlation As Single
-        Dim idd = task.iddList(index)
-        If saveIndex <> index Then
-            saveIndex = index
-
-            If idd.rRect.Width > 0 Then
-                Dim correlationMat As New cv.Mat
-                cv.Cv2.MatchTemplate(dst2(idd.lRect), dst3(idd.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-
-                correlation = correlationMat.Get(Of Single)(0, 0)
-            End If
-        End If
-
-        dst2.Rectangle(idd.lRect, 255, task.lineWidth)
-        dst3.Rectangle(idd.rRect, 255, task.lineWidth)
-        If correlation = 0 Then
-            labels(3) = "There was no depth at that location."
-        Else
-            labels(3) = "Correlation of the left depth cell to the right is " + Format(correlation, fmt3)
-        End If
-    End Sub
-End Class

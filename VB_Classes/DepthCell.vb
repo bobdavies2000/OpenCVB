@@ -14,9 +14,10 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
+        task.iddSize = options.cellSize
+        grid.Run(src)
+
         If task.optionsChanged Or instantUpdate Then
-            task.iddSize = options.cellSize
-            grid.Run(src)
             task.iddList.Clear()
             For Each rect In grid.gridRectsAll
                 Dim idd As New depthCell
@@ -30,8 +31,8 @@ Public Class DepthCell_Basics : Inherits TaskParent
         End If
 
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
-        Dim camInfo = task.calibData
-        Dim irTopLeft As New cv.Point3f, irBottomRight As cv.Point3f
+        Dim camInfo = task.calibData, correlationMat As New cv.Mat
+        '  Dim irTopLeft As New cv.Point3f, irBottomRight As cv.Point3f
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             Dim motion = task.motionMask(idd.lRect).CountNonZero
@@ -47,40 +48,42 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     idd.depth = 0
                 Else
                     idd.age = 1
-                    idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
-                    If idd.depth > task.MaxZmeters Then idd.depth = task.MaxZmeters
+                    idd.depthMean = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
+                    idd.depth = task.pcSplit(2).Get(Of Single)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
                     idd.rRect = idd.lRect
-                    idd.rRect.X -= camInfo.baselineLeftToRGB * camInfo.rgbIntrinsics.fx / idd.depth
-                    If idd.rRect.X < 0 Then idd.rRect = New cv.Rect ' not a valid rectangle
-                    If idd.rRect.Width > 0 Then
-                        Dim correlationMat As New cv.Mat
-                        cv.Cv2.MatchTemplate(dst2(idd.lRect), dst3(idd.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                    If idd.depth > 0 Then
+                        idd.rRect.X -= camInfo.baselineLeftToRGB * camInfo.rgbIntrinsics.fx / idd.depthMean
+                        idd.rRect = ValidateRect(idd.rRect)
+                        cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                                                 cv.TemplateMatchModes.CCoeffNormed)
 
                         idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                    Else
+                        idd.rRect = New cv.Rect
                     End If
 
-                    Dim rgbTopLeft = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
-                    Dim rgbBottomRight = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.BottomRight.Y, idd.lRect.BottomRight.X)
+                    'Dim rgbTopLeft = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
+                    'Dim rgbBottomRight = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.BottomRight.Y, idd.lRect.BottomRight.X)
 
-                    irTopLeft.X = camInfo.rotationLeft(0) * rgbBottomRight.X +
-                                  camInfo.rotationLeft(1) * rgbBottomRight.Y +
-                                  camInfo.rotationLeft(2) * rgbBottomRight.Z + camInfo.translationLeft(0)
-                    irTopLeft.Y = camInfo.rotationLeft(3) * rgbBottomRight.X +
-                                  camInfo.rotationLeft(4) * rgbBottomRight.Y +
-                                  camInfo.rotationLeft(5) * rgbBottomRight.Z + camInfo.translationLeft(1)
-                    irTopLeft.Z = camInfo.rotationLeft(6) * rgbBottomRight.X +
-                                  camInfo.rotationLeft(7) * rgbBottomRight.Y +
-                                  camInfo.rotationLeft(8) * rgbBottomRight.Z + camInfo.translationLeft(2)
+                    'irTopLeft.X = camInfo.rotationLeft(0) * rgbBottomRight.X +
+                    '              camInfo.rotationLeft(1) * rgbBottomRight.Y +
+                    '              camInfo.rotationLeft(2) * rgbBottomRight.Z + camInfo.translationLeft(0)
+                    'irTopLeft.Y = camInfo.rotationLeft(3) * rgbBottomRight.X +
+                    '              camInfo.rotationLeft(4) * rgbBottomRight.Y +
+                    '              camInfo.rotationLeft(5) * rgbBottomRight.Z + camInfo.translationLeft(1)
+                    'irTopLeft.Z = camInfo.rotationLeft(6) * rgbBottomRight.X +
+                    '              camInfo.rotationLeft(7) * rgbBottomRight.Y +
+                    '              camInfo.rotationLeft(8) * rgbBottomRight.Z + camInfo.translationLeft(2)
 
-                    irBottomRight.X = camInfo.rotationLeft(0) * rgbBottomRight.X +
-                                      camInfo.rotationLeft(1) * rgbBottomRight.Y +
-                                      camInfo.rotationLeft(2) * rgbBottomRight.Z + camInfo.translationLeft(0)
-                    irBottomRight.Y = camInfo.rotationLeft(3) * rgbBottomRight.X +
-                                      camInfo.rotationLeft(4) * rgbBottomRight.Y +
-                                      camInfo.rotationLeft(5) * rgbBottomRight.Z + camInfo.translationLeft(1)
-                    irBottomRight.Z = camInfo.rotationLeft(6) * rgbBottomRight.X +
-                                      camInfo.rotationLeft(7) * rgbBottomRight.Y +
-                                      camInfo.rotationLeft(8) * rgbBottomRight.Z + camInfo.translationLeft(2)
+                    'irBottomRight.X = camInfo.rotationLeft(0) * rgbBottomRight.X +
+                    '                  camInfo.rotationLeft(1) * rgbBottomRight.Y +
+                    '                  camInfo.rotationLeft(2) * rgbBottomRight.Z + camInfo.translationLeft(0)
+                    'irBottomRight.Y = camInfo.rotationLeft(3) * rgbBottomRight.X +
+                    '                  camInfo.rotationLeft(4) * rgbBottomRight.Y +
+                    '                  camInfo.rotationLeft(5) * rgbBottomRight.Z + camInfo.translationLeft(1)
+                    'irBottomRight.Z = camInfo.rotationLeft(6) * rgbBottomRight.X +
+                    '                  camInfo.rotationLeft(7) * rgbBottomRight.Y +
+                    '                  camInfo.rotationLeft(8) * rgbBottomRight.Z + camInfo.translationLeft(2)
 
                     ' idd.irTopLeft = camInfo.
                 End If
@@ -212,7 +215,7 @@ Public Class DepthCell_Plot : Inherits TaskParent
         dst2 = task.dCell.dst2
         dst2.SetTo(0, Not task.iddMask)
 
-        Dim index = task.dCell.grid.gridMap.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim idd As depthCell
@@ -281,3 +284,102 @@ Public Class DepthCell_InstantUpdate : Inherits TaskParent
         dst2.SetTo(0, Not task.iddMask)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class DepthCell_Correlation : Inherits TaskParent
+    Public Sub New()
+        desc = "Given a left image cell, find it's match in the right image, and display their correlation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView
+        dst3 = task.rightView
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+
+        Static saveIndex As Integer, saveCorrelation As Single
+        Dim idd = task.iddList(index)
+        If saveIndex <> index Then
+            saveIndex = index
+
+            If idd.depth > 0 Then
+                Dim correlationMat As New cv.Mat
+                cv.Cv2.MatchTemplate(dst2(idd.lRect), dst3(idd.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+
+                saveCorrelation = correlationMat.Get(Of Single)(0, 0)
+            End If
+        End If
+        dst2.Circle(idd.center, task.DotSize, 255, -1)
+        SetTrueText("Correlation " + Format(saveCorrelation, fmt3), task.dCell.mouseD.pt, 2)
+        labels(3) = "Correlation of the left depth cell to the right is " + Format(saveCorrelation, fmt3)
+
+        dst2.Rectangle(idd.lRect, 255, task.lineWidth)
+        dst3.Rectangle(idd.rRect, 255, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+Public Class DepthCell_CorrelationMap : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each depth cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+
+        Dim minCorr = task.dCell.options.correlationThreshold
+        Dim count As Integer
+        For Each idd In task.iddList
+            If idd.depth > 0 Then
+                If idd.correlation = 0 Then Dim k = 0
+                If idd.correlation = 1 Then Dim k = 0
+                Dim val = (idd.correlation + 1) * 255 / 2
+                dst1(idd.lRect).SetTo(val)
+                If idd.correlation > minCorr Then
+                    dst3(idd.lRect).SetTo(255)
+                    count += 1
+                End If
+            End If
+        Next
+
+        dst2 = ShowPalette(dst1)
+
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        If index > 0 And index < task.iddList.Count Then
+            Dim idd = task.iddList(index)
+            dst2.Circle(idd.center, task.DotSize, task.HighlightColor, -1)
+            SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
+        End If
+
+        labels(2) = task.dCell.labels(2)
+        labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
+                    ") with correlation coefficient > " + Format(minCorr, fmt1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class DepthCell_CorrelationMask : Inherits TaskParent
+    Dim corrMap As New DepthCell_CorrelationMap
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        desc = "Isolate only the depth values under the depth cell correlation mask (see DepthCell_CorrelatonMap"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        corrMap.Run(src)
+        dst3 = corrMap.dst2
+
+        dst2.SetTo(0)
+        labels = corrMap.labels
+        task.pointCloud.CopyTo(dst2, corrMap.dst3)
+    End Sub
+End Class
+
+

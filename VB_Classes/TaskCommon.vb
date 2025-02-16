@@ -429,6 +429,7 @@ Public Class depthCell
     Public lRect As cv.Rect
     Public rRect As cv.Rect
     Public depth As Single
+    Public depthMean As Single
     Public age As Integer
     Public index As Integer
     Public color As cv.Point3f
