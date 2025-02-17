@@ -1,8 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Threading
-Imports Intel.RealSense
-
 Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
     End Function
@@ -28,13 +26,12 @@ Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub OakDStop(cPtr As IntPtr)
     End Sub
 End Module
-Structure OakDIMUdata
-    Public acceleration As cv.Point3f
-    Public velocity As cv.Point3f
-    Public angularVelocity As cv.Point3f
-    Public angularAcceleration As cv.Point3f
-End Structure
-Public Class CameraOakD : Inherits GenericCamera
+
+
+
+
+
+Public Class CameraOakD_CPP : Inherits GenericCamera
     Public deviceNum As Integer
     Public accel As cv.Point3f
     Public gyro As cv.Point3f

@@ -1415,7 +1415,7 @@ Public Class Main_UI
                 'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Oak-D camera"
-                Return New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraOakD_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
                 Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 'Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
