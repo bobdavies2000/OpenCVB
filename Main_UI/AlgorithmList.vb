@@ -1191,7 +1191,6 @@ Public Class algorithmList
 	If algorithmName = "OpAuto_YRange" Then return new OpAuto_YRange
 	If algorithmName = "OpenGL_Basics" Then return new OpenGL_Basics
 	If algorithmName = "OpenGL_BasicsMouse" Then return new OpenGL_BasicsMouse
-	If algorithmName = "OpenGL_BasicsSliders" Then return new OpenGL_BasicsSliders
 	If algorithmName = "OpenGL_BPFiltered3D" Then return new OpenGL_BPFiltered3D
 	If algorithmName = "OpenGL_BPFilteredBoth" Then return new OpenGL_BPFilteredBoth
 	If algorithmName = "OpenGL_BPFilteredSideView" Then return new OpenGL_BPFilteredSideView

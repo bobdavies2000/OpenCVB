@@ -9,7 +9,7 @@ Public Class Quad_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim shift As cv.Point3f
         If task.ogl IsNot Nothing Then
-            Dim ptM = task.ogl.options.moveAmount
+            Dim ptM = task.ogl.options4.moveAmount
             shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
         End If
 
@@ -61,7 +61,7 @@ Public Class Quad_GridTiles : Inherits TaskParent
         Dim vec As cv.Scalar
         Dim shift As cv.Point3f
         If Not standalone Then
-            Dim ptM = task.ogl.options.moveAmount
+            Dim ptM = task.ogl.options4.moveAmount
             shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
         End If
         For Each roi In task.gridRects

@@ -2076,24 +2076,6 @@ public:
 	Options_OpenGLFunctions() {
 	}
 };
-class Options_OpenGL {
-public:
-	int pcBufferCount =  10;
-	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
-	double FOV =  35;
-	double yaw =  -3;
-	double pitch =  3;
-	double roll =  0;
-	double zNear =  0;
-	double zFar =  20;
-	int pointSize =  5;
-	double zTrans =  0.5;
-	cv::Vec3f eye =  cv::Vec3f(4, 20, -2);
-	cv::Vec3f scaleXYZ =  cv::Vec3f(15, 30, 1);
-	void RunOpt() {}
-	Options_OpenGL() {
-	}
-};
 class Options_FCSMatch {
 public:
 	void RunOpt() {}
@@ -2190,5 +2172,44 @@ class Options_RGBAlign {
 public:
 	void RunOpt() {}
 	Options_RGBAlign() {
+	}
+};
+class Options_OpenGL1 {
+public:
+	int pcBufferCount =  10;
+	double yaw =  -3;
+	double pitch =  3;
+	double roll =  0;
+	void RunOpt() {}
+	Options_OpenGL1() {
+	}
+};
+class Options_OpenGL2 {
+public:
+	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
+	double FOV =  80;
+	double zNear =  0;
+	double zFar =  20;
+	cv::Vec3f eye =  cv::Vec3f(4, 20, -2);
+	void RunOpt() {}
+	Options_OpenGL2() {
+	}
+};
+class Options_OpenGL3 {
+public:
+	double zNear =  0;
+	double zFar =  20;
+	double zTrans =  0.5;
+	int pointSize =  5;
+	void RunOpt() {}
+	Options_OpenGL3() {
+	}
+};
+class Options_OpenGL4 {
+public:
+	cv::Scalar moveAmount =  cv::Scalar(0, 0, 0);
+	cv::Vec3f scaleXYZ =  cv::Vec3f(15, 30, 1);
+	void RunOpt() {}
+	Options_OpenGL4() {
 	}
 };

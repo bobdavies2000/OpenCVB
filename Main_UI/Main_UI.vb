@@ -340,9 +340,9 @@ Public Class Main_UI
     End Function
     Public Function validatePoint(pt As cv.Point2f) As cv.Point
         If pt.X < 0 Then pt.X = 0
-        If pt.X > camPic(0).Width Then pt.X = camPic(0).Width - 1
+        If pt.X > task.workingRes.Width Then pt.X = task.workingRes.Width - 1
         If pt.Y < 0 Then pt.Y = 0
-        If pt.Y > camPic(0).Height Then pt.Y = camPic(0).Height - 1
+        If pt.Y > task.workingRes.Height Then pt.Y = task.workingRes.Height - 1
         Return pt
     End Function
     Public Function USBenumeration() As List(Of String)

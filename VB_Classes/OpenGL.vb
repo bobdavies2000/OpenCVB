@@ -5,7 +5,6 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.Threading
 Imports cvext = OpenCvSharp.Extensions
-Imports System.Runtime.CompilerServices
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim startInfo As New ProcessStartInfo
@@ -13,7 +12,10 @@ Public Class OpenGL_Basics : Inherits TaskParent
     Public dataInput As New cv.Mat
     Public pointCloudInput As cv.Mat
     Public oglFunction As Integer = 0 ' the default function is to display a point cloud.
-    Public options As New Options_OpenGL
+    Public options1 As New Options_OpenGL1
+    Public options2 As New Options_OpenGL2
+    Public options3 As New Options_OpenGL3
+    Public options4 As New Options_OpenGL4
     Dim rgbBuffer(0) As Byte
     Dim dataBuffer(0) As Byte
     Dim pointCloudBuffer(0) As Byte
@@ -37,14 +39,15 @@ Public Class OpenGL_Basics : Inherits TaskParent
         Dim showXYZaxis = True
         Dim memMapValues() As Double =
             {task.frameCount, dst2.Width, dst2.Height, rgbBufferSize,
-            dataBufferSize, options.FOV, options.yaw, options.pitch, options.roll,
-            options.zNear, options.zFar, options.pointSize, dataInput.Width, dataInput.Height,
+            dataBufferSize, options2.FOV, options1.yaw, options1.pitch, options1.roll,
+            options3.zNear, options3.zFar, options3.pointSize, dataInput.Width, dataInput.Height,
             task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z,
             task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z, task.IMU_TimeStamp,
-            1, options.eye(0) / 100, options.eye(1) / 100, options.eye(2) / 100, options.zTrans,
-            options.scaleXYZ(0) / 10, options.scaleXYZ(1) / 10, options.scaleXYZ(2) / 10, timeConversionUnits, imuAlphaFactor,
-            task.OpenGLTitle.Length, pointCloudInput.Width, pointCloudInput.Height, oglFunction, showXYZaxis,
-            options.pcBufferCount}
+            1, options2.eye(0) / 100, options2.eye(1) / 100, options2.eye(2) / 100, options3.zTrans,
+            options4.scaleXYZ(0) / 10, options4.scaleXYZ(1) / 10, options4.scaleXYZ(2) / 10,
+            timeConversionUnits, imuAlphaFactor, task.OpenGLTitle.Length,
+            pointCloudInput.Width, pointCloudInput.Height, oglFunction, showXYZaxis,
+            options1.pcBufferCount}
         Return memMapValues
     End Function
     Private Sub MemMapUpdate()
@@ -86,9 +89,14 @@ Public Class OpenGL_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then pointCloudInput = task.pointCloud
 
-        ' adjust the point cloud if present and the 'move' sliders are non-zero
-        options.RunOpt()
-        If pointCloudInput.Width <> 0 And options.moveAmount <> New cv.Scalar Then pointCloudInput -= options.moveAmount
+        options1.RunOpt()
+        options2.RunOpt()
+        options3.RunOpt()
+        options4.RunOpt()
+
+        If pointCloudInput.Width <> 0 And options4.moveAmount <> New cv.Scalar Then
+            pointCloudInput -= options4.moveAmount
+        End If
 
         If src.Width > 0 Then
             src = src.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
@@ -155,44 +163,38 @@ Module pipeData
     Public pipeCount As Integer
     Public optiBase As New OptionParent
 End Module
+'Public Class OpenGL_BasicsSliders : Inherits TaskParent
+'    Dim options As New Options_OpenGL
+'    Public pointCloudInput As cv.Mat
+'    Public Sub New()
+'        task.OpenGLTitle = "OpenGL_Basics"
+'        optiBase.FindSlider("OpenGL FOV").Value = 150
+'        desc = "Show the OpenGL point cloud with sliders support."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        options.RunOpt()
 
+'        If standaloneTest() Then
+'            task.ogl.pointCloudInput = task.pointCloud
+'        Else
+'            task.ogl.pointCloudInput = pointCloudInput
+'        End If
 
-
-
-
-
-Public Class OpenGL_BasicsSliders : Inherits TaskParent
-    Dim options As New Options_OpenGL
-    Public pointCloudInput As cv.Mat
-    Public Sub New()
-        task.OpenGLTitle = "OpenGL_Basics"
-        optiBase.FindSlider("OpenGL FOV").Value = 150
-        desc = "Show the OpenGL point cloud with sliders support."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        If standaloneTest() Then
-            task.ogl.pointCloudInput = task.pointCloud
-        Else
-            task.ogl.pointCloudInput = pointCloudInput
-        End If
-
-        ' update all the options from the slider values.
-        task.ogl.options.FOV = options.FOV
-        task.ogl.options.yaw = options.yaw
-        task.ogl.options.pitch = options.pitch
-        task.ogl.options.roll = options.roll
-        task.ogl.options.zNear = options.zNear
-        task.ogl.options.zFar = options.zFar
-        task.ogl.options.pointSize = options.pointSize
-        task.ogl.options.zTrans = options.zTrans
-        task.ogl.options.eye = options.eye
-        task.ogl.options.scaleXYZ = options.scaleXYZ
-        task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
+'        ' update all the options from the slider values.
+'        task.ogl.options.FOV = options.FOV
+'        task.ogl.options.yaw = options.yaw
+'        task.ogl.options.pitch = options.pitch
+'        task.ogl.options.roll = options.roll
+'        task.ogl.options.zNear = options.zNear
+'        task.ogl.options.zFar = options.zFar
+'        task.ogl.options.pointSize = options.pointSize
+'        task.ogl.options.zTrans = options.zTrans
+'        task.ogl.options.eye = options.eye
+'        task.ogl.options.scaleXYZ = options.scaleXYZ
+'        task.ogl.Run(src)
+'        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+'    End Sub
+'End Class
 
 
 

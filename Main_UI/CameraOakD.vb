@@ -37,12 +37,12 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
     Public gyro As cv.Point3f
     Dim templateX As cv.Mat
     Dim templateY As cv.Mat
-    Private Function copyOakIntrinsics(input() As Single, ratio As Single) As VB_Classes.VBtask.intrinsicData
+    Private Function copyOakIntrinsics(input() As Single) As VB_Classes.VBtask.intrinsicData
         Dim output As New VB_Classes.VBtask.intrinsicData
-        output.ppx = input(2) / ratio
-        output.ppy = input(5) / ratio
-        output.fx = input(0) / ratio
-        output.fy = input(4) / ratio
+        output.ppx = input(2)
+        output.ppy = input(5)
+        output.fx = input(0)
+        output.fy = input(4)
         Return output
     End Function
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
@@ -61,17 +61,16 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
             Dim intrin = OakDintrinsics(cPtr, 1)
             Dim intrinsicsArray(9 - 1) As Single
             Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-            Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-            calibData.baseline = 0.075
-            calibData.rgbIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+            calibData.baseline = 0.075 / 2
+            calibData.leftIntrinsics = copyOakIntrinsics(intrinsicsArray)
 
             intrin = OakDintrinsics(cPtr, 2)
             Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-            calibData.leftIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+            calibData.rightIntrinsics = copyOakIntrinsics(intrinsicsArray)
 
             intrin = OakDintrinsics(cPtr, 3)
             Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-            calibData.rightIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+            calibData.rgbIntrinsics = copyOakIntrinsics(intrinsicsArray)
 
             templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
             templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)
