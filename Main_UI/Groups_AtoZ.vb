@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports System.Runtime
-Public Class Groups
+Public Class Groups_AtoZ
     Public homeDir As DirectoryInfo
     Private Sub Groups_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = 1220

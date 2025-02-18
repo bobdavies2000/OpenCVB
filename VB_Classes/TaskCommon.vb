@@ -426,6 +426,7 @@ End Structure
 
 
 Public Class depthCell
+    Public cRect As cv.Rect ' rectange under the cursor in the color image.
     Public lRect As cv.Rect
     Public rRect As cv.Rect
     Public depth As Single
@@ -438,8 +439,6 @@ Public Class depthCell
     Public corners As New List(Of cv.Point3f)
     Public center As cv.Point
     Public correlation As Single
-    Public irTopLeft As cv.Point2f ' lrect.TopLeft in the Left image
-    Public irBottomRight As cv.Point2f ' lrect.BottomRight in the Left image.
 End Class
 
 

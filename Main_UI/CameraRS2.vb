@@ -48,20 +48,20 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim leftExtrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
         calibData.leftIntrinsics = copyIntrinsics(leftIntrinsics, ratio)
 
-        ReDim calibData.translationLeft(3 - 1)
-        ReDim calibData.rotationLeft(9 - 1)
+        ReDim calibData.translation(3 - 1)
+        ReDim calibData.rotation(9 - 1)
 
         For i = 0 To 3 - 1
-            calibData.translationLeft(i) = leftExtrinsics.translation(i)
+            calibData.translation(i) = rgbExtrinsics.translation(i)
         Next
         For i = 0 To 9 - 1
-            calibData.rotationLeft(i) = leftExtrinsics.rotation(i)
+            calibData.rotation(i) = rgbExtrinsics.rotation(i)
         Next
 
         ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
-        calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translationLeft(0), 2) +
-                                              System.Math.Pow(calibData.translationLeft(1), 2) +
-                                              System.Math.Pow(calibData.translationLeft(2), 2))
+        calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
+                                              System.Math.Pow(calibData.translation(1), 2) +
+                                              System.Math.Pow(calibData.translation(2), 2))
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)

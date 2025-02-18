@@ -1239,8 +1239,8 @@ Public Class Main_UI
         End If
     End Sub
     Private Sub GroupButtonList_Click(sender As Object, e As EventArgs) Handles GroupButtonList.Click
-        Groups.homeDir = HomeDir
-        Groups.ShowDialog()
+        Groups_AtoZ.homeDir = HomeDir
+        Groups_AtoZ.ShowDialog()
         If groupButtonSelection = "" Then Exit Sub
         If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
         For Each alg In AvailableAlgorithms.Items

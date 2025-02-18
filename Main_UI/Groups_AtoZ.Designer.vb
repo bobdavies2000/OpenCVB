@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class Groups
+Partial Class Groups_AtoZ
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -39,15 +39,15 @@ Partial Class Groups
         Me.GroupDataView.Size = New System.Drawing.Size(1994, 1358)
         Me.GroupDataView.TabIndex = 0
         '
-        'Groups
+        'Groups_AtoZ
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1994, 1358)
         Me.Controls.Add(Me.GroupDataView)
         Me.KeyPreview = True
-        Me.Name = "Groups"
-        Me.Text = "Groups"
+        Me.Name = "Groups_AtoZ"
+        Me.Text = "Groups_AtoZ"
         CType(Me.GroupDataView, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 

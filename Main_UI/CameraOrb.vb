@@ -119,10 +119,17 @@ Public Class CameraORB : Inherits GenericCamera
         If pointCloud Is Nothing Then pointCloud = New cv.Mat(WorkingRes, cv.MatType.CV_32FC3, 0)
 
         SyncLock cameraLock
-            uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If WorkingRes.Width = captureRes.Width Then
+                uiColor = color.Clone
+                uiLeft = leftView * 4 ' brighten it to help with correlations.
+                uiRight = rightView * 4
+                uiPointCloud = pointCloud.Clone
+            Else
+                uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+                uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
         End SyncLock
 
         GC.Collect() ' this GC seems to be necessary to get the color image in the VB.Net interface.

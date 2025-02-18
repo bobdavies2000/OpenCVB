@@ -32,6 +32,10 @@ Public Class DepthCell_Basics : Inherits TaskParent
 
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
+        Dim ir3D As cv.Point3f, irPt As cv.Point2f
+        Dim unChangedLeftRect As Boolean
+        If task.cameraName.StartsWith("StereoLabs") Then unChangedLeftRect = True
+        If task.cameraName.StartsWith("Orbbec") Then unChangedLeftRect = True
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             Dim motion = task.motionMask(idd.lRect).CountNonZero
@@ -49,14 +53,34 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     idd.age = 1
                     idd.depthMean = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
                     idd.depth = task.pcSplit(2).Get(Of Single)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
-                    idd.rRect = idd.lRect
+                    Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.Y, idd.lRect.X)
                     If idd.depth > 0 Then
-                        idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / idd.depth
-                        idd.rRect = ValidateRect(idd.rRect)
-                        cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
-                                             cv.TemplateMatchModes.CCoeffNormed)
+                        If unChangedLeftRect Then
+                            idd.rRect = idd.lRect
+                            idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / pcTop.Z
+                        Else
+                            ir3D.X = camInfo.rotation(0) * pcTop.X +
+                                     camInfo.rotation(1) * pcTop.Y +
+                                     camInfo.rotation(2) * pcTop.Z + camInfo.translation(0)
+                            ir3D.Y = camInfo.rotation(3) * pcTop.X +
+                                     camInfo.rotation(4) * pcTop.Y +
+                                     camInfo.rotation(5) * pcTop.Z + camInfo.translation(1)
+                            ir3D.Z = camInfo.rotation(6) * pcTop.X +
+                                     camInfo.rotation(7) * pcTop.Y +
+                                     camInfo.rotation(8) * pcTop.Z + camInfo.translation(2)
+                            irPt.X = camInfo.rgbIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.rgbIntrinsics.ppx
+                            irPt.Y = camInfo.rgbIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.rgbIntrinsics.ppy
 
-                        idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                            idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.lRect.Width, idd.lRect.Height)
+                            idd.lRect = ValidateRect(idd.lRect)
+                            idd.rRect = idd.lRect
+                            idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / pcTop.Z
+                            idd.rRect = ValidateRect(idd.rRect)
+                            cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                                                 cv.TemplateMatchModes.CCoeffNormed)
+
+                            idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                        End If
                     Else
                         idd.rRect = New cv.Rect
                     End If
@@ -94,6 +118,7 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim idd = task.iddList(index)
         dst2 = task.dCell.dst2
+
         ptReal = idd.lRect.TopLeft
         pt = idd.lRect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
@@ -264,31 +289,6 @@ End Class
 
 
 
-
-Public Class DepthCell_Correlation : Inherits TaskParent
-    Public Sub New()
-        desc = "Given a left image cell, find it's match in the right image, and display their correlation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then Exit Sub ' settle down first...
-
-        dst2 = task.leftView
-        dst3 = task.rightView
-        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-
-        Dim idd = task.iddList(index)
-        dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
-        SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
-        labels(3) = "Correlation of the left depth cell to the right is " + Format(idd.correlation, fmt3)
-
-        dst2.Rectangle(idd.lRect, 255, task.lineWidth)
-        dst3.Rectangle(idd.rRect, 255, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
 Public Class DepthCell_CorrelationMap : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -377,15 +377,15 @@ Public Class DepthCell_RGBtoLeft : Inherits TaskParent
         If task.cameraName.StartsWith("Intel") Or task.cameraName.StartsWith("Oak-D") Then
             Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
             If pcTop.Z > 0 Then
-                ir3D.X = camInfo.rotationLeft(0) * pcTop.X +
-                         camInfo.rotationLeft(1) * pcTop.Y +
-                         camInfo.rotationLeft(2) * pcTop.Z + camInfo.translationLeft(0)
-                ir3D.Y = camInfo.rotationLeft(3) * pcTop.X +
-                         camInfo.rotationLeft(4) * pcTop.Y +
-                         camInfo.rotationLeft(5) * pcTop.Z + camInfo.translationLeft(1)
-                ir3D.Z = camInfo.rotationLeft(6) * pcTop.X +
-                         camInfo.rotationLeft(7) * pcTop.Y +
-                         camInfo.rotationLeft(8) * pcTop.Z + camInfo.translationLeft(2)
+                ir3D.X = camInfo.rotation(0) * pcTop.X +
+                         camInfo.rotation(1) * pcTop.Y +
+                         camInfo.rotation(2) * pcTop.Z + camInfo.translation(0)
+                ir3D.Y = camInfo.rotation(3) * pcTop.X +
+                         camInfo.rotation(4) * pcTop.Y +
+                         camInfo.rotation(5) * pcTop.Z + camInfo.translation(1)
+                ir3D.Z = camInfo.rotation(6) * pcTop.X +
+                         camInfo.rotation(7) * pcTop.Y +
+                         camInfo.rotation(8) * pcTop.Z + camInfo.translation(2)
                 irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
                 irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
             End If
@@ -401,5 +401,35 @@ Public Class DepthCell_RGBtoLeft : Inherits TaskParent
 
         dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
         ' SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class DepthCell_Correlation : Inherits TaskParent
+    Public Sub New()
+        desc = "Given a left image cell, find it's match in the right image, and display their correlation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then Exit Sub ' settle down first...
+
+        dst2 = task.leftView
+        dst3 = task.rightView
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+
+        Dim idd = task.iddList(index)
+        Dim pt = task.dCell.mouseD.pt
+        Dim corr = idd.correlation
+        dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
+        SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
+        labels(3) = "Correlation of the left depth cell to the right is " + Format(corr, fmt3)
+
+        dst2.Rectangle(idd.lRect, 255, task.lineWidth)
+        dst3.Rectangle(idd.rRect, 255, task.lineWidth)
+        labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
     End Sub
 End Class
