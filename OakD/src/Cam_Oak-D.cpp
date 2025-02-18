@@ -14,13 +14,13 @@ public:
 	std::vector<std::string> queueNames;
 	std::unordered_map<std::string, Mat> frame;
 	std::unordered_map<std::string, std::shared_ptr<dai::ImgFrame>> latestPacket;
-	float intrinsics[9];
 	Mat rgb, leftView, rightView, depth16u;
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
 	bool firstTs = false;
 	int rows, cols;
 	bool firstPass;
+	float intrinsics[9];
 	std::shared_ptr<dai::Device> device;
 	std::shared_ptr<dai::node::ColorCamera> camRgb;
 	std::shared_ptr<dai::node::XLinkOut> xoutRgb;
@@ -228,12 +228,29 @@ int* OakDintrinsics(OakDCamera* cPtr, int camera)
 		else
 			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_C, 1280, 720);
 	}
-	
+
 	int i = 0;
 	for (auto row : intrin)  for (auto val : row) cPtr->intrinsics[i++] = val;
 	return (int*)&cPtr->intrinsics;
 }
 
+
+extern "C" __declspec(dllexport)
+int* OakDRotationTranslation(OakDCamera* cPtr)
+{
+	std::vector<std::vector<float>> extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::RGB, dai::CameraBoardSocket::LEFT);
+
+	std::vector<float> results;
+	std::vector<float> rotation = extrinsics[0];
+	for (int i = 0; i < 9; i++)
+		results.push_back(rotation[i]);
+
+	std::vector<float> translation = extrinsics[1];
+	for (int i = 0; i < 3; i++)
+		results.push_back(translation[i]);
+	
+	return (int*)&results;
+}
 
 
 extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera* cPtr)

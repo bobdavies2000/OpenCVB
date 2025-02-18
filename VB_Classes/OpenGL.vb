@@ -163,40 +163,6 @@ Module pipeData
     Public pipeCount As Integer
     Public optiBase As New OptionParent
 End Module
-'Public Class OpenGL_BasicsSliders : Inherits TaskParent
-'    Dim options As New Options_OpenGL
-'    Public pointCloudInput As cv.Mat
-'    Public Sub New()
-'        task.OpenGLTitle = "OpenGL_Basics"
-'        optiBase.FindSlider("OpenGL FOV").Value = 150
-'        desc = "Show the OpenGL point cloud with sliders support."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        options.RunOpt()
-
-'        If standaloneTest() Then
-'            task.ogl.pointCloudInput = task.pointCloud
-'        Else
-'            task.ogl.pointCloudInput = pointCloudInput
-'        End If
-
-'        ' update all the options from the slider values.
-'        task.ogl.options.FOV = options.FOV
-'        task.ogl.options.yaw = options.yaw
-'        task.ogl.options.pitch = options.pitch
-'        task.ogl.options.roll = options.roll
-'        task.ogl.options.zNear = options.zNear
-'        task.ogl.options.zFar = options.zFar
-'        task.ogl.options.pointSize = options.pointSize
-'        task.ogl.options.zTrans = options.zTrans
-'        task.ogl.options.eye = options.eye
-'        task.ogl.options.scaleXYZ = options.scaleXYZ
-'        task.ogl.Run(src)
-'        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-'    End Sub
-'End Class
-
-
 
 
 

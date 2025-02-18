@@ -2157,7 +2157,7 @@ class Options_DepthCellSize {
 public:
 	int cellSize =  8;
 	float percentThreshold =  0.25;
-	float correlationThreshold =  0.8;
+	float correlationThreshold =  0.6;
 	void RunOpt() {}
 	Options_DepthCellSize() {
 	}

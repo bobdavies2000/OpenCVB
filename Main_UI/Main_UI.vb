@@ -1412,17 +1412,14 @@ Public Class Main_UI
             Case "Azure Kinect 4K"
                 Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Intel(R) RealSense(TM) Depth Camera"
-                'Return New CameraRS2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Oak-D camera"
                 Return New CameraOakD_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
                 Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
-                'Return New CameraZED2_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"
-                'Return New CameraORB_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
         End Select
         Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)

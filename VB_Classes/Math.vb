@@ -215,8 +215,8 @@ Public Class Math_Template : Inherits TaskParent
             dst3.Col(0).CopyTo(dst3.Col(i)) ' duplicate above col
         Next
 
-        dst2 -= task.calibData.rgbIntrinsics.ppx
-        dst3 -= task.calibData.rgbIntrinsics.ppy
+        dst2 -= task.calibData.leftIntrinsics.ppx
+        dst3 -= task.calibData.leftIntrinsics.ppy
     End Sub
 End Class
 

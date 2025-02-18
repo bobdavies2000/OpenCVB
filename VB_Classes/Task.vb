@@ -311,18 +311,12 @@ Public Class VBtask : Implements IDisposable
     End Structure
     Public Structure cameraInfo
         Public baseline As Single
-        Public baselineRightToRGB As Single
-        Public baselineLeftToRight As Single
 
         Public rgbIntrinsics As intrinsicData
         Public leftIntrinsics As intrinsicData
-        Public rightIntrinsics As intrinsicData
 
         Public translationLeft() As Single
         Public rotationLeft() As Single
-
-        Public rotationRight() As Single
-        Public translationRight() As Single
 
         Public v_fov As Single ' vertical field of view in degrees.
         Public h_fov As Single ' horizontal field of view in degrees.

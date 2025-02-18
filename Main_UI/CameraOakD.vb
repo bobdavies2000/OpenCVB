@@ -15,6 +15,9 @@ Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OakDintrinsics(cPtr As IntPtr, camera As Integer) As IntPtr
     End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDRotationTranslation(cPtr As IntPtr) As IntPtr
+    End Function
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDRawDepth(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDGyro(cPtr As IntPtr) As IntPtr
@@ -37,12 +40,16 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
     Public gyro As cv.Point3f
     Dim templateX As cv.Mat
     Dim templateY As cv.Mat
-    Private Function copyOakIntrinsics(input() As Single) As VB_Classes.VBtask.intrinsicData
+    Dim fxTemplate As Single
+    Dim fyTemplate As Single
+    Dim ppxTemplate As Single
+    Dim ppyTemplate As Single
+    Private Function copyOakIntrinsics(input() As Single, ratio As Single) As VB_Classes.VBtask.intrinsicData
         Dim output As New VB_Classes.VBtask.intrinsicData
-        output.ppx = input(2)
-        output.ppy = input(5)
-        output.fx = input(0)
-        output.fy = input(4)
+        output.ppx = input(2) / ratio
+        output.ppy = input(5) / ratio
+        output.fx = input(0) / ratio
+        output.fy = input(4) / ratio
         Return output
     End Function
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
@@ -50,45 +57,59 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
         If templateX IsNot Nothing Then Return ' we have already been initialized.
         cameraName = deviceName
         cPtr = OakDOpen(captureRes.Width, captureRes.Height)
+
+        Dim intrin = OakDintrinsics(cPtr, 1)
+        Dim intrinsicsArray(9 - 1) As Single
+        Dim ratio = captureRes.Width / WorkingRes.Width
+        Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
+        calibData.baseline = 0.075
+        calibData.leftIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+
+        'intrin = OakDintrinsics(cPtr, 3)
+        'Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
+        'calibData.rgbIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+
+        Dim extrin = OakDRotationTranslation(cPtr)
+        Dim extrinsicsArray(9 - 1) As Single
+        Marshal.Copy(extrin, extrinsicsArray, 0, extrinsicsArray.Length)
+
+        'For i = 0 To 3 - 1
+        '    calibData.translationLeft(i) = extrinsicsArray(i)
+        'Next
+        'For i = 0 To 9 - 1
+        '    calibData.rotationLeft(i) = extrinsicsArray(i)
+        'Next
+
+        '' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
+        'calibData.baselineRGBtoLeft = System.Math.Sqrt(System.Math.Pow(calibData.translationLeft(0), 2) +
+        '                              System.Math.Pow(calibData.translationLeft(1), 2) +
+        '                              System.Math.Pow(calibData.translationLeft(2), 2))
+
+        'fxTemplate = calibData.rgbIntrinsics.fx * ratio ' these are used on the full size image before resize.
+        'fyTemplate = calibData.rgbIntrinsics.fy * ratio
+        'ppxTemplate = calibData.rgbIntrinsics.ppx * ratio
+        'ppyTemplate = calibData.rgbIntrinsics.ppy * ratio
+
+        templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
+        templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)
+        For i = 0 To templateX.Width - 1
+            templateX.Set(Of Single)(0, i, i)
+        Next
+
+        For i = 1 To templateX.Height - 1
+            templateX.Row(0).CopyTo(templateX.Row(i))
+            templateY.Set(Of Single)(i, 0, i)
+        Next
+
+        For i = 1 To templateY.Width - 1
+            templateY.Col(0).CopyTo(templateY.Col(i))
+        Next
+        templateX -= ppxTemplate
+        templateY -= ppyTemplate
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         If cPtr = 0 Then Exit Sub
         OakDWaitForFrame(cPtr)
-
-        Static FirstPass = True
-        If (FirstPass) Then
-            FirstPass = False
-            Dim intrin = OakDintrinsics(cPtr, 1)
-            Dim intrinsicsArray(9 - 1) As Single
-            Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-            calibData.baseline = 0.075 / 2
-            calibData.leftIntrinsics = copyOakIntrinsics(intrinsicsArray)
-
-            intrin = OakDintrinsics(cPtr, 2)
-            Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-            calibData.rightIntrinsics = copyOakIntrinsics(intrinsicsArray)
-
-            intrin = OakDintrinsics(cPtr, 3)
-            Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-            calibData.rgbIntrinsics = copyOakIntrinsics(intrinsicsArray)
-
-            templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
-            templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)
-            For i = 0 To templateX.Width - 1
-                templateX.Set(Of Single)(0, i, i)
-            Next
-
-            For i = 1 To templateX.Height - 1
-                templateX.Row(0).CopyTo(templateX.Row(i))
-                templateY.Set(Of Single)(i, 0, i)
-            Next
-
-            For i = 1 To templateY.Width - 1
-                templateY.Col(0).CopyTo(templateY.Col(i))
-            Next
-            templateX -= calibData.rgbIntrinsics.ppx
-            templateY -= calibData.rgbIntrinsics.ppy
-        End If
 
         Dim accelFrame = OakDAccel(cPtr)
         If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
@@ -129,10 +150,10 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
             Dim worldX As New cv.Mat, worldY As New cv.Mat
 
             cv.Cv2.Multiply(templateX, d32f, worldX)
-            worldX *= 1 / calibData.rgbIntrinsics.fx
+            worldX *= 1 / fxTemplate
 
             cv.Cv2.Multiply(templateY, d32f, worldY)
-            worldY *= 1 / calibData.rgbIntrinsics.fy
+            worldY *= 1 / fyTemplate
 
             Dim pc As New cv.Mat
             cv.Cv2.Merge({worldX, worldY, d32f}, pc)

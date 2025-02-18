@@ -4,6 +4,14 @@ Imports Intel.RealSense
 Imports System.Text
 Public Class CameraRS2 : Inherits GenericCamera
     Dim pipe As New Pipeline()
+    Private Function copyIntrinsics(input As Intrinsics, ratio As Single) As VB_Classes.VBtask.intrinsicData
+        Dim output As New VB_Classes.VBtask.intrinsicData
+        output.ppx = input.ppx / ratio
+        output.ppy = input.ppy / ratio
+        output.fx = input.fx / ratio
+        output.fy = input.fy / ratio
+        Return output
+    End Function
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""
         Dim ctx As New Context()
@@ -29,47 +37,31 @@ Public Class CameraRS2 : Inherits GenericCamera
 
         Dim profiles = pipe.Start(cfg)
         Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
-        Dim streamRight = profiles.GetStream(Stream.Infrared, 2)
         Dim StreamColor = profiles.GetStream(Stream.Color)
-        Dim myIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+        Dim rgbIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+        Dim rgbExtrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
 
         Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-        calibData.rgbIntrinsics = copyIntrinsics(myIntrinsics, ratio)
+        calibData.rgbIntrinsics = copyIntrinsics(rgbIntrinsics, ratio)
 
         Dim leftIntrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim leftExtrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
-
-        Dim rightIntrinsics = streamRight.As(Of VideoStreamProfile)().GetIntrinsics()
-        Dim rightExtrinsics = streamRight.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
-
         calibData.leftIntrinsics = copyIntrinsics(leftIntrinsics, ratio)
-        calibData.rightIntrinsics = copyIntrinsics(rightIntrinsics, ratio)
 
         ReDim calibData.translationLeft(3 - 1)
-        ReDim calibData.translationRight(3 - 1)
         ReDim calibData.rotationLeft(9 - 1)
-        ReDim calibData.rotationRight(9 - 1)
 
         For i = 0 To 3 - 1
             calibData.translationLeft(i) = leftExtrinsics.translation(i)
-            calibData.translationRight(i) = rightExtrinsics.translation(i)
         Next
         For i = 0 To 9 - 1
             calibData.rotationLeft(i) = leftExtrinsics.rotation(i)
-            calibData.rotationRight(i) = rightExtrinsics.rotation(i)
         Next
 
         ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
         calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translationLeft(0), 2) +
-                                                       System.Math.Pow(calibData.translationLeft(1), 2) +
-                                                       System.Math.Pow(calibData.translationLeft(2), 2))
-
-        ' Calculate the baseline (distance between the right and RGB cameras) using the translation vector
-        calibData.baselineRightToRGB = System.Math.Sqrt(System.Math.Pow(calibData.translationRight(0), 2) +
-                                                        System.Math.Pow(calibData.translationRight(1), 2) +
-                                                        System.Math.Pow(calibData.translationRight(2), 2))
-
-        calibData.baselineLeftToRight = calibData.baselineRightToRGB - calibData.baseline
+                                              System.Math.Pow(calibData.translationLeft(1), 2) +
+                                              System.Math.Pow(calibData.translationLeft(2), 2))
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
@@ -162,59 +154,3 @@ Structure RS2IMUdata
     Public angularVelocity As cv.Point3f
     Public angularAcceleration As cv.Point3f
 End Structure
-Public Class CameraRS2_CPP : Inherits GenericCamera
-    Public deviceNum As Integer
-    Public deviceName As String
-    Public cPtrOpen As IntPtr
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
-        captureRes = _captureRes
-
-        Dim devName As StringBuilder = New StringBuilder(deviceName)
-        cPtr = RS2Open(devName, captureRes.Width, captureRes.Height)
-
-        Dim intrin = RS2intrinsics(cPtr)
-        Dim intrinInfo(4 - 1) As Single
-        Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
-
-        calibData.baseline = 0.052 ' where can I get this for this camera?
-        calibData.rgbIntrinsics.ppx = intrinInfo(0)
-        calibData.rgbIntrinsics.ppy = intrinInfo(1)
-        calibData.rgbIntrinsics.fx = intrinInfo(2)
-        calibData.rgbIntrinsics.fy = intrinInfo(3)
-    End Sub
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
-        If cPtr = 0 Then Exit Sub
-
-        ' if OpenCVB fails here, just unplug and plug in the RealSense camera.
-        RS2WaitForFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
-        Dim accelFrame = RS2Accel(cPtr)
-        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
-        IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
-
-        Dim gyroFrame = RS2Gyro(cPtr)
-        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
-
-        Static imuStartTime = RS2IMUTimeStamp(cPtr)
-        IMU_TimeStamp = RS2IMUTimeStamp(cPtr) - imuStartTime
-
-        SyncLock cameraLock
-            Dim w = WorkingRes.Width, h = WorkingRes.Height
-            uiColor = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone
-            Dim tmp As cv.Mat = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8U, RS2LeftRaw(cPtr))
-            uiLeft = tmp * 6 ' improved brightness specific to RealSense
-            tmp = cv.Mat.FromPixelData(h, w, cv.MatType.CV_8U, RS2RightRaw(cPtr))
-            uiRight = tmp * 6 ' improved brightness specific to RealSense
-            Dim pc = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr))
-            uiPointCloud = pc.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-        End SyncLock
-        MyBase.GetNextFrameCounts(IMU_FrameTime)
-    End Sub
-    Public Sub stopCamera()
-        Application.DoEvents()
-        Try
-            RS2Stop(cPtr)
-        Catch ex As Exception
-        End Try
-        cPtr = 0
-    End Sub
-End Class

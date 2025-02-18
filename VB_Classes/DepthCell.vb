@@ -32,7 +32,6 @@ Public Class DepthCell_Basics : Inherits TaskParent
 
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        '  Dim irTopLeft As New cv.Point3f, irBottomRight As cv.Point3f
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             Dim motion = task.motionMask(idd.lRect).CountNonZero
@@ -102,7 +101,7 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         Else
             pt.Y -= idd.lRect.Height * 2
         End If
-        strOut = Format(idd.depth, fmt1) + "m (" + Format(idd.pixels / (idd.lRect.Width * idd.lRect.Height), "0%") + ")"
+        strOut = Format(idd.depth, fmt3) + "m (" + Format(idd.pixels / (idd.lRect.Width * idd.lRect.Height), "0%") + ")"
 
         If standaloneTest() Then SetTrueText(strOut, pt, 2)
     End Sub
@@ -133,7 +132,8 @@ Public Class DepthCell_RightView : Inherits TaskParent
         If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435I" Or
             task.cameraName = "Oak-D camera" Then
             SetTrueText("The " + task.cameraName + " left And right cameras are" + vbCrLf +
-                        " Not typically aligned With the RGB camera In OpenCVB." + vbCrLf)
+                        "Not typically aligned With the RGB camera In OpenCVB." + vbCrLf +
+                        "Review the DepthCell_RGBAlignLeft to align RGB and left images.")
             Exit Sub
         End If
         dst1 = task.rightView
@@ -158,7 +158,7 @@ Public Class DepthCell_RightView : Inherits TaskParent
             End If
             Dim depth = task.pcSplit(2)(dw).Mean(task.depthMask(dw))
             If depth(0) > 0 Then
-                Dim disp = 0.12 * camInfo.rgbIntrinsics.fx / depth(0)
+                Dim disp = 0.12 * camInfo.leftIntrinsics.fx / depth(0)
                 disparities.Add(disp)
                 Dim rect = dw
                 rect.X -= disparities.Average
@@ -270,6 +270,8 @@ Public Class DepthCell_Correlation : Inherits TaskParent
         desc = "Given a left image cell, find it's match in the right image, and display their correlation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then Exit Sub ' settle down first...
+
         dst2 = task.leftView
         dst3 = task.rightView
         Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
@@ -316,7 +318,7 @@ Public Class DepthCell_CorrelationMap : Inherits TaskParent
         Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index > 0 And index < task.iddList.Count Then
             Dim idd = task.iddList(index)
-            dst2.Circle(idd.center, task.DotSize, task.HighlightColor, -1)
+            dst2.Circle(idd.lRect.TopLeft, task.DotSize, task.HighlightColor, -1)
             SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
         End If
 
@@ -368,18 +370,22 @@ Public Class DepthCell_RGBtoLeft : Inherits TaskParent
 
         Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         Dim rgbTop = idd.lRect.TopLeft, ir3D As cv.Point3f
-        If task.cameraName.StartsWith("Intel") Then
+        ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
+        ' can be found.  For Intel and the Oak-D, the left image and RGB need to be aligned to get accurate depth.
+        ' With depth the correlation between the left and right for that depth cell will be accurate (if there is depth.)
+        ' NOTE: the Intel camera is accurate in X but way off in Y.  Probably my problem...
+        If task.cameraName.StartsWith("Intel") Or task.cameraName.StartsWith("Oak-D") Then
             Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
             If pcTop.Z > 0 Then
-                ir3D.X = 1000 * (camInfo.rotationLeft(0) * pcTop.X +
-                                     camInfo.rotationLeft(1) * pcTop.Y +
-                                     camInfo.rotationLeft(2) * pcTop.Z + camInfo.translationLeft(0))
-                ir3D.Y = 1000 * (camInfo.rotationLeft(3) * pcTop.X +
-                                     camInfo.rotationLeft(4) * pcTop.Y +
-                                     camInfo.rotationLeft(5) * pcTop.Z + camInfo.translationLeft(1))
-                ir3D.Z = 1000 * (camInfo.rotationLeft(6) * pcTop.X +
-                                     camInfo.rotationLeft(7) * pcTop.Y +
-                                     camInfo.rotationLeft(8) * pcTop.Z + camInfo.translationLeft(2))
+                ir3D.X = camInfo.rotationLeft(0) * pcTop.X +
+                         camInfo.rotationLeft(1) * pcTop.Y +
+                         camInfo.rotationLeft(2) * pcTop.Z + camInfo.translationLeft(0)
+                ir3D.Y = camInfo.rotationLeft(3) * pcTop.X +
+                         camInfo.rotationLeft(4) * pcTop.Y +
+                         camInfo.rotationLeft(5) * pcTop.Z + camInfo.translationLeft(1)
+                ir3D.Z = camInfo.rotationLeft(6) * pcTop.X +
+                         camInfo.rotationLeft(7) * pcTop.Y +
+                         camInfo.rotationLeft(8) * pcTop.Z + camInfo.translationLeft(2)
                 irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
                 irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
             End If

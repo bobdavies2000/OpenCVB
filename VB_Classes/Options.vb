@@ -7878,7 +7878,7 @@ End Class
 Public Class Options_DepthCellSize : Inherits OptionParent
     Public cellSize As Integer = 8
     Public percentThreshold As Single = 0.25
-    Public correlationThreshold As Single = 0.8
+    Public correlationThreshold As Single = 0.6
     Public Sub New()
         If task.dst2.Width >= 640 Then cellSize = 16
         If task.dst2.Width >= 1280 Then cellSize = 32
