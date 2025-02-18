@@ -21,7 +21,87 @@ Public Class DepthCell_Basics : Inherits TaskParent
             task.iddList.Clear()
             For Each rect In grid.gridRectsAll
                 Dim idd As New depthCell
-                If rect.BottomRight.Y = 180 Then Dim k = 0
+                idd.lRect = ValidateRect(rect)
+                Dim cellSize = task.dCell.options.cellSize
+                idd.center = New cv.Point(rect.TopLeft.X + cellSize / 2, rect.TopLeft.Y + cellSize / 2)
+                idd.age = 0
+                task.iddList.Add(idd)
+            Next
+        End If
+
+        Dim colorStdev As cv.Scalar, colormean As cv.Scalar
+        Dim camInfo = task.calibData, correlationMat As New cv.Mat
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            Dim motion = task.motionMask(idd.lRect).CountNonZero
+            If motion = 0 And idd.age > 0 Then
+                idd.age += 1
+            Else
+                idd.correlation = 0
+                cv.Cv2.MeanStdDev(src(idd.lRect), colormean, colorStdev)
+                idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
+
+                idd.pixels = task.depthMask(idd.lRect).CountNonZero
+                If idd.pixels / (idd.lRect.Width * idd.lRect.Height) < options.percentThreshold Then
+                    idd.age = 0
+                    idd.depth = 0
+                Else
+                    idd.age = 1
+                    idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
+                    ' idd.depth = task.pcSplit(2).Get(Of Single)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
+                    idd.rRect = idd.lRect
+                    If idd.depth > 0 Then
+                        idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / idd.depth
+                        idd.rRect = ValidateRect(idd.rRect)
+                        cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                                             cv.TemplateMatchModes.CCoeffNormed)
+
+                        idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                    Else
+                        idd.rRect = New cv.Rect
+                    End If
+                End If
+                idd.pcFrag = task.pointCloud(idd.lRect).Clone
+            End If
+            task.iddList(i) = idd
+        Next
+
+        quad.Run(src)
+        dst2 = quad.dst2
+
+        merge.Run(src)
+        dst3 = merge.dst2
+
+        If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
+    End Sub
+End Class
+
+
+
+
+
+Public Class DepthCell_Basics1 : Inherits TaskParent
+    Public grid As New Grid_Rectangles
+    Public options As New Options_DepthCellSize
+    Public thresholdRangeZ As Single
+    Public instantUpdate As Boolean
+    Public mouseD As New DepthCell_MouseDepth
+    Public quad As New Quad_Basics
+    Public merge As New Quad_CellConnect
+    Public Sub New()
+        optiBase.FindSlider("Percent Depth Threshold").Value = 25
+        desc = "Create the grid of depth cells that reduce depth volatility"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        task.iddSize = options.cellSize
+        grid.Run(src)
+
+        If task.optionsChanged Or instantUpdate Then
+            task.iddList.Clear()
+            For Each rect In grid.gridRectsAll
+                Dim idd As New depthCell
                 idd.lRect = ValidateRect(rect)
                 Dim cellSize = task.dCell.options.cellSize
                 idd.center = New cv.Point(rect.TopLeft.X + cellSize / 2, rect.TopLeft.Y + cellSize / 2)
@@ -51,10 +131,10 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     idd.depth = 0
                 Else
                     idd.age = 1
-                    idd.depthMean = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
-                    idd.depth = task.pcSplit(2).Get(Of Single)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
-                    Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.Y, idd.lRect.X)
+                    idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
+                    'idd.depth = task.pcSplit(2).Get(Of Single)(idd.lRect.Y, idd.lRect.X)
                     If idd.depth > 0 Then
+                        Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.Y, idd.lRect.X)
                         If unChangedLeftRect Then
                             idd.rRect = idd.lRect
                             idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / pcTop.Z
@@ -74,13 +154,13 @@ Public Class DepthCell_Basics : Inherits TaskParent
                             idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.lRect.Width, idd.lRect.Height)
                             idd.lRect = ValidateRect(idd.lRect)
                             idd.rRect = idd.lRect
-                            idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / pcTop.Z
-                            idd.rRect = ValidateRect(idd.rRect)
-                            cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                        End If
+                        idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / idd.depth
+                        idd.rRect = ValidateRect(idd.rRect)
+                        cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
                                                  cv.TemplateMatchModes.CCoeffNormed)
 
-                            idd.correlation = correlationMat.Get(Of Single)(0, 0)
-                        End If
+                        idd.correlation = correlationMat.Get(Of Single)(0, 0)
                     Else
                         idd.rRect = New cv.Rect
                     End If
@@ -302,8 +382,6 @@ Public Class DepthCell_CorrelationMap : Inherits TaskParent
         Dim count As Integer
         For Each idd In task.iddList
             If idd.depth > 0 Then
-                If idd.correlation = 0 Then Dim k = 0
-                If idd.correlation = 1 Then Dim k = 0
                 Dim val = (idd.correlation + 1) * 255 / 2
                 dst1(idd.lRect).SetTo(val)
                 If idd.correlation > minCorr Then
@@ -420,6 +498,7 @@ Public Class DepthCell_Correlation : Inherits TaskParent
         dst2 = task.leftView
         dst3 = task.rightView
         Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        If index < 0 Or index > task.iddList.Count Then Exit Sub
 
         Dim idd = task.iddList(index)
         Dim pt = task.dCell.mouseD.pt

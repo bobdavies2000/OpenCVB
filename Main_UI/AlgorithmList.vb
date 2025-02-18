@@ -325,6 +325,7 @@ Public Class algorithmList
 	If algorithmName = "Depth_WorldXYMT" Then return new Depth_WorldXYMT
 	If algorithmName = "Depth_WorldXYZ" Then return new Depth_WorldXYZ
 	If algorithmName = "DepthCell_Basics" Then return new DepthCell_Basics
+	If algorithmName = "DepthCell_Basics1" Then return new DepthCell_Basics1
 	If algorithmName = "DepthCell_Correlation" Then return new DepthCell_Correlation
 	If algorithmName = "DepthCell_CorrelationMap" Then return new DepthCell_CorrelationMap
 	If algorithmName = "DepthCell_CorrelationMask" Then return new DepthCell_CorrelationMask

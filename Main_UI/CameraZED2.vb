@@ -24,10 +24,10 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         ' stereolabs left camera is the RGB camera so alignment to depth and left camera is already done.
         calibData.baseline = camInfo.cameraConfiguration.calibrationParameters.Trans.X
-        calibData.rgbIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx
-        calibData.rgbIntrinsics.ppy = camInfo.cameraConfiguration.calibrationParameters.leftCam.cy
         calibData.rgbIntrinsics.fx = camInfo.cameraConfiguration.calibrationParameters.leftCam.fx
         calibData.rgbIntrinsics.fy = camInfo.cameraConfiguration.calibrationParameters.leftCam.fy
+        calibData.rgbIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx
+        calibData.rgbIntrinsics.ppy = camInfo.cameraConfiguration.calibrationParameters.leftCam.cy
         calibData.h_fov = camInfo.cameraConfiguration.calibrationParameters.leftCam.hFOV
         calibData.v_fov = camInfo.cameraConfiguration.calibrationParameters.leftCam.vFOV
 
