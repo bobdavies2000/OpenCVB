@@ -551,8 +551,6 @@ Public Class Feature_History : Inherits TaskParent
         desc = "Find good features across multiple frames."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim histCount = task.gOptions.FrameHistory.Value
-
         dst2 = src.Clone
 
         featureHistory.Add(New List(Of cv.Point)(task.featurePoints))
@@ -571,14 +569,14 @@ Public Class Feature_History : Inherits TaskParent
             Next
         Next
 
-        Dim threshold = If(histCount = 1, 0, 1)
+        Dim threshold = If(task.frameHistoryCount = 1, 0, 1)
         features.Clear()
         Dim whiteCount As Integer
         For i = 0 To newFeatures.Count - 1
             If gens(i) > threshold Then
                 Dim pt = newFeatures(i)
                 features.Add(pt)
-                If gens(i) < histCount Then
+                If gens(i) < task.frameHistoryCount Then
                     DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
                 Else
                     whiteCount += 1
@@ -587,10 +585,11 @@ Public Class Feature_History : Inherits TaskParent
             End If
         Next
 
-        If featureHistory.Count > histCount Then featureHistory.RemoveAt(0)
+        If featureHistory.Count > task.frameHistoryCount Then featureHistory.RemoveAt(0)
         If task.heartBeat Then
             labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
-                        " Red is a recent addition, yellow is present on previous " + CStr(histCount) + " frames"
+                        " Red is a recent addition, yellow is present on previous " +
+                        CStr(task.frameHistoryCount) + " frames"
         End If
     End Sub
 End Class

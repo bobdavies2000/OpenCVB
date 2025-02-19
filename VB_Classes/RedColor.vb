@@ -1264,7 +1264,7 @@ Public Class RedColor_Consistent : Inherits TaskParent
             dst2.SetTo(0, mat)
         Next
 
-        If cellmaps.Count > task.gOptions.FrameHistory.Value Then
+        If cellmaps.Count > task.frameHistoryCount Then
             cellmaps.RemoveAt(0)
             cellLists.RemoveAt(0)
             diffs.RemoveAt(0)
@@ -1332,7 +1332,7 @@ Public Class RedColor_Consistent1 : Inherits TaskParent
             dst2.SetTo(0, mat)
         Next
 
-        If cellmaps.Count > task.gOptions.FrameHistory.Value Then
+        If cellmaps.Count > task.frameHistoryCount Then
             cellmaps.RemoveAt(0)
             cellLists.RemoveAt(0)
             diffs.RemoveAt(0)

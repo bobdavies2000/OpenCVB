@@ -463,7 +463,7 @@ Public Class LongLine_History : Inherits TaskParent
         For Each lp In lpList
             DrawLine(dst2, lp.p1, lp.p2, white)
         Next
-        If lpList.Count > task.gOptions.FrameHistory.Value Then lpList.RemoveAt(0)
+        If lpList.Count > task.frameHistoryCount Then lpList.RemoveAt(0)
 
         labels(2) = $"{lpList.Count} were found that were present for every one of the last {task.frameHistoryCount} frames."
     End Sub

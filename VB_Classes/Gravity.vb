@@ -85,7 +85,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
                     Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
                     ptX.Add(pt.X)
                     ptY.Add(pt.Y)
-                    If ptX.Count >= task.gOptions.FrameHistory.Value Then Return New cv.Point2f(ptX.Average, ptY.Average)
+                    If ptX.Count >= task.frameHistoryCount Then Return New cv.Point2f(ptX.Average, ptY.Average)
                 End If
             Next
         Next

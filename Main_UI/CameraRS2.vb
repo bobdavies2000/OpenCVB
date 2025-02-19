@@ -37,6 +37,7 @@ Public Class CameraRS2 : Inherits GenericCamera
 
         Dim profiles = pipe.Start(cfg)
         Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
+        Dim streamRight = profiles.GetStream(Stream.Infrared, 2)
         Dim StreamColor = profiles.GetStream(Stream.Color)
         Dim rgbIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim rgbExtrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
@@ -45,24 +46,31 @@ Public Class CameraRS2 : Inherits GenericCamera
         calibData.rgbIntrinsics = copyIntrinsics(rgbIntrinsics, ratio)
 
         Dim leftIntrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
-        Dim leftExtrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(StreamColor)
+        Dim leftExtrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
         calibData.leftIntrinsics = copyIntrinsics(leftIntrinsics, ratio)
 
         ReDim calibData.translation(3 - 1)
         ReDim calibData.rotation(9 - 1)
 
         For i = 0 To 3 - 1
-            calibData.translation(i) = leftExtrinsics.translation(i)
+            calibData.translation(i) = rgbExtrinsics.translation(i)
         Next
         For i = 0 To 9 - 1
-            calibData.rotation(i) = leftExtrinsics.rotation(i)
+            calibData.rotation(i) = rgbExtrinsics.rotation(i)
         Next
 
         ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
-        'calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
-        '                                      System.Math.Pow(calibData.translation(1), 2) +
-        '                                      System.Math.Pow(calibData.translation(2), 2))
-        calibData.baseline = 0.65
+        calibData.baselineLeftToRGB = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
+                                                       System.Math.Pow(calibData.translation(1), 2) +
+                                                       System.Math.Pow(calibData.translation(2), 2))
+
+        Dim translationLeft(3 - 1) As Single
+        For i = 0 To 3 - 1
+            translationLeft(i) = leftExtrinsics.translation(i)
+        Next
+        calibData.baseline = System.Math.Sqrt(System.Math.Pow(translationLeft(0), 2) +
+                                              System.Math.Pow(translationLeft(1), 2) +
+                                              System.Math.Pow(translationLeft(2), 2))
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)

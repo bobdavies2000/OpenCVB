@@ -268,10 +268,10 @@ Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
 
         leftHist.Add(tmpLeft)
         rightHist.Add(tmpRight)
-        Dim threshold = Math.Min(task.gOptions.FrameHistory.Value, leftHist.Count)
+        Dim threshold = Math.Min(task.frameHistoryCount, leftHist.Count)
 
-        If leftHist.Count >= task.gOptions.FrameHistory.Value Then leftHist.RemoveAt(0)
-        If rightHist.Count >= task.gOptions.FrameHistory.Value Then rightHist.RemoveAt(0)
+        If leftHist.Count >= task.frameHistoryCount Then leftHist.RemoveAt(0)
+        If rightHist.Count >= task.frameHistoryCount Then rightHist.RemoveAt(0)
 
         If task.heartBeat Then
             labels(2) = CStr(leftFeatures.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"

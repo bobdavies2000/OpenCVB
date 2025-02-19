@@ -95,13 +95,16 @@ Public Class VBtask : Implements IDisposable
     Public rightView As New cv.Mat
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
     Public pointCloud As New cv.Mat
+    Public pointCloudRaw As New cv.Mat ' pointcloud without gravity transform.
     Public pcSplit() As cv.Mat
+    Public pcSplitRaw() As cv.Mat
 
     ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public gMatrix As New cv.Mat
     Public IMU_Rotation As System.Numerics.Quaternion
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
+    Public depthMaskRaw As New cv.Mat
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
     Public srcThread As New cv.Mat
@@ -310,7 +313,8 @@ Public Class VBtask : Implements IDisposable
         Public fy As Single
     End Structure
     Public Structure cameraInfo
-        Public baseline As Single
+        Public baseline As Single ' this is the baseline of the left to right cameras
+        Public baselineLeftToRGB As Single
 
         Public rgbIntrinsics As intrinsicData
         Public leftIntrinsics As intrinsicData
@@ -709,13 +713,20 @@ Public Class VBtask : Implements IDisposable
             frameHistoryCount = gOptions.FrameHistory.Value
 
             If useGravityPointcloud Then
+                pointCloudRaw = pointCloud.Clone
                 If pointCloud.Size <> src.Size Then
                     pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
                 End If
 
+
+
                 '******* this is the gravity rotation *******
-                pointCloud = (pointCloud.Reshape(1, src.Rows * src.Cols) * gMatrix).
-                                       ToMat.Reshape(3, src.Rows)
+                pointCloud = (pointCloud.Reshape(1, src.Rows * src.Cols) * gMatrix).ToMat.Reshape(3, src.Rows)
+
+
+
+            Else
+                pointCloudRaw = pointCloud
             End If
 
             If pcSplit Is Nothing Then pcSplit = pointCloud.Split
@@ -732,6 +743,9 @@ Public Class VBtask : Implements IDisposable
         End If
 
         pcSplit = pointCloud.Split
+        pcSplitRaw = pointCloudRaw.Split()
+        depthMaskRaw = pcSplitRaw(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+
 
         If optionsChanged Then maxDepthMask.SetTo(0)
         pcSplit(2) = pcSplit(2)
@@ -748,9 +762,7 @@ Public Class VBtask : Implements IDisposable
             pcSplit(1).SetTo(0, Not mask)
         End If
 
-        depthMask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        depthMask = depthMask.ConvertScaleAbs()
-
+        depthMask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         noDepthMask = Not depthMask
 
         If xRange <> xRangeDefault Or yRange <> yRangeDefault Then

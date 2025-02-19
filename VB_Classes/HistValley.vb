@@ -28,7 +28,7 @@ Public Class HistValley_Basics : Inherits TaskParent
         SetTrueText("Mean", New cv.Point(5, scale), 3)
         dst2.Line(New cv.Point(0, scale), New cv.Point(dst2.Width, scale), cv.Scalar.Yellow, task.lineWidth + 1)
 
-        If scaleList.Count > task.gOptions.FrameHistory.Value Then scaleList.RemoveAt(0)
+        If scaleList.Count > task.frameHistoryCount Then scaleList.RemoveAt(0)
 
         Dim hArray = hist.histArray
         Dim quartile = Math.Floor(hArray.Count / 4) ' note we really just want quartiles 
