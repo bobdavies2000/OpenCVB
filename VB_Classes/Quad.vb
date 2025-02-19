@@ -18,13 +18,13 @@ Public Class Quad_Basics : Inherits TaskParent
         dst2.SetTo(0)
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            task.iddMap(idd.lRect).SetTo(i)
+            task.iddMap(idd.cRect).SetTo(i)
             If idd.depth > 0 Then
                 idd.corners.Clear()
-                task.iddMask(idd.lRect).SetTo(255)
+                task.iddMask(idd.cRect).SetTo(255)
 
-                Dim p0 = getWorldCoordinates(idd.lRect.TopLeft, idd.depth)
-                Dim p1 = getWorldCoordinates(idd.lRect.BottomRight, idd.depth)
+                Dim p0 = getWorldCoordinates(idd.cRect.TopLeft, idd.depth)
+                Dim p1 = getWorldCoordinates(idd.cRect.BottomRight, idd.depth)
 
                 ' clockwise around starting in upper left.
                 idd.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, idd.depth))
@@ -32,7 +32,7 @@ Public Class Quad_Basics : Inherits TaskParent
                 idd.corners.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, idd.depth))
                 idd.corners.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, idd.depth))
             End If
-            dst2(idd.lRect).SetTo(idd.color)
+            dst2(idd.cRect).SetTo(idd.color)
         Next
     End Sub
 End Class
@@ -381,7 +381,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
                 Dim d1 = task.iddList(j).depth
                 Dim d2 = task.iddList(j - 1).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.iddList(j).lRect, task.HighlightColor, -1)
+                    dst2.Rectangle(task.iddList(j).cRect, task.HighlightColor, -1)
                 End If
             Next
         Next
@@ -391,7 +391,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
                 Dim d1 = task.iddList(j * width).depth
                 Dim d2 = task.iddList((j - 1) * width).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.iddList(j).lRect, task.HighlightColor, -1)
+                    dst2.Rectangle(task.iddList(j).cRect, task.HighlightColor, -1)
                 End If
             Next
         Next
@@ -425,8 +425,8 @@ Public Class Quad_CellConnect : Inherits TaskParent
                 Dim idd1 = task.iddList(j)
                 Dim idd2 = task.iddList(j - 1)
                 If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or j = i + width - 1 Then
-                    Dim p1 = task.iddList(colStart).lRect.TopLeft
-                    Dim p2 = task.iddList(colEnd).lRect.BottomRight
+                    Dim p1 = task.iddList(colStart).cRect.TopLeft
+                    Dim p2 = task.iddList(colEnd).cRect.BottomRight
                     dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
                     colorIndex += 1
                     If colEnd - colStart > 1 Then
@@ -455,8 +455,8 @@ Public Class Quad_CellConnect : Inherits TaskParent
                 Dim idd1 = task.iddList(vList(j))
                 Dim idd2 = task.iddList(vList(j - 1))
                 If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or j = height - 1 Then
-                    Dim p1 = task.iddList(vList(rowStart)).lRect.TopLeft
-                    Dim p2 = task.iddList(vList(rowEnd)).lRect.BottomRight
+                    Dim p1 = task.iddList(vList(rowStart)).cRect.TopLeft
+                    Dim p2 = task.iddList(vList(rowEnd)).cRect.BottomRight
                     dst3.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
                     colorIndex += 1
                     If rowEnd - rowStart > 1 Then

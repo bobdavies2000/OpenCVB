@@ -65,30 +65,33 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
         calibData.baseline = 0.075
         calibData.leftIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
 
-        'intrin = OakDintrinsics(cPtr, 3)
-        'Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-        'calibData.rgbIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+        intrin = OakDintrinsics(cPtr, 3)
+        Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
+        calibData.rgbIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
 
         Dim extrin = OakDRotationTranslation(cPtr)
-        Dim extrinsicsArray(9 - 1) As Single
+        Dim extrinsicsArray(12 - 1) As Single
         Marshal.Copy(extrin, extrinsicsArray, 0, extrinsicsArray.Length)
 
-        'For i = 0 To 3 - 1
-        '    calibData.translationLeft(i) = extrinsicsArray(i)
-        'Next
-        'For i = 0 To 9 - 1
-        '    calibData.rotationLeft(i) = extrinsicsArray(i)
-        'Next
+        ReDim calibData.translation(3 - 1)
+        ReDim calibData.rotation(9 - 1)
 
-        '' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
-        'calibData.baselineRGBtoLeft = System.Math.Sqrt(System.Math.Pow(calibData.translationLeft(0), 2) +
-        '                              System.Math.Pow(calibData.translationLeft(1), 2) +
-        '                              System.Math.Pow(calibData.translationLeft(2), 2))
+        For i = 0 To 3 - 1
+            calibData.translation(i) = extrinsicsArray(i)
+        Next
+        For i = 0 To 9 - 1
+            calibData.rotation(i) = extrinsicsArray(i + 3)
+        Next
 
-        'fxTemplate = calibData.rgbIntrinsics.fx * ratio ' these are used on the full size image before resize.
-        'fyTemplate = calibData.rgbIntrinsics.fy * ratio
-        'ppxTemplate = calibData.rgbIntrinsics.ppx * ratio
-        'ppyTemplate = calibData.rgbIntrinsics.ppy * ratio
+        ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
+        'calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
+        '                     System.Math.Pow(calibData.translation(1), 2) +
+        '                     System.Math.Pow(calibData.translation(2), 2))
+
+        fxTemplate = calibData.rgbIntrinsics.fx * ratio ' these are used on the full size image before resize.
+        fyTemplate = calibData.rgbIntrinsics.fy * ratio
+        ppxTemplate = calibData.rgbIntrinsics.ppx * ratio
+        ppyTemplate = calibData.rgbIntrinsics.ppy * ratio
 
         templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
         templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)

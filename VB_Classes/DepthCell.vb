@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Dynamic
+Imports cv = OpenCvSharp
 Public Class DepthCell_Basics : Inherits TaskParent
     Public grid As New Grid_Rectangles
     Public options As New Options_DepthCellSize
@@ -7,6 +8,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Public mouseD As New DepthCell_MouseDepth
     Public quad As New Quad_Basics
     Public merge As New Quad_CellConnect
+    Dim alignLeft As New depthcell_LeftAlign
     Public Sub New()
         optiBase.FindSlider("Percent Depth Threshold").Value = 25
         desc = "Create the grid of depth cells that reduce depth volatility"
@@ -21,7 +23,8 @@ Public Class DepthCell_Basics : Inherits TaskParent
             task.iddList.Clear()
             For Each rect In grid.gridRectsAll
                 Dim idd As New depthCell
-                idd.lRect = ValidateRect(rect)
+                idd.cRect = ValidateRect(rect)
+                idd.lRect = ValidateRect(rect) ' for some cameras the color image and the left image are the same.
                 Dim cellSize = task.dCell.options.cellSize
                 idd.center = New cv.Point(rect.TopLeft.X + cellSize / 2, rect.TopLeft.Y + cellSize / 2)
                 idd.age = 0
@@ -31,141 +34,42 @@ Public Class DepthCell_Basics : Inherits TaskParent
 
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
-            Dim motion = task.motionMask(idd.lRect).CountNonZero
-            If motion = 0 And idd.age > 0 Then
-                idd.age += 1
-            Else
-                idd.correlation = 0
-                cv.Cv2.MeanStdDev(src(idd.lRect), colormean, colorStdev)
-                idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
-
-                idd.pixels = task.depthMask(idd.lRect).CountNonZero
-                If idd.pixels / (idd.lRect.Width * idd.lRect.Height) < options.percentThreshold Then
-                    idd.age = 0
-                    idd.depth = 0
-                Else
-                    idd.age = 1
-                    idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
-                    ' idd.depth = task.pcSplit(2).Get(Of Single)(idd.lRect.TopLeft.Y, idd.lRect.TopLeft.X)
-                    idd.rRect = idd.lRect
-                    If idd.depth > 0 Then
-                        idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / idd.depth
-                        idd.rRect = ValidateRect(idd.rRect)
-                        cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
-                                             cv.TemplateMatchModes.CCoeffNormed)
-
-                        idd.correlation = correlationMat.Get(Of Single)(0, 0)
-                    Else
-                        idd.rRect = New cv.Rect
-                    End If
-                End If
-                idd.pcFrag = task.pointCloud(idd.lRect).Clone
-            End If
-            task.iddList(i) = idd
-        Next
-
-        quad.Run(src)
-        dst2 = quad.dst2
-
-        merge.Run(src)
-        dst3 = merge.dst2
-
-        If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
-    End Sub
-End Class
-
-
-
-
-
-Public Class DepthCell_Basics1 : Inherits TaskParent
-    Public grid As New Grid_Rectangles
-    Public options As New Options_DepthCellSize
-    Public thresholdRangeZ As Single
-    Public instantUpdate As Boolean
-    Public mouseD As New DepthCell_MouseDepth
-    Public quad As New Quad_Basics
-    Public merge As New Quad_CellConnect
-    Public Sub New()
-        optiBase.FindSlider("Percent Depth Threshold").Value = 25
-        desc = "Create the grid of depth cells that reduce depth volatility"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        task.iddSize = options.cellSize
-        grid.Run(src)
-
-        If task.optionsChanged Or instantUpdate Then
-            task.iddList.Clear()
-            For Each rect In grid.gridRectsAll
-                Dim idd As New depthCell
-                idd.lRect = ValidateRect(rect)
-                Dim cellSize = task.dCell.options.cellSize
-                idd.center = New cv.Point(rect.TopLeft.X + cellSize / 2, rect.TopLeft.Y + cellSize / 2)
-                idd.age = 0
-                task.iddList.Add(idd)
-            Next
+        Dim updateRightRect As Boolean
+        If task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec") Then
+            updateRightRect = True
         End If
-
-        Dim colorStdev As cv.Scalar, colormean As cv.Scalar
-        Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim ir3D As cv.Point3f, irPt As cv.Point2f
-        Dim unChangedLeftRect As Boolean
-        If task.cameraName.StartsWith("StereoLabs") Then unChangedLeftRect = True
-        If task.cameraName.StartsWith("Orbbec") Then unChangedLeftRect = True
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            Dim motion = task.motionMask(idd.lRect).CountNonZero
+            Dim motion = task.motionMask(idd.cRect).CountNonZero
             If motion = 0 And idd.age > 0 Then
                 idd.age += 1
             Else
-                cv.Cv2.MeanStdDev(src(idd.lRect), colormean, colorStdev)
+                cv.Cv2.MeanStdDev(src(idd.cRect), colormean, colorStdev)
                 idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
 
-                idd.pixels = task.depthMask(idd.lRect).CountNonZero
-                If idd.pixels / (idd.lRect.Width * idd.lRect.Height) < options.percentThreshold Then
+                idd.pixels = task.depthMask(idd.cRect).CountNonZero
+                If idd.pixels / (idd.cRect.Width * idd.cRect.Height) < options.percentThreshold Then
                     idd.age = 0
                     idd.depth = 0
+                    idd.correlation = 0
+                    idd.rRect = New cv.Rect
                 Else
                     idd.age = 1
-                    idd.depth = task.pcSplit(2)(idd.lRect).Mean(task.depthMask(idd.lRect))(0)
-                    'idd.depth = task.pcSplit(2).Get(Of Single)(idd.lRect.Y, idd.lRect.X)
-                    If idd.depth > 0 Then
-                        Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(idd.lRect.Y, idd.lRect.X)
-                        If unChangedLeftRect Then
-                            idd.rRect = idd.lRect
-                            idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / pcTop.Z
-                        Else
-                            ir3D.X = camInfo.rotation(0) * pcTop.X +
-                                     camInfo.rotation(1) * pcTop.Y +
-                                     camInfo.rotation(2) * pcTop.Z + camInfo.translation(0)
-                            ir3D.Y = camInfo.rotation(3) * pcTop.X +
-                                     camInfo.rotation(4) * pcTop.Y +
-                                     camInfo.rotation(5) * pcTop.Z + camInfo.translation(1)
-                            ir3D.Z = camInfo.rotation(6) * pcTop.X +
-                                     camInfo.rotation(7) * pcTop.Y +
-                                     camInfo.rotation(8) * pcTop.Z + camInfo.translation(2)
-                            irPt.X = camInfo.rgbIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.rgbIntrinsics.ppx
-                            irPt.Y = camInfo.rgbIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.rgbIntrinsics.ppy
-
-                            idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.lRect.Width, idd.lRect.Height)
-                            idd.lRect = ValidateRect(idd.lRect)
-                            idd.rRect = idd.lRect
-                        End If
-                        idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / idd.depth
-                        idd.rRect = ValidateRect(idd.rRect)
-                        cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                    idd.depth = task.pcSplit(2)(idd.cRect).Mean(task.depthMask(idd.cRect))(0)
+                    If updateRightRect Then
+                        idd.rRect = idd.cRect
+                        If idd.depth > 0 Then
+                            idd.rRect.X -= camInfo.baseline * camInfo.rgbIntrinsics.fx / idd.depth
+                            idd.rRect = ValidateRect(idd.rRect)
+                            cv.Cv2.MatchTemplate(task.leftView(idd.cRect), task.rightView(idd.rRect), correlationMat,
                                                  cv.TemplateMatchModes.CCoeffNormed)
 
-                        idd.correlation = correlationMat.Get(Of Single)(0, 0)
-                    Else
-                        idd.rRect = New cv.Rect
+                            idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                        Else
+                            idd.rRect = New cv.Rect
+                        End If
                     End If
                 End If
-                idd.pcFrag = task.pointCloud(idd.lRect).Clone
             End If
             task.iddList(i) = idd
         Next
@@ -176,11 +80,11 @@ Public Class DepthCell_Basics1 : Inherits TaskParent
         merge.Run(src)
         dst3 = merge.dst2
 
+        alignLeft.Run(src) ' update the task.iddlist with the correct left and right rectangles in left/right views.
+
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
     End Sub
 End Class
-
-
 
 
 
@@ -199,14 +103,14 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         Dim idd = task.iddList(index)
         dst2 = task.dCell.dst2
 
-        ptReal = idd.lRect.TopLeft
-        pt = idd.lRect.TopLeft
+        ptReal = idd.cRect.TopLeft
+        pt = idd.cRect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
             pt.X -= dst2.Width * 0.15
         Else
-            pt.Y -= idd.lRect.Height * 2
+            pt.Y -= idd.cRect.Height * 2
         End If
-        strOut = Format(idd.depth, fmt3) + "m (" + Format(idd.pixels / (idd.lRect.Width * idd.lRect.Height), "0%") + ")"
+        strOut = Format(idd.depth, fmt3) + "m (" + Format(idd.pixels / (idd.cRect.Width * idd.cRect.Height), "0%") + ")"
 
         If standaloneTest() Then SetTrueText(strOut, pt, 2)
     End Sub
@@ -301,12 +205,12 @@ Public Class DepthCell_Plot : Inherits TaskParent
         Dim idd As depthCell
         If index < 0 Or index >= task.iddList.Count Then
             idd = task.iddList(task.iddList.Count / 2)
-            task.mouseMovePoint = New cv.Point(idd.lRect.X + idd.lRect.Width / 2, idd.lRect.Y + idd.lRect.Height / 2)
+            task.mouseMovePoint = New cv.Point(idd.cRect.X + idd.cRect.Width / 2, idd.cRect.Y + idd.cRect.Height / 2)
         Else
             idd = task.iddList(index)
         End If
 
-        Dim split() = idd.pcFrag.Split()
+        Dim split() = task.pointCloud(idd.lRect).Split()
         Dim mm = GetMinMax(split(2))
 
         If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
@@ -336,7 +240,7 @@ Public Class DepthCell_FullDepth : Inherits TaskParent
 
         For Each idd In task.iddList
             If idd.depth > 0 Then
-                dst2.Rectangle(idd.lRect, 255, task.lineWidth)
+                dst2.Rectangle(idd.cRect, 255, task.lineWidth)
                 dst3.Rectangle(idd.rRect, 255, task.lineWidth)
             End If
         Next
@@ -383,9 +287,9 @@ Public Class DepthCell_CorrelationMap : Inherits TaskParent
         For Each idd In task.iddList
             If idd.depth > 0 Then
                 Dim val = (idd.correlation + 1) * 255 / 2
-                dst1(idd.lRect).SetTo(val)
+                dst1(idd.cRect).SetTo(val)
                 If idd.correlation > minCorr Then
-                    dst3(idd.lRect).SetTo(255)
+                    dst3(idd.cRect).SetTo(255)
                     count += 1
                 End If
             End If
@@ -396,7 +300,7 @@ Public Class DepthCell_CorrelationMap : Inherits TaskParent
         Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index > 0 And index < task.iddList.Count Then
             Dim idd = task.iddList(index)
-            dst2.Circle(idd.lRect.TopLeft, task.DotSize, task.HighlightColor, -1)
+            dst2.Circle(idd.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
             SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
         End If
 
@@ -447,7 +351,7 @@ Public Class DepthCell_RGBtoLeft : Inherits TaskParent
         End If
 
         Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        Dim rgbTop = idd.lRect.TopLeft, ir3D As cv.Point3f
+        Dim rgbTop = idd.cRect.TopLeft, ir3D As cv.Point3f
         ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
         ' can be found.  For Intel and the Oak-D, the left image and RGB need to be aligned to get accurate depth.
         ' With depth the correlation between the left and right for that depth cell will be accurate (if there is depth.)
@@ -468,13 +372,13 @@ Public Class DepthCell_RGBtoLeft : Inherits TaskParent
                 irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
             End If
         Else
-            irPt = idd.lRect.TopLeft ' the above cameras are already have RGB aligned to the left image.
+            irPt = idd.cRect.TopLeft ' the above cameras are already have RGB aligned to the left image.
         End If
         labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
 
         dst2 = task.leftView
         dst3 = task.rightView
-        Dim r = New cv.Rect(irPt.X, irPt.Y, idd.lRect.Width, idd.lRect.Height)
+        Dim r = New cv.Rect(irPt.X, irPt.Y, idd.cRect.Width, idd.cRect.Height)
         dst2.Rectangle(r, 255, task.lineWidth)
 
         dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
@@ -503,12 +407,61 @@ Public Class DepthCell_Correlation : Inherits TaskParent
         Dim idd = task.iddList(index)
         Dim pt = task.dCell.mouseD.pt
         Dim corr = idd.correlation
-        dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
+        dst2.Circle(idd.cRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
         labels(3) = "Correlation of the left depth cell to the right is " + Format(corr, fmt3)
 
-        dst2.Rectangle(idd.lRect, 255, task.lineWidth)
+        dst2.Rectangle(idd.cRect, 255, task.lineWidth)
         dst3.Rectangle(idd.rRect, 255, task.lineWidth)
         labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class DepthCell_LeftAlign : Inherits TaskParent
+    Public Sub New()
+        desc = "Align depth cell left rectangles in color with the left image.  StereoLabs and Orbbec already match."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standaloneTest() Then
+            dst2 = task.leftView.Clone
+            If task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec") Then
+                For Each idd In task.iddList
+                    dst2.Circle(idd.cRect.TopLeft, task.DotSize, 255, -1)
+                Next
+                Exit Sub
+            End If
+        Else
+            If task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec") Then Exit Sub
+        End If
+
+        Dim ir3D As cv.Point3f, irPt As cv.Point2f
+        Dim camInfo = task.calibData, correlationMat As New cv.Mat
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(idd.cRect.Y, idd.cRect.X)
+            If pcTop.Z > 0 Then
+                ir3D.X = camInfo.rotation(0) * pcTop.X +
+                         camInfo.rotation(1) * pcTop.Y +
+                         camInfo.rotation(2) * pcTop.Z + camInfo.translation(0)
+                ir3D.Y = camInfo.rotation(3) * pcTop.X +
+                         camInfo.rotation(4) * pcTop.Y +
+                         camInfo.rotation(5) * pcTop.Z + camInfo.translation(1)
+                ir3D.Z = camInfo.rotation(6) * pcTop.X +
+                         camInfo.rotation(7) * pcTop.Y +
+                         camInfo.rotation(8) * pcTop.Z + camInfo.translation(2)
+                irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
+                irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
+                idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.cRect.Width, idd.cRect.Height)
+                idd.rRect = idd.lRect
+                idd.rRect.X -= camInfo.baseline * camInfo.leftIntrinsics.fx / pcTop.Z
+                If standaloneTest() Then dst2.Circle(idd.rRect.TopLeft, task.DotSize, 255, -1)
+                task.iddList(i) = idd
+            End If
+        Next
     End Sub
 End Class

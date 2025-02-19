@@ -238,18 +238,21 @@ int* OakDintrinsics(OakDCamera* cPtr, int camera)
 extern "C" __declspec(dllexport)
 int* OakDRotationTranslation(OakDCamera* cPtr)
 {
-	std::vector<std::vector<float>> extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::RGB, dai::CameraBoardSocket::LEFT);
+	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::RGB, dai::CameraBoardSocket::LEFT);
+	std::vector<float> translationRotation = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+	for (auto i = 0; i < 3; i++) {
+		translationRotation[i] = extrinsics[i][3];
+	}
 
-	std::vector<float> results;
-	std::vector<float> rotation = extrinsics[0];
-	for (int i = 0; i < 9; i++)
-		results.push_back(rotation[i]);
+	int index = 3;
+	for (auto i = 0; i < 3; i++) {
+		for (auto j = 0; j < 3; j++)
+		{
+			translationRotation[index++] = extrinsics[i][j];
+		}
+	}
 
-	std::vector<float> translation = extrinsics[1];
-	for (int i = 0; i < 3; i++)
-		results.push_back(translation[i]);
-	
-	return (int*)&results;
+	return (int*)&translationRotation[0];
 }
 
 

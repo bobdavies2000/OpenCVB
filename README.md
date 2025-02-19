@@ -1,32 +1,36 @@
-# February 2025 (Part 2) – Improved Depth Display, QuadDepth OpenGL display, and Left/Right Cameras.
+# February 2025 (Part 2) – More ‘QuadDepth’ improvements, OpenGL display changes, Extrinsics/Intrinsics, and Connected Depth Cells
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   The least used OpenCVB image is the “DepthRGB” in the upper right.
-    -   The option to use an alternative “QuadDepth” view is now the default.
-    -   The QuadDepth image is built using the motion mask in OpenCVB.
-        -   Depth data does not change unless there is motion in that cell.
-    -   The conventional display of the depth is still optionally available.
-    -   Mouse movement in the OpenCVB app will display a location’s depth.
-    -   The first GIF image below shows what the output looks like.
-        -   The depth histogram also shown is for the selected cell.
-        -   See the “Ideal_CellPlot” algorithm for more information.
--   OpenCVB’s OpenGL interface uses ‘quads’ to display rectangles for the scene.
-    -   Each quad has depth and color and the size is controlled with an option.
-    -   See the second GIF display below to understand this further.
--   The left and right camera images are now always provided in grayscale.
-    -   Some cameras could not provide color left and right images.
-    -   The limited use of left/right images didn’t require color values.
-        -   Future uses may require color so some cameras may be limited.
-    -   Using grayscale images is more efficient for now.
+-   The ‘QuadDepth’ display was configured to show OpenGL quad’s or rectangles.
+    -   Neighboring quads are now connected if they are close in depth.
+    -   The depth difference between cells is controlled with a global option.
+    -   Neighboring cells are connected both vertically and horizontally.
+    -   Cursor movements display the depth of any cell under the cursor.
+    -   Debug feature: cell depth is displayed even when the algorithm is paused.
+    -   NOTE: right-click the mouse to avoid updating the mouse move value.
+        -   Move off the screen while holding the right-click to debug.
+-   OpenGL algorithms typically display raw point cloud data.
+    -   OpenGL_QuadCompare algorithm displays multiple views.
+    -   Options include raw point cloud, flat or connected depth cells.
+    -   Connected depth cells remove many artifacts or floating points.
+    -   Horizontal and vertical connections build a solid OpenGL ‘weave’.
+-   The fx, fy, ppx, and ppy intrinsics were reviewed and tested.
+    -   More testing is needed to handle cameras without RGB=Left View.
+    -   All camera parameters are adjusted using the ratio of working to capture size.
+-   DepthCell.vb has a correlation map showing a cell’s left to right image correlation.
+    -   A mask of the heat map can be thresholded to isolate high quality cells.
+    -   The correlation relies on intrinsics and extrinsics for the left and RGB.
+        -   And the corresponding values for the left and right images.
+        -   For the StereoLabs Zed 2/2i cameras, the RGB equals the left image.
+-   The MYNT EYE camera support is not working. Rebuilding the SDK doesn’t work.
+    -   This camera is highly desirable because the RGB and left cameras are the same.
+    -   Any MYNT developer’s pull request would be gratefully received.
+-   The upper right image (DepthRGB) shows the % depth pixels that are present.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/d86045cbdc8eec1c2a5fe6965baf507e.gif)
+![](media/3f3ecad62a60b44ad5d6a8aefa22c148.gif)
 
-**Depth Display:** *The option to use the “QuadDepth” display is shown in the upper right image. In this example, the “Ideal_CellPlot” algorithm shows the histogram of the cell’s depth data at the selected location while the mean depth for the cell is shown in the upper right image. The mouse controls which histogram and mean depth are shown. Mouse movements in all algorithms will show the mean depth in the upper right image for the cell under the mouse.*
-
-![](media/638f97600747b1130688e8061ae8af2a.gif)
-
-**OpenGL_QuadDepth:** *The “QuadDepth” data that is displayed in the upper right image of the output for all the algorithms can also be displayed in OpenGL. Each cell is provided to OpenGL as a quad that is always filled with the mean color for the cell. In the sequence above the last image is zoomed sufficiently to show that each cell is a rectangle, not a set of points.*
+**OpenGL_QuadCompare :** *The 3 different OpenGL display formats are shown above – raw point cloud, flat depth cells, and connected depth cells. The flat and connected depth cells are OpenGL quads, not points. Note that the connected depth cells remove some of the floating artifacts. A cell is connected to its neighbors if their depths are within X centimeters (controlled with an option.) The depth cells are then connected in vertical and horizontal directions to produce a solid appearance.*
 
 # Introduction
 
@@ -1747,3 +1751,33 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   A log of previous changes is included at the bottom of this document.
 
 ![A screen shot of a computer screen Description automatically generated](media/9f00f342149e24119ff7d554df58f31b.png)  ![A screenshot of a computer screen Description automatically generated](media/ed0ab23749b244a50928420654c93c93.png) **OpenGL Multiple Buffers:** *Since the point cloud is different on every frame (depth is only an approximation), using multiple buffers allows a cosmetic improvement to the appearance of the point cloud. The first point cloud is what one buffer looks like while the next uses the last 10 frames. The frame rate for this example was 60 fps at 320x240 with significant magnification (approximately 4X.)*
+
+# February 2025 (Part 2) – Improved Depth Display, QuadDepth OpenGL display, and Left/Right Cameras.
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   The least used OpenCVB image is the “DepthRGB” in the upper right.
+    -   The option to use an alternative “QuadDepth” view is now the default.
+    -   The QuadDepth image is built using the motion mask in OpenCVB.
+        -   Depth data does not change unless there is motion in that cell.
+    -   The conventional display of the depth is still optionally available.
+    -   Mouse movement in the OpenCVB app will display a location’s depth.
+    -   The first GIF image below shows what the output looks like.
+        -   The depth histogram also shown is for the selected cell.
+        -   See the “Ideal_CellPlot” algorithm for more information.
+-   OpenCVB’s OpenGL interface uses ‘quads’ to display rectangles for the scene.
+    -   Each quad has depth and color and the size is controlled with an option.
+    -   See the second GIF display below to understand this further.
+-   The left and right camera images are now always provided in grayscale.
+    -   Some cameras could not provide color left and right images.
+    -   The limited use of left/right images didn’t require color values.
+        -   Future uses may require color so some cameras may be limited.
+    -   Using grayscale images is more efficient for now.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of a person sitting in a chair AI-generated content may be incorrect.](media/d86045cbdc8eec1c2a5fe6965baf507e.gif)
+
+**Depth Display:** *The option to use the “QuadDepth” display is shown in the upper right image. In this example, the “Ideal_CellPlot” algorithm shows the histogram of the cell’s depth data at the selected location while the mean depth for the cell is shown in the upper right image. The mouse controls which histogram and mean depth are shown. Mouse movements in all algorithms will show the mean depth in the upper right image for the cell under the mouse.*
+
+![A person sitting in a room AI-generated content may be incorrect.](media/638f97600747b1130688e8061ae8af2a.gif)
+
+**OpenGL_QuadDepth:** *The “QuadDepth” data that is displayed in the upper right image of the output for all the algorithms can also be displayed in OpenGL. Each cell is provided to OpenGL as a quad that is always filled with the mean color for the cell. In the sequence above the last image is zoomed sufficiently to show that each cell is a rectangle, not a set of points.*
