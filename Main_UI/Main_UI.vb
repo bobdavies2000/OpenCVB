@@ -1697,9 +1697,6 @@ Public Class Main_UI
 
 
                 picLabels = task.labels
-                If picLabels(1) = "" Then
-                    picLabels(1) = "Quad Depth Cells - " + CStr(task.iddSize) + "X" + CStr(task.iddSize)
-                End If
                 motionLabel = task.MotionLabel
 
                 SyncLock mouseLock
@@ -1741,22 +1738,20 @@ Public Class Main_UI
                     If task.trueData.Count Then
                         trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                     End If
-                    Static ptSave = task.dCell.mouseD.pt
-                    Static strSave = task.dCell.mouseD.strOut
-                    If ptSave <> task.dCell.mouseD.pt Then
-                        ptSave = task.dCell.mouseD.pt
-                        strSave = task.dCell.mouseD.strOut
+                    Static ptSave = task.dCell.mouseD.ptDepthAndCorrelation
+                    Static strSave = task.dCell.mouseD.depthAndCorrelationText
+                    If ptSave <> task.dCell.mouseD.ptDepthAndCorrelation Then
+                        ptSave = task.dCell.mouseD.ptDepthAndCorrelation
+                        strSave = task.dCell.mouseD.depthAndCorrelationText
                     End If
                     trueData.Add(New TrueText(strSave, ptSave, 1))
                     task.depthRGB.Circle(task.dCell.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
                     task.color.Circle(task.dCell.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
                     task.trueData.Clear()
+                    Dim corrText = strSave.replace(vbCrLf, ", ")
+                    picLabels(1) = "Quad Depth Cells - " + CStr(task.iddSize) + "X" + CStr(task.iddSize) + "  " + corrText
                 End SyncLock
 
-                If task.algName.StartsWith("Options_") Then
-                    task.labels(2) = "Options algorithms have no output"
-                    Continue While
-                End If
                 If task.dst0 IsNot Nothing Then
                     SyncLock cameraLock
                         dst(0) = task.dst0.Clone

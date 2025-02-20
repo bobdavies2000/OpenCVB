@@ -58,7 +58,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
         If task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec") Then
             rgbLeftAligned = True
         End If
-
+        Dim irPt As cv.Point2f
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             Dim motion = task.motionMask(idd.cRect).CountNonZero
@@ -82,18 +82,30 @@ Public Class DepthCell_Basics : Inherits TaskParent
                             idd.lRect = idd.cRect
                             idd.rRect = idd.lRect
                             idd.rRect.X -= caminfo.baseline * caminfo.rgbIntrinsics.fx / idd.depth
-                        Else
-                            Dim irPt = translateColorToLeft(idd.cRect.TopLeft)
-                            idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.cRect.Width, idd.cRect.Height)
-                            idd.lRect = ValidateRect(idd.lRect)
-                            idd.rRect = idd.lRect
-                            idd.rRect.X -= caminfo.baseline * caminfo.rgbIntrinsics.fx / idd.depth
-                        End If
-                        idd.rRect = ValidateRect(idd.rRect)
-                        cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                            idd.rRect = ValidateRect(idd.rRect)
+                            cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
                                                  cv.TemplateMatchModes.CCoeffNormed)
 
-                        idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                            idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                        Else
+                            irPt = translateColorToLeft(idd.cRect.TopLeft)
+                            If irPt.X < 0 Then
+                                idd.depth = 0 ' off the grid.
+                                idd.lRect = New cv.Rect
+                                idd.rRect = New cv.Rect
+                            Else
+                                idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.cRect.Width, idd.cRect.Height)
+                                idd.lRect = ValidateRect(idd.lRect)
+
+                                idd.rRect = idd.lRect
+                                idd.rRect.X -= caminfo.baseline * caminfo.leftIntrinsics.fx / idd.depth
+                                idd.rRect = ValidateRect(idd.rRect)
+                                cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                                                             cv.TemplateMatchModes.CCoeffNormed)
+
+                                idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                            End If
+                        End If
                     Else
                         idd.lRect = New cv.Rect
                         idd.rRect = New cv.Rect
@@ -118,8 +130,9 @@ End Class
 
 
 Public Class DepthCell_MouseDepth : Inherits TaskParent
-    Public pt As New cv.Point
     Public ptReal As New cv.Point
+    Public ptDepthAndCorrelation As New cv.Point
+    Public depthAndCorrelationText As String
     Public Sub New()
         desc = "Provide the mouse depth at the mouse movement location."
     End Sub
@@ -131,15 +144,17 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         dst2 = task.dCell.dst2
 
         ptReal = idd.cRect.TopLeft
-        pt = idd.cRect.TopLeft
+        Dim pt = idd.cRect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
             pt.X -= dst2.Width * 0.15
         Else
             pt.Y -= idd.cRect.Height * 2
         End If
-        strOut = Format(idd.depth, fmt3) + "m (" + Format(idd.pixels / (idd.cRect.Width * idd.cRect.Height), "0%") + ")"
-
-        If standaloneTest() Then SetTrueText(strOut, pt, 2)
+        depthAndCorrelationText = Format(idd.depth, fmt3) +
+                                  "m (" + Format(idd.pixels / (idd.cRect.Width * idd.cRect.Height), "0%") + ")" +
+                                  vbCrLf + "correlation = " + Format(idd.correlation, fmt3)
+        ptDepthAndCorrelation = pt
+        If standaloneTest() Then SetTrueText(DepthAndCorrelationText, ptDepthAndCorrelation, 2)
     End Sub
 End Class
 
@@ -263,7 +278,7 @@ Public Class DepthCell_CorrelationMap : Inherits TaskParent
         If index > 0 And index < task.iddList.Count Then
             Dim idd = task.iddList(index)
             dst2.Circle(idd.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
-            SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
+            SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.ptDepthAndCorrelation, 2)
         End If
 
         labels(2) = task.dCell.labels(2)
@@ -367,7 +382,7 @@ Public Class DepthCell_Correlation : Inherits TaskParent
         If index < 0 Or index > task.iddList.Count Then Exit Sub
 
         Dim idd = task.iddList(index)
-        Dim pt = task.dCell.mouseD.pt
+        Dim pt = task.dCell.mouseD.ptDepthAndCorrelation
         Dim corr = idd.correlation
         dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
