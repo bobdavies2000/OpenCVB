@@ -427,8 +427,8 @@ End Structure
 
 Public Class depthCell
     Public cRect As cv.Rect ' rectange under the cursor in the color image.
-    Public lRect As cv.Rect
-    Public rRect As cv.Rect
+    Public lRect As New cv.Rect
+    Public rRect As New cv.Rect
     Public depth As Single
     Public depthMean As Single
     Public age As Integer

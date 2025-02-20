@@ -331,6 +331,7 @@ Public Class algorithmList
 	If algorithmName = "DepthCell_FullDepth" Then return new DepthCell_FullDepth
 	If algorithmName = "DepthCell_InstantUpdate" Then return new DepthCell_InstantUpdate
 	If algorithmName = "DepthCell_LeftAlign" Then return new DepthCell_LeftAlign
+	If algorithmName = "DepthCell_LeftRightSize" Then return new DepthCell_LeftRightSize
 	If algorithmName = "DepthCell_MouseDepth" Then return new DepthCell_MouseDepth
 	If algorithmName = "DepthCell_Plot" Then return new DepthCell_Plot
 	If algorithmName = "DepthCell_RGBtoLeft" Then return new DepthCell_RGBtoLeft
