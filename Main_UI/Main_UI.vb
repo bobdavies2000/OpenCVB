@@ -1749,7 +1749,8 @@ Public Class Main_UI
                     task.color.Circle(task.dCell.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
                     task.trueData.Clear()
                     Dim corrText = strSave.replace(vbCrLf, ", ")
-                    picLabels(1) = "Quad Depth Cells - " + CStr(task.iddSize) + "X" + CStr(task.iddSize) + "  " + corrText
+                    picLabels(1) = "Quad Depth Cells - " + CStr(task.dCellSize) + "X" + CStr(task.dCellSize) +
+                                   "  " + corrText
                 End SyncLock
 
                 If task.dst0 IsNot Nothing Then

@@ -9,6 +9,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Public mouseD As New DepthCell_MouseDepth
     Public quad As New Quad_Basics
     Public merge As New Quad_CellConnect
+    Dim iddCorr As New DepthCell_CorrelationMap
     Dim caminfo As cameraInfo
     Public Sub New()
         optiBase.FindSlider("Percent Depth Threshold").Value = 25
@@ -35,7 +36,6 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        task.iddSize = options.cellSize
         grid.Run(src)
 
         If task.optionsChanged Or instantUpdate Then
@@ -44,8 +44,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
                 Dim idd As New depthCell
                 idd.cRect = ValidateRect(rect)
                 idd.lRect = ValidateRect(rect) ' for some cameras the color image and the left image are the same.
-                Dim cellSize = task.dCell.options.cellSize
-                idd.center = New cv.Point(rect.TopLeft.X + cellSize / 2, rect.TopLeft.Y + cellSize / 2)
+                idd.center = New cv.Point(rect.TopLeft.X + task.dCellSize / 2, rect.TopLeft.Y + task.dCellSize / 2)
                 idd.age = 0
                 task.iddList.Add(idd)
             Next
@@ -89,7 +88,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
                             idd.correlation = correlationMat.Get(Of Single)(0, 0)
                         Else
                             irPt = translateColorToLeft(idd.cRect.TopLeft)
-                            If irPt.X < 0 Then
+                            If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Then
                                 idd.depth = 0 ' off the grid.
                                 idd.lRect = New cv.Rect
                                 idd.rRect = New cv.Rect
@@ -120,6 +119,8 @@ Public Class DepthCell_Basics : Inherits TaskParent
 
         merge.Run(src)
         dst3 = merge.dst2
+
+        iddCorr.Run(src)
 
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
     End Sub
@@ -208,18 +209,25 @@ End Class
 
 Public Class DepthCell_FullDepth : Inherits TaskParent
     Public Sub New()
-        optiBase.FindSlider("Depth Cell Size").Value = 12
-        desc = "Display the disparity rectangles for all cells with depth."
+        labels(2) = "Left image depth cells - no overlap.  Click in any column to highlight that column."
+        labels(3) = "Right image: corresponding depth cells.  Overlap indicates uncertainty about depth."
+        desc = "Display the depth cells for all cells with depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView.Clone
-        dst3 = task.rightView.Clone
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
+        Dim col As Integer, tilesPerRow = task.dCell.grid.tilesPerRow
+        Static whiteCol As Integer = tilesPerRow / 2
+        If task.mouseClickFlag Then whiteCol = Math.Round(tilesPerRow * (task.ClickPoint.X - task.dCellSize / 2) / dst2.Width)
         For Each idd In task.iddList
             If idd.depth > 0 Then
-                dst2.Rectangle(idd.cRect, 255, task.lineWidth)
-                dst3.Rectangle(idd.rRect, 255, task.lineWidth)
+                Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / tilesPerRow)))
+                dst2.Rectangle(idd.cRect, color, task.lineWidth)
+                dst3.Rectangle(idd.rRect, color, task.lineWidth)
             End If
+            col += 1
+            If col >= tilesPerRow Then col = 0
         Next
     End Sub
 End Class
@@ -243,47 +251,6 @@ Public Class DepthCell_InstantUpdate : Inherits TaskParent
         dst2 = task.dCell.dst2
         labels(2) = task.dCell.labels(2)
         dst2.SetTo(0, Not task.iddMask)
-    End Sub
-End Class
-
-
-
-
-
-Public Class DepthCell_CorrelationMap : Inherits TaskParent
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each depth cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        dst3.SetTo(0)
-
-        Dim minCorr = task.dCell.options.correlationThreshold
-        Dim count As Integer
-        For Each idd In task.iddList
-            If idd.depth > 0 Then
-                Dim val = (idd.correlation + 1) * 255 / 2
-                dst1(idd.cRect).SetTo(val)
-                If idd.correlation > minCorr Then
-                    dst3(idd.cRect).SetTo(255)
-                    count += 1
-                End If
-            End If
-        Next
-
-        dst2 = ShowPalette(dst1)
-
-        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        If index > 0 And index < task.iddList.Count Then
-            Dim idd = task.iddList(index)
-            dst2.Circle(idd.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
-            SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.ptDepthAndCorrelation, 2)
-        End If
-
-        labels(2) = task.dCell.labels(2)
-        labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
-                    ") with correlation coefficient > " + Format(minCorr, fmt1)
     End Sub
 End Class
 
@@ -363,36 +330,6 @@ Public Class DepthCell_RGBtoLeft : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class DepthCell_Correlation : Inherits TaskParent
-    Public Sub New()
-        desc = "Given a left image cell, find it's match in the right image, and display their correlation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then Exit Sub ' settle down first...
-
-        dst2 = task.leftView
-        dst3 = task.rightView
-        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        If index < 0 Or index > task.iddList.Count Then Exit Sub
-
-        Dim idd = task.iddList(index)
-        Dim pt = task.dCell.mouseD.ptDepthAndCorrelation
-        Dim corr = idd.correlation
-        dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
-        SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
-        labels(3) = "Correlation of the left depth cell to the right is " + Format(corr, fmt3)
-
-        dst2.Rectangle(idd.lRect, 255, task.lineWidth)
-        dst3.Rectangle(idd.rRect, 255, task.lineWidth)
-        labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
-    End Sub
-End Class
 
 
 
@@ -484,5 +421,72 @@ Public Class DepthCell_LeftRightSize : Inherits TaskParent
 
         Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
         dst2 = task.leftView(rect).Resize(task.color.Size)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class DepthCell_CorrelationMap : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each depth cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+
+        Dim minCorr = task.dCell.options.correlationThreshold
+        Dim count As Integer
+        For Each idd In task.iddList
+            If idd.depth > 0 Then
+                Dim val = (idd.correlation + 1) * 255 / 2
+                dst1(idd.cRect).SetTo(val)
+                If idd.correlation > minCorr Then
+                    dst3(idd.cRect).SetTo(255)
+                    count += 1
+                End If
+            End If
+        Next
+
+        task.iddCorr = ShowPalette(dst1)
+
+        labels(2) = task.dCell.labels(2)
+        labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
+                    ") with correlation coefficient > " + Format(minCorr, fmt1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class DepthCell_Correlation : Inherits TaskParent
+    Public Sub New()
+        desc = "Given a left image cell, find it's match in the right image, and display their correlation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then Exit Sub ' settle down first...
+
+        dst2 = task.leftView
+        dst3 = task.rightView
+        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        If index < 0 Or index > task.iddList.Count Then Exit Sub
+
+        Dim idd = task.iddList(index)
+        Dim pt = task.dCell.mouseD.ptDepthAndCorrelation
+        Dim corr = idd.correlation
+        dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
+        SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
+        labels(3) = "Correlation of the left depth cell to the right is " + Format(corr, fmt3)
+
+        dst2.Rectangle(idd.lRect, 255, task.lineWidth)
+        dst3.Rectangle(idd.rRect, 255, task.lineWidth)
+        labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
     End Sub
 End Class

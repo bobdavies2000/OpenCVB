@@ -401,7 +401,7 @@ Public Class OptionsGlobal
     Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TruncateDepth.CheckedChanged
         task.optionsChanged = True
     End Sub
-    Private Sub ShowQuadDepth_CheckedChanged(sender As Object, e As EventArgs) Handles ShowQuadDepth.CheckedChanged
+    Private Sub ShowQuadDepth_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
 

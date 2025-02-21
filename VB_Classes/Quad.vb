@@ -373,9 +373,8 @@ Public Class Quad_Boundaries : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.dCell.dst2.Clone
-        Dim cellSize = task.dCell.options.cellSize
-        Dim width = dst2.Width / cellSize
-        Dim height = dst2.Height / cellSize
+        Dim width = dst2.Width / task.dCellSize
+        Dim height = dst2.Height / task.dCellSize
         For i = 0 To task.iddList.Count - width Step width
             For j = i + 1 To i + width - 1
                 Dim d1 = task.iddList(j).depth
@@ -414,9 +413,8 @@ Public Class Quad_CellConnect : Inherits TaskParent
         dst2 = task.dCell.dst2.Clone
         dst3 = task.dCell.dst2.Clone
 
-        Dim cellSize = task.dCell.options.cellSize
-        Dim width = CInt(dst2.Width / cellSize)
-        Dim height = CInt(dst2.Height / cellSize)
+        Dim width = CInt(dst2.Width / task.dCellSize)
+        Dim height = CInt(dst2.Height / task.dCellSize)
         Dim colorIndex As Integer
         connectedH.Clear()
         For i = 0 To task.iddList.Count - width Step width

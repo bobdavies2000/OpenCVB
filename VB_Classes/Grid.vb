@@ -155,12 +155,13 @@ Public Class Grid_Rectangles : Inherits TaskParent
         If standalone Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim cellSize = task.dCell.options.cellSize
         If task.optionsChanged Then
             gridRectsAll.Clear()
-            For y = 0 To dst2.Height - 1 Step cellSize
-                For x = 0 To dst2.Width - 1 Step cellSize
-                    Dim roi = ValidateRect(New cv.Rect(x, y, cellSize, cellSize))
+            tilesPerRow = 0
+            tilesPerCol = 0
+            For y = 0 To dst2.Height - 1 Step task.dCellSize
+                For x = 0 To dst2.Width - 1 Step task.dCellSize
+                    Dim roi = ValidateRect(New cv.Rect(x, y, task.dCellSize, task.dCellSize))
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
@@ -181,7 +182,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
             labels(2) = "Grid_Basics " + CStr(gridRectsAll.Count) + " tiles, " + CStr(tilesPerRow) +
                         " cols by " + CStr(tilesPerCol) + " rows, with " +
-                        CStr(cellSize) + "X" + CStr(cellSize) + " cells"
+                        CStr(task.dCellSize) + "X" + CStr(task.dCellSize) + " cells"
         End If
         If task.mouseClickFlag Then
             task.gridROIclicked = gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)

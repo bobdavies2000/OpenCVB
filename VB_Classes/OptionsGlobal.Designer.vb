@@ -48,7 +48,6 @@ Partial Class OptionsGlobal
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
-        Me.ShowQuadDepth = New System.Windows.Forms.CheckBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
         Me.UseMotion = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -85,6 +84,10 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
+        Me.ColorizedDepth = New System.Windows.Forms.RadioButton()
+        Me.ShowQuads = New System.Windows.Forms.RadioButton()
+        Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -99,6 +102,7 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.SuspendLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.DepthGroupBox.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -346,6 +350,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.DepthGroupBox)
         Me.GroupBox2.Controls.Add(Me.TruncateDepth)
         Me.GroupBox2.Controls.Add(Me.MotionBox)
         Me.GroupBox2.Controls.Add(Me.Label1)
@@ -389,27 +394,14 @@ Partial Class OptionsGlobal
         '
         'MotionBox
         '
-        Me.MotionBox.Controls.Add(Me.ShowQuadDepth)
         Me.MotionBox.Controls.Add(Me.showMotionMask)
         Me.MotionBox.Controls.Add(Me.UseMotion)
         Me.MotionBox.Location = New System.Drawing.Point(6, 322)
         Me.MotionBox.Name = "MotionBox"
-        Me.MotionBox.Size = New System.Drawing.Size(356, 119)
+        Me.MotionBox.Size = New System.Drawing.Size(245, 119)
         Me.MotionBox.TabIndex = 76
         Me.MotionBox.TabStop = False
         Me.MotionBox.Text = "Motion"
-        '
-        'ShowQuadDepth
-        '
-        Me.ShowQuadDepth.AutoSize = True
-        Me.ShowQuadDepth.Checked = True
-        Me.ShowQuadDepth.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ShowQuadDepth.Location = New System.Drawing.Point(14, 86)
-        Me.ShowQuadDepth.Name = "ShowQuadDepth"
-        Me.ShowQuadDepth.Size = New System.Drawing.Size(258, 24)
-        Me.ShowQuadDepth.TabIndex = 77
-        Me.ShowQuadDepth.Text = "Toggle Quad Depth/DepthRGB"
-        Me.ShowQuadDepth.UseVisualStyleBackColor = True
         '
         'showMotionMask
         '
@@ -470,7 +462,7 @@ Partial Class OptionsGlobal
         Me.GroupBox1.Controls.Add(Me.MotionFilteredCloudOnly)
         Me.GroupBox1.Controls.Add(Me.unFiltered)
         Me.GroupBox1.Enabled = False
-        Me.GroupBox1.Location = New System.Drawing.Point(366, 255)
+        Me.GroupBox1.Location = New System.Drawing.Point(532, 256)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(306, 186)
         Me.GroupBox1.TabIndex = 69
@@ -778,6 +770,52 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'DepthGroupBox
+        '
+        Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
+        Me.DepthGroupBox.Controls.Add(Me.ShowQuads)
+        Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
+        Me.DepthGroupBox.Location = New System.Drawing.Point(334, 265)
+        Me.DepthGroupBox.Name = "DepthGroupBox"
+        Me.DepthGroupBox.Size = New System.Drawing.Size(194, 153)
+        Me.DepthGroupBox.TabIndex = 78
+        Me.DepthGroupBox.TabStop = False
+        Me.DepthGroupBox.Text = "Depth Display"
+        '
+        'ColorizedDepth
+        '
+        Me.ColorizedDepth.AutoSize = True
+        Me.ColorizedDepth.Location = New System.Drawing.Point(16, 35)
+        Me.ColorizedDepth.Name = "ColorizedDepth"
+        Me.ColorizedDepth.Size = New System.Drawing.Size(148, 24)
+        Me.ColorizedDepth.TabIndex = 0
+        Me.ColorizedDepth.TabStop = True
+        Me.ColorizedDepth.Text = "Colorized Depth"
+        Me.ColorizedDepth.UseVisualStyleBackColor = True
+        '
+        'ShowQuads
+        '
+        Me.ShowQuads.AutoSize = True
+        Me.ShowQuads.Location = New System.Drawing.Point(16, 68)
+        Me.ShowQuads.Name = "ShowQuads"
+        Me.ShowQuads.Size = New System.Drawing.Size(121, 24)
+        Me.ShowQuads.TabIndex = 1
+        Me.ShowQuads.TabStop = True
+        Me.ShowQuads.Text = "Quad Depth"
+        Me.ShowQuads.UseVisualStyleBackColor = True
+        '
+        'DepthCorrelations
+        '
+        Me.DepthCorrelations.AutoSize = True
+        Me.DepthCorrelations.Checked = True
+        Me.DepthCorrelations.Location = New System.Drawing.Point(16, 103)
+        Me.DepthCorrelations.Name = "DepthCorrelations"
+        Me.DepthCorrelations.Size = New System.Drawing.Size(167, 24)
+        Me.DepthCorrelations.TabIndex = 2
+        Me.DepthCorrelations.TabStop = True
+        Me.DepthCorrelations.Text = "Depth Correlations"
+        Me.DepthCorrelations.UseVisualStyleBackColor = True
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -808,6 +846,8 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.PerformLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.DepthGroupBox.ResumeLayout(False)
+        Me.DepthGroupBox.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -872,8 +912,11 @@ Partial Class OptionsGlobal
     Friend WithEvents UseMotion As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
     Friend WithEvents TruncateDepth As Windows.Forms.CheckBox
-    Friend WithEvents ShowQuadDepth As Windows.Forms.CheckBox
     Friend WithEvents DepthDiffLabel As Windows.Forms.Label
     Friend WithEvents DepthDiffSlider As Windows.Forms.TrackBar
     Friend WithEvents Label6 As Windows.Forms.Label
+    Friend WithEvents DepthGroupBox As Windows.Forms.GroupBox
+    Friend WithEvents DepthCorrelations As Windows.Forms.RadioButton
+    Friend WithEvents ShowQuads As Windows.Forms.RadioButton
+    Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
 End Class

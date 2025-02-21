@@ -17,9 +17,10 @@ Public Class VBtask : Implements IDisposable
 
     Public lpList As New List(Of linePoints) ' line pair list
     Public iddList As New List(Of depthCell)
+    Public iddCorr As New cv.Mat
     Public iddMap As New cv.Mat
     Public iddMask As New cv.Mat
-    Public iddSize As Integer
+    Public dCellSize As Integer
 
     Public gridSize As Integer
     Public gridRows As Integer
@@ -781,11 +782,14 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.PatchNaNs(pcSplit(2))
         End If
 
-        If task.gOptions.ShowQuadDepth.Checked Then
+        If task.gOptions.ShowQuads.Checked Then
             depthRGB = task.dCell.dst2
-        Else
+        ElseIf task.gOptions.ColorizedDepth.Checked Then
             colorizer.Run(src)
             depthRGB = colorizer.dst2
+        Else
+            If task.iddCorr.Width = 0 Then task.iddCorr = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+            depthRGB = task.iddCorr
         End If
 
         TaskTimer.Enabled = True
