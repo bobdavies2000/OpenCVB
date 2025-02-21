@@ -315,7 +315,6 @@ Public Class VBtask : Implements IDisposable
     End Structure
     Public Structure cameraInfo
         Public baseline As Single ' this is the baseline of the left to right cameras
-        Public baselineLeftToRGB As Single
 
         Public rgbIntrinsics As intrinsicData
         Public leftIntrinsics As intrinsicData

@@ -218,15 +218,15 @@ extern "C" __declspec(dllexport)
 int* OakDintrinsics(OakDCamera* cPtr, int camera)
 {
 	std::vector<std::vector<float>> intrin;
-	if (camera == 1)
+	if (camera == 1) // rgb camera
 	{
 		intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_A, 1280, 720);
 	}
 	else {
-		if (camera == 2)
+		if (camera == 2)  // left camera
 			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_B, 1280, 720);
 		else
-			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_C, 1280, 720);
+			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_C, 1280, 720);  // right camera
 	}
 
 	int i = 0;
@@ -236,9 +236,30 @@ int* OakDintrinsics(OakDCamera* cPtr, int camera)
 
 
 extern "C" __declspec(dllexport)
-int* OakDRotationTranslation(OakDCamera* cPtr)
+int* OakDExtrinsicsRGBtoLeft(OakDCamera* cPtr)
 {
-	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::RGB, dai::CameraBoardSocket::LEFT);
+	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::CAM_A, dai::CameraBoardSocket::CAM_B);
+	std::vector<float> translationRotation = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+	for (auto i = 0; i < 3; i++) {
+		translationRotation[i] = extrinsics[i][3];
+	}
+
+	int index = 3;
+	for (auto i = 0; i < 3; i++) {
+		for (auto j = 0; j < 3; j++)
+		{
+			translationRotation[index++] = extrinsics[i][j];
+		}
+	}
+
+	return (int*)&translationRotation[0];
+}
+
+
+extern "C" __declspec(dllexport)
+int* OakDExtrinsicsLeftToRight(OakDCamera* cPtr)
+{
+	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::CAM_B, dai::CameraBoardSocket::CAM_C);
 	std::vector<float> translationRotation = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
 	for (auto i = 0; i < 3; i++) {
 		translationRotation[i] = extrinsics[i][3];

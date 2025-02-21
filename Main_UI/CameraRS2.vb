@@ -53,24 +53,15 @@ Public Class CameraRS2 : Inherits GenericCamera
         ReDim calibData.rotation(9 - 1)
 
         For i = 0 To 3 - 1
-            calibData.translation(i) = rgbExtrinsics.translation(i)
+            calibData.translation(i) = leftExtrinsics.translation(i)
         Next
         For i = 0 To 9 - 1
-            calibData.rotation(i) = rgbExtrinsics.rotation(i)
+            calibData.rotation(i) = leftExtrinsics.rotation(i)
         Next
 
-        ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
-        calibData.baselineLeftToRGB = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
-                                                       System.Math.Pow(calibData.translation(1), 2) +
-                                                       System.Math.Pow(calibData.translation(2), 2))
-
-        Dim translationLeft(3 - 1) As Single
-        For i = 0 To 3 - 1
-            translationLeft(i) = leftExtrinsics.translation(i)
-        Next
-        calibData.baseline = System.Math.Sqrt(System.Math.Pow(translationLeft(0), 2) +
-                                              System.Math.Pow(translationLeft(1), 2) +
-                                              System.Math.Pow(translationLeft(2), 2))
+        calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
+                                              System.Math.Pow(calibData.translation(1), 2) +
+                                              System.Math.Pow(calibData.translation(2), 2))
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)

@@ -58,6 +58,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
             rgbLeftAligned = True
         End If
         Dim irPt As cv.Point2f
+        Dim testImage As Boolean = True
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             Dim motion = task.motionMask(idd.cRect).CountNonZero
@@ -100,9 +101,19 @@ Public Class DepthCell_Basics : Inherits TaskParent
                                 idd.rRect.X -= caminfo.baseline * caminfo.leftIntrinsics.fx / idd.depth
                                 idd.rRect = ValidateRect(idd.rRect)
                                 cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
-                                                             cv.TemplateMatchModes.CCoeffNormed)
+                                                     cv.TemplateMatchModes.CCoeffNormed)
 
                                 idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                                If idd.lRect.X = 482 And idd.lRect.Y = 320 And testImage Then
+                                    testImage = False
+                                    Dim tmp = task.leftView.Clone
+                                    tmp.Rectangle(idd.lRect, cv.Scalar.White, task.lineWidth)
+                                    cv.Cv2.ImShow("task.leftView", tmp)
+
+                                    Dim tmpR = task.rightView.Clone
+                                    tmpR.Rectangle(idd.rRect, cv.Scalar.White, task.lineWidth)
+                                    cv.Cv2.ImShow("task.rightView", tmpR)
+                                End If
                             End If
                         End If
                     Else

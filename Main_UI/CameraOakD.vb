@@ -16,7 +16,11 @@ Module OakD_Module_CPP
     Public Function OakDintrinsics(cPtr As IntPtr, camera As Integer) As IntPtr
     End Function
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDRotationTranslation(cPtr As IntPtr) As IntPtr
+    Public Function OakDExtrinsicsRGBtoLeft(cPtr As IntPtr) As IntPtr
+    End Function
+
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDExtrinsicsLeftToRight(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDRawDepth(cPtr As IntPtr) As IntPtr
     End Function
@@ -58,40 +62,47 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
         cameraName = deviceName
         cPtr = OakDOpen(captureRes.Width, captureRes.Height)
 
-        Dim intrin = OakDintrinsics(cPtr, 1)
-        Dim intrinsicsArray(9 - 1) As Single
+        Dim intrin = OakDintrinsics(cPtr, 2)
+        Dim leftIntrinsicsArray(9 - 1) As Single
         Dim ratio = captureRes.Width / WorkingRes.Width
-        Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-        calibData.baseline = 0.075
-        calibData.leftIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+        Marshal.Copy(intrin, leftIntrinsicsArray, 0, leftIntrinsicsArray.Length)
+        calibData.leftIntrinsics = copyOakIntrinsics(leftIntrinsicsArray, ratio)
 
-        intrin = OakDintrinsics(cPtr, 3)
-        Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
-        calibData.rgbIntrinsics = copyOakIntrinsics(intrinsicsArray, ratio)
+        intrin = OakDintrinsics(cPtr, 1)
+        Dim rgbIntrinsicsArray(9 - 1) As Single
+        Marshal.Copy(intrin, rgbIntrinsicsArray, 0, rgbIntrinsicsArray.Length)
+        calibData.rgbIntrinsics = copyOakIntrinsics(rgbIntrinsicsArray, ratio) ' will not be used because RGB <> Left image
 
-        Dim extrin = OakDRotationTranslation(cPtr)
-        Dim extrinsicsArray(12 - 1) As Single
-        Marshal.Copy(extrin, extrinsicsArray, 0, extrinsicsArray.Length)
+        Dim rgbExtrin = OakDExtrinsicsRGBtoLeft(cPtr)
+        Dim rgbExtrinsicsArray(12 - 1) As Single
+        Marshal.Copy(rgbExtrin, rgbExtrinsicsArray, 0, rgbExtrinsicsArray.Length)
+
+        Dim leftExtrin = OakDExtrinsicsLeftToRight(cPtr)
+        Dim leftExtrinsicsArray(12 - 1) As Single
+        Marshal.Copy(leftExtrin, leftExtrinsicsArray, 0, leftExtrinsicsArray.Length)
 
         ReDim calibData.translation(3 - 1)
         ReDim calibData.rotation(9 - 1)
 
         For i = 0 To 3 - 1
-            calibData.translation(i) = extrinsicsArray(i)
+            calibData.translation(i) = rgbExtrinsicsArray(i)
         Next
         For i = 0 To 9 - 1
-            calibData.rotation(i) = extrinsicsArray(i + 3)
+            calibData.rotation(i) = rgbExtrinsicsArray(i + 3)
         Next
 
-        ' Calculate the baseline (distance between the left and RGB cameras) using the translation vector
-        'calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
-        '                     System.Math.Pow(calibData.translation(1), 2) +
-        '                     System.Math.Pow(calibData.translation(2), 2))
-
-        fxTemplate = calibData.rgbIntrinsics.fx * ratio ' these are used on the full size image before resize.
+        fxTemplate = calibData.rgbIntrinsics.fx * ratio ' these are used below on the full size image before resize.
         fyTemplate = calibData.rgbIntrinsics.fy * ratio
         ppxTemplate = calibData.rgbIntrinsics.ppx * ratio
         ppyTemplate = calibData.rgbIntrinsics.ppy * ratio
+
+        Dim translation(3 - 1) As Single
+        For i = 0 To 3 - 1
+            translation(i) = rgbExtrinsicsArray(i)
+        Next
+        calibData.baseline = System.Math.Sqrt(System.Math.Pow(translation(0), 2) +
+                                              System.Math.Pow(translation(1), 2) +
+                                              System.Math.Pow(translation(2), 2))
 
         templateX = New cv.Mat(captureRes, cv.MatType.CV_32F)
         templateY = New cv.Mat(captureRes, cv.MatType.CV_32F)
