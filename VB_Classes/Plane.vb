@@ -574,11 +574,11 @@ Public Class Plane_FloorStudy : Inherits TaskParent
     Public planeY As Single
     Dim options = New Options_PlaneFloor()
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = True
         labels = {"", "", "", ""}
         desc = "Find the floor plane (if present)"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         slice.Run(src)

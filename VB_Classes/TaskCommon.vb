@@ -431,7 +431,6 @@ Public Class depthCell
     Public rRect As New cv.Rect
     Public depth As Single
     Public age As Integer
-    Public index As Integer
     Public color As cv.Point3f
     Public pixels As Integer
     Public corners As New List(Of cv.Point3f)

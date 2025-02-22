@@ -325,10 +325,12 @@ Public Class algorithmList
 	If algorithmName = "Depth_WorldXYMT" Then return new Depth_WorldXYMT
 	If algorithmName = "Depth_WorldXYZ" Then return new Depth_WorldXYZ
 	If algorithmName = "DepthCell_Basics" Then return new DepthCell_Basics
+	If algorithmName = "DepthCell_Connected" Then return new DepthCell_Connected
 	If algorithmName = "DepthCell_Correlation" Then return new DepthCell_Correlation
 	If algorithmName = "DepthCell_CorrelationMap" Then return new DepthCell_CorrelationMap
 	If algorithmName = "DepthCell_CorrelationMask" Then return new DepthCell_CorrelationMask
 	If algorithmName = "DepthCell_FullDepth" Then return new DepthCell_FullDepth
+	If algorithmName = "DepthCell_Gaps" Then return new DepthCell_Gaps
 	If algorithmName = "DepthCell_InstantUpdate" Then return new DepthCell_InstantUpdate
 	If algorithmName = "DepthCell_LeftAlign" Then return new DepthCell_LeftAlign
 	If algorithmName = "DepthCell_LeftRightSize" Then return new DepthCell_LeftRightSize
@@ -1451,7 +1453,6 @@ Public Class algorithmList
 	If algorithmName = "Quad_Basics" Then return new Quad_Basics
 	If algorithmName = "Quad_Boundaries" Then return new Quad_Boundaries
 	If algorithmName = "Quad_Bricks" Then return new Quad_Bricks
-	If algorithmName = "Quad_CellConnect" Then return new Quad_CellConnect
 	If algorithmName = "Quad_GridTiles" Then return new Quad_GridTiles
 	If algorithmName = "Quad_Hulls" Then return new Quad_Hulls
 	If algorithmName = "Quad_MinMax" Then return new Quad_MinMax
@@ -1508,6 +1509,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_ContourUpdate" Then return new RedColor_ContourUpdate
 	If algorithmName = "RedColor_CPP" Then return new RedColor_CPP
 	If algorithmName = "RedColor_DelaunayGuidedFeatures" Then return new RedColor_DelaunayGuidedFeatures
+	If algorithmName = "RedColor_DepthCell" Then return new RedColor_DepthCell
 	If algorithmName = "RedColor_DepthOutline" Then return new RedColor_DepthOutline
 	If algorithmName = "RedColor_Equations" Then return new RedColor_Equations
 	If algorithmName = "RedColor_Features" Then return new RedColor_Features
@@ -1536,7 +1538,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_PlaneFromMask" Then return new RedColor_PlaneFromMask
 	If algorithmName = "RedColor_Planes" Then return new RedColor_Planes
 	If algorithmName = "RedColor_PlusTiers" Then return new RedColor_PlusTiers
-	If algorithmName = "RedColor_QuadDepth" Then return new RedColor_QuadDepth
 	If algorithmName = "RedColor_Reduction" Then return new RedColor_Reduction
 	If algorithmName = "RedColor_ShapeCorrelation" Then return new RedColor_ShapeCorrelation
 	If algorithmName = "RedColor_Tiers" Then return new RedColor_Tiers

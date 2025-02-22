@@ -8,7 +8,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public mouseD As New DepthCell_MouseDepth
     Public quad As New Quad_Basics
-    Public merge As New Quad_CellConnect
+    Public merge As New DepthCell_Connected
     Dim iddCorr As New DepthCell_CorrelationMap
     Dim caminfo As cameraInfo
     Public Sub New()
@@ -53,9 +53,9 @@ Public Class DepthCell_Basics : Inherits TaskParent
         Dim colorStdev As cv.Scalar, colormean As cv.Scalar
         caminfo = task.calibData
         Dim correlationMat As New cv.Mat
-        Dim rgbLeftAligned As Boolean
+        task.rgbLeftAligned = False
         If task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec") Then
-            rgbLeftAligned = True
+            task.rgbLeftAligned = True
         End If
         Dim irPt As cv.Point2f
         Dim testImage As Boolean = True
@@ -78,7 +78,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     idd.age = 1
                     idd.depth = task.pcSplitRaw(2)(idd.cRect).Mean(task.depthMaskRaw(idd.cRect))(0)
                     If idd.depth > 0 Then
-                        If rgbLeftAligned Then
+                        If task.rgbLeftAligned Then
                             idd.lRect = idd.cRect
                             idd.rRect = idd.lRect
                             idd.rRect.X -= caminfo.baseline * caminfo.rgbIntrinsics.fx / idd.depth
@@ -225,7 +225,11 @@ Public Class DepthCell_FullDepth : Inherits TaskParent
         desc = "Display the depth cells for all cells with depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If task.rgbLeftAligned Then
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Else
+            dst2 = src
+        End If
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim col As Integer, tilesPerRow = task.dCell.grid.tilesPerRow
@@ -499,5 +503,107 @@ Public Class DepthCell_Correlation : Inherits TaskParent
         dst2.Rectangle(idd.lRect, 255, task.lineWidth)
         dst3.Rectangle(idd.rRect, 255, task.lineWidth)
         labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class DepthCell_Connected : Inherits TaskParent
+    Public connectedH As New List(Of Tuple(Of Integer, Integer))
+    Public connectedV As New List(Of Tuple(Of Integer, Integer))
+    Public Sub New()
+        desc = "Connect cells that are close in depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+
+        Dim width As Integer = dst2.Width / task.dCellSize
+        If width * task.dCellSize <> dst2.Width Then width += 1
+        Dim height As Integer = Math.Floor(dst2.Height / task.dCellSize)
+        If height * task.dCellSize <> dst2.Height Then height += 1
+        Dim colorIndex As Integer
+        connectedH.Clear()
+        Dim idd1 As depthCell, idd2 As depthCell
+        For i = 0 To height - 1
+            Dim colStart As Integer = i * width
+            Dim colEnd As Integer = colStart
+            For j = 0 To width - 2
+                idd1 = task.iddList(i * width + j)
+                idd2 = task.iddList(i * width + j + 1)
+                If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Then
+                    Dim p1 = task.iddList(colStart).cRect.TopLeft
+                    Dim p2 = task.iddList(colEnd).cRect.BottomRight
+                    dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+                    colorIndex += 1
+                    connectedH.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
+                    colStart = i * width + j + 1
+                    colEnd = colStart
+                Else
+                    colEnd += 1
+                End If
+            Next
+        Next
+        labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
+                    CStr(task.depthDiffMeters) + " meters"
+
+        colorIndex = 0
+        connectedV.Clear()
+        For i = 0 To width
+            Dim rowStart = i
+            Dim topLeft As cv.Point = task.iddList(i).cRect.TopLeft
+            Dim bottomRight As cv.Point = task.iddList(i + width).cRect.TopLeft
+            For j = 0 To height - 2
+                idd1 = task.iddList(i + j * width)
+                Dim index = i + (j + 1) * width
+                If index >= task.iddList.Count Then index = task.iddList.Count - 1
+                idd2 = task.iddList(index)
+                If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Then
+                    bottomRight = task.iddList(i + j * width).cRect.BottomRight
+                    dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
+                    colorIndex += 1
+                    connectedV.Add(New Tuple(Of Integer, Integer)(rowStart, i + j * width))
+                    rowStart = index
+                    topLeft = task.iddList(rowStart).cRect.TopLeft
+                End If
+            Next
+        Next
+
+        labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
+                    CStr(task.depthDiffMeters) + " meters"
+    End Sub
+End Class
+
+
+
+
+
+Public Class DepthCell_Gaps : Inherits TaskParent
+    Dim connect As New DepthCell_Connected
+    Public Sub New()
+        desc = "Use the horizontally connected depth cells to find gaps in depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+        dst2 = connect.dst2
+        dst3 = connect.dst3
+
+        For Each tup In connect.connectedH
+            If tup.Item2 - tup.Item1 = 0 Then
+                Dim idd = task.iddList(tup.Item1)
+                dst2(idd.cRect).SetTo(0)
+            End If
+        Next
+
+        For Each tup In connect.connectedV
+            If tup.Item2 - tup.Item1 = 0 Then
+                Dim idd = task.iddList(tup.Item1)
+                dst2(idd.cRect).SetTo(0)
+            End If
+        Next
     End Sub
 End Class

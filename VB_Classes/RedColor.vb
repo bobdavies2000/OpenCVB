@@ -1724,11 +1724,16 @@ End Class
 
 
 
-Public Class RedColor_QuadDepth : Inherits TaskParent
+Public Class RedColor_DepthCell : Inherits TaskParent
+    Dim addw As New AddWeighted_Basics
     Public Sub New()
-        desc = "Use the QuadDepth image as input to RedColor_Basics."
+        desc = "Display the depth cells in combination with the redCloud data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(task.dCell.dst2, labels(2))
+        dst2 = runRedC(src, labels(2))
+
+        addw.src2 = dst2
+        addw.Run(task.depthRGB)
+        dst3 = addw.dst2
     End Sub
 End Class
