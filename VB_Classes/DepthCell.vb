@@ -1,4 +1,5 @@
-﻿Imports System.Dynamic
+﻿Imports System.Drawing.Drawing2D
+Imports System.Dynamic
 Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class DepthCell_Basics : Inherits TaskParent
@@ -8,7 +9,6 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public mouseD As New DepthCell_MouseDepth
     Public quad As New Quad_Basics
-    Public merge As New DepthCell_Connected
     Dim iddCorr As New DepthCell_CorrelationMap
     Dim caminfo As cameraInfo
     Public Sub New()
@@ -128,9 +128,6 @@ Public Class DepthCell_Basics : Inherits TaskParent
         quad.Run(src)
         dst2 = quad.dst2
 
-        merge.Run(src)
-        dst3 = merge.dst2
-
         iddCorr.Run(src)
 
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
@@ -166,7 +163,7 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
                                   "m (" + Format(idd.pixels / (idd.cRect.Width * idd.cRect.Height), "0%") + ")" +
                                   vbCrLf + "correlation = " + Format(idd.correlation, fmt3)
         ptDepthAndCorrelation = pt
-        If standaloneTest() Then SetTrueText(DepthAndCorrelationText, ptDepthAndCorrelation, 2)
+        If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptDepthAndCorrelation, 2)
     End Sub
 End Class
 
@@ -515,8 +512,22 @@ End Class
 Public Class DepthCell_Connected : Inherits TaskParent
     Public connectedH As New List(Of Tuple(Of Integer, Integer))
     Public connectedV As New List(Of Tuple(Of Integer, Integer))
+    Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
     Public Sub New()
         desc = "Connect cells that are close in depth"
+    End Sub
+    Private Sub drawHRect(idd1 As depthCell, idd2 As depthCell, nextStart As Integer)
+        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+            Dim p1 = task.iddList(colStart).cRect.TopLeft
+            Dim p2 = task.iddList(colEnd).cRect.BottomRight
+            dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+            colorIndex += 1
+            connectedH.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
+            colStart = nextStart
+            colEnd = colStart
+        Else
+            colEnd += 1
+        End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
@@ -526,27 +537,16 @@ Public Class DepthCell_Connected : Inherits TaskParent
         If width * task.dCellSize <> dst2.Width Then width += 1
         Dim height As Integer = Math.Floor(dst2.Height / task.dCellSize)
         If height * task.dCellSize <> dst2.Height Then height += 1
-        Dim colorIndex As Integer
         connectedH.Clear()
+        colorIndex = 0
         Dim idd1 As depthCell, idd2 As depthCell
         For i = 0 To height - 1
-            Dim colStart As Integer = i * width
-            Dim colEnd As Integer = colStart
+            colStart = i * width
+            colEnd = colStart
             For j = 0 To width - 2
-                idd1 = task.iddList(i * width + j)
-                idd2 = task.iddList(i * width + j + 1)
-                If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Then
-                    Dim p1 = task.iddList(colStart).cRect.TopLeft
-                    Dim p2 = task.iddList(colEnd).cRect.BottomRight
-                    dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
-                    colorIndex += 1
-                    connectedH.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
-                    colStart = i * width + j + 1
-                    colEnd = colStart
-                Else
-                    colEnd += 1
-                End If
+                drawHRect(task.iddList(i * width + j), task.iddList(i * width + j + 1), i * width + j + 1)
             Next
+            drawHRect(task.iddList(i * width + height - 1), task.iddList(i * width + height - 1), -1)
         Next
         labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
                     CStr(task.depthDiffMeters) + " meters"

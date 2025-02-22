@@ -2109,17 +2109,19 @@ End Class
 
 
 Public Class OpenGL_QuadConnect : Inherits TaskParent
+    Dim connect As New DepthCell_Connected
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Build connected depth cells and remove cells that are not connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.dCell.dst2
-        dst3 = task.dCell.dst3
+        connect.Run(src)
+        dst2 = connect.dst2
+        dst3 = connect.dst3
 
         Dim quadData As New List(Of cv.Point3f)
         Dim idd1 As depthCell, idd2 As depthCell
-        For Each tup In task.dCell.merge.connectedH
+        For Each tup In connect.connectedH
             For i = tup.Item1 + 1 To tup.Item2 - 1
                 idd1 = task.iddList(i - 1)
                 idd2 = task.iddList(i)
@@ -2141,7 +2143,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         Next
 
         Dim width = dst2.Width / task.dCellSize
-        For Each tup In task.dCell.merge.connectedV
+        For Each tup In connect.connectedV
             For i = tup.Item1 To tup.Item2 - width Step width
                 idd1 = task.iddList(i)
                 idd2 = task.iddList(i + width)
