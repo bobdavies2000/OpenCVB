@@ -1,5 +1,6 @@
 ﻿Imports System.Drawing.Drawing2D
 Imports System.Dynamic
+Imports OpenCvSharp.Flann
 Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class DepthCell_Basics : Inherits TaskParent
@@ -512,7 +513,9 @@ End Class
 Public Class DepthCell_Connected : Inherits TaskParent
     Public connectedH As New List(Of Tuple(Of Integer, Integer))
     Public connectedV As New List(Of Tuple(Of Integer, Integer))
+    Dim width As Integer, height As Integer
     Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
+    Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
     Public Sub New()
         desc = "Connect cells that are close in depth"
     End Sub
@@ -529,17 +532,26 @@ Public Class DepthCell_Connected : Inherits TaskParent
             colEnd += 1
         End If
     End Sub
+    Private Sub drawVRect(idd1 As depthCell, idd2 As depthCell, iddNext As Integer, nextStart As Integer)
+        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+            bottomRight = task.iddList(iddNext).cRect.BottomRight
+            dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
+            colorIndex += 1
+            connectedV.Add(New Tuple(Of Integer, Integer)(rowStart, iddNext))
+            rowStart = nextStart
+            If nextStart >= 0 Then topLeft = task.iddList(rowStart).cRect.TopLeft
+        End If
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         dst3.SetTo(0)
 
-        Dim width As Integer = dst2.Width / task.dCellSize
+        width = dst2.Width / task.dCellSize
         If width * task.dCellSize <> dst2.Width Then width += 1
-        Dim height As Integer = Math.Floor(dst2.Height / task.dCellSize)
+        height = Math.Floor(dst2.Height / task.dCellSize)
         If height * task.dCellSize <> dst2.Height Then height += 1
         connectedH.Clear()
         colorIndex = 0
-        Dim idd1 As depthCell, idd2 As depthCell
         For i = 0 To height - 1
             colStart = i * width
             colEnd = colStart
@@ -551,26 +563,21 @@ Public Class DepthCell_Connected : Inherits TaskParent
         labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
                     CStr(task.depthDiffMeters) + " meters"
 
-        colorIndex = 0
         connectedV.Clear()
+        Dim index As Integer
+        colorIndex = 0
         For i = 0 To width
-            Dim rowStart = i
-            Dim topLeft As cv.Point = task.iddList(i).cRect.TopLeft
-            Dim bottomRight As cv.Point = task.iddList(i + width).cRect.TopLeft
+            rowStart = i
+            topLeft = task.iddList(i).cRect.TopLeft
+            bottomRight = task.iddList(i + width).cRect.TopLeft
             For j = 0 To height - 2
-                idd1 = task.iddList(i + j * width)
-                Dim index = i + (j + 1) * width
+                index = i + (j + 1) * width
                 If index >= task.iddList.Count Then index = task.iddList.Count - 1
-                idd2 = task.iddList(index)
-                If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Then
-                    bottomRight = task.iddList(i + j * width).cRect.BottomRight
-                    dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
-                    colorIndex += 1
-                    connectedV.Add(New Tuple(Of Integer, Integer)(rowStart, i + j * width))
-                    rowStart = index
-                    topLeft = task.iddList(rowStart).cRect.TopLeft
-                End If
+                drawVRect(task.iddList(i + j * width), task.iddList(index), i + j * width, index)
             Next
+            Dim iddNext = i + (height - 1) * width
+            If iddNext >= task.iddList.Count Then iddNext = task.iddList.Count - 1
+            drawVRect(task.iddList(iddNext), task.iddList(index), iddNext, -1)
         Next
 
         labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
