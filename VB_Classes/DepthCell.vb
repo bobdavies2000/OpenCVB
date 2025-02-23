@@ -143,7 +143,7 @@ End Class
 
 Public Class DepthCell_MouseDepth : Inherits TaskParent
     Public ptReal As New cv.Point
-    Public ptDepthAndCorrelation As New cv.Point
+    Public ptTopLeft As New cv.Point
     Public depthAndCorrelationText As String
     Public Sub New()
         desc = "Provide the mouse depth at the mouse movement location."
@@ -164,8 +164,8 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         depthAndCorrelationText = Format(task.iddC.depth, fmt3) +
                                   "m (" + Format(task.iddC.pixels / (task.iddC.cRect.Width * task.iddC.cRect.Height), "0%") + ")" +
                                   vbCrLf + "correlation = " + Format(task.iddC.correlation, fmt3)
-        ptDepthAndCorrelation = pt
-        If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptDepthAndCorrelation, 2)
+        ptTopLeft = pt
+        If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptTopLeft, 2)
     End Sub
 End Class
 
@@ -493,7 +493,7 @@ Public Class DepthCell_Correlation : Inherits TaskParent
         If index < 0 Or index > task.iddList.Count Then Exit Sub
 
         Dim idd = task.iddList(index)
-        Dim pt = task.dCell.mouseD.ptDepthAndCorrelation
+        Dim pt = task.dCell.mouseD.ptTopLeft
         Dim corr = idd.correlation
         dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
@@ -637,7 +637,7 @@ Public Class DepthCell_Stdev : Inherits TaskParent
             dst0(idd.cRect).SetTo(idd.colorStdev)
         Next
 
-        Dim pt = task.dCell.mouseD.ptDepthAndCorrelation
+        Dim pt = task.iddC.cRect.TopLeft
         strOut = Format(task.iddC.depthStdev, fmt3)
         labels(2) = "Depth standard deviation for depth cell: " + strOut
         SetTrueText(strOut, pt, 2)
@@ -661,3 +661,39 @@ End Class
 
 
 
+Public Class DepthCell_GrayScaleTest : Inherits TaskParent
+    Dim options As New Options_Stdev
+    Public Sub New()
+        labels(3) = "Depth cells where grayscale stdev and average of the 3 color stdev's"
+        desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+        Dim threshold = options.stdevThreshold
+
+        Dim pt = task.dCell.mouseD.ptTopLeft
+        Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
+        Static saveTrueData As New List(Of TrueText)
+        If task.heartBeat Then
+            dst3.SetTo(0)
+            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim count As Integer
+            For Each idd In task.iddList
+                cv.Cv2.MeanStdDev(dst2(idd.cRect), grayMean, grayStdev)
+                Dim colorStdev = (idd.colorStdev(0) + idd.colorStdev(1) + idd.colorStdev(2)) / 3
+                Dim diff = Math.Abs(grayStdev(0) - colorStdev)
+                If diff > threshold Then
+                    dst2.Rectangle(idd.cRect, 255, task.lineWidth)
+                    SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), idd.cRect.TopLeft, 2)
+                    dst3.Rectangle(idd.cRect, task.HighlightColor, task.lineWidth)
+                    SetTrueText(Format(diff, fmt1), idd.cRect.TopLeft, 3)
+                    count += 1
+                End If
+            Next
+            labels(2) = "There were " + CStr(count) + " cells where the difference was greater than " + CStr(threshold)
+        End If
+
+        If trueData.Count > 0 Then saveTrueData = New List(Of TrueText)(trueData)
+        trueData = New List(Of TrueText)(saveTrueData)
+    End Sub
+End Class

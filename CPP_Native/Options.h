@@ -2212,3 +2212,9 @@ public:
 	Options_OpenGL4() {
 	}
 };
+class Options_Stdev {
+public:
+	void RunOpt() {}
+	Options_Stdev() {
+	}
+};

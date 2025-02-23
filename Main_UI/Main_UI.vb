@@ -1738,10 +1738,10 @@ Public Class Main_UI
                     If task.trueData.Count Then
                         trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                     End If
-                    Static ptSave = task.dCell.mouseD.ptDepthAndCorrelation
+                    Static ptSave = task.dCell.mouseD.ptTopLeft
                     Static strSave = task.dCell.mouseD.depthAndCorrelationText
-                    If ptSave <> task.dCell.mouseD.ptDepthAndCorrelation Then
-                        ptSave = task.dCell.mouseD.ptDepthAndCorrelation
+                    If ptSave <> task.dCell.mouseD.ptTopLeft Then
+                        ptSave = task.dCell.mouseD.ptTopLeft
                         strSave = task.dCell.mouseD.depthAndCorrelationText
                     End If
                     trueData.Add(New TrueText(strSave, ptSave, 1))

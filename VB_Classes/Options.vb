@@ -8089,3 +8089,19 @@ Public Class Options_OpenGL4 : Inherits OptionParent
         scaleXYZ = New cv.Vec3f(scaleXSlider.Value, scaleYSlider.Value, scaleZSlider.Value)
     End Sub
 End Class
+
+
+
+
+Public Class Options_Stdev : Inherits OptionParent
+    Public stdevThreshold As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Stdev Threshold ", 0, 20, 12)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static stdevSlider = FindSlider("Stdev Threshold")
+        stdevThreshold = stdevSlider.value
+    End Sub
+End Class

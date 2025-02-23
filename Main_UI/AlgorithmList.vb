@@ -332,6 +332,7 @@ Public Class algorithmList
 	If algorithmName = "DepthCell_CorrelationMask" Then return new DepthCell_CorrelationMask
 	If algorithmName = "DepthCell_FullDepth" Then return new DepthCell_FullDepth
 	If algorithmName = "DepthCell_Gaps" Then return new DepthCell_Gaps
+	If algorithmName = "DepthCell_GrayScaleTest" Then return new DepthCell_GrayScaleTest
 	If algorithmName = "DepthCell_InstantUpdate" Then return new DepthCell_InstantUpdate
 	If algorithmName = "DepthCell_LeftAlign" Then return new DepthCell_LeftAlign
 	If algorithmName = "DepthCell_LeftRightSize" Then return new DepthCell_LeftRightSize
