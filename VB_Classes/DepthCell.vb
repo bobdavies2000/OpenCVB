@@ -51,7 +51,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
             Next
         End If
 
-        Dim colorStdev As cv.Scalar, colormean As cv.Scalar
+        Dim stdev As cv.Scalar, mean As cv.Scalar
         caminfo = task.calibData
         Dim correlationMat As New cv.Mat
         task.rgbLeftAligned = False
@@ -66,9 +66,8 @@ Public Class DepthCell_Basics : Inherits TaskParent
             If motion = 0 And idd.age > 0 Then
                 idd.age += 1
             Else
-                cv.Cv2.MeanStdDev(src(idd.cRect), colormean, colorStdev)
-                idd.color = New cv.Point3f(colormean(0), colormean(1), colormean(2))
-
+                cv.Cv2.MeanStdDev(src(idd.cRect), idd.colorMean, idd.colorStdev)
+                idd.color = New cv.Point3f(idd.colorMean(0), idd.colorMean(1), idd.colorMean(2))
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
                 If idd.pixels / (idd.cRect.Width * idd.cRect.Height) < options.percentThreshold Then
@@ -77,8 +76,11 @@ Public Class DepthCell_Basics : Inherits TaskParent
                     idd.rRect = New cv.Rect
                 Else
                     idd.age = 1
-                    idd.depth = task.pcSplitRaw(2)(idd.cRect).Mean(task.depthMaskRaw(idd.cRect))(0)
+                    cv.Cv2.MeanStdDev(task.pcSplitRaw(2)(idd.cRect), mean, stdev)
+                    idd.depth = mean(0)
+                    idd.depthStdev = stdev(0)
                     If idd.depth > 0 Then
+                        idd.depthErr = 0.02 * idd.depth / 2
                         If task.rgbLeftAligned Then
                             idd.lRect = idd.cRect
                             idd.rRect = idd.lRect
@@ -150,19 +152,18 @@ Public Class DepthCell_MouseDepth : Inherits TaskParent
         If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
         Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim idd = task.iddList(index)
+        task.iddC = task.iddList(index)
         dst2 = task.dCell.dst2
 
-        ptReal = idd.cRect.TopLeft
-        Dim pt = idd.cRect.TopLeft
+        Dim pt = task.iddC.cRect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
             pt.X -= dst2.Width * 0.15
         Else
-            pt.Y -= idd.cRect.Height * 2
+            pt.Y -= task.iddC.cRect.Height * 2
         End If
-        depthAndCorrelationText = Format(idd.depth, fmt3) +
-                                  "m (" + Format(idd.pixels / (idd.cRect.Width * idd.cRect.Height), "0%") + ")" +
-                                  vbCrLf + "correlation = " + Format(idd.correlation, fmt3)
+        depthAndCorrelationText = Format(task.iddC.depth, fmt3) +
+                                  "m (" + Format(task.iddC.pixels / (task.iddC.cRect.Width * task.iddC.cRect.Height), "0%") + ")" +
+                                  vbCrLf + "correlation = " + Format(task.iddC.correlation, fmt3)
         ptDepthAndCorrelation = pt
         If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptDepthAndCorrelation, 2)
     End Sub
@@ -614,3 +615,44 @@ Public Class DepthCell_Gaps : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+Public Class DepthCell_Stdev : Inherits TaskParent
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
+        labels = {"", "", "Depth standard deviations for each depth cell", "Color standard deviations for each depth cell"}
+        desc = "Visualize the depth and color standard deviation for each depth cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0.SetTo(0)
+        dst1.SetTo(0)
+        Dim maxDepthStdev As Single
+        For Each idd In task.iddList
+            Dim stdev = idd.depthStdev
+            If idd.depth > task.MaxZmeters Or idd.depth = 0 Then stdev = 0
+            If maxDepthStdev < stdev Then maxDepthStdev = stdev
+            dst1(idd.cRect).SetTo(stdev)
+
+            dst0(idd.cRect).SetTo(idd.colorStdev)
+        Next
+
+        Dim pt = task.dCell.mouseD.ptDepthAndCorrelation
+        SetTrueText("Stdev " + Format(task.iddC.depthStdev, fmt3), pt, 2)
+        dst2 = ShowPalette(dst1 * 255 / maxDepthStdev)
+        dst2.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
+
+        Dim mm = GetMinMax(dst0)
+        dst3 = ShowPalette(dst0 * 255 / (mm.maxVal - mm.minVal))
+        dst3.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
+        SetTrueText("RedStdev " + Format(task.iddC.colorStdev(2), fmt3), pt, 3)
+    End Sub
+End Class
+
+
+
+
+

@@ -430,8 +430,12 @@ Public Class depthCell
     Public lRect As New cv.Rect
     Public rRect As New cv.Rect
     Public depth As Single
+    Public depthStdev As Single
+    Public depthErr As Single ' a linear estimate of the depth error based on '2% error at 2 meters'
     Public age As Integer
     Public color As cv.Point3f
+    Public colorMean As cv.Scalar
+    Public colorStdev As cv.Scalar
     Public pixels As Integer
     Public corners As New List(Of cv.Point3f)
     Public center As cv.Point

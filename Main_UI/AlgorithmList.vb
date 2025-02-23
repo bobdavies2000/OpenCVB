@@ -283,6 +283,7 @@ Public Class algorithmList
 	If algorithmName = "Depth_Contour" Then return new Depth_Contour
 	If algorithmName = "Depth_Dilate" Then return new Depth_Dilate
 	If algorithmName = "Depth_Display" Then return new Depth_Display
+	If algorithmName = "Depth_ErrorEstimate" Then return new Depth_ErrorEstimate
 	If algorithmName = "Depth_FirstLastDistance" Then return new Depth_FirstLastDistance
 	If algorithmName = "Depth_Flatland" Then return new Depth_Flatland
 	If algorithmName = "Depth_Foreground" Then return new Depth_Foreground
@@ -338,6 +339,7 @@ Public Class algorithmList
 	If algorithmName = "DepthCell_Plot" Then return new DepthCell_Plot
 	If algorithmName = "DepthCell_RGBtoLeft" Then return new DepthCell_RGBtoLeft
 	If algorithmName = "DepthCell_RightView" Then return new DepthCell_RightView
+	If algorithmName = "DepthCell_Stdev" Then return new DepthCell_Stdev
 	If algorithmName = "Derivative_Basics" Then return new Derivative_Basics
 	If algorithmName = "Derivative_Classes" Then return new Derivative_Classes
 	If algorithmName = "Derivative_Laplacian" Then return new Derivative_Laplacian

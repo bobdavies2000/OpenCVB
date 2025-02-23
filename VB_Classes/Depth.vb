@@ -1681,3 +1681,30 @@ Public Class Depth_CellTiers : Inherits TaskParent
         trueData = New List(Of TrueText)(saveTrueText)
     End Sub
 End Class
+
+
+
+
+
+Public Class Depth_ErrorEstimate : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
+        labels(2) = "Colorized depth error estimate for the current image"
+        desc = "Provide an estimate of the error based on the depth - a linear estimate based on the '2% at 2 meters' statement."
+    End Sub
+    Public Function ErrorEstimate(depth As Single) As Single
+        Dim depthError = 0.02 * depth / 2
+        Return depthError
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        For Each idd In task.iddList
+            Dim testError = ErrorEstimate(idd.depth)
+            dst1(idd.cRect).SetTo(testError)
+        Next
+
+        Dim mm = GetMinMax(dst1)
+        dst2 = ShowPalette(dst1 * 255 / (mm.maxVal - mm.minVal))
+        dst2.SetTo(0, task.noDepthMask)
+    End Sub
+End Class

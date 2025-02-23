@@ -19,6 +19,7 @@ Public Class VBtask : Implements IDisposable
     Public iddList As New List(Of depthCell)
     Public iddCorr As New cv.Mat
     Public iddMap As New cv.Mat
+    Public iddC As depthCell
     Public iddMask As New cv.Mat
     Public dCellSize As Integer
 
