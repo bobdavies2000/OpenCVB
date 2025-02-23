@@ -624,31 +624,36 @@ Public Class DepthCell_Stdev : Inherits TaskParent
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
-        labels = {"", "", "Depth standard deviations for each depth cell", "Color standard deviations for each depth cell"}
         desc = "Visualize the depth and color standard deviation for each depth cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0.SetTo(0)
         dst1.SetTo(0)
+
         Dim maxDepthStdev As Single
         For Each idd In task.iddList
-            Dim stdev = idd.depthStdev
-            If idd.depth > task.MaxZmeters Or idd.depth = 0 Then stdev = 0
-            If maxDepthStdev < stdev Then maxDepthStdev = stdev
-            dst1(idd.cRect).SetTo(stdev)
-
+            If maxDepthStdev < idd.depthStdev Then maxDepthStdev = idd.depthStdev
+            dst1(idd.cRect).SetTo(idd.depthStdev)
             dst0(idd.cRect).SetTo(idd.colorStdev)
         Next
 
         Dim pt = task.dCell.mouseD.ptDepthAndCorrelation
-        SetTrueText("Stdev " + Format(task.iddC.depthStdev, fmt3), pt, 2)
+        strOut = Format(task.iddC.depthStdev, fmt3)
+        labels(2) = "Depth standard deviation for depth cell: " + strOut
+        SetTrueText(strOut, pt, 2)
         dst2 = ShowPalette(dst1 * 255 / maxDepthStdev)
         dst2.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
 
         Dim mm = GetMinMax(dst0)
         dst3 = ShowPalette(dst0 * 255 / (mm.maxVal - mm.minVal))
         dst3.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
-        SetTrueText("RedStdev " + Format(task.iddC.colorStdev(2), fmt3), pt, 3)
+        strOut = Format(task.iddC.colorStdev(0), fmt1) + "/" +
+                 Format(task.iddC.colorStdev(1), fmt1) + "/" +
+                 Format(task.iddC.colorStdev(2), fmt1)
+        labels(3) = "Color standard deviation for depth cell (B/G/R) = " + strOut
+        SetTrueText(strOut, pt, 3)
+
+        task.color.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
     End Sub
 End Class
 
