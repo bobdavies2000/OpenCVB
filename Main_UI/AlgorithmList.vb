@@ -1532,6 +1532,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_MaxDist_CPP" Then return new RedColor_MaxDist_CPP
 	If algorithmName = "RedColor_MeterByMeter" Then return new RedColor_MeterByMeter
 	If algorithmName = "RedColor_MostlyColor" Then return new RedColor_MostlyColor
+	If algorithmName = "RedColor_Motion" Then return new RedColor_Motion
 	If algorithmName = "RedColor_OnlyColorAlt" Then return new RedColor_OnlyColorAlt
 	If algorithmName = "RedColor_OnlyColorHist3D" Then return new RedColor_OnlyColorHist3D
 	If algorithmName = "RedColor_OutlineColor" Then return new RedColor_OutlineColor

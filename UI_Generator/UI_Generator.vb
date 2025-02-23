@@ -269,6 +269,8 @@ Module UI_Generator
             Dim sw = New StreamWriter(HomeDir.FullName + "Data/GroupButtonList.txt")
             Dim lastGroup As String = ""
             For Each alg In allList.Keys
+                If alg.StartsWith("Options") Then Continue For
+                If alg.StartsWith("Python") Then Continue For
                 If alg.EndsWith(".py") Then Continue For
                 Dim split = alg.Split("_")
                 If lastGroup <> split(0) Then sw.WriteLine(split(0))

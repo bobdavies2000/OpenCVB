@@ -1737,3 +1737,41 @@ Public Class RedColor_DepthCell : Inherits TaskParent
         dst3 = addw.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class RedColor_Motion : Inherits TaskParent
+    Dim rclist As New List(Of rcData)
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "If a RedCloud cell has no motion, it is preserved."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3.SetTo(0)
+
+        For Each rc In rclist
+            Dim tmp As cv.Mat = task.motionMask(rc.roi) And rc.mask
+            If tmp.CountNonZero() = 0 Then
+                dst3(rc.roi).SetTo(rc.color, rc.mask)
+                dst1(rc.roi).SetTo(255, rc.mask)
+            End If
+        Next
+        For Each rc In task.rcList
+            Dim tmp As cv.Mat = task.motionMask(rc.roi) And rc.mask
+            If tmp.CountNonZero() = 0 Then
+                dst3(rc.roi).SetTo(rc.color, rc.mask)
+                dst1(rc.roi).SetTo(255, rc.mask)
+            End If
+        Next
+
+        dst2 = runRedC(src, labels(3))
+
+        For Each rc In task.rcList
+            If rc.color = black Then Continue For
+            dst3(rc.roi).SetTo(rc.color, rc.mask)
+        Next
+    End Sub
+End Class

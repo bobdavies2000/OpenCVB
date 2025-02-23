@@ -382,49 +382,6 @@ End Class
 
 
 
-Public Structure vec5f
-    Dim f1 As Single
-    Dim f2 As Single
-    Dim f3 As Single
-    Dim f4 As Single
-    Dim f5 As Single
-    Public Sub New(_f1 As Single, _f2 As Single, _f3 As Single, _f4 As Single, _f5 As Single)
-        f1 = _f1
-        f2 = _f2
-        f3 = _f3
-        f4 = _f4
-        f5 = _f5
-    End Sub
-End Structure
-
-
-
-
-
-Public Structure vec8f
-    Dim f1 As Single
-    Dim f2 As Single
-    Dim f3 As Single
-    Dim f4 As Single
-    Dim f5 As Single
-    Dim f6 As Single
-    Dim f7 As Single
-    Dim f8 As Single
-    Public Sub New(_f1 As Single, _f2 As Single, _f3 As Single, _f4 As Single, _f5 As Single, _f6 As Single, _f7 As Single, _f8 As Single)
-        f1 = _f1
-        f2 = _f2
-        f3 = _f3
-        f4 = _f4
-        f5 = _f5
-        f6 = _f6
-        f7 = _f7
-        f8 = _f8
-    End Sub
-End Structure
-
-
-
-
 Public Class depthCell
     Public cRect As cv.Rect ' rectange under the cursor in the color image.
     Public lRect As New cv.Rect

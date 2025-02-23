@@ -160,7 +160,6 @@ OEX
 OilPaint
 OpAuto
 OpenGL
-Options
 ORB
 Palette
 ParticleFilter
@@ -183,7 +182,6 @@ Projection
 Puzzle
 Pyramid
 PyrFilter
-Python
 QRcode
 Quad
 Quadrant
