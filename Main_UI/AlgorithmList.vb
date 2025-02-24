@@ -1012,12 +1012,10 @@ Public Class algorithmList
 	If algorithmName = "LongLine_Match" Then return new LongLine_Match
 	If algorithmName = "LongLine_NoDepth" Then return new LongLine_NoDepth
 	If algorithmName = "LongLine_Point" Then return new LongLine_Point
-	If algorithmName = "LowRes_Basics" Then return new LowRes_Basics
 	If algorithmName = "LowRes_Boundaries" Then return new LowRes_Boundaries
 	If algorithmName = "LowRes_DepthMask" Then return new LowRes_DepthMask
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
-	If algorithmName = "LowRes_LeftRight" Then return new LowRes_LeftRight
 	If algorithmName = "LowRes_MeasureColor" Then return new LowRes_MeasureColor
 	If algorithmName = "LowRes_MeasureMotion" Then return new LowRes_MeasureMotion
 	If algorithmName = "LowRes_MeasureValidate" Then return new LowRes_MeasureValidate

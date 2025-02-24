@@ -1,27 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class LowRes_Basics : Inherits TaskParent
-    Public Sub New()
-        labels(2) = "Low resolution color image."
-        labels(3) = "Low resolution version of the depth data."
-        desc = "Build the low-res image and accompanying map, rect list, and mask."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        For Each idd In task.iddList
-            dst2(idd.cRect).SetTo(idd.colorMean)
-            dst3(idd.cRect).SetTo(idd.depth)
-        Next
-        task.lowResColor = dst2.Clone
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class LowRes_Features : Inherits TaskParent
-    Dim lowRes As New LowRes_Basics
     Dim options As New Options_Features
     Public Sub New()
         optiBase.FindSlider("Min Distance to next").Value = 3
@@ -32,11 +11,9 @@ Public Class LowRes_Features : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-
         task.feat.Run(src)
 
-        lowRes.Run(src)
-        dst2 = lowRes.dst2.Clone
+        dst2 = task.dCell.dst2
 
         Dim gridIndex As New List(Of Integer)
         Dim gridCounts As New List(Of Integer)
@@ -84,7 +61,6 @@ End Class
 
 
 Public Class LowRes_Edges : Inherits TaskParent
-    Public lowRes As New LowRes_Basics
     Public edges As New Edge_Basics
     Public Sub New()
         task.featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -94,10 +70,6 @@ Public Class LowRes_Edges : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static stateList As New List(Of Single)
-
-        lowRes.Run(src)
-        dst2 = lowRes.dst2.Clone
-
         Static lastDepth As cv.Mat = task.lowResDepth.Clone
 
         edges.Run(src)
@@ -384,7 +356,6 @@ End Class
 
 
 Public Class LowRes_MeasureColor : Inherits TaskParent
-    Dim lowRes As New LowRes_Basics
     Public colors(0) As cv.Vec3b
     Public distances() As Single
     Public options As New Options_LowRes
@@ -395,9 +366,6 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-
-        lowRes.Run(src)
-        dst2 = lowRes.dst2
 
         If task.optionsChanged Or colors.Length <> task.gridRects.Count Then
             ReDim colors(task.gridRects.Count - 1)
@@ -527,25 +495,5 @@ Public Class LowRes_MeasureValidate : Inherits TaskParent
             diff.Run(src)
             dst3 = diff.dst2
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class LowRes_LeftRight : Inherits TaskParent
-    Dim lowRes As New LowRes_Basics
-    Public Sub New()
-        desc = "Get the lowRes grid image for the left and right views"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lowRes.Run(task.leftView)
-        dst2 = lowRes.dst2.Clone
-
-        lowRes.Run(task.rightView)
-        dst3 = lowRes.dst2.Clone
     End Sub
 End Class
