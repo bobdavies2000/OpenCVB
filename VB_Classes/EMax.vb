@@ -129,7 +129,7 @@ Public Class EMax_InputClusters : Inherits TaskParent
             Dim roi = task.gridRects(i)
             eLabelMat.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion).SetTo(i)
             Dim tmp = samples.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion)
-            cv.Cv2.Randn(tmp, New cv.Scalar(roi.X + task.gridSize / 2, roi.Y + task.gridSize / 2),
+            cv.Cv2.Randn(tmp, New cv.Scalar(roi.X + task.cellSize / 2, roi.Y + task.cellSize / 2),
                          cv.Scalar.All(options.sigma))
         Next
 

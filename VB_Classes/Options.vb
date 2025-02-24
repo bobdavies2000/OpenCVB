@@ -7879,28 +7879,14 @@ Public Class Options_DepthCellSize : Inherits OptionParent
     Public percentThreshold As Single = 0.25
     Public correlationThreshold As Single = 0.6
     Public Sub New()
-        task.dCellSize = 8
-        If task.dst2.Width >= 640 Then task.dCellSize = 16
-        If task.dst2.Width >= 1280 Then task.dCellSize = 32
-        If task.dst2.Width >= 1920 Then task.dCellSize = 64
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Depth Cell Size", 1, 64, task.dCellSize)
             sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * percentThreshold)
             sliders.setupTrackBar("Correlation threshold", 1, 100, 100 * correlationThreshold)
         End If
     End Sub
     Public Sub RunOpt()
-        Static sizeSlider = FindSlider("Depth Cell Size")
         Static depthSlider = FindSlider("Percent Depth Threshold")
         Static corrSlider = FindSlider("Correlation threshold")
-        task.dCellSize = sizeSlider.value
-        If task.dCellSize < 2 Then task.dCellSize = 2
-        If task.dCellSize > 2 And task.dCellSize < 4 Then task.dCellSize = 4
-        If task.dCellSize > 4 And task.dCellSize <= 8 Then task.dCellSize = 8
-        If task.dCellSize > 8 And task.dCellSize <= 16 Then task.dCellSize = 16
-        If task.dCellSize > 16 Then task.dCellSize = 32
-        If task.dst2.Width <= 336 And task.dCellSize > 16 Then task.dCellSize = 16
-        sizeSlider.value = task.dCellSize ' powers of 2 only.  Otherwise, trouble...
         percentThreshold = depthSlider.value / 100
         correlationThreshold = corrSlider.value / 100
     End Sub

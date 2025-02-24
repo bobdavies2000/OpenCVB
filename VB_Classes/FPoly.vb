@@ -1350,8 +1350,8 @@ Public Class FPoly_LineRect : Inherits TaskParent
         Dim x = If(lp.p1.X < lp.p2.X, lp.p1.X, lp.p2.X)
         Dim y = If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y)
         lpRect = New cv.Rect(x, y, Math.Abs(lp.p1.X - lp.p2.X), Math.Abs(lp.p1.Y - lp.p2.Y))
-        If lpRect.Width < task.gridSize Then lpRect.Width = task.gridSize
-        If lpRect.Height < task.gridSize Then lpRect.Height = task.gridSize
+        If lpRect.Width < task.cellSize Then lpRect.Width = task.cellSize
+        If lpRect.Height < task.cellSize Then lpRect.Height = task.cellSize
         lpRect = ValidateRect(lpRect)
 
         dst2 = src

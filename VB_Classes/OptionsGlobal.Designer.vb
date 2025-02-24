@@ -39,13 +39,17 @@ Partial Class OptionsGlobal
         Me.labelBinsCount = New System.Windows.Forms.Label()
         Me.HistBinBar = New System.Windows.Forms.TrackBar()
         Me.labelbins = New System.Windows.Forms.Label()
-        Me.ThreadGridSize = New System.Windows.Forms.Label()
+        Me.GridSizeLabel = New System.Windows.Forms.Label()
         Me.GridSlider = New System.Windows.Forms.TrackBar()
         Me.Label9 = New System.Windows.Forms.Label()
         Me.maxCount = New System.Windows.Forms.Label()
         Me.MaxDepthBar = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
+        Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
+        Me.ShowQuads = New System.Windows.Forms.RadioButton()
+        Me.ColorizedDepth = New System.Windows.Forms.RadioButton()
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
@@ -84,10 +88,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
-        Me.ColorizedDepth = New System.Windows.Forms.RadioButton()
-        Me.ShowQuads = New System.Windows.Forms.RadioButton()
-        Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -97,12 +97,12 @@ Partial Class OptionsGlobal
         CType(Me.GridSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MaxDepthBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
+        Me.DepthGroupBox.SuspendLayout()
         Me.MotionBox.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GeometrySettings.SuspendLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.DepthGroupBox.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -123,7 +123,7 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.labelBinsCount)
         Me.MinMaxDepth.Controls.Add(Me.HistBinBar)
         Me.MinMaxDepth.Controls.Add(Me.labelbins)
-        Me.MinMaxDepth.Controls.Add(Me.ThreadGridSize)
+        Me.MinMaxDepth.Controls.Add(Me.GridSizeLabel)
         Me.MinMaxDepth.Controls.Add(Me.GridSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label9)
         Me.MinMaxDepth.Controls.Add(Me.maxCount)
@@ -289,14 +289,14 @@ Partial Class OptionsGlobal
         Me.labelbins.Text = "Histogram Bins"
         Me.labelbins.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'ThreadGridSize
+        'GridSizeLabel
         '
-        Me.ThreadGridSize.AutoSize = True
-        Me.ThreadGridSize.Location = New System.Drawing.Point(696, 99)
-        Me.ThreadGridSize.Name = "ThreadGridSize"
-        Me.ThreadGridSize.Size = New System.Drawing.Size(40, 20)
-        Me.ThreadGridSize.TabIndex = 32
-        Me.ThreadGridSize.Text = "Size"
+        Me.GridSizeLabel.AutoSize = True
+        Me.GridSizeLabel.Location = New System.Drawing.Point(696, 99)
+        Me.GridSizeLabel.Name = "GridSizeLabel"
+        Me.GridSizeLabel.Size = New System.Drawing.Size(40, 20)
+        Me.GridSizeLabel.TabIndex = 32
+        Me.GridSizeLabel.Text = "Size"
         '
         'GridSlider
         '
@@ -307,7 +307,7 @@ Partial Class OptionsGlobal
         Me.GridSlider.Size = New System.Drawing.Size(506, 69)
         Me.GridSlider.TabIndex = 31
         Me.GridSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.GridSlider.Value = 3
+        Me.GridSlider.Value = 8
         '
         'Label9
         '
@@ -381,6 +381,52 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
+        '
+        'DepthGroupBox
+        '
+        Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
+        Me.DepthGroupBox.Controls.Add(Me.ShowQuads)
+        Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
+        Me.DepthGroupBox.Location = New System.Drawing.Point(334, 265)
+        Me.DepthGroupBox.Name = "DepthGroupBox"
+        Me.DepthGroupBox.Size = New System.Drawing.Size(194, 153)
+        Me.DepthGroupBox.TabIndex = 78
+        Me.DepthGroupBox.TabStop = False
+        Me.DepthGroupBox.Text = "Depth Display"
+        '
+        'DepthCorrelations
+        '
+        Me.DepthCorrelations.AutoSize = True
+        Me.DepthCorrelations.Checked = True
+        Me.DepthCorrelations.Location = New System.Drawing.Point(16, 103)
+        Me.DepthCorrelations.Name = "DepthCorrelations"
+        Me.DepthCorrelations.Size = New System.Drawing.Size(167, 24)
+        Me.DepthCorrelations.TabIndex = 2
+        Me.DepthCorrelations.TabStop = True
+        Me.DepthCorrelations.Text = "Depth Correlations"
+        Me.DepthCorrelations.UseVisualStyleBackColor = True
+        '
+        'ShowQuads
+        '
+        Me.ShowQuads.AutoSize = True
+        Me.ShowQuads.Location = New System.Drawing.Point(16, 68)
+        Me.ShowQuads.Name = "ShowQuads"
+        Me.ShowQuads.Size = New System.Drawing.Size(121, 24)
+        Me.ShowQuads.TabIndex = 1
+        Me.ShowQuads.TabStop = True
+        Me.ShowQuads.Text = "Quad Depth"
+        Me.ShowQuads.UseVisualStyleBackColor = True
+        '
+        'ColorizedDepth
+        '
+        Me.ColorizedDepth.AutoSize = True
+        Me.ColorizedDepth.Location = New System.Drawing.Point(16, 35)
+        Me.ColorizedDepth.Name = "ColorizedDepth"
+        Me.ColorizedDepth.Size = New System.Drawing.Size(148, 24)
+        Me.ColorizedDepth.TabIndex = 0
+        Me.ColorizedDepth.TabStop = True
+        Me.ColorizedDepth.Text = "Colorized Depth"
+        Me.ColorizedDepth.UseVisualStyleBackColor = True
         '
         'TruncateDepth
         '
@@ -770,52 +816,6 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'DepthGroupBox
-        '
-        Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
-        Me.DepthGroupBox.Controls.Add(Me.ShowQuads)
-        Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
-        Me.DepthGroupBox.Location = New System.Drawing.Point(334, 265)
-        Me.DepthGroupBox.Name = "DepthGroupBox"
-        Me.DepthGroupBox.Size = New System.Drawing.Size(194, 153)
-        Me.DepthGroupBox.TabIndex = 78
-        Me.DepthGroupBox.TabStop = False
-        Me.DepthGroupBox.Text = "Depth Display"
-        '
-        'ColorizedDepth
-        '
-        Me.ColorizedDepth.AutoSize = True
-        Me.ColorizedDepth.Location = New System.Drawing.Point(16, 35)
-        Me.ColorizedDepth.Name = "ColorizedDepth"
-        Me.ColorizedDepth.Size = New System.Drawing.Size(148, 24)
-        Me.ColorizedDepth.TabIndex = 0
-        Me.ColorizedDepth.TabStop = True
-        Me.ColorizedDepth.Text = "Colorized Depth"
-        Me.ColorizedDepth.UseVisualStyleBackColor = True
-        '
-        'ShowQuads
-        '
-        Me.ShowQuads.AutoSize = True
-        Me.ShowQuads.Location = New System.Drawing.Point(16, 68)
-        Me.ShowQuads.Name = "ShowQuads"
-        Me.ShowQuads.Size = New System.Drawing.Size(121, 24)
-        Me.ShowQuads.TabIndex = 1
-        Me.ShowQuads.TabStop = True
-        Me.ShowQuads.Text = "Quad Depth"
-        Me.ShowQuads.UseVisualStyleBackColor = True
-        '
-        'DepthCorrelations
-        '
-        Me.DepthCorrelations.AutoSize = True
-        Me.DepthCorrelations.Checked = True
-        Me.DepthCorrelations.Location = New System.Drawing.Point(16, 103)
-        Me.DepthCorrelations.Name = "DepthCorrelations"
-        Me.DepthCorrelations.Size = New System.Drawing.Size(167, 24)
-        Me.DepthCorrelations.TabIndex = 2
-        Me.DepthCorrelations.TabStop = True
-        Me.DepthCorrelations.Text = "Depth Correlations"
-        Me.DepthCorrelations.UseVisualStyleBackColor = True
-        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -838,6 +838,8 @@ Partial Class OptionsGlobal
         CType(Me.MaxDepthBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.DepthGroupBox.ResumeLayout(False)
+        Me.DepthGroupBox.PerformLayout()
         Me.MotionBox.ResumeLayout(False)
         Me.MotionBox.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
@@ -846,8 +848,6 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.PerformLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.DepthGroupBox.ResumeLayout(False)
-        Me.DepthGroupBox.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -873,7 +873,7 @@ Partial Class OptionsGlobal
     Friend WithEvents labelBinsCount As System.Windows.Forms.Label
     Friend WithEvents HistBinBar As System.Windows.Forms.TrackBar
     Friend WithEvents labelbins As System.Windows.Forms.Label
-    Friend WithEvents ThreadGridSize As System.Windows.Forms.Label
+    Friend WithEvents GridSizeLabel As System.Windows.Forms.Label
     Friend WithEvents GridSlider As System.Windows.Forms.TrackBar
     Friend WithEvents Label9 As System.Windows.Forms.Label
     Friend WithEvents Label8 As System.Windows.Forms.Label

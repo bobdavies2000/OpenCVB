@@ -946,7 +946,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         desc = "Find the top feature cells and track them in the next frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim half As Integer = CInt(task.gridSize / 2)
+        Dim half As Integer = CInt(task.cellSize / 2)
 
         If task.heartBeatLT Then
             fPoly.Run(src)
@@ -955,7 +955,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             saveMat = src.Clone
             For Each pt In task.topFeatures
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
                 roi = ValidateRect(roi)
                 featureRects.Add(roi)
                 searchRects.Add(task.gridNabeRects(index))
@@ -964,7 +964,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             dst2 = saveMat.Clone
             For Each pt In task.topFeatures
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
                 roi = ValidateRect(roi)
                 dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
                 dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
@@ -1013,7 +1013,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         featureRects.Clear()
         For Each pt In task.topFeatures
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
             roi = ValidateRect(roi)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
@@ -1022,14 +1022,14 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         dst2 = dst1.Clone
         For Each pt In task.topFeatures
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridSize, task.gridSize)
+            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
             roi = ValidateRect(roi)
             dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
             dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        half = CInt(task.gridSize / 2)
+        half = CInt(task.cellSize / 2)
 
         dst1 = src.Clone
         fPoly.Run(src)

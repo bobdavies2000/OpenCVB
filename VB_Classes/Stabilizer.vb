@@ -346,7 +346,7 @@ Public Class Stabilizer_CornerPoints : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
-            Dim size = task.gridSize
+            Dim size = task.cellSize
             ul = New cv.Rect(0, 0, size, size)
             ur = New cv.Rect(dst2.Width - size, 0, size, size)
             ll = New cv.Rect(0, dst2.Height - size, size, size)

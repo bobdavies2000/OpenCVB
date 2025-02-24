@@ -77,10 +77,10 @@ End Class
 '        hist2d.Run(colorFmt.dst2)
 '        dst2 = hist2d.dst2
 
-'        minX = bpRow * xRange / task.gridSize
-'        maxX = (bpRow + 1) * xRange / task.gridSize
-'        minY = bpCol * yRange / task.gridSize
-'        maxY = (bpCol + 1) * yRange / task.gridSize
+'        minX = bpRow * xRange / task.cellSize
+'        maxX = (bpRow + 1) * xRange / task.cellSize
+'        minY = bpCol * yRange / task.cellSize
+'        maxY = (bpCol + 1) * yRange / task.cellSize
 
 '        Dim ranges() = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
 '        cv.Cv2.CalcBackProject({src}, task.redOptions.channels, hist2d.histogram, dst0, ranges)

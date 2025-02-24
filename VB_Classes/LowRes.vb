@@ -147,8 +147,8 @@ Public Class LowRes_Edges : Inherits TaskParent
         Next
 
         For Each r In task.fLessRects
-            Dim x = CInt(r.X / task.gridSize)
-            Dim y = CInt(r.Y / task.gridSize)
+            Dim x = CInt(r.X / task.cellSize)
+            Dim y = CInt(r.Y / task.cellSize)
             task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
         Next
         lastDepth = task.lowResDepth.Clone
@@ -374,7 +374,7 @@ Public Class LowRes_DepthMask : Inherits TaskParent
         dst2.SetTo(0)
         For Each roi In task.gridRects
             Dim count = task.pcSplit(2)(roi).CountNonZero()
-            If count >= task.gridSize * task.gridSize / 2 Then dst2(roi).SetTo(255)
+            If count >= task.cellSize * task.cellSize / 2 Then dst2(roi).SetTo(255)
         Next
     End Sub
 End Class

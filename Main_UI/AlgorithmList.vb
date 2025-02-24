@@ -670,7 +670,6 @@ Public Class algorithmList
 	If algorithmName = "Grid_List" Then return new Grid_List
 	If algorithmName = "Grid_MinMaxDepth" Then return new Grid_MinMaxDepth
 	If algorithmName = "Grid_Neighbors" Then return new Grid_Neighbors
-	If algorithmName = "Grid_Rectangles" Then return new Grid_Rectangles
 	If algorithmName = "Grid_ShowMap" Then return new Grid_ShowMap
 	If algorithmName = "Grid_Special" Then return new Grid_Special
 	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter

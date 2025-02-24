@@ -304,7 +304,7 @@ Public Class Match_PointSlope : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        Dim sz = task.gridSize
+        Dim sz = task.cellSize
 
         If updateLines Then
             updateLines = False

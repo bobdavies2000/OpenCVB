@@ -13,7 +13,12 @@ Public Class OptionsGlobal
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 
-        ThreadGridSize.Text = CStr(GridSlider.Value)
+        Dim cellSize = 8
+        If task.dst2.Width >= 640 Then cellSize = 16
+        If task.dst2.Width >= 1280 Then cellSize = 32
+        If task.dst2.Width >= 1920 Then cellSize = 64
+        GridSlider.Value = cellSize
+        GridSizeLabel.Text = CStr(cellSize)
 
         DotSizeSlider.Value = 1
         LineWidth.Value = 1
@@ -68,7 +73,6 @@ Public Class OptionsGlobal
         task.fPointMinDistance = 10
         Select Case task.dst2.Width
             Case 1920
-                GridSlider.Value = 64
                 task.cvFontSize = 3.5
                 task.cvFontThickness = 4
                 task.DotSize = 4
@@ -79,7 +83,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 25
                 task.fPointMinDistance = 75
             Case 960
-                GridSlider.Value = 40
                 task.cvFontSize = 2.0
                 task.cvFontThickness = 2
                 task.DotSize = 2
@@ -90,7 +93,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 40
                 task.fPointMinDistance = 50
             Case 480
-                GridSlider.Value = 20
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cv.Size(240, 135)
@@ -99,7 +101,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 20
             Case 1280
-                GridSlider.Value = 48
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
                 task.DotSize = 5
@@ -110,7 +111,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 40
                 task.fPointMinDistance = 50
             Case 640
-                GridSlider.Value = 24
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
@@ -120,7 +120,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 30
                 task.fPointMinDistance = 25
             Case 320
-                GridSlider.Value = 14
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
                 task.lowRes = New cv.Size(320, 180)
@@ -130,7 +129,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 12
             Case 160
-                GridSlider.Value = 8
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cv.Size(160, 120)
@@ -139,7 +137,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 5
             Case 672
-                GridSlider.Value = 24
                 task.cvFontSize = 1.5
                 task.DotSize = 1
                 task.disparityAdjustment = 4.4
@@ -149,7 +146,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 25
             Case 336
-                GridSlider.Value = 12
                 task.cvFontSize = 1.0
                 task.DotSize = 1
                 task.disparityAdjustment = 8.8
@@ -159,7 +155,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 10
                 task.fPointMinDistance = 10
             Case 168
-                GridSlider.Value = 8
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
                 task.lowRes = New cv.Size(168, 94)
@@ -221,12 +216,21 @@ Public Class OptionsGlobal
     End Sub
     Private Sub GridSlider_Scroll(sender As Object, e As EventArgs) Handles GridSlider.Scroll
         task.optionsChanged = True
-        task.gridSize = GridSlider.Value
-        ThreadGridSize.Text = CStr(GridSlider.Value)
+        task.cellSize = GridSlider.Value
+
+        If task.cellSize < 2 Then task.cellSize = 2
+        If task.cellSize > 2 And task.cellSize < 4 Then task.cellSize = 4
+        If task.cellSize > 4 And task.cellSize <= 8 Then task.cellSize = 8
+        If task.cellSize > 8 And task.cellSize <= 16 Then task.cellSize = 16
+        If task.cellSize > 16 Then task.cellSize = 32
+        If task.dst2.Width <= 336 And task.cellSize > 16 Then task.cellSize = 16
+        GridSlider.Value = task.cellSize
+
+        GridSizeLabel.Text = CStr(GridSlider.Value)
     End Sub
     Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
         task.optionsChanged = True
-        ThreadGridSize.Text = CStr(GridSlider.Value)
+        GridSizeLabel.Text = CStr(GridSlider.Value)
     End Sub
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
         task.optionsChanged = True

@@ -4,7 +4,6 @@ Imports OpenCvSharp.Flann
 Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class DepthCell_Basics : Inherits TaskParent
-    Public grid As New Grid_Rectangles
     Public options As New Options_DepthCellSize
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean
@@ -37,15 +36,13 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        grid.Run(src)
-
         If task.optionsChanged Or instantUpdate Then
             task.iddList.Clear()
-            For Each rect In grid.gridRectsAll
+            For Each rect In task.gridRects
                 Dim idd As New depthCell
                 idd.cRect = ValidateRect(rect)
                 idd.lRect = ValidateRect(rect) ' for some cameras the color image and the left image are the same.
-                idd.center = New cv.Point(rect.TopLeft.X + task.dCellSize / 2, rect.TopLeft.Y + task.dCellSize / 2)
+                idd.center = New cv.Point(rect.TopLeft.X + task.cellSize / 2, rect.TopLeft.Y + task.cellSize / 2)
                 idd.age = 0
                 task.iddList.Add(idd)
             Next
@@ -187,7 +184,7 @@ Public Class DepthCell_Plot : Inherits TaskParent
         dst2 = task.dCell.dst2
         dst2.SetTo(0, Not task.iddMask)
 
-        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim idd As depthCell
@@ -231,9 +228,11 @@ Public Class DepthCell_FullDepth : Inherits TaskParent
         End If
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim col As Integer, tilesPerRow = task.dCell.grid.tilesPerRow
+        Dim col As Integer, tilesPerRow = task.grid.tilesPerRow
         Static whiteCol As Integer = tilesPerRow / 2
-        If task.mouseClickFlag Then whiteCol = Math.Round(tilesPerRow * (task.ClickPoint.X - task.dCellSize / 2) / dst2.Width)
+        If task.mouseClickFlag Then
+            whiteCol = Math.Round(tilesPerRow * (task.ClickPoint.X - task.cellSize / 2) / dst2.Width)
+        End If
         For Each idd In task.iddList
             If idd.depth > 0 Then
                 Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / tilesPerRow)))
@@ -300,7 +299,7 @@ Public Class DepthCell_RGBtoLeft : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim idd As depthCell
         If index > 0 And index < task.iddList.Count Then
             idd = task.iddList(index)
@@ -489,7 +488,7 @@ Public Class DepthCell_Correlation : Inherits TaskParent
 
         dst2 = task.leftView
         dst3 = task.rightView
-        Dim index = task.dCell.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.iddList.Count Then Exit Sub
 
         Dim idd = task.iddList(index)
@@ -547,10 +546,10 @@ Public Class DepthCell_Connected : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
 
-        width = dst2.Width / task.dCellSize
-        If width * task.dCellSize <> dst2.Width Then width += 1
-        height = Math.Floor(dst2.Height / task.dCellSize)
-        If height * task.dCellSize <> dst2.Height Then height += 1
+        width = dst2.Width / task.cellSize
+        If width * task.cellSize <> dst2.Width Then width += 1
+        height = Math.Floor(dst2.Height / task.cellSize)
+        If height * task.cellSize <> dst2.Height Then height += 1
         connectedH.Clear()
         colorIndex = 0
         For i = 0 To height - 1

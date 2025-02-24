@@ -97,7 +97,7 @@ Module TaskExterns
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_Open(cppFunction As Integer, rows As Integer, cols As Integer,
                              heartBeat As Boolean, addWeighted As Single, lineWidth As Integer,
-                             lineType As Integer, DotSize As Integer, gridSize As Integer,
+                             lineType As Integer, DotSize As Integer, cellSize As Integer,
                              histogramBins As Integer, ocvheartBeat As Boolean, gravityPointCloud As Boolean,
                              pixelDiffThreshold As Integer, UseKalman As Boolean, paletteIndex As Integer,
                              frameHistory As Integer, displayDst0 As Boolean,
@@ -125,7 +125,7 @@ Module TaskExterns
     Public Function cppTask_GetDst(cPtr As IntPtr, index As Integer, ByRef type As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub cppTask_OptionsCPPtoVB(cPtr As IntPtr, ByRef gridSize As Integer,
+    Public Sub cppTask_OptionsCPPtoVB(cPtr As IntPtr, ByRef cellSize As Integer,
                                       ByRef histogramBins As Integer,
                                       ByRef pixelDiffThreshold As Integer,
                                       ByRef UseKalman As Boolean, ByRef frameHistory As Integer,
@@ -137,7 +137,7 @@ Module TaskExterns
                                       )
     End Sub
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub cppTask_OptionsVBtoCPP(cPtr As IntPtr, gridSize As Integer,
+    Public Sub cppTask_OptionsVBtoCPP(cPtr As IntPtr, cellSize As Integer,
                                       histogramBins As Integer,
                                       pixelDiffThreshold As Integer,
                                       UseKalman As Boolean, frameHistory As Integer,

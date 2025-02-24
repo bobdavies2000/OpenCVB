@@ -18,7 +18,7 @@ Public Class Grid_Basics : Inherits TaskParent
             task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
 
-        Dim gridSize As Integer
+        Dim cellSize As Integer
         If task.optionsChanged Then
             tilesPerCol = 0
             tilesPerRow = 0
@@ -26,16 +26,16 @@ Public Class Grid_Basics : Inherits TaskParent
             gridNabeRects.Clear()
             gridNeighbors.Clear()
             gridPoints.Clear()
-            gridSize = task.gOptions.GridSlider.Value
+            cellSize = task.gOptions.GridSlider.Value
             gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             gridMap = New cv.Mat(src.Size(), cv.MatType.CV_32S, 255)
 
             gridRects.Clear()
             gridIndex.Clear()
             Dim index As Integer
-            For y = 0 To src.Height - 1 Step gridSize
-                For x = 0 To src.Width - 1 Step gridSize
-                    Dim roi = ValidateRect(New cv.Rect(x, y, gridSize, gridSize))
+            For y = 0 To src.Height - 1 Step cellSize
+                For x = 0 To src.Width - 1 Step cellSize
+                    Dim roi = ValidateRect(New cv.Rect(x, y, cellSize, cellSize))
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then tilesPerCol += 1
                         If y = 0 Then tilesPerRow += 1
@@ -48,11 +48,11 @@ Public Class Grid_Basics : Inherits TaskParent
             task.subDivisionCount = 9
 
             gridMask.SetTo(0)
-            For x = gridSize To src.Width - 1 Step gridSize
+            For x = cellSize To src.Width - 1 Step cellSize
                 Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, src.Height)
                 gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
-            For y = gridSize To src.Height - 1 Step gridSize
+            For y = cellSize To src.Height - 1 Step cellSize
                 Dim p1 = New cv.Point(0, y), p2 = New cv.Point(src.Width, y)
                 gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
@@ -117,7 +117,7 @@ Public Class Grid_Basics : Inherits TaskParent
                 gridPoints.Add(roi.TopLeft)
             Next
 
-            task.gridSize = gridSize
+            task.cellSize = cellSize
             task.tilesPerCol = tilesPerCol
             task.tilesPerRow = tilesPerRow
             task.gridMask = gridMask
@@ -133,62 +133,11 @@ Public Class Grid_Basics : Inherits TaskParent
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(task.tilesPerCol) + "X" + CStr(task.tilesPerRow) + ") " +
-                                  CStr(gridSize) + "X" + CStr(gridSize) + " regions"
+                                  CStr(cellSize) + "X" + CStr(cellSize) + " regions"
         End If
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Grid_Rectangles : Inherits TaskParent
-    Public tilesPerRow As Integer
-    Public tilesPerCol As Integer
-    Public gridMap As cv.Mat
-    Public gridRectsAll As New List(Of cv.Rect)
-    Public Sub New()
-        gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
-        If standalone Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then
-            gridRectsAll.Clear()
-            tilesPerRow = 0
-            tilesPerCol = 0
-            For y = 0 To dst2.Height - 1 Step task.dCellSize
-                For x = 0 To dst2.Width - 1 Step task.dCellSize
-                    Dim roi = ValidateRect(New cv.Rect(x, y, task.dCellSize, task.dCellSize))
-                    If roi.Width > 0 And roi.Height > 0 Then
-                        If y = 0 Then tilesPerRow += 1
-                        If x = 0 Then tilesPerCol += 1
-                        gridRectsAll.Add(roi)
-                    End If
-                Next
-            Next
-
-            For i = 0 To gridRectsAll.Count - 1
-                Dim roi = gridRectsAll(i)
-                gridMap.Rectangle(roi, i, -1)
-            Next
-        End If
-        If standaloneTest() Then
-            gridMap.ConvertTo(dst1, cv.MatType.CV_32F)
-            Dim mm = GetMinMax(dst1)
-            dst1 = dst1 * 255 / mm.maxVal
-            dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-            labels(2) = "Grid_Basics " + CStr(gridRectsAll.Count) + " tiles, " + CStr(tilesPerRow) +
-                        " cols by " + CStr(tilesPerCol) + " rows, with " +
-                        CStr(task.dCellSize) + "X" + CStr(task.dCellSize) + " cells"
-        End If
-        If task.mouseClickFlag Then
-            task.gridROIclicked = gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        End If
-    End Sub
-End Class
 
 
 
@@ -313,7 +262,7 @@ Public Class Grid_Neighbors : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.tilesPerCol <> CInt(dst2.Height / 10) Then
             task.gOptions.GridSlider.Value = CInt(dst2.Height / 10)
-            task.tilesPerCol = task.gridSize
+            task.tilesPerCol = task.cellSize
             task.grid.Run(src)
         End If
 
@@ -364,7 +313,7 @@ Public Class Grid_Special : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
-            gridWidth = task.gridSize
+            gridWidth = task.cellSize
             gridRects.Clear()
             tilesPerCol = 0
             tilesPerRow = 0

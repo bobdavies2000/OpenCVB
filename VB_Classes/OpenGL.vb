@@ -2142,7 +2142,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
             End If
         Next
 
-        Dim width = dst2.Width / task.dCellSize
+        Dim width = dst2.Width / task.cellSize
         For Each tup In connect.connectedV
             For i = tup.Item1 To tup.Item2 - width Step width
                 idd1 = task.iddList(i)
