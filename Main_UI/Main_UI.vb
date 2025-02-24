@@ -1697,16 +1697,13 @@ Public Class Main_UI
 
 
                 picLabels = task.labels
-                motionLabel = task.MotionLabel
+                motionLabel = task.motionLabel
 
                 SyncLock mouseLock
-                    If mousePoint.X < task.gridMap32S.Width And mousePoint.Y < task.gridMap32S.Height Then
-                        If mousePoint.X < 0 Then mousePoint.X = 0
-                        If mousePoint.Y < 0 Then mousePoint.Y = 0
-                    Else
-                        mousePoint = New cv.Point(0, 0)
-                    End If
+                    mousePoint = validatePoint(mousePoint)
+                    mousePoint = validatePoint(mouseMovePoint)
                 End SyncLock
+
                 Dim returnTime = Now
 
                 ' in case the algorithm has changed the mouse location...

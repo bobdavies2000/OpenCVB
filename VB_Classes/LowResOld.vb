@@ -90,7 +90,7 @@ Public Class LowResOld_Features : Inherits TaskParent
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
-            Dim tile = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+            Dim tile = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim test = gridIndex.IndexOf(tile)
             If test < 0 Then
                 Dim r = task.gridRects(tile)

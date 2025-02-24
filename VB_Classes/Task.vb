@@ -31,7 +31,7 @@ Public Class VBtask : Implements IDisposable
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9
     Public gridMask As New cv.Mat
-    Public gridMap32S As New cv.Mat
+    Public gridMap As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
