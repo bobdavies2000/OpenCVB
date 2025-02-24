@@ -2155,7 +2155,6 @@ public:
 };
 class Options_DepthCellSize {
 public:
-	float percentThreshold =  0.25;
 	float correlationThreshold =  0.6;
 	void RunOpt() {}
 	Options_DepthCellSize() {

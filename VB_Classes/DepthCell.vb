@@ -12,7 +12,6 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Dim iddCorr As New DepthCell_CorrelationMap
     Dim caminfo As cameraInfo
     Public Sub New()
-        optiBase.FindSlider("Percent Depth Threshold").Value = 25
         desc = "Create the grid of depth cells that reduce depth volatility"
     End Sub
     Public Function translateColorToLeft(pt As cv.Point) As cv.Point
@@ -67,7 +66,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
                 idd.color = New cv.Point3f(idd.colorMean(0), idd.colorMean(1), idd.colorMean(2))
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
-                If idd.pixels / (idd.cRect.Width * idd.cRect.Height) < options.percentThreshold Then
+                If idd.pixels = 0 Then
                     idd.age = 0
                     idd.depth = 0
                     idd.rRect = New cv.Rect

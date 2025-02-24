@@ -7876,18 +7876,14 @@ End Class
 
 
 Public Class Options_DepthCellSize : Inherits OptionParent
-    Public percentThreshold As Single = 0.25
     Public correlationThreshold As Single = 0.6
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Percent Depth Threshold", 1, 100, 100 * percentThreshold)
             sliders.setupTrackBar("Correlation threshold", 1, 100, 100 * correlationThreshold)
         End If
     End Sub
     Public Sub RunOpt()
-        Static depthSlider = FindSlider("Percent Depth Threshold")
         Static corrSlider = FindSlider("Correlation threshold")
-        percentThreshold = depthSlider.value / 100
         correlationThreshold = corrSlider.value / 100
     End Sub
 End Class

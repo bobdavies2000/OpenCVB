@@ -2087,9 +2087,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         dst3 = task.dCell.dst3
         Dim quadData As New List(Of cv.Point3f)
         For Each idd In task.iddList
-            If idd.pixels / (idd.cRect.Width * idd.cRect.Height) < task.dCell.options.percentThreshold Then
-                Continue For
-            End If
+            If idd.depth = 0 Then Continue For
             If idd.corners.Count Then quadData.Add(idd.color)
             For Each pt In idd.corners
                 quadData.Add(pt)
