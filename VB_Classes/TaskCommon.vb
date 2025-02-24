@@ -397,6 +397,7 @@ Public Class depthCell
     Public corners As New List(Of cv.Point3f)
     Public center As cv.Point
     Public correlation As Single
+    Public features As New List(Of cv.Point)
 End Class
 
 

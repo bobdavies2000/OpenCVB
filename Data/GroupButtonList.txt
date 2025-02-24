@@ -136,6 +136,7 @@ LineCoin
 LineTrack
 LongLine
 LowRes
+LowResOld
 LUT
 Magnify
 Mat

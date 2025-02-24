@@ -1770,7 +1770,7 @@ End Class
 
 
 Public Class OpenGL_Grid : Inherits TaskParent
-    Dim lowRes As New LowRes_Edges
+    Dim lowRes As New LowResOld_Edges
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the grid depth and color for each cell"

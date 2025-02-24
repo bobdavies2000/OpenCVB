@@ -13,7 +13,7 @@ Public Class ML_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then
-            SetTrueText("ML_BasicsRTree has no output when run standalone." + vbCrLf + "Use LowRes_Depth to test.")
+            SetTrueText("ML_BasicsRTree has no output when run standalone." + vbCrLf + "Use LowResOld_Depth to test.")
             Exit Sub
         End If
 

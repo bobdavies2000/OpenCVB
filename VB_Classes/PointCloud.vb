@@ -662,14 +662,14 @@ Public Class PointCloud_PCpointsMask : Inherits TaskParent
         desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then pcPoints = New cv.Mat(task.gridRows, task.gridCols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
+        If task.optionsChanged Then pcPoints = New cv.Mat(task.tilesPerCol, task.tilesPerRow, cv.MatType.CV_32FC3, cv.Scalar.All(0))
 
         dst2.SetTo(0)
         actualCount = 0
         Dim lastMeanZ As Single
-        For y = 0 To task.gridRows - 1
-            For x = 0 To task.gridCols - 1
-                Dim roi = task.gridRects(y * task.gridCols + x)
+        For y = 0 To task.tilesPerCol - 1
+            For x = 0 To task.tilesPerRow - 1
+                Dim roi = task.gridRects(y * task.tilesPerRow + x)
                 Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
                 If Single.IsNaN(mean(0)) Then Continue For
                 If Single.IsNaN(mean(1)) Then Continue For

@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
-    Public measure As New LowRes_MeasureMotion
+    Public measure As New LowResOld_MeasureMotion
     Public color As cv.Mat
     Public motionMask As cv.Mat
     Dim diff As New Diff_Basics
@@ -37,7 +37,7 @@ End Class
 
 Public Class Motion_BasicsTest : Inherits TaskParent
     Dim diff As New Diff_Basics
-    Dim measure As New LowRes_MeasureMotion
+    Dim measure As New LowResOld_MeasureMotion
     Public Sub New()
         task.gOptions.UseMotion.Checked = False
         task.gOptions.showMotionMask.Checked = True
@@ -161,15 +161,15 @@ Public Class Motion_ThruCorrelation : Inherits TaskParent
                 cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 Dim mm As mmData = GetMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
-                    If (i Mod task.gridRows) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
-                    If (i Mod task.gridRows) < task.gridRows And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
-                    If i > task.gridRows Then
-                        dst3(task.gridRects(i - task.gridRows)).SetTo(255)
-                        dst3(task.gridRects(i - task.gridRows + 1)).SetTo(255)
+                    If (i Mod task.tilesPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
+                    If (i Mod task.tilesPerCol) < task.tilesPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
+                    If i > task.tilesPerCol Then
+                        dst3(task.gridRects(i - task.tilesPerCol)).SetTo(255)
+                        dst3(task.gridRects(i - task.tilesPerCol + 1)).SetTo(255)
                     End If
-                    If i < (task.gridRects.Count - task.gridRows - 1) Then
-                        dst3(task.gridRects(i + task.gridRows)).SetTo(255)
-                        dst3(task.gridRects(i + task.gridRows + 1)).SetTo(255)
+                    If i < (task.gridRects.Count - task.tilesPerCol - 1) Then
+                        dst3(task.gridRects(i + task.tilesPerCol)).SetTo(255)
+                        dst3(task.gridRects(i + task.tilesPerCol + 1)).SetTo(255)
                     End If
                     dst3(roi).SetTo(255)
                 End If
@@ -618,7 +618,7 @@ End Class
 
 
 Public Class Motion_EdgeStability : Inherits TaskParent
-    Dim lowRes As New LowRes_Edges
+    Dim lowRes As New LowResOld_Edges
     Public Sub New()
         labels(3) = "High population cells"
         desc = "Measure the stability of edges in each grid Rect"
@@ -1065,7 +1065,7 @@ End Class
 
 
 Public Class Motion_RightView : Inherits TaskParent
-    Public measure As New LowRes_MeasureMotion
+    Public measure As New LowResOld_MeasureMotion
     Public rightView As cv.Mat
     Dim diff As New Diff_Basics
     Public Sub New()

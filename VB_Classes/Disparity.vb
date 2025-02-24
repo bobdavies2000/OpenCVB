@@ -112,7 +112,7 @@ End Class
 
 
 Public Class Disparity_LowRes : Inherits TaskParent
-    Dim lowres As New LowRes_LeftRight
+    Dim lowres As New LowResOld_LeftRight
     Dim disparity As New Disparity_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True

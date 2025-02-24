@@ -125,6 +125,7 @@
     <Compile Include="Linear.vb" />
     <Compile Include="LineTrack.vb" />
     <Compile Include="LowRes.vb" />
+    <Compile Include="LowResOld.vb" />
     <Compile Include="AsciiArt.vb" />
     <Compile Include="Bezier.vb" />
     <Compile Include="Bin2Way.vb" />

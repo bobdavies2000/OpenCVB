@@ -24,8 +24,8 @@ Public Class VBtask : Implements IDisposable
     Public dCellSize As Integer
 
     Public gridSize As Integer
-    Public gridRows As Integer
-    Public gridCols As Integer
+    Public tilesPerCol As Integer
+    Public tilesPerRow As Integer
     Public gridIndex As New List(Of Integer)
     Public gridRects As List(Of cv.Rect)
     Public subDivisions As New List(Of Integer)
@@ -71,7 +71,7 @@ Public Class VBtask : Implements IDisposable
     Public motionRects As New List(Of cv.Rect)
     Public motionMask As New cv.Mat
     Public motionPercent As Single
-    Public MotionLabel As String = " "
+    Public motionLabel As String = " "
 
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer

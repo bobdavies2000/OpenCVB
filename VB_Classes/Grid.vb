@@ -6,7 +6,7 @@ Public Class Grid_Basics : Inherits TaskParent
     Public gridMask As cv.Mat
     Public gridMap32S As cv.Mat
     Public gridIndex As New List(Of Integer)
-    Public gridRows As Integer, gridCols As Integer
+    Public tilesPerCol As Integer, tilesPerRow As Integer
     Public gridNabeRects As New List(Of cv.Rect)
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridPoints As New List(Of cv.Point)
@@ -20,8 +20,8 @@ Public Class Grid_Basics : Inherits TaskParent
 
         Dim gridSize As Integer
         If task.optionsChanged Then
-            gridRows = 0
-            gridCols = 0
+            tilesPerCol = 0
+            tilesPerRow = 0
             gridIndex.Clear()
             gridNabeRects.Clear()
             gridNeighbors.Clear()
@@ -37,8 +37,8 @@ Public Class Grid_Basics : Inherits TaskParent
                 For x = 0 To src.Width - 1 Step gridSize
                     Dim roi = ValidateRect(New cv.Rect(x, y, gridSize, gridSize))
                     If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then gridRows += 1
-                        If y = 0 Then gridCols += 1
+                        If x = 0 Then tilesPerCol += 1
+                        If y = 0 Then tilesPerRow += 1
                         gridRects.Add(roi)
                         gridIndex.Add(index)
                         index += 1
@@ -118,8 +118,8 @@ Public Class Grid_Basics : Inherits TaskParent
             Next
 
             task.gridSize = gridSize
-            task.gridRows = gridRows
-            task.gridCols = gridCols
+            task.tilesPerCol = tilesPerCol
+            task.tilesPerRow = tilesPerRow
             task.gridMask = gridMask
             task.gridMap32S = gridMap32S
             task.gridIndex = New List(Of Integer)(gridIndex)
@@ -132,7 +132,7 @@ Public Class Grid_Basics : Inherits TaskParent
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
+            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(task.tilesPerCol) + "X" + CStr(task.tilesPerRow) + ") " +
                                   CStr(gridSize) + "X" + CStr(gridSize) + " regions"
         End If
     End Sub
@@ -311,9 +311,9 @@ Public Class Grid_Neighbors : Inherits TaskParent
         desc = "Click any grid element to see its neighbors"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gridRows <> CInt(dst2.Height / 10) Then
+        If task.tilesPerCol <> CInt(dst2.Height / 10) Then
             task.gOptions.GridSlider.Value = CInt(dst2.Height / 10)
-            task.gridRows = task.gridSize
+            task.tilesPerCol = task.gridSize
             task.grid.Run(src)
         End If
 
@@ -351,8 +351,8 @@ Public Class Grid_Special : Inherits TaskParent
     Public gridWidth As Integer = 10
     Public gridHeight As Integer = 10
     Public gridRects As New List(Of cv.Rect)
-    Public gridRows As Integer
-    Public gridCols As Integer
+    Public tilesPerCol As Integer
+    Public tilesPerRow As Integer
     Public gridMask As cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridMap As cv.Mat
@@ -366,16 +366,16 @@ Public Class Grid_Special : Inherits TaskParent
         If task.optionsChanged Then
             gridWidth = task.gridSize
             gridRects.Clear()
-            gridRows = 0
-            gridCols = 0
+            tilesPerCol = 0
+            tilesPerRow = 0
             For y = 0 To dst2.Height - 1 Step gridHeight
                 For x = 0 To dst2.Width - 1 Step gridWidth
                     Dim roi = New cv.Rect(x, y, gridWidth, gridHeight)
                     If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
                     If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then gridRows += 1
-                        If y = 0 Then gridCols += 1
+                        If x = 0 Then tilesPerCol += 1
+                        If y = 0 Then tilesPerRow += 1
                         gridRects.Add(roi)
                     End If
                 Next
@@ -414,7 +414,7 @@ Public Class Grid_Special : Inherits TaskParent
         If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(white, gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(gridRows) + "X" + CStr(gridCols) + ") " +
+            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(tilesPerCol) + "X" + CStr(tilesPerRow) + ") " +
                           CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
         End If
     End Sub

@@ -8,7 +8,7 @@ Public Class FeatureROI_Basics : Inherits TaskParent
     Public Sub New()
         task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
+        desc = "Compute the stdev for each roi.  If small (<10), mark as featureLess."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
@@ -57,7 +57,7 @@ Public Class FeatureROI_Color : Inherits TaskParent
         optiBase.FindSlider("Add Weighted %").Value = 70
         task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
+        desc = "Compute the stdev for each roi.  If small (<10), mark as featureLess."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim stdevList0 As New List(Of Single)

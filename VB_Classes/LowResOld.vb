@@ -1,17 +1,21 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class LowRes_Basics : Inherits TaskParent
+Public Class LowResOld_Basics : Inherits TaskParent
+    Dim lrColor As New LowResOld_Color
+    Dim lrDepth As New LowResOld_Depth
     Public Sub New()
         labels(2) = "Low resolution color image."
         labels(3) = "Low resolution version of the depth data."
         desc = "Build the low-res image and accompanying map, rect list, and mask."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        For Each idd In task.iddList
-            dst2(idd.cRect).SetTo(idd.colorMean)
-            dst3(idd.cRect).SetTo(idd.depth)
-        Next
-        task.lowResColor = dst2.Clone
+        lrColor.Run(src)
+        dst2 = lrColor.dst2.Clone
+        task.lowResColor = lrColor.dst3.Clone
+
+        lrDepth.Run(task.pcSplit(2))
+        dst3 = lrDepth.dst2
+        task.lowResDepth = lrDepth.dst3.Clone
     End Sub
 End Class
 
@@ -20,20 +24,62 @@ End Class
 
 
 
-Public Class LowRes_Features : Inherits TaskParent
-    Dim lowRes As New LowRes_Basics
+Public Class LowResOld_Color : Inherits TaskParent
+    Public Sub New()
+        labels = {"", "", "Grid of mean color values", "Resized task.lowResColor"}
+        desc = "The bare minimum needed to make the LowRes image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        For Each roi In task.gridRects
+            Dim mean = src(roi).Mean()
+            dst2(roi).SetTo(mean)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LowResOld_Depth : Inherits TaskParent
+    Public Sub New()
+        labels = {"", "", "Grid of mean depth values", "Resized task.lowResDepth"}
+        desc = "The bare minimum needed to make the LowRes image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
+        dst2 = src.Clone
+        Dim index As Integer
+        For y = 0 To task.tilesPerCol - 1
+            For x = 0 To task.tilesPerRow - 1
+                Dim roi = task.gridRects(index)
+                index += 1
+                Dim mean = src(roi).Mean()
+                dst2(roi).SetTo(mean)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LowResOld_Features : Inherits TaskParent
+    Dim lowRes As New LowResOld_Basics
     Dim options As New Options_Features
     Public Sub New()
         optiBase.FindSlider("Min Distance to next").Value = 3
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Featureless areas"
-        task.feat = New Feature_Basics
         desc = "Identify the cells with features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-
-        task.feat.Run(src)
 
         lowRes.Run(src)
         dst2 = lowRes.dst2.Clone
@@ -44,19 +90,25 @@ Public Class LowRes_Features : Inherits TaskParent
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
-            Dim index = task.iddMap.Get(Of Integer)(pt.Y, pt.X)
-            Dim idd = task.iddList(index)
-            idd.features.Add(pt)
-            DrawCircle(dst2, idd.cRect.TopLeft, task.DotSize, task.HighlightColor)
-
-            rects.Add(idd.cRect)
-            task.iddList(index) = idd
+            Dim tile = task.gridMap32S.Get(Of Integer)(pt.Y, pt.X)
+            Dim test = gridIndex.IndexOf(tile)
+            If test < 0 Then
+                Dim r = task.gridRects(tile)
+                rects.Add(r)
+                gridIndex.Add(tile)
+                gridCounts.Add(1)
+                Dim p1 = New cv.Point(r.X, r.Y)
+                DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
+                task.featurePoints.Add(p1)
+            Else
+                gridCounts(test) += 1
+            End If
         Next
 
         task.featureRects.Clear()
         task.fLessRects.Clear()
-        For Each idd In task.iddList
-            If idd.features.Count > 0 Then task.featureRects.Add(idd.cRect) Else task.fLessRects.Add(idd.cRect)
+        For Each r In task.gridRects
+            If rects.Contains(r) Then task.featureRects.Add(r) Else task.fLessRects.Add(r)
         Next
 
         If task.gOptions.DebugCheckBox.Checked Then
@@ -83,8 +135,8 @@ End Class
 
 
 
-Public Class LowRes_Edges : Inherits TaskParent
-    Public lowRes As New LowRes_Basics
+Public Class LowResOld_Edges : Inherits TaskParent
+    Public lowRes As New LowResOld_Basics
     Public edges As New Edge_Basics
     Public Sub New()
         task.featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -166,8 +218,8 @@ End Class
 
 
 
-Public Class LowRes_Boundaries : Inherits TaskParent
-    Public feat As New LowRes_Edges
+Public Class LowResOld_Boundaries : Inherits TaskParent
+    Public feat As New LowResOld_Edges
     Public boundaryCells As New List(Of List(Of Integer))
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
@@ -216,9 +268,9 @@ End Class
 
 
 
-Public Class LowRes_MLColor : Inherits TaskParent
+Public Class LowResOld_MLColor : Inherits TaskParent
     Dim ml As New ML_Basics
-    Dim bounds As New LowRes_Boundaries
+    Dim bounds As New LowResOld_Boundaries
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
@@ -289,9 +341,9 @@ End Class
 
 
 
-Public Class LowRes_MLColorDepth : Inherits TaskParent
+Public Class LowResOld_MLColorDepth : Inherits TaskParent
     Dim ml As New ML_Basics
-    Dim bounds As New LowRes_Boundaries
+    Dim bounds As New LowResOld_Boundaries
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
@@ -365,7 +417,7 @@ End Class
 
 
 
-Public Class LowRes_DepthMask : Inherits TaskParent
+Public Class LowResOld_DepthMask : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Create a mask of the cells that are mostly depth - remove speckles in no depth regions"
@@ -383,8 +435,8 @@ End Class
 
 
 
-Public Class LowRes_MeasureColor : Inherits TaskParent
-    Dim lowRes As New LowRes_Basics
+Public Class LowResOld_MeasureColor : Inherits TaskParent
+    Dim lowRes As New LowResOld_Color
     Public colors(0) As cv.Vec3b
     Public distances() As Single
     Public options As New Options_LowRes
@@ -441,8 +493,8 @@ End Class
 
 
 
-Public Class LowRes_MeasureMotion : Inherits TaskParent
-    Dim measure As New LowRes_MeasureColor
+Public Class LowResOld_MeasureMotion : Inherits TaskParent
+    Dim measure As New LowResOld_MeasureColor
     Public motionDetected As Boolean
     Public motionRects As New List(Of cv.Rect)
     Public Sub New()
@@ -500,14 +552,14 @@ End Class
 
 
 
-Public Class LowRes_MeasureValidate : Inherits TaskParent
-    Dim measure As New LowRes_MeasureMotion
+Public Class LowResOld_MeasureValidate : Inherits TaskParent
+    Dim measure As New LowResOld_MeasureMotion
     Public Sub New()
         task.gOptions.setPixelDifference(50)
         labels(1) = "Every pixel is slightly different except where motion is detected."
         labels(3) = "Differences are individual pixels - not significant. " +
                     "Contrast this with BGSubtract."
-        desc = "Validate the image provided by LowRes_MeasureMotion"
+        desc = "Validate the image provided by LowResOld_MeasureMotion"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = src.Clone
@@ -536,8 +588,8 @@ End Class
 
 
 
-Public Class LowRes_LeftRight : Inherits TaskParent
-    Dim lowRes As New LowRes_Basics
+Public Class LowResOld_LeftRight : Inherits TaskParent
+    Dim lowRes As New LowResOld_Color
     Public Sub New()
         desc = "Get the lowRes grid image for the left and right views"
     End Sub

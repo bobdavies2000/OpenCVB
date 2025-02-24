@@ -118,7 +118,7 @@ End Class
 
 
 Public Class Photon_Distance3D : Inherits TaskParent
-    Dim lowRes As New LowRes_Color
+    Dim lowRes As New LowResOld_Color
     Dim hist As New Hist_Basics
     Dim distances As New List(Of Single)
     Public Sub New()
