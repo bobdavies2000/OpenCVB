@@ -887,13 +887,14 @@ Public Class VBtask : Implements IDisposable
                         trueData.Add(tt)
                     Next
                 End If
-
-                If gOptions.showMotionMask.Checked Then
-                    For Each roi In motionRects
-                        dst0.Rectangle(roi, cv.Scalar.White, lineWidth)
-                    Next
-                End If
             End If
+
+            If gOptions.showMotionMask.Checked Then
+                For Each roi In motionRects
+                    dst0.Rectangle(roi, cv.Scalar.White, lineWidth)
+                Next
+            End If
+
             If gOptions.CrossHairs.Checked Then
                 If paused = False Then
                     DrawLine(dst0, horizonVec.p1, horizonVec.p2, cv.Scalar.White)
@@ -907,7 +908,7 @@ Public Class VBtask : Implements IDisposable
                 Dim index = algorithmNames.IndexOf(displayObject.traceName)
                 If index = -1 Then
                     Dim str As New TrueText("This task is not active at this time.",
-                                        New cv.Point(dst2.Width / 2, 0), 3)
+                                            New cv.Point(dst2.Width / 2, 0), 3)
                     displayObject.trueData.Add(str)
                 End If
             End If

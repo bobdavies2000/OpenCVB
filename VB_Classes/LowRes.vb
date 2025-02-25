@@ -342,6 +342,8 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
+        dst2 = task.dCell.dst2
+
         If task.optionsChanged Or colors.Length <> task.gridRects.Count Then
             ReDim colors(task.gridRects.Count - 1)
             ReDim distances(task.gridRects.Count - 1)

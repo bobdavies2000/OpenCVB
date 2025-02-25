@@ -64,7 +64,6 @@ Public Class DepthCell_Basics : Inherits TaskParent
             Else
                 cv.Cv2.MeanStdDev(src(idd.cRect), idd.colorMean, idd.colorStdev)
                 idd.color = New cv.Point3f(idd.colorMean(0), idd.colorMean(1), idd.colorMean(2))
-                idd.colorVec = New cv.Vec3b(idd.colorMean(0), idd.colorMean(1), idd.colorMean(2))
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
                 If idd.pixels = 0 Then

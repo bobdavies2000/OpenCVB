@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
-    Public measure As New LowResOld_MeasureMotion
+    Public measure As New LowRes_MeasureMotion
     Public color As cv.Mat
     Public motionMask As cv.Mat
     Dim diff As New Diff_Basics
@@ -37,7 +37,7 @@ End Class
 
 Public Class Motion_BasicsTest : Inherits TaskParent
     Dim diff As New Diff_Basics
-    Dim measure As New LowResOld_MeasureMotion
+    Dim measure As New LowRes_MeasureMotion
     Public Sub New()
         task.gOptions.UseMotion.Checked = False
         task.gOptions.showMotionMask.Checked = True
@@ -618,7 +618,7 @@ End Class
 
 
 Public Class Motion_EdgeStability : Inherits TaskParent
-    Dim lowRes As New LowResOld_Edges
+    Dim lowRes As New LowRes_Edges
     Public Sub New()
         labels(3) = "High population cells"
         desc = "Measure the stability of edges in each grid Rect"
@@ -1065,7 +1065,7 @@ End Class
 
 
 Public Class Motion_RightView : Inherits TaskParent
-    Public measure As New LowResOld_MeasureMotion
+    Public measure As New LowRes_MeasureMotion
     Public rightView As cv.Mat
     Dim diff As New Diff_Basics
     Public Sub New()
