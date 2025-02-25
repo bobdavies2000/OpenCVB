@@ -7506,22 +7506,6 @@ End Class
 
 
 
-Public Class Options_LowRes : Inherits OptionParent
-    Public colorDifferenceThreshold As Integer = 8
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("LowRes Color difference threshold", 0, 100, colorDifferenceThreshold)
-        End If
-    End Sub
-    Public Sub RunOpt()
-        Static diffSlider = FindSlider("LowRes Color difference threshold")
-        colorDifferenceThreshold = diffSlider.value
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Options_Line : Inherits OptionParent
@@ -7875,23 +7859,6 @@ End Class
 
 
 
-Public Class Options_DepthCellSize : Inherits OptionParent
-    Public correlationThreshold As Single = 0.6
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Correlation threshold", 1, 100, 100 * correlationThreshold)
-        End If
-    End Sub
-    Public Sub RunOpt()
-        Static corrSlider = FindSlider("Correlation threshold")
-        correlationThreshold = corrSlider.value / 100
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Options_QuadCompare : Inherits OptionParent
@@ -8085,5 +8052,37 @@ Public Class Options_Stdev : Inherits OptionParent
     Public Sub RunOpt()
         Static stdevSlider = FindSlider("Stdev Threshold")
         stdevThreshold = stdevSlider.value
+    End Sub
+End Class
+
+
+
+
+Public Class Options_DepthCellSize : Inherits OptionParent
+    Public correlationThreshold As Single = 0.6
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Correlation threshold", 1, 100, 100 * correlationThreshold)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static corrSlider = FindSlider("Correlation threshold")
+        correlationThreshold = corrSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+Public Class Options_LowRes : Inherits OptionParent
+    Public colorDifferenceThreshold As Integer = 8
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("LowRes Color difference threshold", 0, 100, colorDifferenceThreshold)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static diffSlider = FindSlider("LowRes Color difference threshold")
+        colorDifferenceThreshold = diffSlider.value
     End Sub
 End Class

@@ -23,6 +23,7 @@ Public Class Motion_Basics : Inherits TaskParent
                 motionMask(roi).SetTo(255)
             Next
         End If
+        dst2 = motionMask
 
         diff.Run(src)
         dst3 = diff.dst2

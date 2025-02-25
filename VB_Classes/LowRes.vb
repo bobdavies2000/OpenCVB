@@ -331,8 +331,6 @@ End Class
 
 
 Public Class LowRes_MeasureColor : Inherits TaskParent
-    Public colors(0) As cv.Vec3b
-    Public distances() As Single
     Public options As New Options_LowRes
     Public motionList As New List(Of Integer)
     Dim percentList As New List(Of Single)
@@ -343,24 +341,17 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
         options.RunOpt()
 
         dst2 = task.dCell.dst2
-
-        If task.optionsChanged Or colors.Length <> task.gridRects.Count Then
-            ReDim colors(task.gridRects.Count - 1)
-            ReDim distances(task.gridRects.Count - 1)
-        End If
+        Dim threshold = If(task.heartBeat, options.colorDifferenceThreshold - 1,
+                                           options.colorDifferenceThreshold)
 
         If standaloneTest() Then trueData.Clear()
         motionList.Clear()
-        For i = 0 To task.gridRects.Count - 1
-            Dim roi = task.gridRects(i)
-            Dim vec = dst2.Get(Of cv.Vec3b)(roi.Y, roi.X)
-            distances(i) = distance3D(colors(i), vec)
-            If distances(i) > options.colorDifferenceThreshold Then
+        For Each idd In task.iddList
+            If idd.distance3d > threshold Then
                 If standaloneTest() Then
-                    SetTrueText(Format(distances(i), fmt1), roi.Location, 3)
+                    SetTrueText(Format(idd.distance3d, fmt1), idd.cRect.Location, 3)
                 End If
-                colors(i) = vec
-                For Each index In task.gridNeighbors(i)
+                For Each index In task.gridNeighbors(idd.index)
                     If motionList.Contains(index) = False Then
                         motionList.Add(index)
                     End If
@@ -370,7 +361,7 @@ Public Class LowRes_MeasureColor : Inherits TaskParent
 
         If task.heartBeat Or task.optionsChanged Then
             percentList.Add(motionList.Count / task.gridRects.Count)
-            If percentList.Count > 3 Then percentList.RemoveAt(0)
+            If percentList.Count > 10 Then percentList.RemoveAt(0)
             task.motionPercent = percentList.Average
             If task.gOptions.UseMotion.Checked = False Then
                 labels(3) = "100% of each image has motion."
@@ -408,10 +399,9 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
 
         motionRects.Clear()
         Dim indexList As New List(Of Integer)
-        For i = 0 To task.gridRects.Count - 1
-            Dim roi = task.gridRects(i)
-            If measure.distances(i) > threshold Then
-                For Each index In task.gridNeighbors(i)
+        For Each idd In task.iddList
+            If idd.distance3d > threshold Then
+                For Each index In task.gridNeighbors(idd.index)
                     If indexList.Contains(index) = False Then
                         indexList.Add(index)
                         motionRects.Add(task.gridRects(index))
@@ -421,8 +411,7 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
         Next
 
         motionDetected = False
-        ' some configurations are not compatible when switching cameras.
-        ' Use the whole image for the first few images.
+        ' Use the whole image for the first few images as camera stabilizes.
         If task.frameCount < 3 Then
             src.CopyTo(dst3)
             motionRects.Clear()

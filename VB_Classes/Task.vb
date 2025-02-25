@@ -735,6 +735,7 @@ Public Class VBtask : Implements IDisposable
             gOptions.unFiltered.Checked = True
         End If
 
+        dCell.Run(src)
         motionBasics.Run(src)
         motionMask = motionBasics.motionMask
 
@@ -747,20 +748,24 @@ Public Class VBtask : Implements IDisposable
         pcSplitRaw = pointCloudRaw.Split()
         depthMaskRaw = pcSplitRaw(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
-
         If optionsChanged Then maxDepthMask.SetTo(0)
         pcSplit(2) = pcSplit(2)
-
         If gOptions.TruncateDepth.Checked Then
-            pcSplit(2) = pcSplit(2).Threshold(MaxZmeters, MaxZmeters,
-                                                        cv.ThresholdTypes.Trunc)
+            pcSplit(2) = pcSplit(2).Threshold(MaxZmeters, MaxZmeters, cv.ThresholdTypes.Trunc)
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
-        ' The stereolabs camera has some weird -inf and inf values in the Y-plane.  
+        ' The stereolabs camera has some weird -inf and inf values in the Y-plane - with and without gravity transform.  
         If cameraName = "StereoLabs ZED 2/2i" Then
             Dim mask = pcSplit(1).InRange(-100, 100)
             pcSplit(1).SetTo(0, Not mask)
+        End If
+
+        ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
+        If cameraName.StartsWith("StereoLabs") Then
+            cv.Cv2.PatchNaNs(pcSplit(0))
+            cv.Cv2.PatchNaNs(pcSplit(1))
+            cv.Cv2.PatchNaNs(pcSplit(2))
         End If
 
         depthMask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
@@ -773,13 +778,6 @@ Public Class VBtask : Implements IDisposable
             pcSplit(1) *= yRatio
 
             cv.Cv2.Merge(pcSplit, pointCloud)
-        End If
-
-        ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
-        If cameraName.StartsWith("StereoLabs") Then
-            cv.Cv2.PatchNaNs(pcSplit(0))
-            cv.Cv2.PatchNaNs(pcSplit(1))
-            cv.Cv2.PatchNaNs(pcSplit(2))
         End If
 
         If task.gOptions.ShowQuads.Checked Then
@@ -830,7 +828,6 @@ Public Class VBtask : Implements IDisposable
         End If
 
         gravityHorizon.Run(src)
-        dCell.Run(src)
 
         Dim saveOptionsChanged = optionsChanged
         task.dCell.mouseD.Run(src)

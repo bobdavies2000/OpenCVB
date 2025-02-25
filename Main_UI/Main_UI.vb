@@ -1576,7 +1576,8 @@ Public Class Main_UI
             mousePoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
 
             Dim saveDrawRect As cv.Rect
-
+            task.motionMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 255)
+            task.depthMaskRaw = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.

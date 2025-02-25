@@ -2045,13 +2045,6 @@ public:
 	Options_ImageOffset() {
 	}
 };
-class Options_LowRes {
-public:
-	int colorDifferenceThreshold =  8;
-	void RunOpt() {}
-	Options_LowRes() {
-	}
-};
 class Options_Line {
 public:
 	int minLength =  1;
@@ -2153,13 +2146,6 @@ public:
 	Options_Grid() {
 	}
 };
-class Options_DepthCellSize {
-public:
-	float correlationThreshold =  0.6;
-	void RunOpt() {}
-	Options_DepthCellSize() {
-	}
-};
 class Options_QuadCompare {
 public:
 	void RunOpt() {}
@@ -2215,5 +2201,19 @@ class Options_Stdev {
 public:
 	void RunOpt() {}
 	Options_Stdev() {
+	}
+};
+class Options_DepthCellSize {
+public:
+	float correlationThreshold =  0.6;
+	void RunOpt() {}
+	Options_DepthCellSize() {
+	}
+};
+class Options_LowRes {
+public:
+	int colorDifferenceThreshold =  8;
+	void RunOpt() {}
+	Options_LowRes() {
 	}
 };

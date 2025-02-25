@@ -35,6 +35,9 @@ Public Class DepthCell_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
+        Static colorSlider = optiBase.FindSlider("LowRes Color difference threshold")
+        Dim threshold = colorSlider.value
+
         If task.optionsChanged Or instantUpdate Then
             task.iddList.Clear()
             For Each rect In task.gridRects
@@ -43,6 +46,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
                 idd.lRect = ValidateRect(rect) ' for some cameras the color image and the left image are the same.
                 idd.center = New cv.Point(rect.TopLeft.X + task.cellSize / 2, rect.TopLeft.Y + task.cellSize / 2)
                 idd.age = 0
+                idd.index = task.iddList.Count
                 task.iddList.Add(idd)
             Next
         End If
@@ -56,14 +60,17 @@ Public Class DepthCell_Basics : Inherits TaskParent
         End If
         Dim irPt As cv.Point2f
         Dim testImage As Boolean = True
+        Dim colorMean As cv.Scalar
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            Dim motion = task.motionMask(idd.cRect).CountNonZero
-            If motion = 0 And idd.age > 0 Then
+            cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
+            idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
+            idd.colorVec = New cv.Vec3b(idd.color(0), idd.color(1), idd.color(2))
+            idd.distance3d = distance3D(idd.colorVec, idd.colorVecLast)
+            idd.colorVecLast = idd.colorVec
+            If idd.distance3d < threshold And idd.age > 0 Then
                 idd.age += 1
             Else
-                cv.Cv2.MeanStdDev(src(idd.cRect), idd.colorMean, idd.colorStdev)
-                idd.color = New cv.Point3f(idd.colorMean(0), idd.colorMean(1), idd.colorMean(2))
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
                 If idd.pixels = 0 Then
