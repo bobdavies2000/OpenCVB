@@ -1013,7 +1013,6 @@ Public Class algorithmList
 	If algorithmName = "LongLine_NoDepth" Then return new LongLine_NoDepth
 	If algorithmName = "LongLine_Point" Then return new LongLine_Point
 	If algorithmName = "LowRes_Boundaries" Then return new LowRes_Boundaries
-	If algorithmName = "LowRes_DepthMask" Then return new LowRes_DepthMask
 	If algorithmName = "LowRes_Edges" Then return new LowRes_Edges
 	If algorithmName = "LowRes_Features" Then return new LowRes_Features
 	If algorithmName = "LowRes_MeasureColor" Then return new LowRes_MeasureColor

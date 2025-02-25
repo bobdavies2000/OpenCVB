@@ -16,6 +16,10 @@
 
   <ItemGroup>
     <Compile Remove="CameraZED2_CPP.vb" />
+    <Compile Remove="Translator.Designer.vb" />
+    <Compile Remove="Translator.vb" />
+    <Compile Remove="TranslatorResults.Designer.vb" />
+    <Compile Remove="TranslatorResults.vb" />
     <Compile Remove="TreeviewForm.Designer.vb" />
     <Compile Remove="TreeviewForm.vb" />
   </ItemGroup>
@@ -28,6 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Translator.resx" />
+    <EmbeddedResource Remove="TranslatorResults.resx" />
     <EmbeddedResource Remove="TreeviewForm.resx" />
   </ItemGroup>
 

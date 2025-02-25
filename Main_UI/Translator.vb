@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports Microsoft.Web.WebView2.Core
 
 Public Class Translator
 #Region "NonVolatile"

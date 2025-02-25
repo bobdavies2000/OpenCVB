@@ -1538,6 +1538,9 @@ Public Class Main_UI
             drawRect = New cv.Rect
             task = New VBtask(parms)
 
+            task.lowResDepth = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
+            task.lowResColor = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
+
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 
             ' You may land here when the Group x-reference file has not been updated recently.
@@ -1701,7 +1704,7 @@ Public Class Main_UI
 
                 SyncLock mouseLock
                     mousePoint = validatePoint(mousePoint)
-                    mousePoint = validatePoint(mouseMovePoint)
+                    mouseMovePoint = validatePoint(mouseMovePoint)
                 End SyncLock
 
                 Dim returnTime = Now
@@ -1729,27 +1732,25 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
+                Static ptSave = task.dCell.mouseD.ptTopLeft
+                Static strSave = task.dCell.mouseD.depthAndCorrelationText
                 SyncLock trueTextLock
                     If task.frameCount Mod 50 = 0 Then trueData.Clear()
                     If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
                     If task.trueData.Count Then
                         trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                     End If
-                    Static ptSave = task.dCell.mouseD.ptTopLeft
-                    Static strSave = task.dCell.mouseD.depthAndCorrelationText
                     If ptSave <> task.dCell.mouseD.ptTopLeft Then
                         ptSave = task.dCell.mouseD.ptTopLeft
                         strSave = task.dCell.mouseD.depthAndCorrelationText
                     End If
                     trueData.Add(New TrueText(strSave, ptSave, 1))
-                    task.depthRGB.Circle(task.dCell.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
-                    task.color.Circle(task.dCell.mouseD.ptReal, task.DotSize, task.HighlightColor, -1)
                     task.trueData.Clear()
-                    Dim corrText = strSave.replace(vbCrLf, ", ")
-                    picLabels(1) = "Quad Depth Cells - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
-                                   "  " + corrText
                 End SyncLock
 
+                Dim corrText = strSave.replace(vbCrLf, ", ")
+                picLabels(1) = "Quad Depth Cells - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
+                                   "  " + corrText
                 If task.dst0 IsNot Nothing Then
                     SyncLock cameraLock
                         dst(0) = task.dst0.Clone
@@ -1760,6 +1761,12 @@ Public Class Main_UI
                     End SyncLock
                     algorithmRefresh = True
                 End If
+
+                Dim ptReal = task.iddC.cRect.TopLeft
+                dst(0).Circle(ptReal, task.DotSize, task.HighlightColor, -1)
+                dst(1).Circle(ptReal, task.DotSize, task.HighlightColor, -1)
+                dst(2).Circle(ptReal, task.DotSize, task.HighlightColor, -1)
+                dst(3).Circle(ptReal, task.DotSize, task.HighlightColor, -1)
 
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 

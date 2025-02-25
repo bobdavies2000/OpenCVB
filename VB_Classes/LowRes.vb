@@ -73,7 +73,6 @@ Public Class LowRes_Edges : Inherits TaskParent
         Static lastDepth As cv.Mat = task.lowResDepth.Clone
 
         edges.Run(src)
-        dst2.SetTo(0, edges.dst2)
 
         task.featureRects.Clear()
         task.fLessRects.Clear()
@@ -96,7 +95,6 @@ Public Class LowRes_Edges : Inherits TaskParent
             stateList(i) = (stateList(i) + flist(i)) / 2
             Dim r = task.gridRects(i)
             If stateList(i) >= 1.95 Then
-                DrawCircle(dst2, New cv.Point(r.X, r.Y), task.DotSize, task.HighlightColor)
                 task.featureRects.Add(r)
                 task.featureMask(r).SetTo(255)
             ElseIf stateList(i) <= 1.05 Then
@@ -104,18 +102,14 @@ Public Class LowRes_Edges : Inherits TaskParent
                 task.fLessMask(r).SetTo(255)
             Else
                 flipRects.Add(r)
-                'task.fLessRects.Add(r)
-                'task.fLessMask(r).SetTo(255)
-                'task.featureRects.Add(r)
-                'task.featureMask(r).SetTo(255)
             End If
         Next
 
-        dst3.SetTo(0)
-        src.CopyTo(dst3, task.featureMask)
+        dst2.SetTo(0)
+        src.CopyTo(dst2, task.featureMask)
 
         For Each r In flipRects
-            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(r, task.HighlightColor, task.lineWidth)
         Next
 
         For Each r In task.fLessRects
@@ -125,10 +119,8 @@ Public Class LowRes_Edges : Inherits TaskParent
         Next
         lastDepth = task.lowResDepth.Clone
         If task.heartBeat Then
-            labels(2) = CStr(task.featureRects.Count) + "/" + CStr(task.fLessRects.Count) + "/" +
-                        CStr(flipRects.Count) + " Features/FeatureLess/Flipper cells."
-            labels(3) = CStr(task.fLessRects.Count) + " cells without features were found.  " +
-                        "Cells that are flipping are highlighted"
+            labels(2) = CStr(task.fLessRects.Count) + " cells without features were found.  " +
+                        "Cells that are flipping (with and without edges) are highlighted"
         End If
     End Sub
 End Class
@@ -142,13 +134,13 @@ Public Class LowRes_Boundaries : Inherits TaskParent
     Public feat As New LowRes_Edges
     Public boundaryCells As New List(Of List(Of Integer))
     Public Sub New()
+        labels(2) = "Gray and black regions are featureless while white has features..."
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Find the boundary cells between feature and featureless cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
         dst1 = task.featureMask.Clone
-        dst3 = feat.dst2
 
         boundaryCells.Clear()
         For Each nList In task.gridNeighbors
@@ -333,23 +325,6 @@ Public Class LowRes_MLColorDepth : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class LowRes_DepthMask : Inherits TaskParent
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Create a mask of the cells that are mostly depth - remove speckles in no depth regions"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2.SetTo(0)
-        For Each roi In task.gridRects
-            Dim count = task.pcSplit(2)(roi).CountNonZero()
-            If count >= task.cellSize * task.cellSize / 2 Then dst2(roi).SetTo(255)
-        Next
-    End Sub
-End Class
 
 
 

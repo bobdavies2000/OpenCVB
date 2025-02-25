@@ -16,7 +16,7 @@ Public Class OptionsGlobal
         Dim cellSize = 8
         If task.dst2.Width >= 640 Then cellSize = 16
         If task.dst2.Width >= 1280 Then cellSize = 32
-        If task.dst2.Width >= 1920 Then cellSize = 64
+        If task.dst2.Width >= 1920 Then cellSize = 48
         GridSlider.Value = cellSize
         GridSizeLabel.Text = CStr(cellSize)
 

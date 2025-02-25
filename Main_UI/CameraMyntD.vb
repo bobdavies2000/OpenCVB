@@ -27,11 +27,11 @@ Public Class CameraMyntD : Inherits GenericCamera
         cameraName = deviceName
         If cPtr <> 0 Then
             deviceCount = 1
-            IMUtask = New Task(Sub() IMUdataCollection())
-            IMUtask.Start()
+            'IMUtask = New Task(Sub() IMUdataCollection())
+            'IMUtask.Start()
         End If
     End Sub
-    Dim IMUtask As Task
+    'Dim IMUtask As Task
     Private Sub IMUdataCollection()
         MyntDtaskIMU(cPtr)
     End Sub
