@@ -1732,23 +1732,18 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Static ptSave = task.dCell.mouseD.ptTopLeft
-                Static strSave = task.dCell.mouseD.depthAndCorrelationText
+                Dim pt = task.dCell.mouseD.ptTopLeft
+                Dim corrText = task.dCell.mouseD.depthAndCorrelationText
                 SyncLock trueTextLock
-                    If task.frameCount Mod 50 = 0 Then trueData.Clear()
                     If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
                     If task.trueData.Count Then
                         trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                     End If
-                    If ptSave <> task.dCell.mouseD.ptTopLeft Then
-                        ptSave = task.dCell.mouseD.ptTopLeft
-                        strSave = task.dCell.mouseD.depthAndCorrelationText
-                    End If
-                    trueData.Add(New TrueText(strSave, ptSave, 1))
+                    trueData.Add(New TrueText(corrText, pt, 1))
                     task.trueData.Clear()
                 End SyncLock
 
-                Dim corrText = strSave.replace(vbCrLf, ", ")
+                corrText = corrText.Replace(vbCrLf, ", ")
                 picLabels(1) = "Quad Depth Cells - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
                                    "  " + corrText
                 If task.dst0 IsNot Nothing Then
