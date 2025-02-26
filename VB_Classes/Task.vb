@@ -4,7 +4,6 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports System.Windows.Ink
 
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
@@ -737,12 +736,8 @@ Public Class VBtask : Implements IDisposable
 
         dCell.Run(src)
         motionBasics.Run(src)
-        motionMask = motionBasics.motionMask
-
-        If gOptions.UseMotion.Checked Then
-            color = motionBasics.color.Clone
-            motionRects = New List(Of cv.Rect)(motionBasics.measure.motionRects)
-        End If
+        motionMask = motionBasics.dst2
+        If gOptions.UseMotion.Checked Then color = motionBasics.dst3.Clone
 
         pcSplit = pointCloud.Split
         pcSplitRaw = pointCloudRaw.Split()

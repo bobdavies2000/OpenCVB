@@ -2,63 +2,36 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
-Public Class Motion_BasicsNew : Inherits TaskParent
-    Dim diff As New Diff_Basics
+Public Class Motion_Basics : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        labels(3) = "The difference between the motion-filtered image and the current image.  " +
-                    "Highlighted pixels may often be nearly identical."
+        labels(3) = "The motion-filtered color image.  "
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.frameCount < 3 Then dst3 = src.Clone
 
         dst2.SetTo(0)
+        Dim motionMarkers(task.iddList.Count - 1) As Integer
         For Each idd In task.iddList
             If idd.motionCell Then
                 For Each index In task.gridNeighbors(idd.index)
-                    Dim r = task.gridRects(index)
+                    motionMarkers(index) = index
+                    Dim r = task.iddList(index).cRect
                     dst2(r).SetTo(255)
                     src(r).CopyTo(dst3(r))
                 Next
             End If
         Next
+
+        task.motionRects.Clear()
+        For Each index In motionMarkers
+            task.motionRects.Add(task.iddList(index).cRect)
+        Next
+        labels(2) = "There were " + CStr(task.motionRects.Count) + " grid cells with motion."
     End Sub
 End Class
 
-
-
-
-
-Public Class Motion_Basics : Inherits TaskParent
-    Public measure As New GridCell_MeasureMotion
-    Public color As cv.Mat
-    Public motionMask As cv.Mat
-    Dim diff As New Diff_Basics
-    Public Sub New()
-        motionMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        labels(3) = "The difference between the motion-filtered image and the current image.  " +
-                    "Highlighted pixels may often be nearly identical."
-        desc = "Isolate all motion in the scene"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        measure.Run(src)
-        color = measure.dst3.Clone
-        labels(2) = measure.labels(2)
-
-        motionMask.SetTo(0)
-        If measure.motionDetected Then
-            For Each roi In measure.motionRects
-                motionMask(roi).SetTo(255)
-            Next
-        End If
-        dst2 = motionMask
-
-        diff.Run(src)
-        dst3 = diff.dst2
-        If standaloneTest() Then dst2 = motionMask
-    End Sub
-End Class
 
 
 

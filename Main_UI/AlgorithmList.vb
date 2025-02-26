@@ -1105,7 +1105,6 @@ Public Class algorithmList
 	If algorithmName = "Moments_Basics" Then return new Moments_Basics
 	If algorithmName = "Moments_CentroidKalman" Then return new Moments_CentroidKalman
 	If algorithmName = "Motion_Basics" Then return new Motion_Basics
-	If algorithmName = "Motion_BasicsNew" Then return new Motion_BasicsNew
 	If algorithmName = "Motion_BasicsTest" Then return new Motion_BasicsTest
 	If algorithmName = "Motion_BGSub" Then return new Motion_BGSub
 	If algorithmName = "Motion_BGSub_QT" Then return new Motion_BGSub_QT
