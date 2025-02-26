@@ -391,8 +391,8 @@ Public Class depthCell
     Public depthErr As Single ' a linear estimate of the depth error based on '2% error at 2 meters'
     Public age As Integer
     Public color As cv.Vec3f
-    Public colorVec As cv.Vec3b
-    Public colorVecLast As cv.Vec3b ' the mean color on the previous frame.  When diff > threshold, motion detected!
+    Public colorVec As cv.Vec3f
+    Public colorVecLast As cv.Vec3f ' the mean color on the previous frame.  When diff > threshold, motion detected!
     Public distance3d As Single ' distance3D of colorVec and colorVecLast
     Public colorMean As cv.Scalar
     Public colorStdev As cv.Scalar

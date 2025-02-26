@@ -265,49 +265,6 @@ End Class
 
 
 
-Public Class LeftRight_LowRes : Inherits TaskParent
-    Dim lowRes As New LowResOld_LeftRight
-    Public Sub New()
-        task.gOptions.GridSlider.Value = 8
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "", "Left image at low resolution", "Right image at low resolution"}
-        desc = "Get the lowRes image for the left and right views - duplicate of LowResOld_LeftRight (help finding it)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = task.leftView
-        dst1 = task.rightView
-        lowRes.Run(task.leftView)
-        dst2 = lowRes.dst2.Clone
-        dst3 = lowRes.dst3.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class LeftRight_Motion : Inherits TaskParent
-    Dim lowResL As New LowResOld_Color
-    Dim lowResR As New LowResOld_Color
-    Public Sub New()
-        desc = "Get the lowRes image for the left and right views"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lowResL.Run(task.leftView)
-        dst2 = lowResL.dst2
-
-        lowResR.Run(task.rightView)
-        dst3 = lowResR.dst2
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class LeftRight_RedRight : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public redMask As New RedMask_Basics

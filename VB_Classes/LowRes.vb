@@ -329,58 +329,11 @@ End Class
 
 
 
-
-Public Class LowRes_MeasureColor : Inherits TaskParent
-    Public options As New Options_LowRes
-    Public motionList As New List(Of Integer)
-    Dim percentList As New List(Of Single)
-    Public Sub New()
-        desc = "Measure how much color changes with and without motion."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        dst2 = task.dCell.dst2
-        Dim threshold = If(task.heartBeat, options.colorDifferenceThreshold - 1,
-                                           options.colorDifferenceThreshold)
-
-        If standaloneTest() Then trueData.Clear()
-        motionList.Clear()
-        For Each idd In task.iddList
-            If idd.distance3d > threshold Then
-                If standaloneTest() Then
-                    SetTrueText(Format(idd.distance3d, fmt1), idd.cRect.Location, 3)
-                End If
-                For Each index In task.gridNeighbors(idd.index)
-                    If motionList.Contains(index) = False Then
-                        motionList.Add(index)
-                    End If
-                Next
-            End If
-        Next
-
-        If task.heartBeat Or task.optionsChanged Then
-            percentList.Add(motionList.Count / task.gridRects.Count)
-            If percentList.Count > 10 Then percentList.RemoveAt(0)
-            task.motionPercent = percentList.Average
-            If task.gOptions.UseMotion.Checked = False Then
-                labels(3) = "100% of each image has motion."
-            Else
-                labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
-            End If
-            task.motionLabel = labels(3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class LowRes_MeasureMotion : Inherits TaskParent
-    Dim measure As New LowRes_MeasureColor
     Public motionDetected As Boolean
     Public motionRects As New List(Of cv.Rect)
+    Dim percentList As New List(Of Single)
+    Public motionList As New List(Of Integer)
     Public Sub New()
         labels(3) = "A composite of an earlier image and the motion since that input"
         desc = "Show all the grid cells above the motionless value (an option)."
@@ -390,12 +343,11 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
 
         If task.optionsChanged Then motionRects = New List(Of cv.Rect)
 
-        measure.Run(src)
-        dst2 = measure.dst2
-        labels(2) = measure.labels(3)
+        dst2 = task.dCell.dst2
+        labels(2) = task.dCell.labels(3)
 
-        Dim threshold = If(task.heartBeat, measure.options.colorDifferenceThreshold - 1,
-                                           measure.options.colorDifferenceThreshold)
+        Dim threshold = If(task.heartBeat, task.dCell.options.colorDifferenceThreshold - 1,
+                                           task.dCell.options.colorDifferenceThreshold)
 
         motionRects.Clear()
         Dim indexList As New List(Of Integer)
@@ -426,6 +378,18 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
                 motionDetected = True
             End If
         End If
+
+        If task.heartBeat Or task.optionsChanged Then
+            percentList.Add(motionList.Count / task.gridRects.Count)
+            If percentList.Count > 10 Then percentList.RemoveAt(0)
+            task.motionPercent = percentList.Average
+            If task.gOptions.UseMotion.Checked = False Then
+                labels(3) = "100% of each image has motion."
+            Else
+                labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
+            End If
+            task.motionLabel = labels(3)
+        End If
     End Sub
 End Class
 
@@ -434,10 +398,10 @@ End Class
 
 
 
-Public Class LowRes_MeasureValidate : Inherits TaskParent
+Public Class LowRes_Validate : Inherits TaskParent
     Dim measure As New LowRes_MeasureMotion
     Public Sub New()
-        task.gOptions.setPixelDifference(50)
+        If standalone Then task.gOptions.showMotionMask.Checked = True
         labels(1) = "Every pixel is slightly different except where motion is detected."
         labels(3) = "Differences are individual pixels - not significant. " +
                     "Contrast this with BGSubtract."

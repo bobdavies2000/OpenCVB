@@ -111,32 +111,6 @@ End Class
 
 
 
-Public Class Disparity_LowRes : Inherits TaskParent
-    Dim lowres As New LowResOld_LeftRight
-    Dim disparity As New Disparity_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use features in depth cells to confirm depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.rightView
-        lowres.Run(src)
-        disparity.rightView = lowres.dst3
-        disparity.Run(lowres.dst2)
-        dst2 = disparity.dst2
-        dst3 = disparity.dst3
-        labels = disparity.labels
-
-        task.color.Rectangle(disparity.rect, 255, task.lineWidth)
-        dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Disparity_Validate : Inherits TaskParent
     Dim disparity As New Disparity_Basics

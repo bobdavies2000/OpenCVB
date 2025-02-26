@@ -1,7 +1,4 @@
-﻿Imports System.Drawing.Drawing2D
-Imports System.Dynamic
-Imports OpenCvSharp.Flann
-Imports VB_Classes.VBtask
+﻿Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class DepthCell_Basics : Inherits TaskParent
     Public options As New Options_DepthCellSize
@@ -34,9 +31,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-
-        Static colorSlider = optiBase.FindSlider("LowRes Color difference threshold")
-        Dim threshold = colorSlider.value
+        Dim threshold = options.colorDifferenceThreshold
 
         If task.optionsChanged Or instantUpdate Then
             task.iddList.Clear()
@@ -65,12 +60,12 @@ Public Class DepthCell_Basics : Inherits TaskParent
             Dim idd = task.iddList(i)
             cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
             idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
-            idd.colorVec = New cv.Vec3b(idd.color(0), idd.color(1), idd.color(2))
+            idd.colorVec = New cv.Vec3f(idd.color(0), idd.color(1), idd.color(2))
             idd.distance3d = distance3D(idd.colorVec, idd.colorVecLast)
-            idd.colorVecLast = idd.colorVec
             If idd.distance3d < threshold And idd.age > 0 Then
                 idd.age += 1
             Else
+                idd.colorVecLast = idd.colorVec
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
                 If idd.pixels = 0 Then
@@ -423,22 +418,24 @@ End Class
 
 Public Class DepthCell_LeftRightSize : Inherits TaskParent
     Public Sub New()
-        desc = "Build the left and right images so they are the same size as the color image."
+        desc = "Resize the left image so it is about the same size as the color image.  This is just an approximation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim minX As Integer = Integer.MaxValue, minY As Integer = Integer.MaxValue
         Dim maxX As Integer = Integer.MinValue, maxY As Integer = Integer.MinValue
         For Each idd In task.iddList
             If idd.depth > 0 Then
-                If idd.lRect.X < minX Then minX = idd.lRect.X
-                If idd.lRect.Y < minY Then minY = idd.lRect.Y
-                If idd.lRect.BottomRight.X > maxX Then maxX = idd.lRect.BottomRight.X
-                If idd.lRect.BottomRight.Y > maxY Then maxY = idd.lRect.BottomRight.Y
+                If idd.cRect.X < minX Then minX = idd.cRect.X
+                If idd.cRect.Y < minY Then minY = idd.cRect.Y
+                If idd.cRect.BottomRight.X > maxX Then maxX = idd.cRect.BottomRight.X
+                If idd.cRect.BottomRight.Y > maxY Then maxY = idd.cRect.BottomRight.Y
             End If
         Next
 
-        Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
-        dst2 = task.leftView(rect).Resize(task.color.Size)
+        If minX >= 0 And minX < dst2.Width And minY >= 0 And minY < dst2.Height And maxX < dst2.Width And maxY < dst2.Height Then
+            Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
+            dst2 = task.leftView(rect).Resize(task.color.Size)
+        End If
     End Sub
 End Class
 

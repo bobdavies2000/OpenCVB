@@ -2205,15 +2205,9 @@ public:
 };
 class Options_DepthCellSize {
 public:
+	int colorDifferenceThreshold =  10;
 	float correlationThreshold =  0.6;
 	void RunOpt() {}
 	Options_DepthCellSize() {
-	}
-};
-class Options_LowRes {
-public:
-	int colorDifferenceThreshold =  8;
-	void RunOpt() {}
-	Options_LowRes() {
 	}
 };

@@ -223,7 +223,6 @@ Public Class OptionsGlobal
         If task.cellSize > 4 And task.cellSize <= 8 Then task.cellSize = 8
         If task.cellSize > 8 And task.cellSize <= 16 Then task.cellSize = 16
         If task.cellSize > 16 Then task.cellSize = 32
-        If task.dst2.Width <= 336 And task.cellSize > 16 Then task.cellSize = 16
         GridSlider.Value = task.cellSize
 
         GridSizeLabel.Text = CStr(GridSlider.Value)

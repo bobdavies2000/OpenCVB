@@ -118,7 +118,6 @@ End Class
 
 
 Public Class Photon_Distance3D : Inherits TaskParent
-    Dim lowRes As New LowResOld_Color
     Dim hist As New Hist_Basics
     Dim distances As New List(Of Single)
     Public Sub New()
@@ -128,11 +127,9 @@ Public Class Photon_Distance3D : Inherits TaskParent
         desc = "Plot a histogram of the 3D distance of each picture from the previous image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        lowRes.Run(src)
-
         Dim currColors As New List(Of cv.Vec3b)
         For Each roi In task.gridRects
-            currColors.Add(lowRes.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
+            currColors.Add(task.dCell.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
         Next
 
         Static lastColors As New List(Of cv.Vec3b)(currColors)
