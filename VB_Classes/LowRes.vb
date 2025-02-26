@@ -335,7 +335,8 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
     Dim percentList As New List(Of Single)
     Public motionList As New List(Of Integer)
     Public Sub New()
-        labels(3) = "A composite of an earlier image and the motion since that input"
+        labels(3) = "A composite of an earlier image and the motion since that input.  " +
+                    "Any object boundaries are unlikely to be different."
         desc = "Show all the grid cells above the motionless value (an option)."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -350,7 +351,7 @@ Public Class LowRes_MeasureMotion : Inherits TaskParent
                                            task.dCell.options.colorDifferenceThreshold)
 
         motionRects.Clear()
-        Dim indexList As New List(Of Integer)
+        Dim indexList As New List(Of Integer) ' avoid adding the same cell more than once.
         For Each idd In task.iddList
             If idd.distance3d > threshold Then
                 For Each index In task.gridNeighbors(idd.index)
@@ -403,8 +404,7 @@ Public Class LowRes_Validate : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.showMotionMask.Checked = True
         labels(1) = "Every pixel is slightly different except where motion is detected."
-        labels(3) = "Differences are individual pixels - not significant. " +
-                    "Contrast this with BGSubtract."
+        labels(3) = "Differences are individual pixels and not many are connected to other pixels."
         desc = "Validate the image provided by LowRes_MeasureMotion"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

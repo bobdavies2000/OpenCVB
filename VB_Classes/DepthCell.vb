@@ -53,6 +53,15 @@ Public Class DepthCell_Basics : Inherits TaskParent
         If task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec") Then
             task.rgbLeftAligned = True
         End If
+
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            If idd.motionCell Then
+                idd.motionCell = False
+                task.iddList(i) = idd
+            End If
+        Next
+
         Dim irPt As cv.Point2f
         Dim testImage As Boolean = True
         Dim colorMean As cv.Scalar
@@ -64,7 +73,9 @@ Public Class DepthCell_Basics : Inherits TaskParent
             idd.distance3d = distance3D(idd.colorVec, idd.colorVecLast)
             If idd.distance3d < threshold And idd.age > 0 Then
                 idd.age += 1
+                idd.motionCell = False
             Else
+                idd.motionCell = True
                 idd.colorVecLast = idd.colorVec
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
@@ -125,6 +136,7 @@ Public Class DepthCell_Basics : Inherits TaskParent
             End If
             task.iddList(i) = idd
         Next
+
 
         quad.Run(src)
         dst2 = quad.dst2

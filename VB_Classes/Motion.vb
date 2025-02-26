@@ -1,6 +1,35 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
+Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
+Public Class Motion_BasicsNew : Inherits TaskParent
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        labels(3) = "The difference between the motion-filtered image and the current image.  " +
+                    "Highlighted pixels may often be nearly identical."
+        desc = "Isolate all motion in the scene"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.frameCount < 3 Then dst3 = src.Clone
+
+        dst2.SetTo(0)
+        For Each idd In task.iddList
+            If idd.motionCell Then
+                For Each index In task.gridNeighbors(idd.index)
+                    Dim r = task.gridRects(index)
+                    dst2(r).SetTo(255)
+                    src(r).CopyTo(dst3(r))
+                Next
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
 Public Class Motion_Basics : Inherits TaskParent
     Public measure As New LowRes_MeasureMotion
     Public color As cv.Mat

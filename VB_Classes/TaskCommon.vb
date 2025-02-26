@@ -402,6 +402,7 @@ Public Class depthCell
     Public correlation As Single
     Public features As New List(Of cv.Point)
     Public index As Integer
+    Public motionCell As Boolean
 End Class
 
 
