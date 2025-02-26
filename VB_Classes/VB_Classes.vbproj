@@ -118,13 +118,12 @@
     <Compile Include="Concept.vb" />
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />
-    <Compile Include="DepthCell.vb" />
+    <Compile Include="GridCell.vb" />
     <Compile Include="ImageOffset.vb" />
     <Compile Include="KNN.vb" />
     <Compile Include="KNNorm.vb" />
     <Compile Include="Linear.vb" />
     <Compile Include="LineTrack.vb" />
-    <Compile Include="LowRes.vb" />
     <Compile Include="AsciiArt.vb" />
     <Compile Include="Bezier.vb" />
     <Compile Include="Bin2Way.vb" />

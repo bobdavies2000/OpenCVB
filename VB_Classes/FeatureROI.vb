@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class FeatureROI_Basics : Inherits TaskParent
+Public Class GridCell_FeatureLess : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public rects As New List(Of cv.Rect)
     Public meanList As New List(Of Single)
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class FeatureROI_Color : Inherits TaskParent
+Public Class GridCell_Color : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         optiBase.FindSlider("Add Weighted %").Value = 70
@@ -95,9 +95,9 @@ End Class
 
 
 
-Public Class FeatureROI_Canny : Inherits TaskParent
+Public Class GridCell_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
-    Dim devGrid As New FeatureROI_Basics
+    Dim devGrid As New GridCell_Basics
     Public Sub New()
         task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them."
@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class FeatureROI_Sorted : Inherits TaskParent
+Public Class GridCell_Sorted : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
     Public bgrList As New List(Of cv.Vec3b)
@@ -203,8 +203,8 @@ End Class
 
 
 
-Public Class FeatureROI_ColorSplit : Inherits TaskParent
-    Dim devGrid As New FeatureROI_Sorted
+Public Class GridCell_ColorSplit : Inherits TaskParent
+    Dim devGrid As New GridCell_Sorted
     Public Sub New()
         devGrid.maskVal = 255
         task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
@@ -235,8 +235,8 @@ End Class
 
 
 
-Public Class FeatureROI_Correlation : Inherits TaskParent
-    Public gather As New FeatureROI_Basics
+Public Class GridCell_Correlation1 : Inherits TaskParent
+    Public gather As New GridCell_FeatureLess
     Dim plot As New Plot_OverTimeSingle
     Dim options As New Options_Features
     Public Sub New()
@@ -279,9 +279,9 @@ End Class
 
 
 
-Public Class FeatureROI_LowStdev : Inherits TaskParent
+Public Class GridCell_LowStdev : Inherits TaskParent
     Public rects As New List(Of cv.Rect)
-    Dim gather As New FeatureROI_Basics
+    Dim gather As New GridCell_FeatureLess
     Public Sub New()
         desc = "Isolate the roi's with low stdev"
     End Sub
@@ -307,8 +307,8 @@ End Class
 
 
 
-Public Class FeatureROI_LowStdevCorrelation : Inherits TaskParent
-    Dim gather As New FeatureROI_LowStdev
+Public Class GridCell_LowStdevCorrelation : Inherits TaskParent
+    Dim gather As New GridCell_LowStdev
     Dim correlations As New List(Of Single)
     Dim options As New Options_Features
     Dim saveStdev As New List(Of Single)
@@ -360,9 +360,9 @@ End Class
 
 
 
-Public Class FeatureROI_LR : Inherits TaskParent
-    Public gLeft As New FeatureROI_Basics
-    Public gRight As New FeatureROI_Basics
+Public Class GridCell_LR : Inherits TaskParent
+    Public gLeft As New GridCell_FeatureLess
+    Public gRight As New GridCell_FeatureLess
     Public Sub New()
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
@@ -382,15 +382,15 @@ End Class
 
 
 
-Public Class FeatureROI_LRClick : Inherits TaskParent
-    Dim gather As New FeatureROI_Basics
+Public Class GridCell_LRClick : Inherits TaskParent
+    Dim gather As New GridCell_Featureless
     Dim ClickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
     Public Sub New()
         task.gOptions.GridSlider.Value = 16
         optiBase.FindSlider("Feature Correlation Threshold").Value = 80
-        If standalone Then task.gOptions.displaydst1.checked = true
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
@@ -462,8 +462,8 @@ End Class
 
 
 
-Public Class FeatureROI_LRAll : Inherits TaskParent
-    Dim gather As New FeatureROI_Basics
+Public Class GridCell_LRAll : Inherits TaskParent
+    Dim gather As New GridCell_FeatureLess
     Dim options As New Options_Features
     Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
     Public Sub New()

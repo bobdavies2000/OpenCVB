@@ -190,7 +190,7 @@ End Class
 
 
 Public Class Sort_FeatureLess : Inherits TaskParent
-    Public devGrid As New FeatureROI_Basics
+    Public devGrid As New GridCell_Basics
     Public sort As New Sort_Basics
     Dim plot As New Plot_Histogram
     Public Sub New()

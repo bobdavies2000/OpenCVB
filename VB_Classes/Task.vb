@@ -125,7 +125,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public dCell As DepthCell_Basics
+    Public dCell As GridCell_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
@@ -504,7 +504,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Horizon
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        dCell = New DepthCell_Basics
+        dCell = New GridCell_Basics
         colorizer = New Depth_Palette
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics

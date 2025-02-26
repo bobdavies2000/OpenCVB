@@ -1770,7 +1770,7 @@ End Class
 
 
 Public Class OpenGL_Grid : Inherits TaskParent
-    Dim lowRes As New LowRes_Edges
+    Dim lowRes As New GridCell_Edges
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the grid depth and color for each cell"
@@ -2107,7 +2107,7 @@ End Class
 
 
 Public Class OpenGL_QuadConnect : Inherits TaskParent
-    Dim connect As New DepthCell_Connected
+    Dim connect As New GridCell_Connected
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Build connected depth cells and remove cells that are not connected."
@@ -2209,7 +2209,7 @@ End Class
 
 
 Public Class OpenGL_CorrelationMask : Inherits TaskParent
-    Dim corrMask As New DepthCell_CorrelationMask
+    Dim corrMask As New GridCell_CorrelationMask
     Public Sub New()
         desc = "Show only the pointcloud portions that have a correlation greater than the threshold."
     End Sub
@@ -2230,7 +2230,7 @@ End Class
 
 
 Public Class OpenGL_QuadCorrelationMask : Inherits TaskParent
-    Dim corrMask As New DepthCell_CorrelationMask
+    Dim corrMask As New GridCell_CorrelationMask
     Dim ogl As New OpenGL_QuadCompare
     Public Sub New()
         desc = "Show only the pointcloud portions that have a correlation greater than the threshold."

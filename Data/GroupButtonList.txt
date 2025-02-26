@@ -47,7 +47,6 @@ DCT
 Delaunay
 Density
 Depth
-DepthCell
 Derivative
 DFT
 Diff
@@ -74,7 +73,6 @@ Feature
 FeatureFlow
 FeatureLess
 FeatureLine
-FeatureROI
 Fibonacci
 Filter
 FitEllipse
@@ -96,6 +94,7 @@ GrabCut
 Gradient
 Gravity
 Grid
+GridCell
 Guess
 GuidedBP
 HeatMap
@@ -135,7 +134,6 @@ LinearRegression
 LineCoin
 LineTrack
 LongLine
-LowRes
 LUT
 Magnify
 Mat

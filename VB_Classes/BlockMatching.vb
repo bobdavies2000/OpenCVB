@@ -55,7 +55,7 @@ End Class
 'Public Class BlockMatching_Grid : Inherits TaskParent
 '    Dim colorizer As New Depth_Colorizer_CPP
 '    Dim options As New Options_BlockMatching
-'    Dim lowRes As New LowRes_LeftRight
+'    Dim lowRes As New GridCell_LeftRight
 '    Public Sub New()
 '        desc = "Match the low resolution left and right images."
 '    End Sub
