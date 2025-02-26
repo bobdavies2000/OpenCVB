@@ -68,7 +68,7 @@ Public Class Disparity_Features : Inherits TaskParent
         dst2 = featNo.dst2.Clone
         labels(2) = featNo.labels(2)
 
-        'For Each r In task.dCell.gridRects
+        'For Each r In task.gCell.gridRects
         '    dst2.Rectangle(r, 255, task.lineWidth)
         'Next
 

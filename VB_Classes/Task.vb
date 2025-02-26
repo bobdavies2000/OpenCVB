@@ -124,7 +124,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public dCell As GridCell_Basics
+    Public gCell As GridCell_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
@@ -503,7 +503,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Horizon
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        dCell = New GridCell_Basics
+        gCell = New GridCell_Basics
         colorizer = New Depth_Palette
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
@@ -588,6 +588,24 @@ Public Class VBtask : Implements IDisposable
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         dst.Line(p1, p2, color, lineWidth, lineType)
     End Sub
+    Public Shared Function translateColorToLeft(pt As cv.Point) As cv.Point
+        Dim ir3D As cv.Point3f, irPt As cv.Point2f
+        Dim pcTop = task.pointCloudRaw.Get(Of cv.Point3f)(pt.Y, pt.X)
+        If pcTop.Z > 0 Then
+            ir3D.X = task.calibData.rotation(0) * pcTop.X +
+                         task.calibData.rotation(1) * pcTop.Y +
+                         task.calibData.rotation(2) * pcTop.Z + task.calibData.translation(0)
+            ir3D.Y = task.calibData.rotation(3) * pcTop.X +
+                         task.calibData.rotation(4) * pcTop.Y +
+                         task.calibData.rotation(5) * pcTop.Z + task.calibData.translation(1)
+            ir3D.Z = task.calibData.rotation(6) * pcTop.X +
+                         task.calibData.rotation(7) * pcTop.Y +
+                         task.calibData.rotation(8) * pcTop.Z + task.calibData.translation(2)
+            irPt.X = task.calibData.leftIntrinsics.fx * ir3D.X / ir3D.Z + task.calibData.leftIntrinsics.ppx
+            irPt.Y = task.calibData.leftIntrinsics.fy * ir3D.Y / ir3D.Z + task.calibData.leftIntrinsics.ppy
+        End If
+        Return irPt
+    End Function
     Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
@@ -734,17 +752,16 @@ Public Class VBtask : Implements IDisposable
             gOptions.unFiltered.Checked = True
         End If
 
-        dCell.Run(src)
-        motionBasics.Run(src)
-        motionMask = motionBasics.dst2
-        If gOptions.UseMotion.Checked Then color = motionBasics.dst3.Clone
-
         pcSplit = pointCloud.Split
         pcSplitRaw = pointCloudRaw.Split()
         depthMaskRaw = pcSplitRaw(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
+        gCell.Run(src)
+        motionBasics.Run(src)
+        motionMask = motionBasics.dst2
+        If gOptions.UseMotion.Checked Then color = motionBasics.dst3.Clone
+
         If optionsChanged Then maxDepthMask.SetTo(0)
-        pcSplit(2) = pcSplit(2)
         If gOptions.TruncateDepth.Checked Then
             pcSplit(2) = pcSplit(2).Threshold(MaxZmeters, MaxZmeters, cv.ThresholdTypes.Trunc)
             cv.Cv2.Merge(pcSplit, pointCloud)
@@ -776,7 +793,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         If task.gOptions.ShowQuads.Checked Then
-            depthRGB = task.dCell.dst2
+            depthRGB = task.gCell.dst2
         ElseIf task.gOptions.ColorizedDepth.Checked Then
             colorizer.Run(src)
             depthRGB = colorizer.dst2
@@ -825,7 +842,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon.Run(src)
 
         Dim saveOptionsChanged = optionsChanged
-        task.dCell.mouseD.Run(src)
+        task.gCell.mouseD.Run(src)
         If paused = False Then
 
 

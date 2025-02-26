@@ -1733,8 +1733,8 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Dim pt = task.dCell.mouseD.ptTopLeft
-                Dim corrText = task.dCell.mouseD.depthAndCorrelationText
+                Dim pt = task.gCell.mouseD.ptTopLeft
+                Dim corrText = task.gCell.mouseD.depthAndCorrelationText
                 SyncLock trueTextLock
                     If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
                     If task.trueData.Count Then

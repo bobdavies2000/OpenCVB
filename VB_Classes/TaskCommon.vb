@@ -393,7 +393,7 @@ Public Class depthCell
     Public color As cv.Vec3f
     Public colorVec As cv.Vec3f
     Public colorVecLast As cv.Vec3f ' the mean color on the previous frame.  When diff > threshold, motion detected!
-    Public distance3d As Single ' distance3D of colorVec and colorVecLast
+    Public colorChange As Single ' distance3D of colorVec and colorVecLast
     Public colorMean As cv.Scalar
     Public colorStdev As cv.Scalar
     Public pixels As Integer

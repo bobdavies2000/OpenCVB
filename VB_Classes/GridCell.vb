@@ -7,28 +7,10 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public mouseD As New GridCell_MouseDepth
     Public quad As New Quad_Basics
     Dim iddCorr As New GridCell_CorrelationMap
-    Dim caminfo As cameraInfo
     Public Sub New()
+        task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of depth cells that reduce depth volatility"
     End Sub
-    Public Function translateColorToLeft(pt As cv.Point) As cv.Point
-        Dim ir3D As cv.Point3f, irPt As cv.Point2f
-        Dim pcTop = task.pointCloudRaw.Get(Of cv.Point3f)(pt.Y, pt.X)
-        If pcTop.Z > 0 Then
-            ir3D.X = caminfo.rotation(0) * pcTop.X +
-                         caminfo.rotation(1) * pcTop.Y +
-                         caminfo.rotation(2) * pcTop.Z + caminfo.translation(0)
-            ir3D.Y = caminfo.rotation(3) * pcTop.X +
-                         caminfo.rotation(4) * pcTop.Y +
-                         caminfo.rotation(5) * pcTop.Z + caminfo.translation(1)
-            ir3D.Z = caminfo.rotation(6) * pcTop.X +
-                         caminfo.rotation(7) * pcTop.Y +
-                         caminfo.rotation(8) * pcTop.Z + caminfo.translation(2)
-            irPt.X = caminfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + caminfo.leftIntrinsics.ppx
-            irPt.Y = caminfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + caminfo.leftIntrinsics.ppy
-        End If
-        Return irPt
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         Dim threshold = options.colorDifferenceThreshold
@@ -46,14 +28,6 @@ Public Class GridCell_Basics : Inherits TaskParent
             Next
         End If
 
-        Dim stdev As cv.Scalar, mean As cv.Scalar
-        caminfo = task.calibData
-        Dim correlationMat As New cv.Mat
-        task.rgbLeftAligned = False
-        If task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec") Then
-            task.rgbLeftAligned = True
-        End If
-
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             If idd.motionCell Then
@@ -62,81 +36,69 @@ Public Class GridCell_Basics : Inherits TaskParent
             End If
         Next
 
-        Dim irPt As cv.Point2f
-        Dim testImage As Boolean = True
-        Dim colorMean As cv.Scalar
+        Dim stdev As cv.Scalar, mean As cv.Scalar, colorMean As cv.Scalar
+        Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
             idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
             idd.colorVec = New cv.Vec3f(idd.color(0), idd.color(1), idd.color(2))
-            idd.distance3d = distance3D(idd.colorVec, idd.colorVecLast)
-            If idd.distance3d < threshold And idd.age > 0 Then
+            idd.colorChange = distance3D(idd.colorVec, idd.colorVecLast)
+            If idd.colorChange < threshold And idd.age > 0 Then
                 idd.age += 1
                 idd.motionCell = False
             Else
+                cv.Cv2.MeanStdDev(task.pcSplitRaw(2)(idd.cRect), mean, stdev)
+                idd.depth = mean(0)
+                idd.depthStdev = stdev(0)
+
                 idd.motionCell = True
                 idd.colorVecLast = idd.colorVec
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
+                idd.age = 1
                 If idd.pixels = 0 Then
-                    idd.age = 0
                     idd.depth = 0
-                    idd.rRect = New cv.Rect
+                    idd.rRect = emptyRect
                 Else
-                    idd.age = 1
-                    cv.Cv2.MeanStdDev(task.pcSplitRaw(2)(idd.cRect), mean, stdev)
-                    idd.depth = mean(0)
-                    idd.depthStdev = stdev(0)
                     If idd.depth > 0 Then
                         idd.depthErr = 0.02 * idd.depth / 2
                         If task.rgbLeftAligned Then
                             idd.lRect = idd.cRect
                             idd.rRect = idd.lRect
-                            idd.rRect.X -= caminfo.baseline * caminfo.rgbIntrinsics.fx / idd.depth
+                            idd.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / idd.depth
                             idd.rRect = ValidateRect(idd.rRect)
                             cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
                                                  cv.TemplateMatchModes.CCoeffNormed)
 
                             idd.correlation = correlationMat.Get(Of Single)(0, 0)
                         Else
-                            irPt = translateColorToLeft(idd.cRect.TopLeft)
+                            Dim irPt = translateColorToLeft(idd.cRect.TopLeft)
                             If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Then
                                 idd.depth = 0 ' off the grid.
-                                idd.lRect = New cv.Rect
-                                idd.rRect = New cv.Rect
+                                idd.lRect = emptyRect
+                                idd.rRect = emptyRect
                             Else
                                 idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.cRect.Width, idd.cRect.Height)
                                 idd.lRect = ValidateRect(idd.lRect)
 
                                 idd.rRect = idd.lRect
-                                idd.rRect.X -= caminfo.baseline * caminfo.leftIntrinsics.fx / idd.depth
+                                idd.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / idd.depth
                                 idd.rRect = ValidateRect(idd.rRect)
                                 cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)
 
                                 idd.correlation = correlationMat.Get(Of Single)(0, 0)
-                                If idd.lRect.X = 482 And idd.lRect.Y = 320 And testImage Then
-                                    testImage = False
-                                    Dim tmp = task.leftView.Clone
-                                    tmp.Rectangle(idd.lRect, cv.Scalar.White, task.lineWidth)
-                                    cv.Cv2.ImShow("task.leftView", tmp)
-
-                                    Dim tmpR = task.rightView.Clone
-                                    tmpR.Rectangle(idd.rRect, cv.Scalar.White, task.lineWidth)
-                                    cv.Cv2.ImShow("task.rightView", tmpR)
-                                End If
                             End If
                         End If
                     Else
-                        idd.lRect = New cv.Rect
-                        idd.rRect = New cv.Rect
+                        idd.lRect = emptyRect
+                        idd.rRect = emptyRect
                     End If
                 End If
             End If
             task.iddList(i) = idd
         Next
-
 
         quad.Run(src)
         dst2 = quad.dst2
@@ -162,7 +124,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
         Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         task.iddC = task.iddList(index)
-        dst2 = task.dCell.dst2
+        dst2 = task.gCell.dst2
 
         Dim pt = task.iddC.cRect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
@@ -193,7 +155,7 @@ Public Class GridCell_Plot : Inherits TaskParent
         desc = "Select any cell To plot a histogram Of that cell's depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.dCell.dst2
+        dst2 = task.gCell.dst2
         dst2.SetTo(0, Not task.iddMask)
 
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
@@ -266,15 +228,15 @@ End Class
 
 Public Class GridCell_InstantUpdate : Inherits TaskParent
     Public Sub New()
-        task.dCell.instantUpdate = True
+        task.gCell.instantUpdate = True
         labels(3) = "Pointcloud image for cells with good visibility"
         desc = "Create the grid of depth cells with good visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have reasonable depth."
 
-        dst2 = task.dCell.dst2
-        labels(2) = task.dCell.labels(2)
+        dst2 = task.gCell.dst2
+        labels(2) = task.gCell.labels(2)
         dst2.SetTo(0, Not task.iddMask)
     End Sub
 End Class
@@ -351,7 +313,7 @@ Public Class GridCell_RGBtoLeft : Inherits TaskParent
         dst2.Rectangle(r, 255, task.lineWidth)
 
         dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
-        ' SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.dCell.mouseD.pt, 2)
+        ' SetTrueText("Correlation " + Format(idd.correlation, fmt3), task.gCell.mouseD.pt, 2)
     End Sub
 End Class
 
@@ -465,7 +427,7 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
         dst1.SetTo(0)
         dst3.SetTo(0)
 
-        Dim minCorr = task.dCell.options.correlationThreshold
+        Dim minCorr = task.gCell.options.correlationThreshold
         Dim count As Integer
         For Each idd In task.iddList
             If idd.depth > 0 Then
@@ -480,7 +442,7 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
 
         task.iddCorr = ShowPalette(dst1)
 
-        labels(2) = task.dCell.labels(2)
+        labels(2) = task.gCell.labels(2)
         labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
                     ") with correlation coefficient > " + Format(minCorr, fmt1)
     End Sub
@@ -506,7 +468,7 @@ Public Class GridCell_Correlation : Inherits TaskParent
         If index < 0 Or index > task.iddList.Count Then Exit Sub
 
         Dim idd = task.iddList(index)
-        Dim pt = task.dCell.mouseD.ptTopLeft
+        Dim pt = task.gCell.mouseD.ptTopLeft
         Dim corr = idd.correlation
         dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
@@ -684,7 +646,7 @@ Public Class GridCell_GrayScaleTest : Inherits TaskParent
         options.RunOpt()
         Dim threshold = options.stdevThreshold
 
-        Dim pt = task.dCell.mouseD.ptTopLeft
+        Dim pt = task.gCell.mouseD.ptTopLeft
         Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
         Static saveTrueData As New List(Of TrueText)
         If task.heartBeat Then
@@ -727,7 +689,7 @@ Public Class GridCell_Features : Inherits TaskParent
         options.RunOpt()
         task.feat.Run(src)
 
-        dst2 = task.dCell.dst2
+        dst2 = task.gCell.dst2
 
         Dim gridIndex As New List(Of Integer)
         Dim gridCounts As New List(Of Integer)
@@ -1058,16 +1020,16 @@ Public Class GridCell_MeasureMotion : Inherits TaskParent
 
         If task.optionsChanged Then motionRects = New List(Of cv.Rect)
 
-        dst2 = task.dCell.dst2
-        labels(2) = task.dCell.labels(3)
+        dst2 = task.gCell.dst2
+        labels(2) = task.gCell.labels(3)
 
-        Dim threshold = If(task.heartBeat, task.dCell.options.colorDifferenceThreshold - 1,
-                                           task.dCell.options.colorDifferenceThreshold)
+        Dim threshold = If(task.heartBeat, task.gCell.options.colorDifferenceThreshold - 1,
+                                           task.gCell.options.colorDifferenceThreshold)
 
         motionRects.Clear()
         Dim indexList As New List(Of Integer) ' avoid adding the same cell more than once.
         For Each idd In task.iddList
-            If idd.distance3d > threshold Then
+            If idd.colorChange > threshold Then
                 For Each index In task.gridNeighbors(idd.index)
                     If indexList.Contains(index) = False Then
                         indexList.Add(index)

@@ -2054,7 +2054,7 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.depthRGB
-        labels = task.dCell.labels
+        labels = task.gCell.labels
         Dim quadData As New List(Of cv.Point3f)
         For Each idd In task.iddList
             If idd.corners.Count Then quadData.Add(idd.color)
@@ -2083,8 +2083,8 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         desc = "Create a simple plane in each of depth cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.dCell.dst2
-        dst3 = task.dCell.dst3
+        dst2 = task.gCell.dst2
+        dst3 = task.gCell.dst3
         Dim quadData As New List(Of cv.Point3f)
         For Each idd In task.iddList
             If idd.depth = 0 Then Continue For
@@ -2096,7 +2096,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels(2) = task.dCell.labels(2)
+        labels(2) = task.gCell.labels(2)
         labels(3) = "There were " + CStr(quadData.Count / 5) + " quads found."
     End Sub
 End Class
@@ -2165,7 +2165,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels = task.dCell.labels
+        labels = task.gCell.labels
     End Sub
 End Class
 
@@ -2241,7 +2241,7 @@ Public Class OpenGL_QuadCorrelationMask : Inherits TaskParent
         dst3 = corrMask.dst3
         labels = corrMask.labels
 
-        Dim minCorr = task.dCell.options.correlationThreshold
+        Dim minCorr = task.gCell.options.correlationThreshold
         Dim count As Integer
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)

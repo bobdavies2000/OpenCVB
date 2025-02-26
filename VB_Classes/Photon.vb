@@ -129,7 +129,7 @@ Public Class Photon_Distance3D : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim currColors As New List(Of cv.Vec3b)
         For Each roi In task.gridRects
-            currColors.Add(task.dCell.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
+            currColors.Add(task.gCell.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
         Next
 
         Static lastColors As New List(Of cv.Vec3b)(currColors)

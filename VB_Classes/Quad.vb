@@ -372,7 +372,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
         desc = "Find large differences in cell depth that could provide boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.dCell.dst2.Clone
+        dst2 = task.gCell.dst2.Clone
         Dim width = dst2.Width / task.cellSize
         Dim height = dst2.Height / task.cellSize
         For i = 0 To task.iddList.Count - width Step width
