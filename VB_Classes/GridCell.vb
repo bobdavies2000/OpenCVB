@@ -40,7 +40,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev, task.depthMaskRaw(idd.cRect))
+            cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
             idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
             idd.colorVec = New cv.Vec3f(idd.color(0), idd.color(1), idd.color(2))
             idd.colorChange = distance3D(idd.colorVec, idd.colorVecLast)
