@@ -7,42 +7,40 @@ Public Class Cell_Basics : Inherits TaskParent
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
-        If task.heartBeat Then
-            Dim rc = task.rc
+        Dim rc = task.rc
 
-            Dim gridID = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-            strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
-            strOut += "rc.age = " + CStr(rc.age) + vbCrLf
-            strOut += "rc.roi: " + CStr(rc.roi.X) + ", " + CStr(rc.roi.Y) + ", "
-            strOut += CStr(rc.roi.Width) + ", " + CStr(rc.roi.Height) + vbCrLf
-            strOut += "rc.color = " + vbTab + CStr(CInt(rc.color(0))) + vbTab + CStr(CInt(rc.color(1)))
-            strOut += vbTab + CStr(CInt(rc.color(2))) + vbCrLf
-            strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
+        Dim gridID = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+        strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
+        strOut += "rc.age = " + CStr(rc.age) + vbCrLf
+        strOut += "rc.roi: " + CStr(rc.roi.X) + ", " + CStr(rc.roi.Y) + ", "
+        strOut += CStr(rc.roi.Width) + ", " + CStr(rc.roi.Height) + vbCrLf
+        strOut += "rc.color = " + vbTab + CStr(CInt(rc.color(0))) + vbTab + CStr(CInt(rc.color(1)))
+        strOut += vbTab + CStr(CInt(rc.color(2))) + vbCrLf
+        strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
-            strOut += If(rc.depthPixels > 0, "Cell is marked as having depth" + vbCrLf, "")
-            strOut += "Pixels " + Format(rc.pixels, "###,###") + vbCrLf + "depth pixels "
-            If rc.depthPixels > 0 Then
-                strOut += Format(rc.depthPixels, "###,###") + " or " +
+        strOut += If(rc.depthPixels > 0, "Cell is marked as having depth" + vbCrLf, "")
+        strOut += "Pixels " + Format(rc.pixels, "###,###") + vbCrLf + "depth pixels "
+        If rc.depthPixels > 0 Then
+            strOut += Format(rc.depthPixels, "###,###") + " or " +
                           Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
-            Else
-                strOut += Format(rc.pixels, "###,###") + " - no depth data" + vbCrLf
-            End If
-
-            strOut += "Cloud Min/Max/Range: X = " + Format(rc.mmX.minVal, fmt1) + "/" + Format(rc.mmX.maxVal, fmt1)
-            strOut += "/" + Format(rc.mmX.range, fmt1) + vbTab
-            strOut += "Y = " + Format(rc.mmY.minVal, fmt1) + "/" + Format(rc.mmY.maxVal, fmt1)
-            strOut += "/" + Format(rc.mmY.range, fmt1) + vbTab
-            strOut += "Z = " + Format(rc.mmZ.minVal, fmt2) + "/" + Format(rc.mmZ.maxVal, fmt2)
-            strOut += "/" + Format(rc.mmZ.range, fmt2) + vbCrLf + vbCrLf
-
-            strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
-
-            Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-            task.pcSplit(2)(task.rc.roi).CopyTo(tmp, task.rc.mask)
-            plot.rc = task.rc
-            plot.Run(tmp)
-            dst1 = plot.dst2
+        Else
+            strOut += Format(rc.pixels, "###,###") + " - no depth data" + vbCrLf
         End If
+
+        strOut += "Cloud Min/Max/Range: X = " + Format(rc.mmX.minVal, fmt1) + "/" + Format(rc.mmX.maxVal, fmt1)
+        strOut += "/" + Format(rc.mmX.range, fmt1) + vbTab
+        strOut += "Y = " + Format(rc.mmY.minVal, fmt1) + "/" + Format(rc.mmY.maxVal, fmt1)
+        strOut += "/" + Format(rc.mmY.range, fmt1) + vbTab
+        strOut += "Z = " + Format(rc.mmZ.minVal, fmt2) + "/" + Format(rc.mmZ.maxVal, fmt2)
+        strOut += "/" + Format(rc.mmZ.range, fmt2) + vbCrLf + vbCrLf
+
+        strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
+
+        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+        task.pcSplit(2)(task.rc.roi).CopyTo(tmp, task.rc.mask)
+        plot.rc = task.rc
+        plot.Run(tmp)
+        dst1 = plot.dst2
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
@@ -266,7 +264,6 @@ Public Class Cell_Generate : Inherits TaskParent
         End If
 
         Dim initialList As New List(Of rcData)
-        Dim usedColors = New List(Of cv.Scalar)({black})
         For i = 0 To mdList.Count - 1
             Dim rc As New rcData
             rc.roi = mdList(i).roi
@@ -274,24 +271,22 @@ Public Class Cell_Generate : Inherits TaskParent
             rc.mask = mdList(i).mask
             rc.maxDist = mdList(i).maxDist
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            rc.motionFlag = task.motionMask(rc.roi).CountNonZero > 0
             rc.contour = mdList(i).contour
             rc.pixels = mdList(i).mask.CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.color = lrc.color
-                If rc.motionFlag = False Then
-                    rc.depthMean = lrc.depthMean
-                    rc.depthMask = lrc.depthMask
-                    rc.depthPixels = lrc.depthPixels
-                    rc.mmX = lrc.mmX
-                    rc.mmY = lrc.mmY
-                    rc.mmZ = lrc.mmZ
-                    rc.maxDStable = rc.maxDStable
-                End If
-                If usedColors.Contains(rc.color) Then
-                    rc.age = 1 ' a new cell was found that was previously part of another.
+                rc.depthMean = lrc.depthMean
+                rc.depthMask = lrc.depthMask
+                rc.depthPixels = lrc.depthPixels
+                rc.mmX = lrc.mmX
+                rc.mmY = lrc.mmY
+                rc.mmZ = lrc.mmZ
+                rc.maxDStable = rc.maxDStable
+                Dim oldColor = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                If oldColor <> rc.color Then
+                    rc.age = 1 ' a new cell was found that was probably part of another in the previous frame.
                     rc.color = randomCellColor()
                 End If
             Else
@@ -299,14 +294,13 @@ Public Class Cell_Generate : Inherits TaskParent
                 rc.color = randomCellColor()
             End If
 
-            usedColors.Add(rc.color)
             initialList.Add(rc)
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim colorSelection = If(task.redOptions.ColorMean.Checked, 0, 1)
-        If colorSelection > 0 Then colorSelection = If(task.redOptions.ColorTracking.Checked, 1, 2)
-        If colorSelection = 2 Then colorSelection = If(task.redOptions.ColorTrackingDepth.Checked, 2, 3)
+        Dim colorSelection = If(task.redOptions.TrackingMeanColor.Checked, 0, 1)
+        If colorSelection > 0 Then colorSelection = If(task.redOptions.TrackingColor.Checked, 1, 2)
+        If colorSelection = 2 Then colorSelection = If(task.redOptions.TrackingDepthColor.Checked, 2, 3)
 
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         For Each rc In initialList
@@ -318,16 +312,14 @@ Public Class Cell_Generate : Inherits TaskParent
             rc.depthMask.SetTo(0, task.noDepthMask(rc.roi))
             rc.depthPixels = rc.depthMask.CountNonZero
 
-            If rc.motionFlag Then
-                If rc.depthPixels / rc.pixels > 0.1 Then
-                    rc.mmX = GetMinMax(task.pcSplit(0)(rc.roi), rc.depthMask)
-                    rc.mmY = GetMinMax(task.pcSplit(1)(rc.roi), rc.depthMask)
-                    rc.mmZ = GetMinMax(task.pcSplit(2)(rc.roi), rc.depthMask)
+            If rc.depthPixels / rc.pixels > 0.1 Then
+                rc.mmX = GetMinMax(task.pcSplit(0)(rc.roi), rc.depthMask)
+                rc.mmY = GetMinMax(task.pcSplit(1)(rc.roi), rc.depthMask)
+                rc.mmZ = GetMinMax(task.pcSplit(2)(rc.roi), rc.depthMask)
 
-                    cv.Cv2.MeanStdDev(task.pointCloud(rc.roi), depthMean, depthStdev, rc.depthMask)
-                    rc.depthMean = depthMean(2)
-                    If Single.IsNaN(rc.depthMean) Or rc.depthMean < 0 Then rc.depthMean = 0
-                End If
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.roi), depthMean, depthStdev, rc.depthMask)
+                rc.depthMean = depthMean(2)
+                If Single.IsNaN(rc.depthMean) Or rc.depthMean < 0 Then rc.depthMean = 0
             End If
             If rc.depthMean > task.MaxZmeters Then rc.depthMean = task.MaxZmeters
             rc.color = selectColor(rc, colorSelection)

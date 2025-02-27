@@ -462,7 +462,6 @@ Public Class rcData
     Public container As Integer
 
     Public contour As New List(Of cv.Point)
-    Public motionFlag As Boolean
 
     Public ptFacets As New List(Of cv.Point)
     Public ptList As New List(Of cv.Point)

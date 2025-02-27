@@ -64,10 +64,10 @@ Partial Class OptionsRedCloud
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
-        Me.ColorDepth = New System.Windows.Forms.RadioButton()
-        Me.ColorTrackingDepth = New System.Windows.Forms.RadioButton()
-        Me.ColorTracking = New System.Windows.Forms.RadioButton()
-        Me.ColorMean = New System.Windows.Forms.RadioButton()
+        Me.TrackingColorDepth = New System.Windows.Forms.RadioButton()
+        Me.TrackingDepthColor = New System.Windows.Forms.RadioButton()
+        Me.TrackingColor = New System.Windows.Forms.RadioButton()
+        Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
         Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -527,10 +527,10 @@ Partial Class OptionsRedCloud
         '
         'ColoringGroup
         '
-        Me.ColoringGroup.Controls.Add(Me.ColorDepth)
-        Me.ColoringGroup.Controls.Add(Me.ColorTrackingDepth)
-        Me.ColoringGroup.Controls.Add(Me.ColorTracking)
-        Me.ColoringGroup.Controls.Add(Me.ColorMean)
+        Me.ColoringGroup.Controls.Add(Me.TrackingColorDepth)
+        Me.ColoringGroup.Controls.Add(Me.TrackingDepthColor)
+        Me.ColoringGroup.Controls.Add(Me.TrackingColor)
+        Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
         Me.ColoringGroup.Location = New System.Drawing.Point(1046, 23)
         Me.ColoringGroup.Name = "ColoringGroup"
         Me.ColoringGroup.Size = New System.Drawing.Size(220, 155)
@@ -538,49 +538,49 @@ Partial Class OptionsRedCloud
         Me.ColoringGroup.TabStop = False
         Me.ColoringGroup.Text = "Output Color Options"
         '
-        'ColorDepth
+        'TrackingColorDepth
         '
-        Me.ColorDepth.AutoSize = True
-        Me.ColorDepth.Location = New System.Drawing.Point(16, 122)
-        Me.ColorDepth.Name = "ColorDepth"
-        Me.ColorDepth.Size = New System.Drawing.Size(119, 24)
-        Me.ColorDepth.TabIndex = 5
-        Me.ColorDepth.TabStop = True
-        Me.ColorDepth.Text = "Depth Color"
-        Me.ColorDepth.UseVisualStyleBackColor = True
+        Me.TrackingColorDepth.AutoSize = True
+        Me.TrackingColorDepth.Location = New System.Drawing.Point(16, 122)
+        Me.TrackingColorDepth.Name = "TrackingColorDepth"
+        Me.TrackingColorDepth.Size = New System.Drawing.Size(119, 24)
+        Me.TrackingColorDepth.TabIndex = 5
+        Me.TrackingColorDepth.TabStop = True
+        Me.TrackingColorDepth.Text = "Depth Color"
+        Me.TrackingColorDepth.UseVisualStyleBackColor = True
         '
-        'ColorTrackingDepth
+        'TrackingDepthColor
         '
-        Me.ColorTrackingDepth.AutoSize = True
-        Me.ColorTrackingDepth.Location = New System.Drawing.Point(15, 89)
-        Me.ColorTrackingDepth.Name = "ColorTrackingDepth"
-        Me.ColorTrackingDepth.Size = New System.Drawing.Size(183, 24)
-        Me.ColorTrackingDepth.TabIndex = 4
-        Me.ColorTrackingDepth.TabStop = True
-        Me.ColorTrackingDepth.Text = "Depth Tracking Color"
-        Me.ColorTrackingDepth.UseVisualStyleBackColor = True
+        Me.TrackingDepthColor.AutoSize = True
+        Me.TrackingDepthColor.Location = New System.Drawing.Point(15, 89)
+        Me.TrackingDepthColor.Name = "TrackingDepthColor"
+        Me.TrackingDepthColor.Size = New System.Drawing.Size(183, 24)
+        Me.TrackingDepthColor.TabIndex = 4
+        Me.TrackingDepthColor.TabStop = True
+        Me.TrackingDepthColor.Text = "Depth Tracking Color"
+        Me.TrackingDepthColor.UseVisualStyleBackColor = True
         '
-        'ColorTracking
+        'TrackingColor
         '
-        Me.ColorTracking.AutoSize = True
-        Me.ColorTracking.Location = New System.Drawing.Point(15, 59)
-        Me.ColorTracking.Name = "ColorTracking"
-        Me.ColorTracking.Size = New System.Drawing.Size(135, 24)
-        Me.ColorTracking.TabIndex = 3
-        Me.ColorTracking.TabStop = True
-        Me.ColorTracking.Text = "Tracking Color"
-        Me.ColorTracking.UseVisualStyleBackColor = True
+        Me.TrackingColor.AutoSize = True
+        Me.TrackingColor.Location = New System.Drawing.Point(15, 59)
+        Me.TrackingColor.Name = "TrackingColor"
+        Me.TrackingColor.Size = New System.Drawing.Size(135, 24)
+        Me.TrackingColor.TabIndex = 3
+        Me.TrackingColor.TabStop = True
+        Me.TrackingColor.Text = "Tracking Color"
+        Me.TrackingColor.UseVisualStyleBackColor = True
         '
-        'ColorMean
+        'TrackingMeanColor
         '
-        Me.ColorMean.AutoSize = True
-        Me.ColorMean.Location = New System.Drawing.Point(15, 29)
-        Me.ColorMean.Name = "ColorMean"
-        Me.ColorMean.Size = New System.Drawing.Size(112, 24)
-        Me.ColorMean.TabIndex = 0
-        Me.ColorMean.TabStop = True
-        Me.ColorMean.Text = "Mean color"
-        Me.ColorMean.UseVisualStyleBackColor = True
+        Me.TrackingMeanColor.AutoSize = True
+        Me.TrackingMeanColor.Location = New System.Drawing.Point(15, 29)
+        Me.TrackingMeanColor.Name = "TrackingMeanColor"
+        Me.TrackingMeanColor.Size = New System.Drawing.Size(112, 24)
+        Me.TrackingMeanColor.TabIndex = 0
+        Me.TrackingMeanColor.TabStop = True
+        Me.TrackingMeanColor.Text = "Mean color"
+        Me.TrackingMeanColor.UseVisualStyleBackColor = True
         '
         'DisplayCellStats
         '
@@ -671,10 +671,10 @@ Partial Class OptionsRedCloud
     Friend WithEvents IdentifyCountBar As System.Windows.Forms.TrackBar
     Friend WithEvents IdentifyCountLabel As System.Windows.Forms.Label
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
-    Friend WithEvents ColorTrackingDepth As Windows.Forms.RadioButton
-    Friend WithEvents ColorTracking As Windows.Forms.RadioButton
-    Friend WithEvents ColorMean As Windows.Forms.RadioButton
-    Friend WithEvents ColorDepth As Windows.Forms.RadioButton
+    Friend WithEvents TrackingDepthColor As Windows.Forms.RadioButton
+    Friend WithEvents TrackingColor As Windows.Forms.RadioButton
+    Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
+    Friend WithEvents TrackingColorDepth As Windows.Forms.RadioButton
     Friend WithEvents rcReductionSlider As Windows.Forms.TrackBar
     Friend WithEvents Label1 As Windows.Forms.Label
     Friend WithEvents Label3 As Windows.Forms.Label

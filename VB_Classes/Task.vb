@@ -68,6 +68,7 @@ Public Class VBtask : Implements IDisposable
     Public motionRect As New cv.Rect ' get rid of this...
     Public motionRects As New List(Of cv.Rect)
     Public motionMask As New cv.Mat
+    Public motionFlag As Boolean ' True if there was no motion detected in the current image.
     Public motionPercent As Single
     Public motionLabel As String = " "
 
@@ -917,6 +918,7 @@ Public Class VBtask : Implements IDisposable
             displayObject.trueData.Clear()
             If redOptions.DisplayCellStats.Checked Then
                 If redC IsNot Nothing Then
+                    dst1.SetTo(0)
                     For Each tt In redC.trueData
                         trueData.Add(tt)
                     Next

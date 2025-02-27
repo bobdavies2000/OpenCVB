@@ -1568,7 +1568,7 @@ Public Class RedColor_Flippers : Inherits TaskParent
     Public nonFlipCells As New List(Of rcData)
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 255
-        task.redOptions.ColorTracking.Checked = True
+        task.redOptions.TrackingColor.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the cells that are changing color because they were split or lost."
     End Sub
@@ -1651,7 +1651,7 @@ End Class
 
 Public Class RedColor_Contour : Inherits TaskParent
     Public Sub New()
-        task.redOptions.ColorTracking.Checked = True
+        task.redOptions.TrackingColor.Checked = True
         desc = "Add the contour to the cell mask in the RedColor_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1744,32 +1744,33 @@ End Class
 
 
 Public Class RedColor_Motion : Inherits TaskParent
-    Dim rcLastList As New List(Of rcData)
     Public Sub New()
+        task.redOptions.TrackingColor.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "If a RedCloud cell has no motion, it is preserved."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If Not task.motionFlag Then Exit Sub ' no motion means nothing needs to be done...
         dst2 = runRedC(src, labels(2))
-        If task.firstPass Then rcLastList = New List(Of rcData)(task.rcList)
+        Static rcLastList As New List(Of rcData)(task.rcList)
 
         Dim count As Integer
         dst1.SetTo(0)
         task.rcList.RemoveAt(0)
         'Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim newList As New List(Of rcData)
+        Dim newList As New List(Of rcData), tmp As New cv.Mat
         For Each rc In task.rcList
-            Dim tmp As cv.Mat = task.motionMask(rc.roi) And rc.mask
-            If tmp.CountNonZero() = 0 Then
+            tmp = task.motionMask(rc.roi) And rc.mask
+            If tmp.CountNonZero = 0 Then
                 count += 1
                 If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
                     Dim lrc = rcLastList(rc.indexLast)
                     If lrc.maxDStable = rc.maxDStable Then rc = lrc
                 End If
-                newList.Add(rc)
+                Dim testCell = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If testCell = 0 Then newList.Add(rc)
             Else
-                tmp = dst1(rc.roi) And rc.mask
-                If tmp.CountNonZero = 0 Then newList.Add(rc)
+                newList.Add(rc)
             End If
             If rc.maxDStable = task.rc.maxDStable Then task.rc = rc
             dst1(rc.roi).SetTo(255, rc.mask)

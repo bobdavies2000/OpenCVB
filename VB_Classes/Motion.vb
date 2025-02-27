@@ -3,6 +3,7 @@ Imports System.Threading
 Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
+    Public markers As New List(Of Integer)
     Public Sub New()
         labels(3) = "The motion-filtered color image.  "
         desc = "Isolate all motion in the scene"
@@ -11,11 +12,11 @@ Public Class Motion_Basics : Inherits TaskParent
         If task.frameCount < 3 Then dst2 = src.Clone
 
         task.motionMask.SetTo(0)
-        Dim motionMarkers(task.iddList.Count - 1) As Integer
+        markers.Clear()
         For Each idd In task.iddList
             If idd.motionCell Then
                 For Each index In task.gridNeighbors(idd.index)
-                    motionMarkers(index) = index
+                    markers.Add(index)
                     Dim r = task.iddList(index).cRect
                     task.motionMask(r).SetTo(255)
                     src(r).CopyTo(dst2(r))
@@ -23,8 +24,9 @@ Public Class Motion_Basics : Inherits TaskParent
             End If
         Next
 
+        task.motionFlag = markers.Count > 0
         task.motionRects.Clear()
-        For Each index In motionMarkers
+        For Each index In markers
             task.motionRects.Add(task.iddList(index).cRect)
         Next
         labels(2) = "There were " + CStr(task.motionRects.Count) + " grid cells with motion."
@@ -204,9 +206,9 @@ Public Class Motion_PixelDiff : Inherits TaskParent
         cv.Cv2.Absdiff(src, lastFrame, dst2)
         dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         changedPixels = dst2.CountNonZero
-        Dim motionFlag = changedPixels > 0
+        Dim motionTest = changedPixels > 0
 
-        If motionFlag Then changeCount += 1
+        If motionTest Then changeCount += 1
         frames += 1
         If task.heartBeat Then
             strOut = "Pixels changed = " + CStr(changedPixels) + " at last heartbeat.  Since last heartbeat: " +
@@ -215,7 +217,7 @@ Public Class Motion_PixelDiff : Inherits TaskParent
             frames = 0
         End If
         SetTrueText(strOut, 3)
-        If motionFlag Then lastFrame = src
+        If motionTest Then lastFrame = src
     End Sub
 End Class
 
@@ -342,9 +344,9 @@ Public Class Motion_Intersect : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static color = src.Clone
         Static lastMotionRect As cv.Rect = task.motionRect
-        Dim motionFlag = False
+        Dim motionTest = False
         If task.heartBeat Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
-            motionFlag = True
+            motionTest = True
         Else
             bgSub.Run(src)
             dst1 = bgSub.dst2
@@ -352,7 +354,7 @@ Public Class Motion_Intersect : Inherits TaskParent
             cv.Cv2.FindNonZero(dst1, tmp)
 
             If tmp.Total > src.Total / 2 Then
-                motionFlag = True
+                motionTest = True
             ElseIf tmp.Total > 0 Then
                 reconstructedRGB += 1
                 task.motionRect = buildEnclosingRect(tmp)
@@ -360,13 +362,13 @@ Public Class Motion_Intersect : Inherits TaskParent
                     task.motionRect = task.motionRect.Union(lastMotionRect)
                 End If
                 If task.motionRect.Width * task.motionRect.Height > src.Total / 2 Then
-                    motionFlag = True
+                    motionTest = True
                 End If
             End If
         End If
 
         dst3.SetTo(0)
-        If motionFlag Then
+        If motionTest Then
             labels(2) = CStr(reconstructedRGB) + " frames since last full image"
             reconstructedRGB = 0
             task.motionRect = New cv.Rect
