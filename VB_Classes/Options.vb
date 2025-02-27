@@ -7867,14 +7867,14 @@ Public Class Options_QuadCompare : Inherits OptionParent
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Raw Pointcloud")
-            radio.addRadio("Flat Depth Cells")
-            radio.addRadio("Connected Depth Cells")
+            radio.addRadio("Flat grid cells")
+            radio.addRadio("Connected grid cells")
             radio.check(2).Checked = True
         End If
     End Sub
     Public Sub RunOpt()
         Static rawRadio = findRadio("Raw Pointcloud")
-        Static flatRadio = findRadio("Flat Depth Cells")
+        Static flatRadio = findRadio("Flat grid cells")
         displayIndex = 2
         If rawRadio.checked Then
             displayIndex = 0

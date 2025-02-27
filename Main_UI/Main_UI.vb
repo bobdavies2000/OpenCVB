@@ -1745,7 +1745,7 @@ Public Class Main_UI
                 End SyncLock
 
                 corrText = corrText.Replace(vbCrLf, ", ")
-                picLabels(1) = "Quad Depth Cells - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
+                picLabels(1) = "Quad grid cells - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
                                    "  " + corrText
                 If task.dst0 IsNot Nothing Then
                     SyncLock cameraLock

@@ -91,8 +91,8 @@ Public Class Cell_ValidateColorCells : Inherits TaskParent
             strOut = "There are no color cells with depth in them." + vbCrLf
         End If
         If percentDepth.Count > 0 Then
-            strOut += "Depth cell percentage average " + Format(percentDepth.Average, "0%") + vbCrLf
-            strOut += "Depth cell percentage range " + Format(percentDepth.Min, "0%") + " to " + Format(percentDepth.Max, "0%")
+            strOut += "grid cell percentage average " + Format(percentDepth.Average, "0%") + vbCrLf
+            strOut += "grid cell percentage range " + Format(percentDepth.Min, "0%") + " to " + Format(percentDepth.Max, "0%")
         End If
         SetTrueText(strOut, 3)
     End Sub

@@ -2080,7 +2080,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
     Public Sub New()
         optiBase.FindSlider("OpenCVB OpenGL buffer count").Value = 1
         task.ogl.oglFunction = oCase.quadBasics
-        desc = "Create a simple plane in each of depth cells."
+        desc = "Create a simple plane in each of grid cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gCell.dst2
@@ -2110,7 +2110,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
     Dim connect As New GridCell_Connected
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
-        desc = "Build connected depth cells and remove cells that are not connected."
+        desc = "Build connected grid cells and remove cells that are not connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src)

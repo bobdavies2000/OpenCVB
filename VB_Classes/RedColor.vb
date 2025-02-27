@@ -1724,10 +1724,10 @@ End Class
 
 
 
-Public Class RedColor_DepthCell : Inherits TaskParent
+Public Class RedColor_GridCell : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        desc = "Display the depth cells in combination with the redCloud data."
+        desc = "Display the grid cells in combination with the redCloud data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))

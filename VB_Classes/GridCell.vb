@@ -9,7 +9,7 @@ Public Class GridCell_Basics : Inherits TaskParent
     Dim iddCorr As New GridCell_CorrelationMap
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
-        desc = "Create the grid of depth cells that reduce depth volatility"
+        desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
@@ -190,9 +190,9 @@ End Class
 
 Public Class GridCell_FullDepth : Inherits TaskParent
     Public Sub New()
-        labels(2) = "Left image depth cells - no overlap.  Click in any column to highlight that column."
-        labels(3) = "Right image: corresponding depth cells.  Overlap indicates uncertainty about depth."
-        desc = "Display the depth cells for all cells with depth."
+        labels(2) = "Left image grid cells - no overlap.  Click in any column to highlight that column."
+        labels(3) = "Right image: corresponding grid cells.  Overlap indicates uncertainty about depth."
+        desc = "Display the grid cells for all cells with depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.rgbLeftAligned Then
@@ -230,7 +230,7 @@ Public Class GridCell_InstantUpdate : Inherits TaskParent
     Public Sub New()
         task.gCell.instantUpdate = True
         labels(3) = "Pointcloud image for cells with good visibility"
-        desc = "Create the grid of depth cells with good visibility"
+        desc = "Create the grid of grid cells with good visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have reasonable depth."
@@ -249,7 +249,7 @@ Public Class GridCell_CorrelationMask : Inherits TaskParent
     Dim corrMap As New GridCell_CorrelationMap
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        desc = "Isolate only the depth values under the depth cell correlation mask (see GridCell_CorrelatonMap"
+        desc = "Isolate only the depth values under the grid cell correlation mask (see GridCell_CorrelatonMap"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         corrMap.Run(src)
@@ -285,7 +285,7 @@ Public Class GridCell_RGBtoLeft : Inherits TaskParent
         Dim rgbTop = idd.cRect.TopLeft, ir3D As cv.Point3f
         ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
         ' can be found.  For Intel and the Oak-D, the left image and RGB need to be aligned to get accurate depth.
-        ' With depth the correlation between the left and right for that depth cell will be accurate (if there is depth.)
+        ' With depth the correlation between the left and right for that grid cell will be accurate (if there is depth.)
         ' NOTE: the Intel camera is accurate in X but way off in Y.  Probably my problem...
         If task.cameraName.StartsWith("Intel") Or task.cameraName.StartsWith("Oak-D") Then
             Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
@@ -325,8 +325,8 @@ End Class
 
 Public Class GridCell_LeftAlign : Inherits TaskParent
     Public Sub New()
-        labels(3) = "Left view locations for the top left corner of each depth cell."
-        desc = "Align depth cell left rectangles in color with the left image.  StereoLabs and Orbbec already match."
+        labels(3) = "Left view locations for the top left corner of each grid cell."
+        desc = "Align grid cell left rectangles in color with the left image.  StereoLabs and Orbbec already match."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.leftView.Clone
@@ -340,7 +340,7 @@ Public Class GridCell_LeftAlign : Inherits TaskParent
                 dst3.Circle(idd.lRect.TopLeft, task.DotSize, cv.Scalar.White, -1)
             End If
         Next
-        labels(2) = CStr(count) + " depth cells have depth and therefore an equivalent in the left view."
+        labels(2) = CStr(count) + " grid cells have depth and therefore an equivalent in the left view."
     End Sub
 End Class
 
@@ -358,7 +358,7 @@ Public Class GridCell_RightView : Inherits TaskParent
         labels(2) = "Draw above in the color image to see the matches in left and right images"
         labels(3) = "Right view with the translated drawrect."
         task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
-        desc = "Map Each depth cell into the right view."
+        desc = "Map Each grid cell into the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.leftView
@@ -421,7 +421,7 @@ End Class
 Public Class GridCell_CorrelationMap : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each depth cell."
+        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
@@ -472,7 +472,7 @@ Public Class GridCell_Correlation : Inherits TaskParent
         Dim corr = idd.correlation
         dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
-        labels(3) = "Correlation of the left depth cell to the right is " + Format(corr, fmt3)
+        labels(3) = "Correlation of the left grid cell to the right is " + Format(corr, fmt3)
 
         dst2.Rectangle(idd.lRect, 255, task.lineWidth)
         dst3.Rectangle(idd.rRect, 255, task.lineWidth)
@@ -603,7 +603,7 @@ Public Class GridCell_Stdev : Inherits TaskParent
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
-        desc = "Visualize the depth and color standard deviation for each depth cell."
+        desc = "Visualize the depth and color standard deviation for each grid cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0.SetTo(0)
@@ -618,7 +618,7 @@ Public Class GridCell_Stdev : Inherits TaskParent
 
         Dim pt = task.iddC.cRect.TopLeft
         strOut = Format(task.iddC.depthStdev, fmt3)
-        labels(2) = "Depth standard deviation for depth cell: " + strOut
+        labels(2) = "Depth standard deviation for grid cell: " + strOut
         SetTrueText(strOut, pt, 2)
         dst2 = ShowPalette(dst1 * 255 / maxDepthStdev)
         dst2.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
@@ -629,7 +629,7 @@ Public Class GridCell_Stdev : Inherits TaskParent
         strOut = Format(task.iddC.colorStdev(0), fmt1) + "/" +
                  Format(task.iddC.colorStdev(1), fmt1) + "/" +
                  Format(task.iddC.colorStdev(2), fmt1)
-        labels(3) = "Color standard deviation for depth cell (B/G/R) = " + strOut
+        labels(3) = "Color standard deviation for grid cell (B/G/R) = " + strOut
         SetTrueText(strOut, pt, 3)
 
         task.color.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
@@ -643,7 +643,7 @@ End Class
 Public Class GridCell_GrayScaleTest : Inherits TaskParent
     Dim options As New Options_Stdev
     Public Sub New()
-        labels(3) = "Depth cells where grayscale stdev and average of the 3 color stdev's"
+        labels(3) = "grid cells where grayscale stdev and average of the 3 color stdev's"
         desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
