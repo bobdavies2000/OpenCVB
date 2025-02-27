@@ -57,8 +57,8 @@ Public Class Photon_Test : Inherits TaskParent
             mats.mat(i) = dst1.InRange(reduce * i, reduce * i)
             counts(i).Add(mats.mat(i).CountNonZero)
             If counts(i).Count > testCount Then counts(i).RemoveAt(0)
-            strOut += "for " + CStr(i * reduce) + " average = " + Format(counts(i).Average, "###,##0") + " min = " + Format(counts(i).Min, "###,##0.0") + " max = " +
-                      Format(counts(i).Max, "###,##0.0") + vbCrLf
+            strOut += "for " + CStr(i * reduce) + " average = " + Format(counts(i).Average, "###,##0") + " min = " +
+                       Format(counts(i).Min, "###,##0.0") + " max = " + Format(counts(i).Max, "###,##0.0") + vbCrLf
         Next
         SetTrueText(strOut, 3)
         mats.Run(src)

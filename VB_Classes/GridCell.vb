@@ -40,7 +40,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
+            cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev, task.depthMaskRaw(idd.cRect))
             idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
             idd.colorVec = New cv.Vec3f(idd.color(0), idd.color(1), idd.color(2))
             idd.colorChange = distance3D(idd.colorVec, idd.colorVecLast)
@@ -568,7 +568,9 @@ End Class
 Public Class GridCell_Gaps : Inherits TaskParent
     Dim connect As New GridCell_Connected
     Public Sub New()
-        desc = "Use the horizontally connected depth cells to find gaps in depth."
+        labels(2) = "Grid cells with single cells removed for both vertical and horizontal connected cells."
+        labels(3) = "Vertical cells with single cells removed."
+        desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src)
@@ -583,9 +585,11 @@ Public Class GridCell_Gaps : Inherits TaskParent
         Next
 
         For Each tup In connect.connectedV
-            If tup.Item2 - tup.Item1 = 0 Then
-                Dim idd = task.iddList(tup.Item1)
-                dst2(idd.cRect).SetTo(0)
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+            If idd2.cRect.TopLeft.Y - idd1.cRect.TopLeft.Y = 0 Then
+                dst2(idd1.cRect).SetTo(0)
+                dst3(idd1.cRect).SetTo(0)
             End If
         Next
     End Sub
@@ -1101,5 +1105,28 @@ Public Class GridCell_Validate : Inherits TaskParent
             diff.Run(src)
             dst3 = diff.dst2
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class GridCell_FeatureGaps : Inherits TaskParent
+    Dim feat As New GridCell_Features
+    Dim gaps As New GridCell_Gaps
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        labels(2) = "The output of GridCell_Gaps overlaid with the output of the GridCell_Features"
+        desc = "Overlay the features on the image of the gaps"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(src)
+        addw.src2 = feat.dst2
+
+        gaps.Run(src)
+        addw.Run(gaps.dst2)
+
+        dst2 = addw.dst2
     End Sub
 End Class

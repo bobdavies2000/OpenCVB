@@ -655,6 +655,7 @@ Public Class algorithmList
 	If algorithmName = "GridCell_CorrelationMap" Then return new GridCell_CorrelationMap
 	If algorithmName = "GridCell_CorrelationMask" Then return new GridCell_CorrelationMask
 	If algorithmName = "GridCell_Edges" Then return new GridCell_Edges
+	If algorithmName = "GridCell_FeatureGaps" Then return new GridCell_FeatureGaps
 	If algorithmName = "GridCell_FeatureLess" Then return new GridCell_FeatureLess
 	If algorithmName = "GridCell_Features" Then return new GridCell_Features
 	If algorithmName = "GridCell_FullDepth" Then return new GridCell_FullDepth
