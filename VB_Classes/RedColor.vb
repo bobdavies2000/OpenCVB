@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As New cv.Mat
-    Public cellGen As New Cell_Generate
+    Public cellGen As New RedCell_Generate
     Dim redMask As New RedMask_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(40)
@@ -30,10 +30,10 @@ Public Class RedColor_Basics : Inherits TaskParent
         labels(2) = cellGen.labels(2)
 
         If task.redOptions.DisplayCellStats.Checked Then
-            Static stats As Cell_Basics
+            Static stats As RedCell_Basics
             If stats Is Nothing Then
                 task.gOptions.displayDst1.Checked = True
-                stats = New Cell_Basics
+                stats = New RedCell_Basics
             End If
             stats.Run(src)
             strOut = stats.strOut
@@ -737,7 +737,7 @@ End Class
 
 
 Public Class RedColor_CellStatsPlot : Inherits TaskParent
-    Dim cells As New Cell_BasicsPlot
+    Dim cells As New RedCell_BasicsPlot
     Public Sub New()
         If standaloneTest() Then task.gOptions.displaydst1.checked = true
         cells.runRedCloud = True

@@ -83,7 +83,7 @@ End Class
 
 Public Class Image_CellStats : Inherits TaskParent
     Dim images As New Image_RedCloudColor
-    Dim stats As New Cell_Basics
+    Dim stats As New RedCell_Basics
     Public Sub New()
         images.images.images.options.imageSeries = False
         If standalone Then task.gOptions.displaydst0.checked = true

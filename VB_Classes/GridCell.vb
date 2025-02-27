@@ -1,6 +1,6 @@
 ﻿Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
-Public Class GridCell_Basics : Inherits TaskParent
+Public Class GridRedCell_Basics : Inherits TaskParent
     Public options As New Options_DepthCellSize
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean

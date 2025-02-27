@@ -152,7 +152,7 @@ End Class
 
 
 Public Class RedCloud_YZ : Inherits TaskParent
-    Dim stats As New Cell_Basics
+    Dim stats As New RedCell_Basics
     Dim rCloud As New RedCloud_Basics
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100
@@ -178,7 +178,7 @@ End Class
 
 
 Public Class RedCloud_XZ : Inherits TaskParent
-    Dim stats As New Cell_Basics
+    Dim stats As New RedCell_Basics
     Dim rCloud As New RedCloud_Basics
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100

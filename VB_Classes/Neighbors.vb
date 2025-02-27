@@ -126,7 +126,7 @@ End Class
 
 Public Class Neighbors_Precise : Inherits TaskParent
     Public nabList As New List(Of List(Of Integer))
-    Dim stats As New Cell_Basics
+    Dim stats As New RedCell_Basics
     Public rcList As List(Of rcData)
     Public runRedCloud As Boolean = False
     Public Sub New()

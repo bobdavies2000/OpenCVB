@@ -131,7 +131,7 @@
     <Compile Include="Boundary.vb" />
     <Compile Include="Brightness.vb" />
     <Compile Include="CameraMotion.vb" />
-    <Compile Include="Cell.vb" />
+    <Compile Include="RedCell.vb" />
     <Compile Include="Classifier.vb" />
     <Compile Include="Cluster.vb" />
     <Compile Include="Color.vb" />

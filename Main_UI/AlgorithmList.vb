@@ -160,13 +160,6 @@ Public Class algorithmList
 	If algorithmName = "CComp_Hulls" Then return new CComp_Hulls
 	If algorithmName = "CComp_Shapes" Then return new CComp_Shapes
 	If algorithmName = "CComp_Stats" Then return new CComp_Stats
-	If algorithmName = "Cell_Basics" Then return new Cell_Basics
-	If algorithmName = "Cell_BasicsPlot" Then return new Cell_BasicsPlot
-	If algorithmName = "Cell_Binarize" Then return new Cell_Binarize
-	If algorithmName = "Cell_Distance" Then return new Cell_Distance
-	If algorithmName = "Cell_FloodFill" Then return new Cell_FloodFill
-	If algorithmName = "Cell_Generate" Then return new Cell_Generate
-	If algorithmName = "Cell_ValidateColorCells" Then return new Cell_ValidateColorCells
 	If algorithmName = "CellularAutomata_All256" Then return new CellularAutomata_All256
 	If algorithmName = "CellularAutomata_Basics" Then return new CellularAutomata_Basics
 	If algorithmName = "CellularAutomata_Life" Then return new CellularAutomata_Life
@@ -644,7 +637,6 @@ Public Class algorithmList
 	If algorithmName = "Grid_ShowMap" Then return new Grid_ShowMap
 	If algorithmName = "Grid_Special" Then return new Grid_Special
 	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter
-	If algorithmName = "GridCell_Basics" Then return new GridCell_Basics
 	If algorithmName = "GridCell_Boundaries" Then return new GridCell_Boundaries
 	If algorithmName = "GridCell_Canny" Then return new GridCell_Canny
 	If algorithmName = "GridCell_Color" Then return new GridCell_Color
@@ -679,6 +671,7 @@ Public Class algorithmList
 	If algorithmName = "GridCell_Sorted" Then return new GridCell_Sorted
 	If algorithmName = "GridCell_Stdev" Then return new GridCell_Stdev
 	If algorithmName = "GridCell_Validate" Then return new GridCell_Validate
+	If algorithmName = "GridRedCell_Basics" Then return new GridRedCell_Basics
 	If algorithmName = "Guess_Depth_CPP" Then return new Guess_Depth_CPP
 	If algorithmName = "Guess_ImageEdges_CPP" Then return new Guess_ImageEdges_CPP
 	If algorithmName = "GuidedBP_Basics" Then return new GuidedBP_Basics
@@ -1480,6 +1473,13 @@ Public Class algorithmList
 	If algorithmName = "Rectangle_Rotated" Then return new Rectangle_Rotated
 	If algorithmName = "Rectangle_Union" Then return new Rectangle_Union
 	If algorithmName = "RecursiveBilateralFilter_CPP" Then return new RecursiveBilateralFilter_CPP
+	If algorithmName = "RedCell_Basics" Then return new RedCell_Basics
+	If algorithmName = "RedCell_BasicsPlot" Then return new RedCell_BasicsPlot
+	If algorithmName = "RedCell_Binarize" Then return new RedCell_Binarize
+	If algorithmName = "RedCell_Distance" Then return new RedCell_Distance
+	If algorithmName = "RedCell_FloodFill" Then return new RedCell_FloodFill
+	If algorithmName = "RedCell_Generate" Then return new RedCell_Generate
+	If algorithmName = "RedCell_ValidateColor" Then return new RedCell_ValidateColor
 	If algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
 	If algorithmName = "RedCloud_BasicsHist" Then return new RedCloud_BasicsHist
 	If algorithmName = "RedCloud_PrepData" Then return new RedCloud_PrepData

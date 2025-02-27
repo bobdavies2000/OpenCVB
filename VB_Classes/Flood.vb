@@ -24,7 +24,7 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
         If standalone Then task.gOptions.displaydst1.checked = true
         task.gOptions.setHistogramBins(1000)
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
-        desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
+        desc = "Provide cell stats on the flood_basics cells.  Identical to RedCell_FloodFill"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
@@ -89,7 +89,7 @@ End Class
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cv.Mat
     Public inputRemoved As cv.Mat
-    Public cellGen As New Cell_Generate
+    Public cellGen As New RedCell_Generate
     Dim redMask As New RedMask_Basics
     Public buildinputRemoved As Boolean
     Public showSelected As Boolean = True

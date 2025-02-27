@@ -25,7 +25,6 @@ CameraMotion
 CamShift
 Cartoonify
 CComp
-Cell
 CellularAutomata
 Classifier
 Clone
@@ -95,6 +94,7 @@ Gradient
 Gravity
 Grid
 GridCell
+GridRedCell
 Guess
 GuidedBP
 HeatMap
@@ -187,6 +187,7 @@ Quaterion
 Random
 Rectangle
 RecursiveBilateralFilter
+RedCell
 RedCloud
 RedColor
 RedMask

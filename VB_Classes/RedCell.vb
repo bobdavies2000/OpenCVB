@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Cell_Basics : Inherits TaskParent
+Public Class RedCell_Basics : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
     Public Sub New()
@@ -57,7 +57,7 @@ End Class
 
 
 
-Public Class Cell_ValidateColorCells : Inherits TaskParent
+Public Class RedCell_ValidateColor : Inherits TaskParent
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -102,10 +102,10 @@ End Class
 
 
 
-Public Class Cell_Distance : Inherits TaskParent
+Public Class RedCell_Distance : Inherits TaskParent
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
@@ -143,10 +143,10 @@ End Class
 
 
 
-Public Class Cell_Binarize : Inherits TaskParent
+Public Class RedCell_Binarize : Inherits TaskParent
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Binarized image", "", "Relative gray image"}
@@ -185,9 +185,9 @@ End Class
 
 
 
-Public Class Cell_FloodFill : Inherits TaskParent
+Public Class RedCell_FloodFill : Inherits TaskParent
     Dim flood As New Flood_Basics
-    Dim stats As New Cell_Basics
+    Dim stats As New RedCell_Basics
     Public Sub New()
         desc = "Provide cell stats on the flood_basics cells."
     End Sub
@@ -209,10 +209,10 @@ End Class
 
 
 
-Public Class Cell_BasicsPlot : Inherits TaskParent
+Public Class RedCell_BasicsPlot : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
-    Dim stats As New Cell_Basics
+    Dim stats As New RedCell_Basics
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
         If standalone Then task.gOptions.setHistogramBins(20)
@@ -249,7 +249,7 @@ End Class
 
 
 
-Public Class Cell_Generate : Inherits TaskParent
+Public Class RedCell_Generate : Inherits TaskParent
     Public mdList As New List(Of maskData)
     Public Sub New()
         task.rcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
