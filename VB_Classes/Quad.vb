@@ -19,6 +19,8 @@ Public Class Quad_Basics : Inherits TaskParent
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             task.iddMap(idd.cRect).SetTo(i)
+            'Dim d1 = task.pcSplitRaw(2).Get(Of Single)(idd.cRect.TopLeft.Y, idd.cRect.TopLeft.X)
+            'Dim d2 = task.pcSplitRaw(2).Get(Of Single)(idd.cRect.BottomRight.Y, idd.cRect.BottomRight.X)
             If idd.depth > 0 Then
                 idd.corners.Clear()
                 task.iddMask(idd.cRect).SetTo(255)

@@ -382,7 +382,7 @@ End Class
 
 
 
-Public Class depthCell
+Public Class gridCell
     Public cRect As cv.Rect ' rectange under the cursor in the color image.
     Public lRect As New cv.Rect
     Public rRect As New cv.Rect

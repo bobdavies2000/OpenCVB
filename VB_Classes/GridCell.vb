@@ -18,7 +18,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         If task.optionsChanged Or instantUpdate Then
             task.iddList.Clear()
             For Each rect In task.gridRects
-                Dim idd As New depthCell
+                Dim idd As New gridCell
                 idd.cRect = ValidateRect(rect)
                 idd.lRect = ValidateRect(rect) ' for some cameras the color image and the left image are the same.
                 idd.center = New cv.Point(rect.TopLeft.X + task.cellSize / 2, rect.TopLeft.Y + task.cellSize / 2)
@@ -48,7 +48,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                 idd.age += 1
                 idd.motionCell = False
             Else
-                cv.Cv2.MeanStdDev(task.pcSplitRaw(2)(idd.cRect), mean, stdev)
+                cv.Cv2.MeanStdDev(task.pcSplitRaw(2)(idd.cRect), mean, stdev, task.depthMaskRaw(idd.cRect))
                 idd.depth = mean(0)
                 idd.depthStdev = stdev(0)
 
@@ -161,7 +161,7 @@ Public Class GridCell_Plot : Inherits TaskParent
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
 
-        Dim idd As depthCell
+        Dim idd As gridCell
         If index < 0 Or index >= task.iddList.Count Then
             idd = task.iddList(task.iddList.Count / 2)
             task.mouseMovePoint = New cv.Point(idd.cRect.X + idd.cRect.Width / 2, idd.cRect.Y + idd.cRect.Height / 2)
@@ -274,7 +274,7 @@ Public Class GridCell_RGBtoLeft : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim idd As depthCell
+        Dim idd As gridCell
         If index > 0 And index < task.iddList.Count Then
             idd = task.iddList(index)
         Else
@@ -495,7 +495,7 @@ Public Class GridCell_Connected : Inherits TaskParent
     Public Sub New()
         desc = "Connect cells that are close in depth"
     End Sub
-    Private Sub drawHRect(idd1 As depthCell, idd2 As depthCell, nextStart As Integer)
+    Private Sub drawHRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
             Dim p1 = task.iddList(colStart).cRect.TopLeft
             Dim p2 = task.iddList(colEnd).cRect.BottomRight
@@ -508,7 +508,7 @@ Public Class GridCell_Connected : Inherits TaskParent
             colEnd += 1
         End If
     End Sub
-    Private Sub drawVRect(idd1 As depthCell, idd2 As depthCell, iddNext As Integer, nextStart As Integer)
+    Private Sub drawVRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
             bottomRight = task.iddList(iddNext).cRect.BottomRight
             dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)

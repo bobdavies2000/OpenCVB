@@ -15,10 +15,10 @@ Public Class VBtask : Implements IDisposable
     Public rcMinSize As Integer ' the minimum cell size for RedCloud_Basics/RedCloud_Masks
 
     Public lpList As New List(Of linePoints) ' line pair list
-    Public iddList As New List(Of depthCell)
+    Public iddList As New List(Of gridCell)
     Public iddCorr As New cv.Mat
     Public iddMap As New cv.Mat
-    Public iddC As depthCell
+    Public iddC As gridCell
     Public iddMask As New cv.Mat
 
     Public cellSize As Integer

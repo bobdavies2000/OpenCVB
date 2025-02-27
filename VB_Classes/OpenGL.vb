@@ -2118,12 +2118,15 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         dst3 = connect.dst3
 
         Dim quadData As New List(Of cv.Point3f)
-        Dim idd1 As depthCell, idd2 As depthCell
+        Dim idd1 As gridCell, idd2 As gridCell
         For Each tup In connect.connectedH
+            idd1 = task.iddList(tup.Item1)
+            idd2 = task.iddList(tup.Item2)
             For i = tup.Item1 + 1 To tup.Item2 - 1
                 idd1 = task.iddList(i - 1)
                 idd2 = task.iddList(i)
                 If idd1.depth = 0 Or idd2.depth = 0 Then Continue For
+                If idd1.corners.Count = 0 Or idd2.corners.Count = 0 Then Continue For
 
                 quadData.Add(idd1.color)
                 quadData.Add(idd1.corners(0))
@@ -2131,7 +2134,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
                 quadData.Add(idd2.corners(3))
                 quadData.Add(idd1.corners(3))
             Next
-            If idd2.depth > 0 Then
+            If idd1.corners.Count > 0 And idd2.corners.Count > 0 Then
                 quadData.Add(idd2.color)
                 quadData.Add(idd2.corners(0))
                 quadData.Add(idd2.corners(1))
@@ -2146,6 +2149,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
                 idd1 = task.iddList(i)
                 idd2 = task.iddList(i + width)
                 If idd1.depth = 0 Or idd2.depth = 0 Then Continue For
+                If idd1.corners.Count = 0 Or idd2.corners.Count = 0 Then Continue For
 
                 quadData.Add(idd1.color)
                 quadData.Add(idd1.corners(0))
@@ -2153,7 +2157,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
                 quadData.Add(idd2.corners(1))
                 quadData.Add(idd2.corners(0))
             Next
-            If idd2.depth > 0 Then
+            If idd1.corners.Count > 0 And idd2.corners.Count > 0 Then
                 quadData.Add(idd2.color)
                 quadData.Add(idd2.corners(0))
                 quadData.Add(idd2.corners(1))
