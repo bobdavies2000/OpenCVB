@@ -758,8 +758,7 @@ Public Class VBtask : Implements IDisposable
 
         gCell.Run(src)
         motionBasics.Run(src)
-        motionMask = motionBasics.dst2
-        If gOptions.UseMotion.Checked Then color = motionBasics.dst3.Clone
+        If gOptions.UseMotion.Checked Then color = motionBasics.dst2.Clone
 
         If optionsChanged Then maxDepthMask.SetTo(0)
         If gOptions.TruncateDepth.Checked Then
@@ -890,14 +889,6 @@ Public Class VBtask : Implements IDisposable
 
             If gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, gridMask)
 
-            If redOptions.DisplayCellStats.Checked Then
-                If redC IsNot Nothing Then
-                    For Each tt In redC.trueData
-                        trueData.Add(tt)
-                    Next
-                End If
-            End If
-
             If gOptions.showMotionMask.Checked Then
                 For Each roi In motionRects
                     dst0.Rectangle(roi, cv.Scalar.White, lineWidth)
@@ -924,6 +915,14 @@ Public Class VBtask : Implements IDisposable
 
             trueData = New List(Of TrueText)(displayObject.trueData)
             displayObject.trueData.Clear()
+            If redOptions.DisplayCellStats.Checked Then
+                If redC IsNot Nothing Then
+                    For Each tt In redC.trueData
+                        trueData.Add(tt)
+                    Next
+                End If
+            End If
+
             labels = displayObject.labels
         End If
         Return saveOptionsChanged

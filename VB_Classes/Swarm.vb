@@ -261,7 +261,7 @@ Public Class Swarm_Flood2 : Inherits TaskParent
         Return flood.dst2
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.heartBeat = False Then Exit Sub
+        If Not task.heartBeat Then Exit Sub
 
         dst2 = runRedCloud(src).Clone()
         dst3 = lines.dst3.Clone

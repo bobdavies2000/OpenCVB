@@ -1099,7 +1099,7 @@ Public Class GridCell_Validate : Inherits TaskParent
 
         cv.Cv2.Absdiff(curr, motion, dst0)
 
-        If task.heartBeat = False Then
+        If Not task.heartBeat Then
             Static diff As New Diff_Basics
             diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)

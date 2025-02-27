@@ -1502,7 +1502,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_ContourUpdate" Then return new RedColor_ContourUpdate
 	If algorithmName = "RedColor_CPP" Then return new RedColor_CPP
 	If algorithmName = "RedColor_DelaunayGuidedFeatures" Then return new RedColor_DelaunayGuidedFeatures
-	If algorithmName = "RedColor_DepthCell" Then return new RedColor_DepthCell
 	If algorithmName = "RedColor_DepthOutline" Then return new RedColor_DepthOutline
 	If algorithmName = "RedColor_Equations" Then return new RedColor_Equations
 	If algorithmName = "RedColor_Features" Then return new RedColor_Features
@@ -1513,6 +1512,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_FPS" Then return new RedColor_FPS
 	If algorithmName = "RedColor_Gaps" Then return new RedColor_Gaps
 	If algorithmName = "RedColor_GenCellContains" Then return new RedColor_GenCellContains
+	If algorithmName = "RedColor_GridCell" Then return new RedColor_GridCell
 	If algorithmName = "RedColor_Hue" Then return new RedColor_Hue
 	If algorithmName = "RedColor_Hulls" Then return new RedColor_Hulls
 	If algorithmName = "RedColor_KMeans" Then return new RedColor_KMeans

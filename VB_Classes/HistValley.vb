@@ -472,7 +472,7 @@ Public Class HistValley_Tiers : Inherits TaskParent
         desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat = False Then Exit Sub
+        If Not task.heartBeat Then Exit Sub
         valleys.Run(src)
 
         dst2.SetTo(0)

@@ -37,7 +37,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             End If
             stats.Run(src)
             strOut = stats.strOut
-            SetTrueText(strOut, newPoint, 3)
+            SetTrueText(strOut, newPoint, 1)
             dst1 = stats.dst1
         End If
 
@@ -1744,33 +1744,49 @@ End Class
 
 
 Public Class RedColor_Motion : Inherits TaskParent
-    Dim rclist As New List(Of rcData)
+    Dim rcLastList As New List(Of rcData)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "If a RedCloud cell has no motion, it is preserved."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+        If task.firstPass Then rcLastList = New List(Of rcData)(task.rcList)
+
+        Dim count As Integer
+        dst1.SetTo(0)
+        task.rcList.RemoveAt(0)
+        'Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim newList As New List(Of rcData)
+        For Each rc In task.rcList
+            Dim tmp As cv.Mat = task.motionMask(rc.roi) And rc.mask
+            If tmp.CountNonZero() = 0 Then
+                count += 1
+                If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
+                    Dim lrc = rcLastList(rc.indexLast)
+                    If lrc.maxDStable = rc.maxDStable Then rc = lrc
+                End If
+                newList.Add(rc)
+            Else
+                tmp = dst1(rc.roi) And rc.mask
+                If tmp.CountNonZero = 0 Then newList.Add(rc)
+            End If
+            If rc.maxDStable = task.rc.maxDStable Then task.rc = rc
+            dst1(rc.roi).SetTo(255, rc.mask)
+        Next
+        If task.heartBeat Then labels(3) = CStr(count) + " redCloud cells had no motion."
+
+        task.rcList.Clear()
+        task.rcList.Add(New rcData)
+        For Each rc In newList
+            rc.index = task.rcList.Count
+            task.rcList.Add(rc)
+        Next
+
+        rcLastList = New List(Of rcData)(task.rcList)
+
         dst3.SetTo(0)
-
-        For Each rc In rclist
-            Dim tmp As cv.Mat = task.motionMask(rc.roi) And rc.mask
-            If tmp.CountNonZero() = 0 Then
-                dst3(rc.roi).SetTo(rc.color, rc.mask)
-                dst1(rc.roi).SetTo(255, rc.mask)
-            End If
-        Next
         For Each rc In task.rcList
-            Dim tmp As cv.Mat = task.motionMask(rc.roi) And rc.mask
-            If tmp.CountNonZero() = 0 Then
-                dst3(rc.roi).SetTo(rc.color, rc.mask)
-                dst1(rc.roi).SetTo(255, rc.mask)
-            End If
-        Next
-
-        dst2 = runRedC(src, labels(3))
-
-        For Each rc In task.rcList
-            If rc.color = black Then Continue For
             dst3(rc.roi).SetTo(rc.color, rc.mask)
         Next
     End Sub

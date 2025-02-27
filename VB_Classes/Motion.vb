@@ -4,22 +4,21 @@ Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         labels(3) = "The motion-filtered color image.  "
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.frameCount < 3 Then dst3 = src.Clone
+        If task.frameCount < 3 Then dst2 = src.Clone
 
-        dst2.SetTo(0)
+        task.motionMask.SetTo(0)
         Dim motionMarkers(task.iddList.Count - 1) As Integer
         For Each idd In task.iddList
             If idd.motionCell Then
                 For Each index In task.gridNeighbors(idd.index)
                     motionMarkers(index) = index
                     Dim r = task.iddList(index).cRect
-                    dst2(r).SetTo(255)
-                    src(r).CopyTo(dst3(r))
+                    task.motionMask(r).SetTo(255)
+                    src(r).CopyTo(dst2(r))
                 Next
             End If
         Next
