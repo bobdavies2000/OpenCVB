@@ -1119,11 +1119,9 @@ Public Class algorithmList
 	If algorithmName = "Motion_FPolyRect" Then return new Motion_FPolyRect
 	If algorithmName = "Motion_FromEdge" Then return new Motion_FromEdge
 	If algorithmName = "Motion_FromEdgeColorize" Then return new Motion_FromEdgeColorize
-	If algorithmName = "Motion_Grayscale" Then return new Motion_Grayscale
 	If algorithmName = "Motion_Grid" Then return new Motion_Grid
 	If algorithmName = "Motion_Grid_MP" Then return new Motion_Grid_MP
 	If algorithmName = "Motion_HistoryTest" Then return new Motion_HistoryTest
-	If algorithmName = "Motion_Intersect" Then return new Motion_Intersect
 	If algorithmName = "Motion_LeftRight" Then return new Motion_LeftRight
 	If algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
 	If algorithmName = "Motion_PointCloud" Then return new Motion_PointCloud

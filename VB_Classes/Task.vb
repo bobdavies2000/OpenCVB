@@ -65,7 +65,6 @@ Public Class VBtask : Implements IDisposable
     Public lowResColor As New cv.Mat
     Public lowResDepth As New cv.Mat
 
-    Public motionRect As New cv.Rect ' get rid of this...
     Public motionRects As New List(Of cv.Rect)
     Public motionMask As New cv.Mat
     Public motionFlag As Boolean ' True if there was no motion detected in the current image.

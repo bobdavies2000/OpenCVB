@@ -44,7 +44,7 @@ Public Class GridCell_Basics : Inherits TaskParent
             idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
             idd.colorVec = New cv.Vec3f(idd.color(0), idd.color(1), idd.color(2))
             idd.colorChange = distance3D(idd.colorVec, idd.colorVecLast)
-            If idd.colorChange < threshold And idd.age > 0 Then
+            If idd.colorChange < threshold And idd.age > 0 And idd.correlation <> 0 Then
                 idd.age += 1
                 idd.motionCell = False
             Else
