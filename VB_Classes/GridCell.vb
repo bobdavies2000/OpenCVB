@@ -52,7 +52,7 @@ Public Class GridRedCell_Basics : Inherits TaskParent
                 idd.depth = mean(0)
                 idd.depthStdev = stdev(0)
 
-                idd.motionCell = True
+                If idd.colorChange > threshold Then idd.motionCell = True
                 idd.colorVecLast = idd.colorVec
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
