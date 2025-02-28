@@ -16,7 +16,6 @@ Public Class RedMask_Basics : Inherits TaskParent
             color.Run(src)
             src = color.dst2
         End If
-        task.rcMinSize = 0
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
@@ -26,7 +25,7 @@ Public Class RedMask_Basics : Inherits TaskParent
         Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
         Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(),
-                                    handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, task.rcMinSize)
+                                    handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, task.rcPixelThreshold)
         handleMask.Free()
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
@@ -57,7 +56,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             Dim md As New maskData
             md.roi = rectlist(i)
             If md.roi.Size = dst2.Size Then Continue For
-            If md.roi.Width * md.roi.Height < task.rcMinSize Then Continue For
+            If md.roi.Width * md.roi.Height < task.rcPixelThreshold Then Continue For
             Dim pt = ptlist(i)
             Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
             md.mask = dst2(md.roi).InRange(val, val)

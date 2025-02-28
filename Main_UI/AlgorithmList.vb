@@ -799,7 +799,6 @@ Public Class algorithmList
 	If algorithmName = "Horizon_Basics" Then return new Horizon_Basics
 	If algorithmName = "Horizon_ExternalTest" Then return new Horizon_ExternalTest
 	If algorithmName = "Horizon_FindNonZero" Then return new Horizon_FindNonZero
-	If algorithmName = "Horizon_FindNonZeroOld" Then return new Horizon_FindNonZeroOld
 	If algorithmName = "Horizon_Perpendicular" Then return new Horizon_Perpendicular
 	If algorithmName = "Horizon_Regress" Then return new Horizon_Regress
 	If algorithmName = "Horizon_Simple" Then return new Horizon_Simple

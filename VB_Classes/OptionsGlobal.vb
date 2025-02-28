@@ -39,7 +39,7 @@ Public Class OptionsGlobal
         fHist.Text = CStr(FrameHistory.Value)
         LineThicknessAmount.Text = CStr(LineWidth.Value)
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
-        TempSliderLabel.Text = CStr(DebugSlider.Value)
+        DebugSliderLabel.Text = CStr(DebugSlider.Value)
 
         UseKalman.Checked = True
         UseMultiThreading.Checked = False ' too many times it is just not faster.
@@ -70,7 +70,6 @@ Public Class OptionsGlobal
 
         task.DotSize = 1
         task.cvFontThickness = 1
-        task.fPointMinDistance = 10
         Select Case task.dst2.Width
             Case 1920
                 task.cvFontSize = 3.5
@@ -78,93 +77,72 @@ Public Class OptionsGlobal
                 task.DotSize = 4
                 task.disparityAdjustment = 1.1
                 task.lowRes = New cv.Size(240, 135)
-                task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 40
                 task.FASTthreshold = 25
-                task.fPointMinDistance = 75
             Case 960
                 task.cvFontSize = 2.0
                 task.cvFontThickness = 2
                 task.DotSize = 2
                 task.disparityAdjustment = 2.2
                 task.lowRes = New cv.Size(240, 135)
-                task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 200
                 task.FASTthreshold = 40
-                task.fPointMinDistance = 50
             Case 480
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cv.Size(240, 135)
-                task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 650
                 task.FASTthreshold = 10
-                task.fPointMinDistance = 20
             Case 1280
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
                 task.DotSize = 5
                 task.disparityAdjustment = 2.2
                 task.lowRes = New cv.Size(320, 180)
-                task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
                 task.FASTthreshold = 40
-                task.fPointMinDistance = 50
             Case 640
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
                 task.lowRes = New cv.Size(320, task.dst2.Height / 2)
-                task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 200
                 task.FASTthreshold = 30
-                task.fPointMinDistance = 25
             Case 320
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
                 task.lowRes = New cv.Size(320, 180)
-                task.quarterRes = New cv.Size(320, 180)
                 If task.dst2.Height = 240 Then task.lowRes = New cv.Size(160, 120)
                 task.densityMetric = 500
                 task.FASTthreshold = 10
-                task.fPointMinDistance = 12
             Case 160
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cv.Size(160, 120)
-                task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 100
                 task.FASTthreshold = 10
-                task.fPointMinDistance = 5
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 1
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cv.Size(168, 94)
-                task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 300
                 task.FASTthreshold = 10
-                task.fPointMinDistance = 25
             Case 336
                 task.cvFontSize = 1.0
                 task.DotSize = 1
                 task.disparityAdjustment = 8.8
                 task.lowRes = New cv.Size(168, 94)
-                task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 700
                 task.FASTthreshold = 10
-                task.fPointMinDistance = 10
             Case 168
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
                 task.lowRes = New cv.Size(168, 94)
-                task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 1700
                 task.FASTthreshold = 10
-                task.fPointMinDistance = 7
         End Select
 
-        task.rcMinSize = task.dst2.Width * task.dst2.Height * 0.005
         task.depthThresholdPercent = 0.01
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize
@@ -265,6 +243,7 @@ Public Class OptionsGlobal
         SaveSetting("Opencv", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
     End Sub
     Private Sub tempSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
+        DebugSliderLabel.Text = CStr(DebugSlider.Value)
         task.optionsChanged = True
     End Sub
     Private Sub DepthDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles DepthDiffSlider.ValueChanged
@@ -409,6 +388,10 @@ Public Class OptionsGlobal
     End Sub
 
     Private Sub FrameHistory_Scroll(sender As Object, e As EventArgs) Handles FrameHistory.Scroll
+
+    End Sub
+
+    Private Sub DebugSlider_Scroll(sender As Object, e As EventArgs) Handles DebugSlider.Scroll
 
     End Sub
 End Class

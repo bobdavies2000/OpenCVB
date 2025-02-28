@@ -31,10 +31,14 @@ Public Module vbc
         thisObj = withThisObj
         withThisObj = tempObj
     End Sub
+    Public Function vecToScalar(c As cv.Vec3b) As cv.Scalar
+        Return New cv.Scalar(c(0), c(1), c(2))
+    End Function
     Public Function DisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
         For Each rc In task.rcList
+            If rc.pixels < task.rcPixelThreshold Then rc.color = task.rcPixelColor
             dst(rc.roi).SetTo(rc.color, rc.mask)
         Next
 
@@ -52,6 +56,17 @@ Public Module vbc
             If rc.index >= 255 Then Exit For
         Next
         Return DisplayCells()
+    End Function
+    Public Function RebuildRCMap(rcList As List(Of rcData)) As cv.Mat
+        task.rcMap.SetTo(0)
+        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        For Each rc In rcList
+            task.rcMap(rc.roi).SetTo(rc.index, rc.mask)
+            If rc.pixels < task.rcPixelThreshold Then rc.color = task.rcPixelColor
+            dst(rc.roi).SetTo(rc.color, rc.mask)
+            If rc.index >= 255 Then Exit For
+        Next
+        Return dst
     End Function
     Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
         Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -135,6 +150,8 @@ Public Module vbc
         task.metersPerPixel = task.MaxZmeters / task.dst2.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
         task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 100
+
+        task.rcPixelThreshold = task.dst2.Width * task.dst2.Height * 0.002 ' task.gOptions.DebugSlider.Value / 1000
     End Sub
 End Module
 

@@ -12,7 +12,8 @@ Public Class VBtask : Implements IDisposable
     Public rc As New rcData
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
-    Public rcMinSize As Integer ' the minimum cell size for RedCloud_Basics/RedCloud_Masks
+    Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
+    Public rcPixelColor = cv.Scalar.Black ' color for small redCloud cells.
 
     Public lpList As New List(Of linePoints) ' line pair list
     Public iddList As New List(Of gridCell)
@@ -46,11 +47,6 @@ Public Class VBtask : Implements IDisposable
 
     Public fpOutline As New cv.Mat
     Public fpSelected As fpData
-    Public fPointMinDistance As Integer
-    Public fpCorners(3) As Integer
-    Public fpCornerRect(3) As cv.Rect
-    Public fpSearchRect(3) As cv.Rect
-    Public fpTravelAvg As Single
     Public fpMotion As cv.Point2f
 
     Public topFeatures As New List(Of cv.Point2f)

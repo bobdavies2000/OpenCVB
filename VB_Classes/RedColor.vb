@@ -38,7 +38,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             stats.Run(src)
             strOut = stats.strOut
             SetTrueText(strOut, newPoint, 1)
-            dst1 = stats.dst1
+            dst3 = stats.dst3
         End If
 
         labels(3) = "The " + CStr(task.redOptions.IdentifyCountBar.Value) + " largest cells shown below " +
@@ -1750,8 +1750,9 @@ Public Class RedColor_Motion : Inherits TaskParent
         desc = "If a RedCloud cell has no motion, it is preserved."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If Not task.motionFlag Then Exit Sub ' no motion means nothing needs to be done...
-        dst2 = runRedC(src, labels(2))
+        'If Not task.motionFlag Then Exit Sub ' no motion means nothing needs to be done...
+        runRedC(src, labels(2))
+
         Static rcLastList As New List(Of rcData)(task.rcList)
 
         Dim count As Integer
@@ -1759,23 +1760,30 @@ Public Class RedColor_Motion : Inherits TaskParent
         task.rcList.RemoveAt(0)
         'Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim newList As New List(Of rcData), tmp As New cv.Mat
+        Dim countMaxD As Integer, countMissedMaxD As Integer
         For Each rc In task.rcList
             tmp = task.motionMask(rc.roi) And rc.mask
             If tmp.CountNonZero = 0 Then
-                count += 1
                 If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
                     Dim lrc = rcLastList(rc.indexLast)
-                    If lrc.maxDStable = rc.maxDStable Then rc = lrc
+                    If lrc.maxDStable = rc.maxDStable Then
+                        countMaxD += 1
+                        rc = lrc
+                    Else
+                        countMissedMaxD += 1
+                        Continue For
+                    End If
                 End If
                 Dim testCell = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If testCell = 0 Then newList.Add(rc)
             Else
+                count += 1
                 newList.Add(rc)
             End If
-            If rc.maxDStable = task.rc.maxDStable Then task.rc = rc
             dst1(rc.roi).SetTo(255, rc.mask)
         Next
-        If task.heartBeat Then labels(3) = CStr(count) + " redCloud cells had no motion."
+        labels(3) = CStr(count) + " of " + CStr(task.rcList.Count) + " redCloud cells had motion." +
+                    "  There were " + CStr(countMaxD) + " maxDstable matches and " + CStr(countMissedMaxD) + " misses"
 
         task.rcList.Clear()
         task.rcList.Add(New rcData)
@@ -1790,5 +1798,8 @@ Public Class RedColor_Motion : Inherits TaskParent
         For Each rc In task.rcList
             dst3(rc.roi).SetTo(rc.color, rc.mask)
         Next
+
+        dst2 = RebuildRCMap(task.rcList)
+        task.setSelectedCell()
     End Sub
 End Class

@@ -40,7 +40,7 @@ Public Class RedCell_Basics : Inherits TaskParent
         task.pcSplit(2)(task.rc.roi).CopyTo(tmp, task.rc.mask)
         plot.rc = task.rc
         plot.Run(tmp)
-        dst1 = plot.dst2
+        dst3 = plot.dst2
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
@@ -267,7 +267,7 @@ Public Class RedCell_Generate : Inherits TaskParent
         For i = 0 To mdList.Count - 1
             Dim rc As New rcData
             rc.roi = mdList(i).roi
-            If rc.roi.Size = dst2.Size Then Continue For ' RedColor_Basics finds a cell this big.  
+            If rc.roi.Size = dst2.Size Then Continue For ' RedColor_Basics can find a cell this big.  
             rc.mask = mdList(i).mask
             rc.maxDist = mdList(i).maxDist
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -284,10 +284,14 @@ Public Class RedCell_Generate : Inherits TaskParent
                 rc.mmY = lrc.mmY
                 rc.mmZ = lrc.mmZ
                 rc.maxDStable = rc.maxDStable
-                Dim oldColor = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-                If oldColor <> rc.color Then
-                    rc.age = 1 ' a new cell was found that was probably part of another in the previous frame.
-                    rc.color = randomCellColor()
+                Dim oldcolor = vecToScalar(dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X))
+                If oldcolor <> rc.color Or oldcolor = task.rcPixelColor Then
+                    If rc.pixels < task.rcPixelThreshold Then
+                        rc.color = task.rcPixelColor
+                    Else
+                        rc.age = 1 ' a new cell was found that was probably part of another in the previous frame.
+                        rc.color = randomCellColor()
+                    End If
                 End If
             Else
                 rc.age = 1
@@ -326,8 +330,6 @@ Public Class RedCell_Generate : Inherits TaskParent
             sortedCells.Add(rc.pixels, rc)
         Next
 
-        dst2 = RebuildRCMap(sortedCells)
-
         Dim rcNewCount As Integer
         For Each rc In task.rcList
             If rc.age = 1 Then rcNewCount += 1
@@ -337,5 +339,6 @@ Public Class RedCell_Generate : Inherits TaskParent
             labels(2) = CStr(task.rcList.Count) + " total cells (shown with mean or 'natural' color and " +
                         CStr(task.rcList.Count - rcNewCount) + " matched to previous frame"
         End If
+        dst2 = RebuildRCMap(sortedCells)
     End Sub
 End Class

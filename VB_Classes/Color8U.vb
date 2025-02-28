@@ -293,23 +293,20 @@ Public Class Color8U_TopX : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim input = src
-        input = input.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
-
         topX.mapTopX = options.topXcount
-        topX.Run(input)
+        topX.Run(src)
 
         Dim top As New List(Of cv.Vec3b)
         For Each pt In topX.topXPixels
             top.Add(New cv.Vec3b(pt.X, pt.Y, pt.Z))
         Next
 
-        dst2 = input.Clone
-        For y = 0 To input.Rows - 1
-            For x = 0 To input.Cols - 1
+        dst2 = src.Clone
+        For y = 0 To src.Rows - 1
+            For x = 0 To src.Cols - 1
                 Dim distances As New List(Of Single)
                 For Each pt In top
-                    Dim vec = input.Get(Of cv.Vec3b)(y, x)
+                    Dim vec = src.Get(Of cv.Vec3b)(y, x)
                     distances.Add(distance3D(pt, New cv.Vec3b(vec.Item0, vec.Item1, vec.Item2)))
                 Next
                 Dim best = top(distances.IndexOf(distances.Min))

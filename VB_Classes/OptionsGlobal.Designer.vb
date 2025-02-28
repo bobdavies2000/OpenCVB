@@ -26,7 +26,7 @@ Partial Class OptionsGlobal
         Me.DepthDiffLabel = New System.Windows.Forms.Label()
         Me.DepthDiffSlider = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
-        Me.TempSliderLabel = New System.Windows.Forms.Label()
+        Me.DebugSliderLabel = New System.Windows.Forms.Label()
         Me.DebugSlider = New System.Windows.Forms.TrackBar()
         Me.Label11 = New System.Windows.Forms.Label()
         Me.fHist = New System.Windows.Forms.Label()
@@ -110,7 +110,7 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.DepthDiffLabel)
         Me.MinMaxDepth.Controls.Add(Me.DepthDiffSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label6)
-        Me.MinMaxDepth.Controls.Add(Me.TempSliderLabel)
+        Me.MinMaxDepth.Controls.Add(Me.DebugSliderLabel)
         Me.MinMaxDepth.Controls.Add(Me.DebugSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label11)
         Me.MinMaxDepth.Controls.Add(Me.fHist)
@@ -165,14 +165,14 @@ Partial Class OptionsGlobal
         Me.Label6.Text = "Depth Difference Threshold (cm's)"
         Me.Label6.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'TempSliderLabel
+        'DebugSliderLabel
         '
-        Me.TempSliderLabel.AutoSize = True
-        Me.TempSliderLabel.Location = New System.Drawing.Point(695, 515)
-        Me.TempSliderLabel.Name = "TempSliderLabel"
-        Me.TempSliderLabel.Size = New System.Drawing.Size(99, 20)
-        Me.TempSliderLabel.TabIndex = 56
-        Me.TempSliderLabel.Text = "debug Value"
+        Me.DebugSliderLabel.AutoSize = True
+        Me.DebugSliderLabel.Location = New System.Drawing.Point(695, 515)
+        Me.DebugSliderLabel.Name = "DebugSliderLabel"
+        Me.DebugSliderLabel.Size = New System.Drawing.Size(99, 20)
+        Me.DebugSliderLabel.TabIndex = 56
+        Me.DebugSliderLabel.Text = "debug Value"
         '
         'DebugSlider
         '
@@ -894,7 +894,7 @@ Partial Class OptionsGlobal
     Friend WithEvents OpenGLCapture As System.Windows.Forms.CheckBox
     Friend WithEvents ShowAllOptions As System.Windows.Forms.CheckBox
     Friend WithEvents UseMultiThreading As System.Windows.Forms.CheckBox
-    Friend WithEvents TempSliderLabel As System.Windows.Forms.Label
+    Friend WithEvents DebugSliderLabel As System.Windows.Forms.Label
     Friend WithEvents DebugSlider As System.Windows.Forms.TrackBar
     Friend WithEvents Label11 As System.Windows.Forms.Label
     Friend WithEvents debugSyncUI As System.Windows.Forms.CheckBox

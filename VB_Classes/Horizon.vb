@@ -73,7 +73,7 @@ End Class
 Public Class Horizon_FindNonZero : Inherits TaskParent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gravityVec = New linePoints(New cv.Point2f(dst2.Width / 2, 0),
                                          New cv.Point2f(dst2.Width / 2, dst2.Height))
@@ -82,10 +82,7 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim xRatio = dst0.Width / task.quarterRes.Width
-        Dim yRatio = dst0.Height / task.quarterRes.Height
-
-        Dim pc = task.pointCloud.Resize(task.quarterRes)
+        Dim pc = task.pointCloud
         Dim split = pc.Split()
         split(2).SetTo(task.MaxZmeters)
         cv.Cv2.Merge(split, pc)
@@ -93,8 +90,7 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
         pc = (pc.Reshape(1, pc.Rows * pc.Cols) * task.gMatrix).ToMat.Reshape(3, pc.Rows)
 
         dst1 = split(1).InRange(-0.05, 0.05)
-        Dim noDepth = task.noDepthMask.Resize(task.quarterRes)
-        dst1.SetTo(0, noDepth)
+        dst1.SetTo(0, task.noDepthMask)
         Dim pointsMat = dst1.FindNonZero()
         If pointsMat.Rows > 0 Then
             dst2.SetTo(0)
@@ -103,7 +99,7 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
             For i = 0 To pointsMat.Rows - 1
                 Dim pt = pointsMat.Get(Of cv.Point)(i, 0)
                 xVals.Add(pt.X)
-                points.Add(New cv.Point2f(pt.X * xRatio, pt.Y * yRatio))
+                points.Add(New cv.Point2f(pt.X, pt.Y))
             Next
 
             Dim p1 = points(xVals.IndexOf(xVals.Min()))
@@ -115,7 +111,7 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
         End If
 
         dst3 = split(0).InRange(-0.01, 0.01)
-        dst3.SetTo(0, noDepth)
+        dst3.SetTo(0, task.noDepthMask)
         pointsMat = dst3.FindNonZero()
         If pointsMat.Rows > 0 Then
             Dim yVals As New List(Of Integer)
@@ -123,7 +119,7 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
             For i = 0 To pointsMat.Rows - 1
                 Dim pt = pointsMat.Get(Of cv.Point)(i, 0)
                 yVals.Add(pt.Y)
-                points.Add(New cv.Point2f(pt.X * xRatio, pt.Y * yRatio))
+                points.Add(New cv.Point2f(pt.X, pt.Y))
             Next
 
             Dim p1 = points(yVals.IndexOf(yVals.Min()))
@@ -136,90 +132,6 @@ Public Class Horizon_FindNonZero : Inherits TaskParent
             End If
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Horizon_FindNonZeroOld : Inherits TaskParent
-    Public Sub New()
-        task.gOptions.setGravityUsage(False)
-        task.redOptions.YRangeSlider.Value = 3
-        If standalone Then task.gOptions.displaydst1.checked = true
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gravityVec = New linePoints(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
-        task.horizonVec = New linePoints(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
-        labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
-        desc = "Create lines for the gravity vector and horizon vector in the camera image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim xRatio = dst0.Width / task.quarterRes.Width
-        Dim yRatio = dst0.Height / task.quarterRes.Height
-        Dim splitX = task.pcSplit(0)
-        Dim splitY = task.pcSplit(1)
-        Dim noDepth = task.noDepthMask
-        If splitX.Size <> task.quarterRes Then
-            splitX = splitX.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
-            splitY = splitY.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
-            noDepth = task.noDepthMask.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
-        End If
-
-        dst1 = splitY.InRange(-0.05, 0.05)
-        dst1.SetTo(0, noDepth)
-        Dim pointsMat = dst1.FindNonZero()
-        If pointsMat.Rows > 0 Then
-            dst2.SetTo(0)
-            Dim xVals As New List(Of Integer)
-            Dim points As New List(Of cv.Point)
-            For i = 0 To pointsMat.Rows - 1
-                Dim pt = pointsMat.Get(Of cv.Point)(i, 0)
-                xVals.Add(pt.X)
-                points.Add(New cv.Point2f(pt.X * xRatio, pt.Y * yRatio))
-            Next
-
-            Dim p1 = points(xVals.IndexOf(xVals.Min()))
-            Dim p2 = points(xVals.IndexOf(xVals.Max()))
-
-            Dim lp = New linePoints(p1, p2)
-            task.horizonVec = New linePoints(lp.xp1, lp.xp2)
-            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
-        End If
-
-        'If task.horizonVec.originalLength < dst2.Width / 2 And task.redOptions.YRangeSlider.Value < task.redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
-        '    task.redOptions.YRangeSlider.Value += 1
-        'End If
-
-        dst3 = splitX.InRange(-0.01, 0.01)
-        dst3.SetTo(0, noDepth)
-        pointsMat = dst3.FindNonZero()
-        If pointsMat.Rows > 0 Then
-            Dim yVals As New List(Of Integer)
-            Dim points = New List(Of cv.Point)
-            For i = 0 To pointsMat.Rows - 1
-                Dim pt = pointsMat.Get(Of cv.Point)(i, 0)
-                yVals.Add(pt.Y)
-                points.Add(New cv.Point2f(pt.X * xRatio, pt.Y * yRatio))
-            Next
-
-            Dim p1 = points(yVals.IndexOf(yVals.Min()))
-            Dim p2 = points(yVals.IndexOf(yVals.Max()))
-            If Math.Abs(p1.X - p2.X) < 2 Then
-                task.gravityVec = New linePoints(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
-            Else
-                Dim lp = New linePoints(p1, p2)
-                task.gravityVec = New linePoints(lp.xp1, lp.xp2)
-            End If
-            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
-        End If
-
-        'If task.gravityVec.originalLength < dst2.Height / 2 And task.redOptions.XRangeSlider.Value < task.redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then
-        '    task.redOptions.XRangeSlider.Value += 1
-        'End If
     End Sub
 End Class
 

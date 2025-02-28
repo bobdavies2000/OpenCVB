@@ -110,7 +110,6 @@ Public Class Plot_OverTimeSingle : Inherits TaskParent
         desc = "Plot an input variable over time"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = dst2.Resize(task.quarterRes)
         If standaloneTest() Then plotData = task.color.Mean(task.depthMask)(0)
 
         If inputList.Count >= dst2.Width Then inputList.RemoveAt(0)

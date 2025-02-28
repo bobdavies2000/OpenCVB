@@ -117,8 +117,6 @@ End Class
 
 
 
-
-
 Public Class Gravity_HorizonCompare : Inherits TaskParent
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics

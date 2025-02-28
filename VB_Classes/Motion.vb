@@ -600,14 +600,14 @@ End Class
 
 
 Public Class Motion_EdgeStability : Inherits TaskParent
-    Dim lowRes As New GridCell_Edges
+    Dim gEdges As New GridCell_Edges
     Public Sub New()
         labels(3) = "High population cells"
         desc = "Measure the stability of edges in each grid Rect"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lowRes.Run(src)
-        dst2 = lowRes.edges.dst2
+        gEdges.Run(src)
+        dst2 = gEdges.edges.dst2
 
         Dim popSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim pops As New List(Of Integer)
