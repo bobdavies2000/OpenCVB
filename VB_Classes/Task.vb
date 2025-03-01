@@ -80,8 +80,6 @@ Public Class VBtask : Implements IDisposable
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
-    Public lowRes As cv.Size
-    Public quarterRes As cv.Size
     Public displayRes As cv.Size
 
     Public cvFontSize As Single = 0.8

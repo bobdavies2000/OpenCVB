@@ -163,10 +163,6 @@ Public Class OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Cols >= 640 Then
-            src = src.Resize(task.lowRes)
-            dst2 = dst2.Resize(task.lowRes)
-        End If
         For y As Integer = 0 To src.Rows - 1
             For x As Integer = 0 To src.Cols - 1
                 Dim vec = src.Get(Of cv.Vec3b)(y, x)

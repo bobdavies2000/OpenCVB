@@ -977,9 +977,8 @@ Public Class Depth_Colorizer_VB : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        If src.Size <> task.lowRes Then src = src.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-        dst2 = New cv.Mat(task.lowRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        dst2.SetTo(0)
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
                 Dim pixel = src.Get(Of Single)(y, x)

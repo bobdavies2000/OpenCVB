@@ -76,7 +76,6 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 4
                 task.DotSize = 4
                 task.disparityAdjustment = 1.1
-                task.lowRes = New cv.Size(240, 135)
                 task.densityMetric = 40
                 task.FASTthreshold = 25
             Case 960
@@ -84,13 +83,11 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 2
                 task.DotSize = 2
                 task.disparityAdjustment = 2.2
-                task.lowRes = New cv.Size(240, 135)
                 task.densityMetric = 200
                 task.FASTthreshold = 40
             Case 480
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cv.Size(240, 135)
                 task.densityMetric = 650
                 task.FASTthreshold = 10
             Case 1280
@@ -98,47 +95,38 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 2
                 task.DotSize = 5
                 task.disparityAdjustment = 2.2
-                task.lowRes = New cv.Size(320, 180)
                 task.densityMetric = 150
                 task.FASTthreshold = 40
             Case 640
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
-                task.lowRes = New cv.Size(320, task.dst2.Height / 2)
                 task.densityMetric = 200
                 task.FASTthreshold = 30
             Case 320
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
-                task.lowRes = New cv.Size(320, 180)
-                If task.dst2.Height = 240 Then task.lowRes = New cv.Size(160, 120)
                 task.densityMetric = 500
                 task.FASTthreshold = 10
             Case 160
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cv.Size(160, 120)
                 task.densityMetric = 100
                 task.FASTthreshold = 10
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 1
                 task.disparityAdjustment = 4.4
-                task.lowRes = New cv.Size(168, 94)
                 task.densityMetric = 300
                 task.FASTthreshold = 10
             Case 336
                 task.cvFontSize = 1.0
                 task.DotSize = 1
                 task.disparityAdjustment = 8.8
-                task.lowRes = New cv.Size(168, 94)
-                task.densityMetric = 700
                 task.FASTthreshold = 10
             Case 168
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
-                task.lowRes = New cv.Size(168, 94)
                 task.densityMetric = 1700
                 task.FASTthreshold = 10
         End Select

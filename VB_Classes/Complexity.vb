@@ -123,11 +123,10 @@ Public Class Complexity_Dots : Inherits TaskParent
     Public options As New Options_Complexity
     Public initialize As Boolean = True, maxTime As Single, fileName As String
     Public plotColor As cv.Scalar
-    Dim dst As New cv.Mat(New cv.Size(task.lowRes.Width * 2, task.lowRes.Height * 2), cv.MatType.CV_8UC3, cv.Scalar.All(0))
     Public Sub New()
         desc = "Plot the results of multiple runs at various resolutions."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If fileName <> "" Then options.filename = New FileInfo(fileName)
@@ -171,22 +170,21 @@ Public Class Complexity_Dots : Inherits TaskParent
 
         Dim maxX = srcX.Max
         Dim pointSet As New List(Of cv.Point)
-        If initialize Then dst.SetTo(0)
+        If initialize Then dst2.SetTo(0)
         For i = 0 To sortData.Count - 1
-            Dim pt = New cv.Point(dst.Width * sortData.ElementAt(i).Key / maxX,
-                                  dst.Height - dst.Height * sortData.ElementAt(i).Value / maxTime)
-            DrawCircle(dst, pt, task.DotSize, plotColor)
+            Dim pt = New cv.Point(dst2.Width * sortData.ElementAt(i).Key / maxX,
+                                  dst2.Height - dst2.Height * sortData.ElementAt(i).Value / maxTime)
+            DrawCircle(dst2, pt, task.DotSize, plotColor)
             pointSet.Add(pt)
         Next
 
         For i = 1 To pointSet.Count - 1
-            DrawLine(dst, pointSet(i - 1), pointSet(i), plotColor)
+            DrawLine(dst2, pointSet(i - 1), pointSet(i), plotColor)
         Next
 
         SetTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,
                     New cv.Point(dst2.Width / 4, 10))
         SetTrueText(" TIME " + "(Max = " + Format(maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
         labels(2) = "Complexity plot for " + options.filename.Name.Substring(0, Len(options.filename.Name) - 4)
-        dst2 = dst.Resize(dst2.Size)
     End Sub
 End Class
