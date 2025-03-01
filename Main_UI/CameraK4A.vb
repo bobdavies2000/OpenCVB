@@ -12,13 +12,38 @@ Public Class CameraK4A : Inherits GenericCamera
             Dim strPtr = A4KDeviceName(cPtr) ' The width and height of the image are set in the constructor.
             serialNumber = Marshal.PtrToStringAnsi(strPtr)
 
-            Dim ptr = A4KIntrinsics(cPtr)
-            Dim intrinsicsLeftOutput = Marshal.PtrToStructure(Of intrinsicsData)(ptr)
+            Dim ptr = A4KRGBIntrinsics(cPtr)
+            Dim intrinsicsRGB = Marshal.PtrToStructure(Of intrinsicsData)(ptr)
             Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
-            calibData.rgbIntrinsics.ppx = intrinsicsLeftOutput.cx / ratio
-            calibData.rgbIntrinsics.ppy = intrinsicsLeftOutput.cy / ratio
-            calibData.rgbIntrinsics.fx = intrinsicsLeftOutput.fx / ratio
-            calibData.rgbIntrinsics.fy = intrinsicsLeftOutput.fy / ratio
+            calibData.rgbIntrinsics.ppx = intrinsicsRGB.cx / ratio
+            calibData.rgbIntrinsics.ppy = intrinsicsRGB.cy / ratio
+            calibData.rgbIntrinsics.fx = intrinsicsRGB.fx / ratio
+            calibData.rgbIntrinsics.fy = intrinsicsRGB.fy / ratio
+
+            ptr = A4KLeftIntrinsics(cPtr)
+            Dim intrinsicsLeft = Marshal.PtrToStructure(Of intrinsicsData)(ptr)
+            calibData.leftIntrinsics.ppx = intrinsicsRGB.cx / ratio
+            calibData.leftIntrinsics.ppy = intrinsicsRGB.cy / ratio
+            calibData.leftIntrinsics.fx = intrinsicsRGB.fx / ratio
+            calibData.leftIntrinsics.fy = intrinsicsRGB.fy / ratio
+
+            ptr = A4KLeftExtrinsics(cPtr)
+            Dim leftExtrinsics(12) As Single
+            Marshal.Copy(ptr, leftExtrinsics, 0, leftExtrinsics.Length)
+
+            ReDim calibData.translation(3 - 1)
+            ReDim calibData.rotation(9 - 1)
+
+            For i = 0 To 9 - 1
+                calibData.rotation(i) = leftExtrinsics(i)
+            Next
+            For i = 0 To 3 - 1
+                calibData.translation(i) = leftExtrinsics(i + 9)
+            Next
+            calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
+                                                  System.Math.Pow(calibData.translation(1), 2) +
+                                                  System.Math.Pow(calibData.translation(2), 2))
+            calibData.baseline = 0.068
         End If
     End Sub
     Structure imuData
@@ -48,7 +73,7 @@ Public Class CameraK4A : Inherits GenericCamera
         Try
             Dim imuFrame As IntPtr
             If cPtr = 0 Then Exit Sub
-            imuFrame = A4KWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
+            imuFrame = A4KWaitFrame(cPtr)
             If imuFrame = 0 Then
                 Debug.WriteLine("KinectWaitFrame has returned without any image.")
                 failedImageCount += 1
@@ -74,26 +99,33 @@ Public Class CameraK4A : Inherits GenericCamera
 
             If cPtr = 0 Then Exit Sub
 
+            Dim brightness As Single = 0.4
             SyncLock cameraLock
-                uiColor = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
-                                               cv.MatType.CV_8UC3, A4KColor(cPtr)).Clone
-
-                ' so depth data fits into 0-255 (approximately)
-                uiLeft = (cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width,
-                                               cv.MatType.CV_16U, A4KLeftView(cPtr)) * 0.06).ToMat.
-                                               ConvertScaleAbs()
-                uiRight = uiLeft.Clone
                 If captureRes <> WorkingRes Then
+                    uiColor = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                               cv.MatType.CV_8UC3, A4KColor(cPtr)).Resize(WorkingRes)
+
+                    ' so depth data fits into 0-255 (approximately)
+                    uiLeft = (cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                               cv.MatType.CV_16U, A4KLeftView(cPtr)) * brightness).ToMat.
+                                               ConvertScaleAbs().Resize(WorkingRes)
                     Dim ptr = A4KPointCloud(cPtr)
                     Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                                   cv.MatType.CV_16SC3, ptr).
-                                                   Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    tmp.ConvertTo(uiPointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
+                                                   cv.MatType.CV_32FC3, ptr)
+                    uiPointCloud = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
                 Else
-                    Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                                   cv.MatType.CV_16SC3, A4KPointCloud(cPtr))
-                    tmp.ConvertTo(uiPointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
+                    uiColor = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                               cv.MatType.CV_8UC3, A4KColor(cPtr))
+
+                    ' so depth data fits into 0-255 (approximately)
+                    uiLeft = (cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                               cv.MatType.CV_16U, A4KLeftView(cPtr)) * brightness).ToMat.
+                                               ConvertScaleAbs()
+
+                    uiPointCloud = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
+                                                   cv.MatType.CV_32FC3, A4KPointCloud(cPtr)).Clone
                 End If
+                uiRight = uiLeft.Clone
             End SyncLock
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         Catch ex As Exception
@@ -117,9 +149,13 @@ Module A4K_Interface
     End Function
     <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceName(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KWaitFrame(cPtr As IntPtr, w As Integer, h As Integer) As IntPtr
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KWaitFrame(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KIntrinsics(cPtr As IntPtr) As IntPtr
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KRGBIntrinsics(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftIntrinsics(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftExtrinsics(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KPointCloud(cPtr As IntPtr) As IntPtr
     End Function

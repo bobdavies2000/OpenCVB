@@ -34,21 +34,20 @@ public:
 	k4a_device_t device = NULL;
 	k4a_calibration_t calibration;
 	k4a_transformation_t transformation = NULL;
-	int* depthBuffer = 0;
 	uint8_t* colorBuffer = 0;;
 	k4a_image_t point_cloud_image = NULL;
 	k4a_image_t colorImage = NULL;
 	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 	char outMsg[10000];
-	Mat colorMat, leftView;
+	Mat colorMat, leftView, pointCloud;
 	int width, height;
-
+	int* depthBuffer = 0;
 private:
 	k4a_capture_t capture = NULL;
 	const int32_t TIMEOUT_IN_MS = 1000;
 	size_t infraredSize = 0;
-	k4a_image_t point_cloud = NULL;
-	k4a_image_t depthInColor;
+	Mat point_cloud;
+	k4a_image_t depthColorMapped;
 public:
 	~K4Acamera()
 	{
@@ -74,15 +73,17 @@ public:
 
 			k4a_device_get_calibration(device, config.depth_mode, config.color_resolution, &calibration);
 
-			k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, width, height, width * int(sizeof(int16_t)), &depthInColor);
+			k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, width, height, width * int(sizeof(int16_t)), &depthColorMapped);
 			k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM, width, height, width * 3 * int(sizeof(int16_t)), 
-							 &point_cloud_image); // int16_t - not a mistake.
+				&point_cloud_image);
 
 			k4a_image_create(K4A_IMAGE_FORMAT_COLOR_BGRA32, width, height, width * 4 * int(sizeof(uint8_t)), &colorImage);
 
 			k4a_device_start_cameras(device, &config);
 
 			transformation = k4a_transformation_create(&calibration);
+
+			pointCloud = Mat(height, width, CV_32FC3);
 
 			k4a_device_start_imu(device);
 		}
@@ -118,24 +119,28 @@ public:
 			}
 		}
 
-		if (colorImage) k4a_image_release(colorImage);  // we want to keep the colorimage around between calls.
 		colorImage = k4a_capture_get_color_image(capture);
 		if (colorImage)
 		{
 			colorBuffer = k4a_image_get_buffer(colorImage);
 			if (colorBuffer == NULL) return 0; // just have to use the last buffers.  Nothing new...
 		}
+		Mat tmp = Mat(height, width, CV_8UC4, (int*)colorBuffer);
+		cvtColor(tmp, colorMat, COLOR_BGRA2BGR);
 
 		k4a_image_t depthImage = k4a_capture_get_depth_image(capture);
 		if (depthImage != NULL and depthImage->_rsvd != 0)
 		{
-			k4a_transformation_depth_image_to_color_camera(transformation, depthImage, depthInColor);
-			depthBuffer = (int*)k4a_image_get_buffer(depthInColor);
+			k4a_transformation_depth_image_to_color_camera(transformation, depthImage, depthColorMapped);
+			depthBuffer = (int*)k4a_image_get_buffer(depthColorMapped);
 		}
+		leftView = Mat(height, width, CV_16U, depthBuffer);
 
-		k4a_transformation_depth_image_to_point_cloud(transformation, depthInColor, 
+		k4a_transformation_depth_image_to_point_cloud(transformation, depthColorMapped,
 													  K4A_CALIBRATION_TYPE_COLOR, point_cloud_image);
-		
+		Mat pcTmp = Mat(height, width, CV_16UC3, k4a_image_get_buffer(point_cloud_image));
+		pcTmp.convertTo(pointCloud, CV_32FC3);
+
 		for (int i = 0; i < 1000; i++)
 		{
 			auto test = k4a_device_get_imu_sample(device, &imu_sample, 0); // get the latest sample
@@ -157,22 +162,24 @@ public:
 
 extern "C" __declspec(dllexport) int A4KDeviceCount(K4Acamera * cPtr) { return cPtr->deviceCount; }
 extern "C" __declspec(dllexport) int* A4KDeviceName(K4Acamera * cPtr) { return (int*)cPtr->serial_number; }
-extern "C" __declspec(dllexport) int* A4KIntrinsics(K4Acamera * cPtr) { return (int*)&cPtr->calibration.color_camera_calibration.intrinsics.parameters.v; }
+extern "C" __declspec(dllexport) int* A4KRGBIntrinsics(K4Acamera* cPtr) {
+	return (int*)&cPtr->calibration.color_camera_calibration.intrinsics.parameters.v;
+}
+extern "C" __declspec(dllexport) int* A4KLeftIntrinsics(K4Acamera* cPtr) {
+	return (int*)&cPtr->calibration.depth_camera_calibration.intrinsics.parameters.v;
+}
+extern "C" __declspec(dllexport) int* A4KLeftExtrinsics(K4Acamera* cPtr) {
+	return (int*) & cPtr->calibration.extrinsics[K4A_CALIBRATION_TYPE_DEPTH][K4A_CALIBRATION_TYPE_COLOR];
+}
 extern "C" __declspec(dllexport) int* A4KColor(K4Acamera * cPtr) { return (int*)cPtr->colorMat.data; }
 extern "C" __declspec(dllexport) int* A4KPointCloud(K4Acamera * cPtr) 
-		   { return (int*)k4a_image_get_buffer(cPtr->point_cloud_image); }
-extern "C" __declspec(dllexport) int* A4KLeftView(K4Acamera * cPtr) { return (int *)cPtr->depthInColor.data; }
+		   { return (int*)cPtr->pointCloud.data; }
+extern "C" __declspec(dllexport) int* A4KLeftView(K4Acamera * cPtr) { return (int *)cPtr->leftView.data; }
 extern "C" __declspec(dllexport) 
-int* A4KWaitFrame(K4Acamera* cPtr, int w, int h)
+int* A4KWaitFrame(K4Acamera* cPtr)
 { 
 	int* imuFrame = cPtr->waitForFrame();
 	if (cPtr->colorBuffer == 0) return 0;
-	Mat tmp = Mat(cPtr->height, cPtr->width, CV_8UC4, (int*)cPtr->colorBuffer);
-	resize(tmp, tmp, Size(w, h), INTER_NEAREST);
-	cvtColor(tmp, cPtr->colorMat, COLOR_BGRA2BGR);
-
-	tmp = Mat(cPtr->height, cPtr->width, CV_16U, cPtr->depthBuffer);
-	resize(tmp, cPtr->leftView, Size(w, h), INTER_NEAREST);
 
 	return imuFrame;
 }

@@ -72,6 +72,38 @@ Public Class Options
             End Select
         End If
     End Sub
+    Public Sub defineCameraResolutions1(index As Integer)
+        Select Case Main_UI.cameraNames(index)
+            Case "StereoLabs ZED 2/2i"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
+                                                        True, True, True, False, False, False,
+                                                        True, True, True, True, True, True})
+            Case "Intel(R) RealSense(TM) Depth Camera 435i"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                        True, True, True, True, True, True,
+                                                        False, False, False, False, False, False})
+            Case "Intel(R) RealSense(TM) Depth Camera 455"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                        True, True, True, True, True, True,
+                                                        False, False, False, False, False, False})
+            Case "Oak-D camera"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                        True, True, True, False, False, False,
+                                                        False, False, False, False, False, False})
+            Case "MYNT-EYE-D1000"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                        True, True, True, False, False, False,
+                                                        False, False, False, False, False, False})
+            Case "Orbbec Gemini 335L"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                        True, True, True, True, True, True,
+                                                        False, False, False, False, False, False})
+            Case "Azure Kinect 4K"
+                Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True, True,
+                                                        True, True, False, False, False,
+                                                        False, False, False, False, False, False})
+        End Select
+    End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         Dim index = Main_UI.cameraNames.IndexOf(sender.text)
         If sender.checked = False Then Exit Sub

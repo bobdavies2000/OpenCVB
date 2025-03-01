@@ -322,8 +322,6 @@ Public Class VBtask : Implements IDisposable
     End Structure
 
     Public Structure algParms
-        ' The order of cameras in cameraNames is important. Add new cameras at the end.
-        '  "StereoLabs ZED 2/2i C++", turned off
         Public Shared cameraNames As New List(Of String)({"Azure Kinect 4K",
                                                           "Intel(R) RealSense(TM) Depth Camera 435i",
                                                           "Intel(R) RealSense(TM) Depth Camera 455",
@@ -462,18 +460,21 @@ Public Class VBtask : Implements IDisposable
         useRecordedData = parms.useRecordedData
         externalPythonInvocation = parms.externalPythonInvocation
 
-
-        '"Intel(R) RealSense(TM) Depth Camera 435i",
-        '"Intel(R) RealSense(TM) Depth Camera 455",
-        '"Oak-D camera",
-        '"StereoLabs ZED 2/2i",
-        '"MYNT-EYE-D1000",
-        '"Orbbec Gemini 335L"})
-        task.defaultLowResColorDifference = 10
+        ' set options for specific cameras here.
         Select Case task.cameraName
+            Case "StereoLabs ZED 2/2i"
+                task.defaultLowResColorDifference = 6
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
                 task.defaultLowResColorDifference = 6
             Case "Intel(R) RealSense(TM) Depth Camera 455"
+                task.defaultLowResColorDifference = 6
+            Case "Oak-D camera"
+                task.defaultLowResColorDifference = 6
+            Case "Orbbec Gemini 335L"
+                task.defaultLowResColorDifference = 6
+            Case "MYNT-EYE-D1000"
+                task.defaultLowResColorDifference = 6
+            Case "Azure Kinect 4K"
                 task.defaultLowResColorDifference = 6
         End Select
 
@@ -602,14 +603,14 @@ Public Class VBtask : Implements IDisposable
         Dim pcTop = task.pointCloudRaw.Get(Of cv.Point3f)(pt.Y, pt.X)
         If pcTop.Z > 0 Then
             ir3D.X = task.calibData.rotation(0) * pcTop.X +
-                         task.calibData.rotation(1) * pcTop.Y +
-                         task.calibData.rotation(2) * pcTop.Z + task.calibData.translation(0)
+                     task.calibData.rotation(1) * pcTop.Y +
+                     task.calibData.rotation(2) * pcTop.Z + task.calibData.translation(0)
             ir3D.Y = task.calibData.rotation(3) * pcTop.X +
-                         task.calibData.rotation(4) * pcTop.Y +
-                         task.calibData.rotation(5) * pcTop.Z + task.calibData.translation(1)
+                     task.calibData.rotation(4) * pcTop.Y +
+                     task.calibData.rotation(5) * pcTop.Z + task.calibData.translation(1)
             ir3D.Z = task.calibData.rotation(6) * pcTop.X +
-                         task.calibData.rotation(7) * pcTop.Y +
-                         task.calibData.rotation(8) * pcTop.Z + task.calibData.translation(2)
+                     task.calibData.rotation(7) * pcTop.Y +
+                     task.calibData.rotation(8) * pcTop.Z + task.calibData.translation(2)
             irPt.X = task.calibData.leftIntrinsics.fx * ir3D.X / ir3D.Z + task.calibData.leftIntrinsics.ppx
             irPt.Y = task.calibData.leftIntrinsics.fy * ir3D.Y / ir3D.Z + task.calibData.leftIntrinsics.ppy
         End If

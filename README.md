@@ -1,36 +1,29 @@
-# February 2025 (Part 2) – More ‘QuadDepth’ improvements, OpenGL display changes, Extrinsics/Intrinsics, and Connected Depth Cells
+# February 2025 (Part 3) – Azure Kinect Support, Depth Views, Grid Cells, and Motion Detection Compromise.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   The ‘QuadDepth’ display was configured to show OpenGL quad’s or rectangles.
-    -   Neighboring quads are now connected if they are close in depth.
-    -   The depth difference between cells is controlled with a global option.
-    -   Neighboring cells are connected both vertically and horizontally.
-    -   Cursor movements display the depth of any cell under the cursor.
-    -   Debug feature: cell depth is displayed even when the algorithm is paused.
-    -   NOTE: right-click the mouse to avoid updating the mouse move value.
-        -   Move off the screen while holding the right-click to debug.
--   OpenGL algorithms typically display raw point cloud data.
-    -   OpenGL_QuadCompare algorithm displays multiple views.
-    -   Options include raw point cloud, flat or connected depth cells.
-    -   Connected depth cells remove many artifacts or floating points.
-    -   Horizontal and vertical connections build a solid OpenGL ‘weave’.
--   The fx, fy, ppx, and ppy intrinsics were reviewed and tested.
-    -   More testing is needed to handle cameras without RGB=Left View.
-    -   All camera parameters are adjusted using the ratio of working to capture size.
--   DepthCell.vb has a correlation map showing a cell’s left to right image correlation.
-    -   A mask of the heat map can be thresholded to isolate high quality cells.
-    -   The correlation relies on intrinsics and extrinsics for the left and RGB.
-        -   And the corresponding values for the left and right images.
-        -   For the StereoLabs Zed 2/2i cameras, the RGB equals the left image.
--   The MYNT EYE camera support is not working. Rebuilding the SDK doesn’t work.
-    -   This camera is highly desirable because the RGB and left cameras are the same.
-    -   Any MYNT developer’s pull request would be gratefully received.
--   The upper right image (DepthRGB) shows the % depth pixels that are present.
+-   The Azure Kinect camera updated with access to extrinsics but it is limited.
+    -   K4A does not use disparity to compute distance = TOF = time of flight.
+    -   Confirming depth with correlation is not possible with RGB/Left images.
+-   For all other cameras correlations are possible with left and right images.
+    -   Grid cells define a region which is used to confirm depth quality.
+    -   Correlations measure the quality of the depth data in each grid cell.
+    -   Some cameras provide left images already aligned with the RGB image.
+    -   But some need calibration parameters to connect RGB and left grid cells.
+        -   See below where the Intel D435i maps RGB into the left image.
+    -   The mouse cursor displays the correlation coefficient and depth pixel density.
+    -   The Oak-D camera support is still under development – new camera coming.
+-   A reworked Motion_Basics uses grid cells to manage the motion rectangles.
+    -   Motion detection is a compromise that successfully removes artifacts.
+    -   The default setting is to update pixels only where motion is detected.
+    -   Pixels undisturbed by motion provide algorithm results that are more stable.
+    -   The “Depth Correlation” view is a good example of motion detection usage.
+        -   In the upper right image below the red grid cells confirm stable depth.
+    -   Motion detection is a compromise that preserves grid cell color.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/3f3ecad62a60b44ad5d6a8aefa22c148.gif)
+![](media/ba9fd91a6d76b04326a7171aad5eb8ba.gif)
 
-**OpenGL_QuadCompare :** *The 3 different OpenGL display formats are shown above – raw point cloud, flat depth cells, and connected depth cells. The flat and connected depth cells are OpenGL quads, not points. Note that the connected depth cells remove some of the floating artifacts. A cell is connected to its neighbors if their depths are within X centimeters (controlled with an option.) The depth cells are then connected in vertical and horizontal directions to produce a solid appearance.*
+**GridCell_LeftToColor :** *The upper right image rotates between the 3 different representations of the depth data. The correlation coefficients are highlighted in red for grid cells that have 90%+ correlation between the left and right images, indicating that the grid cell is highly visible to both the left and right and is likely to have excellent depth data. The lower left image shows the corresponding points for the RGB data (upper left.)  The camera is the Intel RealSense D435i and the left image is grayscale. The lower right image has the same pixels highlighted as the lower left image but is more readable. Use the mouse cursor to display the correlation coefficient and pixel count percentage for the grid cell under the cursor.*
 
 # Introduction
 
@@ -1781,3 +1774,37 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A person sitting in a room AI-generated content may be incorrect.](media/638f97600747b1130688e8061ae8af2a.gif)
 
 **OpenGL_QuadDepth:** *The “QuadDepth” data that is displayed in the upper right image of the output for all the algorithms can also be displayed in OpenGL. Each cell is provided to OpenGL as a quad that is always filled with the mean color for the cell. In the sequence above the last image is zoomed sufficiently to show that each cell is a rectangle, not a set of points.*
+
+# February 2025 (Part 2) – More ‘QuadDepth’ improvements, OpenGL display changes, Extrinsics/Intrinsics, and Connected Depth Cells
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   The ‘QuadDepth’ display was configured to show OpenGL quad’s or rectangles.
+    -   Neighboring quads are now connected if they are close in depth.
+    -   The depth difference between cells is controlled with a global option.
+    -   Neighboring cells are connected both vertically and horizontally.
+    -   Cursor movements display the depth of any cell under the cursor.
+    -   Debug feature: cell depth is displayed even when the algorithm is paused.
+    -   NOTE: right-click the mouse to avoid updating the mouse move value.
+        -   Move off the screen while holding the right-click to debug.
+-   OpenGL algorithms typically display raw point cloud data.
+    -   OpenGL_QuadCompare algorithm displays multiple views.
+    -   Options include raw point cloud, flat or connected depth cells.
+    -   Connected depth cells remove many artifacts or floating points.
+    -   Horizontal and vertical connections build a solid OpenGL ‘weave’.
+-   The fx, fy, ppx, and ppy intrinsics were reviewed and tested.
+    -   More testing is needed to handle cameras without RGB=Left View.
+    -   All camera parameters are adjusted using the ratio of working to capture size.
+-   DepthCell.vb has a correlation map showing a cell’s left to right image correlation.
+    -   A mask of the heat map can be thresholded to isolate high quality cells.
+    -   The correlation relies on intrinsics and extrinsics for the left and RGB.
+        -   And the corresponding values for the left and right images.
+        -   For the StereoLabs Zed 2/2i cameras, the RGB equals the left image.
+-   The MYNT EYE camera support is not working. Rebuilding the SDK doesn’t work.
+    -   This camera is highly desirable because the RGB and left cameras are the same.
+    -   Any MYNT developer’s pull request would be gratefully received.
+-   The upper right image (DepthRGB) shows the % depth pixels that are present.
+-   A log of previous changes is included at the bottom of this document.
+
+![A room with a door and a room with a door and a room with a door and a room with a door and a room with a door and a room with a door and a room AI-generated content may be incorrect.](media/3f3ecad62a60b44ad5d6a8aefa22c148.gif)
+
+**OpenGL_QuadCompare :** *The 3 different OpenGL display formats are shown above – raw point cloud, flat depth cells, and connected depth cells. The flat and connected depth cells are OpenGL quads, not points. Note that the connected depth cells remove some of the floating artifacts. A cell is connected to its neighbors if their depths are within X centimeters (controlled with an option.) The depth cells are then connected in vertical and horizontal directions to produce a solid appearance.*
