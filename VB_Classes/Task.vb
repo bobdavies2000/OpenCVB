@@ -37,6 +37,7 @@ Public Class VBtask : Implements IDisposable
     Public gridPoints As New List(Of cv.Point) ' the list of each gridRect corner 
     Public depthDiffMeters As Single ' grid cells > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean
+    Public defaultLowResColorDifference As Integer
 
     Public fpList As New List(Of fpData)
     Public fpListLast As New List(Of fpData)
@@ -118,7 +119,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public gCell As GridRedCell_Basics
+    Public gCell As GridCell_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public feat As Feature_Basics
@@ -462,6 +463,21 @@ Public Class VBtask : Implements IDisposable
         useRecordedData = parms.useRecordedData
         externalPythonInvocation = parms.externalPythonInvocation
 
+
+        '"Intel(R) RealSense(TM) Depth Camera 435i",
+        '"Intel(R) RealSense(TM) Depth Camera 455",
+        '"Oak-D camera",
+        '"StereoLabs ZED 2/2i",
+        '"MYNT-EYE-D1000",
+        '"Orbbec Gemini 335L"})
+        task.defaultLowResColorDifference = 10
+        Select Case task.cameraName
+            Case "Intel(R) RealSense(TM) Depth Camera 435i"
+                task.defaultLowResColorDifference = 6
+            Case "Intel(R) RealSense(TM) Depth Camera 455"
+                task.defaultLowResColorDifference = 6
+        End Select
+
         mainFormLocation = parms.mainFormLocation
         displayRes = parms.displayRes
         rows = parms.workingRes.Height
@@ -497,7 +513,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Horizon
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        gCell = New GridRedCell_Basics
+        gCell = New GridCell_Basics
         colorizer = New Depth_Palette
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics

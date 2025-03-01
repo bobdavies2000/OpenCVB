@@ -1,6 +1,6 @@
 ﻿Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
-Public Class GridRedCell_Basics : Inherits TaskParent
+Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_DepthCellSize
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean
@@ -323,24 +323,23 @@ End Class
 
 
 
-Public Class GridCell_LeftAlign : Inherits TaskParent
+Public Class GridCell_LeftToColor : Inherits TaskParent
     Public Sub New()
-        labels(3) = "Left view locations for the top left corner of each grid cell."
         desc = "Align grid cell left rectangles in color with the left image.  StereoLabs and Orbbec already match."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView.Clone
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3.SetTo(0)
         Dim count As Integer
         For Each idd In task.iddList
             If idd.depth > 0 Then
                 count += 1
                 task.color.Circle(idd.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
-                dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
-                dst3.Circle(idd.lRect.TopLeft, task.DotSize, cv.Scalar.White, -1)
+                dst2.Circle(idd.lRect.TopLeft, task.DotSize, task.HighlightColor, -1)
+                dst3.Circle(idd.lRect.TopLeft, task.DotSize, task.HighlightColor, -1)
             End If
         Next
-        labels(2) = CStr(count) + " grid cells have depth and therefore an equivalent in the left view."
+        labels(2) = CStr(count) + " grid cells have depth and therefore an equivalent in the left and right views."
     End Sub
 End Class
 

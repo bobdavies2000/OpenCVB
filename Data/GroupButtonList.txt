@@ -94,7 +94,6 @@ Gradient
 Gravity
 Grid
 GridCell
-GridRedCell
 Guess
 GuidedBP
 HeatMap

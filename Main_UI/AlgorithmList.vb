@@ -637,6 +637,7 @@ Public Class algorithmList
 	If algorithmName = "Grid_ShowMap" Then return new Grid_ShowMap
 	If algorithmName = "Grid_Special" Then return new Grid_Special
 	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter
+	If algorithmName = "GridCell_Basics" Then return new GridCell_Basics
 	If algorithmName = "GridCell_Boundaries" Then return new GridCell_Boundaries
 	If algorithmName = "GridCell_Canny" Then return new GridCell_Canny
 	If algorithmName = "GridCell_Color" Then return new GridCell_Color
@@ -654,8 +655,8 @@ Public Class algorithmList
 	If algorithmName = "GridCell_Gaps" Then return new GridCell_Gaps
 	If algorithmName = "GridCell_GrayScaleTest" Then return new GridCell_GrayScaleTest
 	If algorithmName = "GridCell_InstantUpdate" Then return new GridCell_InstantUpdate
-	If algorithmName = "GridCell_LeftAlign" Then return new GridCell_LeftAlign
 	If algorithmName = "GridCell_LeftRightSize" Then return new GridCell_LeftRightSize
+	If algorithmName = "GridCell_LeftToColor" Then return new GridCell_LeftToColor
 	If algorithmName = "GridCell_LowStdev" Then return new GridCell_LowStdev
 	If algorithmName = "GridCell_LowStdevCorrelation" Then return new GridCell_LowStdevCorrelation
 	If algorithmName = "GridCell_LR" Then return new GridCell_LR
@@ -671,7 +672,6 @@ Public Class algorithmList
 	If algorithmName = "GridCell_Sorted" Then return new GridCell_Sorted
 	If algorithmName = "GridCell_Stdev" Then return new GridCell_Stdev
 	If algorithmName = "GridCell_Validate" Then return new GridCell_Validate
-	If algorithmName = "GridRedCell_Basics" Then return new GridRedCell_Basics
 	If algorithmName = "Guess_Depth_CPP" Then return new Guess_Depth_CPP
 	If algorithmName = "Guess_ImageEdges_CPP" Then return new Guess_ImageEdges_CPP
 	If algorithmName = "GuidedBP_Basics" Then return new GuidedBP_Basics

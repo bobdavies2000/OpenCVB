@@ -97,7 +97,7 @@ End Class
 
 Public Class GridCell_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
-    Dim devGrid As New GridRedCell_Basics
+    Dim devGrid As New GridCell_Basics
     Public Sub New()
         task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them."
