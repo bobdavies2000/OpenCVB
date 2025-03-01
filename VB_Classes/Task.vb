@@ -25,7 +25,6 @@ Public Class VBtask : Implements IDisposable
     Public cellSize As Integer
     Public tilesPerCol As Integer
     Public tilesPerRow As Integer
-    Public gridIndex As New List(Of Integer)
     Public gridRects As List(Of cv.Rect)
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9

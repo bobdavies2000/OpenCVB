@@ -122,7 +122,6 @@ Public Class Grid_Basics : Inherits TaskParent
             task.tilesPerRow = tilesPerRow
             task.gridMask = gridMask
             task.gridMap = gridMap
-            task.gridIndex = New List(Of Integer)(gridIndex)
             task.gridRects = gridRects
             task.gridNabeRects = New List(Of cv.Rect)(gridNabeRects)
             task.gridNeighbors = New List(Of List(Of Integer))(gridNeighbors)
@@ -254,39 +253,25 @@ End Class
 
 
 Public Class Grid_Neighbors : Inherits TaskParent
-    Dim mask As New cv.Mat
     Public Sub New()
-        labels = {"", "", "Grid_Basics output", ""}
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        task.ClickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         desc = "Click any grid element to see its neighbors"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.tilesPerCol <> CInt(dst2.Height / 10) Then
-            task.gOptions.GridSlider.Value = CInt(dst2.Height / 10)
-            task.tilesPerCol = task.cellSize
-            task.grid.Run(src)
-        End If
-
         dst2 = src
-        If standaloneTest() Then
-            If task.heartBeat Then
-                task.mouseClickFlag = True
-                task.ClickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            End If
-        End If
 
         SetTrueText("Click any grid entry to see its neighbors", 3)
-        If task.optionsChanged Then mask = task.gridMask.Clone
+        dst2.SetTo(white, task.gridMask)
 
-        If task.mouseClickFlag Then
-            mask = task.gridMask.Clone
-            Dim roiIndex = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim roiIndex = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
 
-            For Each index In task.gridNeighbors(roiIndex)
-                Dim roi = task.gridRects(index)
-                mask.Rectangle(roi, white)
-            Next
-        End If
-        dst2.SetTo(white, mask)
+        dst3.SetTo(0)
+        For Each index In task.gridNeighbors(roiIndex)
+            Dim roi = task.gridRects(index)
+            dst2.Rectangle(roi, white, task.lineWidth)
+            dst3.Rectangle(roi, 255, task.lineWidth)
+        Next
     End Sub
 End Class
 
