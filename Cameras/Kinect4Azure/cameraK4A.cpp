@@ -161,7 +161,7 @@ extern "C" __declspec(dllexport) int* A4KIntrinsics(K4Acamera * cPtr) { return (
 extern "C" __declspec(dllexport) int* A4KColor(K4Acamera * cPtr) { return (int*)cPtr->colorMat.data; }
 extern "C" __declspec(dllexport) int* A4KPointCloud(K4Acamera * cPtr) 
 		   { return (int*)k4a_image_get_buffer(cPtr->point_cloud_image); }
-extern "C" __declspec(dllexport) int* A4KLeftView(K4Acamera * cPtr) { return (int *)cPtr->leftView.data; }
+extern "C" __declspec(dllexport) int* A4KLeftView(K4Acamera * cPtr) { return (int *)cPtr->depthInColor.data; }
 extern "C" __declspec(dllexport) 
 int* A4KWaitFrame(K4Acamera* cPtr, int w, int h)
 { 
