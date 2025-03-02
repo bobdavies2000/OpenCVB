@@ -638,11 +638,12 @@ Public Class algorithmList
 	If algorithmName = "Grid_Special" Then return new Grid_Special
 	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter
 	If algorithmName = "GridCell_Basics" Then return new GridCell_Basics
-	If algorithmName = "GridCell_Boundaries" Then return new GridCell_Boundaries
 	If algorithmName = "GridCell_Canny" Then return new GridCell_Canny
 	If algorithmName = "GridCell_Color" Then return new GridCell_Color
 	If algorithmName = "GridCell_ColorSplit" Then return new GridCell_ColorSplit
 	If algorithmName = "GridCell_Connected" Then return new GridCell_Connected
+	If algorithmName = "GridCell_ConnectedGaps" Then return new GridCell_ConnectedGaps
+	If algorithmName = "GridCell_ConnectedRects" Then return new GridCell_ConnectedRects
 	If algorithmName = "GridCell_Correlation" Then return new GridCell_Correlation
 	If algorithmName = "GridCell_Correlation1" Then return new GridCell_Correlation1
 	If algorithmName = "GridCell_CorrelationMap" Then return new GridCell_CorrelationMap
@@ -651,8 +652,8 @@ Public Class algorithmList
 	If algorithmName = "GridCell_FeatureGaps" Then return new GridCell_FeatureGaps
 	If algorithmName = "GridCell_FeatureLess" Then return new GridCell_FeatureLess
 	If algorithmName = "GridCell_Features" Then return new GridCell_Features
+	If algorithmName = "GridCell_FeaturesAndEdges" Then return new GridCell_FeaturesAndEdges
 	If algorithmName = "GridCell_FullDepth" Then return new GridCell_FullDepth
-	If algorithmName = "GridCell_Gaps" Then return new GridCell_Gaps
 	If algorithmName = "GridCell_GrayScaleTest" Then return new GridCell_GrayScaleTest
 	If algorithmName = "GridCell_InstantUpdate" Then return new GridCell_InstantUpdate
 	If algorithmName = "GridCell_LeftRightSize" Then return new GridCell_LeftRightSize

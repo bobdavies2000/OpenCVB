@@ -169,7 +169,11 @@ Public Class GridCell_Plot : Inherits TaskParent
             idd = task.iddList(index)
         End If
 
-        Dim split() = task.pointCloud(idd.lRect).Split()
+        If idd.pixels = 0 Then
+            dst3.SetTo(0)
+            Exit Sub
+        End If
+        Dim split() = task.pointCloud(idd.cRect).Split()
         Dim mm = GetMinMax(split(2))
 
         If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
@@ -484,120 +488,6 @@ End Class
 
 
 
-
-Public Class GridCell_Connected : Inherits TaskParent
-    Public connectedH As New List(Of Tuple(Of Integer, Integer))
-    Public connectedV As New List(Of Tuple(Of Integer, Integer))
-    Dim width As Integer, height As Integer
-    Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
-    Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
-    Public Sub New()
-        desc = "Connect cells that are close in depth"
-    End Sub
-    Private Sub drawHRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
-        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            Dim p1 = task.iddList(colStart).cRect.TopLeft
-            Dim p2 = task.iddList(colEnd).cRect.BottomRight
-            dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
-            colorIndex += 1
-            connectedH.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
-            colStart = nextStart
-            colEnd = colStart
-        Else
-            colEnd += 1
-        End If
-    End Sub
-    Private Sub drawVRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
-        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            bottomRight = task.iddList(iddNext).cRect.BottomRight
-            dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
-            colorIndex += 1
-            connectedV.Add(New Tuple(Of Integer, Integer)(rowStart, iddNext))
-            rowStart = nextStart
-            If nextStart >= 0 Then topLeft = task.iddList(rowStart).cRect.TopLeft
-        End If
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-
-        width = dst2.Width / task.cellSize
-        If width * task.cellSize <> dst2.Width Then width += 1
-        height = Math.Floor(dst2.Height / task.cellSize)
-        If height * task.cellSize <> dst2.Height Then height += 1
-        connectedH.Clear()
-        colorIndex = 0
-        For i = 0 To height - 1
-            colStart = i * width
-            colEnd = colStart
-            For j = 0 To width - 2
-                drawHRect(task.iddList(i * width + j), task.iddList(i * width + j + 1), i * width + j + 1)
-            Next
-            drawHRect(task.iddList(i * width + height - 1), task.iddList(i * width + height - 1), -1)
-        Next
-        labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
-                    CStr(task.depthDiffMeters) + " meters"
-
-        connectedV.Clear()
-        Dim index As Integer
-        colorIndex = 0
-        For i = 0 To width
-            rowStart = i
-            topLeft = task.iddList(i).cRect.TopLeft
-            bottomRight = task.iddList(i + width).cRect.TopLeft
-            For j = 0 To height - 2
-                index = i + (j + 1) * width
-                If index >= task.iddList.Count Then index = task.iddList.Count - 1
-                drawVRect(task.iddList(i + j * width), task.iddList(index), i + j * width, index)
-            Next
-            Dim iddNext = i + (height - 1) * width
-            If iddNext >= task.iddList.Count Then iddNext = task.iddList.Count - 1
-            drawVRect(task.iddList(iddNext), task.iddList(index), iddNext, -1)
-        Next
-
-        labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
-                    CStr(task.depthDiffMeters) + " meters"
-    End Sub
-End Class
-
-
-
-
-
-Public Class GridCell_Gaps : Inherits TaskParent
-    Dim connect As New GridCell_Connected
-    Public Sub New()
-        labels(2) = "Grid cells with single cells removed for both vertical and horizontal connected cells."
-        labels(3) = "Vertical cells with single cells removed."
-        desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-        dst2 = connect.dst2
-        dst3 = connect.dst3
-
-        For Each tup In connect.connectedH
-            If tup.Item2 - tup.Item1 = 0 Then
-                Dim idd = task.iddList(tup.Item1)
-                dst2(idd.cRect).SetTo(0)
-            End If
-        Next
-
-        For Each tup In connect.connectedV
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
-            If idd2.cRect.TopLeft.Y - idd1.cRect.TopLeft.Y = 0 Then
-                dst2(idd1.cRect).SetTo(0)
-                dst3(idd1.cRect).SetTo(0)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
 Public Class GridCell_Stdev : Inherits TaskParent
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F)
@@ -679,62 +569,6 @@ End Class
 
 
 
-Public Class GridCell_Features : Inherits TaskParent
-    Dim options As New Options_Features
-    Public Sub New()
-        optiBase.FindSlider("Min Distance to next").Value = 3
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Featureless areas"
-        task.feat = New Feature_Basics
-        desc = "Identify the cells with features"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        task.feat.Run(src)
-
-        dst2 = task.gCell.dst2
-
-        Dim gridIndex As New List(Of Integer)
-        Dim gridCounts As New List(Of Integer)
-
-        task.featurePoints.Clear()
-        Dim rects As New List(Of cv.Rect)
-        For Each pt In task.features
-            Dim index = task.iddMap.Get(Of Integer)(pt.Y, pt.X)
-            Dim idd = task.iddList(index)
-            idd.features.Add(pt)
-            DrawCircle(dst2, idd.cRect.TopLeft, task.DotSize, task.HighlightColor)
-
-            rects.Add(idd.cRect)
-            task.iddList(index) = idd
-        Next
-
-        task.featureRects.Clear()
-        task.fLessRects.Clear()
-        For Each idd In task.iddList
-            If idd.features.Count > 0 Then task.featureRects.Add(idd.cRect) Else task.fLessRects.Add(idd.cRect)
-        Next
-
-        If task.gOptions.DebugCheckBox.Checked Then
-            For Each pt In task.features
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
-            Next
-        End If
-        If standaloneTest() Then
-            dst3.SetTo(0)
-            For Each r In rects
-                dst3.Rectangle(r, white, -1)
-            Next
-            dst3 = Not dst3
-        End If
-        If task.heartBeat Then
-            labels(2) = CStr(task.featureRects.Count) + " cells had features while " + CStr(task.fLessRects.Count) + " had none"
-        End If
-    End Sub
-End Class
-
-
-
 
 
 
@@ -809,59 +643,10 @@ End Class
 
 
 
-Public Class GridCell_Boundaries : Inherits TaskParent
-    Public feat As New GridCell_Edges
-    Public boundaryCells As New List(Of List(Of Integer))
-    Public Sub New()
-        labels(2) = "Gray and black regions are featureless while white has features..."
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Find the boundary cells between feature and featureless cells."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(src)
-        dst1 = task.featureMask.Clone
-
-        boundaryCells.Clear()
-        For Each nList In task.gridNeighbors
-            Dim roiA = task.gridRects(nList(0))
-            Dim centerType = task.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
-            If centerType <> 0 Then
-                Dim boundList = New List(Of Integer)
-                Dim addFirst As Boolean = True
-                For i = 1 To nList.Count - 1
-                    Dim roiB = task.gridRects(nList(i))
-                    Dim val = task.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
-                    If centerType <> val Then
-                        If addFirst Then boundList.Add(nList(0)) ' first element is the center point (has features)
-                        addFirst = False
-                        boundList.Add(nList(i))
-                    End If
-                Next
-                If boundList.Count > 0 Then boundaryCells.Add(boundList)
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each nlist In boundaryCells
-            For Each n In nlist
-                Dim mytoggle As Integer
-                Dim roi = task.gridRects(n)
-                Dim val = task.featureMask.Get(Of Byte)(roi.Y, roi.X)
-                If val > 0 Then mytoggle = 255 Else mytoggle = 128
-                dst2(task.gridRects(n)).SetTo(mytoggle)
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class GridCell_MLColor : Inherits TaskParent
     Dim ml As New ML_Basics
-    Dim bounds As New GridCell_Boundaries
+    Dim bounds As New GridCell_FeaturesAndEdges
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
@@ -934,7 +719,7 @@ End Class
 
 Public Class GridCell_MLColorDepth : Inherits TaskParent
     Dim ml As New ML_Basics
-    Dim bounds As New GridCell_Boundaries
+    Dim bounds As New GridCell_FeaturesAndEdges
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
@@ -1113,7 +898,7 @@ End Class
 
 Public Class GridCell_FeatureGaps : Inherits TaskParent
     Dim feat As New GridCell_Features
-    Dim gaps As New GridCell_Gaps
+    Dim gaps As New GridCell_ConnectedGaps
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         labels(2) = "The output of GridCell_Gaps overlaid with the output of the GridCell_Features"
@@ -1129,3 +914,259 @@ Public Class GridCell_FeatureGaps : Inherits TaskParent
         dst2 = addw.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class GridCell_FeaturesAndEdges : Inherits TaskParent
+    Public feat As New GridCell_Edges
+    Public boundaryCells As New List(Of List(Of Integer))
+    Public Sub New()
+        labels(2) = "Gray and black regions are featureless while white has features..."
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        desc = "Find the boundary cells between feature and featureless cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(src)
+        dst1 = task.featureMask.Clone
+
+        boundaryCells.Clear()
+        For Each nList In task.gridNeighbors
+            Dim roiA = task.gridRects(nList(0))
+            Dim centerType = task.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
+            If centerType <> 0 Then
+                Dim boundList = New List(Of Integer)
+                Dim addFirst As Boolean = True
+                For i = 1 To nList.Count - 1
+                    Dim roiB = task.gridRects(nList(i))
+                    Dim val = task.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
+                    If centerType <> val Then
+                        If addFirst Then boundList.Add(nList(0)) ' first element is the center point (has features)
+                        addFirst = False
+                        boundList.Add(nList(i))
+                    End If
+                Next
+                If boundList.Count > 0 Then boundaryCells.Add(boundList)
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each nlist In boundaryCells
+            For Each n In nlist
+                Dim mytoggle As Integer
+                Dim roi = task.gridRects(n)
+                Dim val = task.featureMask.Get(Of Byte)(roi.Y, roi.X)
+                If val > 0 Then mytoggle = 255 Else mytoggle = 128
+                dst2(task.gridRects(n)).SetTo(mytoggle)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class GridCell_Features : Inherits TaskParent
+    Dim options As New Options_Features
+    Public Sub New()
+        optiBase.FindSlider("Min Distance to next").Value = 3
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Featureless areas"
+        task.feat = New Feature_Basics
+        desc = "Identify the cells with features"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+        task.feat.Run(src)
+
+        dst2 = task.gCell.dst2
+
+        For i = 0 To task.iddList.Count - 1
+            Dim idd = task.iddList(i)
+            idd.features.Clear()
+            task.iddList(i) = idd
+        Next
+
+        task.featurePoints.Clear()
+        Dim rects As New List(Of cv.Rect)
+        For Each pt In task.features
+            Dim index = task.iddMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim idd = task.iddList(index)
+            idd.features.Add(pt)
+            DrawCircle(dst2, idd.cRect.TopLeft, task.DotSize, task.HighlightColor)
+
+            rects.Add(idd.cRect)
+            task.iddList(index) = idd
+        Next
+
+        task.featureRects.Clear()
+        task.fLessRects.Clear()
+        For Each idd In task.iddList
+            If idd.features.Count > 0 Then task.featureRects.Add(idd.cRect) Else task.fLessRects.Add(idd.cRect)
+        Next
+
+        If task.gOptions.DebugCheckBox.Checked Then
+            For Each pt In task.features
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
+            Next
+        End If
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            For Each r In rects
+                dst3.Rectangle(r, white, -1)
+            Next
+            dst3 = Not dst3
+        End If
+        If task.heartBeat Then
+            labels(2) = CStr(task.featureRects.Count) + " cells had features while " + CStr(task.fLessRects.Count) + " had none"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridCell_Connected : Inherits TaskParent
+    Public connectedH As New List(Of Tuple(Of Integer, Integer))
+    Public connectedV As New List(Of Tuple(Of Integer, Integer))
+    Dim width As Integer, height As Integer
+    Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
+    Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
+    Public Sub New()
+        desc = "Connect cells that are close in depth"
+    End Sub
+    Private Sub drawHRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
+        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+            Dim p1 = task.iddList(colStart).cRect.TopLeft
+            Dim p2 = task.iddList(colEnd).cRect.BottomRight
+            dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+            colorIndex += 1
+            connectedH.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
+            colStart = nextStart
+            colEnd = colStart
+        Else
+            colEnd += 1
+        End If
+    End Sub
+    Private Sub drawVRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
+        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+            bottomRight = task.iddList(iddNext).cRect.BottomRight
+            dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
+            colorIndex += 1
+            connectedV.Add(New Tuple(Of Integer, Integer)(rowStart, iddNext))
+            rowStart = nextStart
+            If nextStart >= 0 Then topLeft = task.iddList(rowStart).cRect.TopLeft
+        End If
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+
+        width = dst2.Width / task.cellSize
+        If width * task.cellSize <> dst2.Width Then width += 1
+        height = Math.Floor(dst2.Height / task.cellSize)
+        If height * task.cellSize <> dst2.Height Then height += 1
+        connectedH.Clear()
+        colorIndex = 0
+        For i = 0 To height - 1
+            colStart = i * width
+            colEnd = colStart
+            For j = 0 To width - 2
+                drawHRect(task.iddList(i * width + j), task.iddList(i * width + j + 1), i * width + j + 1)
+            Next
+            drawHRect(task.iddList(i * width + height - 1), task.iddList(i * width + height - 1), -1)
+        Next
+        labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
+                    CStr(task.depthDiffMeters) + " meters"
+
+        connectedV.Clear()
+        Dim index As Integer
+        colorIndex = 0
+        For i = 0 To width
+            rowStart = i
+            topLeft = task.iddList(i).cRect.TopLeft
+            bottomRight = task.iddList(i + width).cRect.TopLeft
+            For j = 0 To height - 2
+                index = i + (j + 1) * width
+                If index >= task.iddList.Count Then index = task.iddList.Count - 1
+                drawVRect(task.iddList(i + j * width), task.iddList(index), i + j * width, index)
+            Next
+            Dim iddNext = i + (height - 1) * width
+            If iddNext >= task.iddList.Count Then iddNext = task.iddList.Count - 1
+            drawVRect(task.iddList(iddNext), task.iddList(index), iddNext, -1)
+        Next
+
+        labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
+                    CStr(task.depthDiffMeters) + " meters"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_ConnectedGaps : Inherits TaskParent
+    Dim connect As New GridCell_Connected
+    Public Sub New()
+        labels(2) = "Grid cells with single cells removed for both vertical and horizontal connected cells."
+        labels(3) = "Vertical cells with single cells removed."
+        desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+        dst2 = connect.dst2
+        dst3 = connect.dst3
+
+        For Each tup In connect.connectedH
+            If tup.Item2 - tup.Item1 = 0 Then
+                Dim idd = task.iddList(tup.Item1)
+                dst2(idd.cRect).SetTo(0)
+            End If
+        Next
+
+        For Each tup In connect.connectedV
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+            If idd2.cRect.TopLeft.Y - idd1.cRect.TopLeft.Y = 0 Then
+                dst2(idd1.cRect).SetTo(0)
+                dst3(idd1.cRect).SetTo(0)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class GridCell_ConnectedRects : Inherits TaskParent
+    Public vRects As New List(Of cv.Rect)
+    Public hRects As New List(Of cv.Rect)
+    Dim connect As New GridCell_Connected
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect featureless cells into featureless regions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        hRects.Clear()
+        For Each tup In connect.connectedH
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+            Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
+            Dim h = idd1.cRect.Height
+            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y, w, h)
+            hRects.Add(r)
+            dst2(r).SetTo(255)
+        Next
+    End Sub
+End Class
+
