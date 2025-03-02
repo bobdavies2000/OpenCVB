@@ -173,8 +173,7 @@ Public Class GridCell_Plot : Inherits TaskParent
             dst3.SetTo(0)
             Exit Sub
         End If
-
-        Dim split() = task.pointCloud(idd.cRect).Split()
+        Dim split() = task.pointCloud(idd.lRect).Split()
         Dim mm = GetMinMax(split(2))
 
         If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
