@@ -638,8 +638,9 @@ Public Class algorithmList
 	If algorithmName = "Grid_Special" Then return new Grid_Special
 	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter
 	If algorithmName = "GridCell_Basics" Then return new GridCell_Basics
-	If algorithmName = "GridCell_Canny" Then return new GridCell_Canny
-	If algorithmName = "GridCell_Color" Then return new GridCell_Color
+		If algorithmName = "GridCell_Boundaries" Then Return New GridCell_Boundaries
+		If algorithmName = "GridCell_Canny" Then Return New GridCell_Canny
+		If algorithmName = "GridCell_Color" Then return new GridCell_Color
 	If algorithmName = "GridCell_ColorSplit" Then return new GridCell_ColorSplit
 	If algorithmName = "GridCell_Connected" Then return new GridCell_Connected
 	If algorithmName = "GridCell_ConnectedGaps" Then return new GridCell_ConnectedGaps

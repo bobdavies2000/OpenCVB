@@ -371,7 +371,7 @@ End Class
 
 Public Class Quad_Boundaries : Inherits TaskParent
     Public Sub New()
-        desc = "Find large differences in cell depth that could provide boundaries."
+        desc = "Find large differences in depth between cells that could provide boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gCell.dst2.Clone

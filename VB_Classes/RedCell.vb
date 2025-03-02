@@ -307,6 +307,7 @@ Public Class RedCell_Generate : Inherits TaskParent
         If colorSelection = 2 Then colorSelection = If(task.redOptions.TrackingDepthColor.Checked, 2, 3)
 
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+        Dim usedColors As New List(Of cv.Scalar)
         For Each rc In initialList
             rc.pixels = rc.mask.CountNonZero
             If rc.pixels = 0 Then Continue For
@@ -326,7 +327,7 @@ Public Class RedCell_Generate : Inherits TaskParent
                 If Single.IsNaN(rc.depthMean) Or rc.depthMean < 0 Then rc.depthMean = 0
             End If
             If rc.depthMean > task.MaxZmeters Then rc.depthMean = task.MaxZmeters
-            rc.color = selectColor(rc, colorSelection)
+            rc.color = selectColor(rc, colorSelection, usedColors)
             sortedCells.Add(rc.pixels, rc)
         Next
 

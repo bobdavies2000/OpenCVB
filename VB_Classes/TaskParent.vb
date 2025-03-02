@@ -356,14 +356,15 @@ Public Class TaskParent : Implements IDisposable
         If r.Height <= 0 Then r.Height = 1
         Return r
     End Function
-    Public Function selectColor(rc As rcData, colorSelection As Integer) As cv.Scalar
+    Public Function selectColor(rc As rcData, colorSelection As Integer, usedColors As List(Of cv.Scalar)) As cv.Scalar
         Dim color As cv.Scalar
         Select Case colorSelection
             Case 0
                 Dim colorStdev As cv.Scalar
                 cv.Cv2.MeanStdDev(task.color(rc.roi), color, colorStdev, rc.mask)
             Case 1
-                color = rc.color
+                If usedColors.Contains(rc.color) Then color = randomCellColor() Else color = rc.color
+                usedColors.Add(color)
             Case 2
                 Dim index = CInt(255 * rc.depthMean / task.MaxZmeters)
                 color = task.scalarColors(index)

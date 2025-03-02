@@ -7,6 +7,7 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public mouseD As New GridCell_MouseDepth
     Public quad As New Quad_Basics
     Dim iddCorr As New GridCell_CorrelationMap
+    Dim edges As New EdgeDraw_Basics
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
@@ -35,6 +36,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                 task.iddList(i) = idd
             End If
         Next
+        edges.Run(src)
 
         Dim stdev As cv.Scalar, mean As cv.Scalar, colorMean As cv.Scalar
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
@@ -55,6 +57,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                 If idd.colorChange > threshold Then idd.motionFlag = True
                 idd.colorVecLast = idd.colorVec
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
+                idd.pixelEdges = edges.dst2(idd.cRect).CountNonZero
                 idd.correlation = 0
                 idd.age = 1
                 If idd.pixels = 0 Then
@@ -62,6 +65,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                     idd.rRect = emptyRect
                 Else
                     If idd.depth > 0 Then
+                        idd.mm = GetMinMax(task.pcSplitRaw(2)(idd.cRect), task.depthMaskRaw(idd.cRect))
                         idd.depthErr = 0.02 * idd.depth / 2
                         If task.rgbLeftAligned Then
                             idd.lRect = idd.cRect
@@ -130,11 +134,12 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
             pt.X -= dst2.Width * 0.15
         Else
-            pt.Y -= task.iddC.cRect.Height * 2
+            pt.Y -= task.iddC.cRect.Height * 3
         End If
         depthAndCorrelationText = Format(task.iddC.depth, fmt3) +
-                                  "m (" + Format(task.iddC.pixels / (task.iddC.cRect.Width * task.iddC.cRect.Height), "0%") + ")" +
-                                  vbCrLf + "correlation = " + Format(task.iddC.correlation, fmt3)
+                                  "m (" + Format(task.iddC.pixels / (task.iddC.cRect.Width * task.iddC.cRect.Height), "0%") +
+                                  ")" + vbCrLf + "depth " + Format(task.iddC.mm.minVal, fmt3) + "m - " +
+                                  Format(task.iddC.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.iddC.correlation, fmt3)
         ptTopLeft = pt
         If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptTopLeft, 2)
     End Sub
@@ -1234,3 +1239,30 @@ Public Class GridCell_ConnectedPalette : Inherits TaskParent
 End Class
 
 
+
+
+
+
+
+Public Class GridCell_Boundaries : Inherits TaskParent
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        desc = "Find cells that have high depth variability indicating that cell is a boundary."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.depthRGB.Clone
+        dst1.SetTo(0)
+        For Each idd In task.iddList
+            If idd.pixels > 0 Then
+                If (idd.mm.maxVal - idd.mm.minVal) - idd.depthErr > task.depthDiffMeters Then
+                    dst2.Rectangle(idd.cRect, 0, -1)
+                    dst1.Rectangle(idd.cRect, cv.Scalar.White, -1)
+                End If
+            End If
+        Next
+
+        addw.src2 = dst1
+        addw.Run(src)
+        dst3 = addw.dst2
+    End Sub
+End Class
