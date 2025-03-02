@@ -63,7 +63,7 @@ Public Class VBtask : Implements IDisposable
 
     Public motionRects As New List(Of cv.Rect)
     Public motionMask As New cv.Mat
-    Public motionFlag As Boolean ' True if there was no motion detected in the current image.
+    Public fullImageStable As Boolean ' True if the current image has no changes from the previous.
     Public motionPercent As Single
     Public motionLabel As String = " "
 

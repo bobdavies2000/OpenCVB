@@ -2,22 +2,24 @@
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   The Azure Kinect camera updated with access to extrinsics but it is limited.
-    -   K4A does not use disparity to compute distance = TOF = time of flight.
+    -   K4A is a TOF (time of flight) camera and does not use disparity to get distance.
     -   Confirming depth with correlation is not possible with RGB/Left images.
 -   For all other cameras correlations are possible with left and right images.
     -   Grid cells define a region which is used to confirm depth quality.
     -   Correlations measure the quality of the depth data in each grid cell.
     -   Some cameras provide left images already aligned with the RGB image.
     -   But some need calibration parameters to connect RGB and left grid cells.
-        -   See below where the Intel D435i maps RGB into the left image.
+        -   See below where the Intel D435i RGB is mapped into the left image.
     -   The mouse cursor displays the correlation coefficient and depth pixel density.
-    -   The Oak-D camera support is still under development – new camera coming.
+    -   Oak-D correlations are under development – new camera coming.
 -   A reworked Motion_Basics uses grid cells to manage the motion rectangles.
     -   Motion detection is a compromise that successfully removes artifacts.
+        -   Motion_BasicsValidate shows the small size of any differences.
     -   The default setting is to update pixels only where motion is detected.
+        -   Motion-filtered RGB means no heartbeat update to the RGB image.
     -   Pixels undisturbed by motion provide algorithm results that are more stable.
     -   The “Depth Correlation” view is a good example of motion detection usage.
-        -   In the upper right image below the red grid cells confirm stable depth.
+        -   The upper right image (below) shows the red grid cells are stable.
     -   Motion detection is a compromise that preserves grid cell color.
 -   A log of previous changes is included at the bottom of this document.
 

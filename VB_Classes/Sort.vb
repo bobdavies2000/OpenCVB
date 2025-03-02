@@ -190,7 +190,7 @@ End Class
 
 
 Public Class Sort_FeatureLess : Inherits TaskParent
-    Public devGrid As New GridCell_Basics
+    Public connect As New GridCell_ConnectedPalette
     Public sort As New Sort_Basics
     Dim plot As New Plot_Histogram
     Public Sub New()
@@ -200,10 +200,11 @@ Public Class Sort_FeatureLess : Inherits TaskParent
         desc = "Sort all the featureless grayscale pixels."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        devGrid.Run(src)
-        dst2 = devGrid.dst2
+        connect.Run(src)
+        dst2 = connect.dst3
+        labels(2) = connect.labels(2)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1.SetTo(0, Not devGrid.dst3)
+        dst1.SetTo(0, Not connect.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary))
 
         sort.Run(dst1)
 

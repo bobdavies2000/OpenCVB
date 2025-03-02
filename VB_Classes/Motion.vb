@@ -14,7 +14,7 @@ Public Class Motion_Basics : Inherits TaskParent
         task.motionMask.SetTo(0)
         markers.Clear()
         For Each idd In task.iddList
-            If idd.motionCell Then
+            If idd.motionFlag Then
                 For Each index In task.gridNeighbors(idd.index)
                     markers.Add(index)
                     Dim r = task.iddList(index).cRect
@@ -24,7 +24,7 @@ Public Class Motion_Basics : Inherits TaskParent
             End If
         Next
 
-        task.motionFlag = markers.Count > 0
+        task.fullImageStable = markers.Count = 0
         task.motionRects.Clear()
         For Each index In markers
             task.motionRects.Add(task.iddList(index).cRect)
@@ -39,7 +39,7 @@ End Class
 
 
 
-Public Class Motion_BasicsTest : Inherits TaskParent
+Public Class Motion_BasicsValidate : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim measure As New GridCell_MeasureMotion
     Public Sub New()

@@ -30,8 +30,8 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            If idd.motionCell Then
-                idd.motionCell = False
+            If idd.motionFlag Then
+                idd.motionFlag = False
                 task.iddList(i) = idd
             End If
         Next
@@ -46,13 +46,13 @@ Public Class GridCell_Basics : Inherits TaskParent
             idd.colorChange = distance3D(idd.colorVec, idd.colorVecLast)
             If idd.colorChange < threshold And idd.age > 0 And idd.correlation <> 0 Then
                 idd.age += 1
-                idd.motionCell = False
+                idd.motionFlag = False
             Else
                 cv.Cv2.MeanStdDev(task.pcSplitRaw(2)(idd.cRect), mean, stdev, task.depthMaskRaw(idd.cRect))
                 idd.depth = mean(0)
                 idd.depthStdev = stdev(0)
 
-                If idd.colorChange > threshold Then idd.motionCell = True
+                If idd.colorChange > threshold Then idd.motionFlag = True
                 idd.colorVecLast = idd.colorVec
                 idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
                 idd.correlation = 0
@@ -169,12 +169,13 @@ Public Class GridCell_Plot : Inherits TaskParent
             idd = task.iddList(index)
         End If
 
-        If idd.pixels = 0 Then
+        If idd.pixels <= 1 Then
             dst3.SetTo(0)
             Exit Sub
         End If
         Dim split() = task.pointCloud(idd.cRect).Split()
         Dim mm = GetMinMax(split(2))
+        If Single.IsInfinity(mm.maxVal) Then Exit Sub
 
         If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
             plot.minRange = mm.minVal
