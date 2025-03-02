@@ -1151,6 +1151,7 @@ Public Class GridCell_ConnectedRects : Inherits TaskParent
     Dim connect As New GridCell_Connected
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Connect featureless cells into featureless regions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1159,6 +1160,7 @@ Public Class GridCell_ConnectedRects : Inherits TaskParent
         dst2.SetTo(0)
         hRects.Clear()
         For Each tup In connect.connectedH
+            If Math.Abs(tup.Item1 - tup.Item2) <= 1 Then Continue For
             Dim idd1 = task.iddList(tup.Item1)
             Dim idd2 = task.iddList(tup.Item2)
             Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
@@ -1167,6 +1169,67 @@ Public Class GridCell_ConnectedRects : Inherits TaskParent
             hRects.Add(r)
             dst2(r).SetTo(255)
         Next
+
+        dst3.SetTo(0)
+        vRects.Clear()
+        For Each tup In connect.connectedV
+            If Math.Abs(tup.Item1 - tup.Item2) <= 1 Then Continue For
+            If tup.Item1 = tup.Item2 Then Continue For
+            If tup.Item1 = tup.Item2 Then Continue For
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+            Dim w = idd1.cRect.Width
+            Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
+            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y, w, h)
+            vRects.Add(r)
+            dst3(r).SetTo(255)
+        Next
     End Sub
 End Class
+
+
+
+
+
+Public Class GridCell_ConnectedPalette : Inherits TaskParent
+    Dim rects As New GridCell_ConnectedRects
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Assign an index to each of vertical and horizontal rects in GridCell_ConnectedRects"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        rects.Run(src)
+
+        Dim index As Integer
+        dst1.SetTo(0)
+        For Each r In rects.hRects
+            If r.Y = 0 Then
+                index += 1
+                dst1(r).SetTo(index)
+            Else
+                Dim foundLast As Boolean
+                For x = r.X To r.X + r.Width - 1
+                    Dim lastIndex = dst1.Get(Of Byte)(r.Y - 1, x)
+                    If lastIndex <> 0 Then
+                        dst1(r).SetTo(lastIndex)
+                        foundLast = True
+                        Exit For
+                    End If
+                Next
+                If foundLast = False Then
+                    index += 1
+                    dst1(r).SetTo(index)
+                End If
+            End If
+        Next
+        dst2 = ShowPalette(dst1 * 255 / index)
+
+        addw.src2 = src
+        addw.Run(dst2)
+        dst3 = addw.dst2
+        If task.heartBeat Then labels(2) = CStr(index) + " regions were found that were connected in depth."
+    End Sub
+End Class
+
 

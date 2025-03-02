@@ -643,6 +643,7 @@ Public Class algorithmList
 	If algorithmName = "GridCell_ColorSplit" Then return new GridCell_ColorSplit
 	If algorithmName = "GridCell_Connected" Then return new GridCell_Connected
 	If algorithmName = "GridCell_ConnectedGaps" Then return new GridCell_ConnectedGaps
+	If algorithmName = "GridCell_ConnectedPalette" Then return new GridCell_ConnectedPalette
 	If algorithmName = "GridCell_ConnectedRects" Then return new GridCell_ConnectedRects
 	If algorithmName = "GridCell_Correlation" Then return new GridCell_Correlation
 	If algorithmName = "GridCell_Correlation1" Then return new GridCell_Correlation1
