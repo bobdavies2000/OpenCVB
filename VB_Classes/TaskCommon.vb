@@ -38,7 +38,6 @@ Public Module vbc
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
         For Each rc In task.rcList
-            If rc.pixels < task.rcPixelThreshold Then rc.color = task.rcPixelColor
             dst(rc.roi).SetTo(rc.color, rc.mask)
         Next
 
@@ -62,7 +61,6 @@ Public Module vbc
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         For Each rc In rcList
             task.rcMap(rc.roi).SetTo(rc.index, rc.mask)
-            If rc.pixels < task.rcPixelThreshold Then rc.color = task.rcPixelColor
             dst(rc.roi).SetTo(rc.color, rc.mask)
             If rc.index >= 255 Then Exit For
         Next
@@ -151,7 +149,7 @@ Public Module vbc
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
         task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 100
 
-        task.rcPixelThreshold = task.dst2.Width * task.dst2.Height * 0.002 ' task.gOptions.DebugSlider.Value / 1000
+        task.rcPixelThreshold = 0 ' task.gOptions.DebugSlider.Value / 1000
     End Sub
 End Module
 
@@ -443,11 +441,7 @@ Public Class maskData
     Public maxDist As cv.Point
     Public pixels As Integer
     Public depthMean As Single
-
-    Public minDepthVec As cv.Point3f
-    Public maxDepthVec As cv.Point3f
-    Public minLoc As cv.Point
-    Public maxLoc As cv.Point
+    Public mm As mmData ' min/max/loc
 End Class
 
 
@@ -484,6 +478,8 @@ Public Class rcData
 
     Public ptFacets As New List(Of cv.Point)
     Public ptList As New List(Of cv.Point)
+
+    Public gridCells As New List(Of gridCell)
 
     ' transition these...
     Public nabs As New List(Of Integer)

@@ -39,6 +39,10 @@ Public Class RedColor_Basics : Inherits TaskParent
             strOut = stats.strOut
             SetTrueText(strOut, newPoint, 1)
             dst3 = stats.dst3
+
+            For Each rc In task.rcList
+                dst3.Circle(rc.maxDStable, task.DotSize, task.HighlightColor)
+            Next
         End If
 
         labels(3) = "The " + CStr(task.redOptions.IdentifyCountBar.Value) + " largest cells shown below " +
@@ -739,7 +743,7 @@ End Class
 Public Class RedColor_CellStatsPlot : Inherits TaskParent
     Dim cells As New RedCell_BasicsPlot
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displaydst1.checked = true
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         cells.runRedCloud = True
         desc = "Display the stats for the requested cell"
     End Sub
@@ -1724,23 +1728,6 @@ End Class
 
 
 
-Public Class RedColor_GridCell : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
-    Public Sub New()
-        desc = "Display the grid cells in combination with the redCloud data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-
-        addw.src2 = dst2
-        addw.Run(task.depthRGB)
-        dst3 = addw.dst2
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class RedColor_Motion : Inherits TaskParent
@@ -1801,5 +1788,146 @@ Public Class RedColor_Motion : Inherits TaskParent
 
         dst2 = RebuildRCMap(task.rcList)
         task.setSelectedCell()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_Largest : Inherits TaskParent
+    Public Sub New()
+        task.gOptions.FrameHistory.Value = 1
+        task.redC = New RedColor_Basics
+        desc = "Identify the largest redCloud cells and accumulate them by size - largest to smallest"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        Dim rc = task.rcList(1)
+        Static rcSave As rcData = rc, stableCount As Integer
+        If rc.maxDStable <> rcSave.maxDStable Then
+            rcSave = rc
+            stableCount = 1
+        Else
+            stableCount += 1
+        End If
+
+        dst3.SetTo(0)
+        dst3(rc.roi).SetTo(rc.color, rc.mask)
+        dst3.Circle(rc.maxDStable, task.DotSize + 2, cv.Scalar.Black)
+        dst3.Circle(rc.maxDStable, task.DotSize, task.HighlightColor)
+        labels(3) = "MaxDStable was the same for " + CStr(stableCount) + " frames"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_HighCorrelation : Inherits TaskParent
+    Dim corrMap As New GridCell_CorrelationMap
+    Public Sub New()
+        task.redC = New RedColor_Basics
+        desc = "Use only the high correlation depth cells as input to RedColor_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        corrMap.Run(src)
+
+        dst3 = src.SetTo(0, Not corrMap.dst3)
+        dst2 = runRedC(src, labels(2))
+        For i = 0 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
+
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_GridCells : Inherits TaskParent
+    Dim regions As New GridCell_Regions
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use the GridCell regions to build task.rcList"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        regions.Run(src)
+        dst1 = regions.dst2
+
+        dst2 = runRedC(src, labels(2))
+
+        Dim mdList = New List(Of maskData)(regions.redC.mdList)
+        dst3.SetTo(0)
+        Dim histogram As New cv.Mat
+        Dim ranges = {New cv.Rangef(0, 255)}
+        Dim histArray(254) As Single
+        Dim rcList As New List(Of rcData)
+        Dim usedList As New List(Of Integer)
+        For Each md In mdList
+            cv.Cv2.CalcHist({task.rcMap(md.roi)}, {0}, md.mask, histogram, 1, {255}, ranges)
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            Dim index = rcList.Count
+            Dim c = dst1.Get(Of cv.Vec3b)(md.maxDist.Y, md.maxDist.X)
+            Dim color = New cv.Scalar(c(0), c(1), c(2))
+            For i = 1 To histArray.Count - 1
+                If usedList.Contains(i) Then Continue For
+                If histArray(i) > 0 Then
+                    Dim rc = task.rcList(i)
+                    If rc.depthMean > md.mm.minVal And rc.depthMean < md.mm.maxVal Then
+                        rc.index = rcList.Count
+                        rc.color = color
+                        dst3(rc.roi).SetTo(rc.color, rc.mask)
+                        rcList.Add(rc)
+                        usedList.Add(i)
+                    Else
+                        Dim k = 0
+                    End If
+                End If
+            Next
+        Next
+
+        labels(3) = CStr(rcList.Count) + " redCloud cells were found"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_GridCellsNew : Inherits TaskParent
+    Dim regions As New GridCell_Regions
+    Public Sub New()
+        task.gOptions.TruncateDepth.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use the GridCell regions to build task.rcList"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        regions.Run(src)
+        dst1 = regions.dst2
+
+        dst2 = runRedC(src, labels(2))
+
+        dst3.SetTo(0)
+        Dim rcList As New List(Of rcData)
+        For Each rc In task.rcList
+            Dim index = rcList.Count
+            Dim c = dst1.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            Dim color = New cv.Scalar(c(0), c(1), c(2))
+            If color = black Then rc.color = task.rcOtherPixelColor
+            rc.index = rcList.Count
+            rc.color = color
+            dst3(rc.roi).SetTo(rc.color, rc.mask)
+            dst3.Circle(rc.maxDStable, task.DotSize, task.HighlightColor, -1)
+            rcList.Add(rc)
+        Next
+
+        labels(3) = CStr(rcList.Count) + " redCloud cells were found"
     End Sub
 End Class

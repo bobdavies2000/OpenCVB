@@ -2206,7 +2206,6 @@ public:
 class Options_DepthCellSize {
 public:
 	int colorDifferenceThreshold =  10;
-	int pixelEdgesThreshold =  10;
 	void RunOpt() {}
 	Options_DepthCellSize() {
 	}

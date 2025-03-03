@@ -3,11 +3,10 @@ Imports System.Runtime.InteropServices
 Public Class RedMask_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public mdList As New List(Of maskData)
-    Dim mask255 As cv.Mat
+    Public classCount As Integer
     Public Sub New()
         cPtr = RedMask_Open()
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        mask255 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -30,7 +29,7 @@ Public Class RedMask_Basics : Inherits TaskParent
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
-        Dim classCount = RedMask_Count(cPtr)
+        classCount = RedMask_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
@@ -51,7 +50,6 @@ Public Class RedMask_Basics : Inherits TaskParent
         Next
 
         mdList.Clear()
-        Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         For i = 0 To classCount - 1
             Dim md As New maskData
             md.roi = rectlist(i)
@@ -64,11 +62,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             DrawContour(md.mask, md.contour, 255, -1)
             md.pixels = md.mask.CountNonZero
             md.maxDist = GetMaxDist(md)
-            cv.Cv2.MeanStdDev(task.pointCloud(md.roi), depthMean, depthStdev, md.mask)
-            md.depthMean = depthMean(2)
-            task.pcSplit(0)(md.roi).MinMaxLoc(md.minDepthVec.X, md.maxDepthVec.X, md.minLoc, md.maxLoc, md.mask)
-            task.pcSplit(1)(md.roi).MinMaxLoc(md.minDepthVec.Y, md.maxDepthVec.Y, md.minLoc, md.maxLoc, md.mask)
-            task.pcSplit(2)(md.roi).MinMaxLoc(md.minDepthVec.Z, md.maxDepthVec.Z, md.minLoc, md.maxLoc, md.mask)
+            md.mm = GetMinMax(task.pcSplit(2)(md.roi), task.depthMask(md.roi))
             mdList.Add(md)
         Next
 

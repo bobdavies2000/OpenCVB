@@ -13,7 +13,7 @@ Public Class VBtask : Implements IDisposable
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
-    Public rcPixelColor = cv.Scalar.Black ' color for small redCloud cells.
+    Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
     Public lpList As New List(Of linePoints) ' line pair list
     Public iddList As New List(Of gridCell)
@@ -772,7 +772,9 @@ Public Class VBtask : Implements IDisposable
 
         If optionsChanged Then maxDepthMask.SetTo(0)
         If gOptions.TruncateDepth.Checked Then
+            cv.Cv2.ImShow("Before trunc", pcSplit(2))
             pcSplit(2) = pcSplit(2).Threshold(MaxZmeters, MaxZmeters, cv.ThresholdTypes.Trunc)
+            cv.Cv2.ImShow("After trunc", pcSplit(2))
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 

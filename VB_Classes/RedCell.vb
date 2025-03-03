@@ -270,9 +270,11 @@ Public Class RedCell_Generate : Inherits TaskParent
             If rc.roi.Size = dst2.Size Then Continue For ' RedColor_Basics can find a cell this big.  
             rc.mask = mdList(i).mask
             rc.maxDist = mdList(i).maxDist
+            rc.maxDStable = rc.maxDist
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             rc.contour = mdList(i).contour
             rc.pixels = mdList(i).mask.CountNonZero
+
             If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
@@ -283,12 +285,18 @@ Public Class RedCell_Generate : Inherits TaskParent
                 rc.mmX = lrc.mmX
                 rc.mmY = lrc.mmY
                 rc.mmZ = lrc.mmZ
-                rc.maxDStable = rc.maxDStable
-                Dim oldcolor = vecToScalar(dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X))
-                If oldcolor <> rc.color Or oldcolor = task.rcPixelColor Then
-                    If rc.pixels < task.rcPixelThreshold Then
-                        rc.color = task.rcPixelColor
-                    Else
+                rc.maxDStable = lrc.maxDStable
+
+                If rc.pixels < task.rcPixelThreshold Then
+                    rc.color = task.rcOtherPixelColor
+                Else
+                    ' verify that the maxDStable is still good.
+                    Dim v1 = task.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                    If v1 <> lrc.index Then
+                        If rc.pixels > 20000 Then Dim k = 0
+
+                        rc.maxDStable = rc.maxDist
+
                         rc.age = 1 ' a new cell was found that was probably part of another in the previous frame.
                         rc.color = randomCellColor()
                     End If
@@ -311,7 +319,6 @@ Public Class RedCell_Generate : Inherits TaskParent
         For Each rc In initialList
             rc.pixels = rc.mask.CountNonZero
             If rc.pixels = 0 Then Continue For
-            If rc.age = 1 Then rc.maxDStable = rc.maxDist
 
             rc.depthMask = rc.mask.Clone
             rc.depthMask.SetTo(0, task.noDepthMask(rc.roi))

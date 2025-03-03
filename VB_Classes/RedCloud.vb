@@ -34,9 +34,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
                     rcMask(md.roi) = rcMask(md.roi) And md.mask
                     md.mask = rcMask(md.roi).Clone
                     rc.mdList(j) = md
-                    If rc.index = task.gOptions.DebugSlider.Value And task.heartBeat Then
-                        strOut += Format(md.minDepthVec.Z, fmt1) + vbTab + Format(md.maxDepthVec.Z, fmt1) + vbCrLf
-                    End If
                 Next
                 task.rcList(i) = rc
             End If

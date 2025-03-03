@@ -157,7 +157,7 @@
     <Compile Include="PongWars.vb" />
     <Compile Include="Bin4Way.vb" />
     <Compile Include="Quadrant.vb" />
-    <Compile Include="FeatureROI.vb" />
+    <Compile Include="GridROI.vb" />
     <Compile Include="Stripes.vb" />
     <Compile Include="Swarm.vb" />
     <Compile Include="TextureFlow.vb" />

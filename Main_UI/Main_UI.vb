@@ -1759,10 +1759,10 @@ Public Class Main_UI
                 End If
 
                 Dim ptReal = task.iddC.cRect.TopLeft
-                dst(0).Circle(ptReal, task.DotSize, task.HighlightColor, -1)
-                dst(1).Circle(ptReal, task.DotSize, task.HighlightColor, -1)
-                dst(2).Circle(ptReal, task.DotSize, task.HighlightColor, -1)
-                dst(3).Circle(ptReal, task.DotSize, task.HighlightColor, -1)
+                dst(0).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(1).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(2).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(3).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)
 
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 

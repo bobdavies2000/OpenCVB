@@ -1,4 +1,5 @@
-﻿Imports VB_Classes.VBtask
+﻿Imports OpenCvSharp.Flann
+Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_DepthCellSize
@@ -419,41 +420,6 @@ Public Class GridCell_LeftRightSize : Inherits TaskParent
             Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
             dst2 = task.leftView(rect).Resize(task.color.Size)
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class GridCell_CorrelationMap : Inherits TaskParent
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        dst3.SetTo(0)
-
-        Dim minCorr = task.gCell.options.correlationThreshold
-        Dim count As Integer
-        For Each idd In task.iddList
-            If idd.depth > 0 Then
-                Dim val = (idd.correlation + 1) * 255 / 2
-                dst1(idd.cRect).SetTo(val)
-                If idd.correlation > minCorr Then
-                    dst3(idd.cRect).SetTo(255)
-                    count += 1
-                End If
-            End If
-        Next
-
-        task.iddCorr = ShowPalette(dst1)
-
-        labels(2) = task.gCell.labels(2)
-        labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
-                    ") with correlation coefficient > " + Format(minCorr, fmt1)
     End Sub
 End Class
 
@@ -1037,87 +1003,6 @@ End Class
 
 
 
-
-Public Class GridCell_Connected : Inherits TaskParent
-    Public connectedH As New List(Of Tuple(Of Integer, Integer))
-    Public connectedV As New List(Of Tuple(Of Integer, Integer))
-    Dim width As Integer, height As Integer
-    Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
-    Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
-    Public Sub New()
-        desc = "Connect cells that are close in depth"
-    End Sub
-    Private Sub drawHRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
-        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            Dim p1 = task.iddList(colStart).cRect.TopLeft
-            Dim p2 = task.iddList(colEnd).cRect.BottomRight
-            dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
-            colorIndex += 1
-            connectedH.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
-            colStart = nextStart
-            colEnd = colStart
-        Else
-            colEnd += 1
-        End If
-    End Sub
-    Private Sub drawVRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
-        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            bottomRight = task.iddList(iddNext).cRect.BottomRight
-            dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
-            colorIndex += 1
-            connectedV.Add(New Tuple(Of Integer, Integer)(rowStart, iddNext))
-            rowStart = nextStart
-            If nextStart >= 0 Then topLeft = task.iddList(rowStart).cRect.TopLeft
-        End If
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-
-        width = dst2.Width / task.cellSize
-        If width * task.cellSize <> dst2.Width Then width += 1
-        height = Math.Floor(dst2.Height / task.cellSize)
-        If height * task.cellSize <> dst2.Height Then height += 1
-        connectedH.Clear()
-        colorIndex = 0
-        For i = 0 To height - 1
-            colStart = i * width
-            colEnd = colStart
-            For j = 0 To width - 2
-                drawHRect(task.iddList(i * width + j), task.iddList(i * width + j + 1), i * width + j + 1)
-            Next
-            drawHRect(task.iddList(i * width + height - 1), task.iddList(i * width + height - 1), -1)
-        Next
-        labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
-                    CStr(task.depthDiffMeters) + " meters"
-
-        connectedV.Clear()
-        Dim index As Integer
-        colorIndex = 0
-        For i = 0 To width
-            rowStart = i
-            topLeft = task.iddList(i).cRect.TopLeft
-            bottomRight = task.iddList(i + width).cRect.TopLeft
-            For j = 0 To height - 2
-                index = i + (j + 1) * width
-                If index >= task.iddList.Count Then index = task.iddList.Count - 1
-                drawVRect(task.iddList(i + j * width), task.iddList(index), i + j * width, index)
-            Next
-            Dim iddNext = i + (height - 1) * width
-            If iddNext >= task.iddList.Count Then iddNext = task.iddList.Count - 1
-            drawVRect(task.iddList(iddNext), task.iddList(index), iddNext, -1)
-        Next
-
-        labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
-                    CStr(task.depthDiffMeters) + " meters"
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class GridCell_ConnectedGaps : Inherits TaskParent
     Dim connect As New GridCell_Connected
     Public Sub New()
@@ -1130,14 +1015,14 @@ Public Class GridCell_ConnectedGaps : Inherits TaskParent
         dst2 = connect.dst2
         dst3 = connect.dst3
 
-        For Each tup In connect.connectedH
+        For Each tup In connect.hTuples
             If tup.Item2 - tup.Item1 = 0 Then
                 Dim idd = task.iddList(tup.Item1)
                 dst2(idd.cRect).SetTo(0)
             End If
         Next
 
-        For Each tup In connect.connectedV
+        For Each tup In connect.vTuples
             Dim idd1 = task.iddList(tup.Item1)
             Dim idd2 = task.iddList(tup.Item2)
             If idd2.cRect.TopLeft.Y - idd1.cRect.TopLeft.Y = 0 Then
@@ -1151,68 +1036,26 @@ End Class
 
 
 
-Public Class GridCell_ConnectedRects : Inherits TaskParent
-    Public vRects As New List(Of cv.Rect)
-    Public hRects As New List(Of cv.Rect)
-    Dim connect As New GridCell_Connected
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Connect featureless cells into featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-
-        dst2.SetTo(0)
-        hRects.Clear()
-        For Each tup In connect.connectedH
-            If Math.Abs(tup.Item1 - tup.Item2) <= 1 Then Continue For
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
-            Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
-            Dim h = idd1.cRect.Height
-            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y, w, h)
-            hRects.Add(r)
-            dst2(r).SetTo(255)
-        Next
-
-        dst3.SetTo(0)
-        vRects.Clear()
-        For Each tup In connect.connectedV
-            If Math.Abs(tup.Item1 - tup.Item2) <= 1 Then Continue For
-            If tup.Item1 = tup.Item2 Then Continue For
-            If tup.Item1 = tup.Item2 Then Continue For
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
-            Dim w = idd1.cRect.Width
-            Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
-            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y, w, h)
-            vRects.Add(r)
-            dst3(r).SetTo(255)
-        Next
-    End Sub
-End Class
-
-
-
 
 
 Public Class GridCell_ConnectedPalette : Inherits TaskParent
-    Dim rects As New GridCell_ConnectedRects
     Dim addw As New AddWeighted_Basics
+    Dim hRects As New GridCell_ConnectedRectsH
+    Dim vRects As New GridCell_ConnectedRectsV
+    Dim mats As New Mat_4Click
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Assign an index to each of vertical and horizontal rects in GridCell_ConnectedRects"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        rects.Run(src)
+        hRects.Run(src)
 
-        Dim index As Integer
+        Dim indexH As Integer
         dst1.SetTo(0)
-        For Each r In rects.hRects
+        For Each r In hRects.hRects
             If r.Y = 0 Then
-                index += 1
-                dst1(r).SetTo(index)
+                indexH += 1
+                dst1(r).SetTo(indexH)
             Else
                 Dim foundLast As Boolean
                 For x = r.X To r.X + r.Width - 1
@@ -1224,17 +1067,85 @@ Public Class GridCell_ConnectedPalette : Inherits TaskParent
                     End If
                 Next
                 If foundLast = False Then
-                    index += 1
-                    dst1(r).SetTo(index)
+                    indexH += 1
+                    dst1(r).SetTo(indexH)
                 End If
             End If
         Next
-        dst2 = ShowPalette(dst1 * 255 / index)
+        mats.mat(0) = ShowPalette(dst1 * 255 / indexH)
 
         addw.src2 = src
-        addw.Run(dst2)
-        dst3 = addw.dst2
-        If task.heartBeat Then labels(2) = CStr(index) + " regions were found that were connected in depth."
+        addw.Run(mats.mat(0))
+        mats.mat(1) = addw.dst2.Clone
+
+        vRects.Run(src)
+        Dim indexV As Integer
+        dst1.SetTo(0)
+        For Each r In vRects.vRects
+            If r.X = 0 Then
+                indexV += 1
+                dst1(r).SetTo(indexV)
+            Else
+                Dim foundLast As Boolean
+                For y = r.Y To r.Y + r.Height - 1
+                    Dim lastIndex = dst1.Get(Of Byte)(y, r.X - 1)
+                    If lastIndex <> 0 Then
+                        dst1(r).SetTo(lastIndex)
+                        foundLast = True
+                        Exit For
+                    End If
+                Next
+                If foundLast = False Then
+                    indexV += 1
+                    dst1(r).SetTo(indexV)
+                End If
+            End If
+        Next
+        mats.mat(2) = ShowPalette(dst1 * 255 / indexV)
+
+        addw.src2 = src
+        addw.Run(mats.mat(2))
+        mats.mat(3) = addw.dst2
+        If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
+
+        mats.Run(src)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_CorrelationMap : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+
+        Dim minCorr = task.gCell.options.correlationThreshold
+        Dim count As Integer
+        For Each idd In task.iddList
+            If idd.depth > 0 Then
+                Dim val = (idd.correlation + 1) * 255 / 2
+                dst1(idd.cRect).SetTo(val)
+                If idd.correlation > minCorr Then
+                    dst3(idd.cRect).SetTo(255)
+                    count += 1
+                End If
+            End If
+        Next
+
+        task.iddCorr = ShowPalette(dst1)
+
+        labels(2) = task.gCell.labels(2)
+        labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
+                    ") with correlation coefficient > " + Format(minCorr, fmt1)
     End Sub
 End Class
 
@@ -1263,6 +1174,219 @@ Public Class GridCell_Boundaries : Inherits TaskParent
 
         addw.src2 = dst1
         addw.Run(src)
+        dst3 = addw.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridCell_Connected : Inherits TaskParent
+    Public hTuples As New List(Of Tuple(Of Integer, Integer))
+    Public vTuples As New List(Of Tuple(Of Integer, Integer))
+    Public width As Integer, height As Integer
+    Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
+    Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
+    Public Sub New()
+        desc = "Connect cells that are close in depth"
+    End Sub
+    Private Sub drawHRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
+        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+            Dim p1 = task.iddList(colStart).cRect.TopLeft
+            Dim p2 = task.iddList(colEnd).cRect.BottomRight
+            dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+            colorIndex += 1
+            hTuples.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
+            colStart = nextStart
+            colEnd = colStart
+        Else
+            colEnd += 1
+        End If
+    End Sub
+    Private Sub drawVRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
+        If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+            bottomRight = task.iddList(iddNext).cRect.BottomRight
+            dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
+            colorIndex += 1
+            vTuples.Add(New Tuple(Of Integer, Integer)(rowStart, iddNext))
+            rowStart = nextStart
+            If nextStart >= 0 Then topLeft = task.iddList(rowStart).cRect.TopLeft
+        End If
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+
+        width = dst2.Width / task.cellSize
+        If width * task.cellSize <> dst2.Width Then width += 1
+        height = Math.Floor(dst2.Height / task.cellSize)
+        If height * task.cellSize <> dst2.Height Then height += 1
+        hTuples.Clear()
+        colorIndex = 0
+        For i = 0 To height - 1
+            colStart = i * width
+            colEnd = colStart
+            For j = 0 To width - 2
+                drawHRect(task.iddList(i * width + j), task.iddList(i * width + j + 1), i * width + j + 1)
+            Next
+            drawHRect(task.iddList(i * width + height - 1), task.iddList(i * width + height - 1), -1)
+        Next
+        labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
+                    CStr(task.depthDiffMeters) + " meters"
+
+        vTuples.Clear()
+        Dim index As Integer
+        colorIndex = 0
+        For i = 0 To width
+            rowStart = i
+            topLeft = task.iddList(i).cRect.TopLeft
+            bottomRight = task.iddList(i + width).cRect.TopLeft
+            For j = 0 To height - 2
+                index = i + (j + 1) * width
+                If index >= task.iddList.Count Then index = task.iddList.Count - 1
+                drawVRect(task.iddList(i + j * width), task.iddList(index), i + j * width, index)
+            Next
+            Dim iddNext = i + (height - 1) * width
+            If iddNext >= task.iddList.Count Then iddNext = task.iddList.Count - 1
+            drawVRect(task.iddList(iddNext), task.iddList(index), iddNext, -1)
+        Next
+
+        labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
+                    CStr(task.depthDiffMeters) + " meters"
+    End Sub
+End Class
+
+
+
+
+
+Public Class GridCell_ConnectedRectsH : Inherits TaskParent
+    Public hRects As New List(Of cv.Rect)
+    Dim connect As New GridCell_Connected
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect grid cells with similar depth - horizontally scanning."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        hRects.Clear()
+        Dim index As Integer
+        For Each tup In connect.hTuples
+            If tup.Item1 = tup.Item2 Then Continue For
+
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+
+            Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
+            Dim h = idd1.cRect.Height
+
+            Dim r = New cv.Rect(idd1.cRect.TopLeft.X + 1, idd1.cRect.TopLeft.Y, w - 1, h)
+
+            If r.Width > task.cellSize Then
+                hRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class GridCell_ConnectedRectsV : Inherits TaskParent
+    Public vRects As New List(Of cv.Rect)
+    Dim connect As New GridCell_Connected
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect grid cells with similar depth - vertically scanning."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        vRects.Clear()
+        Dim index As Integer
+        For Each tup In connect.vTuples
+            If tup.Item1 = tup.Item2 Then Continue For
+
+            If tup.Item1 = tup.Item2 Then Continue For
+            If tup.Item1 = tup.Item2 Then Continue For
+
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+
+            Dim w = idd1.cRect.Width
+            Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
+
+            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y + 1, w, h - 1)
+            If r.Height > task.cellSize Then
+                vRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_ConnectedRects : Inherits TaskParent
+    Dim hConn As New GridCell_ConnectedRectsH
+    Dim vConn As New GridCell_ConnectedRectsV
+    Public Sub New()
+        desc = "Isolate the connected depth grid cells both vertically and horizontally."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hConn.Run(src)
+        vConn.Run(src)
+
+        dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+        dst3 = src
+        dst3.SetTo(0, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_Regions : Inherits TaskParent
+    Public redC As New RedMask_Basics
+    Public connect As New GridCell_ConnectedRects
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        labels(3) = "AddWeighted output combining RGB and masks below left."
+        desc = "Use the merged by depth grid cells to build masks for each region"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src.Clone)
+        dst2 = connect.dst3
+
+        redC.Run(Not connect.dst2)
+        dst2 = ShowPalette(redC.dst2 * 255 / redC.classCount)
+        dst2.SetTo(0, connect.dst2)
+        labels(2) = CStr(redC.mdList.Count) + " regions were identified."
+
+        addw.src2 = connect.dst3
+        addw.Run(dst2)
         dst3 = addw.dst2
     End Sub
 End Class

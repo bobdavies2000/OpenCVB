@@ -2119,7 +2119,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
 
         Dim quadData As New List(Of cv.Point3f)
         Dim idd1 As gridCell, idd2 As gridCell
-        For Each tup In connect.connectedH
+        For Each tup In connect.hTuples
             idd1 = task.iddList(tup.Item1)
             idd2 = task.iddList(tup.Item2)
             For i = tup.Item1 + 1 To tup.Item2 - 1
@@ -2144,7 +2144,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         Next
 
         Dim width = dst2.Width / task.cellSize
-        For Each tup In connect.connectedV
+        For Each tup In connect.vTuples
             For i = tup.Item1 To tup.Item2 - width Step width
                 idd1 = task.iddList(i)
                 idd2 = task.iddList(i + width)
