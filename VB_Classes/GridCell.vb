@@ -51,13 +51,13 @@ Public Class GridCell_Basics : Inherits TaskParent
                 idd.age += 1
                 idd.motionFlag = False
             Else
-                cv.Cv2.MeanStdDev(task.pcSplitRaw(2)(idd.cRect), mean, stdev, task.depthMaskRaw(idd.cRect))
+                cv.Cv2.MeanStdDev(task.pcSplit(2)(idd.cRect), mean, stdev, task.depthMask(idd.cRect))
                 idd.depth = mean(0)
                 idd.depthStdev = stdev(0)
 
                 If idd.colorChange > threshold Then idd.motionFlag = True
                 idd.colorVecLast = idd.colorVec
-                idd.pixels = task.depthMaskRaw(idd.cRect).CountNonZero
+                idd.pixels = task.depthMask(idd.cRect).CountNonZero
                 idd.pixelEdges = edges.dst2(idd.cRect).CountNonZero
                 idd.correlation = 0
                 idd.age = 1
@@ -66,7 +66,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                     idd.rRect = emptyRect
                 Else
                     If idd.depth > 0 Then
-                        idd.mm = GetMinMax(task.pcSplitRaw(2)(idd.cRect), task.depthMaskRaw(idd.cRect))
+                        idd.mm = GetMinMax(task.pcSplit(2)(idd.cRect), task.depthMask(idd.cRect))
                         idd.depthErr = 0.02 * idd.depth / 2
                         If task.rgbLeftAligned Then
                             idd.lRect = idd.cRect

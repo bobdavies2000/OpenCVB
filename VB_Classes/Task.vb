@@ -90,9 +90,7 @@ Public Class VBtask : Implements IDisposable
     Public rightView As New cv.Mat
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
     Public pointCloud As New cv.Mat
-    Public pointCloudRaw As New cv.Mat ' pointcloud without gravity transform.
     Public pcSplit() As cv.Mat
-    Public pcSplitRaw() As cv.Mat
 
     ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public gMatrix As New cv.Mat
@@ -600,7 +598,7 @@ Public Class VBtask : Implements IDisposable
     End Sub
     Public Shared Function translateColorToLeft(pt As cv.Point) As cv.Point
         Dim ir3D As cv.Point3f, irPt As cv.Point2f
-        Dim pcTop = task.pointCloudRaw.Get(Of cv.Point3f)(pt.Y, pt.X)
+        Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
         If pcTop.Z > 0 Then
             ir3D.X = task.calibData.rotation(0) * pcTop.X +
                      task.calibData.rotation(1) * pcTop.Y +
@@ -741,7 +739,6 @@ Public Class VBtask : Implements IDisposable
             frameHistoryCount = gOptions.FrameHistory.Value
 
             If useGravityPointcloud Then
-                pointCloudRaw = pointCloud.Clone
                 If pointCloud.Size <> src.Size Then
                     pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
                 End If
@@ -753,8 +750,7 @@ Public Class VBtask : Implements IDisposable
 
 
 
-            Else
-                pointCloudRaw = pointCloud
+
             End If
 
             If pcSplit Is Nothing Then pcSplit = pointCloud.Split
@@ -763,12 +759,6 @@ Public Class VBtask : Implements IDisposable
         End If
 
         pcSplit = pointCloud.Split
-        pcSplitRaw = pointCloudRaw.Split()
-        depthMaskRaw = pcSplitRaw(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
-        gCell.Run(src)
-        motionBasics.Run(src)
-        If gOptions.UseMotion.Checked Then color = motionBasics.dst2.Clone
 
         If optionsChanged Then maxDepthMask.SetTo(0)
         If gOptions.TruncateDepth.Checked Then
@@ -802,6 +792,10 @@ Public Class VBtask : Implements IDisposable
 
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
+
+        gCell.Run(src)
+        motionBasics.Run(src)
+        If gOptions.UseMotion.Checked Then color = motionBasics.dst2.Clone
 
         If task.gOptions.ShowQuads.Checked Then
             depthRGB = task.gCell.dst2
