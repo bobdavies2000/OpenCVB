@@ -1850,7 +1850,7 @@ End Class
 
 
 
-Public Class RedColor_GridCells : Inherits TaskParent
+Public Class RedColor_GridCellsOld : Inherits TaskParent
     Dim regions As New GridCell_Regions
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1860,10 +1860,10 @@ Public Class RedColor_GridCells : Inherits TaskParent
         regions.Run(src)
         dst1 = regions.dst2
 
-        dst2 = runRedC(src, labels(2))
+        runRedC(src, labels(2))
 
         Dim mdList = New List(Of maskData)(regions.redC.mdList)
-        dst3.SetTo(0)
+        dst2.SetTo(0)
         Dim histogram As New cv.Mat
         Dim ranges = {New cv.Rangef(0, 255)}
         Dim histArray(254) As Single
@@ -1882,11 +1882,9 @@ Public Class RedColor_GridCells : Inherits TaskParent
                     If rc.depthMean > md.mm.minVal And rc.depthMean < md.mm.maxVal Then
                         rc.index = rcList.Count
                         rc.color = color
-                        dst3(rc.roi).SetTo(rc.color, rc.mask)
+                        dst2(rc.roi).SetTo(rc.color, rc.mask)
                         rcList.Add(rc)
                         usedList.Add(i)
-                    Else
-                        Dim k = 0
                     End If
                 End If
             Next
@@ -1901,7 +1899,7 @@ End Class
 
 
 
-Public Class RedColor_GridCellsNew : Inherits TaskParent
+Public Class RedColor_GridCells : Inherits TaskParent
     Dim regions As New GridCell_Regions
     Public Sub New()
         task.gOptions.TruncateDepth.Checked = True
@@ -1912,22 +1910,27 @@ Public Class RedColor_GridCellsNew : Inherits TaskParent
         regions.Run(src)
         dst1 = regions.dst2
 
-        dst2 = runRedC(src, labels(2))
+        runRedC(src, labels(2))
 
-        dst3.SetTo(0)
+        dst2.SetTo(0)
         Dim rcList As New List(Of rcData)
         For Each rc In task.rcList
             Dim index = rcList.Count
+            Dim cTest = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            If cTest <> black Then Continue For
             Dim c = dst1.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             Dim color = New cv.Scalar(c(0), c(1), c(2))
-            If color = black Then rc.color = task.rcOtherPixelColor
+            If color = black Then color = task.rcOtherPixelColor
             rc.index = rcList.Count
             rc.color = color
-            dst3(rc.roi).SetTo(rc.color, rc.mask)
-            dst3.Circle(rc.maxDStable, task.DotSize, task.HighlightColor, -1)
+            dst2(rc.roi).SetTo(rc.color, rc.mask)
+            dst2.Circle(rc.maxDStable, task.DotSize, task.HighlightColor, -1)
             rcList.Add(rc)
         Next
 
+        task.rcList = New List(Of rcData)(rcList)
         labels(3) = CStr(rcList.Count) + " redCloud cells were found"
     End Sub
 End Class
+
+

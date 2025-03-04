@@ -272,7 +272,9 @@ Public Class RedCell_Generate : Inherits TaskParent
             rc.maxDist = mdList(i).maxDist
             rc.maxDStable = rc.maxDist
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            rc.contour = mdList(i).contour
+            ' rc.contour = mdList(i).contour
+            rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            DrawContour(rc.mask, rc.contour, 255, -1)
             rc.pixels = mdList(i).mask.CountNonZero
 
             If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then

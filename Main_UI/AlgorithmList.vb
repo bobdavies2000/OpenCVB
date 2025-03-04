@@ -1516,7 +1516,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_Gaps" Then return new RedColor_Gaps
 	If algorithmName = "RedColor_GenCellContains" Then return new RedColor_GenCellContains
 	If algorithmName = "RedColor_GridCells" Then return new RedColor_GridCells
-	If algorithmName = "RedColor_GridCellsNew" Then return new RedColor_GridCellsNew
+	If algorithmName = "RedColor_GridCellsOld" Then return new RedColor_GridCellsOld
 	If algorithmName = "RedColor_HighCorrelation" Then return new RedColor_HighCorrelation
 	If algorithmName = "RedColor_Hue" Then return new RedColor_Hue
 	If algorithmName = "RedColor_Hulls" Then return new RedColor_Hulls
