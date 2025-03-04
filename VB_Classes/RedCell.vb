@@ -276,8 +276,8 @@ Public Class RedCell_Generate : Inherits TaskParent
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
             rc.pixels = mdList(i).mask.CountNonZero
-
-            If rc.indexLast > 0 And rc.indexLast < task.rcList.Count Then
+            If rc.indexLast >= task.rcList.Count Then rc.indexLast = 0
+            If rc.indexLast > 0 Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.color = lrc.color

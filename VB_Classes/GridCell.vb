@@ -137,7 +137,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
         Else
             pt.Y -= task.iddC.cRect.Height * 3
         End If
-        depthAndCorrelationText = Format(task.iddC.depth, fmt3) +
+        depthAndCorrelationText = Format(task.iddC.depth, fmt2) +
                                   "m (" + Format(task.iddC.pixels / (task.iddC.cRect.Width * task.iddC.cRect.Height), "0%") +
                                   ")" + vbCrLf + "depth " + Format(task.iddC.mm.minVal, fmt3) + "m - " +
                                   Format(task.iddC.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.iddC.correlation, fmt3)

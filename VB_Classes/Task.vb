@@ -762,9 +762,7 @@ Public Class VBtask : Implements IDisposable
 
         If optionsChanged Then maxDepthMask.SetTo(0)
         If gOptions.TruncateDepth.Checked Then
-            cv.Cv2.ImShow("Before trunc", pcSplit(2))
             pcSplit(2) = pcSplit(2).Threshold(MaxZmeters, MaxZmeters, cv.ThresholdTypes.Trunc)
-            cv.Cv2.ImShow("After trunc", pcSplit(2))
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
