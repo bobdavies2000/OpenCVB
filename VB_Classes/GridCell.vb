@@ -1279,7 +1279,6 @@ Public Class GridCell_ConnectedRectsH : Inherits TaskParent
         Dim index As Integer
         For Each tup In connect.hTuples
             If tup.Item1 = tup.Item2 Then Continue For
-
             Dim idd1 = task.iddList(tup.Item1)
             Dim idd2 = task.iddList(tup.Item2)
 
@@ -1288,13 +1287,11 @@ Public Class GridCell_ConnectedRectsH : Inherits TaskParent
 
             Dim r = New cv.Rect(idd1.cRect.TopLeft.X + 1, idd1.cRect.TopLeft.Y, w - 1, h)
 
-            If r.Width > task.cellSize Then
-                hRects.Add(r)
-                dst2(r).SetTo(255)
+            hRects.Add(r)
+            dst2(r).SetTo(255)
 
-                index += 1
-                dst3(r).SetTo(task.scalarColors(index Mod 256))
-            End If
+            index += 1
+            dst3(r).SetTo(task.scalarColors(index Mod 256))
         Next
     End Sub
 End Class
@@ -1319,10 +1316,6 @@ Public Class GridCell_ConnectedRectsV : Inherits TaskParent
         Dim index As Integer
         For Each tup In connect.vTuples
             If tup.Item1 = tup.Item2 Then Continue For
-
-            If tup.Item1 = tup.Item2 Then Continue For
-            If tup.Item1 = tup.Item2 Then Continue For
-
             Dim idd1 = task.iddList(tup.Item1)
             Dim idd2 = task.iddList(tup.Item2)
 
@@ -1330,13 +1323,11 @@ Public Class GridCell_ConnectedRectsV : Inherits TaskParent
             Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
 
             Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y + 1, w, h - 1)
-            If r.Height > task.cellSize Then
-                vRects.Add(r)
-                dst2(r).SetTo(255)
+            vRects.Add(r)
+            dst2(r).SetTo(255)
 
-                index += 1
-                dst3(r).SetTo(task.scalarColors(index Mod 256))
-            End If
+            index += 1
+            dst3(r).SetTo(task.scalarColors(index Mod 256))
         Next
     End Sub
 End Class

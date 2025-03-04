@@ -1910,11 +1910,14 @@ Public Class RedColor_GridCells : Inherits TaskParent
         regions.Run(src)
         dst1 = regions.dst2
 
+        Dim lastList As New List(Of rcData)(task.rcList)
         runRedC(src, labels(2))
 
         dst2.SetTo(0)
+
         Dim rcList As New List(Of rcData)
         For Each rc In task.rcList
+            ' If task.motionMask(rc.roi).CountNonZero = 0 Then Continue For
             Dim index = rcList.Count
             Dim cTest = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             If cTest <> black Then Continue For
