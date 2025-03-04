@@ -818,11 +818,6 @@ Public Class Main_UI
         End If
     End Sub
     Private Sub PixelViewerButton_Click(sender As Object, e As EventArgs) Handles PixelViewerButton.Click
-        If fpsTimer.Enabled Then
-            SaveSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
-            SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Height)
-            SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
-        End If
         PixelViewerButton.Checked = Not PixelViewerButton.Checked
         pixelViewerOn = PixelViewerButton.Checked
     End Sub
@@ -1630,12 +1625,6 @@ Public Class Main_UI
                         Dim spanCopy = New TimeSpan(elapsedCopyTicks)
                         task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
 
-                        If testAllRunning Then
-                            task.pixelViewerOn = False
-                        Else
-                            task.pixelViewerOn = pixelViewerOn
-                        End If
-
                         If GrabRectangleData Then
                             GrabRectangleData = False
                             ' relative size of algorithm size image to displayed image
@@ -1692,6 +1681,11 @@ Public Class Main_UI
                 Dim updatedDrawRect = task.drawRect
                 task.fpsCamera = fpsCamera
 
+                If testAllRunning Then
+                    task.pixelViewerOn = False
+                Else
+                    task.pixelViewerOn = pixelViewerOn
+                End If
 
 
 

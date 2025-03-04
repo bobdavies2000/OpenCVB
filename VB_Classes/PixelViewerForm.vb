@@ -5,7 +5,6 @@ Imports System.ComponentModel
 Public Class PixelViewerForm
     Public mousePoint As cv.Point
     Public saveText As String
-    Dim secondCount As Integer
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Left = task.mainFormLocation.X - 20
         Me.Top = task.mainFormLocation.Y - 20

@@ -807,15 +807,7 @@ Public Class VBtask : Implements IDisposable
 
         TaskTimer.Enabled = True
 
-        If pixelViewerOn And PixelViewer Is Nothing Then
-            PixelViewer = New Pixel_Viewer
-            For i = 1 To callTrace.Count - 1
-                If callTrace(i).Contains("Pixel_Viewer") Then
-                    callTrace(i) = algName + "\" + callTrace(i)
-                    Exit For
-                End If
-            Next
-        End If
+        If pixelViewerOn And PixelViewer Is Nothing Then PixelViewer = New Pixel_Viewer
 
         If gOptions.CreateGif.Checked Then
             If gifCreator Is Nothing Then gifCreator = New Gif_OpenCVB
