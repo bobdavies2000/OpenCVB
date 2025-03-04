@@ -663,6 +663,7 @@ Public Class algorithmList
 	If algorithmName = "GridCell_MouseDepth" Then return new GridCell_MouseDepth
 	If algorithmName = "GridCell_Plot" Then return new GridCell_Plot
 	If algorithmName = "GridCell_Regions" Then return new GridCell_Regions
+	If algorithmName = "GridCell_Regions1" Then return new GridCell_Regions1
 	If algorithmName = "GridCell_RGBtoLeft" Then return new GridCell_RGBtoLeft
 	If algorithmName = "GridCell_RightView" Then return new GridCell_RightView
 	If algorithmName = "GridCell_Stdev" Then return new GridCell_Stdev

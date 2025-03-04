@@ -3451,7 +3451,7 @@ Public Class Options_Threshold : Inherits OptionParent
     End Sub
     Public Sub RunOpt()
         If task.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
-            gradient.Run(empty)
+            gradient.Run(emptyMat)
             dst2 = gradient.dst2
         End If
 

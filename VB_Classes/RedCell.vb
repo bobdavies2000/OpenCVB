@@ -266,14 +266,14 @@ Public Class RedCell_Generate : Inherits TaskParent
         Dim initialList As New List(Of rcData)
         For i = 0 To mdList.Count - 1
             Dim rc As New rcData
-            rc.roi = mdList(i).roi
+            rc.roi = mdList(i).rect
             If rc.roi.Size = dst2.Size Then Continue For ' RedColor_Basics can find a cell this big.  
             rc.mask = mdList(i).mask
             rc.maxDist = mdList(i).maxDist
             rc.maxDStable = rc.maxDist
             rc.indexLast = task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            ' rc.contour = mdList(i).contour
-            rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            rc.contour = mdList(i).contour
+            ' rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(rc.mask, rc.contour, 255, -1)
             rc.pixels = mdList(i).mask.CountNonZero
             If rc.indexLast >= task.rcList.Count Then rc.indexLast = 0

@@ -86,7 +86,7 @@ Public Class Annealing_MT_CPP : Inherits TaskParent
     Dim startTime As DateTime
     Private Sub setup()
         random.options.count = options.cityCount
-        random.Run(empty) ' get the city positions (may or may not be used below.)
+        random.Run(emptyMat) ' get the city positions (may or may not be used below.)
 
         For i = 0 To anneal.Length - 1
             anneal(i) = New Annealing_Basics_CPP()

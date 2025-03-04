@@ -409,8 +409,8 @@ Public Class TaskParent : Implements IDisposable
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
         Dim mm As mmData = GetMinMax(distance32f)
-        mm.maxLoc.X += md.roi.X
-        mm.maxLoc.Y += md.roi.Y
+        mm.maxLoc.X += md.rect.X
+        mm.maxLoc.Y += md.rect.Y
 
         Return mm.maxLoc
     End Function
@@ -596,6 +596,12 @@ Public Class TaskParent : Implements IDisposable
         If task.palette Is Nothing Then task.palette = New Palette_LoadColorMap
         task.palette.Run(input)
         Return task.palette.dst2.Clone
+    End Function
+    Public Function ShowAddweighted(input1 As cv.Mat, input2 As cv.Mat) As cv.Mat
+        Static addw As New AddWeighted_Basics
+        addw.src2 = input1
+        addw.Run(input2)
+        Return addw.dst2
     End Function
     Public Function runRedC(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
         If task.redC Is Nothing Then task.redC = New RedColor_Basics

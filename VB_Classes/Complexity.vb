@@ -92,7 +92,7 @@ Public Class Complexity_PlotOpenCV : Inherits TaskParent
             plot.srcY.Add(nextTime)
             If nextTime > maxTime Then maxTime = nextTime
         Next
-        plot.Run(empty)
+        plot.Run(emptyMat)
         dst2 = plot.dst2.Clone
         Return maxTime
     End Function

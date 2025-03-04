@@ -31,8 +31,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
             If rc.mdList.Count > 0 Then
                 For j = 0 To rc.mdList.Count - 1
                     Dim md = rc.mdList(j)
-                    rcMask(md.roi) = rcMask(md.roi) And md.mask
-                    md.mask = rcMask(md.roi).Clone
+                    rcMask(md.rect) = rcMask(md.rect) And md.mask
+                    md.mask = rcMask(md.rect).Clone
                     rc.mdList(j) = md
                 Next
                 task.rcList(i) = rc

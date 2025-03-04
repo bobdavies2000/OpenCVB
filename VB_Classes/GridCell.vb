@@ -23,7 +23,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                 Dim idd As New gridCell
                 idd.cRect = ValidateRect(rect)
                 idd.lRect = ValidateRect(rect) ' for some cameras the color image and the left image are the same.
-                idd.center = New cv.Point(rect.TopLeft.X + task.cellSize / 2, rect.TopLeft.Y + task.cellSize / 2)
+                idd.center = New cv.Point(rect.TopLeft.X + idd.cRect.Width / 2, rect.TopLeft.Y + idd.cRect.Height / 2)
                 idd.age = 0
                 idd.index = task.iddList.Count
                 task.iddList.Add(idd)
@@ -1369,7 +1369,6 @@ Public Class GridCell_Regions : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src.Clone)
-        dst2 = connect.dst3
 
         redM.Run(Not connect.dst2)
         dst2 = ShowPalette(redM.dst2 * 255 / redM.classCount)
@@ -1381,5 +1380,36 @@ Public Class GridCell_Regions : Inherits TaskParent
             addw.Run(dst2)
             dst3 = addw.dst2
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_Regions1 : Inherits TaskParent
+    Public redM As New RedMask_Basics
+    Public connect As New GridCell_ConnectedRects
+    Public Sub New()
+        task.gOptions.TruncateDepth.Checked = True
+        labels(3) = "AddWeighted output combining RGB and masks below left."
+        desc = "Find the main regions connected in depth and build a contour for each."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src.Clone)
+        redM.Run(Not connect.dst2)
+
+        Dim sqCell = 2 * task.cellSize * task.cellSize
+        dst2.SetTo(0)
+        For Each md In redM.mdList
+            If md.pixels > sqCell Then
+                md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+                dst2(md.rect).SetTo(task.scalarColors(md.index), md.mask)
+                DrawContour(dst2(md.rect), md.contour, cv.Scalar.Black, task.lineWidth)
+            End If
+        Next
+
+        dst3 = ShowAddweighted(src, dst2)
     End Sub
 End Class

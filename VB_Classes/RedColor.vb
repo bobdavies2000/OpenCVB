@@ -1871,7 +1871,7 @@ Public Class RedColor_GridCellsOld : Inherits TaskParent
         Dim rcList As New List(Of rcData)
         Dim usedList As New List(Of Integer)
         For Each md In mdList
-            cv.Cv2.CalcHist({task.rcMap(md.roi)}, {0}, md.mask, histogram, 1, {255}, ranges)
+            cv.Cv2.CalcHist({task.rcMap(md.rect)}, {0}, md.mask, histogram, 1, {255}, ranges)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
             Dim index = rcList.Count
             Dim c = dst1.Get(Of cv.Vec3b)(md.maxDist.Y, md.maxDist.X)

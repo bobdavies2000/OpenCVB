@@ -958,7 +958,7 @@ Public Class Pixel_Display : Inherits TaskParent
         Else
             random.range = New cv.Rect(msRNG.Next(0, dst2.Width - width), msRNG.Next(0, dst2.Height - height), width, height)
         End If
-        random.Run(empty)
+        random.Run(emptyMat)
         task.drawRect = random.range
 
         labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."

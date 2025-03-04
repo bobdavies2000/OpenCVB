@@ -68,7 +68,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits TaskParent
 
         If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
-        knn.Run(empty)
+        knn.Run(emptyMat)
 
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)

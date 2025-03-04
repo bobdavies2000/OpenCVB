@@ -79,8 +79,6 @@ End Class
 
 
 Public Class AddWeighted_InfraRed : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
-    Dim src2 As New cv.Mat
     Public Sub New()
         desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
@@ -93,9 +91,7 @@ Public Class AddWeighted_InfraRed : Inherits TaskParent
             labels(2) = "Right view combined with depthRGB"
         End If
 
-        addw.src2 = dst1
-        addw.Run(task.depthRGB)
-        dst2 = addw.dst2.Clone
+        dst2 = ShowAddweighted(dst1, task.depthRGB)
     End Sub
 End Class
 

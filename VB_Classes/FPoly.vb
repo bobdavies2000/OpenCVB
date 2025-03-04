@@ -658,7 +658,7 @@ Public Class FPoly_RotatePoints : Inherits TaskParent
         rotatePoly.rotateAngle = rotateAngle
         rotatePoly.rotateCenter = rotateCenter
         rotatePoly.poly = New List(Of cv.Point2f)(poly)
-        rotatePoly.Run(empty)
+        rotatePoly.Run(emptyMat)
 
         Dim totalX = rotatePoly.poly(polyPrevSideIndex).X - polyPrev(polyPrevSideIndex).X
         Dim totalY = rotatePoly.poly(polyPrevSideIndex).Y - polyPrev(polyPrevSideIndex).Y
@@ -764,7 +764,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
     Private Function findrotateAngle(p1 As cv.Point2f, p2 As cv.Point2f, pt As cv.Point2f) As Single
         near.lp = New linePoints(p1, p2)
         near.pt = pt
-        near.Run(empty)
+        near.Run(emptyMat)
         DrawLine(dst2, pt, near.nearPoint, cv.Scalar.Red)
         Dim d1 = fPD.rotateCenter.DistanceTo(pt)
         Dim d2 = fPD.rotateCenter.DistanceTo(near.nearPoint)

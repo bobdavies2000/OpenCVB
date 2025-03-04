@@ -23,7 +23,7 @@ Public Module vbc
 
     Public zero3f As New cv.Point3f
     Public newVec4f As New cv.Vec4f
-    Public empty As cv.Mat
+    Public emptyMat As New cv.Mat
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
@@ -399,6 +399,7 @@ End Class
 
 Public Class gridCell
     Public cRect As cv.Rect ' rectange under the cursor in the color image.
+    Public center As cv.Point ' center of the rectangle
     Public lRect As New cv.Rect
     Public rRect As New cv.Rect
     Public depth As Single
@@ -415,7 +416,6 @@ Public Class gridCell
     Public pixelEdges As Integer ' count of edge pixels in this grid cell.
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
-    Public center As cv.Point
     Public correlation As Single
     Public features As New List(Of cv.Point)
     Public index As Integer
@@ -434,7 +434,7 @@ End Class
 
 
 Public Class maskData
-    Public roi As cv.Rect
+    Public rect As cv.Rect
     Public mask As cv.Mat
     Public contour As New List(Of cv.Point)
     Public index As Integer
