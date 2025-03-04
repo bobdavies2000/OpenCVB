@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp.Flann
 Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As New cv.Mat
     Public cellGen As New RedCell_Generate
@@ -1862,7 +1863,7 @@ Public Class RedColor_GridCellsOld : Inherits TaskParent
 
         runRedC(src, labels(2))
 
-        Dim mdList = New List(Of maskData)(regions.redC.mdList)
+        Dim mdList = New List(Of maskData)(regions.redM.mdList)
         dst2.SetTo(0)
         Dim histogram As New cv.Mat
         Dim ranges = {New cv.Rangef(0, 255)}
@@ -1939,3 +1940,55 @@ Public Class RedColor_GridCells : Inherits TaskParent
 End Class
 
 
+
+
+
+
+
+
+Public Class RedColor_GridCellsHist : Inherits TaskParent
+    Dim regions As New GridCell_Regions
+    Public Sub New()
+        task.gOptions.TruncateDepth.Checked = True
+        desc = "For each redCell find the highest population region it covers."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        regions.Run(src)
+        dst1 = regions.redM.dst2
+
+        runRedC(src, labels(2))
+        Static rcLastList As New List(Of rcData)(task.rcList)
+
+        Dim mdList = New List(Of maskData)(regions.redM.mdList)
+        Dim histogram As New cv.Mat
+        Dim ranges = {New cv.Rangef(0, 255)}
+        Dim rcList As New List(Of rcData)
+        Dim lastCount As Integer
+        Dim histArray(mdList.Count - 1) As Single
+        For Each rc In task.rcList
+            cv.Cv2.CalcHist({dst1(rc.roi)}, {0}, rc.mask, histogram, 1, {255}, ranges)
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            Dim index = histArray.ToList.IndexOf(histArray.Max)
+            Dim md = mdList(index)
+            rc.color = task.scalarColors(md.index)
+            If rc.indexLast <> 0 Then
+                If (task.motionMask(rc.roi) And rc.mask).ToMat.CountNonZero = 0 Then
+                    rc = rcLastList(rc.indexLast)
+                    lastCount += 1
+                End If
+            End If
+            rcList.Add(rc)
+        Next
+
+        dst2.SetTo(0)
+        For Each rc In rcList
+            'Dim test = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            'If test = black Then dst2(rc.roi).SetTo(rc.color, rc.mask)
+            dst2(rc.roi).SetTo(rc.color, rc.mask)
+        Next
+
+        task.rcList = New List(Of rcData)(rcList)
+        rcLastList = New List(Of rcData)(rcList)
+        labels(3) = CStr(rcList.Count) + " redCloud cells were found and " + CStr(lastCount) + " cells had no motion."
+    End Sub
+End Class

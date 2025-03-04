@@ -63,6 +63,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             md.pixels = md.mask.CountNonZero
             md.maxDist = GetMaxDist(md)
             md.mm = GetMinMax(task.pcSplit(2)(md.roi), task.depthMask(md.roi))
+            md.index = mdList.Count
             mdList.Add(md)
         Next
 

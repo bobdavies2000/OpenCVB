@@ -55,7 +55,7 @@ Partial Class PixelViewerForm
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripButton3, Me.ToolStripButton4})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1707, 38)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1707, 33)
         Me.ToolStrip1.TabIndex = 3
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -65,7 +65,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
         Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButton1.Text = "ToolStripButton1"
         '
         'ToolStripButton2
@@ -74,7 +74,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
         Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButton2.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButton2.Text = "ToolStripButton2"
         '
         'ToolStripButton3
@@ -83,7 +83,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), System.Drawing.Image)
         Me.ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton3.Name = "ToolStripButton3"
-        Me.ToolStripButton3.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButton3.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButton3.Text = "ToolStripButton3"
         '
         'ToolStripButton4
@@ -92,7 +92,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), System.Drawing.Image)
         Me.ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton4.Name = "ToolStripButton4"
-        Me.ToolStripButton4.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButton4.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButton4.Text = "ToolStripButton4"
         '
         'PixelViewerForm
@@ -100,13 +100,10 @@ Partial Class PixelViewerForm
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1707, 1148)
-        Me.ControlBox = False
         Me.Controls.Add(Me.ToolStrip1)
         Me.Controls.Add(Me.rtb)
         Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.MaximizeBox = False
-        Me.MinimizeBox = False
         Me.Name = "PixelViewerForm"
         Me.Text = "Pixel Viewer"
         Me.ToolStrip1.ResumeLayout(False)

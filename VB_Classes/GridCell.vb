@@ -1360,7 +1360,7 @@ End Class
 
 
 Public Class GridCell_Regions : Inherits TaskParent
-    Public redC As New RedMask_Basics
+    Public redM As New RedMask_Basics
     Public connect As New GridCell_ConnectedRects
     Dim addw As New AddWeighted_Basics
     Public Sub New()
@@ -1371,13 +1371,15 @@ Public Class GridCell_Regions : Inherits TaskParent
         connect.Run(src.Clone)
         dst2 = connect.dst3
 
-        redC.Run(Not connect.dst2)
-        dst2 = ShowPalette(redC.dst2 * 255 / redC.classCount)
+        redM.Run(Not connect.dst2)
+        dst2 = ShowPalette(redM.dst2 * 255 / redM.classCount)
         dst2.SetTo(0, connect.dst2)
-        labels(2) = CStr(redC.mdList.Count) + " regions were identified."
+        labels(2) = CStr(redM.mdList.Count) + " regions were identified."
 
-        addw.src2 = connect.dst3
-        addw.Run(dst2)
-        dst3 = addw.dst2
+        If standaloneTest() Then
+            addw.src2 = connect.dst3
+            addw.Run(dst2)
+            dst3 = addw.dst2
+        End If
     End Sub
 End Class
