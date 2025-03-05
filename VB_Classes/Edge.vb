@@ -323,7 +323,6 @@ End Class
 
 Public Class Edge_SobelLRBinarized : Inherits TaskParent
     Dim edges As New Bin4Way_Sobel
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
         labels = {"", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View"}
         desc = "Isolate edges in the left and right views."
@@ -331,23 +330,11 @@ Public Class Edge_SobelLRBinarized : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
 
-        edges.Run(task.rightView)
-        If standaloneTest() Then
-            addw.src2 = edges.dst3
-            addw.Run(task.rightView)
-            dst3 = addw.dst2.Clone
-        Else
-            dst3 = edges.dst3.Clone
-        End If
-
         edges.Run(task.leftView)
-        If standaloneTest() Then
-            addw.src2 = edges.dst3
-            addw.Run(task.leftView)
-            dst2 = addw.dst2
-        Else
-            dst2 = edges.dst3
-        End If
+        dst2 = If(standaloneTest(), ShowAddweighted(edges.dst3, task.leftView, labels(2)), edges.dst3)
+
+        edges.Run(task.rightView)
+        dst3 = If(standaloneTest(), ShowAddweighted(edges.dst3, task.rightView, labels(3)), edges.dst3)
     End Sub
 End Class
 
@@ -819,7 +806,6 @@ End Class
 
 
 Public Class Edge_SobelCustom : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Dim edgesV As New Edge_SobelCustomV
     Dim edgesH As New Edge_SobelCustomH
     Dim options As New Options_Edges4
@@ -839,13 +825,10 @@ Public Class Edge_SobelCustom : Inherits TaskParent
         If options.verticalCheck Then edgesV.Run(src)
 
         If options.horizonCheck And options.verticalCheck Then
-            addw.src2 = edgesV.dst2
-            addw.Run(dst2)
-            dst2 = addw.dst2
-
-            addw.src2 = edgesV.dst3
-            addw.Run(dst3)
-            dst3 = addw.dst2
+            dst2 = ShowAddweighted(edgesV.dst2, dst2, labels(2))
+            labels(2) += " vertical Sobel"
+            dst3 = ShowAddweighted(edgesV.dst3, dst3, labels(3))
+            labels(2) += " horizontal Sobel"
         ElseIf options.verticalCheck Then
             dst2 = edgesV.dst2.Clone
             dst3 = edgesV.dst3.Clone
@@ -922,7 +905,6 @@ End Class
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edge_Sobel : Inherits TaskParent
-    Public addw As New AddWeighted_Basics
     Dim options As New Options_Sobel
     Public Sub New()
         desc = "Show Sobel edge detection with varying kernel sizes"
@@ -934,9 +916,7 @@ Public Class Edge_Sobel : Inherits TaskParent
         If options.horizontalDerivative And options.verticalDerivative Then
             dst1 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
             If standaloneTest() Then
-                addw.src2 = dst1
-                addw.Run(dst0)
-                dst2 = addw.dst2.ConvertScaleAbs()
+                dst2 = ShowAddweighted(dst1, dst0, labels(2))
             Else
                 dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
             End If

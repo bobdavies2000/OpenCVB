@@ -3,6 +3,8 @@ Public Class Extrinsics_Basics : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         If standalone Then task.gOptions.DotSizeSlider.Value = 5
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        task.drawRect = New cv.Rect(dst2.Width / 3, dst2.Height / 3, dst2.Width / 3, dst2.Height / 3)
         desc = "MatchShapes: Show the alignment of the BGR image to the left and right camera images."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -11,12 +13,8 @@ Public Class Extrinsics_Basics : Inherits TaskParent
 
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
-        If task.drawRect.Width > 0 Then
-            dst2.Rectangle(task.drawRect, white, task.lineWidth, task.lineType)
-            addw.src2 = dst2(task.drawRect).Resize(dst2.Size)
-            addw.Run(gray)
-            dst1 = addw.dst2
-        End If
+        dst1 = ShowAddweighted(dst2(task.drawRect).Resize(dst2.Size), dst3(task.drawRect).Resize(dst3.Size), labels(3))
+        labels(3) = "Image above (dst1) is a combination of drawrect zoomed into both the left and right images."
 
         Dim pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         If standaloneTest() Then
@@ -38,23 +36,19 @@ End Class
 Public Class Extrinsics_Display : Inherits TaskParent
     Dim options As New Options_Extrinsics
     Dim optTrans As New Options_Translation
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
         labels = {"", "", "Left Image", "Right Image"}
         desc = "MatchShapes: Build overlays for the left and right images on the BGR image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         optTrans.RunOpt()
 
         Dim rectLeft = New cv.Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner)
         Dim rectRight = New cv.Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner)
-        addw.src2 = task.leftView(rectLeft).Resize(dst2.Size)
-        addw.Run(src)
-        dst2 = addw.dst2.Clone
-
-        addw.src2 = task.rightView(rectRight).Resize(dst2.Size)
-        addw.Run(src)
-        dst3 = addw.dst2.Clone
+        dst2 = ShowAddweighted(task.leftView(rectLeft).Resize(dst2.Size), src, labels(2))
+        labels(2) += " left view"
+        dst3 = ShowAddweighted(task.rightView(rectRight).Resize(dst2.Size), src, labels(3))
+        labels(3) += " right view"
     End Sub
 End Class

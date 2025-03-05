@@ -378,7 +378,6 @@ End Class
 
 
 Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
-    Public addw As New AddWeighted_Basics
     Dim options As New Options_RGBAlign
     Public Sub New()
         desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
@@ -401,8 +400,6 @@ Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
         Dim rect = New cv.Rect(xD + xS, yD + yS, w - xD * 2, h - yD * 2)
         dst2 = task.leftView(rect).Resize(dst0.Size)
 
-        addw.src2 = dst2
-        addw.Run(src)
-        dst3 = addw.dst2
+        dst3 = ShowAddweighted(dst2, src, labels(3))
     End Sub
 End Class

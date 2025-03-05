@@ -107,7 +107,6 @@ End Class
 
 Public Class Blur_TopoMap : Inherits TaskParent
     Dim gradient As New Gradient_CartToPolar
-    Dim addw As New AddWeighted_Basics
     Dim options As New Options_BlurTopo
     Public Sub New()
         labels(2) = "Image Gradient"
@@ -126,11 +125,9 @@ Public Class Blur_TopoMap : Inherits TaskParent
         dst3 = (dst3 * 1 / options.reduction).ToMat
         dst3 = (dst3 * options.reduction).ToMat
 
-        addw.src2 = ShowPalette(dst3)
-        addw.Run(task.color)
-        dst3 = addw.dst2
+        dst3 = ShowAddweighted(dst3, task.color, labels(3))
 
-        labels(3) = "Blur = " + CStr(options.nextPercent) + "% Reduction Factor = " + CStr(options.reduction)
+        labels(2) = "Blur = " + CStr(options.nextPercent) + "% Reduction Factor = " + CStr(options.reduction)
         If task.frameCount Mod options.frameCycle = 0 Then options.nextPercent -= 1
         If options.nextPercent <= 0 Then options.nextPercent = options.savePercent
     End Sub

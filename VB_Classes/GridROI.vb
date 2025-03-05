@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class GridROI_Basics : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Public rects As New List(Of cv.Rect)
     Public meanList As New List(Of Single)
     Public stdevList As New List(Of Single)
@@ -38,9 +37,7 @@ Public Class GridROI_Basics : Inherits TaskParent
                         Format(stdevList.Average, fmt1) + ")"
         End If
 
-        addw.src2 = dst3
-        addw.Run(dst1)
-        dst2 = addw.dst2
+        dst2 = ShowAddweighted(dst3, dst1, labels(2))
     End Sub
 End Class
 
@@ -52,7 +49,6 @@ End Class
 
 
 Public Class GridROI_Color : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
         optiBase.FindSlider("Add Weighted %").Value = 70
         task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
@@ -83,9 +79,7 @@ Public Class GridROI_Color : Inherits TaskParent
         Next
         labels(3) = "Stdev average X/Y/Z = " + CInt(stdevList0.Average).ToString + ", " + CInt(stdevList1.Average).ToString + ", " + CInt(stdevList2.Average).ToString
 
-        addw.src2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(src)
-        dst2 = addw.dst2
+        dst2 = ShowAddweighted(dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src, labels(2))
     End Sub
 End Class
 
@@ -119,7 +113,6 @@ End Class
 
 
 Public Class GridROI_Sorted : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
     Public bgrList As New List(Of cv.Vec3b)
     Public roiList As New List(Of cv.Rect)
@@ -186,11 +179,7 @@ Public Class GridROI_Sorted : Inherits TaskParent
             End If
         Next
 
-        If standaloneTest() Then
-            addw.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            addw.Run(src)
-            dst3 = addw.dst2
-        End If
+        If standaloneTest() Then dst3 = ShowAddweighted(dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src, labels(3))
 
         labels(3) = $"{count} roi's or " + Format(count / sortedStd.Count, "0%") + " have an average stdev sum of " +
                     Format(avg, fmt1) + " or less"

@@ -416,7 +416,6 @@ End Class
 Public Class FPoly_PlotWeighted : Inherits TaskParent
     Public fPlot As New FPoly_Plot
     Dim plot As New Plot_Histogram
-    Dim addw As New AddWeighted_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
         plot.minRange = 0
@@ -441,9 +440,7 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         Dim histMat = cv.Mat.FromPixelData(fPlot.hist.Length, 1, cv.MatType.CV_32F, fPlot.hist)
         plot.maxRange = fPlot.fGrid.stable.basics.ptList.Count
         plot.Run(histMat)
-        addw.src2 = plot.dst2
-        addw.Run(lastPlot)
-        dst2 = addw.dst2
+        dst2 = ShowAddweighted(plot.dst2, lastPlot, labels(2))
         If task.heartBeat Then
             Dim avg = If(fPlot.distDiff.Count > 0, fPlot.distDiff.Average, 0)
             labels(2) = "Average distance change (after threshholding) = " + Format(avg, fmt3) + ", peak at " +

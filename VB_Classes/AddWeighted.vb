@@ -80,6 +80,7 @@ End Class
 
 Public Class AddWeighted_InfraRed : Inherits TaskParent
     Public Sub New()
+        task.gOptions.ColorizedDepth.Checked = True
         desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -91,7 +92,7 @@ Public Class AddWeighted_InfraRed : Inherits TaskParent
             labels(2) = "Right view combined with depthRGB"
         End If
 
-        dst2 = ShowAddweighted(dst1, task.depthRGB)
+        dst2 = ShowAddweighted(dst1, task.depthRGB, labels(3))
     End Sub
 End Class
 
@@ -103,19 +104,16 @@ End Class
 
 Public Class AddWeighted_Edges : Inherits TaskParent
     Dim edges As New Edge_Basics
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
         labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}
         desc = "Add in the edges separating light and dark to the color image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(src)
         dst2 = edges.dst2
         labels(2) = edges.labels(2)
 
-        addw.src2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(src)
-        dst3 = addw.dst2
+        dst3 = ShowAddweighted(edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src, labels(3))
     End Sub
 End Class
 
@@ -126,14 +124,11 @@ End Class
 
 
 Public Class AddWeighted_LeftRight : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
         desc = "Use AddWeighted to add the left and right images."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        addw.src2 = task.rightView
-        addw.Run(task.leftView)
-        dst2 = addw.dst2
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = ShowAddweighted(task.rightView, task.leftView, labels(2))
     End Sub
 End Class
 

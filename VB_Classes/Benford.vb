@@ -16,15 +16,12 @@ Public Class Benford_Basics : Inherits TaskParent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
     Dim plot As New Plot_Histogram
-    Dim addW As New AddWeighted_Basics
     Dim use99 As Boolean
-    Dim weightSlider As TrackBar
     Public Sub New()
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
         Next
 
-        weightSlider = optiBase.FindSlider("Add Weighted %")
         labels(3) = "Actual distribution of input"
         desc = "Build the capability to perform a Benford analysis."
     End Sub
@@ -36,7 +33,7 @@ Public Class Benford_Basics : Inherits TaskParent
         ReDim counts(expectedDistribution.Count - 1)
         use99 = True
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2Gray))
             src = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
@@ -81,12 +78,7 @@ Public Class Benford_Basics : Inherits TaskParent
         plot.backColor = cv.Scalar.Gray
         plot.Run(hist)
 
-        addW.src2 = Not plot.dst2
-        addW.Run(dst3)
-        dst2 = addW.dst2
-
-        Dim wt = weightSlider.value
-        labels(2) = "AddWeighted: " + Format(wt, "%0.0") + " actual vs. " + Format(1 - wt, "%0.0") + " Benford distribution"
+        dst2 = ShowAddweighted(Not plot.dst2, dst3, labels(2))
     End Sub
 End Class
 

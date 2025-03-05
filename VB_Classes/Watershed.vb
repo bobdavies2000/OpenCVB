@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Public Class Watershed_Basics : Inherits TaskParent
-    Dim addW As New AddWeighted_Basics
     Dim rects As New List(Of cv.Rect)
     Public UseCorners As Boolean
     Public Sub New()
@@ -40,9 +39,7 @@ Public Class Watershed_Basics : Inherits TaskParent
             markers.ConvertTo(tmp, cv.MatType.CV_8U)
             dst3 = ShowPalette(tmp)
 
-            addW.src2 = dst3
-            addW.Run(src)
-            dst2 = addW.dst2
+            dst2 = ShowAddweighted(dst3, src, labels(2))
         Else
             dst2 = src
         End If

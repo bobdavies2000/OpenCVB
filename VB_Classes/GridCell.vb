@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp.Flann
+﻿Imports OpenCvSharp
+Imports OpenCvSharp.Flann
 Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
@@ -871,19 +872,14 @@ End Class
 Public Class GridCell_FeatureGaps : Inherits TaskParent
     Dim feat As New GridCell_Features
     Dim gaps As New GridCell_ConnectedGaps
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
         labels(2) = "The output of GridCell_Gaps overlaid with the output of the GridCell_Features"
         desc = "Overlay the features on the image of the gaps"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
-        addw.src2 = feat.dst2
-
         gaps.Run(src)
-        addw.Run(gaps.dst2)
-
-        dst2 = addw.dst2
+        dst2 = ShowAddweighted(feat.dst2, gaps.dst2, labels(3))
     End Sub
 End Class
 
@@ -1039,7 +1035,6 @@ End Class
 
 
 Public Class GridCell_ConnectedPalette : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Dim hRects As New GridCell_ConnectedRectsH
     Dim vRects As New GridCell_ConnectedRectsV
     Dim mats As New Mat_4Click
@@ -1074,9 +1069,7 @@ Public Class GridCell_ConnectedPalette : Inherits TaskParent
         Next
         mats.mat(0) = ShowPalette(dst1 * 255 / indexH)
 
-        addw.src2 = src
-        addw.Run(mats.mat(0))
-        mats.mat(1) = addw.dst2.Clone
+        mats.mat(1) = ShowAddweighted(src, mats.mat(0), labels(3))
 
         vRects.Run(src)
         Dim indexV As Integer
@@ -1103,9 +1096,7 @@ Public Class GridCell_ConnectedPalette : Inherits TaskParent
         Next
         mats.mat(2) = ShowPalette(dst1 * 255 / indexV)
 
-        addw.src2 = src
-        addw.Run(mats.mat(2))
-        mats.mat(3) = addw.dst2
+        mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
         If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
 
         mats.Run(src)
@@ -1156,7 +1147,6 @@ End Class
 
 
 Public Class GridCell_Boundaries : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
         desc = "Find cells that have high depth variability indicating that cell is a boundary."
     End Sub
@@ -1172,9 +1162,7 @@ Public Class GridCell_Boundaries : Inherits TaskParent
             End If
         Next
 
-        addw.src2 = dst1
-        addw.Run(src)
-        dst3 = addw.dst2
+        dst3 = ShowAddweighted(dst1, src, labels(3))
     End Sub
 End Class
 
@@ -1375,11 +1363,7 @@ Public Class GridCell_Regions : Inherits TaskParent
         dst2.SetTo(0, connect.dst2)
         labels(2) = CStr(redM.mdList.Count) + " regions were identified."
 
-        If standaloneTest() Then
-            addw.src2 = connect.dst3
-            addw.Run(dst2)
-            dst3 = addw.dst2
-        End If
+        If standaloneTest() Then dst3 = ShowAddweighted(connect.dst3, dst2, labels(3))
     End Sub
 End Class
 
@@ -1410,6 +1394,6 @@ Public Class GridCell_Regions1 : Inherits TaskParent
             End If
         Next
 
-        dst3 = ShowAddweighted(src, dst2)
+        dst3 = ShowAddweighted(src, dst2, labels(3))
     End Sub
 End Class

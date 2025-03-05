@@ -597,10 +597,13 @@ Public Class TaskParent : Implements IDisposable
         task.palette.Run(input)
         Return task.palette.dst2.Clone
     End Function
-    Public Function ShowAddweighted(input1 As cv.Mat, input2 As cv.Mat) As cv.Mat
+    Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat
         Static addw As New AddWeighted_Basics
-        addw.src2 = input1
-        addw.Run(input2)
+
+        addw.src2 = src2
+        addw.Run(src1)
+        Dim wt = addw.options.addWeighted
+        label = "AddWeighted: src1 = " + Format(wt, "0%") + " vs. src2 = " + Format(1 - wt, "0%")
         Return addw.dst2
     End Function
     Public Function runRedC(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat

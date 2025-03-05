@@ -246,13 +246,12 @@ End Class
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
 Public Class Corners_Harris_CPP : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Dim options As New Options_Harris
     Public Sub New()
         cPtr = Harris_Features_Open()
         desc = "Use Harris feature detectors to identify interesting points."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -266,10 +265,8 @@ Public Class Corners_Harris_CPP : Inherits TaskParent
         Dim gray32f = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
         '  gray32f = Convert32f_To_8UC3(gray32f)
         gray32f.ConvertTo(dst2, cv.MatType.CV_8U)
-        addw.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(task.color)
-        dst3 = addw.dst2
-        labels(3) = "RGB overlaid with Harris result. "
+
+        dst3 = ShowAddweighted(dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.color, labels(3))
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Harris_Features_Close(cPtr)
