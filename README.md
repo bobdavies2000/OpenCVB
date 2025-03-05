@@ -1,31 +1,28 @@
-# February 2025 (Part 3) – Azure Kinect Support, Depth Views, Grid Cells, and Motion Detection Compromise.
+# March 2025 – GridCell Updates and Task Algorithms.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   The Azure Kinect camera updated with access to extrinsics but it is limited.
-    -   K4A is a TOF (time of flight) camera and does not use disparity to get distance.
-    -   Confirming depth with correlation is not possible with RGB/Left images.
--   For all other cameras correlations are possible with left and right images.
-    -   Grid cells define a region which is used to confirm depth quality.
-    -   Correlations measure the quality of the depth data in each grid cell.
-    -   Some cameras provide left images already aligned with the RGB image.
-    -   But some need calibration parameters to connect RGB and left grid cells.
-        -   See below where the Intel D435i RGB is mapped into the left image.
-    -   The mouse cursor displays the correlation coefficient and depth pixel density.
-    -   Oak-D correlations are under development – new camera coming.
--   A reworked Motion_Basics uses grid cells to manage the motion rectangles.
-    -   Motion detection is a compromise that successfully removes artifacts.
-        -   Motion_BasicsValidate shows the small size of any differences.
-    -   The default setting is to update pixels only where motion is detected.
-        -   Motion-filtered RGB means no heartbeat update to the RGB image.
-    -   Pixels undisturbed by motion provide algorithm results that are more stable.
-    -   The “Depth Correlation” view is a good example of motion detection usage.
-        -   The upper right image (below) shows the red grid cells are stable.
-    -   Motion detection is a compromise that preserves grid cell color.
+-   The GridCell algorithms continue to grow with this version of OpenCVB.
+    -   GridCell_Basics is run on every frame – it is a “task algorithm”.
+    -   Grid cells are available to all algorithms with the task.iddList variable.
+    -   The depth between neighboring grid cells defines a connection.
+    -   Connections are made both vertically and horizontally = see below.
+    -   The depth difference option is available in the global algorithm options.
+        -   “Depth Difference Threshold” is specified in centimeters.
+-   The complete list of task algorithms:
+    -   Depth_Colorizer – to build the depth RGB image.
+    -   Gravity_Horizon – to provide the gravity and horizon lines.
+    -   Grid_Basics – to define the current grid cells and size.
+    -   GridCell_Basics – to get depth correlations for grid cells.
+    -   IMU_Basics – to gather the current IMU data.
+    -   IMU_GMatrix – define gravity conversion matrix for the point cloud.
+    -   Motion_Basics – to build the motion mask for the current frame.
+-   The PixelViewer form can be closed by both the caption box and ![A blue microscope with black outline AI-generated content may be incorrect.](media/0e674efad2384a95fc65c5a030a951fd.png)button.
+-   The AddWeighted_Basics algorithm was moved into a function – reduced code.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/ba9fd91a6d76b04326a7171aad5eb8ba.gif)
+![A screenshot of a computer AI-generated content may be incorrect.](media/2afba4eb6b4ad7bf708ac64a8673a002.png)
 
-**GridCell_LeftToColor :** *The upper right image rotates between the 3 different representations of the depth data. The correlation coefficients are highlighted in red for grid cells that have 90%+ correlation between the left and right images, indicating that the grid cell is highly visible to both the left and right and is likely to have excellent depth data. The lower left image shows the corresponding points for the RGB data (upper left.)  The camera is the Intel RealSense D435i and the left image is grayscale. The lower right image has the same pixels highlighted as the lower left image but is more readable. Use the mouse cursor to display the correlation coefficient and pixel count percentage for the grid cell under the cursor.*
+**GridCell_Connected:** *Grid cells in the lower left image are combined horizontally if their depth is within X centimeters. The same grid cells are combined vertically in the lower right image. Note that many grid cells are not combined vertically or horizontally. Their depth is not close to any of their neighbors. Cells with no depth can still be combined. An example is the entire vertical column at the left of the image where there are no depth values.*
 
 # Introduction
 
@@ -1810,3 +1807,32 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A room with a door and a room with a door and a room with a door and a room with a door and a room with a door and a room with a door and a room AI-generated content may be incorrect.](media/3f3ecad62a60b44ad5d6a8aefa22c148.gif)
 
 **OpenGL_QuadCompare :** *The 3 different OpenGL display formats are shown above – raw point cloud, flat depth cells, and connected depth cells. The flat and connected depth cells are OpenGL quads, not points. Note that the connected depth cells remove some of the floating artifacts. A cell is connected to its neighbors if their depths are within X centimeters (controlled with an option.) The depth cells are then connected in vertical and horizontal directions to produce a solid appearance.*
+
+# February 2025 (Part 3) – Azure Kinect Support, Depth Views, Grid Cells, and Motion Detection Compromise.
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   The Azure Kinect camera updated with access to extrinsics but it is limited.
+    -   K4A is a TOF (time of flight) camera and does not use disparity to get distance.
+    -   Confirming depth with correlation is not possible with RGB/Left images.
+-   For all other cameras correlations are possible with left and right images.
+    -   Grid cells define a region which is used to confirm depth quality.
+    -   Correlations measure the quality of the depth data in each grid cell.
+    -   Some cameras provide left images already aligned with the RGB image.
+    -   But some need calibration parameters to connect RGB and left grid cells.
+        -   See below where the Intel D435i RGB is mapped into the left image.
+    -   The mouse cursor displays the correlation coefficient and depth pixel density.
+    -   Oak-D correlations are under development – new camera coming.
+-   A reworked Motion_Basics uses grid cells to manage the motion rectangles.
+    -   Motion detection is a compromise that successfully removes artifacts.
+        -   Motion_BasicsValidate shows the small size of any differences.
+    -   The default setting is to update pixels only where motion is detected.
+        -   Motion-filtered RGB means no heartbeat update to the RGB image.
+    -   Pixels undisturbed by motion provide algorithm results that are more stable.
+    -   The “Depth Correlation” view is a good example of motion detection usage.
+        -   The upper right image (below) shows the red grid cells are stable.
+    -   Motion detection is a compromise that preserves grid cell color.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer AI-generated content may be incorrect.](media/ba9fd91a6d76b04326a7171aad5eb8ba.gif)
+
+**GridCell_LeftToColor :** *The upper right image rotates between the 3 different representations of the depth data. The correlation coefficients are highlighted in red for grid cells that have 90%+ correlation between the left and right images, indicating that the grid cell is highly visible to both the left and right and is likely to have excellent depth data. The lower left image shows the corresponding points for the RGB data (upper left.) The camera is the Intel RealSense D435i and the left image is grayscale. The lower right image has the same pixels highlighted as the lower left image but is more readable. Use the mouse cursor to display the correlation coefficient and pixel count percentage for the grid cell under the cursor.*

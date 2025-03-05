@@ -3,7 +3,7 @@ Imports OpenCvSharp.Flann
 Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
-    Public options As New Options_DepthCellSize
+    Public options As New Options_GridCells
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean
     Public mouseD As New GridCell_MouseDepth

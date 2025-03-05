@@ -8058,7 +8058,7 @@ End Class
 
 
 
-Public Class Options_DepthCellSize : Inherits OptionParent
+Public Class Options_GridCells : Inherits OptionParent
     Public colorDifferenceThreshold As Integer = 10
     Public correlationThreshold As Single
     Public Sub New()
