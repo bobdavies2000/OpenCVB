@@ -181,14 +181,13 @@ End Class
 
 
 Public Class FeatureLine_Tutorial1 : Inherits TaskParent
-    Dim lines As New Line_Basics
     Public Sub New()
         labels(3) = "The highlighted lines are also lines in 3D."
         desc = "Find all the lines in the image and determine which are in the depth data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
 
         Dim raw2D As New List(Of linePoints)
         Dim raw3D As New List(Of cv.Point3f)
@@ -217,7 +216,6 @@ End Class
 
 
 Public Class FeatureLine_Tutorial2 : Inherits TaskParent
-    Dim lines As New Line_Basics
     Dim gMat As New IMU_GMatrix
     Dim options As New Options_LineFinder()
     Public Sub New()
@@ -226,8 +224,8 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        lines.Run(src)
-        dst2 = lines.dst2
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
 
         Dim raw3D As New List(Of cv.Point3f)
         For Each lp In task.lpList
@@ -611,7 +609,6 @@ End Class
 
 
 Public Class FeatureLine_Finder : Inherits TaskParent
-    Dim lines As New Line_Basics
     Public lines2D As New List(Of cv.Point2f)
     Public lines3D As New List(Of cv.Point3f)
     Public sorted2DV As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
@@ -632,8 +629,8 @@ Public Class FeatureLine_Finder : Inherits TaskParent
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
 
-        lines.Run(src)
-        dst2 = lines.dst2
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
 
         Dim raw2D As New List(Of linePoints)
         Dim raw3D As New List(Of cv.Point3f)

@@ -138,6 +138,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
         Else
             pt.Y -= task.iddC.cRect.Height * 3
         End If
+
         depthAndCorrelationText = Format(task.iddC.depth, fmt2) +
                                   "m (" + Format(task.iddC.pixels / (task.iddC.cRect.Width * task.iddC.cRect.Height), "0%") +
                                   ")" + vbCrLf + "depth " + Format(task.iddC.mm.minVal, fmt3) + "m - " +
@@ -592,7 +593,9 @@ Public Class GridCell_Edges : Inherits TaskParent
         Next
 
         dst2.SetTo(0)
+        dst3.SetTo(0)
         src.CopyTo(dst2, task.featureMask)
+        src.CopyTo(dst3, task.featureMask)
 
         For Each r In flipRects
             dst2.Rectangle(r, task.HighlightColor, task.lineWidth)
@@ -1181,7 +1184,7 @@ Public Class GridCell_Connected : Inherits TaskParent
     Public Sub New()
         desc = "Connect cells that are close in depth"
     End Sub
-    Private Sub drawHRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
+    Private Sub hTestRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
             Dim p1 = task.iddList(colStart).cRect.TopLeft
             Dim p2 = task.iddList(colEnd).cRect.BottomRight
@@ -1194,7 +1197,7 @@ Public Class GridCell_Connected : Inherits TaskParent
             colEnd += 1
         End If
     End Sub
-    Private Sub drawVRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
+    Private Sub vTestRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
             bottomRight = task.iddList(iddNext).cRect.BottomRight
             dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
@@ -1218,9 +1221,9 @@ Public Class GridCell_Connected : Inherits TaskParent
             colStart = i * width
             colEnd = colStart
             For j = 0 To width - 2
-                drawHRect(task.iddList(i * width + j), task.iddList(i * width + j + 1), i * width + j + 1)
+                hTestRect(task.iddList(i * width + j), task.iddList(i * width + j + 1), i * width + j + 1)
             Next
-            drawHRect(task.iddList(i * width + height - 1), task.iddList(i * width + height - 1), -1)
+            hTestRect(task.iddList(i * width + height - 1), task.iddList(i * width + height - 1), -1)
         Next
         labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
                     CStr(task.depthDiffMeters) + " meters"
@@ -1228,18 +1231,18 @@ Public Class GridCell_Connected : Inherits TaskParent
         vTuples.Clear()
         Dim index As Integer
         colorIndex = 0
-        For i = 0 To width
+        For i = 0 To width - 1
             rowStart = i
             topLeft = task.iddList(i).cRect.TopLeft
             bottomRight = task.iddList(i + width).cRect.TopLeft
             For j = 0 To height - 2
                 index = i + (j + 1) * width
                 If index >= task.iddList.Count Then index = task.iddList.Count - 1
-                drawVRect(task.iddList(i + j * width), task.iddList(index), i + j * width, index)
+                vTestRect(task.iddList(i + j * width), task.iddList(index), i + j * width, index)
             Next
             Dim iddNext = i + (height - 1) * width
             If iddNext >= task.iddList.Count Then iddNext = task.iddList.Count - 1
-            drawVRect(task.iddList(iddNext), task.iddList(index), iddNext, -1)
+            vTestRect(task.iddList(iddNext), task.iddList(index), iddNext, -1)
         Next
 
         labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +

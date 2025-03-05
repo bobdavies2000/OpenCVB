@@ -22,13 +22,12 @@ End Class
 
 
 Public Class RedTrack_Lines : Inherits TaskParent
-    Dim lines As New Line_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
+        task.lines.Run(src)
 
         If task.heartBeat Then dst3.SetTo(0)
         Dim index As Integer
@@ -185,7 +184,6 @@ End Class
 
 
 Public Class RedTrack_Points : Inherits TaskParent
-    Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -193,7 +191,7 @@ Public Class RedTrack_Points : Inherits TaskParent
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
+        task.lines.Run(src)
 
         dst3.SetTo(0)
         Dim index As Integer

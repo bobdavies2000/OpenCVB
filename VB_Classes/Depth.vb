@@ -1563,7 +1563,7 @@ End Class
 
 
 
-Public Class Depth_PaletteOld : Inherits TaskParent
+Public Class Depth_ColorizerOld : Inherits TaskParent
     Dim customColorMap As cv.Mat
     Dim gColor As New Gradient_ForDepth
     Public Sub New()
@@ -1588,7 +1588,7 @@ End Class
 
 
 
-Public Class Depth_Palette : Inherits TaskParent
+Public Class Depth_Colorizer : Inherits TaskParent
     Dim customColorMap As cv.Mat
     Public Sub New()
         ' duplicated some code from Gradient_ForDepth to reduce the task algorithms in TreeView.

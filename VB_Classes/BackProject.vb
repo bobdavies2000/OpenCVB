@@ -674,11 +674,9 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines As New Line_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        optiBase.FindSlider("Min Line Length").Value = 1 ' show all lines...
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}
         desc = "Inspect the lines from individual backprojection masks from a histogram"
@@ -690,12 +688,12 @@ Public Class BackProject_MaskLines : Inherits TaskParent
 
         Static saveHistIndex As Integer = masks.histIndex
         If masks.histIndex <> saveHistIndex Then
-            lines.Run(src)
+            task.lines.Run(src)
             task.lpList = New List(Of linePoints)(task.lpList)
             dst1.SetTo(0)
         End If
 
-        lines.Run(masks.mask)
+        task.lines.Run(masks.mask)
 
         For Each lp In task.lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)

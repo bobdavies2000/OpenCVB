@@ -59,7 +59,6 @@ End Class
 
 Public Class Reduction_HeatMapLines : Inherits TaskParent
     Dim heat As New HeatMap_Basics
-    Public lines As New Line_Basics
     Public setupSide As New PointCloud_SetupSide
     Public setupTop As New PointCloud_SetupTop
     Dim reduction As New Reduction_PointCloud
@@ -72,15 +71,15 @@ Public Class Reduction_HeatMapLines : Inherits TaskParent
         reduction.Run(src)
         heat.Run(src)
 
-        lines.Run(heat.dst2)
+        task.lines.Run(heat.dst2)
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
-        dst2.SetTo(white, lines.dst3)
+        dst2.SetTo(white, task.lines.dst3)
 
-        lines.Run(heat.dst3)
+        task.lines.Run(heat.dst3)
         setupSide.Run(heat.dst3)
         dst3 = setupSide.dst2
-        dst3.SetTo(white, lines.dst3)
+        dst3.SetTo(white, task.lines.dst3)
     End Sub
 End Class
 

@@ -117,17 +117,19 @@ Public Class Interpolate_Lines : Inherits TaskParent
     Dim lines as new Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
-       optiBase.findslider("Interpolation Resize %").Value = 80
-       optiBase.findslider("Interpolation threshold").Value = 100
+        optiBase.FindSlider("Interpolation Resize %").Value = 80
+        optiBase.FindSlider("Interpolation threshold").Value = 100
         desc = "Detect lines in interpolation results."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         inter.Run(src)
         dst1 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size)
         dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, cv.ThresholdTypes.Binary)
+
         lines.Run(dst1)
         dst2 = lines.dst2
         dst3 = src
+
         For Each lp In task.lpList
             DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
         Next

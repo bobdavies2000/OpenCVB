@@ -54,15 +54,14 @@ End Class
 
 
 Public Class LongLine_Core : Inherits TaskParent
-    Public lines As New Line_Basics
     Public lineCount As Integer = 1 ' How many of the longest lines...
     Public lpList As New List(Of linePoints) ' this will be sorted by length - longest first
     Public Sub New()
         desc = "Isolate the longest X lines."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
         If task.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
@@ -269,15 +268,14 @@ End Class
 
 
 Public Class LongLine_ExtendAll : Inherits TaskParent
-    Public lines As New Line_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
         labels = {"", "", "Image output from Line_Core", "The extended line for each line found in Line_Core"}
         desc = "Create a list of all the extended lines in an image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
 
         dst3 = src.Clone
         lpList.Clear()

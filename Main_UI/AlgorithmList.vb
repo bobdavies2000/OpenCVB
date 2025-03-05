@@ -269,8 +269,10 @@ Public Class algorithmList
 	If algorithmName = "Depth_Basics" Then return new Depth_Basics
 	If algorithmName = "Depth_BGSubtract" Then return new Depth_BGSubtract
 	If algorithmName = "Depth_CellTiers" Then return new Depth_CellTiers
+	If algorithmName = "Depth_Colorizer" Then return new Depth_Colorizer
 	If algorithmName = "Depth_Colorizer_CPP" Then return new Depth_Colorizer_CPP
 	If algorithmName = "Depth_Colorizer_VB" Then return new Depth_Colorizer_VB
+	If algorithmName = "Depth_ColorizerOld" Then return new Depth_ColorizerOld
 	If algorithmName = "Depth_ColorMap" Then return new Depth_ColorMap
 	If algorithmName = "Depth_Contour" Then return new Depth_Contour
 	If algorithmName = "Depth_Dilate" Then return new Depth_Dilate
@@ -297,8 +299,6 @@ Public Class algorithmList
 	If algorithmName = "Depth_MinMaxToVoronoi" Then return new Depth_MinMaxToVoronoi
 	If algorithmName = "Depth_NotMissing" Then return new Depth_NotMissing
 	If algorithmName = "Depth_Outline" Then return new Depth_Outline
-	If algorithmName = "Depth_Palette" Then return new Depth_Palette
-	If algorithmName = "Depth_PaletteOld" Then return new Depth_PaletteOld
 	If algorithmName = "Depth_PunchBlob" Then return new Depth_PunchBlob
 	If algorithmName = "Depth_PunchBlobNew" Then return new Depth_PunchBlobNew
 	If algorithmName = "Depth_PunchDecreasing" Then return new Depth_PunchDecreasing

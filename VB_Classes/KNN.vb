@@ -505,7 +505,6 @@ End Class
 
 
 Public Class KNN_ClosestTracker : Inherits TaskParent
-    Public lines as new Line_Basics
     Public lastPair As New linePoints
     Public trainInput As New List(Of cv.Point2f)
     Dim minDistances As New List(Of Single)
@@ -518,8 +517,8 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
 
         Dim p1 As cv.Point2f, p2 As cv.Point2f
         If trainInput.Count = 0 Then
-            lines.Run(src)
-            dst3 = lines.dst2
+            task.lines.Run(src)
+            dst3 = task.lines.dst2
         Else
             p1 = lastPair.p1
             p2 = lastPair.p2

@@ -292,7 +292,7 @@ End Class
 
 
 Public Class ML_DepthFromColor : Inherits TaskParent
-    Dim colorPal As New Depth_Palette
+    Dim colorPal As New Depth_Colorizer
     Dim mats As New Mat_4Click
     Dim resizer As New Resize_Smaller
     Public Sub New()

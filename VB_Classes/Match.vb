@@ -249,14 +249,13 @@ End Class
 
 Public Class Match_Lines : Inherits TaskParent
     Dim knn As New KNN_N4Basics
-    Dim lines As New Line_Basics
     Public Sub New()
         labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
         Static lastPt As New List(Of linePoints)(task.lpList)
 
         knn.queries.Clear()

@@ -126,7 +126,7 @@ Public Class VBtask : Implements IDisposable
     Public gravityHorizon As Gravity_Horizon
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
-    Public colorizer As Depth_Palette
+    Public colorizer As Depth_Colorizer
     ' end of task algorithms
 
     Public pythonPipeIn As NamedPipeServerStream
@@ -512,7 +512,8 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
-        colorizer = New Depth_Palette
+        colorizer = New Depth_Colorizer
+        lines = New Line_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics

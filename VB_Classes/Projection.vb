@@ -99,7 +99,6 @@ End Class
 
 Public Class Projection_Lines : Inherits TaskParent
     Dim heat As New HeatMap_Basics
-    Dim lines as new Line_Basics
     Dim options As New Options_Projection
     Public Sub New()
         optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
@@ -118,8 +117,8 @@ Public Class Projection_Lines : Inherits TaskParent
         If options.topCheck Then dst2 = heat.dst2 Else dst2 = heat.dst3
         dst1 = dst2.Threshold(options.projectionThreshold, 255, cv.ThresholdTypes.Binary)
 
-        lines.Run(dst1)
-        dst3 += lines.dst2
+        task.lines.Run(dst1)
+        dst3 += task.lines.dst2
     End Sub
 End Class
 

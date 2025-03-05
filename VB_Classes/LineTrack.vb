@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
-    Public lines as new Line_Basics
     Public delaunay As New Delaunay_Basics
     Public contours As New Delaunay_Contours
     Public lpList As New List(Of linePoints)
@@ -10,7 +9,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
         desc = "Track lines from frame to frame"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        lines.Run(src)
+        task.lines.Run(src)
 
         delaunay.inputPoints.Clear()
         For Each lp In task.lpList
@@ -90,14 +89,13 @@ End Class
 
 
 Public Class LineTrack_RedCloud : Inherits TaskParent
-    Public lines As New Line_Basics
     Public delaunay As New Delaunay_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the line regions with RedCloud"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        lines.Run(src)
+        task.lines.Run(src)
 
         delaunay.inputPoints.Clear()
         For Each lp In task.lpList
@@ -121,7 +119,6 @@ End Class
 
 
 Public Class LineTrack_Basics1 : Inherits TaskParent
-    Public lines As New Line_Basics
     Public delaunay As New Delaunay_Basics
     Public lpList As New List(Of linePoints)
     Dim lineMap As New cv.Mat
@@ -129,7 +126,7 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
         desc = "Track lines from frame to frame"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        lines.Run(src)
+        task.lines.Run(src)
 
         delaunay.inputPoints.Clear()
         For Each lp In task.lpList

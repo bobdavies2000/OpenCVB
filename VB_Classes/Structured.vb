@@ -131,16 +131,15 @@ End Class
 
 Public Class Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
-    Public lines as new Line_Basics
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         multi.Run(src)
         dst3 = multi.dst3
-        lines.Run(dst3)
-        dst2 = lines.dst2
-        labels(2) = lines.labels(2)
+        task.lines.Run(dst3)
+        dst2 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
     End Sub
 End Class
 
@@ -674,7 +673,6 @@ End Class
 
 Public Class Structured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
-    Dim lines as new Line_Basics
     Public Sub New()
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"
@@ -684,13 +682,13 @@ Public Class Structured_MouseSlice : Inherits TaskParent
         If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
         slice.Run(src)
 
-        lines.Run(slice.sliceMask)
+        task.lines.Run(slice.sliceMask)
         Dim tops As New List(Of Integer)
         Dim bots As New List(Of Integer)
         Dim topsList As New List(Of cv.Point)
         Dim botsList As New List(Of cv.Point)
         If task.lpList.Count > 0 Then
-            dst3 = lines.dst2
+            dst3 = task.lines.dst2
             For Each lp In task.lpList
                 dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth + 3, task.lineType)
                 tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
@@ -1403,7 +1401,6 @@ End Class
 
 
 Public Class Structured_LinesX : Inherits TaskParent
-    Public lines As New Line_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1416,7 +1413,7 @@ Public Class Structured_LinesX : Inherits TaskParent
             src = struct.dst2
         End If
 
-        lines.Run(src)
+        task.lines.Run(src)
         lpList = New List(Of linePoints)(task.lpList)
 
         dst2.SetTo(0)
@@ -1431,7 +1428,6 @@ End Class
 
 
 Public Class Structured_LinesY : Inherits TaskParent
-    Public lines As New Line_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1444,7 +1440,7 @@ Public Class Structured_LinesY : Inherits TaskParent
             src = struct.dst3
         End If
 
-        lines.Run(src)
+        task.lines.Run(src)
         lpList = New List(Of linePoints)(task.lpList)
 
         dst2.SetTo(0)

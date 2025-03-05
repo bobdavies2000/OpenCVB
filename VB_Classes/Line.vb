@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Dim lineCore As New Line_Core
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public lpSorted As New List(Of linePoints)
     Public Sub New()
@@ -8,6 +7,7 @@ Public Class Line_Basics : Inherits TaskParent
         desc = "Collect lines across frames using the motion mask."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lineCore As New Line_Core
         lineCore.Run(src)
         dst2 = lineCore.dst2
 
@@ -170,14 +170,14 @@ Public Class Line_InterceptsUI : Inherits TaskParent
     Dim yellowRadio As System.Windows.Forms.RadioButton
     Dim blueRadio As System.Windows.Forms.RadioButton
     Public Sub New()
-        redRadio = optiBase.FindRadio("Show Top intercepts")
-        greenRadio = optiBase.FindRadio("Show Bottom intercepts")
-        yellowRadio = optiBase.FindRadio("Show Right intercepts")
-        blueRadio = optiBase.FindRadio("Show Left intercepts")
+        redRadio = optiBase.findRadio("Show Top intercepts")
+        greenRadio = optiBase.findRadio("Show Bottom intercepts")
+        yellowRadio = optiBase.findRadio("Show Right intercepts")
+        blueRadio = optiBase.findRadio("Show Left intercepts")
         labels(2) = "Use mouse in right image to highlight lines"
         desc = "An alternative way to highlight line segments with common slope"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst3.SetTo(0)
 
@@ -253,7 +253,6 @@ End Class
 
 Public Class Line_Intercepts : Inherits TaskParent
     Public extended As New LongLine_Extend
-    Public lines As New Line_Basics
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
     Dim longLine As New LongLine_Basics
@@ -268,10 +267,10 @@ Public Class Line_Intercepts : Inherits TaskParent
         labels(2) = "Highlight line x- and y-intercepts.  Move mouse over the image."
         desc = "Show lines with similar y-intercepts"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        lines.Run(src)
+        task.lines.Run(src)
         If task.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
@@ -327,7 +326,6 @@ End Class
 
 
 Public Class Line_InDepthAndBGR : Inherits TaskParent
-    Dim lines As New Line_Basics
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
     Public z1List As New List(Of cv.Point3f) ' the point cloud values corresponding to p1 and p2
@@ -337,9 +335,9 @@ Public Class Line_InDepthAndBGR : Inherits TaskParent
         labels(3) = "Lines in BGR confirmed in the point cloud"
         desc = "Find the BGR lines and confirm they are present in the cloud data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
         If task.lpList.Count = 0 Then Exit Sub
 
         Dim lineList = New List(Of cv.Rect)
@@ -404,7 +402,7 @@ Public Class Line_Movement : Inherits TaskParent
         labels = {"", "", "Line Movement", ""}
         desc = "Show the movement of the line provided"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             Static k1 = p1
             Static k2 = p2
@@ -430,7 +428,6 @@ End Class
 
 
 Public Class Line_GCloud : Inherits TaskParent
-    Public lines As New Line_Basics
     Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
@@ -475,7 +472,7 @@ Public Class Line_GCloud : Inherits TaskParent
         Dim maxAngle = angleSlider.Value
 
         dst2 = src.Clone
-        lines.Run(src.Clone)
+        task.lines.Run(src.Clone)
 
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
@@ -538,7 +535,6 @@ End Class
 
 Public Class Line_ViewSide : Inherits TaskParent
     Public autoY As New OpAuto_YRange
-    Public lines As New Line_Basics
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
@@ -550,9 +546,9 @@ Public Class Line_ViewSide : Inherits TaskParent
         autoY.Run(histSide.histogram)
         dst2 = histSide.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
-        lines.Run(dst2.Clone)
-        dst3 = lines.dst2
-        labels(2) = lines.labels(2)
+        task.lines.Run(dst2.Clone)
+        dst3 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
     End Sub
 End Class
 
@@ -563,7 +559,6 @@ End Class
 
 Public Class Line_ViewTop : Inherits TaskParent
     Public autoX As New OpAuto_XRange
-    Public lines As New Line_Basics
     Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View."}
@@ -575,9 +570,9 @@ Public Class Line_ViewTop : Inherits TaskParent
         autoX.Run(histTop.histogram)
         dst2 = histTop.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
-        lines.Run(dst2)
-        dst3 = lines.dst2
-        labels(2) = lines.labels(2)
+        task.lines.Run(dst2)
+        dst3 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
     End Sub
 End Class
 
@@ -588,7 +583,6 @@ End Class
 
 Public Class Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim lines As New Line_Basics
     Dim contours As New Contour_Gray
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
@@ -600,7 +594,7 @@ Public Class Line_FromContours : Inherits TaskParent
         reduction.Run(src)
         contours.Run(reduction.dst2)
         dst2 = contours.dst2.Clone
-        lines.Run(dst2)
+        task.lines.Run(dst2)
 
         dst3.SetTo(0)
         For Each lp In task.lpList
@@ -618,9 +612,8 @@ End Class
 
 Public Class Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
-    Dim lines As New Line_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Lines for the current color class", "Color Class input"}
         desc = "Review lines in all the different color classes"
     End Sub
@@ -628,9 +621,9 @@ Public Class Line_ColorClass : Inherits TaskParent
         color8U.Run(src)
         dst1 = color8U.dst3
 
-        lines.Run(dst1 * 255 / color8U.classCount)
-        dst2 = lines.dst2
-        dst3 = lines.dst2
+        task.lines.Run(dst1 * 255 / color8U.classCount)
+        dst2 = task.lines.dst2
+        dst3 = task.lines.dst2
 
         labels(1) = "Input to Line_Basics"
         labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
@@ -646,7 +639,6 @@ End Class
 
 Public Class Line_TimeView : Inherits TaskParent
     Public frameList As New List(Of List(Of linePoints))
-    Public lines As New Line_Basics
     Public pixelcount As Integer
     Public lpList As New List(Of linePoints)
     Public Sub New()
@@ -654,7 +646,7 @@ Public Class Line_TimeView : Inherits TaskParent
         desc = "Collect lines over time"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
+        task.lines.Run(src)
 
         If task.optionsChanged Then frameList.Clear()
         Dim nextMpList = New List(Of linePoints)(task.lpList)
@@ -880,7 +872,6 @@ End Class
 
 
 Public Class Line_KNN : Inherits TaskParent
-    Dim lines As New Line_Basics
     Dim swarm As New Swarm_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -890,8 +881,8 @@ Public Class Line_KNN : Inherits TaskParent
         runFeature(src)
 
         swarm.options.RunOpt()
-        lines.Run(src)
-        dst2 = lines.dst2
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
 
         dst3.SetTo(0)
         swarm.knn.queries.Clear()
@@ -904,7 +895,7 @@ Public Class Line_KNN : Inherits TaskParent
         swarm.knn.Run(src)
 
         dst3 = swarm.DrawLines().Clone
-        labels(2) = lines.labels(2)
+        labels(2) = task.lines.labels(2)
     End Sub
 End Class
 
@@ -913,15 +904,14 @@ End Class
 
 
 Public Class Line_Vertical : Inherits TaskParent
-    Public lines As New Line_Basics
     Public ptList As New List(Of linePoints)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        lines.Run(src)
-        dst3 = lines.dst2
+        task.lines.Run(src)
+        dst3 = task.lines.dst2
 
         Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
         Dim sideOpposite = p2.X - p1.X
@@ -950,7 +940,6 @@ End Class
 
 
 Public Class Line_Horizontal : Inherits TaskParent
-    Public lines As New Line_Basics
     Public ptList As New List(Of linePoints)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -958,7 +947,7 @@ Public Class Line_Horizontal : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        lines.Run(src)
+        task.lines.Run(src)
 
         Dim p1 = task.horizonVec.p1, p2 = task.horizonVec.p2
         Dim sideOpposite = p2.Y - p1.Y
@@ -1032,7 +1021,6 @@ End Class
 
 Public Class Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
-    Dim lines As New Line_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
         optiBase.FindSlider("Canny Aperture").Value = 7
@@ -1044,8 +1032,8 @@ Public Class Line_Canny : Inherits TaskParent
         canny.Run(src)
         dst3 = canny.dst2.Clone
 
-        lines.Run(canny.dst2)
-        dst2 = lines.dst2
+        task.lines.Run(canny.dst2)
+        dst2 = task.lines.dst2
         lpList = New List(Of linePoints)(task.lpList)
         labels(2) = "Number of lines identified: " + CStr(lpList.Count)
     End Sub
@@ -1057,7 +1045,6 @@ End Class
 
 
 Public Class Line_Cells : Inherits TaskParent
-    Dim lines As New Line_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
@@ -1065,8 +1052,8 @@ Public Class Line_Cells : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        lines.Run(dst2.Clone)
-        dst3 = lines.dst2
+        task.lines.Run(dst2.Clone)
+        dst3 = task.lines.dst2
         lpList = New List(Of linePoints)(task.lpList)
         labels(3) = "Number of lines identified: " + CStr(lpList.Count)
     End Sub
@@ -1113,7 +1100,6 @@ End Class
 
 
 Public Class Line_VerticalHorizontal1 : Inherits TaskParent
-    Dim lines As New Line_Basics
     Dim nearest As New Line_Nearest
     Public Sub New()
         task.gOptions.LineWidth.Value = 2
@@ -1123,8 +1109,8 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
         Dim pixelDiff = task.gOptions.pixelDiffThreshold
 
         dst2 = src.Clone
-        lines.Run(src)
-        If standaloneTest() Then dst3 = lines.dst2
+        task.lines.Run(src)
+        If standaloneTest() Then dst3 = task.lines.dst2
 
         nearest.lp = task.gravityVec
         DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
@@ -1234,19 +1220,18 @@ End Class
 
 
 Public Class Line_PointSlope : Inherits TaskParent
-    Dim lines As New Line_Basics
     Dim knn As New KNN_NNBasics
     Public bestLines As New List(Of linePoints)
     Const lineCount As Integer = 3
     Const searchCount As Integer = 100
     Public Sub New()
         knn.options.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
+        task.lines.Run(src)
         dst2 = src
 
         If bestLines.Count < lineCount Or task.heartBeat Then
@@ -1309,16 +1294,15 @@ End Class
 
 
 Public Class Line_TopX : Inherits TaskParent
-    Dim lines As New Line_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         labels(3) = "The top X lines by length..."
         desc = "Isolate the top X lines by length - lines are already sorted by length."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
-        labels(2) = lines.labels(2)
+        task.lines.Run(src)
+        dst2 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
 
         dst3.SetTo(0)
         For i = 0 To 9
@@ -1332,12 +1316,10 @@ End Class
 
 
 Public Class Line_Matching : Inherits TaskParent
-    Public lines As New Line_Basics
     Public options As New Options_Line
     Dim lineMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim lpList As New List(Of linePoints)
     Public Sub New()
-        optiBase.FindSlider("Min Line Length").Value = 30
         labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
         desc = "Combine lines that are approximately the same line."
     End Sub
@@ -1356,11 +1338,13 @@ Public Class Line_Matching : Inherits TaskParent
             End If
         End If
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         dst2 = src.Clone
 
-        If standalone Then lines.Run(src)
+        If standalone Then task.lines.Run(src)
+
+        If task.firstPass Then optiBase.FindSlider("Min Line Length").Value = 30
 
         Dim tolerance = 0.1
         Dim newSet As New List(Of linePoints)
@@ -1422,13 +1406,13 @@ End Class
 Public Class Line_Info : Inherits TaskParent
     Public lpInput As New List(Of linePoints)
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Click on the oversized line to get details about the line"
         labels(3) = "Details from the point cloud for the selected line"
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Display details about the line selected."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then runLines(src)
         labels(2) = task.lines.labels(2)
 
@@ -1472,14 +1456,13 @@ End Class
 
 
 Public Class Line_ViewRight : Inherits TaskParent
-    Dim lines As New Line_Basics
     Public Sub New()
         desc = "Find lines in the right image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(task.rightView)
-        dst2 = lines.dst2
-        labels(2) = lines.labels(2)
+        task.lines.Run(task.rightView)
+        dst2 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
     End Sub
 End Class
 
