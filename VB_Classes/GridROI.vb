@@ -50,7 +50,6 @@ End Class
 
 Public Class GridROI_Color : Inherits TaskParent
     Public Sub New()
-        optiBase.FindSlider("Add Weighted %").Value = 70
         task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Compute the stdev for each roi.  If small (<10), mark as featureLess."

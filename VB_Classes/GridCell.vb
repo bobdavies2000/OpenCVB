@@ -1372,12 +1372,11 @@ End Class
 
 
 
-Public Class GridCell_Regions1 : Inherits TaskParent
+Public Class GridCell_RegionContours : Inherits TaskParent
     Public redM As New RedMask_Basics
     Public connect As New GridCell_ConnectedRects
     Public Sub New()
         task.gOptions.TruncateDepth.Checked = True
-        labels(3) = "AddWeighted output combining RGB and masks below left."
         desc = "Find the main regions connected in depth and build a contour for each."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
