@@ -1313,9 +1313,8 @@ End Class
 Public Class GridCell_Regions : Inherits TaskParent
     Public redM As New RedMask_Basics
     Public connect As New GridCell_ConnectedRects
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
-        labels(3) = "AddWeighted output combining RGB and masks below left."
+        task.gOptions.TruncateDepth.Checked = True
         desc = "Use the merged by depth grid cells to build masks for each region"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

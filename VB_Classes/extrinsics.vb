@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Public Class Extrinsics_Basics : Inherits TaskParent
-    Dim addw As New AddWeighted_Basics
     Public Sub New()
         If standalone Then task.gOptions.DotSizeSlider.Value = 5
         If standalone Then task.gOptions.displayDst1.Checked = True
