@@ -8075,3 +8075,24 @@ Public Class Options_GridCells : Inherits OptionParent
         colorDifferenceThreshold = diffSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_GridStdev : Inherits OptionParent
+    Public depthThreshold As Single
+    Public colorThreshold As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Stdev Depth Threshold X100", 0, 100, 50)
+            sliders.setupTrackBar("Stdev Color Threshold", 0, 100, 20)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static depthSlider = FindSlider("Stdev Depth Threshold X100")
+        Static colorSlider = FindSlider("Stdev Color Threshold")
+        depthThreshold = depthSlider.value / 100
+        colorThreshold = colorSlider.value
+    End Sub
+End Class

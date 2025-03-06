@@ -2210,3 +2210,9 @@ public:
 	Options_GridCells() {
 	}
 };
+class Options_GridStdev {
+public:
+	void RunOpt() {}
+	Options_GridStdev() {
+	}
+};

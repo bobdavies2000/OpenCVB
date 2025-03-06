@@ -462,47 +462,6 @@ End Class
 
 
 
-Public Class GridCell_Stdev : Inherits TaskParent
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
-        desc = "Visualize the depth and color standard deviation for each grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0.SetTo(0)
-        dst1.SetTo(0)
-
-        Dim maxDepthStdev As Single
-        For Each idd In task.iddList
-            If maxDepthStdev < idd.depthStdev Then maxDepthStdev = idd.depthStdev
-            dst1(idd.cRect).SetTo(idd.depthStdev)
-            dst0(idd.cRect).SetTo(idd.colorStdev)
-        Next
-
-        Dim pt = task.iddC.cRect.TopLeft
-        strOut = Format(task.iddC.depthStdev, fmt3)
-        labels(2) = "Depth standard deviation for grid cell: " + strOut
-        SetTrueText(strOut, pt, 2)
-        dst2 = ShowPalette(dst1 * 255 / maxDepthStdev)
-        dst2.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
-
-        Dim mm = GetMinMax(dst0)
-        dst3 = ShowPalette(dst0 * 255 / (mm.maxVal - mm.minVal))
-        dst3.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
-        strOut = Format(task.iddC.colorStdev(0), fmt1) + "/" +
-                 Format(task.iddC.colorStdev(1), fmt1) + "/" +
-                 Format(task.iddC.colorStdev(2), fmt1)
-        labels(3) = "Color standard deviation for grid cell (B/G/R) = " + strOut
-        SetTrueText(strOut, pt, 3)
-
-        task.color.Circle(task.iddC.cRect.TopLeft, task.DotSize, task.HighlightColor, -1)
-    End Sub
-End Class
-
-
-
-
-
 Public Class GridCell_GrayScaleTest : Inherits TaskParent
     Dim options As New Options_Stdev
     Public Sub New()
@@ -1135,7 +1094,8 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
             End If
         Next
 
-        task.iddCorr = ShowPalette(dst1)
+        dst2 = ShowPalette(dst1)
+        task.iddCorr = dst2
 
         labels(2) = task.gCell.labels(2)
         labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
@@ -1467,3 +1427,27 @@ Public Class GridCell_InternalLines : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class GridCell_Stdev : Inherits TaskParent
+    Dim options As New Options_GridStdev
+    Public Sub New()
+        desc = "Visualize the depth and color standard deviation for each grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        For Each idd In task.iddList
+            If idd.depthStdev > options.depthThreshold Then
+                ' dst2(idd.cRect).SetTo()
+            End If
+        Next
+    End Sub
+End Class
