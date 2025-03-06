@@ -426,6 +426,7 @@ Public Class algorithmList
 	If algorithmName = "Edge_SobelLRBinarized" Then return new Edge_SobelLRBinarized
 	If algorithmName = "Edge_Sweep" Then return new Edge_Sweep
 	If algorithmName = "EdgeDraw_Basics" Then return new EdgeDraw_Basics
+	If algorithmName = "EdgeDraw_GridCell" Then return new EdgeDraw_GridCell
 	If algorithmName = "EdgeDraw_LeftRight" Then return new EdgeDraw_LeftRight
 	If algorithmName = "EdgeDraw_LeftRightVertical" Then return new EdgeDraw_LeftRightVertical
 	If algorithmName = "EdgeDraw_Segments" Then return new EdgeDraw_Segments
@@ -648,6 +649,7 @@ Public Class algorithmList
 	If algorithmName = "GridCell_Correlation" Then return new GridCell_Correlation
 	If algorithmName = "GridCell_CorrelationMap" Then return new GridCell_CorrelationMap
 	If algorithmName = "GridCell_CorrelationMask" Then return new GridCell_CorrelationMask
+	If algorithmName = "GridCell_EdgeDraw" Then return new GridCell_EdgeDraw
 	If algorithmName = "GridCell_Edges" Then return new GridCell_Edges
 	If algorithmName = "GridCell_FeatureGaps" Then return new GridCell_FeatureGaps
 	If algorithmName = "GridCell_Features" Then return new GridCell_Features
@@ -655,6 +657,7 @@ Public Class algorithmList
 	If algorithmName = "GridCell_FullDepth" Then return new GridCell_FullDepth
 	If algorithmName = "GridCell_GrayScaleTest" Then return new GridCell_GrayScaleTest
 	If algorithmName = "GridCell_InstantUpdate" Then return new GridCell_InstantUpdate
+	If algorithmName = "GridCell_InternalLines" Then return new GridCell_InternalLines
 	If algorithmName = "GridCell_LeftRightSize" Then return new GridCell_LeftRightSize
 	If algorithmName = "GridCell_LeftToColor" Then return new GridCell_LeftToColor
 	If algorithmName = "GridCell_Lines" Then return new GridCell_Lines

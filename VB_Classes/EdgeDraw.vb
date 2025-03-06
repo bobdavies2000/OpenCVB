@@ -132,3 +132,24 @@ Public Class EdgeDraw_SplitMean : Inherits TaskParent
         dst3 = edges.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class EdgeDraw_GridCell : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "Find lines within each grid cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        For Each idd In task.iddList
+            edges.Run(src(idd.cRect))
+            For Each lp In task.lpList
+                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+            Next
+        Next
+    End Sub
+End Class

@@ -1420,3 +1420,50 @@ Public Class GridCell_Lines : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class GridCell_EdgeDraw : Inherits TaskParent
+    Dim regions As New GridCell_RegionContours
+    Public edges As New EdgeDraw_Basics
+    Public Sub New()
+        desc = "Lines can mean cells are connected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        regions.Run(src)
+        dst2 = regions.dst3
+
+        edges.Run(src)
+        dst2.SetTo(cv.Scalar.White, edges.dst2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class GridCell_InternalLines : Inherits TaskParent
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Remove lines which cross grid cells that have the same depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.lines.Run(src)
+        dst2 = src.Clone
+        dst3.SetTo(0)
+        For Each lp In task.lpList
+            Dim idd1 = task.iddList(task.iddMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim idd2 = task.iddList(task.iddMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            dst3.Line(lp.p1, lp.p2, 128, task.lineWidth)
+            If Math.Abs(idd1.depth - idd2.depth) >= task.depthDiffMeters Then
+                dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
+            End If
+        Next
+    End Sub
+End Class
+
