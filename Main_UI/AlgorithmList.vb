@@ -955,7 +955,7 @@ Public Class algorithmList
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Cells" Then return new Line_Cells
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
-	If algorithmName = "Line_Core" Then return new Line_Core
+	If algorithmName = "Line_CoreMotion" Then return new Line_CoreMotion
 	If algorithmName = "Line_Detector" Then return new Line_Detector
 	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
 	If algorithmName = "Line_FromContours" Then return new Line_FromContours
@@ -1004,6 +1004,8 @@ Public Class algorithmList
 	If algorithmName = "LineCoin_Basics" Then return new LineCoin_Basics
 	If algorithmName = "LineCoin_HistoryIntercept" Then return new LineCoin_HistoryIntercept
 	If algorithmName = "LineCoin_Parallel" Then return new LineCoin_Parallel
+	If algorithmName = "LineRect_Basics" Then return new LineRect_Basics
+	If algorithmName = "LineRect_Internal" Then return new LineRect_Internal
 	If algorithmName = "LineTrack_Basics" Then return new LineTrack_Basics
 	If algorithmName = "LineTrack_Basics1" Then return new LineTrack_Basics1
 	If algorithmName = "LineTrack_RedCloud" Then return new LineTrack_RedCloud

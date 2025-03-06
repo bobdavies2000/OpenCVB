@@ -12,12 +12,12 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         runLines(src)
 
         dst3.SetTo(0)
-        For Each lp In task.lines.lpSorted
+        For Each lp In task.lpList
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
         dst2 = src
-        Dim lpt = task.lines.lpSorted(0)
+        Dim lpt = task.lpList(0)
         dst2.Line(lpt.p1, lpt.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
     End Sub
 End Class

@@ -132,6 +132,7 @@ Line3D
 Linear
 LinearRegression
 LineCoin
+LineRect
 LineTrack
 LongLine
 LUT

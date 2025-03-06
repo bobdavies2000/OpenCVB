@@ -2216,3 +2216,9 @@ public:
 	Options_GridStdev() {
 	}
 };
+class Options_LineRect {
+public:
+	void RunOpt() {}
+	Options_LineRect() {
+	}
+};

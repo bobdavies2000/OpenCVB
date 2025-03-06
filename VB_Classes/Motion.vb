@@ -1060,8 +1060,8 @@ Public Class Motion_RightView : Inherits TaskParent
         labels(2) = measure.labels(2)
 
         dst2.SetTo(0)
-        If measure.motionDetected Then
-            For Each roi In measure.motionRects
+        If task.motionRects.Count Then
+            For Each roi In task.motionRects
                 dst2(roi).SetTo(255)
             Next
         End If

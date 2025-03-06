@@ -1,6 +1,4 @@
-﻿Imports OpenCvSharp
-Imports OpenCvSharp.Flann
-Imports VB_Classes.VBtask
+﻿Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
@@ -729,7 +727,6 @@ End Class
 
 
 Public Class GridCell_MeasureMotion : Inherits TaskParent
-    Public motionDetected As Boolean
     Public motionRects As New List(Of cv.Rect)
     Dim percentList As New List(Of Single)
     Public motionList As New List(Of Integer)
@@ -762,20 +759,17 @@ Public Class GridCell_MeasureMotion : Inherits TaskParent
             End If
         Next
 
-        motionDetected = False
         ' Use the whole image for the first few images as camera stabilizes.
         If task.frameCount < 3 Then
             src.CopyTo(dst3)
             motionRects.Clear()
             motionRects.Add(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-            motionDetected = True
         Else
             If motionRects.Count > 0 Then
                 For Each roi In motionRects
                     src(roi).CopyTo(dst3(roi))
                     If standaloneTest() Then dst0.Rectangle(roi, white, task.lineWidth)
                 Next
-                motionDetected = True
             End If
         End If
 

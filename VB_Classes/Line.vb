@@ -1,22 +1,24 @@
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public lpSorted As New List(Of linePoints)
+    Public lpList As New List(Of linePoints)
+    Dim lineCore As New Line_CoreMotion
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lineCore As New Line_Core
         lineCore.Run(src)
-        dst2 = lineCore.dst2
 
         lpMap.SetTo(0)
+        dst2 = src.Clone
+        dst2.SetTo(cv.Scalar.White, lineCore.dst2)
         For Each lp In lineCore.lpList
             lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
         Next
 
-        lpSorted = New List(Of linePoints)(lineCore.lpSorted.Values)
+        lpList = New List(Of linePoints)(lineCore.lpList)
         task.lpList = New List(Of linePoints)(lineCore.lpList)
         labels(2) = lineCore.labels(2)
     End Sub
@@ -24,120 +26,6 @@ End Class
 
 
 
-
-
-Public Class Line_Core : Inherits TaskParent
-    Dim lines As New Line_Detector
-    Dim options As New Options_Line
-    Public lpList As New List(Of linePoints)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public lpSorted As New SortedList(Of Single, linePoints)(New compareAllowIdenticalSingleInverted)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines across frames using the motion mask."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        lines.Run(src.Clone)
-        Static lastList As New List(Of linePoints)(lines.lpList)
-
-        Dim newSet As New List(Of linePoints)
-        ' unlike Feature_Basics, we have to check each pair, not each point
-        For Each lp In lastList
-            lp.p1 = validatePoint(lp.p1)
-            lp.p2 = validatePoint(lp.p2)
-            Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-            If val1 = 0 And val2 = 0 Then newSet.Add(lp)
-        Next
-
-        ' unlike Feature_Basics, we have to check each pair, not each point
-        For Each lp In lines.lpList
-            lp.p1 = validatePoint(lp.p1)
-            lp.p2 = validatePoint(lp.p2)
-            Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-            If val1 <> 0 Or val2 <> 0 Then newSet.Add(lp)
-        Next
-
-        lpSorted.Clear()
-        For Each lp In newSet
-            If lp.p1.X > lp.p2.X Then lp = New linePoints(lp.p2, lp.p1)
-            lpSorted.Add(lp.length, lp)
-        Next
-
-        lpList.Clear()
-        For Each lp In lpSorted.Values
-            lp.index = lpList.Count
-            If lp.rect.Width > 0 Then
-                If lp.mask.Width > 0 Then
-                    lp.mmX = GetMinMax(task.pcSplit(0)(lp.rect), lp.mask)
-                    lp.mmY = GetMinMax(task.pcSplit(1)(lp.rect), lp.mask)
-                    lp.mmZ = GetMinMax(task.pcSplit(2)(lp.rect), lp.mask)
-
-                    lp.mmPerPixel = (lp.mmZ.maxVal - lp.mmZ.minVal) / lp.length
-
-                    lpList.Add(lp)
-                End If
-            End If
-        Next
-        lastList = New List(Of linePoints)(lpList)
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector with " +
-                        CStr(lpList.Count) + " after filtering with the motion mask."
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line_Detector : Inherits TaskParent
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of linePoints)
-    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src(subsetRect))
-
-        lpList.Clear()
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
-                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
-                Dim lp = New linePoints(p1, p2)
-                lp.rect = ValidateRect(lp.rect)
-                lp.mask = dst2(lp.rect)
-                lpList.Add(lp)
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-    End Sub
-End Class
 
 
 
@@ -1324,7 +1212,7 @@ Public Class Line_Matching : Inherits TaskParent
     Dim lineMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim lpList As New List(Of linePoints)
     Public Sub New()
-        labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
+        labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_CoreMotion in Treeview to see."
         desc = "Combine lines that are approximately the same line."
     End Sub
     Private Function combine2Lines(lp1 As linePoints, lp2 As linePoints) As linePoints
@@ -1476,7 +1364,7 @@ End Class
 
 
 Public Class Line_LeftRight : Inherits TaskParent
-    Dim lineCore As New Line_Core
+    Dim lineCore As New Line_CoreMotion
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
         desc = "Show lines in both the right and left images."
@@ -1502,6 +1390,112 @@ Public Class Line_LeftRight : Inherits TaskParent
                 dst2.SetTo(0, task.noDepthMask)
                 dst3.SetTo(0, task.noDepthMask)
             End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_Detector : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of linePoints)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+    Public Sub New()
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src(subsetRect))
+
+        lpList.Clear()
+        lpMap.SetTo(0)
+        lpList.Add(New linePoints) ' zero placeholder.
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
+                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
+                Dim lp = New linePoints(p1, p2)
+                lp.rect = ValidateRect(lp.rect)
+                lp.mask = dst2(lp.rect)
+                lp.index = lpList.Count
+                lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+                lpList.Add(lp)
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_CoreMotion : Inherits TaskParent
+    Dim lines As New Line_Detector
+    Public lpList As New List(Of linePoints)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect lines as always but don't update lines where there was no motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.motionRects.Count = 0 Then Exit Sub ' no update to the lplist.
+        Dim histogram As New cv.Mat
+        Dim lastList As New List(Of linePoints)(lpList)
+        Dim histarray(lastList.Count - 1) As Single
+
+        lpList.Clear()
+        lpList.Add(New linePoints) ' placeholder to allow us to build a map.
+        If lastList.Count > 0 Then
+            lpMap.SetTo(0, Not task.motionMask)
+            cv.Cv2.CalcHist({lpMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
+            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+
+            For i = 1 To histarray.Count - 1
+                If histarray(i) = 0 Then lpList.Add(lastList(i))
+            Next
+        End If
+
+        lines.Run(src.Clone)
+        ReDim histarray(lines.lpList.Count - 1)
+
+        Dim tmp = lines.lpMap.Clone
+        tmp.setto(0, Not task.motionMask)
+        cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
+        Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+
+        For i = 1 To histarray.Count - 1
+            If histarray(i) > 0 Then lpList.Add(lines.lpList(i))
+        Next
+
+        dst2.SetTo(0)
+        lpMap.SetTo(0)
+        For i = 0 To lpList.Count - 1
+            lpList(i).index = i
+            Dim lp = lpList(i)
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector in the current image with " +
+                        CStr(lpList.Count) + " after filtering with the motion mask."
         End If
     End Sub
 End Class

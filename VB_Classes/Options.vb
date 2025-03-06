@@ -8096,3 +8096,24 @@ Public Class Options_GridStdev : Inherits OptionParent
         colorThreshold = colorSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_LineRect : Inherits OptionParent
+    Public depthThreshold As Single
+    Public colorThreshold As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("LineRect Depth Threshold X100", 0, 100, 50)
+            sliders.setupTrackBar("LineRect Color Threshold", 0, 100, 20)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static depthSlider = FindSlider("LineRect Depth Threshold X100")
+        Static colorSlider = FindSlider("LineRect Color Threshold")
+        depthThreshold = depthSlider.value / 100
+        colorThreshold = colorSlider.value
+    End Sub
+End Class

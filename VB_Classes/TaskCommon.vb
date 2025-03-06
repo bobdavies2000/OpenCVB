@@ -549,6 +549,8 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
     Public vertical As Boolean
     Public pc1 As cv.Point3f
     Public pc2 As cv.Point3f
+    Public colorMean As cv.Scalar
+    Public depthMean As Single
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
         p2 = _p2
@@ -613,6 +615,20 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
 
         vertical = Math.Abs(p1.X - p2.X) < Math.Abs(p1.Y - p2.Y)
         colorIndex = msRNG.Next(0, 255)
+
+        mask = New cv.Mat(rect.Size, cv.MatType.CV_8U, 0)
+        Dim pt1 As cv.Point, pt2 As cv.Point
+        If slope < 0 Then
+            pt1 = New cv.Point(0, 0)
+            pt2 = New cv.Point(rect.Width, rect.Height)
+        Else
+            pt1 = New cv.Point(rect.Width, 0)
+            pt2 = New cv.Point(0, rect.Height)
+        End If
+        mask.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
+
+        colorMean = task.color(rect).Mean(mask)
+        depthMean = task.pcSplit(2)(rect).Mean(mask)(0)
     End Sub
     Sub New()
         p1 = New cv.Point2f()

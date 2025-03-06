@@ -123,6 +123,7 @@
     <Compile Include="KNN.vb" />
     <Compile Include="KNNorm.vb" />
     <Compile Include="Linear.vb" />
+    <Compile Include="LineRect.vb" />
     <Compile Include="LineTrack.vb" />
     <Compile Include="AsciiArt.vb" />
     <Compile Include="Bezier.vb" />
