@@ -2203,10 +2203,10 @@ public:
 	Options_Stdev() {
 	}
 };
-class Options_DepthCellSize {
+class Options_GridCells {
 public:
 	int colorDifferenceThreshold =  10;
 	void RunOpt() {}
-	Options_DepthCellSize() {
+	Options_GridCells() {
 	}
 };

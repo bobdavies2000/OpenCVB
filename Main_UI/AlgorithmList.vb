@@ -657,6 +657,7 @@ Public Class algorithmList
 	If algorithmName = "GridCell_InstantUpdate" Then return new GridCell_InstantUpdate
 	If algorithmName = "GridCell_LeftRightSize" Then return new GridCell_LeftRightSize
 	If algorithmName = "GridCell_LeftToColor" Then return new GridCell_LeftToColor
+	If algorithmName = "GridCell_Lines" Then return new GridCell_Lines
 	If algorithmName = "GridCell_MeasureMotion" Then return new GridCell_MeasureMotion
 	If algorithmName = "GridCell_MLColor" Then return new GridCell_MLColor
 	If algorithmName = "GridCell_MLColorDepth" Then return new GridCell_MLColorDepth

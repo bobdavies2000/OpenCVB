@@ -1023,8 +1023,6 @@ Public Class Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
     Public lpList As New List(Of linePoints)
     Public Sub New()
-        optiBase.FindSlider("Canny Aperture").Value = 7
-        optiBase.FindSlider("Min Line Length").Value = 30
         labels(3) = "Input to Line_Basics"
         desc = "Find lines in the Canny output"
     End Sub
@@ -1033,6 +1031,12 @@ Public Class Line_Canny : Inherits TaskParent
         dst3 = canny.dst2.Clone
 
         task.lines.Run(canny.dst2)
+
+        If task.firstPass Then
+            optiBase.FindSlider("Canny Aperture").Value = 7
+            optiBase.FindSlider("Min Line Length").Value = 30
+        End If
+
         dst2 = task.lines.dst2
         lpList = New List(Of linePoints)(task.lpList)
         labels(2) = "Number of lines identified: " + CStr(lpList.Count)

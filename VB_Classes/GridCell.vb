@@ -1399,3 +1399,24 @@ Public Class GridCell_RegionContours : Inherits TaskParent
         dst3 = ShowAddweighted(src, dst2, labels(3))
     End Sub
 End Class
+
+
+
+
+
+
+Public Class GridCell_Lines : Inherits TaskParent
+    Dim regions As New GridCell_RegionContours
+    Public Sub New()
+        desc = "Lines can mean cells are connected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        regions.Run(src)
+        dst2 = regions.dst3
+
+        task.lines.Run(src)
+        For Each lp In task.lpList
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
+        Next
+    End Sub
+End Class
