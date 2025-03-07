@@ -1535,6 +1535,7 @@ Public Class Main_UI
 
             task.lowResDepth = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
             task.lowResColor = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
+            trueData.Clear() ' remove any truetext from previous algorithm.
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 
