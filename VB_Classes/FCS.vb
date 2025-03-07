@@ -1064,19 +1064,18 @@ End Class
 
 Public Class FCS_Lines : Inherits TaskParent
     Dim fcs As New FCS_Basics
+    Dim lines As New Line_Basics
+    Dim options As New Options_Line
     Public Sub New()
+        optiBase.FindSlider("Min Line Length").Value = 60
+        optiBase.FindSlider("Distance to next center").Value = 1
         labels(3) = "Cell boundaries with the age (in frames) for each cell."
         desc = "Use lines as input to FCS."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static minSlider = optiBase.FindSlider("Min Distance to next")
         Dim minDistance = minSlider.value
-        task.lines.Run(src)
-
-        If task.firstPass Then
-            optiBase.FindSlider("Min Line Length").Value = 60
-            optiBase.FindSlider("Distance to next center").Value = 1
-        End If
+        lines.Run(src)
 
         task.features.Clear()
         For Each lp In task.lpList
@@ -1093,7 +1092,7 @@ Public Class FCS_Lines : Inherits TaskParent
 
         fcs.Run(src)
         dst2 = fcs.dst2
-        dst2.SetTo(white, task.lines.dst2)
+        dst2.SetTo(white, lines.dst2)
 
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
