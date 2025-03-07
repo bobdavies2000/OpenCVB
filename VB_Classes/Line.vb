@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public lpList As New List(Of linePoints)
-    Dim lineCore As New Line_CoreMotion
+    Dim lineCore As New Line_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
@@ -12,7 +12,7 @@ Public Class Line_Basics : Inherits TaskParent
         lineCore.Run(src)
 
         lpMap.SetTo(0)
-        dst2 = src.Clone
+        dst2 = src
         dst2.SetTo(cv.Scalar.White, lineCore.dst2)
         For Each lp In lineCore.lpList
             lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
@@ -1212,7 +1212,7 @@ Public Class Line_Matching : Inherits TaskParent
     Dim lineMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim lpList As New List(Of linePoints)
     Public Sub New()
-        labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_CoreMotion in Treeview to see."
+        labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
         desc = "Combine lines that are approximately the same line."
     End Sub
     Private Function combine2Lines(lp1 As linePoints, lp2 As linePoints) As linePoints
@@ -1364,7 +1364,7 @@ End Class
 
 
 Public Class Line_LeftRight : Inherits TaskParent
-    Dim lineCore As New Line_CoreMotion
+    Dim lineCore As New Line_Core
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
         desc = "Show lines in both the right and left images."
@@ -1446,7 +1446,7 @@ End Class
 
 
 
-Public Class Line_CoreMotion : Inherits TaskParent
+Public Class Line_Core : Inherits TaskParent
     Dim lines As New Line_Detector
     Public lpList As New List(Of linePoints)
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
@@ -1476,7 +1476,7 @@ Public Class Line_CoreMotion : Inherits TaskParent
         ReDim histarray(lines.lpList.Count - 1)
 
         Dim tmp = lines.lpMap.Clone
-        tmp.setto(0, Not task.motionMask)
+        tmp.SetTo(0, Not task.motionMask)
         cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
         Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 

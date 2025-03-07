@@ -634,13 +634,13 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
     End Sub
-    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As (cv.Point2f, cv.Point2f)
+    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As (cv.Point, cv.Point)
         Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)
         Dim xShift = distance * Math.Cos(angleRadians)
         Dim yShift = distance * Math.Sin(angleRadians)
-        Dim p1 = New cv.Point2f(pt.X + xShift, pt.Y + yShift)
-        Dim p2 = New cv.Point2f(pt.X - xShift, pt.Y - yShift)
+        Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
+        Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
         If p1.X < 0 Then p1.X = 0
         If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
         If p1.Y < 0 Then p1.Y = 0

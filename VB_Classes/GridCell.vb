@@ -1399,7 +1399,7 @@ End Class
 
 
 
-Public Class GridCell_InternalLines : Inherits TaskParent
+Public Class GridCell_ColorLines : Inherits TaskParent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Remove lines which cross grid cells that have the same depth."

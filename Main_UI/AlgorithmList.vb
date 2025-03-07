@@ -640,6 +640,7 @@ Public Class algorithmList
 	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter
 	If algorithmName = "GridCell_Basics" Then return new GridCell_Basics
 	If algorithmName = "GridCell_Boundaries" Then return new GridCell_Boundaries
+	If algorithmName = "GridCell_ColorLines" Then return new GridCell_ColorLines
 	If algorithmName = "GridCell_Connected" Then return new GridCell_Connected
 	If algorithmName = "GridCell_ConnectedGaps" Then return new GridCell_ConnectedGaps
 	If algorithmName = "GridCell_ConnectedPalette" Then return new GridCell_ConnectedPalette
@@ -657,7 +658,6 @@ Public Class algorithmList
 	If algorithmName = "GridCell_FullDepth" Then return new GridCell_FullDepth
 	If algorithmName = "GridCell_GrayScaleTest" Then return new GridCell_GrayScaleTest
 	If algorithmName = "GridCell_InstantUpdate" Then return new GridCell_InstantUpdate
-	If algorithmName = "GridCell_InternalLines" Then return new GridCell_InternalLines
 	If algorithmName = "GridCell_LeftRightSize" Then return new GridCell_LeftRightSize
 	If algorithmName = "GridCell_LeftToColor" Then return new GridCell_LeftToColor
 	If algorithmName = "GridCell_Lines" Then return new GridCell_Lines
@@ -955,7 +955,7 @@ Public Class algorithmList
 	If algorithmName = "Line_Canny" Then return new Line_Canny
 	If algorithmName = "Line_Cells" Then return new Line_Cells
 	If algorithmName = "Line_ColorClass" Then return new Line_ColorClass
-	If algorithmName = "Line_CoreMotion" Then return new Line_CoreMotion
+	If algorithmName = "Line_Core" Then return new Line_Core
 	If algorithmName = "Line_Detector" Then return new Line_Detector
 	If algorithmName = "Line_DisplayInfoOld" Then return new Line_DisplayInfoOld
 	If algorithmName = "Line_FromContours" Then return new Line_FromContours
@@ -1005,7 +1005,10 @@ Public Class algorithmList
 	If algorithmName = "LineCoin_HistoryIntercept" Then return new LineCoin_HistoryIntercept
 	If algorithmName = "LineCoin_Parallel" Then return new LineCoin_Parallel
 	If algorithmName = "LineRect_Basics" Then return new LineRect_Basics
-	If algorithmName = "LineRect_Internal" Then return new LineRect_Internal
+	If algorithmName = "LineRect_CenterDepth" Then return new LineRect_CenterDepth
+	If algorithmName = "LineRect_CenterNeighbor" Then return new LineRect_CenterNeighbor
+	If algorithmName = "LineRect_CenterRange" Then return new LineRect_CenterRange
+	If algorithmName = "LineRect_ColorAndDepthLines" Then return new LineRect_ColorAndDepthLines
 	If algorithmName = "LineTrack_Basics" Then return new LineTrack_Basics
 	If algorithmName = "LineTrack_Basics1" Then return new LineTrack_Basics1
 	If algorithmName = "LineTrack_RedCloud" Then return new LineTrack_RedCloud
