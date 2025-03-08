@@ -413,7 +413,6 @@ Public Class gridCell
     Public colorMean As cv.Scalar
     Public colorStdev As cv.Scalar
     Public pixels As Integer ' depth pixel count...
-    Public pixelEdges As Integer ' count of edge pixels in this grid cell.
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
     Public correlation As Single

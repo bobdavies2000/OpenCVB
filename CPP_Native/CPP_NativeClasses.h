@@ -3888,3 +3888,127 @@ int* EdgeLines_NextSegment(EdgeDrawSegments* cPtr)
 {
     return (int*)&cPtr->segments[cPtr->segmentIndex++][0];
 }
+
+
+
+
+
+
+
+
+class EdgeLine
+{
+private:
+public:
+    Mat src, edgeMap, motionMask, histogram, dst8U;
+    Ptr<EdgeLines_Image> eDraw;
+    vector<Vec4f> lines;
+    vector< vector<Point> > segments;
+    vector< vector<Point> > edgeList;
+    vector<Point> emptyList;
+    size_t expectedCount = 0;
+    EdgeLine() 
+    {
+        eDraw = new EdgeLines_Image();
+    }
+    void RunCPP(int lineWidth) {
+        segments.clear();
+        for (size_t i = 0; i < edgeList.size(); i++)
+            segments.push_back(edgeList[i]);
+
+        edgeList.clear();
+        edgeList.push_back(emptyList); // placeholder for zeros...
+        if (segments.size() > 0)
+        {
+            float hRange[] = { 0, (float)segments.size() };
+            const float* range[] = { hRange };
+            int hbins[] = { (int)segments.size() };
+
+            calcHist(&edgeMap, 1, {0}, motionMask, histogram, 1, hbins, range);
+
+            float* hData = (float*)histogram.data;
+            for (size_t i = 1; i < segments.size(); i++)
+            {
+                if (hData[i] == 0) edgeList.push_back(segments[i]);
+            }
+        }
+
+        segments.clear();
+        eDraw->ed->detectEdges(src);
+        eDraw->ed->detectLines(lines);
+        segments = eDraw->ed->getSegments();
+        expectedCount = segments.size();
+
+        edgeMap.setTo(0);
+        for (size_t i = 0; i < segments.size(); i++)
+        {
+            const Point* pts = &segments[i][0];
+            int n = (int)segments[i].size();
+            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+            bool drawClosed = distance < 10;
+            polylines(edgeMap, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
+        }
+
+        {
+            float hRange[] = { 0, (float)segments.size() };
+            const float* range[] = { hRange };
+            int hbins[] = { (int)segments.size() };
+
+            calcHist(&edgeMap, 1, { 0 }, motionMask, histogram, 1, hbins, range);
+
+            float* hData = (float*)histogram.data;
+            for (size_t i = 1; i < segments.size(); i++)
+            {
+                if (hData[i] > 0) edgeList.push_back(segments[i - 1]);
+            }
+        }
+
+        if (edgeList.size() < expectedCount * 3 / 4)
+        {
+            edgeList.clear();
+            for (size_t i = 0; i < segments.size(); i++)
+                edgeList.push_back(segments[i]);
+        }
+
+        segments.clear();
+        edgeMap.setTo(0);
+        dst8U.setTo(0);
+        for (size_t i = 1; i < edgeList.size(); i++)
+        {
+            const Point* pts = &edgeList[i][0];
+            int n = (int)edgeList[i].size();
+            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+            bool drawClosed = distance < 10;
+            polylines(edgeMap, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4); // for the next iteration.
+            polylines(dst8U, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_4);
+        }
+    }
+};
+
+extern "C" __declspec(dllexport)
+EdgeLine* EdgeLine_Open() {
+    EdgeLine* cPtr = new EdgeLine();
+    return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLine_Close(EdgeLine* cPtr)
+{
+    delete cPtr;
+    return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLine_RunCPP(EdgeLine* cPtr, int* dataPtr, int* motionMask, int rows, int cols, int lineWidth)
+{
+    if (cPtr->edgeMap.rows == 0)
+    {
+        cPtr->dst8U = Mat(rows, cols, CV_8U);
+        cPtr->edgeMap = Mat(rows, cols, CV_32F);
+        cPtr->edgeMap.setTo(0);
+    }
+    cPtr->motionMask = Mat(rows, cols, CV_8U, motionMask);
+    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->RunCPP(lineWidth);
+    return (int*)cPtr->dst8U.data;
+}

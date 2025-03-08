@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
-    Dim edges As New EdgeLines_Image
+    Dim edges As New EdgeLines_Basics
     Public classCount As Integer = 2
     Public Sub New()
-        labels = {"", "", "EdgeLines_Image output", ""}
+        labels = {"", "", "EdgeLines_Basics output", ""}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "CV_8UC1 output of EdgeLines_Image - only 0 and 1"
-        desc = "Access the EdgeLines_Image algorithm directly rather than through the CPP_Basics interface - more efficient"
+        labels(2) = "CV_8UC1 output of EdgeLines_Basics - only 0 and 1"
+        desc = "Access the EdgeLines_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         edges.Run(src)
@@ -20,11 +20,11 @@ End Class
 
 
 Public Class FeatureLess_WithoutMotion : Inherits TaskParent
-    Dim edges As New EdgeLines_Image
+    Dim edges As New EdgeLines_Basics
     Public classCount As Integer = 2
     Public Sub New()
-        labels = {"", "", "EdgeLines_Image output", ""}
-        desc = "Access the EdgeLines_Image algorithm directly rather than through the CPP_Basics interface - more efficient"
+        labels = {"", "", "EdgeLines_Basics output", ""}
+        desc = "Access the EdgeLines_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         edges.Run(src)

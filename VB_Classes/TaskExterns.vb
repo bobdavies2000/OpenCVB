@@ -427,6 +427,16 @@ Module TaskExterns
 
 
 
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function EdgeLine_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
+    End Function
+
+
+
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EMax_Open() As IntPtr
     End Function

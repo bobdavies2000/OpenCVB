@@ -618,11 +618,11 @@ End Class
 
 
 Public Class Contour_RedCloudEdges : Inherits TaskParent
-    Dim edges As New EdgeLines_Image
+    Dim edges As New EdgeLines_Basics
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        labels = {"", "EdgeLines_Image output", "", "Pixels below are both cell boundaries and edges."}
+        labels = {"", "EdgeLines_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
