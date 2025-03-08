@@ -7,7 +7,7 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public mouseD As New GridCell_MouseDepth
     Public quad As New Quad_Basics
     Dim iddCorr As New GridCell_CorrelationMap
-    Dim edges As New EdgeDraw_Basics
+    Dim edges As New EdgeLines_Image
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
@@ -1382,7 +1382,7 @@ End Class
 
 Public Class GridCell_EdgeDraw : Inherits TaskParent
     Dim regions As New GridCell_RegionContours
-    Public edges As New EdgeDraw_Basics
+    Public edges As New EdgeLines_Image
     Public Sub New()
         desc = "Lines can mean cells are connected."
     End Sub

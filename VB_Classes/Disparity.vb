@@ -85,7 +85,7 @@ End Class
 
 
 Public Class Disparity_Edges : Inherits TaskParent
-    Dim edges As New EdgeDraw_Basics
+    Dim edges As New EdgeLines_Image
     Dim disparity As New Disparity_Basics
     Public Sub New()
         desc = "Use features in grid cells to confirm depth."

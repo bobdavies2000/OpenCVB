@@ -374,27 +374,54 @@ Module TaskExterns
 
 
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Basics_Open() As IntPtr
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Image_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Basics_Close(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Image_Close(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Basics_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Edges_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Edges_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Image_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
     End Function
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_Open() As IntPtr
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Edges_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_Count(cPtr As IntPtr) As Integer
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Edges_Close(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_Close(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Edges_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
     End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Lines_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Lines_Count(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Lines_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Lines_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
+    End Function
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
+    End Function
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_NextLength(cPtr As IntPtr) As Integer
+    End Function
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_GetLength(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLines_NextSegment(cPtr As IntPtr) As IntPtr
     End Function
 
 

@@ -58,7 +58,7 @@ Download
 Draw
 Duster
 Edge
-EdgeDraw
+EdgeLines
 Eigen
 EMax
 Encode

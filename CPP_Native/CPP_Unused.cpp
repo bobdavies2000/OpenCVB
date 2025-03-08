@@ -2383,12 +2383,12 @@ public:
 
 
 
-class EdgeDraw_Basics_CC : public CPP_Parent {
+class EdgeLines_Image_CC : public CPP_Parent {
 public:
     EdgeDraw* cPtr;
-    EdgeDraw_Basics_CC() : CPP_Parent() {
+    EdgeLines_Image_CC() : CPP_Parent() {
         cPtr = new EdgeDraw;
-        labels = { "", "", "EdgeDraw_Basics output", "" };
+        labels = { "", "", "EdgeLines_Image output", "" };
         desc = "Access EdgeDraw directly for efficiency";
     }
     void Run(Mat src) {
@@ -2396,14 +2396,14 @@ public:
             cvtColor(src, src, COLOR_BGR2GRAY);
         }
         Mat* srcPtr = &src;
-        int* imagePtr = EdgeDraw_RunCPP(cPtr, (int*)srcPtr->data, src.rows, src.cols, task->lineWidth);
+        int* imagePtr = EdgeLines_RunCPP(cPtr, (int*)srcPtr->data, src.rows, src.cols, task->lineWidth);
         if (imagePtr != nullptr) {
             dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
             rectangle(dst2, Rect(0, 0, dst2.cols, dst2.rows), Scalar(255), task->lineWidth);
         }
     }
-    ~EdgeDraw_Basics_CC() {
-        EdgeDraw_Edges_Close(cPtr);
+    ~EdgeLines_Image_CC() {
+        EdgeLines_Edges_Close(cPtr);
         delete cPtr;
     }
 };
@@ -2415,11 +2415,11 @@ public:
 
 class FeatureLess_Basics_CC : public CPP_Parent {
 public:
-    EdgeDraw_Basics_CC* edgeD;
+    EdgeLines_Image_CC* edgeD;
     FeatureLess_Basics_CC() : CPP_Parent()
     {
-        edgeD = new EdgeDraw_Basics_CC();
-        desc = "Access the EdgeDraw_Basics algorithm directly rather than through the Basics interface - more efficient";
+        edgeD = new EdgeLines_Image_CC();
+        desc = "Access the EdgeLines_Image algorithm directly rather than through the Basics interface - more efficient";
     }
     void Run(Mat src) {
         edgeD->Run(src);
@@ -2438,10 +2438,10 @@ class FeatureLess_Edge_CC : public CPP_Parent
 private:
 public:
     Distance_Basics_CC* dist;
-    EdgeDraw_Basics_CC* eDraw;
+    EdgeLines_Image_CC* eDraw;
     FeatureLess_Edge_CC() : CPP_Parent()
     {
-        eDraw = new EdgeDraw_Basics_CC();
+        eDraw = new EdgeLines_Image_CC();
         dist = new Distance_Basics_CC();
         labels[2] = "Edges found using the Segments and the distance function";
         desc = "Floodfill the output of the Edge Drawing filter (C++)";
@@ -2510,14 +2510,14 @@ public:
 
 class FeatureLess_History_CC : public CPP_Parent {
 public:
-    EdgeDraw_Basics_CC* edgeD;
+    EdgeLines_Image_CC* edgeD;
     History_Basics_CC* frames;
     FeatureLess_History_CC() : CPP_Parent()
     {
         dst2 = Mat::zeros(dst2.size(), CV_8U);
-        edgeD = new EdgeDraw_Basics_CC();
+        edgeD = new EdgeLines_Image_CC();
         frames = new History_Basics_CC();
-        desc = "Access the EdgeDraw_Basics algorithm directly rather than through the Basics interface - more efficient";
+        desc = "Access the EdgeLines_Image algorithm directly rather than through the Basics interface - more efficient";
         task->frameHistoryCount = 10;
     }
     void Run(Mat src) {
