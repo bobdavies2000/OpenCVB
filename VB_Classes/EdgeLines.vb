@@ -292,7 +292,7 @@ End Class
 
 
 
-Public Class EdgeLines_BasicsMotion_CPP : Inherits TaskParent
+Public Class EdgeLines_BasicsMotion : Inherits TaskParent
     Public edgeList As New List(Of List(Of cv.Point))
     Public Sub New()
         cPtr = EdgeLine_Open()
@@ -315,6 +315,11 @@ Public Class EdgeLines_BasicsMotion_CPP : Inherits TaskParent
         handleMask.Free()
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
+        If task.heartBeat Then
+            labels(2) = "There were " + CStr(EdgeLine_GetEdgeLength(cPtr)) + " edge/lines founds while " +
+                                        CStr(EdgeLine_GetSegLength(cPtr)) + " edge/lines were found on the current image."
+            labels(3) = "There were " + CStr(EdgeLine_UnchangedCount(cPtr)) + " edge/lines retained from the previous image."
+        End If
     End Sub
     Public Sub Close()
         EdgeLine_Close(cPtr)

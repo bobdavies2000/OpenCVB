@@ -8,7 +8,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         labels(2) = "CV_8UC1 output of EdgeLines_Basics - only 0 and 1"
         desc = "Access the EdgeLines_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(src)
         dst2.SetTo(0)
         dst2.SetTo(1, edges.dst2)

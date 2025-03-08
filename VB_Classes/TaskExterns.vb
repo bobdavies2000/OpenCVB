@@ -434,6 +434,12 @@ Module TaskExterns
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function EdgeLine_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
     End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_GetEdgeLength(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_GetSegLength(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_UnchangedCount(cPtr As IntPtr) As Integer
+    End Function
 
 
 

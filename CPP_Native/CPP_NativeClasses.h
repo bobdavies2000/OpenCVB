@@ -3906,16 +3906,12 @@ public:
     vector< vector<Point> > segments;
     vector< vector<Point> > edgeList;
     vector<Point> emptyList;
-    size_t expectedCount = 0;
+    size_t unChangedCount = 0;
     EdgeLine() 
     {
         eDraw = new EdgeLines_Image();
     }
     void RunCPP(int lineWidth) {
-        segments.clear();
-        for (size_t i = 0; i < edgeList.size(); i++)
-            segments.push_back(edgeList[i]);
-
         edgeList.clear();
         edgeList.push_back(emptyList); // placeholder for zeros...
         if (segments.size() > 0)
@@ -3924,20 +3920,20 @@ public:
             const float* range[] = { hRange };
             int hbins[] = { (int)segments.size() };
 
-            calcHist(&edgeMap, 1, {0}, motionMask, histogram, 1, hbins, range);
+            calcHist(&edgeMap, 1, {0}, ~motionMask, histogram, 1, hbins, range);
 
             float* hData = (float*)histogram.data;
             for (size_t i = 1; i < segments.size(); i++)
             {
-                if (hData[i] == 0) edgeList.push_back(segments[i]);
+                if (hData[i] > 0) edgeList.push_back(segments[i]);
             }
         }
+        unChangedCount = edgeList.size();
 
         segments.clear();
         eDraw->ed->detectEdges(src);
         eDraw->ed->detectLines(lines);
         segments = eDraw->ed->getSegments();
-        expectedCount = segments.size();
 
         edgeMap.setTo(0);
         for (size_t i = 0; i < segments.size(); i++)
@@ -3949,25 +3945,21 @@ public:
             polylines(edgeMap, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
         }
 
+        float hRange[] = { 0, (float)segments.size()};
+        const float* range[] = { hRange };
+        int hbins[] = { (int)segments.size() };
+
+        Mat tmp;
+        bitwise_not(motionMask, tmp);
+        edgeMap.setTo(0, tmp);
+        imshow("edgeMap", edgeMap);
+
+        calcHist(&edgeMap, 1, { 0 }, motionMask, histogram, 1, hbins, range);
+
+        float* hData = (float*)histogram.data;
+        for (size_t i = 1; i < segments.size(); i++)
         {
-            float hRange[] = { 0, (float)segments.size() };
-            const float* range[] = { hRange };
-            int hbins[] = { (int)segments.size() };
-
-            calcHist(&edgeMap, 1, { 0 }, motionMask, histogram, 1, hbins, range);
-
-            float* hData = (float*)histogram.data;
-            for (size_t i = 1; i < segments.size(); i++)
-            {
-                if (hData[i] > 0) edgeList.push_back(segments[i - 1]);
-            }
-        }
-
-        if (edgeList.size() < expectedCount * 3 / 4)
-        {
-            edgeList.clear();
-            for (size_t i = 0; i < segments.size(); i++)
-                edgeList.push_back(segments[i]);
+            if (hData[i] > 0) edgeList.push_back(segments[i - 1]);
         }
 
         segments.clear();
@@ -3981,6 +3973,7 @@ public:
             bool drawClosed = distance < 10;
             polylines(edgeMap, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4); // for the next iteration.
             polylines(dst8U, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_4);
+            segments.push_back(edgeList[i]);
         }
     }
 };
@@ -3996,6 +3989,24 @@ int* EdgeLine_Close(EdgeLine* cPtr)
 {
     delete cPtr;
     return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int EdgeLine_GetEdgeLength(EdgeLine* cPtr)
+{
+    return (int)cPtr->edgeList.size();
+}
+
+extern "C" __declspec(dllexport)
+int EdgeLine_GetSegLength(EdgeLine* cPtr)
+{
+    return (int)cPtr->segments.size();
+}
+
+extern "C" __declspec(dllexport)
+int EdgeLine_UnchangedCount(EdgeLine* cPtr)
+{
+    return (int)cPtr->unChangedCount;
 }
 
 extern "C" __declspec(dllexport)

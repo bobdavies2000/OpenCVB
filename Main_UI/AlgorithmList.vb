@@ -426,7 +426,7 @@ Public Class algorithmList
 	If algorithmName = "Edge_SobelLRBinarized" Then return new Edge_SobelLRBinarized
 	If algorithmName = "Edge_Sweep" Then return new Edge_Sweep
 	If algorithmName = "EdgeLines_Basics" Then return new EdgeLines_Basics
-	If algorithmName = "EdgeLines_BasicsMotion_CPP" Then return new EdgeLines_BasicsMotion_CPP
+	If algorithmName = "EdgeLines_BasicsMotion" Then return new EdgeLines_BasicsMotion
 	If algorithmName = "EdgeLines_BasicsMotion_VB" Then return new EdgeLines_BasicsMotion_VB
 	If algorithmName = "EdgeLines_JustLines" Then return new EdgeLines_JustLines
 	If algorithmName = "EdgeLines_LeftRight" Then return new EdgeLines_LeftRight
