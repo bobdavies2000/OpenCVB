@@ -777,8 +777,12 @@ Public Class VBtask : Implements IDisposable
 
         ' The stereolabs camera has some weird -inf and inf values in the Y-plane - with and without gravity transform.  
         If cameraName = "StereoLabs ZED 2/2i" Then
-            Dim mask = pcSplit(1).InRange(-100, 100)
+            Dim mask = pcSplit(0).InRange(-100, 100)
+            pcSplit(0).SetTo(0, Not mask)
+            mask = pcSplit(1).InRange(-100, 100)
             pcSplit(1).SetTo(0, Not mask)
+            mask = pcSplit(2).InRange(-100, 100)
+            pcSplit(2).SetTo(0, Not mask)
         End If
 
         ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.

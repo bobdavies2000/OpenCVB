@@ -923,7 +923,7 @@ Public Class Depth_InRange : Inherits TaskParent
         dst0 = src.Clone
         dst0.SetTo(white, dst3)
 
-        If standaloneTest() Then dst2 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst2 = ShowPalette(dst2)
         If task.heartBeat Then labels(2) = Format(classCount, "000") + " regions were found"
     End Sub
 End Class
@@ -1392,7 +1392,6 @@ End Class
 Public Class Depth_Tiers : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_DepthTiers
-
     Public Sub New()
         UpdateAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
         desc = "Create a reduced image of the depth data to define tiers of similar values"
@@ -1406,10 +1405,12 @@ Public Class Depth_Tiers : Inherits TaskParent
 
         Dim mm = GetMinMax(src)
         If Not Single.IsInfinity(mm.minVal) And Not Single.IsInfinity(mm.maxVal) Then
-            classCount = (mm.maxVal - mm.minVal) * 100 / options.cmPerTier + 1
+            If mm.maxVal < 1000 And mm.minVal < 1000 Then
+                classCount = (mm.maxVal - mm.minVal) * 100 / options.cmPerTier + 1
+            End If
         End If
 
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
         labels(2) = $"{classCount} regions found."
     End Sub
 End Class
@@ -1703,7 +1704,8 @@ Public Class Depth_ErrorEstimate : Inherits TaskParent
         Next
 
         Dim mm = GetMinMax(dst1)
-        dst2 = ShowPalette(dst1 * 255 / (mm.maxVal - mm.minVal))
+        labels(3) = "Error estimates vary from " + Format(mm.minVal, fmt3) + " to " + Format(mm.maxVal, fmt3)
+        dst2 = ShowPalette(dst1 * 255 / mm.maxVal)
         dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
