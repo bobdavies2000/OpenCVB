@@ -203,6 +203,14 @@ Public Class algorithmList
 	If algorithmName = "Concat_4way" Then return new Concat_4way
 	If algorithmName = "Concat_Basics" Then return new Concat_Basics
 	If algorithmName = "Concept_Parallel" Then return new Concept_Parallel
+	If algorithmName = "Connected_Basics" Then return new Connected_Basics
+	If algorithmName = "Connected_Contours" Then return new Connected_Contours
+	If algorithmName = "Connected_Gaps" Then return new Connected_Gaps
+	If algorithmName = "Connected_Palette" Then return new Connected_Palette
+	If algorithmName = "Connected_Rects" Then return new Connected_Rects
+	If algorithmName = "Connected_RectsH" Then return new Connected_RectsH
+	If algorithmName = "Connected_RectsV" Then return new Connected_RectsV
+	If algorithmName = "Connected_Regions" Then return new Connected_Regions
 	If algorithmName = "Contour_Basics" Then return new Contour_Basics
 	If algorithmName = "Contour_Compare" Then return new Contour_Compare
 	If algorithmName = "Contour_CompareToFeatureless" Then return new Contour_CompareToFeatureless
@@ -644,12 +652,6 @@ Public Class algorithmList
 	If algorithmName = "GridCell_Basics" Then return new GridCell_Basics
 	If algorithmName = "GridCell_Boundaries" Then return new GridCell_Boundaries
 	If algorithmName = "GridCell_ColorLines" Then return new GridCell_ColorLines
-	If algorithmName = "GridCell_Connected" Then return new GridCell_Connected
-	If algorithmName = "GridCell_ConnectedGaps" Then return new GridCell_ConnectedGaps
-	If algorithmName = "GridCell_ConnectedPalette" Then return new GridCell_ConnectedPalette
-	If algorithmName = "GridCell_ConnectedRects" Then return new GridCell_ConnectedRects
-	If algorithmName = "GridCell_ConnectedRectsH" Then return new GridCell_ConnectedRectsH
-	If algorithmName = "GridCell_ConnectedRectsV" Then return new GridCell_ConnectedRectsV
 	If algorithmName = "GridCell_Correlation" Then return new GridCell_Correlation
 	If algorithmName = "GridCell_CorrelationMap" Then return new GridCell_CorrelationMap
 	If algorithmName = "GridCell_CorrelationMask" Then return new GridCell_CorrelationMask
@@ -669,8 +671,6 @@ Public Class algorithmList
 	If algorithmName = "GridCell_MLColorDepth" Then return new GridCell_MLColorDepth
 	If algorithmName = "GridCell_MouseDepth" Then return new GridCell_MouseDepth
 	If algorithmName = "GridCell_Plot" Then return new GridCell_Plot
-	If algorithmName = "GridCell_RegionContours" Then return new GridCell_RegionContours
-	If algorithmName = "GridCell_Regions" Then return new GridCell_Regions
 	If algorithmName = "GridCell_RGBtoLeft" Then return new GridCell_RGBtoLeft
 	If algorithmName = "GridCell_RightView" Then return new GridCell_RightView
 	If algorithmName = "GridCell_Stdev" Then return new GridCell_Stdev
@@ -1207,6 +1207,7 @@ Public Class algorithmList
 	If algorithmName = "OpenGL_ColorBin4Way" Then return new OpenGL_ColorBin4Way
 	If algorithmName = "OpenGL_ColorRaw" Then return new OpenGL_ColorRaw
 	If algorithmName = "OpenGL_ColorReduced3D" Then return new OpenGL_ColorReduced3D
+	If algorithmName = "OpenGL_Connected" Then return new OpenGL_Connected
 	If algorithmName = "OpenGL_Contours" Then return new OpenGL_Contours
 	If algorithmName = "OpenGL_CorrelationMask" Then return new OpenGL_CorrelationMask
 	If algorithmName = "OpenGL_Density2D" Then return new OpenGL_Density2D
@@ -1289,6 +1290,7 @@ Public Class algorithmList
 	If algorithmName = "Palette_LoadColorMap" Then return new Palette_LoadColorMap
 	If algorithmName = "Palette_Random" Then return new Palette_Random
 	If algorithmName = "Palette_RandomColorMap" Then return new Palette_RandomColorMap
+	If algorithmName = "Palette_RandomColors" Then return new Palette_RandomColors
 	If algorithmName = "Palette_Reduction" Then return new Palette_Reduction
 	If algorithmName = "Palette_RGBDepth" Then return new Palette_RGBDepth
 	If algorithmName = "Palette_TaskColors" Then return new Palette_TaskColors

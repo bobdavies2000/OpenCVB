@@ -369,26 +369,6 @@ End Class
 
 
 
-Public Class Palette_Random : Inherits TaskParent
-    Public colorMap As cv.Mat
-    Public Sub New()
-        UpdateAdvice(traceName + ": There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
-        colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        For i = 0 To 255
-            Dim vec = randomCellColor()
-            colorMap.Set(Of cv.Vec3b)(i, 0, New cv.Vec3b(vec(0), vec(1), vec(2)))
-        Next
-
-        desc = "Build a random colorGrad - no smooth transitions."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
-    End Sub
-End Class
-
-
-
-
 
 Public Class Palette_Variable : Inherits TaskParent
     Public colorGrad As cv.Mat
@@ -448,41 +428,6 @@ Public Class Palette_RandomColorMap : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class Palette_LoadColorMap : Inherits TaskParent
-    Public whitebackground As Boolean
-    Public colorMap As New cv.Mat
-    Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
-    Public Sub New()
-        desc = "Apply the different color maps in OpenCV"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Or colorMap.Rows <> 256 Then
-            labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
-            Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
-            Dim mapFile As New FileInfo(str)
-            Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
-
-            tmp.Col(0).SetTo(If(whitebackground, white, cv.Scalar.Black))
-            tmp = tmp.Row(0)
-            colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
-        End If
-
-        If src.Type = cv.MatType.CV_32F Then
-            src = Convert32f_To_8UC3(src)
-            src.ConvertTo(src, cv.MatType.CV_8U)
-        End If
-        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
-        If standalone Then dst3 = colorMap.Resize(dst3.Size)
-    End Sub
-End Class
 
 
 
@@ -587,5 +532,89 @@ Public Class Palette_Bin4Way : Inherits TaskParent
         classCount = tiers.classCount + 4
 
         dst3 = ShowPalette(dst2 * 255 / classCount)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Palette_Random : Inherits TaskParent
+    Public colorMap As cv.Mat
+    Public Sub New()
+        UpdateAdvice(traceName + ": There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
+        colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        For i = 0 To 255
+            Dim vec = randomCellColor()
+            colorMap.Set(Of cv.Vec3b)(i, 0, New cv.Vec3b(vec(0), vec(1), vec(2)))
+        Next
+
+        desc = "Build a random colorGrad - no smooth transitions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Palette_LoadColorMap : Inherits TaskParent
+    Public whitebackground As Boolean
+    Public colorMap As New cv.Mat
+    Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+    Public Sub New()
+        desc = "Apply the different color maps in OpenCV"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Or colorMap.Rows <> 256 Then
+            labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
+            Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
+            Dim mapFile As New FileInfo(str)
+            Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
+
+            tmp.Col(0).SetTo(If(whitebackground, white, cv.Scalar.Black))
+            tmp = tmp.Row(0)
+            colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
+        End If
+
+        If src.Type = cv.MatType.CV_32F Then
+            src = Convert32f_To_8UC3(src)
+            src.ConvertTo(src, cv.MatType.CV_8U)
+        End If
+        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
+        If standalone Then dst3 = colorMap.Resize(dst3.Size)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Palette_RandomColors : Inherits TaskParent
+    Public whitebackground As Boolean
+    Public colorMap As New cv.Mat
+    Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+    Public Sub New()
+        desc = "Apply the different color maps in OpenCV"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Or colorMap.Rows <> 256 Then
+            colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            For i = 1 To 255 ' leave zero for black...
+                Dim vec = randomCellColor()
+                colorMap.Set(Of cv.Vec3b)(i, 0, New cv.Vec3b(vec(0), vec(1), vec(2)))
+            Next
+        End If
+
+        If src.Type = cv.MatType.CV_32F Then
+            src = Convert32f_To_8UC3(src)
+            src.ConvertTo(src, cv.MatType.CV_8U)
+        End If
+        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
+        If standalone Then dst3 = colorMap.Resize(dst3.Size)
     End Sub
 End Class

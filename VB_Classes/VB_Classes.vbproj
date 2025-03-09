@@ -116,6 +116,7 @@
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
     <Compile Include="Concept.vb" />
+    <Compile Include="Connected.vb" />
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />
     <Compile Include="GridCell.vb" />

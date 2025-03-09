@@ -23,8 +23,8 @@ Public Class RedMask_Basics : Inherits TaskParent
         Marshal.Copy(inputRemoved.Data, maskData, 0, maskData.Length)
         Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(),
-                                    handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, task.rcPixelThreshold)
+        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
+                                   src.Rows, src.Cols, task.rcPixelThreshold)
         handleMask.Free()
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
@@ -40,8 +40,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             rectlist.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
         Next
 
-        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2,
-                                                  RedMask_FloodPoints(cPtr))
+        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2, RedMask_FloodPoints(cPtr))
         Dim ptData(classCount * 2) As Integer
         Marshal.Copy(floodPointData.Data, ptData, 0, ptData.Length)
         Dim ptlist As New List(Of cv.Point)

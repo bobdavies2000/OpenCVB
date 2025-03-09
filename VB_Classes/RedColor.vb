@@ -1852,7 +1852,7 @@ End Class
 
 
 Public Class RedColor_GridCellsOld : Inherits TaskParent
-    Dim regions As New GridCell_Regions
+    Dim regions As New Connected_Regions
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use the GridCell regions to build task.rcList"
@@ -1901,7 +1901,7 @@ End Class
 
 
 Public Class RedColor_GridCells : Inherits TaskParent
-    Dim regions As New GridCell_Regions
+    Dim regions As New Connected_Regions
     Public Sub New()
         task.gOptions.TruncateDepth.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1947,7 +1947,7 @@ End Class
 
 
 Public Class RedColor_GridCellsHist : Inherits TaskParent
-    Dim regions As New GridCell_Regions
+    Dim regions As New Connected_Regions
     Public Sub New()
         task.gOptions.TruncateDepth.Checked = True
         desc = "For each redCell find the highest population region it covers."

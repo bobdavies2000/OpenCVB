@@ -119,6 +119,7 @@ Public Class VBtask : Implements IDisposable
     Public gCell As GridCell_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
+    Public paletteRandom As Palette_RandomColors
     Public feat As Feature_Basics
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Object

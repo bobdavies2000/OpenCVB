@@ -1871,28 +1871,6 @@ End Class
 
 
 
-Public Class OpenGL_PCdiff : Inherits TaskParent
-    Dim filter As New PCdiff_Points
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
-        desc = "Display only pixels that are within X mm's of each other."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        filter.Run(src)
-        dst2 = filter.dst3
-
-        If task.toggleOnOff Then
-            Dim r = New cv.Rect(0, 0, dst2.Width, 2)
-            task.color(r).SetTo(white)
-        End If
-        task.ogl.pointCloudInput = dst2
-        task.ogl.Run(task.color)
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -2107,7 +2085,7 @@ End Class
 
 
 Public Class OpenGL_QuadConnect : Inherits TaskParent
-    Dim connect As New GridCell_Connected
+    Dim connect As New Connected_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Build connected grid cells and remove cells that are not connected."
@@ -2261,5 +2239,53 @@ Public Class OpenGL_QuadCorrelationMask : Inherits TaskParent
         Else
             SetTrueText("With a correlation threshold of " + Format(minCorr, fmt3) + " there are no remaining cells.", 3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_PCdiff : Inherits TaskParent
+    Dim filter As New PCdiff_Points
+    Public Sub New()
+        task.ogl.oglFunction = oCase.drawPointCloudRGB
+        desc = "Display only pixels that are within X mm's of each other."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        filter.Run(src)
+        dst2 = filter.dst3
+
+        If task.toggleOnOff Then
+            Dim r = New cv.Rect(0, 0, dst2.Width, 2)
+            task.color(r).SetTo(white)
+        End If
+        task.ogl.pointCloudInput = dst2
+        task.ogl.Run(task.color)
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_Connected : Inherits TaskParent
+    Dim connect As New Connected_Contours
+    Public Sub New()
+        task.ogl.oglFunction = oCase.drawPointCloudRGB
+        desc = "Display the connected contours in OpenGL"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+        dst2 = connect.dst2
+
+        Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud.CopyTo(pc, connect.dst1)
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.ogl.pointCloudInput = task.pointCloud
+        Else
+            task.ogl.pointCloudInput = pc
+        End If
+        task.ogl.Run(src)
     End Sub
 End Class

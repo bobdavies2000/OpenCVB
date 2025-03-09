@@ -190,7 +190,7 @@ End Class
 
 
 Public Class Sort_FeatureLess : Inherits TaskParent
-    Public connect As New GridCell_ConnectedPalette
+    Public connect As New Connected_Palette
     Public sort As New Sort_Basics
     Dim plot As New Plot_Histogram
     Public Sub New()

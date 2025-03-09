@@ -597,6 +597,11 @@ Public Class TaskParent : Implements IDisposable
         task.palette.Run(input)
         Return task.palette.dst2.Clone
     End Function
+    Public Function ShowPaletteRandom(input As cv.Mat) As cv.Mat
+        If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
+        task.paletteRandom.Run(input)
+        Return task.paletteRandom.dst2.Clone
+    End Function
     Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat
         Static addw As New AddWeighted_Basics
 
