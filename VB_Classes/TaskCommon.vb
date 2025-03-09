@@ -24,6 +24,9 @@ Public Module vbc
     Public zero3f As New cv.Point3f
     Public newVec4f As New cv.Vec4f
     Public emptyMat As New cv.Mat
+    Public saveVecColors(0) As cv.Vec3b
+    Public saveScalarColors(0) As cv.Scalar
+    Public saveFixedPalette As Boolean
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)

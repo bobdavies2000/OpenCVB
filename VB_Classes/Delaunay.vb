@@ -49,7 +49,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
         Next
 
         facet32s.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
+        dst2 = ShowPalette(dst3)
 
         dst3.SetTo(0, dst1)
         dst2.SetTo(white, dst1)

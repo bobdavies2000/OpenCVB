@@ -73,7 +73,7 @@ Public Class BackProject_Full : Inherits TaskParent
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2)
     End Sub
 End Class
 
@@ -274,7 +274,7 @@ Public Class BackProject_Unstable : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         backP.Run(src)
-        dst2 = ShowPalette(backP.dst2 * 255 / backP.classCount)
+        dst2 = ShowPalette(backP.dst2)
 
         diff.Run(dst2)
         dst3 = diff.dst2
@@ -301,15 +301,13 @@ Public Class BackProject_FullEqualized : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         backP.Run(src)
         backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        Dim mm = GetMinMax(dst2)
-        dst2 = ShowPalette(dst2 * 255 / mm.maxVal)
+        dst2 = ShowPalette(dst2)
 
         equalize.Run(src)
         backP.Run(equalize.dst2)
 
         backP.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
-        mm = GetMinMax(dst3)
-        dst3 = ShowPalette(dst3 * 255 / mm.maxVal)
+        dst3 = ShowPalette(dst3)
     End Sub
 End Class
 
@@ -661,7 +659,7 @@ Public Class BackProject_Hue : Inherits TaskParent
         hue.Run(src)
         classCount = hue.classCount
         dst2 = hue.dst2
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 

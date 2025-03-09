@@ -602,17 +602,14 @@ Public Class Palette_RandomColors : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Or colorMap.Rows <> 256 Then
-            colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-            For i = 1 To 255 ' leave zero for black...
-                Dim vec = randomCellColor()
-                colorMap.Set(Of cv.Vec3b)(i, 0, New cv.Vec3b(vec(0), vec(1), vec(2)))
-            Next
+            colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors)
         End If
 
         If src.Type = cv.MatType.CV_32F Then
             src = Convert32f_To_8UC3(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
+
         cv.Cv2.ApplyColorMap(src, dst2, colorMap)
         If standalone Then dst3 = colorMap.Resize(dst3.Size)
     End Sub

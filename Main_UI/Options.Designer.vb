@@ -24,7 +24,6 @@ Partial Class Options
     Private Sub InitializeComponent()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.Label7 = New System.Windows.Forms.Label()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.UpdateXRef = New System.Windows.Forms.Button()
         Me.TestAllDuration = New System.Windows.Forms.NumericUpDown()
@@ -47,6 +46,7 @@ Partial Class Options
         Me.Resolutions = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
+        Me.FixedPalette = New System.Windows.Forms.CheckBox()
         Me.GroupBox2.SuspendLayout()
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox5.SuspendLayout()
@@ -54,8 +54,8 @@ Partial Class Options
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.FixedPalette)
         Me.GroupBox2.Controls.Add(Me.Label7)
-        Me.GroupBox2.Controls.Add(Me.TextBox1)
         Me.GroupBox2.Controls.Add(Me.Label6)
         Me.GroupBox2.Controls.Add(Me.UpdateXRef)
         Me.GroupBox2.Controls.Add(Me.TestAllDuration)
@@ -78,14 +78,6 @@ Partial Class Options
         Me.Label7.Size = New System.Drawing.Size(185, 20)
         Me.Label7.TabIndex = 15
         Me.Label7.Text = "is only updated manually."
-        '
-        'TextBox1
-        '
-        Me.TextBox1.Location = New System.Drawing.Point(862, 93)
-        Me.TextBox1.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(135, 26)
-        Me.TextBox1.TabIndex = 14
         '
         'Label6
         '
@@ -287,6 +279,18 @@ Partial Class Options
         Me.Label5.TabIndex = 17
         Me.Label5.Text = "Working Size Resolution"
         '
+        'FixedPalette
+        '
+        Me.FixedPalette.AutoSize = True
+        Me.FixedPalette.Checked = True
+        Me.FixedPalette.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.FixedPalette.Location = New System.Drawing.Point(422, 86)
+        Me.FixedPalette.Name = "FixedPalette"
+        Me.FixedPalette.Size = New System.Drawing.Size(351, 24)
+        Me.FixedPalette.TabIndex = 16
+        Me.FixedPalette.Text = "On = fixed palette.  Off - random after restart."
+        Me.FixedPalette.UseVisualStyleBackColor = True
+        '
         'Options
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -340,6 +344,6 @@ Partial Class Options
     Friend WithEvents Label6 As Label
     Friend WithEvents UpdateXRef As Button
     Friend WithEvents Label7 As Label
-    Friend WithEvents TextBox1 As TextBox
     Friend WithEvents Label5 As Label
+    Friend WithEvents FixedPalette As CheckBox
 End Class

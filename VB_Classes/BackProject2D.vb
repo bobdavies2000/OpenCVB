@@ -1,17 +1,18 @@
 ﻿Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports OpenCvSharp.XImgProc
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Public Class BackProject2D_Basics : Inherits TaskParent
     Public hist2d As New Hist2D_Basics
     Public colorFmt As New Color_Basics
-    Public backProjectByGrid As Boolean
+    Public backProjectByGrid As Boolean = True
     Public classCount As Integer
     Public Sub New()
         UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
         desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim roi = task.gridRects(index)
 
@@ -35,7 +36,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
         If backProjectByGrid Then
             Dim mm = GetMinMax(dst0)
             classCount = mm.maxVal
-            dst3 = ShowPalette(dst0 * 255 / classCount)
+            dst3 = ShowPalette(dst0)
         Else
             dst3.SetTo(0)
             dst3.SetTo(cv.Scalar.Yellow, dst0)
@@ -113,7 +114,7 @@ Public Class BackProject2D_Compare : Inherits TaskParent
         If standalone Then task.gOptions.GridSlider.Value = 10
         desc = "Compare the hue and brightness images and the results of the Hist_backprojection2d"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hueSat.Run(src.Clone)
         mats.mat(0) = hueSat.dst2
         mats.mat(1) = hueSat.dst3
@@ -146,7 +147,7 @@ Public Class BackProject2D_Top : Inherits TaskParent
         labels = {"", "", "Top Down HeatMap", "BackProject2D for the top-down view"}
         desc = "Backproject the output of the Top View."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst2
 
@@ -166,7 +167,7 @@ Public Class BackProject2D_Side : Inherits TaskParent
         labels = {"", "", "Side View HeatMap", "BackProject2D for the side view"}
         desc = "Backproject the output of the Side View."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst3
 
@@ -191,7 +192,7 @@ Public Class BackProject2D_Filter : Inherits TaskParent
         task.gOptions.setHistogramBins(100) ' extra bins to help isolate the stragglers.
         desc = "Filter a 2D histogram for the backprojection."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
         End If
@@ -212,7 +213,7 @@ Public Class BackProject2D_FilterSide : Inherits TaskParent
     Public Sub New()
         desc = "Backproject the output of the Side View after removing low sample bins."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim histogram As New cv.Mat
@@ -243,7 +244,7 @@ Public Class BackProject2D_FilterTop : Inherits TaskParent
     Public Sub New()
         desc = "Backproject the output of the Side View after removing low sample bins."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim histogram As New cv.Mat
@@ -274,7 +275,7 @@ Public Class BackProject2D_FilterBoth : Inherits TaskParent
     Public Sub New()
         desc = "Backproject the output of the both the top and side views after removing low sample bins."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         filterSide.Run(src)
         filterTop.Run(src)
 
@@ -296,7 +297,7 @@ Public Class BackProject2D_Full : Inherits TaskParent
         backP.backProjectByGrid = True
         desc = "Backproject the 2D histogram marking each grid element's backprojection"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
         dst2 = backP.dst0
         If standaloneTest() Then dst3 = backP.dst3
@@ -316,12 +317,12 @@ Public Class BackProject2D_RowCol : Inherits TaskParent
     Dim backp As New BackProject2D_Basics
     Dim options As New Options_BackProject2D
     Public Sub New()
-        optiBase.FindRadio("HSV").Checked = True
-        If standalone Then task.gOptions.displaydst1.checked = True
+        optiBase.findRadio("HSV").Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         task.gOptions.GridSlider.Value = 10
         desc = "Backproject the whole row or column of the 2D histogram"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         dst0 = src.Clone
@@ -335,7 +336,7 @@ Public Class BackProject2D_RowCol : Inherits TaskParent
         Dim roi = task.gridRects(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X))
         Dim rect As cv.Rect
         If options.backProjectRow Then
-            rect = New cv.Rect(0, roi.Y, dst2.Width, roi.height)
+            rect = New cv.Rect(0, roi.Y, dst2.Width, roi.Height)
         Else
             rect = New cv.Rect(roi.X, 0, roi.Width, dst2.Height)
         End If

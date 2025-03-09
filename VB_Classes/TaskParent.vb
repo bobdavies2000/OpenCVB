@@ -587,17 +587,17 @@ Public Class TaskParent : Implements IDisposable
     Public Sub drawFeaturePoints(dst As cv.Mat, ptlist As List(Of cv.Point), color As cv.Scalar)
         DrawContour(dst, ptlist, color, 1)
     End Sub
+    Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
+        If task.palette Is Nothing Then task.palette = New Palette_LoadColorMap
+        task.palette.Run(input)
+        Return task.palette.dst2.Clone
+    End Function
     Public Function ShowPalette(input As cv.Mat) As cv.Mat
         If input.Type = cv.MatType.CV_32S Then
             Dim mm = GetMinMax(input)
             Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
             input = tmp
         End If
-        If task.palette Is Nothing Then task.palette = New Palette_LoadColorMap
-        task.palette.Run(input)
-        Return task.palette.dst2.Clone
-    End Function
-    Public Function ShowPaletteRandom(input As cv.Mat) As cv.Mat
         If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
         task.paletteRandom.Run(input)
         Return task.paletteRandom.dst2.Clone

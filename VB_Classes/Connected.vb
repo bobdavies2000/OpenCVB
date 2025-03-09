@@ -147,7 +147,7 @@ Public Class Connected_Palette : Inherits TaskParent
                 End If
             End If
         Next
-        mats.mat(0) = ShowPalette(dst1 * 255 / indexH)
+        mats.mat(0) = ShowPalette(dst1)
 
         mats.mat(1) = ShowAddweighted(src, mats.mat(0), labels(3))
 
@@ -174,7 +174,7 @@ Public Class Connected_Palette : Inherits TaskParent
                 End If
             End If
         Next
-        mats.mat(2) = ShowPalette(dst1 * 255 / indexV)
+        mats.mat(2) = ShowPalette(dst1)
 
         mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
         If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
@@ -297,7 +297,7 @@ Public Class Connected_Regions : Inherits TaskParent
         connect.Run(src.Clone)
 
         redM.Run(Not connect.dst2)
-        dst2 = ShowPalette(redM.dst2 * 255 / redM.classCount)
+        dst2 = ShowPalette(redM.dst2)
         dst2.SetTo(0, connect.dst2)
         labels(2) = CStr(redM.mdList.Count) + " regions were identified."
 
@@ -328,7 +328,8 @@ Public Class Connected_Contours : Inherits TaskParent
             dst1(md.rect).SetTo(md.index + 1, md.mask)
         Next
 
-        dst2 = ShowPaletteRandom(dst1)
+        dst2 = ShowPalette(dst1)
+        dst2.SetTo(0, connect.dst2)
         dst3 = ShowAddweighted(src, dst2, labels(3))
         If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
     End Sub

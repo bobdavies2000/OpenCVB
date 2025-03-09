@@ -1982,8 +1982,8 @@ Public Class OpenGL_DrawLines3D : Inherits TaskParent
                 Else
                     lp.pc2.Y = lp.pc1.Y
                 End If
-                Dim c = task.oglColors(lp.colorIndex)
-                vec = {c(0), c(1), c(2), lp.pc1.X, lp.pc1.Y, lp.pc1.Z, lp.pc2.X, lp.pc2.Y, lp.pc2.Z}
+                Dim c = task.scalarColors(lp.colorIndex)
+                vec = {c(0) / 255, c(1) / 255, c(2) / 255, lp.pc1.X, lp.pc1.Y, lp.pc1.Z, lp.pc2.X, lp.pc2.Y, lp.pc2.Z}
                 For i = 0 To vec.Length - 1
                     lineData.Add(vec(i))
                 Next

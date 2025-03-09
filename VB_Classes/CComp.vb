@@ -198,7 +198,7 @@ Public Class CComp_Stats : Inherits TaskParent
         Next
 
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst0 * 255 / centroids.Count)
+        dst3 = ShowPalette(dst0)
         labels(3) = CStr(masks.Count) + " Connected Components"
     End Sub
 End Class

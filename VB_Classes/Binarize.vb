@@ -176,29 +176,6 @@ End Class
 
 
 
-
-
-Public Class Binarize_FourPixelFlips : Inherits TaskParent
-    Dim binar4 As New Bin4Way_Regions
-    Public Sub New()
-        desc = "Identify the marginal regions that flip between subdivisions based on brightness."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        binar4.Run(src)
-        dst2 = ShowPalette(binar4.dst2 * 255 / 5)
-
-        Static lastSubD As cv.Mat = binar4.dst2.Clone
-        dst3 = lastSubD - binar4.dst2
-        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        lastSubD = binar4.dst2.Clone
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Binarize_DepthTiers : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
@@ -234,5 +211,29 @@ Public Class Binarize_Simple : Inherits TaskParent
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         meanScalar = cv.Cv2.Mean(src)
         dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Binarize_FourPixelFlips : Inherits TaskParent
+    Dim binar4 As New Bin4Way_Regions
+    Public Sub New()
+        desc = "Identify the marginal regions that flip between subdivisions based on brightness."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        binar4.Run(src)
+        dst2 = ShowPalette(binar4.dst2)
+
+        Static lastSubD As cv.Mat = binar4.dst2.Clone
+        dst3 = lastSubD - binar4.dst2
+        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        lastSubD = binar4.dst2.Clone
     End Sub
 End Class

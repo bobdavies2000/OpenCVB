@@ -17,7 +17,7 @@ Public Class Classifier_Basics_CPP : Inherits TaskParent
         dst1 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
 
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst0 * 255 / 2)
+        dst2 = ShowPalette(dst0)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
         dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
@@ -95,7 +95,7 @@ Public Class Classifier_Bayesian : Inherits TaskParent
         task.gOptions.DebugCheckBox.Checked = False
         dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr)
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst0 * 255 / 2)
+        dst2 = ShowPalette(dst0)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
     End Sub
 End Class

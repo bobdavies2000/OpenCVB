@@ -37,6 +37,7 @@ Namespace jsonClass
 
         Public testAllDuration As Integer
         Public showConsoleLog As Boolean
+        Public FixedPalette As Boolean
 
         Public treeButton As Boolean
         Public treeLocation As cv.Vec4f

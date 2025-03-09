@@ -858,7 +858,7 @@ Public Class Contour_DepthTiers : Inherits TaskParent
         dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
         classCount = task.MaxZmeters * 100 / optionsTiers.cmPerTier
 
-        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2)
         labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."
     End Sub
 End Class

@@ -239,7 +239,6 @@ Public Class VBtask : Implements IDisposable
     Public pixelViewerOn As Boolean
 
     Public scalarColors(255) As cv.Scalar
-    Public oglColors(255) As cv.Scalar
     Public vecColors(255) As cv.Vec3b
 
     Public topCameraPoint As cv.Point
@@ -349,22 +348,30 @@ Public Class VBtask : Implements IDisposable
         Public displayRes As cv.Size
 
         Public algName As String
+        Public FixedPalette As Boolean ' on = random colors after each restart.  Off = fixed colors.  See buildColors below.
 
         Public calibData As cameraInfo
     End Structure
-    Private Sub buildColors()
-        Dim rand = New Random(1)
-        Dim bgr(3) As Byte
-        For i = 0 To vecColors.Length - 1
-            rand.NextBytes(bgr)
-            vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
-            scalarColors(i) = New cv.Scalar(vecColors(i)(0),
-                                                  vecColors(i)(1),
-                                                  vecColors(i)(2))
-            oglColors(i) = New cv.Scalar(vecColors(i)(0) / 255,
-                                               vecColors(i)(1) / 255,
-                                               vecColors(i)(2) / 255)
-        Next
+    Private Sub buildColors(FixedPalette As Boolean)
+        If saveVecColors.Count = 1 Or FixedPalette <> saveFixedPalette Then
+            saveFixedPalette = FixedPalette
+            Dim initVal = msRNG.Next()
+            If FixedPalette Then initVal = 43
+            Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
+            Dim bgr(3) As Byte
+            For i = 0 To vecColors.Length - 1
+                rand.NextBytes(bgr)
+                vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
+                scalarColors(i) = New cv.Scalar(vecColors(i)(0), vecColors(i)(1), vecColors(i)(2))
+            Next
+            saveVecColors = vecColors
+            saveScalarColors = scalarColors
+        Else
+            ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
+            ' Colors will be different when OpenCVB is restarted.  Don't like the colors?  Restart.
+            vecColors = saveVecColors
+            scalarColors = saveScalarColors
+        End If
     End Sub
 #End Region
     Private Function findDisplayObject(lookupName As String) As TaskParent
@@ -492,7 +499,7 @@ Public Class VBtask : Implements IDisposable
         OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", mainFormLocation.Y))
 
-        buildColors()
+        buildColors(parms.FixedPalette)
         pythonTaskName = HomeDir + "Python\" + algName
 
         allOptions = New OptionsContainer

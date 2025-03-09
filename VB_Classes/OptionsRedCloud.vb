@@ -22,6 +22,7 @@ Public Class OptionsRedCloud
     Public channelCount As Integer
     Public histBinList() As Integer
     Public histBins3D As Integer
+    Public trackingLabel As String
     Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions",
                                        "Binarize_DepthTiers", "EdgeLines_Basics", "Hist3DColor_Basics",
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
@@ -362,5 +363,17 @@ Public Class OptionsRedCloud
     Private Sub rcReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles rcReductionSlider.ValueChanged
         task.optionsChanged = True
         Label3.Text = CStr(rcReductionSlider.Value)
+    End Sub
+    Private Sub TrackingMeanColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingMeanColor.CheckedChanged
+        trackingLabel = TrackingMeanColor.Text
+    End Sub
+    Private Sub TrackingColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingColor.CheckedChanged
+        trackingLabel = TrackingColor.Text
+    End Sub
+    Private Sub TrackingDepthColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingDepthColor.CheckedChanged
+        trackingLabel = TrackingDepthColor.Text
+    End Sub
+    Private Sub TrackingColorDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingColorDepth.CheckedChanged
+        trackingLabel = TrackingColorDepth.Text
     End Sub
 End Class
