@@ -2278,6 +2278,7 @@ Public Class OpenGL_Connected : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src)
         dst2 = connect.dst2
+        dst3 = connect.dst3
 
         Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
         task.pointCloud.CopyTo(pc, connect.dst1)

@@ -301,7 +301,7 @@ Partial Class OptionsGlobal
         'GridSlider
         '
         Me.GridSlider.Location = New System.Drawing.Point(185, 98)
-        Me.GridSlider.Maximum = 300
+        Me.GridSlider.Maximum = 128
         Me.GridSlider.Minimum = 2
         Me.GridSlider.Name = "GridSlider"
         Me.GridSlider.Size = New System.Drawing.Size(506, 69)

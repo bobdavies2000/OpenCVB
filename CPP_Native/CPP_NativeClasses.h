@@ -45,7 +45,7 @@ public:
     Mat src, result;
     vector<Rect>cellRects;
     vector<Point> floodPoints;
-
+      
     RedMask() {}
     void RunCPP(Mat inputRemoved, int minSize) {
         Mat maskCopy = inputRemoved.clone();

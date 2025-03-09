@@ -319,21 +319,17 @@ Public Class Connected_Contours : Inherits TaskParent
         desc = "Find the main regions connected in depth and build a contour for each."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastImage As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         connect.Run(src.Clone)
         redM.Run(Not connect.dst2)
 
-        Dim sqCell = 2 * task.cellSize * task.cellSize
         dst1.SetTo(0)
         For Each md In redM.mdList
-            If md.pixels > sqCell Then
-                md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-                dst1(md.rect).SetTo(md.index + 1, md.mask)
-                ' DrawContour(dst1(md.rect), md.contour, 0, task.lineWidth)
-            End If
+            md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            dst1(md.rect).SetTo(md.index + 1, md.mask)
         Next
 
-        dst2 = ShowPaletteRandom(dst1 * 255 / redM.mdList.Count)
+        dst2 = ShowPaletteRandom(dst1)
         dst3 = ShowAddweighted(src, dst2, labels(3))
+        If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
     End Sub
 End Class

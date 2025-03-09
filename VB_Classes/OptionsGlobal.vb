@@ -184,11 +184,13 @@ Public Class OptionsGlobal
         task.optionsChanged = True
         task.cellSize = GridSlider.Value
 
-        If task.cellSize < 2 Then task.cellSize = 2
-        If task.cellSize > 2 And task.cellSize < 4 Then task.cellSize = 4
+        If task.cellSize <= 2 Then task.cellSize = 2
+        If task.cellSize > 2 And task.cellSize <= 4 Then task.cellSize = 4
         If task.cellSize > 4 And task.cellSize <= 8 Then task.cellSize = 8
         If task.cellSize > 8 And task.cellSize <= 16 Then task.cellSize = 16
-        If task.cellSize > 16 Then task.cellSize = 32
+        If task.cellSize > 16 And task.cellSize <= 32 Then task.cellSize = 32
+        If task.cellSize > 32 And task.cellSize <= 64 Then task.cellSize = 64
+        If task.cellSize > 64 And task.cellSize <= 128 Then task.cellSize = 128
         GridSlider.Value = task.cellSize
 
         GridSizeLabel.Text = CStr(GridSlider.Value)
