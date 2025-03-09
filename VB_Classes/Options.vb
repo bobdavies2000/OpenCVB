@@ -7282,17 +7282,10 @@ Public Class Options_ColorMethod : Inherits OptionParent
     Public Sub New()
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
-            check.addCheckBox("BackProject_Full")
-            check.addCheckBox("BackProject2D_Full")
-            check.addCheckBox("Bin4Way_Regions")
-            check.addCheckBox("Binarize_DepthTiers")
-            check.addCheckBox("FeatureLess_Groups")
-            check.addCheckBox("Hist3Dcolor_Basics")
-            check.addCheckBox("KMeans_Basics")
-            check.addCheckBox("LUT_Basics")
-            check.addCheckBox("Reduction_Basics")
-            check.addCheckBox("PCA_NColor_CPP")
-            check.Box(0).Checked = True
+            For Each alg In task.redOptions.colorMethods
+                check.addCheckBox(alg)
+            Next
+            check.Box(4).Checked = True
         End If
     End Sub
     Public Sub RunOpt()

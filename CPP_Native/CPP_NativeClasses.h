@@ -3726,7 +3726,6 @@ public:
     }
     void RunCPP(int lineWidth) {
         ed->detectEdges(src);
-
         ed->detectLines(lines);
 
         dst.setTo(0);
@@ -4022,4 +4021,61 @@ int* EdgeLine_RunCPP(EdgeLine* cPtr, int* dataPtr, int* motionMask, int rows, in
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
     cPtr->RunCPP(lineWidth);
     return (int*)cPtr->dst8U.data;
+}
+
+
+
+
+
+class EdgeLineSimple
+{
+private:
+public:
+    Mat src, dst;
+    Ptr<EdgeLines_Image> eDraw;
+    vector<Vec4f> lines;
+    vector< vector<Point> > segments;
+    EdgeLineSimple()
+    {
+        eDraw = new EdgeLines_Image();
+    }
+    void RunCPP(int lineWidth) {
+        segments.clear();
+
+        eDraw->ed->detectEdges(src);
+        eDraw->ed->detectLines(lines);
+        segments = eDraw->ed->getSegments();
+
+        dst.setTo(0);
+        for (size_t i = 0; i < segments.size(); i++)
+        {
+            const Point* pts = &segments[i][0];
+            int n = (int)segments[i].size();
+            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+            bool drawClosed = distance < 10;
+            polylines(dst, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_AA);
+        }
+    }
+};
+
+extern "C" __declspec(dllexport)
+EdgeLineSimple* EdgeLineSimple_Open() {
+    EdgeLineSimple* cPtr = new EdgeLineSimple();
+    return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLineSimple_Close(EdgeLineSimple* cPtr)
+{
+    delete cPtr;
+    return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLineSimple_RunCPP(EdgeLineSimple* cPtr, int* dataPtr, int rows, int cols, int lineWidth)
+{
+    if (cPtr->dst.rows == 0) cPtr->dst = Mat(rows, cols, CV_8U);
+    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->RunCPP(lineWidth);
+    return (int*)cPtr->dst.data;
 }

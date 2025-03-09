@@ -4,7 +4,7 @@ Public Class Diff_Basics : Inherits TaskParent
     Public lastFrame As cv.Mat
     Public Sub New()
         labels = {"", "", "Unstable mask", ""}
-        UpdateAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.")
+        UpdateAdvice(traceName + ": use goption 'Color Difference Threshold' to control changed pixels.")
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

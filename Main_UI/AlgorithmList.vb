@@ -435,11 +435,11 @@ Public Class algorithmList
 	If algorithmName = "Edge_Sweep" Then return new Edge_Sweep
 	If algorithmName = "EdgeLines_Basics" Then return new EdgeLines_Basics
 	If algorithmName = "EdgeLines_BasicsMotion" Then return new EdgeLines_BasicsMotion
-	If algorithmName = "EdgeLines_BasicsMotion_VB" Then return new EdgeLines_BasicsMotion_VB
 	If algorithmName = "EdgeLines_JustLines" Then return new EdgeLines_JustLines
 	If algorithmName = "EdgeLines_LeftRight" Then return new EdgeLines_LeftRight
 	If algorithmName = "EdgeLines_LeftRightVertical" Then return new EdgeLines_LeftRightVertical
 	If algorithmName = "EdgeLines_Lines" Then return new EdgeLines_Lines
+	If algorithmName = "EdgeLines_Raw" Then return new EdgeLines_Raw
 	If algorithmName = "EdgeLines_Segments" Then return new EdgeLines_Segments
 	If algorithmName = "EdgeLines_SplitMean" Then return new EdgeLines_SplitMean
 	If algorithmName = "Eigen_Basics" Then return new Eigen_Basics
@@ -1418,6 +1418,7 @@ Public Class algorithmList
 	If algorithmName = "PointCloud_Visualize" Then return new PointCloud_Visualize
 	If algorithmName = "PointCloud_XRangeTest" Then return new PointCloud_XRangeTest
 	If algorithmName = "PointCloud_YRangeTest" Then return new PointCloud_YRangeTest
+	If algorithmName = "Polylines_Basics" Then return new Polylines_Basics
 	If algorithmName = "Polylines_IEnumerableExample" Then return new Polylines_IEnumerableExample
 	If algorithmName = "Polylines_Random" Then return new Polylines_Random
 	If algorithmName = "PongWars_Basics" Then return new PongWars_Basics

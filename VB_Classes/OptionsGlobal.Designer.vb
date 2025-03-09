@@ -247,7 +247,7 @@ Partial Class OptionsGlobal
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(136, 55)
         Me.Label7.TabIndex = 48
-        Me.Label7.Text = "Pixel Difference Threshold"
+        Me.Label7.Text = "Color Difference Threshold"
         Me.Label7.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'DebugCheckBox

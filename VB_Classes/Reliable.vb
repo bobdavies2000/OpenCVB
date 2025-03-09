@@ -89,7 +89,7 @@ Public Class Reliable_RGB : Inherits TaskParent
         task.gOptions.setPixelDifference(10)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
-        desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Pixel Difference threshold'"
+        desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Color Difference threshold'"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         dst3 = src.Clone

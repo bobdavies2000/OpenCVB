@@ -22,7 +22,7 @@ Public Class Color8U_Basics : Inherits TaskParent
                 Case 3
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
                 Case 4
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = New FeatureLess_Basics
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New EdgeLines_Basics
                 Case 5
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
                 Case 6
@@ -46,13 +46,14 @@ Public Class Color8U_Basics : Inherits TaskParent
                 dst1 = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
                 classifier.Run(dst1)
             Else
-                classifier.run(src)
+                classifier.Run(src)
             End If
         End If
 
         dst2 = classifier.dst2
         classCount = classifier.classCount
 
+        'dst3 = ShowPaletteRandom(dst2)
         dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                     " pixel classifications"

@@ -334,7 +334,7 @@ Public Class OpAuto_PixelDifference : Inherits TaskParent
             If gridCount > task.gridRects.Count / 10 Then task.gOptions.pixelDiffThreshold += 1
         End If
         If gridCount = 0 And task.gOptions.pixelDiffThreshold > 1 Then task.gOptions.pixelDiffThreshold -= 1
-        SetTrueText("Pixel difference threshold is at " + CStr(task.gOptions.pixelDiffThreshold))
+        SetTrueText("Color difference threshold is at " + CStr(task.gOptions.pixelDiffThreshold))
         dst2 = src
     End Sub
 End Class

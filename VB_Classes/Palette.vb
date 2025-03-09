@@ -597,7 +597,6 @@ End Class
 Public Class Palette_RandomColors : Inherits TaskParent
     Public whitebackground As Boolean
     Public colorMap As New cv.Mat
-    Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
     End Sub
