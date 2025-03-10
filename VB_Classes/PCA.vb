@@ -849,7 +849,7 @@ Public Class PCA_NColor : Inherits TaskParent
         Dim paletteCount = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
 
         If standaloneTest() Then
-            dst3 = ShowPalette(img8u * 256 / options.desiredNcolors)
+            dst3 = ShowPalette(img8u)
             labels(3) = "dst2 is palettized using global palette option: " + task.gOptions.Palettes.Text
         End If
 

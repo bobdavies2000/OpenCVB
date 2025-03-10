@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class EdgeLine_Basics : Inherits TaskParent
     Public classCount As Integer = 2
-    Public alwaysFullImage As Boolean
+    Public alwaysFullImage As Boolean ' useful for left/right images where motion is only the left image.
     Public Sub New()
         cPtr = EdgeLineSimple_Open()
         desc = "Retain the existing edge/lines and add the edge/lines where motion occurred."

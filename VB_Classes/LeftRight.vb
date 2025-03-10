@@ -271,7 +271,7 @@ Public Class LeftRight_RedRight : Inherits TaskParent
         dst3 = task.rightView.Clone
         fLess.Run(task.rightView)
         redMask.Run(fLess.dst2)
-        dst2 = ShowPalette(redMask.dst2 * 255 / redMask.mdList.Count)
+        dst2 = ShowPalette(redMask.dst2)
         labels(2) = redMask.labels(2)
     End Sub
 End Class
@@ -292,7 +292,7 @@ Public Class LeftRight_RedLeft : Inherits TaskParent
         dst3 = task.leftView.Clone
         fLess.Run(task.leftView)
         redMask.Run(fLess.dst2)
-        dst2 = ShowPalette(redMask.dst2 * 255 / redMask.mdList.Count)
+        dst2 = ShowPalette(redMask.dst2)
         labels(2) = redMask.labels(2)
     End Sub
 End Class
@@ -345,7 +345,7 @@ Public Class LeftRight_RedRightGray : Inherits TaskParent
         color8u.Run(task.rightView)
         redMask.Run(color8u.dst2)
         dst2 = redMask.dst2.Clone
-        dst3 = ShowPalette(dst2 * 255 / redMask.mdList.Count)
+        dst3 = ShowPalette(dst2)
         labels = redMask.labels
     End Sub
 End Class
@@ -364,7 +364,7 @@ Public Class LeftRight_RedLeftGray : Inherits TaskParent
         color8u.Run(task.leftView)
         redMask.Run(color8u.dst2)
         dst2 = redMask.dst2.Clone
-        dst3 = ShowPalette(dst2 * 255 / redMask.mdList.Count)
+        dst3 = ShowPalette(dst2)
         labels = redMask.labels
     End Sub
 End Class

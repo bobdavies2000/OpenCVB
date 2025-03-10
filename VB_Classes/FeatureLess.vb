@@ -13,8 +13,6 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         dst2.SetTo(0)
         dst2.SetTo(1, edges.dst2)
         dst3 = ShowPalette(dst2)
-        dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
-        'dst3.SetTo(0, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
     End Sub
 End Class
 

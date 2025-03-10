@@ -483,7 +483,7 @@ Public Class HistValley_Tiers : Inherits TaskParent
         Next
         dst2.SetTo(marks.Count, task.pcSplit(2).InRange(marks(marks.Count - 1), 100))
 
-        dst3 = ShowPalette(dst2 * 255 / (marks.Count + 1))
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 

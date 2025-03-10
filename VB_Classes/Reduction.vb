@@ -44,7 +44,7 @@ Public Class Reduction_Floodfill : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
-        dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
+        dst2 = ShowPalette(reduction.dst2)
         dst3 = runRedC(reduction.dst2, labels(3))
     End Sub
 End Class
@@ -105,7 +105,7 @@ Public Class Reduction_PointCloud : Inherits TaskParent
         reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst2 * 255 / reduction.classCount)
+        dst3 = ShowPalette(dst2 + 1)
     End Sub
 End Class
 
@@ -216,7 +216,7 @@ Public Class Reduction_BGR : Inherits TaskParent
         For i = 0 To 2
             reduction.Run(split(i))
             If standaloneTest() Then
-                mats.mat(i) = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
+                mats.mat(i) = ShowPalette(reduction.dst2)
             End If
         Next
 

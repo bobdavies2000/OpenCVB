@@ -97,7 +97,7 @@ Public Class Palette_Reduction : Inherits TaskParent
         reduction.Run(src)
         dst3 = reduction.dst2
 
-        dst2 = ShowPalette(dst3 * 255 / reduction.classCount)
+        dst2 = ShowPalette(dst3)
     End Sub
 End Class
 
@@ -531,7 +531,7 @@ Public Class Palette_Bin4Way : Inherits TaskParent
         dst2 += tiers.dst2
         classCount = tiers.classCount + 4
 
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 
@@ -603,6 +603,7 @@ Public Class Palette_RandomColors : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Or colorMap.Rows <> 256 Then
             colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors)
+            colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is the first color...
         End If
 
         If src.Type = cv.MatType.CV_32F Then

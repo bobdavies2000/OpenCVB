@@ -21,7 +21,7 @@ Public Class Stripes_Basics : Inherits TaskParent
         If maxVal = 0 Then maxVal = mm.maxVal ' symmetric around 0 except for Z where all values are above 0
         classCount = CInt(maxVal / reductionVal)
 
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
         mm = GetMinMax(dst2, task.depthMask)
         dst2 *= 255 / mm.maxVal
     End Sub

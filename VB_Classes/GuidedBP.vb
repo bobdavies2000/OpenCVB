@@ -315,7 +315,7 @@ Public Class GuidedBP_MultiSlice : Inherits TaskParent
         Next
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst0, task.rangesTop)
         Dim mm = GetMinMax(dst0)
-        dst2 = ShowPalette(dst0 * 255 / mm.maxVal)
+        dst2 = ShowPalette(dst0)
         labels(2) = "The nonzero horizontal slices produced " + CStr(classCount) + " classes"
 
         histSide.Run(src.Clone)
@@ -398,8 +398,8 @@ Public Class GuidedBP_Regions : Inherits TaskParent
         rcMapX = redC.rcMapX.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
         rcMapY = redC.rcMapY.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
         If standaloneTest() Then
-            dst0 = ShowPalette(rcMapX * 255 / options.cellCount)
-            dst1 = ShowPalette(rcMapY * 255 / options.cellCount)
+            dst0 = ShowPalette(rcMapX)
+            dst1 = ShowPalette(rcMapY)
         End If
 
         mats.mat(0) = redC.dst2
@@ -459,12 +459,12 @@ Public Class GuidedBP_Points : Inherits TaskParent
         topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
         sideRects = New List(Of cv.Rect)(hotPoints.ptHot.sideRects)
 
-        dst2 = ShowPalette(backP * 255 / topRects.Count)
+        dst2 = ShowPalette(backP)
 
         hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
 
-        dst3 = ShowPalette(dst3 * 255 / sideRects.Count)
+        dst3 = ShowPalette(dst3)
 
         classCount = topRects.Count + sideRects.Count
 
@@ -522,7 +522,7 @@ Public Class GuidedBP_TopView : Inherits TaskParent
 
         topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
 
-        dst2 = ShowPalette(backP * 255 / topRects.Count)
+        dst2 = ShowPalette(backP)
         classCount = topRects.Count
 
         If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."

@@ -940,8 +940,7 @@ Public Class PointCloud_Histograms : Inherits TaskParent
                 labels(2) = "2D plot of the resulting 3D histogram."
         End Select
 
-        Dim mm as mmData = GetMinMax(dst2)
-        dst3 = ShowPalette(dst2 * 255 / mm.maxVal)
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 

@@ -39,7 +39,7 @@ Public Class KMeans_Basics : Inherits TaskParent
         saveLabels = dst2.Clone
 
         dst2.Reshape(1, src.Height).ConvertTo(dst2, cv.MatType.CV_8U)
-        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2)
         labels(2) = "KMeans labels 0-" + CStr(classCount - 1) + " spread out across 255 values."
     End Sub
 End Class
@@ -63,7 +63,7 @@ Public Class KMeans_MultiChannel : Inherits TaskParent
         km.Run(src)
         dst3 = km.dst2
 
-        dst2 = ShowPalette(dst3 * 255 / km.classCount)
+        dst2 = ShowPalette(dst3)
     End Sub
 End Class
 
@@ -172,7 +172,7 @@ Public Class KMeans_CustomData : Inherits TaskParent
         End If
 
         km.Run(dst0)
-        dst2 = ShowPalette(km.dst2 * 255 / km.classCount)
+        dst2 = ShowPalette(km.dst2)
     End Sub
 End Class
 
@@ -311,7 +311,7 @@ Public Class KMeans_Image : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         km.Run(src)
-        dst2 = ShowPalette(km.dst2 * 255 / km.classCount)
+        dst2 = ShowPalette(km.dst2)
         classCount = km.options.kMeansK
 
         masks.Clear()
@@ -358,7 +358,7 @@ Public Class KMeans_DepthPlusGray : Inherits TaskParent
         dst3 = km.dst2
         dst3.SetTo(0, task.noDepthMask)
 
-        If standaloneTest() Then dst2 = ShowPalette(km.dst2 * 255 / k)
+        If standaloneTest() Then dst2 = ShowPalette(km.dst2)
     End Sub
 End Class
 
@@ -415,7 +415,7 @@ Public Class KMeans_Dimensions : Inherits TaskParent
         labels(3) = labels(2)
 
         dst2 = km.dst2 + 1
-        dst3 = ShowPalette(dst2 * 255 / km.classCount)
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 
@@ -442,7 +442,7 @@ Public Class KMeans_Valleys : Inherits TaskParent
         km.Run(task.pcSplit(2))
         dst2 = km.dst2 + 1
 
-        dst3 = ShowPalette(dst2 * 255 / tiers.classCount)
+        dst3 = ShowPalette(dst2)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -467,7 +467,7 @@ Public Class KMeans_Depth : Inherits TaskParent
         dst2.SetTo(0, task.noDepthMask)
 
         classCount = km.classCount
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
         labels(2) = "Palettized version of the " + CStr(classCount) + " 8UC1 classes"
     End Sub
 End Class
@@ -500,7 +500,7 @@ Public Class KMeans_SimKColor : Inherits TaskParent
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.redOptions.rangesBGR)
 
-        dst2 = ShowPalette(dst1 * 255 / classCount)
+        dst2 = ShowPalette(dst1)
         labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.histBins3D) + " histogram bins"
     End Sub
 End Class
@@ -530,7 +530,7 @@ Public Class KMeans_SimKDepth : Inherits TaskParent
         cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.redOptions.rangesCloud)
         dst1 = dst1.ConvertScaleAbs
 
-        dst2 = ShowPalette(dst1 * 255 / classCount)
+        dst2 = ShowPalette(dst1)
 
         labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.histBins3D) + " histogram bins"
     End Sub

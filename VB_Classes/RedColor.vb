@@ -59,7 +59,7 @@ Public Class RedColor_CPP : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
-    Public identifyCount As Integer
+    Public identifyCount As Integer = 255
     Public Sub New()
         cPtr = RedMask_Open()
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -98,7 +98,7 @@ Public Class RedColor_CPP : Inherits TaskParent
             rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
         Next
 
-        If standalone Then dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standalone Then dst3 = ShowPalette(dst2)
 
         If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
         If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
@@ -799,7 +799,7 @@ Public Class RedColor_OutlineColor : Inherits TaskParent
         color8U.Run(src)
         dst1 = color8U.dst2 + 1
         dst1.SetTo(0, outline.dst2)
-        dst3 = ShowPalette(dst1 * 255 / color8U.classCount)
+        dst3 = ShowPalette(dst1)
 
         dst2 = runRedC(dst1, labels(2))
     End Sub
@@ -869,7 +869,7 @@ Public Class RedColor_FourColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         binar4.Run(src)
-        dst3 = ShowPalette(binar4.dst2 * 255 / 5)
+        dst3 = ShowPalette(binar4.dst2)
 
         dst2 = runRedC(binar4.dst2, labels(2))
     End Sub
@@ -966,7 +966,7 @@ Public Class RedColor_OnlyColorAlt : Inherits TaskParent
         labels(3) = CStr(task.rcList.Count) + " cells were identified."
         labels(2) = task.redC.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
-        If task.rcList.Count > 0 Then dst2 = ShowPalette(lastMap * 255 / task.rcList.Count)
+        If task.rcList.Count > 0 Then dst2 = ShowPalette(lastMap)
     End Sub
 End Class
 
@@ -1104,7 +1104,7 @@ Public Class RedColor_Tiers : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         binar4.Run(src)
-        dst1 = ShowPalette((binar4.dst2 * 255 / binar4.classCount).ToMat)
+        dst1 = ShowPalette(binar4.dst2)
 
         tiers.Run(src)
         dst3 = tiers.dst3

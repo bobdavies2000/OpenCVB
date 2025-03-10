@@ -1428,7 +1428,7 @@ Public Class Hist_CloudSegments : Inherits TaskParent
             dst1.SetTo(i + 1, mask)
         Next
         dst1.SetTo(0, task.noDepthMask)
-        dst3 = ShowPalette((dst1 + 1) * 255 / task.histogramBins)
+        dst3 = ShowPalette((dst1 + 1))
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

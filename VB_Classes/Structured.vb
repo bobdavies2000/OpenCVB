@@ -1323,7 +1323,7 @@ Public Class Structured_MultiSlice : Inherits TaskParent
             classCount += 1
         Next
 
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
         labels(3) = "ClassCount = " + CStr(classCount)
     End Sub
 End Class

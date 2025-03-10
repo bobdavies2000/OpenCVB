@@ -4053,7 +4053,7 @@ public:
             int n = (int)segments[i].size();
             float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
             bool drawClosed = distance < 10;
-            polylines(dst, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_AA);
+            polylines(dst, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_8);
         }
     }
 };

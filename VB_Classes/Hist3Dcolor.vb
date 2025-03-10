@@ -27,7 +27,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
         End If
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
-        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2)
 
         labels(2) = simK.labels(2)
         labels(3) = "Backprojection of " + CStr(classCount) + " histogram entries."
@@ -153,7 +153,7 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits TaskParent
             Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
         End If
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
         labels(2) = "Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
     End Sub
 End Class
@@ -252,7 +252,7 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits TaskParent
 
             Dim mm As mmData = GetMinMax(dst2)
 
-            dst3 = ShowPalette(dst2 * 255 / mm.maxVal)
+            dst3 = ShowPalette(dst2)
             labels(2) = simK.labels(2)
             labels(3) = CStr(mm.maxVal) + " different levels in the backprojection."
         End If

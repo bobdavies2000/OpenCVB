@@ -100,7 +100,7 @@ Public Class RedCloud_PrepData : Inherits TaskParent
 
                 Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
                 cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
-                dst3 = ShowPalette(dst1 * 255 / task.gOptions.HistBinBar.Value)
+                dst3 = ShowPalette(dst1)
                 labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
             End If
         End If

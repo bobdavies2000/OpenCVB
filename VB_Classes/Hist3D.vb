@@ -22,7 +22,7 @@ Public Class Hist3D_Basics : Inherits TaskParent
         If options.addCloud Then dst2 += hCloud.dst2 Else hCloud.dst2.CopyTo(dst2, task.depthMask)
         classCount = hColor.classCount + hCloud.classCount
 
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
         labels(3) = CStr(classCount) + " classes "
     End Sub
 End Class
@@ -184,7 +184,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
-        dst3 = If(classCount < 256, ShowPalette(dst2 * 255 / classCount), ShowPalette(dst2))
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 
@@ -213,7 +213,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
                                    task.redOptions.rangesBGR)
         Next
 
-        dst3 = ShowPalette(dst2 * 255 / task.redOptions.histBins3D)
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 
