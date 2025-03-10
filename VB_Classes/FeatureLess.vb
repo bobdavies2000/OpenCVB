@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
-    Dim edges As New EdgeLines_Basics
+    Public edges As New EdgeLine_Basics
     Public classCount As Integer = 2
     Public Sub New()
         labels = {"", "", "EdgeLines_Basics output", ""}
@@ -12,7 +12,9 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         edges.Run(src)
         dst2.SetTo(0)
         dst2.SetTo(1, edges.dst2)
+        dst3 = ShowPalette(dst2)
         dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
+        'dst3.SetTo(0, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
     End Sub
 End Class
 
@@ -20,7 +22,7 @@ End Class
 
 
 Public Class FeatureLess_WithoutMotion : Inherits TaskParent
-    Dim edges As New EdgeLines_Basics
+    Dim edges As New EdgeLine_Basics
     Public classCount As Integer = 2
     Public Sub New()
         labels = {"", "", "EdgeLines_Basics output", ""}
@@ -189,30 +191,6 @@ End Class
 
 
 
-
-Public Class FeatureLess_LeftRight : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
-    Public Sub New()
-        labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
-        desc = "Find the featureless regions of the left and right images"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        fLess.Run(task.leftView)
-        dst2 = fLess.dst3.Clone
-
-        fLess.Run(task.rightView)
-        dst3 = fLess.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class FeatureLess_History : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Dim frames As New History_Basics
@@ -241,7 +219,7 @@ Public Class FeatureLess_Groups : Inherits TaskParent
     Public Sub New()
         desc = "Group RedCloud cells by the value of their featureless maxDist"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fless.Run(src)
         dst2 = fless.dst2
         labels(2) = fless.labels(2)
@@ -250,5 +228,32 @@ Public Class FeatureLess_Groups : Inherits TaskParent
         classCount = redCPP.classCount
         dst3 = redCPP.dst2
         labels(3) = CStr(classCount) + " featureless regions were found."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FeatureLess_LeftRight : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Public Sub New()
+        fLess.edges.alwaysFullImage = True
+        labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
+        desc = "Find the featureless regions of the left and right images"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            dst0 = task.leftView
+            dst1 = task.rightView
+        End If
+
+        fLess.Run(task.leftView)
+        dst2 = fLess.dst3.Clone
+
+        fLess.Run(task.rightView)
+        dst3 = fLess.dst3.Clone
     End Sub
 End Class

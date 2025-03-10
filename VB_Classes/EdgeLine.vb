@@ -1,7 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class EdgeLines_Basics : Inherits TaskParent
+Public Class EdgeLine_Basics : Inherits TaskParent
     Public classCount As Integer = 2
+    Public alwaysFullImage As Boolean
     Public Sub New()
         cPtr = EdgeLineSimple_Open()
         desc = "Retain the existing edge/lines and add the edge/lines where motion occurred."
@@ -16,7 +17,7 @@ Public Class EdgeLines_Basics : Inherits TaskParent
         handleSrc.Free()
         dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
 
-        If task.firstPass Then
+        If task.firstPass Or alwaysFullImage Then
             dst2 = dst1.Clone
         Else
             dst1.CopyTo(dst2, task.motionMask)
@@ -33,7 +34,7 @@ End Class
 
 
 
-Public Class EdgeLines_Raw : Inherits TaskParent
+Public Class EdgeLine_Raw : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
     Public Sub New()
         cPtr = EdgeLines_Open()
@@ -78,7 +79,7 @@ End Class
 
 
 
-Public Class EdgeLines_JustLines : Inherits TaskParent
+Public Class EdgeLine_JustLines : Inherits TaskParent
     Public Sub New()
         cPtr = EdgeLines_Image_Open()
         labels = {"", "", "EdgeLines_Image output", ""}
@@ -105,7 +106,7 @@ End Class
 
 
 
-Public Class EdgeLines_Lines : Inherits TaskParent
+Public Class EdgeLine_Lines : Inherits TaskParent
     Public segPoints As New List(Of cv.Point2f)
     Public Sub New()
         cPtr = EdgeLines_Lines_Open()
@@ -147,8 +148,8 @@ End Class
 
 
 
-Public Class EdgeLines_LeftRight : Inherits TaskParent
-    Dim edges As New EdgeLines_Basics
+Public Class EdgeLine_LeftRight : Inherits TaskParent
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         desc = "Find edges is the left and right images using EdgeDraw..."
     End Sub
@@ -167,8 +168,8 @@ End Class
 
 
 
-Public Class EdgeLines_LeftRightVertical : Inherits TaskParent
-    Dim edges As New EdgeLines_Basics
+Public Class EdgeLine_LeftRightVertical : Inherits TaskParent
+    Dim edges As New EdgeLine_Basics
     Dim vert As New Rotate_Verticalize
     Public Sub New()
         desc = "Find edges is the left and right images using EdgeDraw after verticalizing the images."
@@ -190,9 +191,9 @@ End Class
 
 
 
-Public Class EdgeLines_SplitMean : Inherits TaskParent
+Public Class EdgeLine_SplitMean : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
-    Dim edges As New EdgeLines_Basics
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "find the edges in a 4-way color split of the image."
@@ -214,7 +215,7 @@ End Class
 
 
 
-Public Class EdgeLines_Segments : Inherits TaskParent
+Public Class EdgeLine_Segments : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
     Public Sub New()
         cPtr = EdgeLines_Open()
@@ -258,7 +259,7 @@ End Class
 
 
 
-Public Class EdgeLines_BasicsMotion : Inherits TaskParent
+Public Class EdgeLine_BasicsMotion : Inherits TaskParent
     Public edgeList As New List(Of List(Of cv.Point))
     Public Sub New()
         cPtr = EdgeLine_Open()

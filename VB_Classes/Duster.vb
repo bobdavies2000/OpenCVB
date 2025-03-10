@@ -83,7 +83,7 @@ Public Class Duster_MaskZ : Inherits TaskParent
         classCount += 1
         dst2.SetTo(classCount, task.maxDepthMask)
 
-        dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2)
         If task.heartBeat Then labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
         dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub

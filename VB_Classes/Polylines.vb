@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Polylines_Basics : Inherits TaskParent
     Public edgeList As New List(Of List(Of cv.Point))
-    Dim eSeg As New EdgeLines_Raw
+    Dim eSeg As New EdgeLine_Raw
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Retain edges where there was no motion."

@@ -177,7 +177,7 @@
     <Compile Include="CSV.vb" />
     <Compile Include="Density.vb" />
     <Compile Include="Disparity.vb" />
-    <Compile Include="EdgeLines.vb" />
+    <Compile Include="EdgeLine.vb" />
     <Compile Include="Erode.vb" />
     <Compile Include="History.vb" />
     <Compile Include="GuidedBP.vb" />

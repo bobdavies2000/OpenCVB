@@ -391,7 +391,7 @@ End Class
 
 Public Class HistValley_EdgeDraw : Inherits TaskParent
     Dim valley As New HistValley_FromPeaks
-    Dim edges As New EdgeLines_Basics
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         desc = "Remove edge color in RGB before HistValley_FromPeaks"
     End Sub

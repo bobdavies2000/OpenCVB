@@ -443,6 +443,6 @@ Public Class Grid_ShowMap : Inherits TaskParent
         desc = "Verify that task.gridMap is laid out correctly"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.gridMap * 255 / task.gridRects.Count)
+        dst2 = ShowPalette(task.gridMap)
     End Sub
 End Class

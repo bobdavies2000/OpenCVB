@@ -618,7 +618,7 @@ End Class
 
 
 Public Class Contour_RedCloudEdges : Inherits TaskParent
-    Dim edges As New EdgeLines_Basics
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

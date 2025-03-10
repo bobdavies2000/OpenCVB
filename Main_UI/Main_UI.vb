@@ -1494,7 +1494,7 @@ Public Class Main_UI
         parms.captureRes = settings.captureRes
         parms.displayRes = settings.displayRes
         parms.algName = AvailableAlgorithms.Text
-        trueData = New List(Of TrueText)
+
         parms.FixedPalette = settings.FixedPalette
 
         PausePlayButton.Image = PausePlay
@@ -1534,10 +1534,10 @@ Public Class Main_UI
             AlgorithmTestAllCount += 1
             drawRect = New cv.Rect
             task = New VBtask(parms)
+            trueData = New List(Of TrueText)
 
             task.lowResDepth = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
             task.lowResColor = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
-            trueData.Clear() ' remove any truetext from previous algorithm.
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 

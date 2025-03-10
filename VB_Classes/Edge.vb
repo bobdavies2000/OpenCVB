@@ -1065,7 +1065,7 @@ Public Class Edge_Color8U : Inherits TaskParent
                         Case 3
                             colorMethods(i) = New Binarize_DepthTiers()
                         Case 4
-                            colorMethods(i) = New EdgeLines_Basics()
+                            colorMethods(i) = New EdgeLine_Basics()
                         Case 5
                             colorMethods(i) = New Hist3Dcolor_Basics()
                         Case 6
@@ -1087,7 +1087,7 @@ Public Class Edge_Color8U : Inherits TaskParent
         For i = 0 To colorMethods.Count - 1
             If options.check.Box(i).Checked Then
                 colorMethods(i).run(src)
-                If options.check.Box(i).Text = "EdgeLines_Basics" Then
+                If options.check.Box(i).Text = "EdgeLine_Basics" Then
                     canny.dst2 = colorMethods(i).dst2
                 Else
                     canny.Run(colorMethods(i).dst3)

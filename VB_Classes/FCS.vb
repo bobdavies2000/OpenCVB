@@ -39,7 +39,7 @@ Public Class FCS_Basics : Inherits TaskParent
         End If
 
         dst3 = task.fpOutline
-        dst2 = ShowPalette(task.fpMap * 255 / task.fpList.Count)
+        dst2 = ShowPalette(task.fpMap)
         dst2.SetTo(0, task.fpOutline)
 
         If standalone Then
@@ -590,12 +590,14 @@ Public Class FCS_NoTracking : Inherits TaskParent
     Public facet32s As cv.Mat
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
+        task.feat = New Feature_Basics
         facet32s = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        task.feat.Run(src)
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
@@ -623,8 +625,7 @@ Public Class FCS_NoTracking : Inherits TaskParent
             DrawContour(dst1, ptList, 255, 1)
         Next
 
-        facet32s.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
+        dst2 = ShowPalette(facet32s)
 
         dst3.SetTo(0, dst1)
         dst2.SetTo(white, dst1)
@@ -715,8 +716,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             DrawContour(task.fpOutline, fp.facets, 255, 1)
         Next
 
-        task.fpMap.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst3 * 255 / (facets.Length + 1))
+        dst2 = ShowPalette(task.fpMap)
 
         If standalone Then fpDisplayCell()
 
@@ -900,7 +900,9 @@ Public Class FCS_ByDepth : Inherits TaskParent
             SetTrueText(Format(fp.age, fmt0), fp.ptCenter, 0)
             fpCellContour(fp, task.color, 0)
         Next
-        dst3 = ShowPalette(palInput * 255 / task.fpList.Count)
+        dst3 = ShowPalette(palInput)
+        dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
+
 
         Dim removeFrame As Integer = If(task.frameCount > task.frameHistoryCount, task.frameCount - task.frameHistoryCount, -1)
         For i = fpCells.Count - 1 To 0 Step -1

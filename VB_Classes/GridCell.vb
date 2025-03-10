@@ -1040,7 +1040,7 @@ End Class
 
 Public Class GridCell_EdgeDraw : Inherits TaskParent
     Dim regions As New Connected_Contours
-    Public edges As New EdgeLines_Basics
+    Public edges As New EdgeLine_Basics
     Public Sub New()
         desc = "Lines can mean cells are connected."
     End Sub

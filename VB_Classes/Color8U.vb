@@ -22,7 +22,7 @@ Public Class Color8U_Basics : Inherits TaskParent
                 Case 3
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
                 Case 4
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = New EdgeLines_Basics
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New EdgeLine_Basics
                 Case 5
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
                 Case 6

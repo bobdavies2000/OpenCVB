@@ -520,7 +520,7 @@ End Class
 
 
 Public Class Bin4Way_BasicsColors : Inherits TaskParent
-    Dim quart As New Bin4Way_Basics
+    Dim bin4 As New Bin4Way_Basics
     Dim color8U As New Color8U_Basics
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
@@ -528,12 +528,12 @@ Public Class Bin4Way_BasicsColors : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         color8U.Run(src)
-        quart.Run(color8U.dst3)
-        dst1 = quart.dst1
-        dst2 = quart.dst2
-        dst3 = quart.dst3
-        labels = quart.labels
-        trueData = quart.trueData
+        bin4.Run(color8U.dst3)
+        dst1 = bin4.dst1
+        dst2 = bin4.dst2
+        dst3 = bin4.dst3
+        labels = bin4.labels
+        trueData = bin4.trueData
     End Sub
 End Class
 
