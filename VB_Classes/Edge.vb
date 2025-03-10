@@ -331,10 +331,10 @@ Public Class Edge_SobelLRBinarized : Inherits TaskParent
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
 
         edges.Run(task.leftView)
-        dst2 = If(standaloneTest(), ShowAddweighted(edges.dst3, task.leftView, labels(2)), edges.dst3)
+        dst2 = If(standaloneTest(), ShowAddweighted(edges.dst2, task.leftView, labels(2)), edges.dst2)
 
         edges.Run(task.rightView)
-        dst3 = If(standaloneTest(), ShowAddweighted(edges.dst3, task.rightView, labels(3)), edges.dst3)
+        dst3 = If(standaloneTest(), ShowAddweighted(edges.dst2, task.rightView, labels(3)), edges.dst2)
     End Sub
 End Class
 

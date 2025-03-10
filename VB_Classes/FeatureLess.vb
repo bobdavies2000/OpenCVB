@@ -5,14 +5,13 @@ Public Class FeatureLess_Basics : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "EdgeLines_Basics output", ""}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "CV_8UC1 output of EdgeLines_Basics - only 0 and 1"
+        labels(2) = "lines produced with EdgeLine_Basics"
         desc = "Access the EdgeLines_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(src)
         dst2.SetTo(0)
         dst2.SetTo(1, edges.dst2)
-        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 
