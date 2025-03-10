@@ -1534,7 +1534,9 @@ Public Class Main_UI
             AlgorithmTestAllCount += 1
             drawRect = New cv.Rect
             task = New VBtask(parms)
-            trueData = New List(Of TrueText)
+            SyncLock trueTextLock
+                trueData = New List(Of TrueText)
+            End SyncLock
 
             task.lowResDepth = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
             task.lowResColor = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
