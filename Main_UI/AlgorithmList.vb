@@ -436,9 +436,6 @@ Public Class algorithmList
 	If algorithmName = "EdgeLine_Basics" Then return new EdgeLine_Basics
 	If algorithmName = "EdgeLine_BasicsMotion" Then return new EdgeLine_BasicsMotion
 	If algorithmName = "EdgeLine_JustLines" Then return new EdgeLine_JustLines
-	If algorithmName = "EdgeLine_LeftRight" Then return new EdgeLine_LeftRight
-	If algorithmName = "EdgeLine_LeftRightVertical" Then return new EdgeLine_LeftRightVertical
-	If algorithmName = "EdgeLine_Lines" Then return new EdgeLine_Lines
 	If algorithmName = "EdgeLine_Raw" Then return new EdgeLine_Raw
 	If algorithmName = "EdgeLine_Segments" Then return new EdgeLine_Segments
 	If algorithmName = "EdgeLine_SplitMean" Then return new EdgeLine_SplitMean

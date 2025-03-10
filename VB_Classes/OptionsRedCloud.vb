@@ -24,7 +24,7 @@ Public Class OptionsRedCloud
     Public histBins3D As Integer
     Public trackingLabel As String
     Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions",
-                                       "Binarize_DepthTiers", "EdgeLines_Basics", "Hist3DColor_Basics",
+                                       "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
                                        "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsRedColor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -93,7 +93,7 @@ Public Class OptionsRedCloud
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem() = "EdgeLines_Basics"
+        ColorSource.SelectedItem() = "EdgeLine_Basics"
 
         Select Case task.cameraName
             Case "Oak-D camera"

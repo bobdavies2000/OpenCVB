@@ -37,7 +37,7 @@ End Class
 Public Class EdgeLine_Raw : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
     Public Sub New()
-        cPtr = EdgeLines_Open()
+        cPtr = EdgeLineRaw_Open()
         labels = {"", "", "CV_8U Image showing merged lines and edges.", "CV_32S image - lines identified by their index in segments list"}
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
@@ -47,19 +47,19 @@ Public Class EdgeLine_Raw : Inherits TaskParent
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLines_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
+        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
         handleSrc.Free()
         If imagePtr <> 0 Then dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
         dst3.ConvertTo(dst2, cv.MatType.CV_8U)
         dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        Dim segCount = EdgeLines_GetLength(cPtr)
+        Dim segCount = EdgeLine_GetSegCount(cPtr)
         segments.Clear()
 
         For i = 0 To segCount - 1
-            Dim len = EdgeLines_NextLength(cPtr)
+            Dim len = EdgeLineRaw_NextLength(cPtr)
             Dim nextSeg(len - 1) As Integer
-            Dim segPtr = EdgeLines_NextSegment(cPtr)
+            Dim segPtr = EdgeLineRaw_NextSegment(cPtr)
             Marshal.Copy(segPtr, nextSeg, 0, nextSeg.Length)
 
             Dim segment As New List(Of cv.Point)
@@ -70,7 +70,7 @@ Public Class EdgeLine_Raw : Inherits TaskParent
         Next
     End Sub
     Public Sub Close()
-        EdgeLines_Close(cPtr)
+        EdgeLineRaw_Close(cPtr)
     End Sub
 End Class
 
@@ -81,8 +81,8 @@ End Class
 
 Public Class EdgeLine_JustLines : Inherits TaskParent
     Public Sub New()
-        cPtr = EdgeLines_Image_Open()
-        labels = {"", "", "EdgeLines_Image output", ""}
+        cPtr = EdgeLine_Image_Open()
+        labels = {"", "", "EdgeLine_Image output", ""}
         desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -91,99 +91,15 @@ Public Class EdgeLine_JustLines : Inherits TaskParent
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLines_Image_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
+        Dim imagePtr = EdgeLine_Image_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
         handleSrc.Free()
         If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
     End Sub
     Public Sub Close()
-        EdgeLines_Image_Close(cPtr)
+        EdgeLine_Image_Close(cPtr)
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class EdgeLine_Lines : Inherits TaskParent
-    Public segPoints As New List(Of cv.Point2f)
-    Public Sub New()
-        cPtr = EdgeLines_Lines_Open()
-        labels = {"", "", "EdgeLines_Segments output", ""}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Dim cppData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim vecPtr = EdgeLines_Lines_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
-        handleSrc.Free()
-
-        Dim ptData = cv.Mat.FromPixelData(EdgeLines_Lines_Count(cPtr), 2, cv.MatType.CV_32FC2, vecPtr).Clone
-        dst2.SetTo(0)
-        If task.heartBeat Then dst3.SetTo(0)
-        segPoints.Clear()
-        For i = 0 To ptData.Rows - 1 Step 2
-            Dim pt1 = ptData.Get(Of cv.Point2f)(i, 0)
-            Dim pt2 = ptData.Get(Of cv.Point2f)(i, 1)
-            DrawLine(dst2, pt1, pt2, white)
-            dst3 += dst2
-            segPoints.Add(pt1)
-            segPoints.Add(pt2)
-        Next
-    End Sub
-    Public Sub Close()
-        EdgeLines_Lines_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class EdgeLine_LeftRight : Inherits TaskParent
-    Dim edges As New EdgeLine_Basics
-    Public Sub New()
-        desc = "Find edges is the left and right images using EdgeDraw..."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.leftView)
-        dst2 = edges.dst2.Clone
-
-        edges.Run(task.rightView)
-        dst3 = edges.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class EdgeLine_LeftRightVertical : Inherits TaskParent
-    Dim edges As New EdgeLine_Basics
-    Dim vert As New Rotate_Verticalize
-    Public Sub New()
-        desc = "Find edges is the left and right images using EdgeDraw after verticalizing the images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        vert.Run(task.leftView)
-        edges.Run(vert.dst2)
-        dst2 = edges.dst2.Clone
-
-        vert.Run(task.rightView)
-        edges.Run(vert.dst2)
-        dst3 = edges.dst2
-    End Sub
-End Class
 
 
 
@@ -218,7 +134,7 @@ End Class
 Public Class EdgeLine_Segments : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
     Public Sub New()
-        cPtr = EdgeLines_Open()
+        cPtr = EdgeLineRaw_Open()
         desc = "Get the segments from the EdgeDraw C++ algorithm - the list of points for each line in the output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -227,17 +143,17 @@ Public Class EdgeLine_Segments : Inherits TaskParent
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLines_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
+        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
         handleSrc.Free()
         If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
 
-        Dim segCount = EdgeLines_GetLength(cPtr)
+        Dim segCount = EdgeLineRaw_GetSegCount(cPtr)
         segments.Clear()
 
         For i = 0 To segCount - 1
-            Dim len = EdgeLines_NextLength(cPtr)
+            Dim len = EdgeLineRaw_NextLength(cPtr)
             Dim nextSeg(len - 1) As Integer
-            Dim segPtr = EdgeLines_NextSegment(cPtr)
+            Dim segPtr = EdgeLineRaw_NextSegment(cPtr)
             Marshal.Copy(segPtr, nextSeg, 0, nextSeg.Length)
 
             Dim segment As New List(Of cv.Point)
@@ -249,7 +165,7 @@ Public Class EdgeLine_Segments : Inherits TaskParent
 
     End Sub
     Public Sub Close()
-        EdgeLines_Close(cPtr)
+        EdgeLineRaw_Close(cPtr)
     End Sub
 End Class
 
@@ -283,8 +199,8 @@ Public Class EdgeLine_BasicsMotion : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
         If task.heartBeat Then
-            labels(2) = "There were " + CStr(EdgeLine_GetEdgeLength(cPtr)) + " edge/lines founds while " +
-                                        CStr(EdgeLine_GetSegLength(cPtr)) + " edge/lines were found on the current image."
+            labels(2) = "There were " + CStr(EdgeLine_GetEdgeLength(cPtr)) + " edge/lines found while " +
+                                        CStr(EdgeLine_GetSegCount(cPtr)) + " edge/lines were found on the current image."
             labels(3) = "There were " + CStr(EdgeLine_UnchangedCount(cPtr)) + " edge/lines retained from the previous image."
         End If
     End Sub

@@ -3,10 +3,10 @@ Public Class FeatureLess_Basics : Inherits TaskParent
     Public edges As New EdgeLine_Basics
     Public classCount As Integer = 2
     Public Sub New()
-        labels = {"", "", "EdgeLines_Basics output", ""}
+        labels = {"", "", "EdgeLine_Basics output", ""}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "lines produced with EdgeLine_Basics"
-        desc = "Access the EdgeLines_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
+        labels(2) = "lines produced with EdgeLines"
+        desc = "Access the EdgeLine_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(src)
@@ -22,8 +22,8 @@ Public Class FeatureLess_WithoutMotion : Inherits TaskParent
     Dim edges As New EdgeLine_Basics
     Public classCount As Integer = 2
     Public Sub New()
-        labels = {"", "", "EdgeLines_Basics output", ""}
-        desc = "Access the EdgeLines_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
+        labels = {"", "", "EdgeLine_Basics output", ""}
+        desc = "Access the EdgeLine_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         edges.Run(src)
