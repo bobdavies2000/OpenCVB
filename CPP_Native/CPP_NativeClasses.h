@@ -789,6 +789,7 @@ public:
                 circle(output, Point(x, y), stepSize, response, -1);
             }
         }
+
     }
 };
 
@@ -817,6 +818,7 @@ int* EMax_Run(EMax_Raw* cPtr, int* samplePtr, int* labelsPtr, int inCount, int d
     cPtr->samples = Mat(inCount, dimension, CV_32FC1, samplePtr);
     cPtr->output = Mat(rows, cols, CV_32S);
     cPtr->Run();
+
     return (int*)cPtr->output.data;
 }
 
@@ -3041,149 +3043,6 @@ int Neighbors_RunCPP(Neighbors* cPtr, int* dataPtr, int rows, int cols)
 
 
 
-class RedCloudMaxDist
-{
-private:
-public:
-    Mat src, mask, maskCopy, result;
-    vector<Rect>cellRects;
-    vector<Point> floodPoints;
-    vector<Point> maxList;
-
-    RedCloudMaxDist() {}
-    void RunCPP() {
-        Rect rect;
-
-        multimap<int, Point, greater<int>> sizeSorted;
-        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-        Point pt;
-        for (int y = 0; y < src.rows; y++)
-        {
-            for (int x = 0; x < src.cols; x++)
-            {
-                if (mask.at<unsigned char>(y, x) == 0)
-                {
-                    pt = Point(x, y);
-                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
-                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
-                }
-            }
-        }
-
-        cellRects.clear();
-        floodPoints.clear();
-        int fill = 1;
-        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
-        {
-            if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
-            {
-                cellRects.push_back(rect);
-                floodPoints.push_back(it->second);
-
-                if (fill >= 255)
-                    break; // just taking up to the top X largest objects found.
-                fill++;
-            }
-        }
-    }
-
-    void RunMaxList() {
-        Rect rect;
-
-        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-        multimap<int, Point, greater<int>> sizeSorted;
-        for (size_t i = 0; i < maxList.size(); i++)
-        {
-            int count = floodFill(src, mask, maxList[i], 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
-            if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, maxList[i]));
-        }
-
-        Point pt;
-        for (int y = 0; y < src.rows; y++)
-        {
-            for (int x = 0; x < src.cols; x++)
-            {
-                if (mask.at<unsigned char>(y, x) == 0)
-                {
-                    pt = Point(x, y);
-                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
-                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
-                }
-            }
-        }
-
-        cellRects.clear();
-        floodPoints.clear();
-        int fill = 1;
-        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
-        {
-            if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
-            {
-                cellRects.push_back(rect);
-                floodPoints.push_back(it->second);
-
-                if (fill >= 255)
-                    break; // just taking up to the top X largest objects found.
-                fill++;
-            }
-        }
-    }
-};
-
-extern "C" __declspec(dllexport) RedCloudMaxDist* RedCloudMaxDist_Open()
-{
-    return new RedCloudMaxDist();
-}
-
-extern "C" __declspec(dllexport) int RedCloudMaxDist_Count(RedCloudMaxDist* cPtr)
-{
-    return (int)cPtr->cellRects.size();
-}
-
-extern "C" __declspec(dllexport) int* RedCloudMaxDist_Rects(RedCloudMaxDist* cPtr)
-{
-    return (int*)&cPtr->cellRects[0];
-}
-
-extern "C" __declspec(dllexport) void
-RedCloudMaxDist_SetPoints(RedCloudMaxDist* cPtr, int count, int* dataPtr)
-{
-    Mat maxList = Mat(count, 1, CV_32SC2, dataPtr);
-    cPtr->maxList.clear();
-    for (int i = 0; i < count; i++)
-    {
-        cPtr->maxList.push_back(maxList.at<Point>(i, 0));
-    }
-}
-
-extern "C" __declspec(dllexport) int* RedCloudMaxDist_Close(RedCloudMaxDist* cPtr) { delete cPtr; return (int*)0; }
-extern "C" __declspec(dllexport) int*
-RedCloudMaxDist_Run(RedCloudMaxDist* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols)
-{
-    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
-    cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
-    cPtr->mask.setTo(0);
-    Rect r = Rect(1, 1, cols, rows);
-    if (maskPtr != 0)
-    {
-        Mat inputRemoved;
-        inputRemoved = Mat(rows, cols, CV_8U, maskPtr);
-        inputRemoved.copyTo(cPtr->mask(r));
-    }
-    cPtr->maskCopy = cPtr->mask.clone();
-    if (cPtr->maxList.size() > 0)
-        cPtr->RunMaxList();
-    else
-        cPtr->RunCPP();
-    cPtr->maskCopy(r).copyTo(cPtr->result);
-    return (int*)cPtr->result.data;
-}
-
-
-
-
-
-
 class Denoise_Basics
 {
 private:
@@ -4053,7 +3912,7 @@ public:
             int n = (int)segments[i].size();
             float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
             bool drawClosed = distance < 10;
-            polylines(dst, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_8);
+            polylines(dst, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_AA);
         }
     }
 };
@@ -4078,4 +3937,147 @@ int* EdgeLineSimple_RunCPP(EdgeLineSimple* cPtr, int* dataPtr, int rows, int col
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
     cPtr->RunCPP(lineWidth);
     return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+class RedCloudMaxDist
+{
+private:
+public:
+    Mat src, mask, maskCopy, result;
+    vector<Rect>cellRects;
+    vector<Point> floodPoints;
+    vector<Point> maxList;
+
+    RedCloudMaxDist() {}
+    void RunCPP() {
+        Rect rect;
+
+        multimap<int, Point, greater<int>> sizeSorted;
+        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+        Point pt;
+        for (int y = 0; y < src.rows; y++)
+        {
+            for (int x = 0; x < src.cols; x++)
+            {
+                if (mask.at<unsigned char>(y, x) == 0)
+                {
+                    pt = Point(x, y);
+                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+                }
+            }
+        }
+
+        cellRects.clear();
+        floodPoints.clear();
+        int fill = 1;
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
+            {
+                cellRects.push_back(rect);
+                floodPoints.push_back(it->second);
+
+                if (fill >= 255)
+                    break; // just taking up to the top X largest objects found.
+                fill++;
+            }
+        }
+    }
+
+    void RunMaxList() {
+        Rect rect;
+
+        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+        multimap<int, Point, greater<int>> sizeSorted;
+        for (size_t i = 0; i < maxList.size(); i++)
+        {
+            int count = floodFill(src, mask, maxList[i], 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+            if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, maxList[i]));
+        }
+
+        Point pt;
+        for (int y = 0; y < src.rows; y++)
+        {
+            for (int x = 0; x < src.cols; x++)
+            {
+                if (mask.at<unsigned char>(y, x) == 0)
+                {
+                    pt = Point(x, y);
+                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+                }
+            }
+        }
+
+        cellRects.clear();
+        floodPoints.clear();
+        int fill = 1;
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
+            {
+                cellRects.push_back(rect);
+                floodPoints.push_back(it->second);
+
+                if (fill >= 255)
+                    break; // just taking up to the top X largest objects found.
+                fill++;
+            }
+        }
+    }
+};
+
+extern "C" __declspec(dllexport) RedCloudMaxDist* RedCloudMaxDist_Open()
+{
+    return new RedCloudMaxDist();
+}
+
+extern "C" __declspec(dllexport) int RedCloudMaxDist_Count(RedCloudMaxDist* cPtr)
+{
+    return (int)cPtr->cellRects.size();
+}
+
+extern "C" __declspec(dllexport) int* RedCloudMaxDist_Rects(RedCloudMaxDist* cPtr)
+{
+    return (int*)&cPtr->cellRects[0];
+}
+
+extern "C" __declspec(dllexport) void
+RedCloudMaxDist_SetPoints(RedCloudMaxDist* cPtr, int count, int* dataPtr)
+{
+    Mat maxList = Mat(count, 1, CV_32SC2, dataPtr);
+    cPtr->maxList.clear();
+    for (int i = 0; i < count; i++)
+    {
+        cPtr->maxList.push_back(maxList.at<Point>(i, 0));
+    }
+}
+
+extern "C" __declspec(dllexport) int* RedCloudMaxDist_Close(RedCloudMaxDist* cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int*
+RedCloudMaxDist_Run(RedCloudMaxDist* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
+    cPtr->mask.setTo(0);
+    Rect r = Rect(1, 1, cols, rows);
+    if (maskPtr != 0)
+    {
+        Mat inputRemoved;
+        inputRemoved = Mat(rows, cols, CV_8U, maskPtr);
+        inputRemoved.copyTo(cPtr->mask(r));
+    }
+    cPtr->maskCopy = cPtr->mask.clone();
+    if (cPtr->maxList.size() > 0)
+        cPtr->RunMaxList();
+    else
+        cPtr->RunCPP();
+    cPtr->maskCopy(r).copyTo(cPtr->result);
+    return (int*)cPtr->result.data;
 }

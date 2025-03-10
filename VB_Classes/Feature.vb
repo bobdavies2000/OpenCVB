@@ -626,53 +626,6 @@ End Class
 
 
 
-Public Class Feature_Agast : Inherits TaskParent
-    Dim stablePoints As List(Of cv.Point2f)
-    Dim agastFD As cv.AgastFeatureDetector
-    Dim lastPoints As List(Of cv.Point2f)
-    Public Sub New()
-        agastFD = cv.AgastFeatureDetector.Create(10, True, cv.AgastFeatureDetector.DetectorType.OAST_9_16)
-        desc = "Use the Agast Feature Detector in the OpenCV Contrib."
-        stablePoints = New List(Of cv.Point2f)()
-        lastPoints = New List(Of cv.Point2f)()
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim resizeFactor As Integer = 1
-        Dim input As New cv.Mat()
-        If src.Cols >= 1280 Then
-            cv.Cv2.Resize(src, input, New cv.Size(src.Cols \ 4, src.Rows \ 4))
-            resizeFactor = 4
-        Else
-            input = src
-        End If
-        Dim keypoints As cv.KeyPoint() = agastFD.Detect(input)
-        If task.heartBeat OrElse lastPoints.Count < 10 Then
-            lastPoints.Clear()
-            For Each kpt As cv.KeyPoint In keypoints
-                lastPoints.Add(New cv.Point2f(CSng(Math.Round(kpt.Pt.X)) * resizeFactor, CSng(Math.Round(kpt.Pt.Y)) * resizeFactor))
-            Next
-        End If
-        stablePoints.Clear()
-        dst2 = src.Clone()
-        For Each pt As cv.KeyPoint In keypoints
-            Dim p1 As New cv.Point2f(CSng(Math.Round(pt.Pt.X * resizeFactor)), CSng(Math.Round(pt.Pt.Y * resizeFactor)))
-            If lastPoints.Contains(p1) Then
-                stablePoints.Add(p1)
-                DrawCircle(dst2, p1, task.DotSize, New cv.Scalar(0, 0, 255))
-            End If
-        Next
-        lastPoints = New List(Of cv.Point2f)(stablePoints)
-        If task.midHeartBeat Then
-            labels(2) = $"{keypoints.Length} features found and {stablePoints.Count} of them were stable"
-        End If
-        labels(2) = $"Found {keypoints.Length} features"
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -1050,5 +1003,99 @@ Public Class Feature_NoMotion : Inherits TaskParent
         Next
 
         labels(2) = method.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_AgastHeartbeat : Inherits TaskParent
+    Dim stablePoints As List(Of cv.Point2f)
+    Dim agastFD As cv.AgastFeatureDetector
+    Dim lastPoints As List(Of cv.Point2f)
+    Public Sub New()
+        agastFD = cv.AgastFeatureDetector.Create(10, True, cv.AgastFeatureDetector.DetectorType.OAST_9_16)
+        desc = "Use the Agast Feature Detector in the OpenCV Contrib."
+        stablePoints = New List(Of cv.Point2f)()
+        lastPoints = New List(Of cv.Point2f)()
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim resizeFactor As Integer = 1
+        Dim input As New cv.Mat()
+        If src.Cols >= 1280 Then
+            cv.Cv2.Resize(src, input, New cv.Size(src.Cols \ 4, src.Rows \ 4))
+            resizeFactor = 4
+        Else
+            input = src
+        End If
+        Dim keypoints As cv.KeyPoint() = agastFD.Detect(input)
+        If task.heartBeat OrElse lastPoints.Count < 10 Then
+            lastPoints.Clear()
+            For Each kpt As cv.KeyPoint In keypoints
+                lastPoints.Add(kpt.Pt)
+            Next
+        End If
+        stablePoints.Clear()
+        dst2 = src.Clone()
+        For Each pt As cv.KeyPoint In keypoints
+            Dim p1 As New cv.Point2f(CSng(Math.Round(pt.Pt.X * resizeFactor)), CSng(Math.Round(pt.Pt.Y * resizeFactor)))
+            If lastPoints.Contains(p1) Then
+                stablePoints.Add(p1)
+                DrawCircle(dst2, p1, task.DotSize, New cv.Scalar(0, 0, 255))
+            End If
+        Next
+        lastPoints = New List(Of cv.Point2f)(stablePoints)
+        If task.midHeartBeat Then
+            labels(2) = $"{keypoints.Length} features found and {stablePoints.Count} of them were stable"
+        End If
+        labels(2) = $"Found {keypoints.Length} features"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_Agast : Inherits TaskParent
+    Dim agastFD As cv.AgastFeatureDetector
+    Dim stablePoints As New List(Of cv.Point2f)
+    Dim options As New Options_Agast
+    Public Sub New()
+        desc = "Use the Agast Feature Detector in the OpenCV Contrib."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        If task.optionsChanged Then
+            If agastFD IsNot Nothing Then agastFD.Dispose()
+            agastFD = cv.AgastFeatureDetector.Create(options.agastThreshold, options.useNonMaxSuppression,
+                                                     cv.AgastFeatureDetector.DetectorType.OAST_9_16)
+        End If
+
+        Dim keypoints As cv.KeyPoint() = agastFD.Detect(src)
+
+        Dim currPoints As New List(Of cv.Point2f)
+        For Each kpt As cv.KeyPoint In keypoints
+            currPoints.Add(kpt.Pt)
+        Next
+
+        Dim newList As New List(Of cv.Point2f)
+        For Each pt In stablePoints
+            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val = 0 Then newList.Add(pt)
+        Next
+
+        For Each pt In currPoints
+            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val <> 0 Then newList.Add(pt)
+        Next
+
+        stablePoints = New List(Of cv.Point2f)(newList)
+        dst2 = src
+        For Each pt In stablePoints
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+        labels(2) = $"Found {keypoints.Length} features with agast"
     End Sub
 End Class

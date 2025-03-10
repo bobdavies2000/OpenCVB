@@ -192,6 +192,7 @@ RecursiveBilateralFilter
 RedCell
 RedCloud
 RedColor
+RedConnect
 RedMask
 RedTrack
 Reduction

@@ -15,17 +15,17 @@ Public Class EMax_Basics : Inherits TaskParent
     Dim palette As New Palette_Variable
     Public Sub New()
         cPtr = EMax_Open()
-       optiBase.findslider("EMax Number of Samples per region").Value = 1
+        optiBase.FindSlider("EMax Number of Samples per region").Value = 1
         labels(3) = "Emax regions as integers"
         UpdateAdvice(traceName + ": use local options to control EMax.")
         desc = "Use EMax - Expectation Maximization - to classify the regions around a series of labeled points"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Options.RunOpt()
 
         If eLabels.Count = 0 Or useInputClusters Then
             useInputClusters = True
-            emaxInput.Run(src)
+            emaxInput.Run(src.Clone)
             eLabels = New List(Of Integer)(emaxInput.eLabels.ToList)
             eSamples = New List(Of cv.Point2f)(emaxInput.eSamples)
             regionCount = emaxInput.regionCount
@@ -41,28 +41,23 @@ Public Class EMax_Basics : Inherits TaskParent
         handleLabels.Free()
         handleSrc.Free()
 
-        dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr).Clone
+        dst1 = cv.Mat.FromPixelData(dst3.Rows, dst3.Cols, cv.MatType.CV_32S, imagePtr).Clone
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
 
-        If options.consistentcolors Then
-            palette.colors.Clear()
-            Dim newLabels(regionCount) As cv.Vec3b
-            For i = 0 To eLabels.Count - 1
-                Dim pt = eSamples(i)
-                ' emaxInput samples are random so they may be off the image...
-                If pt.X < 0 Or pt.X >= dst2.Width Or pt.Y < 0 Or pt.Y >= dst2.Height Then Continue For
-                Dim newLabel = dst0.Get(Of Byte)(pt.Y, pt.X)
-                Dim original = eLabels(i)
-                Dim c = palette.originalColorMap.Get(Of cv.Vec3b)(0, original Mod 256)
-                If newLabels.Contains(c) = False And newLabel <= regionCount Then newLabels(newLabel) = c
-            Next
-            palette.colors = New List(Of cv.Vec3b)(newLabels)
-            palette.Run(dst0)
-            dst2 = palette.dst2
-        Else
-            dst0 *= 255 / regionCount
-            dst2 = ShowPalette(dst0)
-        End If
+        palette.colors.Clear()
+        Dim newLabels(regionCount) As cv.Vec3b
+        For i = 0 To eLabels.Count - 1
+            Dim pt = eSamples(i)
+            ' emaxInput samples are random so they may be off the image...
+            If pt.X < 0 Or pt.X >= dst2.Width Or pt.Y < 0 Or pt.Y >= dst2.Height Then Continue For
+            Dim newLabel = dst0.Get(Of Byte)(pt.Y, pt.X)
+            Dim original = eLabels(i)
+            Dim c = palette.originalColorMap.Get(Of cv.Vec3b)(0, original Mod 256)
+            If newLabels.Contains(c) = False And newLabel <= regionCount Then newLabels(newLabel) = c
+        Next
+        palette.colors = New List(Of cv.Vec3b)(newLabels)
+        palette.Run(dst0)
+        dst2 = palette.dst2
         centers = New List(Of cv.Point2f)(emaxInput.centers)
     End Sub
     Public Sub Close()
@@ -107,29 +102,27 @@ Public Class EMax_InputClusters : Inherits TaskParent
     Public eSamples As New List(Of cv.Point2f)
     Public centers As New List(Of cv.Point2f)
     Dim options As New Options_EmaxInputClusters
+    Dim grid As New Grid_Emax
     Public Sub New()
         labels(2) = "EMax algorithms input samples"
-        task.gOptions.GridSlider.Maximum = dst2.Width
-        task.gOptions.GridSlider.Value = CInt(dst2.Width / 3)
+        optiBase.FindSlider("EMax Cell Size").Value = CInt(dst2.Width / 3)
+        grid.gridWidth = CInt(dst2.Width / 3)
+        grid.gridHeight = CInt(dst2.Width / 3)
         desc = "Options for EMax algorithms."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If task.firstPass Then task.grid.Run(dst2)
-
-        If regionCount <> task.gridRects.Count Then task.optionsChanged = True
-
-        regionCount = task.gridRects.Count
+        If task.optionsChanged Then grid.Run(dst2)
+        regionCount = grid.gridRects.Count
 
         Dim samples = New cv.Mat(regionCount * options.samplesPerRegion, 2, cv.MatType.CV_32F).Reshape(2, 0)
         Dim eLabelMat = New cv.Mat(regionCount * options.samplesPerRegion, 1, cv.MatType.CV_32S)
 
         For i = 0 To regionCount - 1
-            Dim roi = task.gridRects(i)
             eLabelMat.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion).SetTo(i)
             Dim tmp = samples.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion)
-            cv.Cv2.Randn(tmp, New cv.Scalar(roi.X + task.cellSize / 2, roi.Y + task.cellSize / 2),
+            cv.Cv2.Randn(tmp, New cv.Scalar(grid.gridWidth / 2, grid.gridHeight / 2),
                          cv.Scalar.All(options.sigma))
         Next
 
@@ -138,12 +131,16 @@ Public Class EMax_InputClusters : Inherits TaskParent
         dst2.SetTo(0)
         eSamples.Clear()
         centers.Clear()
+        Dim gIndex As Integer = -1
         For i = 0 To regionCount * options.samplesPerRegion - 1
+            If i Mod options.samplesPerRegion = 0 Then gIndex += 1
+            Dim roi = grid.gridRects(gIndex)
             Dim pt = samples.Get(Of cv.Point2f)(i, 0)
             centers.Add(pt)
-            eSamples.Add(New cv.Point2f(CInt(pt.X), CInt(pt.Y))) ' easier to debug with just integers...
+            Dim ePt = New cv.Point2f(CInt(roi.X + pt.X), CInt(roi.Y + pt.Y))
+            eSamples.Add(ePt) ' easier to debug with just integers...
             Dim label = eLabelMat.Get(Of Integer)(i)
-            DrawCircle(dst2, pt, task.DotSize + 2, task.HighlightColor)
+            DrawCircle(dst2, ePt, task.DotSize + 2, task.HighlightColor)
         Next
 
         ReDim eLabels(eLabelMat.Rows - 1)

@@ -492,6 +492,7 @@ Public Class algorithmList
 	If algorithmName = "FCS_ViewRight" Then return new FCS_ViewRight
 	If algorithmName = "FCS_WithAge" Then return new FCS_WithAge
 	If algorithmName = "Feature_Agast" Then return new Feature_Agast
+	If algorithmName = "Feature_AgastHeartbeat" Then return new Feature_AgastHeartbeat
 	If algorithmName = "Feature_AKaze" Then return new Feature_AKaze
 	If algorithmName = "Feature_Basics" Then return new Feature_Basics
 	If algorithmName = "Feature_Delaunay" Then return new Feature_Delaunay
@@ -642,12 +643,12 @@ Public Class algorithmList
 	If algorithmName = "Gravity_HorizonCompare" Then return new Gravity_HorizonCompare
 	If algorithmName = "Grid_Basics" Then return new Grid_Basics
 	If algorithmName = "Grid_BasicsTest" Then return new Grid_BasicsTest
+	If algorithmName = "Grid_Emax" Then return new Grid_Emax
 	If algorithmName = "Grid_FPS" Then return new Grid_FPS
 	If algorithmName = "Grid_List" Then return new Grid_List
 	If algorithmName = "Grid_MinMaxDepth" Then return new Grid_MinMaxDepth
 	If algorithmName = "Grid_Neighbors" Then return new Grid_Neighbors
 	If algorithmName = "Grid_ShowMap" Then return new Grid_ShowMap
-	If algorithmName = "Grid_Special" Then return new Grid_Special
 	If algorithmName = "Grid_TrackCenter" Then return new Grid_TrackCenter
 	If algorithmName = "GridCell_Basics" Then return new GridCell_Basics
 	If algorithmName = "GridCell_Boundaries" Then return new GridCell_Boundaries
@@ -1563,6 +1564,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_UnmatchedCount" Then return new RedColor_UnmatchedCount
 	If algorithmName = "RedColor_UnstableCells" Then return new RedColor_UnstableCells
 	If algorithmName = "RedColor_UnstableHulls" Then return new RedColor_UnstableHulls
+	If algorithmName = "RedConnect_Basics" Then return new RedConnect_Basics
 	If algorithmName = "RedMask_Basics" Then return new RedMask_Basics
 	If algorithmName = "RedMask_Redraw" Then return new RedMask_Redraw
 	If algorithmName = "RedTrack_Basics" Then return new RedTrack_Basics

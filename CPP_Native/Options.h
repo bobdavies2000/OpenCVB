@@ -559,7 +559,6 @@ public:
 class Options_Emax {
 public:
 	int predictionStepSize =  5;
-	bool consistentcolors = false;
 
 	void RunOpt() {}
 	Options_Emax() {
@@ -1095,6 +1094,7 @@ class Options_EmaxInputClusters {
 public:
 	int samplesPerRegion =  10;
 	int sigma =  10;
+	int emaxCellSize =  CInt(task.workingRes.Width / 3);
 	void RunOpt() {}
 	Options_EmaxInputClusters() {
 	}
@@ -2220,5 +2220,11 @@ class Options_LineRect {
 public:
 	void RunOpt() {}
 	Options_LineRect() {
+	}
+};
+class Options_Agast {
+public:
+	void RunOpt() {}
+	Options_Agast() {
 	}
 };

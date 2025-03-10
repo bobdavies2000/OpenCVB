@@ -281,7 +281,7 @@ End Class
 
 
 
-Public Class Grid_Special : Inherits TaskParent
+Public Class Grid_Emax : Inherits TaskParent
     Public gridWidth As Integer = 10
     Public gridHeight As Integer = 10
     Public gridRects As New List(Of cv.Rect)
@@ -298,7 +298,6 @@ Public Class Grid_Special : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
-            gridWidth = task.cellSize
             gridRects.Clear()
             tilesPerCol = 0
             tilesPerRow = 0

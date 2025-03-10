@@ -2213,7 +2213,6 @@ End Class
 
 Public Class Options_Emax : Inherits OptionParent
     Public predictionStepSize As Integer = 5
-    Public consistentcolors As Boolean = False
     Public covarianceType = cv.EMTypes.CovMatDefault
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("EMax Prediction Step Size", 1, 20, predictionStepSize)
@@ -2224,19 +2223,11 @@ Public Class Options_Emax : Inherits OptionParent
             radio.addRadio("EMax matrix type Generic")
             radio.check(0).Checked = True
         End If
-
-        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Use palette to keep colors consistent")
-            check.Box(0).Checked = True
-        End If
     End Sub
     Public Sub RunOpt()
-        Static colorCheck = FindCheckBox("Use palette to keep colors consistent")
         Static stepSlider = FindSlider("EMax Prediction Step Size")
         predictionStepSize = stepSlider.value
         covarianceType = cv.EMTypes.CovMatDefault
-        consistentcolors = colorCheck.checked
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked = True Then
@@ -4427,17 +4418,21 @@ End Class
 Public Class Options_EmaxInputClusters : Inherits OptionParent
     Public samplesPerRegion As Integer = 10
     Public sigma As Integer = 10
+    Public emaxCellSize As Integer = CInt(task.workingRes.Width / 3)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("EMax Number of Samples per region", 1, 20, samplesPerRegion)
             sliders.setupTrackBar("EMax Sigma (spread)", 1, 100, sigma)
+            sliders.setupTrackBar("EMax Cell Size", 1, task.workingRes.Width, emaxCellSize)
         End If
     End Sub
     Public Sub RunOpt()
         Static sampleSlider = FindSlider("EMax Number of Samples per region")
         Static sigmaSlider = FindSlider("EMax Sigma (spread)")
+        Static sizeSlider = FindSlider("EMax Cell Size")
         samplesPerRegion = sampleSlider.value
         sigma = sigmaSlider.value
+        emaxCellSize = sizeSlider.value
     End Sub
 End Class
 
@@ -8108,5 +8103,30 @@ Public Class Options_LineRect : Inherits OptionParent
         Static colorSlider = FindSlider("LineRect Color Threshold")
         depthThreshold = depthSlider.value / 100
         colorThreshold = colorSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Agast : Inherits OptionParent
+    Public useNonMaxSuppression As Boolean
+    Public agastThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Agast Threshold", 0, 100, 10)
+
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Use non-max suppression in Agast")
+            check.Box(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static thresholdSlider = FindSlider("Agast Threshold")
+        Static nonMaxCheck = FindCheckBox("Use non-max suppression in Agast")
+        useNonMaxSuppression = nonMaxCheck.checked
+        agastThreshold = thresholdSlider.value
     End Sub
 End Class
