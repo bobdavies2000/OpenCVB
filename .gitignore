@@ -389,6 +389,7 @@ OakD/Build/
 Mynt/
 OrbbecSDK/
 *.json
+AlgorithmList.*
 CS_Classes\createAlgorithms.cs
 Temp/*.ply
 testORB/

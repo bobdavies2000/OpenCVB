@@ -62,9 +62,8 @@ Public Class algorithmList
 	If algorithmName = "Benford_Basics" Then return new Benford_Basics
 	If algorithmName = "Benford_Depth" Then return new Benford_Depth
 	If algorithmName = "Benford_JPEG" Then return new Benford_JPEG
-	If algorithmName = "Benford_JPEG99" Then return new Benford_JPEG99
-	If algorithmName = "Benford_NormalizedImage" Then return new Benford_NormalizedImage
-	If algorithmName = "Benford_NormalizedImage99" Then return new Benford_NormalizedImage99
+		If algorithmName = "Benford_NormalizedImage" Then Return New Benford_NormalizedImage
+		If algorithmName = "Benford_NormalizedImage99" Then return new Benford_NormalizedImage99
 	If algorithmName = "Benford_PNG" Then return new Benford_PNG
 	If algorithmName = "Benford_Primes" Then return new Benford_Primes
 	If algorithmName = "Bezier_Basics" Then return new Bezier_Basics
