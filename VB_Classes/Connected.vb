@@ -189,81 +189,6 @@ End Class
 
 
 
-Public Class Connected_RectsH : Inherits TaskParent
-    Public hRects As New List(Of cv.Rect)
-    Dim connect As New Connected_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Connect grid cells with similar depth - horizontally scanning."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        hRects.Clear()
-        Dim index As Integer
-        For Each tup In connect.hTuples
-            If tup.Item1 = tup.Item2 Then Continue For
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
-
-            Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
-            Dim h = idd1.cRect.Height
-
-            Dim r = New cv.Rect(idd1.cRect.TopLeft.X + 1, idd1.cRect.TopLeft.Y, w - 1, h)
-
-            hRects.Add(r)
-            dst2(r).SetTo(255)
-
-            index += 1
-            dst3(r).SetTo(task.scalarColors(index Mod 256))
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Connected_RectsV : Inherits TaskParent
-    Public vRects As New List(Of cv.Rect)
-    Dim connect As New Connected_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Connect grid cells with similar depth - vertically scanning."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        vRects.Clear()
-        Dim index As Integer
-        For Each tup In connect.vTuples
-            If tup.Item1 = tup.Item2 Then Continue For
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
-
-            Dim w = idd1.cRect.Width
-            Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
-
-            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y + 1, w, h - 1)
-            vRects.Add(r)
-            dst2(r).SetTo(255)
-
-            index += 1
-            dst3(r).SetTo(task.scalarColors(index Mod 256))
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Connected_Regions : Inherits TaskParent
     Public redM As New RedMask_Basics
@@ -340,11 +265,73 @@ End Class
 
 
 
-Public Class Connected_AltRects : Inherits TaskParent
+Public Class Connected_RectsH : Inherits TaskParent
+    Public hRects As New List(Of cv.Rect)
+    Dim connect As New Connected_Basics
     Public Sub New()
-        desc = "description"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect grid cells with similar depth - horizontally scanning."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        hRects.Clear()
+        Dim index As Integer
+        For Each tup In connect.hTuples
+            If tup.Item1 = tup.Item2 Then Continue For
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+
+            Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
+            Dim h = idd1.cRect.Height
+
+            Dim r = New cv.Rect(idd1.cRect.TopLeft.X + 1, idd1.cRect.TopLeft.Y, w - 1, h)
+
+            hRects.Add(r)
+            dst2(r).SetTo(255)
+
+            index += 1
+            dst3(r).SetTo(task.scalarColors(index Mod 256))
+        Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Connected_RectsV : Inherits TaskParent
+    Public vRects As New List(Of cv.Rect)
+    Dim connect As New Connected_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect grid cells with similar depth - vertically scanning."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        vRects.Clear()
+        Dim index As Integer
+        For Each tup In connect.vTuples
+            If tup.Item1 = tup.Item2 Then Continue For
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+
+            Dim w = idd1.cRect.Width
+            Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
+
+            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y + 1, w, h - 1)
+            vRects.Add(r)
+            dst2(r).SetTo(255)
+
+            index += 1
+            dst3(r).SetTo(task.scalarColors(index Mod 256))
+        Next
+    End Sub
+End Class
+

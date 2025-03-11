@@ -31,23 +31,20 @@ Public Class RedColor_Basics : Inherits TaskParent
         labels(2) = cellGen.labels(2)
 
         If task.redOptions.DisplayCellStats.Checked Then
-            Static stats As RedCell_Basics
-            If stats Is Nothing Then
-                task.gOptions.displayDst1.Checked = True
-                stats = New RedCell_Basics
-            End If
+            Static stats As New RedCell_Basics
+            task.gOptions.displayDst1.Checked = True
             stats.Run(src)
             strOut = stats.strOut
             SetTrueText(strOut, newPoint, 1)
-            dst3 = stats.dst3
+            dst3 = stats.dst3.Clone
 
-            For Each rc In task.rcList
-                dst3.Circle(rc.maxDStable, task.DotSize, task.HighlightColor)
-            Next
+            labels(3) = stats.labels(3)
+        ElseIf labels(3) <> "" Then
+            dst3.SetTo(0)
+            task.gOptions.displayDst1.Checked = False
+            labels(3) = ""
+            SetTrueText("", newPoint, 1)
         End If
-
-        labels(3) = "The " + CStr(task.redOptions.IdentifyCountBar.Value) + " largest cells shown below " +
-                    " with the tracking color which changes when the cell is split or lost."
         task.setSelectedCell()
     End Sub
 End Class
@@ -63,7 +60,7 @@ Public Class RedColor_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = RedMask_Open()
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Run the C++ RedCloud interface with or without a mask"
+        desc = "Run the C++ RedCloud Interface With Or without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then
@@ -100,8 +97,8 @@ Public Class RedColor_CPP : Inherits TaskParent
 
         If standalone Then dst3 = ShowPalette(dst2)
 
-        If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
-        If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
+        If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+        If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
@@ -116,7 +113,7 @@ Public Class RedColor_Reduction : Inherits TaskParent
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
         task.gOptions.setHistogramBins(20)
-        desc = "Segment the image based on both the reduced color"
+        desc = "Segment the image based On both the reduced color"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
@@ -133,7 +130,7 @@ End Class
 Public Class RedColor_Hulls : Inherits TaskParent
     Dim convex As New Convex_RedCloudDefects
     Public Sub New()
-        labels = {"", "Cells where convexity defects failed", "", "Improved contour results using OpenCV's ConvexityDefects"}
+        labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
         desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

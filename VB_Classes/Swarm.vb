@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Windows.Forms
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
     Public lpList As New List(Of linePoints)

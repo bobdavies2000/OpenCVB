@@ -126,13 +126,12 @@ End Class
 
 Public Class Neighbors_Precise : Inherits TaskParent
     Public nabList As New List(Of List(Of Integer))
-    Dim stats As New RedCell_Basics
     Public rcList As List(Of rcData)
     Public runRedCloud As Boolean = False
     Public Sub New()
         cPtr = Neighbors_Open()
-        If standalone Then task.gOptions.displaydst1.checked = true
-        desc = "Find the neighbors in a selected RedCloud cell"
+        If standalone Then task.gOptions.displaydst1.checked = True
+        desc = "Find the neighbors in a selected RedCell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
@@ -171,6 +170,8 @@ Public Class Neighbors_Precise : Inherits TaskParent
         '    rcList(0).nabs.Clear() ' not interesting.
 
         '    If task.heartBeat And standaloneTest() Then
+        '        Static stats As New RedCell_Basics
+        '        If stats Is Nothing Then stats = New RedCell_Basics
         '        stats.Run(task.color)
 
         '        strOut = stats.strOut

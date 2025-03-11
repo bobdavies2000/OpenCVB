@@ -45,8 +45,8 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
         statsString()
-        SetTrueText(strOut, 3)
-        labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
+        SetTrueText(strOut, 1)
+        labels(3) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
     End Sub
 End Class
 
@@ -223,7 +223,7 @@ Public Class RedCell_BasicsPlot : Inherits TaskParent
         task.pcSplit(2)(task.rc.roi).CopyTo(tmp, task.rc.mask)
         plot.rc = task.rc
         plot.Run(tmp)
-        dst1 = plot.dst2
+        dst3 = plot.dst2
 
         stats.statsString()
         strOut = stats.strOut
@@ -240,7 +240,7 @@ Public Class RedCell_BasicsPlot : Inherits TaskParent
         End If
         If task.heartBeat Then statsString(src)
 
-        SetTrueText(strOut, 3)
+        SetTrueText(strOut, 1)
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
     End Sub
 End Class

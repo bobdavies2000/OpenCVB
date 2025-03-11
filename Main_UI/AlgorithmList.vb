@@ -203,7 +203,6 @@ Public Class algorithmList
 	If algorithmName = "Concat_4way" Then return new Concat_4way
 	If algorithmName = "Concat_Basics" Then return new Concat_Basics
 	If algorithmName = "Concept_Parallel" Then return new Concept_Parallel
-	If algorithmName = "Connected_AltRects" Then return new Connected_AltRects
 	If algorithmName = "Connected_Basics" Then return new Connected_Basics
 	If algorithmName = "Connected_Contours" Then return new Connected_Contours
 	If algorithmName = "Connected_Gaps" Then return new Connected_Gaps

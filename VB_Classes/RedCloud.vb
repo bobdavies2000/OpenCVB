@@ -150,22 +150,21 @@ End Class
 
 Public Class RedCloud_YZ : Inherits TaskParent
     Dim stats As New RedCell_Basics
-    Dim rCloud As New RedCloud_Basics
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.YZReduction.Checked = True
+        stats.runRedCloud = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build horizontal RedCloud cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         stats.Run(src)
+        dst1.SetTo(0)
         dst2 = stats.dst2
-        SetTrueText(stats.strOut, 3)
+        dst3 = stats.dst3
+        SetTrueText(stats.strOut, 1)
 
-        rCloud.Run(src)
-        dst1 = rCloud.dst1
-        dst2 = rCloud.dst2
-        labels(2) = rCloud.labels(2)
+        labels(2) = stats.labels(2)
     End Sub
 End Class
 
