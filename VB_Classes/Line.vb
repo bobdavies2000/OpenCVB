@@ -236,6 +236,7 @@ Public Class Line_InDepthAndBGR : Inherits TaskParent
         z1List.Clear()
         z2List.Clear()
         For Each lp In task.lpList
+            If lp.rect.Width = 0 Then Continue For ' skip placeholder
             Dim mask = New cv.Mat(New cv.Size(lp.rect.Width, lp.rect.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
             mask.Line(New cv.Point(CInt(lp.p1.X - lp.rect.X), CInt(lp.p1.Y - lp.rect.Y)),
                       New cv.Point(CInt(lp.p2.X - lp.rect.X), CInt(lp.p2.Y - lp.rect.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
@@ -910,8 +911,11 @@ End Class
 Public Class Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
     Public lpList As New List(Of linePoints)
+    Dim options As New Options_Line
     Public Sub New()
         labels(3) = "Input to Line_Basics"
+        optiBase.FindSlider("Canny Aperture").Value = 7
+        optiBase.FindSlider("Min Line Length").Value = 30
         desc = "Find lines in the Canny output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -919,11 +923,6 @@ Public Class Line_Canny : Inherits TaskParent
         dst3 = canny.dst2.Clone
 
         task.lines.Run(canny.dst2)
-
-        If task.firstPass Then
-            optiBase.FindSlider("Canny Aperture").Value = 7
-            optiBase.FindSlider("Min Line Length").Value = 30
-        End If
 
         dst2 = task.lines.dst2
         lpList = New List(Of linePoints)(task.lpList)

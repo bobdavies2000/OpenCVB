@@ -4,6 +4,7 @@ Public Class LineRect_Basics : Inherits TaskParent
     Public lpPair As New List(Of Tuple(Of linePoints, linePoints, cv.Rect))
     Public Sub New()
         labels(2) = "Use mouse to display the color and depth means of the both sides of the line."
+        labels(3) = "Lines which straddle the existing line - to sample color from grid cells."
         desc = "Analyze data on either side of a line detected in the image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -44,62 +45,9 @@ Public Class LineRect_Basics : Inherits TaskParent
             lineRectMap(rect).SetTo(lpPair.Count)
             lpPair.Add(New Tuple(Of linePoints, linePoints, cv.Rect)(lp1, lp2, rect))
         Next
-
-        Dim index = lineRectMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim tup = lpPair(index)
-        Dim c1 = tup.Item1.colorMean
-        Dim c2 = tup.Item2.colorMean
-        Dim colorStr1 = Format(c1(0), fmt0) + "/" + Format(c1(1), fmt0) + "/" + Format(c1(2), fmt0)
-        Dim colorStr2 = Format(c2(0), fmt0) + "/" + Format(c2(1), fmt0) + "/" + Format(c2(2), fmt0)
-        labels(3) = "Color1 = " + colorStr1 + " color2 = " + colorStr2 + " and depth1 = " + Format(tup.Item1.depthMean, fmt1) +
-                    "m and depth2 " + Format(tup.Item2.depthMean, fmt1) + "m"
-        dst3.Rectangle(tup.Item3, cv.Scalar.White, task.lineWidth)
-        task.color.Rectangle(tup.Item3, cv.Scalar.White, task.lineWidth)
     End Sub
 End Class
 
-
-
-
-
-
-Public Class LineRect_ColorAndDepthLines : Inherits TaskParent
-    Public options As New Options_LineRect
-    Dim lRect As New LineRect_Basics
-    Public Sub New()
-        desc = "Remove lines which have similar color on both sides of a line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        dst2 = src.Clone
-        dst3 = src.Clone
-        lRect.Run(src)
-
-        Dim colorThreshold = options.colorThreshold
-        Dim depthThreshold = options.depthThreshold
-        Dim depthLines As Integer, colorLines As Integer
-        For Each tup In lRect.lpPair
-            Dim lp1 = tup.Item1
-            Dim lp2 = tup.Item2
-            If Math.Abs(lp1.colorMean(0) - lp2.colorMean(0)) > colorThreshold And
-                Math.Abs(lp1.depthMean - lp2.depthMean) > depthThreshold Then
-                Dim lp = task.lpList(lp1.index)
-                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
-                depthLines += 1
-            Else
-                Dim lp = task.lpList(lp1.index)
-                dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
-                colorLines += 1
-            End If
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(depthLines) + " lines were found between objects (External Lines)"
-            labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
-        End If
-    End Sub
-End Class
 
 
 

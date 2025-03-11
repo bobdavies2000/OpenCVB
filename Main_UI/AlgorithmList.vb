@@ -1010,7 +1010,6 @@ Public Class algorithmList
 	If algorithmName = "LineRect_CenterDepth" Then return new LineRect_CenterDepth
 	If algorithmName = "LineRect_CenterNeighbor" Then return new LineRect_CenterNeighbor
 	If algorithmName = "LineRect_CenterRange" Then return new LineRect_CenterRange
-	If algorithmName = "LineRect_ColorAndDepthLines" Then return new LineRect_ColorAndDepthLines
 	If algorithmName = "LineTrack_Basics" Then return new LineTrack_Basics
 	If algorithmName = "LineTrack_Basics1" Then return new LineTrack_Basics1
 	If algorithmName = "LineTrack_RedCloud" Then return new LineTrack_RedCloud
