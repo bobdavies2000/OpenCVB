@@ -54,7 +54,7 @@ Public Class EdgeLine_Raw : Inherits TaskParent
         dst3.ConvertTo(dst2, cv.MatType.CV_8U)
         dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        Dim segCount = EdgeLine_GetSegCount(cPtr)
+        Dim segCount = EdgeLineRaw_GetSegCount(cPtr)
         segments.Clear()
 
         For i = 0 To segCount - 1

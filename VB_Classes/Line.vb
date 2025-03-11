@@ -5,7 +5,7 @@ Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of linePoints)
     Dim lineCore As New Line_Core
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13,9 +13,11 @@ Public Class Line_Basics : Inherits TaskParent
 
         lpMap.SetTo(0)
         dst2 = src
+        dst3.SetTo(0)
         dst2.SetTo(cv.Scalar.White, lineCore.dst2)
         For Each lp In lineCore.lpList
             lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
         lpList = New List(Of linePoints)(lineCore.lpList)

@@ -106,7 +106,7 @@ Public Class Projection_Lines : Inherits TaskParent
         labels = {"", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells"}
         desc = "Search for surfaces among the FeatureLess regions"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         If task.heartBeat Then
@@ -118,7 +118,8 @@ Public Class Projection_Lines : Inherits TaskParent
         dst1 = dst2.Threshold(options.projectionThreshold, 255, cv.ThresholdTypes.Binary)
 
         task.lines.Run(dst1)
-        dst3 += task.lines.dst2
+        dst3.SetTo(0)
+        dst3.SetTo(cv.Scalar.White, task.lines.dst3)
     End Sub
 End Class
 

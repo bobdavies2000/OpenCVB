@@ -1,28 +1,33 @@
-# March 2025 – GridCell Updates and Task Algorithms.
+# March 2025 (Part 2) – GridCell and EdgeLine Updates.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   The GridCell algorithms continue to grow with this version of OpenCVB.
-    -   GridCell_Basics is run on every frame – it is a “task algorithm”.
-    -   Grid cells are available to all algorithms with the task.iddList variable.
-    -   The depth between neighboring grid cells defines a connection.
-    -   Connections are made both vertically and horizontally = see below.
-    -   The depth difference option is available in the global algorithm options.
-        -   “Depth Difference Threshold” is specified in centimeters.
--   The complete list of task algorithms:
-    -   Depth_Colorizer – to build the depth RGB image.
-    -   Gravity_Horizon – to provide the gravity and horizon lines.
-    -   Grid_Basics – to define the current grid cells and size.
-    -   GridCell_Basics – to get depth correlations for grid cells.
-    -   IMU_Basics – to gather the current IMU data.
-    -   IMU_GMatrix – define gravity conversion matrix for the point cloud.
-    -   Motion_Basics – to build the motion mask for the current frame.
--   The PixelViewer form can be closed by both the caption box and ![A blue microscope with black outline AI-generated content may be incorrect.](media/0e674efad2384a95fc65c5a030a951fd.png)button.
--   The AddWeighted_Basics algorithm was moved into a function – reduced code.
+-   GridCell_Regions expands the horizontal and vertical rectangles.
+    -   Grid cells with consistent depth are combined to build contours.
+    -   The contours define and track the objects in the image – see below.
+-   EdgeLine algorithms: combine edge and line detection to form ‘edgelines’.
+    -   Previously labeled EdgeDraw after OpenCV’s EdgeDrawing API’s.
+    -   EdgeDrawing names are used to access OpenCV C++ code.
+    -   EdgeLine may be a better name to encapsulate how it works.
+-   EdgeLine algorithms update the edgeline output only where motion occurs.
+    -   Algorithms using EdgeLine_Basics see more consistent output.
+    -   Motion-filtered RGB input to EdgeDrawing API’s are not consistent.
+    -   Motion-filtering the edgeline output solves the problem.
+    -   Motion-filtering EdgeLine output impacts many other algorithms.
+-   RedColor_Basics updates only cells that intersect with the motion mask.
+    -   Result for all ‘RedC’ algorithms appears much more stable.
+    -   ‘RedC’ algorithms are the first to benefit from EdgeLine improvements.
+-   Selecting ‘Display Cell Stats’ RedCloud option can be toggled on and off.
+-   OpenCVB option to use a fixed or random palette is available.
+    -   A fixed palette produces consistent colors across different runs.
+    -   Random palettes will be consistently used with all algorithms in a run.
+-   Feature_Agast options improve the quality of feature points found.
+-   ShowPalette no longer requires normalizing – saves a matrix multiply.
+-   Emax_Basics example builds a special set of grid rectangles for its use.
 -   A log of previous changes is included at the bottom of this document.
 
-![A screenshot of a computer AI-generated content may be incorrect.](media/2afba4eb6b4ad7bf708ac64a8673a002.png)
+![](media/f1f77b330a4a33ef4872f2d85b188b32.gif)
 
-**GridCell_Connected:** *Grid cells in the lower left image are combined horizontally if their depth is within X centimeters. The same grid cells are combined vertically in the lower right image. Note that many grid cells are not combined vertically or horizontally. Their depth is not close to any of their neighbors. Cells with no depth can still be combined. An example is the entire vertical column at the left of the image where there are no depth values.*
+**Connected_Contours :** *Each region contains grid cells and neighbors which are at approximately the same depth. For instance, the green cell in the lower left consistently defines and tracks the person seated at the desk (our humble programmer.) The wall and painting are tracked as well. The lower right image confirms this by showing the color image and the contours using OpenCV’s AddWeighted method. The tracking color of the wall changes because it is shrinking in size as the contours are colored by order of size in this version.*
 
 # Introduction
 
@@ -1836,3 +1841,29 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A screenshot of a computer AI-generated content may be incorrect.](media/ba9fd91a6d76b04326a7171aad5eb8ba.gif)
 
 **GridCell_LeftToColor :** *The upper right image rotates between the 3 different representations of the depth data. The correlation coefficients are highlighted in red for grid cells that have 90%+ correlation between the left and right images, indicating that the grid cell is highly visible to both the left and right and is likely to have excellent depth data. The lower left image shows the corresponding points for the RGB data (upper left.) The camera is the Intel RealSense D435i and the left image is grayscale. The lower right image has the same pixels highlighted as the lower left image but is more readable. Use the mouse cursor to display the correlation coefficient and pixel count percentage for the grid cell under the cursor.*
+
+# March 2025 – GridCell Updates and Task Algorithms.
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   The GridCell algorithms continue to grow with this version of OpenCVB.
+    -   GridCell_Basics is run on every frame – it is a “task algorithm”.
+    -   Grid cells are available to all algorithms with the task.iddList variable.
+    -   The depth between neighboring grid cells defines a connection.
+    -   Connections are made both vertically and horizontally = see below.
+    -   The depth difference option is available in the global algorithm options.
+        -   “Depth Difference Threshold” is specified in centimeters.
+-   The complete list of task algorithms:
+    -   Depth_Colorizer – to build the depth RGB image.
+    -   Gravity_Horizon – to provide the gravity and horizon lines.
+    -   Grid_Basics – to define the current grid cells and size.
+    -   GridCell_Basics – to get depth correlations for grid cells.
+    -   IMU_Basics – to gather the current IMU data.
+    -   IMU_GMatrix – define gravity conversion matrix for the point cloud.
+    -   Motion_Basics – to build the motion mask for the current frame.
+-   The PixelViewer form can be closed by both the caption box and ![A blue microscope with black outline AI-generated content may be incorrect.](media/0e674efad2384a95fc65c5a030a951fd.png)button.
+-   The AddWeighted_Basics algorithm was moved into a function – reduced code.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer AI-generated content may be incorrect.](media/2afba4eb6b4ad7bf708ac64a8673a002.png)
+
+**GridCell_Connected:** *Grid cells in the lower left image are combined horizontally if their depth is within X centimeters. The same grid cells are combined vertically in the lower right image. Note that many grid cells are not combined vertically or horizontally. Their depth is not close to any of their neighbors. Cells with no depth can still be combined. An example is the entire vertical column at the left of the image where there are no depth values.*

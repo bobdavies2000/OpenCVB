@@ -71,15 +71,13 @@ Public Class Reduction_HeatMapLines : Inherits TaskParent
         reduction.Run(src)
         heat.Run(src)
 
-        task.lines.Run(heat.dst2)
+        task.lines.Run(heat.dst2.Clone)
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
-        dst2.SetTo(white, task.lines.dst3)
 
         task.lines.Run(heat.dst3)
         setupSide.Run(heat.dst3)
         dst3 = setupSide.dst2
-        dst3.SetTo(white, task.lines.dst3)
     End Sub
 End Class
 
