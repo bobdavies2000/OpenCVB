@@ -40,23 +40,13 @@ Public Class RedMask_Basics : Inherits TaskParent
             rectlist.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
         Next
 
-        Dim floodPointData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC2, RedMask_FloodPoints(cPtr))
-        Dim ptData(classCount * 2) As Integer
-        Marshal.Copy(floodPointData.Data, ptData, 0, ptData.Length)
-        Dim ptlist As New List(Of cv.Point)
-        For i = 0 To ptData.Count - 2 Step 2
-            ptlist.Add(New cv.Point(ptData(i), ptData(i + 1)))
-        Next
-
         mdList.Clear()
         For i = 0 To classCount - 1
             Dim md As New maskData
             md.rect = rectlist(i)
             If md.rect.Size = dst2.Size Then Continue For
             If md.rect.Width * md.rect.Height < task.rcPixelThreshold Then Continue For
-            Dim pt = ptlist(i)
-            Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
-            md.mask = dst2(md.rect).InRange(val, val)
+            md.mask = dst2(md.rect).InRange(i + 1, i + 1)
             md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawContour(md.mask, md.contour, 255, -1)
             md.pixels = md.mask.CountNonZero

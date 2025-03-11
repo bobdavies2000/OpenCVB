@@ -105,11 +105,6 @@ extern "C" __declspec(dllexport) int* RedMask_Rects(RedMask* cPtr)
     return (int*)&cPtr->cellRects[0];
 }
 
-extern "C" __declspec(dllexport) int* RedMask_FloodPoints(RedMask* cPtr)
-{
-    return (int*)&cPtr->floodPoints[0];
-}
-
 extern "C" __declspec(dllexport) int* RedMask_Close(RedMask* cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
 RedMask_Run(RedMask* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int minSize)
