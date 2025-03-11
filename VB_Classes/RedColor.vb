@@ -52,61 +52,6 @@ End Class
 
 
 
-Public Class RedColor_CPP : Inherits TaskParent
-    Public inputRemoved As cv.Mat
-    Public classCount As Integer
-    Public rectList As New List(Of cv.Rect)
-    Public identifyCount As Integer = 255
-    Public Sub New()
-        cPtr = RedMask_Open()
-        inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Run the C++ RedCloud Interface With Or without a mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static color As New Color8U_Basics
-            color.Run(src)
-            src = color.dst2
-        End If
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        Dim maskData(src.Total - 1) As Byte
-        Marshal.Copy(inputRemoved.Data, maskData, 0, maskData.Length)
-        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
-
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(),
-                                    handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
-        handleMask.Free()
-        handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-
-        classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
-        If classCount = 0 Then Exit Sub ' no data to process.
-
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
-
-        Dim rects(classCount * 4) As Integer
-        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-
-        rectList.Clear()
-        For i = 0 To classCount * 4 - 4 Step 4
-            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-        Next
-
-        If standalone Then dst3 = ShowPalette(dst2)
-
-        If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-        If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
-    End Sub
-End Class
-
-
-
 
 
 Public Class RedColor_Reduction : Inherits TaskParent
@@ -1987,5 +1932,170 @@ Public Class RedColor_GridCellsHist : Inherits TaskParent
         task.rcList = New List(Of rcData)(rcList)
         rcLastList = New List(Of rcData)(rcList)
         labels(3) = CStr(rcList.Count) + " redCloud cells were found and " + CStr(lastCount) + " cells had no motion."
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedColor_CPP : Inherits TaskParent
+    Public inputRemoved As cv.Mat
+    Public classCount As Integer
+    Public rectList As New List(Of cv.Rect)
+    Public identifyCount As Integer = 255
+    Public Sub New()
+        cPtr = RedMask_Open()
+        inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Run the C++ RedCloud Interface With Or without a mask"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static color As New Color8U_Basics
+            color.Run(src)
+            src = color.dst2
+        End If
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim maskData(src.Total - 1) As Byte
+        Marshal.Copy(inputRemoved.Data, maskData, 0, maskData.Length)
+        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(),
+                                    handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
+        handleMask.Free()
+        handleInput.Free()
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
+        If classCount = 0 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
+
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+        rectList.Clear()
+        For i = 0 To classCount * 4 - 4 Step 4
+            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+        Next
+
+        If standalone Then dst3 = ShowPalette(dst2)
+
+        If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+        If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedColor_BasicsNoMask : Inherits TaskParent
+    Public classCount As Integer
+    Public rectList As New List(Of cv.Rect)
+    Public identifyCount As Integer = 255
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        desc = "Run the C++ RedCloud Interface With Or without a mask"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static color As New Color8U_Basics
+            color.Run(src)
+            src = color.dst2
+        End If
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
+        handleInput.Free()
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        classCount = Math.Min(RedCloud_Count(cPtr), identifyCount * 2)
+        If classCount = 0 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+        rectList.Clear()
+        For i = 0 To classCount * 4 - 4 Step 4
+            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+        Next
+
+        If standalone Then dst3 = ShowPalette(dst2)
+
+        If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+        If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedColor_BasicsResized : Inherits TaskParent
+    Public classCount As Integer
+    Public rectList As New List(Of cv.Rect)
+    Public identifyCount As Integer = 255
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        desc = "Create the redCells with tiny resolution to see any speed benefit...."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim saveMotionMask = task.motionMask.Clone
+        Dim tinySize = New cv.Size(168, 94)
+        task.motionMask = task.motionMask.Resize(tinySize)
+        src = src.Resize(tinySize)
+        If src.Channels <> 1 Then
+            Static color As New Color8U_Basics
+            color.Run(src)
+            src = color.dst2
+        End If
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
+        handleInput.Free()
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        classCount = Math.Min(RedCloud_Count(cPtr), identifyCount * 2)
+        If classCount = 0 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+        rectList.Clear()
+        For i = 0 To classCount * 4 - 4 Step 4
+            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+        Next
+
+        If standalone Then dst3 = ShowPalette(dst2)
+
+        If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+        If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
+
+        task.motionMask = saveMotionMask.Clone
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class

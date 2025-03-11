@@ -958,35 +958,6 @@ Module TaskExterns
 
 
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Rects(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_FloodPoints(cPtr As IntPtr) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Sizes(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Count(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Run(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr,
-                                 rows As Integer, cols As Integer, minSize As Integer) As IntPtr
-    End Function
-
-
-
-
-
-
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Open() As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Close(cPtr As IntPtr) As IntPtr
@@ -1278,4 +1249,53 @@ Module TaskExterns
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Edge_DiffY_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMask_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMask_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMask_Rects(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMask_FloodPoints(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMask_Count(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMask_Run(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr,
+                                 rows As Integer, cols As Integer, minSize As Integer) As IntPtr
+    End Function
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloud_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloud_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloud_Rects(cPtr As IntPtr) As IntPtr
+    End Function
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloud_Count(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, minSize As Integer) As IntPtr
+    End Function
+
 End Module
+
