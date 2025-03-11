@@ -370,9 +370,9 @@ Hunter/
 OrbbecSDK/
 OrbbecSDK_v1.10.5/
 Orb
-*pcTrans.ply
 survey/
 eigen/
+Temp/*.ply
 depthai-core/
 PythonDebug/env/
 PythonDebug/env1/
@@ -391,7 +391,6 @@ OrbbecSDK/
 *.json
 AlgorithmList.*
 CS_Classes\createAlgorithms.cs
-Temp/*.ply
 testORB/
 Data/AlgorithmCounts.txt
 packages/

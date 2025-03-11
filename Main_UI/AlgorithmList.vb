@@ -62,8 +62,9 @@ Public Class algorithmList
 	If algorithmName = "Benford_Basics" Then return new Benford_Basics
 	If algorithmName = "Benford_Depth" Then return new Benford_Depth
 	If algorithmName = "Benford_JPEG" Then return new Benford_JPEG
-		If algorithmName = "Benford_NormalizedImage" Then Return New Benford_NormalizedImage
-		If algorithmName = "Benford_NormalizedImage99" Then return new Benford_NormalizedImage99
+	If algorithmName = "Benford_JPEG99" Then return new Benford_JPEG99
+	If algorithmName = "Benford_NormalizedImage" Then return new Benford_NormalizedImage
+	If algorithmName = "Benford_NormalizedImage99" Then return new Benford_NormalizedImage99
 	If algorithmName = "Benford_PNG" Then return new Benford_PNG
 	If algorithmName = "Benford_Primes" Then return new Benford_Primes
 	If algorithmName = "Bezier_Basics" Then return new Bezier_Basics
@@ -202,6 +203,7 @@ Public Class algorithmList
 	If algorithmName = "Concat_4way" Then return new Concat_4way
 	If algorithmName = "Concat_Basics" Then return new Concat_Basics
 	If algorithmName = "Concept_Parallel" Then return new Concept_Parallel
+	If algorithmName = "Connected_AltRects" Then return new Connected_AltRects
 	If algorithmName = "Connected_Basics" Then return new Connected_Basics
 	If algorithmName = "Connected_Contours" Then return new Connected_Contours
 	If algorithmName = "Connected_Gaps" Then return new Connected_Gaps
@@ -434,6 +436,7 @@ Public Class algorithmList
 	If algorithmName = "Edge_Sweep" Then return new Edge_Sweep
 	If algorithmName = "EdgeLine_Basics" Then return new EdgeLine_Basics
 	If algorithmName = "EdgeLine_BasicsMotion" Then return new EdgeLine_BasicsMotion
+	If algorithmName = "EdgeLine_Construct" Then return new EdgeLine_Construct
 	If algorithmName = "EdgeLine_JustLines" Then return new EdgeLine_JustLines
 	If algorithmName = "EdgeLine_Raw" Then return new EdgeLine_Raw
 	If algorithmName = "EdgeLine_Segments" Then return new EdgeLine_Segments
@@ -1561,6 +1564,7 @@ Public Class algorithmList
 	If algorithmName = "RedColor_UnstableCells" Then return new RedColor_UnstableCells
 	If algorithmName = "RedColor_UnstableHulls" Then return new RedColor_UnstableHulls
 	If algorithmName = "RedConnect_Basics" Then return new RedConnect_Basics
+	If algorithmName = "RedConnect_Simple" Then return new RedConnect_Simple
 	If algorithmName = "RedMask_Basics" Then return new RedMask_Basics
 	If algorithmName = "RedMask_Redraw" Then return new RedMask_Redraw
 	If algorithmName = "RedTrack_Basics" Then return new RedTrack_Basics

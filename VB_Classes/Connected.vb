@@ -264,27 +264,6 @@ End Class
 
 
 
-Public Class Connected_Rects : Inherits TaskParent
-    Dim hConn As New Connected_RectsH
-    Dim vConn As New Connected_RectsV
-    Public Sub New()
-        desc = "Isolate the connected depth grid cells both vertically and horizontally."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hConn.Run(src)
-        vConn.Run(src)
-
-        dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
-
-        dst3 = src
-        dst3.SetTo(0, dst2)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Connected_Regions : Inherits TaskParent
     Public redM As New RedMask_Basics
@@ -332,5 +311,40 @@ Public Class Connected_Contours : Inherits TaskParent
         dst2.SetTo(0, connect.dst2)
         dst3 = ShowAddweighted(src, dst2, labels(3))
         If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Connected_Rects : Inherits TaskParent
+    Dim hConn As New Connected_RectsH
+    Dim vConn As New Connected_RectsV
+    Public Sub New()
+        desc = "Isolate the connected depth grid cells both vertically and horizontally."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hConn.Run(src)
+        vConn.Run(src)
+
+        dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+        dst3 = src
+        dst3.SetTo(0, dst2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Connected_AltRects : Inherits TaskParent
+    Public Sub New()
+        desc = "description"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
