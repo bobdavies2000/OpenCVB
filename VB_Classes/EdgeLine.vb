@@ -10,10 +10,16 @@ Public Class EdgeLine_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
+        Dim edgeLineWidth = 1, imageEdgeWidth = 2
+        If dst2.Width >= 1280 Then
+            edgeLineWidth = 3
+            imageEdgeWidth = 4
+        End If
+
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, 1)
+        Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, edgeLineWidth)
         handleSrc.Free()
         dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
 
@@ -22,7 +28,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         Else
             dst1.CopyTo(dst2, task.motionMask)
         End If
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, 2) ' prevent leaks at the image boundary...
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
     End Sub
     Public Sub Close()
         EdgeLineSimple_Close(cPtr)
