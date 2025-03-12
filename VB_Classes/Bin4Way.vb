@@ -671,26 +671,27 @@ Public Class Bin4Way_Regions : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
     Public classCount As Integer = 4 ' 4-way split 
     Public Sub New()
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         rebuildMats()
         labels = {"", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2"}
         desc = "Add the 4-way split of images to define the different regions."
     End Sub
     Private Sub rebuildMats()
-        dst2 = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For i = 0 To binary.mats.mat.Count - 1
-            binary.mats.mat(i) = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC1, 0)
+            binary.mats.mat(i) = New cv.Mat(dst1.Size, cv.MatType.CV_8UC1, 0)
         Next
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         binary.Run(src)
-        If dst2.Width <> binary.mats.mat(0).Width Then rebuildMats()
 
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst2.SetTo(1, binary.mats.mat(0))
-        dst2.SetTo(2, binary.mats.mat(1))
-        dst2.SetTo(3, binary.mats.mat(2))
-        dst2.SetTo(4, binary.mats.mat(3))
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst1.SetTo(1, binary.mats.mat(0))
+        dst1.SetTo(2, binary.mats.mat(1))
+        dst1.SetTo(3, binary.mats.mat(2))
+        dst1.SetTo(4, binary.mats.mat(3))
 
+        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = ShowPalette(dst2)
     End Sub
 End Class

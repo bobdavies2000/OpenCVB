@@ -1579,6 +1579,7 @@ Public Class algorithmList
 	If algorithmName = "Reduction_Floodfill" Then return new Reduction_Floodfill
 	If algorithmName = "Reduction_HeatMapLines" Then return new Reduction_HeatMapLines
 	If algorithmName = "Reduction_Histogram" Then return new Reduction_Histogram
+	If algorithmName = "Reduction_MotionTest" Then return new Reduction_MotionTest
 	If algorithmName = "Reduction_PointCloud" Then return new Reduction_PointCloud
 	If algorithmName = "Reduction_XYZ" Then return new Reduction_XYZ
 	If algorithmName = "Reliable_Basics" Then return new Reliable_Basics

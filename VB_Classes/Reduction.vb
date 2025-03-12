@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Reduction_Basics : Inherits TaskParent
     Public classCount As Integer
+    Public alwaysDisplay As Boolean
     Public Sub New()
         task.redOptions.enableReductionTypeGroup(True)
         task.redOptions.enableReductionSliders(True)
@@ -13,20 +14,22 @@ Public Class Reduction_Basics : Inherits TaskParent
             Dim bits = task.redOptions.getBitReductionBar()
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
-            dst2 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
-            dst2 = dst2 / zeroBits
+            dst1 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
+            dst1 = dst1 / zeroBits
         ElseIf task.redOptions.reductionType = "Use Simple Reduction" Then
             Dim reductionVal = task.redOptions.SimpleReductionBar.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
-            dst2 = src / reductionVal
+            dst1 = src / reductionVal
             labels(2) = "Reduced image - factor = " + CStr(task.redOptions.SimpleReductionBar.Value)
         Else
-            dst2 = src
+            dst1 = src
             labels(2) = "No reduction requested"
         End If
 
-        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
+        dst1.CopyTo(dst2, task.motionMask)
+
+        If standaloneTest() Or alwaysDisplay Then dst3 = ShowPalette(dst2)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class
@@ -223,5 +226,35 @@ Public Class Reduction_BGR : Inherits TaskParent
         dst3 = mats.dst2
 
         cv.Cv2.Merge(split, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Reduction_MotionTest : Inherits TaskParent
+    Dim reduction As New Reduction_Basics
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        reduction.alwaysDisplay = True
+        task.gOptions.displayDst1.Checked = True
+        desc = "Compare reduction with and without motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+
+        reduction.Run(src)
+        dst2 = reduction.dst3
+        If task.optionsChanged Then
+            dst3 = dst2
+        Else
+            dst2.CopyTo(dst3, task.motionMask)
+
+            diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            diff.Run(dst3)
+            dst1 = diff.dst2
+        End If
     End Sub
 End Class
