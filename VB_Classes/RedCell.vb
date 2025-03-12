@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp.Flann
+Imports cv = OpenCvSharp
 Public Class RedCell_Basics : Inherits TaskParent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
@@ -12,8 +13,8 @@ Public Class RedCell_Basics : Inherits TaskParent
         Dim gridID = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
         strOut += "rc.age = " + CStr(rc.age) + vbCrLf
-        strOut += "rc.roi: " + CStr(rc.roi.X) + ", " + CStr(rc.roi.Y) + ", "
-        strOut += CStr(rc.roi.Width) + ", " + CStr(rc.roi.Height) + vbCrLf
+        strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
+        strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf
         strOut += "rc.color = " + vbTab + CStr(CInt(rc.color(0))) + vbTab + CStr(CInt(rc.color(1)))
         strOut += vbTab + CStr(CInt(rc.color(2))) + vbCrLf
         strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
@@ -34,10 +35,10 @@ Public Class RedCell_Basics : Inherits TaskParent
         strOut += "Z = " + Format(rc.mmZ.minVal, fmt2) + "/" + Format(rc.mmZ.maxVal, fmt2)
         strOut += "/" + Format(rc.mmZ.range, fmt2) + vbCrLf + vbCrLf
 
-        strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depthMean, fmt2) + vbCrLf
+        strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depth, fmt2) + vbCrLf
 
         Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.pcSplit(2)(task.rc.roi).CopyTo(tmp, task.rc.mask)
+        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
         plot.rc = task.rc
         plot.Run(tmp)
         dst3 = plot.dst2
@@ -70,12 +71,12 @@ Public Class RedCell_ValidateColor : Inherits TaskParent
         dst3.SetTo(0)
         Dim percentDepth As New List(Of Single)
         For Each rc In task.rcList
-            If rc.depthPixels > 0 Then dst1(rc.roi).SetTo(255, rc.mask)
+            If rc.depthPixels > 0 Then dst1(rc.rect).SetTo(255, rc.mask)
             If rc.depthPixels > 0 And rc.index > 0 Then
                 Dim pc = rc.depthPixels / rc.pixels
                 percentDepth.Add(pc)
 
-                If pc < 0.5 Then dst3(rc.roi).SetTo(rc.color, rc.mask)
+                If pc < 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
             End If
         Next
 
@@ -118,10 +119,10 @@ Public Class RedCell_Distance : Inherits TaskParent
 
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
-            Dim selectedMean As cv.Scalar = src(task.rc.roi).Mean(task.rc.mask)
+            Dim selectedMean As cv.Scalar = src(task.rc.rect).Mean(task.rc.mask)
             For Each rc In task.rcList
-                colorDistance.Add(distance3D(selectedMean, src(rc.roi).Mean(rc.mask)))
-                depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
+                colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
+                depthDistance.Add(distance3D(task.rc.depth, rc.depth))
             Next
 
             dst1.SetTo(0)
@@ -129,8 +130,8 @@ Public Class RedCell_Distance : Inherits TaskParent
             Dim maxColorDistance = colorDistance.Max()
             For i = 0 To task.rcList.Count - 1
                 Dim rc = task.rcList(i)
-                dst1(rc.roi).SetTo(255 - depthDistance(i) * 255 / task.MaxZmeters, rc.mask)
-                dst3(rc.roi).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
+                dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / task.MaxZmeters, rc.mask)
+                dst3(rc.rect).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
             Next
         End If
     End Sub
@@ -163,7 +164,7 @@ Public Class RedCell_Binarize : Inherits TaskParent
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             For Each rc In task.rcList
                 Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
-                cv.Cv2.MeanStdDev(gray(rc.roi), grayMean, grayStdev, rc.mask)
+                cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
                 grayMeans.Add(grayMean(0))
             Next
             Dim min = grayMeans.Min
@@ -173,8 +174,8 @@ Public Class RedCell_Binarize : Inherits TaskParent
             dst3.SetTo(0)
             For Each rc In task.rcList
                 Dim color = (grayMeans(rc.index) - min) * 255 / (max - min)
-                dst3(rc.roi).SetTo(color, rc.mask)
-                dst1(rc.roi).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
+                dst3(rc.rect).SetTo(color, rc.mask)
+                dst1(rc.rect).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
             Next
         End If
     End Sub
@@ -214,13 +215,13 @@ Public Class RedCell_BasicsPlot : Inherits TaskParent
     Public runRedCloud As Boolean
     Dim stats As New RedCell_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         If standalone Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
         Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.pcSplit(2)(task.rc.roi).CopyTo(tmp, task.rc.mask)
+        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
         plot.rc = task.rc
         plot.Run(tmp)
         dst3 = plot.dst2
@@ -266,8 +267,8 @@ Public Class RedCell_Generate : Inherits TaskParent
         Dim initialList As New List(Of rcData)
         For i = 0 To mdList.Count - 1
             Dim rc As New rcData
-            rc.roi = mdList(i).rect
-            If rc.roi.Size = dst2.Size Then Continue For ' RedColor_Basics can find a cell this big.  
+            rc.rect = mdList(i).rect
+            If rc.rect.Size = dst2.Size Then Continue For ' RedColor_Basics can find a cell this big.  
             rc.mask = mdList(i).mask
             rc.maxDist = mdList(i).maxDist
             rc.maxDStable = rc.maxDist
@@ -281,7 +282,7 @@ Public Class RedCell_Generate : Inherits TaskParent
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.color = lrc.color
-                rc.depthMean = lrc.depthMean
+                rc.depth = lrc.depth
                 rc.depthMask = lrc.depthMask
                 rc.depthPixels = lrc.depthPixels
                 rc.mmX = lrc.mmX
@@ -312,31 +313,26 @@ Public Class RedCell_Generate : Inherits TaskParent
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim colorSelection = If(task.redOptions.TrackingMeanColor.Checked, 0, 1)
-        If colorSelection > 0 Then colorSelection = If(task.redOptions.TrackingColor.Checked, 1, 2)
-        If colorSelection = 2 Then colorSelection = If(task.redOptions.TrackingDepthColor.Checked, 2, 3)
 
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-        Dim usedColors As New List(Of cv.Scalar)
         For Each rc In initialList
             rc.pixels = rc.mask.CountNonZero
             If rc.pixels = 0 Then Continue For
 
             rc.depthMask = rc.mask.Clone
-            rc.depthMask.SetTo(0, task.noDepthMask(rc.roi))
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
             rc.depthPixels = rc.depthMask.CountNonZero
 
             If rc.depthPixels / rc.pixels > 0.1 Then
-                rc.mmX = GetMinMax(task.pcSplit(0)(rc.roi), rc.depthMask)
-                rc.mmY = GetMinMax(task.pcSplit(1)(rc.roi), rc.depthMask)
-                rc.mmZ = GetMinMax(task.pcSplit(2)(rc.roi), rc.depthMask)
+                rc.mmX = GetMinMax(task.pcSplit(0)(rc.rect), rc.depthMask)
+                rc.mmY = GetMinMax(task.pcSplit(1)(rc.rect), rc.depthMask)
+                rc.mmZ = GetMinMax(task.pcSplit(2)(rc.rect), rc.depthMask)
 
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.roi), depthMean, depthStdev, rc.depthMask)
-                rc.depthMean = depthMean(2)
-                If Single.IsNaN(rc.depthMean) Or rc.depthMean < 0 Then rc.depthMean = 0
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
+                rc.depth = depthMean(2)
+                If Single.IsNaN(rc.depth) Or rc.depth < 0 Then rc.depth = 0
             End If
-            If rc.depthMean > task.MaxZmeters Then rc.depthMean = task.MaxZmeters
-            rc.color = selectColor(rc, colorSelection, usedColors)
+
             sortedCells.Add(rc.pixels, rc)
         Next
 

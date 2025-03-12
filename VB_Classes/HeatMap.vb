@@ -163,7 +163,7 @@ Public Class HeatMap_Cell : Inherits TaskParent
         labels(2) = flood.labels(2)
 
         dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
-        task.pointCloud(task.rc.roi).CopyTo(dst0(task.rc.roi), task.rc.mask)
+        task.pointCloud(task.rc.rect).CopyTo(dst0(task.rc.rect), task.rc.mask)
 
         heat.Run(dst0)
         dst1 = heat.dst2

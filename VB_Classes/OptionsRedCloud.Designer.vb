@@ -64,7 +64,6 @@ Partial Class OptionsRedCloud
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
-        Me.TrackingColorDepth = New System.Windows.Forms.RadioButton()
         Me.TrackingDepthColor = New System.Windows.Forms.RadioButton()
         Me.TrackingColor = New System.Windows.Forms.RadioButton()
         Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
@@ -527,7 +526,6 @@ Partial Class OptionsRedCloud
         '
         'ColoringGroup
         '
-        Me.ColoringGroup.Controls.Add(Me.TrackingColorDepth)
         Me.ColoringGroup.Controls.Add(Me.TrackingDepthColor)
         Me.ColoringGroup.Controls.Add(Me.TrackingColor)
         Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
@@ -537,17 +535,6 @@ Partial Class OptionsRedCloud
         Me.ColoringGroup.TabIndex = 78
         Me.ColoringGroup.TabStop = False
         Me.ColoringGroup.Text = "Output Color Options"
-        '
-        'TrackingColorDepth
-        '
-        Me.TrackingColorDepth.AutoSize = True
-        Me.TrackingColorDepth.Location = New System.Drawing.Point(16, 122)
-        Me.TrackingColorDepth.Name = "TrackingColorDepth"
-        Me.TrackingColorDepth.Size = New System.Drawing.Size(119, 24)
-        Me.TrackingColorDepth.TabIndex = 5
-        Me.TrackingColorDepth.TabStop = True
-        Me.TrackingColorDepth.Text = "Depth Color"
-        Me.TrackingColorDepth.UseVisualStyleBackColor = True
         '
         'TrackingDepthColor
         '
@@ -674,7 +661,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents TrackingDepthColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
-    Friend WithEvents TrackingColorDepth As Windows.Forms.RadioButton
     Friend WithEvents rcReductionSlider As Windows.Forms.TrackBar
     Friend WithEvents Label1 As Windows.Forms.Label
     Friend WithEvents Label3 As Windows.Forms.Label

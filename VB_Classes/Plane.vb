@@ -95,15 +95,15 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
 
         Dim flatCount = 0
         For Each rc In task.rcList
-            If rc.depthMean < 1.0 Then Continue For ' close objects look like planes.
+            If rc.depth < 1.0 Then Continue For ' close objects look like planes.
             Dim RMSerror As Double = 0
             Dim pixelCount = 0
-            For y = 0 To rc.roi.Height - 1
-                For x = 0 To rc.roi.Width - 1
+            For y = 0 To rc.rect.Height - 1
+                For x = 0 To rc.rect.Width - 1
                     Dim val = rc.mask.Get(Of Byte)(y, x)
                     If val > 0 Then
                         If msRNG.Next(100) < 10 Then
-                            Dim pt = task.pointCloud(rc.roi).Get(Of cv.Point3f)(y, x)
+                            Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                             ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                             Dim depth = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
                             RMSerror += Math.Abs(pt.Z - depth)
@@ -114,7 +114,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
                 Next
             Next
             If RMSerror / pixelCount <= plane.options.rmsThreshold Then
-                addW.src2(rc.roi).SetTo(white, rc.mask)
+                addW.src2(rc.rect).SetTo(white, rc.mask)
                 flatCount += 1
             End If
         Next
@@ -141,14 +141,14 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
         desc = "Replace the gCloud with planes in every RedCloud cell"
     End Sub
     Public Sub buildCloudPlane(rc As rcData)
-        For y = 0 To rc.roi.Height - 1
-            For x = 0 To rc.roi.Width - 1
+        For y = 0 To rc.rect.Height - 1
+            For x = 0 To rc.rect.Width - 1
                 If rc.mask.Get(Of Byte)(y, x) > 0 Then
-                    Dim pt = task.pointCloud(rc.roi).Get(Of cv.Point3f)(y, x)
+                    Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                     ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                     pt.Z = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
                     If rc.mmZ.minVal <= pt.Z And rc.mmZ.maxVal >= pt.Z Then
-                        dst3(rc.roi).Set(Of cv.Point3f)(y, x, pt)
+                        dst3(rc.rect).Set(Of cv.Point3f)(y, x, pt)
                     End If
                 End If
             Next
@@ -250,17 +250,17 @@ Public Class Plane_CellColor : Inherits TaskParent
     Public Function buildContourPoints(rc As rcData) As List(Of cv.Point3f)
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
-            If pt.X >= rc.roi.Width Or pt.Y >= rc.roi.Height Then Continue For
+            If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
             If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
-            fitPoints.Add(task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)) ' each contour point is guaranteed to be in the mask and have depth.
+            fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)) ' each contour point is guaranteed to be in the mask and have depth.
         Next
         Return fitPoints
     End Function
     Public Function buildMaskPointEq(rc As rcData) As List(Of cv.Point3f)
         Dim fitPoints As New List(Of cv.Point3f)
-        For y = 0 To rc.roi.Height - 1
-            For x = 0 To rc.roi.Width - 1
-                If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.roi).Get(Of cv.Point3f)(y, x))
+        For y = 0 To rc.rect.Height - 1
+            For x = 0 To rc.rect.Width - 1
+                If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
             Next
         Next
         Return fitPoints
@@ -283,7 +283,7 @@ Public Class Plane_CellColor : Inherits TaskParent
                 rc.eq = build3PointEquation(rc)
             End If
             newCells.Add(rc)
-            dst3(rc.roi).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
+            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
                                               Math.Abs(255 * rc.eq(1)),
                                               Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
@@ -448,10 +448,10 @@ Public Class Plane_Equation : Inherits TaskParent
             Dim p3 = rc.contour(j + offset * 2)
             Dim p4 = rc.contour(j + offset * 3)
 
-            Dim v1 = task.pointCloud(rc.roi).Get(Of cv.Point3f)(p1.Y, p1.X)
-            Dim v2 = task.pointCloud(rc.roi).Get(Of cv.Point3f)(p2.Y, p2.X)
-            Dim v3 = task.pointCloud(rc.roi).Get(Of cv.Point3f)(p3.Y, p3.X)
-            Dim v4 = task.pointCloud(rc.roi).Get(Of cv.Point3f)(p4.Y, p4.X)
+            Dim v1 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
+            Dim v2 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
+            Dim v3 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
+            Dim v4 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p4.Y, p4.X)
             Dim cross1 = crossProduct(v1 - v2, v2 - v3)
             Dim cross2 = crossProduct(v1 - v4, v4 - v3)
 
@@ -488,7 +488,7 @@ Public Class Plane_Equation : Inherits TaskParent
         If standaloneTest() Then
             SetTrueText(strOut, 3)
             dst3.SetTo(0)
-            DrawContour(dst3(rc.roi), rc.contour, rc.color, -1)
+            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
         End If
     End Sub
 End Class

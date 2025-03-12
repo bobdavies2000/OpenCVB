@@ -3056,7 +3056,7 @@ Public Class Options_Spectrum : Inherits OptionParent
 
         Dim rc = task.rc
         Dim mask = rc.mask.Clone
-        mask.SetTo(0, task.noDepthMask(rc.roi))
+        mask.SetTo(0, task.noDepthMask(rc.rect))
         For y = 0 To input.Height - 1
             For x = 0 To input.Width - 1
                 If mask.Get(Of Byte)(y, x) > 0 Then

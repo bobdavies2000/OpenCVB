@@ -119,7 +119,7 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
         dst2 = runRedC(hColor.dst2, labels(2))
-        If task.rcList.Count > 0 Then dst2(task.rc.roi).SetTo(white, task.rc.mask)
+        If task.rcList.Count > 0 Then dst2(task.rc.rect).SetTo(white, task.rc.mask)
     End Sub
 End Class
 
@@ -209,7 +209,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
         pixel.Run(src)
 
         For Each rc In task.rcList
-            cv.Cv2.CalcBackProject({src(rc.roi)}, {0, 1, 2}, pixel.histogram, dst2(rc.roi),
+            cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect),
                                    task.redOptions.rangesBGR)
         Next
 
@@ -235,7 +235,7 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
         dst2 = runRedC(pixel.dst2, labels(2))
 
         If task.rcList.Count > 0 Then
-            dst2(task.rc.roi).SetTo(white, task.rc.mask)
+            dst2(task.rc.rect).SetTo(white, task.rc.mask)
         End If
     End Sub
 End Class

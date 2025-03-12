@@ -142,7 +142,7 @@ Public Class Quad_MinMax : Inherits TaskParent
             End If
 
             Dim rc = task.rcList(index)
-            If rc.depthMean = 0 Then Continue For
+            If rc.depth = 0 Then Continue For
 
             If colorList(i) <> rc.color Then
                 depthList1(i).Clear()
@@ -231,11 +231,11 @@ Public Class Quad_Hulls : Inherits TaskParent
             End If
 
             Dim rc = task.rcList(index)
-            If rc.depthMean = 0 Then Continue For
+            If rc.depth = 0 Then Continue For
 
             If colorList(i) <> rc.color Then depthList(i).Clear()
 
-            depthList(i).Add(rc.depthMean)
+            depthList(i).Add(rc.depth)
             colorList(i) = rc.color
 
             If depthList(i).Count > 0 Then
@@ -304,7 +304,7 @@ Public Class Quad_Bricks : Inherits TaskParent
             If index >= 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
                 Dim rc = task.rcList(index)
-                depthMin = If(depthMax > rc.depthMean, rc.depthMean, depthMin)
+                depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
 
                 If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then
                     depthMinList(i).Add(depthMin)

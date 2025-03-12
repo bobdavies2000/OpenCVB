@@ -108,10 +108,10 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
         If task.rcList.Count < 2 Then
             rectList.Clear()
         Else
-            Dim nextRect = task.rcList.ElementAt(1).roi
+            Dim nextRect = task.rcList.ElementAt(1).rect
             For i = 2 To task.rcList.Count - 1
                 Dim rc = task.rcList.ElementAt(i)
-                nextRect = nextRect.Union(rc.roi)
+                nextRect = nextRect.Union(rc.rect)
             Next
         End If
 
@@ -491,10 +491,10 @@ Public Class Motion_Enclosing : Inherits TaskParent
 
         motionRect = New cv.Rect
         If task.rcList.Count < 2 Then Exit Sub
-        motionRect = task.rcList.ElementAt(1).roi
+        motionRect = task.rcList.ElementAt(1).rect
         For i = 2 To task.rcList.Count - 1
             Dim rc = task.rcList.ElementAt(i)
-            motionRect = motionRect.Union(rc.roi)
+            motionRect = motionRect.Union(rc.rect)
         Next
 
         If motionRect.Width > dst2.Width / 2 And motionRect.Height > dst2.Height / 2 Then

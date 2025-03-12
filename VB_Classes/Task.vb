@@ -412,8 +412,8 @@ Public Class VBtask : Implements IDisposable
             '        If rcX.index = 20 Then Exit For
             '    Next
 
-            '    color.Rectangle(rc.roi, cv.Scalar.Yellow, lineWidth)
-            '    color(rc.roi).SetTo(cv.Scalar.White, rc.mask)
+            '    color.Rectangle(rc.rect, cv.Scalar.Yellow, lineWidth)
+            '    color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
             'End If
 
             optionsChanged = False
@@ -596,7 +596,7 @@ Public Class VBtask : Implements IDisposable
         If index > 0 And index < rcList.Count Then
             ' ClickPoint = rcList(index).maxDist
             rc = rcList(index)
-            task.color(rc.roi).SetTo(cv.Scalar.White, rc.mask)
+            task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
             If rcList.Count > 1 Then rc = rcList(1)

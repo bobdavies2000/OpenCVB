@@ -14,10 +14,10 @@ Public Class Triangle_Basics : Inherits TaskParent
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
         For Each pt In task.rc.contour
-            pt = New cv.Point(pt.X + task.rc.roi.X, pt.Y + task.rc.roi.Y)
+            pt = New cv.Point(pt.X + task.rc.rect.X, pt.Y + task.rc.rect.Y)
             Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
             If vec.Z = 0 Then
-                vec = getWorldCoordinates(New cv.Point3f(pt.X, pt.Y, task.rc.depthMean))
+                vec = getWorldCoordinates(New cv.Point3f(pt.X, pt.Y, task.rc.depth))
             End If
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             pt3D.Add(vec)
@@ -58,13 +58,13 @@ Public Class Triangle_HullContour : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each pt In rc.contour
-            pt = New cv.Point(pt.X + rc.roi.X, pt.Y + rc.roi.Y)
+            pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
         Next
 
         dst1.SetTo(0)
         For Each pt In rc.hull
-            pt = New cv.Point(pt.X + rc.roi.X, pt.Y + rc.roi.Y)
+            pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
             DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
         Next
     End Sub
@@ -90,22 +90,22 @@ Public Class Triangle_Cell : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
-        Dim aspectRect = rc.roi.Width / rc.roi.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
+        Dim aspectRect = rc.rect.Width / rc.rect.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
         Dim xFactor As Single, yFactor As Single
         If aspectRect > aspect Then
-            cellRect = New cv.Rect(0, 0, dst2.Width, rc.roi.Height * dst2.Width / rc.roi.Width)
+            cellRect = New cv.Rect(0, 0, dst2.Width, rc.rect.Height * dst2.Width / rc.rect.Width)
             xFactor = dst2.Width
-            yFactor = rc.roi.Height * dst2.Width / rc.roi.Width
+            yFactor = rc.rect.Height * dst2.Width / rc.rect.Width
         Else
-            cellRect = New cv.Rect(0, 0, rc.roi.Width * dst2.Height / rc.roi.Height, dst2.Height)
-            xFactor = rc.roi.Width * dst2.Height / rc.roi.Height
+            cellRect = New cv.Rect(0, 0, rc.rect.Width * dst2.Height / rc.rect.Height, dst2.Height)
+            xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
             yFactor = dst2.Height
         End If
         dst3.Rectangle(cellRect, white, task.lineWidth)
 
         For Each pt In rc.contour
-            Dim vec = task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)
-            pt = New cv.Point(xFactor * pt.X / rc.roi.Width, yFactor * pt.Y / rc.roi.Height)
+            Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+            pt = New cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height)
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             pt3D.Add(vec)
         Next
@@ -144,32 +144,32 @@ Public Class Triangle_Mask : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
-        Dim aspectRect = rc.roi.Width / rc.roi.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
+        Dim aspectRect = rc.rect.Width / rc.rect.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
         Dim xFactor As Single, yFactor As Single
         If aspectRect > aspect Then
-            cellRect = New cv.Rect(0, 0, dst2.Width, rc.roi.Height * dst2.Width / rc.roi.Width)
+            cellRect = New cv.Rect(0, 0, dst2.Width, rc.rect.Height * dst2.Width / rc.rect.Width)
             xFactor = dst2.Width
-            yFactor = rc.roi.Height * dst2.Width / rc.roi.Width
+            yFactor = rc.rect.Height * dst2.Width / rc.rect.Width
         Else
-            cellRect = New cv.Rect(0, 0, rc.roi.Width * dst2.Height / rc.roi.Height, dst2.Height)
-            xFactor = rc.roi.Width * dst2.Height / rc.roi.Height
+            cellRect = New cv.Rect(0, 0, rc.rect.Width * dst2.Height / rc.rect.Height, dst2.Height)
+            xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
             yFactor = dst2.Height
         End If
         dst3.Rectangle(cellRect, white, task.lineWidth)
 
         triangles.Clear()
-        For y = 0 To rc.roi.Height - 1
-            For x = 0 To rc.roi.Width - 1
+        For y = 0 To rc.rect.Height - 1
+            For x = 0 To rc.rect.Width - 1
                 If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
-                Dim vec = task.pointCloud(rc.roi).Get(Of cv.Point3f)(y, x)
-                Dim pt = New cv.Point2f(xFactor * x / rc.roi.Width, yFactor * y / rc.roi.Height)
+                Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
+                Dim pt = New cv.Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height)
                 DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
                 pt3D.Add(vec)
             Next
         Next
 
-        Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.roi.X) / rc.roi.Width,
-                                      yFactor * (rc.maxDist.Y - rc.roi.Y) / rc.roi.Height)
+        Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
+                                      yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
         DrawCircle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red)
         labels(2) = task.redC.labels(2)
     End Sub
@@ -190,9 +190,9 @@ Public Class Triangle_Basics2D : Inherits TaskParent
         desc = "Prepare the list of 2D triangles"
     End Sub
     Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As rcData, shift As cv.Point3f) As List(Of cv.Point)
-        Dim pt1 = getWorldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depthMean))
-        Dim ptCenter = getWorldCoordinates(New cv.Point3f(center.X, center.Y, rc.depthMean))
-        Dim pt2 = getWorldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depthMean))
+        Dim pt1 = getWorldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depth))
+        Dim ptCenter = getWorldCoordinates(New cv.Point3f(center.X, center.Y, rc.depth))
+        Dim pt2 = getWorldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depth))
 
         colors.Add(rc.color)
         points.Add(New cv.Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z))
@@ -221,9 +221,9 @@ Public Class Triangle_Basics2D : Inherits TaskParent
             Dim corners(4 - 1) As cv.Point
             For i = 0 To corners.Count - 1
                 Dim pt = rc.contour(i * rc.contour.Count / 4)
-                corners(i) = New cv.Point(rc.roi.X + pt.X, rc.roi.Y + pt.Y)
+                corners(i) = New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
             Next
-            Dim center = New cv.Point(rc.roi.X + rc.roi.Width / 2, rc.roi.Y + rc.roi.Height / 2)
+            Dim center = New cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
             DrawLine(dst2, corners(0), center, white)
             DrawLine(dst2, corners(1), center, white)
             DrawLine(dst2, corners(2), center, white)

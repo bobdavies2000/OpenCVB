@@ -685,9 +685,9 @@ Public Class OpenGL_DrawHulls : Inherits TaskParent
             End If
             Dim hullPoints = 0
             For Each pt In rc.hull
-                If pt.X > rc.roi.Width Then pt.X = rc.roi.Width - 1
-                If pt.Y > rc.roi.Height Then pt.Y = rc.roi.Height - 1
-                Dim v = task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)
+                If pt.X > rc.rect.Width Then pt.X = rc.rect.Width - 1
+                If pt.Y > rc.rect.Height Then pt.Y = rc.rect.Height - 1
+                Dim v = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
                 If v.Z > 0 Then
                     hullPoints += 1
                     oglData.Add(New cv.Point3f(v.X + shift.X, v.Y + shift.Y, v.Z + shift.Z))
@@ -735,7 +735,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
         Dim lastDepth As cv.Scalar
         oglData.Add(New cv.Point3f)
         For Each rc In task.rcList
-            Dim d = rc.depthMean
+            Dim d = rc.depth
             If d = 0 Then Continue For
 
             Dim dataIndex = oglData.Count
@@ -745,11 +745,11 @@ Public Class OpenGL_Contours : Inherits TaskParent
             Else
                 oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
             End If
-            lastDepth = rc.depthMean
+            lastDepth = rc.depth
             For Each pt In rc.contour
-                If pt.X > rc.roi.Width Then pt.X = rc.roi.Width - 1
-                If pt.Y > rc.roi.Height Then pt.Y = rc.roi.Height - 1
-                Dim v = task.pointCloud(rc.roi).Get(Of cv.Point3f)(pt.Y, pt.X)
+                If pt.X > rc.rect.Width Then pt.X = rc.rect.Width - 1
+                If pt.Y > rc.rect.Height Then pt.Y = rc.rect.Height - 1
+                Dim v = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
                 If options2.depthPointStyle = pointStyle.flattened Or options2.depthPointStyle = pointStyle.flattenedAndFiltered Then v.Z = d
                 If options2.depthPointStyle = pointStyle.filtered Or options2.depthPointStyle = pointStyle.flattenedAndFiltered Then
                     If Math.Abs(v.X - lastDepth(0)) > options2.filterThreshold Then v.X = lastDepth(0)
@@ -959,9 +959,9 @@ Public Class OpenGL_Profile : Inherits TaskParent
         Dim p2 = rc.contour.ElementAt(mm.maxLoc.Y)
 
         dst3.SetTo(0)
-        DrawContour(dst3(rc.roi), rc.contour, cv.Scalar.Yellow)
-        DrawCircle(dst3, New cv.Point(p1.X + rc.roi.X, p1.Y + rc.roi.Y), task.DotSize + 2, cv.Scalar.Blue)
-        DrawCircle(dst3, New cv.Point(p2.X + rc.roi.X, p2.Y + rc.roi.Y), task.DotSize + 2, cv.Scalar.Red)
+        DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawCircle(dst3, New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Blue)
+        DrawCircle(dst3, New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Red)
         If rc.contour3D.Count > 0 Then
             Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
@@ -1362,7 +1362,7 @@ Public Class OpenGL_RedCloudCell : Inherits TaskParent
 
         task.ogl.pointCloudInput.SetTo(0)
 
-        task.pointCloud(task.rc.roi).CopyTo(task.ogl.pointCloudInput(task.rc.roi), task.rc.mask)
+        task.pointCloud(task.rc.rect).CopyTo(task.ogl.pointCloudInput(task.rc.rect), task.rc.mask)
         task.ogl.Run(dst2)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -1672,7 +1672,7 @@ Public Class OpenGL_ColorBin4Way : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst1.SetTo(0)
-        task.color(task.rc.roi).CopyTo(dst1(task.rc.roi), task.rc.mask)
+        task.color(task.rc.rect).CopyTo(dst1(task.rc.rect), task.rc.mask)
 
         dst1.ConvertTo(dst3, cv.MatType.CV_32FC3)
         dst3 = dst3.Normalize(0, 1, cv.NormTypes.MinMax)

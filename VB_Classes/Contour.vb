@@ -305,7 +305,7 @@ Public Class Contour_SidePoints : Inherits TaskParent
 
             If rc.contour.Count > 0 Then
                 dst3.SetTo(0)
-                DrawContour(dst3(rc.roi), rc.contour, cv.Scalar.Yellow)
+                DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
                 DrawLine(dst3, ptLeft, ptRight, white)
                 DrawLine(dst3, ptTop, ptBot, white)
             End If
@@ -432,11 +432,11 @@ Public Class Contour_Outline : Inherits TaskParent
         For i = 0 To rc.contour.Count - 2
             p1 = rc.contour(i)
             p2 = rc.contour(i + 1)
-            dst3(rc.roi).Line(p1, p2, white, task.lineWidth + 1)
+            dst3(rc.rect).Line(p1, p2, white, task.lineWidth + 1)
             newContour.Add(p2)
         Next
         rc.contour = New List(Of cv.Point)(newContour)
-        dst3(rc.roi).Line(rc.contour(rc.contour.Count - 1), rc.contour(0), white, task.lineWidth + 1)
+        dst3(rc.rect).Line(rc.contour(rc.contour.Count - 1), rc.contour(0), white, task.lineWidth + 1)
 
         labels(2) = "Input points = " + CStr(rc.contour.Count)
     End Sub
@@ -457,7 +457,7 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
         If standaloneTest() Then
             dst2 = runRedC(src, labels(2))
             rc = task.rc
-            DrawContour(dst2(rc.roi), rc.contour, white, -1)
+            DrawContour(dst2(rc.rect), rc.contour, white, -1)
         End If
 
         Dim selfInt As Boolean
@@ -558,7 +558,7 @@ Public Class Contour_Compare : Inherits TaskParent
         cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
 
         dst3.SetTo(0)
-        cv.Cv2.DrawContours(dst3(task.rc.roi), allContours, -1, cv.Scalar.Yellow)
+        cv.Cv2.DrawContours(dst3(task.rc.rect), allContours, -1, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -585,7 +585,7 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
 
         dst3.SetTo(0)
         DrawCircle(dst3, rc.maxDist, task.DotSize, white)
-        Dim center As New cv.Point(rc.maxDist.X - rc.roi.X, rc.maxDist.Y - rc.roi.Y)
+        Dim center As New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
         Dim maxDistance(4 - 1) As Single
         For i = 0 To corners.Length - 1
             corners(i) = center ' default is the center - a triangle shape can omit a corner
@@ -604,9 +604,9 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
             End If
         Next
 
-        DrawContour(dst3(rc.roi), rc.contour, white)
+        DrawContour(dst3(rc.rect), rc.contour, white)
         For i = 0 To corners.Count - 1
-            DrawLine(dst3(rc.roi), center, corners(i), white)
+            DrawLine(dst3(rc.rect), center, corners(i), white)
         Next
     End Sub
 End Class
@@ -631,7 +631,7 @@ Public Class Contour_RedCloudEdges : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each rc In task.rcList
-            DrawContour(dst2(rc.roi), rc.contour, 255, task.lineWidth)
+            DrawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
         edges.Run(src)
@@ -685,10 +685,10 @@ Public Class Contour_Smoothing : Inherits TaskParent
         dst3.SetTo(0)
 
         Dim bestContour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
-        DrawContour(dst3(rc.roi), bestContour, white, task.lineWidth + 3)
+        DrawContour(dst3(rc.rect), bestContour, white, task.lineWidth + 3)
 
         Dim approxContour = ContourBuild(rc.mask, options.ApproximationMode)
-        DrawContour(dst3(rc.roi), approxContour, cv.Scalar.Red)
+        DrawContour(dst3(rc.rect), approxContour, cv.Scalar.Red)
 
         If task.heartBeat Then labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
                                            " to " + CStr(approxContour.Count)
@@ -912,7 +912,7 @@ Public Class Contour_RedCloud : Inherits TaskParent
         dst3.SetTo(0)
         For Each rc In task.rcList
             If rc.index > 1 Then Exit For
-            DrawContour(dst3(rc.roi), rc.contour, 255, task.lineWidth)
+            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
     End Sub
 End Class

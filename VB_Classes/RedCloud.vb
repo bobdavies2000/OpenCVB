@@ -22,7 +22,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         For i = 0 To task.rcList.Count - 1
             Dim rc = task.rcList(i)
             rcMask.SetTo(0)
-            rcMask(rc.roi).SetTo(255, rc.mask)
+            rcMask(rc.rect).SetTo(255, rc.mask)
             rc.mdList = New List(Of maskData)
             For Each md In redMask.mdList
                 Dim index = rcMask.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
@@ -126,8 +126,8 @@ Public Class RedCloud_BasicsHist : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         If task.heartBeat Then
-            Dim depth As cv.Mat = task.pcSplit(2)(task.rc.roi)
-            depth.SetTo(0, task.noDepthMask(task.rc.roi))
+            Dim depth As cv.Mat = task.pcSplit(2)(task.rc.rect)
+            depth.SetTo(0, task.noDepthMask(task.rc.rect))
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)

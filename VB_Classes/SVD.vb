@@ -54,7 +54,7 @@ Public Class SVD_Example2 : Inherits TaskParent
         If task.heartBeat Then
             Dim m = cv.Cv2.Moments(rc.mask, True)
             Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
-            DrawCircle(task.color(rc.roi), center, task.DotSize, task.HighlightColor)
+            DrawCircle(task.color(rc.rect), center, task.DotSize, task.HighlightColor)
 
             Dim mArea = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
             Dim U As New cv.Mat
@@ -81,7 +81,7 @@ Public Class SVD_Example2 : Inherits TaskParent
 
             strOut += "Center.X = " + Format(center.X, fmt2) + " Center.Y = " + Format(center.Y, fmt2) + vbCrLf
 
-            strOut += "Rect is at (" + CStr(rc.roi.X) + ", " + CStr(rc.roi.Y) + ") with width/height = " + CStr(rc.roi.Width) + "/" + CStr(rc.roi.Height) + vbCrLf
+            strOut += "Rect is at (" + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ") with width/height = " + CStr(rc.rect.Width) + "/" + CStr(rc.rect.Height) + vbCrLf
         End If
         SetTrueText(strOut, 3)
     End Sub

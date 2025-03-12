@@ -9,7 +9,7 @@ Public Class SuperPixel_Basics : Inherits TaskParent
 
         dst3 = src
         For Each rc In task.rcList
-            DrawContour(dst3(rc.roi), rc.contour, white, task.lineWidth)
+            DrawContour(dst3(rc.rect), rc.contour, white, task.lineWidth)
         Next
     End Sub
 End Class

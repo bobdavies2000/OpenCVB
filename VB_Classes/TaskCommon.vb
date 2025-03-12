@@ -2,6 +2,7 @@
 Imports System.Drawing
 Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
+Imports VB_Classes.TaskParent
 Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean
@@ -41,30 +42,46 @@ Public Module vbc
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
         For Each rc In task.rcList
-            dst(rc.roi).SetTo(rc.color, rc.mask)
+            dst(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
         Return dst
     End Function
     Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
         task.rcList.Clear()
-        task.rcList.Add(New rcData)
+        task.rcList.Add(New rcData) ' placeholder rcData so map is correct.
         task.rcMap.SetTo(0)
+        Static saveColorSetting = task.redOptions.trackingIndex
         For Each rc In sortedCells.Values
             rc.index = task.rcList.Count
+
+            If saveColorSetting <> task.redOptions.trackingIndex Then rc.color = black
+            Select Case task.redOptions.trackingIndex
+                Case trackColor.meanColor
+                    Dim colorStdev As cv.Scalar
+                    cv.Cv2.MeanStdDev(task.color(rc.rect), rc.color, colorStdev, rc.mask)
+                Case trackColor.tracking
+                    If rc.color = black Then rc.color = task.scalarColors(rc.index)
+                Case trackColor.colorWithDepth
+                    If rc.depth > task.MaxZmeters Then rc.depth = task.MaxZmeters
+                    Dim index = CInt(255 * rc.depth / task.MaxZmeters)
+                    If rc.color = black Then rc.color = task.scalarColors(index)
+            End Select
+
             task.rcList.Add(rc)
-            task.rcMap(rc.roi).SetTo(rc.index, rc.mask)
+            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
 
             If rc.index >= 255 Then Exit For
         Next
+        saveColorSetting = task.redOptions.trackingIndex
         Return DisplayCells()
     End Function
     Public Function RebuildRCMap(rcList As List(Of rcData)) As cv.Mat
         task.rcMap.SetTo(0)
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         For Each rc In rcList
-            task.rcMap(rc.roi).SetTo(rc.index, rc.mask)
-            dst(rc.roi).SetTo(rc.color, rc.mask)
+            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst(rc.rect).SetTo(rc.color, rc.mask)
             If rc.index >= 255 Then Exit For
         Next
         Return dst
@@ -451,7 +468,7 @@ End Class
 
 
 Public Class rcData
-    Public roi As cv.Rect
+    Public rect As cv.Rect
     Public mask As cv.Mat
     Public pixels As Integer
     Public age As Integer
@@ -462,7 +479,7 @@ Public Class rcData
 
     Public depthPixels As Integer
     Public depthMask As cv.Mat
-    Public depthMean As Single
+    Public depth As Single
 
     Public mmX As mmData
     Public mmY As mmData
@@ -492,7 +509,7 @@ Public Class rcData
         index = 0
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         depthMask = mask
-        roi = New cv.Rect(0, 0, 1, 1)
+        rect = New cv.Rect(0, 0, 1, 1)
     End Sub
 End Class
 

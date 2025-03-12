@@ -128,14 +128,14 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         'Dim trainList As New List(Of cv.Scalar)
         'Dim responseList As New List(Of Integer)
         'For Each rc In task.rcList
-        '    trainList.Add(rc.depthMean)
+        '    trainList.Add(rc.depth)
         '    responseList.Add(0)
         'Next
 
         'dst1.SetTo(0)
         'For Each index In nabs.nabList(task.rc.index)
         '    Dim rc = task.rcList(index)
-        '    dst1(rc.roi).SetTo(255, rc.mask)
+        '    dst1(rc.rect).SetTo(255, rc.mask)
         '    strOut += CStr(index) + ","
         '    responseList(index) = -1
         'Next
@@ -175,7 +175,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         'For i = 0 To maskList.Count - 1
         '    If results(i) > 0 Then
         '        Dim rc = task.rcList(maskList(i))
-        '        dst3(rc.roi).SetTo(rc.color, rc.mask)
+        '        dst3(rc.rect).SetTo(rc.color, rc.mask)
         '        zeroOutput = False
         '    End If
         'Next

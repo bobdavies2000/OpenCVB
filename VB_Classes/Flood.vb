@@ -62,8 +62,8 @@ Public Class Flood_ContainedCells : Inherits TaskParent
             Dim count = Math.Min(task.redOptions.IdentifyCountBar.Value, task.rcList.Count)
             For j = 0 To count - 1
                 Dim rcBig = task.rcList(j)
-                If rcBig.roi.IntersectsWith(rc.roi) Then nabs.Add(rcBig.index)
-                If rcBig.roi.Contains(rc.roi) Then contains.Add(rcBig.index)
+                If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
+                If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
             Next
             If contains.Count = 1 Then removeCells.Add(rc.index)
         Next
@@ -71,7 +71,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         dst3.SetTo(0)
         For Each index In removeCells
             Dim rc = task.rcList(index)
-            dst3(rc.roi).SetTo(rc.color, rc.mask)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
         If task.heartBeat Then
@@ -171,7 +171,7 @@ Public Class Flood_Motion : Inherits TaskParent
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -196,7 +196,7 @@ Public Class Flood_Motion : Inherits TaskParent
                 Dim rc = task.rcList(i)
                 If maxDists.Contains(rc.maxDist) Then
                     Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
-                    dst1(lrc.roi).SetTo(lrc.color, lrc.mask)
+                    dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
                 End If
             Next
             dst3 = flood.dst2
@@ -241,7 +241,7 @@ Public Class Flood_Motion1 : Inherits TaskParent
                 Dim rc = task.rcList(i)
                 If maxDists.Contains(rc.maxDist) Then
                     Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
-                    dst1(lrc.roi).SetTo(lrc.color, lrc.mask)
+                    dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
                 End If
             Next
             dst3 = flood.dst2

@@ -9,7 +9,7 @@ Public Class RedConnect_Basics : Inherits TaskParent
 
         For Each rc In task.rcList
             Dim color = connect.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            dst2(rc.roi).SetTo(color, rc.mask)
+            dst2(rc.rect).SetTo(color, rc.mask)
         Next
         'dst0 = connect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         'dst1 = Not dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)

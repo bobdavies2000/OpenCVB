@@ -23,6 +23,7 @@ Public Class OptionsRedCloud
     Public histBinList() As Integer
     Public histBins3D As Integer
     Public trackingLabel As String
+    Public trackingIndex As Integer
     Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions",
                                        "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
@@ -103,7 +104,7 @@ Public Class OptionsRedCloud
         End Select
 
         task.redOptions.setBitReductionBar(5)
-        TrackingColor.Checked = True
+        TrackingMeanColor.Checked = True
 
         rcReductionSlider.Value = 50
         Label3.Text = CStr(rcReductionSlider.Value)
@@ -366,14 +367,14 @@ Public Class OptionsRedCloud
     End Sub
     Private Sub TrackingMeanColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingMeanColor.CheckedChanged
         trackingLabel = TrackingMeanColor.Text
+        trackingIndex = TaskParent.trackColor.meanColor
     End Sub
     Private Sub TrackingColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingColor.CheckedChanged
         trackingLabel = TrackingColor.Text
+        trackingIndex = TaskParent.trackColor.tracking
     End Sub
     Private Sub TrackingDepthColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingDepthColor.CheckedChanged
         trackingLabel = TrackingDepthColor.Text
-    End Sub
-    Private Sub TrackingColorDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingColorDepth.CheckedChanged
-        trackingLabel = TrackingColorDepth.Text
+        trackingIndex = TaskParent.trackColor.colorWithDepth
     End Sub
 End Class

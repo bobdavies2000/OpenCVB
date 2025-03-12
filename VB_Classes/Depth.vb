@@ -1589,40 +1589,6 @@ End Class
 
 
 
-Public Class Depth_Colorizer : Inherits TaskParent
-    Dim customColorMap As cv.Mat
-    Public Sub New()
-        ' duplicated some code from Gradient_ForDepth to reduce the task algorithms in TreeView.
-        Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow, gradientWidth = 256, f As Double = 1.0
-        Dim gradientColors As New cv.Mat(1, gradientWidth, cv.MatType.CV_64FC3)
-        For i = 0 To gradientWidth - 1
-            gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0),
-                                                                 f * color2(1) + (1 - f) * color1(1),
-                                                                 f * color2(2) + (1 - f) * color1(2)))
-            f -= 1 / gradientWidth
-        Next
-
-        customColorMap = New cv.Mat(gradientWidth, 1, cv.MatType.CV_8UC3)
-        For i = 0 To gradientWidth - 1
-            customColorMap.Row(i).SetTo(gradientColors.Get(Of cv.Scalar)(0, i))
-        Next
-
-        customColorMap.Set(Of cv.Vec3b)(0, 0, black.ToVec3b)
-        desc = "Use a palette to display depth from the raw depth data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        Dim depthNorm As cv.Mat = (src * 255 / task.MaxZmeters)
-        depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-        cv.Cv2.ApplyColorMap(depthNorm, dst2, customColorMap)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Depth_TierCount : Inherits TaskParent
@@ -1663,7 +1629,7 @@ Public Class Depth_CellTiers : Inherits TaskParent
         valley.standaloneFlag = standalone
         For i = 1 To Math.Min(10, task.rcList.Count - 1)
             Dim rc = task.rcList(i)
-            Dim depthData = task.pcSplit(2)(rc.roi).Clone
+            Dim depthData = task.pcSplit(2)(rc.rect).Clone
             depthData.SetTo(0, Not rc.mask)
 
             valley.Run(depthData)
@@ -1709,5 +1675,33 @@ Public Class Depth_ErrorEstimate : Inherits TaskParent
         labels(3) = "Error estimates vary from " + Format(mm.minVal, fmt3) + " to " + Format(mm.maxVal, fmt3)
         SetTrueText(Format(ErrorEstimate(task.iddC.depth), fmt3) + " estimated error" + vbCrLf + Format(task.iddC.depth, fmt3) + "m",
                     task.mouseMovePoint, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_Colorizer : Inherits TaskParent
+    Public Sub New()
+        ' duplicated some code from Gradient_ForDepth to reduce the task algorithms in TreeView.
+        Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow, gradientWidth = Math.Min(dst2.Width, 256), f As Double = 1.0
+        Dim colorList As New List(Of cv.Vec3b)
+        For i = 0 To gradientWidth - 1
+            colorList.Add(New cv.Vec3b(f * color2(0) + (1 - f) * color1(0),
+                                       f * color2(1) + (1 - f) * color1(1),
+                                       f * color2(2) + (1 - f) * color1(2)))
+            f -= 1 / gradientWidth
+        Next
+        colorList(0) = New cv.Vec3b ' black for the first color...
+        dst3 = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
+        desc = "Create a traditional depth color scheme."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        src = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
+        Dim depthNorm As cv.Mat = src * 255 / task.MaxZmeters
+        depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
+        cv.Cv2.ApplyColorMap(depthNorm, dst2, dst3)
     End Sub
 End Class

@@ -2006,7 +2006,7 @@ public:
         Point pt;
         rc.contour = vector<Point>({ pt, pt, pt, pt });
         rc.hull = vector<Point>({ pt, pt, pt, pt });
-        rc.roi = Rect(0, 0, 1, 1);
+        rc.rect = Rect(0, 0, 1, 1);
         rc.mask = Mat(1, 1, CV_8U);
         return rc;
     }

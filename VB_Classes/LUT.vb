@@ -231,7 +231,7 @@ Public Class LUT_RedCloud : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim rc = task.rc
-        src(rc.roi).CopyTo(dst3(rc.roi), rc.mask)
+        src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
 
         sort3.Run(dst3)
         dst1 = sort3.dst2
