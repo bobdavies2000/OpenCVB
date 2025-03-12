@@ -19,7 +19,6 @@ Imports System.Runtime.InteropServices
 ' PCA is a powerful tool that can be used to find the main direction of a series of points.
 
 Public Class PCA_Basics : Inherits TaskParent
-    Dim prep As New PCA_Prep_CPP
     Public pca_analysis As New cv.PCA
     Public runRedCloud As Boolean
     Public Sub New()
@@ -886,10 +885,12 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         handlePalette.Free()
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
+        dst1 = cv.Mat.FromPixelData(dst1.Height, dst1.Width, cv.MatType.CV_8U, imagePtr)
         custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palettize.palette)
 
-        custom.Run(dst2)
+        custom.Run(dst1)
+
+        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = custom.dst2
         labels(2) = "The CV_8U image is below.  Values range from 0 to " + CStr(classCount)
         labels(3) = "The upper left image is mapped to " + CStr(classCount) + " colors below.  "

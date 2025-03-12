@@ -70,9 +70,11 @@ Public Class BackProject_Full : Inherits TaskParent
         cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
         histogram = histogram.Normalize(0, classCount, cv.NormTypes.MinMax)
 
-        cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)
+        cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, ranges)
 
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+
+        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = ShowPalette(dst2)
     End Sub
 End Class

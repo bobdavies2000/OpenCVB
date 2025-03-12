@@ -16,38 +16,32 @@ Public Class Color8U_Basics : Inherits TaskParent
                 Case 0
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
                 Case 1
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject2D_Full
-                Case 2
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Regions
-                Case 3
+                Case 2
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
-                Case 4
+                Case 3
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New EdgeLine_Basics
-                Case 5
+                Case 4
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
-                Case 6
+                Case 5
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New KMeans_Basics
-                Case 7
+                Case 6
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New LUT_Basics
-                Case 8
+                Case 7
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Reduction_Basics
-                Case 9
+                Case 8
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New PCA_NColor_CPP
-                Case 10
+                Case 9
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New MeanSubtraction_Gray
             End Select
             classifier = colorMethods(index)
         End If
 
-        If task.redOptions.colorInputName = "BackProject2D_Full" Then
-            classifier.Run(src)
+        If task.redOptions.colorInputName <> "PCA_NColor_CPP" Then
+            dst1 = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
+            classifier.Run(dst1)
         Else
-            If task.redOptions.colorInputName <> "PCA_NColor_CPP" Then
-                dst1 = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-                classifier.Run(dst1)
-            Else
-                classifier.Run(src)
-            End If
+            classifier.Run(src)
         End If
 
         dst2 = classifier.dst2

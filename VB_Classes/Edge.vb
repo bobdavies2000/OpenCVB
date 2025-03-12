@@ -1057,25 +1057,25 @@ Public Class Edge_Color8U : Inherits TaskParent
                 If colorMethods(i) Is Nothing Then
                     Select Case i
                         Case 0
-                            colorMethods(i) = New BackProject_Full()
+                            colorMethods(i) = New BackProject_Full
                         Case 1
-                            colorMethods(i) = New BackProject2D_Full()
+                            colorMethods(i) = New Bin4Way_Regions
                         Case 2
-                            colorMethods(i) = New Bin4Way_Regions()
+                            colorMethods(i) = New Binarize_DepthTiers
                         Case 3
-                            colorMethods(i) = New Binarize_DepthTiers()
+                            colorMethods(i) = New EdgeLine_Basics
                         Case 4
-                            colorMethods(i) = New EdgeLine_Basics()
+                            colorMethods(i) = New Hist3Dcolor_Basics
                         Case 5
-                            colorMethods(i) = New Hist3Dcolor_Basics()
+                            colorMethods(i) = New KMeans_Basics
                         Case 6
-                            colorMethods(i) = New KMeans_Basics()
+                            colorMethods(i) = New LUT_Basics
                         Case 7
-                            colorMethods(i) = New LUT_Basics()
+                            colorMethods(i) = New Reduction_Basics
                         Case 8
-                            colorMethods(i) = New Reduction_Basics()
+                            colorMethods(i) = New PCA_NColor_CPP
                         Case 9
-                            colorMethods(i) = New PCA_NColor_CPP()
+                            colorMethods(i) = New MeanSubtraction_Gray
                     End Select
                 End If
             End If

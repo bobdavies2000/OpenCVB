@@ -24,7 +24,7 @@ Public Class OptionsRedCloud
     Public histBins3D As Integer
     Public trackingLabel As String
     Public trackingIndex As Integer
-    Public colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions",
+    Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
                                        "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
                                        "PCA_NColor_CPP", "MeanSubtraction_Gray"}
