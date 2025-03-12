@@ -47,7 +47,11 @@ Public Class Entropy_Highest : Inherits TaskParent
     Dim entropy As New Entropy_Rectangle
     Public eMaxRect As cv.Rect
     Public Sub New()
-        If standalone Then task.gOptions.GridSlider.Value = CInt(dst2.Width / 10)
+        If standalone Then
+            Dim val As Integer = dst2.Width / 10
+            If task.gOptions.GridSlider.Maximum < val Then task.gOptions.GridSlider.Maximum = val
+            task.gOptions.GridSlider.Value = CInt(dst2.Width / 10)
+        End If
         desc = "Find the highest entropy section of the color image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

@@ -3804,7 +3804,6 @@ public:
         Mat tmp;
         bitwise_not(motionMask, tmp);
         edgeMap.setTo(0, tmp);
-        imshow("edgeMap", edgeMap);
 
         calcHist(&edgeMap, 1, { 0 }, motionMask, histogram, 1, hbins, range);
 

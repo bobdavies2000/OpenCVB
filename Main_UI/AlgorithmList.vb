@@ -1508,7 +1508,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_Basics" Then return new RedColor_Basics
 	If algorithmName = "RedColor_BasicsHist" Then return new RedColor_BasicsHist
 	If algorithmName = "RedColor_BasicsNoMask" Then return new RedColor_BasicsNoMask
-	If algorithmName = "RedColor_BasicsResized" Then return new RedColor_BasicsResized
 	If algorithmName = "RedColor_BProject3D" Then return new RedColor_BProject3D
 	If algorithmName = "RedColor_BrightnessLevel" Then return new RedColor_BrightnessLevel
 	If algorithmName = "RedColor_CCompColor" Then return new RedColor_CCompColor

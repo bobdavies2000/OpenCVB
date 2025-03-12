@@ -538,7 +538,6 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
-        colorizer = New Depth_Colorizer
         lines = New Line_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
@@ -829,10 +828,11 @@ Public Class VBtask : Implements IDisposable
         If task.gOptions.ShowQuads.Checked Then
             depthRGB = task.gCell.dst2
         ElseIf task.gOptions.ColorizedDepth.Checked Then
+            If colorizer Is Nothing Then colorizer = New Depth_Colorizer
             colorizer.Run(src)
             depthRGB = colorizer.dst2
-        Else
-            If task.iddCorr.Width = 0 Then task.iddCorr = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+            Else
+                If task.iddCorr.Width = 0 Then task.iddCorr = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
             depthRGB = task.iddCorr
         End If
 
