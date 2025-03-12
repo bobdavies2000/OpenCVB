@@ -88,6 +88,7 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.LRMeanSubtraction = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -350,6 +351,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.LRMeanSubtraction)
         Me.GroupBox2.Controls.Add(Me.DepthGroupBox)
         Me.GroupBox2.Controls.Add(Me.TruncateDepth)
         Me.GroupBox2.Controls.Add(Me.MotionBox)
@@ -442,9 +444,9 @@ Partial Class OptionsGlobal
         '
         Me.MotionBox.Controls.Add(Me.showMotionMask)
         Me.MotionBox.Controls.Add(Me.UseMotion)
-        Me.MotionBox.Location = New System.Drawing.Point(6, 322)
+        Me.MotionBox.Location = New System.Drawing.Point(6, 352)
         Me.MotionBox.Name = "MotionBox"
-        Me.MotionBox.Size = New System.Drawing.Size(245, 119)
+        Me.MotionBox.Size = New System.Drawing.Size(245, 89)
         Me.MotionBox.TabIndex = 76
         Me.MotionBox.TabStop = False
         Me.MotionBox.Text = "Motion"
@@ -816,6 +818,18 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'LRMeanSubtraction
+        '
+        Me.LRMeanSubtraction.AutoSize = True
+        Me.LRMeanSubtraction.Checked = True
+        Me.LRMeanSubtraction.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.LRMeanSubtraction.Location = New System.Drawing.Point(24, 322)
+        Me.LRMeanSubtraction.Name = "LRMeanSubtraction"
+        Me.LRMeanSubtraction.Size = New System.Drawing.Size(308, 24)
+        Me.LRMeanSubtraction.TabIndex = 79
+        Me.LRMeanSubtraction.Text = "MeanSubtraction on Left/Right images"
+        Me.LRMeanSubtraction.UseVisualStyleBackColor = True
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -919,4 +933,5 @@ Partial Class OptionsGlobal
     Friend WithEvents DepthCorrelations As Windows.Forms.RadioButton
     Friend WithEvents ShowQuads As Windows.Forms.RadioButton
     Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
+    Friend WithEvents LRMeanSubtraction As Windows.Forms.CheckBox
 End Class

@@ -6,7 +6,7 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public mouseD As New GridCell_MouseDepth
     Public quad As New Quad_Basics
-    Dim iddCorr As New GridCell_CorrelationMap
+    Public iddCorr As New GridCell_CorrelationMap
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
@@ -1100,5 +1100,32 @@ Public Class GridCell_Stdev : Inherits TaskParent
                 ' dst2(idd.cRect).SetTo()
             End If
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_MeanSubtraction : Inherits TaskParent
+    Dim meanSub As New MeanSubtraction_LeftRight
+    Public Sub New()
+        task.gCell.instantUpdate = True
+        task.gOptions.LRMeanSubtraction.Checked = False ' so we can see the difference.
+        ' labels = {"", "", "This is the grid cell map using mean subtraction on the left and right images", ""}
+        desc = "Use the mean subtraction output of the left and right images as input to the GridCell_Basics.  NOTE: instant update!"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        meanSub.Run(src)
+
+        task.leftView = meanSub.dst2
+        task.rightView = meanSub.dst3
+
+        task.gCell.Run(src)
+        dst2 = task.gCell.iddCorr.dst2
+        labels(2) = task.gCell.labels(2)
+        SetTrueText("dst2 is the grid cell map using mean subtraction on the left and right images." + vbCrLf +
+                    "dst1 (above right) shows the correlation map produced with the original left and right images.", 3)
     End Sub
 End Class

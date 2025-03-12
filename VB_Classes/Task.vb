@@ -821,6 +821,12 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
+        If task.gOptions.LRMeanSubtraction.Checked Then
+            Static meanSub As New MeanSubtraction_LeftRight
+            meanSub.Run(src)
+            task.leftView = meanSub.dst2
+            task.rightView = meanSub.dst3
+        End If
         gCell.Run(src)
         motionBasics.Run(src)
         If gOptions.UseMotion.Checked Then color = motionBasics.dst2.Clone
