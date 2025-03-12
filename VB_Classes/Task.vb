@@ -240,6 +240,8 @@ Public Class VBtask : Implements IDisposable
 
     Public scalarColors(255) As cv.Scalar
     Public vecColors(255) As cv.Vec3b
+    Public depthColorMap As cv.Mat
+    Public depthColorList As New List(Of cv.Vec3b)
 
     Public topCameraPoint As cv.Point
     Public sideCameraPoint As cv.Point
@@ -364,13 +366,29 @@ Public Class VBtask : Implements IDisposable
                 vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
                 scalarColors(i) = New cv.Scalar(vecColors(i)(0), vecColors(i)(1), vecColors(i)(2))
             Next
+
+            Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow, gradientWidth = Math.Min(dst2.Width, 256), f As Double = 1.0
+            depthColorList = New List(Of cv.Vec3b)
+            For i = 0 To gradientWidth - 1
+                depthColorList.Add(New cv.Vec3b(f * color2(0) + (1 - f) * color1(0),
+                                           f * color2(1) + (1 - f) * color1(1),
+                                           f * color2(2) + (1 - f) * color1(2)))
+                f -= 1 / gradientWidth
+            Next
+            depthColorList(0) = New cv.Vec3b ' black for the first color...
+            depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, depthColorList.ToArray)
+
             saveVecColors = vecColors
             saveScalarColors = scalarColors
+            saveDepthColorMap = depthColorMap
+            saveDepthColorList = New List(Of cv.Vec3b)(depthColorList)
         Else
             ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
             ' Colors will be different when OpenCVB is restarted.  Don't like the colors?  Restart.
             vecColors = saveVecColors
             scalarColors = saveScalarColors
+            depthColorMap = saveDepthColorMap
+            depthColorList = saveDepthColorList
         End If
     End Sub
 #End Region

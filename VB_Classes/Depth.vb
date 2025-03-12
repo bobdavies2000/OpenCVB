@@ -1685,23 +1685,12 @@ End Class
 
 Public Class Depth_Colorizer : Inherits TaskParent
     Public Sub New()
-        ' duplicated some code from Gradient_ForDepth to reduce the task algorithms in TreeView.
-        Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow, gradientWidth = Math.Min(dst2.Width, 256), f As Double = 1.0
-        Dim colorList As New List(Of cv.Vec3b)
-        For i = 0 To gradientWidth - 1
-            colorList.Add(New cv.Vec3b(f * color2(0) + (1 - f) * color1(0),
-                                       f * color2(1) + (1 - f) * color1(1),
-                                       f * color2(2) + (1 - f) * color1(2)))
-            f -= 1 / gradientWidth
-        Next
-        colorList(0) = New cv.Vec3b ' black for the first color...
-        dst3 = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         src = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
         Dim depthNorm As cv.Mat = src * 255 / task.MaxZmeters
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-        cv.Cv2.ApplyColorMap(depthNorm, dst2, dst3)
+        cv.Cv2.ApplyColorMap(depthNorm, dst2, task.depthColorMap)
     End Sub
 End Class

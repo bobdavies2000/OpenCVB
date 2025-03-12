@@ -28,6 +28,8 @@ Public Module vbc
     Public saveVecColors(0) As cv.Vec3b
     Public saveScalarColors(0) As cv.Scalar
     Public saveFixedPalette As Boolean
+    Public saveDepthColorMap As cv.Mat
+    Public saveDepthColorList As New List(Of cv.Vec3b)
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
@@ -65,7 +67,7 @@ Public Module vbc
                 Case trackColor.colorWithDepth
                     If rc.depth > task.MaxZmeters Then rc.depth = task.MaxZmeters
                     Dim index = CInt(255 * rc.depth / task.MaxZmeters)
-                    If rc.color = black Then rc.color = task.scalarColors(index)
+                    rc.color = task.depthColorList(index)
             End Select
 
             task.rcList.Add(rc)
