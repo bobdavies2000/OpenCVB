@@ -210,6 +210,7 @@ Public Class algorithmList
 	If algorithmName = "Connected_Rects" Then return new Connected_Rects
 	If algorithmName = "Connected_RectsH" Then return new Connected_RectsH
 	If algorithmName = "Connected_RectsV" Then return new Connected_RectsV
+	If algorithmName = "Connected_RedColor" Then return new Connected_RedColor
 	If algorithmName = "Connected_Regions" Then return new Connected_Regions
 	If algorithmName = "Contour_Basics" Then return new Contour_Basics
 	If algorithmName = "Contour_Compare" Then return new Contour_Compare
@@ -632,6 +633,7 @@ Public Class algorithmList
 	If algorithmName = "GrabCut_FineTune" Then return new GrabCut_FineTune
 	If algorithmName = "GrabCut_ImageMask" Then return new GrabCut_ImageMask
 	If algorithmName = "GrabCut_ImageRect" Then return new GrabCut_ImageRect
+	If algorithmName = "GrabCut_Regions" Then return new GrabCut_Regions
 	If algorithmName = "Gradient_Basics" Then return new Gradient_Basics
 	If algorithmName = "Gradient_CartToPolar" Then return new Gradient_CartToPolar
 	If algorithmName = "Gradient_Depth" Then return new Gradient_Depth
@@ -1565,8 +1567,6 @@ Public Class algorithmList
 	If algorithmName = "RedColor_UnmatchedCount" Then return new RedColor_UnmatchedCount
 	If algorithmName = "RedColor_UnstableCells" Then return new RedColor_UnstableCells
 	If algorithmName = "RedColor_UnstableHulls" Then return new RedColor_UnstableHulls
-	If algorithmName = "RedConnect_Basics" Then return new RedConnect_Basics
-	If algorithmName = "RedConnect_Simple" Then return new RedConnect_Simple
 	If algorithmName = "RedMask_Basics" Then return new RedMask_Basics
 	If algorithmName = "RedMask_Redraw" Then return new RedMask_Redraw
 	If algorithmName = "RedTrack_Basics" Then return new RedTrack_Basics

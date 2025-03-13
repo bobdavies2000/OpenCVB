@@ -9,8 +9,14 @@ Public Class Motion_Basics : Inherits TaskParent
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.frameCount < 3 Then dst2 = src.Clone
+        If task.gOptions.UseMotionMask.Checked = False Then
+            task.motionRects = New List(Of cv.Rect)(task.gridRects)
+            task.motionMask.SetTo(255)
+            labels(3) = "100% of each image has motion."
+            Exit Sub
+        End If
 
+        If task.frameCount < 3 Then dst2 = src.Clone
         task.motionMask.SetTo(0)
         markers.Clear()
         For Each idd In task.iddList

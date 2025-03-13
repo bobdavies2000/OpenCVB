@@ -95,21 +95,21 @@ End Class
 
 
 Public Class GrabCut_ImageRect : Inherits TaskParent
-    Dim image As cv.Mat
     Dim bgModel As New cv.Mat, fgModel As New cv.Mat
     Dim bgRect1 = New cv.Rect(482, 0, 128, 640)
     Dim bgRect2 = New cv.Rect(0, 0, 162, 320)
     Dim fgRect1 = New cv.Rect(196, 134, 212, 344)
     Dim fgRect2 = New cv.Rect(133, 420, 284, 60)
     Public Sub New()
-        Dim fileInputName = New FileInfo(task.HomeDir + "data/cat.jpg")
-        image = cv.Cv2.ImRead(fileInputName.FullName)
+        task.gOptions.displayDst1.Checked = True
         desc = "Grabcut example using a single image.  Fix this."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = image
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat = False Then Exit Sub
+        Dim fileInputName = New FileInfo(task.HomeDir + "data/cat.jpg")
+        dst2 = cv.Cv2.ImRead(fileInputName.FullName)
 
-        dst0 = New cv.Mat(image.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
+        dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
         dst0(bgRect1).SetTo(cv.GrabCutClasses.BGD)
         dst0(bgRect2).SetTo(cv.GrabCutClasses.BGD)
         dst0(fgRect1).SetTo(cv.GrabCutClasses.FGD)
@@ -123,10 +123,17 @@ Public Class GrabCut_ImageRect : Inherits TaskParent
         End If
 
         Dim rect As New cv.Rect
+
         cv.Cv2.GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, cv.GrabCutModes.Eval)
 
         dst3.SetTo(0)
         dst2.CopyTo(dst3, dst0 + 1)
+
+        dst1.SetTo(0)
+        dst1.Rectangle(bgRect1, task.HighlightColor, task.lineWidth)
+        dst1.Rectangle(bgRect2, task.HighlightColor, task.lineWidth)
+        dst1.Rectangle(fgRect1, task.HighlightColor, task.lineWidth)
+        dst1.Rectangle(fgRect2, task.HighlightColor, task.lineWidth)
     End Sub
 End Class
 
@@ -143,7 +150,7 @@ Public Class GrabCut_ImageMask : Inherits TaskParent
         image = cv.Cv2.ImRead(fileInputName.FullName)
         desc = "Grabcut example using a single image. "
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static bgModel As New cv.Mat, fgModel As New cv.Mat
 
         If task.heartBeat Then
@@ -159,5 +166,22 @@ Public Class GrabCut_ImageMask : Inherits TaskParent
 
         dst3.SetTo(0)
         dst2.CopyTo(dst3, dst1 + 1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class GrabCut_Regions : Inherits TaskParent
+    Dim connect As New Connected_Regions
+    Public Sub New()
+        desc = "Run grabcut for each of the largest regions in Connected_Regions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+        dst3 = connect.dst2
+
+
     End Sub
 End Class

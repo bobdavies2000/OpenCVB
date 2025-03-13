@@ -13,7 +13,6 @@ Public Class GridCell_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-        Dim threshold = options.colorDifferenceThreshold
 
         If task.optionsChanged Or instantUpdate Then
             task.iddList.Clear()
@@ -38,6 +37,7 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         Dim stdev As cv.Scalar, mean As cv.Scalar, colorMean As cv.Scalar
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
+        Dim threshold = options.colorDifferenceThreshold
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
@@ -734,13 +734,6 @@ Public Class GridCell_MeasureMotion : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then dst0 = src.Clone
-
-        If task.gOptions.UseMotionMask.Checked = False Then
-            task.motionRects = New List(Of cv.Rect)(task.gridRects)
-            task.motionMask.SetTo(255)
-            labels(3) = "100% of each image has motion."
-            Exit Sub
-        End If
 
         If task.optionsChanged Then motionRects = New List(Of cv.Rect)
 

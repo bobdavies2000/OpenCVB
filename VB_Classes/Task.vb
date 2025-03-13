@@ -829,8 +829,8 @@ Public Class VBtask : Implements IDisposable
             task.leftView = meanSub.dst2
             task.rightView = meanSub.dst3
         End If
-        gCell.Run(src)
-        motionBasics.Run(src)
+        gCell.Run(src) ' goes with motionBasics - next statement
+        motionBasics.Run(src) ' motion cannot run before gcell where the motionflag is set for each grid cell.
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         If task.gOptions.ShowQuads.Checked Then

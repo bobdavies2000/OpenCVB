@@ -142,7 +142,6 @@
     <Compile Include="PCdiff.vb" />
     <Compile Include="Quad.vb" />
     <Compile Include="RedCloud.vb" />
-    <Compile Include="RedConnect.vb" />
     <Compile Include="RedMask.vb" />
     <Compile Include="Reliable.vb" />
     <Compile Include="ScatterMatrix.vb" />

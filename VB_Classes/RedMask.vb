@@ -41,6 +41,7 @@ Public Class RedMask_Basics : Inherits TaskParent
         Next
 
         mdList.Clear()
+        mdList.Add(New maskData) ' add a placeholder for zero...
         For i = 0 To classCount - 1
             Dim md As New maskData
             md.rect = rectlist(i)

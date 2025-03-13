@@ -5,6 +5,7 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public runRedCloud As Boolean
     Public Sub New()
         If standalone Then task.gOptions.setHistogramBins(20)
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()

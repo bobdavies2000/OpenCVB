@@ -463,6 +463,10 @@ Public Class maskData
     Public pixels As Integer
     Public depthMean As Single
     Public mm As mmData ' min/max/loc
+    Public Sub New()
+        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+        rect = New cv.Rect(0, 0, 1, 1)
+    End Sub
 End Class
 
 

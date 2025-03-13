@@ -189,35 +189,6 @@ End Class
 
 
 
-Public Class Connected_Contours : Inherits TaskParent
-    Public redM As New RedMask_Basics
-    Public connect As New Connected_Rects
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        task.gOptions.TruncateDepth.Checked = True
-        desc = "Find the main regions connected in depth and build a contour for each."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src.Clone)
-        redM.Run(Not connect.dst2)
-
-        dst1.SetTo(0)
-        For Each md In redM.mdList
-            md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            dst1(md.rect).SetTo(md.index + 1, md.mask)
-        Next
-
-        dst2 = ShowPalette(dst1)
-        dst2.SetTo(0, connect.dst2)
-        dst3 = ShowAddweighted(src, dst2, labels(3))
-        If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Connected_Rects : Inherits TaskParent
     Dim hConn As New Connected_RectsH
@@ -315,37 +286,98 @@ End Class
 
 
 
+Public Class Connected_Contours : Inherits TaskParent
+    Public redM As New RedMask_Basics
+    Public connect As New Connected_Rects
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        task.gOptions.TruncateDepth.Checked = True
+        desc = "Find the main regions connected in depth and build a contour for each."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src.Clone)
+        task.rcPixelThreshold = task.cellSize * task.cellSize ' eliminate singles...
+        redM.Run(Not connect.dst2)
+
+        dst1.SetTo(0)
+        For Each md In redM.mdList
+            md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            dst1(md.rect).SetTo(md.index, md.mask)
+        Next
+
+        dst2 = ShowPalette(dst1)
+        dst2.SetTo(0, connect.dst2)
+        dst3 = ShowAddweighted(src, dst2, labels(3))
+        If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Connected_RedColor : Inherits TaskParent
+    Dim connect As New Connected_Contours
+    Public Sub New()
+        desc = "Color each redCell with the color of the nearest grid cell region."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst3 = runRedC(src, labels(3))
+        For Each rc In task.rcList
+            Dim index = connect.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            dst2(rc.rect).SetTo(task.scalarColors(index), rc.mask)
+        Next
+    End Sub
+End Class
+
+
+
+
+
 
 Public Class Connected_Regions : Inherits TaskParent
     Public redM As New RedMask_Basics
     Public connect As New Connected_Rects
+    Public mdLargest As New List(Of maskData)
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.gOptions.TruncateDepth.Checked = True
-        desc = "Use the merged by depth grid cells to build masks for each region"
+        desc = "Find the main regions connected in depth and build a contour for each."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src.Clone)
-
+        task.rcPixelThreshold = task.cellSize * task.cellSize ' eliminate singles...
         redM.Run(Not connect.dst2)
 
-        task.rcPixelThreshold = task.cellSize * task.cellSize
         dst1.SetTo(0)
-        Dim newList As New List(Of maskData)
-        Dim count As Integer
         For Each md In redM.mdList
-            If md.pixels <= task.rcPixelThreshold Then
-                dst1(md.rect).SetTo(0, md.mask)
-                count += 1
-                Continue For
-            End If
-            newList.Add(md)
+            md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             dst1(md.rect).SetTo(md.index, md.mask)
         Next
 
-        dst2 = ShowPaletteFullColor(dst1)
-        dst2.SetTo(0, connect.dst2)
-        labels(2) = CStr(redM.mdList.Count) + " regions were identified."
+        Dim minSize As Integer = src.Total / 25
+        dst2.SetTo(0)
+        mdLargest.Clear()
+        For Each idd In task.iddList
+            Dim index = dst1.Get(Of Byte)(idd.center.Y, idd.center.X)
+            Dim md = redM.mdList(index)
+            If index = 0 Then
+                dst2(idd.cRect).SetTo(black)
+            Else
+                If md.pixels > minSize Then
+                    dst2(idd.cRect).SetTo(task.scalarColors(index))
+                    mdLargest.Add(md)
+                End If
+            End If
+        Next
 
-        If standaloneTest() Then dst3 = ShowAddweighted(connect.dst3, dst2, labels(3))
+        For Each md In mdLargest
+            DrawContour(dst2(md.rect), md.contour, cv.Scalar.Gray, task.cellSize)
+        Next
+
+        dst3 = ShowAddweighted(src, dst2, labels(3))
+        If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
     End Sub
 End Class
