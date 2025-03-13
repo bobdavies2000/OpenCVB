@@ -27,9 +27,8 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
             classCount = simK.classCount
         End If
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
 
-        If task.optionsChanged Or noMotionMask Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = ShowPalette(dst2)
 
         labels(2) = simK.labels(2)

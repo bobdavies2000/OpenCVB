@@ -452,6 +452,8 @@ Public Class gridCellNew
     Public lRect As New cv.Rect
     Public rRect As New cv.Rect
 
+    Public center As New cv.Point
+
     Public depth As Single
     Public pixels As Integer ' depth pixel count...
     Public mm As mmData ' min and max values of the depth data.

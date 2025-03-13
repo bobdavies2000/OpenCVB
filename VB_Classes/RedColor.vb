@@ -1967,7 +1967,7 @@ Public Class RedColor_CPP : Inherits TaskParent
                                     handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
         handleMask.Free()
         handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone - 1
 
         classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
         If classCount = 0 Then Exit Sub ' no data to process.
@@ -1982,7 +1982,7 @@ Public Class RedColor_CPP : Inherits TaskParent
             rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
         Next
 
-        If standalone Then dst3 = ShowPalette(dst2)
+        If standaloneTest() Then dst3 = ShowPalette(dst2)
 
         If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
         If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."

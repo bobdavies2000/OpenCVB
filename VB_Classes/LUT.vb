@@ -29,9 +29,8 @@ Public Class LUT_Basics : Inherits TaskParent
             myLut = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, segment)
         End If
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = src.LUT(myLut) * classCount / 255
+        dst2 = src.LUT(myLut) * classCount / 255
 
-        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = ShowPalette(dst2)
         labels(2) = "Image segmented into " + CStr(classCount + 1) + " divisions (0-" + CStr(classCount) + ")"
     End Sub

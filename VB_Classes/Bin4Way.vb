@@ -685,13 +685,12 @@ Public Class Bin4Way_Regions : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         binary.Run(src)
 
-        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        dst1.SetTo(1, binary.mats.mat(0))
-        dst1.SetTo(2, binary.mats.mat(1))
-        dst1.SetTo(3, binary.mats.mat(2))
-        dst1.SetTo(4, binary.mats.mat(3))
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2.SetTo(1, binary.mats.mat(0))
+        dst2.SetTo(2, binary.mats.mat(1))
+        dst2.SetTo(3, binary.mats.mat(2))
+        dst2.SetTo(4, binary.mats.mat(3))
 
-        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = ShowPalette(dst2)
     End Sub
 End Class

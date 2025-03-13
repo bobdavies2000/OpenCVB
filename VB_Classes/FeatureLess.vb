@@ -196,7 +196,7 @@ Public Class FeatureLess_History : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         fLess.Run(src)
-        dst2 = fLess.dst2
+        dst2 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         frames.Run(dst2)
         dst3 = frames.dst2
@@ -218,12 +218,13 @@ Public Class FeatureLess_Groups : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fless.Run(src)
-        dst2 = fless.dst2
+        dst1 = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels(2) = fless.labels(2)
 
+        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         redCPP.Run(dst2)
         classCount = redCPP.classCount
-        dst3 = redCPP.dst2
+        dst3 = ShowPalette(redCPP.dst2)
         labels(3) = CStr(classCount) + " featureless regions were found."
     End Sub
 End Class
@@ -237,7 +238,6 @@ End Class
 Public Class FeatureLess_LeftRight : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        fLess.edges.alwaysFullImage = True
         labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
         desc = "Find the featureless regions of the left and right images"
     End Sub
@@ -248,9 +248,9 @@ Public Class FeatureLess_LeftRight : Inherits TaskParent
         End If
 
         fLess.Run(task.leftView)
-        dst2 = fLess.dst3.Clone
+        dst2 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         fLess.Run(task.rightView)
-        dst3 = fLess.dst3.Clone
+        dst3 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

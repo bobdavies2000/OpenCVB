@@ -27,7 +27,7 @@ Public Class RedMask_Basics : Inherits TaskParent
                                    src.Rows, src.Cols, task.rcPixelThreshold)
         handleMask.Free()
         handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone - 1
 
         classCount = RedMask_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.

@@ -2,7 +2,6 @@
 Imports System.Runtime.InteropServices
 Public Class EdgeLine_Basics : Inherits TaskParent
     Public classCount As Integer = 2
-    Public alwaysFullImage As Boolean ' useful for left/right images where motion is only the left image.
     Public Sub New()
         cPtr = EdgeLineSimple_Open()
         desc = "Retain the existing edge/lines and add the edge/lines where motion occurred."
@@ -21,13 +20,8 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, edgeLineWidth)
         handleSrc.Free()
-        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
 
-        If task.firstPass Or alwaysFullImage Then
-            dst2 = dst1.Clone
-        Else
-            dst1.CopyTo(dst2, task.motionMask)
-        End If
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
     End Sub
     Public Sub Close()

@@ -660,7 +660,7 @@ Public Class Contour_CompareToFeatureless : Inherits TaskParent
         dst2 = contour.dst2
 
         fLess.Run(src)
-        dst3 = fLess.dst2
+        dst3 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

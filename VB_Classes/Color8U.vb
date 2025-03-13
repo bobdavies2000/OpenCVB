@@ -44,7 +44,7 @@ Public Class Color8U_Basics : Inherits TaskParent
             classifier.Run(src)
         End If
 
-        dst2 = classifier.dst2
+        If task.optionsChanged Then dst2 = classifier.dst2 Else classifier.dst2.copyto(dst2, task.motionMask)
         classCount = classifier.classCount
 
         If standaloneTest() Then dst3 = ShowPalette(dst2)

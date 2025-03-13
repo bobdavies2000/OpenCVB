@@ -885,12 +885,11 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         handlePalette.Free()
         handleSrc.Free()
 
-        dst1 = cv.Mat.FromPixelData(dst1.Height, dst1.Width, cv.MatType.CV_8U, imagePtr)
+        dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
         custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palettize.palette)
 
-        custom.Run(dst1)
+        custom.Run(dst2)
 
-        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = custom.dst2
         labels(2) = "The CV_8U image is below.  Values range from 0 to " + CStr(classCount)
         labels(3) = "The upper left image is mapped to " + CStr(classCount) + " colors below.  "

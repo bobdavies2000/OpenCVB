@@ -187,9 +187,7 @@ Public Class Binarize_DepthTiers : Inherits TaskParent
         binar4.Run(src)
         tiers.Run(src)
 
-        dst1 = tiers.dst2 + binar4.dst2
-
-        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
+        dst2 = tiers.dst2 + binar4.dst2
 
         If standaloneTest() Then dst3 = tiers.dst3
 

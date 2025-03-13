@@ -25,7 +25,7 @@ Public Class KMeans_Basics : Inherits TaskParent
         End If
 
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
-        dst1 = saveLabels
+        dst2 = saveLabels
 
         If columnVector.ElemSize Mod 4 <> 0 Or columnVector.Type = cv.MatType.CV_32S Then columnVector.ConvertTo(columnVector, cv.MatType.CV_32F)
         If colors.Width = 0 Or colors.Height = 0 Then
@@ -34,13 +34,12 @@ Public Class KMeans_Basics : Inherits TaskParent
             colors.SetTo(0)
         End If
 
-        cv.Cv2.Kmeans(columnVector, classCount, dst1, term, 1, options.kMeansFlag, colors)
+        cv.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
 
-        saveLabels = dst1.Clone
+        saveLabels = dst2.Clone
 
-        dst1.Reshape(1, src.Height).ConvertTo(dst1, cv.MatType.CV_8U)
+        dst2.Reshape(1, src.Height).ConvertTo(dst2, cv.MatType.CV_8U)
 
-        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = ShowPalette(dst2)
         labels(2) = "KMeans labels 0-" + CStr(classCount - 1) + " spread out across 255 values."
     End Sub
