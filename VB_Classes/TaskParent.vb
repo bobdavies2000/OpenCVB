@@ -582,6 +582,7 @@ Public Class TaskParent : Implements IDisposable
         Return task.palette.dst2.Clone
     End Function
     Public Function ShowPalette(input As cv.Mat) As cv.Mat
+        If input.Type = cv.MatType.CV_8UC3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If input.Type <> cv.MatType.CV_8U Then
             Dim mm = GetMinMax(input)
             Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
