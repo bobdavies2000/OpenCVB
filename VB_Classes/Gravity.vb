@@ -22,7 +22,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         DrawLine(dst3, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravityHorizon.PrepareDepthInput(0) Else dst0 = src
 
         dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -92,7 +92,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
         Return New cv.Point
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravityHorizon.PrepareDepthInput(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
@@ -165,6 +165,15 @@ Public Class Gravity_Horizon : Inherits TaskParent
         labels(2) = "Gravity vector in yellow and Horizon vector in red."
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
+    Public Function PrepareDepthInput(index As Integer) As cv.Mat
+        If task.useGravityPointcloud Then Return task.pcSplit(index) ' already oriented to gravity
+
+        ' rebuild the pointcloud so it is oriented to gravity.
+        Dim rows = task.pointCloud.Rows, cols = task.pointCloud.Cols
+        Dim pc = (task.pointCloud.Reshape(1, rows * cols) * task.gMatrix).ToMat.Reshape(3, rows)
+        Dim split = pc.Split()
+        Return split(index)
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 

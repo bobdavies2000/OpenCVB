@@ -164,15 +164,6 @@ Public Class TaskParent : Implements IDisposable
         ' If pt.X >= rect.Width Or pt.Y >= rect.Height Then Return New cv.Point2f
         Return pt
     End Function
-    Public Function PrepareDepthInput(index As Integer) As cv.Mat
-        If task.useGravityPointcloud Then Return task.pcSplit(index) ' already oriented to gravity
-
-        ' rebuild the pointcloud so it is oriented to gravity.
-        Dim rows = task.pointCloud.Rows, cols = task.pointCloud.Cols
-        Dim pc = (task.pointCloud.Reshape(1, rows * cols) * task.gMatrix).ToMat.Reshape(3, rows)
-        Dim split = pc.Split()
-        Return split(index)
-    End Function
     Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
         Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
         If Input.Channels() = 1 Then
