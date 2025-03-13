@@ -638,9 +638,9 @@ Public Class BackProject_MeterByMeter : Inherits TaskParent
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.MaxZmeters)}
         cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst1, ranges)
 
-        'dst1.SetTo(task.MaxZmeters, task.maxDepthMask)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst1)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class
 
