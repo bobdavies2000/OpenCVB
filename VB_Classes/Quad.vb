@@ -42,6 +42,26 @@ End Class
 
 
 
+Public Class Quad_RightView : Inherits TaskParent
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Create a grayscale low resolution quad view of the right image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim colorStdev As cv.Scalar, colorMean As cv.Scalar
+        For Each rect In task.gridRects
+            cv.Cv2.MeanStdDev(task.rightView(rect), colorMean, colorStdev)
+            dst2(rect).SetTo(colorMean)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
 
 Public Class Quad_GridTiles : Inherits TaskParent
     Public quadData As New List(Of cv.Point3f)

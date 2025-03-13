@@ -7573,12 +7573,10 @@ End Class
 
 
 
-Public Class Options_FCSMatch : Inherits OptionParent
+Public Class Options_MatchCorrelation : Inherits OptionParent
     Public MinCorrelation As Single
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min Correlation Coefficient", 0, 100, 90)
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Min Correlation Coefficient", 0, 100, 90)
     End Sub
     Public Sub RunOpt()
         Static correlSlider = FindSlider("Min Correlation Coefficient")

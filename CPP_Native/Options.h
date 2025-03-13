@@ -2069,10 +2069,10 @@ public:
 	Options_OpenGLFunctions() {
 	}
 };
-class Options_FCSMatch {
+class Options_MatchCorrelation {
 public:
 	void RunOpt() {}
-	Options_FCSMatch() {
+	Options_MatchCorrelation() {
 	}
 };
 class Options_Sobel {

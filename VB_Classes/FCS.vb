@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim delaunay As New FCS_Delaunay
     Dim match As New Match_Basics
-    Dim options As New Options_FCSMatch
+    Dim options As New Options_MatchCorrelation
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "The feature point of each cell."
@@ -341,7 +341,7 @@ End Class
 'Public Class FCS_MatchDepthColor : Inherits TaskParent
 '    Dim fcs As New FCS_Basics
 '    Dim match As New Match_Basics
-'    Dim options As New Options_FCSMatch
+'    Dim options As New Options_Match
 '    Public Sub New()
 '        desc = "Track each feature with FCS"
 '    End Sub
@@ -443,7 +443,7 @@ End Class
 '    Dim fcs As New FCS_Basics
 '    Dim edges As New Edge_Canny
 '    Dim match As New Match_Basics
-'    Dim options As New Options_FCSMatch
+'    Dim options As New Options_Match
 '    Public Sub New()
 '        If standalone Then task.gOptions.displaydst1.checked = true
 '        labels(3) = "The age of each feature point cell."

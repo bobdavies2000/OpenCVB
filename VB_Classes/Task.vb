@@ -824,11 +824,9 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
-        If task.gOptions.LRMeanSubtraction.Checked Then
-            meanSub.Run(src)
-            task.leftView = meanSub.dst2
-            task.rightView = meanSub.dst3
-        End If
+        If task.gOptions.LRMeanSubtraction.Checked Then meanSub.Run(src)
+        'task.leftView = meanSub.dst2
+        'task.rightView = meanSub.dst3
         gCell.Run(src) ' goes with motionBasics - next statement
         motionBasics.Run(src) ' motion cannot run before gcell where the motionflag is set for each grid cell.
         If task.optionsChanged Then task.motionMask.SetTo(255)

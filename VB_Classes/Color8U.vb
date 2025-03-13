@@ -457,15 +457,16 @@ End Class
 Public Class Color8U_LeftRight : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public Sub New()
+        task.gOptions.UseMotionMask.Checked = False
         desc = "Create a color transformation for both the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8u.Run(task.leftView)
-        dst2 = color8u.dst3
+        dst2 = color8u.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels(2) = color8u.labels(2)
 
         color8u.Run(task.rightView)
-        dst3 = color8u.dst3
+        dst3 = color8u.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels(3) = color8u.labels(2)
     End Sub
 End Class

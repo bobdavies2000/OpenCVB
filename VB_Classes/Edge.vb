@@ -350,6 +350,7 @@ Public Class Edge_Matching : Inherits TaskParent
     Dim redRects As New List(Of Integer)
     Dim options As New Options_EdgeMatching
     Public Sub New()
+        task.gOptions.GridSlider.Value = 16
         desc = "Match edges in the left and right views to determine distance"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

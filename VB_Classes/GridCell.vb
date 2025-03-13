@@ -38,6 +38,8 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim stdev As cv.Scalar, mean As cv.Scalar, colorMean As cv.Scalar
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
         Dim threshold = options.colorDifferenceThreshold
+        Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.meanSub.dst2, task.leftView)
+        Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.meanSub.dst3, task.rightView)
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
@@ -69,7 +71,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                             idd.rRect = idd.lRect
                             idd.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / idd.depth
                             idd.rRect = ValidateRect(idd.rRect)
-                            cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                            cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
                                                  cv.TemplateMatchModes.CCoeffNormed)
 
                             idd.correlation = correlationMat.Get(Of Single)(0, 0)
@@ -86,7 +88,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                                 idd.rRect = idd.lRect
                                 idd.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / idd.depth
                                 idd.rRect = ValidateRect(idd.rRect)
-                                cv.Cv2.MatchTemplate(task.leftView(idd.lRect), task.rightView(idd.rRect), correlationMat,
+                                cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)
 
                                 idd.correlation = correlationMat.Get(Of Single)(0, 0)
@@ -348,47 +350,6 @@ Public Class GridCell_LeftToColor : Inherits TaskParent
             End If
         Next
         labels(2) = CStr(count) + " grid cells have depth and therefore an equivalent in the left and right views."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class GridCell_RightView : Inherits TaskParent
-    Public means As New List(Of Single)
-    Public Sub New()
-        labels(2) = "Draw above in the color image to see the matches in left and right images"
-        labels(3) = "Right view with the translated drawrect."
-        task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
-        desc = "Map Each grid cell into the right view."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView
-        dst3 = task.rightView
-
-        Dim indexTop = task.iddMap.Get(Of Integer)(task.drawRect.Y, task.drawRect.X)
-        If indexTop < 0 Or indexTop >= task.iddList.Count Then Exit Sub
-        Dim indexBot = task.iddMap.Get(Of Integer)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
-        If indexBot < 0 Or indexBot >= task.iddList.Count Then Exit Sub
-
-        Dim idd1 = task.iddList(indexTop)
-        Dim idd2 = task.iddList(indexBot)
-
-        Dim w = idd2.lRect.BottomRight.X - idd1.lRect.TopLeft.X
-        Dim h = idd2.lRect.BottomRight.Y - idd1.lRect.TopLeft.Y
-        Dim rectLeft = New cv.Rect(idd1.lRect.X, idd1.lRect.Y, w, h)
-
-        w = idd2.rRect.BottomRight.X - idd1.rRect.TopLeft.X
-        h = idd2.rRect.BottomRight.Y - idd1.rRect.TopLeft.Y
-        Dim rectRight = New cv.Rect(idd1.rRect.X, idd1.rRect.Y, w, h)
-
-        dst2.Rectangle(rectLeft, 0, task.lineWidth)
-        dst3.Rectangle(rectRight, 0, task.lineWidth)
     End Sub
 End Class
 
@@ -1123,5 +1084,43 @@ Public Class GridCell_MeanSubtraction : Inherits TaskParent
         labels(2) = task.gCell.labels(2)
         SetTrueText("dst2 is the grid cell map using mean subtraction on the left and right images." + vbCrLf +
                     "dst1 (above right) shows the correlation map produced with the original left and right images.", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_LeftRight : Inherits TaskParent
+    Public means As New List(Of Single)
+    Public Sub New()
+        labels(2) = "Draw above in the color image to see the matches in left and right images"
+        labels(3) = "Right view with the translated drawrect."
+        task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
+        desc = "Map Each grid cell into the right view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView
+        dst3 = task.rightView
+
+        Dim indexTop = task.iddMap.Get(Of Integer)(task.drawRect.Y, task.drawRect.X)
+        If indexTop < 0 Or indexTop >= task.iddList.Count Then Exit Sub
+        Dim indexBot = task.iddMap.Get(Of Integer)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
+        If indexBot < 0 Or indexBot >= task.iddList.Count Then Exit Sub
+
+        Dim idd1 = task.iddList(indexTop)
+        Dim idd2 = task.iddList(indexBot)
+
+        Dim w = idd2.lRect.BottomRight.X - idd1.lRect.TopLeft.X
+        Dim h = idd2.lRect.BottomRight.Y - idd1.lRect.TopLeft.Y
+        Dim rectLeft = New cv.Rect(idd1.lRect.X, idd1.lRect.Y, w, h)
+
+        w = idd2.rRect.BottomRight.X - idd1.rRect.TopLeft.X
+        h = idd2.rRect.BottomRight.Y - idd1.rRect.TopLeft.Y
+        Dim rectRight = New cv.Rect(idd1.rRect.X, idd1.rRect.Y, w, h)
+
+        dst2.Rectangle(rectLeft, 0, task.lineWidth)
+        dst3.Rectangle(rectRight, 0, task.lineWidth)
     End Sub
 End Class

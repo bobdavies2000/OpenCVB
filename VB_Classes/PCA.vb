@@ -296,7 +296,12 @@ Public Class PCA_Palettize : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-
+        If src.Channels <> 3 Then
+            Static sendMsg As Boolean = True
+            If sendMsg Then MsgBox("PCA algorithms need rgb data - not grayscale")
+            sendMsg = False
+            Exit Sub
+        End If
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         Marshal.Copy(src.Data, buff, 0, buff.Length)
 
@@ -875,6 +880,13 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 3 Then
+            Static sendMsg As Boolean = True
+            If sendMsg Then MsgBox("PCA algorithms need rgb data - not grayscale")
+            sendMsg = False
+            Exit Sub
+        End If
+
         If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         classCount = palettize.options.desiredNcolors

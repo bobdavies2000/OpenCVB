@@ -702,7 +702,7 @@ Public Class Feature_Matching : Inherits TaskParent
     Public motionPoints As New List(Of cv.Point)
     Dim match As New Match_Basics
     Dim method As New Feature_Methods
-    Dim options As New Options_FCSMatch
+    Dim options As New Options_MatchCorrelation
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 150
         desc = "Use correlation coefficient to keep features from frame to frame."
