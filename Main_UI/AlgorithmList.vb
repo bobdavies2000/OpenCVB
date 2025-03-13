@@ -414,6 +414,7 @@ Public Class algorithmList
 	If algorithmName = "Edge_Laplacian" Then return new Edge_Laplacian
 	If algorithmName = "Edge_LaplacianColor" Then return new Edge_LaplacianColor
 	If algorithmName = "Edge_Matching" Then return new Edge_Matching
+	If algorithmName = "Edge_MeanSubtraction" Then return new Edge_MeanSubtraction
 	If algorithmName = "Edge_MotionFrames" Then return new Edge_MotionFrames
 	If algorithmName = "Edge_MotionOverlay" Then return new Edge_MotionOverlay
 	If algorithmName = "Edge_Preserving" Then return new Edge_Preserving
@@ -1290,6 +1291,7 @@ Public Class algorithmList
 	If algorithmName = "Palette_Random" Then return new Palette_Random
 	If algorithmName = "Palette_RandomColorMap" Then return new Palette_RandomColorMap
 	If algorithmName = "Palette_RandomColors" Then return new Palette_RandomColors
+	If algorithmName = "Palette_RandomWithBlack" Then return new Palette_RandomWithBlack
 	If algorithmName = "Palette_Reduction" Then return new Palette_Reduction
 	If algorithmName = "Palette_RGBDepth" Then return new Palette_RGBDepth
 	If algorithmName = "Palette_TaskColors" Then return new Palette_TaskColors

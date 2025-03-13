@@ -1389,3 +1389,26 @@ Public Class Edge_DericheFiltered : Inherits TaskParent
         labels(2) = "All edges above the " + CStr(deriche.options.threshold) + " threshold in the grayscale copy of dst2"
     End Sub
 End Class
+
+
+
+
+
+Public Class Edge_MeanSubtraction : Inherits TaskParent
+    Dim canny As New Edge_Canny
+    Public Sub New()
+        desc = "Use canny on the left image of the meanSubtraction task algorithm."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.gOptions.LRMeanSubtraction.Checked Then
+            src = task.meanSub.dst2
+        Else
+            Static meanSub As New MeanSubtraction_Basics
+            meanSub.Run(task.leftView)
+            src = meanSub.dst2
+        End If
+        canny.Run(src)
+
+        If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motionMask)
+    End Sub
+End Class

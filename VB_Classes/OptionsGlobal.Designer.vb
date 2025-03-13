@@ -46,6 +46,7 @@ Partial Class OptionsGlobal
         Me.MaxDepthBar = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.LRMeanSubtraction = New System.Windows.Forms.CheckBox()
         Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
         Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
         Me.ShowQuads = New System.Windows.Forms.RadioButton()
@@ -53,7 +54,7 @@ Partial Class OptionsGlobal
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
-        Me.UseMotion = New System.Windows.Forms.CheckBox()
+        Me.UseMotionMask = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.HighlightColor = New System.Windows.Forms.ComboBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
@@ -88,7 +89,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.LRMeanSubtraction = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -384,6 +384,18 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
+        'LRMeanSubtraction
+        '
+        Me.LRMeanSubtraction.AutoSize = True
+        Me.LRMeanSubtraction.Checked = True
+        Me.LRMeanSubtraction.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.LRMeanSubtraction.Location = New System.Drawing.Point(24, 322)
+        Me.LRMeanSubtraction.Name = "LRMeanSubtraction"
+        Me.LRMeanSubtraction.Size = New System.Drawing.Size(308, 24)
+        Me.LRMeanSubtraction.TabIndex = 79
+        Me.LRMeanSubtraction.Text = "MeanSubtraction on Left/Right images"
+        Me.LRMeanSubtraction.UseVisualStyleBackColor = True
+        '
         'DepthGroupBox
         '
         Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
@@ -443,7 +455,7 @@ Partial Class OptionsGlobal
         'MotionBox
         '
         Me.MotionBox.Controls.Add(Me.showMotionMask)
-        Me.MotionBox.Controls.Add(Me.UseMotion)
+        Me.MotionBox.Controls.Add(Me.UseMotionMask)
         Me.MotionBox.Location = New System.Drawing.Point(6, 352)
         Me.MotionBox.Name = "MotionBox"
         Me.MotionBox.Size = New System.Drawing.Size(245, 89)
@@ -461,17 +473,17 @@ Partial Class OptionsGlobal
         Me.showMotionMask.Text = "Show motion cells"
         Me.showMotionMask.UseVisualStyleBackColor = True
         '
-        'UseMotion
+        'UseMotionMask
         '
-        Me.UseMotion.AutoSize = True
-        Me.UseMotion.Checked = True
-        Me.UseMotion.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.UseMotion.Location = New System.Drawing.Point(14, 56)
-        Me.UseMotion.Name = "UseMotion"
-        Me.UseMotion.Size = New System.Drawing.Size(177, 24)
-        Me.UseMotion.TabIndex = 76
-        Me.UseMotion.Text = "Use Motion-Filtering"
-        Me.UseMotion.UseVisualStyleBackColor = True
+        Me.UseMotionMask.AutoSize = True
+        Me.UseMotionMask.Checked = True
+        Me.UseMotionMask.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.UseMotionMask.Location = New System.Drawing.Point(14, 56)
+        Me.UseMotionMask.Name = "UseMotionMask"
+        Me.UseMotionMask.Size = New System.Drawing.Size(154, 24)
+        Me.UseMotionMask.TabIndex = 76
+        Me.UseMotionMask.Text = "Use MotionMask"
+        Me.UseMotionMask.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -818,18 +830,6 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'LRMeanSubtraction
-        '
-        Me.LRMeanSubtraction.AutoSize = True
-        Me.LRMeanSubtraction.Checked = True
-        Me.LRMeanSubtraction.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.LRMeanSubtraction.Location = New System.Drawing.Point(24, 322)
-        Me.LRMeanSubtraction.Name = "LRMeanSubtraction"
-        Me.LRMeanSubtraction.Size = New System.Drawing.Size(308, 24)
-        Me.LRMeanSubtraction.TabIndex = 79
-        Me.LRMeanSubtraction.Text = "MeanSubtraction on Left/Right images"
-        Me.LRMeanSubtraction.UseVisualStyleBackColor = True
-        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -923,7 +923,7 @@ Partial Class OptionsGlobal
     Friend WithEvents CrossHairs As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
-    Friend WithEvents UseMotion As Windows.Forms.CheckBox
+    Friend WithEvents UseMotionMask As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
     Friend WithEvents TruncateDepth As Windows.Forms.CheckBox
     Friend WithEvents DepthDiffLabel As Windows.Forms.Label

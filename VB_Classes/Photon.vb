@@ -123,7 +123,7 @@ Public Class Photon_Distance3D : Inherits TaskParent
     Public Sub New()
         hist.plot.removeZeroEntry = False
         task.gOptions.HistBinBar.Value = 10
-        task.gOptions.UseMotion.Checked = False
+        task.gOptions.UseMotionMask.Checked = False
         desc = "Plot a histogram of the 3D distance of each picture from the previous image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

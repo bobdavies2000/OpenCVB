@@ -596,6 +596,40 @@ End Class
 
 Public Class Palette_RandomColors : Inherits TaskParent
     Public whitebackground As Boolean
+    Public colorMapFull As New cv.Mat
+    Public colorMapWithBlack As New cv.Mat
+    Public Sub New()
+        rebuildColorMaps()
+        desc = "Apply the different color maps in OpenCV.  Complications because some algorithms want black in the first entry."
+    End Sub
+    Private Sub rebuildColorMaps()
+        colorMapFull = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors)
+        colorMapWithBlack = colorMapFull.Clone
+        colorMapWithBlack.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is the first color...
+    End Sub
+    Public Function useColorMapFull(src As cv.Mat) As cv.Mat
+        cv.Cv2.ApplyColorMap(src, dst2, colorMapFull)
+        Return dst2
+    End Function
+    Public Function useColorMapWithBlack(src As cv.Mat) As cv.Mat
+        cv.Cv2.ApplyColorMap(src, dst3, colorMapWithBlack)
+        Return dst3
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Or colorMapFull.Rows <> 256 Then rebuildColorMaps()
+
+        cv.Cv2.ApplyColorMap(src, dst2, colorMapFull)
+        If standalone Then dst3 = colorMapFull.Resize(dst3.Size)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Palette_RandomWithBlack : Inherits TaskParent
+    Public whitebackground As Boolean
     Public colorMap As New cv.Mat
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"

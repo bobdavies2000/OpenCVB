@@ -62,7 +62,7 @@ public:
                 {
                     pt = Point(x, y);
                     int count = floodFill(src, inputRemoved, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
-                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+                    if (rect.width * rect.height > minSize) sizeSorted.insert(make_pair(count, pt));
                 }
             }
         }
@@ -74,15 +74,12 @@ public:
         {
             if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
             {
-                if (rect.width * rect.height > minSize)
-                {
-                    cellRects.push_back(rect);
-                    floodPoints.push_back(it->second);
+                cellRects.push_back(rect);
+                floodPoints.push_back(it->second);
 
-                    if (fill >= 255)
-                        break; // just taking up to the top X largest objects found.
-                    fill++;
-                }
+                if (fill >= 255)
+                    break; // just taking up to the top X largest objects found.
+                fill++;
             }
         }
         Rect r = Rect(1, 1, inputRemoved.cols - 2, inputRemoved.rows - 2);

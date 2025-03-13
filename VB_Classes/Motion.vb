@@ -43,12 +43,12 @@ Public Class Motion_BasicsValidate : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim measure As New GridCell_MeasureMotion
     Public Sub New()
-        task.gOptions.UseMotion.Checked = False
+        task.gOptions.UseMotionMask.Checked = False
         task.gOptions.showMotionMask.Checked = True
         desc = "Display the difference between task.color and src to verify Motion_Basics is working"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.UseMotion.Checked Then
+        If task.gOptions.UseMotionMask.Checked Then
             SetTrueText("Uncheck 'Use Motion-Constructed images' to validate Motion_Basics", 3)
             Exit Sub
         End If

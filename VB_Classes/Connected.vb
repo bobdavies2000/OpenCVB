@@ -189,31 +189,6 @@ End Class
 
 
 
-
-Public Class Connected_Regions : Inherits TaskParent
-    Public redM As New RedMask_Basics
-    Public connect As New Connected_Rects
-    Public Sub New()
-        task.gOptions.TruncateDepth.Checked = True
-        desc = "Use the merged by depth grid cells to build masks for each region"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src.Clone)
-
-        redM.Run(Not connect.dst2)
-        dst2 = ShowPalette(redM.dst2)
-        dst2.SetTo(0, connect.dst2)
-        labels(2) = CStr(redM.mdList.Count) + " regions were identified."
-
-        If standaloneTest() Then dst3 = ShowAddweighted(connect.dst3, dst2, labels(3))
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Connected_Contours : Inherits TaskParent
     Public redM As New RedMask_Basics
     Public connect As New Connected_Rects
@@ -335,3 +310,42 @@ Public Class Connected_RectsV : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Connected_Regions : Inherits TaskParent
+    Public redM As New RedMask_Basics
+    Public connect As New Connected_Rects
+    Public Sub New()
+        task.gOptions.TruncateDepth.Checked = True
+        desc = "Use the merged by depth grid cells to build masks for each region"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src.Clone)
+
+        redM.Run(Not connect.dst2)
+
+        task.rcPixelThreshold = task.cellSize * task.cellSize
+        dst1.SetTo(0)
+        Dim newList As New List(Of maskData)
+        Dim count As Integer
+        For Each md In redM.mdList
+            If md.pixels <= task.rcPixelThreshold Then
+                dst1(md.rect).SetTo(0, md.mask)
+                count += 1
+                Continue For
+            End If
+            newList.Add(md)
+            dst1(md.rect).SetTo(md.index, md.mask)
+        Next
+
+        dst2 = ShowPaletteFullColor(dst1)
+        dst2.SetTo(0, connect.dst2)
+        labels(2) = CStr(redM.mdList.Count) + " regions were identified."
+
+        If standaloneTest() Then dst3 = ShowAddweighted(connect.dst3, dst2, labels(3))
+    End Sub
+End Class

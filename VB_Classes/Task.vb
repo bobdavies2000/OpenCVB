@@ -117,6 +117,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gCell As GridCell_Basics
+    Public meanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public paletteRandom As Palette_RandomColors
@@ -538,7 +539,9 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
+        meanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
+        paletteRandom = New Palette_RandomColors
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -822,14 +825,13 @@ Public Class VBtask : Implements IDisposable
         End If
 
         If task.gOptions.LRMeanSubtraction.Checked Then
-            Static meanSub As New MeanSubtraction_LeftRight
             meanSub.Run(src)
             task.leftView = meanSub.dst2
             task.rightView = meanSub.dst3
         End If
         gCell.Run(src)
         motionBasics.Run(src)
-        If gOptions.UseMotion.Checked Then color = motionBasics.dst2.Clone
+        If task.optionsChanged Then task.motionMask.SetTo(255)
 
         If task.gOptions.ShowQuads.Checked Then
             depthRGB = task.gCell.dst2

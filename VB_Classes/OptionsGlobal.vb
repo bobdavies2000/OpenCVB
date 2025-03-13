@@ -376,12 +376,13 @@ Public Class OptionsGlobal
     Private Sub ShowQuadDepth_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-
-    Private Sub FrameHistory_Scroll(sender As Object, e As EventArgs) Handles FrameHistory.Scroll
-
+    Private Sub LRMeanSubtraction_CheckedChanged(sender As Object, e As EventArgs) Handles LRMeanSubtraction.CheckedChanged
+        task.optionsChanged = True
     End Sub
-
-    Private Sub DebugSlider_Scroll(sender As Object, e As EventArgs) Handles DebugSlider.Scroll
-
+    Private Sub UseMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles UseMotionMask.CheckedChanged
+        task.optionsChanged = True
+    End Sub
+    Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
+        task.optionsChanged = True
     End Sub
 End Class

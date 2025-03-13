@@ -587,9 +587,10 @@ Public Class TaskParent : Implements IDisposable
             Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
             input = tmp
         End If
-        If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
-        task.paletteRandom.Run(input)
-        Return task.paletteRandom.dst2.Clone
+        Return task.paletteRandom.useColorMapWithBlack(input)
+    End Function
+    Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat
+        Return task.paletteRandom.useColorMapFull(input)
     End Function
     Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat
         Static addw As New AddWeighted_Basics

@@ -735,6 +735,13 @@ Public Class GridCell_MeasureMotion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then dst0 = src.Clone
 
+        If task.gOptions.UseMotionMask.Checked = False Then
+            task.motionRects = New List(Of cv.Rect)(task.gridRects)
+            task.motionMask.SetTo(255)
+            labels(3) = "100% of each image has motion."
+            Exit Sub
+        End If
+
         If task.optionsChanged Then motionRects = New List(Of cv.Rect)
 
         dst2 = task.gCell.dst2
@@ -774,11 +781,7 @@ Public Class GridCell_MeasureMotion : Inherits TaskParent
             percentList.Add(motionList.Count / task.gridRects.Count)
             If percentList.Count > 10 Then percentList.RemoveAt(0)
             task.motionPercent = percentList.Average
-            If task.gOptions.UseMotion.Checked = False Then
-                labels(3) = "100% of each image has motion."
-            Else
-                labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
-            End If
+            labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
             task.motionLabel = labels(3)
         End If
     End Sub

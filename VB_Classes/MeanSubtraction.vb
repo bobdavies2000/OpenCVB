@@ -1,18 +1,14 @@
 Imports cv = OpenCvSharp
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
 Public Class MeanSubtraction_Basics : Inherits TaskParent
-    Public options As New Options_MeanSubtraction
-    Public scaleValue As Single
+    Public scaleValue As Single = 16
     Public Sub New()
         desc = "Subtract the mean from the image with a scaling factor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
         Dim mean = cv.Cv2.Mean(src)
         cv.Cv2.Subtract(mean, src, dst2)
-        scaleValue = CSng(100 / options.scaleVal)
-        dst2 *= scaleValue
+        dst2 *= 100 / scaleValue
     End Sub
 End Class
 
@@ -21,7 +17,7 @@ End Class
 
 
 Public Class MeanSubtraction_LeftRight : Inherits TaskParent
-    Dim meanSub As New MeanSubtraction_Basics
+    Dim meanSub As New MeanSubtraction_Gray
     Public Sub New()
         desc = "Apply mean subtraction to the left and right images."
     End Sub
@@ -51,11 +47,8 @@ Public Class MeanSubtraction_Gray : Inherits TaskParent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         meanSub.Run(src)
         dst2 = meanSub.dst2
-        Dim mm = GetMinMax(dst2)
-        labels(2) = "MeanSubtraction gray image: max = " + CStr(mm.maxVal) + " min = " + CStr(mm.minVal)
+        labels(2) = "MeanSubtraction gray image "
 
-        If mm.maxVal = 255 Then meanSub.options.scaleSlider.Value += 1
-        classCount = mm.maxVal
         dst3 = 255 - dst2
     End Sub
 End Class
