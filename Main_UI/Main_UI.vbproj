@@ -121,7 +121,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="hidden\" />
+    <Folder Include="ZListOfAlgorithms\" />
   </ItemGroup>
 
 </Project>
