@@ -190,101 +190,6 @@ End Class
 
 
 
-Public Class Connected_Rects : Inherits TaskParent
-    Dim hConn As New Connected_RectsH
-    Dim vConn As New Connected_RectsV
-    Public Sub New()
-        desc = "Isolate the connected depth grid cells both vertically and horizontally."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hConn.Run(src)
-        vConn.Run(src)
-
-        dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
-
-        dst3 = src
-        dst3.SetTo(0, dst2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Connected_RectsH : Inherits TaskParent
-    Public hRects As New List(Of cv.Rect)
-    Dim connect As New Connected_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Connect grid cells with similar depth - horizontally scanning."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        hRects.Clear()
-        Dim index As Integer
-        For Each tup In connect.hTuples
-            If tup.Item1 = tup.Item2 Then Continue For
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
-
-            Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
-            Dim h = idd1.cRect.Height
-
-            Dim r = New cv.Rect(idd1.cRect.TopLeft.X + 1, idd1.cRect.TopLeft.Y, w - 1, h)
-
-            hRects.Add(r)
-            dst2(r).SetTo(255)
-
-            index += 1
-            dst3(r).SetTo(task.scalarColors(index Mod 256))
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Connected_RectsV : Inherits TaskParent
-    Public vRects As New List(Of cv.Rect)
-    Dim connect As New Connected_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Connect grid cells with similar depth - vertically scanning."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        vRects.Clear()
-        Dim index As Integer
-        For Each tup In connect.vTuples
-            If tup.Item1 = tup.Item2 Then Continue For
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
-
-            Dim w = idd1.cRect.Width
-            Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
-
-            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y + 1, w, h - 1)
-            vRects.Add(r)
-            dst2(r).SetTo(255)
-
-            index += 1
-            dst3(r).SetTo(task.scalarColors(index Mod 256))
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Connected_Contours : Inherits TaskParent
     Public redM As New RedMask_Basics
@@ -373,9 +278,9 @@ Public Class Connected_Regions : Inherits TaskParent
             End If
         Next
 
-        For Each md In mdLargest
-            DrawContour(dst2(md.rect), md.contour, cv.Scalar.Gray, task.cellSize)
-        Next
+        'For Each md In mdLargest
+        '    DrawContour(dst2(md.rect), md.contour, cv.Scalar.Gray, task.cellSize)
+        'Next
 
         dst3 = ShowAddweighted(src, dst2, labels(3))
         If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
@@ -385,66 +290,222 @@ End Class
 
 
 
-'Public Class Connected_BasicsNew : Inherits TaskParent
-'    Public hTuples As New List(Of Tuple(Of Integer, Integer))
-'    Public width As Integer, height As Integer
-'    Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
-'    Public Sub New()
-'        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-'        desc = "Connect cells that are close in depth"
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        Dim gCells As New List(Of gridCellNew)
-'        For Each idd In task.iddList
-'            Dim gc As New gridCellNew
-'            gc.cRect = idd.cRect
-'            gc.lRect = idd.lRect
-'            gc.rRect = idd.rRect
 
-'            gc.depth = idd.depth
-'            gc.pixels = idd.pixels
-'            gc.mm = idd.mm
-'            gc.correlation = idd.correlation
-'            gc.index = gCells.Count
-'            gCells.Add(gc)
-'        Next
+Public Class Connected_BasicsNewBad : Inherits TaskParent
+    Public hTuples As New List(Of Tuple(Of Integer, Integer))
+    Public width As Integer, height As Integer
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        desc = "Connect cells that are close in depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim gCells As New List(Of gridCellNew)
+        For Each idd In task.iddList
+            Dim gc As New gridCellNew
+            gc.cRect = idd.cRect
+            gc.lRect = idd.lRect
+            gc.rRect = idd.rRect
 
-'        width = dst2.Width / task.cellSize
-'        If width * task.cellSize <> dst2.Width Then width += 1
-'        height = Math.Floor(dst2.Height / task.cellSize)
-'        If height * task.cellSize <> dst2.Height Then height += 1
+            gc.depth = idd.depth
+            gc.pixels = idd.pixels
+            gc.mm = idd.mm
+            gc.correlation = idd.correlation
+            gc.index = gCells.Count
+            gCells.Add(gc)
+        Next
 
-'        Dim newCount As Integer = gCells.Count
-'        For i = 0 To height - 2
-'            For j = 1 To width - 1
-'                Dim gc1 = gCells(i * width + j - 1)
-'                Dim gc2 = gCells(i * width + j)
-'                Dim gc3 = gCells((i + 1) * width + j - 1)
-'                Dim gc4 = gCells((i + 1) * width + j)
-'                If Math.Abs(gc1.depth - gc2.depth) < task.depthDiffMeters Then
-'                    gc2.index = gc1.index
-'                    gCells(i * width + j) = gc2
-'                    newCount -= 1
-'                End If
-'                If Math.Abs(gc1.depth - gc3.depth) < task.depthDiffMeters Then
-'                    gc3.index = gc1.index
-'                    gCells((i + 1) * width + j - 1) = gc3
-'                    newCount -= 1
-'                End If
-'                If Math.Abs(gc2.depth - gc4.depth) < task.depthDiffMeters Then
-'                    gc4.index = gc2.index
-'                    gCells((i + 1) * width + j) = gc4
-'                    newCount -= 1
-'                End If
-'            Next
-'        Next
+        width = dst2.Width / task.cellSize
+        If width * task.cellSize <> dst2.Width Then width += 1
+        height = Math.Floor(dst2.Height / task.cellSize)
+        If height * task.cellSize <> dst2.Height Then height += 1
 
-'        For Each gc In gCells
-'            dst3(gc.cRect).SetTo(gc.index)
-'        Next
+        Dim newCount(gCells.Count - 1) As Integer
+        For i = 0 To height - 2
+            For j = 1 To width - 1
+                Dim gc1 = gCells(i * width + j - 1)
+                Dim gc2 = gCells(i * width + j)
+                Dim gc3 = gCells((i + 1) * width + j - 1)
+                Dim gc4 = gCells((i + 1) * width + j)
+                If gc1.index <> gc2.index Then
+                    If Math.Abs(gc1.depth - gc2.depth) < task.depthDiffMeters Then
+                        gc2.index = gc1.index
+                        gCells(i * width + j) = gc2
+                        newCount(gc2.index) += 1
+                    End If
+                End If
 
-'        dst2 = ShowPalette(dst3)
+                If gc3.index <> gc1.index Then
+                    If Math.Abs(gc1.depth - gc3.depth) < task.depthDiffMeters Then
+                        gc3.index = gc1.index
+                        gCells((i + 1) * width + j - 1) = gc3
+                        newCount(gc3.index) += 1
+                    End If
+                End If
 
-'        labels(2) = CStr(gCells.Count) + " grid cells consolidated into " + CStr(newCount)
-'    End Sub
-'End Class
+                If gc4.index <> gc2.index Then
+                    If Math.Abs(gc2.depth - gc4.depth) < task.depthDiffMeters Then
+                        gc4.index = gc2.index
+                        gCells((i + 1) * width + j) = gc4
+                        newCount(gc4.index) += 1
+                    End If
+                End If
+            Next
+        Next
+
+        Dim sortedCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To newCount.Count - 1
+            sortedCounts.Add(newCount(i), i)
+        Next
+
+        Dim indexList As New List(Of Integer)
+        For i = 0 To 10 - 1
+            Dim index = sortedCounts.ElementAt(i).Value
+            indexList.Add(index)
+        Next
+
+        dst3.SetTo(0)
+        For Each gc In gCells
+            If indexList.Contains(gc.index) Then
+                dst3(gc.cRect).SetTo(gc.index)
+            End If
+        Next
+
+        dst2 = ShowPalette(dst3)
+
+        labels(2) = CStr(gCells.Count) + " grid cells consolidated into the top 10 cells."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Connected_RectsH : Inherits TaskParent
+    Public hRects As New List(Of cv.Rect)
+    Dim connect As New Connected_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect grid cells with similar depth - horizontally scanning."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        hRects.Clear()
+        Dim index As Integer
+        For Each tup In connect.hTuples
+            If tup.Item1 = tup.Item2 Then Continue For
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+
+            Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
+            Dim h = idd1.cRect.Height
+
+            Dim r = New cv.Rect(idd1.cRect.TopLeft.X + 1, idd1.cRect.TopLeft.Y, w - 1, h)
+
+            hRects.Add(r)
+            dst2(r).SetTo(255)
+
+            index += 1
+            dst3(r).SetTo(task.scalarColors(index Mod 256))
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Connected_RectsV : Inherits TaskParent
+    Public vRects As New List(Of cv.Rect)
+    Dim connect As New Connected_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect grid cells with similar depth - vertically scanning."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        vRects.Clear()
+        Dim index As Integer
+        For Each tup In connect.vTuples
+            If tup.Item1 = tup.Item2 Then Continue For
+            Dim idd1 = task.iddList(tup.Item1)
+            Dim idd2 = task.iddList(tup.Item2)
+
+            Dim w = idd1.cRect.Width
+            Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
+
+            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y + 1, w, h - 1)
+            vRects.Add(r)
+            dst2(r).SetTo(255)
+
+            index += 1
+            dst3(r).SetTo(task.scalarColors(index Mod 256))
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Connected_Rects : Inherits TaskParent
+    Dim hConn As New Connected_RectsH
+    Dim vConn As New Connected_RectsV
+    Public Sub New()
+        desc = "Isolate the connected depth grid cells both vertically and horizontally."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hConn.Run(src)
+        vConn.Run(src)
+
+        dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+        dst3 = src
+        dst3.SetTo(0, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Connected_RectsNew : Inherits TaskParent
+    Dim hConn As New Connected_RectsH
+    Dim vConn As New Connected_RectsV
+    Public Sub New()
+        desc = "Modify each grid cell to indicate which group it is in.  Single cells are not in any group."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim gCells As New List(Of gridCellNew)
+        For Each idd In task.iddList
+            Dim gc As New gridCellNew
+            gc.cRect = idd.cRect
+            gc.lRect = idd.lRect
+            gc.rRect = idd.rRect
+
+            gc.depth = idd.depth
+            gc.pixels = idd.pixels
+            gc.mm = idd.mm
+            gc.correlation = idd.correlation
+            gc.index = gCells.Count
+            gCells.Add(gc)
+        Next
+
+        hConn.Run(src)
+        vConn.Run(src)
+
+        dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+        dst3 = src
+        dst3.SetTo(0, dst2)
+    End Sub
+End Class
