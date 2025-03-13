@@ -47,6 +47,7 @@ DCT
 Delaunay
 Density
 Depth
+DepthRegion
 Derivative
 DFT
 Diff

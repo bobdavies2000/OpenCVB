@@ -168,20 +168,3 @@ Public Class GrabCut_ImageMask : Inherits TaskParent
         dst2.CopyTo(dst3, dst1 + 1)
     End Sub
 End Class
-
-
-
-
-
-Public Class GrabCut_Regions : Inherits TaskParent
-    Dim connect As New Connected_Regions
-    Public Sub New()
-        desc = "Run grabcut for each of the largest regions in Connected_Regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-        dst3 = connect.dst2
-
-
-    End Sub
-End Class
