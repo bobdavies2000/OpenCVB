@@ -15,7 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AlgorithmList.vb" />
     <Compile Remove="CameraZED2_CPP.vb" />
     <Compile Remove="Translator.Designer.vb" />
     <Compile Remove="Translator.vb" />
