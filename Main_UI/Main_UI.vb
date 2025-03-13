@@ -128,7 +128,7 @@ Public Class Main_UI
     Dim testAllStartingRes As Integer
     Dim testAllEndingRes As Integer
     Dim windowsVersion As Integer
-    Dim algolist As algorithmList = New algorithmList
+    Dim algolist As ZAlgorithmList = New ZAlgorithmList
     Dim magIndex As Integer
     Dim motionLabel As String
 
