@@ -182,8 +182,9 @@ Public Class Distance_RedCloud : Inherits TaskParent
     Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
     Dim lastrcList As New List(Of rcData)
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = True
         task.redOptions.HistBinBar3D.Value = 5
+        hColor.noMotionMask = True
         labels(1) = "3D Histogram distance for each of the cells at left"
         desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
     End Sub
@@ -199,7 +200,7 @@ Public Class Distance_RedCloud : Inherits TaskParent
 
         pixelVector.Clear()
         distances.Clear()
-        For i = 0 To task.rcList.Count - 1
+        For i = 1 To task.rcList.Count - 1
             Dim rc = task.rcList(i)
             hColor.inputMask = rc.mask
             hColor.Run(src(rc.rect))

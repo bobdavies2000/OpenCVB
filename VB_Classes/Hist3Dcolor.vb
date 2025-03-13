@@ -8,6 +8,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
     Public histArray() As Single
     Public simK As New Hist3D_BuildHistogram
     Public alwaysRun As Boolean
+    Public noMotionMask As Boolean
     Public Sub New()
         desc = "Capture a 3D color histogram, find the gaps, and backproject the clusters found."
     End Sub
@@ -28,7 +29,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.redOptions.rangesBGR)
 
-        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
+        If task.optionsChanged Or noMotionMask Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         If standaloneTest() Then dst3 = ShowPalette(dst2)
 
         labels(2) = simK.labels(2)

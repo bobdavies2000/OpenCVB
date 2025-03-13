@@ -381,3 +381,70 @@ Public Class Connected_Regions : Inherits TaskParent
         If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
     End Sub
 End Class
+
+
+
+
+'Public Class Connected_BasicsNew : Inherits TaskParent
+'    Public hTuples As New List(Of Tuple(Of Integer, Integer))
+'    Public width As Integer, height As Integer
+'    Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
+'    Public Sub New()
+'        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+'        desc = "Connect cells that are close in depth"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        Dim gCells As New List(Of gridCellNew)
+'        For Each idd In task.iddList
+'            Dim gc As New gridCellNew
+'            gc.cRect = idd.cRect
+'            gc.lRect = idd.lRect
+'            gc.rRect = idd.rRect
+
+'            gc.depth = idd.depth
+'            gc.pixels = idd.pixels
+'            gc.mm = idd.mm
+'            gc.correlation = idd.correlation
+'            gc.index = gCells.Count
+'            gCells.Add(gc)
+'        Next
+
+'        width = dst2.Width / task.cellSize
+'        If width * task.cellSize <> dst2.Width Then width += 1
+'        height = Math.Floor(dst2.Height / task.cellSize)
+'        If height * task.cellSize <> dst2.Height Then height += 1
+
+'        Dim newCount As Integer = gCells.Count
+'        For i = 0 To height - 2
+'            For j = 1 To width - 1
+'                Dim gc1 = gCells(i * width + j - 1)
+'                Dim gc2 = gCells(i * width + j)
+'                Dim gc3 = gCells((i + 1) * width + j - 1)
+'                Dim gc4 = gCells((i + 1) * width + j)
+'                If Math.Abs(gc1.depth - gc2.depth) < task.depthDiffMeters Then
+'                    gc2.index = gc1.index
+'                    gCells(i * width + j) = gc2
+'                    newCount -= 1
+'                End If
+'                If Math.Abs(gc1.depth - gc3.depth) < task.depthDiffMeters Then
+'                    gc3.index = gc1.index
+'                    gCells((i + 1) * width + j - 1) = gc3
+'                    newCount -= 1
+'                End If
+'                If Math.Abs(gc2.depth - gc4.depth) < task.depthDiffMeters Then
+'                    gc4.index = gc2.index
+'                    gCells((i + 1) * width + j) = gc4
+'                    newCount -= 1
+'                End If
+'            Next
+'        Next
+
+'        For Each gc In gCells
+'            dst3(gc.cRect).SetTo(gc.index)
+'        Next
+
+'        dst2 = ShowPalette(dst3)
+
+'        labels(2) = CStr(gCells.Count) + " grid cells consolidated into " + CStr(newCount)
+'    End Sub
+'End Class

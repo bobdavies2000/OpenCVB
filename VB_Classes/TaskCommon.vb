@@ -446,6 +446,22 @@ End Class
 
 
 
+
+Public Class gridCellNew
+    Public cRect As cv.Rect ' rectangle under the cursor
+    Public lRect As New cv.Rect
+    Public rRect As New cv.Rect
+
+    Public depth As Single
+    Public pixels As Integer ' depth pixel count...
+    Public mm As mmData ' min and max values of the depth data.
+    Public correlation As Single
+    Public index As Integer
+End Class
+
+
+
+
 Public Class triangleData
     Public color As cv.Point3f
     Public facets(3) As cv.Point3f

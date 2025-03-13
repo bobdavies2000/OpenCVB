@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AlgorithmList.vb" />
     <Compile Remove="CameraZED2_CPP.vb" />
     <Compile Remove="Translator.Designer.vb" />
     <Compile Remove="Translator.vb" />
@@ -118,6 +119,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="hidden\" />
   </ItemGroup>
 
 </Project>
