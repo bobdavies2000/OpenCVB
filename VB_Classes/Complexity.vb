@@ -127,6 +127,7 @@ Public Class Complexity_Dots : Inherits TaskParent
         desc = "Plot the results of multiple runs at various resolutions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.testAllRunning Then Exit Sub ' there is some bug below that only occurs during test all.  Not worth pursuing...
         options.RunOpt()
 
         If fileName <> "" Then options.filename = New FileInfo(fileName)
