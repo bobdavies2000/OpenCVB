@@ -503,7 +503,7 @@ Public Class Mat_ToList : Inherits TaskParent
     Public Sub New()
         desc = "Convert a Mat to List of points in 2 ways to measure which is better"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
         autoX.Run(histTop.histogram)
@@ -526,4 +526,30 @@ Public Class Mat_ToList : Inherits TaskParent
         labels(2) = "There were " + CStr(ptList.Count) + " points identified"
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Mat_FindNearZero : Inherits TaskParent
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("FindNearZero threshold X1000", 0, 200, 10)
+        desc = "Find samples near zero using FindNonZero"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = optiBase.FindSlider("FindNearZero threshold X1000")
+        Dim threshold = thresholdSlider.value / 1000
+
+        dst3 = task.pcSplit(1).InRange(-threshold, threshold)
+        dst3.SetTo(0, task.noDepthMask)
+        dst3.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        dst1 = dst3.FindNonZero()
+        Dim ptLeft = dst1.Get(Of cv.Point)(0, 0)
+        Dim ptRight = dst1.Get(Of cv.Point)(dst1.Rows - 1, 0)
+    End Sub
+End Class
+
 

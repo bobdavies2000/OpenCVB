@@ -1768,6 +1768,8 @@ Public Class Main_UI
                 dst(2).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)
                 dst(3).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)
 
+                If dst(0).Type = cv.MatType.CV_32S Then Dim k = 0
+
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 
                 Dim elapsedTicks = Now.Ticks - returnTime.Ticks

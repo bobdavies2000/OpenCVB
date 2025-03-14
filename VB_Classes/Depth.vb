@@ -306,75 +306,6 @@ End Class
 
 
 
-Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
-    Dim kalman As New Kalman_Basics
-    Public Sub New()
-        ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
-
-        labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min and max points for each cell."}
-        desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
-    End Sub
-    Private Function validatePoint2f(p As cv.Point2f) As cv.Point2f
-        If p.X < 0 Then p.X = 0
-        If p.Y < 0 Then p.Y = 0
-        If p.X >= dst2.Width Then p.X = dst2.Width - 1
-        If p.Y >= dst2.Height Then p.Y = dst2.Height - 1
-        Return p
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
-
-        dst2 = src.Clone()
-        dst2.SetTo(white, task.gridMask)
-
-        Dim depthmask As cv.Mat = task.depthMask
-
-        Parallel.For(0, task.gridRects.Count,
-        Sub(i)
-            Dim roi = task.gridRects(i)
-            Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), depthmask(roi))
-            If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
-            kalman.kInput(i * 4) = mm.minLoc.X
-            kalman.kInput(i * 4 + 1) = mm.minLoc.Y
-            kalman.kInput(i * 4 + 2) = mm.maxLoc.X
-            kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
-        End Sub)
-
-        kalman.Run(src)
-
-        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
-        For i = 0 To task.gridRects.Count - 1
-            Dim roi = task.gridRects(i)
-            Dim ptmin = New cv.Point2f(kalman.kOutput(i * 4) + roi.X, kalman.kOutput(i * 4 + 1) + roi.Y)
-            Dim ptmax = New cv.Point2f(kalman.kOutput(i * 4 + 2) + roi.X, kalman.kOutput(i * 4 + 3) + roi.Y)
-            ptmin = validatePoint2f(ptmin)
-            ptmax = validatePoint2f(ptmax)
-            subdiv.Insert(ptmin)
-            DrawCircle(dst2, ptmin, task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst2, ptmax, task.DotSize, cv.Scalar.Blue)
-        Next
-        Dim facets = New cv.Point2f()() {Nothing}
-        Dim centers() As cv.Point2f
-        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
-
-        Dim ifacet() As cv.Point
-        Dim ifacets = New cv.Point()() {Nothing}
-
-        For i = 0 To facets.Length - 1
-            ReDim ifacet(facets(i).Length - 1)
-            For j = 0 To facets(i).Length - 1
-                ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
-            Next
-            ifacets(0) = ifacet
-            dst3.FillConvexPoly(ifacet, task.scalarColors(i Mod task.scalarColors.Length), task.lineType)
-            cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, task.lineType, 0)
-        Next
-    End Sub
-End Class
-
-
-
-
 
 Public Class Depth_ColorMap : Inherits TaskParent
     Dim options As New Options_DepthColor
@@ -599,7 +530,6 @@ End Class
 
 Public Class Depth_ForegroundHead : Inherits TaskParent
     Dim fgnd As New Depth_ForegroundBlob
-    Public kalman As New Kalman_Basics
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Public Sub New()
@@ -619,10 +549,10 @@ Public Class Depth_ForegroundHead : Inherits TaskParent
             If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
             dst2 = fgnd.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            kalman.kInput = {xx, yy, rectSize, rectSize}
-            kalman.Run(src)
+            task.kalman.kInput = {xx, yy, rectSize, rectSize}
+            task.kalman.Run(src)
             Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
-            Dim kRect = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
+            Dim kRect = New cv.Rect(task.kalman.kOutput(0), task.kalman.kOutput(1), task.kalman.kOutput(2), task.kalman.kOutput(3))
             dst2.Rectangle(kRect, cv.Scalar.Red, 2)
             dst2.Rectangle(nextRect, cv.Scalar.Blue, 2)
             If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
@@ -1692,5 +1622,87 @@ Public Class Depth_Colorizer : Inherits TaskParent
         Dim depthNorm As cv.Mat = src * 255 / task.MaxZmeters
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
         cv.Cv2.ApplyColorMap(depthNorm, dst2, task.depthColorMap)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
+    Public Sub New()
+        ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
+
+        labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
+        desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
+    End Sub
+    Private Function validatePoint2f(p As cv.Point2f) As cv.Point2f
+        If p.X < 0 Then p.X = 0
+        If p.Y < 0 Then p.Y = 0
+        If p.X >= dst2.Width Then p.X = dst2.Width - 1
+        If p.Y >= dst2.Height Then p.Y = dst2.Height - 1
+        Return p
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
+
+
+        Dim depthmask As cv.Mat = task.depthMask
+
+        Parallel.For(0, task.gridRects.Count,
+        Sub(i)
+            Dim roi = task.gridRects(i)
+            Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), depthmask(roi))
+            If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
+            task.kalman.kInput(i * 4) = mm.minLoc.X
+            task.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
+            task.kalman.kInput(i * 4 + 2) = mm.maxLoc.X
+            task.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
+        End Sub)
+
+        task.kalman.Run(src)
+
+        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
+        Static minList(task.gridRects.Count - 1) As cv.Point2f
+        Static maxList(task.gridRects.Count - 1) As cv.Point2f
+        For i = 0 To task.gridRects.Count - 1
+            Dim rect = task.gridRects(i)
+            If task.motionRects.Contains(rect) Then
+                Dim ptmin = New cv.Point2f(task.kalman.kOutput(i * 4) + rect.X, task.kalman.kOutput(i * 4 + 1) + rect.Y)
+                Dim ptmax = New cv.Point2f(task.kalman.kOutput(i * 4 + 2) + rect.X, task.kalman.kOutput(i * 4 + 3) + rect.Y)
+                ptmin = validatePoint2f(ptmin)
+                ptmax = validatePoint2f(ptmax)
+                minList(i) = ptmin
+                maxList(i) = ptmax
+            End If
+        Next
+
+        dst1 = src.Clone()
+        dst1.SetTo(white, task.gridMask)
+        For i = 0 To minList.Count - 1
+            Dim ptMin = minList(i)
+            subdiv.Insert(ptMin)
+            DrawCircle(dst1, ptMin, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst1, maxList(i), task.DotSize, cv.Scalar.Blue)
+        Next
+
+        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        Dim centers() As cv.Point2f
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
+
+        Dim ifacet() As cv.Point
+        Dim ifacets = New cv.Point()() {Nothing}
+
+        For i = 0 To facets.Length - 1
+            ReDim ifacet(facets(i).Length - 1)
+            For j = 0 To facets(i).Length - 1
+                ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
+            Next
+            ifacets(0) = ifacet
+            dst3.FillConvexPoly(ifacet, task.scalarColors(i Mod task.scalarColors.Length), task.lineType)
+            cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, task.lineType, 0)
+        Next
     End Sub
 End Class

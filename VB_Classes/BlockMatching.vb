@@ -31,8 +31,8 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         blockMatch.Disp12MaxDiff = 1
 
         If useDefaultLeftRight Then
-            leftView = If(task.gOptions.LRMeanSubtraction.Checked, task.meanSub.dst2, task.leftView)
-            rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.meanSub.dst3, task.rightView)
+            leftView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
+            rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
         End If
 
         Dim disparity As New cv.Mat

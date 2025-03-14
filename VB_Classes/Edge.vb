@@ -1402,11 +1402,11 @@ Public Class Edge_MeanSubtraction : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.LRMeanSubtraction.Checked Then
-            src = task.meanSub.dst2
+            src = task.LRMeanSub.dst2
         Else
-            Static meanSub As New MeanSubtraction_Basics
-            meanSub.Run(task.leftView)
-            src = meanSub.dst2
+            Static LRMeanSub As New MeanSubtraction_Basics
+            LRMeanSub.Run(task.leftView)
+            src = LRMeanSub.dst2
         End If
         canny.Run(src)
 

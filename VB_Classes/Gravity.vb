@@ -22,7 +22,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         DrawLine(dst3, task.gravityVec.p1, task.gravityVec.p2, white)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravityHorizon.PrepareDepthInput(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravitySplit(0) Else dst0 = src
 
         dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -92,7 +92,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
         Return New cv.Point
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravityHorizon.PrepareDepthInput(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravitySplit(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
@@ -155,7 +155,7 @@ End Class
 
 
 
-Public Class Gravity_Horizon : Inherits TaskParent
+Public Class Gravity_HorizonOriginal : Inherits TaskParent
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
     Dim lastVec As linePoints
@@ -165,15 +165,6 @@ Public Class Gravity_Horizon : Inherits TaskParent
         labels(2) = "Gravity vector in yellow and Horizon vector in red."
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
-    Public Function PrepareDepthInput(index As Integer) As cv.Mat
-        If task.useGravityPointcloud Then Return task.pcSplit(index) ' already oriented to gravity
-
-        ' rebuild the pointcloud so it is oriented to gravity.
-        Dim rows = task.pointCloud.Rows, cols = task.pointCloud.Cols
-        Dim pc = (task.pointCloud.Reshape(1, rows * cols) * task.gMatrix).ToMat.Reshape(3, rows)
-        Dim split = pc.Split()
-        Return split(index)
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
@@ -185,6 +176,77 @@ Public Class Gravity_Horizon : Inherits TaskParent
         task.horizonVec = horizon.vec
         If standaloneTest() Then
             SetTrueText("Gravity vector (yellow):" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector (red): " + vbCrLf + horizon.strOut, 3)
+            dst2.SetTo(0)
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor)
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Gravity_Horizon : Inherits TaskParent
+    Dim threshold As Single = 0.015
+    Dim points As New cv.Mat
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Horizon and Gravity Vectors"
+        desc = "Improved method to find gravity and horizon vectors"
+    End Sub
+    Private Function findFirst(horizon As Boolean) As Integer
+        Dim ptList As New List(Of Integer)
+
+        For i = 0 To Math.Min(10, points.Rows / 2)
+            Dim pt = points.Get(Of cv.Point)(i, 0)
+            If pt.X <= 0 Or pt.Y <= 0 Then Continue For
+            If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
+            If horizon Then ptList.Add(pt.Y) Else ptList.Add(pt.X)
+        Next
+
+        If ptList.Count = 0 Then Return 0
+        Return ptList.Average()
+    End Function
+    Private Function findLast(horizon As Boolean) As Integer
+        Dim ptList As New List(Of Integer)
+
+        For i = points.Rows To Math.Max(points.Rows - 10, points.Rows / 2) Step -1
+            Dim pt = points.Get(Of cv.Point)(i, 0)
+            If pt.X <= 0 Or pt.Y <= 0 Then Continue For
+            If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
+            If horizon Then ptList.Add(pt.Y) Else ptList.Add(pt.X)
+        Next
+
+        If ptList.Count = 0 Then Return 0
+        Return ptList.Average()
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim work As New cv.Mat
+
+        work = task.pcSplit(1).InRange(-threshold, threshold)
+        work.SetTo(0, task.noDepthMask)
+        work.ConvertTo(dst1, cv.MatType.CV_8U)
+        points = dst1.FindNonZero()
+        If points.Total > 0 Then
+            task.horizonVec = New linePoints(New cv.Point(0, findFirst(True)), New cv.Point(dst2.Width, findLast(True)))
+        Else
+            task.horizonVec = New linePoints
+        End If
+
+        If task.horizonVec.p2.Y < 85 Then Dim k = 0
+
+        work = task.pcSplit(0).InRange(-threshold, threshold)
+        work.SetTo(0, task.noDepthMask)
+        work.ConvertTo(dst3, cv.MatType.CV_8U)
+        points = dst3.FindNonZero()
+        task.gravityVec = New linePoints(New cv.Point(findFirst(False), 0), New cv.Point(findLast(False), dst2.Height))
+
+        If task.gravityVec.p2.X < 85 Then Dim k = 0
+
+        If standaloneTest() Then
             dst2.SetTo(0)
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)

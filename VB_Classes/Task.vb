@@ -90,7 +90,9 @@ Public Class VBtask : Implements IDisposable
     Public rightView As New cv.Mat
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
     Public pointCloud As New cv.Mat
+    Public gravityCloud As New cv.Mat
     Public pcSplit() As cv.Mat
+    Public gravitySplit() As cv.Mat
 
     ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public gMatrix As New cv.Mat
@@ -117,7 +119,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gCell As GridCell_Basics
-    Public meanSub As MeanSubtraction_LeftRight
+    Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public paletteRandom As Palette_RandomColors
@@ -129,6 +131,8 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As Depth_Colorizer
+    Public kalman As Kalman_Basics
+
     ' end of task algorithms
 
     Public pythonPipeIn As NamedPipeServerStream
@@ -539,9 +543,10 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
-        meanSub = New MeanSubtraction_LeftRight
+        LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
         paletteRandom = New Palette_RandomColors
+        kalman = New Kalman_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -767,20 +772,19 @@ Public Class VBtask : Implements IDisposable
         If paused = False Then
             frameHistoryCount = gOptions.FrameHistory.Value
 
-            If useGravityPointcloud Then
-                If pointCloud.Size <> src.Size Then
-                    pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
-                End If
-
-
-
-                '******* this is the gravity rotation *******
-                pointCloud = (pointCloud.Reshape(1, src.Rows * src.Cols) * gMatrix).ToMat.Reshape(3, src.Rows)
-
-
-
-
+            If pointCloud.Size <> src.Size Then
+                pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
+                gravityCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
             End If
+
+
+
+            '******* this is the gravity rotation *******
+            gravityCloud = (pointCloud.Reshape(1, src.Rows * src.Cols) * gMatrix).ToMat.Reshape(3, src.Rows)
+
+
+
+            If useGravityPointcloud Then pointCloud = gravityCloud
 
             If pcSplit Is Nothing Then pcSplit = pointCloud.Split
 
@@ -788,6 +792,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         pcSplit = pointCloud.Split
+        If useGravityPointcloud Then gravitySplit = pcSplit Else gravitySplit = gravityCloud.Split()
 
         If optionsChanged Then maxDepthMask.SetTo(0)
         If gOptions.TruncateDepth.Checked Then
@@ -824,9 +829,10 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
-        If task.gOptions.LRMeanSubtraction.Checked Then meanSub.Run(src)
-        'task.leftView = meanSub.dst2
-        'task.rightView = meanSub.dst3
+        If task.gOptions.LRMeanSubtraction.Checked Then
+            If task.optionsChanged Then task.motionMask.SetTo(255) ' force the change over...
+            LRMeanSub.Run(src)
+        End If
         gCell.Run(src) ' goes with motionBasics - next statement
         motionBasics.Run(src) ' motion cannot run before gcell where the motionflag is set for each grid cell.
         If task.optionsChanged Then task.motionMask.SetTo(255)
@@ -923,6 +929,7 @@ Public Class VBtask : Implements IDisposable
             If dst3.Size <> workingRes And dst3.Width > 0 Then
                 dst3 = dst3.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
+
 
             If gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, gridMask)
 

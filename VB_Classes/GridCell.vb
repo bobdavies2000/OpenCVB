@@ -38,8 +38,8 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim stdev As cv.Scalar, mean As cv.Scalar, colorMean As cv.Scalar
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
         Dim threshold = options.colorDifferenceThreshold
-        Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.meanSub.dst2, task.leftView)
-        Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.meanSub.dst3, task.rightView)
+        Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
+        Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
@@ -1066,7 +1066,7 @@ End Class
 
 
 Public Class GridCell_MeanSubtraction : Inherits TaskParent
-    Dim meanSub As New MeanSubtraction_LeftRight
+    Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
         task.gCell.instantUpdate = True
         task.gOptions.LRMeanSubtraction.Checked = False ' so we can see the difference.
@@ -1074,10 +1074,10 @@ Public Class GridCell_MeanSubtraction : Inherits TaskParent
         desc = "Use the mean subtraction output of the left and right images as input to the GridCell_Basics.  NOTE: instant update!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        meanSub.Run(src)
+        LRMeanSub.Run(src)
 
-        task.leftView = meanSub.dst2
-        task.rightView = meanSub.dst3
+        task.leftView = LRMeanSub.dst2
+        task.rightView = LRMeanSub.dst3
 
         task.gCell.Run(src)
         dst2 = task.gCell.iddCorr.dst2

@@ -524,7 +524,6 @@ End Class
 Public Class BackProject_Image : Inherits TaskParent
     Public hist As New Hist_Basics
     Public mask As New cv.Mat
-    Dim kalman As New Kalman_Basics
     Public useInrange As Boolean
     Public Sub New()
         labels(2) = "Move mouse to backproject each histogram column"
@@ -540,12 +539,12 @@ Public Class BackProject_Image : Inherits TaskParent
         End If
         dst2 = hist.dst2
 
-        If kalman.kInput.Length <> 2 Then ReDim kalman.kInput(2 - 1)
-        kalman.kInput(0) = hist.mm.minVal
-        kalman.kInput(1) = hist.mm.maxVal
-        kalman.Run(src)
-        hist.mm.minVal = Math.Min(kalman.kOutput(0), kalman.kOutput(1))
-        hist.mm.maxVal = Math.Max(kalman.kOutput(0), kalman.kOutput(1))
+        If task.kalman.kInput.Length <> 2 Then ReDim task.kalman.kInput(2 - 1)
+        task.kalman.kInput(0) = hist.mm.minVal
+        task.kalman.kInput(1) = hist.mm.maxVal
+        task.kalman.Run(src)
+        hist.mm.minVal = Math.Min(task.kalman.kOutput(0), task.kalman.kOutput(1))
+        hist.mm.maxVal = Math.Max(task.kalman.kOutput(0), task.kalman.kOutput(1))
 
         Dim totalPixels = dst2.Total ' assume we are including zeros.
         If hist.plot.removeZeroEntry Then totalPixels = input.CountNonZero
