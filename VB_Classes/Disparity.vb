@@ -226,8 +226,8 @@ Public Class Disparity_Color8u : Inherits TaskParent
         dst1 = task.rightView.Clone
         color8u.Run(src)
 
-        dst2 = color8u.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        disparity.rightView = color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = color8u.dst2
+        disparity.rightView = color8u.dst3
         disparity.Run(dst2)
         dst3 = disparity.dst3
         labels = disparity.labels
