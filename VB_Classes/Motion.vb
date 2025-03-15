@@ -760,12 +760,11 @@ End Class
 
 Public Class Motion_CenterKalman : Inherits TaskParent
     Dim motion As New Motion_CenterRect
-    Dim kalman As New Kalman_Basics
     Dim kalmanRR As New Kalman_Basics
     Dim centerRect As cv.Rect
     Dim drawRotate As New Draw_RotatedRect
     Public Sub New()
-        ReDim kalman.kInput(2 - 1)
+        ReDim task.kalman.kInput(2 - 1)
         labels(3) = "Template for motion matchTemplate.  Shake the camera to see Kalman impact."
         desc = "Kalmanize the output of center rotation"
     End Sub
@@ -779,11 +778,11 @@ Public Class Motion_CenterKalman : Inherits TaskParent
             newRect = centerRect
             drawRotate.rr = New cv.RotatedRect(motion.matchCenter, task.centerRect.Size, 0)
         Else
-            kalman.kInput = {motion.translation.X, motion.translation.Y}
-            kalman.Run(src)
+            task.kalman.kInput = {motion.translation.X, motion.translation.Y}
+            task.kalman.Run(src)
 
-            newRect = New cv.Rect(centerRect.X + kalman.kOutput(0), centerRect.Y + kalman.kOutput(1),
-                                       centerRect.Width, centerRect.Height)
+            newRect = New cv.Rect(centerRect.X + task.kalman.kOutput(0), centerRect.Y + task.kalman.kOutput(1),
+                                  centerRect.Width, centerRect.Height)
 
             kalmanRR.kInput = New Single() {motion.matchCenter.X, motion.matchCenter.Y, motion.angle}
             kalmanRR.Run(src)

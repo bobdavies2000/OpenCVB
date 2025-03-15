@@ -578,7 +578,6 @@ End Class
 
 Public Class OpenGL_PeakFlat : Inherits TaskParent
     Dim peak As New Plane_Histogram
-    Dim kalman As New Kalman_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.floorStudy
         desc = "Display the peak flat level in OpenGL"
@@ -588,11 +587,11 @@ Public Class OpenGL_PeakFlat : Inherits TaskParent
         dst2 = peak.dst2
         labels(2) = peak.labels(3)
 
-        kalman.kInput = {peak.peakFloor, peak.peakCeiling}
-        kalman.Run(src)
+        task.kalman.kInput = {peak.peakFloor, peak.peakCeiling}
+        task.kalman.Run(src)
 
         task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.dataInput = cv.Mat.FromPixelData(2, 1, cv.MatType.CV_32F, {kalman.kOutput(0), kalman.kOutput(1)})
+        task.ogl.dataInput = cv.Mat.FromPixelData(2, 1, cv.MatType.CV_32F, {task.kalman.kOutput(0), task.kalman.kOutput(1)})
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub

@@ -578,7 +578,6 @@ End Class
 
 Public Class Random_KalmanPoints : Inherits TaskParent
     Dim random As New Random_Basics
-    Dim kalman As New Kalman_Basics
     Dim targetSet As New List(Of cv.Point2f)
     Dim currSet As New List(Of cv.Point2f)
     Dim refreshPoints As Boolean = True
@@ -595,19 +594,19 @@ Public Class Random_KalmanPoints : Inherits TaskParent
             currSet = New List(Of cv.Point2f)(random.PointList) ' just to get the updated size
             refreshPoints = False
 
-            If targetSet.Count * 2 <> kalman.kInput.Length Then ReDim kalman.kInput(targetSet.Count * 2 - 1)
+            If targetSet.Count * 2 <> task.kalman.kInput.Length Then ReDim task.kalman.kInput(targetSet.Count * 2 - 1)
 
         End If
 
         For i = 0 To targetSet.Count - 1
             Dim pt As cv.Point = targetSet(i)
-            kalman.kInput(i * 2) = pt.X
-            kalman.kInput(i * 2 + 1) = pt.Y
+            task.kalman.kInput(i * 2) = pt.X
+            task.kalman.kInput(i * 2 + 1) = pt.Y
         Next
 
-        kalman.Run(src)
-        For i = 0 To kalman.kOutput.Count - 1 Step 2
-            currSet(i / 2) = New cv.Point(kalman.kOutput(i), kalman.kOutput(i + 1))
+        task.kalman.Run(src)
+        For i = 0 To task.kalman.kOutput.Count - 1 Step 2
+            currSet(i / 2) = New cv.Point(task.kalman.kOutput(i), task.kalman.kOutput(i + 1))
         Next
 
         dst2.SetTo(0)

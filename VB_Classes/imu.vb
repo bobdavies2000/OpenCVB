@@ -71,7 +71,6 @@ End Class
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class IMU_BasicsKalman : Inherits TaskParent
     Dim lastTimeStamp As Double
-    Dim kalman As New Kalman_Basics
     Public Sub New()
         desc = "Read and display the IMU coordinates"
     End Sub
@@ -92,10 +91,10 @@ Public Class IMU_BasicsKalman : Inherits TaskParent
         task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
 
-        kalman.kInput = {task.accRadians.X, task.accRadians.Y, task.accRadians.Z}
-        kalman.Run(Nothing)
+        task.kalman.kInput = {task.accRadians.X, task.accRadians.Y, task.accRadians.Z}
+        task.kalman.Run(Nothing)
 
-        task.accRadians = New cv.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
+        task.accRadians = New cv.Point3f(task.kalman.kOutput(0), task.kalman.kOutput(1), task.kalman.kOutput(2))
 
         Dim x1 = -(90 + task.accRadians.X * 57.2958)
         Dim y1 = task.accRadians.Y - cv.Cv2.PI
@@ -246,9 +245,8 @@ End Class
 
 
 Public Class IMU_Stabilize : Inherits TaskParent
-    Dim kalman As New Kalman_Basics
     Public Sub New()
-        ReDim kalman.kInput(3 - 1)
+        ReDim task.kalman.kInput(3 - 1)
         desc = "Stabilize IMU acceleration data."
         labels = {"", "", "IMU Stabilize (move camera around)", "Difference from Color Image"}
     End Sub
@@ -261,11 +259,11 @@ Public Class IMU_Stabilize : Inherits TaskParent
         Dim sx = 1 ' assume no scaling is taking place.
         Dim sy = 1 ' assume no scaling is taking place.
 
-        kalman.kInput = {dx, dy, dz}
-        kalman.Run(src)
-        dx = kalman.kOutput(0)
-        dy = kalman.kOutput(1)
-        dz = kalman.kOutput(2)
+        task.kalman.kInput = {dx, dy, dz}
+        task.kalman.Run(src)
+        dx = task.kalman.kOutput(0)
+        dy = task.kalman.kOutput(1)
+        dz = task.kalman.kOutput(2)
 
         Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
         smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(dz))
@@ -540,7 +538,6 @@ End Class
 
 Public Class IMU_Lines : Inherits TaskParent
     Dim vert As New Line_GCloud
-    Dim kalman As New Kalman_Basics
     Dim lastGcell As gravityLine
     Public Sub New()
         labels(2) = "Vertical lines in Blue and horizontal lines in Yellow"
@@ -557,14 +554,14 @@ Public Class IMU_Lines : Inherits TaskParent
             If task.heartBeat Then dst3.SetTo(0)
             Dim p1 = gcell.tc1.center
             Dim p2 = gcell.tc2.center
-            Dim lastP1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-            Dim lastp2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
+            Dim lastP1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
+            Dim lastp2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
 
-            kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
-            kalman.Run(src)
+            task.kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
+            task.kalman.Run(src)
 
-            p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-            p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
+            p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
+            p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
             DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
             DrawCircle(dst2, p2, task.DotSize, task.HighlightColor)
             DrawCircle(dst3, p1, task.DotSize, white)
@@ -686,16 +683,17 @@ End Class
 
 
 Public Class IMU_Kalman : Inherits TaskParent
-    Dim kalman As New Kalman_Basics
     Public Sub New()
         desc = "Use Kalman Filter to stabilize the IMU acceleration and velocity"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        kalman.kInput = {task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z,
-                         task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z}
-        kalman.Run(src)
-        task.kalmanIMUacc = New cv.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
-        task.kalmanIMUvelocity = New cv.Point3f(kalman.kOutput(3), kalman.kOutput(4), kalman.kOutput(5))
+        With task.kalman
+            .kInput = {task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z,
+                              task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z}
+            .Run(src)
+            task.kalmanIMUacc = New cv.Point3f(.kOutput(0), .kOutput(1), .kOutput(2))
+            task.kalmanIMUvelocity = New cv.Point3f(.kOutput(3), .kOutput(4), .kOutput(5))
+        End With
         strOut = "IMU Acceleration Raw" + vbTab + "IMU Velocity Raw" + vbCrLf +
                  Format(task.IMU_RawAcceleration.X, fmt3) + vbTab + Format(task.IMU_RawAcceleration.Y, fmt3) + vbTab +
                  Format(task.IMU_RawAcceleration.Z, fmt3) + vbTab + Format(task.IMU_RawAngularVelocity.X, fmt3) + vbTab +

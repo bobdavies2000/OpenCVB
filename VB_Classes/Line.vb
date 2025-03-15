@@ -278,10 +278,9 @@ Public Class Line_Movement : Inherits TaskParent
     Public p1 As cv.Point
     Public p2 As cv.Point
     Dim gradientColors(100) As cv.Scalar
-    Dim kalman As New Kalman_Basics
     Dim frameCount As Integer
     Public Sub New()
-        kalman.kOutput = {0, 0, 0, 0}
+        task.kalman.kOutput = {0, 0, 0, 0}
 
         Dim color1 = cv.Scalar.Yellow, color2 = cv.Scalar.Blue
         Dim f As Double = 1.0
@@ -302,10 +301,10 @@ Public Class Line_Movement : Inherits TaskParent
                 k2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 dst2.SetTo(0)
             End If
-            kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
-            kalman.Run(src)
-            p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-            p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
+            task.kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
+            task.kalman.Run(src)
+            p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
+            p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
         End If
         frameCount += 1
         DrawLine(dst2, p1, p2, gradientColors(frameCount Mod gradientColors.Count))

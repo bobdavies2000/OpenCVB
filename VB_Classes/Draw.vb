@@ -233,7 +233,6 @@ End Class
 
 
 Public Class Draw_Arc : Inherits TaskParent
-    Dim kalman As New Kalman_Basics
     Dim rect As cv.Rect
 
     Dim angle As Single
@@ -256,12 +255,12 @@ Public Class Draw_Arc : Inherits TaskParent
             startAngle = msRNG.Next(1, 360)
             endAngle = msRNG.Next(1, 360)
 
-            kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
+            task.kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
         End If
 
-        kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-        kalman.Run(src)
-        Dim r = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
+        task.kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
+        task.kalman.Run(src)
+        Dim r = New cv.Rect(task.kalman.kOutput(0), task.kalman.kOutput(1), task.kalman.kOutput(2), task.kalman.kOutput(3))
         If r.Width <= 5 Then r.Width = 5
         If r.Height <= 5 Then r.Height = 5
         Dim rr = New cv.RotatedRect(New cv.Point2f(r.X, r.Y), New cv.Size2f(r.Width, r.Height), angle)
@@ -272,9 +271,9 @@ Public Class Draw_Arc : Inherits TaskParent
             dst2.Ellipse(rr, color, thickness, task.lineType)
             DrawRotatedOutline(rr, dst2, task.scalarColors(colorIndex))
         Else
-            Dim angle = kalman.kOutput(4)
-            Dim startAngle = kalman.kOutput(5)
-            Dim endAngle = kalman.kOutput(6)
+            Dim angle = task.kalman.kOutput(4)
+            Dim startAngle = task.kalman.kOutput(5)
+            Dim endAngle = task.kalman.kOutput(6)
             If options.drawFill Then thickness = -1
             Dim r1 = rr.BoundingRect
             dst2.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(r1.Width, r1.Height),
@@ -290,14 +289,13 @@ End Class
 
 Public Class Draw_ClipLine : Inherits TaskParent
     Dim flow As New Font_FlowText
-    Dim kalman As New Kalman_Basics
     Dim pt1 As cv.Point
     Dim pt2 As cv.Point
     Dim rect As cv.Rect
     Dim linenum = 0
     Dim hitCount = 0
     Private Sub setup()
-        ReDim kalman.kInput(8)
+        ReDim task.kalman.kInput(8)
         Dim r = InitRandomRect(25)
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
@@ -311,14 +309,14 @@ Public Class Draw_ClipLine : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         dst3 = src
-        kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-        kalman.Run(src)
-        Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
-        Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
+        task.kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
+        task.kalman.Run(src)
+        Dim p1 = New cv.Point(CInt(task.kalman.kOutput(0)), CInt(task.kalman.kOutput(1)))
+        Dim p2 = New cv.Point(CInt(task.kalman.kOutput(2)), CInt(task.kalman.kOutput(3)))
 
-        If kalman.kOutput(6) < 5 Then kalman.kOutput(6) = 5 ' don't let the width/height get too small...
-        If kalman.kOutput(7) < 5 Then kalman.kOutput(7) = 5
-        Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
+        If task.kalman.kOutput(6) < 5 Then task.kalman.kOutput(6) = 5 ' don't let the width/height get too small...
+        If task.kalman.kOutput(7) < 5 Then task.kalman.kOutput(7) = 5
+        Dim r = New cv.Rect(task.kalman.kOutput(4), task.kalman.kOutput(5), task.kalman.kOutput(6), task.kalman.kOutput(7))
 
         Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
         dst3.Line(p1, p2, If(clipped, white, cv.Scalar.Black), task.lineWidth + 1, task.lineType)

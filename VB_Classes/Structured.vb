@@ -489,9 +489,8 @@ End Class
 
 Public Class Structured_FloorCeiling : Inherits TaskParent
     Public slice As New Structured_SliceEither
-    Dim kalman As New Kalman_Basics
     Public Sub New()
-        ReDim kalman.kInput(2 - 1)
+        ReDim task.kalman.kInput(2 - 1)
         optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Find the floor or ceiling plane"
     End Sub
@@ -525,12 +524,12 @@ Public Class Structured_FloorCeiling : Inherits TaskParent
             End If
         Next
 
-        kalman.kInput(0) = floorY
-        kalman.kInput(1) = ceilingY
-        kalman.Run(src)
+        task.kalman.kInput(0) = floorY
+        task.kalman.kInput(1) = ceilingY
+        task.kalman.Run(src)
 
         labels(2) = "Current slice is at row =" + CStr(task.mouseMovePoint.Y)
-        labels(3) = "Ceiling is at row =" + CStr(CInt(kalman.kOutput(1))) + " floor at y=" + CStr(CInt(kalman.kOutput(0)))
+        labels(3) = "Ceiling is at row =" + CStr(CInt(task.kalman.kOutput(1))) + " floor at y=" + CStr(CInt(task.kalman.kOutput(0)))
 
         DrawLine(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow)
         SetTrueText("floor", New cv.Point(10, floorY + task.DotSize), 3)

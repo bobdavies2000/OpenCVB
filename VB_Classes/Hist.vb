@@ -522,7 +522,6 @@ End Class
 
 Public Class Hist_KalmanAuto : Inherits TaskParent
     Public histogram As New cv.Mat
-    Public kalman As New Kalman_Basics
     Public plot As New Plot_Histogram
     Dim mm As mmData
     Public ranges() As cv.Rangef
@@ -551,13 +550,13 @@ Public Class Hist_KalmanAuto : Inherits TaskParent
         Dim dimensions() = {task.histogramBins}
         cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, dimensions, ranges)
 
-        If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
+        If task.kalman.kInput.Length <> task.histogramBins Then ReDim task.kalman.kInput(task.histogramBins - 1)
 
         For i = 0 To task.histogramBins - 1
-            kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
+            task.kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
         Next
-        kalman.Run(src)
-        histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
+        task.kalman.Run(src)
+        histogram = cv.Mat.FromPixelData(task.kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, task.kalman.kOutput)
 
         Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
         If standaloneTest() Then plot.backColor = splitColors(splitIndex)
@@ -1314,7 +1313,6 @@ End Class
 
 Public Class Hist_Kalman : Inherits TaskParent
     Public hist As New Hist_Basics
-    Dim kalman As New Kalman_Basics
     Public Sub New()
         labels = {"", "", "With Kalman", "Without Kalman"}
         desc = "Use Kalman to smooth the histogram results."
@@ -1327,13 +1325,13 @@ Public Class Hist_Kalman : Inherits TaskParent
             hist.histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         End If
 
-        If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
+        If task.kalman.kInput.Length <> task.histogramBins Then ReDim task.kalman.kInput(task.histogramBins - 1)
         For i = 0 To task.histogramBins - 1
-            kalman.kInput(i) = hist.histogram.Get(Of Single)(i, 0)
+            task.kalman.kInput(i) = hist.histogram.Get(Of Single)(i, 0)
         Next
-        kalman.Run(src)
+        task.kalman.Run(src)
 
-        hist.histogram = cv.Mat.FromPixelData(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
+        hist.histogram = cv.Mat.FromPixelData(task.kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, task.kalman.kOutput)
         hist.plot.Run(hist.histogram)
         dst2 = hist.dst2
     End Sub

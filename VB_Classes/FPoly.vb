@@ -416,7 +416,6 @@ End Class
 Public Class FPoly_PlotWeighted : Inherits TaskParent
     Public fPlot As New FPoly_Plot
     Dim plot As New Plot_Histogram
-    Dim kalman As New Kalman_Basics
     Public Sub New()
         plot.minRange = 0
         plot.removeZeroEntry = False
@@ -428,11 +427,11 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         dst3 = fPlot.dst3
 
         Dim lastPlot As cv.Mat = plot.dst2.Clone
-        If task.optionsChanged Then ReDim kalman.kInput(fPlot.hist.Length - 1)
+        If task.optionsChanged Then ReDim task.kalman.kInput(fPlot.hist.Length - 1)
 
-        kalman.kInput = fPlot.hist
-        kalman.Run(src)
-        fPlot.hist = kalman.kOutput
+        task.kalman.kInput = fPlot.hist
+        task.kalman.Run(src)
+        fPlot.hist = task.kalman.kOutput
 
         Dim hlist = fPlot.hist.ToList
         Dim peak = hlist.Max
@@ -775,7 +774,6 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
             Exit Sub
         End If
 
-        Static kalman As New Kalman_Basics
         Static perp1 As New Line_Perpendicular
         Static perp2 As New Line_Perpendicular
 
@@ -804,9 +802,9 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         altCenterShift = New cv.Point2f(fPD.currPoly(fPD.polyPrevSideIndex).X - fPD.prevPoly(fPD.polyPrevSideIndex).X,
                                         fPD.currPoly(fPD.polyPrevSideIndex).Y - fPD.prevPoly(fPD.polyPrevSideIndex).Y)
 
-        kalman.kInput = {fPD.rotateAngle}
-        kalman.Run(src)
-        fPD.rotateAngle = kalman.kOutput(0)
+        task.kalman.kInput = {fPD.rotateAngle}
+        task.kalman.Run(src)
+        fPD.rotateAngle = task.kalman.kOutput(0)
 
         rotatePoints.poly = fPD.currPoly
         rotatePoints.polyPrev = fPD.prevPoly

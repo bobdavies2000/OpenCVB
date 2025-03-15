@@ -45,7 +45,6 @@ End Class
 
 Public Class Interpolate_Kalman : Inherits TaskParent
     Dim inter As New Interpolate_Basics
-    Dim kalman As New Kalman_Basics
     Dim updatedFrames As Integer
     Dim myFrameCount As Integer
     Dim heartCount As Integer
@@ -57,25 +56,25 @@ Public Class Interpolate_Kalman : Inherits TaskParent
 
         dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.optionsChanged Then
-            ReDim kalman.kInput(dst2.Width * dst2.Height - 1)
+            ReDim task.kalman.kInput(dst2.Width * dst2.Height - 1)
             myFrameCount = 1
             updatedFrames = 0
         End If
 
         Dim tmp32f As New cv.Mat
         dst2.ConvertTo(tmp32f, cv.MatType.CV_32F)
-        Marshal.Copy(tmp32f.Data, kalman.kInput, 0, kalman.kInput.Length)
-        kalman.Run(src)
+        Marshal.Copy(tmp32f.Data, task.kalman.kInput, 0, task.kalman.kInput.Length)
+        task.kalman.Run(src)
 
-        Dim results(kalman.kInput.Length - 1) As Byte
-        For i = 0 To kalman.kOutput.Length - 1
-            Dim val = kalman.kOutput(i)
+        Dim results(task.kalman.kInput.Length - 1) As Byte
+        For i = 0 To task.kalman.kOutput.Length - 1
+            Dim val = task.kalman.kOutput(i)
             If Single.IsNaN(val) Then val = 255
             If val < 0 Then val = 0
             If val > 255 Then val = 255
             results(i) = val
         Next
-        Marshal.Copy(results, 0, dst2.Data, kalman.kOutput.Length)
+        Marshal.Copy(results, 0, dst2.Data, task.kalman.kOutput.Length)
 
         If task.gOptions.UseKalman.Checked Then
             labels(2) = "Kalman-smoothed output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)

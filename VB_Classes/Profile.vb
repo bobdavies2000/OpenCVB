@@ -333,10 +333,9 @@ End Class
 
 Public Class Profile_Kalman : Inherits TaskParent
     Dim sides As New Profile_Basics
-    Dim kalman As New Kalman_Basics
     Public Sub New()
-        ReDim kalman.kInput(12 - 1)
-        If standalone Then task.gOptions.displaydst1.checked = true
+        ReDim task.kalman.kInput(12 - 1)
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
         desc = "Use Kalman to smooth the results of the contour key points"
     End Sub
@@ -346,19 +345,19 @@ Public Class Profile_Kalman : Inherits TaskParent
         dst2 = sides.dst3
         Dim rc = task.rc
 
-        If kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)
+        If task.kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim task.kalman.kInput(sides.corners.Count * 2 - 1)
         For i = 0 To sides.corners.Count - 1
-            kalman.kInput(i * 2) = sides.corners(i).X
-            kalman.kInput(i * 2 + 1) = sides.corners(i).Y
+            task.kalman.kInput(i * 2) = sides.corners(i).X
+            task.kalman.kInput(i * 2 + 1) = sides.corners(i).Y
         Next
 
-        kalman.Run(src)
+        task.kalman.Run(src)
 
         If rc.index > 0 Then
             dst3.SetTo(0)
             DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
             For i = 0 To sides.corners.Count - 1
-                Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
+                Dim pt = New cv.Point(CInt(task.kalman.kOutput(i * 2)), CInt(task.kalman.kOutput(i * 2 + 1)))
                 DrawCircle(dst3,pt, task.DotSize + 2, sides.cornerColors(i))
             Next
         End If

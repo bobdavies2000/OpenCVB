@@ -237,7 +237,6 @@ End Class
 
 Public Class RedColor_CellsAtDepth : Inherits TaskParent
     Dim plot As New Plot_Histogram
-    Dim kalman As New Kalman_Basics
     Public Sub New()
         plot.removeZeroEntry = False
         labels(3) = "Histogram of depth weighted by the size of the cell."
@@ -261,10 +260,10 @@ Public Class RedColor_CellsAtDepth : Inherits TaskParent
             hist(slot) += rc.pixels
         Next
 
-        kalman.kInput = hist
-        kalman.Run(src)
+        task.kalman.kInput = hist
+        task.kalman.Run(src)
 
-        Dim histMat = cv.Mat.FromPixelData(histBins, 1, cv.MatType.CV_32F, kalman.kOutput)
+        Dim histMat = cv.Mat.FromPixelData(histBins, 1, cv.MatType.CV_32F, task.kalman.kOutput)
         plot.Run(histMat)
         dst3 = plot.dst2
 

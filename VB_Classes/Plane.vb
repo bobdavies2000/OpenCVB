@@ -180,7 +180,6 @@ Public Class Plane_EqCorrelation : Inherits TaskParent
     Public correlations As New List(Of Single)
     Public equations As New List(Of cv.Vec4f)
     Public ptList2D As New List(Of List(Of cv.Point))
-    Dim kalman As New Kalman_Basics
     Public Sub New()
         desc = "Classify equations based on the correlation of their coefficients"
     End Sub
@@ -222,12 +221,14 @@ Public Class Plane_EqCorrelation : Inherits TaskParent
         Dim s2 = If(pt(2) < 0, " - ", " + ")
 
         If count(index) > plane.equations.Count / 4 Then
-            kalman.kInput = {pt(0), pt(1), pt(2), pt(3)}
-            kalman.Run(src)
+            With task.kalman
+                .kInput = {pt(0), pt(1), pt(2), pt(3)}
+                .Run(src)
 
-            strOut = "Normalized Plane equation: " + Format(kalman.kOutput(0), fmt3) + "x" + s1 + Format(Math.Abs(kalman.kOutput(1)), fmt3) + "y" + s2 +
-                     Format(Math.Abs(kalman.kOutput(2)), fmt3) + "z = " + Format(-kalman.kOutput(3), fmt3) + " with " + CStr(count(index)) +
-                     " closely matching plane equations." + vbCrLf
+                strOut = "Normalized Plane equation: " + Format(.kOutput(0), fmt3) + "x" + s1 + Format(Math.Abs(.kOutput(1)), fmt3) + "y" + s2 +
+                         Format(Math.Abs(.kOutput(2)), fmt3) + "z = " + Format(- .kOutput(3), fmt3) + " with " + CStr(count(index)) +
+                         " closely matching plane equations." + vbCrLf
+            End With
         End If
         SetTrueText(strOut, 3)
     End Sub

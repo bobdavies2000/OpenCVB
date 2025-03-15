@@ -173,10 +173,9 @@ End Class
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
 Public Class Kalman_MousePredict : Inherits TaskParent
-    Dim kalman As New Kalman_Basics
     Public Sub New()
-        ReDim kalman.kInput(2 - 1)
-        ReDim kalman.kOutput(2 - 1)
+        ReDim task.kalman.kInput(2 - 1)
+        ReDim task.kalman.kOutput(2 - 1)
 
         labels(2) = "Red is real mouse, white is prediction"
         desc = "Use kalman filter to predict the next mouse location."
@@ -184,11 +183,11 @@ Public Class Kalman_MousePredict : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.frameCount Mod 300 = 0 Then dst2.SetTo(0)
 
-        Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
+        Dim lastStateResult = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
         Static lastRealMouse = task.mouseMovePoint
-        kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
-        kalman.Run(src)
-        DrawLine(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, white)
+        task.kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
+        task.kalman.Run(src)
+        DrawLine(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), lastStateResult, white)
         dst2.Line(task.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
         lastRealMouse = task.mouseMovePoint
     End Sub
@@ -203,11 +202,9 @@ End Class
 Public Class Kalman_CVMat : Inherits TaskParent
     Dim kalman() As Kalman_Simple
     Public output As cv.Mat
-    Dim basics As New Kalman_Basics
     Public input As cv.Mat
     Dim saveDimension = -1
     Public Sub New()
-        ReDim basics.kInput(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         If standalone Then labels(2) = "Rectangle moves smoothly to random locations"
         desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"

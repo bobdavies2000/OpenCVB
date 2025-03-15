@@ -81,9 +81,8 @@ End Class
 Public Class LongLine_Depth : Inherits TaskParent
     Dim longLine As New LongLine_Consistent
     Dim plot As New Plot_OverTimeScalar
-    Dim kalman As New Kalman_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         plot.dst2 = dst3
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
@@ -100,10 +99,10 @@ Public Class LongLine_Depth : Inherits TaskParent
 
         Dim mm As mmData = GetMinMax(task.pcSplit(2), dst0)
 
-        kalman.kInput = {mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y}
-        kalman.Run(src)
-        mm.minLoc = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-        mm.maxLoc = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
+        task.kalman.kInput = {mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y}
+        task.kalman.Run(src)
+        mm.minLoc = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
+        mm.maxLoc = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
 
         DrawCircle(dst1, mm.minLoc, task.DotSize, cv.Scalar.Red)
         DrawCircle(dst1, mm.maxLoc, task.DotSize, cv.Scalar.Blue)
@@ -172,7 +171,6 @@ End Class
 
 Public Class LongLine_Point : Inherits TaskParent
     Dim longLine As New LongLine_Consistent
-    Dim kalman As New Kalman_Basics
     Public longPt As cv.Point
     Public Sub New()
         desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point"
@@ -182,10 +180,10 @@ Public Class LongLine_Point : Inherits TaskParent
         dst2 = longLine.dst2
 
         Dim lp = longLine.ptLong
-        kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
-        kalman.Run(src)
-        lp.p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-        lp.p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
+        task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
+        task.kalman.Run(src)
+        lp.p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
+        lp.p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
         longPt = New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
 
         DrawCircle(dst2, longPt, task.DotSize, cv.Scalar.Red)
