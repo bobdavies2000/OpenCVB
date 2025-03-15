@@ -1959,42 +1959,42 @@ End Class
 
 
 
-Public Class OpenGL_DrawLines3D : Inherits TaskParent
-    Dim lines As New Structured_Lines
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawLines
-        desc = "Draw all the lines found with Line3D_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
-        dst3 = lines.dst3
+'Public Class OpenGL_DrawLines3D : Inherits TaskParent
+'    Dim lines As New Structured_Lines
+'    Public Sub New()
+'        task.ogl.oglFunction = oCase.drawLines
+'        desc = "Draw all the lines found with Line3D_Basics"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        lines.Run(src)
+'        dst2 = lines.dst2
+'        dst3 = lines.dst3
 
-        Dim vec(8) As Single
-        Dim lineData As New List(Of Single)
-        lineData.Add(0) ' fill this in below
-        For Each lp In task.lpList
-            If lp.pc1.Z > 0 And lp.pc2.Z > 0 Then
-                If lp.vertical Then
-                    lp.pc2.X = lp.pc1.X
-                    lp.pc2.Z = lp.pc1.Z
-                Else
-                    lp.pc2.Y = lp.pc1.Y
-                End If
-                Dim c = task.scalarColors(lp.colorIndex)
-                vec = {c(0) / 255, c(1) / 255, c(2) / 255, lp.pc1.X, lp.pc1.Y, lp.pc1.Z, lp.pc2.X, lp.pc2.Y, lp.pc2.Z}
-                For i = 0 To vec.Length - 1
-                    lineData.Add(vec(i))
-                Next
-            End If
-        Next
-        lineData(0) = lineData.Count
-        task.ogl.dataInput = cv.Mat.FromPixelData(lineData.Count, 1, cv.MatType.CV_32F,
-                                                   lineData.ToArray)
+'        Dim vec(8) As Single
+'        Dim lineData As New List(Of Single)
+'        lineData.Add(0) ' fill this in below
+'        For Each lp In task.lpList
+'            If lp.pc1.Z > 0 And lp.pc2.Z > 0 Then
+'                If lp.vertical Then
+'                    lp.pc2.X = lp.pc1.X
+'                    lp.pc2.Z = lp.pc1.Z
+'                Else
+'                    lp.pc2.Y = lp.pc1.Y
+'                End If
+'                Dim c = task.scalarColors(lp.colorIndex)
+'                vec = {c(0) / 255, c(1) / 255, c(2) / 255, lp.pc1.X, lp.pc1.Y, lp.pc1.Z, lp.pc2.X, lp.pc2.Y, lp.pc2.Z}
+'                For i = 0 To vec.Length - 1
+'                    lineData.Add(vec(i))
+'                Next
+'            End If
+'        Next
+'        lineData(0) = lineData.Count
+'        task.ogl.dataInput = cv.Mat.FromPixelData(lineData.Count, 1, cv.MatType.CV_32F,
+'                                                   lineData.ToArray)
 
-        task.ogl.Run(task.color)
-    End Sub
-End Class
+'        task.ogl.Run(task.color)
+'    End Sub
+'End Class
 
 
 

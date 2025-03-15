@@ -588,8 +588,6 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
     Public xp1 As cv.Point2f ' intercept points at the edges of the image.
     Public xp2 As cv.Point2f
     Public vertical As Boolean
-    Public pc1 As cv.Point3f
-    Public pc2 As cv.Point3f
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
         p2 = _p2
@@ -599,19 +597,6 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
         End If
         p1 = New cv.Point2f(CInt(p1.X), CInt(p1.Y))
         p2 = New cv.Point2f(CInt(p2.X), CInt(p2.Y))
-        'If p1.X < 0 Then p1.X = 0
-        'If p2.X < 0 Then p2.X = 0
-        'If p1.X >= task.cols Then p1.X = task.cols - 1
-        'If p2.X >= task.cols Then p2.X = task.cols - 1
-        'If p1.Y < 0 Then p1.Y = 0
-        'If p2.Y < 0 Then p2.Y = 0
-        'If p1.Y >= task.rows Then p1.Y = task.rows - 1
-        'If p2.Y >= task.rows Then p2.Y = task.rows - 1
-
-        If task.pointCloud IsNot Nothing Then
-            pc1 = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
-            pc2 = task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X)
-        End If
 
         center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 

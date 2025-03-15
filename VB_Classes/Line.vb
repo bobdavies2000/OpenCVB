@@ -1,7 +1,5 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Imports MathNet.Numerics
-Imports MathNet.Numerics.LinearAlgebra
 Public Class Line_Basics : Inherits TaskParent
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public lpList As New List(Of linePoints)
@@ -1486,13 +1484,27 @@ Public Class Line_Perpendicular : Inherits TaskParent
         desc = "Find the line perpendicular to the line created by the points provided."
     End Sub
     Public Function computePerp(lp As linePoints) As linePoints
-
         midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
-        Dim m = 1 / lp.slope
-        ' Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
+        Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
 
         Dim b = midPoint.Y - m * midPoint.X
-        Return New linePoints(New cv.Point2f(-b / m, 0), New cv.Point2f((dst2.Height - b) / m, dst2.Height))
+        Dim p1 = New cv.Point2f(-b / m, 0)
+        Dim p2 = New cv.Point2f((dst2.Height - b) / m, dst2.Height)
+
+        Dim w = task.workingRes.Width
+        Dim h = task.workingRes.Height
+
+        If p1.X < 0 Then p1 = New cv.Point2f(0, b)
+        If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)
+        If p1.Y < 0 Then p1 = New cv.Point2f(-b / m, 0)
+        If p1.Y > h Then p1 = New cv.Point2f(w, m * w + b)
+
+        If p2.X < 0 Then p2 = New cv.Point2f(0, b)
+        If p2.X > w Then p2 = New cv.Point2f(w, m * w + b)
+        If p2.Y < 0 Then p2 = New cv.Point2f(-b / m, 0)
+        If p2.Y > h Then p2 = New cv.Point2f(w, m * w + b)
+
+        Return New linePoints(p1, p2)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then input = task.gravityVec
