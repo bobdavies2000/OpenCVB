@@ -1,7 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Drawing
-Imports System.Windows.Forms
-Imports System.Runtime.InteropServices
+
 Imports VB_Classes.TaskParent
 Public Module vbc
     Public task As VBtask
@@ -601,14 +599,14 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
         End If
         p1 = New cv.Point2f(CInt(p1.X), CInt(p1.Y))
         p2 = New cv.Point2f(CInt(p2.X), CInt(p2.Y))
-        If p1.X < 0 Then p1.X = 0
-        If p2.X < 0 Then p2.X = 0
-        If p1.X >= task.cols Then p1.X = task.cols - 1
-        If p2.X >= task.cols Then p2.X = task.cols - 1
-        If p1.Y < 0 Then p1.Y = 0
-        If p2.Y < 0 Then p2.Y = 0
-        If p1.Y >= task.rows Then p1.Y = task.rows - 1
-        If p2.Y >= task.rows Then p2.Y = task.rows - 1
+        'If p1.X < 0 Then p1.X = 0
+        'If p2.X < 0 Then p2.X = 0
+        'If p1.X >= task.cols Then p1.X = task.cols - 1
+        'If p2.X >= task.cols Then p2.X = task.cols - 1
+        'If p1.Y < 0 Then p1.Y = 0
+        'If p2.Y < 0 Then p2.Y = 0
+        'If p1.Y >= task.rows Then p1.Y = task.rows - 1
+        'If p2.Y >= task.rows Then p2.Y = task.rows - 1
 
         If task.pointCloud IsNot Nothing Then
             pc1 = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)

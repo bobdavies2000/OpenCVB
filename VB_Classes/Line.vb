@@ -1,5 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+Imports MathNet.Numerics
+Imports MathNet.Numerics.LinearAlgebra
 Public Class Line_Basics : Inherits TaskParent
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public lpList As New List(Of linePoints)
@@ -384,38 +386,6 @@ Public Class Line_GCloud : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Line_Perpendicular : Inherits TaskParent
-    Public input As linePoints
-    Public output As linePoints
-    Dim midPoint As cv.Point2f
-    Public Sub New()
-        labels = {"", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", ""}
-        desc = "Find the line perpendicular to the line created by the points provided."
-    End Sub
-    Public Function computePerp(lp As linePoints) As linePoints
-        midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
-
-        Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
-
-        Dim b = midPoint.Y - m * midPoint.X
-        Return New linePoints(New cv.Point2f(-b / m, 0), New cv.Point2f((dst2.Height - b) / m, dst2.Height))
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then input = task.gravityVec
-        dst2.SetTo(0)
-        DrawLine(dst2, input.p1, input.p2, white)
-
-        output = computePerp(input)
-        DrawCircle(dst2, midPoint, task.DotSize + 2, cv.Scalar.Red)
-        DrawLine(dst2, output.p1, output.p2, cv.Scalar.Yellow)
-    End Sub
-End Class
 
 
 
@@ -1497,5 +1467,40 @@ Public Class Line_Core : Inherits TaskParent
             labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector in the current image with " +
                         CStr(lpList.Count) + " after filtering with the motion mask."
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_Perpendicular : Inherits TaskParent
+    Public input As linePoints
+    Public output As linePoints
+    Dim midPoint As cv.Point2f
+    Public Sub New()
+        labels = {"", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", ""}
+        desc = "Find the line perpendicular to the line created by the points provided."
+    End Sub
+    Public Function computePerp(lp As linePoints) As linePoints
+
+        midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
+        Dim m = 1 / lp.slope
+        ' Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
+
+        Dim b = midPoint.Y - m * midPoint.X
+        Return New linePoints(New cv.Point2f(-b / m, 0), New cv.Point2f((dst2.Height - b) / m, dst2.Height))
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standaloneTest() Then input = task.gravityVec
+        dst2.SetTo(0)
+        DrawLine(dst2, input.p1, input.p2, white)
+
+        output = computePerp(input)
+        DrawCircle(dst2, midPoint, task.DotSize + 2, cv.Scalar.Red)
+        DrawLine(dst2, output.p1, output.p2, cv.Scalar.Yellow)
     End Sub
 End Class

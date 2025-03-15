@@ -111,7 +111,6 @@ HistValley
 HMM
 HOG
 Homography
-Horizon
 Hough
 Hull
 Image
@@ -242,4 +241,5 @@ WarpModel
 WarpPerspective
 Watershed
 XFeatures2D
+XO
 XPhoto

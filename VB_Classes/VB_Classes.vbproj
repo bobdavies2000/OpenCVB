@@ -150,7 +150,6 @@
     <Compile Include="Duster.vb" />
     <Compile Include="FeatureLine.vb" />
     <Compile Include="Gravity.vb" />
-    <Compile Include="Horizon.vb" />
     <Compile Include="LinearRegression.vb" />
     <Compile Include="LineCoin.vb" />
     <Compile Include="MatchLine.vb" />
@@ -445,6 +444,7 @@
     <Compile Include="Vector.vb" />
     <Compile Include="WarpAffine.vb" />
     <Compile Include="Watershed.vb" />
+    <Compile Include="XO.vb" />
     <Compile Include="XPhoto.vb" />
     <Compile Include="Magnify.vb" />
   </ItemGroup>
@@ -504,6 +504,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="NAudio">
       <Version>2.2.1</Version>
     </PackageReference>

@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Threading_Test : Inherits TaskParent
     Dim thread1 As System.Threading.Thread
     Dim thread2 As System.Threading.Thread
-    Dim horizon As New Horizon_Basics
+    Dim horizon As New XO_Horizon_Basics
     Dim gravity As New Gravity_Basics
     Public Sub New()
         task.recordTimings = False
