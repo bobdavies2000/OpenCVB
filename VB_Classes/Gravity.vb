@@ -188,16 +188,15 @@ End Class
 
 
 
-Public Class Gravity_Horizon : Inherits TaskParent
-    Dim threshold As Single = 0.015
-    Dim points As New cv.Mat
+Public Class Gravity_HorizonRawOld : Inherits TaskParent
+    Public yLeft As Integer, yRight As Integer, xTop As Integer, xBot As Integer
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Horizon and Gravity Vectors"
         desc = "Improved method to find gravity and horizon vectors"
     End Sub
-    Private Function findFirst(horizon As Boolean) As Integer
+    Private Function findFirst(points As cv.Mat, horizon As Boolean, ByRef sampleX As Integer) As Integer
         Dim ptList As New List(Of Integer)
 
         For i = 0 To Math.Min(10, points.Rows / 2)
@@ -205,12 +204,13 @@ Public Class Gravity_Horizon : Inherits TaskParent
             If pt.X <= 0 Or pt.Y <= 0 Then Continue For
             If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
             If horizon Then ptList.Add(pt.Y) Else ptList.Add(pt.X)
+            sampleX = pt.X ' this X value tells us if the horizon found is for the left or the right.
         Next
 
         If ptList.Count = 0 Then Return 0
         Return ptList.Average()
     End Function
-    Private Function findLast(horizon As Boolean) As Integer
+    Private Function findLast(points As cv.Mat, horizon As Boolean, sampleX As Integer) As Integer
         Dim ptList As New List(Of Integer)
 
         For i = points.Rows To Math.Max(points.Rows - 10, points.Rows / 2) Step -1
@@ -218,33 +218,146 @@ Public Class Gravity_Horizon : Inherits TaskParent
             If pt.X <= 0 Or pt.Y <= 0 Then Continue For
             If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
             If horizon Then ptList.Add(pt.Y) Else ptList.Add(pt.X)
+            sampleX = pt.X ' this X value tells us if the horizon found is for the left or the right.
         Next
 
         If ptList.Count = 0 Then Return 0
         Return ptList.Average()
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim threshold As Single = 0.015
         Dim work As New cv.Mat
 
         work = task.pcSplit(1).InRange(-threshold, threshold)
         work.SetTo(0, task.noDepthMask)
         work.ConvertTo(dst1, cv.MatType.CV_8U)
-        points = dst1.FindNonZero()
-        If points.Total > 0 Then
-            task.horizonVec = New linePoints(New cv.Point(0, findFirst(True)), New cv.Point(dst2.Width, findLast(True)))
-        Else
-            task.horizonVec = New linePoints
-        End If
+        Dim hPoints = dst1.FindNonZero()
+        If hPoints.Total > 0 Then
+            Dim sampleX1 As Integer, sampleX2 As Integer
+            Dim y1 = findFirst(hPoints, True, sampleX1)
+            Dim y2 = findLast(hPoints, True, sampleX2)
 
-        If task.horizonVec.p2.Y < 85 Then Dim k = 0
+            ' This is because FindNonZero works from the top of the image down.  
+            ' If the horizon has a positive slope, the first point found will be on the right.
+            ' if the horizon has a negative slope, the first point found will be on the left.
+            If sampleX1 < dst2.Width / 2 Then
+                yLeft = y1
+                yRight = y2
+            Else
+                yLeft = y2
+                yRight = y1
+            End If
+        Else
+            yLeft = 0
+            yRight = 0
+        End If
 
         work = task.pcSplit(0).InRange(-threshold, threshold)
         work.SetTo(0, task.noDepthMask)
         work.ConvertTo(dst3, cv.MatType.CV_8U)
-        points = dst3.FindNonZero()
-        task.gravityVec = New linePoints(New cv.Point(findFirst(False), 0), New cv.Point(findLast(False), dst2.Height))
+        Dim gPoints = dst3.FindNonZero()
+        Dim sampleUnused As Integer
+        xTop = findFirst(gPoints, False, sampleUnused)
+        xBot = findLast(gPoints, False, sampleUnused)
 
-        If task.gravityVec.p2.X < 85 Then Dim k = 0
+        If standaloneTest() Then
+            Dim horizonVec As linePoints, gravityVec As linePoints
+            If hPoints.Total > 0 Then
+                horizonVec = New linePoints(New cv.Point(0, yLeft), New cv.Point(dst2.Width, yRight))
+            Else
+                horizonVec = New linePoints
+            End If
+
+            gravityVec = New linePoints(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
+
+            dst2.SetTo(0)
+            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.HighlightColor)
+            DrawLine(dst2, horizonVec.p1, horizonVec.p2, cv.Scalar.Red)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Gravity_Raw : Inherits TaskParent
+    Public xTop As Integer, xBot As Integer
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Horizon and Gravity Vectors"
+        desc = "Improved method to find gravity and horizon vectors"
+    End Sub
+    Private Function findFirst(points As cv.Mat) As Integer
+        Dim ptList As New List(Of Integer)
+
+        For i = 0 To Math.Min(10, points.Rows / 2)
+            Dim pt = points.Get(Of cv.Point)(i, 0)
+            If pt.X <= 0 Or pt.Y <= 0 Then Continue For
+            If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
+            ptList.Add(pt.X)
+        Next
+
+        If ptList.Count = 0 Then Return 0
+        Return ptList.Average()
+    End Function
+    Private Function findLast(points As cv.Mat) As Integer
+        Dim ptList As New List(Of Integer)
+
+        For i = points.Rows To Math.Max(points.Rows - 10, points.Rows / 2) Step -1
+            Dim pt = points.Get(Of cv.Point)(i, 0)
+            If pt.X <= 0 Or pt.Y <= 0 Then Continue For
+            If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
+            ptList.Add(pt.X)
+        Next
+
+        If ptList.Count = 0 Then Return 0
+        Return ptList.Average()
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim threshold As Single = 0.015
+        Dim work As New cv.Mat
+
+        work = task.pcSplit(0).InRange(-threshold, threshold)
+        work.SetTo(0, task.noDepthMask)
+        work.ConvertTo(dst3, cv.MatType.CV_8U)
+        Dim gPoints = dst3.FindNonZero()
+        xTop = findFirst(gPoints)
+        xBot = findLast(gPoints)
+
+        If standaloneTest() Then
+            Dim gravityVec = New linePoints(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
+
+            dst2.SetTo(0)
+            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.HighlightColor)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Gravity_Horizon : Inherits TaskParent
+    Dim ghRaw As New Gravity_Raw
+    Dim kalman As New Kalman_Basics
+    Dim line As New Line_Perpendicular
+    Public Sub New()
+        ReDim kalman.kInput(2 - 1)
+        desc = "Use kalman to smooth gravity and horizon vectors."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        ghRaw.Run(src)
+
+        With kalman
+            .kInput = {ghRaw.xBot, ghRaw.xTop}
+            .Run(src)
+
+            task.gravityVec = New linePoints(New cv.Point2f(.kOutput(0), 0),
+                                             New cv.Point2f(.kOutput(1), dst2.Height))
+            task.horizonVec = line.computePerp(task.gravityVec)
+        End With
 
         If standaloneTest() Then
             dst2.SetTo(0)

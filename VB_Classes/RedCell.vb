@@ -297,8 +297,6 @@ Public Class RedCell_Generate : Inherits TaskParent
                     ' verify that the maxDStable is still good.
                     Dim v1 = task.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                     If v1 <> lrc.index Then
-                        If rc.pixels > 20000 Then Dim k = 0
-
                         rc.maxDStable = rc.maxDist
 
                         rc.age = 1 ' a new cell was found that was probably part of another in the previous frame.
