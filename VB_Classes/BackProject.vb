@@ -59,21 +59,20 @@ Public Class BackProject_Full : Inherits TaskParent
     Public classCount As Integer
     Public ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
     Public Sub New()
+        task.gOptions.HistBinBar.Value = 10
         labels = {"", "", "CV_8U format of the backprojection", "dst2 presented with a palette"}
         desc = "Create a color histogram, normalize it, and backproject it with a palette."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         classCount = task.histogramBins
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
+
         Dim histogram As New cv.Mat
         cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
         histogram = histogram.Normalize(0, classCount, cv.NormTypes.MinMax)
 
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)
-
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
         If standaloneTest() Then dst3 = ShowPalette(dst2)
     End Sub
 End Class

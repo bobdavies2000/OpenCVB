@@ -206,61 +206,6 @@ End Class
 
 
 
-Public Class Rotate_Horizon : Inherits TaskParent
-    Dim rotate As New Rotate_Basics
-    Dim edges As New CameraMotion_WithRotation
-    Public Sub New()
-       optiBase.findslider("Rotation Angle in degrees").Value = 3
-        labels(2) = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector."
-        desc = "Rotate the horizon independently from the rotation of the image to validate the Edge_CameraMotion algorithm."
-    End Sub
-    Function RotatePoint(point As cv.Point2f, center As cv.Point2f, angle As Double) As cv.Point2f
-        Dim radians As Double = angle * (PI / 180.0)
-
-        Dim sinAngle As Double = Sin(radians)
-        Dim cosAngle As Double = Cos(radians)
-
-        Dim x As Double = point.X - center.X
-        Dim y As Double = point.Y - center.Y
-
-        Dim xNew As Double = x * cosAngle - y * sinAngle
-        Dim yNew As Double = x * sinAngle + y * cosAngle
-
-        xNew += center.X
-        yNew += center.Y
-
-        Return New cv.Point2f(xNew, yNew)
-    End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
-        rotate.Run(src)
-        dst2 = rotate.dst2.Clone
-        dst1 = dst2.Clone
-
-        Dim horizonVec = New linePoints(task.horizonVec.p1, task.horizonVec.p2)
-
-        horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle)
-        horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)
-
-        DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.HighlightColor)
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
-
-        Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
-        Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
-        edges.translateRotateY(y1, y2)
-
-        rotate.rotateAngle = edges.rotationY
-        rotate.rotateCenter = edges.centerY
-        rotate.Run(dst1)
-        dst3 = rotate.dst2.Clone
-
-        strOut = edges.strOut
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Rotate_Verticalize : Inherits TaskParent
     Dim rotate As New Rotate_Basics

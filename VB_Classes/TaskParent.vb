@@ -573,6 +573,7 @@ Public Class TaskParent : Implements IDisposable
         Return task.palette.dst2.Clone
     End Function
     Public Function ShowPalette(input As cv.Mat) As cv.Mat
+        If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
         If input.Type = cv.MatType.CV_8UC3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If input.Type <> cv.MatType.CV_8U Then
             Dim mm = GetMinMax(input)
@@ -583,6 +584,7 @@ Public Class TaskParent : Implements IDisposable
         Return task.paletteRandom.useColorMapWithBlack(input)
     End Function
     Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat
+        If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
         Return task.paletteRandom.useColorMapFull(input)
     End Function
     Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat

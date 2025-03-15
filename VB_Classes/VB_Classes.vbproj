@@ -220,7 +220,6 @@
     <Compile Include="Sides.vb" />
     <Compile Include="Spectrum.vb" />
     <Compile Include="Thickness.vb" />
-    <Compile Include="Threading.vb" />
     <Compile Include="TreeviewForm.Designer.vb">
       <DependentUpon>TreeviewForm.vb</DependentUpon>
     </Compile>

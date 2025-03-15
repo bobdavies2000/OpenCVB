@@ -37,14 +37,13 @@ Public Class Color8U_Basics : Inherits TaskParent
             classifier = colorMethods(index)
         End If
 
-        If task.redOptions.colorInputName <> "PCA_NColor_CPP" Then
-            dst1 = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-            classifier.Run(dst1)
-        Else
+        If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
             classifier.Run(src)
+        Else
+            classifier.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         End If
 
-        If task.optionsChanged Then dst2 = classifier.dst2 Else classifier.dst2.copyto(dst2, task.motionMask)
+        If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)
         classCount = classifier.classCount
 
         If standaloneTest() Then dst3 = ShowPalette(dst2)

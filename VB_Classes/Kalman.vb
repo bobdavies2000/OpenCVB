@@ -36,7 +36,7 @@ Public Class Kalman_Basics : Inherits TaskParent
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standaloneTest() Then
+        If standalone Then
             dst2 = src
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = ValidateRect(rect)

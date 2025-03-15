@@ -15,7 +15,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             color.Run(src)
             src = color.dst2
         End If
-        Dim inputData(src.Total - 1) As Byte
+        Dim inputData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 

@@ -127,7 +127,7 @@ Public Class VBtask : Implements IDisposable
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Object
     Public ogl As OpenGL_Basics
-    Public gravityHorizon As Gravity_Horizon
+    Public gravityHorizon As Gravity_Basics
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As Depth_Colorizer
@@ -539,13 +539,12 @@ Public Class VBtask : Implements IDisposable
 
         gmat = New IMU_GMatrix
         grid = New Grid_Basics
-        gravityHorizon = New Gravity_Horizon
+        gravityHorizon = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
-        paletteRandom = New Palette_RandomColors
         kalman = New Kalman_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics

@@ -21,7 +21,6 @@ BlurMotion
 Boundary
 Brightness
 BRISK
-CameraMotion
 CamShift
 Cartoonify
 CComp
@@ -226,7 +225,6 @@ Swarm
 Texture
 TextureFlow
 Thickness
-Threading
 Threshold
 Tracker
 Transform
