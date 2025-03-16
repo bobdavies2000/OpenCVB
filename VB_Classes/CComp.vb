@@ -177,7 +177,7 @@ Public Class CComp_Stats : Inherits TaskParent
             If area < 10 Then Continue For
             Dim r1 = ValidateRect(stats.Get(Of cv.Rect)(i, 0))
             Dim r = ValidateRect(New cv.Rect(r1.X, r1.Y, r1.Width, r1.Height))
-            If (r.Width = dst2.Width And r.Height = dst2.Height) Or (r.Width = 1 And r.Height = 1) Then Continue For
+            If (r.Width = dst2.Width Or r.Height = dst2.Height) Or (r.Width = 1 Or r.Height = 1) Then Continue For
             areas.Add(area)
             unsortedRects.Add(r)
             dst2.Rectangle(r, task.HighlightColor, task.lineWidth)

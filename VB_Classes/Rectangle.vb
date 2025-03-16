@@ -293,6 +293,7 @@ End Class
 
 Public Class Rectangle_EnclosingPoints : Inherits TaskParent
     Public pointList As New List(Of cv.Point2f)
+    Public minRect As cv.RotatedRect
     Public Sub New()
         desc = "Build an enclosing rectangle for the supplied pointlist"
     End Sub
@@ -305,7 +306,7 @@ Public Class Rectangle_EnclosingPoints : Inherits TaskParent
             Next
         End If
 
-        Dim minRect = cv.Cv2.MinAreaRect(pointList.ToArray)
+        minRect = cv.Cv2.MinAreaRect(pointList.ToArray)
         DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
     End Sub
 End Class

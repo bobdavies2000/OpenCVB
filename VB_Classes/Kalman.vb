@@ -28,7 +28,7 @@ Public Class Kalman_Basics : Inherits TaskParent
         If task.gOptions.UseKalman.Checked Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
-                kalman(i).runAlg(Nothing)
+                kalman(i).RunAlg(Nothing)
                 If Double.IsNaN(kalman(i).stateResult) Then kalman(i).stateResult = kalman(i).inputReal ' kalman failure...
                 kOutput(i) = kalman(i).stateResult
             Next
@@ -38,16 +38,8 @@ Public Class Kalman_Basics : Inherits TaskParent
 
         If standalone Then
             dst2 = src
-            Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
-            rect = ValidateRect(rect)
-            Static lastRect = rect
-            If rect = lastRect Then
-                Dim r = InitRandomRect(If(src.Height <= 240, 20, 50))
-                kInput = New Single() {r.X, r.Y, r.Width, r.Height}
-            End If
-            lastRect = rect
-            dst2.Rectangle(rect, white, task.lineWidth + 1)
-            dst2.Rectangle(rect, cv.Scalar.Red, task.lineWidth)
+            SetTrueText("Kalman_Basics doesn't produce output when run standalone..." + vbCrLf +
+                        "It is used a lot. No need for standalone", 3)
         End If
     End Sub
 End Class

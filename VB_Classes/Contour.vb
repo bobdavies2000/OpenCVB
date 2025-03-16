@@ -38,9 +38,10 @@ Public Class Contour_Basics : Inherits TaskParent
         For i = 0 To sortedList.Count - 1
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             contourlist.Add(tour)
-            Dim vec = dst2.Get(Of cv.Vec3b)(tour(0).Y, tour(0).X)
-            Dim color = New cv.Scalar(vec.Item0, vec.Item1, vec.Item2)
-            DrawContour(dst3, tour.ToList, color, -1)
+            'Dim test = validatePoint(tour(0))
+            'Dim vec = dst2.Get(Of cv.Vec3b)(test.Y, test.X)
+            'Dim color = New cv.Scalar(vec.Item0, vec.Item1, vec.Item2)
+            DrawContour(dst3, tour.ToList, cv.Scalar.White, -1)
         Next
         labels(3) = $"Top {sortedList.Count} contours found"
     End Sub

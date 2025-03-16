@@ -37,7 +37,6 @@ Public Class GridCell_Basics : Inherits TaskParent
             cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
             idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
             Dim colorChange = distance3D(idd.color, idd.colorVecLast)
-            If idd.cRect.Width <> task.cellSize Or idd.cRect.Height <> task.cellSize Then Dim k = 0
             If colorChange < threshold And idd.age > 0 And idd.correlation <> 0 Then
                 idd.age += 1
                 idd.motionFlag = False
