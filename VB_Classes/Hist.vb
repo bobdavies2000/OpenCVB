@@ -7,11 +7,11 @@ Public Class Hist_Basics : Inherits TaskParent
     Public ranges() As cv.Rangef
 
     Public histArray() As Single
-    Public inputOnlyMask As New cv.Mat
     Public fixedRanges() As cv.Rangef
     Public bins As Integer
     Public removeMax As Boolean
     Public autoDisplay As Boolean
+    Public histMask As New cv.Mat
     Dim splitIndex As Integer
     Public Sub New()
         If standalone Then task.gOptions.setHistogramBins(255)
@@ -34,9 +34,9 @@ Public Class Hist_Basics : Inherits TaskParent
 
         ' ranges are exclusive in OpenCV!!!
         If bins = 0 Then
-            cv.Cv2.CalcHist({src}, {splitIndex}, inputOnlyMask, histogram, 1, {task.histogramBins}, ranges)
+            cv.Cv2.CalcHist({src}, {splitIndex}, histMask, histogram, 1, {task.histogramBins}, ranges)
         Else
-            cv.Cv2.CalcHist({src}, {splitIndex}, inputOnlyMask, histogram, 1, {bins}, ranges)
+            cv.Cv2.CalcHist({src}, {splitIndex}, histMask, histogram, 1, {bins}, ranges)
         End If
 
         If removeMax Then

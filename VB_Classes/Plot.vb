@@ -476,6 +476,7 @@ Public Class Plot_Histogram : Inherits TaskParent
     Public addLabels As Boolean = True
     Public removeZeroEntry As Boolean = True
     Public createHistogram As Boolean = False
+    Public histMask As New cv.Mat
     Public mm As mmData
     Public Sub New()
         desc = "Plot histogram data with a stable scale at the left of the image."
@@ -498,7 +499,7 @@ Public Class Plot_Histogram : Inherits TaskParent
                 End If
             End If
             ranges = {New cv.Rangef(min, max)}
-            cv.Cv2.CalcHist({src}, {0}, New cv.Mat(), histogram, 1, {task.histogramBins}, ranges)
+            cv.Cv2.CalcHist({src}, {0}, histMask, histogram, 1, {task.histogramBins}, ranges)
         Else
             histogram = src
         End If

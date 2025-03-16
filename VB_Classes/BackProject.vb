@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Public Class BackProject_Basics : Inherits TaskParent
-    Public histK As New Hist_Kalman
+    Public hist As New Hist_Basics
     Public minRange As cv.Scalar, maxRange As cv.Scalar
     Public Sub New()
         labels(2) = "Move mouse to backproject a histogram column"
@@ -11,19 +11,17 @@ Public Class BackProject_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim input = src.Clone
         If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        histK.Run(input)
-        If histK.hist.mm.minVal = histK.hist.mm.maxVal Then
+        hist.Run(input)
+        If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
             Exit Sub
         End If
 
-        dst2 = histK.dst2
+        dst2 = hist.dst2
 
         Dim totalPixels = dst2.Total ' assume we are including zeros.
-        If histK.hist.plot.removeZeroEntry Then totalPixels = input.CountNonZero
-
         Dim brickWidth = dst2.Width / task.histogramBins
-        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / task.histogramBins
+        Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
 
         minRange = New cv.Scalar(histIndex * incr)
@@ -39,8 +37,8 @@ Public Class BackProject_Basics : Inherits TaskParent
         Dim actualCount = dst0.CountNonZero
         dst3 = task.color.Clone
         dst3.SetTo(cv.Scalar.Yellow, dst0)
-        Dim count = histK.hist.histogram.Get(Of Single)(CInt(histIndex), 0)
-        Dim histMax As mmData = GetMinMax(histK.hist.histogram)
+        Dim count = hist.histogram.Get(Of Single)(CInt(histIndex), 0)
+        Dim histMax As mmData = GetMinMax(hist.histogram)
         labels(3) = $"Backprojecting {CInt(minRange(0))} to {CInt(maxRange(0))} with {CInt(count)} of {totalPixels} compared to " +
                     $"mask pixels = {actualCount}.  Histogram max count = {CInt(histMax.maxVal)}"
         dst2.Rectangle(New cv.Rect(CInt(histIndex) * brickWidth, 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
@@ -87,7 +85,7 @@ End Class
 
 Public Class BackProject_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim backP As New BackProject_Basics
+    Dim bProject As New BackProject_Basics
     Public Sub New()
         task.redOptions.checkSimpleReduction(True)
         labels(3) = "Backprojection of highlighted histogram bin"
@@ -96,9 +94,9 @@ Public Class BackProject_Reduction : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         reduction.Run(src)
 
-        backP.Run(reduction.dst2)
-        dst2 = backP.dst2
-        dst3 = backP.dst3
+        bProject.Run(reduction.dst2)
+        dst2 = bProject.dst2
+        dst3 = bProject.dst3
         labels(2) = "Reduction = " + CStr(task.redOptions.SimpleReductionBar.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
@@ -110,7 +108,7 @@ End Class
 
 
 Public Class BackProject_FeatureLess : Inherits TaskParent
-    Dim backP As New BackProject_Basics
+    Dim bProject As New BackProject_Basics
     Dim reduction As New Reduction_Basics
     Dim edges As New Edge_ColorGap_CPP
     Public Sub New()
@@ -122,9 +120,9 @@ Public Class BackProject_FeatureLess : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         edges.Run(src)
         reduction.Run(edges.dst3)
-        backP.Run(reduction.dst2)
-        dst2 = backP.dst2
-        dst3 = backP.dst3
+        bProject.Run(reduction.dst2)
+        dst2 = bProject.dst2
+        dst3 = bProject.dst3
         labels(2) = "Reduction = " + CStr(task.redOptions.SimpleReductionBar.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class

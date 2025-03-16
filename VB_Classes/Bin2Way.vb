@@ -126,20 +126,20 @@ Public Class Bin2Way_RecurseOnce : Inherits TaskParent
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         bin2.fraction = src.Total / 2
-        bin2.hist.inputOnlyMask = New cv.Mat
+        bin2.hist.histMask = New cv.Mat
         bin2.Run(src)
         Dim darkestMask = bin2.mats.mat(0).Clone
         Dim lightestMask = bin2.mats.mat(1).Clone
 
         bin2.fraction = src.Total / 4
-        bin2.hist.inputOnlyMask = darkestMask
+        bin2.hist.histMask = darkestMask
         bin2.Run(src)
 
         mats.mat(0) = bin2.mats.mat(0)
         mats.mat(1) = bin2.mats.mat(1) And Not lightestMask
 
         bin2.fraction = src.Total / 4
-        bin2.hist.inputOnlyMask = lightestMask
+        bin2.hist.histMask = lightestMask
         bin2.Run(src)
         mats.mat(2) = bin2.mats.mat(0) And Not darkestMask
         mats.mat(3) = bin2.mats.mat(1)

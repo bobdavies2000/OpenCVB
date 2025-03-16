@@ -48,6 +48,7 @@ Density
 Depth
 DepthRegion
 Derivative
+Deterministic
 DFT
 Diff
 Dilate
