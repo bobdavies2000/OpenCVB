@@ -119,6 +119,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gCell As GridCell_Basics
+    Public buildCorrMap As GridCell_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
@@ -130,7 +131,7 @@ Public Class VBtask : Implements IDisposable
     Public gravityHorizon As Gravity_Basics
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
-    Public colorizer As Depth_Colorizer
+    Public colorizer As DepthColorizer_Basics
     Public kalman As Kalman_Basics
 
     ' end of task algorithms
@@ -543,6 +544,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
+        buildCorrMap = New GridCell_CorrelationMap
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
         kalman = New Kalman_Basics
@@ -834,12 +836,14 @@ Public Class VBtask : Implements IDisposable
         End If
         gCell.Run(src) ' goes with motionBasics - next statement
         motionBasics.Run(src) ' motion cannot run before gcell where the motionflag is set for each grid cell.
+        buildCorrMap.Run(src)
+
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         If task.gOptions.ShowQuads.Checked Then
             depthRGB = task.gCell.dst2
         ElseIf task.gOptions.ColorizedDepth.Checked Then
-            If colorizer Is Nothing Then colorizer = New Depth_Colorizer
+            If colorizer Is Nothing Then colorizer = New DepthColorizer_Basics
             colorizer.Run(src)
             depthRGB = colorizer.dst2
             Else

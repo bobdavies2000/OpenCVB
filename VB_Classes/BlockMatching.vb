@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
 Public Class BlockMatching_Basics : Inherits TaskParent
-    Dim colorizer As New Depth_Colorizer_CPP
+    Dim colorizer As New DepthColorizer_CPP
     Dim options As New Options_BlockMatching
     Public useDefaultLeftRight As Boolean = True
     Public leftView As cv.Mat, rightView As cv.Mat

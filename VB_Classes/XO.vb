@@ -680,3 +680,74 @@ Public Class XO_Gravity_BasicsOriginal : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
+    Public Sub New()
+        ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
+
+        labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
+        desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
+
+        Parallel.For(0, task.gridRects.Count,
+        Sub(i)
+            Dim roi = task.gridRects(i)
+            Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), task.depthMask(roi))
+            If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
+            task.kalman.kInput(i * 4) = mm.minLoc.X
+            task.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
+            task.kalman.kInput(i * 4 + 2) = mm.maxLoc.X
+            task.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
+        End Sub)
+
+        task.kalman.Run(src)
+
+        Static minList(task.gridRects.Count - 1) As cv.Point2f
+        Static maxList(task.gridRects.Count - 1) As cv.Point2f
+        For i = 0 To task.gridRects.Count - 1
+            Dim rect = task.gridRects(i)
+            If task.motionRects.Contains(rect) Then
+                Dim ptmin = New cv.Point2f(task.kalman.kOutput(i * 4) + rect.X, task.kalman.kOutput(i * 4 + 1) + rect.Y)
+                Dim ptmax = New cv.Point2f(task.kalman.kOutput(i * 4 + 2) + rect.X, task.kalman.kOutput(i * 4 + 3) + rect.Y)
+                ptmin = validatePoint(ptmin)
+                ptmax = validatePoint(ptmax)
+                minList(i) = ptmin
+                maxList(i) = ptmax
+            End If
+        Next
+
+        dst1 = src.Clone()
+        dst1.SetTo(white, task.gridMask)
+        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
+        For i = 0 To minList.Count - 1
+            Dim ptMin = minList(i)
+            subdiv.Insert(ptMin)
+            DrawCircle(dst1, ptMin, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst1, maxList(i), task.DotSize, cv.Scalar.Blue)
+        Next
+
+        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        Dim centers() As cv.Point2f
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
+
+        Dim ifacet() As cv.Point
+        Dim ifacets = New cv.Point()() {Nothing}
+
+        For i = 0 To facets.Length - 1
+            ReDim ifacet(facets(i).Length - 1)
+            For j = 0 To facets(i).Length - 1
+                ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
+            Next
+            ifacets(0) = ifacet
+            dst3.FillConvexPoly(ifacet, task.scalarColors(i Mod task.scalarColors.Length), task.lineType)
+            cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, task.lineType, 0)
+        Next
+    End Sub
+End Class

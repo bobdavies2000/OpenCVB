@@ -46,6 +46,7 @@ DCT
 Delaunay
 Density
 Depth
+DepthColorizer
 DepthRegion
 Derivative
 Deterministic

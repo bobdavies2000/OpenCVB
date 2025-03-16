@@ -186,9 +186,6 @@ End Class
 
 
 
-
-
-
 Public Class Depth_MeanStdevPlot : Inherits TaskParent
     Dim plot1 As New Plot_OverTimeSingle
     Dim plot2 As New Plot_OverTimeSingle
@@ -232,31 +229,6 @@ Public Class Depth_Uncertainty : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Depth_Colorizer_CPP : Inherits TaskParent
-    Public Sub New()
-        cPtr = Depth_Colorizer_Open()
-        desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-
-        Dim depthData(src.Total * src.ElemSize - 1) As Byte
-        Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-        Marshal.Copy(src.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
-        handleSrc.Free()
-
-        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
-    End Sub
-End Class
 
 
 
@@ -603,29 +575,6 @@ Public Class Depth_BGSubtract : Inherits TaskParent
 End Class
 
 
-
-
-
-
-
-
-
-Public Class Depth_Averaging : Inherits TaskParent
-    Public avg As New Math_ImageAverage
-    Public colorize As New Depth_Colorizer_CPP
-    Public Sub New()
-        labels(3) = "32-bit format depth data"
-        desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        avg.Run(src)
-
-        dst3 = avg.dst2
-        colorize.Run(dst3)
-        dst2 = colorize.dst2
-    End Sub
-End Class
 
 
 
@@ -1113,11 +1062,11 @@ End Class
 
 
 Public Class Depth_StableAverage : Inherits TaskParent
-    Dim dAvg As New Depth_Averaging
+    Dim dAvg As New DepthColorizer_Mean
     Dim extrema As New Depth_StableMinMax
     Public Sub New()
         optiBase.findRadio("Use farthest distance").Checked = True
-        desc = "Use Depth_StableMax to remove the artifacts from the Depth_Averaging"
+        desc = "Use Depth_StableMax to remove the artifacts from the depth averaging"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static unchangedRadio = optiBase.findRadio("Use unchanged depth input")
@@ -1143,7 +1092,7 @@ End Class
 
 Public Class Depth_StableMin : Inherits TaskParent
     Public stableMin As cv.Mat
-    Dim colorize As New Depth_Colorizer_CPP
+    Dim colorize As New DepthColorizer_CPP
     Public Sub New()
         task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
@@ -1175,7 +1124,7 @@ End Class
 
 
 Public Class Depth_StableMinMax : Inherits TaskParent
-    Dim colorize As New Depth_Colorizer_CPP
+    Dim colorize As New DepthColorizer_CPP
     Public dMin As New Depth_StableMin
     Public dMax As New Depth_StableMax
     Public options As New Options_MinMaxNone
@@ -1305,7 +1254,7 @@ Public Class Depth_World : Inherits TaskParent
 
         cv.Cv2.Merge({dst0, dst1, src}, dst2)
         If standaloneTest() Then
-            Static colorizer As New Depth_Colorizer_CPP
+            Static colorizer As New DepthColorizer_CPP
             colorizer.Run(dst2)
             dst2 = colorizer.dst2
         End If
@@ -1376,7 +1325,7 @@ End Class
 
 Public Class Depth_StableMax : Inherits TaskParent
     Public stableMax As cv.Mat
-    Dim colorize As New Depth_Colorizer_CPP
+    Dim colorize As New DepthColorizer_CPP
     Public Sub New()
         task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
@@ -1613,21 +1562,6 @@ End Class
 
 
 
-Public Class Depth_Colorizer : Inherits TaskParent
-    Public Sub New()
-        desc = "Create a traditional depth color scheme."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        src = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
-        Dim depthNorm As cv.Mat = src * 255 / task.MaxZmeters
-        depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-        cv.Cv2.ApplyColorMap(depthNorm, dst2, task.depthColorMap)
-    End Sub
-End Class
-
-
-
-
 
 Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
     Public Sub New()
@@ -1636,54 +1570,16 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
         labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
         desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
     End Sub
-    Private Function validatePoint2f(p As cv.Point2f) As cv.Point2f
-        If p.X < 0 Then p.X = 0
-        If p.Y < 0 Then p.Y = 0
-        If p.X >= dst2.Width Then p.X = dst2.Width - 1
-        If p.Y >= dst2.Height Then p.Y = dst2.Height - 1
-        Return p
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
-
-
-        Dim depthmask As cv.Mat = task.depthMask
-
-        Parallel.For(0, task.gridRects.Count,
-        Sub(i)
-            Dim roi = task.gridRects(i)
-            Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), depthmask(roi))
-            If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
-            task.kalman.kInput(i * 4) = mm.minLoc.X
-            task.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
-            task.kalman.kInput(i * 4 + 2) = mm.maxLoc.X
-            task.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
-        End Sub)
-
-        task.kalman.Run(src)
-
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
-        Static minList(task.gridRects.Count - 1) As cv.Point2f
-        Static maxList(task.gridRects.Count - 1) As cv.Point2f
-        For i = 0 To task.gridRects.Count - 1
-            Dim rect = task.gridRects(i)
-            If task.motionRects.Contains(rect) Then
-                Dim ptmin = New cv.Point2f(task.kalman.kOutput(i * 4) + rect.X, task.kalman.kOutput(i * 4 + 1) + rect.Y)
-                Dim ptmax = New cv.Point2f(task.kalman.kOutput(i * 4 + 2) + rect.X, task.kalman.kOutput(i * 4 + 3) + rect.Y)
-                ptmin = validatePoint2f(ptmin)
-                ptmax = validatePoint2f(ptmax)
-                minList(i) = ptmin
-                maxList(i) = ptmax
-            End If
-        Next
 
         dst1 = src.Clone()
         dst1.SetTo(white, task.gridMask)
-        For i = 0 To minList.Count - 1
-            Dim ptMin = minList(i)
-            subdiv.Insert(ptMin)
-            DrawCircle(dst1, ptMin, task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst1, maxList(i), task.DotSize, cv.Scalar.Blue)
+        For Each idd In task.iddList
+            Dim pt = idd.mm.minLoc
+            subdiv.Insert(New cv.Point(pt.X + idd.cRect.TopLeft.X, pt.Y + idd.cRect.TopLeft.Y))
+            DrawCircle(dst1(idd.cRect), idd.mm.minLoc, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst1(idd.cRect), idd.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
         Next
 
         If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)

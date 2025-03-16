@@ -6,7 +6,6 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public mouseD As New GridCell_MouseDepth
     Public quad As New Quad_Basics
-    Public iddCorr As New GridCell_CorrelationMap
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
@@ -96,8 +95,6 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         quad.Run(src)
         dst2 = quad.dst2
-
-        iddCorr.Run(src)
 
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
     End Sub
@@ -841,42 +838,6 @@ End Class
 
 
 
-Public Class GridCell_CorrelationMap : Inherits TaskParent
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        dst3.SetTo(0)
-
-        Dim minCorr = task.gCell.options.correlationThreshold
-        Dim count As Integer
-        For Each idd In task.iddList
-            If idd.depth > 0 Then
-                Dim val = (idd.correlation + 1) * 255 / 2
-                dst1(idd.cRect).SetTo(val)
-                If idd.correlation > minCorr Then
-                    dst3(idd.cRect).SetTo(255)
-                    count += 1
-                End If
-            End If
-        Next
-
-        dst2 = ShowPaletteDepth(dst1)
-        task.iddCorr = dst2
-
-        labels(2) = task.gCell.labels(2)
-        labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
-                    ") with correlation coefficient > " + Format(minCorr, fmt1)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class GridCell_Boundaries : Inherits TaskParent
     Public Sub New()
@@ -1011,7 +972,7 @@ Public Class GridCell_MeanSubtraction : Inherits TaskParent
         task.rightView = LRMeanSub.dst3
 
         task.gCell.Run(src)
-        dst2 = task.gCell.iddCorr.dst2
+        dst2 = task.buildCorrMap.dst2
         labels(2) = task.gCell.labels(2)
         SetTrueText("dst2 is the grid cell map using mean subtraction on the left and right images." + vbCrLf +
                     "dst1 (above right) shows the correlation map produced with the original left and right images.", 3)
@@ -1112,5 +1073,42 @@ Public Class GridCell_MeasureMotion : Inherits TaskParent
             labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
             task.motionLabel = labels(3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridCell_CorrelationMap : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+
+        Dim minCorr = task.gCell.options.correlationThreshold
+        Dim count As Integer
+        For Each idd In task.iddList
+            If idd.depth > 0 Then
+                Dim val = (idd.correlation + 1) * 255 / 2
+                dst1(idd.cRect).SetTo(val)
+                If idd.correlation > minCorr Then
+                    dst3(idd.cRect).SetTo(255)
+                    count += 1
+                End If
+            End If
+        Next
+
+        dst2 = ShowPaletteDepth(dst1)
+        task.iddCorr = dst2
+
+        labels(2) = task.gCell.labels(2)
+        labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
+                    ") with correlation coefficient > " + Format(minCorr, fmt1)
     End Sub
 End Class

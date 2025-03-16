@@ -265,7 +265,7 @@ Module ML__Exports
 End Module
 Public Class ML_FillRGBDepth_MT : Inherits TaskParent
     Dim shadow As New Depth_Holes
-    Dim colorizer As New Depth_Colorizer_CPP
+    Dim colorizer As New DepthColorizer_CPP
     Public Sub New()
         task.gOptions.GridSlider.Maximum = dst2.Cols / 2
         task.gOptions.GridSlider.Value = CInt(dst2.Cols / 2)
@@ -292,7 +292,7 @@ End Class
 
 
 Public Class ML_DepthFromColor : Inherits TaskParent
-    Dim colorPal As New Depth_Colorizer
+    Dim colorPal As New DepthColorizer_Basics
     Dim mats As New Mat_4Click
     Dim resizer As New Resize_Smaller
     Public Sub New()
@@ -353,7 +353,7 @@ End Class
 Public Class ML_DepthFromXYColor : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim resizer As New Resize_Smaller
-    Dim colorizer As New Depth_Colorizer_CPP
+    Dim colorizer As New DepthColorizer_CPP
     Public Sub New()
         labels(2) = "Predicted Depth"
        optiBase.findslider("LowRes %").Value = 2 ' 2% of the image.
