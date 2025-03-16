@@ -70,9 +70,11 @@ Public Class Color8U_Sweep : Inherits TaskParent
             task.redOptions.ColorSource.SelectedIndex = index
             task.redOptions.Sync()
         End If
+
         color8u.Run(src)
         classCount = color8u.classCount
-        dst3 = color8u.dst3
+        dst2 = ShowPalette(color8u.dst2)
+
         strOut = "Current color source = " + task.redOptions.colorInputName
         SetTrueText(strOut, 2)
     End Sub

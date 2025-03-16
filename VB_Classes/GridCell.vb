@@ -27,14 +27,6 @@ Public Class GridCell_Basics : Inherits TaskParent
             Next
         End If
 
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
-            If idd.motionFlag Then
-                idd.motionFlag = False
-                task.iddList(i) = idd
-            End If
-        Next
-
         Dim stdev As cv.Scalar, mean As cv.Scalar, colorMean As cv.Scalar
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
         Dim threshold = options.colorDifferenceThreshold
@@ -44,9 +36,9 @@ Public Class GridCell_Basics : Inherits TaskParent
             Dim idd = task.iddList(i)
             cv.Cv2.MeanStdDev(src(idd.cRect), colorMean, idd.colorStdev)
             idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
-            idd.colorVec = New cv.Vec3f(idd.color(0), idd.color(1), idd.color(2))
-            idd.colorChange = distance3D(idd.colorVec, idd.colorVecLast)
-            If idd.colorChange < threshold And idd.age > 0 And idd.correlation <> 0 Then
+            Dim colorChange = distance3D(idd.color, idd.colorVecLast)
+            If idd.cRect.Width <> task.cellSize Or idd.cRect.Height <> task.cellSize Then Dim k = 0
+            If colorChange < threshold And idd.age > 0 And idd.correlation <> 0 Then
                 idd.age += 1
                 idd.motionFlag = False
             Else
@@ -54,8 +46,8 @@ Public Class GridCell_Basics : Inherits TaskParent
                 idd.depth = mean(0)
                 idd.depthStdev = stdev(0)
 
-                If idd.colorChange > threshold Then idd.motionFlag = True
-                idd.colorVecLast = idd.colorVec
+                idd.motionFlag = True
+                idd.colorVecLast = idd.color
                 idd.pixels = task.depthMask(idd.cRect).CountNonZero
                 idd.correlation = 0
                 idd.age = 1
@@ -684,66 +676,6 @@ End Class
 
 
 
-Public Class GridCell_MeasureMotion : Inherits TaskParent
-    Public motionRects As New List(Of cv.Rect)
-    Dim percentList As New List(Of Single)
-    Public motionList As New List(Of Integer)
-    Public Sub New()
-        labels(3) = "A composite of an earlier image and the motion since that input.  " +
-                    "Any object boundaries are unlikely to be different."
-        desc = "Show all the grid cells above the motionless value (an option)."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then dst0 = src.Clone
-
-        If task.optionsChanged Then motionRects = New List(Of cv.Rect)
-
-        dst2 = task.gCell.dst2
-        labels(2) = task.gCell.labels(3)
-
-        Dim threshold = If(task.heartBeat, task.gCell.options.colorDifferenceThreshold - 1,
-                                           task.gCell.options.colorDifferenceThreshold)
-
-        motionRects.Clear()
-        Dim indexList As New List(Of Integer) ' avoid adding the same cell more than once.
-        For Each idd In task.iddList
-            If idd.colorChange > threshold Then
-                For Each index In task.gridNeighbors(idd.index)
-                    If indexList.Contains(index) = False Then
-                        indexList.Add(index)
-                        motionRects.Add(task.gridRects(index))
-                    End If
-                Next
-            End If
-        Next
-
-        ' Use the whole image for the first few images as camera stabilizes.
-        If task.frameCount < 3 Then
-            src.CopyTo(dst3)
-            motionRects.Clear()
-            motionRects.Add(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        Else
-            If motionRects.Count > 0 Then
-                For Each roi In motionRects
-                    src(roi).CopyTo(dst3(roi))
-                    If standaloneTest() Then dst0.Rectangle(roi, white, task.lineWidth)
-                Next
-            End If
-        End If
-
-        If task.heartBeat Or task.optionsChanged Then
-            percentList.Add(motionList.Count / task.gridRects.Count)
-            If percentList.Count > 10 Then percentList.RemoveAt(0)
-            task.motionPercent = percentList.Average
-            labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
-            task.motionLabel = labels(3)
-        End If
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class GridCell_Validate : Inherits TaskParent
@@ -1122,5 +1054,64 @@ Public Class GridCell_LeftRight : Inherits TaskParent
 
         dst2.Rectangle(rectLeft, 0, task.lineWidth)
         dst3.Rectangle(rectRight, 0, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_MeasureMotion : Inherits TaskParent
+    Public motionRects As New List(Of cv.Rect)
+    Dim percentList As New List(Of Single)
+    Public motionList As New List(Of Integer)
+    Public Sub New()
+        labels(3) = "A composite of an earlier image and the motion since that input.  " +
+                    "Any object boundaries are unlikely to be different."
+        desc = "Show all the grid cells above the motionless value (an option)."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standaloneTest() Then dst0 = src.Clone
+
+        If task.optionsChanged Then motionRects = New List(Of cv.Rect)
+
+        dst2 = task.gCell.dst2
+        labels(2) = task.gCell.labels(3)
+
+        motionRects.Clear()
+        Dim indexList As New List(Of Integer) ' avoid adding the same cell more than once.
+        For Each idd In task.iddList
+            If idd.motionFlag Then
+                For Each index In task.gridNeighbors(idd.index)
+                    If indexList.Contains(index) = False Then
+                        indexList.Add(index)
+                        motionRects.Add(task.gridRects(index))
+                    End If
+                Next
+            End If
+        Next
+
+        ' Use the whole image for the first few images as camera stabilizes.
+        If task.frameCount < 3 Then
+            src.CopyTo(dst3)
+            motionRects.Clear()
+            motionRects.Add(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        Else
+            If motionRects.Count > 0 Then
+                For Each roi In motionRects
+                    src(roi).CopyTo(dst3(roi))
+                    If standaloneTest() Then dst0.Rectangle(roi, white, task.lineWidth)
+                Next
+            End If
+        End If
+
+        If task.heartBeat Or task.optionsChanged Then
+            percentList.Add(motionList.Count / task.gridRects.Count)
+            If percentList.Count > 10 Then percentList.RemoveAt(0)
+            task.motionPercent = percentList.Average
+            labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
+            task.motionLabel = labels(3)
+        End If
     End Sub
 End Class
