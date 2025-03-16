@@ -25,10 +25,10 @@ Public Class DepthRegion_Basics : Inherits TaskParent
             Dim index = dst1.Get(Of Byte)(idd.center.Y, idd.center.X)
             Dim md = redM.mdList(index)
             If index = 0 Then
-                dst2(idd.cRect).SetTo(black)
+                dst2(idd.rect).SetTo(black)
             Else
                 If md.pixels > minSize Then
-                    dst2(idd.cRect).SetTo(task.scalarColors(index))
+                    dst2(idd.rect).SetTo(task.scalarColors(index))
                     mdLargest.Add(md)
                 End If
             End If
@@ -65,7 +65,7 @@ Public Class DepthRegion_Correlation : Inherits TaskParent
         For Each idd In task.iddList
             If idd.correlation > minCorr Then
                 dst0.Rectangle(idd.rRect, 255, -1)
-                dst1.Rectangle(idd.cRect, 255, -1)
+                dst1.Rectangle(idd.rect, 255, -1)
                 count += 1
             End If
         Next

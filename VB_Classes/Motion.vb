@@ -23,7 +23,7 @@ Public Class Motion_Basics : Inherits TaskParent
             If idd.motionFlag Then
                 For Each index In task.gridNeighbors(idd.index)
                     markers.Add(index)
-                    Dim r = task.iddList(index).cRect
+                    Dim r = task.iddList(index).rect
                     task.motionMask(r).SetTo(255)
                     src(r).CopyTo(dst2(r))
                 Next
@@ -33,7 +33,7 @@ Public Class Motion_Basics : Inherits TaskParent
         task.fullImageStable = markers.Count = 0
         task.motionRects.Clear()
         For Each index In markers
-            task.motionRects.Add(task.iddList(index).cRect)
+            task.motionRects.Add(task.iddList(index).rect)
         Next
         labels(2) = "There were " + CStr(task.motionRects.Count) + " grid cells with motion."
     End Sub

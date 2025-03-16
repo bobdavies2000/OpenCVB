@@ -18,13 +18,13 @@ Public Class Quad_Basics : Inherits TaskParent
         dst2.SetTo(0)
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            task.iddMap(idd.cRect).SetTo(i)
+            task.iddMap(idd.rect).SetTo(i)
             If idd.depth > 0 Then
                 idd.corners.Clear()
-                task.iddMask(idd.cRect).SetTo(255)
+                task.iddMask(idd.rect).SetTo(255)
 
-                Dim p0 = getWorldCoordinates(idd.cRect.TopLeft, idd.depth)
-                Dim p1 = getWorldCoordinates(idd.cRect.BottomRight, idd.depth)
+                Dim p0 = getWorldCoordinates(idd.rect.TopLeft, idd.depth)
+                Dim p1 = getWorldCoordinates(idd.rect.BottomRight, idd.depth)
 
                 ' clockwise around starting in upper left.
                 idd.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, idd.depth))
@@ -32,7 +32,7 @@ Public Class Quad_Basics : Inherits TaskParent
                 idd.corners.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, idd.depth))
                 idd.corners.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, idd.depth))
             End If
-            dst2(idd.cRect).SetTo(idd.color)
+            dst2(idd.rect).SetTo(idd.color)
         Next
     End Sub
 End Class
@@ -400,7 +400,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
                 Dim d1 = task.iddList(j).depth
                 Dim d2 = task.iddList(j - 1).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.iddList(j).cRect, task.HighlightColor, -1)
+                    dst2.Rectangle(task.iddList(j).rect, task.HighlightColor, -1)
                 End If
             Next
         Next
@@ -410,7 +410,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
                 Dim d1 = task.iddList(j * width).depth
                 Dim d2 = task.iddList((j - 1) * width).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.iddList(j).cRect, task.HighlightColor, -1)
+                    dst2.Rectangle(task.iddList(j).rect, task.HighlightColor, -1)
                 End If
             Next
         Next

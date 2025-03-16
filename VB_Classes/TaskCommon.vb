@@ -418,10 +418,11 @@ End Class
 
 
 Public Class gridCell
-    Public cRect As cv.Rect ' rectange under the cursor in the color image.
+    Public rect As cv.Rect ' rectange under the cursor in the color image.
+    Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.
+    Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
+
     Public center As cv.Point ' center of the rectangle
-    Public lRect As New cv.Rect
-    Public rRect As New cv.Rect
     Public depth As Single
     Public depthStdev As Single
     Public depthErr As Single ' a linear estimate of the depth error based on '2% error at 2 meters'
@@ -444,9 +445,9 @@ End Class
 
 
 Public Class gridCellNew
-    Public cRect As cv.Rect ' rectangle under the cursor
-    Public lRect As New cv.Rect
-    Public rRect As New cv.Rect
+    Public rect As cv.Rect ' rectange under the cursor in the color image.
+    Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.
+    Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
 
     Public center As New cv.Point
 

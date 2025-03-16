@@ -10,8 +10,8 @@ Public Class Connected_Basics : Inherits TaskParent
     End Sub
     Private Sub hTestRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            Dim p1 = task.iddList(colStart).cRect.TopLeft
-            Dim p2 = task.iddList(colEnd).cRect.BottomRight
+            Dim p1 = task.iddList(colStart).rect.TopLeft
+            Dim p2 = task.iddList(colEnd).rect.BottomRight
             dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
             colorIndex += 1
             hTuples.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
@@ -23,12 +23,12 @@ Public Class Connected_Basics : Inherits TaskParent
     End Sub
     Private Sub vTestRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            bottomRight = task.iddList(iddNext).cRect.BottomRight
+            bottomRight = task.iddList(iddNext).rect.BottomRight
             dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
             colorIndex += 1
             vTuples.Add(New Tuple(Of Integer, Integer)(rowStart, iddNext))
             rowStart = nextStart
-            If nextStart >= 0 Then topLeft = task.iddList(rowStart).cRect.TopLeft
+            If nextStart >= 0 Then topLeft = task.iddList(rowStart).rect.TopLeft
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -57,8 +57,8 @@ Public Class Connected_Basics : Inherits TaskParent
         colorIndex = 0
         For i = 0 To width - 1
             rowStart = i
-            topLeft = task.iddList(i).cRect.TopLeft
-            bottomRight = task.iddList(i + width).cRect.TopLeft
+            topLeft = task.iddList(i).rect.TopLeft
+            bottomRight = task.iddList(i + width).rect.TopLeft
             For j = 0 To height - 2
                 index = i + (j + 1) * width
                 If index >= task.iddList.Count Then index = task.iddList.Count - 1
@@ -93,16 +93,16 @@ Public Class Connected_Gaps : Inherits TaskParent
         For Each tup In connect.hTuples
             If tup.Item2 - tup.Item1 = 0 Then
                 Dim idd = task.iddList(tup.Item1)
-                dst2(idd.cRect).SetTo(0)
+                dst2(idd.rect).SetTo(0)
             End If
         Next
 
         For Each tup In connect.vTuples
             Dim idd1 = task.iddList(tup.Item1)
             Dim idd2 = task.iddList(tup.Item2)
-            If idd2.cRect.TopLeft.Y - idd1.cRect.TopLeft.Y = 0 Then
-                dst2(idd1.cRect).SetTo(0)
-                dst3(idd1.cRect).SetTo(0)
+            If idd2.rect.TopLeft.Y - idd1.rect.TopLeft.Y = 0 Then
+                dst2(idd1.rect).SetTo(0)
+                dst3(idd1.rect).SetTo(0)
             End If
         Next
     End Sub
@@ -253,7 +253,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
         Dim gCells As New List(Of gridCellNew)
         For Each idd In task.iddList
             Dim gc As New gridCellNew
-            gc.cRect = idd.cRect
+            gc.rect = idd.rect
             gc.lRect = idd.lRect
             gc.rRect = idd.rRect
 
@@ -317,7 +317,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
         dst3.SetTo(0)
         For Each gc In gCells
             If indexList.Contains(gc.index) Then
-                dst3(gc.cRect).SetTo(gc.index)
+                dst3(gc.rect).SetTo(gc.index)
             End If
         Next
 
@@ -351,10 +351,10 @@ Public Class Connected_RectsH : Inherits TaskParent
             Dim idd1 = task.iddList(tup.Item1)
             Dim idd2 = task.iddList(tup.Item2)
 
-            Dim w = idd2.cRect.BottomRight.X - idd1.cRect.TopLeft.X
-            Dim h = idd1.cRect.Height
+            Dim w = idd2.rect.BottomRight.X - idd1.rect.TopLeft.X
+            Dim h = idd1.rect.Height
 
-            Dim r = New cv.Rect(idd1.cRect.TopLeft.X + 1, idd1.cRect.TopLeft.Y, w - 1, h)
+            Dim r = New cv.Rect(idd1.rect.TopLeft.X + 1, idd1.rect.TopLeft.Y, w - 1, h)
 
             hRects.Add(r)
             dst2(r).SetTo(255)
@@ -389,10 +389,10 @@ Public Class Connected_RectsV : Inherits TaskParent
             Dim idd1 = task.iddList(tup.Item1)
             Dim idd2 = task.iddList(tup.Item2)
 
-            Dim w = idd1.cRect.Width
-            Dim h = idd2.cRect.BottomRight.Y - idd1.cRect.TopLeft.Y
+            Dim w = idd1.rect.Width
+            Dim h = idd2.rect.BottomRight.Y - idd1.rect.TopLeft.Y
 
-            Dim r = New cv.Rect(idd1.cRect.TopLeft.X, idd1.cRect.TopLeft.Y + 1, w, h - 1)
+            Dim r = New cv.Rect(idd1.rect.TopLeft.X, idd1.rect.TopLeft.Y + 1, w, h - 1)
             vRects.Add(r)
             dst2(r).SetTo(255)
 
@@ -439,7 +439,7 @@ Public Class Connected_RegionsNew : Inherits TaskParent
         Dim gCells As New List(Of gridCellNew)
         For Each idd In task.iddList
             Dim gc As New gridCellNew
-            gc.cRect = idd.cRect
+            gc.rect = idd.rect
             gc.lRect = idd.lRect
             gc.rRect = idd.rRect
 
@@ -460,10 +460,10 @@ Public Class Connected_RegionsNew : Inherits TaskParent
         '    Dim index = dst1.Get(Of Byte)(gc.center.Y, gc.center.X)
         '    Dim md = redM.mdList(index)
         '    If index = 0 Then
-        '        dst2(idd.cRect).SetTo(black)
+        '        dst2(idd.rect).SetTo(black)
         '    Else
         '        If md.pixels > minSize Then
-        '            dst2(idd.cRect).SetTo(task.scalarColors(index))
+        '            dst2(idd.rect).SetTo(task.scalarColors(index))
         '            mdLargest.Add(md)
         '        End If
         '    End If
@@ -483,7 +483,7 @@ Public Class Connected_RegionsNew : Inherits TaskParent
         'dst3.SetTo(0)
         'For Each gc In gCells
         '    If indexList.Contains(gc.index) Then
-        '        dst3(gc.cRect).SetTo(gc.index)
+        '        dst3(gc.rect).SetTo(gc.index)
         '    End If
         'Next
 
