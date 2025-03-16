@@ -2,8 +2,6 @@
 Public Class Quad_Basics : Inherits TaskParent
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        task.iddMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a quad representation of the redCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -14,14 +12,12 @@ Public Class Quad_Basics : Inherits TaskParent
         End If
 
         task.iddMap.SetTo(0)
-        task.iddMask.SetTo(0)
         dst2.SetTo(0)
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
             task.iddMap(idd.rect).SetTo(i)
             If idd.depth > 0 Then
                 idd.corners.Clear()
-                task.iddMask(idd.rect).SetTo(255)
 
                 Dim p0 = getWorldCoordinates(idd.rect.TopLeft, idd.depth)
                 Dim p1 = getWorldCoordinates(idd.rect.BottomRight, idd.depth)

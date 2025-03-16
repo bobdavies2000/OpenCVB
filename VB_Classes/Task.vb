@@ -17,10 +17,9 @@ Public Class VBtask : Implements IDisposable
 
     Public lpList As New List(Of linePoints) ' line pair list
     Public iddList As New List(Of gridCell)
-    Public iddCorr As New cv.Mat
+    Public iddCorrelations As New cv.Mat
     Public iddMap As New cv.Mat
     Public iddC As gridCell
-    Public iddMask As New cv.Mat
 
     Public cellSize As Integer
     Public tilesPerCol As Integer
@@ -119,7 +118,6 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gCell As GridCell_Basics
-    Public buildCorrMap As GridCell_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
@@ -537,6 +535,8 @@ Public Class VBtask : Implements IDisposable
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        task.iddCorrelations = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
 
         gmat = New IMU_GMatrix
         grid = New Grid_Basics
@@ -544,7 +544,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
-        buildCorrMap = New GridCell_CorrelationMap
+        task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
         kalman = New Kalman_Basics
@@ -834,22 +834,13 @@ Public Class VBtask : Implements IDisposable
             If task.optionsChanged Then task.motionMask.SetTo(255) ' force the change over...
             LRMeanSub.Run(src)
         End If
-        gCell.Run(src) ' goes with motionBasics - next statement
-        motionBasics.Run(src) ' motion cannot run before gcell where the motionflag is set for each grid cell.
-        buildCorrMap.Run(src)
+
+        motionBasics.Run(src)
+        gCell.Run(src)
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
-        If task.gOptions.ShowQuads.Checked Then
-            depthRGB = task.gCell.dst2
-        ElseIf task.gOptions.ColorizedDepth.Checked Then
-            If colorizer Is Nothing Then colorizer = New DepthColorizer_Basics
-            colorizer.Run(src)
-            depthRGB = colorizer.dst2
-            Else
-                If task.iddCorr.Width = 0 Then task.iddCorr = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
-            depthRGB = task.iddCorr
-        End If
+        task.colorizer.Run(src)
 
         TaskTimer.Enabled = True
 

@@ -125,8 +125,8 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
         End If
 
         depthAndCorrelationText = Format(task.iddC.depth, fmt2) +
-                                  "m (" + Format(task.iddC.pixels / (task.iddC.rect.Width * task.iddC.rect.Height), "0%") +
-                                  ")" + vbCrLf + "depth " + Format(task.iddC.mm.minVal, fmt3) + "m - " +
+                                  "m (" + Format(task.iddC.pixels / (task.iddC.rect.Width * task.iddC.rect.Height), "0%") + ") ID=" +
+                                  CStr(task.iddC.index) + vbCrLf + "depth " + Format(task.iddC.mm.minVal, fmt3) + "m - " +
                                   Format(task.iddC.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.iddC.correlation, fmt3)
         ptTopLeft = pt
         If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptTopLeft, 2)
@@ -149,7 +149,6 @@ Public Class GridCell_Plot : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gCell.dst2
-        dst2.SetTo(0, Not task.iddMask)
 
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.iddList.Count = 0 Or task.optionsChanged Then Exit Sub
@@ -235,7 +234,6 @@ Public Class GridCell_InstantUpdate : Inherits TaskParent
 
         dst2 = task.gCell.dst2
         labels(2) = task.gCell.labels(2)
-        dst2.SetTo(0, Not task.iddMask)
     End Sub
 End Class
 
@@ -972,7 +970,9 @@ Public Class GridCell_MeanSubtraction : Inherits TaskParent
         task.rightView = LRMeanSub.dst3
 
         task.gCell.Run(src)
-        dst2 = task.buildCorrMap.dst2
+        task.colorizer.Run(src)
+        dst2 = task.colorizer.buildCorrMap.dst2
+
         labels(2) = task.gCell.labels(2)
         SetTrueText("dst2 is the grid cell map using mean subtraction on the left and right images." + vbCrLf +
                     "dst1 (above right) shows the correlation map produced with the original left and right images.", 3)
@@ -1084,31 +1084,21 @@ End Class
 
 Public Class GridCell_CorrelationMap : Inherits TaskParent
     Public Sub New()
+        labels(3) = "The correlation values are in dst2"
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        dst3.SetTo(0)
 
-        Dim minCorr = task.gCell.options.correlationThreshold
-        Dim count As Integer
         For Each idd In task.iddList
-            If idd.depth > 0 Then
+            If idd.correlation <> 0 Then
                 Dim val = (idd.correlation + 1) * 255 / 2
                 dst1(idd.rect).SetTo(val)
-                If idd.correlation > minCorr Then
-                    dst3(idd.rect).SetTo(255)
-                    count += 1
-                End If
             End If
         Next
 
         dst2 = ShowPaletteDepth(dst1)
-        task.iddCorr = dst2
-
         labels(2) = task.gCell.labels(2)
-        labels(3) = "There were " + CStr(count) + " cells (out of " + CStr(task.iddList.Count) +
-                    ") with correlation coefficient > " + Format(minCorr, fmt1)
     End Sub
 End Class
