@@ -3,8 +3,11 @@
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   For RedCloud output, a coloring scheme may be selected in the RedCloud options.
     -   Color a cell with its mean color, tracking color, or depth color.
-    -   The different color schemes are explained in the second GIF below.
--   All the Color8U algorithms (currently 10) now use motion to increase image stability.
+    -   The different color schemes are explained in the first GIF below.
+    -   Background cells are unchanged even with hand motion.
+    -   Only cells within the motion mask need to be updated.
+-   This image stability is visible in all of the Color8U algorithms input to RedColor.
+-   All the Color8U algorithms (currently 10) use motion to increase image stability.
     -   Color8U output is often input to the RedColor or RedCloud algorithms.
     -   Bin4Way_Regions – 4 color categories based on brightness.
     -   Binarize_DepthTiers – 1-meter categories of depth.
