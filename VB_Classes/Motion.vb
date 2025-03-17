@@ -3,7 +3,7 @@ Imports System.Threading
 Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
-    Dim lastColor() As cv.Vec3f
+    Public lastColor() As cv.Vec3f
     Public motionFlags() As Boolean
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

@@ -19,8 +19,8 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim stdev As cv.Scalar, mean As cv.Scalar
         For Each rect In task.gridRects
             Dim idd As New gridCell
-            idd.rect = ValidateRect(rect)
-            idd.lRect = idd.rect ' for some cameras the color image and the left image are the same.
+            idd.rect = rect
+            idd.lRect = idd.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
             idd.center = New cv.Point(rect.TopLeft.X + idd.rect.Width / 2, rect.TopLeft.Y + idd.rect.Height / 2)
             If task.depthMask(idd.rect).CountNonZero Then
                 cv.Cv2.MeanStdDev(task.pcSplit(2)(idd.rect), mean, stdev, task.depthMask(idd.rect))
@@ -36,44 +36,39 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            If task.motionBasics.motionFlags(i) = False Then
-                idd.age += 1
-                idd.correlation = lastCorrelation(i)
+            idd.color = task.motionBasics.lastColor(i) ' the last color is actually the current color - motion basics runs first.
+            If idd.depth = 0 Then
+                idd.correlation = 0
+                idd.rRect = emptyRect
             Else
-                idd.age = 1
-                If idd.depth = 0 Then
-                    idd.correlation = 0
-                    idd.rRect = emptyRect
+                idd.mm = GetMinMax(task.pcSplit(2)(idd.rect), task.depthMask(idd.rect))
+                idd.depthErr = 0.02 * idd.depth / 2
+                If task.rgbLeftAligned Then
+                    idd.lRect = idd.rect
+                    idd.rRect = idd.lRect
+                    idd.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / idd.depth
+                    idd.rRect = ValidateRect(idd.rRect)
+                    cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
+                                                     cv.TemplateMatchModes.CCoeffNormed)
+
+                    idd.correlation = correlationMat.Get(Of Single)(0, 0)
                 Else
-                    idd.mm = GetMinMax(task.pcSplit(2)(idd.rect), task.depthMask(idd.rect))
-                    idd.depthErr = 0.02 * idd.depth / 2
-                    If task.rgbLeftAligned Then
-                        idd.lRect = idd.rect
+                    Dim irPt = translateColorToLeft(idd.rect.TopLeft)
+                    If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Then
+                        idd.depth = 0 ' off the grid.
+                        idd.lRect = emptyRect
+                        idd.rRect = emptyRect
+                    Else
+                        idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.rect.Width, idd.rect.Height)
+                        idd.lRect = ValidateRect(idd.lRect)
+
                         idd.rRect = idd.lRect
-                        idd.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / idd.depth
+                        idd.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / idd.depth
                         idd.rRect = ValidateRect(idd.rRect)
                         cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
-                                                 cv.TemplateMatchModes.CCoeffNormed)
+                                                             cv.TemplateMatchModes.CCoeffNormed)
 
                         idd.correlation = correlationMat.Get(Of Single)(0, 0)
-                    Else
-                        Dim irPt = translateColorToLeft(idd.rect.TopLeft)
-                        If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Then
-                            idd.depth = 0 ' off the grid.
-                            idd.lRect = emptyRect
-                            idd.rRect = emptyRect
-                        Else
-                            idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.rect.Width, idd.rect.Height)
-                            idd.lRect = ValidateRect(idd.lRect)
-
-                            idd.rRect = idd.lRect
-                            idd.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / idd.depth
-                            idd.rRect = ValidateRect(idd.rRect)
-                            cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
-                                                         cv.TemplateMatchModes.CCoeffNormed)
-
-                            idd.correlation = correlationMat.Get(Of Single)(0, 0)
-                        End If
                     End If
                 End If
             End If
