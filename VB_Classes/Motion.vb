@@ -12,7 +12,7 @@ Public Class Motion_Basics : Inherits TaskParent
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then
+        If task.optionsChanged Or task.firstPass Then
             ReDim lastColor(task.gridRects.Count - 1)
             ReDim cellAge(task.gridRects.Count - 1)
         End If
