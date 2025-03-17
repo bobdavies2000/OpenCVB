@@ -71,11 +71,11 @@ Public Class Main_UI
     Dim LastX As Integer
     Dim LastY As Integer
     Dim mouseClickFlag As Boolean
-    Dim ClickPoint As New cv.Point
+    Dim ClickPoint As New cv.Point ' last place where mouse was clicked.
     Dim mousePicTag As Integer
     Dim mouseDownPoint As New cv.Point
-    Dim mouseMovePoint As New cv.Point
-    Dim mousePoint As New cv.Point
+    Dim mouseMovePoint As New cv.Point ' last place the mouse was located in any of the OpenCVB images.
+    Dim mouseDisplayPoint As New cv.Point
     Dim activeMouseDown As Boolean
 
     Dim myBrush = New SolidBrush(Color.White)
@@ -562,11 +562,11 @@ Public Class Main_UI
             End If
 
             mousePicTag = pic.Tag
-            mousePoint.X = e.X
-            mousePoint.Y = e.Y
-            mousePoint *= settings.WorkingRes.Width / camPic(0).Width
+            mouseDisplayPoint.X = e.X
+            mouseDisplayPoint.Y = e.Y
+            mouseDisplayPoint *= settings.WorkingRes.Width / camPic(0).Width
 
-            XYLoc.Text = mousePoint.ToString + ", last click point at: " + ClickPoint.ToString
+            XYLoc.Text = mouseDisplayPoint.ToString + ", last click point at: " + ClickPoint.ToString
 
         Catch ex As Exception
             Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
@@ -660,7 +660,7 @@ Public Class Main_UI
         ' when switching resolution, best to reset these as the move from higher to lower res
         ' could mean the point is no longer valid.
         ClickPoint = New cv.Point
-        mousePoint = New cv.Point
+        mouseDisplayPoint = New cv.Point
 
         StartTask()
 
@@ -1303,7 +1303,7 @@ Public Class Main_UI
             ' when switching resolution, best to reset these as the move from higher to lower res
             ' could mean the point is no longer valid.
             ClickPoint = New cv.Point
-            mousePoint = New cv.Point
+            mouseDisplayPoint = New cv.Point
         End If
 
         Static saveLastAlgorithm = AvailableAlgorithms.Text
@@ -1573,7 +1573,7 @@ Public Class Main_UI
 
             Dim saveWorkingRes = settings.WorkingRes
             task.labels = {"", "", "", ""}
-            mousePoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
+            mouseDisplayPoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
 
             Dim saveDrawRect As cv.Rect
             task.motionMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 255)
@@ -1659,12 +1659,12 @@ Public Class Main_UI
 
                 If activeMouseDown = False Then
                     SyncLock mouseLock
-                        If mousePoint.X < 0 Then mousePoint.X = 0
-                        If mousePoint.Y < 0 Then mousePoint.Y = 0
-                        If mousePoint.X >= task.dst2.Width Then mousePoint.X = task.dst2.Width - 1
-                        If mousePoint.Y >= task.dst2.Height Then mousePoint.Y = task.dst2.Height - 1
+                        If mouseDisplayPoint.X < 0 Then mouseDisplayPoint.X = 0
+                        If mouseDisplayPoint.Y < 0 Then mouseDisplayPoint.Y = 0
+                        If mouseDisplayPoint.X >= task.dst2.Width Then mouseDisplayPoint.X = task.dst2.Width - 1
+                        If mouseDisplayPoint.Y >= task.dst2.Height Then mouseDisplayPoint.Y = task.dst2.Height - 1
 
-                        task.mouseMovePoint = mousePoint
+                        task.mouseMovePoint = mouseDisplayPoint
                         If task.mouseMovePoint = New cv.Point(0, 0) Then
                             task.mouseMovePoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2)
                         End If
@@ -1672,7 +1672,7 @@ Public Class Main_UI
                         task.mousePicTag = mousePicTag
                         If mouseClickFlag Then
                             task.mouseClickFlag = mouseClickFlag
-                            task.ClickPoint = mousePoint
+                            task.ClickPoint = mouseDisplayPoint
                             ClickPoint = task.ClickPoint
                             mouseClickFlag = False
                         End If
@@ -1703,14 +1703,14 @@ Public Class Main_UI
                 motionLabel = task.motionLabel
 
                 SyncLock mouseLock
-                    mousePoint = validatePoint(mousePoint)
-                    mouseMovePoint = validatePoint(mouseMovePoint)
+                    mouseDisplayPoint = validatePoint(mouseDisplayPoint)
+                    mouseMovePoint = mouseMovePoint
                 End SyncLock
 
                 Dim returnTime = Now
 
                 ' in case the algorithm has changed the mouse location...
-                If task.mouseMovePointUpdated Then mousePoint = task.mouseMovePoint
+                If task.mouseMovePointUpdated Then mouseDisplayPoint = task.mouseMovePoint
                 If updatedDrawRect <> task.drawRect Then
                     drawRect = task.drawRect
                     ' relative size of algorithm size image to displayed image

@@ -751,3 +751,50 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
+    Dim options As New Options_Stdev
+    Public Sub New()
+        labels(3) = "grid cells where grayscale stdev and average of the 3 color stdev's"
+        desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+        Dim threshold = options.stdevThreshold
+
+        Dim pt = task.mouseD.ptTopLeft
+        Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
+        Dim ColorMean As cv.Scalar, colorStdev As cv.Scalar
+        Static saveTrueData As New List(Of TrueText)
+        If task.heartBeat Then
+            dst3.SetTo(0)
+            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim count As Integer
+            For Each idd In task.iddList
+                cv.Cv2.MeanStdDev(dst2(idd.rect), grayMean, grayStdev)
+                cv.Cv2.MeanStdDev(task.color(idd.rect), ColorMean, colorStdev)
+                Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
+                Dim diff = Math.Abs(grayStdev(0) - nextColorStdev)
+                If diff > threshold Then
+                    dst2.Rectangle(idd.rect, 255, task.lineWidth)
+                    SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), idd.rect.TopLeft, 2)
+                    dst3.Rectangle(idd.rect, task.HighlightColor, task.lineWidth)
+                    SetTrueText(Format(diff, fmt1), idd.rect.TopLeft, 3)
+                    count += 1
+                End If
+            Next
+            labels(2) = "There were " + CStr(count) + " cells where the difference was greater than " + CStr(threshold)
+        End If
+
+        If trueData.Count > 0 Then saveTrueData = New List(Of TrueText)(trueData)
+        trueData = New List(Of TrueText)(saveTrueData)
+    End Sub
+End Class

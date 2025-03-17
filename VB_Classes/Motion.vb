@@ -4,6 +4,7 @@ Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public lastColor() As cv.Vec3f
+    Public cellAge() As Integer
     Public motionFlags() As Boolean
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -11,7 +12,10 @@ Public Class Motion_Basics : Inherits TaskParent
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then ReDim lastColor(task.gridRects.Count - 1)
+        If task.optionsChanged Then
+            ReDim lastColor(task.gridRects.Count - 1)
+            ReDim cellAge(task.gridRects.Count - 1)
+        End If
 
         If task.frameCount < 3 Then dst2 = src.Clone
         Dim threshold = task.gCell.options.colorDifferenceThreshold
@@ -25,12 +29,15 @@ Public Class Motion_Basics : Inherits TaskParent
             Dim colorChange = distance3D(colorVec, lastColor(i))
             If colorChange > threshold Then
                 lastColor(i) = colorVec
+                cellAge(i) = 1
                 For Each index In task.gridNeighbors(i)
                     If motionList.Contains(index) = False Then
                         motionFlags(index) = True
                         motionList.Add(index)
                     End If
                 Next
+            Else
+                cellAge(i) += 1
             End If
         Next
 

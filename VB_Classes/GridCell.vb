@@ -15,28 +15,26 @@ Public Class GridCell_Basics : Inherits TaskParent
             ReDim lastCorrelation(task.gridRects.Count - 1)
         End If
 
-        task.iddList.Clear()
         Dim stdev As cv.Scalar, mean As cv.Scalar
-        For Each rect In task.gridRects
+        Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
+        Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
+        Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
+
+        task.iddList.Clear()
+        For i = 0 To task.gridRects.Count - 1
             Dim idd As New gridCell
-            idd.rect = rect
+            idd.rect = task.gridRects(i)
+            idd.age = task.motionBasics.cellAge(i)
+            idd.rect = idd.rect
+            idd.color = task.motionBasics.lastColor(i) ' the last color is actually the current color - motion basics runs first.
             idd.lRect = idd.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
-            idd.center = New cv.Point(rect.TopLeft.X + idd.rect.Width / 2, rect.TopLeft.Y + idd.rect.Height / 2)
+            idd.center = New cv.Point(idd.rect.TopLeft.X + idd.rect.Width / 2, idd.rect.TopLeft.Y + idd.rect.Height / 2)
             If task.depthMask(idd.rect).CountNonZero Then
                 cv.Cv2.MeanStdDev(task.pcSplit(2)(idd.rect), mean, stdev, task.depthMask(idd.rect))
                 idd.depth = mean(0)
                 idd.depthStdev = stdev(0)
             End If
-            idd.index = task.iddList.Count
-            task.iddList.Add(idd)
-        Next
 
-        Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
-        Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
-        Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
-            idd.color = task.motionBasics.lastColor(i) ' the last color is actually the current color - motion basics runs first.
             If idd.depth = 0 Then
                 idd.correlation = 0
                 idd.rRect = emptyRect
@@ -74,7 +72,8 @@ Public Class GridCell_Basics : Inherits TaskParent
             End If
 
             lastCorrelation(i) = idd.correlation
-            task.iddList(i) = idd
+            idd.index = task.iddList.Count
+            task.iddList.Add(idd)
         Next
 
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
@@ -376,47 +375,6 @@ Public Class GridCell_Correlation : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class GridCell_GrayScaleTest : Inherits TaskParent
-    Dim options As New Options_Stdev
-    Public Sub New()
-        labels(3) = "grid cells where grayscale stdev and average of the 3 color stdev's"
-        desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        Dim threshold = options.stdevThreshold
-
-        Dim pt = task.mouseD.ptTopLeft
-        Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
-        Static saveTrueData As New List(Of TrueText)
-        If task.heartBeat Then
-            dst3.SetTo(0)
-            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim count As Integer
-            For Each idd In task.iddList
-                cv.Cv2.MeanStdDev(dst2(idd.rect), grayMean, grayStdev)
-                Dim colorStdev = (idd.colorStdev(0) + idd.colorStdev(1) + idd.colorStdev(2)) / 3
-                Dim diff = Math.Abs(grayStdev(0) - colorStdev)
-                If diff > threshold Then
-                    dst2.Rectangle(idd.rect, 255, task.lineWidth)
-                    SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), idd.rect.TopLeft, 2)
-                    dst3.Rectangle(idd.rect, task.HighlightColor, task.lineWidth)
-                    SetTrueText(Format(diff, fmt1), idd.rect.TopLeft, 3)
-                    count += 1
-                End If
-            Next
-            labels(2) = "There were " + CStr(count) + " cells where the difference was greater than " + CStr(threshold)
-        End If
-
-        If trueData.Count > 0 Then saveTrueData = New List(Of TrueText)(trueData)
-        trueData = New List(Of TrueText)(saveTrueData)
-    End Sub
-End Class
 
 
 
@@ -867,30 +825,6 @@ Public Class GridCell_ColorLines : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class GridCell_Stdev : Inherits TaskParent
-    Dim options As New Options_GridStdev
-    Public Sub New()
-        desc = "Visualize the depth and color standard deviation for each grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        For Each idd In task.iddList
-            If idd.depthStdev > options.depthThreshold Then
-                ' dst2(idd.rect).SetTo()
-            End If
-        Next
-    End Sub
-End Class
 
 
 

@@ -428,9 +428,6 @@ Public Class gridCell
     Public depthErr As Single ' a linear estimate of the depth error based on '2% error at 2 meters'
     Public age As Integer
     Public color As cv.Vec3f
-    Public colorVecLast As cv.Vec3f ' the mean color of the last frame with motion in the cell.
-    Public colorMean As cv.Scalar
-    Public colorStdev As cv.Scalar
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
     Public correlation As Single
