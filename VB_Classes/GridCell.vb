@@ -52,7 +52,8 @@ Public Class GridCell_Basics : Inherits TaskParent
                     idd.correlation = correlationMat.Get(Of Single)(0, 0)
                 Else
                     Dim irPt = translateColorToLeft(idd.rect.TopLeft)
-                    If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Then
+                    If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or
+                        (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                         idd.depth = 0 ' off the grid.
                         idd.lRect = emptyRect
                         idd.rRect = emptyRect
@@ -63,6 +64,8 @@ Public Class GridCell_Basics : Inherits TaskParent
                         idd.rRect = idd.lRect
                         idd.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / idd.depth
                         idd.rRect = ValidateRect(idd.rRect)
+                        If idd.rRect.Width = 1 Then Dim k = 0
+                        If idd.rRect.Height = 1 Then Dim k = 0
                         cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
                                                              cv.TemplateMatchModes.CCoeffNormed)
 
