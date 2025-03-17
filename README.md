@@ -8,7 +8,7 @@
     -   Only cells within the motion mask need to be updated.
 -   This image stability is visible in all of the Color8U algorithms input to RedColor.
 -   All the Color8U algorithms (currently 10) use motion to increase image stability.
-    -   Color8U output is often input to the RedColor or RedCloud algorithms.
+    -   BackProject_Full – a histogram setting determines the classifications.
     -   Bin4Way_Regions – 4 color categories based on brightness.
     -   Binarize_DepthTiers – 1-meter categories of depth.
     -   EdgeLine_Basics – (default) uses lines and edges to segment the image.
