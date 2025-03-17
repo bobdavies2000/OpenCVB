@@ -1,33 +1,44 @@
-# March 2025 (Part 2) – GridCell and EdgeLine Updates.
+# March 2025 (Part 3) – RedColor, Color8U, Left/Right Mean Subtraction, Gravity/Horizon, and the XO algorithms.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   GridCell_Regions expands the horizontal and vertical rectangles.
-    -   Grid cells with consistent depth are combined to build contours.
-    -   The contours define and track the objects in the image – see below.
--   EdgeLine algorithms: combine edge and line detection to form ‘edgelines’.
-    -   Previously labeled EdgeDraw after OpenCV’s EdgeDrawing API’s.
-    -   EdgeDrawing names are used to access OpenCV C++ code.
-    -   EdgeLine may be a better name to encapsulate how it works.
--   EdgeLine algorithms update the edgeline output only where motion occurs.
-    -   Algorithms using EdgeLine_Basics see more consistent output.
-    -   Motion-filtered RGB input to EdgeDrawing API’s are not consistent.
-    -   Motion-filtering the edgeline output solves the problem.
-    -   Motion-filtering EdgeLine output impacts many other algorithms.
--   RedColor_Basics updates only cells that intersect with the motion mask.
-    -   Result for all ‘RedC’ algorithms appears much more stable.
-    -   ‘RedC’ algorithms are the first to benefit from EdgeLine improvements.
--   Selecting ‘Display Cell Stats’ RedCloud option can be toggled on and off.
--   OpenCVB option to use a fixed or random palette is available.
-    -   A fixed palette produces consistent colors across different runs.
-    -   Random palettes will be consistently used with all algorithms in a run.
--   Feature_Agast options improve the quality of feature points found.
--   ShowPalette no longer requires normalizing – saves a matrix multiply.
--   Emax_Basics example builds a special set of grid rectangles for its use.
+-   For RedCloud output, a coloring scheme may be selected in the RedCloud options.
+    -   Color a cell with its mean color, tracking color, or depth color.
+    -   The different color schemes are explained in the second GIF below.
+-   All the Color8U algorithms (currently 10) now use motion to increase image stability.
+    -   Color8U output is often input to the RedColor or RedCloud algorithms.
+    -   Bin4Way_Regions – 4 color categories based on brightness.
+    -   Binarize_DepthTiers – 1-meter categories of depth.
+    -   EdgeLine_Basics – (default) uses lines and edges to segment the image.
+    -   Hist3DColor_Basics – categorize color pixels with a 3D histogram.
+    -   KMeans_Basics – a standard K-Means approach to segmentation.
+    -   LUT_Basics – use a look-up-table (LUT) to categorize each pixel.
+    -   Reduction_Basics – reduce each pixel mechanically to group similar pixels.
+    -   PCA_NColor_CPP – principal component analysis on the entire image.
+    -   MeanSubtraction_Gray – grayscale separation into 2 classes.
+-   Mean subtraction of the left and right images may show depth correlation better.
+    -   The first GIF shows the previous version with no mean subtraction.
+    -   The second GIF below alternates with and without mean subtraction.
+    -   Check global option ‘Mean Subtraction on Left/Right Images’ to see the impact.
+    -   Mean subtraction of left and right images finds better correlation values.
+    -   Much more testing is needed to confirm the value of using this approach.
+-   The gravity algorithms were reworked to use OpenCV’s FindNonZero.
+    -   The gravity vector is defined in image coordinates to help find vertical lines.
+    -   Similarly, the horizon vector is used to find horizontal lines algebraically.
+    -   The gravity vector can be smoothed with Kalman. See Gravity_Basics.
+        -   But it is too slow on some configurations with a moving camera.
+-   The XO algorithms are experimental or obsolete algorithms that are not active.
+    -   Separating inactive code is simpler and preserves the possibility of later use.
+    -   Obsolete gravity and horizon algorithms prompted XO’s creation.
+    -   More and more algorithms will migrate there to simplify the source tree.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/f1f77b330a4a33ef4872f2d85b188b32.gif)
+![](media/101f64619a75aba05208e888ad0a7c16.gif)
 
-**Connected_Contours :** *Each region contains grid cells and neighbors which are at approximately the same depth. For instance, the green cell in the lower left consistently defines and tracks the person seated at the desk (our humble programmer.) The wall and painting are tracked as well. The lower right image confirms this by showing the color image and the contours using OpenCV’s AddWeighted method. The tracking color of the wall changes because it is shrinking in size as the contours are colored by order of size in this version.*
+**RedColor_Basics :** *The different display options for RedCloud output are shown above. The radio button insert shows the current selection. The 3 options are to display the mean color of the cell, a tracking color, and the depth color. The tracking color is a highly visible color that is randomly assigned to a cell so that it may be visually tracked from frame to frame.*
+
+*![](media/44e21adc20afb2490256ae9462af7c56.gif)*
+
+**Mean Subtraction :** *An OpenCVB global option enables using mean subtraction of the left and right images as input to the depth correlation. The featureless regions are highlighted in the output with solid red regions. The improved output is available to all algorithms in the DepthRGB Mat. More testing is needed to confirm the value of mean subtraction.*
 
 # Introduction
 
@@ -1867,3 +1878,34 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A screenshot of a computer AI-generated content may be incorrect.](media/2afba4eb6b4ad7bf708ac64a8673a002.png)
 
 **GridCell_Connected:** *Grid cells in the lower left image are combined horizontally if their depth is within X centimeters. The same grid cells are combined vertically in the lower right image. Note that many grid cells are not combined vertically or horizontally. Their depth is not close to any of their neighbors. Cells with no depth can still be combined. An example is the entire vertical column at the left of the image where there are no depth values.*
+
+# March 2025 (Part 2) – GridCell and EdgeLine Updates.
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   GridCell_Regions expands the horizontal and vertical rectangles.
+    -   Grid cells with consistent depth are combined to build contours.
+    -   The contours define and track the objects in the image – see below.
+-   EdgeLine algorithms: combine edge and line detection to form ‘edgelines’.
+    -   Previously labeled EdgeDraw after OpenCV’s EdgeDrawing API’s.
+    -   EdgeDrawing names are used to access OpenCV C++ code.
+    -   EdgeLine may be a better name to encapsulate how it works.
+-   EdgeLine algorithms update the edgeline output only where motion occurs.
+    -   Algorithms using EdgeLine_Basics see more consistent output.
+    -   Motion-filtered RGB input to EdgeDrawing API’s are not consistent.
+    -   Motion-filtering the edgeline output solves the problem.
+    -   Motion-filtering EdgeLine output impacts many other algorithms.
+-   RedColor_Basics updates only cells that intersect with the motion mask.
+    -   Result for all ‘RedC’ algorithms appears much more stable.
+    -   ‘RedC’ algorithms are the first to benefit from EdgeLine improvements.
+-   Selecting ‘Display Cell Stats’ RedCloud option can be toggled on and off.
+-   OpenCVB option to use a fixed or random palette is available.
+    -   A fixed palette produces consistent colors across different runs.
+    -   Random palettes will be consistently used with all algorithms in a run.
+-   Feature_Agast options improve the quality of feature points found.
+-   ShowPalette no longer requires normalizing – saves a matrix multiply.
+-   Emax_Basics example builds a special set of grid rectangles for its use.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of a person sitting in a chair AI-generated content may be incorrect.](media/f1f77b330a4a33ef4872f2d85b188b32.gif)
+
+**Connected_Contours :** *Each region contains grid cells and neighbors which are at approximately the same depth. For instance, the green cell in the lower left consistently defines and tracks the person seated at the desk (our humble programmer.) The wall and painting are tracked as well. The lower right image confirms this by showing the color image and the contours using OpenCV’s AddWeighted method. The tracking color of the wall changes because it is shrinking in size as the contours are colored by order of size in this version.*
