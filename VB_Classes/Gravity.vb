@@ -1,61 +1,4 @@
-﻿Imports System.Net
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
-Public Class Gravity_Basics : Inherits TaskParent
-    Dim ghRaw As New Gravity_Raw
-    Dim kalman As New Kalman_Basics
-    Public Sub New()
-        ReDim kalman.kInput(2 - 1)
-        desc = "Use kalman to smooth gravity and horizon vectors."
-    End Sub
-    Public Function computePerp(lp As linePoints) As linePoints
-        Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
-        Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
-        Dim b = midPoint.Y - m * midPoint.X
-        Dim p1 = New cv.Point2f(-b / m, 0)
-        Dim p2 = New cv.Point2f((dst2.Height - b) / m, dst2.Height)
-
-        Dim w = task.workingRes.Width
-        Dim h = task.workingRes.Height
-
-        If p1.X < 0 Then p1 = New cv.Point2f(0, b)
-        If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)
-        If p1.Y < 0 Then p1 = New cv.Point2f(-b / m, 0)
-        If p1.Y > h Then p1 = New cv.Point2f(w, m * w + b)
-
-        If p2.X < 0 Then p2 = New cv.Point2f(0, b)
-        If p2.X > w Then p2 = New cv.Point2f(w, m * w + b)
-        If p2.Y < 0 Then p2 = New cv.Point2f(-b / m, 0)
-        If p2.Y > h Then p2 = New cv.Point2f(w, m * w + b)
-
-        Return New linePoints(p1, p2)
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        ghRaw.Run(src)
-
-        With kalman
-            .kInput = {ghRaw.xBot, ghRaw.xTop}
-            .Run(src)
-
-            task.gravityVec = New linePoints(New cv.Point2f(.kOutput(1), 0),
-                                             New cv.Point2f(.kOutput(0), dst2.Height))
-            task.horizonVec = computePerp(task.gravityVec)
-        End With
-
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor)
-            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
+﻿Imports cv = OpenCvSharp
 Public Class Gravity_Raw : Inherits TaskParent
     Public xTop As Integer, xBot As Integer
     Dim sampleSize As Integer = 25
@@ -111,6 +54,69 @@ Public Class Gravity_Raw : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Gravity_Basics : Inherits TaskParent
+    Dim gravity As New Gravity_Raw
+    Dim kalman As New Kalman_Basics
+    Public Sub New()
+        ReDim kalman.kInput(2 - 1)
+        desc = "Use kalman to smooth gravity and horizon vectors."
+    End Sub
+    Public Function computePerp(lp As linePoints) As linePoints
+        Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
+        Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
+        Dim b = midPoint.Y - m * midPoint.X
+        Dim p1 = New cv.Point2f(-b / m, 0)
+        Dim p2 = New cv.Point2f((dst2.Height - b) / m, dst2.Height)
+
+        Dim w = task.workingRes.Width
+        Dim h = task.workingRes.Height
+
+        If p1.X < 0 Then p1 = New cv.Point2f(0, b)
+        If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)
+        If p1.Y < 0 Then p1 = New cv.Point2f(-b / m, 0)
+        If p1.Y > h Then p1 = New cv.Point2f(w, m * w + b)
+
+        If p2.X < 0 Then p2 = New cv.Point2f(0, b)
+        If p2.X > w Then p2 = New cv.Point2f(w, m * w + b)
+        If p2.Y < 0 Then p2 = New cv.Point2f(-b / m, 0)
+        If p2.Y > h Then p2 = New cv.Point2f(w, m * w + b)
+
+        Return New linePoints(p1, p2)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gravity.Run(src)
+
+        With kalman
+            .kInput = {gravity.xTop, gravity.xBot}
+
+            ' kalman is too slow to reacting... Skip for now.  
+            .kOutput = .kInput ' .Run(src)
+
+            task.gravityVec = New linePoints(New cv.Point2f(.kOutput(0), 0),
+                                             New cv.Point2f(.kOutput(1), dst2.Height))
+            task.horizonVec = computePerp(task.gravityVec)
+        End With
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor)
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
 
 
 

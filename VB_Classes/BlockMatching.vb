@@ -55,22 +55,22 @@ End Class
 
 
 
-Public Class BlockMatching_Grid : Inherits TaskParent
-    Dim quadR As New Quad_RightView
-    Dim block As New BlockMatching_Basics
-    Public Sub New()
-        task.gOptions.displayDst1.Checked = True
-        block.useDefaultLeftRight = False
-        task.gOptions.GridSlider.Value = 2
-        desc = "Match the low resolution left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        block.leftView = task.gCell.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = block.leftView
-        quadR.Run(task.rightView)
-        block.rightView = quadR.dst2
-        dst3 = block.rightView
-        block.Run(src)
-        dst2 = block.dst2
-    End Sub
-End Class
+'Public Class BlockMatching_Grid : Inherits TaskParent
+'    Dim quadR As New Quad_RightView
+'    Dim block As New BlockMatching_Basics
+'    Public Sub New()
+'        task.gOptions.displayDst1.Checked = True
+'        block.useDefaultLeftRight = False
+'        task.gOptions.GridSlider.Value = 2
+'        desc = "Match the low resolution left and right images."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        block.leftView = task.gCell.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        dst1 = block.leftView
+'        quadR.Run(task.rightView)
+'        block.rightView = quadR.dst2
+'        dst3 = block.rightView
+'        block.Run(src)
+'        dst2 = block.dst2
+'    End Sub
+'End Class

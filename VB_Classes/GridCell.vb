@@ -5,6 +5,7 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean = True
     Dim lastCorrelation() As Single
+    Public quad As New Quad_Basics
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
@@ -78,6 +79,8 @@ Public Class GridCell_Basics : Inherits TaskParent
             idd.index = task.iddList.Count
             task.iddList.Add(idd)
         Next
+
+        quad.Run(src)
 
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
     End Sub

@@ -250,36 +250,22 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
         desc = "Connect cells that are close in depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gCells As New List(Of gridCellNew)
-        For Each idd In task.iddList
-            Dim gc As New gridCellNew
-            gc.rect = idd.rect
-            gc.lRect = idd.lRect
-            gc.rRect = idd.rRect
-
-            gc.depth = idd.depth
-            gc.mm = idd.mm
-            gc.correlation = idd.correlation
-            gc.index = gCells.Count
-            gCells.Add(gc)
-        Next
-
         width = dst2.Width / task.cellSize
         If width * task.cellSize <> dst2.Width Then width += 1
         height = Math.Floor(dst2.Height / task.cellSize)
         If height * task.cellSize <> dst2.Height Then height += 1
 
-        Dim newCount(gCells.Count - 1) As Integer
+        Dim newCount(task.iddList.Count - 1) As Integer
         For i = 0 To height - 2
             For j = 1 To width - 1
-                Dim gc1 = gCells(i * width + j - 1)
-                Dim gc2 = gCells(i * width + j)
-                Dim gc3 = gCells((i + 1) * width + j - 1)
-                Dim gc4 = gCells((i + 1) * width + j)
+                Dim gc1 = task.iddList(i * width + j - 1)
+                Dim gc2 = task.iddList(i * width + j)
+                Dim gc3 = task.iddList((i + 1) * width + j - 1)
+                Dim gc4 = task.iddList((i + 1) * width + j)
                 If gc1.index <> gc2.index Then
                     If Math.Abs(gc1.depth - gc2.depth) < task.depthDiffMeters Then
                         gc2.index = gc1.index
-                        gCells(i * width + j) = gc2
+                        task.iddList(i * width + j) = gc2
                         newCount(gc2.index) += 1
                     End If
                 End If
@@ -287,7 +273,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
                 If gc3.index <> gc1.index Then
                     If Math.Abs(gc1.depth - gc3.depth) < task.depthDiffMeters Then
                         gc3.index = gc1.index
-                        gCells((i + 1) * width + j - 1) = gc3
+                        task.iddList((i + 1) * width + j - 1) = gc3
                         newCount(gc3.index) += 1
                     End If
                 End If
@@ -295,7 +281,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
                 If gc4.index <> gc2.index Then
                     If Math.Abs(gc2.depth - gc4.depth) < task.depthDiffMeters Then
                         gc4.index = gc2.index
-                        gCells((i + 1) * width + j) = gc4
+                        task.iddList((i + 1) * width + j) = gc4
                         newCount(gc4.index) += 1
                     End If
                 End If
@@ -314,7 +300,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        For Each gc In gCells
+        For Each gc In task.iddList
             If indexList.Contains(gc.index) Then
                 dst3(gc.rect).SetTo(gc.index)
             End If
@@ -322,7 +308,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
 
         dst2 = ShowPalette(dst3)
 
-        labels(2) = CStr(gCells.Count) + " grid cells consolidated into the top 10 cells."
+        labels(2) = CStr(task.iddList.Count) + " grid cells consolidated into the top 10 cells."
     End Sub
 End Class
 
@@ -420,74 +406,5 @@ Public Class Connected_Rects : Inherits TaskParent
 
         dst3 = src
         dst3.SetTo(0, dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Connected_RegionsNew : Inherits TaskParent
-    Dim connect As New Connected_Basics
-    Dim redM As New RedMask_Basics
-    Public Sub New()
-        desc = "Modify each grid cell to indicate which group it is in.  Single cells are not in any group."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gCells As New List(Of gridCellNew)
-        For Each idd In task.iddList
-            Dim gc As New gridCellNew
-            gc.rect = idd.rect
-            gc.lRect = idd.lRect
-            gc.rRect = idd.rRect
-
-            gc.depth = idd.depth
-            gc.mm = idd.mm
-            gc.correlation = idd.correlation
-            gc.index = gCells.Count
-            gCells.Add(gc)
-        Next
-
-        connect.Run(src.Clone)
-        task.rcPixelThreshold = task.cellSize * task.cellSize ' eliminate singles...
-        redM.Run(Not connect.dst2)
-
-        'Dim counts(gCells.Count - 1) As Integer
-        'For Each gc In gCells
-        '    Dim index = dst1.Get(Of Byte)(gc.center.Y, gc.center.X)
-        '    Dim md = redM.mdList(index)
-        '    If index = 0 Then
-        '        dst2(idd.rect).SetTo(black)
-        '    Else
-        '        If md.pixels > minSize Then
-        '            dst2(idd.rect).SetTo(task.scalarColors(index))
-        '            mdLargest.Add(md)
-        '        End If
-        '    End If
-        'Next
-
-        'Dim sortedCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        'For i = 0 To newCount.Count - 1
-        '    sortedCounts.Add(newCount(i), i)
-        'Next
-
-        'Dim indexList As New List(Of Integer)
-        'For i = 0 To 10 - 1
-        '    Dim index = sortedCounts.ElementAt(i).Value
-        '    indexList.Add(index)
-        'Next
-
-        'dst3.SetTo(0)
-        'For Each gc In gCells
-        '    If indexList.Contains(gc.index) Then
-        '        dst3(gc.rect).SetTo(gc.index)
-        '    End If
-        'Next
-
-        'dst1.SetTo(0)
-        'For Each md In redM.mdList
-        '    dst1(md.rect).SetTo(md.index, md.mask)
-        'Next
     End Sub
 End Class

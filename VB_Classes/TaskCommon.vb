@@ -439,23 +439,6 @@ End Class
 
 
 
-Public Class gridCellNew
-    Public rect As cv.Rect ' rectange under the cursor in the color image.
-    Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.
-    Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
-
-    Public center As New cv.Point
-
-    Public depth As Single
-    Public pixels As Integer ' depth pixel count...
-    Public mm As mmData ' min and max values of the depth data.
-    Public correlation As Single
-    Public index As Integer
-End Class
-
-
-
-
 Public Class triangleData
     Public color As cv.Point3f
     Public facets(3) As cv.Point3f
