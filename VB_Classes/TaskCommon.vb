@@ -431,13 +431,11 @@ Public Class gridCell
     Public colorVecLast As cv.Vec3f ' the mean color of the last frame with motion in the cell.
     Public colorMean As cv.Scalar
     Public colorStdev As cv.Scalar
-    Public pixels As Integer ' depth pixel count...
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
     Public correlation As Single
     Public features As New List(Of cv.Point)
     Public index As Integer
-    Public motionFlag As Boolean
 End Class
 
 

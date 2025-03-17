@@ -258,7 +258,6 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
             gc.rRect = idd.rRect
 
             gc.depth = idd.depth
-            gc.pixels = idd.pixels
             gc.mm = idd.mm
             gc.correlation = idd.correlation
             gc.index = gCells.Count
@@ -444,7 +443,6 @@ Public Class Connected_RegionsNew : Inherits TaskParent
             gc.rRect = idd.rRect
 
             gc.depth = idd.depth
-            gc.pixels = idd.pixels
             gc.mm = idd.mm
             gc.correlation = idd.correlation
             gc.index = gCells.Count

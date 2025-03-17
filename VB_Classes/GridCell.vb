@@ -3,93 +3,84 @@ Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
     Public thresholdRangeZ As Single
-    Public instantUpdate As Boolean
+    Public instantUpdate As Boolean = True
     Public mouseD As New GridCell_MouseDepth
     Public quad As New Quad_Basics
+    Dim lastCorrelation() As Single
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-
-        If task.optionsChanged Or instantUpdate Then
-            task.iddList.Clear()
-            For Each rect In task.gridRects
-                Dim idd As New gridCell
-                idd.rect = ValidateRect(rect)
-                idd.lRect = ValidateRect(rect) ' for some cameras the color image and the left image are the same.
-                idd.center = New cv.Point(rect.TopLeft.X + idd.rect.Width / 2, rect.TopLeft.Y + idd.rect.Height / 2)
-                idd.age = 0
-                idd.index = task.iddList.Count
-                task.iddList.Add(idd)
-            Next
+        If task.optionsChanged Then
+            ReDim lastCorrelation(task.gridRects.Count - 1)
         End If
 
-        Dim stdev As cv.Scalar, mean As cv.Scalar, colorMean As cv.Scalar
+        task.iddList.Clear()
+        Dim stdev As cv.Scalar, mean As cv.Scalar
+        For Each rect In task.gridRects
+            Dim idd As New gridCell
+            idd.rect = ValidateRect(rect)
+            idd.lRect = idd.rect ' for some cameras the color image and the left image are the same.
+            idd.center = New cv.Point(rect.TopLeft.X + idd.rect.Width / 2, rect.TopLeft.Y + idd.rect.Height / 2)
+            If task.depthMask(idd.rect).CountNonZero Then
+                cv.Cv2.MeanStdDev(task.pcSplit(2)(idd.rect), mean, stdev, task.depthMask(idd.rect))
+                idd.depth = mean(0)
+                idd.depthStdev = stdev(0)
+            End If
+            idd.index = task.iddList.Count
+            task.iddList.Add(idd)
+        Next
+
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
-        Dim threshold = options.colorDifferenceThreshold
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            cv.Cv2.MeanStdDev(src(idd.rect), colorMean, idd.colorStdev)
-            idd.color = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
-            Dim colorChange = distance3D(idd.color, idd.colorVecLast)
-            If colorChange < threshold And idd.age > 0 And idd.correlation <> 0 Then
+            If task.motionBasics.motionFlag(i) = False Then
                 idd.age += 1
-                idd.motionFlag = False
+                idd.correlation = lastCorrelation(i)
             Else
-                cv.Cv2.MeanStdDev(task.pcSplit(2)(idd.rect), mean, stdev, task.depthMask(idd.rect))
-                idd.depth = mean(0)
-                idd.depthStdev = stdev(0)
-
-                idd.motionFlag = True
-                idd.colorVecLast = idd.color
-                idd.pixels = task.depthMask(idd.rect).CountNonZero
-                idd.correlation = 0
                 idd.age = 1
-                If idd.pixels = 0 Then
-                    idd.depth = 0
+                If idd.depth = 0 Then
+                    idd.correlation = 0
                     idd.rRect = emptyRect
                 Else
-                    If idd.depth > 0 Then
-                        idd.mm = GetMinMax(task.pcSplit(2)(idd.rect), task.depthMask(idd.rect))
-                        idd.depthErr = 0.02 * idd.depth / 2
-                        If task.rgbLeftAligned Then
-                            idd.lRect = idd.rect
-                            idd.rRect = idd.lRect
-                            idd.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / idd.depth
-                            idd.rRect = ValidateRect(idd.rRect)
-                            cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
+                    idd.mm = GetMinMax(task.pcSplit(2)(idd.rect), task.depthMask(idd.rect))
+                    idd.depthErr = 0.02 * idd.depth / 2
+                    If task.rgbLeftAligned Then
+                        idd.lRect = idd.rect
+                        idd.rRect = idd.lRect
+                        idd.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / idd.depth
+                        idd.rRect = ValidateRect(idd.rRect)
+                        cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
                                                  cv.TemplateMatchModes.CCoeffNormed)
 
-                            idd.correlation = correlationMat.Get(Of Single)(0, 0)
-                        Else
-                            Dim irPt = translateColorToLeft(idd.rect.TopLeft)
-                            If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Then
-                                idd.depth = 0 ' off the grid.
-                                idd.lRect = emptyRect
-                                idd.rRect = emptyRect
-                            Else
-                                idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.rect.Width, idd.rect.Height)
-                                idd.lRect = ValidateRect(idd.lRect)
-
-                                idd.rRect = idd.lRect
-                                idd.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / idd.depth
-                                idd.rRect = ValidateRect(idd.rRect)
-                                cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
-                                                     cv.TemplateMatchModes.CCoeffNormed)
-
-                                idd.correlation = correlationMat.Get(Of Single)(0, 0)
-                            End If
-                        End If
+                        idd.correlation = correlationMat.Get(Of Single)(0, 0)
                     Else
-                        idd.lRect = emptyRect
-                        idd.rRect = emptyRect
+                        Dim irPt = translateColorToLeft(idd.rect.TopLeft)
+                        If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Then
+                            idd.depth = 0 ' off the grid.
+                            idd.lRect = emptyRect
+                            idd.rRect = emptyRect
+                        Else
+                            idd.lRect = New cv.Rect(irPt.X, irPt.Y, idd.rect.Width, idd.rect.Height)
+                            idd.lRect = ValidateRect(idd.lRect)
+
+                            idd.rRect = idd.lRect
+                            idd.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / idd.depth
+                            idd.rRect = ValidateRect(idd.rRect)
+                            cv.Cv2.MatchTemplate(leftview(idd.lRect), rightView(idd.rRect), correlationMat,
+                                                         cv.TemplateMatchModes.CCoeffNormed)
+
+                            idd.correlation = correlationMat.Get(Of Single)(0, 0)
+                        End If
                     End If
                 End If
             End If
+
+            lastCorrelation(i) = idd.correlation
             task.iddList(i) = idd
         Next
 
@@ -125,7 +116,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
         End If
 
         depthAndCorrelationText = Format(task.iddC.depth, fmt2) +
-                                  "m (" + Format(task.iddC.pixels / (task.iddC.rect.Width * task.iddC.rect.Height), "0%") + ") ID=" +
+                                  "m " + " ID=" +
                                   CStr(task.iddC.index) + vbCrLf + "depth " + Format(task.iddC.mm.minVal, fmt3) + "m - " +
                                   Format(task.iddC.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.iddC.correlation, fmt3)
         ptTopLeft = pt
@@ -161,10 +152,6 @@ Public Class GridCell_Plot : Inherits TaskParent
             idd = task.iddList(index)
         End If
 
-        If idd.pixels <= 1 Then
-            dst3.SetTo(0)
-            Exit Sub
-        End If
         Dim split() = task.pointCloud(idd.rect).Split()
         Dim mm = GetMinMax(split(2))
         If Single.IsInfinity(mm.maxVal) Then Exit Sub
@@ -845,7 +832,7 @@ Public Class GridCell_Boundaries : Inherits TaskParent
         dst2 = task.depthRGB.Clone
         dst1.SetTo(0)
         For Each idd In task.iddList
-            If idd.pixels > 0 Then
+            If idd.correlation > 0 Then
                 If (idd.mm.maxVal - idd.mm.minVal) - idd.depthErr > task.depthDiffMeters Then
                     dst2.Rectangle(idd.rect, 0, -1)
                     dst1.Rectangle(idd.rect, cv.Scalar.White, -1)
@@ -959,7 +946,6 @@ Public Class GridCell_MeanSubtraction : Inherits TaskParent
     Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
         task.gCell.instantUpdate = True
-        task.gOptions.LRMeanSubtraction.Checked = False ' so we can see the difference.
         ' labels = {"", "", "This is the grid cell map using mean subtraction on the left and right images", ""}
         desc = "Use the mean subtraction output of the left and right images as input to the GridCell_Basics.  NOTE: instant update!"
     End Sub
@@ -1041,8 +1027,9 @@ Public Class GridCell_MeasureMotion : Inherits TaskParent
 
         motionRects.Clear()
         Dim indexList As New List(Of Integer) ' avoid adding the same cell more than once.
+        Dim motionFlags = task.motionBasics.motionFlag
         For Each idd In task.iddList
-            If idd.motionFlag Then
+            If motionFlags(idd.index) Then
                 For Each index In task.gridNeighbors(idd.index)
                     If indexList.Contains(index) = False Then
                         indexList.Add(index)
@@ -1091,14 +1078,17 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
 
+        Dim count As Integer
         For Each idd In task.iddList
-            If idd.correlation <> 0 Then
-                Dim val = (idd.correlation + 1) * 255 / 2
-                dst1(idd.rect).SetTo(val)
+            If idd.depth > 0 Then
+                dst1(idd.rect).SetTo((idd.correlation + 1) * 255 / 2)
+                If idd.correlation > 0 Then count += 1
+            Else
+                dst1(idd.rect).SetTo(0)
             End If
         Next
 
         dst2 = ShowPaletteDepth(dst1)
-        labels(2) = task.gCell.labels(2)
+        labels(2) = task.gCell.labels(2) + " and " + CStr(count) + " had a correlation."
     End Sub
 End Class

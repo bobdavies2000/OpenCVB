@@ -1,9 +1,11 @@
+Imports System.Drawing.Imaging
 Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
-    Public markers As New List(Of Integer)
+    Dim lastColor() As cv.Vec3f
+    Public motionFlag() As Boolean
     Public Sub New()
         labels(3) = "The motion-filtered color image.  "
         desc = "Isolate all motion in the scene"
@@ -16,23 +18,34 @@ Public Class Motion_Basics : Inherits TaskParent
             Exit Sub
         End If
 
+        If task.optionsChanged Then ReDim lastColor(task.gridRects.Count - 1)
+
         If task.frameCount < 3 Then dst2 = src.Clone
         task.motionMask.SetTo(0)
-        markers.Clear()
-        For Each idd In task.iddList
-            If idd.motionFlag Then
-                For Each index In task.gridNeighbors(idd.index)
-                    markers.Add(index)
+        Dim threshold = task.gCell.options.colorDifferenceThreshold
+        Dim colorstdev As cv.Scalar, colorMean As cv.Scalar
+        ReDim motionFlag(task.gridRects.Count - 1)
+        Dim motionList As New List(Of Integer)
+        For i = 0 To task.gridRects.Count - 1
+            Dim rect = task.gridRects(i)
+            cv.Cv2.MeanStdDev(src(rect), colorMean, colorstdev)
+            Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
+            Dim colorChange = distance3D(colorVec, lastColor(i))
+            lastColor(i) = colorVec
+            If colorChange < threshold Then
+                For Each index In task.gridNeighbors(i)
+                    motionList.Add(index)
                     Dim r = task.iddList(index).rect
                     task.motionMask(r).SetTo(255)
                     src(r).CopyTo(dst2(r))
+                    motionFlag(i) = True
                 Next
             End If
         Next
 
-        task.fullImageStable = markers.Count = 0
+        task.fullImageStable = motionList.Count = 0
         task.motionRects.Clear()
-        For Each index In markers
+        For Each index In motionList
             task.motionRects.Add(task.iddList(index).rect)
         Next
         labels(2) = "There were " + CStr(task.motionRects.Count) + " grid cells with motion."

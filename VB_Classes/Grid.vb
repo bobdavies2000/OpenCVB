@@ -2,15 +2,10 @@
 Imports System.Threading
 Imports System.Windows.Media.Media3D
 Public Class Grid_Basics : Inherits TaskParent
-    Public gridRects As New List(Of cv.Rect)
-    Public gridMask As cv.Mat
-    Public gridMap As cv.Mat
-    Public gridIndex As New List(Of Integer)
     Public tilesPerCol As Integer, tilesPerRow As Integer
-    Public gridNabeRects As New List(Of cv.Rect)
-    Public gridNeighbors As New List(Of List(Of Integer))
-    Public gridPoints As New List(Of cv.Point)
     Public Sub New()
+        task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        task.gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 255)
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -22,16 +17,13 @@ Public Class Grid_Basics : Inherits TaskParent
         If task.optionsChanged Then
             tilesPerCol = 0
             tilesPerRow = 0
-            gridIndex.Clear()
-            gridNabeRects.Clear()
-            gridNeighbors.Clear()
-            gridPoints.Clear()
-            cellSize = task.gOptions.GridSlider.Value
-            gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8U)
-            gridMap = New cv.Mat(src.Size(), cv.MatType.CV_32S, 255)
+            task.gridNabeRects.Clear()
+            task.gridNeighbors.Clear()
+            task.gridPoints.Clear()
 
-            gridRects.Clear()
-            gridIndex.Clear()
+            cellSize = task.gOptions.GridSlider.Value
+
+            task.gridRects.Clear()
             Dim index As Integer
             For y = 0 To src.Height - 1 Step cellSize
                 For x = 0 To src.Width - 1 Step cellSize
@@ -39,31 +31,30 @@ Public Class Grid_Basics : Inherits TaskParent
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then tilesPerCol += 1
                         If y = 0 Then tilesPerRow += 1
-                        gridRects.Add(roi)
-                        gridIndex.Add(index)
+                        task.gridRects.Add(roi)
                         index += 1
                     End If
                 Next
             Next
             task.subDivisionCount = 9
 
-            gridMask.SetTo(0)
+            task.gridMask.SetTo(0)
             For x = cellSize To src.Width - 1 Step cellSize
                 Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, src.Height)
-                gridMask.Line(p1, p2, 255, task.lineWidth)
+                task.gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
             For y = cellSize To src.Height - 1 Step cellSize
                 Dim p1 = New cv.Point(0, y), p2 = New cv.Point(src.Width, y)
-                gridMask.Line(p1, p2, 255, task.lineWidth)
+                task.gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
 
-            For i = 0 To gridRects.Count - 1
-                Dim roi = gridRects(i)
-                gridMap.Rectangle(roi, i, -1)
+            For i = 0 To task.gridRects.Count - 1
+                Dim roi = task.gridRects(i)
+                task.gridMap.Rectangle(roi, i, -1)
             Next
 
-            For j = 0 To gridRects.Count - 1
-                Dim roi = gridRects(j)
+            For j = 0 To task.gridRects.Count - 1
+                Dim roi = task.gridRects(j)
                 Dim nextList As New List(Of Integer)
                 nextList.Add(j)
                 For i = 0 To 8
@@ -73,30 +64,30 @@ Public Class Grid_Basics : Inherits TaskParent
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                               roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                     If x >= 0 And x < src.Width And y >= 0 And y < src.Height Then
-                        Dim val = gridMap.Get(Of Integer)(y, x)
+                        Dim val = task.gridMap.Get(Of Integer)(y, x)
                         If nextList.Contains(val) = False Then nextList.Add(val)
                     End If
                 Next
-                gridNeighbors.Add(nextList)
+                task.gridNeighbors.Add(nextList)
             Next
 
-            gridNabeRects.Clear()
-            For Each nabeList In gridNeighbors
+            task.gridNabeRects.Clear()
+            For Each nabeList In task.gridNeighbors
                 Dim xList As New List(Of Integer), yList As New List(Of Integer)
                 For Each index In nabeList
-                    Dim roi = gridRects(index)
+                    Dim roi = task.gridRects(index)
                     xList.Add(roi.X)
                     yList.Add(roi.Y)
                     xList.Add(roi.BottomRight.X)
                     yList.Add(roi.BottomRight.Y)
                 Next
-                gridNabeRects.Add(New cv.Rect(xList.Min, yList.Min,
+                task.gridNabeRects.Add(New cv.Rect(xList.Min, yList.Min,
                                               xList.Max - xList.Min,
                                               yList.Max - yList.Min))
             Next
 
-            gridPoints.Clear()
-            For Each roi In gridRects
+            task.gridPoints.Clear()
+            For Each roi In task.gridRects
                 Dim xSub = roi.X + roi.Width
                 Dim ySub = roi.Y + roi.Height
                 If ySub <= dst2.Height / 3 Then
@@ -114,24 +105,18 @@ Public Class Grid_Basics : Inherits TaskParent
                     If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then task.subDivisions.Add(7)
                     If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(8)
                 End If
-                gridPoints.Add(roi.TopLeft)
+                task.gridPoints.Add(roi.TopLeft)
             Next
 
             task.cellSize = cellSize
             task.tilesPerCol = tilesPerCol
             task.tilesPerRow = tilesPerRow
-            task.gridMask = gridMask
-            task.gridMap = gridMap
-            task.gridRects = gridRects
-            task.gridNabeRects = New List(Of cv.Rect)(gridNabeRects)
-            task.gridNeighbors = New List(Of List(Of Integer))(gridNeighbors)
-            task.gridPoints = New List(Of cv.Point)(gridPoints)
         End If
         If standaloneTest() Then
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(task.tilesPerCol) + "X" + CStr(task.tilesPerRow) + ") " +
+            labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.tilesPerCol) + "X" + CStr(task.tilesPerRow) + ") " +
                                   CStr(cellSize) + "X" + CStr(cellSize) + " regions"
         End If
     End Sub
