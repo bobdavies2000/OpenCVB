@@ -2,12 +2,14 @@
 Imports cv = OpenCvSharp
 Public Class DepthColorizer_Basics : Inherits TaskParent
     Public buildCorrMap As New GridCell_CorrelationMap
+    Public quad As New Quad_Basics
     Public Sub New()
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.ShowQuads.Checked Then
-            task.depthRGB = task.gCell.dst2
+            quad.Run(src)
+            task.depthRGB = quad.dst2
         ElseIf task.gOptions.ColorizedDepth.Checked Then
             src = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
             Dim depthNorm As cv.Mat = src * 255 / task.MaxZmeters

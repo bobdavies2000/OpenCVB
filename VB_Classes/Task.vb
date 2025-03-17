@@ -60,7 +60,6 @@ Public Class VBtask : Implements IDisposable
     Public lowResColor As New cv.Mat
     Public lowResDepth As New cv.Mat
 
-    Public motionRects As New List(Of cv.Rect)
     Public motionMask As New cv.Mat
     Public fullImageStable As Boolean ' True if the current image has no changes from the previous.
     Public motionPercent As Single
@@ -131,6 +130,7 @@ Public Class VBtask : Implements IDisposable
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
     Public kalman As Kalman_Basics
+    Public mouseD As GridCell_MouseDepth
 
     ' end of task algorithms
 
@@ -548,6 +548,7 @@ Public Class VBtask : Implements IDisposable
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
         kalman = New Kalman_Basics
+        mouseD = New GridCell_MouseDepth
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -878,7 +879,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon.Run(src)
 
         Dim saveOptionsChanged = optionsChanged
-        task.gCell.mouseD.Run(src)
+        mouseD.Run(src)
         If paused = False Then
 
 
@@ -928,8 +929,10 @@ Public Class VBtask : Implements IDisposable
             If gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, gridMask)
 
             If gOptions.showMotionMask.Checked Then
-                For Each roi In motionRects
-                    dst0.Rectangle(roi, cv.Scalar.White, lineWidth)
+                For i = 0 To task.gridRects.Count - 1
+                    If motionBasics.motionFlags(i) Then
+                        dst0.Rectangle(task.gridRects(i), cv.Scalar.White, lineWidth)
+                    End If
                 Next
             End If
 

@@ -1423,7 +1423,6 @@ Public Class Line_Core : Inherits TaskParent
         desc = "Collect lines as always but don't update lines where there was no motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.motionRects.Count = 0 Then Exit Sub ' no update to the lplist.
         Dim histogram As New cv.Mat
         Dim lastList As New List(Of linePoints)(lpList)
         Dim histarray(lastList.Count - 1) As Single

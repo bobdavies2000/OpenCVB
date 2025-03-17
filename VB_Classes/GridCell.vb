@@ -4,8 +4,6 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean = True
-    Public mouseD As New GridCell_MouseDepth
-    Public quad As New Quad_Basics
     Dim lastCorrelation() As Single
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
@@ -38,7 +36,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
         For i = 0 To task.iddList.Count - 1
             Dim idd = task.iddList(i)
-            If task.motionBasics.motionFlag(i) = False Then
+            If task.motionBasics.motionFlags(i) = False Then
                 idd.age += 1
                 idd.correlation = lastCorrelation(i)
             Else
@@ -83,9 +81,6 @@ Public Class GridCell_Basics : Inherits TaskParent
             lastCorrelation(i) = idd.correlation
             task.iddList(i) = idd
         Next
-
-        quad.Run(src)
-        dst2 = quad.dst2
 
         If task.heartBeat Then labels(2) = CStr(task.iddList.Count) + " grid cells have the useful depth values."
     End Sub
@@ -374,7 +369,7 @@ Public Class GridCell_Correlation : Inherits TaskParent
         If index < 0 Or index > task.iddList.Count Then Exit Sub
 
         Dim idd = task.iddList(index)
-        Dim pt = task.gCell.mouseD.ptTopLeft
+        Dim pt = task.mouseD.ptTopLeft
         Dim corr = idd.correlation
         dst2.Circle(idd.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
@@ -401,7 +396,7 @@ Public Class GridCell_GrayScaleTest : Inherits TaskParent
         options.RunOpt()
         Dim threshold = options.stdevThreshold
 
-        Dim pt = task.gCell.mouseD.ptTopLeft
+        Dim pt = task.mouseD.ptTopLeft
         Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
         Static saveTrueData As New List(Of TrueText)
         If task.heartBeat Then
@@ -650,41 +645,6 @@ Public Class GridCell_MLColorDepth : Inherits TaskParent
 
         labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
                   " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class GridCell_Validate : Inherits TaskParent
-    Dim measure As New GridCell_MeasureMotion
-    Public Sub New()
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        labels(1) = "Every pixel is slightly different except where motion is detected."
-        labels(3) = "Differences are individual pixels and not many are connected to other pixels."
-        desc = "Validate the image provided by GridCell_MeasureMotion"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = src.Clone
-        measure.Run(src)
-        dst2 = measure.dst3.Clone
-        labels(2) = measure.labels(2)
-        labels(2) = labels(2).Replace("Values shown are above average", "")
-
-        Dim curr = dst0.Reshape(1, dst0.Rows * 3)
-        Dim motion = dst2.Reshape(1, dst2.Rows * 3)
-
-        cv.Cv2.Absdiff(curr, motion, dst0)
-
-        If Not task.heartBeat Then
-            Static diff As New Diff_Basics
-            diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            diff.Run(src)
-            dst3 = diff.dst2
-        End If
     End Sub
 End Class
 
@@ -1003,65 +963,6 @@ Public Class GridCell_LeftRight : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class GridCell_MeasureMotion : Inherits TaskParent
-    Public motionRects As New List(Of cv.Rect)
-    Dim percentList As New List(Of Single)
-    Public motionList As New List(Of Integer)
-    Public Sub New()
-        labels(3) = "A composite of an earlier image and the motion since that input.  " +
-                    "Any object boundaries are unlikely to be different."
-        desc = "Show all the grid cells above the motionless value (an option)."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then dst0 = src.Clone
-
-        If task.optionsChanged Then motionRects = New List(Of cv.Rect)
-
-        dst2 = task.gCell.dst2
-        labels(2) = task.gCell.labels(3)
-
-        motionRects.Clear()
-        Dim indexList As New List(Of Integer) ' avoid adding the same cell more than once.
-        Dim motionFlags = task.motionBasics.motionFlag
-        For Each idd In task.iddList
-            If motionFlags(idd.index) Then
-                For Each index In task.gridNeighbors(idd.index)
-                    If indexList.Contains(index) = False Then
-                        indexList.Add(index)
-                        motionRects.Add(task.gridRects(index))
-                    End If
-                Next
-            End If
-        Next
-
-        ' Use the whole image for the first few images as camera stabilizes.
-        If task.frameCount < 3 Then
-            src.CopyTo(dst3)
-            motionRects.Clear()
-            motionRects.Add(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        Else
-            If motionRects.Count > 0 Then
-                For Each roi In motionRects
-                    src(roi).CopyTo(dst3(roi))
-                    If standaloneTest() Then dst0.Rectangle(roi, white, task.lineWidth)
-                Next
-            End If
-        End If
-
-        If task.heartBeat Or task.optionsChanged Then
-            percentList.Add(motionList.Count / task.gridRects.Count)
-            If percentList.Count > 10 Then percentList.RemoveAt(0)
-            task.motionPercent = percentList.Average
-            labels(3) = " Average motion per image: " + Format(task.motionPercent, "0%")
-            task.motionLabel = labels(3)
-        End If
-    End Sub
-End Class
 
 
 

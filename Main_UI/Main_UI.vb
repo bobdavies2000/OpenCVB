@@ -1732,8 +1732,8 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Dim pt = task.gCell.mouseD.ptTopLeft
-                Dim corrText = task.gCell.mouseD.depthAndCorrelationText
+                Dim pt = task.mouseD.ptTopLeft
+                Dim corrText = task.mouseD.depthAndCorrelationText
                 SyncLock trueTextLock
                     Static saveObjectName = task.displayObjectName
                     If saveObjectName <> task.displayObjectName Then

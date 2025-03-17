@@ -1,54 +1,55 @@
-Imports System.Drawing.Imaging
 Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Dim lastColor() As cv.Vec3f
-    Public motionFlag() As Boolean
+    Public motionFlags() As Boolean
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "The motion-filtered color image.  "
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.UseMotionMask.Checked = False Then
-            task.motionRects = New List(Of cv.Rect)(task.gridRects)
-            task.motionMask.SetTo(255)
-            labels(3) = "100% of each image has motion."
-            Exit Sub
-        End If
-
         If task.optionsChanged Then ReDim lastColor(task.gridRects.Count - 1)
 
         If task.frameCount < 3 Then dst2 = src.Clone
-        task.motionMask.SetTo(0)
         Dim threshold = task.gCell.options.colorDifferenceThreshold
         Dim colorstdev As cv.Scalar, colorMean As cv.Scalar
-        ReDim motionFlag(task.gridRects.Count - 1)
+        ReDim motionFlags(task.gridRects.Count - 1)
         Dim motionList As New List(Of Integer)
         For i = 0 To task.gridRects.Count - 1
             Dim rect = task.gridRects(i)
             cv.Cv2.MeanStdDev(src(rect), colorMean, colorstdev)
             Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
             Dim colorChange = distance3D(colorVec, lastColor(i))
-            lastColor(i) = colorVec
-            If colorChange < threshold Then
+            If colorChange > threshold Then
+                lastColor(i) = colorVec
                 For Each index In task.gridNeighbors(i)
-                    motionList.Add(index)
-                    Dim r = task.iddList(index).rect
-                    task.motionMask(r).SetTo(255)
-                    src(r).CopyTo(dst2(r))
-                    motionFlag(i) = True
+                    If motionList.Contains(index) = False Then
+                        motionFlags(index) = True
+                        motionList.Add(index)
+                    End If
                 Next
             End If
         Next
 
-        task.fullImageStable = motionList.Count = 0
-        task.motionRects.Clear()
-        For Each index In motionList
-            task.motionRects.Add(task.iddList(index).rect)
+        dst1.SetTo(0)
+        For Each i In motionList
+            dst1(task.gridRects(i)).SetTo(255)
+            motionFlags(i) = True
         Next
-        labels(2) = "There were " + CStr(task.motionRects.Count) + " grid cells with motion."
+
+        task.fullImageStable = motionList.Count = 0
+        labels(2) = "There were " + CStr(motionList.Count) + " grid cells with motion."
+
+        ' some cameras have low light images for the first few frames.
+        If task.gOptions.UseMotionMask.Checked = False Or task.frameCount < 3 Then
+            dst1.SetTo(255)
+            labels(3) = "100% of each image has motion."
+        End If
+
+        task.motionMask = dst1
     End Sub
 End Class
 
@@ -60,26 +61,20 @@ End Class
 
 Public Class Motion_BasicsValidate : Inherits TaskParent
     Dim diff As New Diff_Basics
-    Dim measure As New GridCell_MeasureMotion
     Public Sub New()
-        task.gOptions.UseMotionMask.Checked = False
         task.gOptions.showMotionMask.Checked = True
         desc = "Display the difference between task.color and src to verify Motion_Basics is working"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.UseMotionMask.Checked Then
-            SetTrueText("Uncheck 'Use Motion-Constructed images' to validate Motion_Basics", 3)
-            Exit Sub
-        End If
+        If task.optionsChanged Then dst3 = src.Clone Else src.CopyTo(dst3, task.motionMask)
 
-        measure.Run(src)
-
-        diff.lastFrame = measure.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        diff.lastFrame = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         diff.Run(src)
         dst2 = diff.dst2
 
         labels(2) = "The image below is a diff of the camera image and the task.color built" +
                     " with the motion mask.  Difference in pixels = " + CStr(dst2.CountNonZero)
+        labels(3) = task.motionBasics.labels(2)
     End Sub
 End Class
 
@@ -1057,50 +1052,5 @@ Public Class Motion_TopFeatures : Inherits TaskParent
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
         Next
-    End Sub
-End Class
-
-
-
-
-
-Public Class Motion_RightView : Inherits TaskParent
-    Public measure As New GridCell_MeasureMotion
-    Public rightView As cv.Mat
-    Dim diff As New Diff_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Create motion mask for the right view image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        measure.Run(task.rightView)
-        rightView = measure.dst3.Clone
-        labels(2) = measure.labels(2)
-
-        dst2.SetTo(0)
-        If task.motionRects.Count Then
-            For Each roi In task.motionRects
-                dst2(roi).SetTo(255)
-            Next
-        End If
-        diff.Run(task.rightView)
-        dst3 = diff.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Motion_LeftRight : Inherits TaskParent
-    Dim rMotion As New Motion_RightView
-    Public Sub New()
-        desc = "Capture the left and right motion"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.motionBasics.dst3
-        rMotion.Run(src)
-        dst3 = rMotion.dst3
     End Sub
 End Class

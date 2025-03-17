@@ -711,7 +711,7 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
         Static maxList(task.gridRects.Count - 1) As cv.Point2f
         For i = 0 To task.gridRects.Count - 1
             Dim rect = task.gridRects(i)
-            If task.motionRects.Contains(rect) Then
+            If task.motionBasics.motionFlags(i) Then
                 Dim ptmin = New cv.Point2f(task.kalman.kOutput(i * 4) + rect.X, task.kalman.kOutput(i * 4 + 1) + rect.Y)
                 Dim ptmax = New cv.Point2f(task.kalman.kOutput(i * 4 + 2) + rect.X, task.kalman.kOutput(i * 4 + 3) + rect.Y)
                 ptmin = validatePoint(ptmin)
