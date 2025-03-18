@@ -8108,9 +8108,9 @@ End Class
 
 Public Class Options_Agast : Inherits OptionParent
     Public useNonMaxSuppression As Boolean
-    Public agastThreshold As Integer
+    Public agastThreshold As Integer = 30
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Agast Threshold", 0, 100, 10)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Agast Threshold", 0, 100, agastThreshold)
 
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)

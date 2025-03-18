@@ -778,7 +778,7 @@ Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
             dst3.SetTo(0)
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim count As Integer
-            for each gc in task.gcList
+            For Each gc In task.gcList
                 cv.Cv2.MeanStdDev(dst2(gc.rect), grayMean, grayStdev)
                 cv.Cv2.MeanStdDev(task.color(gc.rect), ColorMean, colorStdev)
                 Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
@@ -796,5 +796,53 @@ Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
 
         If trueData.Count > 0 Then saveTrueData = New List(Of TrueText)(trueData)
         trueData = New List(Of TrueText)(saveTrueData)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Feature_AgastHeartbeat : Inherits TaskParent
+    Dim stablePoints As List(Of cv.Point2f)
+    Dim agastFD As cv.AgastFeatureDetector
+    Dim lastPoints As List(Of cv.Point2f)
+    Public Sub New()
+        agastFD = cv.AgastFeatureDetector.Create(10, True, cv.AgastFeatureDetector.DetectorType.OAST_9_16)
+        desc = "Use the Agast Feature Detector in the OpenCV Contrib."
+        stablePoints = New List(Of cv.Point2f)()
+        lastPoints = New List(Of cv.Point2f)()
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim resizeFactor As Integer = 1
+        Dim input As New cv.Mat()
+        If src.Cols >= 1280 Then
+            cv.Cv2.Resize(src, input, New cv.Size(src.Cols \ 4, src.Rows \ 4))
+            resizeFactor = 4
+        Else
+            input = src
+        End If
+        Dim keypoints As cv.KeyPoint() = agastFD.Detect(input)
+        If task.heartBeat OrElse lastPoints.Count < 10 Then
+            lastPoints.Clear()
+            For Each kpt As cv.KeyPoint In keypoints
+                lastPoints.Add(kpt.Pt)
+            Next
+        End If
+        stablePoints.Clear()
+        dst2 = src.Clone()
+        For Each pt As cv.KeyPoint In keypoints
+            Dim p1 As New cv.Point2f(CSng(Math.Round(pt.Pt.X * resizeFactor)), CSng(Math.Round(pt.Pt.Y * resizeFactor)))
+            If lastPoints.Contains(p1) Then
+                stablePoints.Add(p1)
+                DrawCircle(dst2, p1, task.DotSize, New cv.Scalar(0, 0, 255))
+            End If
+        Next
+        lastPoints = New List(Of cv.Point2f)(stablePoints)
+        If task.midHeartBeat Then
+            labels(2) = $"{keypoints.Length} features found and {stablePoints.Count} of them were stable"
+        End If
+        labels(2) = $"Found {keypoints.Length} features"
     End Sub
 End Class

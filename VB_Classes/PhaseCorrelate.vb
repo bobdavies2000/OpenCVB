@@ -40,11 +40,10 @@ Public Class PhaseCorrelate_Basics : Inherits TaskParent
             stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shift.X), src.Height - Math.Abs(shift.Y))
             stableRect = ValidateRect(stableRect)
 
-            If stableRect.Width > 0 And stableRect.Height > 0 Then
-                Dim x2 = If(shift.X < 0, 0, shift.X)
-                Dim y2 = If(shift.Y < 0, 0, shift.Y)
-                srcRect = ValidateRect(New cv.Rect(x2, y2, stableRect.Width, stableRect.Height))
-
+            Dim x2 = If(shift.X < 0, 0, shift.X)
+            Dim y2 = If(shift.Y < 0, 0, shift.Y)
+            srcRect = ValidateRect(New cv.Rect(x2, y2, stableRect.Width, stableRect.Height))
+            If stableRect.Width > 0 And stableRect.Height > 0 And srcRect.Bottom <= dst2.Height Then
                 center = New cv.Point(input64.Cols / 2, input64.Rows / 2)
                 If src.Channels() = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 dst2 = src.Clone

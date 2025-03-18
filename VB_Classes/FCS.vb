@@ -15,7 +15,7 @@ Public Class FCS_Basics : Inherits TaskParent
 
         runFeature(src)
 
-        task.fpListLast = New List(Of fpData)(task.fpList)
+        task.fpListLast = New List(Of fpXData)(task.fpList)
         task.fpMapLast = task.fpMap.Clone
         Static fpLastSrc = src.Clone
 
@@ -353,7 +353,7 @@ End Class
 '        Dim fp1 = task.fpSelected
 '        dst2(fp1.rect).SetTo(cv.Scalar.White, fp1.mask)
 
-'        Static fpLastList = New List(Of fpData)(task.fpList)
+'        Static fpLastList = New List(Of fpXData)(task.fpList)
 '        Static fpLastIDs = New List(Of Single)(task.fpIDlist)
 '        Static fpLastMap = task.fpMap.Clone
 '        Static fpLastSrc = src.Clone
@@ -393,7 +393,7 @@ End Class
 '            task.fpList(i) = fp
 '        Next
 
-'        fpLastList = New List(Of fpData)(task.fpList)
+'        fpLastList = New List(Of fpXData)(task.fpList)
 '        fpLastIDs = New List(Of Single)(task.fpIDlist)
 '        fpLastMap = task.fpMap.Clone
 '        fpLastSrc = src.Clone
@@ -464,7 +464,7 @@ End Class
 
 '        Dim matchEdges As Integer, matchSrc As Integer
 '        For i = 0 To task.fpList.Count - 1
-'            Dim fp As fpData = task.fpList(i)
+'            Dim fp As fpXData = task.fpList(i)
 '            If fp.indexLast < 0 Then
 '                Dim indexLast = task.fpMapLast.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
 '                Dim fpLast = task.fpListLast(indexLast)
@@ -659,7 +659,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
         task.fpOutline.SetTo(0)
         Dim depthMean As cv.Scalar, stdev As cv.Scalar
         For i = 0 To facets.Length - 1
-            Dim fp As New fpData
+            Dim fp As New fpXData
             fp.pt = task.features(i)
             fp.ptHistory.Add(fp.pt)
             fp.index = i
@@ -767,7 +767,7 @@ End Class
 
 
 Public Class FCS_Info : Inherits TaskParent
-    Public fpSelection As fpData
+    Public fpSelection As fpXData
     Public Sub New()
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
@@ -876,7 +876,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
         Dim depthStart = histIndex * depthIncr
         Dim depthEnd = (histIndex + 1) * depthIncr
 
-        Static fpCells As New List(Of (fpData, Integer))
+        Static fpCells As New List(Of (fpXData, Integer))
         Static histIndexSave = histIndex
 
         If histIndexSave <> histIndex Or task.optionsChanged Then
@@ -896,7 +896,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
         Next
 
         For Each ele In fpCells
-            Dim fp As fpData = ele.Item1
+            Dim fp As fpXData = ele.Item1
             SetTrueText(Format(fp.age, fmt0), fp.ptCenter, 0)
             fpCellContour(fp, task.color, 0)
         Next
@@ -929,7 +929,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         optiBase.FindSlider("KNN Dimension").Value = 6
         desc = "Can we distinguish each feature point cell with color, depth, and grid."
     End Sub
-    Private Function buildEntry(fp As fpData) As List(Of Single)
+    Private Function buildEntry(fp As fpXData) As List(Of Single)
         Dim dataList As New List(Of Single)
         For i = 0 To dimension - 1
             dataList.Add(Choose(i + 1, fp.depthMean, fp.depthMin, fp.depthMax,
@@ -944,7 +944,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         fcs.Run(src)
         dst2 = fcs.dst2
 
-        Static fpSave As fpData
+        Static fpSave As fpXData
         If task.firstPass Or task.mouseClickFlag Then
             fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
         End If

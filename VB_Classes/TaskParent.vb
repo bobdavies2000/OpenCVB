@@ -428,7 +428,7 @@ Public Class TaskParent : Implements IDisposable
             Next
         Next
     End Sub
-    Public Sub fpCellContour(fp As fpData, dst As cv.Mat, Optional colorIndex As Integer = 0)
+    Public Sub fpCellContour(fp As fpXData, dst As cv.Mat, Optional colorIndex As Integer = 0)
         Dim color = Choose(colorIndex + 1, cv.Scalar.White, cv.Scalar.Black)
         For i = 0 To fp.facets.Count - 1
             Dim p1 = fp.facets(i)
@@ -436,7 +436,7 @@ Public Class TaskParent : Implements IDisposable
             dst.Line(p1, p2, color, task.lineWidth, task.lineType)
         Next
     End Sub
-    Public Function buildRect(fp As fpData, mms() As Single) As fpData
+    Public Function buildRect(fp As fpXData, mms() As Single) As fpXData
         fp.rect = ValidateRect(New cv.Rect(mms(0), mms(1), mms(2) - mms(0) + 1, mms(3) - mms(1) + 1))
 
         Static mask32s As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -448,7 +448,7 @@ Public Class TaskParent : Implements IDisposable
 
         Return fp
     End Function
-    Public Function findRect(fp As fpData, mms() As Single) As fpData
+    Public Function findRect(fp As fpXData, mms() As Single) As fpXData
         Dim pts As cv.Mat = fp.mask.FindNonZero()
 
         Dim points(pts.Total * 2 - 1) As Integer
@@ -469,7 +469,7 @@ Public Class TaskParent : Implements IDisposable
         fp.rect = New cv.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX + 1, maxY - miny + 1)
         Return fp
     End Function
-    Public Function fpUpdate(fp As fpData, fpLast As fpData) As fpData
+    Public Function fpUpdate(fp As fpXData, fpLast As fpXData) As fpXData
         While 1
             If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
         End While
@@ -482,7 +482,7 @@ Public Class TaskParent : Implements IDisposable
         If fp.ptHistory.Count > 20 Then fp.ptHistory.RemoveAt(0)
         Return fp
     End Function
-    Public Function GetMaxDist(ByRef fp As fpData) As cv.Point
+    Public Function GetMaxDist(ByRef fp As fpXData) As cv.Point
         Dim mask = fp.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)

@@ -2224,6 +2224,7 @@ public:
 };
 class Options_Agast {
 public:
+	int agastThreshold =  30;
 	void RunOpt() {}
 	Options_Agast() {
 	}

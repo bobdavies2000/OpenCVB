@@ -267,7 +267,7 @@ End Structure
 
 
 
-Public Class fpData ' feature point
+Public Class fpXData ' feature point -  excessive - trim this to fpData...
     Public index As Integer
     Public indexLast As Integer = -1
     Public age As Integer
@@ -299,6 +299,16 @@ Public Class fpData ' feature point
         nabeList = New List(Of Integer)
     End Sub
 End Class
+
+
+
+
+Public Class fpData ' feature point
+    Public index As Integer
+    Public age As Integer
+    Public pt As cv.Point
+End Class
+
 
 
 

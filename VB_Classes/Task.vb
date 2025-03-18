@@ -37,15 +37,15 @@ Public Class VBtask : Implements IDisposable
     Public rgbLeftAligned As Boolean
     Public defaultLowResColorDifference As Integer
 
-    Public fpList As New List(Of fpData)
-    Public fpListLast As New List(Of fpData)
+    Public fpList As New List(Of fpXData)
+    Public fpListLast As New List(Of fpXData)
     Public fpIDlist As New List(Of Single)
 
     Public fpMap As New cv.Mat
     Public fpMapLast As New cv.Mat
 
     Public fpOutline As New cv.Mat
-    Public fpSelected As fpData
+    Public fpSelected As fpXData
     Public fpMotion As cv.Point2f
 
     Public topFeatures As New List(Of cv.Point2f)
