@@ -1,22 +1,22 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineCoin_Basics : Inherits TaskParent
     Public longLines As New LongLine_Basics
-    Public lpList As New List(Of linePoints)
-    Dim lpLists As New List(Of List(Of linePoints))
+    Public lpList As New List(Of lpData)
+    Dim lpLists As New List(Of List(Of lpData))
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the coincident lines in the image and measure their value."
     End Sub
-    Public Function findLines(lpLists As List(Of List(Of linePoints))) As List(Of linePoints)
+    Public Function findLines(lpLists As List(Of List(Of lpData))) As List(Of lpData)
         Dim p1List As New List(Of cv.Point)
         Dim p2List As New List(Of cv.Point)
         Dim ptCounts As New List(Of Integer)
-        Dim lp As linePoints
+        Dim lp As lpData
         For Each lpList In lpLists
             For Each mp In lpList
                 mp.slope = CInt(mp.slope * 10) / 10
                 If mp.slope = 0 Then
-                    lp = New linePoints(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
+                    lp = New lpData(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
                 Else
                     lp = longLines.BuildLongLine(mp)
                 End If
@@ -35,7 +35,7 @@ Public Class LineCoin_Basics : Inherits TaskParent
         For i = 0 To p1List.Count - 1
             If ptCounts(i) >= task.frameHistoryCount Then
                 DrawLine(dst2, p1List(i), p2List(i), 255)
-                lpList.Add(New linePoints(p1List(i), p2List(i)))
+                lpList.Add(New lpData(p1List(i), p2List(i)))
             End If
         Next
         If lpLists.Count >= task.frameHistoryCount Then lpLists.RemoveAt(0)
@@ -65,8 +65,8 @@ End Class
 
 Public Class LineCoin_HistoryIntercept : Inherits TaskParent
     Dim coin As New LineCoin_Basics
-    Public lpList As New List(Of linePoints)
-    Dim mpLists As New List(Of List(Of linePoints))
+    Public lpList As New List(Of lpData)
+    Dim mpLists As New List(Of List(Of lpData))
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "find lines with coincident slopes and intercepts."
@@ -98,7 +98,7 @@ Public Class LineCoin_Parallel : Inherits TaskParent
         coinList.Clear()
 
         For Each cp In parallel.parList
-            near.lp = New linePoints(cp.p1, cp.p2)
+            near.lp = New lpData(cp.p1, cp.p2)
             near.pt = cp.p3
             near.Run(src)
             Dim d1 = near.distance

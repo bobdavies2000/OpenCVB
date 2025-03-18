@@ -47,7 +47,7 @@ Public Class Gravity_Raw : Inherits TaskParent
         xBot = findLast(gPoints)
 
         If standaloneTest() Then
-            Dim gravityVec = New linePoints(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
+            Dim gravityVec = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
 
             dst2.SetTo(0)
             DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.HighlightColor)
@@ -67,7 +67,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         ReDim kalman.kInput(2 - 1)
         desc = "Use kalman to smooth gravity and horizon vectors."
     End Sub
-    Public Function computePerp(lp As linePoints) As linePoints
+    Public Function computePerp(lp As lpData) As lpData
         Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
         Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
         Dim b = midPoint.Y - m * midPoint.X
@@ -87,7 +87,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         If p2.Y < 0 Then p2 = New cv.Point2f(-b / m, 0)
         If p2.Y > h Then p2 = New cv.Point2f(w, m * w + b)
 
-        Return New linePoints(p1, p2)
+        Return New lpData(p1, p2)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
@@ -98,7 +98,7 @@ Public Class Gravity_Basics : Inherits TaskParent
             ' kalman is too slow to reacting... Skip for now.  
             .kOutput = .kInput ' .Run(src)
 
-            task.gravityVec = New linePoints(New cv.Point2f(.kOutput(0), 0),
+            task.gravityVec = New lpData(New cv.Point2f(.kOutput(0), 0),
                                              New cv.Point2f(.kOutput(1), dst2.Height))
             task.horizonVec = computePerp(task.gravityVec)
         End With

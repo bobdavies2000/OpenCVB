@@ -103,13 +103,13 @@ Public Class FPoly_Sides : Inherits TaskParent
     Public currSideIndex As Integer
     Public currLengths As New List(Of Single)
     Public currFLineLen As Single
-    Public mpCurr As linePoints
+    Public mpCurr As lpData
 
     Public prevPoly As New List(Of cv.Point2f)
     Public prevSideIndex As Integer
     Public prevLengths As New List(Of Single)
     Public prevFLineLen As Single
-    Public mpPrev As linePoints
+    Public mpPrev As lpData
 
     Public prevImage As cv.Mat
 
@@ -152,8 +152,8 @@ Public Class FPoly_Sides : Inherits TaskParent
 
         If prevPoly.Count = 0 Then Exit Sub
 
-        mpPrev = New linePoints(prevPoly(prevSideIndex), prevPoly((prevSideIndex + 1) Mod task.polyCount))
-        mpCurr = New linePoints(currPoly(currSideIndex), currPoly((currSideIndex + 1) Mod task.polyCount))
+        mpPrev = New lpData(prevPoly(prevSideIndex), prevPoly((prevSideIndex + 1) Mod task.polyCount))
+        mpCurr = New lpData(currPoly(currSideIndex), currPoly((currSideIndex + 1) Mod task.polyCount))
 
         prevFLineLen = mpPrev.p1.DistanceTo(mpPrev.p2)
         currFLineLen = mpCurr.p1.DistanceTo(mpCurr.p2)
@@ -161,15 +161,15 @@ Public Class FPoly_Sides : Inherits TaskParent
         Dim d1 = mpPrev.p1.DistanceTo(mpCurr.p1)
         Dim d2 = mpPrev.p2.DistanceTo(mpCurr.p2)
 
-        Dim newNear As linePoints
+        Dim newNear As lpData
         If d1 < d2 Then
             centerShift = New cv.Point2f(mpPrev.p1.X - mpCurr.p1.X, mpPrev.p1.Y - mpCurr.p1.Y)
             rotateCenter = mpPrev.p1
-            newNear = New linePoints(mpPrev.p2, mpCurr.p2)
+            newNear = New lpData(mpPrev.p2, mpCurr.p2)
         Else
             centerShift = New cv.Point2f(mpPrev.p2.X - mpCurr.p2.X, mpPrev.p2.Y - mpCurr.p2.Y)
             rotateCenter = mpPrev.p2
-            newNear = New linePoints(mpPrev.p1, mpCurr.p1)
+            newNear = New lpData(mpPrev.p1, mpCurr.p1)
         End If
 
         Dim transPoly As New List(Of cv.Point2f)
@@ -522,7 +522,7 @@ Public Class FPoly_StartPoints : Inherits TaskParent
 
         dst0.SetTo(255)
         If standaloneTest() Then dst1.SetTo(0)
-        Dim lpList As New List(Of linePoints)
+        Dim lpList As New List(Of lpData)
         goodPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
         Dim facet As New List(Of cv.Point)
         Dim usedGood As New List(Of Integer)
@@ -535,7 +535,7 @@ Public Class FPoly_StartPoints : Inherits TaskParent
                 facet = facets(startPoint)
                 dst0.FillConvexPoly(facet, startPoint, cv.LineTypes.Link4)
                 If standaloneTest() Then dst1.FillConvexPoly(facet, task.scalarColors(startPoint), task.lineType)
-                lpList.Add(New linePoints(startPoints(startPoint), pt))
+                lpList.Add(New lpData(startPoints(startPoint), pt))
             End If
         Next
 
@@ -758,7 +758,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FPoly_Basics"
     End Sub
     Private Function findrotateAngle(p1 As cv.Point2f, p2 As cv.Point2f, pt As cv.Point2f) As Single
-        near.lp = New linePoints(p1, p2)
+        near.lp = New lpData(p1, p2)
         near.pt = pt
         near.Run(emptyMat)
         DrawLine(dst2, pt, near.nearPoint, cv.Scalar.Red)
@@ -778,13 +778,13 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         Static perp2 As New Line_Perpendicular
 
         dst2.SetTo(0)
-        perp1.input = New linePoints(fPD.currPoly(fPD.polyPrevSideIndex),
+        perp1.input = New lpData(fPD.currPoly(fPD.polyPrevSideIndex),
                                     fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
         perp1.Run(src)
 
         DrawLine(dst2, perp1.output.p1, perp1.output.p2, cv.Scalar.Yellow)
 
-        perp2.input = New linePoints(fPD.prevPoly(fPD.polyPrevSideIndex),
+        perp2.input = New lpData(fPD.prevPoly(fPD.polyPrevSideIndex),
                                    fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
         perp2.Run(src)
         DrawLine(dst2, perp2.output.p1, perp2.output.p2, white)
@@ -1015,15 +1015,15 @@ Public Class FPoly_Center : Inherits TaskParent
         Dim mp2 = fPD.prevmp()
         Dim d1 = mp1.p1.DistanceTo(mp2.p1)
         Dim d2 = mp1.p2.DistanceTo(mp2.p2)
-        Dim newNear As linePoints
+        Dim newNear As lpData
         If d1 < d2 Then
             fPD.centerShift = New cv.Point2f(mp1.p1.X - mp2.p1.X, mp1.p1.Y - mp2.p1.Y)
             fPD.rotateCenter = mp1.p1
-            newNear = New linePoints(mp1.p2, mp2.p2)
+            newNear = New lpData(mp1.p2, mp2.p2)
         Else
             fPD.centerShift = New cv.Point2f(mp1.p2.X - mp2.p2.X, mp1.p2.Y - mp2.p2.Y)
             fPD.rotateCenter = mp1.p2
-            newNear = New linePoints(mp1.p1, mp2.p1)
+            newNear = New lpData(mp1.p1, mp2.p1)
         End If
 
         Dim transPoly As New List(Of cv.Point2f)
@@ -1041,7 +1041,7 @@ Public Class FPoly_Center : Inherits TaskParent
         fPD.rotateAngle = 0
         If d1 <> d2 Then
             If newNear.p1.DistanceTo(newNear.p2) > threshold Then
-                near.lp = New linePoints(fPD.prevPoly(sindex1), fPD.prevPoly(sIndex2))
+                near.lp = New lpData(fPD.prevPoly(sindex1), fPD.prevPoly(sIndex2))
                 near.pt = newNear.p1
                 near.Run(src)
                 dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
@@ -1303,7 +1303,7 @@ End Class
 
 Public Class FPoly_Line : Inherits TaskParent
     Dim topFeatures As New FPoly_TopFeatures
-    Public lp As New linePoints
+    Public lp As New lpData
     Public Sub New()
         labels = {"", "", "Points found with FPoly_TopFeatures", "Longest line in task.topFeatures"}
         desc = "Identify the longest line in task.topFeatures"
@@ -1320,7 +1320,7 @@ Public Class FPoly_Line : Inherits TaskParent
         Next
 
         Dim index = distances.IndexOf(distances.Max)
-        lp = New linePoints(pts(index), pts(index + 1))
+        lp = New lpData(pts(index), pts(index + 1))
         dst3 = src
         DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
     End Sub

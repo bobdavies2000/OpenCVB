@@ -189,7 +189,7 @@ Public Class FeatureLine_Tutorial1 : Inherits TaskParent
         task.lines.Run(src)
         dst2 = task.lines.dst2
 
-        Dim raw2D As New List(Of linePoints)
+        Dim raw2D As New List(Of lpData)
         Dim raw3D As New List(Of cv.Point3f)
         For Each lp In task.lpList
             If task.pcSplit(2).Get(Of Single)(lp.p1.Y, lp.p1.X) > 0 And task.pcSplit(2).Get(Of Single)(lp.p2.Y, lp.p2.X) > 0 Then
@@ -269,7 +269,7 @@ Public Class FeatureLine_LongestVerticalKNN : Inherits TaskParent
         labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
         desc = "Find all the vertical lines and then track the longest one with a lightweight KNN."
     End Sub
-    Private Function testLastPair(lastPair As linePoints, gc As gravityLine) As Boolean
+    Private Function testLastPair(lastPair As lpData, gc As gravityLine) As Boolean
         Dim distance1 = lastPair.p1.DistanceTo(lastPair.p2)
         Dim p1 = gc.tc1.center
         Dim p2 = gc.tc2.center
@@ -286,13 +286,13 @@ Public Class FeatureLine_LongestVerticalKNN : Inherits TaskParent
         dst3 = src.Clone
         Dim index As Integer
 
-        If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New linePoints
+        If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New lpData
         For Each gc In gLines.sortedVerticals.Values
             If index >= 10 Then Exit For
 
             Dim p1 = gc.tc1.center
             Dim p2 = gc.tc2.center
-            If longest.knn.lastPair.compare(New linePoints) Then longest.knn.lastPair = New linePoints(p1, p2)
+            If longest.knn.lastPair.compare(New lpData) Then longest.knn.lastPair = New lpData(p1, p2)
             Dim pt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
             SetTrueText(CStr(index) + vbCrLf + Format(gc.arcY, fmt1), pt, 3)
             index += 1
@@ -546,7 +546,7 @@ Public Class FeatureLine_LongestKNN : Inherits TaskParent
             match.template = src(rect).Clone
         Else
             task.HighlightColor = If(task.HighlightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-            knn.lastPair = New linePoints(New cv.Point2f, New cv.Point2f)
+            knn.lastPair = New lpData(New cv.Point2f, New cv.Point2f)
         End If
         labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
     End Sub
@@ -632,7 +632,7 @@ Public Class FeatureLine_Finder : Inherits TaskParent
         task.lines.Run(src)
         dst2 = task.lines.dst2
 
-        Dim raw2D As New List(Of linePoints)
+        Dim raw2D As New List(Of lpData)
         Dim raw3D As New List(Of cv.Point3f)
         For Each lp In task.lpList
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f

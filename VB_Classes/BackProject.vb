@@ -486,12 +486,12 @@ End Class
 
 Public Class BackProject_LineSide : Inherits TaskParent
     Dim line As New Line_ViewSide
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Backproject the lines found in the side view."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         line.Run(src)
 
         dst2.SetTo(0)
@@ -526,7 +526,7 @@ Public Class BackProject_Image : Inherits TaskParent
         labels(2) = "Move mouse to backproject each histogram column"
         desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim input = src
         If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(input)
@@ -587,7 +587,7 @@ Public Class BackProject_Mouse : Inherits TaskParent
         labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
         desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
         dst2 = backP.dst2
         dst3 = backP.dst3
@@ -602,7 +602,7 @@ Public Class BackProject_Depth : Inherits TaskParent
     Public Sub New()
         desc = "Allow review of the depth backprojection"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim depth = task.pcSplit(2).Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.TozeroInv)
         backp.Run(depth * 1000)
         dst2 = backp.dst2
@@ -619,7 +619,7 @@ Public Class BackProject_MeterByMeter : Inherits TaskParent
     Public Sub New()
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.histogramBins < task.MaxZmeters Then task.gOptions.setHistogramBins(task.MaxZmeters + 1)
         If task.optionsChanged Then
             Dim incr = task.MaxZmeters / task.histogramBins
@@ -651,7 +651,7 @@ Public Class BackProject_Hue : Inherits TaskParent
     Public Sub New()
         desc = "Create an 8UC1 image with a backprojection of the hue."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hue.Run(src)
         classCount = hue.classCount
         dst2 = hue.dst2
@@ -675,7 +675,7 @@ Public Class BackProject_MaskLines : Inherits TaskParent
                   "Yellow is backProjection, lines detected are highlighted"}
         desc = "Inspect the lines from individual backprojection masks from a histogram"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         masks.Run(src)
         dst2 = masks.dst2
         dst3 = src.Clone
@@ -683,7 +683,7 @@ Public Class BackProject_MaskLines : Inherits TaskParent
         Static saveHistIndex As Integer = masks.histIndex
         If masks.histIndex <> saveHistIndex Then
             task.lines.Run(src)
-            task.lpList = New List(Of linePoints)(task.lpList)
+            task.lpList = New List(Of lpData)(task.lpList)
             dst1.SetTo(0)
         End If
 

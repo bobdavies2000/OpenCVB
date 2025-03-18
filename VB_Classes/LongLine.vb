@@ -1,17 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LongLine_Basics : Inherits TaskParent
     Public lines As New LongLine_Core
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Dim options As New Options_LongLine
     Public Sub New()
         lines.lineCount = 1000
         desc = "Identify the longest lines"
     End Sub
-    Public Function BuildLongLine(lp As linePoints) As linePoints
+    Public Function BuildLongLine(lp As lpData) As lpData
         If lp.p1.X <> lp.p2.X Then
             Dim b = lp.p1.Y - lp.p1.X * lp.slope
             If lp.p1.Y = lp.p2.Y Then
-                Return New linePoints(New cv.Point(0, lp.p1.Y), New cv.Point(dst2.Width, lp.p1.Y))
+                Return New lpData(New cv.Point(0, lp.p1.Y), New cv.Point(dst2.Width, lp.p1.Y))
             Else
                 Dim xint1 = CInt(-b / lp.slope)
                 Dim xint2 = CInt((dst2.Height - b) / lp.slope)
@@ -23,10 +23,10 @@ Public Class LongLine_Basics : Inherits TaskParent
                 If xint2 >= 0 And xint2 <= dst2.Width Then points.Add(New cv.Point(xint2, dst2.Height))
                 If yint1 >= 0 And yint1 <= dst2.Height Then points.Add(New cv.Point(0, yint1))
                 If yint2 >= 0 And yint2 <= dst2.Height Then points.Add(New cv.Point(dst2.Width, yint2))
-                Return New linePoints(points(0), points(1))
+                Return New lpData(points(0), points(1))
             End If
         End If
-        Return New linePoints(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
+        Return New lpData(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
@@ -38,7 +38,7 @@ Public Class LongLine_Basics : Inherits TaskParent
         For Each lp In lines.lpList
             lp = BuildLongLine(lp)
             DrawLine(dst2, lp.p1, lp.p2, white)
-            If lp.p1.X > lp.p2.X Then lp = New linePoints(lp.p2, lp.p1)
+            If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
             lpList.Add(lp)
             If lpList.Count >= options.maxCount Then Exit For
         Next
@@ -55,7 +55,7 @@ End Class
 
 Public Class LongLine_Core : Inherits TaskParent
     Public lineCount As Integer = 1 ' How many of the longest lines...
-    Public lpList As New List(Of linePoints) ' this will be sorted by length - longest first
+    Public lpList As New List(Of lpData) ' this will be sorted by length - longest first
     Public Sub New()
         desc = "Isolate the longest X lines."
     End Sub
@@ -134,7 +134,7 @@ End Class
 
 Public Class LongLine_Consistent : Inherits TaskParent
     Dim longest As New LongLine_Core
-    Public ptLong As linePoints
+    Public ptLong As lpData
     Public Sub New()
         longest.lineCount = 4
         desc = "Isolate the line that is consistently among the longest lines present in the image."
@@ -146,7 +146,7 @@ Public Class LongLine_Consistent : Inherits TaskParent
         If ptLong Is Nothing Then ptLong = longest.lpList(0)
 
         Dim minDistance = Single.MaxValue
-        Dim lpMin As linePoints
+        Dim lpMin As lpData
         For Each lp In longest.lpList
             Dim distance = lp.p1.DistanceTo(ptLong.p1) + lp.p2.DistanceTo(ptLong.p2)
             If distance < minDistance Then
@@ -240,7 +240,7 @@ Public Class LongLine_ExtendTest : Inherits TaskParent
     Dim longLine As New LongLine_Basics
     Public Sub New()
         labels = {"", "", "Random Line drawn", ""}
-        desc = "Test linePoints constructor with random values to make sure lines are extended properly"
+        desc = "Test lpData constructor with random values to make sure lines are extended properly"
     End Sub
 
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -248,7 +248,7 @@ Public Class LongLine_ExtendTest : Inherits TaskParent
             Dim p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
-            Dim mps = New linePoints(p1, p2)
+            Dim mps = New lpData(p1, p2)
             Dim emps = longLine.BuildLongLine(mps)
             dst2 = src
             DrawLine(dst2, emps.p1, emps.p2, task.HighlightColor)
@@ -266,7 +266,7 @@ End Class
 
 
 Public Class LongLine_ExtendAll : Inherits TaskParent
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Public Sub New()
         labels = {"", "", "Image output from Line_Core", "The extended line for each line found in Line_Core"}
         desc = "Create a list of all the extended lines in an image"
@@ -382,7 +382,7 @@ Public Class LongLine_Extend : Inherits TaskParent
             saveP2 = p2
         End If
 
-        Dim mps = New linePoints(p1, p2)
+        Dim mps = New lpData(p1, p2)
         Dim emps = lines.BuildLongLine(mps)
 
         If standaloneTest() Then
@@ -425,8 +425,8 @@ End Class
 
 Public Class LongLine_History : Inherits TaskParent
     Dim lines As New LongLine_Basics
-    Public lpList As New List(Of linePoints)
-    Dim lpListList As New List(Of List(Of linePoints))
+    Public lpList As New List(Of lpData)
+    Dim lpListList As New List(Of List(Of lpData))
     Public Sub New()
         desc = "Find the longest lines and toss any that are intermittant."
     End Sub
@@ -436,7 +436,7 @@ Public Class LongLine_History : Inherits TaskParent
 
         lpListList.Add(lines.lpList)
 
-        Dim tmplist As New List(Of linePoints)
+        Dim tmplist As New List(Of lpData)
         Dim lpCount As New List(Of Integer)
         For Each list In lpListList
             For Each lp In list

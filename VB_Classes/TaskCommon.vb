@@ -400,12 +400,12 @@ Public Class fPolyData
         prevPoly = New List(Of cv.Point2f)(currPoly)
         jitterCheck.SetTo(0)
     End Sub
-    Public Function prevmp() As linePoints
-        Return New linePoints(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+    Public Function prevmp() As lpData
+        Return New lpData(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
-    Public Function currmp() As linePoints
+    Public Function currmp() As lpData
         If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
-        Return New linePoints(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+        Return New lpData(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
     Public Sub DrawPolys(dst As cv.Mat, currPoly As List(Of cv.Point2f), parent As Object)
         parent.DrawFPoly(dst, prevPoly, cv.Scalar.White)
@@ -556,11 +556,13 @@ End Enum
 
 
 
-Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
-    Public center As cv.Point2f
-    Public colorIndex As Integer
+Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
+    Public pt As cv.Point ' the point to use when identifying this line
+    Public age As Integer
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
+    Public center As cv.Point2f
+    Public colorIndex As Integer
     Public slope As Single
     Public yIntercept As Single
     Public xIntercept As Single
@@ -571,10 +573,8 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
     Public mmX As New mmData
     Public mmY As New mmData
     Public mmZ As New mmData
-    Public mmPerPixel As Single
     Public xp1 As cv.Point2f ' intercept points at the edges of the image.
     Public xp2 As cv.Point2f
-    Public vertical As Boolean
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
         p2 = _p2
@@ -582,8 +582,9 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
             p1 = _p2
             p2 = _p1
         End If
-        p1 = New cv.Point2f(CInt(p1.X), CInt(p1.Y))
-        p2 = New cv.Point2f(CInt(p2.X), CInt(p2.Y))
+        pt = New cv.Point(CInt(p1.X), CInt(p1.Y))
+        p1 = New cv.Point2f(p1.X, p1.Y)
+        p2 = New cv.Point2f(p2.X, p2.Y)
 
         center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
@@ -624,7 +625,6 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
             xp2.Y = 0
         End If
 
-        vertical = Math.Abs(p1.X - p2.X) < Math.Abs(p1.Y - p2.Y)
         colorIndex = msRNG.Next(0, 255)
 
         mask = New cv.Mat(rect.Size, cv.MatType.CV_8U, 0)
@@ -637,6 +637,7 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
             pt2 = New cv.Point(0, rect.Height)
         End If
         mask.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
+        age = 1
     End Sub
     Sub New()
         p1 = New cv.Point2f()
@@ -659,7 +660,7 @@ Public Class linePoints ' LineSegmentPoint in OpenCV does not use Point2f so thi
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
         Return (p1, p2)
     End Function
-    Public Function compare(mp As linePoints) As Boolean
+    Public Function compare(mp As lpData) As Boolean
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function

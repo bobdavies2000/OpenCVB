@@ -505,7 +505,7 @@ End Class
 
 
 Public Class KNN_ClosestTracker : Inherits TaskParent
-    Public lastPair As New linePoints
+    Public lastPair As New lpData
     Public trainInput As New List(Of cv.Point2f)
     Dim minDistances As New List(Of Single)
     Public Sub New()
@@ -539,7 +539,7 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
             Exit Sub
         End If
 
-        If lastPair.compare(New linePoints) Then lastPair = New linePoints(p1, p2)
+        If lastPair.compare(New lpData) Then lastPair = New lpData(p1, p2)
         Dim distances As New List(Of Single)
         For i = 0 To trainInput.Count - 1 Step 2
             Dim pt1 = trainInput(i)
@@ -555,12 +555,12 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
         If minDistances.Count > 0 Then
             If minDist > minDistances.Max * 2 Then
                 Debug.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
-                lastPair = New linePoints(trainInput(0), trainInput(1))
+                lastPair = New lpData(trainInput(0), trainInput(1))
             Else
-                lastPair = New linePoints(p1, p2)
+                lastPair = New lpData(p1, p2)
             End If
         Else
-            lastPair = New linePoints(p1, p2)
+            lastPair = New lpData(p1, p2)
         End If
 
         If minDist > 0 Then minDistances.Add(minDist)
@@ -683,7 +683,7 @@ End Class
 
 Public Class KNN_TrackEach : Inherits TaskParent
     Dim knn As New KNN_OneToOne
-    Dim trackAll As New List(Of List(Of linePoints))
+    Dim trackAll As New List(Of List(Of lpData))
     Public Sub New()
         desc = "Track each good feature with KNN and match the features from frame to frame"
     End Sub
@@ -697,7 +697,7 @@ Public Class KNN_TrackEach : Inherits TaskParent
         knn.queries = New List(Of cv.Point2f)(task.features)
         knn.Run(src)
 
-        Dim tracker As New List(Of linePoints)
+        Dim tracker As New List(Of lpData)
         dst2 = src.Clone
         For Each lp In knn.matches
             If lp.p1.DistanceTo(lp.p2) < minDistance Then tracker.Add(lp)
@@ -796,7 +796,7 @@ End Class
 
 Public Class KNN_Farthest : Inherits TaskParent
     Public knn As New KNN_Basics
-    Public lpFar As linePoints
+    Public lpFar As lpData
     Public Sub New()
         labels = {"", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line"}
         desc = "Use KNN to find the farthest point from each query point."
@@ -815,11 +815,11 @@ Public Class KNN_Farthest : Inherits TaskParent
 
         dst2.SetTo(0)
         dst3.SetTo(0)
-        Dim farthest = New List(Of linePoints)
+        Dim farthest = New List(Of lpData)
         Dim distances As New List(Of Single)
         For i = 0 To knn.result.GetUpperBound(0) - 1
             Dim farIndex = knn.result(i, knn.result.GetUpperBound(1))
-            Dim lp = New linePoints(knn.queries(i), knn.trainInput(farIndex))
+            Dim lp = New lpData(knn.queries(i), knn.trainInput(farIndex))
             DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Yellow)
             DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Yellow)
             DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
@@ -1103,7 +1103,7 @@ End Class
 
 
 Public Class KNN_OneToOne : Inherits TaskParent
-    Public matches As New List(Of linePoints)
+    Public matches As New List(Of lpData)
     Public noMatch As New List(Of cv.Point)
     Public knn As New KNN_Basics
     Public queries As New List(Of cv.Point2f)
@@ -1179,7 +1179,7 @@ Public Class KNN_OneToOne : Inherits TaskParent
             Else
                 If nearest(i) < knn.trainInput.Count Then ' there seems like a boundary condition when there is only 1 traininput...
                     Dim nn = knn.trainInput(nearest(i))
-                    matches.Add(New linePoints(pt, nn))
+                    matches.Add(New lpData(pt, nn))
                     DrawLine(dst2, nn, pt, white)
                 End If
             End If

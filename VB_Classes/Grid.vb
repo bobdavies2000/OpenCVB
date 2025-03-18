@@ -345,7 +345,7 @@ End Class
 
 
 Public Class Grid_MinMaxDepth : Inherits TaskParent
-    Public minMaxLocs(0) As linePoints
+    Public minMaxLocs(0) As lpData
     Public minMaxVals(0) As cv.Vec2f
     Public Sub New()
         task.gOptions.GridSlider.Value = 8
@@ -359,7 +359,7 @@ Public Class Grid_MinMaxDepth : Inherits TaskParent
         For i = 0 To minMaxLocs.Count - 1
             Dim roi = task.gridRects(i)
             task.pcSplit(2)(roi).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(roi))
-            minMaxLocs(i) = New linePoints(mm.minLoc, mm.maxLoc)
+            minMaxLocs(i) = New lpData(mm.minLoc, mm.maxLoc)
             minMaxVals(i) = New cv.Vec2f(mm.minVal, mm.maxVal)
         Next
 

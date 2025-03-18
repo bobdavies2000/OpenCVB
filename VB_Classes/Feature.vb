@@ -934,7 +934,43 @@ End Class
 
 
 
-Public Class Feature_Stable : Inherits TaskParent
+Public Class Feature_StableVisual : Inherits TaskParent
+    Dim noMotion As New Feature_NoMotion
+    Public fpStable As New List(Of fpData)
+    Public ptStable As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Show only features present on this and the previous frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+
+        noMotion.Run(src)
+        dst3 = noMotion.dst2
+
+        dst2.SetTo(0)
+        Dim stable As New List(Of cv.Point)
+        For Each pt In task.featurePoints
+            If lastFeatures.Contains(pt) Then
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                stable.Add(pt)
+            End If
+        Next
+        lastFeatures = New List(Of cv.Point)(stable)
+        labels(2) = noMotion.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
+
+        dst2 = src.Clone
+        For Each pt In stable
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        Next
+        labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_StableVisualize : Inherits TaskParent
     Dim noMotion As New Feature_NoMotion
     Public fpStable As New List(Of fpData)
     Public ptStable As New List(Of cv.Point)
@@ -946,7 +982,7 @@ Public Class Feature_Stable : Inherits TaskParent
 
         noMotion.Run(src)
 
-        dst2.SetTo(0)
+        dst2 = src
         Dim stable As New List(Of cv.Point)
         For Each pt In task.featurePoints
             If lastFeatures.Contains(pt) Then
@@ -954,6 +990,7 @@ Public Class Feature_Stable : Inherits TaskParent
                 stable.Add(pt)
             End If
         Next
+        lastFeatures = New List(Of cv.Point)(stable)
         labels(2) = noMotion.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
 
         Dim fpNew As New List(Of fpData)
@@ -974,21 +1011,15 @@ Public Class Feature_Stable : Inherits TaskParent
             ptNew.Add(pt)
         Next
 
-        Dim newFP As New List(Of fpData)
-        Dim NewPT As New List(Of cv.Point)
-        For Each fp In fpNew
-            If ptStable.Contains(fp.pt) = False Then
-                newFP.Add(fp)
-                NewPT.Add(fp.pt)
-            End If
-        Next
-
-        fpStable = New List(Of fpData)(newFP)
-        ptStable = New List(Of cv.Point)(NewPT)
+        fpStable = New List(Of fpData)(fpNew)
+        ptStable = New List(Of cv.Point)(ptNew)
 
         dst3.SetTo(0)
         For Each fp In fpStable
-            If fp.age > 2 Then DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            If fp.age > 2 Then
+                DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+                SetTrueText(CStr(fp.age), fp.pt, 3)
+            End If
         Next
 
         labels(3) = "There were " + CStr(fpStable.Count) + " stable points"

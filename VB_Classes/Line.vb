@@ -1,8 +1,9 @@
 Imports System.Runtime.InteropServices
+Imports System.Windows.Shapes
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Dim lineCore As New Line_Core
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -20,8 +21,8 @@ Public Class Line_Basics : Inherits TaskParent
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
-        lpList = New List(Of linePoints)(lineCore.lpList)
-        task.lpList = New List(Of linePoints)(lineCore.lpList)
+        lpList = New List(Of lpData)(lineCore.lpList)
+        task.lpList = New List(Of lpData)(lineCore.lpList)
         labels(2) = lineCore.labels(2)
     End Sub
 End Class
@@ -496,9 +497,9 @@ End Class
 
 
 Public Class Line_TimeView : Inherits TaskParent
-    Public frameList As New List(Of List(Of linePoints))
+    Public frameList As New List(Of List(Of lpData))
     Public pixelcount As Integer
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Collect lines over time"
@@ -507,7 +508,7 @@ Public Class Line_TimeView : Inherits TaskParent
         task.lines.Run(src)
 
         If task.optionsChanged Then frameList.Clear()
-        Dim nextMpList = New List(Of linePoints)(task.lpList)
+        Dim nextMpList = New List(Of lpData)(task.lpList)
         frameList.Add(nextMpList)
 
         dst2 = src
@@ -632,7 +633,7 @@ End Class
 
 Public Class Line_Nearest : Inherits TaskParent
     Public pt As cv.Point2f ' How close is this point to the input line?
-    Public lp As New linePoints ' the input line.
+    Public lp As New lpData ' the input line.
     Public nearPoint As cv.Point2f
     Public onTheLine As Boolean
     Public distance As Single
@@ -762,7 +763,7 @@ End Class
 
 
 Public Class Line_Vertical : Inherits TaskParent
-    Public ptList As New List(Of linePoints)
+    Public ptList As New List(Of lpData)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
     End Sub
@@ -778,7 +779,7 @@ Public Class Line_Vertical : Inherits TaskParent
 
         ptList.Clear()
         For Each lp In task.lpList
-            If lp.p1.Y > lp.p2.Y Then lp = New linePoints(lp.p2, lp.p1)
+            If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
 
             sideOpposite = lp.p2.X - lp.p1.X
             If lp.p1.Y < lp.p2.Y Then sideOpposite = lp.p1.X - lp.p2.X
@@ -798,7 +799,7 @@ End Class
 
 
 Public Class Line_Horizontal : Inherits TaskParent
-    Public ptList As New List(Of linePoints)
+    Public ptList As New List(Of lpData)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         desc = "Find all the Horizontal lines with horizon vector"
@@ -815,7 +816,7 @@ Public Class Line_Horizontal : Inherits TaskParent
         ptList.Clear()
         If task.heartBeat Then dst3.SetTo(0)
         For Each lp In task.lpList
-            If lp.p1.X > lp.p2.X Then lp = New linePoints(lp.p2, lp.p1)
+            If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
 
             sideOpposite = lp.p2.Y - lp.p1.Y
             If lp.p1.X < lp.p2.X Then sideOpposite = lp.p1.Y - lp.p2.Y
@@ -839,8 +840,8 @@ End Class
 Public Class Line_VerticalHorizontal : Inherits TaskParent
     Dim verts As New Line_Vertical
     Dim horiz As New Line_Horizontal
-    Public vList As New SortedList(Of Integer, linePoints)(New compareAllowIdenticalIntegerInverted)
-    Public hList As New SortedList(Of Integer, linePoints)(New compareAllowIdenticalIntegerInverted)
+    Public vList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
+    Public hList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         task.gOptions.LineWidth.Value = 2
         labels(3) = "Vertical lines are in yellow and horizontal lines in red."
@@ -879,7 +880,7 @@ End Class
 
 Public Class Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Dim options As New Options_Line
     Public Sub New()
         labels(3) = "Input to Line_Basics"
@@ -894,7 +895,7 @@ Public Class Line_Canny : Inherits TaskParent
         task.lines.Run(canny.dst2)
 
         dst2 = task.lines.dst2
-        lpList = New List(Of linePoints)(task.lpList)
+        lpList = New List(Of lpData)(task.lpList)
         labels(2) = "Number of lines identified: " + CStr(lpList.Count)
     End Sub
 End Class
@@ -905,7 +906,7 @@ End Class
 
 
 Public Class Line_Cells : Inherits TaskParent
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Public Sub New()
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
@@ -914,7 +915,7 @@ Public Class Line_Cells : Inherits TaskParent
 
         task.lines.Run(dst2.Clone)
         dst3 = task.lines.dst2
-        lpList = New List(Of linePoints)(task.lpList)
+        lpList = New List(Of lpData)(task.lpList)
         labels(3) = "Number of lines identified: " + CStr(lpList.Count)
     End Sub
 End Class
@@ -1081,7 +1082,7 @@ End Class
 
 Public Class Line_PointSlope : Inherits TaskParent
     Dim knn As New KNN_NNBasics
-    Public bestLines As New List(Of linePoints)
+    Public bestLines As New List(Of lpData)
     Const lineCount As Integer = 3
     Const searchCount As Integer = 100
     Public Sub New()
@@ -1123,7 +1124,7 @@ Public Class Line_PointSlope : Inherits TaskParent
 
         knn.Run(src)
         If knn.result Is Nothing Then Exit Sub
-        Dim nextLines As New List(Of linePoints)
+        Dim nextLines As New List(Of lpData)
         Dim usedBest As New List(Of Integer)
         Dim index As Integer
         For i = 0 To knn.result.GetUpperBound(0)
@@ -1134,14 +1135,14 @@ Public Class Line_PointSlope : Inherits TaskParent
             usedBest.Add(index)
 
             If index * knn.options.knnDimension + 4 < knn.trainInput.Count Then
-                Dim mps = New linePoints(New cv.Point2f(knn.trainInput(index * knn.options.knnDimension + 0), knn.trainInput(index * knn.options.knnDimension + 1)),
+                Dim mps = New lpData(New cv.Point2f(knn.trainInput(index * knn.options.knnDimension + 0), knn.trainInput(index * knn.options.knnDimension + 1)),
                           New cv.Point2f(knn.trainInput(index * knn.options.knnDimension + 2), knn.trainInput(index * knn.options.knnDimension + 3)))
                 mps.slope = knn.trainInput(index * knn.options.knnDimension)
                 nextLines.Add(mps)
             End If
         Next
 
-        bestLines = New List(Of linePoints)(nextLines)
+        bestLines = New List(Of lpData)(nextLines)
         For Each ptS In bestLines
             DrawLine(dst2, ptS.p1, ptS.p2, task.HighlightColor)
             DrawLine(dst1, ptS.p1, ptS.p2, cv.Scalar.Red)
@@ -1178,23 +1179,23 @@ End Class
 Public Class Line_Matching : Inherits TaskParent
     Public options As New Options_Line
     Dim lineMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim lpList As New List(Of linePoints)
+    Dim lpList As New List(Of lpData)
     Public Sub New()
         labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
         desc = "Combine lines that are approximately the same line."
     End Sub
-    Private Function combine2Lines(lp1 As linePoints, lp2 As linePoints) As linePoints
+    Private Function combine2Lines(lp1 As lpData, lp2 As lpData) As lpData
         If Math.Abs(lp1.slope) >= 1 Then
             If lp1.p1.Y < lp2.p1.Y Then
-                Return New linePoints(lp1.p1, lp2.p2)
+                Return New lpData(lp1.p1, lp2.p2)
             Else
-                Return New linePoints(lp2.p1, lp1.p2)
+                Return New lpData(lp2.p1, lp1.p2)
             End If
         Else
             If lp1.p1.X < lp2.p1.X Then
-                Return New linePoints(lp1.p1, lp2.p2)
+                Return New lpData(lp1.p1, lp2.p2)
             Else
-                Return New linePoints(lp2.p1, lp1.p2)
+                Return New lpData(lp2.p1, lp1.p2)
             End If
         End If
     End Function
@@ -1207,9 +1208,9 @@ Public Class Line_Matching : Inherits TaskParent
         If task.firstPass Then optiBase.FindSlider("Min Line Length").Value = 30
 
         Dim tolerance = 0.1
-        Dim newSet As New List(Of linePoints)
+        Dim newSet As New List(Of lpData)
         Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        Dim addList As New List(Of linePoints)
+        Dim addList As New List(Of lpData)
         Dim combineCount As Integer
         For i = 0 To task.lpList.Count - 1
             Dim lp = task.lpList(i)
@@ -1242,7 +1243,7 @@ Public Class Line_Matching : Inherits TaskParent
         For Each lp In addList
             task.lpList.Add(lp)
         Next
-        lpList = New List(Of linePoints)(task.lpList)
+        lpList = New List(Of lpData)(task.lpList)
         lineMap.SetTo(0)
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
@@ -1264,7 +1265,7 @@ End Class
 
 
 Public Class Line_Info : Inherits TaskParent
-    Public lpInput As New List(Of linePoints)
+    Public lpInput As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Click on the oversized line to get details about the line"
@@ -1295,8 +1296,6 @@ Public Class Line_Info : Inherits TaskParent
                        Format(lp.mmY.maxVal, fmt3) + vbCrLf
             strOut += "Pointcloud range Z " + Format(lp.mmZ.minVal, fmt3) + " to " +
                        Format(lp.mmZ.maxVal, fmt3) + vbCrLf + vbCrLf
-
-            strOut += "mm per pixel = " + Format(lp.mmPerPixel * 1000, fmt1) + vbCrLf
 
             strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
             strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
@@ -1367,56 +1366,9 @@ End Class
 
 
 
-
-Public Class Line_Detector : Inherits TaskParent
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of linePoints)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src(subsetRect))
-
-        lpList.Clear()
-        lpMap.SetTo(0)
-        lpList.Add(New linePoints) ' zero placeholder.
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
-                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
-                Dim lp = New linePoints(p1, p2)
-                lp.rect = ValidateRect(lp.rect)
-                lp.mask = dst2(lp.rect)
-                lp.index = lpList.Count
-                lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
-                lpList.Add(lp)
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-    End Sub
-End Class
-
-
-
-
-
 Public Class Line_Core : Inherits TaskParent
     Dim lines As New Line_Detector
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1424,11 +1376,11 @@ Public Class Line_Core : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histogram As New cv.Mat
-        Dim lastList As New List(Of linePoints)(lpList)
+        Dim lastList As New List(Of lpData)(lpList)
         Dim histarray(lastList.Count - 1) As Single
 
         lpList.Clear()
-        lpList.Add(New linePoints) ' placeholder to allow us to build a map.
+        lpList.Add(New lpData) ' placeholder to allow us to build a map.
         If lastList.Count > 0 Then
             lpMap.SetTo(0, Not task.motionMask)
             cv.Cv2.CalcHist({lpMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
@@ -1475,8 +1427,8 @@ End Class
 
 
 Public Class Line_Perpendicular : Inherits TaskParent
-    Public input As linePoints
-    Public output As linePoints
+    Public input As lpData
+    Public output As lpData
     Dim midPoint As cv.Point2f
     Public Sub New()
         labels = {"", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", ""}
@@ -1490,5 +1442,184 @@ Public Class Line_Perpendicular : Inherits TaskParent
         output = task.gravityHorizon.computePerp(input)
         DrawCircle(dst2, midPoint, task.DotSize + 2, cv.Scalar.Red)
         DrawLine(dst2, output.p1, output.p2, cv.Scalar.Yellow)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_Detector : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public ptList As New List(Of cv.Point)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+    Public Sub New()
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src(subsetRect))
+
+        lpList.Clear()
+        ptList.Clear()
+        lpMap.SetTo(0)
+        lpList.Add(New lpData) ' zero placeholder.
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
+                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
+                Dim lp = New lpData(p1, p2)
+                lp.rect = ValidateRect(lp.rect)
+                lp.mask = dst2(lp.rect)
+                lp.index = lpList.Count
+                lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+                lpList.Add(lp)
+                ptList.Add(New cv.Point(CInt(lp.p1.X), CInt(lp.p1.Y)))
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+End Class
+
+
+
+
+Public Class Line_StableVisualize : Inherits TaskParent
+    Dim lines As New Line_Detector
+    Public lpStable As New List(Of lpData)
+    Public ptStable As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Identify features that consistently present in the image - with motion ignored."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lastLines As New List(Of cv.Point)(lines.ptList)
+        lines.Run(src)
+
+        dst2 = src
+        Dim stable As New List(Of cv.Point)
+        Dim lp As New lpData
+        For Each lp In lines.lpList
+            If lastLines.Contains(lp.pt) Then
+                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+                stable.Add(lp.pt)
+            End If
+        Next
+        lastLines = New List(Of cv.Point)(stable)
+        labels(2) = lines.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
+
+        Dim lpNew As New List(Of lpData)
+        Dim ptNew As New List(Of cv.Point)
+        For Each pt In stable
+            If ptStable.Contains(pt) Then
+                Dim index = ptStable.IndexOf(pt)
+                lp = lpStable(index)
+                lp.age += 1
+            Else
+                lp.age = 1
+                lp.pt = pt
+            End If
+
+            lp.index = lpNew.Count
+            lpNew.Add(lp)
+            ptNew.Add(pt)
+        Next
+
+        lpStable = New List(Of lpData)(lpNew)
+        ptStable = New List(Of cv.Point)(ptNew)
+
+        dst3.SetTo(0)
+        For Each lp In lpStable
+            If lp.age >= 2 Then
+                dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+                SetTrueText(CStr(lp.age), lp.pt, 3)
+            End If
+        Next
+
+        labels(3) = "There were " + CStr(lpStable.Count) + " stable points"
+    End Sub
+End Class
+
+
+
+
+Public Class Line_Stable : Inherits TaskParent
+    Dim lines As New Line_Detector
+    Public lpStable As New List(Of lpData)
+    Public ptStable As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Identify features that consistently present in the image - with motion ignored."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lpSets As New List(Of List(Of lpData))
+        Static ptSets As New List(Of List(Of cv.Point))
+        lines.Run(src)
+
+        Dim ageThreshold = task.gOptions.FrameHistory.Value
+
+        dst2 = src
+        Dim lpStable As New List(Of lpData)
+        Dim ptStable As New List(Of cv.Point)
+        Dim index As Integer
+        For j = 0 To lines.ptList.Count - 1
+            Dim pt = lines.ptList(j)
+            Dim lp = lines.lpList(j)
+            index = -1 ' if -1 after the loop below, then it is a new point.
+
+            Dim val = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            For i = 0 To ptSets.Count - 1
+                If ptSets(i).Contains(pt) Then
+                    index = ptSets(i).IndexOf(pt)
+                    lp = lpSets(i)(index)
+                    If ptStable.Contains(pt) Then
+                        index = ptStable.IndexOf(pt)
+                        lp = lpStable(index)
+                        lpStable(index) = lp
+                    Else
+                        lpStable.Add(lp)
+                        ptStable.Add(pt)
+                    End If
+                End If
+            Next
+            If index = -1 Then
+                lpStable.Add(lp)
+                ptStable.Add(pt)
+            Else
+                lp.age += 1
+                lpStable(index) = lp
+            End If
+        Next
+
+        dst2 = src
+        dst3.SetTo(0)
+        For Each lp In lpStable
+            If lp.age > ageThreshold Then
+                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+                dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
+                SetTrueText(CStr(lp.age), lp.pt, 3)
+            End If
+        Next
+
+        lpSets.Add(lpStable)
+        ptSets.Add(ptStable)
+
+        If ptSets.Count > task.gOptions.FrameHistory.Value Then
+            ptSets.RemoveAt(0)
+            lpSets.RemoveAt(0)
+        End If
     End Sub
 End Class

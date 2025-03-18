@@ -73,14 +73,14 @@ Public Class XO_Gravity_HorizonRawOld : Inherits TaskParent
         xBot = findLast(gPoints, False, sampleUnused)
 
         If standaloneTest() Then
-            Dim horizonVec As linePoints, gravityVec As linePoints
+            Dim horizonVec As lpData, gravityVec As lpData
             If hPoints.Total > 0 Then
-                horizonVec = New linePoints(New cv.Point(0, yLeft), New cv.Point(dst2.Width, yRight))
+                horizonVec = New lpData(New cv.Point(0, yLeft), New cv.Point(dst2.Width, yRight))
             Else
-                horizonVec = New linePoints
+                horizonVec = New lpData
             End If
 
-            gravityVec = New linePoints(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
+            gravityVec = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
 
             dst2.SetTo(0)
             DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.HighlightColor)
@@ -99,9 +99,9 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
         task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gravityVec = New linePoints(New cv.Point2f(dst2.Width / 2, 0),
+        task.gravityVec = New lpData(New cv.Point2f(dst2.Width / 2, 0),
                                          New cv.Point2f(dst2.Width / 2, dst2.Height))
-        task.horizonVec = New linePoints(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
+        task.horizonVec = New lpData(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
@@ -129,8 +129,8 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
             Dim p1 = points(xVals.IndexOf(xVals.Min()))
             Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
-            Dim lp = New linePoints(p1, p2)
-            task.horizonVec = New linePoints(lp.xp1, lp.xp2)
+            Dim lp = New lpData(p1, p2)
+            task.horizonVec = New lpData(lp.xp1, lp.xp2)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
@@ -149,10 +149,10 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
             Dim p1 = points(yVals.IndexOf(yVals.Min()))
             Dim p2 = points(yVals.IndexOf(yVals.Max()))
             If Math.Abs(p1.X - p2.X) < 2 Then
-                task.gravityVec = New linePoints(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
+                task.gravityVec = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
             Else
-                Dim lp = New linePoints(p1, p2)
-                task.gravityVec = New linePoints(lp.xp1, lp.xp2)
+                Dim lp = New lpData(p1, p2)
+                task.gravityVec = New lpData(lp.xp1, lp.xp2)
             End If
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
@@ -217,7 +217,7 @@ End Class
 Public Class XO_Horizon_Basics : Inherits TaskParent
     Public points As New List(Of cv.Point)
     Dim resizeRatio As Integer = 1
-    Public vec As New linePoints
+    Public vec As New lpData
     Public autoDisplay As Boolean
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -268,11 +268,11 @@ Public Class XO_Horizon_Basics : Inherits TaskParent
         Dim distance = p1.DistanceTo(p2)
         If distance < 10 Then ' enough to get a line with some credibility
             points.Clear()
-            vec = New linePoints
+            vec = New lpData
             strOut = "Horizon not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
-            Dim lp = New linePoints(p1, p2)
-            vec = New linePoints(lp.xp1, lp.xp2)
+            Dim lp = New lpData(p1, p2)
+            vec = New lpData(lp.xp1, lp.xp2)
             If standaloneTest() Or autoDisplay Then
                 displayResults(p1, p2)
                 displayResults(New cv.Point(-p1.Y, p1.X), New cv.Point(p2.Y, -p2.X))
@@ -394,8 +394,8 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
                      CStr(CInt(distance)) + " pixels." + vbCrLf
             strOut += "Using the previous value for the gravity vector."
         Else
-            Dim lp = New linePoints(p1, p2)
-            task.gravityVec = New linePoints(lp.xp1, lp.xp2)
+            Dim lp = New lpData(p1, p2)
+            task.gravityVec = New lpData(lp.xp1, lp.xp2)
             If standaloneTest() Then displayResults(p1, p2)
         End If
 
@@ -419,8 +419,8 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gravityVec = New linePoints(task.gravityVec.p1, task.gravityVec.p2)
-        Dim horizonVec = New linePoints(task.horizonVec.p1, task.horizonVec.p2)
+        Dim gravityVec = New lpData(task.gravityVec.p1, task.gravityVec.p2)
+        Dim horizonVec = New lpData(task.horizonVec.p1, task.horizonVec.p2)
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -428,7 +428,7 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
         translationY = task.gOptions.DebugSlider.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
         If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
         If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
-            horizonVec = New linePoints(New cv.Point2f, New cv.Point2f(336, 0))
+            horizonVec = New lpData(New cv.Point2f, New cv.Point2f(336, 0))
             translationY = 0
         End If
 
@@ -472,8 +472,8 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
             End If
         End If
 
-        gravityVec = New linePoints(task.gravityVec.p1, task.gravityVec.p2)
-        horizonVec = New linePoints(task.horizonVec.p1, task.horizonVec.p2)
+        gravityVec = New lpData(task.gravityVec.p1, task.gravityVec.p2)
+        horizonVec = New lpData(task.horizonVec.p1, task.horizonVec.p2)
         SetTrueText(strOut, 3)
 
         labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
@@ -493,8 +493,8 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
     Public rotationY As Single
     Public centerY As cv.Point2f
     Public rotate As New Rotate_BasicsQT
-    Dim gravityVec As linePoints
-    Dim horizonVec As linePoints
+    Dim gravityVec As lpData
+    Dim horizonVec As lpData
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -609,7 +609,7 @@ Public Class XO_Rotate_Horizon : Inherits TaskParent
         dst2 = rotate.dst2.Clone
         dst1 = dst2.Clone
 
-        Dim horizonVec = New linePoints(task.horizonVec.p1, task.horizonVec.p2)
+        Dim horizonVec = New lpData(task.horizonVec.p1, task.horizonVec.p2)
 
         horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle)
         horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)
@@ -636,7 +636,7 @@ End Class
 
 
 Public Class XO_Gravity_BasicsOriginal : Inherits TaskParent
-    Public vec As New linePoints
+    Public vec As New lpData
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Search for the transition from positive to negative to find the gravity vector."
@@ -665,8 +665,8 @@ Public Class XO_Gravity_BasicsOriginal : Inherits TaskParent
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
-        Dim lp = New linePoints(p1, p2)
-        vec = New linePoints(lp.xp1, lp.xp2)
+        Dim lp = New lpData(p1, p2)
+        vec = New lpData(lp.xp1, lp.xp2)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +

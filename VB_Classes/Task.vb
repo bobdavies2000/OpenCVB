@@ -10,13 +10,15 @@ Imports System.Runtime.InteropServices
 Public Class VBtask : Implements IDisposable
     Public redC As RedColor_Basics
     Public rc As New rcData
-    Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
-    Public lpList As New List(Of linePoints) ' line pair list
+    Public lpList As New List(Of lpData) ' line pair list
     Public gcList As New List(Of gridCell)
+    Public rcList As New List(Of rcData)
+    Public fpList As New List(Of fpXData)
+
     Public iddCorrelations As New cv.Mat
     Public iddMap As New cv.Mat
     Public iddC As gridCell
@@ -37,7 +39,6 @@ Public Class VBtask : Implements IDisposable
     Public rgbLeftAligned As Boolean
     Public defaultLowResColorDifference As Integer
 
-    Public fpList As New List(Of fpXData)
     Public fpListLast As New List(Of fpXData)
     Public fpIDlist As New List(Of Single)
 
@@ -173,8 +174,8 @@ Public Class VBtask : Implements IDisposable
 
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
-    Public gravityVec As New linePoints
-    Public horizonVec As New linePoints
+    Public gravityVec As New lpData
+    Public horizonVec As New lpData
 
     Public IMU_RawAcceleration As cv.Point3f
     Public IMU_Acceleration As cv.Point3f

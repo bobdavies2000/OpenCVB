@@ -1388,7 +1388,7 @@ Public Class Structured_Lines : Inherits TaskParent
         dst3 = lineY.dst2
         labels(3) = lineY.labels(2)
 
-        task.lpList = New List(Of linePoints)(lineX.lpList)
+        task.lpList = New List(Of lpData)(lineX.lpList)
         task.lpList.AddRange(lineY.lpList)
     End Sub
 End Class
@@ -1400,7 +1400,7 @@ End Class
 
 
 Public Class Structured_LinesX : Inherits TaskParent
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the X-direction of the Structured_Basics output"
@@ -1413,7 +1413,7 @@ Public Class Structured_LinesX : Inherits TaskParent
         End If
 
         task.lines.Run(src)
-        lpList = New List(Of linePoints)(task.lpList)
+        lpList = New List(Of lpData)(task.lpList)
 
         dst2.SetTo(0)
         For Each lp In lpList
@@ -1427,7 +1427,7 @@ End Class
 
 
 Public Class Structured_LinesY : Inherits TaskParent
-    Public lpList As New List(Of linePoints)
+    Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the Y-direction of the Structured_Basics output"
@@ -1440,7 +1440,7 @@ Public Class Structured_LinesY : Inherits TaskParent
         End If
 
         task.lines.Run(src)
-        lpList = New List(Of linePoints)(task.lpList)
+        lpList = New List(Of lpData)(task.lpList)
 
         dst2.SetTo(0)
         For Each lp In lpList
