@@ -1543,9 +1543,9 @@ Public Class Depth_ErrorEstimate : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        For Each idd In task.iddList
-            Dim testError = ErrorEstimate(idd.depth)
-            dst1(idd.rect).SetTo(testError)
+        for each gc in task.gcList
+            Dim testError = ErrorEstimate(gc.depth)
+            dst1(gc.rect).SetTo(testError)
         Next
 
         Dim mm = GetMinMax(dst1)
@@ -1575,11 +1575,11 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
 
         dst1 = src.Clone()
         dst1.SetTo(white, task.gridMask)
-        For Each idd In task.iddList
-            Dim pt = idd.mm.minLoc
-            subdiv.Insert(New cv.Point(pt.X + idd.rect.TopLeft.X, pt.Y + idd.rect.TopLeft.Y))
-            DrawCircle(dst1(idd.rect), idd.mm.minLoc, task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst1(idd.rect), idd.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
+        for each gc in task.gcList
+            Dim pt = gc.mm.minLoc
+            subdiv.Insert(New cv.Point(pt.X + gc.rect.TopLeft.X, pt.Y + gc.rect.TopLeft.Y))
+            DrawCircle(dst1(gc.rect), gc.mm.minLoc, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst1(gc.rect), gc.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
         Next
 
         If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)

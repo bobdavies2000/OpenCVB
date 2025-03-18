@@ -10,8 +10,8 @@ Public Class Connected_Basics : Inherits TaskParent
     End Sub
     Private Sub hTestRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            Dim p1 = task.iddList(colStart).rect.TopLeft
-            Dim p2 = task.iddList(colEnd).rect.BottomRight
+            Dim p1 = task.gcList(colStart).rect.TopLeft
+            Dim p2 = task.gcList(colEnd).rect.BottomRight
             dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
             colorIndex += 1
             hTuples.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
@@ -23,12 +23,12 @@ Public Class Connected_Basics : Inherits TaskParent
     End Sub
     Private Sub vTestRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            bottomRight = task.iddList(iddNext).rect.BottomRight
+            bottomRight = task.gcList(iddNext).rect.BottomRight
             dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
             colorIndex += 1
             vTuples.Add(New Tuple(Of Integer, Integer)(rowStart, iddNext))
             rowStart = nextStart
-            If nextStart >= 0 Then topLeft = task.iddList(rowStart).rect.TopLeft
+            If nextStart >= 0 Then topLeft = task.gcList(rowStart).rect.TopLeft
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -45,9 +45,9 @@ Public Class Connected_Basics : Inherits TaskParent
             colStart = i * width
             colEnd = colStart
             For j = 0 To width - 2
-                hTestRect(task.iddList(i * width + j), task.iddList(i * width + j + 1), i * width + j + 1)
+                hTestRect(task.gcList(i * width + j), task.gcList(i * width + j + 1), i * width + j + 1)
             Next
-            hTestRect(task.iddList(i * width + height - 1), task.iddList(i * width + height - 1), -1)
+            hTestRect(task.gcList(i * width + height - 1), task.gcList(i * width + height - 1), -1)
         Next
         labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
                     CStr(task.depthDiffMeters) + " meters"
@@ -57,16 +57,16 @@ Public Class Connected_Basics : Inherits TaskParent
         colorIndex = 0
         For i = 0 To width - 1
             rowStart = i
-            topLeft = task.iddList(i).rect.TopLeft
-            bottomRight = task.iddList(i + width).rect.TopLeft
+            topLeft = task.gcList(i).rect.TopLeft
+            bottomRight = task.gcList(i + width).rect.TopLeft
             For j = 0 To height - 2
                 index = i + (j + 1) * width
-                If index >= task.iddList.Count Then index = task.iddList.Count - 1
-                vTestRect(task.iddList(i + j * width), task.iddList(index), i + j * width, index)
+                If index >= task.gcList.Count Then index = task.gcList.Count - 1
+                vTestRect(task.gcList(i + j * width), task.gcList(index), i + j * width, index)
             Next
             Dim iddNext = i + (height - 1) * width
-            If iddNext >= task.iddList.Count Then iddNext = task.iddList.Count - 1
-            vTestRect(task.iddList(iddNext), task.iddList(index), iddNext, -1)
+            If iddNext >= task.gcList.Count Then iddNext = task.gcList.Count - 1
+            vTestRect(task.gcList(iddNext), task.gcList(index), iddNext, -1)
         Next
 
         labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
@@ -92,14 +92,14 @@ Public Class Connected_Gaps : Inherits TaskParent
 
         For Each tup In connect.hTuples
             If tup.Item2 - tup.Item1 = 0 Then
-                Dim idd = task.iddList(tup.Item1)
+                Dim idd = task.gcList(tup.Item1)
                 dst2(idd.rect).SetTo(0)
             End If
         Next
 
         For Each tup In connect.vTuples
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
+            Dim idd1 = task.gcList(tup.Item1)
+            Dim idd2 = task.gcList(tup.Item2)
             If idd2.rect.TopLeft.Y - idd1.rect.TopLeft.Y = 0 Then
                 dst2(idd1.rect).SetTo(0)
                 dst3(idd1.rect).SetTo(0)
@@ -255,17 +255,17 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
         height = Math.Floor(dst2.Height / task.cellSize)
         If height * task.cellSize <> dst2.Height Then height += 1
 
-        Dim newCount(task.iddList.Count - 1) As Integer
+        Dim newCount(task.gcList.Count - 1) As Integer
         For i = 0 To height - 2
             For j = 1 To width - 1
-                Dim gc1 = task.iddList(i * width + j - 1)
-                Dim gc2 = task.iddList(i * width + j)
-                Dim gc3 = task.iddList((i + 1) * width + j - 1)
-                Dim gc4 = task.iddList((i + 1) * width + j)
+                Dim gc1 = task.gcList(i * width + j - 1)
+                Dim gc2 = task.gcList(i * width + j)
+                Dim gc3 = task.gcList((i + 1) * width + j - 1)
+                Dim gc4 = task.gcList((i + 1) * width + j)
                 If gc1.index <> gc2.index Then
                     If Math.Abs(gc1.depth - gc2.depth) < task.depthDiffMeters Then
                         gc2.index = gc1.index
-                        task.iddList(i * width + j) = gc2
+                        task.gcList(i * width + j) = gc2
                         newCount(gc2.index) += 1
                     End If
                 End If
@@ -273,7 +273,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
                 If gc3.index <> gc1.index Then
                     If Math.Abs(gc1.depth - gc3.depth) < task.depthDiffMeters Then
                         gc3.index = gc1.index
-                        task.iddList((i + 1) * width + j - 1) = gc3
+                        task.gcList((i + 1) * width + j - 1) = gc3
                         newCount(gc3.index) += 1
                     End If
                 End If
@@ -281,7 +281,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
                 If gc4.index <> gc2.index Then
                     If Math.Abs(gc2.depth - gc4.depth) < task.depthDiffMeters Then
                         gc4.index = gc2.index
-                        task.iddList((i + 1) * width + j) = gc4
+                        task.gcList((i + 1) * width + j) = gc4
                         newCount(gc4.index) += 1
                     End If
                 End If
@@ -300,7 +300,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        For Each gc In task.iddList
+        For Each gc In task.gcList
             If indexList.Contains(gc.index) Then
                 dst3(gc.rect).SetTo(gc.index)
             End If
@@ -308,7 +308,7 @@ Public Class Connected_BasicsNewBad : Inherits TaskParent
 
         dst2 = ShowPalette(dst3)
 
-        labels(2) = CStr(task.iddList.Count) + " grid cells consolidated into the top 10 cells."
+        labels(2) = CStr(task.gcList.Count) + " grid cells consolidated into the top 10 cells."
     End Sub
 End Class
 
@@ -333,8 +333,8 @@ Public Class Connected_RectsH : Inherits TaskParent
         Dim index As Integer
         For Each tup In connect.hTuples
             If tup.Item1 = tup.Item2 Then Continue For
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
+            Dim idd1 = task.gcList(tup.Item1)
+            Dim idd2 = task.gcList(tup.Item2)
 
             Dim w = idd2.rect.BottomRight.X - idd1.rect.TopLeft.X
             Dim h = idd1.rect.Height
@@ -371,8 +371,8 @@ Public Class Connected_RectsV : Inherits TaskParent
         Dim index As Integer
         For Each tup In connect.vTuples
             If tup.Item1 = tup.Item2 Then Continue For
-            Dim idd1 = task.iddList(tup.Item1)
-            Dim idd2 = task.iddList(tup.Item2)
+            Dim idd1 = task.gcList(tup.Item1)
+            Dim idd2 = task.gcList(tup.Item2)
 
             Dim w = idd1.rect.Width
             Dim h = idd2.rect.BottomRight.Y - idd1.rect.TopLeft.Y

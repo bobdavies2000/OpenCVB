@@ -778,16 +778,16 @@ Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
             dst3.SetTo(0)
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim count As Integer
-            For Each idd In task.iddList
-                cv.Cv2.MeanStdDev(dst2(idd.rect), grayMean, grayStdev)
-                cv.Cv2.MeanStdDev(task.color(idd.rect), ColorMean, colorStdev)
+            for each gc in task.gcList
+                cv.Cv2.MeanStdDev(dst2(gc.rect), grayMean, grayStdev)
+                cv.Cv2.MeanStdDev(task.color(gc.rect), ColorMean, colorStdev)
                 Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
                 Dim diff = Math.Abs(grayStdev(0) - nextColorStdev)
                 If diff > threshold Then
-                    dst2.Rectangle(idd.rect, 255, task.lineWidth)
-                    SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), idd.rect.TopLeft, 2)
-                    dst3.Rectangle(idd.rect, task.HighlightColor, task.lineWidth)
-                    SetTrueText(Format(diff, fmt1), idd.rect.TopLeft, 3)
+                    dst2.Rectangle(gc.rect, 255, task.lineWidth)
+                    SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), gc.rect.TopLeft, 2)
+                    dst3.Rectangle(gc.rect, task.HighlightColor, task.lineWidth)
+                    SetTrueText(Format(diff, fmt1), gc.rect.TopLeft, 3)
                     count += 1
                 End If
             Next

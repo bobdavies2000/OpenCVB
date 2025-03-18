@@ -13,8 +13,8 @@ Public Class Quad_Basics : Inherits TaskParent
 
         task.iddMap.SetTo(0)
         dst2.SetTo(0)
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
+        For i = 0 To task.gcList.Count - 1
+            Dim idd = task.gcList(i)
             task.iddMap(idd.rect).SetTo(i)
             If idd.depth > 0 Then
                 idd.corners.Clear()
@@ -391,22 +391,22 @@ Public Class Quad_Boundaries : Inherits TaskParent
         dst2 = task.gCell.dst2.Clone
         Dim width = dst2.Width / task.cellSize
         Dim height = dst2.Height / task.cellSize
-        For i = 0 To task.iddList.Count - width Step width
+        For i = 0 To task.gcList.Count - width Step width
             For j = i + 1 To i + width - 1
-                Dim d1 = task.iddList(j).depth
-                Dim d2 = task.iddList(j - 1).depth
+                Dim d1 = task.gcList(j).depth
+                Dim d2 = task.gcList(j - 1).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.iddList(j).rect, task.HighlightColor, -1)
+                    dst2.Rectangle(task.gcList(j).rect, task.HighlightColor, -1)
                 End If
             Next
         Next
 
         For i = 0 To width - 1
             For j = 1 To height - 1
-                Dim d1 = task.iddList(j * width).depth
-                Dim d2 = task.iddList((j - 1) * width).depth
+                Dim d1 = task.gcList(j * width).depth
+                Dim d2 = task.gcList((j - 1) * width).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.iddList(j).rect, task.HighlightColor, -1)
+                    dst2.Rectangle(task.gcList(j).rect, task.HighlightColor, -1)
                 End If
             Next
         Next

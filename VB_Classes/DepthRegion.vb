@@ -21,14 +21,14 @@ Public Class DepthRegion_Basics : Inherits TaskParent
         Dim minSize As Integer = src.Total / 25
         dst2.SetTo(0)
         mdLargest.Clear()
-        For Each idd In task.iddList
-            Dim index = dst1.Get(Of Byte)(idd.center.Y, idd.center.X)
+        for each gc in task.gcList
+            Dim index = dst1.Get(Of Byte)(gc.center.Y, gc.center.X)
             Dim md = redM.mdList(index)
             If index = 0 Then
-                dst2(idd.rect).SetTo(black)
+                dst2(gc.rect).SetTo(black)
             Else
                 If md.pixels > minSize Then
-                    dst2(idd.rect).SetTo(task.scalarColors(index))
+                    dst2(gc.rect).SetTo(task.scalarColors(index))
                     mdLargest.Add(md)
                 End If
             End If
@@ -62,10 +62,10 @@ Public Class DepthRegion_Correlation : Inherits TaskParent
         dst0.SetTo(0)
         dst1.SetTo(0)
         Dim count As Integer
-        For Each idd In task.iddList
-            If idd.correlation > minCorr Then
-                dst0.Rectangle(idd.rRect, 255, -1)
-                dst1.Rectangle(idd.rect, 255, -1)
+        for each gc in task.gcList
+            If gc.correlation > minCorr Then
+                dst0.Rectangle(gc.rRect, 255, -1)
+                dst1.Rectangle(gc.rect, 255, -1)
                 count += 1
             End If
         Next
@@ -76,7 +76,7 @@ Public Class DepthRegion_Correlation : Inherits TaskParent
         dst3.SetTo(0)
         task.rightView.CopyTo(dst3, dst0)
 
-        labels(2) = Format(count / task.iddList.Count, "0%") + " of grid cells had color correlation of " + Format(minCorr, "0.0%") + " or better"
+        labels(2) = Format(count / task.gcList.Count, "0%") + " of grid cells had color correlation of " + Format(minCorr, "0.0%") + " or better"
     End Sub
 End Class
 

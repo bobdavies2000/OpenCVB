@@ -2033,9 +2033,9 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
         dst2 = task.depthRGB
         labels = task.gCell.labels
         Dim quadData As New List(Of cv.Point3f)
-        For Each idd In task.iddList
-            If idd.corners.Count Then quadData.Add(idd.color)
-            For Each pt In idd.corners
+        For Each gc In task.gcList
+            If gc.corners.Count Then quadData.Add(gc.color)
+            For Each pt In gc.corners
                 quadData.Add(pt)
             Next
         Next
@@ -2063,10 +2063,10 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         dst2 = task.gCell.dst2
         dst3 = task.gCell.dst3
         Dim quadData As New List(Of cv.Point3f)
-        For Each idd In task.iddList
-            If idd.depth = 0 Then Continue For
-            If idd.corners.Count Then quadData.Add(idd.color)
-            For Each pt In idd.corners
+        For Each gc In task.gcList
+            If gc.depth = 0 Then Continue For
+            If gc.corners.Count Then quadData.Add(gc.color)
+            For Each pt In gc.corners
                 quadData.Add(pt)
             Next
         Next
@@ -2097,11 +2097,11 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         Dim quadData As New List(Of cv.Point3f)
         Dim idd1 As gridCell, idd2 As gridCell
         For Each tup In connect.hTuples
-            idd1 = task.iddList(tup.Item1)
-            idd2 = task.iddList(tup.Item2)
+            idd1 = task.gcList(tup.Item1)
+            idd2 = task.gcList(tup.Item2)
             For i = tup.Item1 + 1 To tup.Item2 - 1
-                idd1 = task.iddList(i - 1)
-                idd2 = task.iddList(i)
+                idd1 = task.gcList(i - 1)
+                idd2 = task.gcList(i)
                 If idd1.depth = 0 Or idd2.depth = 0 Then Continue For
                 If idd1.corners.Count = 0 Or idd2.corners.Count = 0 Then Continue For
 
@@ -2123,8 +2123,8 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         Dim width = dst2.Width / task.cellSize
         For Each tup In connect.vTuples
             For i = tup.Item1 To tup.Item2 - width Step width
-                idd1 = task.iddList(i)
-                idd2 = task.iddList(i + width)
+                idd1 = task.gcList(i)
+                idd2 = task.gcList(i + width)
                 If idd1.depth = 0 Or idd2.depth = 0 Then Continue For
                 If idd1.corners.Count = 0 Or idd2.corners.Count = 0 Then Continue For
 
@@ -2224,16 +2224,16 @@ Public Class OpenGL_QuadCorrelationMask : Inherits TaskParent
 
         Dim minCorr = task.gCell.options.correlationThreshold
         Dim count As Integer
-        For i = 0 To task.iddList.Count - 1
-            Dim idd = task.iddList(i)
+        For i = 0 To task.gcList.Count - 1
+            Dim idd = task.gcList(i)
             If idd.correlation < minCorr Then
                 idd.depth = 0
-                task.iddList(i) = idd
+                task.gcList(i) = idd
             End If
             If idd.depth = 0 Then count += 1
         Next
         task.pointCloud = corrMask.dst2
-        If count < task.iddList.Count Then
+        If count < task.gcList.Count Then
             ogl.Run(src)
         Else
             SetTrueText("With a correlation threshold of " + Format(minCorr, fmt3) + " there are no remaining cells.", 3)

@@ -9,48 +9,32 @@ Public Class Feature_Basics : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find good features to track in a BGR image using the motion mask+"
     End Sub
-    Public Function motionFilter(featureInput As List(Of cv.Point2f)) As List(Of cv.Point2f)
-        Static ptList = New List(Of cv.Point2f)(featureInput)
-
-        Dim newSet As New List(Of cv.Point2f)
-        For Each pt In ptList
-            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val = 0 Then newSet.Add(pt)
-        Next
-
-        For Each pt In featureInput
-            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val <> 0 Then newSet.Add(pt)
-        Next
-
-        Dim ptSort As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalInteger)
-        ' Not technically needed but organizes all the points from top to bottom, left to right.
-        For Each pt In newSet
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            ptSort.Add(index, pt)
-        Next
-
-        ptList = New List(Of cv.Point2f)(ptSort.Values)
-        Return ptList
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         dst2 = src.Clone
 
+        Dim ptNew As New List(Of cv.Point2f)
+        For Each pt In task.features
+            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val = 0 Then ptNew.Add(pt)
+        Next
+
         method.Run(src)
 
-        Dim ptlist = motionFilter(method.features)
+        Dim ptlist = method.features
+
+        For Each pt In ptlist
+            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val = 255 Then ptNew.Add(pt)
+        Next
 
         task.features.Clear()
         task.featurePoints.Clear()
-        For Each pt In ptlist
+        dst3.SetTo(0)
+        For Each pt In ptNew
             task.features.Add(pt)
             task.featurePoints.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
-        Next
 
-        dst3.SetTo(0)
-        For i = 0 To ptlist.Count - 1
-            Dim pt = ptlist(i)
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
@@ -903,6 +887,9 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         desc = "Assign each delaunay point to a RedCell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.feat Is Nothing Then task.feat = New Feature_Basics
+        task.feat.Run(src)
+
         If standalone Then runRedC(src)
 
         delaunay.inputPoints = task.features

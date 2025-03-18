@@ -16,7 +16,7 @@ Public Class VBtask : Implements IDisposable
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
     Public lpList As New List(Of linePoints) ' line pair list
-    Public iddList As New List(Of gridCell)
+    Public gcList As New List(Of gridCell)
     Public iddCorrelations As New cv.Mat
     Public iddMap As New cv.Mat
     Public iddC As gridCell
