@@ -1,91 +1,52 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public lpList As New List(Of lpData)
-    Dim lineCore As New Line_Core
+    Dim lines As New Line_Detector
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lineCore.Run(src)
+        Dim histogram As New cv.Mat
 
-        lpMap.SetTo(0)
-        dst2 = src
-        dst3.SetTo(0)
-        dst2.SetTo(cv.Scalar.White, lineCore.dst2)
-        For Each lp In lineCore.lpList
-            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        lines.Run(task.grayMotion)
+
+        Dim lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim index As Integer = 1
+        Dim tmpList As New List(Of lpData)(lines.lpList)
+        For Each lp In lines.lpList
+            lpMap.Line(lp.p1, lp.p2, index, task.lineWidth, cv.LineTypes.Link4)
+            index += 1
         Next
 
-        lpList = New List(Of lpData)(lineCore.lpList)
-        task.lpList = New List(Of lpData)(lineCore.lpList)
-        labels(2) = lineCore.labels(2)
-    End Sub
-End Class
+        cv.Cv2.CalcHist({lpMap}, {0}, task.motionMask, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(1, lines.lpList.Count)})
 
-
-
-
-
-
-
-
-Public Class Line_Core : Inherits TaskParent
-    Dim lines As New XO_Line_DetectorOld
-    Public lpList As New List(Of lpData)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines as always but don't update lines where there was no motion."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim histogram As New cv.Mat
-        Dim lastList As New List(Of lpData)(lpList)
-        Dim histarray(lastList.Count - 1) As Single
-
-        lpList.Clear()
-        lpList.Add(New lpData) ' placeholder to allow us to build a map.
-        If lastList.Count > 0 Then
-            lpMap.SetTo(0, Not task.motionMask)
-            cv.Cv2.CalcHist({lpMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
-            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
-
-            For i = 1 To histarray.Count - 1
-                If histarray(i) = 0 Then lpList.Add(lastList(i))
-            Next
-        End If
-
-        lines.Run(src.Clone)
-        ReDim histarray(lines.lpList.Count - 1)
-
-        Dim tmp = lines.lpMap.Clone
-        tmp.SetTo(0, Not task.motionMask)
-        cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
+        Dim histarray(lines.lpList.Count - 1) As Single
         Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
-        For i = 1 To histarray.Count - 1
-            If histarray(i) > 0 Then lpList.Add(lines.lpList(i))
+        For i = histarray.Count - 1 To 0 Step -1
+            If histarray(i) = 0 Then lines.lpList.RemoveAt(i)
         Next
 
-        dst2.SetTo(0)
-        lpMap.SetTo(0)
-        For i = 0 To lpList.Count - 1
-            lpList(i).index = i
-            Dim lp = lpList(i)
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+        dst3.SetTo(0)
+        For Each lp In lines.lpList
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            lp.age = 1
+            tmpList.Add(lp)
         Next
 
-        If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector in the current image with " +
-                            CStr(lpList.Count) + " after filtering with the motion mask."
-        End If
+        index = 0
+        task.lpList.Clear()
+        dst2 = src
+        For Each lp In tmpList
+            lp.index = index
+            task.lpList.Add(lp)
+            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(task.lpList.Count) + " lines were found."
+        labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
     End Sub
 End Class
-
 
 
 
@@ -577,56 +538,6 @@ End Class
 
 
 
-Public Class Line_Info : Inherits TaskParent
-    Public lpInput As New List(Of lpData)
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(2) = "Click on the oversized line to get details about the line"
-        labels(3) = "Details from the point cloud for the selected line"
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Display details about the line selected."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then runLines(src)
-        labels(2) = task.lines.labels(2)
-
-        dst2 = src
-        For Each lp In task.lpList
-            dst2.Line(lp.p1, lp.p2, white, 2, cv.LineTypes.Link8)
-        Next
-
-        If task.mouseClickFlag Or task.firstPass Then
-            Dim index = task.lines.lpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            Dim lp = task.lpList(index)
-
-            strOut = "Click on any line (below left) to get details on that line " + vbCrLf
-            strOut += "Lines identified in the image: " + CStr(task.lpList.Count) + vbCrLf + vbCrLf
-            strOut += "index = " + CStr(lp.index) + vbCrLf
-            strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf
-            strOut += "Pointcloud range X " + Format(lp.mmX.minVal, fmt3) + " to " +
-                       Format(lp.mmX.maxVal, fmt3) + vbCrLf
-            strOut += "Pointcloud range Y " + Format(lp.mmY.minVal, fmt3) + " to " +
-                       Format(lp.mmY.maxVal, fmt3) + vbCrLf
-            strOut += "Pointcloud range Z " + Format(lp.mmZ.minVal, fmt3) + " to " +
-                       Format(lp.mmZ.maxVal, fmt3) + vbCrLf + vbCrLf
-
-            strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
-            strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
-            strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
-            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
-
-            dst3.SetTo(0)
-            DrawLine(dst3, lp.p1, lp.p2, 255)
-            dst3.Rectangle(lp.rect, 255, task.lineWidth, task.lineType)
-        End If
-        SetTrueText(strOut, 1)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Line_ViewRight : Inherits TaskParent
     Public Sub New()
         desc = "Find lines in the right image"
@@ -750,7 +661,6 @@ Public Class Line_Detector : Inherits TaskParent
 
         lpList.Clear()
         ptList.Clear()
-        lpList.Add(New lpData) ' zero placeholder.
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
                v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
@@ -775,25 +685,51 @@ End Class
 
 
 
-Public Class Line_BasicsNew : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Dim lineCore As New Line_Core
+
+
+
+Public Class Line_Info : Inherits TaskParent
+    Public lpInput As New List(Of lpData)
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(2) = "Click on the oversized line to get details about the line"
+        labels(3) = "Details from the point cloud for the selected line"
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines across frames using the motion mask."
+        desc = "Display details about the line selected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lineCore.Run(src)
+        If standaloneTest() Then runLines(src)
+        labels(2) = task.lines.labels(2)
 
         dst2 = src
-        dst3.SetTo(0)
-        dst2.SetTo(cv.Scalar.White, lineCore.dst2)
-        For Each lp In lineCore.lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        For Each lp In task.lpList
+            dst2.Line(lp.p1, lp.p2, white, 2, cv.LineTypes.Link8)
         Next
 
-        lpList = New List(Of lpData)(lineCore.lpList)
-        task.lpList = New List(Of lpData)(lineCore.lpList)
-        labels(2) = lineCore.labels(2)
+        If task.mouseClickFlag Or task.firstPass Then
+            'Dim index = task.lines.lpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+            'Dim lp = task.lpList(index)
+
+            'strOut = "Click on any line (below left) to get details on that line " + vbCrLf
+            'strOut += "Lines identified in the image: " + CStr(task.lpList.Count) + vbCrLf + vbCrLf
+            'strOut += "index = " + CStr(lp.index) + vbCrLf
+            'strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf
+            'strOut += "Pointcloud range X " + Format(lp.mmX.minVal, fmt3) + " to " +
+            '           Format(lp.mmX.maxVal, fmt3) + vbCrLf
+            'strOut += "Pointcloud range Y " + Format(lp.mmY.minVal, fmt3) + " to " +
+            '           Format(lp.mmY.maxVal, fmt3) + vbCrLf
+            'strOut += "Pointcloud range Z " + Format(lp.mmZ.minVal, fmt3) + " to " +
+            '           Format(lp.mmZ.maxVal, fmt3) + vbCrLf + vbCrLf
+
+            'strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
+            'strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
+            'strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
+            'strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
+
+            'dst3.SetTo(0)
+            'DrawLine(dst3, lp.p1, lp.p2, 255)
+            'dst3.Rectangle(lp.rect, 255, task.lineWidth, task.lineType)
+        End If
+        SetTrueText(strOut, 1)
     End Sub
 End Class

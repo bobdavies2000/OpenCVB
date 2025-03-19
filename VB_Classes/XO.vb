@@ -990,7 +990,7 @@ End Class
 
 
 Public Class XO_Line_LeftRight : Inherits TaskParent
-    Dim lineCore As New Line_Core
+    Dim lineCore As New XO_Line_Core
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
         desc = "Show lines in both the right and left images."
@@ -1744,5 +1744,96 @@ Public Class XO_Line_GCloud : Inherits TaskParent
         Next
 
         labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " + Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_Line_Core : Inherits TaskParent
+    Dim lines As New XO_Line_DetectorOld
+    Public lpList As New List(Of lpData)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect lines as always but don't update lines where there was no motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+        Dim lastList As New List(Of lpData)(lpList)
+        Dim histarray(lastList.Count - 1) As Single
+
+        lpList.Clear()
+        lpList.Add(New lpData) ' placeholder to allow us to build a map.
+        If lastList.Count > 0 Then
+            lpMap.SetTo(0, Not task.motionMask)
+            cv.Cv2.CalcHist({lpMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
+            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+
+            For i = 1 To histarray.Count - 1
+                If histarray(i) = 0 Then lpList.Add(lastList(i))
+            Next
+        End If
+
+        lines.Run(src.Clone)
+        ReDim histarray(lines.lpList.Count - 1)
+
+        Dim tmp = lines.lpMap.Clone
+        tmp.SetTo(0, Not task.motionMask)
+        cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
+        Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+
+        For i = 1 To histarray.Count - 1
+            If histarray(i) > 0 Then lpList.Add(lines.lpList(i))
+        Next
+
+        dst2.SetTo(0)
+        lpMap.SetTo(0)
+        For i = 0 To lpList.Count - 1
+            lpList(i).index = i
+            Dim lp = lpList(i)
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector in the current image with " +
+                            CStr(lpList.Count) + " after filtering with the motion mask."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Line_Basics : Inherits TaskParent
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public lpList As New List(Of lpData)
+    Dim lineCore As New XO_Line_Core
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect lines across frames using the motion mask."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lineCore.Run(src)
+
+        lpMap.SetTo(0)
+        dst2 = src
+        dst3.SetTo(0)
+        dst2.SetTo(cv.Scalar.White, lineCore.dst2)
+        For Each lp In lineCore.lpList
+            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+
+        lpList = New List(Of lpData)(lineCore.lpList)
+        task.lpList = New List(Of lpData)(lineCore.lpList)
+        labels(2) = lineCore.labels(2)
     End Sub
 End Class

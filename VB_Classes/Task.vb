@@ -85,6 +85,8 @@ Public Class VBtask : Implements IDisposable
     Public cvFontThickness As Integer = 1
 
     Public color As New cv.Mat
+    Public gray As New cv.Mat
+    Public grayMotion As New cv.Mat
     Public leftView As New cv.Mat
     Public rightView As New cv.Mat
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
@@ -704,6 +706,7 @@ Public Class VBtask : Implements IDisposable
         redOptions.Sync()
 
         Dim src = color
+
         If src.Size <> New cv.Size(dst2.Cols, dst2.Rows) Then dst2 = dst2.Resize(src.Size)
         If src.Size <> New cv.Size(dst3.Cols, dst3.Rows) Then dst3 = dst3.Resize(src.Size)
         bins2D = {dst2.Height, dst2.Width}
@@ -841,6 +844,9 @@ Public Class VBtask : Implements IDisposable
         gCell.Run(src)
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
+
+        gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.optionsChanged Then grayMotion = gray.Clone Else gray.CopyTo(grayMotion, motionMask)
 
         task.colorizer.Run(src)
 
