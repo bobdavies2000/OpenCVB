@@ -1,4 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
+Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class XO_Gravity_HorizonRawOld : Inherits TaskParent
@@ -101,7 +102,7 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gravityVec = New lpData(New cv.Point2f(dst2.Width / 2, 0),
-                                         New cv.Point2f(dst2.Width / 2, dst2.Height))
+                                             New cv.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New lpData(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
         labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
@@ -392,7 +393,7 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
         Dim distance = p1.DistanceTo(p2)
         If distance < 10 Then ' enough to get a line with some credibility
             strOut = "Gravity vector not found " + vbCrLf + "The distance of p1 to p2 is " +
-                     CStr(CInt(distance)) + " pixels." + vbCrLf
+                         CStr(CInt(distance)) + " pixels." + vbCrLf
             strOut += "Using the previous value for the gravity vector."
         Else
             Dim lp = New lpData(p1, p2)
@@ -441,7 +442,7 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
         Else
             ' dst2.SetTo(0)
             r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
-                                                         Math.Min(dst2.Height - translationY * 2, dst2.Height))
+                                                             Math.Min(dst2.Height - translationY * 2, dst2.Height))
             If r1.X < 0 Then
                 r1.X = -r1.X
                 r1.Width += translationX * 2
@@ -478,7 +479,7 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
         SetTrueText(strOut, 3)
 
         labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
-                    If(horizonVec.p1.Y = 0 And horizonVec.p2.Y = 0, " there is no horizon present", "")
+                        If(horizonVec.p1.Y = 0 And horizonVec.p2.Y = 0, " there is no horizon present", "")
         labels(3) = "Camera direction (radians) = " + Format(task.camDirection, fmt1) + " with distance = " + Format(task.camMotionPixels, fmt1)
     End Sub
 End Class
@@ -569,9 +570,9 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
         horizonVec = task.horizonVec
 
         labels(2) = "Translation X = " + Format(translationX, fmt1) + " rotation X = " + Format(rotationX, fmt1) + " degrees " +
-                    " center of rotation X = " + Format(centerX.X, fmt0) + ", " + Format(centerX.Y, fmt0)
+                        " center of rotation X = " + Format(centerX.X, fmt0) + ", " + Format(centerX.Y, fmt0)
         labels(3) = "Translation Y = " + Format(translationY, fmt1) + " rotation Y = " + Format(rotationY, fmt1) + " degrees " +
-                    " center of rotation Y = " + Format(centerY.X, fmt0) + ", " + Format(centerY.Y, fmt0)
+                        " center of rotation Y = " + Format(centerY.X, fmt0) + ", " + Format(centerY.Y, fmt0)
     End Sub
 End Class
 
@@ -671,7 +672,7 @@ Public Class XO_Gravity_BasicsOriginal : Inherits TaskParent
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
-                      Format(dst0.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(dst0.Get(Of Single)(p1.Y, p1.X - 1))
+                          Format(dst0.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(dst0.Get(Of Single)(p1.Y, p1.X - 1))
         End If
         SetTrueText(strOut, 3)
 
@@ -696,15 +697,15 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
         If task.optionsChanged Then ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
 
         Parallel.For(0, task.gridRects.Count,
-        Sub(i)
-            Dim roi = task.gridRects(i)
-            Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), task.depthMask(roi))
-            If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
-            task.kalman.kInput(i * 4) = mm.minLoc.X
-            task.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
-            task.kalman.kInput(i * 4 + 2) = mm.maxLoc.X
-            task.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
-        End Sub)
+            Sub(i)
+                Dim roi = task.gridRects(i)
+                Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), task.depthMask(roi))
+                If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
+                task.kalman.kInput(i * 4) = mm.minLoc.X
+                task.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
+                task.kalman.kInput(i * 4 + 2) = mm.maxLoc.X
+                task.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
+            End Sub)
 
         task.kalman.Run(src)
 
@@ -864,7 +865,7 @@ Public Class XO_Line_DetectorOld : Inherits TaskParent
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
+                   "rectangle (provided externally)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -878,7 +879,7 @@ Public Class XO_Line_DetectorOld : Inherits TaskParent
         lpList.Add(New lpData) ' zero placeholder.
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                   v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
                 Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
                 Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
                 Dim lp = New lpData(p1, p2)
@@ -899,64 +900,6 @@ Public Class XO_Line_DetectorOld : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class XO_Line_Core : Inherits TaskParent
-    Dim lines As New XO_Line_DetectorOld
-    Public lpList As New List(Of lpData)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines as always but don't update lines where there was no motion."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim histogram As New cv.Mat
-        Dim lastList As New List(Of lpData)(lpList)
-        Dim histarray(lastList.Count - 1) As Single
-
-        lpList.Clear()
-        lpList.Add(New lpData) ' placeholder to allow us to build a map.
-        If lastList.Count > 0 Then
-            lpMap.SetTo(0, Not task.motionMask)
-            cv.Cv2.CalcHist({lpMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
-            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
-
-            For i = 1 To histarray.Count - 1
-                If histarray(i) = 0 Then lpList.Add(lastList(i))
-            Next
-        End If
-
-        lines.Run(src.Clone)
-        ReDim histarray(lines.lpList.Count - 1)
-
-        Dim tmp = lines.lpMap.Clone
-        tmp.SetTo(0, Not task.motionMask)
-        cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
-        Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
-
-        For i = 1 To histarray.Count - 1
-            If histarray(i) > 0 Then lpList.Add(lines.lpList(i))
-        Next
-
-        dst2.SetTo(0)
-        lpMap.SetTo(0)
-        For i = 0 To lpList.Count - 1
-            lpList(i).index = i
-            Dim lp = lpList(i)
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector in the current image with " +
-                        CStr(lpList.Count) + " after filtering with the motion mask."
-        End If
-    End Sub
-End Class
 
 
 
@@ -1047,7 +990,7 @@ End Class
 
 
 Public Class XO_Line_LeftRight : Inherits TaskParent
-    Dim lineCore As New XO_Line_Core
+    Dim lineCore As New Line_Core
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
         desc = "Show lines in both the right and left images."
@@ -1157,7 +1100,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
         dst3 = dst3.Threshold(0, cv.Scalar.White, cv.ThresholdTypes.Binary)
         If task.heartBeat Then
             labels(2) = CStr(task.lpList.Count) + " lines were input and " + CStr(combineCount) +
-                        " lines were matched to the previous frame"
+                            " lines were matched to the previous frame"
         End If
     End Sub
 End Class
@@ -1240,7 +1183,7 @@ Public Class XO_Line_DisplayInfoOld : Inherits TaskParent
         DrawLine(dst2, p1, p2, task.HighlightColor)
 
         strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
-                  "Correlation coefficient is shown with the depth in meters."
+                      "Correlation coefficient is shown with the depth in meters."
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -1626,80 +1569,9 @@ Public Class XO_Line_ViewTop : Inherits TaskParent
         dst3 = task.lines.dst2
         labels(2) = task.lines.labels(2)
     End Sub
-
-
-
-
-
-
-
-    Public Class XO_Line_GCloud : Inherits TaskParent
-        Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-        Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-        Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-        Public options As New Options_LineFinder
-        Dim match As New Match_tCell
-        Dim angleSlider As System.Windows.Forms.TrackBar
-        Public Sub New()
-            angleSlider = optiBase.FindSlider("Angle tolerance in degrees")
-            labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
-            desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
-        End Sub
-        Public Function updateGLine(src As cv.Mat, gc As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
-            gc.tc1.center = p1
-            gc.tc2.center = p2
-            gc.tc1 = match.createCell(src, gc.tc1.correlation, p1)
-            gc.tc2 = match.createCell(src, gc.tc2.correlation, p2)
-            gc.tc1.strOut = Format(gc.tc1.correlation, fmt2) + vbCrLf + Format(gc.tc1.depth, fmt2) + "m"
-            gc.tc2.strOut = Format(gc.tc2.correlation, fmt2) + vbCrLf + Format(gc.tc2.depth, fmt2) + "m"
-
-            Dim mean = task.pointCloud(gc.tc1.rect).Mean(task.depthMask(gc.tc1.rect))
-            gc.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
-            gc.tc1.depth = gc.pt1.Z
-            mean = task.pointCloud(gc.tc2.rect).Mean(task.depthMask(gc.tc2.rect))
-            gc.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
-            gc.tc2.depth = gc.pt2.Z
-
-            gc.len3D = distance3D(gc.pt1, gc.pt2)
-            If gc.pt1 = New cv.Point3f Or gc.pt2 = New cv.Point3f Then
-                gc.len3D = 0
-            Else
-                gc.arcX = Math.Asin((gc.pt1.X - gc.pt2.X) / gc.len3D) * 57.2958
-                gc.arcY = Math.Abs(Math.Asin((gc.pt1.Y - gc.pt2.Y) / gc.len3D) * 57.2958)
-                If gc.arcY > 90 Then gc.arcY -= 90
-                gc.arcZ = Math.Asin((gc.pt1.Z - gc.pt2.Z) / gc.len3D) * 57.2958
-            End If
-
-            Return gc
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.RunOpt()
-
-            Dim maxAngle = angleSlider.Value
-
-            dst2 = src.Clone
-            task.lines.Run(src.Clone)
-
-            sortedVerticals.Clear()
-            sortedHorizontals.Clear()
-            For Each lp In task.lpList
-                Dim gc As gravityLine
-                gc = updateGLine(src, gc, lp.p1, lp.p2)
-                allLines.Add(lp.p1.DistanceTo(lp.p2), gc)
-                If Math.Abs(90 - gc.arcY) < maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
-                    sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gc)
-                    DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
-                End If
-                If Math.Abs(gc.arcY) <= maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
-                    sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gc)
-                    DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
-                End If
-            Next
-
-            labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " + Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
-        End Sub
-    End Class
 End Class
+
+
 
 
 
@@ -1776,7 +1648,7 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
             If lp.rect.Width = 0 Then Continue For ' skip placeholder
             Dim mask = New cv.Mat(New cv.Size(lp.rect.Width, lp.rect.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
             mask.Line(New cv.Point(CInt(lp.p1.X - lp.rect.X), CInt(lp.p1.Y - lp.rect.Y)),
-                      New cv.Point(CInt(lp.p2.X - lp.rect.X), CInt(lp.p2.Y - lp.rect.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
+                          New cv.Point(CInt(lp.p2.X - lp.rect.X), CInt(lp.p2.Y - lp.rect.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
             Dim mean = task.pointCloud(lp.rect).Mean(mask)
 
             If mean <> New cv.Scalar Then
@@ -1800,5 +1672,77 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
                 End If
             End If
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Line_GCloud : Inherits TaskParent
+    Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public options As New Options_LineFinder
+    Dim match As New Match_tCell
+    Dim angleSlider As System.Windows.Forms.TrackBar
+    Public Sub New()
+        angleSlider = optiBase.FindSlider("Angle tolerance in degrees")
+        labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
+        desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
+    End Sub
+    Public Function updateGLine(src As cv.Mat, gc As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
+        gc.tc1.center = p1
+        gc.tc2.center = p2
+        gc.tc1 = match.createCell(src, gc.tc1.correlation, p1)
+        gc.tc2 = match.createCell(src, gc.tc2.correlation, p2)
+        gc.tc1.strOut = Format(gc.tc1.correlation, fmt2) + vbCrLf + Format(gc.tc1.depth, fmt2) + "m"
+        gc.tc2.strOut = Format(gc.tc2.correlation, fmt2) + vbCrLf + Format(gc.tc2.depth, fmt2) + "m"
+
+        Dim mean = task.pointCloud(gc.tc1.rect).Mean(task.depthMask(gc.tc1.rect))
+        gc.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
+        gc.tc1.depth = gc.pt1.Z
+        mean = task.pointCloud(gc.tc2.rect).Mean(task.depthMask(gc.tc2.rect))
+        gc.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
+        gc.tc2.depth = gc.pt2.Z
+
+        gc.len3D = distance3D(gc.pt1, gc.pt2)
+        If gc.pt1 = New cv.Point3f Or gc.pt2 = New cv.Point3f Then
+            gc.len3D = 0
+        Else
+            gc.arcX = Math.Asin((gc.pt1.X - gc.pt2.X) / gc.len3D) * 57.2958
+            gc.arcY = Math.Abs(Math.Asin((gc.pt1.Y - gc.pt2.Y) / gc.len3D) * 57.2958)
+            If gc.arcY > 90 Then gc.arcY -= 90
+            gc.arcZ = Math.Asin((gc.pt1.Z - gc.pt2.Z) / gc.len3D) * 57.2958
+        End If
+
+        Return gc
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        Dim maxAngle = angleSlider.Value
+
+        dst2 = src.Clone
+        task.lines.Run(src.Clone)
+
+        sortedVerticals.Clear()
+        sortedHorizontals.Clear()
+        For Each lp In task.lpList
+            Dim gc As gravityLine
+            gc = updateGLine(src, gc, lp.p1, lp.p2)
+            allLines.Add(lp.p1.DistanceTo(lp.p2), gc)
+            If Math.Abs(90 - gc.arcY) < maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
+                sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gc)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
+            End If
+            If Math.Abs(gc.arcY) <= maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
+                sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gc)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+            End If
+        Next
+
+        labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " + Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
     End Sub
 End Class

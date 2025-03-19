@@ -1,11 +1,9 @@
 Imports System.Runtime.InteropServices
-Imports System.Windows.Shapes
-Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public lpList As New List(Of lpData)
-    Dim lineCore As New XO_Line_Core
+    Dim lineCore As New Line_Core
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
@@ -28,6 +26,65 @@ Public Class Line_Basics : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Line_Core : Inherits TaskParent
+    Dim lines As New XO_Line_DetectorOld
+    Public lpList As New List(Of lpData)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect lines as always but don't update lines where there was no motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+        Dim lastList As New List(Of lpData)(lpList)
+        Dim histarray(lastList.Count - 1) As Single
+
+        lpList.Clear()
+        lpList.Add(New lpData) ' placeholder to allow us to build a map.
+        If lastList.Count > 0 Then
+            lpMap.SetTo(0, Not task.motionMask)
+            cv.Cv2.CalcHist({lpMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
+            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+
+            For i = 1 To histarray.Count - 1
+                If histarray(i) = 0 Then lpList.Add(lastList(i))
+            Next
+        End If
+
+        lines.Run(src.Clone)
+        ReDim histarray(lines.lpList.Count - 1)
+
+        Dim tmp = lines.lpMap.Clone
+        tmp.SetTo(0, Not task.motionMask)
+        cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
+        Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+
+        For i = 1 To histarray.Count - 1
+            If histarray(i) > 0 Then lpList.Add(lines.lpList(i))
+        Next
+
+        dst2.SetTo(0)
+        lpMap.SetTo(0)
+        For i = 0 To lpList.Count - 1
+            lpList(i).index = i
+            Dim lp = lpList(i)
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector in the current image with " +
+                            CStr(lpList.Count) + " after filtering with the motion mask."
+        End If
+    End Sub
+End Class
 
 
 
@@ -615,54 +672,6 @@ End Class
 
 
 
-
-Public Class Line_Detector : Inherits TaskParent
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of lpData)
-    Public ptList As New List(Of cv.Point)
-    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src(subsetRect))
-
-        lpList.Clear()
-        ptList.Clear()
-        lpList.Add(New lpData) ' zero placeholder.
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
-                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
-                Dim lp = New lpData(p1, p2)
-                lp.rect = ValidateRect(lp.rect)
-                lp.mask = dst2(lp.rect)
-                lp.index = lpList.Count
-                lpList.Add(lp)
-                ptList.Add(New cv.Point(CInt(lp.p1.X), CInt(lp.p1.Y)))
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Line_Stable : Inherits TaskParent
     Dim lines As New Line_Detector
     Public lpStable As New List(Of lpData)
@@ -714,5 +723,77 @@ Public Class Line_Stable : Inherits TaskParent
         Next
 
         labels(3) = "There were " + CStr(lpStable.Count) + " stable lines found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Detector : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public ptList As New List(Of cv.Point)
+    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+    Public Sub New()
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src(subsetRect))
+
+        lpList.Clear()
+        ptList.Clear()
+        lpList.Add(New lpData) ' zero placeholder.
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
+                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
+                Dim lp = New lpData(p1, p2)
+                lp.rect = ValidateRect(lp.rect)
+                lp.mask = dst2(lp.rect)
+                lp.index = lpList.Count
+                lpList.Add(lp)
+                ptList.Add(New cv.Point(CInt(lp.p1.X), CInt(lp.p1.Y)))
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+End Class
+
+
+
+Public Class Line_BasicsNew : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Dim lineCore As New Line_Core
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect lines across frames using the motion mask."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lineCore.Run(src)
+
+        dst2 = src
+        dst3.SetTo(0)
+        dst2.SetTo(cv.Scalar.White, lineCore.dst2)
+        For Each lp In lineCore.lpList
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+
+        lpList = New List(Of lpData)(lineCore.lpList)
+        task.lpList = New List(Of lpData)(lineCore.lpList)
+        labels(2) = lineCore.labels(2)
     End Sub
 End Class

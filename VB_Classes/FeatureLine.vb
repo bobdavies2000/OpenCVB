@@ -351,7 +351,7 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits TaskParent
     Public Sub New()
         desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Basics4D to track each line."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         lines.Run(src)
         dst1 = lines.dst3
@@ -410,7 +410,7 @@ Public Class FeatureLine_VerticalLongLine : Inherits TaskParent
     Public Sub New()
         desc = "Use FeatureLine_Finder data to identify the longest lines and show its angle."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             dst2 = src.Clone
             lines.Run(src)
@@ -455,7 +455,7 @@ Public Class FeatureLine_DetailsAll : Inherits TaskParent
         flow.dst = 3
         desc = "Use FeatureLine_Finder data to collect vertical lines and measure accuracy of each."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             dst2 = src.Clone
             lines.Run(src)
@@ -526,7 +526,7 @@ Public Class FeatureLine_LongestKNN : Inherits TaskParent
     Public Sub New()
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         dst2 = src
 
