@@ -118,7 +118,7 @@ Public Class FPoly_Sides : Inherits TaskParent
     Public centerShift As cv.Point2f
 
     Public options As New Options_FPoly
-    Dim near As New Line_Nearest
+    Dim near As New XO_Line_Nearest
     Public rotatePoly As New Rotate_PolyQT
     Dim newPoly As New List(Of cv.Point2f)
     Dim random As New Random_Basics
@@ -752,7 +752,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
     Public altCenterShift As cv.Point2f
     Public fPD As fPolyData
     Public rotatePoints As New FPoly_RotatePoints
-    Dim near As New Line_Nearest
+    Dim near As New XO_Line_Nearest
     Public Sub New()
         labels = {"", "", "Output of FPoly_Basics", "Center of rotation is where the extended lines intersect"}
         desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FPoly_Basics"
@@ -986,7 +986,7 @@ End Class
 
 Public Class FPoly_Center : Inherits TaskParent
     Public rotatePoly As New Rotate_PolyQT
-    Dim near As New Line_Nearest
+    Dim near As New XO_Line_Nearest
     Public fPD As fPolyData
     Dim newPoly As List(Of cv.Point2f)
     Public Sub New()

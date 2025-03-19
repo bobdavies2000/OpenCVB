@@ -456,7 +456,7 @@ End Class
 
 
 Public Class BackProject_LineTop : Inherits TaskParent
-    Dim line As New Line_ViewTop
+    Dim line As New XO_Line_ViewTop
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Backproject the lines found in the top view."
@@ -485,7 +485,7 @@ End Class
 
 
 Public Class BackProject_LineSide : Inherits TaskParent
-    Dim line As New Line_ViewSide
+    Dim line As New XO_Line_ViewSide
     Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

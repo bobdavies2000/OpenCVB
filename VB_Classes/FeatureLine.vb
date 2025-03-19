@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports VB_Classes.XO_Line_ViewTop
+Imports cv = OpenCvSharp
 Public Class FeatureLine_Basics : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
@@ -28,7 +29,7 @@ End Class
 
 Public Class FeatureLine_Detector : Inherits TaskParent
     Dim lines As New Line_Detector
-    Dim lineDisp As New Line_DisplayInfoOld
+    Dim lineDisp As New XO_Line_DisplayInfoOld
     Dim options As New Options_Features
     Dim match As New Match_tCell
     Public tcells As List(Of tCell)
@@ -88,7 +89,7 @@ Public Class FeatureLine_VerticalVerify : Inherits TaskParent
     Public Sub New()
         desc = "Select a line or group of lines and track the result"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         linesVH.Run(src)
 
         verify.gCells = New List(Of gravityLine)(linesVH.gCells)
@@ -107,13 +108,13 @@ End Class
 Public Class FeatureLine_VH : Inherits TaskParent
     Public gCells As New List(Of gravityLine)
     Dim match As New Match_tCell
-    Dim gLines As New Line_GCloud
+    Dim gLines As New XO_Line_GCloud
     Dim options As New Options_Features
     Public Sub New()
         labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"
         desc = "Find and track all the horizontal or vertical lines"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         Dim templatePad = options.templatePad
@@ -185,7 +186,7 @@ Public Class FeatureLine_Tutorial1 : Inherits TaskParent
         labels(3) = "The highlighted lines are also lines in 3D."
         desc = "Find all the lines in the image and determine which are in the depth data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.lines.Run(src)
         dst2 = task.lines.dst2
 
@@ -221,7 +222,7 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
     Public Sub New()
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
         task.lines.Run(src)
@@ -263,7 +264,7 @@ End Class
 
 
 Public Class FeatureLine_LongestVerticalKNN : Inherits TaskParent
-    Dim gLines As New Line_GCloud
+    Dim gLines As New XO_Line_GCloud
     Dim longest As New FeatureLine_Longest
     Public Sub New()
         labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
@@ -276,7 +277,7 @@ Public Class FeatureLine_LongestVerticalKNN : Inherits TaskParent
         If distance1 < 0.75 * p1.DistanceTo(p2) Then Return True ' it the longest vertical * 0.75 > current lastPair, then use the longest vertical...
         Return False
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         gLines.Run(src)
         If gLines.sortedVerticals.Count = 0 Then
             SetTrueText("No vertical lines were present", 3)
@@ -318,7 +319,7 @@ Public Class FeatureLine_LongestV_Tutorial1 : Inherits TaskParent
     Public Sub New()
         desc = "Use FeatureLine_Finder to find all the vertical lines and show the longest."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         lines.Run(src)
 
@@ -516,7 +517,7 @@ End Class
 
 
 Public Class FeatureLine_LongestKNN : Inherits TaskParent
-    Dim glines As New Line_GCloud
+    Dim glines As New XO_Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public options As New Options_Features
     Public gline As gravityLine
@@ -558,7 +559,7 @@ End Class
 
 
 Public Class FeatureLine_Longest : Inherits TaskParent
-    Dim glines As New Line_GCloud
+    Dim glines As New XO_Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public options As New Options_Features
     Public gline As gravityLine

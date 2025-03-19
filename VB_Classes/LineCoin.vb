@@ -87,7 +87,7 @@ End Class
 
 Public Class LineCoin_Parallel : Inherits TaskParent
     Dim parallel As New LongLine_ExtendParallel
-    Dim near As New Line_Nearest
+    Dim near As New XO_Line_Nearest
     Public coinList As New List(Of coinPoints)
     Public Sub New()
         desc = "Find the lines that are coincident in the parallel lines"

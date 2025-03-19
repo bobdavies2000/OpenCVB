@@ -245,7 +245,7 @@ End Class
 
 
 Public Class Swarm_Flood2 : Inherits TaskParent
-    Public lines As New Line_KNN
+    Public lines As New XO_Line_KNN
     Public flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Public Sub New()

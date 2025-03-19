@@ -33,7 +33,6 @@ Color
 Color8U
 Complexity
 Concat
-Concept
 Connected
 Contour
 Contrast

@@ -380,7 +380,7 @@ Public Class Match_tCell : Inherits TaskParent
     Public tCells As New List(Of tCell)
     Dim cellSlider As TrackBar
     Dim options As New Options_Features
-    Dim lineDisp As New Line_DisplayInfoOld
+    Dim lineDisp As New XO_Line_DisplayInfoOld
     Public Sub New()
         Dim tc As tCell
         tCells.Add(tc)

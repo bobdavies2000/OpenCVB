@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 Imports OpenCvSharp
+Imports VB_Classes.XO_Line_ViewTop
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class IMU_Basics : Inherits TaskParent
@@ -448,7 +449,7 @@ End Class
 
 
 Public Class IMU_VerticalAngles : Inherits TaskParent
-    Dim vert As New Line_GCloud
+    Dim vert As New XO_Line_GCloud
     Public Sub New()
         labels = {"", "", "Highlighted vertical lines", "Line details"}
         desc = "Compare the IMU changes to the angle changes in the vertical lines."
@@ -485,7 +486,7 @@ End Class
 Public Class IMU_PlotGravityAngles : Inherits TaskParent
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Plot the motion of the camera based on the IMU data in degrees"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -512,7 +513,7 @@ End Class
 Public Class IMU_PlotAngularVelocity : Inherits TaskParent
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Plot the IMU Velocity over time."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -537,7 +538,7 @@ End Class
 
 
 Public Class IMU_Lines : Inherits TaskParent
-    Dim vert As New Line_GCloud
+    Dim vert As New XO_Line_GCloud
     Dim lastGcell As gravityLine
     Public Sub New()
         labels(2) = "Vertical lines in Blue and horizontal lines in Yellow"
@@ -590,7 +591,7 @@ End Class
 Public Class IMU_PlotAcceleration : Inherits TaskParent
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Plot the IMU Acceleration in m/Sec^2 over time."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -639,7 +640,7 @@ Public Class IMU_PlotCompareIMU : Inherits TaskParent
     Dim plot(3 - 1) As Plot_OverTimeScalar
     Dim imuAll As New IMU_AllMethods
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         If standalone Then task.gOptions.displaydst1.checked = true
 
         For i = 0 To plot.Count - 1
