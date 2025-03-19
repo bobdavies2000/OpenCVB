@@ -455,68 +455,6 @@ End Class
 
 
 
-Public Class BackProject_LineTop : Inherits TaskParent
-    Dim line As New XO_Line_ViewTop
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Backproject the lines found in the top view."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        line.Run(src)
-
-        dst2.SetTo(0)
-        Dim w = task.lineWidth + 5
-        For Each lp In task.lpList
-            dst2.Line(lp.xp1, lp.xp2, 255, w, task.lineType)
-        Next
-
-        Dim histogram = line.autoX.histogram
-        histogram.SetTo(0, Not dst2)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst3, task.rangesTop)
-        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class BackProject_LineSide : Inherits TaskParent
-    Dim line As New XO_Line_ViewSide
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Backproject the lines found in the side view."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        line.Run(src)
-
-        dst2.SetTo(0)
-        Dim w = task.lineWidth + 5
-        lpList.Clear()
-        For Each lp In task.lpList
-            If Math.Abs(lp.slope) < 0.1 Then
-                dst2.Line(lp.xp1, lp.xp2, 255, w, task.lineType)
-                lpList.Add(lp)
-            End If
-        Next
-
-        Dim histogram = line.autoY.histogram
-        histogram.SetTo(0, Not dst2)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst1, task.rangesSide)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        dst3 = src
-        dst3.SetTo(white, dst1)
-    End Sub
-End Class
-
-
-
-
-
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Public Class BackProject_Image : Inherits TaskParent
     Public hist As New Hist_Basics

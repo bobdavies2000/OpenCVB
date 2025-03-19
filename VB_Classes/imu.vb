@@ -1,8 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Windows.Forms
-Imports OpenCvSharp
-Imports VB_Classes.XO_Line_ViewTop
-
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class IMU_Basics : Inherits TaskParent
     Dim lastTimeStamp As Double

@@ -1028,42 +1028,6 @@ End Class
 
 
 
-Public Class FCS_Lines1 : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Public Sub New()
-        labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
-        desc = "Use lines as input to FCS."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
-
-        task.features.Clear()
-        For Each lp In task.lpList
-            task.features.Add(lp.center)
-        Next
-
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        dst2.SetTo(white, task.lines.dst2)
-
-        For Each lp In task.lpList
-            DrawCircle(dst2, lp.center, task.DotSize, red, -1)
-            dst0.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-        Next
-
-        fpDisplayAge()
-        fpDisplayCell()
-
-        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were found."
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class FCS_Lines : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Dim lines As New Line_Basics

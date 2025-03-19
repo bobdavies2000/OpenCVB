@@ -667,8 +667,6 @@ Public Class Line_Detector : Inherits TaskParent
                 Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
                 Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
                 Dim lp = New lpData(p1, p2)
-                lp.rect = ValidateRect(lp.rect)
-                lp.mask = dst2(lp.rect)
                 lp.index = lpList.Count
                 lpList.Add(lp)
                 ptList.Add(New cv.Point(CInt(lp.p1.X), CInt(lp.p1.Y)))
@@ -690,6 +688,7 @@ End Class
 
 Public Class Line_Info : Inherits TaskParent
     Public lpInput As New List(Of lpData)
+    Public delaunay As New Delaunay_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Click on the oversized line to get details about the line"
@@ -700,6 +699,13 @@ Public Class Line_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then runLines(src)
         labels(2) = task.lines.labels(2)
+
+        delaunay.inputPoints.Clear()
+        For Each lp In task.lpList
+            delaunay.inputPoints.Add(lp.p1)
+            delaunay.inputPoints.Add(lp.p2)
+        Next
+        delaunay.Run(src)
 
         dst2 = src
         For Each lp In task.lpList

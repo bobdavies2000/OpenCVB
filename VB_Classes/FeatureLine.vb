@@ -1,5 +1,4 @@
-﻿Imports VB_Classes.XO_Line_ViewTop
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class FeatureLine_Basics : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()

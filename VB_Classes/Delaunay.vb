@@ -8,8 +8,6 @@ Public Class Delaunay_Basics : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
         facet32s = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -35,7 +33,6 @@ Public Class Delaunay_Basics : Inherits TaskParent
             facetList.Add(nextFacet)
         Next
 
-        dst1.SetTo(0)
         ptList.Clear()
         For i = 0 To facets.Length - 1
             For j = 0 To facets(i).Length - 1
@@ -44,15 +41,10 @@ Public Class Delaunay_Basics : Inherits TaskParent
                     ptList.Add(New cv.Point(pt.X, pt.Y))
                 End If
             Next
-
-            DrawContour(dst1, ptList, 255, 1)
         Next
 
-        facet32s.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst3)
+        dst2 = ShowPalette(facet32s)
 
-        dst3.SetTo(0, dst1)
-        dst2.SetTo(white, dst1)
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class

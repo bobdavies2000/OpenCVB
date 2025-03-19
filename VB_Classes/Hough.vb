@@ -58,26 +58,6 @@ End Class
 
 
 
-Public Class Hough_Sudoku1 : Inherits TaskParent
-    Public Sub New()
-        desc = "FastLineDetect version for finding lines in the Sudoku input."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst3 = cv.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
-        task.lines.Run(dst3.Clone)
-        dst2 = task.lines.dst2
-        labels(2) = task.lines.labels(2)
-        For Each lp In task.lpList
-            dst3.Line(lp.xp1, lp.xp2, cv.Scalar.Red, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 Public Class Hough_Circles : Inherits TaskParent

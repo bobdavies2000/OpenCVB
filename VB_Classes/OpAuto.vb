@@ -98,58 +98,6 @@ End Class
 
 
 
-Public Class OpAuto_FloorCeiling : Inherits TaskParent
-    Public bpLine As New BackProject_LineSide
-    Public yList As New List(Of Single)
-    Public floorY As Single
-    Public ceilingY As Single
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Automatically find the Y values that best describes the floor and ceiling (if present)"
-    End Sub
-    Private Sub rebuildMask(maskLabel As String, min As Single, max As Single)
-        Dim mask = task.pcSplit(1).InRange(min, max).ConvertScaleAbs
-
-        Dim mean As cv.Scalar, stdev As cv.Scalar
-        cv.Cv2.MeanStdDev(task.pointCloud, mean, stdev, mask)
-
-        strOut += "The " + maskLabel + " mask has Y mean and stdev are:" + vbCrLf
-        strOut += maskLabel + " Y Mean = " + Format(mean(1), fmt3) + vbCrLf
-        strOut += maskLabel + " Y Stdev = " + Format(stdev(1), fmt3) + vbCrLf + vbCrLf
-
-        If Math.Abs(mean(1)) > task.yRange / 4 Then dst1 = mask Or dst1
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Dim pad As Single = 0.05 ' pad the estimate by X cm's
-
-        dst2 = src.Clone
-        bpLine.Run(src)
-
-        If bpLine.lpList.Count > 0 Then
-            strOut = "Y range = " + Format(task.yRange, fmt3) + vbCrLf + vbCrLf
-            If task.heartBeat Then yList.Clear()
-            If task.heartBeat Then dst1.SetTo(0)
-            Dim h = dst2.Height / 2
-            For Each lp In bpLine.lpList
-                Dim nextY = task.yRange * (lp.p1.Y - h) / h
-                If Math.Abs(nextY) > task.yRange / 4 Then yList.Add(nextY)
-            Next
-
-            If yList.Count > 0 Then
-                If yList.Max > 0 Then rebuildMask("floor", yList.Max - pad, task.yRange)
-                If yList.Min < 0 Then rebuildMask("ceiling", -task.yRange, yList.Min + pad)
-            End If
-
-            dst2.SetTo(white, dst1)
-        End If
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class OpAuto_Valley : Inherits TaskParent

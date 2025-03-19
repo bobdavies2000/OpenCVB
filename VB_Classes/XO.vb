@@ -884,7 +884,6 @@ Public Class XO_Line_DetectorOld : Inherits TaskParent
                 Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
                 Dim lp = New lpData(p1, p2)
                 lp.rect = ValidateRect(lp.rect)
-                lp.mask = dst2(lp.rect)
                 lp.index = lpList.Count
                 lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
                 lpList.Add(lp)
@@ -1552,32 +1551,6 @@ End Class
 
 
 
-Public Class XO_Line_ViewTop : Inherits TaskParent
-    Public autoX As New OpAuto_XRange
-    Dim histTop As New Projection_HistTop
-    Public Sub New()
-        labels = {"", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View."}
-        desc = "Find lines in the hotspots for the Top View."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        histTop.Run(src)
-
-        autoX.Run(histTop.histogram)
-        dst2 = histTop.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-
-        task.lines.Run(dst2)
-        dst3 = task.lines.dst2
-        labels(2) = task.lines.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 Public Class XO_Line_Movement : Inherits TaskParent
     Public p1 As cv.Point
@@ -1835,5 +1808,151 @@ Public Class XO_Line_Basics : Inherits TaskParent
         lpList = New List(Of lpData)(lineCore.lpList)
         task.lpList = New List(Of lpData)(lineCore.lpList)
         labels(2) = lineCore.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class XO_BackProject_LineSide : Inherits TaskParent
+    Dim line As New XO_Line_ViewSide
+    Public lpList As New List(Of lpDataOld)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Backproject the lines found in the side view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        line.Run(src)
+
+        dst2.SetTo(0)
+        Dim w = task.lineWidth + 5
+        lpList.Clear()
+        For Each lp In task.lpListOld
+            If Math.Abs(lp.slope) < 0.1 Then
+                dst2.Line(lp.xp1, lp.xp2, 255, w, task.lineType)
+                lpList.Add(lp)
+            End If
+        Next
+
+        Dim histogram = line.autoY.histogram
+        histogram.SetTo(0, Not dst2)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst1, task.rangesSide)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        dst3 = src
+        dst3.SetTo(white, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_OpAuto_FloorCeiling : Inherits TaskParent
+    Public bpLine As New XO_BackProject_LineSide
+    Public yList As New List(Of Single)
+    Public floorY As Single
+    Public ceilingY As Single
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Automatically find the Y values that best describes the floor and ceiling (if present)"
+    End Sub
+    Private Sub rebuildMask(maskLabel As String, min As Single, max As Single)
+        Dim mask = task.pcSplit(1).InRange(min, max).ConvertScaleAbs
+
+        Dim mean As cv.Scalar, stdev As cv.Scalar
+        cv.Cv2.MeanStdDev(task.pointCloud, mean, stdev, mask)
+
+        strOut += "The " + maskLabel + " mask has Y mean and stdev are:" + vbCrLf
+        strOut += maskLabel + " Y Mean = " + Format(mean(1), fmt3) + vbCrLf
+        strOut += maskLabel + " Y Stdev = " + Format(stdev(1), fmt3) + vbCrLf + vbCrLf
+
+        If Math.Abs(mean(1)) > task.yRange / 4 Then dst1 = mask Or dst1
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim pad As Single = 0.05 ' pad the estimate by X cm's
+
+        dst2 = src.Clone
+        bpLine.Run(src)
+
+        If bpLine.lpList.Count > 0 Then
+            strOut = "Y range = " + Format(task.yRange, fmt3) + vbCrLf + vbCrLf
+            If task.heartBeat Then yList.Clear()
+            If task.heartBeat Then dst1.SetTo(0)
+            Dim h = dst2.Height / 2
+            For Each lp In bpLine.lpList
+                Dim nextY = task.yRange * (lp.p1.Y - h) / h
+                If Math.Abs(nextY) > task.yRange / 4 Then yList.Add(nextY)
+            Next
+
+            If yList.Count > 0 Then
+                If yList.Max > 0 Then rebuildMask("floor", yList.Max - pad, task.yRange)
+                If yList.Min < 0 Then rebuildMask("ceiling", -task.yRange, yList.Min + pad)
+            End If
+
+            dst2.SetTo(white, dst1)
+        End If
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_FCS_Lines1 : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        labels = {"", "Edge_Canny", "Line_Basics output", "Feature_Basics Output"}
+        desc = "Use lines as input to FCS."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.lines.Run(src)
+
+        task.features.Clear()
+        For Each lp In task.lpListOld
+            task.features.Add(lp.center)
+        Next
+
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        dst2.SetTo(white, task.lines.dst2)
+
+        For Each lp In task.lpList
+            DrawCircle(dst2, lp.center, task.DotSize, red, -1)
+            dst0.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+        Next
+
+        fpDisplayAge()
+        fpDisplayCell()
+
+        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Hough_Sudoku1 : Inherits TaskParent
+    Public Sub New()
+        desc = "FastLineDetect version for finding lines in the Sudoku input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = cv.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
+        task.lines.Run(dst3.Clone)
+        dst2 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
+        For Each lp In task.lpListOld
+            dst3.Line(lp.xp1, lp.xp2, cv.Scalar.Red, task.lineWidth, task.lineType)
+        Next
     End Sub
 End Class
