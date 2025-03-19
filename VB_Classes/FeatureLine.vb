@@ -26,8 +26,8 @@ End Class
 
 
 
-Public Class FeatureLine_Detector : Inherits TaskParent
-    Dim lines As New Line_Detector
+Public Class FeatureLine_BasicsRaw : Inherits TaskParent
+    Dim lines As New Line_BasicsRaw
     Dim lineDisp As New XO_Line_DisplayInfoOld
     Dim options As New Options_Features
     Dim match As New Match_tCell

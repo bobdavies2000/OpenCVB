@@ -171,6 +171,36 @@ Public Module vbc
 
         task.rcPixelThreshold = 0 ' task.gOptions.DebugSlider.Value / 1000
     End Sub
+
+
+
+    Public Function findEdgePoints(lp As lpData) As lpData
+        ' compute the edge to edge line - might be useful...
+        Dim yIntercept = lp.p1.Y - lp.slope * lp.p1.X
+        Dim w = task.cols, h = task.rows
+
+        Dim xp1 = New cv.Point2f(0, yIntercept)
+        Dim xp2 = New cv.Point2f(w, w * lp.slope + yIntercept)
+        Dim xIntercept = -yIntercept / lp.slope
+        If xp1.Y > h Then
+            xp1.X = (h - yIntercept) / lp.slope
+            xp1.Y = h
+        End If
+        If xp1.Y < 0 Then
+            xp1.X = xIntercept
+            xp1.Y = 0
+        End If
+
+        If xp2.Y > h Then
+            xp2.X = (h - yIntercept) / lp.slope
+            xp2.Y = h
+        End If
+        If xp2.Y < 0 Then
+            xp2.X = xIntercept
+            xp2.Y = 0
+        End If
+        Return New lpData(xp1, xp2)
+    End Function
 End Module
 
 
@@ -556,6 +586,7 @@ End Enum
 
 
 
+
 Public Class lpDataOld ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
     Public pt As cv.Point ' the point to use when identifying this line
     Public age As Integer
@@ -573,8 +604,6 @@ Public Class lpDataOld ' LineSegmentPoint in OpenCV does not use Point2f so this
     Public mmX As New mmData
     Public mmY As New mmData
     Public mmZ As New mmData
-    Public xp1 As cv.Point2f ' intercept points at the edges of the image.
-    Public xp2 As cv.Point2f
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
         p2 = _p2
@@ -598,32 +627,8 @@ Public Class lpDataOld ' LineSegmentPoint in OpenCV does not use Point2f so this
         Else
             slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
-        yIntercept = p1.Y - slope * p1.X
 
         length = p1.DistanceTo(p2)
-
-        ' compute the edge to edge line - might be useful...
-        Dim w = task.cols, h = task.rows
-        xp1 = New cv.Point2f(0, yIntercept)
-        xp2 = New cv.Point2f(w, w * slope + yIntercept)
-        xIntercept = -yIntercept / slope
-        If xp1.Y > h Then
-            xp1.X = (h - yIntercept) / slope
-            xp1.Y = h
-        End If
-        If xp1.Y < 0 Then
-            xp1.X = xIntercept
-            xp1.Y = 0
-        End If
-
-        If xp2.Y > h Then
-            xp2.X = (h - yIntercept) / slope
-            xp2.Y = h
-        End If
-        If xp2.Y < 0 Then
-            xp2.X = xIntercept
-            xp2.Y = 0
-        End If
 
         colorIndex = msRNG.Next(0, 255)
 
@@ -672,8 +677,7 @@ End Class
 
 
 Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
-    Public pt As cv.Point ' the point to use when identifying this line
-    Public center As cv.Point2f
+    Public center As cv.Point ' the point to use when identifying this line
     Public age As Integer
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
@@ -682,8 +686,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public index As Integer
 
 
-    Public xp1 As cv.Point2f ' intercept points at the edges of the image.
-    Public xp2 As cv.Point2f
     Public colorIndex As Integer
     Public rect As cv.Rect
 
@@ -695,7 +697,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             p1 = _p2
             p2 = _p1
         End If
-        pt = New cv.Point(CInt(p1.X), CInt(p1.Y))
         p1 = New cv.Point2f(p1.X, p1.Y)
         p2 = New cv.Point2f(p2.X, p2.Y)
 
@@ -705,6 +706,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
 
+        center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
         length = p1.DistanceTo(p2)
         age = 1
     End Sub

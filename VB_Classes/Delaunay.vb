@@ -2,12 +2,11 @@ Imports cv = OpenCvSharp
 Public Class Delaunay_Basics : Inherits TaskParent
     Public inputPoints As New List(Of cv.Point2f)
     Public facetList As New List(Of List(Of cv.Point))
-    Public facet32s As cv.Mat
     Public ptList As New List(Of cv.Point)
     Dim randEnum As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
-        facet32s = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -29,7 +28,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
                 nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            facet32s.FillConvexPoly(nextFacet, i, task.lineType)
+            dst3.FillConvexPoly(nextFacet, i, task.lineType)
             facetList.Add(nextFacet)
         Next
 
@@ -43,7 +42,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
             Next
         Next
 
-        dst2 = ShowPalette(facet32s)
+        dst2 = ShowPalette(dst3)
 
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
@@ -215,7 +214,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits TaskParent
         dst3.SetTo(0)
         Dim usedG As New List(Of Integer), g As Integer
         For Each pt In inputPoints
-            Dim index = facet.facet32s.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = facet.dst3.Get(Of Integer)(pt.Y, pt.X)
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
@@ -272,7 +271,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
         dst0.SetTo(0)
         Dim usedG As New List(Of Integer), g As Integer
         For Each lp In knn.matches
-            Dim index = facet.facet32s.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            Dim index = facet.dst3.Get(Of Integer)(lp.p2.Y, lp.p2.X)
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number

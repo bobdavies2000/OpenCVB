@@ -1,10 +1,10 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Dim lines As New Line_Detector
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines across frames using the motion mask."
+        desc = "Collect lines across frames using the motion mask.  Results are in task.lplist."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histogram As New cv.Mat
@@ -35,11 +35,17 @@ Public Class Line_Basics : Inherits TaskParent
             tmpList.Add(lp)
         Next
 
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each lp In tmpList
+            sortlines.Add(lp.length, lp)
+        Next
+
         index = 0
         task.lpList.Clear()
         dst2 = src
         For Each lp In tmpList
             lp.index = index
+            index += 1
             task.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
         Next
@@ -48,6 +54,46 @@ Public Class Line_Basics : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Line_BasicsRaw : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+    Public Sub New()
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src(subsetRect))
+
+        lpList.Clear()
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
+                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
+                Dim lp = New lpData(p1, p2)
+                lp.index = lpList.Count
+                lpList.Add(lp)
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+End Class
 
 
 
@@ -583,143 +629,41 @@ End Class
 
 
 
-Public Class Line_Stable : Inherits TaskParent
-    Dim lines As New Line_Detector
-    Public lpStable As New List(Of lpData)
-    Public ptStable As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Identify features that consistently present in the image - with motion ignored."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then dst1 = src.Clone Else src.CopyTo(dst1, task.motionMask)
-
-        lines.Run(dst1)
-
-        Static lpStable As New List(Of lpData)
-        Static ptStable As New List(Of cv.Point)
-        For j = 0 To lines.ptList.Count - 1
-            Dim pt = lines.ptList(j)
-            Dim lp = lines.lpList(j)
-            Dim index = ptStable.IndexOf(pt)
-            If index < 0 Then
-                lpStable.Add(lp)
-                ptStable.Add(pt)
-            Else
-                lp = lpStable(index)
-                lp.pt = pt
-                lp.age += 1
-                lpStable(index) = lp
-                ptStable(index) = pt
-            End If
-        Next
-
-        Dim removelist As New List(Of Integer)
-        For i = 0 To ptStable.Count - 1
-            Dim pt = ptStable(i)
-            If lines.ptList.Contains(pt) = False Then removelist.Add(i)
-        Next
-
-        For i = removelist.Count - 1 To 0 Step -1
-            Dim index = removelist(i)
-            lpStable.RemoveAt(index)
-            ptStable.RemoveAt(index)
-        Next
-
-        dst2 = src
-        dst3.SetTo(0)
-        For Each lp In lpStable
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
-            dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
-            SetTrueText(CStr(lp.age), lp.pt, 3)
-        Next
-
-        labels(3) = "There were " + CStr(lpStable.Count) + " stable lines found."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_Detector : Inherits TaskParent
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of lpData)
-    Public ptList As New List(Of cv.Point)
-    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src(subsetRect))
-
-        lpList.Clear()
-        ptList.Clear()
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
-                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
-                Dim lp = New lpData(p1, p2)
-                lp.index = lpList.Count
-                lpList.Add(lp)
-                ptList.Add(New cv.Point(CInt(lp.p1.X), CInt(lp.p1.Y)))
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Line_Info : Inherits TaskParent
     Public lpInput As New List(Of lpData)
     Public delaunay As New Delaunay_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(2) = "Click on the oversized line to get details about the line"
-        labels(3) = "Details from the point cloud for the selected line"
+        labels(3) = "The selected line with details."
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Display details about the line selected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then runLines(src)
-        labels(2) = task.lines.labels(2)
+        labels(2) = task.lines.labels(2) + " - click near the center (black dot) of any line."
 
         delaunay.inputPoints.Clear()
         For Each lp In task.lpList
-            delaunay.inputPoints.Add(lp.p1)
-            delaunay.inputPoints.Add(lp.p2)
+            delaunay.inputPoints.Add(lp.center)
         Next
         delaunay.Run(src)
 
-        dst2 = src
+        delaunay.dst3.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each lp In task.lpList
-            dst2.Line(lp.p1, lp.p2, white, 2, cv.LineTypes.Link8)
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+            DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor)
         Next
 
-        If task.mouseClickFlag Or task.firstPass Then
-            'Dim index = task.lines.lpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            'Dim lp = task.lpList(index)
+        If task.mouseClickFlag Or task.frameCount < 5 Then
+            strOut = "Click on any delaunay polygon at left to get details on that line " + vbCrLf
+            strOut += CStr(task.lpList.Count) + " lines found " + vbCrLf + vbCrLf
 
-            'strOut = "Click on any line (below left) to get details on that line " + vbCrLf
-            'strOut += "Lines identified in the image: " + CStr(task.lpList.Count) + vbCrLf + vbCrLf
-            'strOut += "index = " + CStr(lp.index) + vbCrLf
-            'strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf
+            Dim index = If(task.mouseClickFlag, delaunay.dst3.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X), 0)
+            Dim lp = task.lpList(index)
+
+            strOut += "Line ID = " + CStr(index) + " which should be equal to " + CStr(lp.index) + vbCrLf + vbCrLf
+
+            strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf
             'strOut += "Pointcloud range X " + Format(lp.mmX.minVal, fmt3) + " to " +
             '           Format(lp.mmX.maxVal, fmt3) + vbCrLf
             'strOut += "Pointcloud range Y " + Format(lp.mmY.minVal, fmt3) + " to " +
@@ -727,15 +671,15 @@ Public Class Line_Info : Inherits TaskParent
             'strOut += "Pointcloud range Z " + Format(lp.mmZ.minVal, fmt3) + " to " +
             '           Format(lp.mmZ.maxVal, fmt3) + vbCrLf + vbCrLf
 
-            'strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
+            strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
             'strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
             'strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
-            'strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
+            strOut += vbCrLf + "Remember: the Y-Axis is inverted - Y increases down so slopes are inverted."
 
-            'dst3.SetTo(0)
-            'DrawLine(dst3, lp.p1, lp.p2, 255)
-            'dst3.Rectangle(lp.rect, 255, task.lineWidth, task.lineType)
+            dst3.SetTo(0)
+            DrawLine(dst3, lp.p1, lp.p2, 255)
+            dst3.Rectangle(lp.rect, 255, task.lineWidth, task.lineType)
         End If
-        SetTrueText(strOut, 1)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

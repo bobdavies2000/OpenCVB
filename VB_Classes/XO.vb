@@ -95,7 +95,6 @@ End Class
 
 
 
-
 Public Class XO_Horizon_FindNonZero : Inherits TaskParent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3
@@ -132,7 +131,8 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
             Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
             Dim lp = New lpData(p1, p2)
-            task.horizonVec = New lpData(lp.xp1, lp.xp2)
+            Dim lpTmp = findEdgePoints(lp)
+            task.horizonVec = New lpData(lpTmp.p1, lpTmp.p2)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
@@ -154,7 +154,8 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
                 task.gravityVec = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
             Else
                 Dim lp = New lpData(p1, p2)
-                task.gravityVec = New lpData(lp.xp1, lp.xp2)
+                Dim lpTmp = findEdgePoints(lp)
+                task.gravityVec = New lpData(lpTmp.p1, lpTmp.p2)
             End If
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
@@ -274,7 +275,8 @@ Public Class XO_Horizon_Basics : Inherits TaskParent
             strOut = "Horizon not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
             Dim lp = New lpData(p1, p2)
-            vec = New lpData(lp.xp1, lp.xp2)
+            Dim lpTmp = findEdgePoints(lp)
+            vec = New lpData(lpTmp.p1, lpTmp.p2)
             If standaloneTest() Or autoDisplay Then
                 displayResults(p1, p2)
                 displayResults(New cv.Point(-p1.Y, p1.X), New cv.Point(p2.Y, -p2.X))
@@ -397,7 +399,8 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
             strOut += "Using the previous value for the gravity vector."
         Else
             Dim lp = New lpData(p1, p2)
-            task.gravityVec = New lpData(lp.xp1, lp.xp2)
+            Dim lpTmp = findEdgePoints(lp)
+            task.gravityVec = New lpData(lpTmp.p1, lpTmp.p2)
             If standaloneTest() Then displayResults(p1, p2)
         End If
 
@@ -668,7 +671,8 @@ Public Class XO_Gravity_BasicsOriginal : Inherits TaskParent
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
         Dim lp = New lpData(p1, p2)
-        vec = New lpData(lp.xp1, lp.xp2)
+        Dim lpTmp = findEdgePoints(lp)
+        vec = New lpData(lpTmp.p1, lpTmp.p2)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
@@ -855,7 +859,7 @@ End Class
 
 
 
-Public Class XO_Line_DetectorOld : Inherits TaskParent
+Public Class XO_Line_BasicsRawOld : Inherits TaskParent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of lpData)
     Public ptList As New List(Of cv.Point)
@@ -899,89 +903,6 @@ Public Class XO_Line_DetectorOld : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class XO_Line_Stable1 : Inherits TaskParent
-    Dim lines As New Line_Detector
-    Public lpStable As New List(Of lpData)
-    Public ptStable As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Identify features that consistently present in the image - with motion ignored."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lpSets As New List(Of List(Of lpData))
-        Static ptSets As New List(Of List(Of cv.Point))
-
-        If task.optionsChanged Then
-            lpSets.Clear()
-            ptSets.Clear()
-            dst1 = src.Clone
-        Else
-            src.CopyTo(dst1, task.motionMask)
-        End If
-
-        lines.Run(dst1)
-
-        Dim ageThreshold = task.gOptions.FrameHistory.Value
-
-        Static lpStable As New List(Of lpData)
-        Static ptStable As New List(Of cv.Point)
-        For j = 0 To lines.ptList.Count - 1
-            Dim pt = lines.ptList(j)
-            Dim lp = lines.lpList(j)
-
-            Dim age As Integer = 0
-            For i = ptSets.Count - 1 To 0 Step -1
-                If ptSets(i).Contains(pt) Then age += 1
-            Next
-
-            If age = ageThreshold Then
-                Dim index = ptStable.IndexOf(pt)
-                If index < 0 Then
-                    lpStable.Add(lp)
-                    ptStable.Add(pt)
-                Else
-                    lp = lpStable(index)
-                    lp.pt = pt
-                    lp.age += 1
-                    lpStable(index) = lp
-                    ptStable(index) = pt
-                End If
-            End If
-        Next
-
-        Dim removelist As New List(Of Integer)
-        For i = 0 To ptStable.Count - 1
-            Dim pt = ptStable(i)
-            If lines.ptList.Contains(pt) = False Then removelist.Add(i)
-        Next
-
-        For i = removelist.Count - 1 To 0 Step -1
-            Dim index = removelist(i)
-            lpStable.RemoveAt(index)
-            ptStable.RemoveAt(index)
-        Next
-        dst2 = src
-        dst3.SetTo(0)
-        For Each lp In lpStable
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
-            dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth)
-            ' SetTrueText(CStr(lp.age), lp.pt, 3)
-        Next
-
-        lpSets.Add(lines.lpList)
-        ptSets.Add(lines.ptList)
-
-        If ptSets.Count > task.gOptions.FrameHistory.Value Then
-            ptSets.RemoveAt(0)
-            lpSets.RemoveAt(0)
-        End If
-        labels(3) = "There were " + CStr(lpStable.Count) + " stable lines found."
-    End Sub
-End Class
 
 
 
@@ -1729,7 +1650,7 @@ End Class
 
 
 Public Class XO_Line_Core : Inherits TaskParent
-    Dim lines As New XO_Line_DetectorOld
+    Dim lines As New XO_Line_BasicsRawOld
     Public lpList As New List(Of lpData)
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public Sub New()
@@ -1775,7 +1696,7 @@ Public Class XO_Line_Core : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_Detector in the current image with " +
+            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_BasicsRaw in the current image with " +
                             CStr(lpList.Count) + " after filtering with the motion mask."
         End If
     End Sub
@@ -1820,7 +1741,7 @@ End Class
 
 Public Class XO_BackProject_LineSide : Inherits TaskParent
     Dim line As New XO_Line_ViewSide
-    Public lpList As New List(Of lpDataOld)
+    Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Backproject the lines found in the side view."
@@ -1831,9 +1752,10 @@ Public Class XO_BackProject_LineSide : Inherits TaskParent
         dst2.SetTo(0)
         Dim w = task.lineWidth + 5
         lpList.Clear()
-        For Each lp In task.lpListOld
+        For Each lp In task.lpList
             If Math.Abs(lp.slope) < 0.1 Then
-                dst2.Line(lp.xp1, lp.xp2, 255, w, task.lineType)
+                Dim lpTmp = findEdgePoints(lp)
+                dst2.Line(lpTmp.p1, lpTmp.p2, 255, w, task.lineType)
                 lpList.Add(lp)
             End If
         Next
@@ -1951,8 +1873,9 @@ Public Class XO_Hough_Sudoku1 : Inherits TaskParent
         task.lines.Run(dst3.Clone)
         dst2 = task.lines.dst2
         labels(2) = task.lines.labels(2)
-        For Each lp In task.lpListOld
-            dst3.Line(lp.xp1, lp.xp2, cv.Scalar.Red, task.lineWidth, task.lineType)
+        For Each lp In task.lpList
+            Dim lpTmp = findEdgePoints(lp)
+            dst3.Line(lpTmp.p1, lpTmp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

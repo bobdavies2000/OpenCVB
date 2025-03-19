@@ -19,7 +19,7 @@ Public Class Stable_Basics : Inherits TaskParent
         ptList.Clear()
         Dim generations As New List(Of Integer)
         For Each pt In facetGen.inputPoints
-            Dim fIndex = facetGen.facet.facet32s.Get(Of Integer)(pt.Y, pt.X)
+            Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
             If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new point
             Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             generations.Add(g)

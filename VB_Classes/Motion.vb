@@ -915,13 +915,13 @@ Public Class Motion_CenterRotation : Inherits TaskParent
             Dim botPoint = tmp.Get(Of cv.Point)(tmp.Rows - 1, 0)
 
             Dim pair = New lpData(topPoint, botPoint)
-            mp = New lpData(pair.xp1, pair.xp2)
+            mp = findEdgePoints(pair)
             dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
 
             Dim sideAdjacent = dst2.Height
-            Dim sideOpposite = mp.xp1.X - mp.xp2.X
+            Dim sideOpposite = mp.p1.X - mp.p2.X
             angle = Math.Atan(sideOpposite / sideAdjacent) * 180 / cv.Cv2.PI
-            If mp.xp1.Y = dst2.Height Then angle = -angle
+            If mp.p1.Y = dst2.Height Then angle = -angle
             rotatedRect = New cv.RotatedRect(mm.maxLoc, task.centerRect.Size, angle)
             labels(3) = "angle = " + Format(angle, fmt1) + " degrees"
             drawRotate.rr = rotatedRect
