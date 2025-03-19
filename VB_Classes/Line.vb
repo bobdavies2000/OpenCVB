@@ -12,11 +12,9 @@ Public Class Line_Basics : Inherits TaskParent
         lines.Run(task.grayMotion)
 
         Dim lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim index As Integer = 1
         Dim tmpList As New List(Of lpData)(lines.lpList)
         For Each lp In lines.lpList
-            lpMap.Line(lp.p1, lp.p2, index, task.lineWidth, cv.LineTypes.Link4)
-            index += 1
+            lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
         Next
 
         cv.Cv2.CalcHist({lpMap}, {0}, task.motionMask, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(1, lines.lpList.Count)})
@@ -40,12 +38,10 @@ Public Class Line_Basics : Inherits TaskParent
             sortlines.Add(lp.length, lp)
         Next
 
-        index = 0
         task.lpList.Clear()
         dst2 = src
         For Each lp In tmpList
-            lp.index = index
-            index += 1
+            lp.index = task.lpList.Count
             task.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
         Next
@@ -53,6 +49,7 @@ Public Class Line_Basics : Inherits TaskParent
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
     End Sub
 End Class
+
 
 
 
@@ -662,6 +659,7 @@ Public Class Line_Info : Inherits TaskParent
             Dim lp = task.lpList(index)
 
             strOut += "Line ID = " + CStr(index) + " which should be equal to " + CStr(lp.index) + vbCrLf + vbCrLf
+            strOut += "Age = " + CStr(lp.age) + vbCrLf
 
             strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf
             'strOut += "Pointcloud range X " + Format(lp.mmX.minVal, fmt3) + " to " +
