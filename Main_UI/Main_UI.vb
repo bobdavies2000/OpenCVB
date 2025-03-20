@@ -947,6 +947,7 @@ Public Class Main_UI
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
+#If AZURE_SUPPORT Then
         Dim K4ADLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
         If K4ADLL.Exists = False Then
             MsgBox("The Microsoft installer for the Kinect 4 Azure camera proprietary portion" + vbCrLf +
@@ -959,6 +960,7 @@ Public Class Main_UI
         Else
             updatePath(K4ADLL.Directory.FullName, "Kinect depth engine dll.")
         End If
+#End If
         ' check pathlist here if there is any problem with dll not found.
     End Sub
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -1405,8 +1407,10 @@ Public Class Main_UI
             cameraName = "Intel(R) RealSense(TM) Depth Camera"
         End If
         Select Case cameraName
+#If AZURE_SUPPORT Then
             Case "Azure Kinect 4K"
                 Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
+#End If
             Case "Intel(R) RealSense(TM) Depth Camera"
                 Return New CameraRS2(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Oak-D camera"

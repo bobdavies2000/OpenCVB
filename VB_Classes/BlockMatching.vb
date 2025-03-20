@@ -13,9 +13,11 @@ Public Class BlockMatching_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
 
+#If AZURE_SUPPORT Then
         If task.cameraName = "Azure Kinect 4K" Then
             SetTrueText("For the K4A 4 Azure camera, the left and right views are the same.")
         End If
+#End If
 
         Static blockMatch = cv.StereoBM.Create()
         blockMatch.BlockSize = options.blockSize

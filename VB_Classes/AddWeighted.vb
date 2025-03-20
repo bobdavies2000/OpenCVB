@@ -65,8 +65,7 @@ Public Class AddWeighted_Accumulate : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        src.ConvertTo(dst3, cv.MatType.CV_32F)
+        task.gray.ConvertTo(dst3, cv.MatType.CV_32F)
         cv.Cv2.AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         labels(2) = "Accumulated gray scale image"

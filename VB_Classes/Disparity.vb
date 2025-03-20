@@ -60,17 +60,12 @@ End Class
 Public Class Disparity_Features : Inherits TaskParent
     Dim featNo As New Feature_NoMotion
     Public Sub New()
-        optiBase.findRadio("GoodFeatures (ShiTomasi) grid").Checked = True
         desc = "Use features in grid cells to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        featNo.Run(task.leftView)
-        dst2 = featNo.dst2.Clone
+        runFeature(src)
+        dst2 = task.feat.dst3
         labels(2) = featNo.labels(2)
-
-        'For Each r In task.gCell.gridRects
-        '    dst2.Rectangle(r, 255, task.lineWidth)
-        'Next
 
         featNo.Run(task.rightView)
         dst3 = featNo.dst2

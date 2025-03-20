@@ -39,11 +39,14 @@ Public Class Options
         Me.Close()
     End Sub
     Public Sub defineCameraResolutions(index As Integer)
+#If AZURE_SUPPORT Then
         If Main_UI.cameraNames(index).StartsWith("Azure Kinect 4K") Then
             Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True, True,
                                                         True, True, False, False, False,
                                                         False, False, False, False, False, False})
-        ElseIf Main_UI.cameraNames(index).StartsWith("StereoLabs ZED 2/2i") Then
+        Else
+#End If
+        If Main_UI.cameraNames(index).StartsWith("StereoLabs ZED 2/2i") Then
             Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
                                                         True, True, True, False, False, False,
                                                         True, True, True, True, True, True})
@@ -98,10 +101,12 @@ Public Class Options
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, True, True, True,
                                                         False, False, False, False, False, False})
+#If AZURE_SUPPORT Then
             Case "Azure Kinect 4K"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True, True,
                                                         True, True, False, False, False,
                                                         False, False, False, False, False, False})
+#End If
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)

@@ -6,7 +6,7 @@ if errorlevel 1 goto errorNoPython
 :: Reaching here means Python is installed.
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
 
-rem echo "OpenCVB requires that .Net Framework 3.5 be installed."
+rem echo "OpenCVB requires that .Net Framework 3.5 or later to be installed."
 rem echo "You need to check before installing OpenCVB."
 rem echo "When you close the optionalfeatures window, OpenCVB will install."
 rem start /wait optionalfeatures.exe
@@ -30,10 +30,6 @@ if not exist OrbbecSDK (
 if not exist OrbbecSDK_CSharp (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK_CSharp.git"
 ) 
-
-if not exist Azure-Kinect-Sensor-SDK (
-	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/microsoft/Azure-Kinect-Sensor-SDK"
-)
 
 if not exist OakD\depthai-core (
 	cd OakD
@@ -67,11 +63,15 @@ if not exist OrbbecSDK_CSharp\Build (
 	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Release
 )
 
-if not exist Azure-Kinect-Sensor-SDK\Build (
-	cmake -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
-	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
-	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Release
-)
+rem if not exist Azure-Kinect-Sensor-SDK (
+rem 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/microsoft/Azure-Kinect-Sensor-SDK"
+rem )
+
+rem if not exist Azure-Kinect-Sensor-SDK\Build (
+rem 	cmake -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
+rem 	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
+rem 	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Release
+rem )
 
 if not exist OakD\Build (
 	cmake -S OakD -B OakD\Build -DOpenCV_DIR='%CD%/opencv/Build/'

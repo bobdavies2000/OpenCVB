@@ -36,10 +36,13 @@ Public Class OptionsRedCloud
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
+#If AZURE_SUPPORT Then
         If task.cameraName.StartsWith("Azure Kinect 4K") Then
             task.xRange = 4.4
             task.yRange = 1.5
-        ElseIf task.cameraName.StartsWith("StereoLabs ZED 2/2i") Then
+        Else
+#End If
+        If task.cameraName.StartsWith("StereoLabs ZED 2/2i") Then
             task.xRange = 4
             task.yRange = 1.5
         Else

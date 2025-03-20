@@ -330,8 +330,10 @@ Public Class VBtask : Implements IDisposable
     End Structure
 
     Public Structure algParms
-        Public Shared cameraNames As New List(Of String)({"Azure Kinect 4K",
-                                                          "Intel(R) RealSense(TM) Depth Camera 435i",
+#If AZURE_SUPPORT Then
+        "Azure Kinect 4K",
+#End If
+        Public Shared cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
                                                           "Intel(R) RealSense(TM) Depth Camera 455",
                                                           "Oak-D camera",
                                                           "StereoLabs ZED 2/2i",
@@ -506,8 +508,10 @@ Public Class VBtask : Implements IDisposable
                 task.defaultLowResColorDifference = 6
             Case "MYNT-EYE-D1000"
                 task.defaultLowResColorDifference = 6
+#If AZURE_SUPPORT Then
             Case "Azure Kinect 4K"
                 task.defaultLowResColorDifference = 6
+#End If
         End Select
 
         mainFormLocation = parms.mainFormLocation

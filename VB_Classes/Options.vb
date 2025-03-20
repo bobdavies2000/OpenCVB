@@ -4190,10 +4190,12 @@ Public Class Options_BrightnessContrast : Inherits OptionParent
             alphaDefault = 500
             betaDefault = 0
         End If
+#If AZURE_SUPPORT Then
         If task.cameraName = "Azure Kinect 4K" Then
             alphaDefault = 600
             betaDefault = 0
         End If
+#End If
         If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Alpha (contrast)", 0, 10000, alphaDefault)
