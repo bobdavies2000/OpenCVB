@@ -887,7 +887,6 @@ Public Class XO_Line_BasicsRawOld : Inherits TaskParent
                 Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
                 Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
                 Dim lp = New lpData(p1, p2)
-                lp.rect = ValidateRect(lp.rect)
                 lp.index = lpList.Count
                 lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
                 lpList.Add(lp)
@@ -1539,23 +1538,23 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
         z1List.Clear()
         z2List.Clear()
         For Each lp In task.lpList
-            If lp.rect.Width = 0 Then Continue For ' skip placeholder
-            Dim mask = New cv.Mat(New cv.Size(lp.rect.Width, lp.rect.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-            mask.Line(New cv.Point(CInt(lp.p1.X - lp.rect.X), CInt(lp.p1.Y - lp.rect.Y)),
-                          New cv.Point(CInt(lp.p2.X - lp.rect.X), CInt(lp.p2.Y - lp.rect.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
-            Dim mean = task.pointCloud(lp.rect).Mean(mask)
+            Dim rect = findRectFromLine(lp)
+            Dim mask = New cv.Mat(New cv.Size(rect.Width, rect.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            mask.Line(New cv.Point(CInt(lp.p1.X - rect.X), CInt(lp.p1.Y - rect.Y)),
+                          New cv.Point(CInt(lp.p2.X - rect.X), CInt(lp.p2.Y - rect.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
+            Dim mean = task.pointCloud(rect).Mean(mask)
 
             If mean <> New cv.Scalar Then
-                Dim mmX = GetMinMax(task.pcSplit(0)(lp.rect), mask)
-                Dim mmY = GetMinMax(task.pcSplit(1)(lp.rect), mask)
+                Dim mmX = GetMinMax(task.pcSplit(0)(rect), mask)
+                Dim mmY = GetMinMax(task.pcSplit(1)(rect), mask)
                 Dim len1 = mmX.minLoc.DistanceTo(mmX.maxLoc)
                 Dim len2 = mmY.minLoc.DistanceTo(mmY.maxLoc)
                 If len1 > len2 Then
-                    lp.p1 = New cv.Point(mmX.minLoc.X + lp.rect.X, mmX.minLoc.Y + lp.rect.Y)
-                    lp.p2 = New cv.Point(mmX.maxLoc.X + lp.rect.X, mmX.maxLoc.Y + lp.rect.Y)
+                    lp.p1 = New cv.Point(mmX.minLoc.X + rect.X, mmX.minLoc.Y + rect.Y)
+                    lp.p2 = New cv.Point(mmX.maxLoc.X + rect.X, mmX.maxLoc.Y + rect.Y)
                 Else
-                    lp.p1 = New cv.Point(mmY.minLoc.X + lp.rect.X, mmY.minLoc.Y + lp.rect.Y)
-                    lp.p2 = New cv.Point(mmY.maxLoc.X + lp.rect.X, mmY.maxLoc.Y + lp.rect.Y)
+                    lp.p1 = New cv.Point(mmY.minLoc.X + rect.X, mmY.minLoc.Y + rect.Y)
+                    lp.p2 = New cv.Point(mmY.maxLoc.X + rect.X, mmY.maxLoc.Y + rect.Y)
                 End If
                 If lp.p1.DistanceTo(lp.p2) > 1 Then
                     DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
@@ -1877,5 +1876,91 @@ Public Class XO_Hough_Sudoku1 : Inherits TaskParent
             Dim lpTmp = findEdgePoints(lp)
             dst3.Line(lpTmp.p1, lpTmp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         Next
+    End Sub
+End Class
+
+
+
+
+Public Class XO_Line_InterceptsUI : Inherits TaskParent
+    Dim lines As New Line_Intercepts
+    Dim p2 As cv.Point
+    Dim redRadio As System.Windows.Forms.RadioButton
+    Dim greenRadio As System.Windows.Forms.RadioButton
+    Dim yellowRadio As System.Windows.Forms.RadioButton
+    Dim blueRadio As System.Windows.Forms.RadioButton
+    Public Sub New()
+        redRadio = optiBase.findRadio("Show Top intercepts")
+        greenRadio = optiBase.findRadio("Show Bottom intercepts")
+        yellowRadio = optiBase.findRadio("Show Right intercepts")
+        blueRadio = optiBase.findRadio("Show Left intercepts")
+        labels(2) = "Use mouse in right image to highlight lines"
+        desc = "An alternative way to highlight line segments with common slope"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
+        dst3.SetTo(0)
+
+        Dim red = New cv.Scalar(0, 0, 255)
+        Dim green = New cv.Scalar(1, 128, 0)
+        Dim yellow = New cv.Scalar(2, 255, 255)
+        Dim blue = New cv.Scalar(254, 0, 0)
+
+        Dim center = New cv.Point(dst3.Width / 2, dst3.Height / 2)
+        dst3.Line(New cv.Point(0, 0), center, blue, task.lineWidth, cv.LineTypes.Link4)
+        dst3.Line(New cv.Point(dst2.Width, 0), center, red, task.lineWidth, cv.LineTypes.Link4)
+        dst3.Line(New cv.Point(0, dst2.Height), center, blue, task.lineWidth, cv.LineTypes.Link4)
+        dst3.Line(New cv.Point(dst2.Width, dst2.Height), center, yellow, task.lineWidth, cv.LineTypes.Link4)
+
+        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, cv.Scalar.All(0))
+        Dim pt = New cv.Point(center.X, center.Y - 30)
+        cv.Cv2.FloodFill(dst3, mask, pt, red, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X, center.Y + 30)
+        cv.Cv2.FloodFill(dst3, mask, pt, green, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X - 30, center.Y)
+        cv.Cv2.FloodFill(dst3, mask, pt, blue, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X + 30, center.Y)
+        cv.Cv2.FloodFill(dst3, mask, pt, yellow, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+        Dim color = dst3.Get(Of cv.Vec3b)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+
+        Dim p1 = task.mouseMovePoint
+        If p1.X = center.X Then
+            If p1.Y <= center.Y Then p2 = New cv.Point(dst3.Width / 2, 0) Else p2 = New cv.Point(dst3.Width, dst3.Height)
+        Else
+            Dim m = (center.Y - p1.Y) / (center.X - p1.X)
+            Dim b = p1.Y - p1.X * m
+
+            If color(0) = 0 Then p2 = New cv.Point(-b / m, 0) ' red zone
+            If color(0) = 1 Then p2 = New cv.Point((dst3.Height - b) / m, dst3.Height) ' green
+            If color(0) = 2 Then p2 = New cv.Point(dst3.Width, dst3.Width * m + b) ' yellow
+            If color(0) = 254 Then p2 = New cv.Point(0, b) ' blue
+            DrawLine(dst3, center, p2, cv.Scalar.Black)
+        End If
+        DrawCircle(dst3, center, task.DotSize, white)
+        If color(0) = 0 Then redRadio.Checked = True
+        If color(0) = 1 Then greenRadio.Checked = True
+        If color(0) = 2 Then yellowRadio.Checked = True
+        If color(0) = 254 Then blueRadio.Checked = True
+
+        For Each inter In lines.intercept
+            Select Case lines.options.selectedIntercept
+                Case 0
+                    dst3.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), white,
+                             task.lineWidth)
+                Case 1
+                    dst3.Line(New cv.Point(inter.Key, dst3.Height), New cv.Point(inter.Key, dst3.Height - 10),
+                             white, task.lineWidth)
+                Case 2
+                    dst3.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), white,
+                             task.lineWidth)
+                Case 3
+                    dst3.Line(New cv.Point(dst3.Width, inter.Key), New cv.Point(dst3.Width - 10, inter.Key),
+                             white, task.lineWidth)
+            End Select
+        Next
+        dst2 = lines.dst2
     End Sub
 End Class

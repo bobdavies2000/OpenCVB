@@ -172,6 +172,13 @@ Public Module vbc
         task.rcPixelThreshold = 0 ' task.gOptions.DebugSlider.Value / 1000
     End Sub
 
+    Public Function findRectFromLine(lp As lpData) As cv.Rect
+        Dim rect = New cv.Rect(lp.p1.X, lp.p1.Y, Math.Abs(lp.p1.X - lp.p2.X), Math.Abs(lp.p1.Y - lp.p2.Y))
+        If lp.p1.Y > lp.p2.Y Then rect = New cv.Rect(lp.p1.X, lp.p2.Y, rect.Width, rect.Height)
+        If rect.Width < 2 Then rect.Width = 2
+        If rect.Height < 2 Then rect.Height = 2
+        Return rect
+    End Function
 
 
     Public Function findEdgePoints(lp As lpData) As lpData
@@ -687,7 +694,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
 
 
     Public colorIndex As Integer
-    Public rect As cv.Rect
 
 
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)

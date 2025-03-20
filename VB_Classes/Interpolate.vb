@@ -113,7 +113,6 @@ End Class
 
 
 Public Class Interpolate_Lines : Inherits TaskParent
-    Dim lines as new Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
         optiBase.FindSlider("Interpolation Resize %").Value = 80
@@ -125,8 +124,8 @@ Public Class Interpolate_Lines : Inherits TaskParent
         dst1 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size)
         dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, cv.ThresholdTypes.Binary)
 
-        lines.Run(dst1)
-        dst2 = lines.dst2
+        task.lines.Run(dst1)
+        dst2 = task.lines.dst2
         dst3 = src
 
         For Each lp In task.lpList

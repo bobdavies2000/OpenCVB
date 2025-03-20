@@ -2,40 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
-    Public options As New Options_Features
-    Dim method As New Feature_Methods
-    Public Sub New()
-        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find good features to track in a BGR image using the motion mask+"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        dst2 = src.Clone
-
-        method.Run(src)
-
-        task.features.Clear()
-        task.featurePoints.Clear()
-        dst3.SetTo(0)
-        For Each pt In task.features
-            task.features.Add(pt)
-            task.featurePoints.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
-
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
-        Next
-
-        labels(2) = method.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_Methods : Inherits TaskParent
     Dim harris As Corners_HarrisDetector_CPP
     Dim FAST As Corners_Basics
     Dim featureMethod As New Options_FeatureGather
@@ -43,6 +9,8 @@ Public Class Feature_Methods : Inherits TaskParent
     Public options As New Options_Features
     Dim methodList As New List(Of Integer)({})
     Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "CV_8U mask with all the features present."
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -58,7 +26,6 @@ Public Class Feature_Methods : Inherits TaskParent
                 Exit For
             End If
         Next
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim features As New List(Of cv.Point2f)
         Dim ptNew As New List(Of cv.Point2f)
@@ -69,16 +36,16 @@ Public Class Feature_Methods : Inherits TaskParent
 
         Select Case featureSource
             Case FeatureSrc.GoodFeaturesFull
-                features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality,
-                                                       options.minDistance, New cv.Mat,
-                                                       options.blockSize, True, options.k).ToList
+                features = cv.Cv2.GoodFeaturesToTrack(task.gray, options.featurePoints, options.quality,
+                                                      options.minDistance, New cv.Mat,
+                                                      options.blockSize, True, options.k).ToList
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.GoodFeaturesGrid
                 options.featurePoints = 4
                 features.Clear()
                 For i = 0 To task.gridRects.Count - 1
                     Dim roi = task.gridRects(i)
-                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cv.Mat,
+                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(task.gray(roi), options.featurePoints, options.quality, options.minDistance, New cv.Mat,
                                                                  options.blockSize, True, options.k).ToList
                     For j = 0 To tmpFeatures.Count - 1
                         features.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
@@ -108,31 +75,40 @@ Public Class Feature_Methods : Inherits TaskParent
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.BRISK
                 If brisk Is Nothing Then brisk = New BRISK_Basics
-                brisk.Run(src)
+                brisk.Run(task.gray)
                 features = brisk.features
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.Harris
                 If harris Is Nothing Then harris = New Corners_HarrisDetector_CPP
-                harris.Run(src)
+                harris.Run(task.gray)
                 features = harris.features
                 labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
             Case FeatureSrc.FAST
                 If FAST Is Nothing Then FAST = New Corners_Basics
-                FAST.Run(src)
+                FAST.Run(task.gray)
                 features = FAST.features
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
         End Select
 
-        For Each pt In features
-            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val = 255 Then ptNew.Add(pt)
-        Next
+        If task.optionsChanged Or ptNew.Count = 0 Then
+            For Each pt In features
+                ptNew.Add(pt)
+            Next
+        Else
+            For Each pt In features
+                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val = 255 Then ptNew.Add(pt)
+            Next
+        End If
 
         task.features.Clear()
         task.featurePoints.Clear()
+        dst3.SetTo(0)
         For Each pt In ptNew
             task.features.Add(pt)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
         If standaloneTest() Then
@@ -154,7 +130,7 @@ End Class
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_NoMotionTest : Inherits TaskParent
     Public options As New Options_Features
-    Dim method As New Feature_Methods
+    Dim method As New Feature_Basics
     Public Sub New()
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
@@ -675,7 +651,7 @@ Public Class Feature_Matching : Inherits TaskParent
     Public features As New List(Of cv.Point)
     Public motionPoints As New List(Of cv.Point)
     Dim match As New Match_Basics
-    Dim method As New Feature_Methods
+    Dim feat As New Feature_Basics
     Dim options As New Options_MatchCorrelation
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 150
@@ -705,7 +681,7 @@ Public Class Feature_Matching : Inherits TaskParent
                     " were matched to the previous frame"
 
         If matched.Count < match.options.featurePoints / 2 Then
-            method.Run(src)
+            feat.Run(src)
             features = task.featurePoints
         Else
             features = New List(Of cv.Point)(matched)
@@ -907,7 +883,6 @@ End Class
 
 Public Class Feature_NoMotion : Inherits TaskParent
     Public options As New Options_Features
-    Dim method As New Feature_Methods
     Public Sub New()
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         task.gOptions.UseMotionMask.Checked = False
@@ -918,7 +893,7 @@ Public Class Feature_NoMotion : Inherits TaskParent
         options.RunOpt()
         dst2 = src.Clone
 
-        method.Run(src)
+        runFeature(src)
 
         dst3.SetTo(0)
         For Each pt In task.featurePoints
@@ -926,7 +901,7 @@ Public Class Feature_NoMotion : Inherits TaskParent
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
-        labels(2) = method.labels(2)
+        labels(2) = task.feat.labels(2)
     End Sub
 End Class
 

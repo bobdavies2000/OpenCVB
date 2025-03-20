@@ -14,8 +14,7 @@ Public Class Corners_Basics : Inherits TaskParent
         options.RunOpt()
 
         dst2 = src.Clone
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src, task.FASTthreshold, optionCorner.useNonMax)
+        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, task.FASTthreshold, optionCorner.useNonMax)
 
         features.Clear()
         For Each kp As cv.KeyPoint In kpoints
@@ -51,13 +50,12 @@ Public Class Corners_Harris : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        mc = New cv.Mat(gray.Size(), cv.MatType.CV_32FC1, 0)
-        dst2 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        cv.Cv2.CornerEigenValsAndVecs(gray, dst2, options.blockSize, options.aperture, cv.BorderTypes.Default)
+        mc = New cv.Mat(task.gray.Size(), cv.MatType.CV_32FC1, 0)
+        dst2 = New cv.Mat(task.gray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        cv.Cv2.CornerEigenValsAndVecs(task.gray, dst2, options.blockSize, options.aperture, cv.BorderTypes.Default)
 
-        For y = 0 To gray.Rows - 1
-            For x = 0 To gray.Cols - 1
+        For y = 0 To task.gray.Rows - 1
+            For x = 0 To task.gray.Cols - 1
                 Dim lambda_1 = dst2.Get(Of cv.Vec6f)(y, x)(0)
                 Dim lambda_2 = dst2.Get(Of cv.Vec6f)(y, x)(1)
                 mc.Set(Of Single)(y, x, lambda_1 * lambda_2 - 0.04 * Math.Pow(lambda_1 + lambda_2, 2))
@@ -68,8 +66,8 @@ Public Class Corners_Harris : Inherits TaskParent
 
         src.CopyTo(dst2)
         Dim count As Integer
-        For y = 0 To gray.Rows - 1
-            For x = 0 To gray.Cols - 1
+        For y = 0 To task.gray.Rows - 1
+            For x = 0 To task.gray.Cols - 1
                 If mc.Get(Of Single)(y, x) > mm.minVal + (mm.maxVal - mm.minVal) * options.quality / options.qualityMax Then
                     DrawCircle(dst2, New cv.Point(x, y), task.DotSize, task.HighlightColor)
                     count += 1
@@ -99,15 +97,14 @@ Public Class Corners_PreCornerDetect : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim prob As New cv.Mat
-        cv.Cv2.PreCornerDetect(gray, prob, options.kernelSize)
+        cv.Cv2.PreCornerDetect(task.gray, prob, options.kernelSize)
 
         cv.Cv2.Normalize(prob, prob, 0, 255, cv.NormTypes.MinMax)
-        prob.ConvertTo(gray, cv.MatType.CV_8U)
-        median.Run(gray.Clone())
-        dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        prob.ConvertTo(task.gray, cv.MatType.CV_8U)
+        median.Run(task.gray.Clone())
+        dst2 = task.gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         labels(3) = "median = " + CStr(median.medianVal)
     End Sub
 End Class
@@ -125,11 +122,9 @@ Public Class Corners_ShiTomasi_CPP : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Dim data(src.Total - 1) As Byte
+        Dim data(task.gray.Total - 1) As Byte
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
-        Marshal.Copy(src.Data, data, 0, data.Length)
+        Marshal.Copy(task.gray.Data, data, 0, data.Length)
         Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols,
                                          options.blocksize, options.aperture)
         handle.Free()
@@ -158,12 +153,11 @@ Public Class Corners_BasicsCentroid : Inherits TaskParent
         For Each pt In fast.features
             DrawCircle(dst3, pt, task.DotSize + 2, white)
         Next
-        Dim gray = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim m = cv.Cv2.Moments(gray, True)
+        Dim m = cv.Cv2.Moments(task.gray, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             task.kalman.kInput(0) = m.M10 / m.M00
             task.kalman.kInput(1) = m.M01 / m.M00
-            task.kalman.Run(src)
+            task.kalman.Run(task.gray)
             DrawCircle(dst3, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), 10, cv.Scalar.Red)
         End If
     End Sub
@@ -290,9 +284,8 @@ Public Class Corners_HarrisDetector_CPP : Inherits TaskParent
 
         dst2 = src.Clone
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim dataSrc(src.Total) As Byte
-        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Dim dataSrc(task.gray.Total) As Byte
+        Marshal.Copy(task.gray.Data, dataSrc, 0, dataSrc.Length)
 
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim imagePtr = Harris_Detector_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.quality)

@@ -13,8 +13,7 @@ Public Class BRISK_Basics : Inherits TaskParent
 
         src.CopyTo(dst2)
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        Dim keyPoints = brisk.Detect(src)
+        Dim keyPoints = brisk.Detect(task.gray)
 
         features.Clear()
         For Each pt In keyPoints

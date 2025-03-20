@@ -373,7 +373,7 @@ Public Class Delaunay_Points : Inherits TaskParent
         dst3 = fPoly.dst3
 
         delaunay.inputPoints.Clear()
-        For i = 0 To ptSlider.value - 1
+        For i = 0 To Math.Min(ptSlider.value, task.topFeatures.Count) - 1
             delaunay.inputPoints.Add(task.topFeatures(i))
         Next
         delaunay.Run(src)

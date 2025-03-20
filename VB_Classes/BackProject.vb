@@ -63,10 +63,9 @@ Public Class BackProject_Full : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         classCount = task.histogramBins
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim histogram As New cv.Mat
-        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
+        cv.Cv2.CalcHist({task.gray}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
         histogram = histogram.Normalize(0, classCount, cv.NormTypes.MinMax)
 
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)
@@ -674,9 +673,8 @@ Public Class BackProject_Masks : Inherits TaskParent
         Dim brickWidth = dst2.Width / task.histogramBins
         histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
 
-        Dim gray = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst3 = task.color.Clone
-        dst1 = maskDetect(gray, histIndex)
+        dst1 = maskDetect(task.gray, histIndex)
         If dst1.Width = 0 Then Exit Sub
         dst3.SetTo(white, dst1)
         dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
@@ -701,7 +699,6 @@ Public Class BackProject_MaskList : Inherits TaskParent
         desc = "Create masks for each histogram bin backprojection"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim bins = If(task.histogramBins <= 255, task.histogramBins - 1, 255)
         Dim incr = 255 / bins
         If bins <> task.gOptions.DebugSlider.Maximum Then
@@ -715,7 +712,7 @@ Public Class BackProject_MaskList : Inherits TaskParent
         For i = 0 To bins - 2
             Dim minVal = i * incr
             Dim maxVal = (i + 1) * incr
-            histS.inputOnlyMask = gray.InRange(minVal, maxVal)
+            histS.inputOnlyMask = task.gray.InRange(minVal, maxVal)
             histS.Run(task.pcSplit(2))
             histList.Add(New List(Of Single)(histS.histList))
             histogramList.Add(histS.histogram.Clone)

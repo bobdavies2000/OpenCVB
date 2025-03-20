@@ -34,11 +34,7 @@ Public Class Benford_Basics : Inherits TaskParent
         use99 = True
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then
-            dst2 = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2Gray))
-            src = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-            dst2.ConvertTo(src, cv.MatType.CV_32F)
-        End If
+        If standaloneTest() Then task.gray.ConvertTo(src, cv.MatType.CV_32F)
 
         src = src.Reshape(1, src.Width * src.Height)
         Dim indexer = src.GetGenericIndexer(Of Single)()
