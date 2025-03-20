@@ -1277,6 +1277,9 @@ Public Class Main_UI
             End If
         End If
 
+        ' skip testing the XO_ algorithms.  They are obsolete.
+        If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
+
         TestAllTimer.Interval = settings.testAllDuration * 1000
         Static startingAlgorithm = AvailableAlgorithms.Text
         If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
