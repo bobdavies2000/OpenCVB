@@ -18,10 +18,7 @@ Public Class CComp_Basics : Inherits TaskParent
         rects.Clear()
         centroids.Clear()
 
-        Dim input = src
-        If input.Channels() = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        dst2 = input.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
+        dst2 = task.gray.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
         connectedComponents.RenderBlobs(dst3)
@@ -123,7 +120,7 @@ Public Class CComp_Hulls : Inherits TaskParent
         desc = "Create connected components using RedCloud Hulls"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ccomp.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        ccomp.Run(task.gray)
         dst2 = ccomp.dst3
         ccomp.dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         hulls.Run(dst1)
@@ -151,15 +148,14 @@ Public Class CComp_Stats : Inherits TaskParent
         desc = "Use a threshold slider on the CComp input"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
+        dst2 = task.gray
         options.RunOpt()
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standaloneTest() Then src = src.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
+        If standaloneTest() Then dst2 = task.gray.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim stats As New cv.Mat
         Dim centroidRaw As New cv.Mat
-        numberOfLabels = src.ConnectedComponentsWithStats(dst1, stats, centroidRaw)
+        numberOfLabels = task.gray.ConnectedComponentsWithStats(dst1, stats, centroidRaw)
 
         rects.Clear()
         areas.Clear()

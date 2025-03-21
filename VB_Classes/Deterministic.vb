@@ -110,8 +110,7 @@ Public Class Deterministic_BackProject : Inherits TaskParent
         desc = "Build a histogram from the differences in an attempt to answer why are the images different."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        deter.Run(src)
+        deter.Run(task.gray)
 
         If task.heartBeat = False Then Exit Sub
         dst3 = deter.dst3
@@ -132,7 +131,7 @@ Public Class Deterministic_BackProject : Inherits TaskParent
         dst0 = src.Clone
         dst1.CopyTo(dst0, mask)
 
-        Dim mm = GetMinMax(gray, deter.dst3)
+        Dim mm = GetMinMax(task.gray, deter.dst3)
         labels(2) = "Active histogram bins range from " + CStr(mm.minVal) + " to " + CStr(mm.maxVal) + ".  X-axis is 0 to 255"
         SetTrueText("Pixels in the selected histogram bin - move mouse to reset to 0.", 1)
     End Sub

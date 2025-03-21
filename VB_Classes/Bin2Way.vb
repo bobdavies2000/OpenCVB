@@ -12,8 +12,7 @@ Public Class Bin2Way_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim bins = task.histogramBins
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.Run(src)
+        hist.Run(task.gray)
         dst3 = hist.dst2
 
         Dim histArray = hist.histArray
@@ -29,11 +28,11 @@ Public Class Bin2Way_Basics : Inherits TaskParent
         Dim offset = halfSplit / bins * dst3.Width
         DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white)
 
-        mats.mat(0) = src.InRange(0, halfSplit - 1)         ' darkest
-        mats.mat(1) = src.InRange(halfSplit, 255)            ' lightest
+        mats.mat(0) = task.gray.InRange(0, halfSplit - 1)         ' darkest
+        mats.mat(1) = task.gray.InRange(halfSplit, 255)            ' lightest
 
         If standaloneTest() Then
-            mats.Run(src)
+            mats.Run(task.gray)
             dst2 = mats.dst2
         End If
     End Sub
@@ -54,10 +53,9 @@ Public Class Bin2Way_KMeans : Inherits TaskParent
         desc = "Use kmeans with each of the 2-way split images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        bin2.Run(src)
+        bin2.Run(task.gray)
 
-        kmeans.Run(src)
+        kmeans.Run(task.gray)
         For i = 0 To 2
             mats.mat(i).SetTo(0)
             kmeans.dst3.CopyTo(mats.mat(i), bin2.mats.mat(i))
@@ -123,28 +121,26 @@ Public Class Bin2Way_RecurseOnce : Inherits TaskParent
         desc = "Keep splitting an image between light and dark"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        bin2.fraction = src.Total / 2
+        bin2.fraction = task.gray.Total / 2
         bin2.hist.histMask = New cv.Mat
-        bin2.Run(src)
+        bin2.Run(task.gray)
         Dim darkestMask = bin2.mats.mat(0).Clone
         Dim lightestMask = bin2.mats.mat(1).Clone
 
-        bin2.fraction = src.Total / 4
+        bin2.fraction = task.gray.Total / 4
         bin2.hist.histMask = darkestMask
-        bin2.Run(src)
+        bin2.Run(task.gray)
 
         mats.mat(0) = bin2.mats.mat(0)
         mats.mat(1) = bin2.mats.mat(1) And Not lightestMask
 
-        bin2.fraction = src.Total / 4
+        bin2.fraction = task.gray.Total / 4
         bin2.hist.histMask = lightestMask
-        bin2.Run(src)
+        bin2.Run(task.gray)
         mats.mat(2) = bin2.mats.mat(0) And Not darkestMask
         mats.mat(3) = bin2.mats.mat(1)
 
-        mats.Run(src)
+        mats.Run(task.gray)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

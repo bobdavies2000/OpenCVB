@@ -31,13 +31,10 @@ Public Class DFT_Basics : Inherits TaskParent
         labels(3) = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        grayMat = src
-        If src.Channels() = 3 Then grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        rows = cv.Cv2.GetOptimalDFTSize(grayMat.Rows)
-        cols = cv.Cv2.GetOptimalDFTSize(grayMat.Cols)
-        Dim padded = New cv.Mat(grayMat.Width, grayMat.Height, cv.MatType.CV_8UC3)
-        cv.Cv2.CopyMakeBorder(grayMat, padded, 0, rows - grayMat.Rows, 0, cols - grayMat.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
+        rows = cv.Cv2.GetOptimalDFTSize(task.gray.Rows)
+        cols = cv.Cv2.GetOptimalDFTSize(task.gray.Cols)
+        Dim padded = New cv.Mat(task.gray.Width, task.gray.Height, cv.MatType.CV_8UC3)
+        cv.Cv2.CopyMakeBorder(task.gray, padded, 0, rows - task.gray.Rows, 0, cols - task.gray.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
         Dim padded32 As New cv.Mat
         padded.ConvertTo(padded32, cv.MatType.CV_32F)
         Dim planes() = {padded32, New cv.Mat(padded.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
@@ -84,9 +81,8 @@ Public Class DFT_Inverse : Inherits TaskParent
         desc = "Take the inverse of the Discrete Fourier Transform."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
-        src.ConvertTo(gray32f, cv.MatType.CV_32F)
+        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
         Dim planes() = {gray32f, New cv.Mat(gray32f.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
         Dim complex As New cv.Mat, complexImage As New cv.Mat
         cv.Cv2.Merge(planes, complex)
@@ -95,10 +91,10 @@ Public Class DFT_Inverse : Inherits TaskParent
         dst2 = inverseDFT(complexImage)
 
         Dim diff As New cv.Mat
-        cv.Cv2.Absdiff(src, dst2, diff)
+        cv.Cv2.Absdiff(task.gray, dst2, diff)
         mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
-        mats.Run(src)
+        mats.Run(task.gray)
         If mats.mat(0).CountNonZero > 0 Then
             dst3 = mats.dst2
             labels(3) = "Mask of difference (top) and relative diff (bot)"

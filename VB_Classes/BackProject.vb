@@ -9,9 +9,7 @@ Public Class BackProject_Basics : Inherits TaskParent
         desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim input = src.Clone
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.Run(input)
+        hist.Run(task.gray)
         If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
             Exit Sub
@@ -29,10 +27,10 @@ Public Class BackProject_Basics : Inherits TaskParent
         If histIndex + 1 = task.histogramBins Then maxRange = New cv.Scalar(255)
 
         '     Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        '     cv.Cv2.CalcBackProject({input}, {0}, histK.hist.histogram, dst0, ranges)
+        '     cv.Cv2.CalcBackProject({task.gray}, {0}, histK.hist.histogram, dst0, ranges)
         ' for single dimension histograms, backprojection is the same as inrange
         ' (and this works for backproject_FeatureLess below)
-        dst0 = input.InRange(minRange, maxRange)
+        dst0 = task.gray.InRange(minRange, maxRange)
 
         Dim actualCount = dst0.CountNonZero
         dst3 = task.color.Clone
@@ -464,9 +462,7 @@ Public Class BackProject_Image : Inherits TaskParent
         desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim input = src
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.Run(input)
+        hist.Run(task.gray)
         If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
             Exit Sub ' the input image is empty...
@@ -481,7 +477,7 @@ Public Class BackProject_Image : Inherits TaskParent
         hist.mm.maxVal = Math.Max(task.kalman.kOutput(0), task.kalman.kOutput(1))
 
         Dim totalPixels = dst2.Total ' assume we are including zeros.
-        If hist.plot.removeZeroEntry Then totalPixels = input.CountNonZero
+        If hist.plot.removeZeroEntry Then totalPixels = task.gray.CountNonZero
 
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
@@ -494,11 +490,15 @@ Public Class BackProject_Image : Inherits TaskParent
             maxRange = New cv.Scalar(255)
         End If
         If useInrange Then
-            If histIndex = 0 And hist.plot.removeZeroEntry Then mask = New cv.Mat(input.Size(), cv.MatType.CV_8U, cv.Scalar.All(0)) Else mask = input.InRange(minRange, maxRange)
+            If histIndex = 0 And hist.plot.removeZeroEntry Then
+                mask = New cv.Mat(task.gray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            Else
+                mask = task.gray.InRange(minRange, maxRange)
+            End If
         Else
             Dim bRange = New cv.Rangef(minRange(0), maxRange(0))
             Dim ranges() = New cv.Rangef() {bRange}
-            cv.Cv2.CalcBackProject({input}, {0}, hist.histogram, mask, ranges)
+            cv.Cv2.CalcBackProject({task.gray}, {0}, hist.histogram, mask, ranges)
         End If
         dst3 = src
         If mask.Type <> cv.MatType.CV_8U Then mask.ConvertTo(mask, cv.MatType.CV_8U)

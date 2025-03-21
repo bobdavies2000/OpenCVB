@@ -405,21 +405,19 @@ int main(int argc, char* argv[])
 			}
 		case 17: // oglFunction = oCase.pcLines
 			{
+				drawPointCloudRGB();
 				float* pc = (float*)dataBuffer;
 				int floatCount = int(dataBufferSize / sizeof(float));
-				glLineWidth((GLfloat) 5); 
+				glLineWidth((GLfloat) 10); 
+				glBegin(GL_LINES);
 				for (int i = 0; i < floatCount; i += 9)
 				{
 					GLfloat color[3] = { GLfloat(pc[i]), GLfloat(pc[i + 1]), GLfloat(pc[i + 2]) };
-					if (color[0] != 0 || color[1] != 0 || color[2] != 0)
-					{
-						glBegin(GL_LINES);
-						glColor3fv(color);
-						glVertex3fv((GLfloat*)(&pc[i + 3]));
-						glVertex3fv((GLfloat*)(&pc[i + 6]));
-						glEnd();
-					}
+					glColor3fv(color);
+					glVertex3fv((GLfloat*)(&pc[i + 3]));
+					glVertex3fv((GLfloat*)(&pc[i + 6]));
 				}
+				glEnd();
 				glDisable(GL_TEXTURE_2D);
 				break;
 			}

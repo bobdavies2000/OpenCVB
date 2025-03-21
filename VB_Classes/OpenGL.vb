@@ -800,29 +800,6 @@ End Class
 
 
 
-Public Class OpenGL_PClinesFirstLast : Inherits TaskParent
-    Dim lines As New Line3D_CandidatesFirstLast
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pcLines
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
-        desc = "Draw the 3D lines found from the PCpoints"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
-
-        If lines.pcLinesMat.Rows = 0 Then task.ogl.dataInput = New cv.Mat Else task.ogl.dataInput = lines.pcLinesMat
-        task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = "OpenGL_PClines found " + CStr(lines.pcLinesMat.Rows / 3) + " lines"
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class OpenGL_PatchHorizontal : Inherits TaskParent
     Dim patch As New Pixel_NeighborsPatchNeighbors
     Public Sub New()
@@ -2095,7 +2072,7 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         dst3 = connect.dst3
 
         Dim quadData As New List(Of cv.Point3f)
-        Dim idd1 As gridCell, idd2 As gridCell
+        Dim idd1 As gcData, idd2 As gcData
         For Each tup In connect.hTuples
             idd1 = task.gcList(tup.Item1)
             idd2 = task.gcList(tup.Item2)
@@ -2287,5 +2264,56 @@ Public Class OpenGL_Connected : Inherits TaskParent
             task.ogl.pointCloudInput = pc
         End If
         task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class OpenGL_PClinesFirstLast : Inherits TaskParent
+    Dim lines As New Line3D_CandidatesFirstLast
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pcLines
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        desc = "Draw the 3D lines found from the PCpoints"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+
+        If lines.pcLinesMat.Rows = 0 Then task.ogl.dataInput = New cv.Mat Else task.ogl.dataInput = lines.pcLinesMat
+        'task.ogl.pointCloudInput = task.pointCloud
+        task.ogl.Run(New cv.Mat)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        labels(2) = "OpenGL_PClines found " + CStr(lines.pcLinesMat.Rows / 3) + " lines"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_Lines3D : Inherits TaskParent
+    Dim lines As New Line3D_Basics
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pcLines
+        desc = "Draw the 3D lines found using the task.lpList and the accompanying grid cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+
+        If lines.lines3D.Count Then
+            task.ogl.dataInput = lines.lines3DMat
+            ' task.ogl.pointCloudInput = task.pointCloud
+            task.ogl.Run(New cv.Mat)
+        End If
+
+        SetTrueText(lines.strOut, 3)
     End Sub
 End Class

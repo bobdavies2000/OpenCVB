@@ -9,10 +9,8 @@ Public Class DCT_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-
         Dim src32f As New cv.Mat
-        src.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
+        task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
 
         Dim frequencies As New cv.Mat
         cv.Cv2.Dct(src32f, frequencies, options.removeFrequency)
@@ -24,7 +22,7 @@ Public Class DCT_Basics : Inherits TaskParent
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-        cv.Cv2.Subtract(src, dst2, dst3)
+        cv.Cv2.Subtract(task.gray, dst2, dst3)
     End Sub
 End Class
 

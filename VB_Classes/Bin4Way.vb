@@ -22,7 +22,6 @@ Public Class Bin4Way_Basics : Inherits TaskParent
 
         If task.optionsChanged Then index = 0
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim matList(3) As cv.Mat
         For i = 0 To matList.Count - 1
             mats.mat(i) = New cv.Mat(mats.mat(i).Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -30,8 +29,8 @@ Public Class Bin4Way_Basics : Inherits TaskParent
         Next
 
         Dim quadrant As Integer
-        binary.Run(src)
-        binary.mats.Run(src)
+        binary.Run(task.gray)
+        binary.mats.Run(task.gray)
         dst2 = binary.mats.dst2
         dst1 = binary.mats.dst3 * 0.5
         matList = binary.mats.mat
@@ -58,7 +57,7 @@ Public Class Bin4Way_Basics : Inherits TaskParent
                     means.Add(New List(Of Single))
                 End If
                 contourCounts(j).Add(allContours.Count)
-                means(j).Add(src(roi).Mean(tmp)(0))
+                means(j).Add(task.gray(roi).Mean(tmp)(0))
                 If i = quadrant Then SetTrueText(CStr(allContours.Count), roi.TopLeft, 1)
                 counts(i, j) = allContours.Count
             Next
@@ -89,7 +88,7 @@ Public Class Bin4Way_Basics : Inherits TaskParent
             SetTrueText(labelStr(i), points(i), 3)
         Next
 
-        mats.Run(src)
+        mats.Run(task.gray)
         dst3 = mats.dst2
 
         dst1.Rectangle(roiSave, white, task.lineWidth)
@@ -236,9 +235,7 @@ Public Class Bin4Way_UnstablePixels : Inherits TaskParent
         desc = "Identify the unstable grayscale pixel values "
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        unstable.Run(src)
+        unstable.Run(task.gray)
         dst2 = unstable.dst3
 
         Dim points = dst2.FindNonZero()
@@ -249,7 +246,7 @@ Public Class Bin4Way_UnstablePixels : Inherits TaskParent
         Dim pixels As New List(Of Byte)
         Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
         For i = 0 To pts.Count - 1 Step 2
-            Dim val = src.Get(Of Byte)(pts(i + 1), pts(i))
+            Dim val = task.gray.Get(Of Byte)(pts(i + 1), pts(i))
             If pixels.Contains(val) = False Then
                 pixelSort.Add(val, 1)
                 pixels.Add(val)
@@ -301,19 +298,17 @@ Public Class Bin4Way_SplitValley : Inherits TaskParent
         desc = "Binarize an image using the valleys provided by HistValley_Basics"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binary.Run(gray)
+        binary.Run(task.gray)
         Dim mask = binary.dst2.Clone
 
-        If task.heartBeat Then valley.Run(gray)
+        If task.heartBeat Then valley.Run(task.gray)
 
-        mats.mat(0) = gray.InRange(0, valley.valleys(1) - 1)
-        mats.mat(1) = gray.InRange(valley.valleys(1), valley.valleys(2) - 1)
-        mats.mat(2) = gray.InRange(valley.valleys(2), valley.valleys(3) - 1)
-        mats.mat(3) = gray.InRange(valley.valleys(3), 255)
+        mats.mat(0) = task.gray.InRange(0, valley.valleys(1) - 1)
+        mats.mat(1) = task.gray.InRange(valley.valleys(1), valley.valleys(2) - 1)
+        mats.mat(2) = task.gray.InRange(valley.valleys(2), valley.valleys(3) - 1)
+        mats.mat(3) = task.gray.InRange(valley.valleys(3), 255)
 
-        mats.Run(src)
+        mats.Run(task.gray)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)
@@ -336,11 +331,9 @@ Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
         desc = "Identify the unstable grayscale pixel values "
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist.Run(task.gray)
 
-        hist.Run(src)
-
-        unstable.Run(src)
+        unstable.Run(task.gray)
         dst2 = unstable.dst3
 
         Dim points = dst2.FindNonZero()
@@ -351,7 +344,7 @@ Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
         Dim pixels As New List(Of Byte)
         Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
         For i = 0 To pts.Count - 1 Step 2
-            Dim val = src.Get(Of Byte)(pts(i + 1), pts(i))
+            Dim val = task.gray.Get(Of Byte)(pts(i + 1), pts(i))
             If pixels.Contains(val) = False Then
                 pixelSort.Add(val, 1)
                 pixels.Add(val)
@@ -419,13 +412,11 @@ Public Class Bin4Way_SplitGaps : Inherits TaskParent
         desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        unstable.Run(gray)
+        unstable.Run(task.gray)
 
         Dim lastVal As Integer = 255
         For i = Math.Min(mats.mat.Count, unstable.gapValues.Count) - 1 To 0 Step -1
-            mats.mat(i) = gray.InRange(unstable.gapValues(i), lastVal)
+            mats.mat(i) = task.gray.InRange(unstable.gapValues(i), lastVal)
             lastVal = unstable.gapValues(i)
         Next
 
@@ -434,7 +425,7 @@ Public Class Bin4Way_SplitGaps : Inherits TaskParent
             diff(i).Run(mats.mat(i))
             dst1 = dst1 Or diff(i).dst2
         Next
-        mats.Run(src)
+        mats.Run(task.gray)
         dst2 = mats.dst2
         dst3 = mats.dst3
         If task.heartBeat Then labels(1) = "There are " + CStr(dst1.CountNonZero) + " unstable pixels"
@@ -494,20 +485,18 @@ Public Class Bin4Way_Regions1 : Inherits TaskParent
         desc = "Binarize an image and split it into quartiles using peaks."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binary.Run(gray)
+        binary.Run(task.gray)
         Dim mask = binary.dst2.Clone
 
         Dim midColor = binary.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        mats.mat(0) = gray.InRange(0, botColor)
-        mats.mat(1) = gray.InRange(botColor, midColor)
-        mats.mat(2) = gray.InRange(midColor, topColor)
-        mats.mat(3) = gray.InRange(topColor, 255)
+        Dim topColor = cv.Cv2.Mean(task.gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(task.gray, Not mask)(0)
+        mats.mat(0) = task.gray.InRange(0, botColor)
+        mats.mat(1) = task.gray.InRange(botColor, midColor)
+        mats.mat(2) = task.gray.InRange(midColor, topColor)
+        mats.mat(3) = task.gray.InRange(topColor, 255)
 
-        mats.Run(src)
+        mats.Run(task.gray)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)
@@ -578,8 +567,7 @@ Public Class Bin4Way_BasicsRed : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim bins = task.histogramBins
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.Run(src)
+        hist.Run(task.gray)
         dst3 = hist.dst2
 
         Dim histArray = hist.histArray
@@ -600,13 +588,13 @@ Public Class Bin4Way_BasicsRed : Inherits TaskParent
             DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white)
         Next
 
-        mats.mat(0) = src.InRange(0, quartiles(0) - 1)
-        mats.mat(1) = src.InRange(quartiles(0), quartiles(1) - 1)
-        mats.mat(2) = src.InRange(quartiles(1), quartiles(2) - 1)
-        mats.mat(3) = src.InRange(quartiles(2), 255)
+        mats.mat(0) = task.gray.InRange(0, quartiles(0) - 1)
+        mats.mat(1) = task.gray.InRange(quartiles(0), quartiles(1) - 1)
+        mats.mat(2) = task.gray.InRange(quartiles(1), quartiles(2) - 1)
+        mats.mat(3) = task.gray.InRange(quartiles(2), 255)
 
         If standaloneTest() Then
-            mats.Run(src)
+            mats.Run(task.gray)
             dst2 = mats.dst2
         End If
     End Sub
@@ -711,21 +699,19 @@ Public Class Bin4Way_SplitMean : Inherits TaskParent
         desc = "Binarize an image and split it into quartiles using peaks."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim gray = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binary.Run(gray)
+        binary.Run(task.gray)
         Dim mask = binary.dst2.Clone
 
         If task.heartBeat Then
             midColor = binary.meanScalar(0)
-            topColor = cv.Cv2.Mean(gray, mask)(0)
-            botColor = cv.Cv2.Mean(gray, Not mask)(0)
+            topColor = cv.Cv2.Mean(task.gray, mask)(0)
+            botColor = cv.Cv2.Mean(task.gray, Not mask)(0)
         End If
 
-        mats.mat(0) = gray.InRange(0, botColor)
-        mats.mat(1) = gray.InRange(botColor, midColor)
-        mats.mat(2) = gray.InRange(midColor, topColor)
-        mats.mat(3) = gray.InRange(topColor, 255)
+        mats.mat(0) = task.gray.InRange(0, botColor)
+        mats.mat(1) = task.gray.InRange(botColor, midColor)
+        mats.mat(2) = task.gray.InRange(midColor, topColor)
+        mats.mat(3) = task.gray.InRange(topColor, 255)
 
         mats.Run(src)
         dst2 = mats.dst2

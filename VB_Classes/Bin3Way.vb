@@ -10,12 +10,11 @@ Public Class Bin3Way_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim bins = task.histogramBins
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.heartBeat Then
             firstThird = 0
             lastThird = 0
-            hist.Run(src)
+            hist.Run(task.gray)
             dst3 = hist.dst2
 
             Dim histogram = hist.histArray
@@ -39,12 +38,12 @@ Public Class Bin3Way_Basics : Inherits TaskParent
         offset = lastThird / bins * dst3.Width
         DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white)
 
-        mats.mat(0) = src.InRange(0, firstThird - 1)         ' darkest
-        mats.mat(1) = src.InRange(lastThird, 255)            ' lightest
-        mats.mat(2) = src.InRange(firstThird, lastThird - 1) ' other
+        mats.mat(0) = task.gray.InRange(0, firstThird - 1)         ' darkest
+        mats.mat(1) = task.gray.InRange(lastThird, 255)            ' lightest
+        mats.mat(2) = task.gray.InRange(firstThird, lastThird - 1) ' other
 
         If standaloneTest() Then
-            mats.Run(src)
+            mats.Run(task.gray)
             dst2 = mats.dst2
         End If
     End Sub
@@ -66,16 +65,15 @@ Public Class Bin3Way_KMeans : Inherits TaskParent
         desc = "Use kmeans with each of the 3-way split images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        bin3.Run(src)
+        bin3.Run(task.gray)
 
-        kmeans.Run(src)
+        kmeans.Run(task.gray)
         For i = 0 To 2
             mats.mat(i).SetTo(0)
             kmeans.dst3.CopyTo(mats.mat(i), bin3.mats.mat(i))
         Next
 
-        mats.Run(src)
+        mats.Run(task.gray)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

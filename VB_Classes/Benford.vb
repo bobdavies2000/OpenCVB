@@ -90,9 +90,8 @@ Public Class Benford_NormalizedImage : Inherits TaskParent
         desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim gray32f As New cv.Mat
-        dst3.ConvertTo(gray32f, cv.MatType.CV_32F)
+        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f.Normalize(1))
         dst2 = benford.dst2
@@ -115,9 +114,8 @@ Public Class Benford_NormalizedImage99 : Inherits TaskParent
         desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim gray32f As New cv.Mat
-        dst3.ConvertTo(gray32f, cv.MatType.CV_32F)
+        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f.Normalize(1))
         dst2 = benford.dst2

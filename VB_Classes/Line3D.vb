@@ -1,30 +1,54 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
-    Dim sLines As New Structured_Lines
+    Dim lines As New Line_Basics
+    Public lines3D As New List(Of cv.Point3f)
+    Public lines3DMat As New cv.Mat
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find all the lines in 3D using the structured slices through the pointcloud."
+        desc = "Find all the lines in 3D using the structured slices through the grid cells."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        sLines.Run(src)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
 
-        dst2 = src
-        dst3.SetTo(0)
-        For Each lp In sLines.lineX.lpList
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        lines.Run(src)
+        dst2 = lines.dst2
+        labels(2) = lines.labels(2)
+
+        Static gcList As New List(Of gcData)(task.gcList)
+
+        For i = 0 To task.gridRects.Count - 1
+            Dim gc = task.gcList(i)
+            Dim val = task.motionMask.Get(Of Byte)(gc.center.Y, gc.center.X)
+            If val Then gcList(i) = gc
         Next
 
-        For Each lp In sLines.lineY.lpList
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        lines3D.Clear()
+
+        For Each lp In task.lpList
+            Dim gc1 = gcList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            If gc1.depth = 0 Then Continue For
+
+            Dim gc2 = gcList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            If gc2.depth = 0 Then Continue For
+
+            lines3D.Add(New cv.Point3f(0, 0.9, 0.9))
+            Dim p1 = getWorldCoordinates(gc1.center, gc1.depth)
+            Dim p2 = getWorldCoordinates(gc2.center, gc2.depth)
+            'p1.Z -= 0.5
+            'p2.Z -= 0.5 ' so the line will appear in front of the pointcloud data by 0.5 meter
+            lines3D.Add(p1)
+            lines3D.Add(p2)
+            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link8)
         Next
+
+        lines3DMat = cv.Mat.FromPixelData(lines3D.Count / 3, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
 
         If task.heartBeat Then
-            labels(2) = CStr(sLines.lineX.lpList.Count) + " X-direction lines and " +
-                        CStr(sLines.lineY.lpList.Count) + " Y-direction lines were identified in 3D."
-            labels(3) = labels(2)
+            strOut = CStr(lines3D.Count / 3) + " 3D lines are prepared in lines3D." + vbCrLf +
+                     CStr(task.lpList.Count - lines3D.Count / 3) + " lines occurred in areas with no depth and were skipped."
         End If
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -44,7 +68,7 @@ Public Class Line3D_Correlation : Inherits TaskParent
         cv.Cv2.MatchTemplate(A, B, correlation, cv.TemplateMatchModes.CCoeffNormed)
         Return correlation.Get(Of Single)(0, 0)
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then runRedC(src)
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
@@ -87,7 +111,7 @@ Public Class Line3D_Draw : Inherits TaskParent
     Dim plot As New Plot_OverTimeScalar
     Dim toggleFirstSecond As Boolean
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         plot.plotCount = 2
 
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -103,7 +127,7 @@ Public Class Line3D_Draw : Inherits TaskParent
         cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.mouseClickFlag Then
                 If toggleFirstSecond = False Then
@@ -152,6 +176,27 @@ End Class
 
 
 
+Public Class Line3D_Constructed : Inherits TaskParent
+    Dim lines As New Line3D_Basics
+    Public Sub New()
+        desc = "Build the 3D lines found in Line3D_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+        dst3 = lines.dst3
+        labels(2) = lines.labels(2)
+
+
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
     Dim pts As New PointCloud_Basics
     Public pcLines As New List(Of cv.Point3f)
@@ -163,7 +208,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
                "in the sequence"
     End Sub
     Private Sub addLines(nextList As List(Of List(Of cv.Point3f)), xyList As List(Of List(Of cv.Point)))
-        Dim white32 As New cv.Point3f(1, 1, 1)
+        Dim white32 As New cv.Point3f(0, 1, 1)
         For i = 0 To nextList.Count - 1
             pcLines.Add(white32)
             pcLines.Add(nextList(i)(0))
@@ -176,7 +221,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
             DrawLine(dst2, p1, p2, white)
         Next
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         pts.Run(src)
         dst2 = pts.dst2
 
@@ -186,25 +231,5 @@ Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
 
         pcLinesMat = cv.Mat.FromPixelData(pcLines.Count, 1, cv.MatType.CV_32FC3, pcLines.ToArray)
         labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line3D_Constructed : Inherits TaskParent
-    Dim lines As New Line3D_Basics
-    Public Sub New()
-        desc = "Build the 3D lines found in Line3D_Basics"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
-        dst3 = lines.dst3
-        labels(2) = lines.labels(2)
-
-
     End Sub
 End Class

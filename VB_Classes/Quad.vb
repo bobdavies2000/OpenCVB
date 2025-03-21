@@ -11,24 +11,24 @@ Public Class Quad_Basics : Inherits TaskParent
             shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
         End If
 
-        task.iddMap.SetTo(0)
+        task.gcMap.SetTo(0)
         dst2.SetTo(0)
         For i = 0 To task.gcList.Count - 1
-            Dim idd = task.gcList(i)
-            task.iddMap(idd.rect).SetTo(i)
-            If idd.depth > 0 Then
-                idd.corners.Clear()
+            Dim gc = task.gcList(i)
+            task.gcMap(gc.rect).SetTo(i)
+            If gc.depth > 0 Then
+                gc.corners.Clear()
 
-                Dim p0 = getWorldCoordinates(idd.rect.TopLeft, idd.depth)
-                Dim p1 = getWorldCoordinates(idd.rect.BottomRight, idd.depth)
+                Dim p0 = getWorldCoordinates(gc.rect.TopLeft, gc.depth)
+                Dim p1 = getWorldCoordinates(gc.rect.BottomRight, gc.depth)
 
                 ' clockwise around starting in upper left.
-                idd.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, idd.depth))
-                idd.corners.Add(New cv.Point3f(p1.X + shift.X, p0.Y + shift.Y, idd.depth))
-                idd.corners.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, idd.depth))
-                idd.corners.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, idd.depth))
+                gc.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, gc.depth))
+                gc.corners.Add(New cv.Point3f(p1.X + shift.X, p0.Y + shift.Y, gc.depth))
+                gc.corners.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, gc.depth))
+                gc.corners.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, gc.depth))
             End If
-            dst2(idd.rect).SetTo(idd.color)
+            dst2(gc.rect).SetTo(gc.color)
         Next
     End Sub
 End Class

@@ -205,37 +205,3 @@ Public Class Blur_Gaussian : Inherits TaskParent
         cv.Cv2.GaussianBlur(src, dst2, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
     End Sub
 End Class
-
-
-
-
-
-'Public Class KAZE_KeypointsAKAZE_CS : Inherits TaskParent
-'    Dim CS_AKaze As New CS_Classes.AKaze_Basics
-'    Public Sub New()
-'        desc = "Find keypoints using AKAZE algorithm."
-'        labels(2) = "AKAZE key points"
-'    End Sub
-'    Public Overrides sub RunAlg(src As cv.Mat)
-'        CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-'        src.CopyTo(dst2)
-'        For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
-'            DrawCircle(dst2, CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.DotSize, cv.Scalar.Red)
-'        Next
-'    End Sub
-'    End 
-
-'    ClassPublic Class KAZE_KeypointsKAZE_CS : Inherits TaskParent
-'        Dim CS_Kaze As New CS_Classes.Kaze_Basics
-'        Public Sub New()
-'            desc = "Find keypoints using KAZE algorithm."
-'            labels(2) = "KAZE key points"
-'        End Sub
-'        Public Overrides sub RunAlg(src As cv.Mat)
-'            CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-'            src.CopyTo(dst2)
-'            For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
-'                DrawCircle(dst2, CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.DotSize, cv.Scalar.Red)
-'            Next
-'        End Sub
-'    End Class

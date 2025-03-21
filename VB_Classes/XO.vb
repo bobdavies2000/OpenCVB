@@ -1964,3 +1964,60 @@ Public Class XO_Line_InterceptsUI : Inherits TaskParent
         dst2 = lines.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_Diff_Heartbeat : Inherits TaskParent
+    Public cumulativePixels As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        labels = {"", "", "Unstable mask", "Pixel difference"}
+        desc = "Diff an image with one from the last heartbeat."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            dst1 = task.gray.Clone
+            dst2.SetTo(0)
+        End If
+
+        cv.Cv2.Absdiff(task.gray, dst1, dst3)
+        cumulativePixels = dst3.CountNonZero
+        dst2 = dst2 Or dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Line3D_Basics : Inherits TaskParent
+    Dim sLines As New Structured_Lines
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find all the lines in 3D using the structured slices through the pointcloud."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        sLines.Run(src)
+
+        dst2 = src
+        dst3.SetTo(0)
+        For Each lp In sLines.lineX.lpList
+            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+
+        For Each lp In sLines.lineY.lpList
+            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(sLines.lineX.lpList.Count) + " X-direction lines and " +
+                        CStr(sLines.lineY.lpList.Count) + " Y-direction lines were identified in 3D."
+            labels(3) = labels(2)
+        End If
+    End Sub
+End Class

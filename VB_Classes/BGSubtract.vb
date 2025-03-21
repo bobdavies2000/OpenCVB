@@ -62,6 +62,9 @@ End Class
 
 
 
+
+
+
 Public Class BGSubtract_MOG2 : Inherits TaskParent
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Dim options As New Options_BGSubtract
@@ -69,12 +72,13 @@ Public Class BGSubtract_MOG2 : Inherits TaskParent
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG2.Apply(src, dst2, options.learnRate)
     End Sub
 End Class
+
 
 
 
@@ -87,7 +91,7 @@ Public Class BGSubtract_MOG2_QT : Inherits TaskParent
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         desc = "Subtract background using a mixture of Gaussians - the QT version"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
         MOG2.Apply(src, dst2, learnRate)
@@ -148,7 +152,7 @@ Public Class BGSubtract_MOG : Inherits TaskParent
         MOG = cv.BackgroundSubtractorMOG.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG.Apply(src, dst2, options.learnRate)
@@ -177,8 +181,7 @@ Public Class BGSubtract_GMG_KNN : Inherits TaskParent
             SetTrueText("")
         End If
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gmg.Apply(dst2, dst2, options.learnRate)
+        gmg.Apply(task.gray, dst2, options.learnRate)
         knn.Apply(dst2, dst2, options.learnRate)
     End Sub
 End Class
@@ -205,8 +208,7 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits TaskParent
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
         dst2 = grayMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGRGB.Apply(src, dst3, options.learnRate)
+        MOGRGB.Apply(task.gray, dst3, options.learnRate)
     End Sub
 End Class
 

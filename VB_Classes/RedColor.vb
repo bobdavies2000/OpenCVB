@@ -1796,7 +1796,7 @@ Public Class RedColor_GridCellsOld : Inherits TaskParent
     Dim regions As New Connected_Contours
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use the GridCell regions to build task.rcList"
+        desc = "Use the gcData regions to build task.rcList"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         regions.Run(src)
@@ -1846,7 +1846,7 @@ Public Class RedColor_GridCells : Inherits TaskParent
     Public Sub New()
         task.gOptions.TruncateDepth.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use the GridCell regions to build task.rcList"
+        desc = "Use the gcData regions to build task.rcList"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         regions.Run(src)

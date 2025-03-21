@@ -76,12 +76,11 @@ Public Class Covariance_Images : Inherits TaskParent
         desc = "Calculate the covariance of 2 images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.optionsChanged Then gray.ConvertTo(last32f, cv.MatType.CV_32F)
-        dst2 = gray
+        If task.optionsChanged Then task.gray.ConvertTo(last32f, cv.MatType.CV_32F)
+        dst2 = task.gray
 
         Dim gray32f As New cv.Mat
-        gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
         cv.Cv2.Merge({gray32f, last32f}, dst0)
         Dim samples = dst0.Reshape(1, dst0.Rows * dst0.Cols)
         covar.Run(samples)

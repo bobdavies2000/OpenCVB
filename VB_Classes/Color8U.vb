@@ -40,8 +40,8 @@ Public Class Color8U_Basics : Inherits TaskParent
         If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
             classifier.Run(src)
         Else
-            dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-            classifier.Run(dst1)
+            dst1 = task.gray
+            classifier.Run(task.gray)
         End If
 
         If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)
@@ -102,7 +102,7 @@ Public Class Color8U_Grayscale : Inherits TaskParent
         End If
 
         If options.useOpenCV Then
-            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = task.gray
         Else
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Parallel.For(0, src.Rows,
@@ -399,7 +399,7 @@ Public Class Color8U_BlackAndWhite : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = task.gray
         dst2 = dst1.Threshold(options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)
         dst3 = dst1.Threshold(options.maxThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub

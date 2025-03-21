@@ -11,8 +11,7 @@ Public Class Cartoonify_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Options.RunOpt()
 
-        Dim gray8u = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        gray8u = gray8u.MedianBlur(options.medianBlur)
+        Dim gray8u = task.gray.MedianBlur(options.medianBlur)
         Dim edges = gray8u.Laplacian(cv.MatType.CV_8U, options.kernelSize)
         Dim mask = edges.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

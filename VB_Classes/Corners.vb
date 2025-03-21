@@ -247,9 +247,8 @@ Public Class Corners_Harris_CPP : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim dataSrc(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Dim dataSrc(task.gray.Total - 1) As Byte
+        Marshal.Copy(task.gray.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim imagePtr = Harris_Features_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.threshold,
                                            options.neighborhood, options.aperture, options.harrisParm)
@@ -345,10 +344,9 @@ Public Class Corners_SubPix : Inherits TaskParent
         runFeature(src)
 
         dst2 = src.Clone
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.features.Count = 0 Then Exit Sub ' completely dark?  No features...
-        cv.Cv2.CornerSubPix(src, task.features, New cv.Size(options.subpixSize, options.subpixSize), New cv.Size(-1, -1), term)
+        cv.Cv2.CornerSubPix(task.gray, task.features, New cv.Size(options.subpixSize, options.subpixSize), New cv.Size(-1, -1), term)
 
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)

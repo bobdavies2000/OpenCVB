@@ -49,13 +49,13 @@ Public Class Video_CarCounting : Inherits TaskParent
         video.Run(src)
         dst2.SetTo(0)
         bgSub.Run(video.dst1) ' use the original size of the video input - not the dst2 size...
-        Dim videoImage = bgSub.dst2
+        Dim videoImage = bgSub.dst2.Resize(video.dst1.Size)
         dst3 = video.dst2
 
         ' there are 5 lanes of traffic so setup 5 regions
         ' NOTE: if long shadows are present this approach will not work without provision for the width of a car.  Needs more sample data.
         Dim activeHeight = 30
-        Dim finishLine = bgSub.dst2.Height - activeHeight * 8
+        Dim finishLine = videoImage.Height - activeHeight * 8
         For i = 1 To activeState.Length - 1
             Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
             Dim cellCount = videoImage(lane).CountNonZero

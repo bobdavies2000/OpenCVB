@@ -69,7 +69,7 @@ Public Class Contour_General : Inherits TaskParent
             dst2 = rotatedRect.dst2
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            If src.Channels() = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
+            dst2 = task.gray
         End If
 
         If dst2.Type = cv.MatType.CV_8U Then
@@ -120,7 +120,7 @@ Public Class Contour_GeneralWithOptions : Inherits TaskParent
                 dst2 = dst2.ConvertScaleAbs(255)
             End If
         Else
-            If src.Channels() = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
+            dst2 = task.gray
         End If
 
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then dst2.ConvertTo(dst2, cv.MatType.CV_32SC1)
@@ -722,8 +722,7 @@ Public Class Contour_RC_AddContour : Inherits TaskParent
         End If
 
         Dim allContours As cv.Point()()
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
+        cv.Cv2.FindContours(task.gray, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
 
         Dim maxCount As Integer, maxIndex As Integer
         For i = 0 To allContours.Count - 1

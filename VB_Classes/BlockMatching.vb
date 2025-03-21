@@ -67,7 +67,7 @@ End Class
 '        desc = "Match the low resolution left and right images."
 '    End Sub
 '    Public Overrides Sub RunAlg(src As cv.Mat)
-'        block.leftView = task.gCell.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        block.leftView = task.leftview
 '        dst1 = block.leftView
 '        quadR.Run(task.rightView)
 '        block.rightView = quadR.dst2

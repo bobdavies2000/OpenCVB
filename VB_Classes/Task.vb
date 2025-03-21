@@ -9,20 +9,19 @@ Imports System.Runtime.InteropServices
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public redC As RedColor_Basics
-    Public rc As New rcData
-    Public rcMap As cv.Mat
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
     Public lpList As New List(Of lpData) ' line pair list
     Public lpListOld As New List(Of lpDataOld) ' line pair list
-    Public gcList As New List(Of gridCell)
+    Public gcList As New List(Of gcData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpXData)
 
-    Public iddCorrelations As New cv.Mat
-    Public iddMap As New cv.Mat
-    Public iddC As gridCell
+    Public gcMap As New cv.Mat
+    Public rcMap As cv.Mat
+    Public gcCell As gcData
+    Public rc As New rcData
 
     Public cellSize As Integer
     Public tilesPerCol As Integer
@@ -543,8 +542,7 @@ Public Class VBtask : Implements IDisposable
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        task.iddMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        task.iddCorrelations = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+        task.gcMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
 
         gmat = New IMU_GMatrix
         grid = New Grid_Basics

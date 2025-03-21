@@ -8,7 +8,7 @@ Public Class Connected_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Connect cells that are close in depth"
     End Sub
-    Private Sub hTestRect(idd1 As gridCell, idd2 As gridCell, nextStart As Integer)
+    Private Sub hTestRect(idd1 As gcData, idd2 As gcData, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
             Dim p1 = task.gcList(colStart).rect.TopLeft
             Dim p2 = task.gcList(colEnd).rect.BottomRight
@@ -21,7 +21,7 @@ Public Class Connected_Basics : Inherits TaskParent
             colEnd += 1
         End If
     End Sub
-    Private Sub vTestRect(idd1 As gridCell, idd2 As gridCell, iddNext As Integer, nextStart As Integer)
+    Private Sub vTestRect(idd1 As gcData, idd2 As gcData, iddNext As Integer, nextStart As Integer)
         If Math.Abs(idd1.depth - idd2.depth) > task.depthDiffMeters Or nextStart = -1 Then
             bottomRight = task.gcList(iddNext).rect.BottomRight
             dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)

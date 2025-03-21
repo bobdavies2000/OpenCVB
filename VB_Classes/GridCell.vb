@@ -23,7 +23,7 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         task.gcList.Clear()
         For i = 0 To task.gridRects.Count - 1
-            Dim idd As New gridCell
+            Dim idd As New gcData
             idd.rect = task.gridRects(i)
             idd.age = task.motionBasics.cellAge(i)
             idd.rect = idd.rect
@@ -99,21 +99,21 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
-        Dim index = task.iddMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        task.iddC = task.gcList(index)
+        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        task.gcCell = task.gcList(index)
         dst2 = task.gCell.dst2
 
-        Dim pt = task.iddC.rect.TopLeft
+        Dim pt = task.gcCell.rect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
             pt.X -= dst2.Width * 0.15
         Else
-            pt.Y -= task.iddC.rect.Height * 3
+            pt.Y -= task.gcCell.rect.Height * 3
         End If
 
-        depthAndCorrelationText = Format(task.iddC.depth, fmt2) +
+        depthAndCorrelationText = Format(task.gcCell.depth, fmt2) +
                                   "m " + " ID=" +
-                                  CStr(task.iddC.index) + vbCrLf + "depth " + Format(task.iddC.mm.minVal, fmt3) + "m - " +
-                                  Format(task.iddC.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.iddC.correlation, fmt3)
+                                  CStr(task.gcCell.index) + vbCrLf + "depth " + Format(task.gcCell.mm.minVal, fmt3) + "m - " +
+                                  Format(task.gcCell.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.gcCell.correlation, fmt3)
         ptTopLeft = pt
         If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptTopLeft, 2)
     End Sub
@@ -139,7 +139,7 @@ Public Class GridCell_Plot : Inherits TaskParent
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.gcList.Count = 0 Or task.optionsChanged Then Exit Sub
 
-        Dim idd As gridCell
+        Dim idd As gcData
         If index < 0 Or index >= task.gcList.Count Then
             idd = task.gcList(task.gcList.Count / 2)
             task.mouseMovePoint = New cv.Point(idd.rect.X + idd.rect.Width / 2, idd.rect.Y + idd.rect.Height / 2)
@@ -252,7 +252,7 @@ Public Class GridCell_RGBtoLeft : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim idd As gridCell
+        Dim idd As gcData
         If index > 0 And index < task.gcList.Count Then
             idd = task.gcList(index)
         Else
@@ -703,7 +703,7 @@ Public Class GridCell_Features : Inherits TaskParent
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
-            Dim index = task.iddMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gcMap.Get(Of Integer)(pt.Y, pt.X)
             Dim idd = task.gcList(index)
             idd.features.Add(pt)
             DrawCircle(dst2, idd.rect.TopLeft, task.DotSize, task.HighlightColor)
@@ -820,8 +820,8 @@ Public Class GridCell_ColorLines : Inherits TaskParent
         dst2 = src.Clone
         dst3.SetTo(0)
         For Each lp In task.lpList
-            Dim idd1 = task.gcList(task.iddMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim idd2 = task.gcList(task.iddMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim idd1 = task.gcList(task.gcMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim idd2 = task.gcList(task.gcMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
             dst3.Line(lp.p1, lp.p2, 128, task.lineWidth)
             If Math.Abs(idd1.depth - idd2.depth) >= task.depthDiffMeters Then
                 dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
@@ -877,9 +877,9 @@ Public Class GridCell_LeftRight : Inherits TaskParent
         dst2 = task.leftView
         dst3 = task.rightView
 
-        Dim indexTop = task.iddMap.Get(Of Integer)(task.drawRect.Y, task.drawRect.X)
+        Dim indexTop = task.gcMap.Get(Of Integer)(task.drawRect.Y, task.drawRect.X)
         If indexTop < 0 Or indexTop >= task.gcList.Count Then Exit Sub
-        Dim indexBot = task.iddMap.Get(Of Integer)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
+        Dim indexBot = task.gcMap.Get(Of Integer)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
         If indexBot < 0 Or indexBot >= task.gcList.Count Then Exit Sub
 
         Dim idd1 = task.gcList(indexTop)

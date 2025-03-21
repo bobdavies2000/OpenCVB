@@ -464,7 +464,7 @@ End Class
 
 
 
-Public Class gridCell
+Public Class gcData
     Public rect As cv.Rect ' rectange under the cursor in the color image.
     Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.
     Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
@@ -544,7 +544,7 @@ Public Class rcData
     Public ptFacets As New List(Of cv.Point)
     Public ptList As New List(Of cv.Point)
 
-    Public gridCells As New List(Of gridCell)
+    Public gridCells As New List(Of gcData)
 
     ' transition these...
     Public nabs As New List(Of Integer)

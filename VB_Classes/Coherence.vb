@@ -28,11 +28,11 @@ Public Class Coherence_Basics : Inherits TaskParent
         dst2 = src.Clone()
         src = src(srcRect)
 
-        Dim gray As New cv.Mat
+        ' Dim gray As New cv.Mat
         Dim eigen As New cv.Mat
         Dim split() As cv.Mat
         For i = 0 To 3
-            gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             eigen = gray.CornerEigenValsAndVecs(options.str_sigma, options.eigenkernelsize)
             split = eigen.Split()
             Dim x = split(2), y = split(3)

@@ -124,30 +124,6 @@ End Class
 
 
 
-Public Class Diff_Heartbeat : Inherits TaskParent
-    Public cumulativePixels As Integer
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        labels = {"", "", "Unstable mask", "Pixel difference"}
-        desc = "Diff an image with one from the last heartbeat."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.heartBeat Then
-            dst1 = src.Clone
-            dst2.SetTo(0)
-        End If
-
-        cv.Cv2.Absdiff(src, dst1, dst3)
-        cumulativePixels = dst3.CountNonZero
-        dst2 = dst2 Or dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Diff_Depth32f : Inherits TaskParent
     Public lastDepth32f As New cv.Mat

@@ -86,7 +86,7 @@ Public Class Density_Mask : Inherits TaskParent
         desc = "Measure a mask's size in any image and track the biggest regions."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If src.Channels() <> 1 Then src = task.gray
         src.SetTo(0, task.noDepthMask)
 
         Dim threshold = task.cellSize * task.cellSize / 2
