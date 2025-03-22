@@ -795,18 +795,18 @@ End Class
 
 
 Public Class Options_Eigen : Inherits OptionParent
-    Public linePairCount As Integer = 20
+    Public noisyPointCount As Integer = 100
     Public noiseOffset As Integer = 200
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Line Point Count", 5, 100, linePairCount)
+            sliders.setupTrackBar("Line Point Count", 5, 100, noisyPointCount)
             sliders.setupTrackBar("Line Noise", 1, 500, noiseOffset)
         End If
     End Sub
     Public Sub RunOpt()
         Static linePairSlider = FindSlider("Line Point Count")
         Static noiseSlider = FindSlider("Line Noise")
-        linePairCount = linePairSlider.Value
+        noisyPointCount = linePairSlider.Value
         noiseOffset = noiseSlider.Value
     End Sub
 End Class

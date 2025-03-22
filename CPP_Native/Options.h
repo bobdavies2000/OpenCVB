@@ -203,7 +203,7 @@ public:
 };
 class Options_Eigen {
 public:
-	int linePairCount =  20;
+	int noisyPointCount =  100;
 	int noiseOffset =  200;
 	void RunOpt() {}
 	Options_Eigen() {
