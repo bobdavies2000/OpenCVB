@@ -54,35 +54,35 @@ End Class
 
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
 Public Class Eigen_Fitline : Inherits TaskParent
-    Dim noisyLine As New Eigen_FitLineInput
+    Dim noisyLine As New Eigen_Input
     Dim eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0)), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0))
-    Dim theta As Single
-    Dim len As Single
-    Dim m2 As Single
+    Dim theta As Single, len As Single, m2 As Single
     Public Sub New()
         labels(2) = "blue is Ground Truth, red is fitline, yellow is EigenFit"
         desc = "Yellow line shows the ground truth used to create random points.  Add more points to match the ground truth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then noisyLine.Run(src)
-
+        If task.heartBeat = False Then Exit Sub
+        noisyLine.Run(src)
         dst2 = noisyLine.dst2
+        Dim pointCount = noisyLine.eigen3D.points.Count
 
         Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
         Dim m = line.Vy / line.Vx
         Dim bb = line.Y1 - m * line.X1
         Dim p1 = New cv.Point(line.X1, line.Y1)
         Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
-        dst2.Line(p1, p2, cv.Scalar.Red, 20, task.lineType)
+        Dim lp = findEdgePoints(New lpData(p1, p2))
+        dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, 20, task.lineType)
 
-        Dim pointMat = cv.Mat.FromPixelData(noisyLine.options.noisyPointCount, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
+        Dim pointMat = cv.Mat.FromPixelData(pointCount, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
         Dim mean = pointMat.Mean()
         Dim split() = pointMat.Split()
         Dim mmX = GetMinMax(split(0))
         Dim mmY = GetMinMax(split(1))
 
         Dim eigenInput As New cv.Vec4f
-        For i = 0 To noisyLine.points.Count - 1
+        For i = 0 To pointCount - 1
             Dim pt = noisyLine.points(i)
             Dim x = pt.X - mean.Val0
             Dim y = pt.Y - mean.Val1
@@ -105,7 +105,6 @@ Public Class Eigen_Fitline : Inherits TaskParent
         p1 = New cv.Point2f(mean.Val0 - Math.Cos(theta) * len / 2, mean.Val1 - Math.Sin(theta) * len / 2)
         p2 = New cv.Point2f(mean.Val0 + Math.Cos(theta) * len / 2, mean.Val1 + Math.Sin(theta) * len / 2)
         m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-        If Single.IsNaN(m2) Or Single.IsInfinity(m2) Then Dim k = 0
 
         If Math.Abs(m2) > 1.0 Then
             dst2.Line(p1, p2, task.HighlightColor, 10, task.lineType)
@@ -131,53 +130,26 @@ End Class
 
 
 
-Public Class Eigen_FitLineInput : Inherits TaskParent
+Public Class Eigen_Input : Inherits TaskParent
     Public points As New List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
-    Public options As New Options_Eigen
+    Public eigen3D As New Eigen_Input3D
     Public Sub New()
         labels(2) = "Use sliders to adjust the width and intensityf of the line"
         desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        eigen3D.Run(src)
+        m = eigen3D.m
+        bb = eigen3D.bb
+        points.Clear()
 
-        If task.heartBeatLT Then
-            dst2.SetTo(0)
-            Dim width = src.Width
-            Dim height = src.Height
+        For Each pt In eigen3D.points
+            points.Add(New cv.Point2f(pt.X, pt.Y))
+        Next
 
-            ' p1 and p2 are intended to provide a real trendline to which the noise applies.
-            Dim p1 As cv.Point2f, p2 As cv.Point2f
-            If Rnd() * 2 - 1 >= 0 Then
-                p1 = New cv.Point(Rnd() * width, 0)
-                p2 = New cv.Point(Rnd() * width, height)
-            Else
-                p1 = New cv.Point(0, Rnd() * height)
-                p2 = New cv.Point(width, Rnd() * height)
-            End If
-
-            If p1.X = p2.X Then p1.X += 1
-            If p1.Y = p2.Y Then p1.Y += 1
-            m = (p2.Y - p1.Y) / (p2.X - p1.X)
-            bb = p2.Y - p2.X * m
-            Dim startx = Math.Min(p1.X, p2.X)
-            Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.noisyPointCount
-            Dim highLight = cv.Scalar.Gray
-            points.Clear()
-            For i = 0 To options.noisyPointCount - 1
-                Dim noiseOffsetX = (Rnd() * 2 - 1) * options.noiseOffset
-                Dim noiseOffsetY = (Rnd() * 2 - 1) * options.noiseOffset
-                Dim pt = New cv.Point(startx + i * incr + noiseOffsetX, Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)))
-                If pt.X < 0 Then pt.X = 0
-                If pt.X > width Then pt.X = width
-                If pt.Y < 0 Then pt.Y = 0
-                If pt.Y > height Then pt.Y = height
-                points.Add(pt)
-                DrawCircle(dst2, pt, task.DotSize + 1, highLight)
-            Next
-        End If
+        dst2 = eigen3D.dst2
     End Sub
 End Class
 
@@ -188,7 +160,7 @@ End Class
 
 
 
-Public Class Eigen_FitLineInput3D : Inherits TaskParent
+Public Class Eigen_Input3D : Inherits TaskParent
     Public points As New List(Of cv.Point3f)
     Public m As Single
     Public bb As Single
@@ -199,43 +171,39 @@ Public Class Eigen_FitLineInput3D : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-        If task.heartBeatLT Then
-            dst2.SetTo(0)
-            Dim width = src.Width
-            Dim height = src.Height
-            Dim depth = src.Height
+        dst2.SetTo(0)
+        Dim width = src.Width, height = src.Height, depth = src.Height
 
-            ' p1 and p2 are intended to provide a real trendline to which the noise applies.
-            Dim p1 As cv.Point3f, p2 As cv.Point3f
-            If Rnd() * 2 - 1 >= 0 Then
-                p1 = New cv.Point3f(Rnd() * width, 0, Rnd() * depth)
-                p2 = New cv.Point3f(Rnd() * width, height, Rnd() * depth)
-            Else
-                p1 = New cv.Point3f(0, Rnd() * height, Rnd() * depth)
-                p2 = New cv.Point3f(width, Rnd() * height, Rnd() * depth)
-            End If
-
-            If p1.X = p2.X Then p1.X += 1
-            If p1.Y = p2.Y Then p1.Y += 1
-            m = (p2.Y - p1.Y) / (p2.X - p1.X)
-            bb = p2.Y - p2.X * m
-            Dim startx = Math.Min(p1.X, p2.X)
-            Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.noisyPointCount
-
-            Dim highLight = cv.Scalar.Gray
-            points.Clear()
-            For i = 0 To options.noisyPointCount - 1
-                Dim noiseOffsetX = (Rnd() * 2 - 1) * options.noiseOffset
-                Dim noiseOffsetY = (Rnd() * 2 - 1) * options.noiseOffset
-                Dim pt = New cv.Point3f(startx + i * incr + noiseOffsetX,
-                                        Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
-                If pt.X < 0 Then pt.X = 0
-                If pt.X > width Then pt.X = width
-                If pt.Y < 0 Then pt.Y = 0
-                If pt.Y > height Then pt.Y = height
-                points.Add(pt)
-                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight)
-            Next
+        ' p1 and p2 are intended to provide a ground truth trendline to which the noise applies.
+        Dim p1 As cv.Point3f, p2 As cv.Point3f
+        If Rnd() * 2 - 1 >= 0 Then
+            p1 = New cv.Point3f(Rnd() * width, 0, Rnd() * depth)
+            p2 = New cv.Point3f(Rnd() * width, height, Rnd() * depth)
+        Else
+            p1 = New cv.Point3f(0, Rnd() * height, Rnd() * depth)
+            p2 = New cv.Point3f(width, Rnd() * height, Rnd() * depth)
         End If
+
+        If p1.X = p2.X Then p1.X += 1
+        If p1.Y = p2.Y Then p1.Y += 1
+        m = (p2.Y - p1.Y) / (p2.X - p1.X)
+        bb = p2.Y - p2.X * m
+        Dim startx = Math.Min(p1.X, p2.X)
+        Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.noisyPointCount
+
+        Dim highLight = cv.Scalar.Gray
+        points.Clear()
+        For i = 0 To options.noisyPointCount - 1
+            Dim noiseOffsetX = (Rnd() * 2 - 1) * options.noiseOffset
+            Dim noiseOffsetY = (Rnd() * 2 - 1) * options.noiseOffset
+            Dim pt = New cv.Point3f(startx + i * incr + noiseOffsetX,
+                                        Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
+            If pt.X < 0 Then pt.X = 0
+            If pt.X > width Then pt.X = width
+            If pt.Y < 0 Then pt.Y = 0
+            If pt.Y > height Then pt.Y = height
+            points.Add(pt)
+            DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight)
+        Next
     End Sub
 End Class

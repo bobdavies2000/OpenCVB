@@ -799,7 +799,7 @@ Public Class Options_Eigen : Inherits OptionParent
     Public noiseOffset As Integer = 200
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Line Point Count", 5, 100, noisyPointCount)
+            sliders.setupTrackBar("Line Point Count", 5, 200, noisyPointCount)
             sliders.setupTrackBar("Line Noise", 1, 500, noiseOffset)
         End If
     End Sub

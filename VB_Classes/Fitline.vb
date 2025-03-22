@@ -9,7 +9,7 @@ Public Class FitLine_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone And task.heartBeatLT Then
-            Static inputData As New Eigen_FitLineInput
+            Static inputData As New Eigen_Input
             inputData.Run(src)
             ptList = New List(Of cv.Point2f)(inputData.points)
             dst2 = inputData.dst2
@@ -184,7 +184,7 @@ End Class
 
 
 Public Class FitLine_Example2D : Inherits TaskParent
-    Dim inputData As New Eigen_FitLineInput
+    Dim inputData As New Eigen_Input
     Dim fitLine As New FitLine_Basics
     Public Sub New()
         desc = "A way to test the fitline using 3D data."
