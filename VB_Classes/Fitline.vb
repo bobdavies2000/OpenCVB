@@ -77,71 +77,6 @@ End Class
 
 
 
-Public Class FitLine_Basics3D : Inherits TaskParent
-    Dim hlines As New Hough_Lines_MT
-    Public Sub New()
-        desc = "Use visual lines to find 3D lines.  This algorithm is NOT working."
-        labels(3) = "White is featureless RGB, blue depth shadow"
-    End Sub
-    Public Sub houghShowLines3D(ByRef dst As cv.Mat, segment As cv.Line3D)
-        Dim x As Double = segment.X1 * dst.Cols
-        Dim y As Double = segment.Y1 * dst.Rows
-        Dim m As Double
-        If segment.Vx < 0.001 Then m = 0 Else m = segment.Vy / segment.Vx ' vertical slope a no-no.
-        Dim b As Double = y - m * x
-        Dim pt1 As cv.Point = New cv.Point(x, y)
-        Dim pt2 As cv.Point
-        If m = 0 Then pt2 = New cv.Point(x, dst.Rows) Else pt2 = New cv.Point((dst.Rows - b) / m, dst.Rows)
-        dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType, 0)
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If Not task.heartBeat Then Exit Sub
-        hlines.Run(src)
-        dst3 = hlines.dst3
-        Dim mask = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        src.CopyTo(dst2)
-
-        Dim lines As New List(Of cv.Line3D)
-        Dim nullLine = New cv.Line3D(0, 0, 0, 0, 0, 0)
-        Parallel.ForEach(task.gridRects,
-        Sub(roi)
-            Dim depth = task.pcSplit(2)(roi)
-            Dim fMask = mask(roi)
-            Dim points As New List(Of cv.Point3f)
-            Dim rows = src.Rows, cols = src.Cols
-            For y = 0 To roi.Height - 1
-                For x = 0 To roi.Width - 1
-                    If fMask.Get(Of Byte)(y, x) > 0 Then
-                        Dim d = depth.Get(Of Single)(y, x)
-                        If d > 0 And d < 10000 Then
-                            points.Add(New cv.Point3f(x / rows, y / cols, d / 10000))
-                        End If
-                    End If
-                Next
-            Next
-            Dim line = nullLine
-            If points.Count = 0 Then
-                ' save the average color for this roi
-                Dim mean = task.depthRGB(roi).Mean()
-                mean(0) = 255 - mean(0)
-                dst3.Rectangle(roi, mean)
-            Else
-                line = cv.Cv2.FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0, 0.01)
-            End If
-            SyncLock lines
-                lines.Add(line)
-            End SyncLock
-        End Sub)
-        ' putting this in the parallel for above causes a memory leak - could not find it...
-        For i = 0 To task.gridRects.Count - 1
-            houghShowLines3D(dst2(task.gridRects(i)), lines.ElementAt(i))
-        Next
-    End Sub
-End Class
-
-
-
 
 
 
@@ -212,7 +147,7 @@ End Class
 
 
 
-Public Class FitLine_TrendLine3D : Inherits TaskParent
+Public Class FitLine_Basics3D : Inherits TaskParent
     Public ptList As New List(Of cv.Point3f)
     Public lp As lpData
     Public center As cv.Point2f
