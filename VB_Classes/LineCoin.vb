@@ -111,7 +111,7 @@ Public Class LineCoin_Parallel : Inherits TaskParent
         dst2 = src.Clone
         For Each cp In coinList
             dst2.Line(cp.p3, cp.p4, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
-            dst2.Line(cp.p1, cp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+            dst2.Line(cp.p1, cp.p2, task.highlight, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(coinList.Count) + " coincident lines were detected"
     End Sub

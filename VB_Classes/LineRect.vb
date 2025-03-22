@@ -15,17 +15,17 @@ Public Class LineRect_CenterDepth : Inherits TaskParent
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer
         For Each lp In task.lpList
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
             Dim pts = lp.perpendicularPoints(lp.center, task.cellSize)
             Dim index1 = task.gcMap.Get(Of Integer)(pts.Item1.Y, pts.Item1.X)
             Dim index2 = task.gcMap.Get(Of Integer)(pts.Item2.Y, pts.Item2.X)
             Dim idd1 = task.gcList(index1)
             Dim idd2 = task.gcList(index2)
             If Math.Abs(idd1.depth - idd2.depth) > depthThreshold Then
-                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else
-                dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 colorLines += 1
             End If
         Next
@@ -77,10 +77,10 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
                 If foundObjectLine Then Exit For
             Next
             If foundObjectLine Then
-                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else
-                dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 colorLines += 1
             End If
         Next
@@ -118,10 +118,10 @@ Public Class LineRect_CenterRange : Inherits TaskParent
             Dim index = task.gcMap.Get(Of Integer)(lp.center.Y, lp.center.X)
             Dim idd = task.gcList(index)
             If idd.mm.maxVal - idd.mm.minVal > depthThreshold Then
-                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else
-                dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link4)
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 colorLines += 1
             End If
         Next

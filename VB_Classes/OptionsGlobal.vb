@@ -60,11 +60,11 @@ Public Class OptionsGlobal
         Next
         RGBFilterList.SelectedIndex = 0
 
-        HighlightColor.Items.Add("Yellow")
-        HighlightColor.Items.Add("Black")
-        HighlightColor.Items.Add("White")
-        HighlightColor.Items.Add("Red")
-        HighlightColor.SelectedIndex = 0
+        highlight.Items.Add("Yellow")
+        highlight.Items.Add("Black")
+        highlight.Items.Add("White")
+        highlight.Items.Add("Red")
+        highlight.SelectedIndex = 0
 
         ShowAllOptions.Checked = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
 
@@ -270,16 +270,16 @@ Public Class OptionsGlobal
     Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles RGBFilterActive.CheckedChanged
         task.optionsChanged = True
     End Sub
-    Private Sub HighlightColor_SelectedIndexChanged(sender As Object, e As EventArgs) Handles HighlightColor.SelectedIndexChanged
-        Select Case HighlightColor.Text
+    Private Sub highlight_SelectedIndexChanged(sender As Object, e As EventArgs) Handles highlight.SelectedIndexChanged
+        Select Case highlight.Text
             Case "Yellow"
-                task.HighlightColor = cv.Scalar.Yellow
+                task.highlight = cv.Scalar.Yellow
             Case "Black"
-                task.HighlightColor = cv.Scalar.Black
+                task.highlight = cv.Scalar.Black
             Case "White"
-                task.HighlightColor = cv.Scalar.White
+                task.highlight = cv.Scalar.White
             Case "Red"
-                task.HighlightColor = cv.Scalar.Red
+                task.highlight = cv.Scalar.Red
         End Select
     End Sub
     Public Sub setMaxDepth(val As Integer)

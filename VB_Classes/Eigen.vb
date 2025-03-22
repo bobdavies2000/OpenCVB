@@ -107,7 +107,7 @@ Public Class Eigen_Fitline : Inherits TaskParent
         m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
         If Math.Abs(m2) > 1.0 Then
-            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 2, task.lineType)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
         Else
             p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
             p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)

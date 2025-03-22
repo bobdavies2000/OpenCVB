@@ -204,7 +204,7 @@ Public Class VBtask : Implements IDisposable
 
     Public recordTimings As Boolean = True
 
-    Public HighlightColor As cv.Scalar ' color to use to highlight objects in an image.
+    Public highlight As cv.Scalar ' color to use to highlight objects in an image.
 
     Public histogramBins As Integer
 

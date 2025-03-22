@@ -44,7 +44,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         SetTrueText("Click near any feature to find the corresponding pair of features.", 1)
         dst2 = src.Clone
         For Each pt In task.featurePoints
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
         prevFeatures = New List(Of cv.Point)(task.featurePoints)
     End Sub
@@ -113,7 +113,7 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
                 If length < 30 Then
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
-                    dst2.Line(pt1, pt2, task.HighlightColor, task.lineWidth + task.lineWidth, task.lineType)
+                    dst2.Line(pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
                     DrawCircle(dst3, pt1, task.DotSize + 3, white)
                     DrawCircle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red)
                 End If
@@ -151,12 +151,12 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
         For i = 0 To pyrLeft.features.Count - 1
             Dim pt = pyrLeft.features(i)
             ptLeft.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
             leftY.Add(pt.Y)
 
             pt = pyrLeft.lastFeatures(i)
             ptLeft.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
             leftY.Add(pt.Y)
         Next
 
@@ -166,12 +166,12 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
         For i = 0 To pyrRight.features.Count - 1
             Dim pt = pyrRight.features(i)
             ptRight.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, pt, task.DotSize, task.highlight)
             rightY.Add(pt.Y)
 
             pt = pyrRight.lastFeatures(i)
             ptRight.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, pt, task.DotSize, task.highlight)
             rightY.Add(pt.Y)
         Next
 
@@ -204,7 +204,7 @@ Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
     End Sub
     Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
         For Each pt In features
-            DrawCircle(dst, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst, pt, task.DotSize, task.highlight)
         Next
         Return dst
     End Function
@@ -295,7 +295,7 @@ Public Class FeatureFlow_LeftRight : Inherits TaskParent
     Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
         For Each ptlist In features
             For Each pt In ptlist
-                DrawCircle(dst, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst, pt, task.DotSize, task.highlight)
             Next
         Next
         Return dst

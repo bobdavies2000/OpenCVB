@@ -68,7 +68,7 @@ Public Class LongLine_Core : Inherits TaskParent
         lpList.Clear()
         For Each lp In task.lpList
             lpList.Add(lp)
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+            DrawLine(dst2, lp.p1, lp.p2, task.highlight)
             If lpList.Count >= lineCount Then Exit For
         Next
     End Sub
@@ -156,7 +156,7 @@ Public Class LongLine_Consistent : Inherits TaskParent
         Next
 
         labels(2) = "minDistance = " + Format(minDistance, fmt1)
-        DrawLine(dst2, ptLong.p1, ptLong.p2, task.HighlightColor)
+        DrawLine(dst2, ptLong.p1, ptLong.p2, task.highlight)
         ptLong = lpMin
     End Sub
 End Class
@@ -212,7 +212,7 @@ Public Class LongLine_Match : Inherits TaskParent
         Dim x1 = Math.Min(lp.p1.X - options.pad, lp.p2.X - options.pad), x2 = Math.Max(lp.p1.X + options.pad, lp.p2.X + options.pad)
         Dim y1 = Math.Min(lp.p1.Y - options.pad, lp.p2.Y - options.pad), y2 = Math.Max(lp.p1.Y + options.pad, lp.p2.Y + options.pad)
         Dim rect = ValidateRect(New cv.Rect(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2)))
-        dst2.Rectangle(rect, task.HighlightColor, task.lineWidth)
+        dst2.Rectangle(rect, task.highlight, task.lineWidth)
 
         Static template As cv.Mat = src(rect).Clone
         cv.Cv2.MatchTemplate(template, src, dst0, cv.TemplateMatchModes.CCoeffNormed)
@@ -251,7 +251,7 @@ Public Class LongLine_ExtendTest : Inherits TaskParent
             Dim mps = New lpData(p1, p2)
             Dim emps = longLine.BuildLongLine(mps)
             dst2 = src
-            DrawLine(dst2, emps.p1, emps.p2, task.HighlightColor)
+            DrawLine(dst2, emps.p1, emps.p2, task.highlight)
             DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
             DrawCircle(dst2, p2, task.DotSize + 2, cv.Scalar.Red)
         End If
@@ -279,7 +279,7 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
         lpList.Clear()
         For Each lp In task.lpList
             lpList.Add(lp)
-            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+            DrawLine(dst3, lp.p1, lp.p2, task.highlight)
         Next
     End Sub
 End Class
@@ -343,7 +343,7 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
                         If (cp.p1 = cp.p3 Or cp.p1 = cp.p4) And (cp.p2 = cp.p3 Or cp.p2 = cp.p4) Then
                             ' duplicate points...
                         Else
-                            DrawLine(dst2, cp.p1, cp.p2, task.HighlightColor)
+                            DrawLine(dst2, cp.p1, cp.p2, task.highlight)
                             DrawLine(dst2, cp.p3, cp.p4, cv.Scalar.Red)
                             parList.Add(cp)
                             checkList.Add(cp.p1)
@@ -388,7 +388,7 @@ Public Class LongLine_Extend : Inherits TaskParent
         If standaloneTest() Then
             labels(2) = emps.p1.ToString + " and " + emps.p2.ToString + " started with " + saveP1.ToString + " and " + saveP2.ToString
             dst2 = src
-            DrawLine(dst2, emps.p1, emps.p2, task.HighlightColor)
+            DrawLine(dst2, emps.p1, emps.p2, task.highlight)
             DrawCircle(dst2, saveP1, task.DotSize, cv.Scalar.Red)
             DrawCircle(dst2, saveP2, task.DotSize, cv.Scalar.Red)
         End If

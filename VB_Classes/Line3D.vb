@@ -39,7 +39,7 @@ Public Class Line3D_Basics : Inherits TaskParent
             'p2.Z -= 0.5 ' so the line will appear in front of the pointcloud data by 0.5 meter
             lines3D.Add(p1)
             lines3D.Add(p2)
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, cv.LineTypes.Link8)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
         Next
 
         lines3DMat = cv.Mat.FromPixelData(lines3D.Count / 3, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
@@ -96,7 +96,7 @@ Public Class Line3D_Correlation : Inherits TaskParent
         End If
         If task.heartBeat Then SetTrueText(strOut, 3)
         For Each pt In task.rc.ptList
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
     End Sub
 End Class
@@ -142,7 +142,7 @@ Public Class Line3D_Draw : Inherits TaskParent
         If toggleFirstSecond Then Exit Sub ' wait until the second point is selected...
 
         dst1 = src
-        DrawLine(dst1, p1, p2, task.HighlightColor)
+        DrawLine(dst1, p1, p2, task.highlight)
         dst0.SetTo(0)
         DrawLine(dst0, p1, p2, 255)
         dst1.SetTo(0)

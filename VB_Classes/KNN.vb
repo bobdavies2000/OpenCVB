@@ -355,7 +355,7 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
                 Dim index = knn.result(i, j)
                 Dim nn = New cv.Point2f(knn.trainInput(index)(0), knn.trainInput(index)(1))
                 DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
-                DrawLine(dst2, pt, nn, task.HighlightColor)
+                DrawLine(dst2, pt, nn, task.highlight)
                 Dim midPt = New cv.Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2)
                 SetTrueText(CStr(j), midPt)
             Next
@@ -468,7 +468,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
             Dim prevRect = ValidateRect(New cv.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))
             cv.Cv2.MatchTemplate(lastImage(prevRect), src(currRect), correlationMat, task.feat.options.matchOption)
             Dim corrNext = correlationMat.Get(Of Single)(0, 0)
-            DrawCircle(dst2, mps.p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, mps.p1, task.DotSize, task.highlight)
             diffX.Add(mps.p1.X - mps.p2.X)
             diffY.Add(mps.p1.Y - mps.p2.Y)
         Next
@@ -566,7 +566,7 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
         If minDist > 0 Then minDistances.Add(minDist)
         If minDistances.Count > 100 Then minDistances.RemoveAt(0)
 
-        DrawLine(dst2, p1, p2, task.HighlightColor)
+        DrawLine(dst2, p1, p2, task.highlight)
         trainInput.Clear()
     End Sub
 End Class
@@ -618,7 +618,7 @@ Public Class KNN_ClosestLine : Inherits TaskParent
         If minDist > 0 Then minDistances.Add(minDist)
         If minDistances.Count > 100 Then minDistances.RemoveAt(0)
 
-        DrawLine(dst2, lastP1, lastP2, task.HighlightColor)
+        DrawLine(dst2, lastP1, lastP2, task.highlight)
         trainInput.Clear()
     End Sub
 End Class
@@ -670,7 +670,7 @@ Public Class KNN_ClosestVertical : Inherits TaskParent
         pt2 = lines.lines3D(knn.lastIndex + 1)
 
         dst3 = lines.dst3
-        DrawLine(dst2, knn.lastP1, knn.lastP2, task.HighlightColor)
+        DrawLine(dst2, knn.lastP1, knn.lastP2, task.highlight)
     End Sub
 End Class
 
@@ -708,8 +708,8 @@ Public Class KNN_TrackEach : Inherits TaskParent
         For i = 0 To trackAll.Count - 1 Step 2
             Dim t1 = trackAll(i)
             For Each lp In t1
-                DrawCircle(dst2, lp.p1, task.DotSize, task.HighlightColor)
-                DrawCircle(dst2, lp.p2, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
+                DrawCircle(dst2, lp.p2, task.DotSize, task.highlight)
                 DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
             Next
         Next
@@ -927,7 +927,7 @@ Public Class KNN_MaxDistance : Inherits TaskParent
         For Each pair In pairList
             Dim p1 = New cv.Point(pair.Item1.X, pair.Item1.Y)
             Dim p2 = New cv.Point(pair.Item2.X, pair.Item2.Y)
-            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             outputPoints.Add(pair)
         Next
         labels(2) = "There were " + CStr(inputPoints.Count) + " input points and " +
@@ -972,8 +972,8 @@ Public Class KNN_NNBasicsTest : Inherits TaskParent
             Dim pt = New cv.Point2f(knn.queries(i), knn.queries(i + 1))
             Dim index = knn.result(i, 0)
             Dim nn = New cv.Point2f(knn.trainInput(index * knn.options.knnDimension), knn.trainInput(index * knn.options.knnDimension + 1))
-            DrawCircle(dst2, pt, task.DotSize + 1, task.HighlightColor)
-            DrawLine(dst2, pt, nn, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize + 1, task.highlight)
+            DrawLine(dst2, pt, nn, task.highlight)
         Next
         If standaloneTest() Then
             SetTrueText("Results are easily verified for the 2-dimensional case.  For higher dimension, " + vbCrLf +

@@ -55,7 +55,7 @@ Public Class FCS_Basics : Inherits TaskParent
         End If
         labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
         fpLastSrc = src.Clone
-        ' DrawCircle(task.color, task.ClickPoint, task.DotSize, task.HighlightColor)
+        ' DrawCircle(task.color, task.ClickPoint, task.DotSize, task.highlight)
     End Sub
 End Class
 
@@ -130,7 +130,7 @@ Public Class FCS_Motion : Inherits TaskParent
 
         runFeature(src)
         For Each fp In task.fpList
-            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
         Next
 
         dst3.SetTo(0)
@@ -143,7 +143,7 @@ Public Class FCS_Motion : Inherits TaskParent
             If fp.indexLast >= 0 Then linkedCount += 1
             Dim p1 = fp.pt
             Dim p2 = If(fp.indexLast < 0, fp.pt, task.fpListLast(fp.indexLast).pt)
-            dst3.Line(p1, p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             If p1 <> p2 Then
                 motionCount += 1
                 xDist.Add(p2.X - p1.X)
@@ -250,12 +250,12 @@ Public Class FCS_FloodFill : Inherits TaskParent
 
         For i = 0 To task.fpList.Count - 1
             Dim fp = task.fpList(i)
-            DrawCircle(dst1, fp.pt, task.DotSize, task.HighlightColor)
-            DrawCircle(dst2, fp.pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst1, fp.pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
             fp.rcIndex = task.rcMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
 
             task.fpList(i) = fp
-            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
         Next
         dst3.SetTo(cv.Scalar.White, task.fpOutline)
     End Sub
@@ -292,7 +292,7 @@ Public Class FCS_Periphery : Inherits TaskParent
         For Each fp In task.fpList
             If fp.periph Then
                 dst3(fp.rect).SetTo(cv.Scalar.Gray, fp.mask)
-                DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
                 ptOutside.Add(fp.pt)
                 ptOutID.Add(fp.ID)
             Else
@@ -301,7 +301,7 @@ Public Class FCS_Periphery : Inherits TaskParent
             End If
         Next
         fpDisplayCell()
-        dst3.Rectangle(task.fpSelected.rect, task.HighlightColor, task.lineWidth)
+        dst3.Rectangle(task.fpSelected.rect, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -325,8 +325,8 @@ Public Class FCS_Edges : Inherits TaskParent
         edges.Run(src)
         dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each fp In task.fpList
-            DrawCircle(dst2, fp.ptCenter, task.DotSize, task.HighlightColor)
-            DrawCircle(dst3, fp.ptCenter, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, fp.ptCenter, task.DotSize, task.highlight)
+            DrawCircle(dst3, fp.ptCenter, task.DotSize, task.highlight)
         Next
         dst3.SetTo(cv.Scalar.White, task.fpOutline)
         fpDisplayCell()
@@ -424,7 +424,7 @@ End Class
 '        dst3.SetTo(0)
 '        For Each index In fp.nabeList
 '            Dim fpNabe = task.fpList(index)
-'            DrawCircle(dst3, fpNabe.ptCenter, task.DotSize, task.HighlightColor)
+'            DrawCircle(dst3, fpNabe.ptCenter, task.DotSize, task.highlight)
 '            SetTrueText(CStr(fpNabe.age), fpNabe.ptCenter, 3)
 '        Next
 '        Static finfo As New FCS_Info
@@ -494,8 +494,8 @@ End Class
 
 '        dst3.SetTo(0)
 '        For Each fp In task.fpList
-'            DrawCircle(dst1, fp.ptCenter, task.DotSize, task.HighlightColor)
-'            DrawCircle(dst3, fp.ptCenter, task.DotSize, task.HighlightColor)
+'            DrawCircle(dst1, fp.ptCenter, task.DotSize, task.highlight)
+'            DrawCircle(dst3, fp.ptCenter, task.DotSize, task.highlight)
 '            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
 '        Next
 '    End Sub
@@ -1061,7 +1061,7 @@ Public Class FCS_Lines : Inherits TaskParent
         dst2.SetTo(white, lines.dst2)
 
         For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
         task.color.SetTo(0, task.fpOutline)
         fpDisplayAge()
@@ -1088,7 +1088,7 @@ Public Class FCS_WithAge : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each fp In task.fpList
-            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
             Dim age = If(fp.age >= 900, fp.age Mod 900 + 100, fp.age)
             SetTrueText(CStr(age), fp.pt, 3)
         Next
@@ -1119,7 +1119,7 @@ Public Class FCS_BestAge : Inherits TaskParent
         Dim maxIndex As Integer = 0
         For Each index In fpSorted.Values
             Dim fp = task.fpList(index)
-            DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
             Dim age = If(fp.age >= 900, fp.age Mod 900 + 100, fp.age)
             SetTrueText(CStr(age), fp.pt, 3)
             maxIndex += 1

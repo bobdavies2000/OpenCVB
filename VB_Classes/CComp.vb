@@ -176,7 +176,7 @@ Public Class CComp_Stats : Inherits TaskParent
             If (r.Width = dst2.Width Or r.Height = dst2.Height) Or (r.Width = 1 Or r.Height = 1) Then Continue For
             areas.Add(area)
             unsortedRects.Add(r)
-            dst2.Rectangle(r, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(r, task.highlight, task.lineWidth)
             index.Add(i)
             colors.Add(task.vecColors(colors.Count))
             maskOrder.Add(area, unsortedMasks.Count)

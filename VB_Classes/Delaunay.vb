@@ -342,7 +342,7 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
 
         dst1.SetTo(0)
         For Each pt In inputPoints
-            dst1.Circle(New cv.Point(pt.X, pt.Y), task.DotSize, task.HighlightColor, -1, task.lineType)
+            dst1.Circle(New cv.Point(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
         Next
         lastColor = dst2.Clone
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."

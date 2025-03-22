@@ -146,7 +146,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
 
         If task.gOptions.displayDst0.Checked Then
             dst0 = task.color.Clone
-            DrawContour(dst0(rc.rect), rc.contour, task.HighlightColor)
+            DrawContour(dst0(rc.rect), rc.contour, task.highlight)
         End If
 
         Dim minMatch As Single = Single.MaxValue

@@ -312,9 +312,9 @@ Public Class GridCell_LeftToColor : Inherits TaskParent
         For Each gc In task.gcList
             If gc.depth > 0 Then
                 count += 1
-                task.color.Circle(gc.rect.TopLeft, task.DotSize, task.HighlightColor, -1)
-                dst2.Circle(gc.lRect.TopLeft, task.DotSize, task.HighlightColor, -1)
-                dst3.Circle(gc.lRect.TopLeft, task.DotSize, task.HighlightColor, -1)
+                task.color.Circle(gc.rect.TopLeft, task.DotSize, task.highlight, -1)
+                dst2.Circle(gc.lRect.TopLeft, task.DotSize, task.highlight, -1)
+                dst3.Circle(gc.lRect.TopLeft, task.DotSize, task.highlight, -1)
             End If
         Next
         labels(2) = CStr(count) + " grid cells have depth and therefore an equivalent in the left and right views."
@@ -440,7 +440,7 @@ Public Class GridCell_Edges : Inherits TaskParent
         src.CopyTo(dst3, task.featureMask)
 
         For Each r In flipRects
-            dst2.Rectangle(r, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(r, task.highlight, task.lineWidth)
         Next
 
         For Each r In task.fLessRects
@@ -706,7 +706,7 @@ Public Class GridCell_Features : Inherits TaskParent
             Dim index = task.gcMap.Get(Of Integer)(pt.Y, pt.X)
             Dim idd = task.gcList(index)
             idd.features.Add(pt)
-            DrawCircle(dst2, idd.rect.TopLeft, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, idd.rect.TopLeft, task.DotSize, task.highlight)
 
             rects.Add(idd.rect)
             task.gcList(index) = idd

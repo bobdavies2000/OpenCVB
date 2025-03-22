@@ -130,10 +130,10 @@ Public Class GrabCut_ImageRect : Inherits TaskParent
         dst2.CopyTo(dst3, dst0 + 1)
 
         dst1.SetTo(0)
-        dst1.Rectangle(bgRect1, task.HighlightColor, task.lineWidth)
-        dst1.Rectangle(bgRect2, task.HighlightColor, task.lineWidth)
-        dst1.Rectangle(fgRect1, task.HighlightColor, task.lineWidth)
-        dst1.Rectangle(fgRect2, task.HighlightColor, task.lineWidth)
+        dst1.Rectangle(bgRect1, task.highlight, task.lineWidth)
+        dst1.Rectangle(bgRect2, task.highlight, task.lineWidth)
+        dst1.Rectangle(fgRect1, task.highlight, task.lineWidth)
+        dst1.Rectangle(fgRect2, task.highlight, task.lineWidth)
     End Sub
 End Class
 

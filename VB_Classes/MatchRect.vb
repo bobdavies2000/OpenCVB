@@ -23,7 +23,7 @@ Public Class MatchRect_Basics : Inherits TaskParent
 
         If standalone Then
             If task.heartBeat Then dst3.SetTo(0)
-            dst3.Rectangle(rectOutput, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Rectangle(rectOutput, task.highlight, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -45,7 +45,7 @@ Public Class MatchRect_RedCloud : Inherits TaskParent
         matchRect.Run(src)
         If standalone Then
             If task.heartBeat Then dst3.SetTo(0)
-            dst3.Rectangle(matchRect.rectOutput, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Rectangle(matchRect.rectOutput, task.highlight, task.lineWidth, task.lineType)
         End If
         labels(2) = "MatchLine correlation = " + Format(matchRect.match.correlation, fmt3) +
                     " - Red = current gravity vector, yellow is matchLine output"

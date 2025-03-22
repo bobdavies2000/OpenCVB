@@ -562,7 +562,7 @@ Public Class Plot_Points : Inherits TaskParent
             Dim pt = New cv.Point(CInt(dst2.Width * (input(i).X - minX) / (maxX - minX)),
                                    CInt(dst2.Height - dst2.Height * (y - minY) / (maxY - minY)))
             If pt.Y <> dst2.Height / 2 Then
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 output.Add(pt)
             Else
                 output.Add(newPoint)

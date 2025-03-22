@@ -396,7 +396,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
                 Dim d1 = task.gcList(j).depth
                 Dim d2 = task.gcList(j - 1).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.gcList(j).rect, task.HighlightColor, -1)
+                    dst2.Rectangle(task.gcList(j).rect, task.highlight, -1)
                 End If
             Next
         Next
@@ -406,7 +406,7 @@ Public Class Quad_Boundaries : Inherits TaskParent
                 Dim d1 = task.gcList(j * width).depth
                 Dim d2 = task.gcList((j - 1) * width).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.gcList(j).rect, task.HighlightColor, -1)
+                    dst2.Rectangle(task.gcList(j).rect, task.highlight, -1)
                 End If
             Next
         Next

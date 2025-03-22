@@ -33,7 +33,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
                 If pt = task.rc.maxDStable Then
                     DrawCircle(dst2, pt, task.DotSize, black)
                 Else
-                    DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
                     ptCount += 1
                     If ptCount > options.xNeighbors Then Exit For
                 End If
@@ -84,7 +84,7 @@ Public Class Neighbors_Intersects : Inherits TaskParent
         If standaloneTest() Then
             dst3 = task.color.Clone
             For Each pt In nPoints
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             Next
         End If
@@ -111,7 +111,7 @@ Public Class Neighbors_ColorOnly : Inherits TaskParent
 
         corners.Run(task.rcMap.Clone())
         For Each pt In corners.nPoints
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
 
         labels(2) = task.redC.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"

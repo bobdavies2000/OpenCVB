@@ -270,7 +270,7 @@ Public Class Hough_LaneFinder : Inherits TaskParent
         For i = 0 To segments.Length - 1
             If laneLineMinY > segments(i).P1.Y Then laneLineMinY = segments(i).P1.Y
             If laneLineMinY > segments(i).P2.Y Then laneLineMinY = segments(i).P2.Y
-            DrawLine(dst3, segments(i).P1, segments(i).P2, task.HighlightColor)
+            DrawLine(dst3, segments(i).P1, segments(i).P2, task.highlight)
         Next
     End Sub
 End Class

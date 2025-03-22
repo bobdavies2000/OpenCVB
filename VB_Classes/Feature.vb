@@ -107,14 +107,14 @@ Public Class Feature_Basics : Inherits TaskParent
         For Each pt In ptNew
             task.features.Add(pt)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
         If standaloneTest() Then
             dst2 = task.color.Clone
             For Each pt In features
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         End If
     End Sub
@@ -142,7 +142,7 @@ Public Class Feature_NoMotionTest : Inherits TaskParent
         method.Run(src)
 
         For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
 
         labels(2) = method.labels(2)
@@ -252,7 +252,7 @@ Public Class Feature_PointTracker : Inherits TaskParent
         dst2 = src.Clone
         For i = mPoints.ptx.Count - 1 To 0 Step -1
             If mPoints.correlation(i) > correlationMin Then
-                DrawCircle(dst2, mPoints.ptx(i), task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, mPoints.ptx(i), task.DotSize, task.highlight)
                 strOut += Format(mPoints.correlation(i), fmt3) + ", "
             Else
                 mPoints.ptx.RemoveAt(i)
@@ -324,7 +324,7 @@ Public Class Feature_LucasKanade : Inherits TaskParent
             Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
             ptList.Add(pt)
             If ptLast.Contains(pt) Then
-                DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst3, pt, task.DotSize, task.highlight)
                 stationary += 1
             Else
                 DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), white)
@@ -355,8 +355,8 @@ Public Class Feature_Points : Inherits TaskParent
         If task.heartBeat Then dst3.SetTo(0)
 
         For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
-            DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst3, pt, task.DotSize, task.highlight)
         Next
         labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(task.feat.options.featurePoints) + " requested."
     End Sub
@@ -404,7 +404,7 @@ Public Class Feature_TraceDelaunay : Inherits TaskParent
         dst2.SetTo(0)
         For Each ptList In goodList
             For Each pt In ptList
-                DrawCircle(task.color, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(task.color, pt, task.DotSize, task.highlight)
                 Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
                 DrawCircle(dst2, pt, task.DotSize + 1, c)
             Next
@@ -437,7 +437,7 @@ Public Class Feature_ShiTomasi : Inherits TaskParent
             dst2.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
             shiTomasi.Run(task.rightView)
-            dst3.SetTo(task.HighlightColor, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst3.SetTo(task.highlight, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Else
             harris.Run(task.leftView)
             dst2 = harris.dst2.Clone
@@ -530,7 +530,7 @@ Public Class Feature_History : Inherits TaskParent
                     DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
                 Else
                     whiteCount += 1
-                    DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 End If
             End If
         Next
@@ -595,7 +595,7 @@ Public Class Feature_AKaze : Inherits TaskParent
         Dim kazeDescriptors As New cv.Mat()
         kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
         For i As Integer = 0 To kazeKeyPoints.Length - 1
-            DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight)
         Next
     End Sub
 End Class
@@ -612,7 +612,7 @@ Public Class Feature_RedCloud : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         For Each pt In task.featurePoints
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
     End Sub
 End Class
@@ -634,7 +634,7 @@ Public Class Feature_WithDepth : Inherits TaskParent
         For Each pt In task.featurePoints
             Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If val > 0 Then
-                DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst3, pt, task.DotSize, task.highlight)
                 depthCount += 1
             End If
         Next
@@ -689,7 +689,7 @@ Public Class Feature_Matching : Inherits TaskParent
 
         dst2 = src.Clone
         For Each pt In features
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
 
         fpLastSrc = src.Clone
@@ -733,7 +733,7 @@ Public Class Feature_SteadyCam : Inherits TaskParent
 
         dst2 = src
         For Each pt In features
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
 
         lastSrc = src.Clone
@@ -777,15 +777,15 @@ Public Class Feature_FacetPoints : Inherits TaskParent
 
         For Each rc In task.rcList
             For Each pt In rc.ptFacets
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         Next
 
         If standalone Then
             Dim rc = task.rcList(task.rc.index)
-            task.color.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            task.color.Rectangle(rc.rect, task.highlight, task.lineWidth)
             For Each pt In rc.ptFacets
-                DrawCircle(task.color, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(task.color, pt, task.DotSize, task.highlight)
             Next
         End If
     End Sub
@@ -820,9 +820,9 @@ Public Class Feature_GridPoints : Inherits TaskParent
 
         If standalone Then
             Dim rc = task.rcList(task.rc.index)
-            dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
             For Each pt In rc.ptList
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         End If
     End Sub
@@ -870,7 +870,7 @@ Public Class Feature_Agast : Inherits TaskParent
         stablePoints = New List(Of cv.Point2f)(newList)
         dst2 = src
         For Each pt In stablePoints
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
         labels(2) = $"Found {keypoints.Length} features with agast"
     End Sub
@@ -897,7 +897,7 @@ Public Class Feature_NoMotion : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each pt In task.featurePoints
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
@@ -926,7 +926,7 @@ Public Class Feature_StableVisual : Inherits TaskParent
         Dim stable As New List(Of cv.Point)
         For Each pt In task.featurePoints
             If lastFeatures.Contains(pt) Then
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 stable.Add(pt)
             End If
         Next
@@ -935,7 +935,7 @@ Public Class Feature_StableVisual : Inherits TaskParent
 
         dst2 = src.Clone
         For Each pt In stable
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
         labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
     End Sub
@@ -961,7 +961,7 @@ Public Class Feature_StableVisualize : Inherits TaskParent
         Dim stable As New List(Of cv.Point)
         For Each pt In task.featurePoints
             If lastFeatures.Contains(pt) Then
-                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 stable.Add(pt)
             End If
         Next
@@ -992,7 +992,7 @@ Public Class Feature_StableVisualize : Inherits TaskParent
         dst3.SetTo(0)
         For Each fp In fpStable
             If fp.age > 2 Then
-                DrawCircle(dst3, fp.pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
                 SetTrueText(CStr(fp.age), fp.pt, 3)
             End If
         Next

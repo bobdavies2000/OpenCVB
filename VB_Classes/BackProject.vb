@@ -190,7 +190,7 @@ Public Class BackProject_FullLines : Inherits TaskParent
         dst2 = src
         dst3.SetTo(0)
         For Each lp In task.lpList
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+            DrawLine(dst2, lp.p1, lp.p2, task.highlight)
             DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
     End Sub
@@ -631,7 +631,7 @@ Public Class BackProject_MaskLines : Inherits TaskParent
             If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, white)
         Next
         dst3.SetTo(cv.Scalar.Yellow, masks.mask)
-        dst3.SetTo(task.HighlightColor, dst1)
+        dst3.SetTo(task.highlight, dst1)
     End Sub
 End Class
 

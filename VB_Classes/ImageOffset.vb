@@ -108,8 +108,8 @@ Public Class ImageOffset_SliceH : Inherits TaskParent
         dst2 = mats.dst2
 
         Dim p1 = New cv.Point(0, pt.Y), p2 = New cv.Point(dst2.Width, pt.Y)
-        task.color.Line(p1, p2, task.HighlightColor, task.lineWidth)
-        task.depthRGB.Line(p1, p2, task.HighlightColor, task.lineWidth)
+        task.color.Line(p1, p2, task.highlight, task.lineWidth)
+        task.depthRGB.Line(p1, p2, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -169,8 +169,8 @@ Public Class ImageOffset_SliceV : Inherits TaskParent
         dst2 = mats.dst2
 
         Dim p1 = New cv.Point(pt.X, 0), p2 = New cv.Point(pt.X, dst2.Height)
-        task.color.Line(p1, p2, task.HighlightColor, task.lineWidth)
-        task.depthRGB.Line(p1, p2, task.HighlightColor, task.lineWidth)
+        task.color.Line(p1, p2, task.highlight, task.lineWidth)
+        task.depthRGB.Line(p1, p2, task.highlight, task.lineWidth)
     End Sub
 End Class
 

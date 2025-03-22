@@ -73,7 +73,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each rc In task.rcList
-            dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
         Next
         labels(2) = $"{task.rcList.Count} rectangles before contain test"
 
@@ -106,7 +106,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each r In rects
-            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+            dst3.Rectangle(r, task.highlight, task.lineWidth)
         Next
         labels(3) = $"{rects.Count} rectangles after contain test"
     End Sub

@@ -69,7 +69,7 @@ Public Class Corners_Harris : Inherits TaskParent
         For y = 0 To task.gray.Rows - 1
             For x = 0 To task.gray.Cols - 1
                 If mc.Get(Of Single)(y, x) > mm.minVal + (mm.maxVal - mm.minVal) * options.quality / options.qualityMax Then
-                    DrawCircle(dst2, New cv.Point(x, y), task.DotSize, task.HighlightColor)
+                    DrawCircle(dst2, New cv.Point(x, y), task.DotSize, task.highlight)
                     count += 1
                 End If
             Next
@@ -324,7 +324,7 @@ Public Class Corners_RedCloud : Inherits TaskParent
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
         Next
     End Sub
@@ -349,7 +349,7 @@ Public Class Corners_SubPix : Inherits TaskParent
         cv.Cv2.CornerSubPix(task.gray, task.features, New cv.Size(options.subpixSize, options.subpixSize), New cv.Size(-1, -1), term)
 
         For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
     End Sub
 End Class

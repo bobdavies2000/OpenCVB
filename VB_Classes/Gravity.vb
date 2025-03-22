@@ -50,7 +50,7 @@ Public Class Gravity_Raw : Inherits TaskParent
             Dim gravityVec = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
 
             dst2.SetTo(0)
-            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.HighlightColor)
+            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
         End If
     End Sub
 End Class
@@ -105,7 +105,7 @@ Public Class Gravity_Basics : Inherits TaskParent
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor)
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
         End If
     End Sub

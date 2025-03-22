@@ -279,7 +279,7 @@ Public Class Linear_Slices : Inherits TaskParent
             plotSLR.plot.minY = -task.xRange
             plotSLR.plot.maxY = task.xRange
         End If
-        task.depthRGB.Line(p1, p2, task.HighlightColor, task.lineWidth)
+        task.depthRGB.Line(p1, p2, task.highlight, task.lineWidth)
 
         plotSLR.slrCore.inputX.Clear()
         plotSLR.slrCore.inputY.Clear()

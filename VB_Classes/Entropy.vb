@@ -110,7 +110,7 @@ Public Class Entropy_FAST : Inherits TaskParent
         entropy.Run(fast.dst2)
         dst2 = entropy.dst2
         dst3 = entropy.dst2
-        dst3.Rectangle(entropy.eMaxRect, task.HighlightColor, task.lineWidth)
+        dst3.Rectangle(entropy.eMaxRect, task.highlight, task.lineWidth)
     End Sub
 End Class
 

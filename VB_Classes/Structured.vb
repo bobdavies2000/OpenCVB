@@ -650,7 +650,7 @@ Public Class Structured_SliceYPlot : Inherits TaskParent
 
         If mm.maxVal > 0 Then
             DrawCircle(dst3, New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, cv.Scalar.Yellow)
-            ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.HighlightColor, task.lineWidth, task.lineType)
+            ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.highlight, task.lineWidth, task.lineType)
             Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
 
             Dim depthMask = task.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
@@ -689,7 +689,7 @@ Public Class Structured_MouseSlice : Inherits TaskParent
         If task.lpList.Count > 0 Then
             dst3 = task.lines.dst2
             For Each lp In task.lpList
-                dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth + 3, task.lineType)
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 3, task.lineType)
                 tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
                 bots.Add(If(lp.p1.Y > lp.p2.Y, lp.p1.Y, lp.p2.Y))
                 topsList.Add(lp.p1)
@@ -700,7 +700,7 @@ Public Class Structured_MouseSlice : Inherits TaskParent
             'Dim botPt = botsList(bots.IndexOf(bots.Max))
             'DrawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.DotSize + 5, cv.Scalar.Red)
             'dst3.Line(topPt, botPt, cv.Scalar.Red, task.lineWidth, task.lineType)
-            'DrawLine(dst2,topPt, botPt, task.HighlightColor, task.lineWidth + 2, task.lineType)
+            'DrawLine(dst2,topPt, botPt, task.highlight, task.lineWidth + 2, task.lineType)
         End If
         If standaloneTest() Then
             dst2 = src
@@ -1014,8 +1014,8 @@ Public Class Structured_SliceV : Inherits TaskParent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst2
-        DrawCircle(dst3, New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.HighlightColor)
-        dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.HighlightColor, options.sliceSize)
+        DrawCircle(dst3, New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.highlight)
+        dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlight, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
             dst2.SetTo(white, sliceMask)
@@ -1059,8 +1059,8 @@ Public Class Structured_SliceH : Inherits TaskParent
 
         dst3 = heat.dst3
         Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
-        DrawCircle(dst3, New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.HighlightColor)
-        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.HighlightColor, options.sliceSize)
+        DrawCircle(dst3, New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.highlight)
+        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlight, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
             dst2.SetTo(white, sliceMask)
@@ -1259,14 +1259,14 @@ Public Class Structured_Crosshairs : Inherits TaskParent
                         Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
                         If p1.X > 0 Then
                             Dim p2 = New cv.Point(xx, yy)
-                            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+                            dst2.Line(p1, p2, task.highlight, task.lineWidth + 1, task.lineType)
                         End If
                     End If
                     If y = sCloud.options.indexY Then
                         Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
                         If p1.X > 0 Then
                             Dim p2 = New cv.Point(xx, yy)
-                            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+                            dst2.Line(p1, p2, task.highlight, task.lineWidth + 1, task.lineType)
                         End If
                     End If
                 End If

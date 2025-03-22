@@ -424,7 +424,7 @@ Public Class TaskParent : Implements IDisposable
         dst1.SetTo(0)
         For Each fp In task.fpList
             For Each pt In fp.ptHistory
-                DrawCircle(dst1, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst1, pt, task.DotSize, task.highlight)
             Next
         Next
     End Sub
@@ -560,7 +560,7 @@ Public Class TaskParent : Implements IDisposable
         For i = 1 To pts.Length
             Dim index = i Mod pts.Length
             Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            DrawLine(dst2, pt, lastPt, task.HighlightColor)
+            DrawLine(dst2, pt, lastPt, task.highlight)
             lastPt = pt
         Next
     End Sub

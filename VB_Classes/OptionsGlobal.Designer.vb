@@ -56,7 +56,7 @@ Partial Class OptionsGlobal
         Me.showMotionMask = New System.Windows.Forms.CheckBox()
         Me.UseMotionMask = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.HighlightColor = New System.Windows.Forms.ComboBox()
+        Me.highlight = New System.Windows.Forms.ComboBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
@@ -356,7 +356,7 @@ Partial Class OptionsGlobal
         Me.GroupBox2.Controls.Add(Me.TruncateDepth)
         Me.GroupBox2.Controls.Add(Me.MotionBox)
         Me.GroupBox2.Controls.Add(Me.Label1)
-        Me.GroupBox2.Controls.Add(Me.HighlightColor)
+        Me.GroupBox2.Controls.Add(Me.highlight)
         Me.GroupBox2.Controls.Add(Me.CrossHairs)
         Me.GroupBox2.Controls.Add(Me.GroupBox1)
         Me.GroupBox2.Controls.Add(Me.ShowGrid)
@@ -494,13 +494,13 @@ Partial Class OptionsGlobal
         Me.Label1.TabIndex = 73
         Me.Label1.Text = "Highlight Color"
         '
-        'HighlightColor
+        'highlight
         '
-        Me.HighlightColor.FormattingEnabled = True
-        Me.HighlightColor.Location = New System.Drawing.Point(528, 168)
-        Me.HighlightColor.Name = "HighlightColor"
-        Me.HighlightColor.Size = New System.Drawing.Size(120, 28)
-        Me.HighlightColor.TabIndex = 72
+        Me.highlight.FormattingEnabled = True
+        Me.highlight.Location = New System.Drawing.Point(528, 168)
+        Me.highlight.Name = "highlight"
+        Me.highlight.Size = New System.Drawing.Size(120, 28)
+        Me.highlight.TabIndex = 72
         '
         'CrossHairs
         '
@@ -922,7 +922,7 @@ Partial Class OptionsGlobal
     Friend WithEvents showMotionMask As System.Windows.Forms.CheckBox
     Friend WithEvents CrossHairs As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents HighlightColor As System.Windows.Forms.ComboBox
+    Friend WithEvents highlight As System.Windows.Forms.ComboBox
     Friend WithEvents UseMotionMask As Windows.Forms.CheckBox
     Friend WithEvents MotionBox As Windows.Forms.GroupBox
     Friend WithEvents TruncateDepth As Windows.Forms.CheckBox

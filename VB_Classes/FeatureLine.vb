@@ -18,7 +18,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
 
         dst2 = src
         Dim lpt = task.lpList(0)
-        dst2.Line(lpt.p1, lpt.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+        dst2.Line(lpt.p1, lpt.p2, task.highlight, task.lineWidth + 1, task.lineType)
     End Sub
 End Class
 
@@ -165,8 +165,8 @@ Public Class FeatureLine_VH : Inherits TaskParent
             SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 2)
             SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 3)
 
-            DrawLine(dst2, p1, p2, task.HighlightColor)
-            DrawLine(dst3, p1, p2, task.HighlightColor)
+            DrawLine(dst2, p1, p2, task.highlight)
+            DrawLine(dst3, p1, p2, task.highlight)
         Next
     End Sub
 End Class
@@ -201,7 +201,7 @@ Public Class FeatureLine_Tutorial1 : Inherits TaskParent
 
         dst3 = src
         For i = 0 To raw2D.Count - 2 Step 2
-            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.HighlightColor)
+            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlight)
         Next
         If task.heartBeat Then labels(2) = "Starting with " + Format(task.lpList.Count, "000") +
                                            " lines, there are " + Format(raw3D.Count / 2, "000") +
@@ -297,7 +297,7 @@ Public Class FeatureLine_LongestVerticalKNN : Inherits TaskParent
             SetTrueText(CStr(index) + vbCrLf + Format(gc.arcY, fmt1), pt, 3)
             index += 1
 
-            DrawLine(dst3, p1, p2, task.HighlightColor)
+            DrawLine(dst3, p1, p2, task.highlight)
             longest.knn.trainInput.Add(p1)
             longest.knn.trainInput.Add(p2)
         Next
@@ -330,9 +330,9 @@ Public Class FeatureLine_LongestV_Tutorial1 : Inherits TaskParent
         Dim index = lines.sortedVerticals.ElementAt(0).Value
         Dim p1 = lines.lines2D(index)
         Dim p2 = lines.lines2D(index + 1)
-        DrawLine(dst2, p1, p2, task.HighlightColor)
+        DrawLine(dst2, p1, p2, task.highlight)
         dst3.SetTo(0)
-        DrawLine(dst3, p1, p2, task.HighlightColor)
+        DrawLine(dst3, p1, p2, task.highlight)
     End Sub
 End Class
 
@@ -381,9 +381,9 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits TaskParent
         Dim p2 = New cv.Point2f(knn.trainInput(index)(2), knn.trainInput(index)(3))
         pt1 = match3D(index * 2)
         pt2 = match3D(index * 2 + 1)
-        DrawLine(dst2, p1, p2, task.HighlightColor)
+        DrawLine(dst2, p1, p2, task.highlight)
         dst3.SetTo(0)
-        DrawLine(dst3, p1, p2, task.HighlightColor)
+        DrawLine(dst3, p1, p2, task.highlight)
 
         Static lastLength = lines.sorted2DV.ElementAt(0).Key
         Dim bestLength = lines.sorted2DV.ElementAt(0).Key
@@ -424,9 +424,9 @@ Public Class FeatureLine_VerticalLongLine : Inherits TaskParent
         Dim index = lines.sortedVerticals.ElementAt(0).Value
         Dim p1 = lines.lines2D(index)
         Dim p2 = lines.lines2D(index + 1)
-        DrawLine(dst2, p1, p2, task.HighlightColor)
+        DrawLine(dst2, p1, p2, task.highlight)
         dst3.SetTo(0)
-        DrawLine(dst3, p1, p2, task.HighlightColor)
+        DrawLine(dst3, p1, p2, task.highlight)
         Dim pt1 = lines.lines3D(index)
         Dim pt2 = lines.lines3D(index + 1)
         Dim len3D = distance3D(pt1, pt2)
@@ -471,9 +471,9 @@ Public Class FeatureLine_DetailsAll : Inherits TaskParent
                 Dim index = lines.sortedVerticals.ElementAt(i).Value
                 Dim p1 = lines.lines2D(index)
                 Dim p2 = lines.lines2D(index + 1)
-                DrawLine(dst2, p1, p2, task.HighlightColor)
+                DrawLine(dst2, p1, p2, task.highlight)
                 SetTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
-                DrawLine(dst3, p1, p2, task.HighlightColor)
+                DrawLine(dst3, p1, p2, task.highlight)
 
                 Dim pt1 = lines.lines3D(index)
                 Dim pt2 = lines.lines3D(index + 1)
@@ -539,13 +539,13 @@ Public Class FeatureLine_LongestKNN : Inherits TaskParent
         match.Run(src)
         If match.correlation >= options.correlationMin Then
             dst3 = match.dst0.Resize(dst3.Size)
-            DrawLine(dst2, p1, p2, task.HighlightColor)
-            DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
-            DrawCircle(dst2, p2, task.DotSize, task.HighlightColor)
+            DrawLine(dst2, p1, p2, task.highlight)
+            DrawCircle(dst2, p1, task.DotSize, task.highlight)
+            DrawCircle(dst2, p2, task.DotSize, task.highlight)
             rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
             match.template = src(rect).Clone
         Else
-            task.HighlightColor = If(task.HighlightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
+            task.highlight = If(task.highlight = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
             knn.lastPair = New lpData(New cv.Point2f, New cv.Point2f)
         End If
         labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
@@ -595,9 +595,9 @@ Public Class FeatureLine_Longest : Inherits TaskParent
         p2 = match2.matchCenter
 
         gline = glines.updateGLine(src, gline, p1, p2)
-        DrawLine(dst2, p1, p2, task.HighlightColor)
-        DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
-        DrawCircle(dst2, p2, task.DotSize, task.HighlightColor)
+        DrawLine(dst2, p1, p2, task.highlight)
+        DrawCircle(dst2, p1, task.DotSize, task.highlight)
+        DrawCircle(dst2, p2, task.DotSize, task.highlight)
         SetTrueText(Format(match1.correlation, fmt3), p1)
         SetTrueText(Format(match2.correlation, fmt3), p2)
     End Sub

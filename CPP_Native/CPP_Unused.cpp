@@ -2496,7 +2496,7 @@ public:
             for (int j = 0; j <= 100; j++) {
                 Point p2 = nextPoint(points, i, j / 100.0f);
                 if (j > 0) {
-                    line(dst2, p1, p2, task->HighlightColor, task->lineWidth);
+                    line(dst2, p1, p2, task->highlight, task->lineWidth);
                 }
                 p1 = p2;
             }
@@ -3373,7 +3373,7 @@ public:
         kaze->detectAndCompute(src, cv::noArray(), kazeKeyPoints, kazeDescriptors);
         for (const auto& keyPoint : kazeKeyPoints)
         {
-            cv::circle(dst2, keyPoint.pt, task->DotSize, task->HighlightColor);
+            cv::circle(dst2, keyPoint.pt, task->DotSize, task->highlight);
         }
     }
 };

@@ -91,13 +91,13 @@ Public Class Convex_Defects : Inherits TaskParent
         dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim hull = cv.Cv2.ConvexHull(c, False)
         Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
-        DrawContour(dst3, hull.ToList, task.HighlightColor)
+        DrawContour(dst3, hull.ToList, task.highlight)
 
         Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
         For Each v In defects
             dst3.Line(c(v(0)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             dst3.Line(c(v(1)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-            DrawCircle(dst3,c(v(2)), task.DotSize + 2, task.HighlightColor)
+            DrawCircle(dst3,c(v(2)), task.DotSize + 2, task.highlight)
         Next
     End Sub
 End Class

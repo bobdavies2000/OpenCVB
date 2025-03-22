@@ -161,6 +161,6 @@ Public Class ROI_Accumulate : Inherits TaskParent
             End If
         End If
         dst2.Rectangle(roiRect, white, task.lineWidth)
-        task.color.Rectangle(roiRect, task.HighlightColor, task.lineWidth)
+        task.color.Rectangle(roiRect, task.highlight, task.lineWidth)
     End Sub
 End Class

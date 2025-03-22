@@ -173,7 +173,7 @@ Public Class FitLine_Simple3D : Inherits TaskParent
         Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
         Dim lp = New lpData(center, p2)
         lpResult = findEdgePoints(lp)
-        dst2.Line(lpResult.p1, lpResult.p2, task.HighlightColor, task.lineWidth, task.lineType)
+        dst2.Line(lpResult.p1, lpResult.p2, task.highlight, task.lineWidth, task.lineType)
         dst2.Circle(center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
@@ -199,7 +199,7 @@ Public Class FitLine_Example2D : Inherits TaskParent
         Next
         fitLine.Run(src)
 
-        dst2.Line(fitLine.lp.p1, fitLine.lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+        dst2.Line(fitLine.lp.p1, fitLine.lp.p2, task.highlight, task.lineWidth, task.lineType)
         dst2.Circle(fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
@@ -224,7 +224,7 @@ Public Class FitLine_TrendLine3D : Inherits TaskParent
             dst2.SetTo(0)
             ptList.Clear()
             For Each pt In inputData.PointList
-                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight)
                 ptList.Add(pt)
             Next
         End If
@@ -236,7 +236,7 @@ Public Class FitLine_TrendLine3D : Inherits TaskParent
         Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
         Dim lp = New lpData(center, p2)
         lpResult = findEdgePoints(lp)
-        dst2.Line(lpResult.p1, lpResult.p2, task.HighlightColor, task.lineWidth, task.lineType)
+        dst2.Line(lpResult.p1, lpResult.p2, task.highlight, task.lineWidth, task.lineType)
         dst2.Circle(center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class

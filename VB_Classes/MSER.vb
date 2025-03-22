@@ -353,7 +353,7 @@ Public Class MSER_ROI : Inherits TaskParent
                 If center.X >= box.X And center.X <= (box.X + box.Width) Then
                     If center.Y >= box.Y And center.Y <= (box.Y + box.Height) Then
                         removeBoxes.Add(i)
-                        dst3.Rectangle(b, task.HighlightColor, task.lineWidth)
+                        dst3.Rectangle(b, task.highlight, task.lineWidth)
                     End If
                 End If
             Next
@@ -364,7 +364,7 @@ Public Class MSER_ROI : Inherits TaskParent
         End While
 
         For Each rect In containers
-            dst2.Rectangle(rect, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(rect, task.highlight, task.lineWidth)
         Next
 
         labels(2) = CStr(containers.Count) + " consolidated regions of interest located"
@@ -418,7 +418,7 @@ Public Class MSER_TestExample : Inherits TaskParent
         Next
 
         For Each box In boxes
-            dst3.Rectangle(box, task.HighlightColor, task.lineWidth + 1, task.lineType)
+            dst3.Rectangle(box, task.highlight, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(boxes.Count) + " regions were found using MSER"
     End Sub
@@ -550,7 +550,7 @@ Public Class MSER_BasicsNew : Inherits TaskParent
         dst3 = src
         For i = 0 To boxes.Count - 1
             Dim r = boxes.ElementAt(i).Value
-            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+            dst3.Rectangle(r, task.highlight, task.lineWidth)
             If i >= displaycount Then Exit For
         Next
 
@@ -682,7 +682,7 @@ Public Class MSER_CPP : Inherits TaskParent
         If standaloneTest() Then
             dst3 = src
             For i = 0 To boxes.Count - 1
-                dst3.Rectangle(boxes(i), task.HighlightColor, task.lineWidth)
+                dst3.Rectangle(boxes(i), task.highlight, task.lineWidth)
                 If i < task.redOptions.IdentifyCountBar.Value Then SetTrueText(CStr(i + 1), boxes(i).TopLeft, 3)
             Next
         End If

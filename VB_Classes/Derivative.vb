@@ -55,7 +55,7 @@ Public Class Derivative_Basics : Inherits TaskParent
 
         dst2.Rectangle(New cv.Rect(CInt((center - bars) * brickWidth), 0,
                        brickWidth * (bars * 2 + centerAdjust), dst2.Height),
-                       task.HighlightColor, task.lineWidth)
+                       task.highlight, task.lineWidth)
 
         labels(2) = CStr(proximityCount) + " depth points were within " +
                     CStr(subD.options.mmThreshold * 1000) + " mm's of their neighbor or " +

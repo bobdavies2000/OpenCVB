@@ -30,7 +30,7 @@ Public Class Mesh_Basics : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
             DrawCircle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst3, knn.queries(i), task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, knn.queries(i), task.DotSize, task.highlight)
         Next
         labels(2) = "Triangles built each input point and its " + CStr(options.nabeCount) + " nearest neighbors."
     End Sub

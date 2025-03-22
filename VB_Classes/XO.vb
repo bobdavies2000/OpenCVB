@@ -85,7 +85,7 @@ Public Class XO_Gravity_HorizonRawOld : Inherits TaskParent
             gravityVec = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
 
             dst2.SetTo(0)
-            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.HighlightColor)
+            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
             DrawLine(dst2, horizonVec.p1, horizonVec.p2, cv.Scalar.Red)
         End If
     End Sub
@@ -619,7 +619,7 @@ Public Class XO_Rotate_Horizon : Inherits TaskParent
         horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle)
         horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)
 
-        DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.HighlightColor)
+        DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.highlight)
         DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
 
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
@@ -792,7 +792,7 @@ Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
                 If diff > threshold Then
                     dst2.Rectangle(gc.rect, 255, task.lineWidth)
                     SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), gc.rect.TopLeft, 2)
-                    dst3.Rectangle(gc.rect, task.HighlightColor, task.lineWidth)
+                    dst3.Rectangle(gc.rect, task.highlight, task.lineWidth)
                     SetTrueText(Format(diff, fmt1), gc.rect.TopLeft, 3)
                     count += 1
                 End If
@@ -990,7 +990,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
                     Dim lpNew = combine2Lines(lp, mp)
                     If lpNew IsNot Nothing Then
                         addList.Add(lpNew)
-                        DrawLine(dst2, lpNew.p1, lpNew.p2, task.HighlightColor)
+                        DrawLine(dst2, lpNew.p1, lpNew.p2, task.highlight)
                         If removeList.Values.Contains(j) = False Then removeList.Add(j, j)
                         lpRemove = True
                         combineCount += 1
@@ -1093,13 +1093,13 @@ Public Class XO_Line_DisplayInfoOld : Inherits TaskParent
         maskCount = dst3.CountNonZero
 
         For Each tc In tcells
-            'dst2.Rectangle(tc.rect, myHighlightColor)
+            'dst2.Rectangle(tc.rect, myhighlight)
             'dst2.Rectangle(tc.searchRect, white, task.lineWidth)
             SetTrueText(tc.strOut, New cv.Point(tc.rect.X, tc.rect.Y))
         Next
 
         strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
-        DrawLine(dst2, p1, p2, task.HighlightColor)
+        DrawLine(dst2, p1, p2, task.highlight)
 
         strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
                       "Correlation coefficient is shown with the depth in meters."
@@ -1423,7 +1423,7 @@ Public Class XO_Line_FromContours : Inherits TaskParent
     Dim contours As New Contour_Gray
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
-        task.gOptions.HighlightColor.SelectedIndex = 3
+        task.gOptions.highlight.SelectedIndex = 3
         UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
         desc = "Find the lines in the contours."
     End Sub
@@ -2005,12 +2005,12 @@ Public Class XO_Line3D_Basics : Inherits TaskParent
         dst2 = src
         dst3.SetTo(0)
         For Each lp In sLines.lineX.lpList
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
         For Each lp In sLines.lineY.lpList
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 

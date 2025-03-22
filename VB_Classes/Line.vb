@@ -57,7 +57,7 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In sortlines.Values
             lp.index = task.lpList.Count
             task.lpList.Add(lp)
-            dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(task.lpList.Count) + " lines were found."
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
@@ -248,7 +248,7 @@ Public Class Line_Vertical : Inherits TaskParent
             Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
 
             If Math.Abs(angle - gAngle) < 2 Then
-                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 ptList.Add(lp)
             End If
         Next
@@ -283,8 +283,8 @@ Public Class Line_VerticalHorizontal : Inherits TaskParent
         dst3.SetTo(0)
         For Each lp In verts.ptList
             vList.Add(lp.length, lp)
-            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
-            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+            DrawLine(dst2, lp.p1, lp.p2, task.highlight)
+            DrawLine(dst3, lp.p1, lp.p2, task.highlight)
         Next
 
         For Each lp In horiz.ptList
@@ -369,7 +369,7 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
             Dim d2 = nearest.distance
 
             If Math.Abs(d1 - d2) <= pixelDiff Then
-                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
+                DrawLine(dst2, lp.p1, lp.p2, task.highlight)
             End If
         Next
 
@@ -423,7 +423,7 @@ Public Class Line_PointSlope : Inherits TaskParent
                 For j = 0 To knn.options.knnDimension - 1
                     knn.queries.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
                 Next
-                DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+                DrawLine(dst3, lp.p1, lp.p2, task.highlight)
                 If bestLines.Count >= lineCount Then Exit For
             Next
         End If
@@ -434,7 +434,7 @@ Public Class Line_PointSlope : Inherits TaskParent
             For j = 0 To knn.options.knnDimension - 1
                 knn.trainInput.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
             Next
-            dst1.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+            dst1.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         If knn.trainInput.Count = 0 Then
             SetTrueText("There were no lines detected!  Were there any unusual settings for this run?", 3)
@@ -463,7 +463,7 @@ Public Class Line_PointSlope : Inherits TaskParent
 
         bestLines = New List(Of lpData)(nextLines)
         For Each ptS In bestLines
-            DrawLine(dst2, ptS.p1, ptS.p2, task.HighlightColor)
+            DrawLine(dst2, ptS.p1, ptS.p2, task.highlight)
             DrawLine(dst1, ptS.p1, ptS.p2, cv.Scalar.Red)
         Next
     End Sub
@@ -517,7 +517,7 @@ Public Class Line_Info : Inherits TaskParent
         dst2.SetTo(0)
         For Each lp In task.lpList
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
-            DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, lp.center, task.DotSize, task.highlight)
 
             Dim nIndex = task.gridMap.Get(Of Integer)(lp.center.Y, lp.center.X)
             For Each gIndex In task.gridNeighbors(nIndex)
@@ -589,7 +589,7 @@ Public Class Line_Horizontal : Inherits TaskParent
             Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.X - lp.p2.X)) * 57.2958
 
             If Math.Abs(angle - hAngle) < 2 Then
-                dst2.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
                 ptList.Add(lp)
             End If

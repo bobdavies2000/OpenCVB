@@ -466,7 +466,7 @@ Public Class IMU_VerticalAngles : Inherits TaskParent
             strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbTab + vbCrLf
             SetTrueText(CStr(i), gc.tc1.center, 2)
             SetTrueText(CStr(i), gc.tc1.center, 3)
-            DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.HighlightColor)
+            DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.highlight)
             DrawLine(dst3, gc.tc1.center, gc.tc2.center, white)
         Next
         SetTrueText(strOut, 3)
@@ -560,8 +560,8 @@ Public Class IMU_Lines : Inherits TaskParent
 
             p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
             p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
-            DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
-            DrawCircle(dst2, p2, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, p1, task.DotSize, task.highlight)
+            DrawCircle(dst2, p2, task.DotSize, task.highlight)
             DrawCircle(dst3, p1, task.DotSize, white)
 
             DrawCircle(dst3, p2, task.DotSize, white)
@@ -1067,7 +1067,7 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
 
                 SetTrueText(CStr(index), gc.tc1.center, 2)
                 SetTrueText(CStr(index), gc.tc1.center, 3)
-                DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.HighlightColor)
+                DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.highlight)
                 DrawLine(dst3, gc.tc1.center, gc.tc2.center, white)
                 gCells(i) = gc
             Else

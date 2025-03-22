@@ -385,7 +385,7 @@ Public Class FPoly_Plot : Inherits TaskParent
             If absDiff >= hist.Length Then absDiff = hist.Length - 1
             If absDiff < fGrid.threshold Then
                 hist(CInt(absDiff)) += 1
-                DrawLine(dst3, fGrid.anchor, pt, task.HighlightColor)
+                DrawLine(dst3, fGrid.anchor, pt, task.highlight)
                 distDiff.Add(absDiff)
             Else
                 hist(fGrid.threshold) += 1
@@ -1251,7 +1251,7 @@ Public Class FPoly_Core : Inherits TaskParent
                 goodPoints.Add(pt)
                 goodFacets.Add(facet)
                 SetTrueText(Format(absDiff, fmt1), pt, 2)
-                DrawLine(dst3, anchor, pt, task.HighlightColor)
+                DrawLine(dst3, anchor, pt, task.highlight)
                 dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, white.ToVec3b)
             End If
         Next
@@ -1315,14 +1315,14 @@ Public Class FPoly_Line : Inherits TaskParent
         Dim pts = task.topFeatures
         Dim distances As New List(Of Single)
         For i = 0 To pts.Count - 2
-            DrawLine(dst2, pts(i), pts(i + 1), task.HighlightColor)
+            DrawLine(dst2, pts(i), pts(i + 1), task.highlight)
             distances.Add(pts(i).DistanceTo(pts(i + 1)))
         Next
 
         Dim index = distances.IndexOf(distances.Max)
         lp = New lpData(pts(index), pts(index + 1))
         dst3 = src
-        DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
+        DrawLine(dst3, lp.p1, lp.p2, task.highlight)
     End Sub
 End Class
 
@@ -1350,7 +1350,7 @@ Public Class FPoly_LineRect : Inherits TaskParent
         lpRect = ValidateRect(lpRect)
 
         dst2 = src
-        DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
-        dst2.Rectangle(lpRect, task.HighlightColor, task.lineWidth)
+        DrawLine(dst2, lp.p1, lp.p2, task.highlight)
+        dst2.Rectangle(lpRect, task.highlight, task.lineWidth)
     End Sub
 End Class

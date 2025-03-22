@@ -406,11 +406,11 @@ Public Class Grid_TrackCenter : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth + 1, task.lineType)
+            dst2.Rectangle(match.matchRect, task.highlight, task.lineWidth + 1, task.lineType)
             DrawCircle(dst2, center, task.DotSize, white)
 
             If task.heartBeat Then dst3.SetTo(0)
-            DrawCircle(dst3, center, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, center, task.DotSize, task.highlight)
             SetTrueText(Format(match.correlation, fmt3), center, 3)
 
             labels(3) = "Match correlation = " + Format(match.correlation, fmt3)

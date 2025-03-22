@@ -52,10 +52,10 @@ Public Class Depth_FirstLastDistance : Inherits TaskParent
         desc = "Monitor the first and last depth distances"
     End Sub
     Private Sub identifyMinMax(pt As cv.Point, text As String)
-        DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        DrawCircle(dst2, pt, task.DotSize, task.highlight)
         SetTrueText(text, pt, 2)
 
-        DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+        DrawCircle(dst3, pt, task.DotSize, task.highlight)
         SetTrueText(text, pt, 3)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -263,12 +263,12 @@ Public Class Depth_LocalMinMax_MT : Inherits TaskParent
             minPoint(i) = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             maxPoint(i) = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
 
-            DrawCircle(dst2(roi), mm.minLoc, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2(roi), mm.minLoc, task.DotSize, task.highlight)
             DrawCircle(dst2(roi), mm.maxLoc, task.DotSize, cv.Scalar.Red)
 
             Dim p1 = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             Dim p2 = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
-            DrawCircle(dst3, p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, p1, task.DotSize, task.highlight)
             DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Red)
         End Sub)
     End Sub

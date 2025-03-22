@@ -320,7 +320,7 @@ Public Class LeftRight_RedMask : Inherits TaskParent
         If standaloneTest() Then
             For Each md In redLeft.redMask.mdList
                 'DrawContour(dst2(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
-                DrawCircle(dst2, md.maxDist, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, md.maxDist, task.DotSize, task.highlight)
             Next
         End If
 
@@ -329,7 +329,7 @@ Public Class LeftRight_RedMask : Inherits TaskParent
         If standaloneTest() Then
             For Each md In redRight.redMask.mdList
                 'DrawContour(dst3(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
-                DrawCircle(dst3, md.maxDist, task.DotSize, task.HighlightColor)
+                DrawCircle(dst3, md.maxDist, task.DotSize, task.highlight)
             Next
         End If
     End Sub

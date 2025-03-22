@@ -83,7 +83,7 @@ Public Class EMax_Centers : Inherits TaskParent
         dst2 = emax.dst2
         Static lastCenters As New List(Of cv.Point2f)(emax.centers)
         For i = 0 To emax.centers.Count - 1
-            DrawCircle(dst2,emax.centers(i), task.DotSize + 1, task.HighlightColor)
+            DrawCircle(dst2,emax.centers(i), task.DotSize + 1, task.highlight)
             If i < lastCenters.Count Then
                 DrawCircle(dst2,lastCenters(i), task.DotSize + 2, cv.Scalar.Black)
             End If
@@ -140,7 +140,7 @@ Public Class EMax_InputClusters : Inherits TaskParent
             Dim ePt = New cv.Point2f(CInt(roi.X + pt.X), CInt(roi.Y + pt.Y))
             eSamples.Add(ePt) ' easier to debug with just integers...
             Dim label = eLabelMat.Get(Of Integer)(i)
-            DrawCircle(dst2, ePt, task.DotSize + 2, task.HighlightColor)
+            DrawCircle(dst2, ePt, task.DotSize + 2, task.highlight)
         Next
 
         ReDim eLabels(eLabelMat.Rows - 1)
@@ -227,7 +227,7 @@ Public Class EMax_PointTracker : Inherits TaskParent
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
             Dim p2 = knn.trainInput(knn.result(i, 0))
-            DrawCircle(dst3,p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3,p1, task.DotSize, task.highlight)
             DrawCircle(dst3,p2, task.DotSize, cv.Scalar.Red)
             DrawLine(dst3, p1, p2, white)
         Next

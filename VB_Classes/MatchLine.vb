@@ -58,7 +58,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
             If standaloneTest() Then dst3 = match.dst0.Resize(dst3.Size)
             Dim p1 = cornerToPoint(corner1, match.matchRect)
             Dim p2 = cornerToPoint(corner2, match.matchRect)
-            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 2, task.lineType)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
             lpOutput = New lpData(p1, p2)
         End If
         labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."

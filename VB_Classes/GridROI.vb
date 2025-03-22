@@ -431,11 +431,11 @@ Public Class GridROI_LRClick : Inherits TaskParent
                     strOut += "Right Mean = " + Format(mean(0), fmt3) + " Right stdev = " + Format(stdev(0), fmt3) + vbCrLf
                     strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
                 End If
-                dst3.Rectangle(rectRight, task.HighlightColor, task.lineWidth)
-                dst0.Rectangle(roi, task.HighlightColor, task.lineWidth)
+                dst3.Rectangle(rectRight, task.highlight, task.lineWidth)
+                dst0.Rectangle(roi, task.highlight, task.lineWidth)
                 dst1.SetTo(0)
-                DrawCircle(dst1, roi.TopLeft, task.DotSize, task.HighlightColor)
-                DrawCircle(dst1, rectRight.TopLeft, task.DotSize + 2, task.HighlightColor)
+                DrawCircle(dst1, roi.TopLeft, task.DotSize, task.highlight)
+                DrawCircle(dst1, rectRight.TopLeft, task.DotSize + 2, task.highlight)
                 Dim pt = New cv.Point(rectRight.X, roi.Y + 5)
                 SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
                 SetTrueText(strOut, 1)
@@ -484,7 +484,7 @@ Public Class GridROI_LRAll : Inherits TaskParent
         labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(options.correlationMin, fmt3)
 
         For Each roi In sortedRects.Values
-            dst3.Rectangle(roi, task.HighlightColor, task.lineWidth)
+            dst3.Rectangle(roi, task.highlight, task.lineWidth)
         Next
     End Sub
 End Class

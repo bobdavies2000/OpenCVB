@@ -1016,7 +1016,7 @@ Public Class RedColor_MaxDist : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         For Each rc In task.rcList
-            DrawCircle(dst2, rc.maxDist, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
         Next
 
         addTour.rcList = task.rcList
@@ -1026,7 +1026,7 @@ Public Class RedColor_MaxDist : Inherits TaskParent
         For i = 1 To addTour.rcList.Count - 1
             Dim rc = addTour.rcList(i)
             rc.maxDist = GetMaxDist(rc)
-            DrawCircle(dst3, rc.maxDist, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, rc.maxDist, task.DotSize, task.highlight)
         Next
     End Sub
 End Class
@@ -1120,7 +1120,7 @@ Public Class RedColor_GenCellContains : Inherits TaskParent
         For i = 0 To count - 1
             Dim rc = task.rcList(i)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst2.Rectangle(rc.rect, task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
         Next
 
         For i = task.redOptions.IdentifyCountBar.Value To task.rcList.Count - 1
@@ -1373,7 +1373,7 @@ Public Class RedColor_Features : Inherits TaskParent
         Select Case options.selection
             Case 0
                 Dim pt = rc.maxDist
-                dst2.Circle(pt, task.DotSize, task.HighlightColor, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, cv.LineTypes.AntiAlias)
                 labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
             Case 1
                 dst3(rc.rect).SetTo(vbNearFar((rc.depth) / task.MaxZmeters), rc.mask)
@@ -1653,7 +1653,7 @@ Public Class RedColor_TopX : Inherits TaskParent
                 Dim index = task.rcMap.Get(Of Byte)(pt.Y, pt.X)
                 Dim rc = task.rcList(index)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                DrawCircle(dst2, rc.maxDist, task.DotSize, task.HighlightColor)
+                DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
                 maxList.Add(rc.maxDist)
             Next
             topXcells = New List(Of cv.Point)(maxList)
@@ -1759,7 +1759,7 @@ Public Class RedColor_Largest : Inherits TaskParent
         dst3.SetTo(0)
         dst3(rc.rect).SetTo(rc.color, rc.mask)
         dst3.Circle(rc.maxDStable, task.DotSize + 2, cv.Scalar.Black)
-        dst3.Circle(rc.maxDStable, task.DotSize, task.HighlightColor)
+        dst3.Circle(rc.maxDStable, task.DotSize, task.highlight)
         labels(3) = "MaxDStable was the same for " + CStr(stableCount) + " frames"
     End Sub
 End Class
@@ -1871,7 +1871,7 @@ Public Class RedColor_GridCells : Inherits TaskParent
             rc.index = rcList.Count
             rc.color = color
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst2.Circle(rc.maxDStable, task.DotSize, task.HighlightColor, -1)
+            dst2.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
             rcList.Add(rc)
         Next
 

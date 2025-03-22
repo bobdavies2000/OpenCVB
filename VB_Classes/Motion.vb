@@ -452,7 +452,7 @@ Public Class Motion_RectTest : Inherits TaskParent
             diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst2)
             dst3 = diff.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst3.Rectangle(r, task.HighlightColor, task.lineWidth, task.lineType)
+            dst3.Rectangle(r, task.highlight, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -685,7 +685,7 @@ Public Class Motion_FPolyRect : Inherits TaskParent
         match.template = srcSave(fRect.lpRect).Clone
         match.Run(src)
         dst3 = src
-        dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
+        dst3.Rectangle(match.matchRect, task.highlight, task.lineWidth)
         labels(3) = "Correlation Coefficient = " + Format(match.correlation * 100, fmt1)
     End Sub
 End Class
@@ -732,13 +732,13 @@ Public Class Motion_CenterRect : Inherits TaskParent
         matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
 
         dst2 = src.Clone
-        dst2.Rectangle(matchRect, task.HighlightColor, task.lineWidth)
+        dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
 
         dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax).Resize(dst2.Size)
         DrawCircle(dst3, matchCenter, task.DotSize, cv.Scalar.Black)
 
         Dim smp = New lpData(gravitySnap.p1, gravitySnap.p2)
-        dst2.Line(smp.p1, smp.p2, task.HighlightColor, task.lineWidth + 2, task.lineType)
+        dst2.Line(smp.p1, smp.p2, task.highlight, task.lineWidth + 2, task.lineType)
 
         Dim xDisp = matchCenter.X - dst2.Width / 2
         Dim yDisp = matchCenter.Y - dst2.Height / 2
@@ -808,7 +808,7 @@ Public Class Motion_CenterKalman : Inherits TaskParent
 
         drawRotate.Run(dst2)
         dst2 = drawRotate.dst2
-        dst2.Rectangle(newRect, task.HighlightColor, task.lineWidth)
+        dst2.Rectangle(newRect, task.highlight, task.lineWidth)
 
         dst3(centerRect) = motion.template
         labels(2) = motion.labels(2)
@@ -916,7 +916,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
 
             Dim pair = New lpData(topPoint, botPoint)
             mp = findEdgePoints(pair)
-            dst3.Line(mp.p1, mp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
+            dst3.Line(mp.p1, mp.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
             Dim sideAdjacent = dst2.Height
             Dim sideOpposite = mp.p1.X - mp.p2.X
@@ -968,8 +968,8 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
                 roi = ValidateRect(roi)
-                dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
-                dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
+                dst2.Rectangle(roi, task.highlight, task.lineWidth)
+                dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
             Next
         End If
 
@@ -980,7 +980,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             match.template = saveMat(roi)
             match.searchRect = searchRects(i)
             match.Run(src)
-            dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
+            dst3.Rectangle(match.matchRect, task.highlight, task.lineWidth)
             matchRects.Add(match.matchRect)
         Next
 
@@ -1026,8 +1026,8 @@ Public Class Motion_TopFeatures : Inherits TaskParent
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
             roi = ValidateRect(roi)
-            dst2.Rectangle(roi, task.HighlightColor, task.lineWidth)
-            dst2.Rectangle(task.gridNabeRects(index), task.HighlightColor, task.lineWidth)
+            dst2.Rectangle(roi, task.highlight, task.lineWidth)
+            dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1047,7 +1047,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
             match.template = dst1(roi)
             match.searchRect = searchRects(i)
             match.Run(src)
-            dst3.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth)
+            dst3.Rectangle(match.matchRect, task.highlight, task.lineWidth)
             matchRects.Add(match.matchRect)
         Next
 

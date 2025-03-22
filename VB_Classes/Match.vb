@@ -488,7 +488,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
                 dst2 = dst2.Threshold(minCorrelation, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-            DrawCircle(dst3, ptx(i), task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
             dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
             rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
             target(i) = task.color(rect)
@@ -541,7 +541,7 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
         dst2 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         dst3 = src
-        dst3.SetTo(task.HighlightColor, dst2)
+        dst3.SetTo(task.highlight, dst2)
     End Sub
 End Class
 

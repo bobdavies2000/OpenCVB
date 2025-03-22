@@ -82,7 +82,7 @@ Public Class Projection_Basics : Inherits TaskParent
         SetTrueText(strOut, 3)
         If showRectangles Then
             For i = 0 To Math.Min(rcList.Count, task.redOptions.IdentifyCountBar.Value) - 1
-                dst2.Rectangle(rcList(i).rect, task.HighlightColor, task.lineWidth)
+                dst2.Rectangle(rcList(i).rect, task.highlight, task.lineWidth)
             Next
         End If
         labels(2) = CStr(rcList.Count) + " objects were found in the " + viewType + " view."

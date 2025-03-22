@@ -73,7 +73,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
             End If
             'dst3.Line(lp.p1, lp.p2, task.vecColors(lp.colorIndex), 3, task.lineType)
             DrawLine(dst2, lp.p1, lp.p2, white, task.lineWidth)
-            DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor, -1)
+            DrawCircle(dst2, lp.center, task.DotSize, task.highlight, -1)
         Next
 
         lineMap = delaunay.dst3
@@ -108,7 +108,7 @@ Public Class LineTrack_RedCloud : Inherits TaskParent
         dst3.SetTo(0)
         For Each lp In task.lpList
             DrawLine(dst2, lp.p1, lp.p2, white, task.lineWidth)
-            DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor, -1)
+            DrawCircle(dst2, lp.center, task.DotSize, task.highlight, -1)
         Next
     End Sub
 End Class
@@ -179,7 +179,7 @@ Public Class LineTrack_Basics1 : Inherits TaskParent
             End If
             dst3.Line(lp.p1, lp.p2, task.vecColors(lp.colorIndex), 3, task.lineType)
             DrawLine(dst2, lp.p1, lp.p2, white, task.lineWidth)
-            DrawCircle(dst2, lp.center, task.DotSize, task.HighlightColor, -1)
+            DrawCircle(dst2, lp.center, task.DotSize, task.highlight, -1)
         Next
 
         lineMap = delaunay.dst3

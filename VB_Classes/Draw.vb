@@ -377,9 +377,9 @@ Public Class Draw_Line : Inherits TaskParent
         If task.ClickPoint <> New cv.Point Or externalUse Then
             If p1 = New cv.Point Then p1 = task.ClickPoint Else p2 = task.ClickPoint
         End If
-        If p1 <> newPoint And p2 = newPoint Then DrawCircle(dst2, p1, task.DotSize, task.HighlightColor)
+        If p1 <> newPoint And p2 = newPoint Then DrawCircle(dst2, p1, task.DotSize, task.highlight)
         If p1 <> newPoint And p2 <> newPoint Then
-            DrawLine(dst2, p1, p2, task.HighlightColor)
+            DrawLine(dst2, p1, p2, task.highlight)
         End If
         SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
                     "P1 = " + p1.ToString + vbCrLf + "P2 = " + p2.ToString, 3)
