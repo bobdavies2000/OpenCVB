@@ -1935,48 +1935,6 @@ End Class
 
 
 
-
-'Public Class OpenGL_DrawLines3D : Inherits TaskParent
-'    Dim lines As New Structured_Lines
-'    Public Sub New()
-'        task.ogl.oglFunction = oCase.drawLines
-'        desc = "Draw all the lines found with Line3D_Basics"
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        lines.Run(src)
-'        dst2 = lines.dst2
-'        dst3 = lines.dst3
-
-'        Dim vec(8) As Single
-'        Dim lineData As New List(Of Single)
-'        lineData.Add(0) ' fill this in below
-'        For Each lp In task.lpList
-'            If lp.pc1.Z > 0 And lp.pc2.Z > 0 Then
-'                If lp.vertical Then
-'                    lp.pc2.X = lp.pc1.X
-'                    lp.pc2.Z = lp.pc1.Z
-'                Else
-'                    lp.pc2.Y = lp.pc1.Y
-'                End If
-'                Dim c = task.scalarColors(lp.colorIndex)
-'                vec = {c(0) / 255, c(1) / 255, c(2) / 255, lp.pc1.X, lp.pc1.Y, lp.pc1.Z, lp.pc2.X, lp.pc2.Y, lp.pc2.Z}
-'                For i = 0 To vec.Length - 1
-'                    lineData.Add(vec(i))
-'                Next
-'            End If
-'        Next
-'        lineData(0) = lineData.Count
-'        task.ogl.dataInput = cv.Mat.FromPixelData(lineData.Count, 1, cv.MatType.CV_32F,
-'                                                   lineData.ToArray)
-
-'        task.ogl.Run(task.color)
-'    End Sub
-'End Class
-
-
-
-
-
 Public Class OpenGL_QuadGridTiles : Inherits TaskParent
     Dim tiles As New Quad_GridTiles
     Public Sub New()
@@ -2011,10 +1969,11 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
         labels = task.gCell.labels
         Dim quadData As New List(Of cv.Point3f)
         For Each gc In task.gcList
-            If gc.corners.Count Then quadData.Add(gc.color)
+            quadData.Add(gc.color)
             For Each pt In gc.corners
                 quadData.Add(pt)
             Next
+            dst2(gc.rect).SetTo(gc.color)
         Next
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
 
@@ -2072,51 +2031,51 @@ Public Class OpenGL_QuadConnect : Inherits TaskParent
         dst3 = connect.dst3
 
         Dim quadData As New List(Of cv.Point3f)
-        Dim idd1 As gcData, idd2 As gcData
+        Dim gc1 As gcData, gc2 As gcData
         For Each tup In connect.hTuples
-            idd1 = task.gcList(tup.Item1)
-            idd2 = task.gcList(tup.Item2)
+            gc1 = task.gcList(tup.Item1)
+            gc2 = task.gcList(tup.Item2)
             For i = tup.Item1 + 1 To tup.Item2 - 1
-                idd1 = task.gcList(i - 1)
-                idd2 = task.gcList(i)
-                If idd1.depth = 0 Or idd2.depth = 0 Then Continue For
-                If idd1.corners.Count = 0 Or idd2.corners.Count = 0 Then Continue For
+                gc1 = task.gcList(i - 1)
+                gc2 = task.gcList(i)
+                If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
+                If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
 
-                quadData.Add(idd1.color)
-                quadData.Add(idd1.corners(0))
-                quadData.Add(idd2.corners(0))
-                quadData.Add(idd2.corners(3))
-                quadData.Add(idd1.corners(3))
+                quadData.Add(gc1.color)
+                quadData.Add(gc1.corners(0))
+                quadData.Add(gc2.corners(0))
+                quadData.Add(gc2.corners(3))
+                quadData.Add(gc1.corners(3))
             Next
-            If idd1.corners.Count > 0 And idd2.corners.Count > 0 Then
-                quadData.Add(idd2.color)
-                quadData.Add(idd2.corners(0))
-                quadData.Add(idd2.corners(1))
-                quadData.Add(idd2.corners(2))
-                quadData.Add(idd2.corners(3))
+            If gc1.corners.Count > 0 And gc2.corners.Count > 0 Then
+                quadData.Add(gc2.color)
+                quadData.Add(gc2.corners(0))
+                quadData.Add(gc2.corners(1))
+                quadData.Add(gc2.corners(2))
+                quadData.Add(gc2.corners(3))
             End If
         Next
 
         Dim width = dst2.Width / task.cellSize
         For Each tup In connect.vTuples
             For i = tup.Item1 To tup.Item2 - width Step width
-                idd1 = task.gcList(i)
-                idd2 = task.gcList(i + width)
-                If idd1.depth = 0 Or idd2.depth = 0 Then Continue For
-                If idd1.corners.Count = 0 Or idd2.corners.Count = 0 Then Continue For
+                gc1 = task.gcList(i)
+                gc2 = task.gcList(i + width)
+                If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
+                If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
 
-                quadData.Add(idd1.color)
-                quadData.Add(idd1.corners(0))
-                quadData.Add(idd1.corners(1))
-                quadData.Add(idd2.corners(1))
-                quadData.Add(idd2.corners(0))
+                quadData.Add(gc1.color)
+                quadData.Add(gc1.corners(0))
+                quadData.Add(gc1.corners(1))
+                quadData.Add(gc2.corners(1))
+                quadData.Add(gc2.corners(0))
             Next
-            If idd1.corners.Count > 0 And idd2.corners.Count > 0 Then
-                quadData.Add(idd2.color)
-                quadData.Add(idd2.corners(0))
-                quadData.Add(idd2.corners(1))
-                quadData.Add(idd2.corners(2))
-                quadData.Add(idd2.corners(3))
+            If gc1.corners.Count > 0 And gc2.corners.Count > 0 Then
+                quadData.Add(gc2.color)
+                quadData.Add(gc2.corners(0))
+                quadData.Add(gc2.corners(1))
+                quadData.Add(gc2.corners(2))
+                quadData.Add(gc2.corners(3))
             End If
         Next
 
@@ -2202,12 +2161,12 @@ Public Class OpenGL_QuadCorrelationMask : Inherits TaskParent
         Dim minCorr = task.gCell.options.correlationThreshold
         Dim count As Integer
         For i = 0 To task.gcList.Count - 1
-            Dim idd = task.gcList(i)
-            If idd.correlation < minCorr Then
-                idd.depth = 0
-                task.gcList(i) = idd
+            Dim gc = task.gcList(i)
+            If gc.correlation < minCorr Then
+                gc.depth = 0
+                task.gcList(i) = gc
             End If
-            If idd.depth = 0 Then count += 1
+            If gc.depth = 0 Then count += 1
         Next
         task.pointCloud = corrMask.dst2
         If count < task.gcList.Count Then

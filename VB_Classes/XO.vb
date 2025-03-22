@@ -2084,3 +2084,175 @@ Public Class XO_FitLine_Hough3D : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+Public Class XO_GridCell_Basics : Inherits TaskParent
+    Public options As New Options_GridCells
+    Public thresholdRangeZ As Single
+    Public instantUpdate As Boolean = True
+    Dim lastCorrelation() As Single
+    Public quad As New XO_Quad_Basics
+    Public Sub New()
+        task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
+        desc = "Create the grid of grid cells that reduce depth volatility"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+        If task.optionsChanged Then
+            ReDim lastCorrelation(task.gridRects.Count - 1)
+        End If
+
+        Dim stdev As cv.Scalar, mean As cv.Scalar
+        Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
+        Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
+        Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
+
+        task.gcList.Clear()
+        For i = 0 To task.gridRects.Count - 1
+            Dim gc As New gcData
+            gc.rect = task.gridRects(i)
+            gc.age = task.motionBasics.cellAge(i)
+            gc.rect = gc.rect
+            gc.color = task.motionBasics.lastColor(i) ' the last color is actually the current color - motion basics runs first.
+            gc.lRect = gc.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
+            gc.center = New cv.Point(gc.rect.TopLeft.X + gc.rect.Width / 2, gc.rect.TopLeft.Y + gc.rect.Height / 2)
+            If task.depthMask(gc.rect).CountNonZero Then
+                cv.Cv2.MeanStdDev(task.pcSplit(2)(gc.rect), mean, stdev, task.depthMask(gc.rect))
+                gc.depth = mean(0)
+                gc.depthStdev = stdev(0)
+            End If
+
+            If gc.depth = 0 Then
+                gc.correlation = 0
+                gc.rRect = emptyRect
+            Else
+                gc.mm = GetMinMax(task.pcSplit(2)(gc.rect), task.depthMask(gc.rect))
+                gc.depthErr = 0.02 * gc.depth / 2
+                If task.rgbLeftAligned Then
+                    gc.lRect = gc.rect
+                    gc.rRect = gc.lRect
+                    gc.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
+                    gc.rRect = ValidateRect(gc.rRect)
+                    cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
+                                                     cv.TemplateMatchModes.CCoeffNormed)
+
+                    gc.correlation = correlationMat.Get(Of Single)(0, 0)
+                Else
+                    Dim irPt = VBtask.translateColorToLeft(gc.rect.TopLeft)
+                    If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or
+                        (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
+                        gc.depth = 0 ' off the grid.
+                        gc.lRect = emptyRect
+                        gc.rRect = emptyRect
+                    Else
+                        gc.lRect = New cv.Rect(irPt.X, irPt.Y, gc.rect.Width, gc.rect.Height)
+                        gc.lRect = ValidateRect(gc.lRect)
+
+                        gc.rRect = gc.lRect
+                        gc.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
+                        gc.rRect = ValidateRect(gc.rRect)
+                        If gc.rRect.Width = 1 Then Dim k = 0
+                        If gc.rRect.Height = 1 Then Dim k = 0
+                        cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
+                                                      cv.TemplateMatchModes.CCoeffNormed)
+
+                        gc.correlation = correlationMat.Get(Of Single)(0, 0)
+                    End If
+                End If
+            End If
+
+            lastCorrelation(i) = gc.correlation
+            gc.index = task.gcList.Count
+            task.gridMap(gc.rect).SetTo(i)
+            task.gcList.Add(gc)
+        Next
+
+        quad.Run(src)
+
+        If task.heartBeat Then labels(2) = CStr(task.gcList.Count) + " grid cells have the useful depth values."
+    End Sub
+End Class
+
+
+
+
+Public Class XO_Quad_Basics : Inherits TaskParent
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        desc = "Create a quad representation of the redCloud data"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim shift As cv.Point3f
+        If task.ogl IsNot Nothing Then
+            Dim ptM = task.ogl.options4.moveAmount
+            shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
+        End If
+
+        task.gridMap.SetTo(0)
+        dst2.SetTo(0)
+        For i = 0 To task.gcList.Count - 1
+            Dim gc = task.gcList(i)
+            task.gridMap(gc.rect).SetTo(i)
+            If gc.depth > 0 Then
+                gc.corners.Clear()
+
+                Dim p0 = getWorldCoordinates(gc.rect.TopLeft, gc.depth)
+                Dim p1 = getWorldCoordinates(gc.rect.BottomRight, gc.depth)
+
+                ' clockwise around starting in upper left.
+                gc.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, gc.depth))
+                gc.corners.Add(New cv.Point3f(p1.X + shift.X, p0.Y + shift.Y, gc.depth))
+                gc.corners.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, gc.depth))
+                gc.corners.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, gc.depth))
+            End If
+            dst2(gc.rect).SetTo(gc.color)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+'Public Class XO_OpenGL_DrawLines3D : Inherits TaskParent
+'    Dim lines As New Structured_Lines
+'    Public Sub New()
+'        task.ogl.oglFunction = oCase.drawLines
+'        desc = "Draw all the lines found with Line3D_Basics"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        lines.Run(src)
+'        dst2 = lines.dst2
+'        dst3 = lines.dst3
+
+'        Dim vec(8) As Single
+'        Dim lineData As New List(Of Single)
+'        lineData.Add(0) ' fill this in below
+'        For Each lp In task.lpList
+'            lp3d = findEdgePoints(lp)
+'            If lp.p1.Z > 0 And lp.p2.Z > 0 Then
+'                If lp.vertical Then
+'                    lp.p2.X = lp.p1.X
+'                    lp.p2.Z = lp.p1.Z
+'                Else
+'                    lp.p2.Y = lp.p1.Y
+'                End If
+'                Dim c = task.scalarColors(lp.colorIndex)
+'                vec = {c(0) / 255, c(1) / 255, c(2) / 255, lp.p1.X, lp.p1.Y, lp.p1.Z, lp.p2.X, lp.p2.Y, lp.p2.Z}
+'                For i = 0 To vec.Length - 1
+'                    lineData.Add(vec(i))
+'                Next
+'            End If
+'        Next
+'        lineData(0) = lineData.Count
+'        task.ogl.dataInput = cv.Mat.FromPixelData(lineData.Count, 1, cv.MatType.CV_32F,
+'                                                   lineData.ToArray)
+
+'        task.ogl.Run(task.color)
+'    End Sub
+'End Class

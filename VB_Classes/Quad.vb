@@ -1,43 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Quad_Basics : Inherits TaskParent
-    Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        desc = "Create a quad representation of the redCloud data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim shift As cv.Point3f
-        If task.ogl IsNot Nothing Then
-            Dim ptM = task.ogl.options4.moveAmount
-            shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
-        End If
-
-        task.gcMap.SetTo(0)
-        dst2.SetTo(0)
-        For i = 0 To task.gcList.Count - 1
-            Dim gc = task.gcList(i)
-            task.gcMap(gc.rect).SetTo(i)
-            If gc.depth > 0 Then
-                gc.corners.Clear()
-
-                Dim p0 = getWorldCoordinates(gc.rect.TopLeft, gc.depth)
-                Dim p1 = getWorldCoordinates(gc.rect.BottomRight, gc.depth)
-
-                ' clockwise around starting in upper left.
-                gc.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, gc.depth))
-                gc.corners.Add(New cv.Point3f(p1.X + shift.X, p0.Y + shift.Y, gc.depth))
-                gc.corners.Add(New cv.Point3f(p1.X + shift.X, p1.Y + shift.Y, gc.depth))
-                gc.corners.Add(New cv.Point3f(p0.X + shift.X, p1.Y + shift.Y, gc.depth))
-            End If
-            dst2(gc.rect).SetTo(gc.color)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Quad_RightView : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

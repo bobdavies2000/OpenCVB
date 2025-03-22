@@ -49,7 +49,6 @@ Partial Class OptionsGlobal
         Me.LRMeanSubtraction = New System.Windows.Forms.CheckBox()
         Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
         Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
-        Me.ShowQuads = New System.Windows.Forms.RadioButton()
         Me.ColorizedDepth = New System.Windows.Forms.RadioButton()
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
         Me.MotionBox = New System.Windows.Forms.GroupBox()
@@ -399,7 +398,6 @@ Partial Class OptionsGlobal
         'DepthGroupBox
         '
         Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
-        Me.DepthGroupBox.Controls.Add(Me.ShowQuads)
         Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
         Me.DepthGroupBox.Location = New System.Drawing.Point(334, 265)
         Me.DepthGroupBox.Name = "DepthGroupBox"
@@ -412,24 +410,13 @@ Partial Class OptionsGlobal
         '
         Me.DepthCorrelations.AutoSize = True
         Me.DepthCorrelations.Checked = True
-        Me.DepthCorrelations.Location = New System.Drawing.Point(16, 103)
+        Me.DepthCorrelations.Location = New System.Drawing.Point(16, 74)
         Me.DepthCorrelations.Name = "DepthCorrelations"
         Me.DepthCorrelations.Size = New System.Drawing.Size(167, 24)
         Me.DepthCorrelations.TabIndex = 2
         Me.DepthCorrelations.TabStop = True
         Me.DepthCorrelations.Text = "Depth Correlations"
         Me.DepthCorrelations.UseVisualStyleBackColor = True
-        '
-        'ShowQuads
-        '
-        Me.ShowQuads.AutoSize = True
-        Me.ShowQuads.Location = New System.Drawing.Point(16, 68)
-        Me.ShowQuads.Name = "ShowQuads"
-        Me.ShowQuads.Size = New System.Drawing.Size(121, 24)
-        Me.ShowQuads.TabIndex = 1
-        Me.ShowQuads.TabStop = True
-        Me.ShowQuads.Text = "Quad Depth"
-        Me.ShowQuads.UseVisualStyleBackColor = True
         '
         'ColorizedDepth
         '
@@ -931,7 +918,6 @@ Partial Class OptionsGlobal
     Friend WithEvents Label6 As Windows.Forms.Label
     Friend WithEvents DepthGroupBox As Windows.Forms.GroupBox
     Friend WithEvents DepthCorrelations As Windows.Forms.RadioButton
-    Friend WithEvents ShowQuads As Windows.Forms.RadioButton
     Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
     Friend WithEvents LRMeanSubtraction As Windows.Forms.CheckBox
 End Class

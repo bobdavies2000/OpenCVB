@@ -18,7 +18,7 @@ Public Class VBtask : Implements IDisposable
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpXData)
 
-    Public gcMap As New cv.Mat
+    Public gridMap As New cv.Mat
     Public rcMap As cv.Mat
     Public gcCell As gcData
     Public rc As New rcData
@@ -30,7 +30,6 @@ Public Class VBtask : Implements IDisposable
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9
     Public gridMask As New cv.Mat
-    Public gridMap As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
@@ -542,7 +541,6 @@ Public Class VBtask : Implements IDisposable
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        task.gcMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
 
         gmat = New IMU_GMatrix
         grid = New Grid_Basics

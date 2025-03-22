@@ -692,7 +692,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public index As Integer
 
-
     Public colorIndex As Integer
 
 
