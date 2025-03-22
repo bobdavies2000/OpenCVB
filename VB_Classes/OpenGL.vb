@@ -1487,7 +1487,7 @@ Public Class OpenGL_SoloPointsRemoved : Inherits TaskParent
         desc = "Remove the solo points and display the pointcloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.toggleOnOff Then
+        If task.toggleOn Then
             solos.Run(src)
             dst2 = solos.dst2
             task.pointCloud.SetTo(0, dst2)
@@ -1759,7 +1759,7 @@ Public Class OpenGL_Grid : Inherits TaskParent
         Dim depth = task.lowResDepth.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
         Dim pc As New cv.Mat
         cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), depth}, pc)
-        If task.toggleOnOff Then pc.SetTo(0, task.fLessMask)
+        If task.toggleOn Then pc.SetTo(0, task.fLessMask)
         task.ogl.pointCloudInput = pc
         task.ogl.Run(dst2)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
@@ -1781,7 +1781,7 @@ Public Class OpenGL_Neighbors : Inherits TaskParent
         dst2 = inputZ.dst3.ConvertScaleAbs
 
         task.ogl.pointCloudInput = task.pointCloud
-        If task.toggleOnOff Then task.ogl.pointCloudInput.SetTo(0, Not dst2)
+        If task.toggleOn Then task.ogl.pointCloudInput.SetTo(0, Not dst2)
         task.ogl.Run(task.color)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -2191,7 +2191,7 @@ Public Class OpenGL_PCdiff : Inherits TaskParent
         filter.Run(src)
         dst2 = filter.dst3
 
-        If task.toggleOnOff Then
+        If task.toggleOn Then
             Dim r = New cv.Rect(0, 0, dst2.Width, 2)
             task.color(r).SetTo(white)
         End If

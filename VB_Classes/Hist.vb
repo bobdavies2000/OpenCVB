@@ -992,7 +992,7 @@ Public Class Hist_Gotcha2D : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim expected = task.pcSplit(2).CountNonZero
         Dim ranges = task.rangesSide
-        If task.toggleOnOff Then
+        If task.toggleOn Then
             ranges = New cv.Rangef() {New cv.Rangef(-10, +10), New cv.Rangef(-1, 20)}
         End If
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)

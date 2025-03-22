@@ -5,22 +5,19 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean = True
-    Dim lastCorrelation() As Single
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
-        If task.optionsChanged Then
-            ReDim lastCorrelation(task.gridRects.Count - 1)
-        End If
 
         Dim stdev As cv.Scalar, mean As cv.Scalar
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
+        Dim gcLast As New List(Of gcData)(task.gcList), unchangedCount As Integer
         task.gcList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
@@ -40,57 +37,66 @@ Public Class GridCell_Basics : Inherits TaskParent
                 gc.correlation = 0
                 gc.rRect = emptyRect
             Else
-                gc.mm = GetMinMax(task.pcSplit(2)(gc.rect), task.depthMask(gc.rect))
-                gc.depthErr = 0.02 * gc.depth / 2
-                If task.rgbLeftAligned Then
-                    gc.lRect = gc.rect
-                    gc.rRect = gc.lRect
-                    gc.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
-                    gc.rRect = ValidateRect(gc.rRect)
-                    cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
+                ' motion mask does not include depth shadow so if there is depth shadow, we must recompute gc.
+                Dim lastCorrelation = If(task.firstPass, 0, gcLast(i).correlation)
+                If gc.age > 1 And lastCorrelation > 0.5 Then
+                    unchangedCount += 1
+                    ' no need to recompute everything when there is no motion in the cell.
+                    gc = gcLast(i)
+                    gc.age = task.motionBasics.cellAge(i)
+                Else
+                    ' everything is recomputed when there is motion in the cell.
+                    gc.mm = GetMinMax(task.pcSplit(2)(gc.rect), task.depthMask(gc.rect))
+                    gc.depthErr = 0.02 * gc.depth / 2
+                    If task.rgbLeftAligned Then
+                        gc.lRect = gc.rect
+                        gc.rRect = gc.lRect
+                        gc.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
+                        gc.rRect = ValidateRect(gc.rRect)
+                        cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)
 
-                    gc.correlation = correlationMat.Get(Of Single)(0, 0)
-                Else
-                    Dim irPt = translateColorToLeft(gc.rect.TopLeft)
-                    If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or
-                        (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
-                        gc.depth = 0 ' off the grid.
-                        gc.lRect = emptyRect
-                        gc.rRect = emptyRect
+                        gc.correlation = correlationMat.Get(Of Single)(0, 0)
                     Else
-                        gc.lRect = New cv.Rect(irPt.X, irPt.Y, gc.rect.Width, gc.rect.Height)
-                        gc.lRect = ValidateRect(gc.lRect)
+                        Dim irPt = translateColorToLeft(gc.rect.TopLeft)
+                        If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or
+                        (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
+                            gc.depth = 0 ' off the grid.
+                            gc.lRect = emptyRect
+                            gc.rRect = emptyRect
+                        Else
+                            gc.lRect = New cv.Rect(irPt.X, irPt.Y, gc.rect.Width, gc.rect.Height)
+                            gc.lRect = ValidateRect(gc.lRect)
 
-                        gc.rRect = gc.lRect
-                        gc.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
-                        gc.rRect = ValidateRect(gc.rRect)
-                        If gc.rRect.Width = 1 Then Dim k = 0
-                        If gc.rRect.Height = 1 Then Dim k = 0
-                        cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
+                            gc.rRect = gc.lRect
+                            gc.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
+                            gc.rRect = ValidateRect(gc.rRect)
+                            If gc.rRect.Width = 1 Then Dim k = 0
+                            If gc.rRect.Height = 1 Then Dim k = 0
+                            cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
                                                       cv.TemplateMatchModes.CCoeffNormed)
 
-                        gc.correlation = correlationMat.Get(Of Single)(0, 0)
+                            gc.correlation = correlationMat.Get(Of Single)(0, 0)
+                        End If
                     End If
+
+                    Dim p0 = getWorldCoordinates(gc.rect.TopLeft, gc.depth)
+                    Dim p1 = getWorldCoordinates(gc.rect.BottomRight, gc.depth)
+
+                    ' clockwise around starting in upper left.
+                    gc.corners.Add(New cv.Point3f(p0.X, p0.Y, gc.depth))
+                    gc.corners.Add(New cv.Point3f(p1.X, p0.Y, gc.depth))
+                    gc.corners.Add(New cv.Point3f(p1.X, p1.Y, gc.depth))
+                    gc.corners.Add(New cv.Point3f(p0.X, p1.Y, gc.depth))
                 End If
-
-                Dim p0 = getWorldCoordinates(gc.rect.TopLeft, gc.depth)
-                Dim p1 = getWorldCoordinates(gc.rect.BottomRight, gc.depth)
-
-                ' clockwise around starting in upper left.
-                gc.corners.Add(New cv.Point3f(p0.X, p0.Y, gc.depth))
-                gc.corners.Add(New cv.Point3f(p1.X, p0.Y, gc.depth))
-                gc.corners.Add(New cv.Point3f(p1.X, p1.Y, gc.depth))
-                gc.corners.Add(New cv.Point3f(p0.X, p1.Y, gc.depth))
             End If
 
-            lastCorrelation(i) = gc.correlation
             gc.index = task.gcList.Count
-
             task.gcList.Add(gc)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(task.gcList.Count) + " grid cells have the useful depth values."
+        If task.heartBeat Then labels(2) = CStr(task.gcList.Count) + " grid cells have the useful depth values and " +
+                                           CStr(unchangedCount) + " of them were unchanged from the previous frame"
     End Sub
 End Class
 Public Class GridCell_MouseDepth : Inherits TaskParent

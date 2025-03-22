@@ -164,7 +164,7 @@ Public Class VBtask : Implements IDisposable
     Public msLast As Integer
     Public firstPass As Boolean
 
-    Public toggleOnOff As Boolean ' toggles on the heartbeat.
+    Public toggleOn As Boolean ' toggles on the heartbeat.
     Public paused As Boolean
     Public showAllOptions As Boolean ' show all options when initializing the options for all algorithms.
 

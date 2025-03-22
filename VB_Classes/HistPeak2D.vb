@@ -53,7 +53,7 @@ Public Class HistPeak2D_TopAndSide : Inherits TaskParent
         desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.toggleOnOff Then
+        If task.toggleOn Then
             histSide.Run(src)
             peak.ranges = task.rangesSide
             task.redOptions.channels = task.channelsSide

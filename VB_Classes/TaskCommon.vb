@@ -150,10 +150,8 @@ Public Module vbc
         Dim frameDuration = 1000 / task.fpsAlgorithm
         task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
 
-        If (task.msWatch - task.msLast) > 1000 Then
-            task.msLast = task.msWatch
-            task.toggleOnOff = Not task.toggleOnOff
-        End If
+        If (task.msWatch - task.msLast) > 1000 Then task.msLast = task.msWatch
+        If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
 
         If task.paused Then
             task.midHeartBeat = False

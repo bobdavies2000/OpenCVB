@@ -926,7 +926,7 @@ Public Class XO_Line_LeftRight : Inherits TaskParent
                 dst3.SetTo(0, task.noDepthMask)
             End If
         Else
-            If task.toggleOnOff Then
+            If task.toggleOn Then
                 dst2.SetTo(0, task.noDepthMask)
                 dst3.SetTo(0, task.noDepthMask)
             End If

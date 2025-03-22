@@ -8,7 +8,7 @@ Public Class Motion_Basics : Inherits TaskParent
     Public motionFlags() As Boolean
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "The motion-filtered color image.  "
+        labels(3) = "Below is the difference between the current image and the dst2 at left which is composed using the motion mask."
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -51,12 +51,22 @@ Public Class Motion_Basics : Inherits TaskParent
         labels(2) = "There were " + CStr(motionList.Count) + " grid cells with motion."
 
         ' some cameras have low light images for the first few frames.
-        If task.gOptions.UseMotionMask.Checked = False Or task.frameCount < 3 Then
-            dst1.SetTo(255)
-            labels(3) = "100% of each image has motion."
-        End If
+        If task.gOptions.UseMotionMask.Checked = False Or task.frameCount < 3 Then dst1.SetTo(255)
 
         task.motionMask = dst1
+
+        If standalone Then
+            If task.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, task.motionMask)
+            Static diff As New Diff_Basics
+            diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            diff.Run(src)
+            dst3 = diff.dst2
+            SetTrueText("NOTE: the differences should be small - no blobs or artifacts should be present." + vbCrLf +
+                        "Any differences that persist should not be visible in the RGB image at left." + vbCrLf +
+                        "Some differences will occur when the displayed size is not the working resolution size." + vbCrLf +
+                        "The anti-aliasing in the resize may produce some differences.", 3)
+        End If
+        If task.heartBeatLT Then dst2 = src.Clone
     End Sub
 End Class
 

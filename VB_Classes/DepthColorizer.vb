@@ -14,6 +14,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         Else
             buildCorrMap.Run(src)
             task.depthRGB = buildCorrMap.dst2
+            If task.toggleOn Then task.depthRGB.SetTo(0, task.noDepthMask)
         End If
     End Sub
 End Class

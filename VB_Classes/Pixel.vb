@@ -110,7 +110,7 @@ Public Class Pixel_Viewer : Inherits TaskParent
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
                     For x = 0 To img.Width - 1
-                        If (task.toggleOnOff And y = ClickPoint.Y) And (x = ClickPoint.X - 1 Or x = ClickPoint.X) Then
+                        If (task.toggleOn And y = ClickPoint.Y) And (x = ClickPoint.X - 1 Or x = ClickPoint.X) Then
                             imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "***", "*")
                         Else
                             imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")

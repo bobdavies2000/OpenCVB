@@ -136,7 +136,7 @@ Public Class Rectangle_Intersection : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
-                rotatedCheck.Enabled = task.toggleOnOff
+                rotatedCheck.Enabled = task.toggleOn
                 countSlider.Value = msRNG.Next(2, 10)
                 labels(2) = "Input rectangles = " + CStr(countSlider.Value)
 

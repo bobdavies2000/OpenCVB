@@ -97,7 +97,7 @@ Public Class Linear_Visualize : Inherits TaskParent
             pc = task.pcSplit(i)(roi)
 
             ' toggle between the pixel to the right or below
-            If task.toggleOnOff Then
+            If task.toggleOn Then
                 r1 = New cv.Rect(0, 0, task.cols - 1, task.rows)
                 r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
             Else
