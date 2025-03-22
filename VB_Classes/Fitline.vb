@@ -21,7 +21,10 @@ Public Class FitLine_Basics : Inherits TaskParent
         Dim leftY = Math.Round(-line2d.X1 * slope + line2d.Y1)
         Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
         lp = New lpData(New cv.Point(0, leftY), New cv.Point(src.Cols - 1, rightY))
-        DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+        End If
     End Sub
 End Class
 
@@ -190,6 +193,7 @@ Public Class FitLine_Example2D : Inherits TaskParent
         desc = "A way to test the fitline using 3D data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone And task.heartBeat = False Then Exit Sub
         inputData.Run(src)
         dst2 = inputData.dst2
 
@@ -210,11 +214,11 @@ End Class
 
 Public Class FitLine_TrendLine3D : Inherits TaskParent
     Public ptList As New List(Of cv.Point3f)
-    Public lpResult As lpData
+    Public lp As lpData
     Public center As cv.Point2f
     Public Sub New()
         labels(2) = "The input is a noisy trendline but the result should track pretty well."
-        desc = "A simple demo of using fitline with uniformly distributed 3D points."
+        desc = "Use fitline to find the trendline in the input data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
@@ -231,12 +235,13 @@ Public Class FitLine_TrendLine3D : Inherits TaskParent
 
         ' Fit a line to the 3D points
         Dim line = cv.Cv2.FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
-        center = New cv.Point2f(line.X1, line.Y1)
+        Dim m = line.Vy / line.Vx
+        Dim bb = line.Y1 - m * line.X1
+        Dim p1 = New cv.Point(line.X1, line.Y1)
+        Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
 
-        Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
-        Dim lp = New lpData(center, p2)
-        lpResult = findEdgePoints(lp)
-        dst2.Line(lpResult.p1, lpResult.p2, task.highlight, task.lineWidth, task.lineType)
-        dst2.Circle(center, task.DotSize + 2, cv.Scalar.Blue, -1)
+        lp = findEdgePoints(New lpData(p1, p2))
+        dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        dst2.Circle(New cv.Point2f(line.X1, line.Y1), task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class

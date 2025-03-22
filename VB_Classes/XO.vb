@@ -130,9 +130,8 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
             Dim p1 = points(xVals.IndexOf(xVals.Min()))
             Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
-            Dim lp = New lpData(p1, p2)
-            Dim lpTmp = findEdgePoints(lp)
-            task.horizonVec = New lpData(lpTmp.p1, lpTmp.p2)
+            Dim lp = findEdgePoints(New lpData(p1, p2))
+            task.horizonVec = New lpData(lp.p1, lp.p2)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
@@ -153,9 +152,8 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
             If Math.Abs(p1.X - p2.X) < 2 Then
                 task.gravityVec = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
             Else
-                Dim lp = New lpData(p1, p2)
-                Dim lpTmp = findEdgePoints(lp)
-                task.gravityVec = New lpData(lpTmp.p1, lpTmp.p2)
+                Dim lp = findEdgePoints(New lpData(p1, p2))
+                task.gravityVec = New lpData(lp.p1, lp.p2)
             End If
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
@@ -274,9 +272,8 @@ Public Class XO_Horizon_Basics : Inherits TaskParent
             vec = New lpData
             strOut = "Horizon not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
-            Dim lp = New lpData(p1, p2)
-            Dim lpTmp = findEdgePoints(lp)
-            vec = New lpData(lpTmp.p1, lpTmp.p2)
+            Dim lp = findEdgePoints(New lpData(p1, p2))
+            vec = New lpData(lp.p1, lp.p2)
             If standaloneTest() Or autoDisplay Then
                 displayResults(p1, p2)
                 displayResults(New cv.Point(-p1.Y, p1.X), New cv.Point(p2.Y, -p2.X))
@@ -398,9 +395,8 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
                          CStr(CInt(distance)) + " pixels." + vbCrLf
             strOut += "Using the previous value for the gravity vector."
         Else
-            Dim lp = New lpData(p1, p2)
-            Dim lpTmp = findEdgePoints(lp)
-            task.gravityVec = New lpData(lpTmp.p1, lpTmp.p2)
+            Dim lp = findEdgePoints(New lpData(p1, p2))
+            task.gravityVec = New lpData(lp.p1, lp.p2)
             If standaloneTest() Then displayResults(p1, p2)
         End If
 
@@ -670,9 +666,8 @@ Public Class XO_Gravity_BasicsOriginal : Inherits TaskParent
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
-        Dim lp = New lpData(p1, p2)
-        Dim lpTmp = findEdgePoints(lp)
-        vec = New lpData(lpTmp.p1, lpTmp.p2)
+        Dim lp = findEdgePoints(New lpData(p1, p2))
+        vec = New lpData(lp.p1, lp.p2)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
@@ -1753,8 +1748,8 @@ Public Class XO_BackProject_LineSide : Inherits TaskParent
         lpList.Clear()
         For Each lp In task.lpList
             If Math.Abs(lp.slope) < 0.1 Then
-                Dim lpTmp = findEdgePoints(lp)
-                dst2.Line(lpTmp.p1, lpTmp.p2, 255, w, task.lineType)
+                lp = findEdgePoints(lp)
+                dst2.Line(lp.p1, lp.p2, 255, w, task.lineType)
                 lpList.Add(lp)
             End If
         Next
@@ -1873,8 +1868,8 @@ Public Class XO_Hough_Sudoku1 : Inherits TaskParent
         dst2 = task.lines.dst2
         labels(2) = task.lines.labels(2)
         For Each lp In task.lpList
-            Dim lpTmp = findEdgePoints(lp)
-            dst3.Line(lpTmp.p1, lpTmp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            lp = findEdgePoints(lp)
+            dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
