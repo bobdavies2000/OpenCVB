@@ -1,22 +1,53 @@
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-' https://docs.opencvb.org/3.4/js_contour_features_fitLine.html
 Public Class FitLine_Basics : Inherits TaskParent
+    Public lp As lpData
+    Public ptList As New List(Of cv.Point2f)
+    Public center As cv.Point2f
+    Public Sub New()
+        desc = "Show how Fitline API works with simple data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone And task.heartBeatLT Then
+            Static inputData As New Eigen_FitLineInput
+            inputData.Run(src)
+            ptList = New List(Of cv.Point2f)(inputData.points)
+            dst2 = inputData.dst2
+        End If
+
+        Dim line2d = cv.Cv2.FitLine(ptList, cv.DistanceTypes.L2, 0, 0, 0)
+        center = New cv.Point2f(line2d.X1, line2d.Y1)
+        Dim slope = line2d.Vy / line2d.Vx
+        Dim leftY = Math.Round(-line2d.X1 * slope + line2d.Y1)
+        Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
+        lp = New lpData(New cv.Point(0, leftY), New cv.Point(src.Cols - 1, rightY))
+        DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+    End Sub
+End Class
+
+
+
+
+
+
+' https://docs.opencvb.org/3.4/js_contour_features_fitLine.html
+Public Class FitLine_FindLine : Inherits TaskParent
     Dim options As New Options_FitLine
     Public draw As New Draw_Lines
-    Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
+    Public lines As New List(Of cv.Point)
     Public Sub New()
-       optiBase.findslider("DrawCount").Value = 2
+        optiBase.FindSlider("DrawCount").Value = 2
 
         labels(3) = "FitLine_Basics input"
         desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If not task.heartBeat Then Exit Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If Not task.heartBeatLT Then Exit Sub
         options.RunOpt()
 
         If standaloneTest() Then
             draw.Run(src)
-            dst3 = draw.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst3 = draw.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Else
             lines.Clear()
@@ -60,7 +91,7 @@ Public Class FitLine_Basics3D : Inherits TaskParent
         If m = 0 Then pt2 = New cv.Point(x, dst.Rows) Else pt2 = New cv.Point((dst.Rows - b) / m, dst.Rows)
         dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType, 0)
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If Not task.heartBeat Then Exit Sub
         hlines.Run(src)
         dst3 = hlines.dst3
@@ -103,5 +134,72 @@ Public Class FitLine_Basics3D : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             houghShowLines3D(dst2(task.gridRects(i)), lines.ElementAt(i))
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FitLine_Simple3D : Inherits TaskParent
+    Public ptList As New List(Of cv.Point3f)
+    Public lpResult As lpData
+    Public center As cv.Point2f
+    Dim options As New Options_FitLine
+    Public Sub New()
+        labels(2) = "With only a few points, the resulting vector can be anywhere but with lots of data, it will be pretty level."
+        desc = "A simple demo of using fitline with 3D points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        If standalone Then
+            Static random As New Random_Basics3D
+            If task.firstPass Then optiBase.FindSlider("Random Pixel Count").Value = 200
+            random.Run(src)
+            dst2.SetTo(0)
+            ptList.Clear()
+            For Each pt In random.PointList
+                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow)
+                ptList.Add(pt)
+            Next
+        End If
+
+        ' Fit a line to the 3D points
+        Dim line = cv.Cv2.FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
+        center = New cv.Point2f(line.X1, line.Y1)
+
+        Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
+        Dim lp = New lpData(center, p2)
+        lpResult = findEdgePoints(lp)
+        dst2.Line(lpResult.p1, lpResult.p2, task.HighlightColor, task.lineWidth, task.lineType)
+        dst2.Circle(center, task.DotSize + 2, cv.Scalar.Blue, -1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FitLine_Example2D : Inherits TaskParent
+    Dim inputData As New Eigen_FitLineInput
+    Dim fitLine As New FitLine_Basics
+    Public Sub New()
+        desc = "A way to test the fitline using 3D data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        inputData.Run(src)
+        dst2 = inputData.dst2
+
+        fitLine.ptList.Clear()
+        For Each pt In inputData.points
+            fitLine.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+        Next
+        fitLine.Run(src)
+
+        dst2.Line(fitLine.lp.p1, fitLine.lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
+        dst2.Circle(fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class

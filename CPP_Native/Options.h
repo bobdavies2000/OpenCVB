@@ -203,11 +203,8 @@ public:
 };
 class Options_Eigen {
 public:
-	bool highlight = false;
-	bool recompute = false;
-	int randomCount =  100;
 	int linePairCount =  20;
-	int noiseOffset =  10;
+	int noiseOffset =  200;
 	void RunOpt() {}
 	Options_Eigen() {
 	}

@@ -795,34 +795,18 @@ End Class
 
 
 Public Class Options_Eigen : Inherits OptionParent
-    Public highlight As Boolean = False
-    Public recompute As Boolean = False
-    Public randomCount As Integer = 100
     Public linePairCount As Integer = 20
-    Public noiseOffset As Integer = 10
+    Public noiseOffset As Integer = 200
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Random point count", 0, 500, randomCount)
-            sliders.setupTrackBar("Line Point Count", 0, 500, linePairCount)
-            sliders.setupTrackBar("Line Noise", 1, 100, noiseOffset)
-        End If
-        If check.Setup(traceName) Then
-            check.addCheckBox("Highlight Line Data")
-            check.addCheckBox("Recompute with new random data")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
+            sliders.setupTrackBar("Line Point Count", 5, 100, linePairCount)
+            sliders.setupTrackBar("Line Noise", 1, 500, noiseOffset)
         End If
     End Sub
     Public Sub RunOpt()
-        Static recomputeBox = FindCheckBox("Recompute with new random data")
-        Static highlightBox = FindCheckBox("Highlight Line Data")
-        Static randomSlider = FindSlider("Random point count")
-        Static linePairSlider = FindSlider("Random point count")
+        Static linePairSlider = FindSlider("Line Point Count")
         Static noiseSlider = FindSlider("Line Noise")
-        randomCount = randomSlider.Value
         linePairCount = linePairSlider.Value
-        highlight = highlightBox.checked
-        recompute = recomputeBox.checked
         noiseOffset = noiseSlider.Value
     End Sub
 End Class

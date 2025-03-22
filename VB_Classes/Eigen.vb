@@ -50,6 +50,86 @@ End Class
 
 
 
+' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
+'Public Class Eigen_Fitline : Inherits TaskParent
+'    Dim noisyLine As New Eigen_FitLineInput
+'    Dim eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0)), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0))
+'    Dim theta As Single
+'    Dim len As Single
+'    Dim m2 As Single
+'    Public Sub New()
+'        labels(2) = "blue is Ground Truth, red is fitline, yellow is EigenFit"
+'        labels(3) = "Raw input (use sliders below to explore)"
+'        desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        noisyLine.Run(src)
+
+'        dst3 = noisyLine.dst2
+'        dst2.SetTo(0)
+
+'        Dim width = src.Width
+
+'        Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
+'        Dim m = line.Vy / line.Vx
+'        Dim bb = line.Y1 - m * line.X1
+'        Dim p1 = New cv.Point(0, bb)
+'        Dim p2 = New cv.Point(width, m * width + bb)
+'        dst2.Line(p1, p2, cv.Scalar.Red, 20, task.lineType)
+
+'        Dim pointMat = cv.Mat.FromPixelData(noisyLine.options.randomCount, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
+'        Dim mean = pointMat.Mean()
+'        Dim split() = pointMat.Split()
+'        Dim mmX = GetMinMax(split(0))
+'        Dim mmY = GetMinMax(split(1))
+
+'        Dim eigenInput As New cv.Vec4f
+'        For i = 0 To noisyLine.points.Count - 1
+'            Dim pt = noisyLine.points(i)
+'            Dim x = pt.X - mean.Val0
+'            Dim y = pt.Y - mean.Val1
+'            eigenInput(0) += x * x
+'            eigenInput(1) += x * y
+'            eigenInput(3) += y * y
+'        Next
+'        eigenInput(2) = eigenInput(1)
+
+'        Dim vec4f As New List(Of cv.Point2f)
+'        vec4f.Add(New cv.Point2f(eigenInput(0), eigenInput(1)))
+'        vec4f.Add(New cv.Point2f(eigenInput(1), eigenInput(3)))
+
+'        Dim D = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
+'        cv.Cv2.Eigen(D, eigenVal, eigenVec)
+'        theta = Math.Atan2(eigenVec.Get(Of Single)(1, 0), eigenVec.Get(Of Single)(0, 0))
+
+'        len = Math.Sqrt(Math.Pow(mmX.maxVal - mmX.minVal, 2) + Math.Pow(mmY.maxVal - mmY.minVal, 2))
+
+'        p1 = New cv.Point2f(mean.Val0 - Math.Cos(theta) * len / 2, mean.Val1 - Math.Sin(theta) * len / 2)
+'        p2 = New cv.Point2f(mean.Val0 + Math.Cos(theta) * len / 2, mean.Val1 + Math.Sin(theta) * len / 2)
+'        m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
+
+'        If Math.Abs(m2) > 1.0 Then
+'            dst2.Line(p1, p2, task.HighlightColor, 10, task.lineType)
+'        Else
+'            p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
+'            p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
+'            m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
+'            dst2.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
+'        End If
+'        p1 = New cv.Point(0, noisyLine.bb)
+'        p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
+'        dst2.Line(p1, p2, cv.Scalar.Blue, task.lineWidth + 2, task.lineType)
+'        SetTrueText("Ground Truth m = " + Format(noisyLine.m, fmt2) + " eigen m = " + Format(m2, fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
+'                    "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), fmt1) + vbCrLf +
+'                    "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), fmt1) + ", " + Format(eigenVec.Get(Of Single)(0, 0), fmt1) + ") = " +
+'                    Format(theta, fmt4))
+'    End Sub
+'End Class
+
+
+
+
+
 
 
 Public Class Eigen_FitLineInput : Inherits TaskParent
@@ -61,25 +141,15 @@ Public Class Eigen_FitLineInput : Inherits TaskParent
         labels(2) = "Use sliders to adjust the width and intensityf of the line"
         desc = "Generate a noisy line in a field of random data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
-        If task.heartBeat Then
-            If task.testAllRunning = False Then options.recompute = False
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        If task.heartBeatLT Then
             dst2.SetTo(0)
             Dim width = src.Width
             Dim height = src.Height
 
-            points.Clear()
-            For i = 0 To options.randomCount - 1
-                Dim pt = New cv.Point2f(Rnd() * width, Rnd() * height)
-                If pt.X < 0 Then pt.X = 0
-                If pt.X > width Then pt.X = width
-                If pt.Y < 0 Then pt.Y = 0
-                If pt.Y > height Then pt.Y = height
-                points.Add(pt)
-                DrawCircle(dst2, points(i), task.DotSize, cv.Scalar.White)
-            Next
-
+            ' p1 and p2 are intended to provide a real trendline to which the noise applies.
             Dim p1 As cv.Point2f, p2 As cv.Point2f
             If Rnd() * 2 - 1 >= 0 Then
                 p1 = New cv.Point(Rnd() * width, 0)
@@ -95,8 +165,8 @@ Public Class Eigen_FitLineInput : Inherits TaskParent
             bb = p2.Y - p2.X * m
             Dim startx = Math.Min(p1.X, p2.X)
             Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.linePairCount
-            Dim highLight As cv.Scalar = white
-            If options.highlight Then highLight = cv.Scalar.Gray
+            Dim highLight = cv.Scalar.Gray
+            points.Clear()
             For i = 0 To options.linePairCount - 1
                 Dim noiseOffsetX = (Rnd() * 2 - 1) * options.noiseOffset
                 Dim noiseOffsetY = (Rnd() * 2 - 1) * options.noiseOffset
@@ -115,80 +185,58 @@ End Class
 
 
 
-' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
-Public Class Eigen_Fitline : Inherits TaskParent
-    Dim noisyLine As New Eigen_FitLineInput
-    Dim eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0)), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0))
-    Dim theta As Single
-    Dim len As Single
-    Dim m2 As Single
+
+
+
+
+Public Class Eigen_FitLineInput3D : Inherits TaskParent
+    Public points As New List(Of cv.Point3f)
+    Public m As Single
+    Public bb As Single
+    Public options As New Options_Eigen
     Public Sub New()
-        labels(2) = "blue is Ground Truth, red is fitline, yellow is EigenFit"
-        labels(3) = "Raw input (use sliders below to explore)"
-        desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
+        labels(2) = "Use sliders to adjust the width and intensityf of the line"
+        desc = "Generate a noisy line in a field of random data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        noisyLine.options.recompute = True
-        noisyLine.Run(src)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+        If task.heartBeatLT Then
+            dst2.SetTo(0)
+            Dim width = src.Width
+            Dim height = src.Height
+            Dim depth = src.Height
 
-        dst3 = noisyLine.dst2
-        dst2.SetTo(0)
-        noisyLine.options.recompute = False
+            ' p1 and p2 are intended to provide a real trendline to which the noise applies.
+            Dim p1 As cv.Point3f, p2 As cv.Point3f
+            If Rnd() * 2 - 1 >= 0 Then
+                p1 = New cv.Point3f(Rnd() * width, 0, Rnd() * depth)
+                p2 = New cv.Point3f(Rnd() * width, height, Rnd() * depth)
+            Else
+                p1 = New cv.Point3f(0, Rnd() * height, Rnd() * depth)
+                p2 = New cv.Point3f(width, Rnd() * height, Rnd() * depth)
+            End If
 
-        Dim width = src.Width
+            If p1.X = p2.X Then p1.X += 1
+            If p1.Y = p2.Y Then p1.Y += 1
+            m = (p2.Y - p1.Y) / (p2.X - p1.X)
+            bb = p2.Y - p2.X * m
+            Dim startx = Math.Min(p1.X, p2.X)
+            Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.linePairCount
 
-        Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
-        Dim m = line.Vy / line.Vx
-        Dim bb = line.Y1 - m * line.X1
-        Dim p1 = New cv.Point(0, bb)
-        Dim p2 = New cv.Point(width, m * width + bb)
-        dst2.Line(p1, p2, cv.Scalar.Red, 20, task.lineType)
-
-        Dim pointMat = cv.Mat.FromPixelData(noisyLine.options.randomCount, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
-        Dim mean = pointMat.Mean()
-        Dim split() = pointMat.Split()
-        Dim mmX = GetMinMax(split(0))
-        Dim mmY = GetMinMax(split(1))
-
-        Dim eigenInput As New cv.Vec4f
-        For i = 0 To noisyLine.points.Count - 1
-            Dim pt = noisyLine.points(i)
-            Dim x = pt.X - mean.Val0
-            Dim y = pt.Y - mean.Val1
-            eigenInput(0) += x * x
-            eigenInput(1) += x * y
-            eigenInput(3) += y * y
-        Next
-        eigenInput(2) = eigenInput(1)
-
-        Dim vec4f As New List(Of cv.Point2f)
-        vec4f.Add(New cv.Point2f(eigenInput(0), eigenInput(1)))
-        vec4f.Add(New cv.Point2f(eigenInput(1), eigenInput(3)))
-
-        Dim D = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
-        cv.Cv2.Eigen(D, eigenVal, eigenVec)
-        theta = Math.Atan2(eigenVec.Get(Of Single)(1, 0), eigenVec.Get(Of Single)(0, 0))
-
-        len = Math.Sqrt(Math.Pow(mmX.maxVal - mmX.minVal, 2) + Math.Pow(mmY.maxVal - mmY.minVal, 2))
-
-        p1 = New cv.Point2f(mean.Val0 - Math.Cos(theta) * len / 2, mean.Val1 - Math.Sin(theta) * len / 2)
-        p2 = New cv.Point2f(mean.Val0 + Math.Cos(theta) * len / 2, mean.Val1 + Math.Sin(theta) * len / 2)
-        m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-
-        If Math.Abs(m2) > 1.0 Then
-            dst2.Line(p1, p2, task.HighlightColor, 10, task.lineType)
-        Else
-            p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
-            p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
-            m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
+            Dim highLight = cv.Scalar.Gray
+            points.Clear()
+            For i = 0 To options.linePairCount - 1
+                Dim noiseOffsetX = (Rnd() * 2 - 1) * options.noiseOffset
+                Dim noiseOffsetY = (Rnd() * 2 - 1) * options.noiseOffset
+                Dim pt = New cv.Point3f(startx + i * incr + noiseOffsetX,
+                                        Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
+                If pt.X < 0 Then pt.X = 0
+                If pt.X > width Then pt.X = width
+                If pt.Y < 0 Then pt.Y = 0
+                If pt.Y > height Then pt.Y = height
+                points.Add(pt)
+                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight)
+            Next
         End If
-        p1 = New cv.Point(0, noisyLine.bb)
-        p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
-        dst2.Line(p1, p2, cv.Scalar.Blue, task.lineWidth + 2, task.lineType)
-        SetTrueText("Ground Truth m = " + Format(noisyLine.m, fmt2) + " eigen m = " + Format(m2, fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
-                    "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), fmt1) + vbCrLf +
-                    "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), fmt1) + ", " + Format(eigenVec.Get(Of Single)(0, 0), fmt1) + ") = " +
-                    Format(theta, fmt4))
     End Sub
 End Class
