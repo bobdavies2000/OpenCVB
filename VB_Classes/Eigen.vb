@@ -65,17 +65,17 @@ Public Class Eigen_Fitline : Inherits TaskParent
         If task.heartBeat = False Then Exit Sub
         noisyLine.Run(src)
         dst2 = noisyLine.dst2
-        Dim pointCount = noisyLine.eigen3D.points.Count
+        Dim pointCount = noisyLine.eigen3D.PointList.Count
 
-        Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
+        Dim line = cv.Cv2.FitLine(noisyLine.PointList, cv.DistanceTypes.L2, 1, 0.01, 0.01)
         Dim m = line.Vy / line.Vx
         Dim bb = line.Y1 - m * line.X1
         Dim p1 = New cv.Point(line.X1, line.Y1)
         Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
         Dim lp = findEdgePoints(New lpData(p1, p2))
-        dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, 20, task.lineType)
+        dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth + 4, task.lineType)
 
-        Dim pointMat = cv.Mat.FromPixelData(pointCount, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
+        Dim pointMat = cv.Mat.FromPixelData(pointCount, 1, cv.MatType.CV_32FC2, noisyLine.PointList.ToArray)
         Dim mean = pointMat.Mean()
         Dim split() = pointMat.Split()
         Dim mmX = GetMinMax(split(0))
@@ -83,7 +83,7 @@ Public Class Eigen_Fitline : Inherits TaskParent
 
         Dim eigenInput As New cv.Vec4f
         For i = 0 To pointCount - 1
-            Dim pt = noisyLine.points(i)
+            Dim pt = noisyLine.PointList(i)
             Dim x = pt.X - mean.Val0
             Dim y = pt.Y - mean.Val1
             eigenInput(0) += x * x
@@ -107,16 +107,17 @@ Public Class Eigen_Fitline : Inherits TaskParent
         m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
         If Math.Abs(m2) > 1.0 Then
-            dst2.Line(p1, p2, task.HighlightColor, 10, task.lineType)
+            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 2, task.lineType)
         Else
             p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
             p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         End If
+
         p1 = New cv.Point(0, noisyLine.bb)
         p2 = New cv.Point(src.Width, noisyLine.m * src.Width + noisyLine.bb)
-        dst2.Line(p1, p2, cv.Scalar.Blue, task.lineWidth + 2, task.lineType)
+        dst2.Line(p1, p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
         SetTrueText("Ground Truth m = " + Format(noisyLine.m, fmt2) + " eigen m = " + Format(m2, fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
                     "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), fmt1) + vbCrLf +
                     "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), fmt1) + ", " + Format(eigenVec.Get(Of Single)(0, 0), fmt1) + ") = " +
@@ -131,7 +132,7 @@ End Class
 
 
 Public Class Eigen_Input : Inherits TaskParent
-    Public points As New List(Of cv.Point2f)
+    Public PointList As New List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
     Public eigen3D As New Eigen_Input3D
@@ -143,10 +144,10 @@ Public Class Eigen_Input : Inherits TaskParent
         eigen3D.Run(src)
         m = eigen3D.m
         bb = eigen3D.bb
-        points.Clear()
+        PointList.Clear()
 
-        For Each pt In eigen3D.points
-            points.Add(New cv.Point2f(pt.X, pt.Y))
+        For Each pt In eigen3D.PointList
+            PointList.Add(New cv.Point2f(pt.X, pt.Y))
         Next
 
         dst2 = eigen3D.dst2
@@ -161,16 +162,18 @@ End Class
 
 
 Public Class Eigen_Input3D : Inherits TaskParent
-    Public points As New List(Of cv.Point3f)
+    Public PointList As New List(Of cv.Point3f)
     Public m As Single
     Public bb As Single
     Public options As New Options_Eigen
     Public Sub New()
-        labels(2) = "Use sliders to adjust the width and intensityf of the line"
+        labels(2) = "Use sliders to adjust the width and intensityf of the trendline"
         desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
+
+        If standalone And task.heartBeat = False Then Exit Sub
         dst2.SetTo(0)
         Dim width = src.Width, height = src.Height, depth = src.Height
 
@@ -192,17 +195,13 @@ Public Class Eigen_Input3D : Inherits TaskParent
         Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.noisyPointCount
 
         Dim highLight = cv.Scalar.Gray
-        points.Clear()
+        PointList.Clear()
         For i = 0 To options.noisyPointCount - 1
             Dim noiseOffsetX = (Rnd() * 2 - 1) * options.noiseOffset
             Dim noiseOffsetY = (Rnd() * 2 - 1) * options.noiseOffset
             Dim pt = New cv.Point3f(startx + i * incr + noiseOffsetX,
-                                        Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
-            If pt.X < 0 Then pt.X = 0
-            If pt.X > width Then pt.X = width
-            If pt.Y < 0 Then pt.Y = 0
-            If pt.Y > height Then pt.Y = height
-            points.Add(pt)
+                                    Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
+            PointList.Add(pt)
             DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight)
         Next
     End Sub

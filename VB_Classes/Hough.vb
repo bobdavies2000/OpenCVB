@@ -101,7 +101,7 @@ Public Class Hough_Lines_MT : Inherits TaskParent
         desc = "Multithread Houghlines to find lines in image fragments."
     End Sub
 
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         edges.Run(src)
         dst2 = edges.dst2
@@ -117,7 +117,6 @@ Public Class Hough_Lines_MT : Inherits TaskParent
             dst3(roi).SetTo(0)
             houghShowLines(dst3(roi), segments, 1)
         End Sub)
-        dst2.SetTo(cv.Scalar.White, task.gridMask)
     End Sub
 End Class
 
@@ -289,7 +288,7 @@ Public Class Hough_Lines : Inherits TaskParent
         labels(3) = "Hough Lines for each threaded cell or if no lines, the featureless cell depth data."
         desc = "Multithread Houghlines to find lines in image fragments."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
         edges.Run(src)
         dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -301,7 +300,6 @@ Public Class Hough_Lines : Inherits TaskParent
             houghShowLines(dst2(roi), segments, 2)
             houghShowLines(dst3(roi), segments, 2)
         Next
-        dst2.SetTo(white, task.gridMask)
     End Sub
 End Class
 

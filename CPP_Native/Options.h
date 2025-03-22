@@ -204,7 +204,7 @@ public:
 class Options_Eigen {
 public:
 	int noisyPointCount =  100;
-	int noiseOffset =  200;
+	int noiseOffset =  25;
 	void RunOpt() {}
 	Options_Eigen() {
 	}

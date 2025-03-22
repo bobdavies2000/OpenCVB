@@ -332,12 +332,12 @@ Public Class VBtask : Implements IDisposable
 #If AZURE_SUPPORT Then
         "Azure Kinect 4K",
 #End If
-        Public Shared cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
-                                                          "Intel(R) RealSense(TM) Depth Camera 455",
+        Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
+                                                          "Orbbec Gemini 335L",
                                                           "Oak-D camera",
-                                                          "StereoLabs ZED 2/2i",
-                                                          "MYNT-EYE-D1000",
-                                                          "Orbbec Gemini 335L"})
+                                                          "Intel(R) RealSense(TM) Depth Camera 435i",
+                                                          "Intel(R) RealSense(TM) Depth Camera 455",
+                                                          "MYNT-EYE-D1000"})
         Public cameraName As String
         Public cameraIndex As Integer
 

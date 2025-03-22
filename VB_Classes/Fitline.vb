@@ -11,7 +11,7 @@ Public Class FitLine_Basics : Inherits TaskParent
         If standalone And task.heartBeatLT Then
             Static inputData As New Eigen_Input
             inputData.Run(src)
-            ptList = New List(Of cv.Point2f)(inputData.points)
+            ptList = New List(Of cv.Point2f)(inputData.PointList)
             dst2 = inputData.dst2
         End If
 
@@ -31,14 +31,14 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/js_contour_features_fitLine.html
-Public Class FitLine_FindLine : Inherits TaskParent
+Public Class FitLine_Lines : Inherits TaskParent
     Dim options As New Options_FitLine
     Public draw As New Draw_Lines
     Public lines As New List(Of cv.Point)
     Public Sub New()
         optiBase.FindSlider("DrawCount").Value = 2
-
-        labels(3) = "FitLine_Basics input"
+        labels(2) = "If the contours overlap, then one line the trendline for both is found.  Otherwise, 2 lines are found."
+        labels(3) = "FitLine_Basics contour input - if they overlap, a trendline will be found."
         desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -148,8 +148,8 @@ Public Class FitLine_Simple3D : Inherits TaskParent
     Public center As cv.Point2f
     Dim options As New Options_FitLine
     Public Sub New()
-        labels(2) = "With only a few points, the resulting vector can be anywhere but with lots of data, it will be pretty level."
-        desc = "A simple demo of using fitline with 3D points."
+        labels(2) = "With only a few points, resulting vector can be anywhere but it will be horizontal with uniformly distributed points."
+        desc = "A simple demo of using fitline with uniformly distributed 3D points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.RunOpt()
@@ -194,12 +194,49 @@ Public Class FitLine_Example2D : Inherits TaskParent
         dst2 = inputData.dst2
 
         fitLine.ptList.Clear()
-        For Each pt In inputData.points
+        For Each pt In inputData.PointList
             fitLine.ptList.Add(New cv.Point2f(pt.X, pt.Y))
         Next
         fitLine.Run(src)
 
         dst2.Line(fitLine.lp.p1, fitLine.lp.p2, task.HighlightColor, task.lineWidth, task.lineType)
         dst2.Circle(fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class FitLine_TrendLine3D : Inherits TaskParent
+    Public ptList As New List(Of cv.Point3f)
+    Public lpResult As lpData
+    Public center As cv.Point2f
+    Public Sub New()
+        labels(2) = "The input is a noisy trendline but the result should track pretty well."
+        desc = "A simple demo of using fitline with uniformly distributed 3D points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static inputData As New Eigen_Input3D
+            If task.heartBeat = False Then Exit Sub
+            inputData.Run(src)
+            dst2.SetTo(0)
+            ptList.Clear()
+            For Each pt In inputData.PointList
+                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.HighlightColor)
+                ptList.Add(pt)
+            Next
+        End If
+
+        ' Fit a line to the 3D points
+        Dim line = cv.Cv2.FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
+        center = New cv.Point2f(line.X1, line.Y1)
+
+        Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
+        Dim lp = New lpData(center, p2)
+        lpResult = findEdgePoints(lp)
+        dst2.Line(lpResult.p1, lpResult.p2, task.HighlightColor, task.lineWidth, task.lineType)
+        dst2.Circle(center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class

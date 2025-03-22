@@ -23,6 +23,7 @@ Partial Class Options
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.FixedPalette = New System.Windows.Forms.CheckBox()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.UpdateXRef = New System.Windows.Forms.Button()
@@ -46,7 +47,6 @@ Partial Class Options
         Me.Resolutions = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
-        Me.FixedPalette = New System.Windows.Forms.CheckBox()
         Me.GroupBox2.SuspendLayout()
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox5.SuspendLayout()
@@ -63,12 +63,24 @@ Partial Class Options
         Me.GroupBox2.Controls.Add(Me.fontInfo)
         Me.GroupBox2.Controls.Add(Me.Button1)
         Me.GroupBox2.Controls.Add(Me.showConsoleLog)
-        Me.GroupBox2.Location = New System.Drawing.Point(24, 543)
+        Me.GroupBox2.Location = New System.Drawing.Point(24, 499)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(962, 165)
+        Me.GroupBox2.Size = New System.Drawing.Size(962, 209)
         Me.GroupBox2.TabIndex = 5
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Other Global Settings"
+        '
+        'FixedPalette
+        '
+        Me.FixedPalette.AutoSize = True
+        Me.FixedPalette.Checked = True
+        Me.FixedPalette.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.FixedPalette.Location = New System.Drawing.Point(422, 86)
+        Me.FixedPalette.Name = "FixedPalette"
+        Me.FixedPalette.Size = New System.Drawing.Size(351, 24)
+        Me.FixedPalette.TabIndex = 16
+        Me.FixedPalette.Text = "On = fixed palette.  Off - random after restart."
+        Me.FixedPalette.UseVisualStyleBackColor = True
         '
         'Label7
         '
@@ -173,7 +185,7 @@ Partial Class Options
         Me.CameraGroup.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.CameraGroup.Location = New System.Drawing.Point(24, 32)
         Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(821, 171)
+        Me.CameraGroup.Size = New System.Drawing.Size(821, 117)
         Me.CameraGroup.TabIndex = 13
         '
         'GroupBox5
@@ -184,7 +196,7 @@ Partial Class Options
         Me.GroupBox5.Controls.Add(Me.SnapCustom)
         Me.GroupBox5.Controls.Add(Me.Snap320)
         Me.GroupBox5.Controls.Add(Me.Snap640)
-        Me.GroupBox5.Location = New System.Drawing.Point(24, 438)
+        Me.GroupBox5.Location = New System.Drawing.Point(24, 394)
         Me.GroupBox5.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox5.Name = "GroupBox5"
         Me.GroupBox5.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -256,7 +268,7 @@ Partial Class Options
         'Resolutions
         '
         Me.Resolutions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.Resolutions.Location = New System.Drawing.Point(24, 229)
+        Me.Resolutions.Location = New System.Drawing.Point(24, 185)
         Me.Resolutions.Name = "Resolutions"
         Me.Resolutions.Size = New System.Drawing.Size(821, 201)
         Me.Resolutions.TabIndex = 15
@@ -273,23 +285,11 @@ Partial Class Options
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(20, 206)
+        Me.Label5.Location = New System.Drawing.Point(20, 162)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(182, 20)
         Me.Label5.TabIndex = 17
         Me.Label5.Text = "Working Size Resolution"
-        '
-        'FixedPalette
-        '
-        Me.FixedPalette.AutoSize = True
-        Me.FixedPalette.Checked = True
-        Me.FixedPalette.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.FixedPalette.Location = New System.Drawing.Point(422, 86)
-        Me.FixedPalette.Name = "FixedPalette"
-        Me.FixedPalette.Size = New System.Drawing.Size(351, 24)
-        Me.FixedPalette.TabIndex = 16
-        Me.FixedPalette.Text = "On = fixed palette.  Off - random after restart."
-        Me.FixedPalette.UseVisualStyleBackColor = True
         '
         'Options
         '
