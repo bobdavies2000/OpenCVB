@@ -21,7 +21,7 @@
     -   This change is motivated by the difficulty of tracking motion in depth.
         -   There is simply too much volatility in regions with zero depth.
         -   Grid cells impacted by RGB motion get a full update.
-        -   And so do grid cells with low depth correlation (lots of zeros.)
+        -   And so do grid cells with low depth correlation (unreliable depth.)
     -   RGB motion cannot cover changes in depth shadow from foreground objects.
 -   A log of previous changes is included at the bottom of this document.
 
