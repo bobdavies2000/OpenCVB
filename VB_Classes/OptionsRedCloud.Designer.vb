@@ -534,7 +534,7 @@ Partial Class OptionsRedCloud
         Me.ColoringGroup.Size = New System.Drawing.Size(220, 155)
         Me.ColoringGroup.TabIndex = 78
         Me.ColoringGroup.TabStop = False
-        Me.ColoringGroup.Text = "Output Color Options"
+        Me.ColoringGroup.Text = "RedCloud Output Color"
         '
         'TrackingDepthColor
         '

@@ -65,16 +65,15 @@ Public Class Distance_Foreground : Inherits TaskParent
         foreground.Run(src)
         dst3 = If(useBackgroundAsInput, foreground.dst2, foreground.dst3)
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim DistanceType = cv.DistanceTypes.L2
         If cRadio.Checked Then DistanceType = cv.DistanceTypes.C
         If l1Radio.Checked Then DistanceType = cv.DistanceTypes.L1
 
-        src = dst3 And src
-        Dim dist = src.DistanceTransform(DistanceType, cv.DistanceTransformMasks.Precise)
-        Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
-        dist32f.ConvertTo(src, cv.MatType.CV_8UC1)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst0 = dst3 And task.gray
+        dst0 = dst0.DistanceTransform(DistanceType, cv.DistanceTransformMasks.Precise)
+        Dim dist32f = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
+        dist32f.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -164,7 +163,7 @@ Public Class Distance_Point4D : Inherits TaskParent
         distance = Math.Sqrt(x * x + y * y + z * z + d * d)
 
         strOut = inPoint1.ToString + vbCrLf + inPoint2.ToString + vbCrLf + "Distance = " + Format(distance, fmt1)
-        SetTrueText(strOut, New cv.Point(10, 10), 2)
+        If standalone And task.heartBeat Then SetTrueText(strOut, New cv.Point(10, 10), 2)
     End Sub
 End Class
 

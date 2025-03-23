@@ -63,7 +63,8 @@ Public Class Foreground_KMeans : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         task.optionsChanged = True
 
-        km.Run(task.pcSplit(2))
+        src = task.pcSplit(2).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        km.Run(src)
 
         Dim minDistance = Single.MaxValue
         Dim minIndex As Integer
