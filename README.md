@@ -1,47 +1,33 @@
-# March 2025 (Part 3) – RedColor, Color8U, Left/Right Mean Subtraction, Gravity/Horizon, and the XO algorithms.
+# March 2025 (Part 4) – Azure Support, FitLine, Eigen, Feature, XO, Depth Correlation Updates.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   For RedCloud output, a coloring scheme may be selected in the RedCloud options.
-    -   Color a cell with its mean color, tracking color, or depth color.
-    -   The different color schemes are explained in the first GIF below.
-    -   Background cells are unchanged even with hand motion.
-    -   Only cells within the motion mask need to be updated.
--   This image stability is visible in all of the Color8U algorithms input to RedColor.
--   All the Color8U algorithms (currently 10) use motion to increase image stability.
-    -   BackProject_Full – a histogram setting determines the classifications.
-    -   Bin4Way_Regions – 4 color categories based on brightness.
-    -   Binarize_DepthTiers – 1-meter categories of depth.
-    -   EdgeLine_Basics – (default) uses lines and edges to segment the image.
-    -   Hist3DColor_Basics – categorize color pixels with a 3D histogram.
-    -   KMeans_Basics – a standard K-Means approach to segmentation.
-    -   LUT_Basics – use a look-up-table (LUT) to categorize each pixel.
-    -   Reduction_Basics – reduce each pixel mechanically to group similar pixels.
-    -   PCA_NColor_CPP – principal component analysis on the entire image.
-    -   MeanSubtraction_Gray – grayscale separation into 2 classes.
--   Mean subtraction of the left and right images may show depth correlation better.
-    -   The first GIF shows the previous version with no mean subtraction.
-    -   The second GIF below alternates with and without mean subtraction.
-    -   Check global option ‘Mean Subtraction on Left/Right Images’ to see the impact.
-    -   Mean subtraction of left and right images finds better correlation values.
-    -   Much more testing is needed to confirm the value of using this approach.
--   The gravity algorithms were reworked to use OpenCV’s FindNonZero.
-    -   The gravity vector is defined in image coordinates to help find vertical lines.
-    -   Similarly, the horizon vector is used to find horizontal lines algebraically.
-    -   The gravity vector can be smoothed with Kalman. See Gravity_Basics.
-        -   But it is too slow on some configurations with a moving camera.
--   The XO algorithms are experimental or obsolete algorithms that are not active.
-    -   Separating inactive code is simpler and preserves the possibility of later use.
-    -   Obsolete gravity and horizon algorithms prompted XO’s creation.
-    -   More and more algorithms will migrate there to simplify the source tree.
+-   Support for the Azure Kinect 4K is present but \#ifdef’d out
+    -   With no left/right image, the support required too much special handling.
+    -   Look for the “AZURE_SUPPORT” \#define to reenable support.
+    -   “Update_All.bat” install script has commented the Azure-related commands.
+    -   The camera order has changed in the OpenCVB options.
+        -   Stereolabs’ camera is the preferred camera at the top of the list.
+        -   Orbbec Gemini 335L next best.
+        -   Then Oak-D because Intel cameras are no longer available.
+        -   Mynt is still there in case anyone still has their camera.
+-   The FitLine and Eigen algorithms were reviewed and updated.
+    -   There are 2 ways to fit a line to raw data but FitLine looks a little better.
+-   All the Feature methods use the motion mask to manage the features.
+    -   Feature points are stable across frames if there is no motion nearby.
+-   Algorithms starting with “XO_” are obsolete and not included in overnight testing.
+    -   The obsolete examples should still run when selected manually.
+    -   The obsolete examples can be useful for exploring OpenCV API’s.
+-   The “Depth Correlation” view includes the depth shadow – see below.
+    -   This change is motivated by the difficulty of tracking motion in depth.
+        -   There is simply too much volatility in regions with zero depth.
+        -   Grid cells impacted by RGB motion get a full update.
+        -   And so do grid cells with low depth correlation (lots of zeros.)
+    -   RGB motion cannot cover changes in depth shadow from foreground objects.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/101f64619a75aba05208e888ad0a7c16.gif)
+![](media/5411c8981b86e7bc4779ffc60a1a8309.gif)
 
-**RedColor_Basics :** *The different display options for RedCloud output are shown above. The radio button insert shows the current selection. The 3 options are to display the mean color of the cell, a tracking color, and the depth color. The tracking color is a highly visible color that is randomly assigned to a cell so that it may be visually tracked from frame to frame.*
-
-*![](media/44e21adc20afb2490256ae9462af7c56.gif)*
-
-**Mean Subtraction :** *An OpenCVB global option enables using mean subtraction of the left and right images as input to the depth correlation. The featureless regions are highlighted in the output with solid red regions. The improved output is available to all algorithms in the DepthRGB Mat. More testing is needed to confirm the value of mean subtraction.*
+**RedColor_Basics :** *The same algorithm as the previous update but with the improved representation of the “Depth Correlation”. The upper right image is switching between the previous view of the depth and the current one that includes the regions with zero depth.*
 
 # Introduction
 
@@ -1912,3 +1898,48 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of a person sitting in a chair AI-generated content may be incorrect.](media/f1f77b330a4a33ef4872f2d85b188b32.gif)
 
 **Connected_Contours :** *Each region contains grid cells and neighbors which are at approximately the same depth. For instance, the green cell in the lower left consistently defines and tracks the person seated at the desk (our humble programmer.) The wall and painting are tracked as well. The lower right image confirms this by showing the color image and the contours using OpenCV’s AddWeighted method. The tracking color of the wall changes because it is shrinking in size as the contours are colored by order of size in this version.*
+
+# March 2025 (Part 3) – RedColor, Color8U, Left/Right Mean Subtraction, Gravity/Horizon, and the XO algorithms.
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   For RedCloud output, a coloring scheme may be selected in the RedCloud options.
+    -   Color a cell with its mean color, tracking color, or depth color.
+    -   The different color schemes are explained in the first GIF below.
+    -   Background cells are unchanged even with hand motion.
+    -   Only cells within the motion mask need to be updated.
+-   This image stability is visible in all of the Color8U algorithms input to RedColor.
+-   All the Color8U algorithms (currently 10) use motion to increase image stability.
+    -   BackProject_Full – a histogram setting determines the classifications.
+    -   Bin4Way_Regions – 4 color categories based on brightness.
+    -   Binarize_DepthTiers – 1-meter categories of depth.
+    -   EdgeLine_Basics – (default) uses lines and edges to segment the image.
+    -   Hist3DColor_Basics – categorize color pixels with a 3D histogram.
+    -   KMeans_Basics – a standard K-Means approach to segmentation.
+    -   LUT_Basics – use a look-up-table (LUT) to categorize each pixel.
+    -   Reduction_Basics – reduce each pixel mechanically to group similar pixels.
+    -   PCA_NColor_CPP – principal component analysis on the entire image.
+    -   MeanSubtraction_Gray – grayscale separation into 2 classes.
+-   Mean subtraction of the left and right images may show depth correlation better.
+    -   The first GIF shows the previous version with no mean subtraction.
+    -   The second GIF below alternates with and without mean subtraction.
+    -   Check global option ‘Mean Subtraction on Left/Right Images’ to see the impact.
+    -   Mean subtraction of left and right images finds better correlation values.
+    -   Much more testing is needed to confirm the value of using this approach.
+-   The gravity algorithms were reworked to use OpenCV’s FindNonZero.
+    -   The gravity vector is defined in image coordinates to help find vertical lines.
+    -   Similarly, the horizon vector is used to find horizontal lines algebraically.
+    -   The gravity vector can be smoothed with Kalman. See Gravity_Basics.
+        -   But it is too slow on some configurations with a moving camera.
+-   The XO algorithms are experimental or obsolete algorithms that are not active.
+    -   Separating inactive code is simpler and preserves the possibility of later use.
+    -   Obsolete gravity and horizon algorithms prompted XO’s creation.
+    -   More and more algorithms will migrate there to simplify the source tree.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of a person in a room AI-generated content may be incorrect.](media/101f64619a75aba05208e888ad0a7c16.gif)
+
+**RedColor_Basics :** *The different display options for RedCloud output are shown above. The radio button insert shows the current selection. The 3 options are to display the mean color of the cell, a tracking color, and the depth color. The tracking color is a highly visible color that is randomly assigned to a cell so that it may be visually tracked from frame to frame.*
+
+*![A collage of a room with a door and a room with a computer screen AI-generated content may be incorrect.](media/44e21adc20afb2490256ae9462af7c56.gif)*
+
+**Mean Subtraction :** *An OpenCVB global option enables using mean subtraction of the left and right images as input to the depth correlation. The featureless regions are highlighted in the output with solid red regions. The improved output is available to all algorithms in the DepthRGB Mat. More testing is needed to confirm the value of mean subtraction.*
