@@ -26,10 +26,10 @@ Public Class Line3D_Basics : Inherits TaskParent
         lines3D.Clear()
 
         For Each lp In task.lpList
-            Dim gc1 = gcList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim gc1 = gcList(task.gcMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
             If gc1.depth = 0 Then Continue For
 
-            Dim gc2 = gcList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim gc2 = gcList(task.gcMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
             If gc2.depth = 0 Then Continue For
 
             lines3D.Add(New cv.Point3f(0, 0.9, 0.9))

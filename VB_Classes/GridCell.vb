@@ -108,7 +108,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
-        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         task.gcCell = task.gcList(index)
         dst2 = task.gCell.dst2
 
@@ -145,7 +145,7 @@ Public Class GridCell_Plot : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gCell.dst2
 
-        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.gcList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim gc As gcData
@@ -260,7 +260,7 @@ Public Class GridCell_RGBtoLeft : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim gc As gcData
         If index > 0 And index < task.gcList.Count Then
             gc = task.gcList(index)
@@ -374,7 +374,7 @@ Public Class GridCell_Correlation : Inherits TaskParent
 
         dst2 = task.leftView
         dst3 = task.rightView
-        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.gcList.Count Then Exit Sub
 
         Dim gc = task.gcList(index)
@@ -712,7 +712,7 @@ Public Class GridCell_Features : Inherits TaskParent
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gcMap.Get(Of Integer)(pt.Y, pt.X)
             Dim gc = task.gcList(index)
             gc.features.Add(pt)
             DrawCircle(dst2, gc.rect.TopLeft, task.DotSize, task.highlight)
@@ -829,8 +829,8 @@ Public Class GridCell_ColorLines : Inherits TaskParent
         dst2 = src.Clone
         dst3.SetTo(0)
         For Each lp In task.lpList
-            Dim gc1 = task.gcList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim gc2 = task.gcList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim gc1 = task.gcList(task.gcMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim gc2 = task.gcList(task.gcMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
             dst3.Line(lp.p1, lp.p2, 128, task.lineWidth)
             If Math.Abs(gc1.depth - gc2.depth) >= task.depthDiffMeters Then
                 dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
@@ -886,9 +886,9 @@ Public Class GridCell_LeftRight : Inherits TaskParent
         dst2 = task.leftView
         dst3 = task.rightView
 
-        Dim indexTop = task.gridMap.Get(Of Integer)(task.drawRect.Y, task.drawRect.X)
+        Dim indexTop = task.gcMap.Get(Of Integer)(task.drawRect.Y, task.drawRect.X)
         If indexTop < 0 Or indexTop >= task.gcList.Count Then Exit Sub
-        Dim indexBot = task.gridMap.Get(Of Integer)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
+        Dim indexBot = task.gcMap.Get(Of Integer)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
         If indexBot < 0 Or indexBot >= task.gcList.Count Then Exit Sub
 
         Dim gc1 = task.gcList(indexTop)

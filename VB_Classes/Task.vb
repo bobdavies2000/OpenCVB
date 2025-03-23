@@ -18,8 +18,9 @@ Public Class VBtask : Implements IDisposable
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpXData)
 
-    Public gridMap As New cv.Mat
-    Public rcMap As cv.Mat
+    Public gcMap As New cv.Mat ' grid cell map
+    Public fpMap As New cv.Mat ' feature map
+    Public rcMap As cv.Mat ' redColor map
     Public gcCell As gcData
     Public rc As New rcData
 
@@ -40,8 +41,6 @@ Public Class VBtask : Implements IDisposable
 
     Public fpListLast As New List(Of fpXData)
     Public fpIDlist As New List(Of Single)
-
-    Public fpMap As New cv.Mat
     Public fpMapLast As New cv.Mat
 
     Public fpOutline As New cv.Mat

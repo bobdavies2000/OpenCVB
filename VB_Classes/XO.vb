@@ -2164,7 +2164,7 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
 
             lastCorrelation(i) = gc.correlation
             gc.index = task.gcList.Count
-            task.gridMap(gc.rect).SetTo(i)
+            task.gcMap(gc.rect).SetTo(i)
             task.gcList.Add(gc)
         Next
 
@@ -2189,11 +2189,11 @@ Public Class XO_Quad_Basics : Inherits TaskParent
             shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
         End If
 
-        task.gridMap.SetTo(0)
+        task.gcMap.SetTo(0)
         dst2.SetTo(0)
         For i = 0 To task.gcList.Count - 1
             Dim gc = task.gcList(i)
-            task.gridMap(gc.rect).SetTo(i)
+            task.gcMap(gc.rect).SetTo(i)
             If gc.depth > 0 Then
                 gc.corners.Clear()
 

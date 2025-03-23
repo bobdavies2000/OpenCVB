@@ -667,7 +667,7 @@ Public Class Feature_Matching : Inherits TaskParent
         For Each pt In features
             Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
             If val = 0 Then
-                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim index = task.gcMap.Get(Of Integer)(pt.Y, pt.X)
                 Dim r = task.gridRects(index)
                 match.template = fpLastSrc(r)
                 match.Run(src(r))
@@ -723,7 +723,7 @@ Public Class Feature_SteadyCam : Inherits TaskParent
         Dim mode = cv.TemplateMatchModes.CCoeffNormed
         features.Clear()
         For Each pt In ptList
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gcMap.Get(Of Integer)(pt.Y, pt.X)
             Dim r = task.gridRects(index)
             cv.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
             If correlationMat.Get(Of Single)(0, 0) >= options.correlationMin Then

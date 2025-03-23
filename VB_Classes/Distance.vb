@@ -1,5 +1,22 @@
 Imports cv = OpenCvSharp
 Public Class Distance_Basics : Inherits TaskParent
+    Dim distance As New Distance_Instant
+    Public Sub New()
+        desc = "Floodfill the distance_basics results"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then src = task.depthMask.Clone
+        If task.optionsChanged Then dst1 = src.Clone Else src.CopyTo(dst1, task.motionMask)
+        distance.Run(dst1)
+        dst2 = distance.dst2
+        dst2.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+Public Class Distance_Instant : Inherits TaskParent
     Dim options As New Options_Distance
     Public Sub New()
         labels = {"", "", "Distance transform - create a mask with threshold", ""}
@@ -18,31 +35,6 @@ Public Class Distance_Basics : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Distance_Labels : Inherits TaskParent
-    Dim options As New Options_Distance
-    Public Sub New()
-        labels(2) = "Distance results"
-        labels(3) = "Input mask to distance transformm"
-        desc = "Distance algorithm basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-
-        If standaloneTest() Then src = task.depthRGB
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        'Dim labels As cv.Mat
-        'cv.Cv2.DistanceTransformWithLabels(src, dst0, labels, cv.DistanceTypes.L2, cv.DistanceTransformMasks.Precise)
-        'Dim dist32f = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
-        'dist32f.ConvertTo(src, cv.MatType.CV_8UC1)
-        'dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-    End Sub
-End Class
 
 
 
@@ -172,101 +164,6 @@ End Class
 
 
 
-
-
-Public Class Distance_RedCloud : Inherits TaskParent
-    Dim hColor As New Hist3Dcolor_Basics
-    Public pixelVector As New List(Of List(Of Single))
-    Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-    Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-    Dim lastrcList As New List(Of rcData)
-    Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = True
-        task.redOptions.HistBinBar3D.Value = 5
-        hColor.noMotionMask = True
-        labels(1) = "3D Histogram distance for each of the cells at left"
-        desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
-    End Sub
-    Private Function distanceFromZero(histlist As List(Of Single)) As Double
-        Dim result As Double
-        For Each d In histlist
-            result += d * d
-        Next
-        Return Math.Sqrt(result)
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        runRedC(src)
-
-        pixelVector.Clear()
-        distances.Clear()
-        For i = 1 To task.rcList.Count - 1
-            Dim rc = task.rcList(i)
-            hColor.inputMask = rc.mask
-            hColor.Run(src(rc.rect))
-
-            Dim nextD = distanceFromZero(hColor.histArray.ToList)
-            distances.Add(nextD, i)
-        Next
-
-        If task.heartBeat Then
-            strOut = "3D histogram distances from zero for each cell" + vbCrLf
-            Dim index As Integer
-            For Each el In distances
-                strOut += "(" + CStr(el.Value) + ") "
-                strOut += Format(el.Key, fmt1) + vbTab
-                If index Mod 6 = 5 Then strOut += vbCrLf
-                index += 1
-
-                Dim rc = task.rcList(el.Value)
-                SetTrueText(CStr(el.Value), rc.maxDist)
-            Next
-
-            strOut += "----------------------" + vbCrLf
-            index = 0
-            For Each el In lastDistances
-                strOut += "(" + CStr(el.Value) + ") "
-                strOut += Format(el.Key, fmt1) + vbTab
-                If index Mod 6 = 5 Then strOut += vbCrLf
-                index += 1
-                Dim rc = lastrcList(el.Value)
-                SetTrueText(el.Value, New cv.Point(rc.maxDist.X, rc.maxDist.Y + 10))
-            Next
-
-            For Each el In distances
-                Dim rc = task.rcList(el.Value)
-                SetTrueText(CStr(el.Value), rc.maxDist)
-            Next
-        End If
-
-        For Each el In lastDistances
-            Dim rp = lastrcList(el.Value)
-            SetTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
-        Next
-
-        SetTrueText(strOut, 1)
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        For i = 0 To distances.Count - 1
-            Dim rp = task.rcList(distances.ElementAt(i).Value)
-            task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
-            dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
-        Next
-        labels(2) = task.redC.labels(3)
-
-        lastDistances.Clear()
-        For Each el In distances
-            lastDistances.Add(el.Key, el.Value)
-        Next
-
-        lastrcList = New List(Of rcData)(task.rcList)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Distance_BinaryImage : Inherits TaskParent
     Dim binary As New Binarize_Simple
     Dim distance As New Distance_Basics
@@ -286,5 +183,238 @@ Public Class Distance_BinaryImage : Inherits TaskParent
         End If
         dst3 = distance.dst2
         dst1 = dst3.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Distance_Peaks : Inherits TaskParent
+    Public Sub New()
+        desc = "Find the points which are furthest from the zero depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.noDepthMask
+        Dim distance32f = dst1.DistanceTransform(cv.DistanceTypes.L1, 0)
+
+        Dim maxList As New List(Of Integer)
+        Dim ptList As New List(Of cv.Point)
+        Dim countList As New List(Of Integer)
+        For Each rect In task.gridRects
+            Dim mm = GetMinMax(distance32f(rect))
+            maxList.Add(mm.maxVal)
+            dst1(rect).SetTo(CInt(mm.maxVal))
+            If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
+            countList.Add(distance32f(rect).CountNonZero)
+        Next
+        dst2 = ShowPalette(dst1 * 255 / maxList.Max)
+
+        If standalone Then
+            dst0.SetTo(0)
+            For Each pt In ptList
+                DrawCircle(dst0, pt, task.DotSize, task.highlight)
+            Next
+        End If
+
+        Dim max = countList.Max
+        For i = 0 To task.gridRects.Count - 1
+            Dim rect = task.gridRects(i)
+            dst3(rect).SetTo(255 * countList(i) / max)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Distance_Labels : Inherits TaskParent
+    Dim options As New Options_Distance
+    Public Sub New()
+        labels(2) = "Distance results"
+        labels(3) = "The labels for each vein of the distance transform output."
+        desc = "Distance algorithm basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.RunOpt()
+
+        If standalone Then src = task.noDepthMask
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        cv.Cv2.DistanceTransformWithLabels(src, dst0, dst1, options.distanceType, cv.DistanceTransformMasks.Precise)
+        dst2 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        dst3 = ShowPalette(dst1)
+        If standalone Then dst3.SetTo(0, task.depthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Distance_LabelsNoDepth : Inherits TaskParent
+    Dim labeller As New Distance_Labels
+    Public Sub New()
+        desc = "Distance algorithm for the regions with no depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat = False Then Exit Sub
+        labeller.Run(task.noDepthMask)
+        dst2 = labeller.dst2
+        dst3 = labeller.dst3
+        labels = labeller.labels
+        dst3.SetTo(0, task.depthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Distance_LabelsDepth : Inherits TaskParent
+    Dim labeller As New Distance_Labels
+    Public Sub New()
+        desc = "Distance algorithm for the regions with no depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT = False Then Exit Sub
+        labeller.Run(task.depthMask)
+        dst2 = labeller.dst2
+        dst3 = labeller.dst3
+        labels = labeller.labels
+        dst3.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Distance_Edges : Inherits TaskParent
+    Dim distance As New Distance_Basics
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "Combine the output of edge_Basics and distance_basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        distance.Run(task.depthMask)
+
+        edges.Run(src)
+
+        dst2 = ShowAddweighted(distance.dst2, edges.dst2, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Distance_RedDistance : Inherits TaskParent
+    Dim distance As New Distance_Basics
+    Public Sub New()
+        desc = "Combine the output of redColor_Basics and distance_basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        distance.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        dst2 = ShowAddweighted(distance.dst2, task.redC.dst2, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Distance_RedColor : Inherits TaskParent
+    Dim hColor As New Hist3Dcolor_Basics
+    Public pixelVector As New List(Of List(Of Single))
+    Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
+    Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
+    Dim lastrcList As New List(Of rcData)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        task.redOptions.HistBinBar3D.Value = 5
+        hColor.noMotionMask = True
+        labels(1) = "3D Histogram distance for each of the cells at left"
+        labels(2) = "RedColor output with the cell's distance from zero depth"
+        desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
+    End Sub
+    Private Function distanceFromZero(histlist As List(Of Single)) As Double
+        Dim result As Double
+        For Each d In histlist
+            result += d * d
+        Next
+        Return Math.Sqrt(result)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = runRedC(src, labels(3))
+
+        pixelVector.Clear()
+        distances.Clear()
+        For i = 1 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
+            hColor.inputMask = rc.mask
+            hColor.Run(src(rc.rect))
+
+            Dim nextD = distanceFromZero(hColor.histArray.ToList)
+            distances.Add(nextD, i)
+        Next
+
+        If task.heartBeatLT Then
+            strOut = "3D histogram distances from zero for each cell" + vbCrLf
+            Dim index As Integer
+            For Each el In distances
+                strOut += "(" + CStr(el.Value) + ") "
+                strOut += Format(el.Key, fmt1) + vbTab
+                If index Mod 6 = 5 Then strOut += vbCrLf
+                index += 1
+            Next
+
+            strOut += "----------------------" + vbCrLf
+            index = 0
+            For Each el In lastDistances
+                strOut += "(" + CStr(el.Value) + ") "
+                strOut += Format(el.Key, fmt1) + vbTab
+                If index Mod 6 = 5 Then strOut += vbCrLf
+                index += 1
+                Dim rc = lastrcList(el.Value)
+            Next
+        End If
+
+        For Each el In lastDistances
+            Dim rp = lastrcList(el.Value)
+            SetTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
+        Next
+
+        SetTrueText(strOut, 1)
+
+        dst2.SetTo(0)
+        For i = 0 To distances.Count - 1
+            Dim rp = task.rcList(distances.ElementAt(i).Value)
+            task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
+        Next
+        labels(2) = task.redC.labels(3)
+
+        lastDistances.Clear()
+        For Each el In distances
+            lastDistances.Add(el.Key, el.Value)
+        Next
+
+        lastrcList = New List(Of rcData)(task.rcList)
     End Sub
 End Class

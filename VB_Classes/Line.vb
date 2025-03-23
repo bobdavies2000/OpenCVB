@@ -519,7 +519,7 @@ Public Class Line_Info : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
             DrawCircle(dst2, lp.center, task.DotSize, task.highlight)
 
-            Dim nIndex = task.gridMap.Get(Of Integer)(lp.center.Y, lp.center.X)
+            Dim nIndex = task.gcMap.Get(Of Integer)(lp.center.Y, lp.center.X)
             For Each gIndex In task.gridNeighbors(nIndex)
                 clickMap(task.gridRects(gIndex)).SetTo(lp.index)
             Next
@@ -536,7 +536,7 @@ Public Class Line_Info : Inherits TaskParent
         lp = task.lpList(clickIndex)
 
         strOut += "Line ID = " + CStr(lp.index) + vbCrLf + vbCrLf
-        strOut += "Gridmap element = " + CStr(clickIndex) + vbCrLf
+        strOut += "gcMap element = " + CStr(clickIndex) + vbCrLf
         strOut += "Age = " + CStr(lp.age) + vbCrLf
 
         strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf

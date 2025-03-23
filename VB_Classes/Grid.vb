@@ -5,12 +5,12 @@ Public Class Grid_Basics : Inherits TaskParent
     Public tilesPerCol As Integer, tilesPerRow As Integer
     Public Sub New()
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        task.gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 255)
+        task.gcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 255)
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.mouseClickFlag And Not task.firstPass Then
-            task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.gridROIclicked = task.gcMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
 
         Dim cellSize As Integer
@@ -50,7 +50,7 @@ Public Class Grid_Basics : Inherits TaskParent
 
             For i = 0 To task.gridRects.Count - 1
                 Dim roi = task.gridRects(i)
-                task.gridMap.Rectangle(roi, i, -1)
+                task.gcMap.Rectangle(roi, i, -1)
             Next
 
             For j = 0 To task.gridRects.Count - 1
@@ -64,7 +64,7 @@ Public Class Grid_Basics : Inherits TaskParent
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                               roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                     If x >= 0 And x < src.Width And y >= 0 And y < src.Height Then
-                        Dim val = task.gridMap.Get(Of Integer)(y, x)
+                        Dim val = task.gcMap.Get(Of Integer)(y, x)
                         If nextList.Contains(val) = False Then nextList.Add(val)
                     End If
                 Next
@@ -249,7 +249,7 @@ Public Class Grid_Neighbors : Inherits TaskParent
         SetTrueText("Click any grid entry to see its neighbors", 3)
         dst2.SetTo(white, task.gridMask)
 
-        Dim roiIndex = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim roiIndex = task.gcMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
 
         dst3.SetTo(0)
         For Each index In task.gridNeighbors(roiIndex)
@@ -274,10 +274,10 @@ Public Class Grid_Emax : Inherits TaskParent
     Public tilesPerRow As Integer
     Public gridMask As cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
-    Public gridMap As cv.Mat
+    Public gcMap As cv.Mat
     Public Sub New()
         gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
+        gcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
         desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
                 "  Specify the Y size."
     End Sub
@@ -310,7 +310,7 @@ Public Class Grid_Emax : Inherits TaskParent
             Next
 
             For Each roi In gridRects
-                gridMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
+                gcMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
             Next
 
             gridNeighbors.Clear()
@@ -323,7 +323,7 @@ Public Class Grid_Emax : Inherits TaskParent
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                           roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                     If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        gridNeighbors(gridNeighbors.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
+                        gridNeighbors(gridNeighbors.Count - 1).Add(gcMap.Get(Of Integer)(y, x))
                     End If
                 Next
             Next
@@ -392,7 +392,7 @@ Public Class Grid_TrackCenter : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If match.correlation < match.options.correlationMin Or task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
-            Dim index = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
+            Dim index = task.gcMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridRects(index)
             match.template = src(roi).Clone
             center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
@@ -424,9 +424,9 @@ End Class
 
 Public Class Grid_ShowMap : Inherits TaskParent
     Public Sub New()
-        desc = "Verify that task.gridMap is laid out correctly"
+        desc = "Verify that task.gcMap is laid out correctly"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.gridMap)
+        dst2 = ShowPalette(task.gcMap)
     End Sub
 End Class

@@ -11,7 +11,7 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Sub statsString()
         Dim rc = task.rc
 
-        Dim gridID = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+        Dim gridID = task.gcMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
         strOut += "rc.age = " + CStr(rc.age) + vbCrLf
         strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
