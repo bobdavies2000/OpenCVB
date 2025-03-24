@@ -21,6 +21,7 @@ Public Class VBtask : Implements IDisposable
     Public gcMap As New cv.Mat ' grid cell map
     Public fpMap As New cv.Mat ' feature map
     Public rcMap As cv.Mat ' redColor map
+    Public lpMap As cv.Mat ' lpData map (lines)
     Public gcCell As gcData
     Public rc As New rcData
 

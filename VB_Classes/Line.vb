@@ -5,17 +5,17 @@ Public Class Line_Basics : Inherits TaskParent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask.  Results are in task.lplist."
+        task.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
     End Sub
     Private Function getLineCounts(lpList As List(Of lpData)) As Single()
         Dim histarray(lpList.Count - 1) As Single
         If lpList.Count > 0 Then
             Dim histogram As New cv.Mat
-            Dim lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             For Each lp In lpList
-                lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+                task.lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
             Next
 
-            cv.Cv2.CalcHist({lpMap}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(1, lpList.Count)})
+            cv.Cv2.CalcHist({task.lpMap}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(1, lpList.Count)})
 
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
         End If

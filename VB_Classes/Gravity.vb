@@ -1,65 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Gravity_Raw : Inherits TaskParent
-    Public xTop As Integer, xBot As Integer
-    Dim sampleSize As Integer = 25
-    Dim ptList As New List(Of Integer)
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "Horizon and Gravity Vectors"
-        desc = "Improved method to find gravity and horizon vectors"
-    End Sub
-    Private Function findFirst(points As cv.Mat) As Integer
-        ptList.Clear()
-
-        For i = 0 To Math.Min(sampleSize, points.Rows / 2)
-            Dim pt = points.Get(Of cv.Point)(i, 0)
-            If pt.X <= 0 Or pt.Y <= 0 Then Continue For
-            If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
-            ptList.Add(pt.X)
-        Next
-
-        If ptList.Count = 0 Then Return 0
-        Return ptList.Average()
-    End Function
-    Private Function findLast(points As cv.Mat) As Integer
-        ptList.Clear()
-
-        For i = points.Rows To Math.Max(points.Rows - sampleSize, points.Rows / 2) Step -1
-            Dim pt = points.Get(Of cv.Point)(i, 0)
-            If pt.X <= 5 Or pt.Y <= 5 Then Continue For
-            If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
-            ptList.Add(pt.X)
-        Next
-
-        If ptList.Count = 0 Then Return 0
-        Return ptList.Average()
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim threshold As Single = 0.015
-        Dim work As New cv.Mat
-
-        work = task.pcSplit(0).InRange(-threshold, threshold)
-        work.SetTo(0, task.noDepthMask)
-        work.ConvertTo(dst3, cv.MatType.CV_8U)
-        Dim gPoints = dst3.FindNonZero()
-        If gPoints.Rows = 0 Then Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
-        xTop = findFirst(gPoints)
-        xBot = findLast(gPoints)
-
-        If standaloneTest() Then
-            Dim gravityVec = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
-
-            dst2.SetTo(0)
-            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Gravity_Basics : Inherits TaskParent
     Dim gravity As New Gravity_Raw
     Dim kalman As New Kalman_Basics
@@ -107,6 +46,66 @@ Public Class Gravity_Basics : Inherits TaskParent
             dst2.SetTo(0)
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Gravity_Raw : Inherits TaskParent
+    Public xTop As Integer, xBot As Integer
+    Dim sampleSize As Integer = 25
+    Dim ptList As New List(Of Integer)
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Horizon and Gravity Vectors"
+        desc = "Improved method to find gravity and horizon vectors"
+    End Sub
+    Private Function findFirst(points As cv.Mat) As Integer
+        ptList.Clear()
+
+        For i = 0 To Math.Min(sampleSize, points.Rows / 2)
+            Dim pt = points.Get(Of cv.Point)(i, 0)
+            If pt.X <= 0 Or pt.Y < 0 Then Continue For
+            If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
+            ptList.Add(pt.X)
+        Next
+
+        If ptList.Count = 0 Then Return 0
+        Return ptList.Average()
+    End Function
+    Private Function findLast(points As cv.Mat) As Integer
+        ptList.Clear()
+
+        For i = points.Rows To Math.Max(points.Rows - sampleSize, points.Rows / 2) Step -1
+            Dim pt = points.Get(Of cv.Point)(i, 0)
+            If pt.X <= 5 Or pt.Y <= 5 Then Continue For
+            If pt.X > dst2.Width Or pt.Y > dst2.Height Then Continue For
+            ptList.Add(pt.X)
+        Next
+
+        If ptList.Count = 0 Then Return 0
+        Return ptList.Average()
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim threshold As Single = 0.015
+
+        dst3 = task.pcSplit(0).InRange(-threshold, threshold)
+        dst3.SetTo(0, task.noDepthMask)
+        Dim gPoints = dst3.FindNonZero()
+        If gPoints.Rows = 0 Then Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
+        xTop = findFirst(gPoints)
+        xBot = findLast(gPoints)
+
+        If standaloneTest() Then
+            Dim gravityVec = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
+
+            dst2.SetTo(0)
+            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
         End If
     End Sub
 End Class
