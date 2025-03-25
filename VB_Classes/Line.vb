@@ -11,6 +11,7 @@ Public Class Line_Basics : Inherits TaskParent
         Dim histarray(lpList.Count - 1) As Single
         If lpList.Count > 0 Then
             Dim histogram As New cv.Mat
+            task.lpMap.SetTo(0)
             For Each lp In lpList
                 task.lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
             Next
@@ -22,7 +23,6 @@ Public Class Line_Basics : Inherits TaskParent
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-
         lines.Run(task.grayMotion)
 
         Dim histArray = getLineCounts(lines.lpList)

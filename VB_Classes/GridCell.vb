@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp.Features2D
+﻿Imports System.Runtime.InteropServices
+Imports OpenCvSharp.Features2D
 Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
