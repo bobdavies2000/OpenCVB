@@ -2128,7 +2128,6 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
                 gc.rRect = emptyRect
             Else
                 gc.mm = GetMinMax(task.pcSplit(2)(gc.rect), task.depthMask(gc.rect))
-                gc.depthErr = 0.02 * gc.depth / 2
                 If task.rgbLeftAligned Then
                     gc.lRect = gc.rect
                     gc.rRect = gc.lRect

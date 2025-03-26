@@ -48,7 +48,6 @@ Public Class GridCell_Basics : Inherits TaskParent
                 Else
                     ' everything is recomputed when there is motion in the cell.
                     gc.mm = GetMinMax(task.pcSplit(2)(gc.rect), task.depthMask(gc.rect))
-                    gc.depthErr = 0.02 * gc.depth / 2
                     If task.rgbLeftAligned Then
                         gc.lRect = gc.rect
                         gc.rRect = gc.lRect
@@ -744,33 +743,6 @@ Public Class GridCell_Features : Inherits TaskParent
         If task.heartBeat Then
             labels(2) = CStr(task.featureRects.Count) + " cells had features while " + CStr(task.fLessRects.Count) + " had none"
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class GridCell_Boundaries : Inherits TaskParent
-    Public Sub New()
-        desc = "Find cells that have high depth variability indicating that cell is a boundary."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.depthRGB.Clone
-        dst1.SetTo(0)
-        For Each gc In task.gcList
-            If gc.correlation > 0 Then
-                If (gc.mm.maxVal - gc.mm.minVal) - gc.depthErr > task.depthDiffMeters Then
-                    dst2.Rectangle(gc.rect, 0, -1)
-                    dst1.Rectangle(gc.rect, cv.Scalar.White, -1)
-                End If
-            End If
-        Next
-
-        dst3 = ShowAddweighted(dst1, src, labels(3))
     End Sub
 End Class
 

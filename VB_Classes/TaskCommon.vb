@@ -470,7 +470,6 @@ Public Class gcData
     Public center As cv.Point ' center of the rectangle
     Public depth As Single
     Public depthStdev As Single
-    Public depthErr As Single ' a linear estimate of the depth error based on '2% error at 2 meters'
     Public age As Integer
     Public color As cv.Vec3f
     Public mm As mmData ' min and max values of the depth data.
@@ -687,7 +686,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public slope As Single
     Public length As Single
     Public index As Integer
-
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
         p2 = _p2

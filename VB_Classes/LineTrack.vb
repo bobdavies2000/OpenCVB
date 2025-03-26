@@ -56,7 +56,7 @@ Public Class LineTrack_Map : Inherits TaskParent
                 If histarray(j) > 0 Then
                     Dim rc = task.rcList(j)
                     dst3(gc.rect).SetTo(rc.color)
-                    dst3(gc.rect).SetTo(0, Not dst1(gc.rect))
+                    ' dst3(gc.rect).SetTo(0, Not dst1(gc.rect))
                     count += 1
                     Exit For
                 End If
@@ -64,5 +64,40 @@ Public Class LineTrack_Map : Inherits TaskParent
         Next
 
         labels(3) = "The redCloud cells are completely covered by " + CStr(count) + " grid cells"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineTrack_Depth : Inherits TaskParent
+    Dim lTrack As New LineTrack_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.CrossHairs.Checked = False
+        desc = "Track lines and separate them by depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lTrack.Run(src)
+        dst2 = lTrack.dst2
+
+        For Each lp In task.lpList
+            dst2.Line(lp.p1, lp.p2, black, task.lineWidth, task.lineType)
+        Next
+
+        dst3.SetTo(0)
+        For Each lp In task.lpList
+            Dim index1 = task.gcMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            Dim index2 = task.gcMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            Dim gc1 = task.gcList(index1)
+            Dim gc2 = task.gcList(index2)
+
+            dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            ' SetTrueText(Format(proximity, fmt3), lp.p1, 3)
+        Next
     End Sub
 End Class
