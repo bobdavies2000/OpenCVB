@@ -542,8 +542,6 @@ Public Class rcData
     Public ptFacets As New List(Of cv.Point)
     Public ptList As New List(Of cv.Point)
 
-    Public gridCells As New List(Of Integer)
-
     ' transition these...
     Public nabs As New List(Of Integer)
     Public hull As New List(Of cv.Point)

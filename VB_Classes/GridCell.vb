@@ -94,6 +94,7 @@ Public Class GridCell_Basics : Inherits TaskParent
 
             gc.index = task.gcList.Count
             task.gcList.Add(gc)
+            dst2(gc.rect).SetTo(gc.color)
         Next
 
         If task.heartBeat Then labels(2) = CStr(task.gcList.Count) + " grid cells have the useful depth values and " +

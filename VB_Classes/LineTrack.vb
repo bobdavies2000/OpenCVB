@@ -38,30 +38,29 @@ Public Class LineTrack_Map : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         lTrack.Run(src)
         dst2 = lTrack.dst2
+        dst1 = lTrack.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels(2) = lTrack.labels(2)
 
         Dim count As Integer
-        For i = 0 To task.gridRects.Count - 1
-            Dim rect = task.gridRects(i)
-            'Dim histarray(task.rcList.Count - 1) As Single
-            'If task.rcList.Count > 0 Then
-            '    Dim histogram As New cv.Mat
-            '    cv.Cv2.CalcHist({task.lpMap}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(1, lpList.Count)})
+        dst3.SetTo(0)
+        Dim histarray(task.rcList.Count - 1) As Single
+        Dim histogram As New cv.Mat
+        For Each gc In task.gcList
+            cv.Cv2.CalcHist({task.rcMap(gc.rect)}, {0}, emptyMat, histogram, 1, {task.rcList.Count},
+                             New cv.Rangef() {New cv.Rangef(1, task.rcList.Count)})
 
-            '    Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
-            'End If
-
-            Dim mm = GetMinMax(task.rcMap(rect), task.depthMask(rect))
-            If mm.minVal = 0 Then Dim k = 0
-            If mm.maxVal > 0 Then
-                ' if multiple lines intersect a grid rect, choose the largest redcloud cell containing them.
-                ' mm.minval is the index of the largest.
-                Dim index = If(mm.minVal = 0, mm.maxVal, mm.minVal)
-                Dim rc = task.rcList(index)
-                task.rcList(mm.minVal).gridCells.Add(i)
-                dst3(rect).SetTo(rc.color)
-                count += 1
-            End If
+            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+            ' if multiple lines intersect a grid rect, choose the largest redcloud cell containing them.
+            ' The largest will be the index of the first non-zero histogram entry.
+            For j = 1 To histarray.Count - 1
+                If histarray(j) > 0 Then
+                    Dim rc = task.rcList(j)
+                    dst3(gc.rect).SetTo(rc.color)
+                    dst3(gc.rect).SetTo(0, Not dst1(gc.rect))
+                    count += 1
+                    Exit For
+                End If
+            Next
         Next
 
         labels(3) = "The redCloud cells are completely covered by " + CStr(count) + " grid cells"
