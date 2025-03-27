@@ -7,7 +7,7 @@ Public Class DCT_Basics : Inherits TaskParent
         desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         Dim src32f As New cv.Mat
         task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
@@ -37,7 +37,7 @@ Public Class DCT_RGB : Inherits TaskParent
         desc = "Apply OpenCV's Discrete Cosine Transform to a BGR image and use slider to remove the highest frequencies."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dct.Options.RunOpt()
+        dct.Options.Run()
 
         Dim srcPlanes = src.Split()
 

@@ -28,7 +28,7 @@ Public Class Filter_NormalizedKernel : Inherits TaskParent
         desc = "Create a normalized kernel and use it."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         Dim sum As Double
         For i = 0 To options.kernel.Width - 1
@@ -53,7 +53,7 @@ Public Class Filter_Normalized2D : Inherits TaskParent
         desc = "Create and apply a normalized kernel."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst2 = src.Filter2D(-1, kernel)
@@ -76,7 +76,7 @@ Public Class Filter_SepFilter2D : Inherits TaskParent
         desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
         Dim kernel = cv.Cv2.GetGaussianKernel(options.xDim, options.sigma)
         dst2 = src.GaussianBlur(New cv.Size(options.xDim, options.yDim), options.sigma)
         dst3 = src.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
@@ -103,7 +103,7 @@ Public Class Filter_Minimum : Inherits TaskParent
         desc = "Implement the Minimum Filter - use minimum value in kernel"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
         dst2 = src.Erode(element)
@@ -122,7 +122,7 @@ Public Class Filter_Maximum : Inherits TaskParent
         desc = "Implement the Maximum Filter - use maximum value in kernel"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
         dst2 = src.Dilate(element)
@@ -141,7 +141,7 @@ Public Class Filter_Mean : Inherits TaskParent
         desc = "Implement the Mean Filter - use mean value in kernel"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim kernel = (cv.Mat.Ones(cv.MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
         dst2 = src.Filter2D(-1, kernel)
@@ -160,7 +160,7 @@ Public Class Filter_Median : Inherits TaskParent
         desc = "Implement the Median Filter - use median value in kernel"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         dst2 = src.MedianBlur(kernelSize)

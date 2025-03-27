@@ -19,7 +19,7 @@ Public Class Convex_Basics : Inherits TaskParent
         Return hullList
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim hullList = task.rcD.contour
         If standaloneTest() Then

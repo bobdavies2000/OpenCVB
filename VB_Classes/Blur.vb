@@ -7,7 +7,7 @@ Public Class Blur_Basics : Inherits TaskParent
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
         cv.Cv2.GaussianBlur(src, dst2, New cv.Size(Options.kernelSize, Options.kernelSize),
                             Options.sigmaX, Options.sigmaY)
     End Sub
@@ -113,7 +113,7 @@ Public Class Blur_TopoMap : Inherits TaskParent
         desc = "Create a topo map from the blurred image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         gradient.Run(src)
         dst2 = gradient.magnitude
@@ -201,7 +201,7 @@ Public Class Blur_Gaussian : Inherits TaskParent
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         cv.Cv2.GaussianBlur(src, dst2, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
     End Sub
 End Class

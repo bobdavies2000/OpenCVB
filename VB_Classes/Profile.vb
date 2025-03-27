@@ -115,7 +115,7 @@ Public Class Profile_Rotation : Inherits TaskParent
         gMat.Run(src)
 
         If standaloneTest() Then
-            options.RunOpt()
+            options.Run()
             strOut = "Gravity-oriented gMatrix" + vbCrLf
             strOut += task.gmat.strOut + vbCrLf
             strOut += vbCrLf + "New gMatrix from sliders" + vbCrLf
@@ -239,7 +239,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static ySlider = optiBase.FindSlider("Rotate pointcloud around Y-axis (degrees)")
 

@@ -5,7 +5,7 @@ Public Class Brightness_Basics : Inherits TaskParent
         desc = "Implement a brightness effect"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         dst2 = src.ConvertScaleAbs(Options.brightness, Options.contrast)
         labels(3) = "Brightness level = " + CStr(Options.contrast)
@@ -25,7 +25,7 @@ Public Class Brightness_HSV : Inherits TaskParent
         desc = "Implement the brightness effect for HSV images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hsv64 As New cv.Mat

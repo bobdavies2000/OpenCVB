@@ -5,7 +5,7 @@ Public Class TextureFlow_Basics : Inherits TaskParent
         desc = "Find and mark the texture flow in an image - see texture_flow.py"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
         If src.Channels() <> 1 Then src = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)

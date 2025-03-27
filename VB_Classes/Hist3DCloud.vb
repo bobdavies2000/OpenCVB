@@ -161,7 +161,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits TaskParent
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim bins = task.redOptions.HistBinBar3D.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud

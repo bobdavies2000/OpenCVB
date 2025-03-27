@@ -10,7 +10,7 @@ Public Class Linear_Basics : Inherits TaskParent
         desc = "Confine derivatives to linear values"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         inputZ.Run(src)
         Dim mask As cv.Mat = inputZ.dst2
@@ -90,7 +90,7 @@ Public Class Linear_Visualize : Inherits TaskParent
         desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim r1 As cv.Rect, r2 As cv.Rect
 
         For i = 0 To task.pcSplit.Count - 1
@@ -156,7 +156,7 @@ Public Class Linear_Input : Inherits TaskParent
         desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         pc = task.pcSplit(options.dimension)(roi)
 
@@ -257,7 +257,7 @@ Public Class Linear_Slices : Inherits TaskParent
         desc = "Isolate and display a line segment through the point cloud data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim pt = task.mouseMovePoint
         If standalone And task.mouseMovePoint = newPoint Then
@@ -315,7 +315,7 @@ Public Class Linear_ImageX : Inherits TaskParent
         desc = "Create SLR slices for the X dimension of an entire image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = task.pcSplit(0).Clone
 
@@ -362,7 +362,7 @@ Public Class Linear_ImageY : Inherits TaskParent
         desc = "Create SLR slices for the Y dimension of an entire image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = task.pcSplit(1).Clone
 

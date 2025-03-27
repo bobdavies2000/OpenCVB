@@ -36,7 +36,7 @@ Public Class Duster_MaskZ : Inherits TaskParent
         desc = "Build a histogram that finds the clusters of depth data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         hist.bins = options.bins
 
         Dim src32f = task.pcSplit(2)

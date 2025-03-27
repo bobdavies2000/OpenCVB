@@ -55,7 +55,7 @@ Public Class FCSLine_Parallel : Inherits TaskParent
         desc = "Find all verticle lines and combine them if they are 'close'."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         findVH.Run(src)
         dst2 = findVH.dst2

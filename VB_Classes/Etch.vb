@@ -19,7 +19,7 @@ Public Class Etch_ASketch : Inherits TaskParent
         desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         keys.Run(src)
         Dim keyIn = New List(Of String)(keys.keyInput)

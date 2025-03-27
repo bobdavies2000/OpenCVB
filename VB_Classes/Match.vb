@@ -19,7 +19,7 @@ Public Class Match_Basics : Inherits TaskParent
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If standalone Then
             If task.gOptions.DebugCheckBox.Checked Then
                 task.gOptions.DebugCheckBox.Checked = False
@@ -106,7 +106,7 @@ Public Class Match_RandomTest : Inherits TaskParent
         desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If standaloneTest() Then
             Static saveSampleCount = options.featurePoints
             If saveSampleCount <> options.featurePoints Then
@@ -195,8 +195,8 @@ Public Class Match_Motion : Inherits TaskParent
         desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optionsMatch.RunOpt()
+        options.Run()
+        optionsMatch.Run()
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
         dst2 = src.Clone
@@ -402,7 +402,7 @@ Public Class Match_tCell : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rSize = cellSlider.Value
         If standaloneTest() And task.heartBeat Then
-            options.RunOpt()
+            options.Run()
             tCells.Clear()
             tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
             tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
@@ -454,7 +454,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
 
         Dim rect As cv.Rect
 
-        options.RunOpt()
+        options.Run()
 
         If (target(0) IsNot Nothing And correlation(0) < minCorrelation) Then target(0) = Nothing
         If task.mouseClickFlag Then

@@ -46,7 +46,7 @@ Public Class FitLine_Lines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If Not task.heartBeatLT Then Exit Sub
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then
             draw.Run(src)
@@ -90,7 +90,7 @@ Public Class FitLine_Simple3D : Inherits TaskParent
         desc = "A simple demo of using fitline with uniformly distributed 3D points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standalone Then
             Static random As New Random_Basics3D

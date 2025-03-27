@@ -447,8 +447,8 @@ Public Class KNN_TrackMean : Inherits TaskParent
         Return histSum / histList.Count
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optionsEx.RunOpt()
+        options.Run()
+        optionsEx.Run()
 
         runFeature(src)
 
@@ -736,7 +736,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standalone Then
             runFeature(src)
@@ -853,7 +853,7 @@ Public Class KNN_MaxDistance : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Static pairList As New List(Of (cv.Point2f, cv.Point2f))
         Static pairIDs As New List(Of Single)
-        options.RunOpt()
+        options.Run()
 
         If standalone Or inputPoints.Count = 0 Or task.optionsChanged Then
             Static peri As New FCS_Periphery
@@ -1001,7 +1001,7 @@ Public Class KNN_NNBasics : Inherits TaskParent
         desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
         If standaloneTest() Then
@@ -1060,7 +1060,7 @@ Public Class KNN_NNearest : Inherits TaskParent
         desc = "Find the nearest cells to the selected cell"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
         If standaloneTest() Then

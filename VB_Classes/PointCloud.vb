@@ -83,7 +83,7 @@ Public Class PointCloud_Basics : Inherits TaskParent
     End Function
 
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src
         actualCount = 0
@@ -616,7 +616,7 @@ Public Class PointCloud_NeighborV : Inherits TaskParent
         desc = "Show where vertical neighbor depth values are within Y mm's"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))

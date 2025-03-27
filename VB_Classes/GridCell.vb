@@ -11,7 +11,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim stdev As cv.Scalar, mean As cv.Scalar
         Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
@@ -697,7 +697,7 @@ Public Class GridCell_Features : Inherits TaskParent
         desc = "Identify the cells with features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         task.feat.Run(src)
 
         dst2 = task.gCell.dst2

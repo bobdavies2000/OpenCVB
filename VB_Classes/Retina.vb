@@ -15,7 +15,7 @@ Public Class Retina_Basics_CPP : Inherits TaskParent
         desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If options.xmlCheck Then
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")

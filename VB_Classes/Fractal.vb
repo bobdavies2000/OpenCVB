@@ -36,7 +36,7 @@ Public Class Fractal_Mandelbrot : Inherits TaskParent
         Next
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
         For y = 0 To src.Height - 1
             mandelbrotLoop(y)
         Next

@@ -11,7 +11,7 @@ Public Class SVM_Basics : Inherits TaskParent
         labels = {"", "", "SVM_Basics input data", "Results - white line is ground truth"}
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt() ' update any options specified in the interface.
+        options.Run() ' update any options specified in the interface.
 
         If standaloneTest() Then
             sampleData.Run(src)
@@ -66,7 +66,7 @@ Public Class SVM_SampleData : Inherits TaskParent
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2.SetTo(0)
         points.Clear()
@@ -104,7 +104,7 @@ Public Class SVM_TestCase : Inherits TaskParent
         desc = "Text book example on SVM"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2.SetTo(white)
         dst3.SetTo(0)
@@ -215,7 +215,7 @@ Public Class SVM_ReuseRandom : Inherits TaskParent
         desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        svm.options.RunOpt()
+        svm.options.Run()
 
         Dim rect = task.drawRect
         Dim contour As New List(Of cv.Point)

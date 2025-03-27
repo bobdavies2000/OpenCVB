@@ -7,7 +7,7 @@ Public Class Coherence_Basics : Inherits TaskParent
         desc = "Find lines that are artistically coherent in the image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim side As Integer
         Select Case src.Height

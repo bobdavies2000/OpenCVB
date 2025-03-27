@@ -206,7 +206,7 @@ Public Class Triangle_Basics2D : Inherits TaskParent
         Return points2d
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        oglOptions.RunOpt()
+        oglOptions.Run()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 

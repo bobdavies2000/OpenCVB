@@ -7,7 +7,7 @@ Public Class Complexity_Basics : Inherits TaskParent
         desc = "Plot all the available complexity runs."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        complex.options.RunOpt()
+        complex.options.Run()
 
         Dim saveLatestFile = complex.options.filename.FullName
 
@@ -97,7 +97,7 @@ Public Class Complexity_PlotOpenCV : Inherits TaskParent
         Return maxTime
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         maxFrameCount = 0
         plot.srcX.Clear()
@@ -128,7 +128,7 @@ Public Class Complexity_Dots : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there is some bug below that only occurs during test all.  Not worth pursuing...
-        options.RunOpt()
+        options.Run()
 
         If fileName <> "" Then options.filename = New FileInfo(fileName)
         Dim contents = My.Computer.FileSystem.ReadAllText(options.filename.FullName)

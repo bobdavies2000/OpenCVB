@@ -11,8 +11,8 @@ Public Class Interpolate_Basics : Inherits TaskParent
         desc = "Resize image using all available interpolation methods in OpenCV"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        iOptions.RunOpt()
+        options.Run()
+        iOptions.Run()
         Static saveSliderValue As Integer = iOptions.interpolationThreshold
 
         If standaloneTest() Then

@@ -19,7 +19,7 @@ Public Class SuperRes_Basics : Inherits TaskParent
             Exit Sub
         End If
 
-        options.RunOpt()
+        options.Run()
         If options.restartWithNewOptions Then
             warningMessage = 10
             optFlow = Nothing ' start over...

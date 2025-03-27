@@ -6,7 +6,7 @@ Public Class Erode_Basics : Inherits TaskParent
         desc = "Erode the image provided."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         If options.noshape Or options.iterations = 0 Then dst2 = src Else dst2 = src.Erode(options.element, Nothing, options.iterations)
 
@@ -65,7 +65,7 @@ Public Class Erode_DepthSeed : Inherits TaskParent
         desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         cv.Cv2.Erode(task.pcSplit(2), dst0, erode.options.element)
         dst0 = task.pcSplit(2) - dst0
@@ -92,7 +92,7 @@ Public Class Erode_Dilate : Inherits TaskParent
         desc = "Erode and then dilate with MorphologyEx on the input image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
         cv.Cv2.MorphologyEx(src, dst2, cv.MorphTypes.Close, options.element)
         cv.Cv2.MorphologyEx(dst2, dst2, cv.MorphTypes.Open, options.element)
     End Sub

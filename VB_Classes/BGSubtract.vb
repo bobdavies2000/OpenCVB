@@ -10,7 +10,7 @@ Public Class BGSubtract_Basics : Inherits TaskParent
         desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then
             BGSubtract_BGFG_Close(cPtr)
@@ -73,7 +73,7 @@ Public Class BGSubtract_MOG2 : Inherits TaskParent
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG2.Apply(src, dst2, options.learnRate)
     End Sub
@@ -111,7 +111,7 @@ Public Class BGSubtract_MotionDetect : Inherits TaskParent
         desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
         Dim threadCount = options.threadData(0)
@@ -153,7 +153,7 @@ Public Class BGSubtract_MOG : Inherits TaskParent
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG.Apply(src, dst2, options.learnRate)
     End Sub
@@ -174,7 +174,7 @@ Public Class BGSubtract_GMG_KNN : Inherits TaskParent
         desc = "GMG and KNN API's to subtract background"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.frameCount < 120 Then
             SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
         Else
@@ -203,7 +203,7 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits TaskParent
         desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         grayMat = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
         dst2 = grayMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -282,7 +282,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits TaskParent
         desc = "Generate a synthetic input to background subtraction method"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.optionsChanged Then
             If Not task.firstPass Then BGSubtract_Synthetic_Close(cPtr)
 

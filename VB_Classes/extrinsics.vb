@@ -40,8 +40,8 @@ Public Class Extrinsics_Display : Inherits TaskParent
         desc = "MatchShapes: Build overlays for the left and right images on the BGR image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optTrans.RunOpt()
+        options.Run()
+        optTrans.Run()
 
         Dim rectLeft = New cv.Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner)
         Dim rectRight = New cv.Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner)

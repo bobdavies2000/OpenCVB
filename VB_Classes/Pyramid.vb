@@ -6,7 +6,7 @@ Public Class Pyramid_Basics : Inherits TaskParent
         desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If options.zoom <> 0 Then
             If options.zoom < 0 Then

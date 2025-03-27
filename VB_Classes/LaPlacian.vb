@@ -8,7 +8,7 @@ Public Class Laplacian_Basics : Inherits TaskParent
         desc = "Laplacian filter - the second derivative."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
         If standaloneTest() Then src = src.GaussianBlur(options.kernel, 0, 0)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         dst3 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
@@ -33,7 +33,7 @@ Public Class Laplacian_Blur : Inherits TaskParent
         desc = "Laplacian filter - the second derivative - with different bluring techniques"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         Dim blurText As String
         If options.gaussianBlur Then
@@ -64,7 +64,7 @@ Public Class Laplacian_PyramidFilter : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         src.ConvertTo(options.img, cv.MatType.CV_32F)
-        options.RunOpt()
+        options.Run()
         options.img.ConvertTo(dst2, cv.MatType.CV_8UC3)
     End Sub
 End Class

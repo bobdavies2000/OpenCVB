@@ -12,7 +12,7 @@ Public Class OilPaint_Pointilism : Inherits TaskParent
         desc = "Alter the image to effect the pointilism style"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         dst2 = src
         Dim img = src(task.drawRect)
@@ -80,7 +80,7 @@ Public Class OilPaint_ManualVB : Inherits TaskParent
         desc = "Alter an image so it appears more like an oil painting.  Select a region of interest."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
         Dim filterKern = options.filterSize Or 1
 
         Dim roi = task.drawRect

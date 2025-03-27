@@ -12,7 +12,7 @@ Public Class FitEllipse_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
-            options.RunOpt()
+            options.Run()
             inputPoints = options.srcPoints
         End If
 
@@ -49,7 +49,7 @@ Public Class FitEllipse_AMS_CPP : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
-            options.RunOpt()
+            options.Run()
             inputPoints = options.srcPoints
         End If
         dst2.SetTo(0)
@@ -92,7 +92,7 @@ Public Class FitEllipse_Direct_CPP : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If not task.heartBeat Then Exit Sub
-        options.RunOpt()
+        options.Run()
         Dim dataSrc(options.srcPoints.Count * 2 - 1) As Single
 
         dst2.SetTo(0)

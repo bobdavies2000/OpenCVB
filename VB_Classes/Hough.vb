@@ -9,7 +9,7 @@ Public Class Hough_Basics : Inherits TaskParent
         desc = "Use Houghlines to find lines in the image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         edges.Run(src)
 
         segments = cv.Cv2.HoughLines(edges.dst2, options.rho, options.theta, options.threshold)
@@ -102,7 +102,7 @@ Public Class Hough_Lines_MT : Inherits TaskParent
     End Sub
 
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         edges.Run(src)
         dst2 = edges.dst2
 
@@ -143,7 +143,7 @@ Public Class Hough_Featureless : Inherits TaskParent
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         edges.Run(src)
 
@@ -190,7 +190,7 @@ Public Class Hough_FeatureLessTopX : Inherits TaskParent
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static segSlider =optiBase.findslider("Minimum feature pixels")
         Dim minSegments = segSlider.Value
@@ -289,7 +289,7 @@ Public Class Hough_Lines : Inherits TaskParent
         desc = "Multithread Houghlines to find lines in image fragments."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         edges.Run(src)
         dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -315,7 +315,7 @@ Public Class Hough_FullImage : Inherits TaskParent
         desc = "Use Houghlines to find lines in the image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         edges.Run(src)
 
         Dim segments = cv.Cv2.HoughLines(edges.dst2, options.rho, options.theta, options.threshold)
@@ -347,7 +347,7 @@ Public Class Hough_Probabilistic : Inherits TaskParent
         desc = "Use Houghlines to find lines in the image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         edges.Run(src)
 
         Static segments As cv.LineSegmentPoint()

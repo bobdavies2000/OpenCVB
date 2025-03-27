@@ -6,7 +6,7 @@ Public Class Quaterion_Basics : Inherits TaskParent
         desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim quatmul = Quaternion.Multiply(options.q1, options.q2)
         SetTrueText("q1 = " + options.q1.ToString() + vbCrLf + "q2 = " + options.q2.ToString() + vbCrLf +
                     "Multiply q1 * q2" + quatmul.ToString())
@@ -18,7 +18,7 @@ End Class
 
 
 
-Public Class Options_Quaternion : Inherits TaskParent
+Public Class Options_Quaternion : Inherits OptionParent
     Public q1 As Quaternion = New Quaternion
     Public q2 As Quaternion = New Quaternion
     Public Sub New()
@@ -34,7 +34,7 @@ Public Class Options_Quaternion : Inherits TaskParent
             sliders.setupTrackBar("quaternion B Theta X100", -100, 100, 100)
         End If
     End Sub
-    Public Sub RunOpt()
+    Public Sub Run()
         Static axSlider =optiBase.findslider("quaternion A.x X100")
         Static aySlider =optiBase.findslider("quaternion A.y X100")
         Static azSlider =optiBase.findslider("quaternion A.z X100")

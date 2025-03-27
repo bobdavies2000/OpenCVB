@@ -87,7 +87,7 @@ Public Class DNN_Basics : Inherits TaskParent
         labels(2) = "Cropped Input Image - must be square!"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If dnnPrepared Then
             Dim inScaleFactor As Single = options.ScaleFactor / options.scaleMax ' should be 0.0078 by default...
@@ -180,7 +180,7 @@ Public Class DNN_SuperRes : Inherits TaskParent
         desc = "Get better super-resolution through a DNN"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If saveModelFile <> options.superResModelFileName Then
             saveModelFile = options.superResModelFileName
             multiplier = options.superResMultiplier

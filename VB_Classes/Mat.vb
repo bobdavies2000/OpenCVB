@@ -224,7 +224,7 @@ Public Class Mat_Inverse : Inherits TaskParent
         desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Or validateInverse Then
             strOut = "Matrix Input " + vbCrLf

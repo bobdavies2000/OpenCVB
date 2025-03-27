@@ -8,7 +8,7 @@ Public Class Density_Basics : Inherits TaskParent
         desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -57,7 +57,7 @@ Public Class Density_Count_CPP : Inherits TaskParent
         desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 

@@ -89,10 +89,10 @@ Public Class OpenGL_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then pointCloudInput = task.pointCloud
 
-        options1.RunOpt()
-        options2.RunOpt()
-        options3.RunOpt()
-        options4.RunOpt()
+        options1.Run()
+        options2.Run()
+        options3.Run()
+        options4.Run()
 
         If pointCloudInput.Width <> 0 And options4.moveAmount <> New cv.Scalar Then
             pointCloudInput -= options4.moveAmount
@@ -662,7 +662,7 @@ Public Class OpenGL_DrawHulls : Inherits TaskParent
         desc = "Draw all the hulls in OpenGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim ptM = options.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
@@ -720,11 +720,11 @@ Public Class OpenGL_Contours : Inherits TaskParent
         desc = "Draw all the RedCloud contours in OpenGL with various settings."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim ptM = options.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
-        options2.RunOpt()
+        options2.Run()
 
         dst2 = runRedC(src, labels(2))
         Dim rcx = task.rcD
@@ -974,7 +974,7 @@ Public Class OpenGL_ProfileSweep : Inherits TaskParent
         If task.frameCount Mod 100 = 0 Then
             testCase += 1
             If testCase >= 3 Then testCase = 0
-            options.RunOpt()
+            options.Run()
             options.rotateX = -45
             options.rotateY = -45
             options.rotateZ = -45
@@ -1514,7 +1514,7 @@ Public Class OpenGL_Duster : Inherits TaskParent
         desc = "Show a dusted version point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         duster.Run(src)
         dst2 = duster.dst3
@@ -1536,7 +1536,7 @@ Public Class OpenGL_DusterY : Inherits TaskParent
         desc = "Show a dusted version point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         duster.Run(src)
         dst2 = duster.dst3
@@ -2099,7 +2099,7 @@ Public Class OpenGL_QuadCompare : Inherits TaskParent
         desc = "Compare different representations of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Select Case options.displayIndex
             Case 0

@@ -27,7 +27,7 @@ Public Class Gif_Basics : Inherits TaskParent
         End If
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src
 

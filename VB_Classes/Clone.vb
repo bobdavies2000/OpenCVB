@@ -45,7 +45,7 @@ Public Class Clone_ColorChange : Inherits TaskParent
         desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(options.blueChange, options.greenChange, options.redChange)
@@ -67,7 +67,7 @@ Public Class Clone_IlluminationChange : Inherits TaskParent
         desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(options.alpha, options.beta)
@@ -90,7 +90,7 @@ Public Class Clone_TextureFlattening : Inherits TaskParent
         desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(options.lowThreshold, options.highThreshold)
@@ -134,7 +134,7 @@ Public Class Clone_Eagle : Inherits TaskParent
         desc = "Clone an eagle into the video stream."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone()
         If task.mouseClickFlag Then
@@ -161,7 +161,7 @@ Public Class Clone_Seamless : Inherits TaskParent
         desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100

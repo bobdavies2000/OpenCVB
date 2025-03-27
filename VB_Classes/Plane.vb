@@ -267,7 +267,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         Return fitPoints
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = runRedC(src, labels(2))
 
@@ -580,7 +580,7 @@ Public Class Plane_FloorStudy : Inherits TaskParent
         desc = "Find the floor plane (if present)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         slice.Run(src)
         dst1 = slice.dst3

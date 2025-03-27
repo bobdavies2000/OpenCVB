@@ -10,7 +10,7 @@ Public Class Random_Basics : Inherits TaskParent
         desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim sizeRequest = options.count
         If task.paused = False Then
@@ -42,7 +42,7 @@ Public Class Random_Point2d : Inherits TaskParent
         desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         PointList.Clear()
         If task.paused = False Then
@@ -72,7 +72,7 @@ Public Class Random_Enumerable : Inherits TaskParent
         desc = "Create an enumerable list of points using a lambda function"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         points = Enumerable.Range(0, options.count).Select(Of cv.Point2f)(
             Function(i)
@@ -100,7 +100,7 @@ Public Class Random_Basics3D : Inherits TaskParent
         desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         PointList.Clear()
         If task.paused = False Then
@@ -227,7 +227,7 @@ Public Class Random_NormalDist : Inherits TaskParent
         desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If options.grayChecked And dst2.Channels() <> 1 Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randn(dst2, New cv.Scalar(options.blueVal, options.greenVal, options.redVal), cv.Scalar.All(options.stdev))
@@ -397,7 +397,7 @@ Public Class Random_MonteCarlo : Inherits TaskParent
         desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim histogram = New cv.Mat(options.dimension, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         For i = 0 To outputRandom.rows - 1
@@ -475,7 +475,7 @@ Public Class Random_StaticTV : Inherits TaskParent
         desc = "Imitate an old TV appearance using randomness."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst3 = dst2(task.drawRect)
@@ -645,7 +645,7 @@ Public Class Random_Clusters : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If Not task.heartBeat Then Exit Sub
-        options.RunOpt()
+        options.Run()
 
         Dim ptMat As cv.Mat = New cv.Mat(1, 1, cv.MatType.CV_32FC2)
         dst2.SetTo(0)

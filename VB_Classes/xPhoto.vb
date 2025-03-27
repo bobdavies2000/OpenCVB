@@ -55,7 +55,7 @@ Public Class XPhoto_OilPaint_CPP : Inherits TaskParent
         desc = "Use the xPhoto Oil Painting transform"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
@@ -86,7 +86,7 @@ Public Class XPhoto_Inpaint : Inherits TaskParent
         desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src
         Dim mask = basics.drawRandomLine(dst2)
@@ -111,7 +111,7 @@ Public Class XPhoto_Inpaint_CPP : Inherits TaskParent
         desc = "Use the xPhoto Oil Painting transform"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        inpVB.options.RunOpt()
+        inpVB.options.Run()
 
         Dim iType = InpaintTypes.FSR_BEST
         If inpVB.options.FSRFast Then iType = InpaintTypes.FSR_FAST

@@ -10,7 +10,7 @@ Public Class Vignetting_Basics : Inherits TaskParent
         desc = "C++ version of vignetting for comparison with the VB version."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.ClickPoint <> newPoint Then center = task.ClickPoint
 
@@ -47,7 +47,7 @@ Public Class Vignetting_VB : Inherits TaskParent
         Return 1.27323954 * x - 0.405284735 * x * x
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.ClickPoint <> newPoint Then center = task.ClickPoint
         Dim maxDist = New cv.Point(0, 0).DistanceTo(center) * options.radius

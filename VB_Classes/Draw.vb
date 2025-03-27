@@ -8,7 +8,7 @@ Public Class Draw_Noise : Inherits TaskParent
         desc = "Add Noise to the color image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         src.CopyTo(dst2)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
@@ -37,7 +37,7 @@ Public Class Draw_Ellipses : Inherits TaskParent
         desc = "Draw the requested number of ellipses."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             For i = 0 To options.drawCount - 1
@@ -61,7 +61,7 @@ Public Class Draw_Circles : Inherits TaskParent
         desc = "Draw the requested number of circles."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             For i = 0 To options.drawCount - 1
@@ -87,7 +87,7 @@ Public Class Draw_Lines : Inherits TaskParent
         desc = "Draw the requested number of Lines."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             For i = 0 To options.drawCount - 1
@@ -113,7 +113,7 @@ Public Class Draw_Polygon : Inherits TaskParent
         labels = {"", "", "Convex Hull for the same points", "Polylines output"}
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If Not task.heartBeat Then Exit Sub
         Dim height = src.Height / 8
@@ -199,7 +199,7 @@ Public Class Draw_SymmetricalShapes : Inherits TaskParent
         desc = "Generate shapes programmatically"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             Dim pt As New cv.Point
@@ -246,7 +246,7 @@ Public Class Draw_Arc : Inherits TaskParent
         desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.heartBeat Then
             rect = InitRandomRect(options.saveMargin)
             angle = msRNG.Next(0, 360)

@@ -13,8 +13,8 @@ Public Class Rotate_Basics : Inherits TaskParent
         desc = "Rotate a rectangle by a specified angle"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optionsRotate.RunOpt()
+        options.Run()
+        optionsRotate.Run()
 
         rotateAngle = optionsRotate.rotateAngle
         M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
@@ -39,7 +39,7 @@ Public Class Rotate_BasicsQT : Inherits TaskParent
         rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
         dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest)
     End Sub
@@ -58,7 +58,7 @@ Public Class Rotate_Box : Inherits TaskParent
         labels(3) = "Same Rectangle in the new warped perspective"
         desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         rotation.Run(src)
         dst3 = dst2.Clone()
 
@@ -101,8 +101,8 @@ Public Class Rotate_Poly : Inherits TaskParent
         labels = {"", "", "Triangle before rotation", "Triangle after rotation"}
         desc = "Rotate a triangle around a center of rotation"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        optionsFPoly.RunOpt()
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        optionsFPoly.Run()
 
         If options.changeCheck.Checked Or task.firstPass Then
             rPoly.Clear()

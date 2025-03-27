@@ -48,7 +48,7 @@ Public Class Gradient_CartToPolar : Inherits TaskParent
         desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim tmp As New cv.Mat
         src.ConvertTo(tmp, cv.MatType.CV_32FC3, 1 / 255)

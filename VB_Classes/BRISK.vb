@@ -9,7 +9,7 @@ Public Class BRISK_Basics : Inherits TaskParent
         desc = "Detect features with BRISK"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         src.CopyTo(dst2)
 

@@ -9,7 +9,7 @@ Public Class HeatMap_Basics : Inherits TaskParent
         desc = "Highlight concentrations of depth pixels in the side view"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 

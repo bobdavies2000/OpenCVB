@@ -13,7 +13,7 @@ Public Class HistValley_Basics : Inherits TaskParent
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim vCount = options.desiredBoundaries
         Dim minDistance = options.peakDistance
 
@@ -127,7 +127,7 @@ Public Class HistValley_Peaks : Inherits TaskParent
         desc = "Find the requested number of peaks in the histogram "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim desiredBoundaries = options.desiredBoundaries
 
         If src.Type <> cv.MatType.CV_32FC1 Or standaloneTest() Then
@@ -261,7 +261,7 @@ Public Class HistValley_Test : Inherits TaskParent
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim desiredBoundaries = options.desiredBoundaries
 
         ' input should be a histogram.  If not, get one...

@@ -131,7 +131,7 @@ Public Class Line_Intercepts : Inherits TaskParent
         desc = "Show lines with similar y-intercepts"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         task.lines.Run(src)
         If task.lpList.Count = 0 Then Exit Sub

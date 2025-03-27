@@ -12,7 +12,7 @@ Public Class LUT_Basics : Inherits TaskParent
         desc = "Divide the image into n-segments controlled with a slider."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If classCount <> options.lutSegments Then
             classCount = options.lutSegments
@@ -48,7 +48,7 @@ Public Class LUT_Sliders : Inherits TaskParent
         desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim gray = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
@@ -250,7 +250,7 @@ Public Class LUT_Create : Inherits TaskParent
         desc = "Create a LUT table that can map similar pixels to the same exact pixel."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim split = src.Split()
         For i = 0 To 2

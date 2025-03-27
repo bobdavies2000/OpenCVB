@@ -115,7 +115,7 @@ Public Class OEX_bgSub : Inherits TaskParent
         desc = "OpenCV example bgSub"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then
             Select Case options.methodDesc
@@ -145,7 +145,7 @@ Public Class OEX_BasicLinearTransforms : Inherits TaskParent
         desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         src.ConvertTo(dst2, -1, options.brightness, options.contrast)
     End Sub
 End Class
@@ -161,7 +161,7 @@ Public Class OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
         desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than OEX_BasicLinearTransforms"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         For y As Integer = 0 To src.Rows - 1
             For x As Integer = 0 To src.Cols - 1
@@ -428,7 +428,7 @@ Public Class OEX_Threshold_Inrange : Inherits TaskParent
         desc = "OpenCV Example Threshold_Inrange"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         dst2 = hsv.InRange(options.lows, options.highs)
@@ -592,7 +592,7 @@ Public Class OEX_FitEllipse : Inherits TaskParent
         desc = "OEX Example fitellipse"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim cppData(img.Total * img.ElemSize - 1) As Byte
         Marshal.Copy(img.Data, cppData, 0, cppData.Length)

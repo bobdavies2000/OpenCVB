@@ -458,7 +458,7 @@ Module UI_Generator
                     index += 1
                     If line = "" Then Continue For
                     If line.StartsWith("Public Sub New") Then
-                        output.Add(vbTab + "void RunOpt() {}")
+                        output.Add(vbTab + "void Run() {}")
                         output.Add(vbTab + splitLine(2) + "() {")
                         output.Add(vbTab + "}")
                         output.Add("};")

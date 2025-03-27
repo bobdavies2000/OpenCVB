@@ -137,7 +137,7 @@ Public Class Benford_JPEG : Inherits TaskParent
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
         Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
@@ -163,7 +163,7 @@ Public Class Benford_JPEG99 : Inherits TaskParent
         desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
         Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
@@ -189,7 +189,7 @@ Public Class Benford_PNG : Inherits TaskParent
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, options.compression})
         Dim tmp = cv.Mat.FromPixelData(png.Count, 1, cv.MatType.CV_8U, png)

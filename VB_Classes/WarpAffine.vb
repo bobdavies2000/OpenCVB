@@ -11,8 +11,8 @@ Public Class WarpAffine_Basics : Inherits TaskParent
         desc = "Use WarpAffine to transform input images."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optionsWarp.RunOpt()
+        options.Run()
+        optionsWarp.Run()
 
         If standaloneTest() And task.heartBeat Then
             rotateAngle = optionsWarp.angle
@@ -229,7 +229,7 @@ Public Class WarpAffine_4Points : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
-            options.RunOpt()
+            options.Run()
             mRect.inputPoints = options.srcPoints
 
             Dim roi = New cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6)

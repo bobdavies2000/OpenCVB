@@ -11,7 +11,7 @@ Public Class Video_Basics : Inherits TaskParent
         desc = "Show a video file"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then
             captureVideo = New cv.VideoCapture(options.fileInfo.FullName)

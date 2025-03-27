@@ -299,7 +299,7 @@ Public Class GuidedBP_MultiSlice : Inherits TaskParent
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim stepSize = options.stepSize
 
         histTop.Run(src.Clone)
@@ -391,7 +391,7 @@ Public Class GuidedBP_Regions : Inherits TaskParent
         desc = "Identify the top X regions in the GuidedBP_RedCloud output"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         redC.Run(src)
 

@@ -16,7 +16,7 @@ Public Class Fuzzy_Basics : Inherits TaskParent
         desc = "That which is not solid is fuzzy"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         reduction.Run(src)
         dst0 = reduction.dst2
@@ -86,7 +86,7 @@ Public Class Fuzzy_Filter : Inherits TaskParent
         desc = "Use a 2D filter to find smooth areas"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run(src)
@@ -210,7 +210,7 @@ Public Class Fuzzy_TrackerDepth : Inherits TaskParent
         desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         fuzzy.Run(task.depthRGB)
         dst2 = fuzzy.dst1

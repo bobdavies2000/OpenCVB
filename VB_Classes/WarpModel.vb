@@ -12,7 +12,7 @@ Public Class WarpModel_Basics : Inherits TaskParent
         desc = "Align the BGR inputs raw images from the Prokudin examples."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then ecc.warpInput.Run(src)
         dst0 = ecc.warpInput.rgb(0).Clone
@@ -64,7 +64,7 @@ Public Class WarpModel_ECC : Inherits TaskParent
         desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         If standaloneTest() Then
             warpInput.Run(src)
@@ -146,7 +146,7 @@ Public Class WarpModel_Input : Inherits TaskParent
         desc = "Import the misaligned input."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         Dim r() = {New cv.Rect(0, 0, options.pkImage.Width, options.pkImage.Height / 3),
                    New cv.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),

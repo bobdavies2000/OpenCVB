@@ -8,7 +8,7 @@ Public Class Correlation_Basics : Inherits TaskParent
         desc = "Compute a correlation for src rows (See also: Match.vb"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         kFlood.Run(src)
         dst1 = kFlood.dst2

@@ -7,7 +7,7 @@ Public Class Classifier_Basics_CPP : Inherits TaskParent
         desc = "OpenCV Example Points_Classifier"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then task.gOptions.DebugCheckBox.Checked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex,
@@ -83,7 +83,7 @@ Public Class Classifier_Bayesian : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim sampleCount As Integer, methodIndex = 0
         If src.Type <> cv.MatType.CV_32FC2 Then
-            options.RunOpt()
+            options.Run()
             sampleCount = options.sampleCount
             methodIndex = options.methodIndex
         Else

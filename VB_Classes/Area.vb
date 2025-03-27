@@ -8,7 +8,7 @@ Public Class Area_MinTriangle_CPP : Inherits TaskParent
         desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.heartBeat Then
             srcPoints = New List(Of cv.Point2f)(options.srcPoints)
         Else
@@ -164,7 +164,7 @@ Public Class Area_MinRect : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If Not task.heartBeat Then Exit Sub
-            options.RunOpt()
+            options.Run()
             inputPoints = quickRandomPoints(options.numPoints)
         End If
 

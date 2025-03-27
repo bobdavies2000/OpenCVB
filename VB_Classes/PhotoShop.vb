@@ -398,7 +398,7 @@ Public Class PhotoShop_DuoTone : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Static duoCheck = optiBase.FindCheckBox("DuoTone Dark if checked, Light otherwise")
-        options.RunOpt()
+        options.Run()
         Static expSlider =optiBase.findslider("DuoTone Exponent")
         Dim exp = 1 + expSlider.Value / 100
         Dim expMat As New cv.Mat(256, 1, cv.MatType.CV_8U)

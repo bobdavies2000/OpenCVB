@@ -10,7 +10,7 @@ Public Class Hist3D_Basics : Inherits TaskParent
         desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         hColor.Run(src)
         dst2 = hColor.dst2

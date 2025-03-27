@@ -349,7 +349,7 @@ Public Class RedColor_PlaneColor : Inherits TaskParent
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = runRedC(src, labels(2))
 
@@ -1361,7 +1361,7 @@ Public Class RedColor_Features : Inherits TaskParent
                             ((1 - factor) * farBlue(2) + factor * nearYellow(2)))
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = runRedC(src, labels(2))
 

@@ -67,7 +67,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
         desc = "Build the boundaries for rcList and remove interior rectangles"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         bounds.Run(src)
 

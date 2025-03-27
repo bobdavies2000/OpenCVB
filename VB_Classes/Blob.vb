@@ -11,7 +11,7 @@ Public Class Blob_Basics : Inherits TaskParent
     End Sub
 
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then
             input.Run(src)

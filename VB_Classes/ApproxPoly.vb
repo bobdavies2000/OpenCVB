@@ -10,7 +10,7 @@ Public Class ApproxPoly_Basics : Inherits TaskParent
         desc = "Using the input contours, create ApproxPoly output"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then
             If task.heartBeat Then rotatedRect.Run(src)

@@ -132,7 +132,7 @@ Public Class Diff_Depth32f : Inherits TaskParent
         desc = "Where is the depth difference between frames greater than X centimeters."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Or lastDepth32f.Width = 0 Then lastDepth32f = task.pcSplit(2).Clone
 

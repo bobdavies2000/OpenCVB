@@ -29,7 +29,7 @@ Public Class LongLine_Basics : Inherits TaskParent
         Return New lpData(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
         lines.Run(src)
@@ -202,7 +202,7 @@ Public Class LongLine_Match : Inherits TaskParent
         desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         longest.Run(src)
         dst2 = longest.dst2

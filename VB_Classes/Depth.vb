@@ -221,7 +221,7 @@ Public Class Depth_Uncertainty : Inherits TaskParent
         desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         retina.Run(task.depthRGB)
         dst2 = retina.dst2
@@ -285,7 +285,7 @@ Public Class Depth_ColorMap : Inherits TaskParent
         desc = "Display the depth as a color map"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         cv.Cv2.ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, options.alpha, options.beta)
         dst1 += 1
@@ -359,7 +359,7 @@ Public Class Depth_SmoothingMat : Inherits TaskParent
         desc = "Use depth rate of change to smooth the depth values in close range"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static lastDepth = task.pcSplit(2)
 
@@ -622,7 +622,7 @@ Public Class Depth_ForegroundOverTime : Inherits TaskParent
         desc = "Create a fused foreground mask over x number of frames (task.frameHistoryCount)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then lastFrames.Clear()
 
@@ -659,7 +659,7 @@ Public Class Depth_ForegroundBlob : Inherits TaskParent
         desc = "Use InRange to define foreground and find the largest blob in the foreground"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         cv.Cv2.InRange(task.pcSplit(2), 0.01, options.maxForegroundDepthInMeters, dst2)
         dst3 = dst2.Clone
@@ -714,7 +714,7 @@ Public Class Depth_Foreground : Inherits TaskParent
         desc = "Create a mask for the objects in the foreground"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim dst1 = task.pcSplit(2).Threshold(options.maxForegroundDepthInMeters, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dst1.SetTo(0, task.noDepthMask)
@@ -775,7 +775,7 @@ Public Class Depth_InRange : Inherits TaskParent
         desc = "Create the selected number of depth ranges "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim regMats As New List(Of cv.Mat)
         For i = 0 To options.numberOfRegions - 1
@@ -1135,7 +1135,7 @@ Public Class Depth_StableMinMax : Inherits TaskParent
         desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
         If task.optionsChanged Then dst3 = task.pcSplit(2)
@@ -1276,7 +1276,7 @@ Public Class Depth_Tiers : Inherits TaskParent
         desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         dst1 = (src * 100 / options.cmPerTier).ToMat
@@ -1308,7 +1308,7 @@ Public Class Depth_Flatland : Inherits TaskParent
         desc = "Attempt to stabilize the depth image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = task.depthRGB / options.reductionFactor
         dst2 *= options.reductionFactor
@@ -1361,7 +1361,7 @@ Public Class Depth_MinMaxNone : Inherits TaskParent
         desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim split() As cv.Mat
         If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
 

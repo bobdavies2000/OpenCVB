@@ -53,7 +53,7 @@ Public Class Puzzle_Solver : Inherits TaskParent
         desc = "Solve the puzzle using matchTemplate"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Or options.startPuzzle Then
             puzzle.Run(src)

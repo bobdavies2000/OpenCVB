@@ -86,7 +86,7 @@ Public Class Quad_MinMax : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        oglOptions.RunOpt()
+        oglOptions.Run()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
@@ -177,7 +177,7 @@ Public Class Quad_Hulls : Inherits TaskParent
         desc = "Create a triangle representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        oglOptions.RunOpt()
+        oglOptions.Run()
         Dim ptM = oglOptions.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
@@ -264,7 +264,7 @@ Public Class Quad_Bricks : Inherits TaskParent
             Next
         End If
 
-        options.RunOpt()
+        options.Run()
         Dim ptM = options.moveAmount
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 

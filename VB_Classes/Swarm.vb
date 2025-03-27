@@ -34,8 +34,8 @@ Public Class Swarm_Basics : Inherits TaskParent
         Return dst
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optionsEx.RunOpt()
+        options.Run()
+        optionsEx.Run()
 
         dst3 = runFeature(src)
 
@@ -193,7 +193,7 @@ Public Class Swarm_Percentage : Inherits TaskParent
         desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         swarm.Run(src)
         dst2 = swarm.dst2

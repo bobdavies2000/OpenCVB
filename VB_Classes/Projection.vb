@@ -107,7 +107,7 @@ Public Class Projection_Lines : Inherits TaskParent
         desc = "Search for surfaces among the FeatureLess regions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.heartBeat Then
             dst1.SetTo(0)
@@ -140,7 +140,7 @@ Public Class Projection_ObjectIsolate : Inherits TaskParent
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         top.Run(src)
         dst3 = top.dst2

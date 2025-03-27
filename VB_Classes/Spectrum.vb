@@ -32,7 +32,7 @@ Public Class Spectrum_X : Inherits TaskParent
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
@@ -56,7 +56,7 @@ Public Class Spectrum_Y : Inherits TaskParent
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
@@ -80,7 +80,7 @@ Public Class Spectrum_Z : Inherits TaskParent
         desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
         If task.heartBeat And task.rcD.index > 0 Then
@@ -108,7 +108,7 @@ Public Class Spectrum_Cloud : Inherits TaskParent
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
@@ -139,7 +139,7 @@ Public Class Spectrum_GrayAndCloud : Inherits TaskParent
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
@@ -166,7 +166,7 @@ Public Class Spectrum_RGB : Inherits TaskParent
         desc = "Create a spectrum of the RGB values for a given RedCloud cell."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
@@ -202,7 +202,7 @@ Public Class Spectrum_CellZoom : Inherits TaskParent
         desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        breakdown.options.RunOpt()
+        breakdown.options.Run()
 
         dst2 = runRedC(src, labels(2))
 
@@ -235,7 +235,7 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            options.RunOpt()
+            options.Run()
             dst2 = runRedC(src, labels(2))
         End If
 
@@ -301,7 +301,7 @@ Public Class Spectrum_RedCloud : Inherits TaskParent
         desc = "Breakdown each cell in rcList."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        breakdown.options.RunOpt()
+        breakdown.options.Run()
         dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
@@ -350,7 +350,7 @@ Public Class Spectrum_Gray : Inherits TaskParent
         desc = "Given a RedCloud cell, create a spectrum that contains the color ranges."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 

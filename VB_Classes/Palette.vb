@@ -37,7 +37,7 @@ Public Class Palette_Color : Inherits TaskParent
         desc = "Define a color Using sliders."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         dst2.SetTo(New cv.Scalar(options.blueS, options.greenS, options.redS))
         dst3.SetTo(New cv.Scalar(255 - options.blueS, 255 - options.greenS, 255 - options.redS))
         labels(2) = "Color (RGB) = " + CStr(options.blueS) + " " + CStr(options.greenS) + " " + CStr(options.redS)
@@ -71,7 +71,7 @@ Public Class Palette_LinearPolar : Inherits TaskParent
             dst2.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
 
-        rotateOptions.RunOpt()
+        rotateOptions.Run()
 
         dst3.SetTo(0)
         If rotateOptions.warpFlag = cv.InterpolationFlags.WarpInverseMap Then radiusSlider.Value = radiusSlider.Maximum

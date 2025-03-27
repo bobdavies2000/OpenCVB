@@ -7,7 +7,7 @@ Public Class Mesh_Basics : Inherits TaskParent
         desc = "Build triangles from the ptList input of points."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src
         If task.heartBeat And standaloneTest() Then ptList = task.features

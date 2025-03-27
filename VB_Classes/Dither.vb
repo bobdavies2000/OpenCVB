@@ -9,7 +9,7 @@ Public Class Dither_Basics : Inherits TaskParent
         desc = "Explore all the varieties of dithering"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         Dim w = dst2.Width
         Dim h = dst2.Height

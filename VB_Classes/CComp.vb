@@ -13,7 +13,7 @@ Public Class CComp_Basics : Inherits TaskParent
         desc = "Draw bounding boxes around BGR binarized connected Components"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         rects.Clear()
         centroids.Clear()
@@ -97,7 +97,7 @@ Public Class CComp_Both : Inherits TaskParent
         desc = "Prepare the connected components for both above and below the threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ccomp.options.RunOpt()
+        ccomp.options.Run()
 
         Dim light = src.Threshold(ccomp.options.light, 255, cv.ThresholdTypes.Binary)
         ccomp.Run(light)
@@ -149,7 +149,7 @@ Public Class CComp_Stats : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gray
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then dst2 = task.gray.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
 

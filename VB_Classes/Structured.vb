@@ -7,7 +7,7 @@ Public Class Structured_Basics : Inherits TaskParent
         desc = "Build structured slices through the point cloud."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim stepsize = options.stepSize
 
         dst2.SetTo(0)
@@ -53,7 +53,7 @@ Public Class Structured_LinearizeFloor : Inherits TaskParent
         desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         floor.Run(src)
         dst2 = floor.dst2
@@ -237,7 +237,7 @@ Public Class Structured_Rebuild : Inherits TaskParent
         Return output
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim metersPerPixel = task.MaxZmeters / dst3.Height
         thickness = options.sliceSize * metersPerPixel
@@ -273,7 +273,7 @@ Public Class Structured_Cloud2 : Inherits TaskParent
         desc = "Attempt to impose a structure on the point cloud data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
@@ -328,7 +328,7 @@ Public Class Structured_Cloud : Inherits TaskParent
         desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim yLines = CInt(options.xLines * dst2.Height / dst2.Width)
 
@@ -562,7 +562,7 @@ Public Class Structured_MultiSliceH : Inherits TaskParent
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim stepsize = options.stepSize
 
         heat.Run(src)
@@ -599,7 +599,7 @@ Public Class Structured_SliceXPlot : Inherits TaskParent
         desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         multi.Run(src)
         dst3 = multi.heat.dst2
@@ -637,7 +637,7 @@ Public Class Structured_SliceYPlot : Inherits TaskParent
         desc = "Find any plane around a peak value in the side view histogram"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         multi.Run(src)
         dst3 = multi.heat.dst3
@@ -724,7 +724,7 @@ Public Class Structured_SliceEither : Inherits TaskParent
         desc = "Create slices in top and side views"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Static topRadio = optiBase.FindCheckBox("Top View (Unchecked Side View)")
         Dim topView = topRadio.checked
 
@@ -789,7 +789,7 @@ Public Class Structured_TransformH : Inherits TaskParent
         desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
     End Sub
     Public Function createSliceMaskH() As cv.Mat
-        options.RunOpt()
+        options.Run()
 
         Dim sliceMask As New cv.Mat
         Dim ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
@@ -834,7 +834,7 @@ Public Class Structured_TransformV : Inherits TaskParent
         desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Function createSliceMaskV() As cv.Mat
-        options.RunOpt()
+        options.Run()
 
         Dim sliceMask As New cv.Mat
         If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
@@ -992,7 +992,7 @@ Public Class Structured_SliceV : Inherits TaskParent
         desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
         Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
@@ -1038,7 +1038,7 @@ Public Class Structured_SliceH : Inherits TaskParent
         desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         heat.Run(src)
 
@@ -1178,7 +1178,7 @@ Public Class Structured_MultiSlicePolygon : Inherits TaskParent
         desc = "Detect polygons in the multiSlice output"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         multi.Run(src)
         dst2 = Not multi.dst3
@@ -1290,7 +1290,7 @@ Public Class Structured_MultiSlice : Inherits TaskParent
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim stepSize = options.stepSize
 
         heat.Run(src)
@@ -1340,7 +1340,7 @@ Public Class Structured_MultiSliceV : Inherits TaskParent
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim stepsize = options.stepSize
 
         heat.Run(src)

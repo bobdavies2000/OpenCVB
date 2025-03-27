@@ -17,7 +17,7 @@ Public Class KMeans_Basics : Inherits TaskParent
             Return
         End If
         If standaloneTest() And src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        options.RunOpt()
+        options.Run()
         classCount = options.kMeansK
         If task.optionsChanged Then
             options.kMeansFlag = cv.KMeansFlags.PpCenters
@@ -154,7 +154,7 @@ Public Class KMeans_CustomData : Inherits TaskParent
         desc = "Cluster the selected input using kMeans"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        km.options.RunOpt()
+        km.options.Run()
         Dim k = km.options.kMeansK
         If src.Rows < k Then k = src.Rows
 

@@ -24,7 +24,7 @@ Public Class HOG_Basics : Inherits TaskParent
         Next rect
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim hog As New cv.HOGDescriptor()
         hog.SetSVMDetector(cv.HOGDescriptor.GetDefaultPeopleDetector())

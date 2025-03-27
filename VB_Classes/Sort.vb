@@ -6,7 +6,7 @@ Public Class Sort_Basics : Inherits TaskParent
         desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If options.radio5.Checked Then
             src = src.Reshape(1, src.Rows * src.Cols)
             options.sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Descending

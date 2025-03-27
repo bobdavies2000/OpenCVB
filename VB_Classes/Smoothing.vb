@@ -47,7 +47,7 @@ Public Class Smoothing_Exterior : Inherits TaskParent
         desc = "Smoothing the line connecting a series of points."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        smOptions.RunOpt()
+        smOptions.Run()
         If standaloneTest() Then
             If task.heartBeat And Not task.paused Then
                 Dim hullList = hull.buildRandomHullPoints()
@@ -125,7 +125,7 @@ Public Class Smoothing_Interior : Inherits TaskParent
         desc = "Smoothing the line connecting a series of points staying inside the outline."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If standaloneTest() Then
             If task.heartBeat And task.paused = False Then
                 Dim hullList = hull.buildRandomHullPoints()

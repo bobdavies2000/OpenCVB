@@ -156,7 +156,7 @@ Public Class Hist_NormalizeGray : Inherits TaskParent
         desc = "Create a histogram of a normalized image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst3 = src.Normalize(options.minGray, options.maxGray, cv.NormTypes.MinMax) ' only minMax is working...
         histogram.Run(dst3)
@@ -636,7 +636,7 @@ Public Class Hist_CompareGray : Inherits TaskParent
         desc = "Compare grayscale histograms for successive frames"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         histK.Run(src)
         dst2 = histK.dst2.Clone
@@ -1291,7 +1291,7 @@ Public Class Hist_PointCloud : Inherits TaskParent
         desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         rangesX = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.MaxZmeters)}
@@ -1392,7 +1392,7 @@ Public Class Hist_CloudSegments : Inherits TaskParent
         desc = "Find the segments of X, Y, and Z values from the point cloud."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standalone Then
             If task.heartBeatLT Or task.optionsChanged Then

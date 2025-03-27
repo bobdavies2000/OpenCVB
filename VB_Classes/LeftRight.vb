@@ -27,7 +27,7 @@ Public Class LeftRight_CompareRaw : Inherits TaskParent
         desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim r1 = New cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight)
         Dim r2 = New cv.Rect(0, 25, task.leftView.Width, options.sliceHeight)
@@ -389,7 +389,7 @@ Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
             Exit Sub
         End If
 
-        options.RunOpt()
+        options.Run()
 
         Dim w = dst0.Width
         Dim h = dst0.Height

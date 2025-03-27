@@ -473,7 +473,7 @@ Public Class Kalman_VB : Inherits TaskParent
         q_bias += K_1 * angle_err
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         'The Kalman Filter code comes from:
         'http://www.rotomotion.com/downloads/tilt.c
@@ -547,7 +547,7 @@ Public Class Kalman_VB_Basics : Inherits TaskParent
         q_bias += K_1 * kError
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then kInput = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()(0)
 

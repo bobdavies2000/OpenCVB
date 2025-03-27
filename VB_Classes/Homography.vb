@@ -8,7 +8,7 @@ Public Class Homography_Basics : Inherits TaskParent
         desc = "Build the homography matrix from 2 lists of corners and use it in a WarpPerspective call."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         If standaloneTest() And task.heartBeat And options.hMethod = cv.HomographyMethods.None Then
             random.Run(src)

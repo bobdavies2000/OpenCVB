@@ -9,7 +9,7 @@ Public Class Cartoonify_Basics : Inherits TaskParent
         desc = "Create a cartoon from a color image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         Dim gray8u = task.gray.MedianBlur(options.medianBlur)
         Dim edges = gray8u.Laplacian(cv.MatType.CV_8U, options.kernelSize)

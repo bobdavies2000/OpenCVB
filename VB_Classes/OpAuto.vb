@@ -109,7 +109,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim desiredBoundaries = options.desiredBoundaries
 
         ' input should be a histogram.  If not, get one...
@@ -173,7 +173,7 @@ Public Class OpAuto_Peaks2D : Inherits TaskParent
         desc = "Find the peaks in a 2D histogram"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim desiredBoundaries = options.desiredBoundaries
         Dim peakDistance = options.peakDistance
 

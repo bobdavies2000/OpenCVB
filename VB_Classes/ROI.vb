@@ -88,7 +88,7 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
             dst0 = task.color
             dst1.SetTo(0)
@@ -139,7 +139,7 @@ Public Class ROI_Accumulate : Inherits TaskParent
         desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         SetTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)
         If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then

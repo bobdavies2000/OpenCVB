@@ -9,7 +9,7 @@ Public Class Image_Basics : Inherits TaskParent
         desc = "Load an image into OpenCVB"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         src = options.fullsizeImage
 
@@ -123,7 +123,7 @@ Public Class Image_MSER : Inherits TaskParent
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         images.Run(options.fullsizeImage)
         dst1 = images.dst2

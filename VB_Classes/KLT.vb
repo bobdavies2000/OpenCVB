@@ -11,7 +11,7 @@ Public Class KLT_Basics : Inherits TaskParent
         desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         If options.nightMode Then dst2.SetTo(0) Else src.CopyTo(dst2)
         Static lastGray As cv.Mat = src.Clone

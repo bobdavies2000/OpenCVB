@@ -16,8 +16,8 @@ Public Class Feature_Basics : Inherits TaskParent
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        featureMethod.RunOpt()
+        options.Run()
+        featureMethod.Run()
         Static frm = optiBase.FindFrm("Options_FeatureGather Radio Buttons")
         Dim featureSource As Integer
         For i = 0 To frm.check.Count - 1
@@ -138,7 +138,7 @@ Public Class Feature_NoMotionTest : Inherits TaskParent
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         dst2 = src.Clone
 
         method.Run(src)
@@ -235,7 +235,7 @@ Public Class Feature_PointTracker : Inherits TaskParent
         desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim correlationMin = options.correlationMin
         Dim templatePad = options.templatePad
         Dim templateSize = options.templateSize
@@ -285,7 +285,7 @@ Public Class Feature_Delaunay : Inherits TaskParent
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = runFeature(src)
         labels(2) = task.feat.labels(2)
@@ -430,7 +430,7 @@ Public Class Feature_ShiTomasi : Inherits TaskParent
         desc = "Identify feature points in the left And right views"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If options.useShiTomasi Then
             dst2 = task.leftView
@@ -660,7 +660,7 @@ Public Class Feature_Matching : Inherits TaskParent
         desc = "Use correlation coefficient to keep features from frame to frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static fpLastSrc = src.Clone
 
@@ -710,7 +710,7 @@ Public Class Feature_SteadyCam : Inherits TaskParent
         desc = "Track features using correlation without the motion mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static features As New List(Of cv.Point)(task.featurePoints)
         Static lastSrc As cv.Mat = src.Clone
@@ -852,7 +852,7 @@ Public Class Feature_Agast : Inherits TaskParent
         desc = "Use the Agast Feature Detector in the OpenCV Contrib."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then
             If agastFD IsNot Nothing Then agastFD.Dispose()
@@ -901,7 +901,7 @@ Public Class Feature_NoMotion : Inherits TaskParent
         desc = "Find good features to track in a BGR image using the motion mask+"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         dst2 = src.Clone
 
         runFeature(src)

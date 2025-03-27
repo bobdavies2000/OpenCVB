@@ -12,7 +12,7 @@ Public Class Contour_Basics : Inherits TaskParent
         desc = "General purpose contour finder"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         color8U.Run(src)
         dst2 = color8U.dst2
@@ -108,7 +108,7 @@ Public Class Contour_GeneralWithOptions : Inherits TaskParent
         desc = "General purpose contour finder"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then
             If Not task.heartBeat Then Exit Sub
@@ -199,7 +199,7 @@ Public Class Contour_RemoveLines : Inherits TaskParent
         Return tour
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = image.Resize(dst2.Size)
         dst3 = dst2.Clone
@@ -498,7 +498,7 @@ Public Class Contour_Largest : Inherits TaskParent
         desc = "Create a mask from the largest contour of the input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If standaloneTest() Then
             If task.heartBeat Then
                 rotatedRect.Run(src)
@@ -548,7 +548,7 @@ Public Class Contour_Compare : Inherits TaskParent
         desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = runRedC(src, labels(2))
 
@@ -712,7 +712,7 @@ Public Class Contour_RC_AddContour : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If myFrameCount <> task.frameCount Then
-            options.RunOpt() ' avoid running options more than once per frame.
+            options.Run() ' avoid running options more than once per frame.
             myFrameCount = task.frameCount
         End If
 
@@ -755,7 +755,7 @@ Public Class Contour_Gray : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If myFrameCount <> task.frameCount Then
-            options.RunOpt() ' avoid running options more than once per frame.
+            options.Run() ' avoid running options more than once per frame.
             myFrameCount = task.frameCount
         End If
 
@@ -827,7 +827,7 @@ Public Class Contour_DepthTiers : Inherits TaskParent
         desc = "General purpose contour finder"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         task.pcSplit(2).ConvertTo(dst1, cv.MatType.CV_32S, 100 / optionsTiers.cmPerTier, 1)
 

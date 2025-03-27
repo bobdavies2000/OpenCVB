@@ -54,7 +54,7 @@ Public Class GrabCut_FineTune : Inherits TaskParent
         desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If options.clearAll Or basics.fgFineTune Is Nothing Then
             basics.fgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

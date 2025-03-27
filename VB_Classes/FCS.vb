@@ -9,7 +9,7 @@ Public Class FCS_Basics : Inherits TaskParent
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         runFeature(src)
 
@@ -343,7 +343,7 @@ End Class
 '        desc = "Track each feature with FCS"
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)
-'        options.RunOpt()
+'        options.Run()
 
 '        fcs.Run(src)
 '        dst2 = fcs.dst2
@@ -447,7 +447,7 @@ End Class
 '        desc = "Try to improve the match count to the previous frame using correlation"
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)
-'        options.RunOpt()
+'        options.Run()
 
 '        edges.Run(src)
 '        dst1 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

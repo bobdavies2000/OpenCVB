@@ -214,7 +214,7 @@ Public Class BackProject2D_FilterSide : Inherits TaskParent
         desc = "Backproject the output of the Side View after removing low sample bins."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim histogram As New cv.Mat
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
@@ -245,7 +245,7 @@ Public Class BackProject2D_FilterTop : Inherits TaskParent
         desc = "Backproject the output of the Side View after removing low sample bins."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim histogram As New cv.Mat
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
@@ -323,7 +323,7 @@ Public Class BackProject2D_RowCol : Inherits TaskParent
         desc = "Backproject the whole row or column of the 2D histogram"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst0 = src.Clone
 

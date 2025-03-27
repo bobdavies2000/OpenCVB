@@ -9,7 +9,7 @@ Public Class AsciiArt_Basics : Inherits TaskParent
         desc = "Build an ascii art representation of the input stream."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst3 = task.gray.Resize(options.size, 0, 0, cv.InterpolationFlags.Nearest)
         For y = 0 To dst3.Height - 1

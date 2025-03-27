@@ -5,7 +5,7 @@ Public Class Transform_Resize : Inherits TaskParent
         desc = "Resize an image based on the slider value."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim w = CInt(options.resizeFactor * src.Width)
         Dim h = CInt(options.resizeFactor * src.Height)
@@ -35,7 +35,7 @@ Public Class Transform_Affine3D : Inherits TaskParent
         desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
 
@@ -97,7 +97,7 @@ Public Class Transform_Rotate : Inherits TaskParent
         desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         imageCenter = New cv.Point2f(options.centerX, options.centerY)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale)

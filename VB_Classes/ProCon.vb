@@ -63,7 +63,7 @@ Public Class ProCon_Basics : Inherits TaskParent
             SetTrueText("ProCon_Basics is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
             Exit Sub
         End If
-        options.RunOpt()
+        options.Run()
         If options.buffer.Length <> options.bufferSize Then
             SyncLock mutex
                 ReDim options.buffer(options.bufferSize - 1)

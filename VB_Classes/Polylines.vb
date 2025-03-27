@@ -73,7 +73,7 @@ Public Class Polylines_IEnumerableExample : Inherits TaskParent
         desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim points = Enumerable.Range(0, options.polyCount).Select(Of cv.Point)(
             Function(i)

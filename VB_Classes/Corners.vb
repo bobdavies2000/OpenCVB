@@ -10,8 +10,8 @@ Public Class Corners_Basics : Inherits TaskParent
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        optionCorner.RunOpt()
-        options.RunOpt()
+        optionCorner.Run()
+        options.Run()
 
         dst2 = src.Clone
         Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, task.FASTthreshold, optionCorner.useNonMax)
@@ -48,7 +48,7 @@ Public Class Corners_Harris : Inherits TaskParent
         labels(3) = "Corner Eigen values"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         mc = New cv.Mat(task.gray.Size(), cv.MatType.CV_32FC1, 0)
         dst2 = New cv.Mat(task.gray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -95,7 +95,7 @@ Public Class Corners_PreCornerDetect : Inherits TaskParent
         desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim prob As New cv.Mat
         cv.Cv2.PreCornerDetect(task.gray, prob, options.kernelSize)
@@ -120,7 +120,7 @@ Public Class Corners_ShiTomasi_CPP : Inherits TaskParent
         labels(3) = "Corner Eigen values using ShiTomasi which is also what is used in GoodFeatures."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim data(task.gray.Total - 1) As Byte
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
@@ -245,7 +245,7 @@ Public Class Corners_Harris_CPP : Inherits TaskParent
         desc = "Use Harris feature detectors to identify interesting points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim dataSrc(task.gray.Total - 1) As Byte
         Marshal.Copy(task.gray.Data, dataSrc, 0, dataSrc.Length)
@@ -279,7 +279,7 @@ Public Class Corners_HarrisDetector_CPP : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If cPtr = 0 Then cPtr = Harris_Detector_Open()
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
 
@@ -340,7 +340,7 @@ Public Class Corners_SubPix : Inherits TaskParent
         desc = "Use PreCornerDetect to refine the feature points to sub-pixel accuracy."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         runFeature(src)
 
         dst2 = src.Clone

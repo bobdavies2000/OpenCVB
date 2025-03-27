@@ -93,7 +93,7 @@ Public Class Color8U_Grayscale : Inherits TaskParent
         desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Channels = 1 Then
             dst2 = src ' nothing to do...
@@ -197,7 +197,7 @@ Public Class Color8U_RedHue : Inherits TaskParent
         desc = "Find all the reddish pixels in the image - indicate some life form."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim mask = hsv.InRange(options.camSBins, New cv.Scalar(180, 255, options.camMax))
@@ -287,7 +287,7 @@ Public Class Color8U_TopX : Inherits TaskParent
         desc = "Classify every BGR pixel into some common colors"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         topX.mapTopX = options.topXcount
         topX.Run(src)
@@ -397,7 +397,7 @@ Public Class Color8U_BlackAndWhite : Inherits TaskParent
         desc = "Create masks for black and white"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst1 = task.gray
         dst2 = dst1.Threshold(options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)

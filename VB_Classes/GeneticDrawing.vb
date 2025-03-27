@@ -96,7 +96,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
         totalError = calculateError(mats.mat(3))
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.displayObjectName = traceName Then
             SetTrueText("There are too many operations inside GeneticDrawing_Basics to break down the displayObject results")

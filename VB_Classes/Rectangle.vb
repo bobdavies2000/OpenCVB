@@ -7,7 +7,7 @@ Public Class Rectangle_Basics : Inherits TaskParent
         desc = "Draw the requested number of rectangles."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             rectangles.Clear()

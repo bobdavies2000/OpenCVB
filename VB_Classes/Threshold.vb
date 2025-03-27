@@ -7,7 +7,7 @@ Public Class Threshold_Basics : Inherits TaskParent
         desc = "Demonstrate the use of OpenCV's threshold and all its options"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         labels(3) = "Image after thresholding with threshold = " + CStr(options.threshold)
         dst2 = src
@@ -38,8 +38,8 @@ Public Class Threshold_Adaptive : Inherits TaskParent
         desc = "Explore what adaptive threshold can do."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optionsAdaptive.RunOpt()
+        options.Run()
+        optionsAdaptive.Run()
 
         If src.Channels() <> 1 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
         dst3 = dst2.AdaptiveThreshold(255, optionsAdaptive.method, options.thresholdMethod,
@@ -65,7 +65,7 @@ Public Class Threshold_Definitions : Inherits TaskParent
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         gradient.Run(src)
         dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -115,8 +115,8 @@ Public Class Threshold_ByChannels : Inherits TaskParent
         desc = "Threshold by channel - use red threshold slider to impact grayscale results."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optionsColor.RunOpt()
+        options.Run()
+        optionsColor.Run()
 
         If src.Channels = 1 Then
             dst2 = src.Threshold(optionsColor.redS, 255, options.thresholdMethod)

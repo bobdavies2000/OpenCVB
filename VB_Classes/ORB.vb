@@ -8,7 +8,7 @@ Public Class ORB_Basics : Inherits TaskParent
         desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         orb = cv.ORB.Create(options.desiredCount)

@@ -9,7 +9,7 @@ Public Class AddWeighted_Basics : Inherits TaskParent
         desc = "Add 2 images with specified weights."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standalone Then src2 = task.depthRGB
         If src2.Type <> src.Type Then
@@ -42,7 +42,7 @@ Public Class AddWeighted_DepthAccumulate : Inherits TaskParent
         desc = "Update a running average of the image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         cv.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New cv.Mat)
     End Sub
@@ -63,7 +63,7 @@ Public Class AddWeighted_Accumulate : Inherits TaskParent
         desc = "Update a running average of the image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         task.gray.ConvertTo(dst3, cv.MatType.CV_32F)
         cv.Cv2.AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)

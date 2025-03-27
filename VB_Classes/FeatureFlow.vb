@@ -64,7 +64,7 @@ Public Class FeatureFlow_Dense : Inherits TaskParent
 
     Public Overrides sub RunAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        options.RunOpt()
+        options.Run()
         Static lastGray As cv.Mat = src.Clone
         Dim hsv = opticalFlow_Dense(lastGray, src, options.pyrScale, options.levels, options.winSize, options.iterations, options.polyN,
                                     options.polySigma, options.OpticalFlowFlags)
@@ -91,7 +91,7 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
         desc = "Show the optical flow of a sparse matrix."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone()
         dst3 = src.Clone()

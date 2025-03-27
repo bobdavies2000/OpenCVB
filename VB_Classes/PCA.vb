@@ -295,7 +295,7 @@ Public Class PCA_Palettize : Inherits TaskParent
         desc = "Create a palette for the input image but don't use it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If src.Channels <> 3 Then
             Static sendMsg As Boolean = True
             If sendMsg Then MsgBox("PCA algorithms need rgb data - not grayscale")
@@ -834,7 +834,7 @@ Public Class PCA_NColor : Inherits TaskParent
         desc = "Use PCA to build a palettized CV_8U image from the input using a palette."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         Marshal.Copy(src.Data, buff, 0, buff.Length)

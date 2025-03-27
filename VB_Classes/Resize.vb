@@ -8,7 +8,7 @@ Public Class Resize_Basics : Inherits TaskParent
         labels(2) = "Rectangle highlight above resized"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         If task.drawRect.Width <> 0 Then
             src = src(task.drawRect)
@@ -33,8 +33,8 @@ Public Class Resize_Smaller : Inherits TaskParent
         desc = "Resize by a percentage of the image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optGrid.RunOpt()
+        options.Run()
+        optGrid.Run()
 
         newSize = New cv.Size(Math.Ceiling(src.Width * optGrid.lowResPercent),
                                Math.Ceiling(src.Height * optGrid.lowResPercent))
@@ -56,7 +56,7 @@ Public Class Resize_Proportional : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            options.RunOpt()
+            options.Run()
             dst2 = runRedC(src, labels(2))
             src = src(task.rcD.rect)
         End If

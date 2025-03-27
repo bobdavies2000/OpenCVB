@@ -15,7 +15,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim resetImage As Boolean
         templateRect = New cv.Rect(src.Width / 2 - options.width / 2, src.Height / 2 - options.height / 2,
@@ -98,7 +98,7 @@ Public Class Stabilizer_BasicsRandomInput : Inherits TaskParent
         desc = "Generate images that have been arbitrarily shifted"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim input = src
         If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

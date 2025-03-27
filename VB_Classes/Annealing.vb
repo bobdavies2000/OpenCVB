@@ -106,7 +106,7 @@ Public Class Annealing_MT_CPP : Inherits TaskParent
         desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.optionsChanged Then setup()
         Parallel.For(0, anneal.Length,
             Sub(i)

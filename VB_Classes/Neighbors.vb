@@ -8,7 +8,7 @@ Public Class Neighbors_Basics : Inherits TaskParent
         desc = "Find all the neighbors with KNN"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
 

@@ -7,7 +7,7 @@ Public Class PlyFormat_Basics : Inherits TaskParent
         desc = "Create a .ply format file with the pointcloud."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim fileInfo = New FileInfo(options.fileName)
         If saveFileName <> fileInfo.FullName Then
@@ -49,7 +49,7 @@ Public Class PlyFormat_PlusRGB : Inherits TaskParent
         desc = "Save the pointcloud in .ply format and include the RGB data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim fileInfo = New FileInfo(options.fileName)
         If saveFileName <> fileInfo.FullName Then

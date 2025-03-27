@@ -13,7 +13,7 @@ Public Class ImageOffset_Basics : Inherits TaskParent
         desc = "Compute various differences between neighboring pixels"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
         Dim r2 As cv.Rect
@@ -68,7 +68,7 @@ Public Class ImageOffset_SliceH : Inherits TaskParent
         desc = "Visualize a slice through the ImageOffsets_Basics images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         iOff.Run(src)
 
@@ -130,7 +130,7 @@ Public Class ImageOffset_SliceV : Inherits TaskParent
         desc = "Visualize a slice through the ImageOffsets_Basics images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         iOff.Run(src)
 

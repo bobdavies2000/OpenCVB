@@ -27,7 +27,7 @@ Public Class SuperPixel_Basics_CPP : Inherits TaskParent
         desc = "Sub-divide the image into super pixels."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then
             If cPtr <> 0 Then SuperPixel_Close(cPtr)

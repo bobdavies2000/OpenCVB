@@ -446,7 +446,7 @@ Public Class Pixel_NeighborsHorizontal : Inherits TaskParent
         desc = "Manual step through depth data to find horizontal neighbors within x mm's"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -488,7 +488,7 @@ Public Class Pixel_NeighborsVertical : Inherits TaskParent
         desc = "Manual step through depth data to find vertical neighbors within x mm's"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -527,7 +527,7 @@ Public Class Pixel_NeighborsMaskH : Inherits TaskParent
         desc = "Show where horizontal neighbor depth values are within X mm's"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -554,7 +554,7 @@ Public Class Pixel_NeighborsMaskV : Inherits TaskParent
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -604,7 +604,7 @@ Public Class Pixel_NeighborsPatchNeighbors : Inherits TaskParent
         desc = "Update depth values for neighbors where they are within X mm's"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 

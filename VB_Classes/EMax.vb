@@ -21,7 +21,7 @@ Public Class EMax_Basics : Inherits TaskParent
         desc = "Use EMax - Expectation Maximization - to classify the regions around a series of labeled points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         If eLabels.Count = 0 Or useInputClusters Then
             useInputClusters = True
@@ -111,7 +111,7 @@ Public Class EMax_InputClusters : Inherits TaskParent
         desc = "Options for EMax algorithms."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then grid.Run(dst2)
         regionCount = grid.gridRects.Count

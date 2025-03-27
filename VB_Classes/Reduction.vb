@@ -124,7 +124,7 @@ Public Class Reduction_XYZ : Inherits TaskParent
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split = src.Split()

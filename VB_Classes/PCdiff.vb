@@ -6,7 +6,7 @@ Public Class PCdiff_Basics : Inherits TaskParent
         desc = "Find depth regions where neighboring pixels are close in depth"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If standalone Then src = task.pcSplit(2)
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
@@ -86,7 +86,7 @@ Public Class PCdiff_Basics1 : Inherits TaskParent
         desc = "Compute various differences between neighboring pixels"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
         Dim r2 As cv.Rect

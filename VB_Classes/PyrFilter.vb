@@ -6,7 +6,7 @@ Public Class PyrFilter_Basics : Inherits TaskParent
         desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         cv.Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid)
     End Sub
 End Class

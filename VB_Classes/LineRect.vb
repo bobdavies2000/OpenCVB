@@ -5,7 +5,7 @@ Public Class LineRect_CenterDepth : Inherits TaskParent
         desc = "Remove lines which have similar depth in grid cells on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
         dst3 = src.Clone
@@ -50,7 +50,7 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
         desc = "Remove lines which have similar depth in grid cells on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
         dst3 = src.Clone
@@ -105,7 +105,7 @@ Public Class LineRect_CenterRange : Inherits TaskParent
         desc = "Remove lines which have similar depth in grid cells on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
         dst3 = src.Clone

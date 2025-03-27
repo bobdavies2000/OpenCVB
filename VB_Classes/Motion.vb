@@ -722,7 +722,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
         desc = "Build a center rectangle and track it with MatchTemplate."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         ' set a low threshold to make the results more visible.
         Dim correlationThreshold = 0.95 ' If(task.gOptions.debugChecked, 0.5, 0.9)
@@ -895,7 +895,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
                "from the thresholded MatchTemplate output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim dCount = dst2.CountNonZero
         Static tSlider = optiBase.FindSlider("Threshold value")

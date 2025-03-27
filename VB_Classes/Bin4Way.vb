@@ -618,7 +618,7 @@ Public Class Bin4Way_RedCloud : Inherits TaskParent
         desc = "Identify the lightest and darkest regions separately and then combine the rcData."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then
             For i = 0 To rcList.Count - 1

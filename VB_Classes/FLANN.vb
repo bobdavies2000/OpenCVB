@@ -58,7 +58,7 @@ Public Class FLANN_Basics : Inherits TaskParent
         labels(2) = "Red is query, Nearest points blue"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(src) ' fill result1 with random points in x and y range of the image.
         Dim features As cv.Mat = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)

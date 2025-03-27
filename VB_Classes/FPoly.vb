@@ -16,12 +16,12 @@ Public Class FPoly_Basics : Inherits TaskParent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         runFeature(src)
 
         If task.firstPass Then sides.prevImage = src.Clone
-        sides.options.RunOpt()
+        sides.options.Run()
 
         topFeatures.Run(src)
         dst2 = topFeatures.dst2
@@ -127,10 +127,10 @@ Public Class FPoly_Sides : Inherits TaskParent
         desc = "Compute the lengths of each side in a polygon"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.firstPass Then prevImage = src.Clone
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() And task.heartBeat Then
             random.Run(src)
@@ -252,8 +252,8 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.firstPass Then resyncImage = src.Clone
-        options.RunOpt()
-        optionsEx.RunOpt()
+        options.Run()
+        optionsEx.Run()
 
         runFeature(src)
 
@@ -1222,9 +1222,9 @@ Public Class FPoly_Core : Inherits TaskParent
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        optionsCore.RunOpt()
-        optionsEx.RunOpt()
+        options.Run()
+        optionsCore.Run()
+        optionsEx.Run()
 
         runFeature(src)
 
@@ -1276,7 +1276,7 @@ Public Class FPoly_TopFeatures : Inherits TaskParent
         desc = "Get the top features and validate them using Delaunay regions."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         runFeature(src)
 
         stable.Run(src)

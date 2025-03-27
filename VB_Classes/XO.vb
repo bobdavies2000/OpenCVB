@@ -768,7 +768,7 @@ Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
         desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim threshold = options.stdevThreshold
 
         Dim pt = task.mouseD.ptTopLeft
@@ -961,7 +961,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
         End If
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         dst2 = src.Clone
 
         If standalone Then task.lines.Run(src)
@@ -1166,7 +1166,7 @@ Public Class XO_Line_KNN : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         runFeature(src)
 
-        swarm.options.RunOpt()
+        swarm.options.Run()
         task.lines.Run(src)
         dst2 = task.lines.dst2
 
@@ -1608,7 +1608,7 @@ Public Class XO_Line_GCloud : Inherits TaskParent
         Return gc
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim maxAngle = angleSlider.Value
 
@@ -2062,7 +2062,7 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.optionsChanged Then
             ReDim lastCorrelation(task.gridRects.Count - 1)
         End If

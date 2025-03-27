@@ -42,7 +42,7 @@ Public Class SLR_Core : Inherits TaskParent
         desc = "The core algorithm for Segmented Linear Regression"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If inputX.Count = 0 Then
             SetTrueText("No input provided.  Update inputX and inputY and test again." + vbCrLf +
@@ -81,7 +81,7 @@ Public Class SLR_Plot : Inherits TaskParent
     End Sub
 
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.firstPass And standalone Then
             Static slrInput As New SLR_PlotTest()
             slrInput.getData(dataX, dataY)
@@ -163,7 +163,7 @@ Public Class SLR_TrendImages : Inherits TaskParent
         desc = "Find trends by filling in short histogram gaps for depth or 1-channel images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim split = src.Split()
         trends.hist.plot.maxRange = 255

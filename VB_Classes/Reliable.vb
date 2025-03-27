@@ -51,7 +51,7 @@ Public Class Reliable_MaxDepth : Inherits TaskParent
         desc = "Create a mas"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim split() As cv.Mat
         If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
 

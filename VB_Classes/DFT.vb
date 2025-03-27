@@ -120,7 +120,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits TaskParent
         labels(3) = "Same filter with radius / 2"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         dft.Run(src)
 
         If task.optionsChanged Then
@@ -199,7 +199,7 @@ Public Class DFT_Shapes : Inherits TaskParent
         desc = "Show the spectrum magnitude for some standard shapes"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static frm = optiBase.FindFrm("Options_DFTShape Radio Buttons")
         Select Case optiBase.findRadioText(frm.check)

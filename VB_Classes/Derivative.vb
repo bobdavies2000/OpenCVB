@@ -79,7 +79,7 @@ Public Class Derivative_Subtract : Inherits TaskParent
         desc = "Subtract neighboring cells in the point cloud depth."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -104,7 +104,7 @@ Public Class Derivative_Sobel : Inherits TaskParent
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(options.channel)
         src = src.Sobel(cv.MatType.CV_32F, 1, 1, options.kernelSize)
@@ -194,7 +194,7 @@ Public Class Derivative_Laplacian : Inherits TaskParent
         desc = "Create a histogram and backprojection for the second derivative of depth in the selected dimension."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim channel = deriv.options.channel
         Dim gausskern = New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize))

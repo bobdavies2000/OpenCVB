@@ -8,7 +8,7 @@ Public Class Salience_Basics_CPP : Inherits TaskParent
         desc = "Show results of Salience algorithm when using C++"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)

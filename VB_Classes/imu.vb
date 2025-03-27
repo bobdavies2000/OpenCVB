@@ -123,7 +123,7 @@ Public Class IMU_BasicsWithOptions : Inherits TaskParent
         desc = "Read and display the IMU coordinates"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim gyroAngle As cv.Point3f
         If task.optionsChanged Then
@@ -303,7 +303,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits TaskParent
         desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static IMUanchor As Integer = task.IMU_FrameTime Mod 4000000000
         Static histogramIMU(plot.maxScale) As Integer
@@ -774,7 +774,7 @@ Public Class IMU_IscameraStable : Inherits TaskParent
         desc = "Track the standard deviation of the angular velocities."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         task.pitch = task.IMU_AngularVelocity.X
         task.yaw = task.IMU_AngularVelocity.Y
@@ -807,7 +807,7 @@ Public Class IMU_PlotHostFrameTimes : Inherits TaskParent
         desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static CPUanchor As Integer = task.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
@@ -886,7 +886,7 @@ Public Class IMU_PlotHostFrameScalar : Inherits TaskParent
         desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Static CPUanchor As Integer = task.CPU_FrameTime
 
@@ -1036,7 +1036,7 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
         desc = "Use the Y-Arc to confirm which vertical lines are valid"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
 
@@ -1095,7 +1095,7 @@ Public Class IMU_Plot : Inherits TaskParent
         desc = "Plot the angular velocity of the camera based on the IMU data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then
             blueA = task.IMU_AngularVelocity.X * 1000

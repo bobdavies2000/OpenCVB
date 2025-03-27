@@ -7,7 +7,7 @@ Public Class Contrast_Basics : Inherits TaskParent
         desc = "Show image with varying contrast and brightness."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.ConvertScaleAbs(options.brightness, options.contrast)
     End Sub
@@ -25,7 +25,7 @@ Public Class Contrast_POW : Inherits TaskParent
         desc = "Reduce contrast with POW function"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = task.gray
         dst2.ConvertTo(dst3, cv.MatType.CV_32FC3)

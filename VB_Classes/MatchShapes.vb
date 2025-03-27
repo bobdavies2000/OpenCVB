@@ -32,8 +32,8 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         Return maxIndex
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
-        match.RunOpt()
+        options.Run()
+        match.Run()
 
         If standaloneTest() Then
             dst2 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -76,7 +76,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
         desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then
             hulls.Run(task.color)
@@ -129,7 +129,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim myStandalone = standaloneTest() Or runStandalone
 
@@ -189,7 +189,7 @@ Public Class MatchShapes_Hulls : Inherits TaskParent
         desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         hulls.Run(src)
         dst2 = hulls.dst2
@@ -223,7 +223,7 @@ Public Class MatchShapes_Contours : Inherits TaskParent
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = runRedC(src, labels(2))
         If task.heartBeat Then dst3.SetTo(0)

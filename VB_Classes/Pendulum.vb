@@ -14,7 +14,7 @@ Public Class Pendulum_Basics : Inherits TaskParent
         desc = "Build a double pendulum"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim accumulator As Single
 

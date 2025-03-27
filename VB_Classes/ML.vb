@@ -17,7 +17,7 @@ Public Class ML_Basics : Inherits TaskParent
             Exit Sub
         End If
 
-        options.RunOpt()
+        options.Run()
         labels(2) = "ML algorithm selected is " + options.ML_Name
 
         Dim trainMat As New cv.Mat

@@ -43,7 +43,7 @@ Public Class FeatureLess_Canny : Inherits TaskParent
         desc = "Use Canny edges to define featureless regions."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         edges.Run(src)
         dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
@@ -64,7 +64,7 @@ Public Class FeatureLess_Sobel : Inherits TaskParent
         desc = "Use Sobel edges to define featureless regions."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         edges.Run(src)
         dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cv.ThresholdTypes.Binary)

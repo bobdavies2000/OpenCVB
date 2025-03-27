@@ -171,7 +171,7 @@ Public Class Eigen_Input3D : Inherits TaskParent
         desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standalone And task.heartBeat = False Then Exit Sub
         dst2.SetTo(0)

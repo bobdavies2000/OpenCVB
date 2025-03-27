@@ -126,7 +126,7 @@ Public Class GridROI_Sorted : Inherits TaskParent
         desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim meanS As cv.Scalar, stdev As cv.Scalar
         sortedStd.Clear()
@@ -232,7 +232,7 @@ Public Class GridROI_CorrelationMotion : Inherits TaskParent
         desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
@@ -305,7 +305,7 @@ Public Class GridROI_LowStdevCorrelation : Inherits TaskParent
         desc = "Display the correlation coefficients for roi's with low standard deviation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
@@ -387,7 +387,7 @@ Public Class GridROI_LRClick : Inherits TaskParent
         picTag = _pictag
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst0 = src.Clone
         dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
@@ -461,7 +461,7 @@ Public Class GridROI_LRAll : Inherits TaskParent
         desc = "Find all the roi's with high stdev and high correlation between left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

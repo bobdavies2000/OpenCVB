@@ -24,7 +24,7 @@ Public Class Distance_Instant : Inherits TaskParent
         desc = "Distance algorithm basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standaloneTest() Then src = task.depthRGB
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -240,7 +240,7 @@ Public Class Distance_Labels : Inherits TaskParent
         desc = "Distance algorithm basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If standalone Then src = task.noDepthMask
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

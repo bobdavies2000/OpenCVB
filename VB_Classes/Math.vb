@@ -7,7 +7,7 @@ Public Class Math_Subtract : Inherits TaskParent
         desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         Dim bgr = New cv.Scalar(options.blueS, options.greenS, options.redS)
         cv.Cv2.Subtract(bgr, src, dst2) ' or dst2 = bgr - src
@@ -337,7 +337,7 @@ Public Class Math_Stdev : Inherits TaskParent
         desc = "Compute the standard deviation in each segment"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim updateCount As Integer
         lowStdevMask.SetTo(0)

@@ -18,7 +18,7 @@ Public Class InPaint_Basics : Inherits TaskParent
         Return mask
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
         src.CopyTo(dst2)
         Dim mask As cv.Mat = drawRandomLine(dst2)
         cv.Cv2.Inpaint(dst2, mask, dst3, task.lineWidth, If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
@@ -38,7 +38,7 @@ Public Class InPaint_Noise : Inherits TaskParent
         labels(3) = "Repaired Image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
         noise.Run(src) ' create some noise in the result1 image.
         dst2 = noise.dst2
         cv.Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
@@ -59,7 +59,7 @@ Public Class InPaint_Depth : Inherits TaskParent
         desc = "Use Navier-Stokes to fill in the holes in the depth"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         dst2 = src.Clone
         cv.Cv2.Inpaint(src, task.noDepthMask, dst3, 20, If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
@@ -80,7 +80,7 @@ Public Class InPaint_PointCloud : Inherits TaskParent
         desc = "Use Navier-Stokes to fill in the holes in the depth"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         dst2 = task.pointCloud.Clone
 
         Dim split(2) As cv.Mat

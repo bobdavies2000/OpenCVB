@@ -77,7 +77,7 @@ Public Class MSER_Detect : Inherits TaskParent
         desc = "Run the core MSER (Maximally Stable Extremal Region) algorithm"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
 
@@ -219,7 +219,7 @@ Public Class MSER_Hulls : Inherits TaskParent
         desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         mser.Run(src)
         dst2 = mser.dst2
@@ -255,7 +255,7 @@ Public Class MSER_TestSynthetic : Inherits TaskParent
         desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         synth.Run(src)
         dst2 = synth.dst2.Clone()
@@ -325,7 +325,7 @@ Public Class MSER_ROI : Inherits TaskParent
         desc = "Identify the main regions of interest with MSER (Maximally Stable Extremal Region)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Clone
         dst3 = src.Clone
@@ -392,7 +392,7 @@ Public Class MSER_TestExample : Inherits TaskParent
         mser = cv.MSER.Create()
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         Dim regions()() As cv.Point
         Dim boxes() As cv.Rect
@@ -454,13 +454,13 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         optiBase.FindCheckBox("Use grayscale input").Checked = False
-        options.RunOpt()
+        options.Run()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "MSER in a nutshell: intensity threshold, stability, maximize region, adaptive threshold."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
@@ -630,13 +630,13 @@ Public Class MSER_CPP : Inherits TaskParent
     Public classcount As Integer
     Public Sub New()
         optiBase.FindCheckBox("Use grayscale input").Checked = False
-        options.RunOpt()
+        options.Run()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         desc = "C++ version of MSER basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         If task.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,

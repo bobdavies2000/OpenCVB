@@ -12,7 +12,7 @@ Public Class Cluster_Basics : Inherits TaskParent
         desc = "Group the points based on their proximity to each other."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         runFeature(src)
 

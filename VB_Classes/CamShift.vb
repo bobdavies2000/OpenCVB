@@ -52,7 +52,7 @@ Public Class CamShift_RedHue : Inherits TaskParent
         desc = "Find that portion of the image where red dominates"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Options.RunOpt()
+        Options.Run()
 
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         dst3 = hsv.InRange(options.camSBins, New cv.Scalar(180, 255, options.camMax))

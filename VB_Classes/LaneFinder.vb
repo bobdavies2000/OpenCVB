@@ -33,7 +33,7 @@ Public Class LaneFinder_Videos : Inherits TaskParent
         desc = "Read in the videos showing road conditions."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.optionsChanged Then
             Dim inputfile = New FileInfo(task.HomeDir + options.inputName)

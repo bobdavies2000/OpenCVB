@@ -56,7 +56,7 @@ Public Class DepthRegion_Correlation : Inherits TaskParent
         desc = "Create depth region markers using a correlation threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
         Dim minCorr = options.MinCorrelation
 
         dst0.SetTo(0)

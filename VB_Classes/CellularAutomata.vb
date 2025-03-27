@@ -38,7 +38,7 @@ Public Class CellularAutomata_Basics : Inherits TaskParent
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.heartBeat Then
             labels(2) = i18(index)
@@ -261,7 +261,7 @@ Public Class CellularAutomata_All256 : Inherits TaskParent
             labels(2) = createOutcome(options.currentRule) + " options.currentRule = " + CStr(options.currentRule)
             dst2 = cell.createCells(labels(2))
 
-            options.RunOpt()
+            options.Run()
 
             labels(3) = createOutcome(options.currentRule) + " current rule = " + CStr(options.currentRule)
             dst3 = cell.createCells(labels(3))

@@ -10,7 +10,7 @@ Public Class Tracker_Basics : Inherits TaskParent
         desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

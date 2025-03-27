@@ -11,7 +11,7 @@ Public Class TransformationMatrix_Basics : Inherits TaskParent
         desc = "Show the contents of the transformation matrix"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         If task.transformationMatrix IsNot Nothing Then
             Dim t = task.transformationMatrix

@@ -8,7 +8,7 @@ Public Class Gabor_Basics : Inherits TaskParent
         desc = "Explore Gabor kernel"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.RunOpt()
+        options.Run()
 
         dst2 = src.Filter2D(cv.MatType.CV_8UC3, options.gKernel)
     End Sub
