@@ -133,7 +133,7 @@ Public Class Model_CellZoom : Inherits TaskParent
         dst2 = oglData.dst2
         dst3 = oglData.oglD.dst3
 
-        Dim rcX = task.rc
+        Dim rcX = task.rcD
 
         dst1.SetTo(0)
         Dim mask = dst3.InRange(white, white)

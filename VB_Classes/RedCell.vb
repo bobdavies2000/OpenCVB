@@ -9,7 +9,7 @@ Public Class RedCell_Basics : Inherits TaskParent
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
-        Dim rc = task.rc
+        Dim rc = task.rcD
 
         Dim gridID = task.gcMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
@@ -38,9 +38,9 @@ Public Class RedCell_Basics : Inherits TaskParent
 
         strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depth, fmt2) + vbCrLf
 
-        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
-        plot.rc = task.rc
+        Dim tmp = New cv.Mat(task.rcD.mask.Rows, task.rcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+        task.pcSplit(2)(task.rcD.rect).CopyTo(tmp, task.rcD.mask)
+        plot.rc = task.rcD
         plot.Run(tmp)
         dst3 = plot.dst2
     End Sub
@@ -120,10 +120,10 @@ Public Class RedCell_Distance : Inherits TaskParent
 
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
-            Dim selectedMean As cv.Scalar = src(task.rc.rect).Mean(task.rc.mask)
+            Dim selectedMean As cv.Scalar = src(task.rcD.rect).Mean(task.rcD.mask)
             For Each rc In task.rcList
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
-                depthDistance.Add(distance3D(task.rc.depth, rc.depth))
+                depthDistance.Add(distance3D(task.rcD.depth, rc.depth))
             Next
 
             dst1.SetTo(0)
@@ -221,9 +221,9 @@ Public Class RedCell_BasicsPlot : Inherits TaskParent
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
-        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
-        plot.rc = task.rc
+        Dim tmp = New cv.Mat(task.rcD.mask.Rows, task.rcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+        task.pcSplit(2)(task.rcD.rect).CopyTo(tmp, task.rcD.mask)
+        plot.rc = task.rcD
         plot.Run(tmp)
         dst3 = plot.dst2
 
@@ -235,8 +235,8 @@ Public Class RedCell_BasicsPlot : Inherits TaskParent
             dst2 = runRedC(src, labels(2))
             If task.ClickPoint = newPoint Then
                 If task.rcList.Count > 1 Then
-                    task.rc = task.rcList(1)
-                    task.ClickPoint = task.rc.maxDist
+                    task.rcD = task.rcList(1)
+                    task.ClickPoint = task.rcD.maxDist
                 End If
             End If
         End If

@@ -135,15 +135,15 @@ Public Class FitEllipse_RedCloud : Inherits TaskParent
         If not task.heartBeat Then Exit Sub
         dst2 = runRedC(src, labels(2))
 
-        If task.rc.contour Is Nothing Then Exit Sub
+        If task.rcD.contour Is Nothing Then Exit Sub
         fitE.inputPoints.Clear()
-        For Each pt In task.rc.contour
+        For Each pt In task.rcD.contour
             fitE.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
         Next
         fitE.Run(src)
         dst3.SetTo(0)
-        dst3(task.rc.rect).SetTo(white, task.rc.mask)
-        dst3.Rectangle(task.rc.rect, white, task.lineWidth, task.lineType)
-        dst3(task.rc.rect).Ellipse(fitE.box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+        dst3.Rectangle(task.rcD.rect, white, task.lineWidth, task.lineType)
+        dst3(task.rcD.rect).Ellipse(fitE.box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub
 End Class

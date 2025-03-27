@@ -58,7 +58,7 @@ Public Class PCA_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then dst2 = runRedC(src, labels(2))
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
         Dim inputPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
@@ -97,7 +97,7 @@ Public Class PCA_CellMask : Inherits TaskParent
         dst2 = pca.dst2
         labels(2) = pca.labels(2)
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
         If rc.mmZ.maxVal > 0 Then
             pcaPrep.Run(task.pointCloud(rc.rect).Clone)
 

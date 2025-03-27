@@ -668,7 +668,7 @@ Public Class OpenGL_DrawHulls : Inherits TaskParent
 
         hulls.Run(src)
         dst2 = hulls.dst2
-        Dim rcx = task.rc
+        Dim rcx = task.rcD
 
         Dim oglData As New List(Of cv.Point3f)
         oglData.Add(New cv.Point3f)
@@ -727,7 +727,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
         options2.RunOpt()
 
         dst2 = runRedC(src, labels(2))
-        Dim rcx = task.rc
+        Dim rcx = task.rcD
 
         Dim polygonCount As Integer
         Dim oglData As New List(Of cv.Point3f)
@@ -926,7 +926,7 @@ Public Class OpenGL_Profile : Inherits TaskParent
         sides.Run(src)
         dst2 = sides.dst2
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
         Dim contourMat As cv.Mat = cv.Mat.FromPixelData(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
         If rc.contour.Count = 0 Then Exit Sub
         Dim split = contourMat.Split()
@@ -1330,15 +1330,15 @@ Public Class OpenGL_RedCloudCell : Inherits TaskParent
         SetTrueText(specZ.strOut, 3)
 
         If task.ClickPoint = newPoint And task.rcList.Count > 1 Then
-            task.rc = task.rcList(1) ' pick the largest cell
-            task.ClickPoint = task.rc.maxDist
+            task.rcD = task.rcList(1) ' pick the largest cell
+            task.ClickPoint = task.rcD.maxDist
         End If
 
         breakdown.Run(src)
 
         task.ogl.pointCloudInput.SetTo(0)
 
-        task.pointCloud(task.rc.rect).CopyTo(task.ogl.pointCloudInput(task.rc.rect), task.rc.mask)
+        task.pointCloud(task.rcD.rect).CopyTo(task.ogl.pointCloudInput(task.rcD.rect), task.rcD.mask)
         task.ogl.Run(dst2)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
@@ -1648,7 +1648,7 @@ Public Class OpenGL_ColorBin4Way : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst1.SetTo(0)
-        task.color(task.rc.rect).CopyTo(dst1(task.rc.rect), task.rc.mask)
+        task.color(task.rcD.rect).CopyTo(dst1(task.rcD.rect), task.rcD.mask)
 
         dst1.ConvertTo(dst3, cv.MatType.CV_32FC3)
         dst3 = dst3.Normalize(0, 1, cv.NormTypes.MinMax)

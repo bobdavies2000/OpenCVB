@@ -46,7 +46,7 @@ Public Class Hull_Contour : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
-        Dim rc = task.rc
+        Dim rc = task.rcD
 
         Dim jumpList As New List(Of cv.Point)
         For i = 1 To rc.contour.Count - 1

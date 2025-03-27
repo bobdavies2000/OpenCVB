@@ -43,9 +43,10 @@ Public Class Line_Basics : Inherits TaskParent
             If histArray(i) Then task.lpList.RemoveAt(i)
         Next
 
-        For i = 0 To task.lpList.Count - 1
-            task.lpList(i).age += 1
-            newList.Add(task.lpList(i))
+        For Each lp In task.lpList
+            lp.age += 1
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            newList.Add(lp)
         Next
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)

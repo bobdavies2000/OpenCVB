@@ -58,7 +58,7 @@ Public Class Resize_Proportional : Inherits TaskParent
         If standaloneTest() Then
             options.RunOpt()
             dst2 = runRedC(src, labels(2))
-            src = src(task.rc.rect)
+            src = src(task.rcD.rect)
         End If
 
         Dim newSize As cv.Size

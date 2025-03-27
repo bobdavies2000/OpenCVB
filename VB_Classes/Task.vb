@@ -19,10 +19,12 @@ Public Class VBtask : Implements IDisposable
 
     Public gcMap As New cv.Mat ' grid cell map
     Public fpMap As New cv.Mat ' feature map
+    Public fcsMap As New cv.Mat ' line-based feature coordinate system (FCS) map
     Public rcMap As cv.Mat ' redColor map
     Public lpMap As cv.Mat ' lpData map (lines)
     Public gcCell As gcData
-    Public rc As New rcData
+    Public rcD As New rcData
+    Public lpD As New lpData
 
     Public cellSize As Integer
     Public tilesPerCol As Integer
@@ -611,10 +613,10 @@ Public Class VBtask : Implements IDisposable
         If rcList.Count = 0 Then Exit Sub
         If ClickPoint = ptNew And rcList.Count > 1 Then ClickPoint = rcList(1).maxDist
         Dim index = cellMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
-        rc = rcList(index)
+        task.rcD = rcList(index)
         If index > 0 And index < rcList.Count Then
             ' ClickPoint = rcList(index).maxDist
-            rc = rcList(index)
+            task.rcD = rcList(index)
         End If
     End Sub
     Public Sub setSelectedCell()
@@ -625,11 +627,11 @@ Public Class VBtask : Implements IDisposable
         Dim index = rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
         If index > 0 And index < rcList.Count Then
             ' ClickPoint = rcList(index).maxDist
-            rc = rcList(index)
-            task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            task.rcD = rcList(index)
+            task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
-            If rcList.Count > 1 Then rc = rcList(1)
+            If rcList.Count > 1 Then task.rcD = rcList(1)
         End If
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)

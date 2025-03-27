@@ -556,6 +556,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public color As cv.Vec3f
     Public index As Integer
+    Public gcIndex As Integer
+    Public facets As New List(Of cv.Point)
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
         p2 = _p2
@@ -575,9 +577,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
         length = p1.DistanceTo(p2)
         age = 1
-        Dim index = task.gcMap.Get(Of Integer)(center.Y, center.X)
-        depth = task.gcList(index).depth
-        color = task.gcList(index).color
+        gcIndex = task.gcMap.Get(Of Integer)(center.Y, center.X)
+        depth = task.gcList(gcIndex).depth
+        color = task.gcList(gcIndex).color
     End Sub
     Sub New()
         p1 = New cv.Point2f()

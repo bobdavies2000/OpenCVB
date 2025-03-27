@@ -10,7 +10,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
         dst2.SetTo(0)
         For Each rc As rcData In task.rcList
             DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If rc.index = task.rc.index Then DrawContour(dst2(rc.rect), rc.contour, white, -1)
+            If rc.index = task.rcD.index Then DrawContour(dst2(rc.rect), rc.contour, white, -1)
         Next
     End Sub
 End Class

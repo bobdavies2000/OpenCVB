@@ -290,7 +290,7 @@ Public Class Contour_SidePoints : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
-        Dim rc = task.rc
+        Dim rc = task.rcD
 
         If sides.corners.Count > 0 And task.heartBeat Then
             ptLeft = sides.corners(1)
@@ -426,7 +426,7 @@ Public Class Contour_Outline : Inherits TaskParent
         dst3.SetTo(0)
 
         Dim newContour As New List(Of cv.Point)
-        rc = task.rc
+        rc = task.rcD
         If rc.contour.Count = 0 Then Exit Sub
         Dim p1 As cv.Point, p2 As cv.Point
         newContour.Add(p1)
@@ -457,7 +457,7 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedC(src, labels(2))
-            rc = task.rc
+            rc = task.rcD
             DrawContour(dst2(rc.rect), rc.contour, white, -1)
         End If
 
@@ -552,14 +552,14 @@ Public Class Contour_Compare : Inherits TaskParent
 
         dst2 = runRedC(src, labels(2))
 
-        Dim tmp = task.rc.mask.Clone
+        Dim tmp = task.rcD.mask.Clone
 
         Dim allContours As cv.Point()()
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, cv.MatType.CV_32SC1)
         cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
 
         dst3.SetTo(0)
-        cv.Cv2.DrawContours(dst3(task.rc.rect), allContours, -1, cv.Scalar.Yellow)
+        cv.Cv2.DrawContours(dst3(task.rcD.rect), allContours, -1, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -581,7 +581,7 @@ Public Class Contour_RedCloudCorners : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedC(src, labels(2))
-            rc = task.rc
+            rc = task.rcD
         End If
 
         dst3.SetTo(0)
@@ -680,7 +680,7 @@ Public Class Contour_Smoothing : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
 
         dst1.SetTo(0)
         dst3.SetTo(0)

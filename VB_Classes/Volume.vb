@@ -8,7 +8,7 @@ Public Class Volume_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedC(src, labels(2))
-            rc = task.rc
+            rc = task.rcD
         End If
 
         Dim xList As New List(Of Single)

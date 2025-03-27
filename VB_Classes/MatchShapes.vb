@@ -82,7 +82,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
             hulls.Run(task.color)
             If task.rcList.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
-            rc = task.rc
+            rc = task.rcD
         End If
 
         dst3.SetTo(0)
@@ -138,7 +138,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
             If task.rcList.Count = 0 Then Exit Sub
             addTour.rcList = New List(Of rcData)(task.rcList)
             addTour.Run(src)
-            rc = task.rc
+            rc = task.rcD
         End If
 
         If task.heartBeat And myStandalone Then dst3.SetTo(0)
@@ -195,7 +195,7 @@ Public Class MatchShapes_Hulls : Inherits TaskParent
         dst2 = hulls.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
-        Dim rcX = task.rc
+        Dim rcX = task.rcD
 
         For Each rc In task.rcList
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
@@ -228,7 +228,7 @@ Public Class MatchShapes_Contours : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
         If task.heartBeat Then dst3.SetTo(0)
 
-        Dim rcX = task.rc
+        Dim rcX = task.rcD
 
         For Each rc In task.rcList
             If rc.contour Is Nothing Then Continue For

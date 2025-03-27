@@ -208,13 +208,13 @@ Public Class Fractal_Dimension : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
         dst3.SetTo(0)
 
-        Static rect = New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
+        Static rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
         If task.optionsChanged Or task.mouseClickFlag Then
-            rect = New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
+            rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
         End If
 
-        If task.rc.rect.Width = 0 Or task.rc.rect.Height = 0 Then Exit Sub
-        task.rc.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)))
+        If task.rcD.rect.Width = 0 Or task.rcD.rect.Height = 0 Then Exit Sub
+        task.rcD.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)))
         If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
         dst3.Rectangle(rect, white, task.lineWidth, task.lineType)
     End Sub

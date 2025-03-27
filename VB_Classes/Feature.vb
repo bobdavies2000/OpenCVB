@@ -1,6 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes.OptionParent
+Imports OpenCvSharp
+Imports System.Windows.Documents
 Public Class Feature_Basics : Inherits TaskParent
     Dim harris As Corners_HarrisDetector_CPP
     Dim FAST As Corners_Basics
@@ -761,7 +763,16 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         delaunay.inputPoints = task.features
         delaunay.Run(src)
 
-        For Each pt In delaunay.ptList
+        Dim ptList As New List(Of cv.Point)
+        For Each facets In delaunay.facetList
+            For Each pt In facets
+                If pt.X >= 0 And pt.X < dst2.Width And pt.Y >= 0 And pt.Y < dst2.Height Then
+                    ptList.Add(New cv.Point(pt.X, pt.Y))
+                End If
+            Next
+        Next
+
+        For Each pt In ptList
             Dim index = task.rcMap.Get(Of Byte)(pt.Y, pt.X)
             If index = 0 Then Continue For
             Dim rc = task.rcList(index)
@@ -782,7 +793,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         Next
 
         If standalone Then
-            Dim rc = task.rcList(task.rc.index)
+            Dim rc = task.rcList(task.rcD.index)
             task.color.Rectangle(rc.rect, task.highlight, task.lineWidth)
             For Each pt In rc.ptFacets
                 DrawCircle(task.color, pt, task.DotSize, task.highlight)
@@ -819,7 +830,7 @@ Public Class Feature_GridPoints : Inherits TaskParent
         labels(2) = task.redC.labels(2)
 
         If standalone Then
-            Dim rc = task.rcList(task.rc.index)
+            Dim rc = task.rcList(task.rcD.index)
             dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
             For Each pt In rc.ptList
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)

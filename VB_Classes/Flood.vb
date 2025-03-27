@@ -33,8 +33,8 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
 
         If task.ClickPoint = newPoint Then
             If task.rcList.Count > 1 Then
-                task.rc = task.rcList(1)
-                task.ClickPoint = task.rc.maxDist
+                task.rcD = task.rcList(1)
+                task.ClickPoint = task.rcD.maxDist
             End If
         End If
     End Sub

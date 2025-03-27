@@ -9,23 +9,23 @@ Public Class Triangle_Basics : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         If task.rcList.Count <= 1 Then Exit Sub
-        task.rc = task.rcList(1)
+        task.rcD = task.rcList(1)
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
-        For Each pt In task.rc.contour
-            pt = New cv.Point(pt.X + task.rc.rect.X, pt.Y + task.rc.rect.Y)
+        For Each pt In task.rcD.contour
+            pt = New cv.Point(pt.X + task.rcD.rect.X, pt.Y + task.rcD.rect.Y)
             Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
             If vec.Z = 0 Then
-                vec = getWorldCoordinates(New cv.Point3f(pt.X, pt.Y, task.rc.depth))
+                vec = getWorldCoordinates(New cv.Point3f(pt.X, pt.Y, task.rcD.depth))
             End If
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             pt3D.Add(vec)
         Next
 
-        Dim c3D = task.pointCloud.Get(Of cv.Point3f)(task.rc.maxDist.Y, task.rc.maxDist.X)
+        Dim c3D = task.pointCloud.Get(Of cv.Point3f)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
         triangles.Clear()
-        Dim color3D As New cv.Point3f(task.rc.color(0), task.rc.color(1), task.rc.color(2))
+        Dim color3D As New cv.Point3f(task.rcD.color(0), task.rcD.color(1), task.rcD.color(2))
         For i = 0 To pt3D.Count - 1
             triangles.Add(color3D)
             triangles.Add(c3D)
@@ -52,7 +52,7 @@ Public Class Triangle_HullContour : Inherits TaskParent
         hulls.Run(src)
         dst2 = hulls.dst2
         If task.rcList.Count <= 1 Then Exit Sub
-        Dim rc = task.rc
+        Dim rc = task.rcD
 
         rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
 
@@ -85,7 +85,7 @@ Public Class Triangle_Cell : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         If task.rcList.Count <= 1 Then Exit Sub
-        Dim rc = task.rc
+        Dim rc = task.rcD
         If rc.index = 0 Then Exit Sub
 
         dst3.SetTo(0)
@@ -139,7 +139,7 @@ Public Class Triangle_Mask : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         If task.rcList.Count <= 1 Then Exit Sub
-        Dim rc = task.rc
+        Dim rc = task.rcD
         If rc.index = 0 Then Exit Sub
 
         dst3.SetTo(0)

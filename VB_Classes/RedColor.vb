@@ -293,7 +293,7 @@ Public Class RedColor_ShapeCorrelation : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
         If rc.contour.Count > 0 Then
             Dim shape = shapeCorrelation(rc.contour)
             strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
@@ -388,7 +388,7 @@ Public Class RedColor_PlaneFromContour : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -419,7 +419,7 @@ Public Class RedColor_PlaneFromMask : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then dst2 = runRedC(src, labels(2))
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
         Dim fitPoints As New List(Of cv.Point3f)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
@@ -513,7 +513,7 @@ Public Class RedColor_LikelyFlatSurfaces : Inherits TaskParent
             End If
         Next
 
-        Dim rcX = task.rc
+        Dim rcX = task.rcD
         SetTrueText("mean depth = " + Format(rcX.depth, "0.0"), 3)
         labels(2) = task.redC.labels(2)
     End Sub
@@ -534,7 +534,7 @@ Public Class RedColor_PlaneEq3D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
         If rc.mmZ.maxVal Then
             eq.rc = rc
             eq.Run(src)
@@ -1365,7 +1365,7 @@ Public Class RedColor_Features : Inherits TaskParent
 
         dst2 = runRedC(src, labels(2))
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
 
         dst0 = task.color
         Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
@@ -1416,7 +1416,7 @@ Public Class RedColor_Gaps : Inherits TaskParent
         dst3 = frames.dst2
 
         If task.rcList.Count > 0 Then
-            dst2(task.rc.rect).SetTo(white, task.rc.mask)
+            dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
 
         If task.rcList.Count > 0 Then

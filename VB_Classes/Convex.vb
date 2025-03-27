@@ -21,7 +21,7 @@ Public Class Convex_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.RunOpt()
 
-        Dim hullList = task.rc.contour
+        Dim hullList = task.rcD.contour
         If standaloneTest() Then
             If Not task.heartBeat Then Exit Sub
             hullList = buildRandomHullPoints()
@@ -59,12 +59,12 @@ Public Class Convex_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
-        If task.rc.contour IsNot Nothing Then
+        If task.rcD.contour IsNot Nothing Then
             convex.Run(src)
 
             dst3.SetTo(0)
-            dst3(task.rc.rect) = convex.dst2(New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height))
-            DrawCircle(dst3, task.rc.maxDist, task.DotSize, white)
+            dst3(task.rcD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height))
+            DrawCircle(dst3, task.rcD.maxDist, task.DotSize, white)
         End If
     End Sub
 End Class
@@ -145,7 +145,7 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
         labels(1) = task.redC.labels(2)
         dst3 = convex.dst3
 
-        Dim rc = task.rc
+        Dim rc = task.rcD
         If rc.mask Is Nothing Then Exit Sub
 
         dst2 = rc.mask.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)

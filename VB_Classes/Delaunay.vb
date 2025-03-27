@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Delaunay_Basics : Inherits TaskParent
     Public inputPoints As New List(Of cv.Point2f)
     Public facetList As New List(Of List(Of cv.Point))
-    Public ptList As New List(Of cv.Point)
-    Dim randEnum As New Random_Enumerable
+    Dim random As New Random_Basics
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
@@ -11,8 +10,8 @@ Public Class Delaunay_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
-            randEnum.Run(src)
-            inputPoints = New List(Of cv.Point2f)(randEnum.points)
+            random.Run(src)
+            inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
@@ -30,16 +29,6 @@ Public Class Delaunay_Basics : Inherits TaskParent
 
             dst3.FillConvexPoly(nextFacet, i, task.lineType)
             facetList.Add(nextFacet)
-        Next
-
-        ptList.Clear()
-        For i = 0 To facets.Length - 1
-            For j = 0 To facets(i).Length - 1
-                Dim pt = facets(i)(j)
-                If pt.X >= 0 And pt.X < dst2.Width And pt.Y >= 0 And pt.Y < dst2.Height Then
-                    ptList.Add(New cv.Point(pt.X, pt.Y))
-                End If
-            Next
         Next
 
         dst2 = ShowPalette(dst3)

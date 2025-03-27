@@ -76,7 +76,7 @@ Public Class Line3D_Correlation : Inherits TaskParent
         gpoints.Run(src)
 
         Dim xList As New List(Of Single), yList As New List(Of Single), zList As New List(Of Single)
-        For Each pt In task.rc.ptList
+        For Each pt In task.rcD.ptList
             Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
             xList.Add(vec.X)
             yList.Add(vec.Y)
@@ -95,7 +95,7 @@ Public Class Line3D_Correlation : Inherits TaskParent
                      "Y to Z correlation = " + Format(correlationYZ, fmt3) + vbCrLf
         End If
         If task.heartBeat Then SetTrueText(strOut, 3)
-        For Each pt In task.rc.ptList
+        For Each pt In task.rcD.ptList
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
     End Sub

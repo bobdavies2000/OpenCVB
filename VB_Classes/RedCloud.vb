@@ -126,8 +126,8 @@ Public Class RedCloud_BasicsHist : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         If task.heartBeat Then
-            Dim depth As cv.Mat = task.pcSplit(2)(task.rc.rect)
-            depth.SetTo(0, task.noDepthMask(task.rc.rect))
+            Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)
