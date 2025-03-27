@@ -3,20 +3,21 @@ Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Dim lines As New Line_BasicsRaw
     Public Sub New()
+        task.lpMap = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask.  Results are in task.lplist."
-        task.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
     End Sub
     Private Function getLineCounts(lpList As List(Of lpData)) As Single()
         Dim histarray(lpList.Count - 1) As Single
         If lpList.Count > 0 Then
             Dim histogram As New cv.Mat
-            task.lpMap.SetTo(0)
+            dst1.SetTo(0)
             For Each lp In lpList
-                task.lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
             Next
 
-            cv.Cv2.CalcHist({task.lpMap}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(1, lpList.Count)})
+            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(1, lpList.Count)})
 
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
         End If
@@ -54,10 +55,12 @@ Public Class Line_Basics : Inherits TaskParent
 
         task.lpList.Clear()
         dst2 = src
+        task.lpMap.SetTo(0)
         For Each lp In sortlines.Values
             lp.index = task.lpList.Count
             task.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            task.lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
         Next
         labels(2) = CStr(task.lpList.Count) + " lines were found."
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."

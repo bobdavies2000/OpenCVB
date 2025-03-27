@@ -73,22 +73,21 @@ End Class
 
 
 Public Class LineTrack_Depth : Inherits TaskParent
-    Dim lTrack As New LineTrack_Basics
     Public Sub New()
         desc = "Track lines and separate them by depth value."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         task.lines.Run(src)
 
-        dst3.SetTo(0)
+        dst2.SetTo(0)
+        Dim lp As New lpData
         For Each lp In task.lpList
-            Dim index1 = task.gcMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-            Dim index2 = task.gcMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-            Dim gc1 = task.gcList(index1)
-            Dim gc2 = task.gcList(index2)
-
-            dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-            SetTrueText(Format(lp.depth, fmt1), lp.p1, 3)
+            Dim gc = task.gcList(task.gcMap.Get(Of Integer)(lp.center.Y, lp.center.X))
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
         Next
+
+        Dim index = task.lpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        lp = task.lpList(index)
+        task.color.Line(lp.p1, lp.p2, white, task.lineWidth + 2, task.lineType)
     End Sub
 End Class

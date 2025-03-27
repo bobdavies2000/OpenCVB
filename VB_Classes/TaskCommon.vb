@@ -598,6 +598,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public slope As Single
     Public depth As Single
     Public length As Single
+    Public color As cv.Vec3f
     Public index As Integer
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
@@ -618,6 +619,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
         length = p1.DistanceTo(p2)
         age = 1
+        Dim index = task.gcMap.Get(Of Integer)(center.Y, center.X)
+        depth = task.gcList(index).depth
+        color = task.gcList(index).color
     End Sub
     Sub New()
         p1 = New cv.Point2f()
@@ -639,7 +643,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If p2.Y < 0 Then p2.Y = 0
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
         center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-        depth = task.gcList(task.gcMap.Get(Of Integer)(center.Y, center.X)).depth
         Return (p1, p2)
     End Function
     Public Function compare(mp As lpData) As Boolean
