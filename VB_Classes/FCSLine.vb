@@ -2,7 +2,7 @@
 Public Class FCSLine_Basics : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
-        task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Build a feature coordinate system (FCS) based on lines, not features."
     End Sub
@@ -27,19 +27,13 @@ Public Class FCSLine_Basics : Inherits TaskParent
             Dim lp = task.lpList(i)
             lp.facets = delaunay.facetList(i)
 
-
-
-
-
-
-            lp.color = task.gcList(lp.gcIndex).color
             DrawContour(dst1, lp.facets, 255, task.lineWidth)
             DrawContour(task.fcsMap, lp.facets, lp.index)
             DrawContour(dst3, lp.facets, lp.color)
             task.lpList(i) = lp
         Next
 
-        Dim index = task.fcsMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim index = task.fcsMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         task.lpD = task.lpList(index)
         DrawContour(dst2, task.lpD.facets, white, task.lineWidth)
 
@@ -47,3 +41,9 @@ Public Class FCSLine_Basics : Inherits TaskParent
         labels(3) = delaunay.labels(2)
     End Sub
 End Class
+
+
+
+
+
+

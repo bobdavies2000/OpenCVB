@@ -21,7 +21,6 @@ Public Class VBtask : Implements IDisposable
     Public fpMap As New cv.Mat ' feature map
     Public fcsMap As New cv.Mat ' line-based feature coordinate system (FCS) map
     Public rcMap As cv.Mat ' redColor map
-    Public lpMap As cv.Mat ' lpData map (lines)
     Public gcCell As gcData
     Public rcD As New rcData
     Public lpD As New lpData

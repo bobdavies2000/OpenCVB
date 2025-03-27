@@ -33,7 +33,7 @@ Public Class LineTrack_Map : Inherits TaskParent
     Dim lTrack As New LineTrack_Basics
     Public Sub New()
         task.gOptions.CrossHairs.Checked = False
-        desc = "Show the gcmap (grid cells) and lpMap (lines) "
+        desc = "Show the gcmap (grid cells) and fcsMap (lines) "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lTrack.Run(src)
@@ -86,8 +86,9 @@ Public Class LineTrack_Depth : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
         Next
 
-        Dim index = task.lpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        lp = task.lpList(index)
-        task.color.Line(lp.p1, lp.p2, white, task.lineWidth + 2, task.lineType)
+        ' redo this when the fcsMap is ready.
+        'Dim index = task.lpMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        'lp = task.lpList(index)
+        'task.color.Line(lp.p1, lp.p2, white, task.lineWidth + 2, task.lineType)
     End Sub
 End Class

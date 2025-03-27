@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Dim lines As New Line_BasicsRaw
     Public Sub New()
-        task.lpMap = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask.  Results are in task.lplist."
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
@@ -56,12 +55,10 @@ Public Class Line_Basics : Inherits TaskParent
 
         task.lpList.Clear()
         dst2 = src
-        task.lpMap.SetTo(0)
         For Each lp In sortlines.Values
             lp.index = task.lpList.Count
             task.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            task.lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
         Next
         labels(2) = CStr(task.lpList.Count) + " lines were found."
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
