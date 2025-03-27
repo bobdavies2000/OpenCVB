@@ -911,7 +911,7 @@ End Class
 
 Public Class Feature_StableVisual : Inherits TaskParent
     Dim noMotion As New Feature_NoMotion
-    Public fpStable As New List(Of fpData)
+    Public fpStable As New List(Of fcsData)
     Public ptStable As New List(Of cv.Point)
     Public Sub New()
         desc = "Show only features present on this and the previous frame."
@@ -947,7 +947,7 @@ End Class
 
 Public Class Feature_StableVisualize : Inherits TaskParent
     Dim noMotion As New Feature_NoMotion
-    Public fpStable As New List(Of fpData)
+    Public fpStable As New List(Of fcsData)
     Public ptStable As New List(Of cv.Point)
     Public Sub New()
         desc = "Identify features that consistently present in the image - with motion ignored."
@@ -968,10 +968,10 @@ Public Class Feature_StableVisualize : Inherits TaskParent
         lastFeatures = New List(Of cv.Point)(stable)
         labels(2) = noMotion.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
 
-        Dim fpNew As New List(Of fpData)
+        Dim fpNew As New List(Of fcsData)
         Dim ptNew As New List(Of cv.Point)
         For Each pt In stable
-            Dim fp As New fpData
+            Dim fp As New fcsData
             If ptStable.Contains(pt) Then
                 Dim index = ptStable.IndexOf(pt)
                 fp = fpStable(index)
@@ -986,7 +986,7 @@ Public Class Feature_StableVisualize : Inherits TaskParent
             ptNew.Add(pt)
         Next
 
-        fpStable = New List(Of fpData)(fpNew)
+        fpStable = New List(Of fcsData)(fpNew)
         ptStable = New List(Of cv.Point)(ptNew)
 
         dst3.SetTo(0)

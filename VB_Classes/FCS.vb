@@ -1,6 +1,4 @@
-﻿Imports System.Web.UI
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim delaunay As New FCS_Delaunay
     Dim match As New Match_Basics
@@ -30,7 +28,6 @@ Public Class FCS_Basics : Inherits TaskParent
                 ' is this the same point?
                 match.template = fpLastSrc(fpLast.rect)
                 match.Run(src(fpLast.rect))
-                fp.correlation = match.correlation
                 If match.correlation > options.MinCorrelation Then
                     task.fpList(i) = fpUpdate(fp, fpLast)
                     matchCount += 1
@@ -709,8 +706,6 @@ Public Class FCS_Delaunay : Inherits TaskParent
             fp.depthMax = mm.maxVal
             fp.colorTracking = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
 
-            cv.Cv2.MeanStdDev(task.color(fp.rect), fp.colorMean, fp.colorStdev, fp.mask)
-
             fp.age = 1
             task.fpList.Add(fp)
             DrawContour(task.fpOutline, fp.facets, 255, 1)
@@ -797,12 +792,6 @@ Public Class FCS_Info : Inherits TaskParent
                                             Format(vec.Z, fmt1) + vbCrLf
         strOut += "Depth min/mean/max: " + Format(fp.depthMin, fmt1) + "/" + Format(fp.depthMean, fmt1) + "/" +
                                            Format(fp.depthMax, fmt1) + vbCrLf
-        strOut += "Color mean B/G/R: " + Format(fp.colorMean(0), fmt1) + "/" +
-                                         Format(fp.colorMean(1), fmt1) + "/" +
-                                         Format(fp.colorMean(2), fmt1) + vbCrLf
-        strOut += "Color Stdev B/G/R: " + Format(fp.colorStdev(0), fmt1) + "/" +
-                                          Format(fp.colorStdev(1), fmt1) + "/" +
-                                          Format(fp.colorStdev(2), fmt1) + vbCrLf
         strOut += vbCrLf
         strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
         For i = 0 To fp.facets.Count - 1
@@ -926,14 +915,13 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
     Public Sub New()
         task.gOptions.debugSyncUI.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
-        optiBase.FindSlider("KNN Dimension").Value = 6
+        optiBase.FindSlider("KNN Dimension").Value = 3
         desc = "Can we distinguish each feature point cell with color, depth, and grid."
     End Sub
     Private Function buildEntry(fp As fpXData) As List(Of Single)
         Dim dataList As New List(Of Single)
         For i = 0 To dimension - 1
-            dataList.Add(Choose(i + 1, fp.depthMean, fp.depthMin, fp.depthMax,
-                                       fp.colorMean(0), fp.colorMean(1), fp.colorMean(2)))
+            dataList.Add(Choose(i + 1, fp.depthMean, fp.depthMin, fp.depthMax))
         Next
         Return dataList
     End Function
@@ -994,7 +982,6 @@ Public Class FCS_Tracker : Inherits TaskParent
     Dim fcs As New FCS_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(3) = "dst2 is a tracking color while dst3 is the color mean"
         desc = "Track the selected cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1013,7 +1000,6 @@ Public Class FCS_Tracker : Inherits TaskParent
                 task.fpList(i) = fp
             End If
             dst2(fp.rect).SetTo(fp.colorTracking, fp.mask)
-            dst3(fp.rect).SetTo(fp.colorMean, fp.mask)
 
             colors.Add(fp.colorTracking)
         Next

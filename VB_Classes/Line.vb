@@ -24,7 +24,7 @@ Public Class Line_Basics : Inherits TaskParent
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(task.grayMotion)
+        lines.Run(task.grayStable)
 
         Dim histArray = getLineCounts(lines.lpList)
         For i = histArray.Count - 1 To 0 Step -1

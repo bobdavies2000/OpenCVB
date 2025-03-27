@@ -84,7 +84,7 @@ Public Class VBtask : Implements IDisposable
 
     Public color As New cv.Mat
     Public gray As New cv.Mat
-    Public grayMotion As New cv.Mat
+    Public grayStable As New cv.Mat
     Public leftView As New cv.Mat
     Public rightView As New cv.Mat
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
@@ -846,7 +846,7 @@ Public Class VBtask : Implements IDisposable
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.optionsChanged Then grayMotion = gray.Clone Else gray.CopyTo(grayMotion, motionMask)
+        If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
         task.colorizer.Run(src)
 

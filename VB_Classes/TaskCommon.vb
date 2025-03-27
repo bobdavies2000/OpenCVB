@@ -301,50 +301,6 @@ End Structure
 
 
 
-Public Class fpXData ' feature point -  excessive - trim this to fpData...
-    Public index As Integer
-    Public indexLast As Integer = -1
-    Public age As Integer
-    Public ID As Single
-    Public travelDistance As Single
-    Public periph As Boolean
-    Public mask As cv.Mat
-    Public rect As cv.Rect
-    Public facet2f As List(Of cv.Point2f)
-    Public facets As List(Of cv.Point)
-    Public pt As cv.Point
-    Public ptHistory As List(Of cv.Point)
-    Public ptCenter As cv.Point
-    Public rcIndex As Integer
-    Public nabeList As List(Of Integer)
-    Public nabeRect As cv.Rect
-    Public depthMean As Single
-    Public depthMin As Single
-    Public depthMax As Single
-    Public colorMean As cv.Scalar
-    Public colorTracking As cv.Scalar
-    Public colorStdev As cv.Scalar
-    Public correlation As Single
-    Sub New()
-        mask = New cv.Mat
-        facet2f = New List(Of cv.Point2f)
-        facets = New List(Of cv.Point)
-        ptHistory = New List(Of cv.Point)
-        nabeList = New List(Of Integer)
-    End Sub
-End Class
-
-
-
-
-Public Class fpData ' feature point
-    Public index As Integer
-    Public age As Integer
-    Public pt As cv.Point
-End Class
-
-
-
 
 
 Public Structure coinPoints
@@ -649,4 +605,55 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function
+End Class
+
+
+
+
+
+Public Class fcsData ' feature coordinate system (Line centers are the input)
+    Public index As Integer
+    Public age As Integer
+    Public pt As cv.Point
+    Sub New()
+
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class fpXData ' feature point -  excessive - trim this to fpData...
+    Public index As Integer
+    Public indexLast As Integer = -1
+    Public age As Integer
+    Public ID As Single
+    Public travelDistance As Single
+    Public periph As Boolean
+    Public mask As cv.Mat
+    Public rect As cv.Rect
+    Public facet2f As List(Of cv.Point2f)
+    Public facets As List(Of cv.Point)
+    Public pt As cv.Point
+    Public ptHistory As List(Of cv.Point)
+    Public ptCenter As cv.Point
+    Public center As cv.Point
+    Public rcIndex As Integer
+    Public nabeList As List(Of Integer)
+    Public nabeRect As cv.Rect
+    Public depthMean As Single
+    Public depthMin As Single
+    Public depthMax As Single
+    Public gcIndex As Integer
+
+    Public colorTracking As cv.Scalar
+    Sub New()
+        mask = New cv.Mat
+        facet2f = New List(Of cv.Point2f)
+        facets = New List(Of cv.Point)
+        ptHistory = New List(Of cv.Point)
+        nabeList = New List(Of Integer)
+    End Sub
 End Class

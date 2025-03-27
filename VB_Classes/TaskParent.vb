@@ -691,8 +691,7 @@ Public Class TaskParent : Implements IDisposable
         Catch ex As Exception
         End Try
     End Sub
-    Public Sub DrawContour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
-        If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
+    Public Sub DrawContour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1)
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cv.Point))
         listOfPoints.Add(contour)
