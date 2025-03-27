@@ -2146,41 +2146,6 @@ End Class
 
 
 
-Public Class OpenGL_QuadCorrelationMask : Inherits TaskParent
-    Dim corrMask As New GridCell_CorrelationMask
-    Dim ogl As New OpenGL_QuadCompare
-    Public Sub New()
-        desc = "Show only the pointcloud portions that have a correlation greater than the threshold."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        corrMask.Run(src)
-        dst2 = corrMask.dst2
-        dst3 = corrMask.dst3
-        labels = corrMask.labels
-
-        Dim minCorr = task.gCell.options.correlationThreshold
-        Dim count As Integer
-        For i = 0 To task.gcList.Count - 1
-            Dim gc = task.gcList(i)
-            If gc.correlation < minCorr Then
-                gc.depth = 0
-                task.gcList(i) = gc
-            End If
-            If gc.depth = 0 Then count += 1
-        Next
-        task.pointCloud = corrMask.dst2
-        If count < task.gcList.Count Then
-            ogl.Run(src)
-        Else
-            SetTrueText("With a correlation threshold of " + Format(minCorr, fmt3) + " there are no remaining cells.", 3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class OpenGL_PCdiff : Inherits TaskParent
     Dim filter As New PCdiff_Points
     Public Sub New()

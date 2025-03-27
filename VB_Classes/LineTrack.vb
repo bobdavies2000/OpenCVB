@@ -75,19 +75,10 @@ End Class
 Public Class LineTrack_Depth : Inherits TaskParent
     Dim lTrack As New LineTrack_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        If standalone Then task.gOptions.CrossHairs.Checked = False
-        desc = "Track lines and separate them by depth."
+        desc = "Track lines and separate them by depth value."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lTrack.Run(src)
-        dst2 = lTrack.dst2
-
-        For Each lp In task.lpList
-            dst2.Line(lp.p1, lp.p2, black, task.lineWidth, task.lineType)
-        Next
+        task.lines.Run(src)
 
         dst3.SetTo(0)
         For Each lp In task.lpList
@@ -97,7 +88,7 @@ Public Class LineTrack_Depth : Inherits TaskParent
             Dim gc2 = task.gcList(index2)
 
             dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-            ' SetTrueText(Format(proximity, fmt3), lp.p1, 3)
+            SetTrueText(Format(lp.depth, fmt1), lp.p1, 3)
         Next
     End Sub
 End Class

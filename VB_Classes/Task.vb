@@ -13,7 +13,6 @@ Public Class VBtask : Implements IDisposable
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
     Public lpList As New List(Of lpData) ' line pair list
-    Public lpListOld As New List(Of lpDataOld) ' line pair list
     Public gcList As New List(Of gcData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpXData)

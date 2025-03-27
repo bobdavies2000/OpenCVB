@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-
 Imports VB_Classes.TaskParent
 Public Module vbc
     Public task As VBtask
@@ -589,93 +588,6 @@ End Enum
 
 
 
-Public Class lpDataOld ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
-    Public pt As cv.Point ' the point to use when identifying this line
-    Public age As Integer
-    Public p1 As cv.Point2f
-    Public p2 As cv.Point2f
-    Public center As cv.Point2f
-    Public colorIndex As Integer
-    Public slope As Single
-    Public yIntercept As Single
-    Public xIntercept As Single
-    Public rect As cv.Rect
-    Public mask As New cv.Mat
-    Public length As Single
-    Public index As Integer
-    Public mmX As New mmData
-    Public mmY As New mmData
-    Public mmZ As New mmData
-    Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
-        p1 = _p1
-        p2 = _p2
-        If p1.X > p2.X Then
-            p1 = _p2
-            p2 = _p1
-        End If
-        pt = New cv.Point(CInt(p1.X), CInt(p1.Y))
-        p1 = New cv.Point2f(p1.X, p1.Y)
-        p2 = New cv.Point2f(p2.X, p2.Y)
-
-        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-
-        rect = New cv.Rect(p1.X, p1.Y, Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
-        If p1.Y > p2.Y Then rect = New cv.Rect(p1.X, p2.Y, rect.Width, rect.Height)
-        If rect.Width < 2 Then rect.Width = 2
-        If rect.Height < 2 Then rect.Height = 2
-
-        If p1.X = p2.X Then
-            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
-        Else
-            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
-        End If
-
-        length = p1.DistanceTo(p2)
-
-        colorIndex = msRNG.Next(0, 255)
-
-        mask = New cv.Mat(rect.Size, cv.MatType.CV_8U, 0)
-        Dim pt1 As cv.Point, pt2 As cv.Point
-        If slope < 0 Then
-            pt1 = New cv.Point(0, 0)
-            pt2 = New cv.Point(rect.Width, rect.Height)
-        Else
-            pt1 = New cv.Point(rect.Width, 0)
-            pt2 = New cv.Point(0, rect.Height)
-        End If
-        mask.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
-        age = 1
-    End Sub
-    Sub New()
-        p1 = New cv.Point2f()
-        p2 = New cv.Point2f()
-    End Sub
-    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As (cv.Point, cv.Point)
-        Dim perpSlope = -1 / slope
-        Dim angleRadians As Double = Math.Atan(perpSlope)
-        Dim xShift = distance * Math.Cos(angleRadians)
-        Dim yShift = distance * Math.Sin(angleRadians)
-        Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
-        Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
-        If p1.X < 0 Then p1.X = 0
-        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
-        If p1.Y < 0 Then p1.Y = 0
-        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
-        If p2.X < 0 Then p2.X = 0
-        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
-        If p2.Y < 0 Then p2.Y = 0
-        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-        Return (p1, p2)
-    End Function
-    Public Function compare(mp As lpData) As Boolean
-        If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
-        Return False
-    End Function
-End Class
-
-
-
-
 
 
 Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
@@ -684,6 +596,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public slope As Single
+    Public depth As Single
     Public length As Single
     Public index As Integer
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
@@ -726,6 +639,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If p2.Y < 0 Then p2.Y = 0
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
         center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+        depth = task.gcList(task.gcMap.Get(Of Integer)(center.Y, center.X)).depth
         Return (p1, p2)
     End Function
     Public Function compare(mp As lpData) As Boolean
