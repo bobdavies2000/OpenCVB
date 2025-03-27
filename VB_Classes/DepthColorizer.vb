@@ -6,7 +6,9 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.ColorizedDepth.Checked Then
+        If task.gOptions.ColorGrid.Checked Then
+            task.depthRGB = task.gCell.dst2
+        ElseIf task.gOptions.ColorizedDepth.Checked Then
             src = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
             Dim depthNorm As cv.Mat = src * 255 / task.MaxZmeters
             depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)

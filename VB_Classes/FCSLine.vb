@@ -7,6 +7,9 @@ Public Class FCSLine_Basics : Inherits TaskParent
         desc = "Build a feature coordinate system (FCS) based on lines, not features."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lastMap = task.fcsMap.Clone
+        Dim lastCount = task.lpList.Count
+
         task.lines.Run(src)
         dst2 = task.lines.dst2
 
@@ -23,14 +26,18 @@ Public Class FCSLine_Basics : Inherits TaskParent
         For i = 0 To delaunay.facetList.Count - 1
             Dim lp = task.lpList(i)
             lp.facets = delaunay.facetList(i)
-            task.lpList(i) = lp
 
-            DrawContour(task.fcsMap, lp.facets, lp.index)
+
+
+
+
+
+            lp.color = task.gcList(lp.gcIndex).color
             DrawContour(dst1, lp.facets, 255, task.lineWidth)
+            DrawContour(task.fcsMap, lp.facets, lp.index)
+            DrawContour(dst3, lp.facets, lp.color)
+            task.lpList(i) = lp
         Next
-
-        dst3 = ShowPalette(task.fcsMap)
-        dst3.SetTo(0, dst1)
 
         Dim index = task.fcsMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         task.lpD = task.lpList(index)

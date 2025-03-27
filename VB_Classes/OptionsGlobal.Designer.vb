@@ -88,6 +88,7 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.ColorGrid = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -397,6 +398,7 @@ Partial Class OptionsGlobal
         '
         'DepthGroupBox
         '
+        Me.DepthGroupBox.Controls.Add(Me.ColorGrid)
         Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
         Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
         Me.DepthGroupBox.Location = New System.Drawing.Point(334, 265)
@@ -410,7 +412,7 @@ Partial Class OptionsGlobal
         '
         Me.DepthCorrelations.AutoSize = True
         Me.DepthCorrelations.Checked = True
-        Me.DepthCorrelations.Location = New System.Drawing.Point(16, 74)
+        Me.DepthCorrelations.Location = New System.Drawing.Point(16, 69)
         Me.DepthCorrelations.Name = "DepthCorrelations"
         Me.DepthCorrelations.Size = New System.Drawing.Size(167, 24)
         Me.DepthCorrelations.TabIndex = 2
@@ -817,6 +819,18 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'ColorGrid
+        '
+        Me.ColorGrid.AutoSize = True
+        Me.ColorGrid.Checked = True
+        Me.ColorGrid.Location = New System.Drawing.Point(16, 103)
+        Me.ColorGrid.Name = "ColorGrid"
+        Me.ColorGrid.Size = New System.Drawing.Size(113, 24)
+        Me.ColorGrid.TabIndex = 3
+        Me.ColorGrid.TabStop = True
+        Me.ColorGrid.Text = "Grid Colors"
+        Me.ColorGrid.UseVisualStyleBackColor = True
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -920,4 +934,5 @@ Partial Class OptionsGlobal
     Friend WithEvents DepthCorrelations As Windows.Forms.RadioButton
     Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
     Friend WithEvents LRMeanSubtraction As Windows.Forms.CheckBox
+    Friend WithEvents ColorGrid As Windows.Forms.RadioButton
 End Class

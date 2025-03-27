@@ -1352,11 +1352,13 @@ Public Class Main_UI
                         CamSwitchProgress.Visible = False
                         CamSwitchTimer.Enabled = False
                     End If
-                    If uiColor.Width > 0 And dst(0) IsNot Nothing Then
+                    If uiColor.Width > 0 Then
                         Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                         For i = 0 To dst.Count - 1
-                            Dim tmp = dst(i).Resize(camSize)
-                            cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                            If dst(i).Width > 0 Then
+                                Dim tmp = dst(i).Resize(camSize)
+                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                            End If
                         Next
                     End If
                 End If

@@ -71,8 +71,6 @@ Public Class GridCell_Basics : Inherits TaskParent
                             gc.rRect = gc.lRect
                             gc.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
                             gc.rRect = ValidateRect(gc.rRect)
-                            If gc.rRect.Width = 1 Then Dim k = 0
-                            If gc.rRect.Height = 1 Then Dim k = 0
                             cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
                                                       cv.TemplateMatchModes.CCoeffNormed)
 
