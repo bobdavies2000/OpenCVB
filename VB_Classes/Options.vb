@@ -8106,3 +8106,20 @@ Public Class Options_Agast : Inherits OptionParent
         agastThreshold = thresholdSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_FCSLine : Inherits OptionParent
+    Public proximity As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Proximity in pixels", 0, 100, 10)
+        End If
+    End Sub
+    Public Sub RunOpt()
+        Static proximitySlider = FindSlider("Proximity in pixels")
+        proximity = proximitySlider.value
+    End Sub
+End Class

@@ -2226,3 +2226,9 @@ public:
 	Options_Agast() {
 	}
 };
+class Options_FCSLine {
+public:
+	void RunOpt() {}
+	Options_FCSLine() {
+	}
+};

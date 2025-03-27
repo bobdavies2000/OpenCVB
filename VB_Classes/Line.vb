@@ -226,7 +226,7 @@ End Class
 
 
 Public Class Line_Vertical : Inherits TaskParent
-    Public ptList As New List(Of lpData)
+    Public vertList As New List(Of lpData)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
     End Sub
@@ -240,7 +240,7 @@ Public Class Line_Vertical : Inherits TaskParent
         If p1.Y = 0 Then sideOpposite = p1.X - p2.X
         Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
 
-        ptList.Clear()
+        vertList.Clear()
         For Each lp In task.lpList
             If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
 
@@ -250,10 +250,10 @@ Public Class Line_Vertical : Inherits TaskParent
 
             If Math.Abs(angle - gAngle) < 2 Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                ptList.Add(lp)
+                vertList.Add(lp)
             End If
         Next
-        labels(2) = "There are " + CStr(ptList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
+        labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
     End Sub
 End Class
 
@@ -266,8 +266,8 @@ End Class
 Public Class Line_VerticalHorizontal : Inherits TaskParent
     Dim verts As New Line_Vertical
     Dim horiz As New Line_Horizontal
-    Public vList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
-    Public hList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
+    Public vertList As New List(Of lpData)
+    Public horizList As New List(Of lpData)
     Public Sub New()
         task.gOptions.LineWidth.Value = 2
         labels(3) = "Vertical lines are in yellow and horizontal lines in red."
@@ -278,21 +278,24 @@ Public Class Line_VerticalHorizontal : Inherits TaskParent
         verts.Run(src)
         horiz.Run(src)
 
-        vList.Clear()
-        hList.Clear()
+        Dim vList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
+        Dim hList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
 
         dst3.SetTo(0)
-        For Each lp In verts.ptList
+        For Each lp In verts.vertList
             vList.Add(lp.length, lp)
             DrawLine(dst2, lp.p1, lp.p2, task.highlight)
             DrawLine(dst3, lp.p1, lp.p2, task.highlight)
         Next
 
-        For Each lp In horiz.ptList
+        For Each lp In horiz.horizList
             hList.Add(lp.length, lp)
             DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
             DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Red)
         Next
+
+        vertList = New List(Of lpData)(vList.Values)
+        horizList = New List(Of lpData)(hList.Values)
         labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vList.Count) + "/" + CStr(hList.Count)
     End Sub
 End Class
@@ -566,7 +569,7 @@ End Class
 
 
 Public Class Line_Horizontal : Inherits TaskParent
-    Public ptList As New List(Of lpData)
+    Public horizList As New List(Of lpData)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         desc = "Find all the Horizontal lines with horizon vector"
@@ -580,7 +583,7 @@ Public Class Line_Horizontal : Inherits TaskParent
         If p1.X = 0 Then sideOpposite = p1.Y - p2.Y
         Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
 
-        ptList.Clear()
+        horizList.Clear()
         dst3.SetTo(0)
         For Each lp In task.lpList
             If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
@@ -592,10 +595,10 @@ Public Class Line_Horizontal : Inherits TaskParent
             If Math.Abs(angle - hAngle) < 2 Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                ptList.Add(lp)
+                horizList.Add(lp)
             End If
         Next
-        labels(2) = "There are " + CStr(ptList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
+        labels(2) = "There are " + CStr(horizList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
     End Sub
 End Class
 
