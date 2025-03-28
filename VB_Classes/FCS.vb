@@ -1031,13 +1031,13 @@ Public Class FCS_Lines : Inherits TaskParent
 
         task.features.Clear()
         For Each lp In task.lpList
-            Dim pair = lp.perpendicularPoints(lp.p1, minDistance)
-            task.features.Add(pair.Item1)
-            task.features.Add(pair.Item2)
+            Dim lpPerp = lp.perpendicularPoints(lp.p1, minDistance)
+            task.features.Add(lpPerp.p1)
+            task.features.Add(lpPerp.p2)
 
-            pair = lp.perpendicularPoints(lp.p2, minDistance)
-            task.features.Add(pair.Item1)
-            task.features.Add(pair.Item2)
+            lpPerp = lp.perpendicularPoints(lp.p2, minDistance)
+            task.features.Add(lpPerp.p1)
+            task.features.Add(lpPerp.p2)
 
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next

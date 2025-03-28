@@ -556,11 +556,19 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public color As cv.Vec3f
     Public index As Integer
+    Public rotatedRect As cv.RotatedRect
     Public gcIndex As Integer
     Public facets As New List(Of cv.Point)
+    Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
+        If pt.X < 0 Then pt.X = 0
+        If pt.X >= task.color.Width Then pt.X = task.color.Width
+        If pt.Y < 0 Then pt.Y = 0
+        If pt.Y >= task.color.Height Then pt.Y = task.color.Height
+        Return pt
+    End Function
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
-        p1 = _p1
-        p2 = _p2
+        p1 = validatePoint(_p1)
+        p2 = validatePoint(_p2)
         If p1.X > p2.X Then
             p1 = _p2
             p2 = _p1
@@ -578,14 +586,16 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         length = p1.DistanceTo(p2)
         age = 1
         gcIndex = task.gcMap.Get(Of Integer)(center.Y, center.X)
-        depth = task.gcList(gcIndex).depth
-        color = task.gcList(gcIndex).color
+        If gcIndex >= 0 And gcIndex < task.gcList.Count Then
+            depth = task.gcList(gcIndex).depth
+            color = task.gcList(gcIndex).color
+        End If
     End Sub
     Sub New()
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
     End Sub
-    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As (cv.Point, cv.Point)
+    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
         Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)
         Dim xShift = distance * Math.Cos(angleRadians)
@@ -601,7 +611,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If p2.Y < 0 Then p2.Y = 0
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
         center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-        Return (p1, p2)
+
+        Return New lpData(p1, p2)
     End Function
     Public Function compare(mp As lpData) As Boolean
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True

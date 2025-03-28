@@ -1,4 +1,54 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
+Public Class LineRect_Basics : Inherits TaskParent
+    Public lpInput1 As lpData
+    Public lpInput2 As lpData
+    Public rotatedRect As RotatedRect
+    Public Sub New()
+        desc = "Create a rectangle from 2 lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lp1 = lpInput1, lp2 = lpInput2
+        If lp1 Is Nothing Then
+            Dim p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            Dim p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            Dim p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            Dim p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            lp1 = New lpData(p1, p2)
+            lp2 = New lpData(p3, p4)
+        End If
+
+        Dim inputPoints As New List(Of cv.Point2f)
+        inputPoints.Add(lp1.p1)
+        inputPoints.Add(lp1.p2)
+        inputPoints.Add(lp2.p1)
+        inputPoints.Add(lp2.p2)
+        If lp1.rotatedRect = Nothing And lp2.rotatedRect = Nothing Then
+            rotatedRect = cv.Cv2.MinAreaRect(inputPoints.ToArray)
+        ElseIf lp1.rotatedRect = Nothing Then
+            For Each pt In lp2.rotatedRect.Points
+                inputPoints.Add(pt)
+            Next
+        Else
+            For Each pt In lp1.rotatedRect.Points
+                inputPoints.Add(pt)
+            Next
+        End If
+        If standalone And task.heartBeat Then
+            dst2.SetTo(0)
+            For Each pt In inputPoints
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            Next
+            DrawRotatedOutline(rotatedRect, dst2, cv.Scalar.Yellow)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class LineRect_CenterDepth : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
@@ -16,9 +66,9 @@ Public Class LineRect_CenterDepth : Inherits TaskParent
         Dim depthLines As Integer, colorLines As Integer
         For Each lp In task.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
-            Dim pts = lp.perpendicularPoints(lp.center, task.cellSize)
-            Dim index1 = task.gcMap.Get(Of Integer)(pts.Item1.Y, pts.Item1.X)
-            Dim index2 = task.gcMap.Get(Of Integer)(pts.Item2.Y, pts.Item2.X)
+            Dim lpPerp = lp.perpendicularPoints(lp.center, task.cellSize)
+            Dim index1 = task.gcMap.Get(Of Integer)(lpPerp.p1.Y, lpPerp.p1.X)
+            Dim index2 = task.gcMap.Get(Of Integer)(lpPerp.p2.Y, lpPerp.p2.X)
             Dim idd1 = task.gcList(index1)
             Dim idd2 = task.gcList(index2)
             If Math.Abs(idd1.depth - idd2.depth) > depthThreshold Then

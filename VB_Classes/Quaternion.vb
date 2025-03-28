@@ -18,44 +18,6 @@ End Class
 
 
 
-Public Class Options_Quaternion : Inherits OptionParent
-    Public q1 As Quaternion = New Quaternion
-    Public q2 As Quaternion = New Quaternion
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("quaternion A.x X100", -100, 100, -50)
-            sliders.setupTrackBar("quaternion A.y X100", -100, 100, 10)
-            sliders.setupTrackBar("quaternion A.z X100", -100, 100, 20)
-            sliders.setupTrackBar("quaternion A Theta X100", -100, 100, 100)
-
-            sliders.setupTrackBar("quaternion B.x X100", -100, 100, -10)
-            sliders.setupTrackBar("quaternion B.y X100", -100, 100, -10)
-            sliders.setupTrackBar("quaternion B.z X100", -100, 100, -10)
-            sliders.setupTrackBar("quaternion B Theta X100", -100, 100, 100)
-        End If
-    End Sub
-    Public Sub Run()
-        Static axSlider =optiBase.findslider("quaternion A.x X100")
-        Static aySlider =optiBase.findslider("quaternion A.y X100")
-        Static azSlider =optiBase.findslider("quaternion A.z X100")
-        Static athetaSlider =optiBase.findslider("quaternion A Theta X100")
-
-        Static bxSlider =optiBase.findslider("quaternion B.x X100")
-        Static bySlider =optiBase.findslider("quaternion B.y X100")
-        Static bzSlider =optiBase.findslider("quaternion B.z X100")
-        Static bthetaSlider =optiBase.findslider("quaternion B Theta X100")
-
-        q1 = New Quaternion(CSng(axSlider.Value / 100), CSng(aySlider.Value / 100),
-                                CSng(azSlider.Value / 100), CSng(athetaSlider.Value / 100))
-        q2 = New Quaternion(CSng(bxSlider.Value / 100), CSng(bySlider.Value / 100),
-                                    CSng(bzSlider.Value / 100), CSng(bthetaSlider.Value / 100))
-    End Sub
-End Class
-
-
-
-
-
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
 Public Class Quaterion_IMUPrediction : Inherits TaskParent

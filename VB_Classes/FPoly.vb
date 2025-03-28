@@ -789,8 +789,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
         perp2.Run(src)
         DrawLine(dst2, perp2.output.p1, perp2.output.p2, white)
 
-        fPD.rotateCenter = IntersectTest(perp2.output.p1, perp2.output.p2,
-                                         perp1.output.p1, perp1.output.p2, New cv.Rect(0, 0, src.Width, src.Height))
+        fPD.rotateCenter = IntersectTest(perp2.output.p1, perp2.output.p2, perp1.output.p1, perp1.output.p2)
         If fPD.rotateCenter = New cv.Point2f Then
             fPD.rotateAngle = 0
         Else

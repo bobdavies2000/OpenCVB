@@ -822,12 +822,10 @@ Partial Class OptionsGlobal
         'ColorGrid
         '
         Me.ColorGrid.AutoSize = True
-        Me.ColorGrid.Checked = True
         Me.ColorGrid.Location = New System.Drawing.Point(16, 103)
         Me.ColorGrid.Name = "ColorGrid"
         Me.ColorGrid.Size = New System.Drawing.Size(113, 24)
         Me.ColorGrid.TabIndex = 3
-        Me.ColorGrid.TabStop = True
         Me.ColorGrid.Text = "Grid Colors"
         Me.ColorGrid.UseVisualStyleBackColor = True
         '

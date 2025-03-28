@@ -153,7 +153,7 @@ Public Class TaskParent : Implements IDisposable
         dst.Line(p1, p2, fatColor, task.lineWidth + pad, task.lineType)
         DrawLine(dst, p1, p2, cv.Scalar.Black)
     End Sub
-    Public Function IntersectTest(p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f, rect As cv.Rect) As cv.Point2f
+    Public Function IntersectTest(p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f) As cv.Point2f
         Dim x = p3 - p1
         Dim d1 = p2 - p1
         Dim d2 = p4 - p3
@@ -161,9 +161,19 @@ Public Class TaskParent : Implements IDisposable
         If Math.Abs(cross) < 0.000001 Then Return New cv.Point2f
         Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
         Dim pt = p1 + d1 * t1
-        ' If pt.X >= rect.Width Or pt.Y >= rect.Height Then Return New cv.Point2f
         Return pt
     End Function
+    Public Function IntersectTest(lp1 As lpData, lp2 As lpData) As cv.Point2f
+        Dim x = lp2.p1 - lp1.p1
+        Dim d1 = lp1.p2 - lp1.p1
+        Dim d2 = lp2.p2 - lp2.p1
+        Dim cross = d1.X * d2.Y - d1.Y * d2.X
+        If Math.Abs(cross) < 0.000001 Then Return New cv.Point2f
+        Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
+        Dim pt = lp1.p1 + d1 * t1
+        Return pt
+    End Function
+
     Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
         Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
         If Input.Channels() = 1 Then

@@ -38,7 +38,7 @@ Public Class Gravity_Basics : Inherits TaskParent
             .kOutput = .kInput ' .Run(src)
 
             task.gravityVec = New lpData(New cv.Point2f(.kOutput(0), 0),
-                                             New cv.Point2f(.kOutput(1), dst2.Height))
+                                         New cv.Point2f(.kOutput(1), dst2.Height))
             task.horizonVec = computePerp(task.gravityVec)
         End With
 

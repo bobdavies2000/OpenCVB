@@ -91,11 +91,14 @@ Public Class Line_BasicsRaw : Inherits TaskParent
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
                v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
-                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
-                Dim lp = New lpData(p1, p2)
-                lp.index = lpList.Count
-                lpList.Add(lp)
+                Dim p1 = New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y))
+                Dim p2 = New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y))
+                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
+                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
+                    Dim lp = New lpData(p1, p2)
+                    lp.index = lpList.Count
+                    lpList.Add(lp)
+                End If
             End If
         Next
 
@@ -203,7 +206,8 @@ Public Class Line_Intersection : Inherits TaskParent
             p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         End If
 
-        intersectionPoint = IntersectTest(p1, p2, p3, p4, New cv.Rect(0, 0, src.Width, src.Height))
+        intersectionPoint = IntersectTest(p1, p2, p3, p4)
+        intersectionPoint = IntersectTest(New lpData(p1, p2), New lpData(p3, p4))
 
         dst2.SetTo(0)
         dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
@@ -220,42 +224,6 @@ Public Class Line_Intersection : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Line_Vertical : Inherits TaskParent
-    Public vertList As New List(Of lpData)
-    Public Sub New()
-        desc = "Find all the vertical lines with gravity vector"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        task.lines.Run(src)
-        dst3 = task.lines.dst2
-
-        Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
-        Dim sideOpposite = p2.X - p1.X
-        If p1.Y = 0 Then sideOpposite = p1.X - p2.X
-        Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
-
-        vertList.Clear()
-        For Each lp In task.lpList
-            If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
-
-            sideOpposite = lp.p2.X - lp.p1.X
-            If lp.p1.Y < lp.p2.Y Then sideOpposite = lp.p1.X - lp.p2.X
-            Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
-
-            If Math.Abs(angle - gAngle) < 2 Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                vertList.Add(lp)
-            End If
-        Next
-        labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
-    End Sub
-End Class
 
 
 
@@ -358,8 +326,7 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
         nearest.lp = task.gravityVec
         DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
         For Each lp In task.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2,
-                                        New cv.Rect(0, 0, src.Width, src.Height))
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2)
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
                 Continue For
             End If
@@ -380,7 +347,7 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
         DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
         nearest.lp = task.horizonVec
         For Each lp In task.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2)
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
             nearest.pt = lp.p1
@@ -625,5 +592,99 @@ Public Class Line_ViewLeftRight : Inherits TaskParent
         linesRaw.Run(task.rightView)
         dst3 = linesRaw.dst2
         labels(3) = linesRaw.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Vertical : Inherits TaskParent
+    Public vertList As New List(Of lpData)
+    Public Sub New()
+        desc = "Find all the vertical lines with gravity vector"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        task.lines.Run(src)
+        dst3 = task.lines.dst2
+
+        Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
+        Dim sideOpposite = p2.X - p1.X
+        If p1.Y = 0 Then sideOpposite = p1.X - p2.X
+        Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
+
+        vertList.Clear()
+        For Each lp In task.lpList
+            If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
+
+            sideOpposite = lp.p2.X - lp.p1.X
+            If lp.p1.Y < lp.p2.Y Then sideOpposite = lp.p1.X - lp.p2.X
+            Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
+
+            If Math.Abs(angle - gAngle) < 2 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                vertList.Add(lp)
+            End If
+        Next
+        labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Horizontal3D : Inherits TaskParent
+    Public horizList As New List(Of lpData)
+    Public dimension As Integer = 1 ' 0 for vertical, 1 for horizontal.
+    Public Sub New()
+        desc = "Find all the horizontal lines in 3D using the grid cells and their depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        task.lines.Run(src)
+        dst3 = task.lines.dst2
+
+        Dim p1 As cv.Scalar, p2 As cv.Scalar
+        horizList.Clear()
+        For Each lp In task.lpList
+            Dim gc1 = task.gcList(task.gcMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim gc2 = task.gcList(task.gcMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+
+            p1 = task.pointCloud(gc1.rect).Mean(task.depthMask(gc1.rect))
+            p2 = task.pointCloud(gc2.rect).Mean(task.depthMask(gc2.rect))
+
+            If p1.Item(dimension) = 0 Or p2.Item(dimension) = 0 Then Continue For ' no depth...
+
+            If Math.Abs(p1.Item(dimension) - p2.Item(dimension)) < 0.01 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                horizList.Add(lp)
+            End If
+        Next
+
+        labels(2) = "There are " + CStr(horizList.Count) + " lines similar to the horizon vector "
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Vertical3D : Inherits TaskParent
+    Public vertlist As New List(Of lpData)
+    Dim verts As New Line_Horizontal3D
+    Public Sub New()
+        verts.dimension = 0
+        desc = "Find all the vertical lines in 3D using the grid cells and their depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        verts.Run(src)
+        dst2 = verts.dst2
+        dst3 = verts.dst3
+
+        vertlist = New List(Of lpData)(verts.horizList)
+        labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity vector "
     End Sub
 End Class

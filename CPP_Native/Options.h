@@ -5,6 +5,14 @@
 #include <string.h>
 using namespace cv;
 using namespace std;
+
+public:
+
+
+	void Run() {}
+
+	}
+};
 class Options_Annealing {
 public:
 	int cityCount =  25;

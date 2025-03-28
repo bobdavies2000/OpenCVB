@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class FCSLine_Basics : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
@@ -48,8 +49,9 @@ End Class
 
 
 
-Public Class FCSLine_Parallel : Inherits TaskParent
-    Dim findVH As New Line_VerticalHorizontal
+Public Class FCSLine_Vertical : Inherits TaskParent
+    Dim verts As New Line_Vertical
+    Dim minRect As New LineRect_Basics
     Dim options As New Options_FCSLine
     Public Sub New()
         desc = "Find all verticle lines and combine them if they are 'close'."
@@ -57,9 +59,28 @@ Public Class FCSLine_Parallel : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        findVH.Run(src)
-        dst2 = findVH.dst2
-        dst3 = findVH.dst3
+        verts.Run(src)
 
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        For i = 0 To verts.vertList.Count - 1
+            Dim lp1 = verts.vertList(i)
+            For j = i + 1 To verts.vertList.Count - 1
+                Dim lp2 = verts.vertList(j)
+                Dim lpPerp = lp1.perpendicularPoints(lp1.center, task.cellSize)
+                Dim intersectionPoint = IntersectTest(lp1, lpPerp)
+                Dim distance = intersectionPoint.DistanceTo(lp1.center)
+                If distance <= options.proximity Then
+                    minRect.lpInput1 = lp1
+                    minRect.lpInput2 = lp2
+                    lp1.rotatedRect = minRect.rotatedRect
+                    lp2.rotatedRect = minRect.rotatedRect
+                    minRect.Run(src)
+                    dst2.Line(lp1.p1, lp1.p2, task.highlight, task.lineWidth, task.lineType)
+                    dst2.Line(lp2.p1, lp2.p2, task.highlight, task.lineWidth, task.lineType)
+                    DrawRotatedOutline(minRect.rotatedRect, dst3, cv.Scalar.Yellow)
+                End If
+            Next
+        Next
     End Sub
 End Class
