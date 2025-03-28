@@ -886,6 +886,8 @@ Public Class VBtask : Implements IDisposable
 
         gravityHorizon.Run(src)
 
+        lines.Run(src.Clone)
+
         Dim saveOptionsChanged = optionsChanged
         mouseD.Run(src)
         If paused = False Then

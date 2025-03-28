@@ -23,7 +23,7 @@ Public Class Line_Basics : Inherits TaskParent
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(task.grayStable)
+        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable)
 
         Dim histArray = getLineCounts(lines.lpList)
         For i = histArray.Count - 1 To 0 Step -1
@@ -136,7 +136,6 @@ Public Class Line_Intercepts : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        task.lines.Run(src)
         If task.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
@@ -320,7 +319,6 @@ Public Class Line_VerticalHorizontal1 : Inherits TaskParent
         Dim pixelDiff = task.gOptions.pixelDiffThreshold
 
         dst2 = src.Clone
-        task.lines.Run(src)
         If standaloneTest() Then dst3 = task.lines.dst2
 
         nearest.lp = task.gravityVec
@@ -382,7 +380,6 @@ Public Class Line_PointSlope : Inherits TaskParent
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
         dst2 = src
 
         If bestLines.Count < lineCount Or task.heartBeat Then
@@ -480,7 +477,6 @@ Public Class Line_Info : Inherits TaskParent
         desc = "Display details about the line selected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then runLines(src)
         labels(2) = task.lines.labels(2) + " - click near the center (highlighted dot) of any line."
 
         Dim clickMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -543,7 +539,6 @@ Public Class Line_Horizontal : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        task.lines.Run(src)
 
         Dim p1 = task.horizonVec.p1, p2 = task.horizonVec.p2
         Dim sideOpposite = p2.Y - p1.Y
@@ -607,7 +602,6 @@ Public Class Line_Vertical : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        task.lines.Run(src)
         dst3 = task.lines.dst2
 
         Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
@@ -644,7 +638,6 @@ Public Class Line_Horizontal3D : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        task.lines.Run(src)
         dst3 = task.lines.dst2
 
         horizList.Clear()
@@ -673,7 +666,6 @@ Public Class Line_Vertical3D : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        task.lines.Run(src)
         dst3 = task.lines.dst2
 
         vertlist.Clear()

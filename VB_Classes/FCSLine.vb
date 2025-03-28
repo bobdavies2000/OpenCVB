@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class FCSLine_Basics : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
@@ -11,7 +10,6 @@ Public Class FCSLine_Basics : Inherits TaskParent
         Dim lastMap = task.fcsMap.Clone
         Dim lastCount = task.lpList.Count
 
-        task.lines.Run(src)
         dst2 = task.lines.dst2
 
         delaunay.inputPoints.Clear()

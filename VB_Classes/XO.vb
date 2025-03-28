@@ -910,8 +910,6 @@ Public Class XO_Line_LeftRight : Inherits TaskParent
         desc = "Show lines in both the right and left images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runLines(src) ' the default is the left view.
-
         dst2 = task.lines.dst2.Clone
         labels(2) = "Left view" + task.lines.labels(2)
 
@@ -1952,8 +1950,36 @@ End Class
 
 
 
+
+
+Public Class XO_Structured_Lines : Inherits TaskParent
+    Dim struct As New Structured_Basics
+    Public lineX As New Structured_LinesX
+    Public lineY As New Structured_LinesY
+    Public Sub New()
+        desc = "Find the lines in the Structured_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        struct.Run(src)
+
+        lineX.Run(struct.dst2)
+        dst2 = lineX.dst2
+        labels(2) = lineX.labels(2)
+
+        lineY.Run(struct.dst3)
+        dst3 = lineY.dst2
+        labels(3) = lineY.labels(2)
+
+        task.lpList = New List(Of lpData)(lineX.lpList)
+        task.lpList.AddRange(lineY.lpList)
+    End Sub
+End Class
+
+
+
+
 Public Class XO_Line3D_Basics : Inherits TaskParent
-    Dim sLines As New Structured_Lines
+    Dim sLines As New XO_Structured_Lines
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find all the lines in 3D using the structured slices through the pointcloud."

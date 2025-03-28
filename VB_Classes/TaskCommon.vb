@@ -611,6 +611,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public color As cv.Vec3f
     Public index As Integer
     Public rotatedRect As cv.RotatedRect
+    Public gc1 As Integer
+    Public gc2 As Integer
     Public gcCenter As Integer
     Public pc1 As cv.Scalar
     Public pc2 As cv.Scalar

@@ -638,10 +638,6 @@ Public Class TaskParent : Implements IDisposable
         labels = task.feat.labels(2)
         Return task.feat.dst2
     End Function
-    Public Sub runLines(src As cv.Mat)
-        If task.lines Is Nothing Then task.lines = New Line_Basics
-        task.lines.Run(src)
-    End Sub
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))

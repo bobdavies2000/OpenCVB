@@ -60,8 +60,6 @@ Public Class LineRect_CenterDepth : Inherits TaskParent
         dst2 = src.Clone
         dst3 = src.Clone
 
-        task.lines.Run(src)
-
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer
         For Each lp In task.lpList
@@ -104,8 +102,6 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
 
         dst2 = src.Clone
         dst3 = src.Clone
-
-        task.lines.Run(src)
 
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer
@@ -159,8 +155,6 @@ Public Class LineRect_CenterRange : Inherits TaskParent
 
         dst2 = src.Clone
         dst3 = src.Clone
-
-        task.lines.Run(src)
 
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer

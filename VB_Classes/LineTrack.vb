@@ -7,8 +7,6 @@ Public Class LineTrack_Basics : Inherits TaskParent
         desc = "Track the line regions with RedCloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
-
         dst1.SetTo(0)
         For Each lp In task.lpList
             dst1.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, cv.LineTypes.Link8)
@@ -77,8 +75,6 @@ Public Class LineTrack_Depth : Inherits TaskParent
         desc = "Track lines and separate them by depth value."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
-
         dst2.SetTo(0)
         Dim lp As New lpData
         For Each lp In task.lpList

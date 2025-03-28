@@ -13,12 +13,10 @@ Public Class HeatMap_Basics : Inherits TaskParent
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogramTop, 2,
-                                task.bins2D, task.rangesTop)
+        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogramTop, 2, task.bins2D, task.rangesTop)
         histogramTop.Row(0).SetTo(0)
 
-        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2,
-                                task.bins2D, task.rangesSide)
+        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
         histogramSide.Col(0).SetTo(0)
 
         topframes.Run(histogramTop)
@@ -27,7 +25,7 @@ Public Class HeatMap_Basics : Inherits TaskParent
         sideframes.Run(histogramSide)
         dst1 = sideframes.dst2
 
-        dst2 = ShowPalette(dst0.ConvertScaleAbs())
+        dst2 = ShowPalette(dst0.ConvertScaleAbs()).Clone
         dst3 = ShowPalette(dst1.ConvertScaleAbs())
         labels(2) = "Top view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
         labels(3) = "Side view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"

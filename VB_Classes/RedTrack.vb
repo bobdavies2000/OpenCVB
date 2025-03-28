@@ -27,8 +27,6 @@ Public Class RedTrack_Lines : Inherits TaskParent
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
-
         If task.heartBeat Then dst3.SetTo(0)
         Dim index As Integer
         For Each lp In task.lpList
@@ -191,8 +189,6 @@ Public Class RedTrack_Points : Inherits TaskParent
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
-
         dst3.SetTo(0)
         Dim index As Integer
         For Each lp In task.lpList

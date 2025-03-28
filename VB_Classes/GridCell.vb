@@ -759,7 +759,6 @@ Public Class GridCell_Lines : Inherits TaskParent
         regions.Run(src)
         dst2 = regions.dst3
 
-        task.lines.Run(src)
         For Each lp In task.lpList
             dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
         Next
@@ -797,8 +796,7 @@ Public Class GridCell_ColorLines : Inherits TaskParent
         desc = "Remove lines which cross grid cells that have the same depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
-        dst2 = src.Clone
+        dst2 = src
         dst3.SetTo(0)
         For Each lp In task.lpList
             Dim gc1 = task.gcList(task.gcMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))

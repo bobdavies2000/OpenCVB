@@ -131,15 +131,16 @@ End Class
 
 Public Class Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         multi.Run(src)
         dst3 = multi.dst3
-        task.lines.Run(dst3)
-        dst2 = task.lines.dst2
-        labels(2) = task.lines.labels(2)
+        lines.Run(dst3)
+        dst2 = lines.dst2
+        labels(2) = lines.labels(2)
     End Sub
 End Class
 
@@ -672,6 +673,7 @@ End Class
 
 Public Class Structured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"
@@ -681,13 +683,13 @@ Public Class Structured_MouseSlice : Inherits TaskParent
         If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
         slice.Run(src)
 
-        task.lines.Run(slice.sliceMask)
+        lines.Run(slice.sliceMask)
         Dim tops As New List(Of Integer)
         Dim bots As New List(Of Integer)
         Dim topsList As New List(Of cv.Point)
         Dim botsList As New List(Of cv.Point)
         If task.lpList.Count > 0 Then
-            dst3 = task.lines.dst2
+            dst3 = lines.dst2
             For Each lp In task.lpList
                 dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 3, task.lineType)
                 tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
@@ -1370,37 +1372,11 @@ End Class
 
 
 
-Public Class Structured_Lines : Inherits TaskParent
-    Dim struct As New Structured_Basics
-    Public lineX As New Structured_LinesX
-    Public lineY As New Structured_LinesY
-    Public Sub New()
-        desc = "Find the lines in the Structured_Basics output"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        struct.Run(src)
-
-        lineX.Run(struct.dst2)
-        dst2 = lineX.dst2
-        labels(2) = lineX.labels(2)
-
-        lineY.Run(struct.dst3)
-        dst3 = lineY.dst2
-        labels(3) = lineY.labels(2)
-
-        task.lpList = New List(Of lpData)(lineX.lpList)
-        task.lpList.AddRange(lineY.lpList)
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Structured_LinesX : Inherits TaskParent
     Public lpList As New List(Of lpData)
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the X-direction of the Structured_Basics output"
@@ -1412,8 +1388,8 @@ Public Class Structured_LinesX : Inherits TaskParent
             src = struct.dst2
         End If
 
-        task.lines.Run(src)
-        lpList = New List(Of lpData)(task.lpList)
+        lines.Run(src)
+        lpList = New List(Of lpData)(lines.lpList)
 
         dst2.SetTo(0)
         For Each lp In lpList
@@ -1428,6 +1404,7 @@ End Class
 
 Public Class Structured_LinesY : Inherits TaskParent
     Public lpList As New List(Of lpData)
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the Y-direction of the Structured_Basics output"
@@ -1439,8 +1416,8 @@ Public Class Structured_LinesY : Inherits TaskParent
             src = struct.dst3
         End If
 
-        task.lines.Run(src)
-        lpList = New List(Of lpData)(task.lpList)
+        lines.Run(src)
+        lpList = New List(Of lpData)(lines.lpList)
 
         dst2.SetTo(0)
         For Each lp In lpList

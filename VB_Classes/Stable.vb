@@ -97,8 +97,6 @@ Public Class Stable_Lines : Inherits TaskParent
         desc = "Track the line end points found in the BGR image and keep those that are stable."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
-
         basics.facetGen.inputPoints.Clear()
         dst1 = src.Clone
         For Each lp In task.lpList

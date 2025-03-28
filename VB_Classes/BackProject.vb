@@ -176,6 +176,7 @@ End Class
 
 Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -185,11 +186,11 @@ Public Class BackProject_FullLines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
 
-        runLines(backP.dst3)
-        labels(2) = task.lines.labels(2)
+        lines.Run(backP.dst3)
+        labels(2) = lines.labels(2)
         dst2 = src
         dst3.SetTo(0)
-        For Each lp In task.lpList
+        For Each lp In lines.lpList
             DrawLine(dst2, lp.p1, lp.p2, task.highlight)
             DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
@@ -605,6 +606,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -618,15 +620,11 @@ Public Class BackProject_MaskLines : Inherits TaskParent
         dst3 = src.Clone
 
         Static saveHistIndex As Integer = masks.histIndex
-        If masks.histIndex <> saveHistIndex Then
-            task.lines.Run(src)
-            task.lpList = New List(Of lpData)(task.lpList)
-            dst1.SetTo(0)
-        End If
+        If masks.histIndex <> saveHistIndex Then dst1.SetTo(0)
 
-        task.lines.Run(masks.mask)
+        lines.Run(masks.mask)
 
-        For Each lp In task.lpList
+        For Each lp In lines.lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, white)
         Next

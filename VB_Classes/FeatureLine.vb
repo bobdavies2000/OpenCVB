@@ -9,8 +9,6 @@ Public Class FeatureLine_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        runLines(src)
-
         dst3.SetTo(0)
         For Each lp In task.lpList
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
@@ -186,16 +184,15 @@ Public Class FeatureLine_Tutorial1 : Inherits TaskParent
         desc = "Find all the lines in the image and determine which are in the depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
         dst2 = task.lines.dst2
 
         Dim raw2D As New List(Of lpData)
-        Dim raw3D As New List(Of cv.Point3f)
+        Dim raw3D As New List(Of cv.Scalar)
         For Each lp In task.lpList
-            If task.pcSplit(2).Get(Of Single)(lp.p1.Y, lp.p1.X) > 0 And task.pcSplit(2).Get(Of Single)(lp.p2.Y, lp.p2.X) > 0 Then
-                raw2D.Add(lp)
-                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
-                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
+            raw2D.Add(lp)
+            If lp.depth > 0 Then
+                raw3D.Add(lp.pc1)
+                raw3D.Add(lp.pc2)
             End If
         Next
 
@@ -224,7 +221,6 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        task.lines.Run(src)
         dst2 = task.lines.dst2
 
         Dim raw3D As New List(Of cv.Point3f)
@@ -629,7 +625,6 @@ Public Class FeatureLine_Finder : Inherits TaskParent
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
 
-        task.lines.Run(src)
         dst2 = task.lines.dst2
 
         Dim raw2D As New List(Of lpData)

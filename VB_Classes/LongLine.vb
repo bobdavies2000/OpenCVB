@@ -60,7 +60,6 @@ Public Class LongLine_Core : Inherits TaskParent
         desc = "Isolate the longest X lines."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
         dst2 = task.lines.dst2
         If task.lpList.Count = 0 Then Exit Sub
 
@@ -272,7 +271,6 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
         desc = "Create a list of all the extended lines in an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
         dst2 = task.lines.dst2
 
         dst3 = src.Clone
