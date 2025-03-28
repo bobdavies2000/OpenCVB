@@ -205,6 +205,9 @@ Public Module vbc
             xp2.X = xIntercept
             xp2.Y = 0
         End If
+
+        If xp1.Y = task.color.Height Then xp1.Y -= 1
+        If xp2.Y = task.color.Height Then xp2.Y -= 1
         Return New lpData(xp1, xp2)
     End Function
 End Module

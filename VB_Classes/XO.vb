@@ -962,8 +962,6 @@ Public Class XO_Line_Matching : Inherits TaskParent
         options.Run()
         dst2 = src.Clone
 
-        If standalone Then task.lines.Run(src)
-
         If task.firstPass Then optiBase.FindSlider("Min Line Length").Value = 30
 
         Dim tolerance = 0.1
@@ -1028,7 +1026,6 @@ Public Class XO_Line_TopX : Inherits TaskParent
         desc = "Isolate the top X lines by length - lines are already sorted by length."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
         dst2 = task.lines.dst2
         labels(2) = task.lines.labels(2)
 
@@ -1107,15 +1104,16 @@ End Class
 
 Public Class XO_Line_Cells : Inherits TaskParent
     Public lpList As New List(Of lpData)
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        task.lines.Run(dst2.Clone)
-        dst3 = task.lines.dst2
-        lpList = New List(Of lpData)(task.lpList)
+        lines.Run(dst2.Clone)
+        dst3 = lines.dst2
+        lpList = New List(Of lpData)(lines.lpList)
         labels(3) = "Number of lines identified: " + CStr(lpList.Count)
     End Sub
 End Class
@@ -1130,7 +1128,7 @@ End Class
 Public Class XO_Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
     Public lpList As New List(Of lpData)
-    Dim options As New Options_Line
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         labels(3) = "Input to Line_Basics"
         optiBase.FindSlider("Canny Aperture").Value = 7
@@ -1141,10 +1139,10 @@ Public Class XO_Line_Canny : Inherits TaskParent
         canny.Run(src)
         dst3 = canny.dst2.Clone
 
-        task.lines.Run(canny.dst2)
+        lines.Run(canny.dst2)
 
-        dst2 = task.lines.dst2
-        lpList = New List(Of lpData)(task.lpList)
+        dst2 = lines.dst2
+        lpList = New List(Of lpData)(lines.lpList)
         labels(2) = "Number of lines identified: " + CStr(lpList.Count)
     End Sub
 End Class
@@ -1165,7 +1163,6 @@ Public Class XO_Line_KNN : Inherits TaskParent
         runFeature(src)
 
         swarm.options.Run()
-        task.lines.Run(src)
         dst2 = task.lines.dst2
 
         dst3.SetTo(0)
@@ -1356,8 +1353,6 @@ Public Class XO_Line_TimeView : Inherits TaskParent
         desc = "Collect lines over time"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
-
         If task.optionsChanged Then frameList.Clear()
         Dim nextMpList = New List(Of lpData)(task.lpList)
         frameList.Add(nextMpList)
@@ -1389,6 +1384,7 @@ End Class
 
 Public Class XO_Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Lines for the current color class", "Color Class input"}
@@ -1396,11 +1392,11 @@ Public Class XO_Line_ColorClass : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
-        dst1 = color8U.dst3
+        dst1 = color8U.dst2
 
-        task.lines.Run(dst1 * 255 / color8U.classCount)
-        dst2 = task.lines.dst2
-        dst3 = task.lines.dst2
+        lines.Run(dst1 * 255 / color8U.classCount)
+        dst2 = lines.dst2
+        dst3 = lines.dst2
 
         labels(1) = "Input to Line_Basics"
         labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
@@ -1414,6 +1410,7 @@ End Class
 Public Class XO_Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim contours As New Contour_Gray
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         task.gOptions.highlight.SelectedIndex = 3
@@ -1424,10 +1421,10 @@ Public Class XO_Line_FromContours : Inherits TaskParent
         reduction.Run(src)
         contours.Run(reduction.dst2)
         dst2 = contours.dst2.Clone
-        task.lines.Run(dst2)
+        lines.Run(dst2)
 
         dst3.SetTo(0)
-        For Each lp In task.lpList
+        For Each lp In lines.lpList
             DrawLine(dst3, lp.p1, lp.p2, white)
         Next
     End Sub
@@ -1443,6 +1440,7 @@ End Class
 Public Class XO_Line_ViewSide : Inherits TaskParent
     Public autoY As New OpAuto_YRange
     Dim histSide As New Projection_HistSide
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
         desc = "Find lines in the hotspots for the side view."
@@ -1453,9 +1451,9 @@ Public Class XO_Line_ViewSide : Inherits TaskParent
         autoY.Run(histSide.histogram)
         dst2 = histSide.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
-        task.lines.Run(dst2.Clone)
-        dst3 = task.lines.dst2
-        labels(2) = task.lines.labels(2)
+        lines.Run(dst2.Clone)
+        dst3 = lines.dst2
+        labels(2) = lines.labels(2)
     End Sub
 End Class
 
@@ -1519,7 +1517,6 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
         desc = "Find the BGR lines and confirm they are present in the cloud data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.lines.Run(src)
         dst2 = task.lines.dst2
         If task.lpList.Count = 0 Then Exit Sub
 
@@ -1573,6 +1570,7 @@ Public Class XO_Line_GCloud : Inherits TaskParent
     Public options As New Options_LineFinder
     Dim match As New Match_tCell
     Dim angleSlider As System.Windows.Forms.TrackBar
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         angleSlider = optiBase.FindSlider("Angle tolerance in degrees")
         labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
@@ -1611,7 +1609,7 @@ Public Class XO_Line_GCloud : Inherits TaskParent
         Dim maxAngle = angleSlider.Value
 
         dst2 = src.Clone
-        task.lines.Run(src.Clone)
+        lines.Run(src.Clone)
 
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
@@ -1629,7 +1627,8 @@ Public Class XO_Line_GCloud : Inherits TaskParent
             End If
         Next
 
-        labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " + Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
+        labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
+                    Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
     End Sub
 End Class
 
@@ -1821,15 +1820,16 @@ End Class
 
 
 Public Class XO_Hough_Sudoku1 : Inherits TaskParent
+    Dim lines As New Line_BasicsRaw
     Public Sub New()
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = cv.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
-        task.lines.Run(dst3.Clone)
-        dst2 = task.lines.dst2
-        labels(2) = task.lines.labels(2)
-        For Each lp In task.lpList
+        lines.Run(dst3.Clone)
+        dst2 = lines.dst2
+        labels(2) = lines.labels(2)
+        For Each lp In lines.lpList
             lp = findEdgePoints(lp)
             dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         Next
