@@ -1,9 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Dim gravity As New Gravity_Raw
-    Dim kalman As New Kalman_Basics
     Public Sub New()
-        ReDim kalman.kInput(2 - 1)
         desc = "Use kalman to smooth gravity and horizon vectors."
     End Sub
     Public Function computePerp(lp As lpData) As lpData
@@ -31,16 +29,8 @@ Public Class Gravity_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
-        With kalman
-            .kInput = {gravity.xTop, gravity.xBot}
-
-            ' kalman is too slow to reacting... Skip for now.  
-            .kOutput = .kInput ' .Run(src)
-
-            task.gravityVec = New lpData(New cv.Point2f(.kOutput(0), 0),
-                                         New cv.Point2f(.kOutput(1), dst2.Height))
-            task.horizonVec = computePerp(task.gravityVec)
-        End With
+        task.gravityVec = New lpData(New cv.Point2f(gravity.xTop, 0), New cv.Point2f(gravity.xBot, dst2.Height - 1))
+        task.horizonVec = computePerp(task.gravityVec)
 
         If standaloneTest() Then
             dst2.SetTo(0)

@@ -1,5 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports VB_Classes.TaskParent
+Imports System.Security.Cryptography
+Imports OpenCvSharp.Flann
 Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean
@@ -546,84 +548,6 @@ End Enum
 
 
 
-Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
-    Public center As cv.Point ' the point to use when identifying this line
-    Public age As Integer
-    Public p1 As cv.Point2f
-    Public p2 As cv.Point2f
-    Public slope As Single
-    Public depth As Single
-    Public length As Single
-    Public color As cv.Vec3f
-    Public index As Integer
-    Public rotatedRect As cv.RotatedRect
-    Public gcIndex As Integer
-    Public facets As New List(Of cv.Point)
-    Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
-        If pt.X < 0 Then pt.X = 0
-        If pt.X >= task.color.Width Then pt.X = task.color.Width
-        If pt.Y < 0 Then pt.Y = 0
-        If pt.Y >= task.color.Height Then pt.Y = task.color.Height
-        Return pt
-    End Function
-    Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
-        p1 = validatePoint(_p1)
-        p2 = validatePoint(_p2)
-        If p1.X > p2.X Then
-            p1 = _p2
-            p2 = _p1
-        End If
-        p1 = New cv.Point2f(p1.X, p1.Y)
-        p2 = New cv.Point2f(p2.X, p2.Y)
-
-        If p1.X = p2.X Then
-            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
-        Else
-            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
-        End If
-
-        center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
-        length = p1.DistanceTo(p2)
-        age = 1
-        gcIndex = task.gcMap.Get(Of Integer)(center.Y, center.X)
-        If gcIndex >= 0 And gcIndex < task.gcList.Count Then
-            depth = task.gcList(gcIndex).depth
-            color = task.gcList(gcIndex).color
-        End If
-    End Sub
-    Sub New()
-        p1 = New cv.Point2f()
-        p2 = New cv.Point2f()
-    End Sub
-    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
-        Dim perpSlope = -1 / slope
-        Dim angleRadians As Double = Math.Atan(perpSlope)
-        Dim xShift = distance * Math.Cos(angleRadians)
-        Dim yShift = distance * Math.Sin(angleRadians)
-        Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
-        Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
-        If p1.X < 0 Then p1.X = 0
-        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
-        If p1.Y < 0 Then p1.Y = 0
-        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
-        If p2.X < 0 Then p2.X = 0
-        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
-        If p2.Y < 0 Then p2.Y = 0
-        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-
-        Return New lpData(p1, p2)
-    End Function
-    Public Function compare(mp As lpData) As Boolean
-        If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
-        Return False
-    End Function
-End Class
-
-
-
-
-
 Public Class fcsData ' feature coordinate system (Line centers are the input)
     Public index As Integer
     Public age As Integer
@@ -669,4 +593,92 @@ Public Class fpXData ' feature point -  excessive - trim this to fpData...
         ptHistory = New List(Of cv.Point)
         nabeList = New List(Of Integer)
     End Sub
+End Class
+
+
+
+
+
+
+Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
+    Public center As cv.Point ' the point to use when identifying this line
+    Public age As Integer
+    Public p1 As cv.Point2f
+    Public p2 As cv.Point2f
+    Public slope As Single
+    Public depth As Single
+    Public length As Single
+    Public color As cv.Vec3f
+    Public index As Integer
+    Public rotatedRect As cv.RotatedRect
+    Public gcCenter As Integer
+    Public pc1 As cv.Scalar
+    Public pc2 As cv.Scalar
+    Public pcCenter As cv.Scalar
+    Public facets As New List(Of cv.Point)
+    Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
+        If pt.X < 0 Then pt.X = 0
+        If pt.X >= task.color.Width Then pt.X = task.color.Width
+        If pt.Y < 0 Then pt.Y = 0
+        If pt.Y >= task.color.Height Then pt.Y = task.color.Height
+        Return pt
+    End Function
+    Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
+        p1 = validatePoint(_p1)
+        p2 = validatePoint(_p2)
+        If p1.X > p2.X Then
+            p1 = _p2
+            p2 = _p1
+        End If
+        p1 = New cv.Point2f(p1.X, p1.Y)
+        p2 = New cv.Point2f(p2.X, p2.Y)
+
+        If p1.X = p2.X Then
+            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+        Else
+            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
+        End If
+
+        center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
+        length = p1.DistanceTo(p2)
+        age = 1
+
+        gcCenter = task.gcMap.Get(Of Integer)(center.Y, center.X)
+        Dim gc = task.gcList(gcCenter)
+        depth = gc.depth
+        color = gc.color
+        pcCenter = task.pointCloud(gc.rect).Mean(task.depthMask(gc.rect))
+
+        Dim gc1 = task.gcList(task.gcMap.Get(Of Integer)(p1.Y, p1.X))
+        Dim gc2 = task.gcList(task.gcMap.Get(Of Integer)(p2.Y, p2.X))
+        pc1 = task.pointCloud(gc1.rect).Mean(task.depthMask(gc1.rect))
+        pc2 = task.pointCloud(gc2.rect).Mean(task.depthMask(gc2.rect))
+    End Sub
+    Sub New()
+        p1 = New cv.Point2f()
+        p2 = New cv.Point2f()
+    End Sub
+    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
+        Dim perpSlope = -1 / slope
+        Dim angleRadians As Double = Math.Atan(perpSlope)
+        Dim xShift = distance * Math.Cos(angleRadians)
+        Dim yShift = distance * Math.Sin(angleRadians)
+        Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
+        Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
+        If p1.X < 0 Then p1.X = 0
+        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
+        If p1.Y < 0 Then p1.Y = 0
+        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
+        If p2.X < 0 Then p2.X = 0
+        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
+        If p2.Y < 0 Then p2.Y = 0
+        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
+        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+
+        Return New lpData(p1, p2)
+    End Function
+    Public Function compare(mp As lpData) As Boolean
+        If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
+        Return False
+    End Function
 End Class
