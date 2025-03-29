@@ -1,6 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Features2D
-Imports VB_Classes.VBtask
+﻿Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
@@ -59,8 +57,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                         gc.correlation = correlationMat.Get(Of Single)(0, 0)
                     Else
                         Dim irPt = translateColorToLeft(gc.rect.TopLeft)
-                        If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or
-                        (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
+                        If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                             gc.depth = 0 ' off the grid.
                             gc.lRect = emptyRect
                             gc.rRect = emptyRect
@@ -98,6 +95,11 @@ Public Class GridCell_Basics : Inherits TaskParent
                                            CStr(unchangedCount) + " of them were unchanged from the previous frame"
     End Sub
 End Class
+
+
+
+
+
 Public Class GridCell_MouseDepth : Inherits TaskParent
     Public ptTopLeft As New cv.Point
     Public depthAndCorrelationText As String

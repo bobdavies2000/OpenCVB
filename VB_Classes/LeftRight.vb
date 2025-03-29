@@ -255,17 +255,17 @@ Public Class LeftRight_Lines : Inherits TaskParent
         leftLines = New List(Of lpData)(task.lpList)
         dst2 = task.leftView.Clone
         For Each lp In leftLines
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
-        labels(2) = task.lines.labels(2)
+        labels(2) = "There were " + CStr(leftLines.Count) + " lines found in the left view"
 
         lines.Run(task.rightView.Clone)
         rightLines = New List(Of lpData)(lines.lpList)
         dst3 = task.rightView.Clone
         For Each lp In rightLines
-            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
-        labels(3) = lines.labels(2)
+        labels(3) = "There were " + CStr(rightLines.Count) + " lines found in the right view"
     End Sub
 End Class
 

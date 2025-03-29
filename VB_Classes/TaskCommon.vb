@@ -620,12 +620,13 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public pc1 As cv.Scalar
     Public pc2 As cv.Scalar
     Public pcCenter As cv.Scalar
+    Public highlyVisible As Boolean
     Public facets As New List(Of cv.Point)
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
-        If pt.X >= task.color.Width Then pt.X = task.color.Width
+        If pt.X >= task.color.Width Then pt.X = task.color.Width - 1
         If pt.Y < 0 Then pt.Y = 0
-        If pt.Y >= task.color.Height Then pt.Y = task.color.Height
+        If pt.Y >= task.color.Height Then pt.Y = task.color.Height - 1
         Return pt
     End Function
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
@@ -653,6 +654,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         depth = gc.depth
         color = gc.color
         pcCenter = task.pointCloud(gc.rect).Mean(task.depthMask(gc.rect))
+        Dim threshold = task.gCell.options.correlationThreshold
+        If task.gcList(gcCenter).correlation > threshold Then highlyVisible = True
 
         Dim gc1 = task.gcList(task.gcMap.Get(Of Integer)(p1.Y, p1.X))
         Dim gc2 = task.gcList(task.gcMap.Get(Of Integer)(p2.Y, p2.X))

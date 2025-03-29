@@ -87,7 +87,7 @@ Public Class Line_BasicsRaw : Inherits TaskParent
 
         Dim lines = ld.Detect(src(subsetRect))
 
-        lpList.Clear()
+        Dim lpDataList As New List(Of lpData)
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
                v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
@@ -95,17 +95,28 @@ Public Class Line_BasicsRaw : Inherits TaskParent
                 Dim p2 = New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y))
                 If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
                    p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
-                    Dim lp = New lpData(p1, p2)
-                    lp.index = lpList.Count
-                    lpList.Add(lp)
+                    lpDataList.Add(New lpData(p1, p2))
                 End If
             End If
         Next
 
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each lp In lpDataList
+            sortlines.Add(lp.length, lp)
         Next
+
+        lpList.Clear()
+        For Each lp In sortlines.Values
+            lp.index = lpList.Count
+            lpList.Add(lp)
+        Next
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            For Each lp In lpList
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Next
+        End If
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
 End Class

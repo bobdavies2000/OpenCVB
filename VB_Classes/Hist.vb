@@ -1253,35 +1253,6 @@ End Class
 
 
 
-
-
-Public Class Hist_Cell : Inherits TaskParent
-    Dim hist As New Hist_Depth
-    Public Sub New()
-        If standalone Then task.redOptions.DisplayCellStats.Checked = True
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
-        desc = "Review depth data for a RedCloud Cell"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-        hist.rc = task.rcD
-        If hist.rc.index = 0 Or hist.rc.mmZ.maxVal = 0 Then Exit Sub
-
-        dst0.SetTo(0)
-        task.pcSplit(2)(hist.rc.rect).CopyTo(dst0)
-
-        hist.Run(dst0)
-        dst3 = hist.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Hist_PointCloud : Inherits TaskParent
     Public rangesX() As cv.Rangef
     Public rangesY() As cv.Rangef
@@ -1391,7 +1362,7 @@ Public Class Hist_CloudSegments : Inherits TaskParent
         plot.removeZeroEntry = False
         desc = "Find the segments of X, Y, and Z values from the point cloud."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If standalone Then
@@ -1428,5 +1399,60 @@ Public Class Hist_CloudSegments : Inherits TaskParent
         dst1.SetTo(0, task.noDepthMask)
         dst3 = ShowPalette((dst1 + 1))
         dst3.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Hist_RedCell : Inherits TaskParent
+    Dim hist As New Hist_Depth
+    Public Sub New()
+        If standalone Then task.redOptions.DisplayCellStats.Checked = True
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
+        desc = "Review depth data for a RedCloud Cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+        hist.rc = task.rcD
+        If hist.rc.index = 0 Or hist.rc.mmZ.maxVal = 0 Then Exit Sub
+
+        dst0.SetTo(0)
+        task.pcSplit(2)(hist.rc.rect).CopyTo(dst0)
+
+        hist.Run(dst0)
+        dst3 = hist.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Hist_GridCell : Inherits TaskParent
+    Dim histogram As New cv.Mat
+    Public mask As New cv.Mat
+    Public histarray(0) As Single
+    Public Sub New()
+        desc = "Build a histogram of the cell contents"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then src = task.gray
+        Dim mm = GetMinMax(src)
+        If mm.maxVal > 0 Then
+            cv.Cv2.CalcHist({src}, {0}, mask, histogram, 1, {mm.maxVal - 1}, New cv.Rangef() {New cv.Rangef(0, mm.maxVal)})
+            If histogram.Rows > 0 Then
+                ReDim histarray(mm.maxVal - 1)
+                Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+            End If
+        End If
+        If standalone Then
+            Static plotHist As New Plot_Histogram
+            plotHist.Run(histogram)
+            dst2 = plotHist.dst2
+        End If
     End Sub
 End Class

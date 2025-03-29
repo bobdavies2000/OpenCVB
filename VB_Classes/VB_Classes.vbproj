@@ -436,6 +436,7 @@
     <Compile Include="Remap.vb" />
     <Compile Include="Video.vb" />
     <Compile Include="Stabilizer.vb" />
+    <Compile Include="Visible.vb" />
     <Compile Include="Volume.vb" />
     <Compile Include="WarpModel.vb" />
     <Compile Include="WarpPerspective.vb" />
