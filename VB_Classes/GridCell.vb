@@ -17,6 +17,8 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
         Dim gcLast As New List(Of gcData)(task.gcList), unchangedCount As Integer
+        Dim threshold = task.gCell.options.correlationThreshold
+
         task.gcList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
@@ -86,6 +88,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                 End If
             End If
 
+            If gc.correlation > threshold And gc.depth > 0 Then gc.highlyVisible = True Else gc.highlyVisible = False
             gc.index = task.gcList.Count
             task.gcList.Add(gc)
             dst2(gc.rect).SetTo(gc.color)

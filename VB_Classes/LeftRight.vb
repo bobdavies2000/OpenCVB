@@ -243,37 +243,6 @@ End Class
 
 
 
-Public Class LeftRight_Lines : Inherits TaskParent
-    Public leftLines As New List(Of lpData)
-    Public rightLines As New List(Of lpData)
-    Dim lines As New Line_BasicsRaw
-    Public Sub New()
-        labels = {"", "", "Left camera lines", "Right camera lines"}
-        desc = "Find the lines in the Left and Right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        leftLines = New List(Of lpData)(task.lpList)
-        dst2 = task.leftView.Clone
-        For Each lp In leftLines
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(2) = "There were " + CStr(leftLines.Count) + " lines found in the left view"
-
-        lines.Run(task.rightView.Clone)
-        rightLines = New List(Of lpData)(lines.lpList)
-        dst3 = task.rightView.Clone
-        For Each lp In rightLines
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(3) = "There were " + CStr(rightLines.Count) + " lines found in the right view"
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class LeftRight_RedRight : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
@@ -411,5 +380,38 @@ Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
         dst2 = task.leftView(rect).Resize(dst0.Size)
 
         dst3 = ShowAddweighted(dst2, src, labels(3))
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class LeftRight_Lines : Inherits TaskParent
+    Public leftLines As New List(Of lpData)
+    Public rightLines As New List(Of lpData)
+    Dim lines As New Line_BasicsRaw
+    Public Sub New()
+        labels = {"", "", "Left camera lines", "Right camera lines"}
+        desc = "Find the lines in the Left and Right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        leftLines = New List(Of lpData)(task.lpList)
+        dst2 = task.leftView.Clone
+        For Each lp In leftLines
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = "There were " + CStr(leftLines.Count) + " lines found in the left view"
+
+        lines.Run(task.rightView.Clone)
+        rightLines = New List(Of lpData)(lines.lpList)
+        dst3 = task.rightView.Clone
+        For Each lp In rightLines
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(3) = "There were " + CStr(rightLines.Count) + " lines found in the right view"
     End Sub
 End Class

@@ -191,8 +191,8 @@ Public Class FeatureLine_Tutorial1 : Inherits TaskParent
         For Each lp In task.lpList
             raw2D.Add(lp)
             If lp.depth > 0 Then
-                raw3D.Add(lp.pc1)
-                raw3D.Add(lp.pc2)
+                raw3D.Add(lp.pcMeans(1))
+                raw3D.Add(lp.pcMeans(2))
             End If
         Next
 

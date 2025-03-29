@@ -422,26 +422,6 @@ End Class
 
 
 
-Public Class gcData
-    Public rect As cv.Rect ' rectange under the cursor in the color image.
-    Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.
-    Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
-
-    Public center As cv.Point ' center of the rectangle
-    Public depth As Single
-    Public depthStdev As Single
-    Public age As Integer
-    Public color As cv.Vec3f
-    Public mm As mmData ' min and max values of the depth data.
-    Public corners As New List(Of cv.Point3f)
-    Public correlation As Single
-    Public features As New List(Of cv.Point)
-    Public index As Integer
-End Class
-
-
-
-
 
 Public Class triangleData
     Public color As cv.Point3f
@@ -603,6 +583,27 @@ End Class
 
 
 
+Public Class gcData
+    Public rect As cv.Rect ' rectange under the cursor in the color image.
+    Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.
+    Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
+
+    Public center As cv.Point ' center of the rectangle
+    Public depth As Single
+    Public depthStdev As Single
+    Public age As Integer
+    Public color As cv.Vec3f
+    Public mm As mmData ' min and max values of the depth data.
+    Public corners As New List(Of cv.Point3f)
+    Public correlation As Single
+    Public highlyVisible As Boolean
+    Public features As New List(Of cv.Point)
+    Public index As Integer
+End Class
+
+
+
+
 Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
     Public center As cv.Point ' the point to use when identifying this line
     Public age As Integer
@@ -614,12 +615,10 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public color As cv.Vec3f
     Public index As Integer
     Public rotatedRect As cv.RotatedRect
-    Public gc1 As Integer
-    Public gc2 As Integer
-    Public gcCenter As Integer
-    Public pc1 As cv.Scalar
-    Public pc2 As cv.Scalar
-    Public pcCenter As cv.Scalar
+
+    Public gcIndex As New List(Of Integer)
+    Public pcMeans As New List(Of cv.Scalar) ' point cloud means for all points in gcList
+
     Public highlyVisible As Boolean
     Public facets As New List(Of cv.Point)
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
@@ -630,14 +629,13 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Return pt
     End Function
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
-        p1 = validatePoint(_p1)
-        p2 = validatePoint(_p2)
         If p1.X > p2.X Then
             p1 = _p2
             p2 = _p1
         End If
-        p1 = New cv.Point2f(p1.X, p1.Y)
-        p2 = New cv.Point2f(p2.X, p2.Y)
+
+        p1 = validatePoint(_p1)
+        p2 = validatePoint(_p2)
 
         If p1.X = p2.X Then
             slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
@@ -649,18 +647,21 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         length = p1.DistanceTo(p2)
         age = 1
 
-        gcCenter = task.gcMap.Get(Of Integer)(center.Y, center.X)
-        Dim gc = task.gcList(gcCenter)
-        depth = gc.depth
-        color = gc.color
-        pcCenter = task.pointCloud(gc.rect).Mean(task.depthMask(gc.rect))
         Dim threshold = task.gCell.options.correlationThreshold
-        If task.gcList(gcCenter).correlation > threshold Then highlyVisible = True
 
-        Dim gc1 = task.gcList(task.gcMap.Get(Of Integer)(p1.Y, p1.X))
-        Dim gc2 = task.gcList(task.gcMap.Get(Of Integer)(p2.Y, p2.X))
-        pc1 = task.pointCloud(gc1.rect).Mean(task.depthMask(gc1.rect))
-        pc2 = task.pointCloud(gc2.rect).Mean(task.depthMask(gc2.rect))
+        For i = 0 To 2
+            Dim pt = Choose(i + 1, center, p1, p2)
+            Dim nextIndex = task.gcMap.Get(Of Integer)(pt.y, pt.x)
+            gcIndex.Add(nextIndex)
+            Dim r = task.gcList(nextIndex).rect
+            pcMeans.Add(task.pointCloud(r).Mean(task.depthMask(r)))
+        Next
+
+        Dim gcCenter = task.gcList(gcIndex(0))
+        depth = gcCenter.depth
+        color = gcCenter.color
+
+        If gcCenter.highlyVisible Then highlyVisible = True Else highlyVisible = False
     End Sub
     Sub New()
         p1 = New cv.Point2f()

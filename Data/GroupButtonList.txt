@@ -101,6 +101,7 @@ GridROI
 Guess
 GuidedBP
 HeatMap
+HighVis
 Hist
 Hist2D
 Hist3D
@@ -235,7 +236,6 @@ Triangle
 Vector
 Video
 Vignetting
-Visible
 Volume
 WarpAffine
 WarpModel

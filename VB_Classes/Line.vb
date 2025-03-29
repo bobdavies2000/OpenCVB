@@ -57,9 +57,14 @@ Public Class Line_Basics : Inherits TaskParent
         dst2 = src
         For Each lp In sortlines.Values
             lp.index = task.lpList.Count
+
+            Dim gcCenter = task.gcList(lp.gcIndex(0))
+            If gcCenter.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
+
             task.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
+
         labels(2) = CStr(task.lpList.Count) + " lines were found."
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
     End Sub
@@ -379,78 +384,6 @@ End Class
 
 
 
-Public Class Line_PointSlope : Inherits TaskParent
-    Dim knn As New KNN_NNBasics
-    Public bestLines As New List(Of lpData)
-    Const lineCount As Integer = 3
-    Const searchCount As Integer = 100
-    Public Sub New()
-        knn.options.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
-        desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
-
-        If bestLines.Count < lineCount Or task.heartBeat Then
-            dst3.SetTo(0)
-            bestLines.Clear()
-            knn.queries.Clear()
-            For Each lp In task.lpList
-                bestLines.Add(lp)
-                For j = 0 To knn.options.knnDimension - 1
-                    knn.queries.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
-                Next
-                DrawLine(dst3, lp.p1, lp.p2, task.highlight)
-                If bestLines.Count >= lineCount Then Exit For
-            Next
-        End If
-
-        dst1.SetTo(0)
-        knn.trainInput.Clear()
-        For Each lp In task.lpList
-            For j = 0 To knn.options.knnDimension - 1
-                knn.trainInput.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
-            Next
-            dst1.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-        Next
-        If knn.trainInput.Count = 0 Then
-            SetTrueText("There were no lines detected!  Were there any unusual settings for this run?", 3)
-            Exit Sub
-        End If
-
-        knn.Run(src)
-        If knn.result Is Nothing Then Exit Sub
-        Dim nextLines As New List(Of lpData)
-        Dim usedBest As New List(Of Integer)
-        Dim index As Integer
-        For i = 0 To knn.result.GetUpperBound(0)
-            For j = 0 To knn.result.GetUpperBound(1)
-                index = knn.result(i, j)
-                If usedBest.Contains(index) = False Then Exit For
-            Next
-            usedBest.Add(index)
-
-            If index * knn.options.knnDimension + 4 < knn.trainInput.Count Then
-                Dim mps = New lpData(New cv.Point2f(knn.trainInput(index * knn.options.knnDimension + 0), knn.trainInput(index * knn.options.knnDimension + 1)),
-                          New cv.Point2f(knn.trainInput(index * knn.options.knnDimension + 2), knn.trainInput(index * knn.options.knnDimension + 3)))
-                mps.slope = knn.trainInput(index * knn.options.knnDimension)
-                nextLines.Add(mps)
-            End If
-        Next
-
-        bestLines = New List(Of lpData)(nextLines)
-        For Each ptS In bestLines
-            DrawLine(dst2, ptS.p1, ptS.p2, task.highlight)
-            DrawLine(dst1, ptS.p1, ptS.p2, cv.Scalar.Red)
-        Next
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -653,9 +586,9 @@ Public Class Line_Horizontal3D : Inherits TaskParent
 
         horizList.Clear()
         For Each lp In task.lpList
-            If lp.pc1.Item(dimension) = 0 Or lp.pc2.Item(dimension) = 0 Then Continue For ' no depth...
+            If lp.pcMeans(1).Item(dimension) = 0 Or lp.pcMeans(2).Item(dimension) = 0 Then Continue For ' no depth...
 
-            If Math.Abs(lp.pc1.Item(dimension) - lp.pc2.Item(dimension)) < 0.01 Then
+            If Math.Abs(lp.pcMeans(1).Item(dimension) - lp.pcMeans(2).Item(dimension)) < 0.01 Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 horizList.Add(lp)
             End If
@@ -681,9 +614,9 @@ Public Class Line_Vertical3D : Inherits TaskParent
 
         vertlist.Clear()
         For Each lp In task.lpList
-            If lp.pc1.Item(dimension) = 0 Or lp.pc2.Item(dimension) = 0 Then Continue For ' no depth...
+            If lp.pcMeans(1).Item(dimension) = 0 Or lp.pcMeans(2).Item(dimension) = 0 Then Continue For ' no depth...
 
-            If Math.Abs(lp.pc1.Item(dimension) - lp.pc2.Item(dimension)) < 0.01 Then
+            If Math.Abs(lp.pcMeans(1).Item(dimension) - lp.pcMeans(2).Item(dimension)) < 0.01 Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 vertlist.Add(lp)
             End If
