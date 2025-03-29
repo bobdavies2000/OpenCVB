@@ -629,13 +629,14 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Return pt
     End Function
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
-        If p1.X > p2.X Then
-            p1 = _p2
-            p2 = _p1
-        End If
-
         p1 = validatePoint(_p1)
         p2 = validatePoint(_p2)
+
+        If p1.X > p2.X Then
+            Dim ptTemp = p1
+            p1 = p2
+            p2 = p1
+        End If
 
         If p1.X = p2.X Then
             slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
