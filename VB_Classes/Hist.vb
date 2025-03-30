@@ -1443,9 +1443,9 @@ Public Class Hist_GridCell : Inherits TaskParent
         If standalone Then src = task.gray
         Dim mm = GetMinMax(src)
         If mm.maxVal > 0 Then
-            cv.Cv2.CalcHist({src}, {0}, mask, histogram, 1, {mm.maxVal - 1}, New cv.Rangef() {New cv.Rangef(0, mm.maxVal)})
+            cv.Cv2.CalcHist({src}, {0}, mask, histogram, 1, {mm.maxVal + 1}, New cv.Rangef() {New cv.Rangef(0, mm.maxVal + 1)})
             If histogram.Rows > 0 Then
-                ReDim histarray(mm.maxVal - 1)
+                ReDim histarray(mm.maxVal)
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
             End If
         End If

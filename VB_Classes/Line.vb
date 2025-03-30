@@ -1,11 +1,11 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Dim lines As New Line_BasicsRaw
+    Public lines As New Line_BasicsRaw
     Public Sub New()
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask.  Results are in task.lplist."
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
     End Sub
     Private Function getLineCounts(lpList As List(Of lpData)) As Single()
         Dim histarray(lpList.Count - 1) As Single
@@ -20,6 +20,7 @@ Public Class Line_Basics : Inherits TaskParent
 
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
         End If
+
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -38,7 +39,7 @@ Public Class Line_Basics : Inherits TaskParent
         Next
 
         histArray = getLineCounts(task.lpList)
-        For i = histArray.Count - 1 To 0 Step -1
+        For i = histArray.Count - 1 To 1 Step -1
             If histArray(i) Then task.lpList.RemoveAt(i)
         Next
 
@@ -50,10 +51,11 @@ Public Class Line_Basics : Inherits TaskParent
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each lp In newList
-            sortlines.Add(lp.length, lp)
+            If lp.length > 0 Then sortlines.Add(lp.length, lp)
         Next
 
         task.lpList.Clear()
+        task.lpList.Add(New lpData(New cv.Point, New cv.Point)) ' placeholder for zero so we can distinguish line 1 from the background which is 0.
         dst2 = src
         For Each lp In sortlines.Values
             lp.index = task.lpList.Count
@@ -81,7 +83,7 @@ Public Class Line_BasicsRaw : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
     Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
                "rectangle (provided externally)"
@@ -414,37 +416,31 @@ End Class
 
 
 Public Class Line_Info : Inherits TaskParent
-    Public lpInput As New List(Of lpData)
     Public Sub New()
+        task.gOptions.DebugSlider.Value = 1 ' because the 0th element is a placeholder at 0,0
         labels(3) = "The selected line with details."
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Display details about the line selected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = task.lines.labels(2) + " - click near the center (highlighted dot) of any line."
+        labels(2) = task.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
-        Dim clickMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Dim lp As lpData
         dst2.SetTo(0)
         For Each lp In task.lpList
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
             DrawCircle(dst2, lp.center, task.DotSize, task.highlight)
-
-            Dim nIndex = task.gcMap.Get(Of Integer)(lp.center.Y, lp.center.X)
-            For Each gIndex In task.gridNeighbors(nIndex)
-                clickMap(task.gridRects(gIndex)).SetTo(lp.index)
-            Next
         Next
 
         If task.firstPass Then task.ClickPoint = task.lpList(0).center
 
-        strOut = "Click near any center at left to get details on that line " + vbCrLf
-        strOut += "If lines are crowded, not all lines may be clickable." + vbCrLf
+        strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
         strOut += CStr(task.lpList.Count) + " lines found " + vbCrLf + vbCrLf
 
-        Static clickIndex As Integer
-        clickIndex = clickMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim clickIndex As Integer = Math.Abs(task.gOptions.DebugSlider.Value)
         lp = task.lpList(clickIndex)
+
+        dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
         strOut += "Line ID = " + CStr(lp.index) + vbCrLf + vbCrLf
         strOut += "gcMap element = " + CStr(clickIndex) + vbCrLf
@@ -463,9 +459,7 @@ Public Class Line_Info : Inherits TaskParent
         'strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted."
 
-        dst3.SetTo(0)
-        DrawLine(dst3, lp.p1, lp.p2, 255)
-        dst3.Rectangle(findRectFromLine(lp), 255, task.lineWidth, task.lineType)
+        ' dst3.Rectangle(findRectFromLine(lp), 255, task.lineWidth, task.lineType)
         SetTrueText(strOut, 3)
     End Sub
 End Class

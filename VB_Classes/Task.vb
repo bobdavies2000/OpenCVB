@@ -777,8 +777,6 @@ Public Class VBtask : Implements IDisposable
             heartBeat = heartBeat Or debugSyncUI Or optionsChanged Or mouseClickFlag
         End If
 
-        splitOriginalCloud = pointCloud.Split
-
         If paused = False Then
             frameHistoryCount = gOptions.FrameHistory.Value
 
@@ -794,6 +792,7 @@ Public Class VBtask : Implements IDisposable
 
 
 
+            splitOriginalCloud = gravityCloud.Split
             If useGravityPointcloud Then pointCloud = gravityCloud
 
             If pcSplit Is Nothing Then pcSplit = pointCloud.Split

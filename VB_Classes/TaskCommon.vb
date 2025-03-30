@@ -621,6 +621,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
 
     Public highlyVisible As Boolean
     Public facets As New List(Of cv.Point)
+    Public gridList As New List(Of Integer)
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
         If pt.X >= task.color.Width Then pt.X = task.color.Width - 1

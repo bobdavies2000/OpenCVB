@@ -1,4 +1,5 @@
-﻿Imports VB_Classes.VBtask
+﻿Imports System.Runtime.InteropServices
+Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
@@ -930,16 +931,37 @@ End Class
 
 
 Public Class GridCell_Lines : Inherits TaskParent
-    Dim regions As New Connected_Contours
+    Dim hist As New Hist_GridCell
+    Dim info As New Line_Info
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Lines can mean cells are connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        regions.Run(src)
-        dst2 = regions.dst3
-
+        dst2 = task.lines.dst2
+        dst1.SetTo(0)
+        dst3.SetTo(0)
         For Each lp In task.lpList
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
         Next
+
+        Dim srcArray(task.cellSize * task.cellSize - 1) As Single
+        For Each gc In task.gcList
+            hist.Run(dst1(gc.rect).Clone)
+            For i = 1 To hist.histarray.Count - 1
+                If hist.histarray(i) > 0 Then task.lpList(i).gridList.Add(gc.index)
+            Next
+        Next
+
+        dst3.SetTo(0)
+        For Each index In task.lpList(Math.Abs(task.gOptions.DebugSlider.Value)).gridList
+            dst3.Rectangle(task.gcList(index).rect, 255, task.lineWidth, task.lineType)
+        Next
+
+        info.Run(src)
+        SetTrueText(info.strOut, 3)
     End Sub
 End Class
