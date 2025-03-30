@@ -596,9 +596,12 @@ Public Class gcData
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
     Public correlation As Single
+    Public hoodCorrelation As Single
     Public highlyVisible As Boolean
     Public features As New List(Of cv.Point)
     Public index As Integer
+    Public hoodRect As cv.Rect ' a rect describing the neighborhood of the center cell...
+    Public rHoodRect As cv.Rect ' a rect describing the neighborhood of the center cell for the right image.
 End Class
 
 
@@ -611,13 +614,13 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p2 As cv.Point2f
     Public slope As Single
     Public depth As Single
+    Public pcMeans As New List(Of cv.Scalar) ' point cloud means for all points in gcList
     Public length As Single
     Public color As cv.Vec3f
     Public index As Integer
     Public rotatedRect As cv.RotatedRect
 
     Public gcIndex As New List(Of Integer)
-    Public pcMeans As New List(Of cv.Scalar) ' point cloud means for all points in gcList
 
     Public highlyVisible As Boolean
     Public facets As New List(Of cv.Point)
@@ -655,8 +658,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             Dim pt = Choose(i + 1, center, p1, p2)
             Dim nextIndex = task.gcMap.Get(Of Integer)(pt.y, pt.x)
             gcIndex.Add(nextIndex)
-            Dim r = task.gcList(nextIndex).rect
-            pcMeans.Add(task.pointCloud(r).Mean(task.depthMask(r)))
+            Dim gc = task.gcList(nextIndex)
+            Dim r = gc.rect
+            pcMeans.Add(task.pointCloud(gc.rect).Mean(task.depthMask(gc.rect)))
         Next
 
         Dim gcCenter = task.gcList(gcIndex(0))

@@ -3,8 +3,7 @@ Imports VB_Classes.VBtask
 Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
-    Public thresholdRangeZ As Single
-    Public instantUpdate As Boolean = True
+    Public instantUpdate As Boolean
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
@@ -13,13 +12,14 @@ Public Class GridCell_Basics : Inherits TaskParent
         options.Run()
 
         Dim stdev As cv.Scalar, mean As cv.Scalar
-        Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
+        Dim correlationMat As New cv.Mat
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
         Dim gcLast As New List(Of gcData)(task.gcList), unchangedCount As Integer
         Dim threshold = task.gCell.options.correlationThreshold
 
+        Dim maxPixels = task.cellSize * task.cellSize
         task.gcList.Clear()
         Dim depthCount As Integer, visibleCount As Integer
         For i = 0 To task.gridRects.Count - 1
@@ -37,13 +37,16 @@ Public Class GridCell_Basics : Inherits TaskParent
                 depthCount += 1
             End If
 
-            If gc.depth = 0 Then
-                gc.correlation = 0
-                gc.rRect = emptyRect
-            Else
+            gc.index = task.gcList.Count
+            gc.hoodRect = gc.rect
+            For Each index In task.gridNeighbors(gc.index)
+                gc.hoodRect = gc.hoodRect.Union(task.gridRects(index))
+            Next
+
+            If gc.depth > 0 Then
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute gc.
                 Dim lastCorrelation = If(task.firstPass, 0, gcLast(i).correlation)
-                If gc.age > 1 And lastCorrelation > 0.5 Then
+                If gc.age > 1 And lastCorrelation > threshold And instantUpdate = False Then
                     unchangedCount += 1
                     ' no need to recompute everything when there is no motion in the cell.
                     gc = gcLast(i)
@@ -51,15 +54,10 @@ Public Class GridCell_Basics : Inherits TaskParent
                 Else
                     ' everything is recomputed when there is motion in the cell.
                     gc.mm = GetMinMax(task.pcSplit(2)(gc.rect), task.depthMask(gc.rect))
+                    Dim delta As Single
                     If task.rgbLeftAligned Then
                         gc.lRect = gc.rect
-                        gc.rRect = gc.lRect
-                        gc.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
-                        gc.rRect = ValidateRect(gc.rRect)
-                        cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
-                                                     cv.TemplateMatchModes.CCoeffNormed)
-
-                        gc.correlation = correlationMat.Get(Of Single)(0, 0)
+                        delta = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
                     Else
                         Dim irPt = translateColorToLeft(gc.rect.TopLeft)
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
@@ -70,30 +68,38 @@ Public Class GridCell_Basics : Inherits TaskParent
                             gc.lRect = New cv.Rect(irPt.X, irPt.Y, gc.rect.Width, gc.rect.Height)
                             gc.lRect = ValidateRect(gc.lRect)
 
-                            gc.rRect = gc.lRect
-                            gc.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
-                            gc.rRect = ValidateRect(gc.rRect)
-                            cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat,
-                                                      cv.TemplateMatchModes.CCoeffNormed)
-
-                            gc.correlation = correlationMat.Get(Of Single)(0, 0)
+                            delta = task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
                         End If
                     End If
 
-                    Dim p0 = getWorldCoordinates(gc.rect.TopLeft, gc.depth)
-                    Dim p1 = getWorldCoordinates(gc.rect.BottomRight, gc.depth)
+                    If gc.depth > 0 Then
+                        gc.rRect = gc.lRect
+                        gc.rRect.X -= delta
+                        gc.rRect = ValidateRect(gc.rRect)
+                        gc.rHoodRect = gc.hoodRect
+                        gc.rHoodRect.X -= delta
+                        gc.rHoodRect = ValidateRect(gc.rHoodRect)
 
-                    ' clockwise around starting in upper left.
-                    gc.corners.Add(New cv.Point3f(p0.X, p0.Y, gc.depth))
-                    gc.corners.Add(New cv.Point3f(p1.X, p0.Y, gc.depth))
-                    gc.corners.Add(New cv.Point3f(p1.X, p1.Y, gc.depth))
-                    gc.corners.Add(New cv.Point3f(p0.X, p1.Y, gc.depth))
+                        cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                        gc.correlation = correlationMat.Get(Of Single)(0, 0)
+
+                        cv.Cv2.MatchTemplate(leftview(gc.hoodRect), rightView(gc.rHoodRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                        gc.hoodCorrelation = correlationMat.Get(Of Single)(0, 0)
+
+                        Dim p0 = getWorldCoordinates(gc.rect.TopLeft, gc.depth)
+                        Dim p1 = getWorldCoordinates(gc.rect.BottomRight, gc.depth)
+
+                        ' clockwise around starting in upper left.
+                        gc.corners.Add(New cv.Point3f(p0.X, p0.Y, gc.depth))
+                        gc.corners.Add(New cv.Point3f(p1.X, p0.Y, gc.depth))
+                        gc.corners.Add(New cv.Point3f(p1.X, p1.Y, gc.depth))
+                        gc.corners.Add(New cv.Point3f(p0.X, p1.Y, gc.depth))
+                    End If
                 End If
+                If gc.correlation > threshold Then gc.highlyVisible = True Else gc.highlyVisible = False
+                If gc.highlyVisible Then visibleCount += 1
             End If
 
-            If gc.correlation > threshold And gc.depth > 0 Then gc.highlyVisible = True Else gc.highlyVisible = False
-            gc.index = task.gcList.Count
-            If gc.highlyVisible Then visibleCount += 1
             task.gcList.Add(gc)
             dst2(gc.rect).SetTo(gc.color)
         Next
@@ -119,7 +125,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
         Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         task.gcCell = task.gcList(index)
-        dst2 = task.gCell.dst2
+        If standaloneTest() Then dst2 = task.gCell.dst2
 
         Dim pt = task.gcCell.rect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
@@ -129,7 +135,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
         End If
 
         depthAndCorrelationText = Format(task.gcCell.depth, fmt2) +
-                                  "m " + " ID=" +
+                                  "m stdev " + Format(task.gcCell.depthStdev, fmt1) + " ID=" +
                                   CStr(task.gcCell.index) + vbCrLf + "depth " + Format(task.gcCell.mm.minVal, fmt3) + "m - " +
                                   Format(task.gcCell.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.gcCell.correlation, fmt3)
         ptTopLeft = pt
@@ -347,37 +353,6 @@ Public Class GridCell_LeftRightSize : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class GridCell_Correlation : Inherits TaskParent
-    Public Sub New()
-        desc = "Given a left image cell, find it's match in the right image, and display their correlation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then Exit Sub ' settle down first...
-
-        dst2 = task.leftView
-        dst3 = task.rightView
-        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        If index < 0 Or index > task.gcList.Count Then Exit Sub
-
-        Dim gc = task.gcList(index)
-        Dim pt = task.mouseD.ptTopLeft
-        Dim corr = gc.correlation
-        dst2.Circle(gc.lRect.TopLeft, task.DotSize, 255, -1)
-        SetTrueText("Correlation " + Format(corr, fmt3), pt, 2)
-        labels(3) = "Correlation of the left grid cell to the right is " + Format(corr, fmt3)
-
-        dst2.Rectangle(gc.lRect, 255, task.lineWidth)
-        dst3.Rectangle(gc.rRect, 255, task.lineWidth)
-        labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
-    End Sub
-End Class
 
 
 
@@ -955,5 +930,78 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
         labels(2) = task.gCell.labels(2)
 
         If standaloneTest() Then dst3 = task.gcMap
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class GridCell_Correlation : Inherits TaskParent
+    Public Sub New()
+        desc = "Given a left image cell, find it's match in the right image, and display their correlation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then Exit Sub ' settle down first...
+
+        dst2 = task.leftView
+        dst3 = task.rightView
+        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        If index < 0 Or index > task.gcList.Count Then Exit Sub
+
+        Dim gc = task.gcList(index)
+        Dim pt = task.mouseD.ptTopLeft
+        Dim corr = gc.correlation
+        dst2.Circle(gc.lRect.TopLeft, task.DotSize, 255, -1)
+        SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf + "Hood corr. " + Format(gc.hoodCorrelation, fmt3), pt, 2)
+        labels(3) = "Correlation of the left grid cell to the right is " + Format(corr, fmt3) +
+                    " neighborhood correlation = " + Format(gc.hoodCorrelation, fmt3)
+
+        dst2.Rectangle(gc.lRect, 255, task.lineWidth)
+        dst3.Rectangle(gc.rRect, 255, task.lineWidth)
+
+        dst2.Rectangle(gc.hoodRect, 255, task.lineWidth)
+        dst3.Rectangle(gc.rHoodRect, 255, task.lineWidth)
+
+        labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3) +
+                    " neighborhood correlation = " + Format(gc.hoodCorrelation, fmt3)
+    End Sub
+End Class
+
+
+
+
+Public Class GridCell_Info : Inherits TaskParent
+    Public Sub New()
+        task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        desc = "Display the info about the select grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        labels(2) = "Click on a grid cell to see the properties."
+
+        Dim index = task.gcMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+
+        Dim gc As gcData = task.gcList(index)
+        dst2 = task.colorizer.buildCorrMap.dst2
+
+        strOut += CStr(task.gcList.Count) + " grid cells found " + vbCrLf + vbCrLf
+
+        dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
+        dst2.Rectangle(gc.hoodRect, task.highlight, task.lineWidth)
+
+        strOut = "Grid ID = " + CStr(index) + vbCrLf + vbCrLf
+        strOut += "Age = " + CStr(gc.age) + vbCrLf
+        strOut += "Correlation to right image = " + vbTab + Format(gc.correlation, fmt3) + vbCrLf
+        strOut += "neighborhood correlation = " + vbTab + Format(gc.hoodCorrelation, fmt3) + vbCrLf
+        strOut += "Depth stdev = " + vbTab + vbTab + Format(gc.depthStdev, fmt3) + vbCrLf
+        strOut += "depth = " + vbTab + vbTab + vbTab + Format(gc.depth, fmt3) + vbCrLf
+        strOut += "HighlyVisible = " + vbTab + vbTab + CStr(gc.highlyVisible) + vbCrLf
+        strOut += "Depth mm.maxval =" + vbTab + Format(gc.mm.maxVal, fmt3) + vbCrLf
+        strOut += "Depth mm.minval =" + vbTab + Format(gc.mm.minVal, fmt3) + vbCrLf
+
+        SetTrueText(strOut, 3)
     End Sub
 End Class

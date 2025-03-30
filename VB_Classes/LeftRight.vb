@@ -395,7 +395,7 @@ Public Class LeftRight_Lines : Inherits TaskParent
     Public rightLines As New List(Of lpData)
     Dim lines As New Line_BasicsRaw
     Public Sub New()
-        labels = {"", "", "Left camera lines", "Right camera lines"}
+        labels = {"", "", "Left image lines", "Right image lines"}
         desc = "Find the lines in the Left and Right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

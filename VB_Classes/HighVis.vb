@@ -44,7 +44,11 @@ Public Class HighVis_Lines : Inherits TaskParent
         Dim leftLines = New List(Of lpData)(highVis.leftLines)
         Dim rightCount As Integer
         For Each lp In leftLines
-            If lp.pcMeans(1) = 0 Or lp.pcMeans(2) = 0 Then Continue For ' the end points don't have depth so skip them.
+            If lp.pcMeans(1).Item(2) = 0 Or lp.pcMeans(2).Item(2) = 0 Then Continue For ' end points must have depth so skip them if not.
+
+            Dim gc = task.gcList(lp.gcIndex(0)) ' what is the range of depth values in the left grid cell.
+            If gc.mm.maxVal = gc.mm.minVal > 0.1 Then Continue For ' too much variability in depth - not reliable for translation.
+
             rightCount += 1
 
             Dim ptRight() As cv.Point = {lp.p1, lp.p2}
@@ -64,3 +68,8 @@ Public Class HighVis_Lines : Inherits TaskParent
         'End If
     End Sub
 End Class
+
+
+
+
+

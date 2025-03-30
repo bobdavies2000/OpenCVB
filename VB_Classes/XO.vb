@@ -2110,7 +2110,6 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
             If task.depthMask(gc.rect).CountNonZero Then
                 cv.Cv2.MeanStdDev(task.pcSplit(2)(gc.rect), mean, stdev, task.depthMask(gc.rect))
                 gc.depth = mean(0)
-                gc.depthStdev = stdev(0)
             End If
 
             If gc.depth = 0 Then

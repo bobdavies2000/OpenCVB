@@ -447,19 +447,9 @@ Public Class Line_Info : Inherits TaskParent
         strOut += "Age = " + CStr(lp.age) + vbCrLf
 
         strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf
-        'strOut += "Pointcloud range X " + Format(lp.mmX.minVal, fmt3) + " to " +
-        '           Format(lp.mmX.maxVal, fmt3) + vbCrLf
-        'strOut += "Pointcloud range Y " + Format(lp.mmY.minVal, fmt3) + " to " +
-        '           Format(lp.mmY.maxVal, fmt3) + vbCrLf
-        'strOut += "Pointcloud range Z " + Format(lp.mmZ.minVal, fmt3) + " to " +
-        '           Format(lp.mmZ.maxVal, fmt3) + vbCrLf + vbCrLf
-
         strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
-        'strOut += "X-intercept = " + Format(lp.xIntercept, fmt1) + vbCrLf
-        'strOut += "Y-intercept = " + Format(lp.yIntercept, fmt1) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted."
 
-        ' dst3.Rectangle(findRectFromLine(lp), 255, task.lineWidth, task.lineType)
         SetTrueText(strOut, 3)
     End Sub
 End Class
