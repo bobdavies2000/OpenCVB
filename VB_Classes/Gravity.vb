@@ -84,7 +84,7 @@ Public Class Gravity_Raw : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim threshold As Single = 0.015
 
-        dst3 = task.pcSplit(0).InRange(-threshold, threshold)
+        dst3 = task.splitOriginalCloud(0).InRange(-threshold, threshold)
         dst3.SetTo(0, task.noDepthMask)
         Dim gPoints = dst3.FindNonZero()
         If gPoints.Rows = 0 Then Exit Sub ' no point cloud data to get the gravity line in the image coordinates.

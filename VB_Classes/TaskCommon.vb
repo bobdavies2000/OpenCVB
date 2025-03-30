@@ -635,7 +635,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If p1.X > p2.X Then
             Dim ptTemp = p1
             p1 = p2
-            p2 = p1
+            p2 = ptTemp
         End If
 
         If p1.X = p2.X Then

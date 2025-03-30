@@ -90,6 +90,7 @@ Public Class VBtask : Implements IDisposable
     Public rightView As New cv.Mat
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
     Public pointCloud As New cv.Mat
+    Public splitOriginalCloud() As cv.Mat
     Public gravityCloud As New cv.Mat
     Public pcSplit() As cv.Mat
     Public gravitySplit() As cv.Mat
@@ -775,6 +776,8 @@ Public Class VBtask : Implements IDisposable
         Else
             heartBeat = heartBeat Or debugSyncUI Or optionsChanged Or mouseClickFlag
         End If
+
+        splitOriginalCloud = pointCloud.Split
 
         If paused = False Then
             frameHistoryCount = gOptions.FrameHistory.Value
