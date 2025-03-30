@@ -942,24 +942,33 @@ Public Class GridCell_Lines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lines.dst2
         dst1.SetTo(0)
-        dst3.SetTo(0)
         For Each lp In task.lpList
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            lp.gridList.Clear()
         Next
 
         Dim srcArray(task.cellSize * task.cellSize - 1) As Single
         For Each gc In task.gcList
+            If gc.rect.Width <> task.cellSize Or gc.rect.Height <> task.cellSize Then Continue For ' ignore odd size gridcells.
             hist.Run(dst1(gc.rect).Clone)
             For i = 1 To hist.histarray.Count - 1
-                If hist.histarray(i) > 0 Then task.lpList(i).gridList.Add(gc.index)
+                If hist.histarray(i) > 0 Then
+                    task.lpList(i).gridList.Add(gc.index)
+                End If
             Next
         Next
 
         dst3.SetTo(0)
-        For Each index In task.lpList(Math.Abs(task.gOptions.DebugSlider.Value)).gridList
-            dst3.Rectangle(task.gcList(index).rect, 255, task.lineWidth, task.lineType)
+        Dim lineRect As cv.Rect
+        task.lpD = task.lpList(Math.Abs(task.gOptions.DebugSlider.Value))
+        For Each index In task.lpD.gridList
+            Dim gc = task.gcList(index)
+            If lineRect.Width = 0 Then lineRect = gc.rect Else lineRect = lineRect.Union(gc.rect)
+            dst3.Rectangle(gc.rect, 255, 1, task.lineType)
         Next
+
+        dst1.Rectangle(lineRect, 255, task.lineWidth, task.lineType)
+        dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
         info.Run(src)
         SetTrueText(info.strOut, 3)
