@@ -5,7 +5,7 @@ Public Class Grid_Basics : Inherits TaskParent
     Public tilesPerCol As Integer, tilesPerRow As Integer
     Public Sub New()
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        task.gcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 255)
+        task.gcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 0)
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -28,6 +28,11 @@ Public Class Grid_Basics : Inherits TaskParent
             For y = 0 To src.Height - 1 Step cellSize
                 For x = 0 To src.Width - 1 Step cellSize
                     Dim roi = ValidateRect(New cv.Rect(x, y, cellSize, cellSize))
+
+                    If roi.Height <> cellSize Then Dim k = 0
+                    If roi.Bottom = dst2.Height - 1 Then roi.Height += 1
+                    If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
+
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then tilesPerCol += 1
                         If y = 0 Then tilesPerRow += 1
@@ -81,9 +86,7 @@ Public Class Grid_Basics : Inherits TaskParent
                     xList.Add(roi.BottomRight.X)
                     yList.Add(roi.BottomRight.Y)
                 Next
-                task.gridNabeRects.Add(New cv.Rect(xList.Min, yList.Min,
-                                              xList.Max - xList.Min,
-                                              yList.Max - yList.Min))
+                task.gridNabeRects.Add(New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min))
             Next
 
             task.gridPoints.Clear()

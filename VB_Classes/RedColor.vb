@@ -1769,28 +1769,6 @@ End Class
 
 
 
-Public Class RedColor_HighCorrelation : Inherits TaskParent
-    Dim corrMap As New GridCell_CorrelationMap
-    Public Sub New()
-        task.redC = New RedColor_Basics
-        desc = "Use only the high correlation depth cells as input to RedColor_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        corrMap.Run(src)
-
-        dst3 = src.SetTo(0, Not corrMap.dst3)
-        dst2 = runRedC(src, labels(2))
-        For i = 0 To task.rcList.Count - 1
-            Dim rc = task.rcList(i)
-
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class RedColor_GridCellsOld : Inherits TaskParent
     Dim regions As New Connected_Contours

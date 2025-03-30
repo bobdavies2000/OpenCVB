@@ -29,7 +29,7 @@ Public Class Gravity_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
-        task.gravityVec = New lpData(New cv.Point2f(gravity.xTop, 0), New cv.Point2f(gravity.xBot, dst2.Height - 1))
+        task.gravityVec = New lpData(New cv.Point2f(gravity.xTop, 0), New cv.Point2f(gravity.xBot, dst2.Height))
         task.horizonVec = computePerp(task.gravityVec)
 
         If standaloneTest() Then

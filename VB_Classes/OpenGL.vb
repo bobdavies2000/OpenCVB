@@ -2125,27 +2125,6 @@ End Class
 
 
 
-Public Class OpenGL_CorrelationMask : Inherits TaskParent
-    Dim corrMask As New GridCell_CorrelationMask
-    Public Sub New()
-        desc = "Show only the pointcloud portions that have a correlation greater than the threshold."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        corrMask.Run(src)
-        dst2 = corrMask.dst2
-        dst3 = corrMask.dst3
-        labels = corrMask.labels
-
-        task.ogl.pointCloudInput = corrMask.dst2
-        task.ogl.Run(src)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class OpenGL_PCdiff : Inherits TaskParent
     Dim filter As New PCdiff_Points
     Public Sub New()

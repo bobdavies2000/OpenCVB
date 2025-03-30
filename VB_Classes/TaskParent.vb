@@ -348,10 +348,10 @@ Public Class TaskParent : Implements IDisposable
     Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X + r.Width >= task.dst2.Width * ratio Then r.Width = task.dst2.Width * ratio - r.X
-        If r.Y + r.Height >= task.dst2.Height * ratio Then r.Height = task.dst2.Height * ratio - r.Y
-        If r.X >= task.dst2.Width * ratio Then r.X = dst2.Width
-        If r.Y >= task.dst2.Height * ratio Then r.Y = dst2.Height
+        If r.X + r.Width >= task.dst2.Width * ratio Then r.Width = task.dst2.Width * ratio - r.X - 1
+        If r.Y + r.Height >= task.dst2.Height * ratio Then r.Height = task.dst2.Height * ratio - r.Y - 1
+        If r.X >= task.dst2.Width * ratio Then r.X = dst2.Width - 1
+        If r.Y >= task.dst2.Height * ratio Then r.Y = dst2.Height - 1
         If r.Width <= 0 Then r.Width = 1
         If r.Height <= 0 Then r.Height = 1
         Return r

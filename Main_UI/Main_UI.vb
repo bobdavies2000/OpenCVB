@@ -1577,7 +1577,7 @@ Public Class Main_UI
                 ' relative size of algorithm size image to displayed image
                 Dim ratio = camPic(0).Width / task.dst2.Width
                 drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
-                                            task.drawRect.Width * ratio, task.drawRect.Height * ratio)
+                                        task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
 
             Dim saveWorkingRes = settings.WorkingRes

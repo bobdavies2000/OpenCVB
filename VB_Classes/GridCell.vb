@@ -21,6 +21,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim threshold = task.gCell.options.correlationThreshold
 
         task.gcList.Clear()
+        Dim depthCount As Integer, visibleCount As Integer
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
             gc.rect = task.gridRects(i)
@@ -33,6 +34,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                 cv.Cv2.MeanStdDev(task.pcSplit(2)(gc.rect), mean, stdev, task.depthMask(gc.rect))
                 gc.depth = mean(0)
                 gc.depthStdev = stdev(0)
+                depthCount += 1
             End If
 
             If gc.depth = 0 Then
@@ -91,12 +93,14 @@ Public Class GridCell_Basics : Inherits TaskParent
 
             If gc.correlation > threshold And gc.depth > 0 Then gc.highlyVisible = True Else gc.highlyVisible = False
             gc.index = task.gcList.Count
+            If gc.highlyVisible Then visibleCount += 1
             task.gcList.Add(gc)
             dst2(gc.rect).SetTo(gc.color)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(task.gcList.Count) + " grid cells have the useful depth values and " +
-                                           CStr(unchangedCount) + " of them were unchanged from the previous frame"
+        If task.heartBeat Then labels(2) = "Of " + CStr(task.gcList.Count) + " grid cells, " + CStr(depthCount) +
+                                           " have the useful depth values and " + CStr(unchangedCount) +
+                                           " were unchanged and " + CStr(visibleCount) + " were highly visible."
     End Sub
 End Class
 
@@ -230,26 +234,6 @@ Public Class GridCell_InstantUpdate : Inherits TaskParent
 
         dst2 = task.gCell.dst2
         labels(2) = task.gCell.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class GridCell_CorrelationMask : Inherits TaskParent
-    Dim corrMap As New GridCell_CorrelationMap
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        desc = "Isolate only the depth values under the grid cell correlation mask (see GridCell_CorrelatonMap"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        corrMap.Run(src)
-        dst3 = corrMap.dst2
-
-        dst2.SetTo(0)
-        labels = corrMap.labels
-        task.pointCloud.CopyTo(dst2, corrMap.dst3)
     End Sub
 End Class
 
@@ -870,36 +854,6 @@ End Class
 
 
 
-Public Class GridCell_CorrelationMap : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "The correlation values are in dst2"
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-
-        Dim count As Integer
-        For Each gc In task.gcList
-            If gc.depth > 0 Then
-                dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
-                If gc.correlation > 0 Then count += 1
-            Else
-                dst1(gc.rect).SetTo(0)
-            End If
-        Next
-
-        dst2 = ShowPaletteDepth(dst1)
-        labels(2) = task.gCell.labels(2) + " and " + CStr(count) + " had a correlation."
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class GridCell_RegionLines : Inherits TaskParent
     Dim regions As New Connected_Contours
@@ -972,5 +926,34 @@ Public Class GridCell_Lines : Inherits TaskParent
 
         info.Run(src)
         SetTrueText(info.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_CorrelationMap : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "The map to identify each grid cell."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+
+        For Each gc In task.gcList
+            If gc.depth > 0 Then
+                dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
+            Else
+                dst1(gc.rect).SetTo(0)
+            End If
+        Next
+
+        dst2 = ShowPaletteDepth(dst1)
+        labels(2) = task.gCell.labels(2)
+
+        If standaloneTest() Then dst3 = task.gcMap
     End Sub
 End Class
