@@ -110,7 +110,7 @@ End Class
 
 
 Public Class Classifier_BayesianTest : Inherits TaskParent
-    Dim nabs As New Neighbors_Precise
+    Dim nabs As New Neighbor_Precise
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask of the neighbors to the selected cell", "RedColor_Basics output", "Classifier_Bayesian output"}
@@ -121,7 +121,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        SetTrueText("Review the neighbors_Precise algorithm")
+        SetTrueText("Review the Neighbor_Precise algorithm")
         'nabs.rcList = task.rcList
         'nabs.Run(task.rcMap)
 

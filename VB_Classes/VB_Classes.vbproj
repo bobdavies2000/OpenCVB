@@ -172,7 +172,7 @@
     <Compile Include="Hist3D.vb" />
     <Compile Include="Hist3Dcloud.vb" />
     <Compile Include="Mesh.vb" />
-    <Compile Include="Neighbors.vb" />
+    <Compile Include="Neighbor.vb" />
     <Compile Include="OpAuto.vb" />
     <Compile Include="BackProject2D.vb" />
     <Compile Include="Color8U.vb" />

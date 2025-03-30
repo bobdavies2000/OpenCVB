@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-' https://docs.opencvb.org/2.4/modules/flann/doc/flann_fast_approximate_nearest_Neighbors_search.html#
+' https://docs.opencvb.org/2.4/modules/flann/doc/flann_fast_approximate_nearest_Neighbor_search.html#
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
 Public Class FLANN_Test : Inherits TaskParent
     Public Sub New()

@@ -1,9 +1,9 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Neighbors_Basics : Inherits TaskParent
+Public Class Neighbor_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public runRedCloud As Boolean = False
-    Public options As New Options_XNeighbors
+    Public options As New Options_Neighbors
     Public Sub New()
         desc = "Find all the neighbors with KNN"
     End Sub
@@ -14,29 +14,22 @@ Public Class Neighbors_Basics : Inherits TaskParent
 
         knn.queries.Clear()
         For Each rc In task.rcList
-            knn.queries.Add(rc.maxDStable)
+            knn.queries.Add(rc.maxDist)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
 
-        For i = 0 To task.rcList.Count - 1
-            Dim rc = task.rcList(i)
-            rc.nabs = knn.neighbors(i)
+        For Each rc In task.rcList
+            For i = 0 To options.neighbors - 1
+                rc.nabs.Add(knn.neighbors(rc.index)(i))
+            Next
         Next
 
         If standalone Then
             task.setSelectedCell()
             dst3.SetTo(0)
-            Dim ptCount As Integer
             For Each index In task.rcD.nabs
-                Dim pt = task.rcList(index).maxDStable
-                If pt = task.rcD.maxDStable Then
-                    DrawCircle(dst2, pt, task.DotSize, black)
-                Else
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                    ptCount += 1
-                    If ptCount > options.xNeighbors Then Exit For
-                End If
+                DrawCircle(dst2, task.rcList(index).maxDist, task.DotSize, task.highlight)
             Next
         End If
     End Sub
@@ -48,7 +41,7 @@ End Class
 
 
 
-Public Class Neighbors_Intersects : Inherits TaskParent
+Public Class Neighbor_Intersects : Inherits TaskParent
     Public nPoints As New List(Of cv.Point)
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
@@ -101,8 +94,8 @@ End Class
 
 
 
-Public Class Neighbors_ColorOnly : Inherits TaskParent
-    Dim corners As New Neighbors_Intersects
+Public Class Neighbor_ColorOnly : Inherits TaskParent
+    Dim corners As New Neighbor_Intersects
     Public Sub New()
         desc = "Find neighbors in a redColor cellMap"
     End Sub
@@ -124,13 +117,13 @@ End Class
 
 
 
-Public Class Neighbors_Precise : Inherits TaskParent
+Public Class Neighbor_Precise : Inherits TaskParent
     Public nabList As New List(Of List(Of Integer))
     Public rcList As List(Of rcData)
     Public runRedCloud As Boolean = False
     Public Sub New()
-        cPtr = Neighbors_Open()
-        If standalone Then task.gOptions.displaydst1.checked = True
+        cPtr = Neighbor_Open()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find the neighbors in a selected RedCell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -144,12 +137,12 @@ Public Class Neighbors_Precise : Inherits TaskParent
         Dim mapData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, mapData, 0, mapData.Length)
         Dim handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned)
-        Dim nabCount = Neighbors_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        Dim nabCount = Neighbor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
-        SetTrueText("Review the neighbors_Precise algorithm")
+        SetTrueText("Review the Neighbor_Precise algorithm")
 
         'If nabCount > 0 Then
-        '    Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbors_NabList(cPtr))
+        '    Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbor_NabList(cPtr))
         '    nabList.Clear()
         '    For i = 0 To rcList.Count - 1
         '        nabList.Add(New List(Of Integer))
@@ -193,6 +186,6 @@ Public Class Neighbors_Precise : Inherits TaskParent
         labels(3) = CStr(nabCount) + " neighbor pairs were found."
     End Sub
     Public Sub Close()
-        Neighbors_Close(cPtr)
+        Neighbor_Close(cPtr)
     End Sub
 End Class

@@ -408,3 +408,19 @@ Public Class Connected_Rects : Inherits TaskParent
         dst3.SetTo(0, dst2)
     End Sub
 End Class
+
+
+
+
+
+Public Class Connected_Lines : Inherits TaskParent
+    Dim cellLine As New GridCell_Lines
+    Public Sub New()
+        desc = "Display grid cells that are connected by lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        cellLine.Run(src)
+        dst2 = cellLine.dst2
+
+    End Sub
+End Class

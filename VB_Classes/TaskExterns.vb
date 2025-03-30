@@ -941,16 +941,16 @@ Module TaskExterns
 
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbors_Open() As IntPtr
+    Public Function Neighbor_Open() As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Neighbors_Close(cPtr As IntPtr)
+    Public Sub Neighbor_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbors_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
+    Public Function Neighbor_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbors_NabList(cPtr As IntPtr) As IntPtr
+    Public Function Neighbor_NabList(cPtr As IntPtr) As IntPtr
     End Function
 
 

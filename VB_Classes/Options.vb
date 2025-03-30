@@ -406,33 +406,6 @@ End Class
 
 
 
-
-Public Class Options_Neighbors : Inherits OptionParent
-    Public threshold As Double = 0.005
-    Public pixels As Integer = 6
-    Public patchZ As Boolean = False
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Difference from neighbor in mm's", 0, 20, threshold * 1000)
-            sliders.setupTrackBar("Minimum offset to neighbor pixel", 1, 100, pixels)
-            sliders.setupTrackBar("Patch z-values", 0, 1, 1)
-        End If
-    End Sub
-    Public Sub Run()
-        Static thresholdSlider = FindSlider("Difference from neighbor in mm's")
-        Static pixelSlider = FindSlider("Minimum offset to neighbor pixel")
-        Static patchSlider = FindSlider("Patch z-values")
-        threshold = thresholdSlider.value / 1000
-        pixels = pixelSlider.value
-        patchZ = patchSlider.value = 1
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Options_Interpolate : Inherits OptionParent
     Public resizePercent As Integer = 2
     Public interpolationThreshold As Integer = 4
@@ -3779,24 +3752,6 @@ Public Class Options_TopX : Inherits OptionParent
     Public Sub Run()
         Static topXSlider = FindSlider("Show the top X cells")
         topX = topXSlider.value
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Options_XNeighbors : Inherits OptionParent
-    Public xNeighbors As Integer = 5
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("X neighbors", 1, 255, xNeighbors)
-    End Sub
-    Public Sub Run()
-        Static topXSlider = FindSlider("X neighbors")
-        xNeighbors = topXSlider.value
     End Sub
 End Class
 
@@ -8162,3 +8117,36 @@ Public Class Options_FCSLine : Inherits OptionParent
         proximity = proximitySlider.value
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Options_Neighbors : Inherits OptionParent
+    Public threshold As Double = 0.005
+    Public pixels As Integer = 6
+    Public patchZ As Boolean = False
+    Public neighbors As Integer = 10
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Difference from neighbor in mm's", 0, 20, threshold * 1000)
+            sliders.setupTrackBar("Minimum offset to neighbor pixel", 1, 100, pixels)
+            sliders.setupTrackBar("Patch z-values", 0, 1, 1)
+            sliders.setupTrackBar("X neighbors", 1, 255, neighbors)
+        End If
+    End Sub
+    Public Sub Run()
+        Static thresholdSlider = FindSlider("Difference from neighbor in mm's")
+        Static pixelSlider = FindSlider("Minimum offset to neighbor pixel")
+        Static patchSlider = FindSlider("Patch z-values")
+        Static topXSlider = FindSlider("X neighbors")
+        neighbors = topXSlider.value
+        threshold = thresholdSlider.value / 1000
+        pixels = pixelSlider.value
+        patchZ = patchSlider.value = 1
+    End Sub
+End Class
+

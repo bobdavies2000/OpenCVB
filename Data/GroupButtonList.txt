@@ -157,7 +157,7 @@ Motion
 Mouse
 MSER
 MultiDimensionScaling
-Neighbors
+Neighbor
 OEX
 OilPaint
 OpAuto

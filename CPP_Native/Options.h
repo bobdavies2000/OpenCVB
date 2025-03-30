@@ -105,15 +105,6 @@ public:
 	Options_Plane() {
 	}
 };
-class Options_Neighbors {
-public:
-	double threshold =  0.005;
-	int pixels =  6;
-	bool patchZ = false;
-	void Run() {}
-	Options_Neighbors() {
-	}
-};
 class Options_Interpolate {
 public:
 	int resizePercent =  2;
@@ -906,13 +897,6 @@ public:
 	int topX =  10;
 	void Run() {}
 	Options_TopX() {
-	}
-};
-class Options_XNeighbors {
-public:
-	int xNeighbors =  5;
-	void Run() {}
-	Options_XNeighbors() {
 	}
 };
 class Options_EdgeOverlay {
@@ -2239,5 +2223,15 @@ class Options_FCSLine {
 public:
 	void Run() {}
 	Options_FCSLine() {
+	}
+};
+class Options_Neighbors {
+public:
+	double threshold =  0.005;
+	int pixels =  6;
+	bool patchZ = false;
+	int neighbors =  10;
+	void Run() {}
+	Options_Neighbors() {
 	}
 };

@@ -192,8 +192,7 @@ Public Class Flood_Motion : Inherits TaskParent
         Else
             flood.Run(src)
             dst1.SetTo(0)
-            For i = 0 To task.rcList.Count - 1
-                Dim rc = task.rcList(i)
+            For Each rc In task.rcList
                 If maxDists.Contains(rc.maxDist) Then
                     Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
                     dst1(lrc.rect).SetTo(lrc.color, lrc.mask)

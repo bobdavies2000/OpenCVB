@@ -17,7 +17,7 @@ End Class
 
 
 Public Class Magnify_Example : Inherits TaskParent
-    Dim prep As New Neighbors_Intersects
+    Dim prep As New Neighbor_Intersects
     Dim zoom As New Magnify_Basics
     Public Sub New()
         desc = "Magnify the output of the algorithm above."
