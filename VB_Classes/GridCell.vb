@@ -24,7 +24,7 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.gcList.Clear()
-        Dim depthCount As Integer, visibleCount As Integer
+        Dim depthCount As Integer, visibleCount As Integer, prevDisparity As Single
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
             gc.rect = task.gridRects(i)
@@ -59,7 +59,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                     gc.mm = GetMinMax(task.pcSplit(2)(gc.rect), task.depthMask(gc.rect))
                     If task.rgbLeftAligned Then
                         gc.lRect = gc.rect
-                        gc.rShift = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
+                        gc.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
                     Else
                         Dim irPt = translateColorToLeft(gc.rect.TopLeft)
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
@@ -70,16 +70,16 @@ Public Class GridCell_Basics : Inherits TaskParent
                             gc.lRect = New cv.Rect(irPt.X, irPt.Y, gc.rect.Width, gc.rect.Height)
                             gc.lRect = ValidateRect(gc.lRect)
 
-                            gc.rShift = task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
+                            gc.disparity = task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
                         End If
                     End If
 
                     If gc.depth > 0 Then ' depth can be zero if the translation of the irPt fails.
                         gc.rRect = gc.lRect
-                        gc.rRect.X -= gc.rShift
+                        gc.rRect.X -= gc.disparity
                         gc.rRect = ValidateRect(gc.rRect)
                         gc.rHoodRect = gc.hoodRect
-                        gc.rHoodRect.X -= gc.rShift
+                        gc.rHoodRect.X -= gc.disparity
                         gc.rHoodRect = ValidateRect(gc.rHoodRect)
 
                         cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
@@ -99,8 +99,18 @@ Public Class GridCell_Basics : Inherits TaskParent
                 If gc.highlyVisible Then visibleCount += 1
             End If
 
-            task.gcList.Add(gc)
+            ' if the shift is less than 1 pixel, this is not good grid cell data.
+            If Math.Abs(prevDisparity - gc.disparity) > options.rShiftThreshold Then
+                task.depthMask(gc.rect).SetTo(0)
+                task.noDepthMask(gc.rect).SetTo(255)
+                gc.depth = 0
+                gc.correlation = 0
+                dst3(gc.rect).SetTo(0)
+            End If
             dst2(gc.rect).SetTo(gc.color)
+
+            task.gcList.Add(gc)
+            prevDisparity = gc.disparity
         Next
 
         buildCorr.Run(src)
@@ -928,8 +938,6 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
         For Each gc In task.gcList
             If gc.depth > 0 Then
                 dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
-            Else
-                dst1(gc.rect).SetTo(0)
             End If
         Next
 
@@ -972,11 +980,12 @@ Public Class GridCell_Correlation : Inherits TaskParent
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
         labels(3) = "Correlation of the left grid cell to the right is " + Format(corr, fmt3)
 
-        dst2.Rectangle(gc.lRect, 255, task.lineWidth)
-        dst3.Rectangle(gc.rRect, 255, task.lineWidth)
+        Dim grayScale As Integer = If(task.gOptions.LRMeanSubtraction.Checked, 128, 255)
+        dst2.Rectangle(gc.lRect, grayScale, task.lineWidth)
+        dst3.Rectangle(gc.rRect, grayScale, task.lineWidth)
 
-        dst2.Rectangle(gc.hoodRect, 255, task.lineWidth)
-        dst3.Rectangle(gc.rHoodRect, 255, task.lineWidth)
+        dst2.Rectangle(gc.hoodRect, grayScale, task.lineWidth)
+        dst3.Rectangle(gc.rHoodRect, grayScale, task.lineWidth)
 
         labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
     End Sub
@@ -1022,19 +1031,19 @@ End Class
 
 
 Public Class GridCell_ShiftEdges : Inherits TaskParent
-    Dim options As New Options_Shift
     Public Sub New()
         desc = "Highlight the gridcells where the right shift accelerates."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim gcPrev As New gcData
-        dst2 = task.gCell.dst2
+        Dim prevShift As New Single
+        dst2 = task.gCell.dst3
         For Each gc In task.gcList
-            If Math.Abs(gc.rShift - gcPrev.rShift) > options.rShiftThreshold Then
-
+            If gc.disparity <> 0 And prevShift <> 0 Then
+                If Math.Abs(gc.disparity - prevShift) > task.gCell.options.rShiftThreshold Then
+                    dst2(gc.rect).SetTo(0)
+                End If
             End If
+            prevShift = gc.disparity
         Next
     End Sub
 End Class

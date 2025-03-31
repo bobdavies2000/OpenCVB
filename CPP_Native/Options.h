@@ -2192,14 +2192,6 @@ public:
 	Options_Stdev() {
 	}
 };
-class Options_GridCells {
-public:
-	int colorDifferenceThreshold =  10;
-	float correlationThreshold =  0.9;
-	void Run() {}
-	Options_GridCells() {
-	}
-};
 class Options_GridStdev {
 public:
 	void Run() {}
@@ -2235,9 +2227,11 @@ public:
 	Options_Neighbors() {
 	}
 };
-class Options_Shift {
+class Options_GridCells {
 public:
+	int colorDifferenceThreshold =  10;
+	float correlationThreshold =  0.9;
 	void Run() {}
-	Options_Shift() {
+	Options_GridCells() {
 	}
 };

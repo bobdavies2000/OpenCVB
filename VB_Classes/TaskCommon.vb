@@ -590,7 +590,7 @@ Public Class gcData
 
     Public center As cv.Point ' center of the rectangle
     Public depth As Single
-    Public rShift As Single
+    Public disparity As Single
     Public depthStdev As Single
     Public age As Integer
     Public color As cv.Vec3f
