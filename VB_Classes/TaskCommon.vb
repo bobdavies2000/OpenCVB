@@ -590,13 +590,13 @@ Public Class gcData
 
     Public center As cv.Point ' center of the rectangle
     Public depth As Single
+    Public rShift As Single
     Public depthStdev As Single
     Public age As Integer
     Public color As cv.Vec3f
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
     Public correlation As Single
-    Public hoodCorrelation As Single
     Public highlyVisible As Boolean
     Public features As New List(Of cv.Point)
     Public index As Integer
@@ -655,7 +655,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Dim threshold = task.gCell.options.correlationThreshold
 
         For i = 0 To 2
-            Dim pt = Choose(i + 1, center, p1, p2)
+            Dim pt = Choose(i + 1, center, validatePoint(p1), validatePoint(p2))
             Dim nextIndex = task.gcMap.Get(Of Integer)(pt.y, pt.x)
             gcIndex.Add(nextIndex)
             Dim gc = task.gcList(nextIndex)

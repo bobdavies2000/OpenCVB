@@ -9,10 +9,10 @@ Public Class FitLine_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone And task.heartBeatLT Then
-            Static inputData As New Eigen_Input
-            inputData.Run(src)
-            ptList = New List(Of cv.Point2f)(inputData.PointList)
-            dst2 = inputData.dst2
+            Static eigenInput As New Eigen_Input
+            eigenInput.Run(src)
+            ptList = New List(Of cv.Point2f)(eigenInput.PointList)
+            dst2 = eigenInput.dst2
         End If
 
         Dim line2d = cv.Cv2.FitLine(ptList, cv.DistanceTypes.L2, 0, 0, 0)

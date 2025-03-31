@@ -14,7 +14,7 @@ Public Class Options_Example : Inherits OptionParent
             sliders.setupTrackBar("firstSlider", 0, 100, 50)
         End If
     End Sub
-    Public Sub RunOpt()
+    Public Sub Run()
         static firstSlider = findSlider("firstSlider")
         count = firstSlider.value
     End Sub

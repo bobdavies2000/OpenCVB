@@ -2235,3 +2235,9 @@ public:
 	Options_Neighbors() {
 	}
 };
+class Options_Shift {
+public:
+	void Run() {}
+	Options_Shift() {
+	}
+};

@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Eigen_Basics : Inherits TaskParent
     Public inputData() As Double
@@ -137,6 +138,7 @@ Public Class Eigen_Input : Inherits TaskParent
     Public bb As Single
     Public eigen3D As New Eigen_Input3D
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Use sliders to adjust the width and intensityf of the line"
         desc = "Generate a noisy line in a field of random data."
     End Sub
@@ -144,13 +146,14 @@ Public Class Eigen_Input : Inherits TaskParent
         eigen3D.Run(src)
         m = eigen3D.m
         bb = eigen3D.bb
+
         PointList.Clear()
-
+        dst2.SetTo(0)
         For Each pt In eigen3D.PointList
-            PointList.Add(New cv.Point2f(pt.X, pt.Y))
+            Dim p1 = New cv.Point2f(pt.X, pt.Y)
+            PointList.Add(p1)
+            dst2.Circle(p1, task.DotSize, 255, -1)
         Next
-
-        dst2 = eigen3D.dst2
     End Sub
 End Class
 

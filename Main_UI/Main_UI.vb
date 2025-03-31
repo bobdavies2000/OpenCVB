@@ -1771,7 +1771,7 @@ Public Class Main_UI
                     algorithmRefresh = True
                 End If
 
-                Dim ptReal = task.gcCell.rect.TopLeft
+                Dim ptReal = task.gcD.rect.TopLeft
                 dst(0).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)
                 dst(1).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)
                 dst(2).Circle(ptReal, task.DotSize + 1, cv.Scalar.White, -1)

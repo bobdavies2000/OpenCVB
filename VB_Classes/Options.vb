@@ -8150,3 +8150,18 @@ Public Class Options_Neighbors : Inherits OptionParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Options_Shift : Inherits OptionParent
+    Public rShiftThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Right Shift Threshold", 0, 100, 5)
+    End Sub
+    Public Sub Run()
+        Static shiftSlider = FindSlider("Right Shift Threshold")
+        rShiftThreshold = shiftSlider.value
+    End Sub
+End Class

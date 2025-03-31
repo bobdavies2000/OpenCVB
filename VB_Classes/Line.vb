@@ -16,7 +16,7 @@ Public Class Line_Basics : Inherits TaskParent
                 dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
             Next
 
-            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(1, lpList.Count)})
+            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
 
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
         End If
@@ -25,6 +25,11 @@ Public Class Line_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable)
+
+        If task.optionsChanged Then
+            task.lpList.Clear()
+            ' lines.lpList.Clear()
+        End If
 
         Dim histArray = getLineCounts(lines.lpList)
         For i = histArray.Count - 1 To 0 Step -1

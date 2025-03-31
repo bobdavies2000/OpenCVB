@@ -1,13 +1,10 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class DepthColorizer_Basics : Inherits TaskParent
-    Public buildCorrMap As New GridCell_CorrelationMap
     Public Sub New()
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        buildCorrMap.Run(src) ' always build the gridCell correlations 
-
         If task.gOptions.ColorGrid.Checked Then
             task.depthRGB = task.gCell.dst2
         ElseIf task.gOptions.ColorizedDepth.Checked Then
@@ -16,7 +13,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
             cv.Cv2.ApplyColorMap(depthNorm, task.depthRGB, task.depthColorMap)
         Else
-            task.depthRGB = buildCorrMap.dst2.Clone
+            task.depthRGB = task.gCell.dst3.Clone
             task.depthRGB.SetTo(0, task.noDepthMask)
         End If
     End Sub
