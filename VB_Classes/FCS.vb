@@ -661,7 +661,7 @@ Public Class FCS_Delaunay : Inherits TaskParent
             fp.ptHistory.Add(fp.pt)
             fp.index = i
 
-            fp.ID = CSng(task.gcMap.Get(Of Integer)(fp.pt.Y, fp.pt.X))
+            fp.ID = CSng(task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X))
 
             While 1
                 If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While

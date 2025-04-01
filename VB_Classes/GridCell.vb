@@ -14,7 +14,6 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         If task.optionsChanged Then task.gcList.Clear()
 
-        Dim stdev As cv.Scalar, mean As cv.Scalar
         Dim correlationMat As New cv.Mat
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
@@ -24,41 +23,20 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.gcList.Clear()
-        Dim depthCount As Integer, visibleCount As Integer, prevDisparity As Single
+        Dim depthCount As Integer, visibleCount As Integer, prevDisparity As Single, history = task.gOptions.FrameHistory.Value
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
-            gc.rect = task.gridRects(i)
-            gc.age = task.motionBasics.cellAge(i)
-            gc.rect = gc.rect
-            gc.color = task.motionBasics.lastColor(i) ' the last color is actually the current color - motion basics runs first.
-            gc.lRect = gc.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
-            gc.center = New cv.Point(gc.rect.TopLeft.X + gc.rect.Width / 2, gc.rect.TopLeft.Y + gc.rect.Height / 2)
-            If task.depthMask(gc.rect).CountNonZero Then
-                cv.Cv2.MeanStdDev(task.pcSplit(2)(gc.rect), mean, stdev, task.depthMask(gc.rect))
-                gc.depth = mean(0)
-                gc.depthStdev = stdev(0)
-                depthCount += 1
-            End If
-
-            gc.index = task.gcList.Count
-            gc.hoodRect = gc.rect
-            For Each index In task.gridNeighbors(gc.index)
-                gc.hoodRect = gc.hoodRect.Union(task.gridRects(index))
-            Next
-
             If gc.depth > 0 Then
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute gc.
                 Dim lastCorrelation = If(task.optionsChanged, 0, gcLast(i).correlation)
                 If gc.age > 1 And lastCorrelation > threshold And instantUpdate = False Then
-                    unchangedCount += 1
                     ' no need to recompute everything when there is no motion in the cell.
                     gc = gcLast(i)
                     gc.age = task.motionBasics.cellAge(i)
+                    unchangedCount += 1
                 Else
                     ' everything is recomputed when there is motion in the cell.
-                    gc.mm = GetMinMax(task.pcSplit(2)(gc.rect), task.depthMask(gc.rect))
                     If task.rgbLeftAligned Then
-                        gc.lRect = gc.rect
                         gc.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
                     Else
                         Dim irPt = translateColorToLeft(gc.rect.TopLeft)
@@ -75,10 +53,8 @@ Public Class GridCell_Basics : Inherits TaskParent
                     End If
 
                     If gc.depth > 0 Then ' depth can be zero if the translation of the irPt fails.
-                        gc.rRect = gc.lRect
                         gc.rRect.X -= gc.disparity
                         gc.rRect = ValidateRect(gc.rRect)
-                        gc.rHoodRect = gc.hoodRect
                         gc.rHoodRect.X -= gc.disparity
                         gc.rHoodRect = ValidateRect(gc.rHoodRect)
 
@@ -95,18 +71,25 @@ Public Class GridCell_Basics : Inherits TaskParent
                         gc.corners.Add(New cv.Point3f(p0.X, p1.Y, gc.depth))
                     End If
                 End If
-                If gc.correlation > threshold Then gc.highlyVisible = True Else gc.highlyVisible = False
-                If gc.highlyVisible Then visibleCount += 1
+                gc.corrHistory.Add(gc.correlation)
+                If gc.corrHistory.Average > threshold Then gc.highlyVisible = True Else gc.highlyVisible = False
             End If
 
-            If Math.Abs(prevDisparity - gc.disparity) > options.rShiftThreshold Or gc.disparity <= 1 Then
+            If Math.Abs(prevDisparity - gc.disparity) > options.disparityThreshold Then
                 task.depthMask(gc.rect).SetTo(0)
                 task.noDepthMask(gc.rect).SetTo(255)
                 gc.depth = 0
                 gc.correlation = 0
-                dst3(gc.rect).SetTo(0)
+                gc.highlyVisible = False
             End If
             dst2(gc.rect).SetTo(gc.color)
+
+            If gc.depth > 0 Then depthCount += 1
+            If gc.highlyVisible Then visibleCount += 1
+            If gc.depthRanges.Count > history Then
+                gc.depthRanges.RemoveAt(0)
+                gc.corrHistory.RemoveAt(0)
+            End If
 
             task.gcList.Add(gc)
             prevDisparity = gc.disparity
@@ -116,7 +99,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         dst3 = buildCorr.dst2
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.gcList.Count) + " grid cells, " + CStr(depthCount) +
-                                           " have the useful depth values and " + CStr(unchangedCount) +
+                                           " have useful depth data and " + CStr(unchangedCount) +
                                            " were unchanged and " + CStr(visibleCount) + " were highly visible."
     End Sub
 End Class
@@ -134,7 +117,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
-        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gcMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         task.gcD = task.gcList(index)
         If standaloneTest() Then dst2 = task.gCell.dst3
 
@@ -171,7 +154,7 @@ Public Class GridCell_Plot : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gCell.dst2
 
-        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gcMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.gcList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim gc As gcData
@@ -268,7 +251,7 @@ Public Class GridCell_RGBtoLeft : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gcMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim gc As gcData
         If index > 0 And index < task.gcList.Count Then
             gc = task.gcList(index)
@@ -689,7 +672,7 @@ Public Class GridCell_Features : Inherits TaskParent
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
-            Dim index = task.gcMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
             Dim gc = task.gcList(index)
             gc.features.Add(pt)
             DrawCircle(dst2, gc.rect.TopLeft, task.DotSize, task.highlight)
@@ -757,8 +740,8 @@ Public Class GridCell_ColorLines : Inherits TaskParent
         dst2 = src
         dst3.SetTo(0)
         For Each lp In task.lpList
-            Dim gc1 = task.gcList(task.gcMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim gc2 = task.gcList(task.gcMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim gc1 = task.gcList(task.gcMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            Dim gc2 = task.gcList(task.gcMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
             dst3.Line(lp.p1, lp.p2, 128, task.lineWidth)
             If Math.Abs(gc1.depth - gc2.depth) >= task.depthDiffMeters Then
                 dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
@@ -817,9 +800,9 @@ Public Class GridCell_LeftRight : Inherits TaskParent
         dst2 = task.leftView
         dst3 = task.rightView
 
-        Dim indexTop = task.gcMap.Get(Of Integer)(task.drawRect.Y, task.drawRect.X)
+        Dim indexTop As Integer = task.gcMap.Get(Of Single)(task.drawRect.Y, task.drawRect.X)
         If indexTop < 0 Or indexTop >= task.gcList.Count Then Exit Sub
-        Dim indexBot = task.gcMap.Get(Of Integer)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
+        Dim indexBot As Integer = task.gcMap.Get(Of Single)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
         If indexBot < 0 Or indexBot >= task.gcList.Count Then Exit Sub
 
         Dim gc1 = task.gcList(indexTop)
@@ -969,7 +952,7 @@ Public Class GridCell_Correlation : Inherits TaskParent
             dst3 = task.rightView
         End If
 
-        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gcMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.gcList.Count Then Exit Sub
 
         Dim gc = task.gcList(index)
@@ -999,28 +982,28 @@ Public Class GridCell_Info : Inherits TaskParent
         desc = "Display the info about the select grid cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = "Click on a grid cell to see the properties."
+        labels(2) = task.gCell.labels(2)
 
-        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gcMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim gc As gcData = task.gcList(index)
         dst2 = task.gCell.dst2
 
-        strOut += CStr(task.gcList.Count) + " grid cells found " + vbCrLf + vbCrLf
+        strOut = labels(2) + vbCrLf + vbCrLf
 
         dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
         dst2.Rectangle(gc.hoodRect, task.highlight, task.lineWidth)
 
-        strOut = "Grid ID = " + CStr(index) + vbCrLf + vbCrLf
-        strOut += "Age = " + CStr(gc.age) + vbCrLf
-        strOut += "Correlation to right image = " + vbTab + Format(gc.correlation, fmt3) + vbCrLf
-        strOut += "Disparity to right image =" + vbTab + vbTab + Format(gc.disparity, fmt1) + vbCrLf
-        strOut += "Depth stdev = " + vbTab + vbTab + vbTab + Format(gc.depthStdev, fmt3) + vbCrLf
-        strOut += "depth = " + vbTab + vbTab + vbTab + vbTab + Format(gc.depth, fmt3) + vbCrLf
-        strOut += "HighlyVisible = " + vbTab + vbTab + vbTab + CStr(gc.highlyVisible) + vbCrLf
-        strOut += "Depth mm.maxval =" + vbTab + vbTab + Format(gc.mm.maxVal, fmt3) + vbCrLf
-        strOut += "Depth mm.minval =" + vbTab + vbTab + Format(gc.mm.minVal, fmt3) + vbCrLf
-        strOut += "Depth mm.range =" + vbTab + vbTab + Format(gc.mm.range, fmt3) + vbCrLf
+        strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
+        strOut += CStr(gc.age) + vbTab + "Age" + vbTab + vbCrLf
+        strOut += Format(gc.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
+        strOut += Format(gc.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
+        strOut += Format(gc.depthStdev, fmt3) + vbTab + "Depth stdev" + vbCrLf
+        strOut += Format(gc.depth, fmt3) + vbTab + "Depth" + vbCrLf
+        strOut += CStr(gc.highlyVisible) + vbTab + "HighlyVisible" + vbCrLf
+        strOut += Format(gc.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
+        strOut += Format(gc.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
+        strOut += Format(gc.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
 
         SetTrueText(strOut, 3)
     End Sub
@@ -1033,18 +1016,27 @@ End Class
 
 Public Class GridCell_ShiftEdges : Inherits TaskParent
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Highlight the gridcells where the right shift accelerates."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim prevShift As New Single
         dst2 = task.gCell.dst3
+        dst1.SetTo(0)
         For Each gc In task.gcList
             If gc.disparity <> 0 And prevShift <> 0 Then
-                If Math.Abs(gc.disparity - prevShift) > task.gCell.options.rShiftThreshold Then
-                    dst2(gc.rect).SetTo(0)
+                If Math.Abs(gc.disparity - prevShift) > task.gCell.options.disparityThreshold Then
+                    If gc.correlation > 0 Then
+                        dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
+                    Else
+                        dst1(gc.rect).SetTo(0)
+                    End If
                 End If
             End If
             prevShift = gc.disparity
         Next
+
+        dst3 = ShowPaletteDepth(dst1)
+        labels(2) = task.gCell.labels(2)
     End Sub
 End Class

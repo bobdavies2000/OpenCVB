@@ -8135,7 +8135,7 @@ End Class
 
 
 Public Class Options_GridCells : Inherits OptionParent
-    Public rShiftThreshold As Integer
+    Public disparityThreshold As Integer
     Public colorDifferenceThreshold As Integer = 10
     Public correlationThreshold As Single = 0.9
     Public Sub New()
@@ -8149,7 +8149,7 @@ Public Class Options_GridCells : Inherits OptionParent
         Static corrSlider = FindSlider("Correlation threshold X100")
         Static diffSlider = FindSlider("LowRes Color difference threshold")
         Static shiftSlider = FindSlider("Right Shift Threshold")
-        rShiftThreshold = shiftSlider.value
+        disparityThreshold = shiftSlider.value
         colorDifferenceThreshold = diffSlider.value
         correlationThreshold = corrSlider.value / 100
     End Sub

@@ -1,6 +1,33 @@
-﻿Imports VB_Classes.VBtask
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class HighVis_Basics : Inherits TaskParent
+    Dim info As New GridCell_Info
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display all the grid cells that have good visibility"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        For Each gc In task.gcList
+            If gc.highlyVisible Then
+                If gc.correlation > 0 Then dst1(gc.rect).SetTo((gc.correlation + 1) * 127) Else dst1(gc.rect).SetTo(0)
+            End If
+        Next
+
+        dst0 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        Dim mm = GetMinMax(dst1, dst0)
+        dst2 = ShowPaletteDepth((dst1 - mm.minVal) * mm.maxVal / (mm.maxVal - mm.minVal))
+        labels(2) = task.gCell.labels(2)
+
+        info.Run(src)
+        SetTrueText(info.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class HighVis_LineBasics : Inherits TaskParent
     Dim LRViews As New LeftRight_Lines
     Public leftLines As New List(Of lpData)
     Public Sub New()
@@ -31,7 +58,7 @@ End Class
 
 
 Public Class HighVis_Lines : Inherits TaskParent
-    Dim highVis As New HighVis_Basics
+    Dim highVis As New HighVis_LineBasics
     Public Sub New()
         desc = "Find lines that are highly visible in the left image and copy them to the right image"
     End Sub
@@ -53,7 +80,7 @@ Public Class HighVis_Lines : Inherits TaskParent
 
             Dim ptRight() As cv.Point = {lp.p1, lp.p2}
             For i = 0 To 1
-                If task.rgbLeftAligned = False Then ptRight(i) = translateColorToLeft(ptRight(i))
+                If task.rgbLeftAligned = False Then ptRight(i) = VB_Classes.VBtask.translateColorToLeft(ptRight(i))
                 ptRight(i).X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / lp.pcMeans(i + 1).Item(2)
             Next
 
@@ -68,6 +95,12 @@ Public Class HighVis_Lines : Inherits TaskParent
         'End If
     End Sub
 End Class
+
+
+
+
+
+
 
 
 

@@ -584,24 +584,59 @@ End Class
 
 
 Public Class gcData
+    Public age As Integer
+    Public color As cv.Vec3f
+    Public correlation As Single
+    Public corrHistory As New List(Of Single)
+    Public index As Integer
+
     Public rect As cv.Rect ' rectange under the cursor in the color image.
     Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.
     Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
 
     Public center As cv.Point ' center of the rectangle
     Public depth As Single
+    Public depthRanges As New List(Of Single)
     Public disparity As Single
     Public depthStdev As Single
-    Public age As Integer
-    Public color As cv.Vec3f
+
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
-    Public correlation As Single
     Public highlyVisible As Boolean
     Public features As New List(Of cv.Point)
-    Public index As Integer
     Public hoodRect As cv.Rect ' a rect describing the neighborhood of the center cell...
     Public rHoodRect As cv.Rect ' a rect describing the neighborhood of the center cell for the right image.
+    Sub New()
+        Dim stdev As cv.Scalar, mean As cv.Scalar
+        index = task.gcList.Count
+        rect = task.gridRects(index)
+        lRect = rect
+        rRect = lRect
+        hoodRect = rect
+        rHoodRect = hoodRect
+
+        age = task.motionBasics.cellAge(index)
+        color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
+        lRect = rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
+        center = New cv.Point(rect.TopLeft.X + rect.Width / 2, rect.TopLeft.Y + rect.Height / 2)
+        If task.depthMask(rect).CountNonZero Then
+            cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), mean, stdev, task.depthMask(rect))
+            depth = mean(0)
+            depthStdev = stdev(0)
+        End If
+
+        For Each index In task.gridNeighbors(index)
+            hoodRect = hoodRect.Union(task.gridRects(index))
+        Next
+
+        If depth = 0 Then
+            depthRanges.Add(0)
+        Else
+            task.pcSplit(2)(rect).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(rect))
+            mm.range = mm.maxVal - mm.minVal
+            depthRanges.Add(mm.range)
+        End If
+    End Sub
 End Class
 
 
@@ -627,9 +662,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public gridList As New List(Of Integer)
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
-        If pt.X >= task.color.Width Then pt.X = task.color.Width - 1
+        If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
         If pt.Y < 0 Then pt.Y = 0
-        If pt.Y >= task.color.Height Then pt.Y = task.color.Height - 1
+        If pt.Y > task.color.Height - 1 Then pt.Y = task.color.Height - 1
         Return pt
     End Function
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
@@ -656,7 +691,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
 
         For i = 0 To 2
             Dim pt = Choose(i + 1, center, validatePoint(p1), validatePoint(p2))
-            Dim nextIndex = task.gcMap.Get(Of Integer)(pt.y, pt.x)
+            Dim nextIndex As Integer = task.gcMap.Get(Of Single)(pt.y, pt.x)
             gcIndex.Add(nextIndex)
             Dim gc = task.gcList(nextIndex)
             Dim r = gc.rect

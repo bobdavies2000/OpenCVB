@@ -78,7 +78,7 @@ Public Class LineTrack_Depth : Inherits TaskParent
         dst2.SetTo(0)
         Dim lp As New lpData
         For Each lp In task.lpList
-            Dim gc = task.gcList(task.gcMap.Get(Of Integer)(lp.center.Y, lp.center.X))
+            Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
         Next
 
