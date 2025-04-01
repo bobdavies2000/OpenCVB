@@ -99,8 +99,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                 If gc.highlyVisible Then visibleCount += 1
             End If
 
-            ' if the shift is less than 1 pixel, this is not good grid cell data.
-            If Math.Abs(prevDisparity - gc.disparity) > options.rShiftThreshold Then
+            If Math.Abs(prevDisparity - gc.disparity) > options.rShiftThreshold Or gc.disparity <= 1 Then
                 task.depthMask(gc.rect).SetTo(0)
                 task.noDepthMask(gc.rect).SetTo(255)
                 gc.depth = 0
@@ -1002,7 +1001,7 @@ Public Class GridCell_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = "Click on a grid cell to see the properties."
 
-        Dim index = task.gcMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim index = task.gcMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim gc As gcData = task.gcList(index)
         dst2 = task.gCell.dst2
@@ -1015,11 +1014,13 @@ Public Class GridCell_Info : Inherits TaskParent
         strOut = "Grid ID = " + CStr(index) + vbCrLf + vbCrLf
         strOut += "Age = " + CStr(gc.age) + vbCrLf
         strOut += "Correlation to right image = " + vbTab + Format(gc.correlation, fmt3) + vbCrLf
-        strOut += "Depth stdev = " + vbTab + vbTab + Format(gc.depthStdev, fmt3) + vbCrLf
-        strOut += "depth = " + vbTab + vbTab + vbTab + Format(gc.depth, fmt3) + vbCrLf
-        strOut += "HighlyVisible = " + vbTab + vbTab + CStr(gc.highlyVisible) + vbCrLf
-        strOut += "Depth mm.maxval =" + vbTab + Format(gc.mm.maxVal, fmt3) + vbCrLf
-        strOut += "Depth mm.minval =" + vbTab + Format(gc.mm.minVal, fmt3) + vbCrLf
+        strOut += "Disparity to right image =" + vbTab + vbTab + Format(gc.disparity, fmt1) + vbCrLf
+        strOut += "Depth stdev = " + vbTab + vbTab + vbTab + Format(gc.depthStdev, fmt3) + vbCrLf
+        strOut += "depth = " + vbTab + vbTab + vbTab + vbTab + Format(gc.depth, fmt3) + vbCrLf
+        strOut += "HighlyVisible = " + vbTab + vbTab + vbTab + CStr(gc.highlyVisible) + vbCrLf
+        strOut += "Depth mm.maxval =" + vbTab + vbTab + Format(gc.mm.maxVal, fmt3) + vbCrLf
+        strOut += "Depth mm.minval =" + vbTab + vbTab + Format(gc.mm.minVal, fmt3) + vbCrLf
+        strOut += "Depth mm.range =" + vbTab + vbTab + Format(gc.mm.range, fmt3) + vbCrLf
 
         SetTrueText(strOut, 3)
     End Sub
