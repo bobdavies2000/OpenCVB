@@ -649,7 +649,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p2 As cv.Point2f
     Public slope As Single
     Public depth As Single
-    Public pcMeans As New List(Of cv.Scalar) ' point cloud means for all points in gcList
+    Public pcMeans As New List(Of cv.Scalar) ' point cloud means for all cells in gridList below.
     Public length As Single
     Public color As cv.Vec3f
     Public index As Integer
@@ -689,9 +689,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
 
         Dim threshold = task.gCell.options.correlationThreshold
 
-        For i = 0 To 2
-            Dim pt = Choose(i + 1, center, validatePoint(p1), validatePoint(p2))
-            Dim nextIndex As Integer = task.gcMap.Get(Of Single)(pt.y, pt.x)
+        Dim ptlist = {center, p1, p2}
+        For Each pt In ptlist
+            Dim nextIndex As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
             gcIndex.Add(nextIndex)
             Dim gc = task.gcList(nextIndex)
             Dim r = gc.rect
