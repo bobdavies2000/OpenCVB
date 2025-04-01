@@ -51,8 +51,7 @@ Public Class ApproxPoly_FindandDraw : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         rotatedRect.Run(src)
         dst2 = rotatedRect.dst2
-        dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst0 = dst0.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         dst0.ConvertTo(dst1, cv.MatType.CV_32SC1)
         cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)

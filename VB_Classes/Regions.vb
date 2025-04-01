@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Connected_Basics : Inherits TaskParent
+Public Class Regions_Basics : Inherits TaskParent
     Public hTuples As New List(Of Tuple(Of Integer, Integer))
     Public vTuples As New List(Of Tuple(Of Integer, Integer))
     Public width As Integer, height As Integer
@@ -78,8 +78,8 @@ End Class
 
 
 
-Public Class Connected_Gaps : Inherits TaskParent
-    Dim connect As New Connected_Basics
+Public Class Regions_Gaps : Inherits TaskParent
+    Dim connect As New Regions_Basics
     Public Sub New()
         labels(2) = "Grid cells with single cells removed for both vertical and horizontal connected cells."
         labels(3) = "Vertical cells with single cells removed."
@@ -114,13 +114,13 @@ End Class
 
 
 
-Public Class Connected_Palette : Inherits TaskParent
-    Dim hRects As New Connected_RectsH
-    Dim vRects As New Connected_RectsV
+Public Class Regions_Palette : Inherits TaskParent
+    Dim hRects As New Regions_RectsH
+    Dim vRects As New Regions_RectsV
     Dim mats As New Mat_4Click
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Assign an index to each of vertical and horizontal rects in Connected_Rects"
+        desc = "Assign an index to each of vertical and horizontal rects in Regions_Rects"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hRects.Run(src)
@@ -191,9 +191,9 @@ End Class
 
 
 
-Public Class Connected_Contours : Inherits TaskParent
+Public Class Regions_Contours : Inherits TaskParent
     Public redM As New RedMask_Basics
-    Public connect As New Connected_Rects
+    Public connect As New Regions_Rects
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.gOptions.TruncateDepth.Checked = True
@@ -221,8 +221,8 @@ End Class
 
 
 
-Public Class Connected_RedColor : Inherits TaskParent
-    Dim connect As New Connected_Contours
+Public Class Regions_RedColor : Inherits TaskParent
+    Dim connect As New Regions_Contours
     Public Sub New()
         desc = "Color each redCell with the color of the nearest grid cell region."
     End Sub
@@ -242,7 +242,7 @@ End Class
 
 
 
-Public Class Connected_BasicsNewBad : Inherits TaskParent
+Public Class Regions_BasicsNewBad : Inherits TaskParent
     Public hTuples As New List(Of Tuple(Of Integer, Integer))
     Public width As Integer, height As Integer
     Public Sub New()
@@ -317,9 +317,9 @@ End Class
 
 
 
-Public Class Connected_RectsH : Inherits TaskParent
+Public Class Regions_RectsH : Inherits TaskParent
     Public hRects As New List(Of cv.Rect)
-    Dim connect As New Connected_Basics
+    Dim connect As New Regions_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Connect grid cells with similar depth - horizontally scanning."
@@ -355,9 +355,9 @@ End Class
 
 
 
-Public Class Connected_RectsV : Inherits TaskParent
+Public Class Regions_RectsV : Inherits TaskParent
     Public vRects As New List(Of cv.Rect)
-    Dim connect As New Connected_Basics
+    Dim connect As New Regions_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Connect grid cells with similar depth - vertically scanning."
@@ -392,9 +392,9 @@ End Class
 
 
 
-Public Class Connected_Rects : Inherits TaskParent
-    Dim hConn As New Connected_RectsH
-    Dim vConn As New Connected_RectsV
+Public Class Regions_Rects : Inherits TaskParent
+    Dim hConn As New Regions_RectsH
+    Dim vConn As New Regions_RectsV
     Public Sub New()
         desc = "Isolate the connected depth grid cells both vertically and horizontally."
     End Sub
@@ -413,7 +413,7 @@ End Class
 
 
 
-Public Class Connected_Lines : Inherits TaskParent
+Public Class Regions_Lines : Inherits TaskParent
     Dim cellLine As New GridCell_Lines
     Public Sub New()
         desc = "Display grid cells that are connected by lines."

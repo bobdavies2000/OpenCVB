@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class DepthRegion_Basics : Inherits TaskParent
     Public redM As New RedMask_Basics
-    Public connect As New Connected_Rects
+    Public connect As New Regions_Rects
     Public mdLargest As New List(Of maskData)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

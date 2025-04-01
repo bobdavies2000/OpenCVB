@@ -582,7 +582,7 @@ End Class
 
 Public Class GridCell_FeatureGaps : Inherits TaskParent
     Dim feat As New GridCell_Features
-    Dim gaps As New Connected_Gaps
+    Dim gaps As New Regions_Gaps
     Public Sub New()
         labels(2) = "The output of GridCell_Gaps overlaid with the output of the GridCell_Features"
         desc = "Overlay the features on the image of the gaps"
@@ -713,7 +713,7 @@ End Class
 
 
 Public Class GridCell_EdgeDraw : Inherits TaskParent
-    Dim regions As New Connected_Contours
+    Dim regions As New Regions_Contours
     Public edges As New EdgeLine_Basics
     Public Sub New()
         desc = "Lines can mean cells are connected."
@@ -830,7 +830,7 @@ End Class
 
 
 Public Class GridCell_RegionLines : Inherits TaskParent
-    Dim regions As New Connected_Contours
+    Dim regions As New Regions_Contours
     Public Sub New()
         desc = "Lines can mean cells are connected."
     End Sub

@@ -33,7 +33,6 @@ Color
 Color8U
 Complexity
 Concat
-Connected
 Contour
 Contrast
 Convex
@@ -197,6 +196,7 @@ RedColor
 RedMask
 RedTrack
 Reduction
+Regions
 Reliable
 Remap
 Replay

@@ -824,7 +824,7 @@ End Class
 
 
 
-' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
+' https://docs.opencv.org/master/de/d01/samples_2cpp_2Regions_components_8cpp-example.html
 Public Class RedColor_CCompColor : Inherits TaskParent
     Dim ccomp As New CComp_Both
     Public Sub New()
@@ -1771,7 +1771,7 @@ End Class
 
 
 Public Class RedColor_GridCellsOld : Inherits TaskParent
-    Dim regions As New Connected_Contours
+    Dim regions As New Regions_Contours
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use the gcData regions to build task.rcList"
@@ -1820,7 +1820,7 @@ End Class
 
 
 Public Class RedColor_GridCells : Inherits TaskParent
-    Dim regions As New Connected_Contours
+    Dim regions As New Regions_Contours
     Public Sub New()
         task.gOptions.TruncateDepth.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1866,7 +1866,7 @@ End Class
 
 
 Public Class RedColor_GridCellsHist : Inherits TaskParent
-    Dim regions As New Connected_Contours
+    Dim regions As New Regions_Contours
     Public Sub New()
         task.gOptions.TruncateDepth.Checked = True
         desc = "For each redCell find the highest population region it covers."

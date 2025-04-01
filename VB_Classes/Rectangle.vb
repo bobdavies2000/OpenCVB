@@ -59,7 +59,7 @@ End Class
 Public Class Rectangle_Overlap : Inherits TaskParent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect
-    Public enclosingRect As cv.Rect
+    Public enclosingRect As New cv.Rect
     Dim draw As New Rectangle_Basics
     Public Sub New()
        optiBase.findslider("DrawCount").Value = 2
@@ -67,7 +67,7 @@ Public Class Rectangle_Overlap : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Static typeCheckBox = optiBase.FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        If Not task.heartBeat Then Exit Sub
+        If task.heartBeatLT = False Then Exit Sub
         If standaloneTest() Then
             draw.Run(src)
             dst2 = draw.dst2
@@ -86,7 +86,6 @@ Public Class Rectangle_Overlap : Inherits TaskParent
             rect2 = draw.rectangles(1)
         End If
 
-        enclosingRect = New cv.Rect
         If rect1.IntersectsWith(rect2) Then
             enclosingRect = rect1.Union(rect2)
             dst3.Rectangle(enclosingRect, white, 4)

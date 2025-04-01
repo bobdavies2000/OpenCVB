@@ -135,7 +135,7 @@ End Class
 
 
 
-' https://docs.opencvb.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
+' https://docs.opencvb.org/master/de/d01/samples_2cpp_2Regions_components_8cpp-example.html
 Public Class CComp_Stats : Inherits TaskParent
     Public masks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)

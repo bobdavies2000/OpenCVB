@@ -1,6 +1,35 @@
-Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class FitLine_Basics : Inherits TaskParent
+    Dim fitE As New FitEllipse_Rectangle
+    Public ptList As New List(Of cv.Point2f)
+    Public lp As New lpData
+    Public Sub New()
+        desc = "Use FitEllipse to build the FitLine solution."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone And task.heartBeatLT Then
+            Static noisyLine As New Eigen_Input
+            noisyLine.Run(src)
+            ptList = New List(Of cv.Point2f)(noisyLine.PointList)
+            dst2 = noisyLine.dst2
+        End If
+
+        Dim rect = cv.Cv2.FitEllipse(ptList)
+        Dim v = rect.Points()
+
+        Dim p1 = New cv.Point((v(0).X + v(3).X) / 2, (v(0).Y + v(3).Y) / 2)
+        Dim p2 = New cv.Point((v(1).X + v(2).X) / 2, (v(1).Y + v(2).Y) / 2)
+        lp = New lpData(p1, p2)
+        dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FitLine_Conventional : Inherits TaskParent
     Public lp As lpData
     Public ptList As New List(Of cv.Point2f)
     Public center As cv.Point2f
@@ -9,10 +38,10 @@ Public Class FitLine_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone And task.heartBeatLT Then
-            Static eigenInput As New Eigen_Input
-            eigenInput.Run(src)
-            ptList = New List(Of cv.Point2f)(eigenInput.PointList)
-            dst2 = eigenInput.dst2
+            Static noisyLine As New Eigen_Input
+            noisyLine.Run(src)
+            ptList = New List(Of cv.Point2f)(noisyLine.PointList)
+            dst2 = noisyLine.dst2
         End If
 
         Dim line2d = cv.Cv2.FitLine(ptList, cv.DistanceTypes.L2, 0, 0, 0)
@@ -122,18 +151,18 @@ End Class
 
 
 Public Class FitLine_Example2D : Inherits TaskParent
-    Dim inputData As New Eigen_Input
-    Dim fitLine As New FitLine_Basics
+    Dim noisyLine As New Eigen_Input
+    Dim fitLine As New FitLine_Conventional
     Public Sub New()
         desc = "A way to test the fitline using 3D data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone And task.heartBeat = False Then Exit Sub
-        inputData.Run(src)
-        dst2 = inputData.dst2
+        noisyLine.Run(src)
+        dst2 = noisyLine.dst2
 
         fitLine.ptList.Clear()
-        For Each pt In inputData.PointList
+        For Each pt In noisyLine.PointList
             fitLine.ptList.Add(New cv.Point2f(pt.X, pt.Y))
         Next
         fitLine.Run(src)
@@ -157,12 +186,12 @@ Public Class FitLine_Basics3D : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static inputData As New Eigen_Input3D
+            Static noisyLine As New Eigen_Input3D
             If task.heartBeat = False Then Exit Sub
-            inputData.Run(src)
+            noisyLine.Run(src)
             dst2.SetTo(0)
             ptList.Clear()
-            For Each pt In inputData.PointList
+            For Each pt In noisyLine.PointList
                 DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight)
                 ptList.Add(pt)
             Next

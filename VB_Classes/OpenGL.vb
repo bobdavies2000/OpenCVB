@@ -2020,7 +2020,7 @@ End Class
 
 
 Public Class OpenGL_QuadConnect : Inherits TaskParent
-    Dim connect As New Connected_Basics
+    Dim connect As New Regions_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Build connected grid cells and remove cells that are not connected."
@@ -2149,7 +2149,7 @@ End Class
 
 
 Public Class OpenGL_Connected : Inherits TaskParent
-    Dim connect As New Connected_Contours
+    Dim connect As New Regions_Contours
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the connected contours in OpenGL"

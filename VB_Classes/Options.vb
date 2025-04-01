@@ -6445,6 +6445,7 @@ Public Class Options_Draw : Inherits OptionParent
         If check.Setup(traceName) Then
             check.addCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             check.addCheckBox("Draw filled (unchecked draw an outline)")
+            check.Box(0).Checked = True
         End If
     End Sub
     Public Sub Run()
