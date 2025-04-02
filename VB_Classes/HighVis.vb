@@ -63,6 +63,7 @@ End Class
 
 Public Class HighVis_Lines : Inherits TaskParent
     Dim highVis As New HighVis_LineBasics
+    Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
         desc = "Find lines that are highly visible in the left image and copy them to the right image"
     End Sub
@@ -84,7 +85,11 @@ Public Class HighVis_Lines : Inherits TaskParent
 
             Dim ptRight() As cv.Point = {lp.p1, lp.p2}
             For i = 0 To 1
-                If task.rgbLeftAligned = False Then ptRight(i) = VB_Classes.VBtask.translateColorToLeft(ptRight(i))
+                If task.rgbLeftAligned = False Then
+                    intrinsics.gc = gc
+                    intrinsics.Run(emptyMat)
+                    ptRight(i) = intrinsics.ptTranslated
+                End If
                 ptRight(i).X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / lp.pcMeans(i + 1).Item(2)
             Next
 

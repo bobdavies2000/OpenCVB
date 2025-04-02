@@ -120,6 +120,7 @@ ImShow
 IMU
 InPaint
 Interpolate
+Intrinsics
 Kalman
 Keyboard
 KLT

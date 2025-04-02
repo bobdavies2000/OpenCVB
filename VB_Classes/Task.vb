@@ -638,24 +638,7 @@ Public Class VBtask : Implements IDisposable
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         dst.Line(p1, p2, color, lineWidth, lineType)
     End Sub
-    Public Shared Function translateColorToLeft(pt As cv.Point) As cv.Point
-        Dim ir3D As cv.Point3f, irPt As cv.Point2f
-        Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
-        If pcTop.Z > 0 Then
-            ir3D.X = task.calibData.rotation(0) * pcTop.X +
-                     task.calibData.rotation(1) * pcTop.Y +
-                     task.calibData.rotation(2) * pcTop.Z + task.calibData.translation(0)
-            ir3D.Y = task.calibData.rotation(3) * pcTop.X +
-                     task.calibData.rotation(4) * pcTop.Y +
-                     task.calibData.rotation(5) * pcTop.Z + task.calibData.translation(1)
-            ir3D.Z = task.calibData.rotation(6) * pcTop.X +
-                     task.calibData.rotation(7) * pcTop.Y +
-                     task.calibData.rotation(8) * pcTop.Z + task.calibData.translation(2)
-            irPt.X = task.calibData.leftIntrinsics.fx * ir3D.X / ir3D.Z + task.calibData.leftIntrinsics.ppx
-            irPt.Y = task.calibData.leftIntrinsics.fy * ir3D.Y / ir3D.Z + task.calibData.leftIntrinsics.ppy
-        End If
-        Return irPt
-    End Function
+
     Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then

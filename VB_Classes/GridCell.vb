@@ -1,10 +1,9 @@
-﻿Imports System.Runtime.InteropServices
-Imports VB_Classes.VBtask
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
     Public instantUpdate As Boolean
     Dim buildCorr As New GridCell_CorrelationMap
+    Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
@@ -39,7 +38,9 @@ Public Class GridCell_Basics : Inherits TaskParent
                     If task.rgbLeftAligned Then
                         gc.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
                     Else
-                        Dim irPt = translateColorToLeft(gc.rect.TopLeft)
+                        intrinsics.gc = gc
+                        intrinsics.Run(emptyMat)
+                        Dim irPt = intrinsics.ptTranslated
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                             gc.depth = 0 ' off the grid.
                             gc.lRect = emptyRect
@@ -298,31 +299,6 @@ Public Class GridCell_RGBtoLeft : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class GridCell_LeftToColor : Inherits TaskParent
-    Public Sub New()
-        desc = "Align grid cell left rectangles in color with the left image.  StereoLabs and Orbbec already match."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3.SetTo(0)
-        Dim count As Integer
-        For Each gc In task.gcList
-            If gc.depth > 0 Then
-                count += 1
-                task.color.Circle(gc.rect.TopLeft, task.DotSize, task.highlight, -1)
-                dst2.Circle(gc.lRect.TopLeft, task.DotSize, task.highlight, -1)
-                dst3.Circle(gc.lRect.TopLeft, task.DotSize, task.highlight, -1)
-            End If
-        Next
-        labels(2) = CStr(count) + " grid cells have depth and therefore an equivalent in the left and right views."
-    End Sub
-End Class
 
 
 
@@ -1052,5 +1028,55 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
         labels(2) = task.gCell.labels(2)
 
         If standaloneTest() Then dst3 = task.gcMap
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridCell_LeftToColor : Inherits TaskParent
+    Public Sub New()
+        desc = "Align grid cell left rectangles in color with the left image.  StereoLabs and Orbbec already match."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3.SetTo(0)
+        Dim count As Integer
+        For Each gc In task.gcList
+            If gc.depth > 0 Then
+                count += 1
+                task.color.Circle(gc.rect.TopLeft, task.DotSize, task.highlight, -1)
+                dst2.Circle(gc.lRect.TopLeft, task.DotSize, task.highlight, -1)
+                dst3.Circle(gc.lRect.TopLeft, task.DotSize, task.highlight, -1)
+            End If
+        Next
+        labels(2) = CStr(count) + " grid cells have depth and therefore an equivalent in the left and right views."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridCell_FitLeftInColor : Inherits TaskParent
+    Public Sub New()
+        desc = "Translate the left image into the same coordinates as the color image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim correlationMat As New cv.Mat
+
+        Dim p1 = task.gcList(0).lRect.TopLeft
+        Dim p2 = task.gcList(task.gcList.Count - 1).lRect.BottomRight
+
+        Dim rect = ValidateRect(New cv.Rect(p1.X - task.cellSize, p1.Y - task.cellSize, task.cellSize * 2, task.cellSize * 2))
+        cv.Cv2.MatchTemplate(task.gray(New cv.Rect(0, 0, dst1.Width / 2, dst1.Height / 2)), task.leftView, dst2,
+                                       cv.TemplateMatchModes.CCoeffNormed)
+        Dim mm = GetMinMax(dst2)
+        dst3 = src(ValidateRect(New cv.Rect(mm.maxLoc.X / 2, mm.maxLoc.Y / 2, dst2.Width, dst2.Height)))
+        labels(2) = "Correlation coefficient peak = " + Format(mm.maxVal, fmt3)
     End Sub
 End Class

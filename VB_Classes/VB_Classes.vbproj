@@ -115,6 +115,7 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
+    <Compile Include="Intrinsics.vb" />
     <Compile Include="Regions.vb" />
     <Compile Include="DepthColorizer.vb" />
     <Compile Include="DepthRegion.vb" />

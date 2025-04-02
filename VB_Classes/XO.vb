@@ -2083,6 +2083,7 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean = True
     Dim lastCorrelation() As Single
     Public quad As New XO_Quad_Basics
+    Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
@@ -2127,9 +2128,10 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
 
                     gc.correlation = correlationMat.Get(Of Single)(0, 0)
                 Else
-                    Dim irPt = VBtask.translateColorToLeft(gc.rect.TopLeft)
-                    If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or
-                        (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
+                    intrinsics.gc = gc
+                    intrinsics.Run(emptyMat)
+                    Dim irPt = intrinsics.ptTranslated
+                    If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                         gc.depth = 0 ' off the grid.
                         gc.lRect = emptyRect
                         gc.rRect = emptyRect
