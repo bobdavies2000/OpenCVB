@@ -57,6 +57,8 @@ Public Class GridCell_Basics : Inherits TaskParent
                         gc.rRect = ValidateRect(gc.rRect)
                         gc.rHoodRect.X -= gc.disparity
                         gc.rHoodRect = ValidateRect(gc.rHoodRect)
+                        If gc.lRect.Width <> gc.rRect.Width Then gc.lRect.Width = Math.Min(gc.lRect.Width, gc.rRect.Width)
+                        If gc.lRect.Height <> gc.rRect.Height Then gc.lRect.Height = Math.Min(gc.lRect.Height, gc.rRect.Height)
 
                         cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                         gc.correlation = correlationMat.Get(Of Single)(0, 0)
@@ -1002,7 +1004,7 @@ End Class
 Public Class GridCell_Disparity : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Highlight the gridcells where the right shift accelerates."
+        desc = "Highlight the gridcells where the disparity changes."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim prevShift As New Single

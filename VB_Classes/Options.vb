@@ -8138,18 +8138,18 @@ End Class
 Public Class Options_GridCells : Inherits OptionParent
     Public disparityThreshold As Integer
     Public colorDifferenceThreshold As Integer = 10
-    Public correlationThreshold As Single = 0.9
+    Public correlationThreshold As Single = 0.5
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Correlation threshold X100", 0, 100, correlationThreshold * 100)
             sliders.setupTrackBar("LowRes Color difference threshold", 0, 100, task.defaultLowResColorDifference)
-            sliders.setupTrackBar("Right Shift Threshold", 0, 20, 3)
+            sliders.setupTrackBar("Disparity Threshold", 0, 20, 3)
         End If
     End Sub
     Public Sub Run()
         Static corrSlider = FindSlider("Correlation threshold X100")
         Static diffSlider = FindSlider("LowRes Color difference threshold")
-        Static shiftSlider = FindSlider("Right Shift Threshold")
+        Static shiftSlider = FindSlider("Disparity Threshold")
         disparityThreshold = shiftSlider.value
         colorDifferenceThreshold = diffSlider.value
         correlationThreshold = corrSlider.value / 100
