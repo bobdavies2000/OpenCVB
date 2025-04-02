@@ -169,6 +169,7 @@ Public Module vbc
         task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 100
 
         task.rcPixelThreshold = 0 ' task.gOptions.DebugSlider.Value / 1000
+        task.historyCount = task.gOptions.FrameHistory.Value
     End Sub
 
     Public Function findRectFromLine(lp As lpData) As cv.Rect
@@ -629,12 +630,9 @@ Public Class gcData
             hoodRect = hoodRect.Union(task.gridRects(index))
         Next
 
-        If depth = 0 Then
-            depthRanges.Add(0)
-        Else
+        If depth > 0 Then
             task.pcSplit(2)(rect).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(rect))
             mm.range = mm.maxVal - mm.minVal
-            depthRanges.Add(mm.range)
         End If
     End Sub
 End Class

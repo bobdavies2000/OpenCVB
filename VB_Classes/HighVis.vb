@@ -9,7 +9,11 @@ Public Class HighVis_Basics : Inherits TaskParent
         dst1.SetTo(0)
         For Each gc In task.gcList
             If gc.highlyVisible Then
-                If gc.correlation > 0 Then dst1(gc.rect).SetTo((gc.correlation + 1) * 127) Else dst1(gc.rect).SetTo(0)
+                If gc.correlation > 0 And gc.corrHistory.Count = task.historyCount Then
+                    dst1(gc.rect).SetTo((gc.correlation + 1) * 127)
+                Else
+                    dst1(gc.rect).SetTo(0)
+                End If
             End If
         Next
 

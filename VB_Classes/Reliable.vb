@@ -8,7 +8,6 @@ Public Class Reliable_Basics : Inherits TaskParent
         desc = "Identify each grid element with unreliable data or motion."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-
         bgs.Run(src)
         dst2 = bgs.dst2
 

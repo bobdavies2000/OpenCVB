@@ -6,6 +6,7 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Dim buildCorr As New GridCell_CorrelationMap
     Public Sub New()
+        task.gOptions.FrameHistory.Value = 5
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
@@ -23,7 +24,7 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.gcList.Clear()
-        Dim depthCount As Integer, visibleCount As Integer, prevDisparity As Single, history = task.gOptions.FrameHistory.Value
+        Dim depthCount As Integer, visibleCount As Integer, prevDisparity As Single
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
             If gc.depth > 0 Then
@@ -71,6 +72,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                         gc.corners.Add(New cv.Point3f(p0.X, p1.Y, gc.depth))
                     End If
                 End If
+                gc.depthRanges.Add(gc.mm.range)
                 gc.corrHistory.Add(gc.correlation)
                 If gc.corrHistory.Average > threshold Then gc.highlyVisible = True Else gc.highlyVisible = False
             End If
@@ -86,7 +88,7 @@ Public Class GridCell_Basics : Inherits TaskParent
 
             If gc.depth > 0 Then depthCount += 1
             If gc.highlyVisible Then visibleCount += 1
-            If gc.depthRanges.Count > history Then
+            If gc.depthRanges.Count > task.historyCount Then
                 gc.depthRanges.RemoveAt(0)
                 gc.corrHistory.RemoveAt(0)
             End If
@@ -908,32 +910,6 @@ End Class
 
 
 
-Public Class GridCell_CorrelationMap : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "The map to identify each grid cell."
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-
-        For Each gc In task.gcList
-            If gc.depth > 0 Then
-                dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
-            End If
-        Next
-
-        dst2 = ShowPaletteDepth(dst1)
-        labels(2) = task.gCell.labels(2)
-
-        If standaloneTest() Then dst3 = task.gcMap
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -1005,6 +981,16 @@ Public Class GridCell_Info : Inherits TaskParent
         strOut += Format(gc.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
         strOut += Format(gc.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
 
+        strOut += "Depth range history: "
+        For Each ele In gc.depthRanges
+            strOut += Format(ele, fmt1) + vbTab
+        Next
+
+        strOut += vbCrLf + vbCrLf + "Correlation history: "
+        For Each ele In gc.corrHistory
+            strOut += Format(ele, fmt3) + vbTab
+        Next
+
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -1014,7 +1000,7 @@ End Class
 
 
 
-Public Class GridCell_ShiftEdges : Inherits TaskParent
+Public Class GridCell_Disparity : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Highlight the gridcells where the right shift accelerates."
@@ -1038,5 +1024,32 @@ Public Class GridCell_ShiftEdges : Inherits TaskParent
 
         dst3 = ShowPaletteDepth(dst1)
         labels(2) = task.gCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridCell_CorrelationMap : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "The map to identify each grid cell."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        For Each gc In task.gcList
+            If gc.depth > 0 And gc.corrHistory.Count = history Then
+                dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
+            End If
+        Next
+
+        dst2 = ShowPaletteDepth(dst1)
+        labels(2) = task.gCell.labels(2)
+
+        If standaloneTest() Then dst3 = task.gcMap
     End Sub
 End Class

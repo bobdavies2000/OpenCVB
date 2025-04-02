@@ -10,7 +10,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(src)
-        dst2.SetTo(0)
+        dst2 = src.Clone
         dst2.SetTo(1, edges.dst2)
     End Sub
 End Class
@@ -248,9 +248,9 @@ Public Class FeatureLess_LeftRight : Inherits TaskParent
         End If
 
         fLess.Run(task.leftView)
-        dst2 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = fLess.dst2.Clone
 
         fLess.Run(task.rightView)
-        dst3 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3 = fLess.dst2.Clone
     End Sub
 End Class
