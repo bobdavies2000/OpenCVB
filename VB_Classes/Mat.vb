@@ -547,8 +547,10 @@ Public Class Mat_FindNearZero : Inherits TaskParent
         dst3.ConvertTo(dst2, cv.MatType.CV_8U)
 
         dst1 = dst3.FindNonZero()
-        Dim ptLeft = dst1.Get(Of cv.Point)(0, 0)
-        Dim ptRight = dst1.Get(Of cv.Point)(dst1.Rows - 1, 0)
+        If dst1.Rows > 0 Then
+            Dim ptLeft = dst1.Get(Of cv.Point)(0, 0)
+            Dim ptRight = dst1.Get(Of cv.Point)(dst1.Rows - 1, 0)
+        End If
     End Sub
 End Class
 

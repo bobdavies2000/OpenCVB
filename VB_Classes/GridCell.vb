@@ -6,7 +6,6 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Dim buildCorr As New GridCell_CorrelationMap
     Public Sub New()
-        task.gOptions.FrameHistory.Value = 5
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
@@ -981,12 +980,12 @@ Public Class GridCell_Info : Inherits TaskParent
         strOut += Format(gc.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
         strOut += Format(gc.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
 
-        strOut += "Depth range history: "
+        strOut += "Depth range history: " + vbTab
         For Each ele In gc.depthRanges
-            strOut += Format(ele, fmt1) + vbTab
+            strOut += Format(ele, fmt3) + vbTab
         Next
 
-        strOut += vbCrLf + vbCrLf + "Correlation history: "
+        strOut += vbCrLf + vbCrLf + "Correlation history: " + vbTab
         For Each ele In gc.corrHistory
             strOut += Format(ele, fmt3) + vbTab
         Next
@@ -1042,7 +1041,7 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
         For Each gc In task.gcList
-            If gc.depth > 0 And gc.corrHistory.Count = history Then
+            If gc.depth > 0 And gc.corrHistory.Count = task.historyCount Then
                 dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
             End If
         Next

@@ -29,7 +29,7 @@ Public Class OptionsGlobal
             DotSizeSlider.Value = 2
             LineWidth.Value = 2
         End If
-        FrameHistory.Value = 3
+        FrameHistory.Value = 5
         MotionFilteredColorAndCloud.Checked = True
         gravityPointCloud.Checked = True
 
