@@ -55,7 +55,7 @@ Public Class Motion_Basics : Inherits TaskParent
 
         task.motionMask = dst1
 
-        If standalone Then
+        If standaloneTest() Then
             If task.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, task.motionMask)
             Static diff As New Diff_Basics
             diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

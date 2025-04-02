@@ -24,17 +24,14 @@ Public Class Line_Basics : Inherits TaskParent
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable)
-
-        If task.optionsChanged Then
-            task.lpList.Clear()
-            ' lines.lpList.Clear()
-        End If
+        If task.optionsChanged Then task.lpList.Clear()
 
         Dim histArray = getLineCounts(lines.lpList)
         For i = histArray.Count - 1 To 0 Step -1
             If histArray(i) = 0 Then lines.lpList.RemoveAt(i)
         Next
+
+        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable)
 
         dst3.SetTo(0)
         Dim newList As New List(Of lpData)
@@ -62,14 +59,18 @@ Public Class Line_Basics : Inherits TaskParent
         task.lpList.Clear()
         task.lpList.Add(New lpData(New cv.Point, New cv.Point)) ' placeholder for zero so we can distinguish line 1 from the background which is 0.
         dst2 = src
+        Dim intLengths As New List(Of Integer), lenPrev As Single = -1
         For Each lp In sortlines.Values
-            lp.index = task.lpList.Count
+            If lenPrev <> lp.length Then
+                lp.index = task.lpList.Count
 
-            Dim gcCenter = task.gcList(lp.gcIndex(0))
-            If gcCenter.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
+                Dim gcCenter = task.gcList(lp.gcIndex(0))
+                If gcCenter.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
 
-            task.lpList.Add(lp)
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                task.lpList.Add(lp)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            End If
+            lenPrev = lp.length
         Next
 
         labels(2) = CStr(task.lpList.Count) + " lines were found."
@@ -614,3 +615,8 @@ Public Class Line_Vertical3D : Inherits TaskParent
         labels(2) = "There are " + CStr(vertlist.Count) + " lines similar to the Gravity vector "
     End Sub
 End Class
+
+
+
+
+

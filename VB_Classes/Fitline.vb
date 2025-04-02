@@ -1,3 +1,4 @@
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class FitLine_Basics : Inherits TaskParent
     Dim fitE As New FitEllipse_Rectangle
@@ -207,5 +208,39 @@ Public Class FitLine_Basics3D : Inherits TaskParent
         lp = findEdgePoints(New lpData(p1, p2))
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         dst2.Circle(New cv.Point2f(line.X1, line.Y1), task.DotSize + 2, cv.Scalar.Blue, -1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FitLine_Grid : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Dim fitline As New FitLine_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find lines within each grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+
+        dst3.SetTo(0)
+        Dim ptMat As New cv.Mat
+        For Each gc In task.gcList
+            If dst2(gc.rect).CountNonZero >= 5 Then
+                ptMat = dst2(gc.rect).FindNonZero()
+
+                fitline.ptList.Clear()
+                For i = 0 To ptMat.Rows - 1
+                    fitline.ptList.Add(ptMat.Get(Of cv.Point)(i, 0))
+                Next
+
+                fitline.Run(dst2(gc.rect))
+                dst3(gc.rect).Line(fitline.lp.p1, fitline.lp.p2, 255, task.lineWidth, task.lineType)
+            End If
+        Next
     End Sub
 End Class
