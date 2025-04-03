@@ -38,9 +38,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                     If task.rgbLeftAligned Then
                         gc.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
                     Else
-                        intrinsics.gc = gc
-                        intrinsics.Run(emptyMat)
-                        Dim irPt = intrinsics.ptTranslated
+                        Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X))
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                             gc.depth = 0 ' off the grid.
                             gc.lRect = emptyRect
