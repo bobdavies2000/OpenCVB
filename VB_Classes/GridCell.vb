@@ -9,6 +9,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         options.Run()
 
         If task.optionsChanged Then task.gcList.Clear()

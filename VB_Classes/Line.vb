@@ -24,6 +24,7 @@ Public Class Line_Basics : Inherits TaskParent
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.optionsChanged Then task.lpList.Clear()
 
         Dim histArray = getLineCounts(lines.lpList)

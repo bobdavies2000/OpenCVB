@@ -1426,6 +1426,7 @@ Public Class Main_UI
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L"
                 Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                ' Return New CameraORB_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
         End Select
         Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
     End Function

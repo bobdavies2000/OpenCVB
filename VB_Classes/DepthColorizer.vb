@@ -5,6 +5,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.gOptions.ColorGrid.Checked Then
             task.depthRGB = task.gCell.dst2
         ElseIf task.gOptions.ColorizedDepth.Checked Then
@@ -14,7 +15,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             cv.Cv2.ApplyColorMap(depthNorm, task.depthRGB, task.depthColorMap)
         Else
             task.depthRGB = task.gCell.dst3.Clone
-            task.depthRGB.SetTo(0, task.noDepthMask)
+            ' task.depthRGB.SetTo(0, task.noDepthMask)
         End If
     End Sub
 End Class

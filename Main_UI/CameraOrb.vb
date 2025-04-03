@@ -167,3 +167,86 @@ Module ORB_Module
                                                    width As Integer, height As Integer) As IntPtr
     End Function
 End Module
+
+
+
+
+Public Class CameraORB_CPP : Inherits GenericCamera
+    Public deviceNum As Integer
+    Public deviceName As String
+    Public cPtrOpen As IntPtr
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+        captureRes = _captureRes
+
+        cPtr = ORBOpen(captureRes.Width, captureRes.Height)
+        Dim intrin = ORBIntrinsics(cPtr)
+        Dim intrinInfo(4 - 1) As Single
+        Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
+        calibData.rgbIntrinsics.ppx = intrinInfo(0)
+        calibData.rgbIntrinsics.ppy = intrinInfo(1)
+        calibData.rgbIntrinsics.fx = intrinInfo(2)
+        calibData.rgbIntrinsics.fy = intrinInfo(3)
+    End Sub
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
+        Static color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat
+
+        If cPtr = 0 Then Exit Sub
+        Dim cols = captureRes.Width, rows = captureRes.Height
+
+        Dim colorData = ORBWaitForFrame(cPtr)
+
+        If colorData <> 0 Then
+            color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
+        Else
+            color = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
+        End If
+
+        Dim pcData = ORBPointCloud(cPtr)
+        If pcData <> 0 Then
+            pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData) * 0.001
+        Else
+            pointCloud = New cv.Mat(WorkingRes, cv.MatType.CV_32FC3, New cv.Scalar(0))
+        End If
+
+        Dim leftData = ORBLeftImage(cPtr)
+        If leftData <> 0 Then
+            leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, leftData).
+                                             CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
+        Else
+            leftView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
+
+        End If
+
+        Dim rightData = ORBRightImage(cPtr)
+        If rightData <> 0 Then
+            rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, rightData).
+                                              CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
+        Else
+            rightView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
+        End If
+
+        Dim accelFrame = ORBAccel(cPtr)
+        Dim gyroFrame = ORBGyro(cPtr)
+        SyncLock cameraLock
+            Static imuStartTime = ORBIMUTimeStamp(cPtr)
+            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+            IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
+
+            uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+        End SyncLock
+
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
+    End Sub
+    Public Sub stopCamera()
+        Application.DoEvents()
+        Try
+            ORBClose(cPtr)
+        Catch ex As Exception
+        End Try
+        cPtr = 0
+    End Sub
+End Class

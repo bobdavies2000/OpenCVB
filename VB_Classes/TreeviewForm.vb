@@ -4,6 +4,7 @@ Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String)
     Dim moduleList As New List(Of String) ' the list of all active algorithms.
+    Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingle)
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
         PercentTime.Height = TreeView1.Height
@@ -98,7 +99,6 @@ Public Class TreeviewForm
             PercentTime.Text = ""
             Exit Sub
         End If
-        Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingle)
         Dim sumTime As Single
         For i = 0 To algorithm_ms.Count - 1
             sumTime += algorithm_ms(i)
@@ -108,6 +108,7 @@ Public Class TreeviewForm
 
         Dim otherTime As Single
         Dim otherCount As Integer
+        PercentTimes.Clear()
         For i = 0 To algorithm_ms.Count - 1
             Dim percent = algorithm_ms(i) / sumTime
             If percent < 0 Then percent = 0

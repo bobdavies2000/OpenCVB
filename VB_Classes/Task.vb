@@ -38,11 +38,9 @@ Public Class VBtask : Implements IDisposable
     Public gridPoints As New List(Of cv.Point) ' the list of each gridRect corner 
     Public depthDiffMeters As Single ' grid cells > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean
-    Public defaultLowResColorDifference As Integer
 
     Public fpListLast As New List(Of fpXData)
     Public fpIDlist As New List(Of Single)
-    Public fpMapLast As New cv.Mat
 
     Public fpOutline As New cv.Mat
     Public fpSelected As fpXData
@@ -70,6 +68,9 @@ Public Class VBtask : Implements IDisposable
     Public cols As Integer
     Public workingRes As cv.Size
     Public TaskTimer As New System.Timers.Timer(1000)
+
+    ' if true, algorithm prep means algorithm tasks will run.  If false, they have already been run...
+    Public algorithmPrep As Boolean = True
 
     Public dst0 As New cv.Mat
     Public dst1 As New cv.Mat
@@ -497,20 +498,13 @@ Public Class VBtask : Implements IDisposable
         ' set options for specific cameras here.
         Select Case task.cameraName
             Case "StereoLabs ZED 2/2i"
-                task.defaultLowResColorDifference = 6
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                task.defaultLowResColorDifference = 6
             Case "Intel(R) RealSense(TM) Depth Camera 455"
-                task.defaultLowResColorDifference = 6
             Case "Oak-D camera"
-                task.defaultLowResColorDifference = 6
             Case "Orbbec Gemini 335L"
-                task.defaultLowResColorDifference = 6
             Case "MYNT-EYE-D1000"
-                task.defaultLowResColorDifference = 6
 #If AZURE_SUPPORT Then
             Case "Azure Kinect 4K"
-                task.defaultLowResColorDifference = 6
 #End If
         End Select
 
@@ -881,7 +875,9 @@ Public Class VBtask : Implements IDisposable
 
 
 
+            algorithmPrep = False
             MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
+            algorithmPrep = True
 
 
 

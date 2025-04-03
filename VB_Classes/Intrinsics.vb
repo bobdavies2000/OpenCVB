@@ -18,8 +18,6 @@ Public Class Intrinsics_Basics : Inherits TaskParent
         ptTranslated.X = task.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppx
         ptTranslated.Y = task.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppy
 
-        If ptTranslated.X < 0 Or ptTranslated.X >= dst2.Width Then Return New cv.Point2f
-        If ptTranslated.Y < 0 Or ptTranslated.Y >= dst2.Height Then Return New cv.Point2f
         Return ptTranslated
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)

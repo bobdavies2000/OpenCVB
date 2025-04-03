@@ -2229,7 +2229,7 @@ public:
 };
 class Options_GridCells {
 public:
-	int colorDifferenceThreshold =  10;
+	int colorDifferenceThreshold =  6;
 	float correlationThreshold =  0.5;
 	void Run() {}
 	Options_GridCells() {
