@@ -5,7 +5,8 @@ Public Class Line_Basics : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines across frames using the motion mask.  Results are in task.lplist."
+        desc = "Toss any line in the previous image if that line had either end in the motion mask.  " +
+               "If both ends are NOT in motion mask for the current image, the keep the line."
     End Sub
     Private Function getLineCounts(lpList As List(Of lpData)) As Single()
         Dim histarray(lpList.Count - 1) As Single
@@ -27,29 +28,28 @@ Public Class Line_Basics : Inherits TaskParent
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.optionsChanged Then task.lpList.Clear()
 
-        Dim histArray = getLineCounts(lines.lpList)
-        For i = histArray.Count - 1 To 0 Step -1
-            If histArray(i) = 0 Then lines.lpList.RemoveAt(i)
+        Dim newList As New List(Of lpData)
+        For Each lp In lines.lpList ' 
+            Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+            If val1 = 0 And val2 = 0 Then
+                lp.age += 1
+                newList.Add(lp)
+            End If
         Next
 
         If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable)
 
+        Dim histArray = getLineCounts(task.lpList)
+        For i = 0 To histArray.Count - 1
+            If histArray(i) Then
+                newList.Add(task.lpList(i)) ' Add the lines in the motion mask.
+            End If
+        Next
+
         dst3.SetTo(0)
-        Dim newList As New List(Of lpData)
-        For Each lp In lines.lpList
+        For Each lp In newList
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-            newList.Add(lp)
-        Next
-
-        histArray = getLineCounts(task.lpList)
-        For i = histArray.Count - 1 To 1 Step -1
-            If histArray(i) Then task.lpList.RemoveAt(i)
-        Next
-
-        For Each lp In task.lpList
-            lp.age += 1
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-            newList.Add(lp)
         Next
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -58,26 +58,105 @@ Public Class Line_Basics : Inherits TaskParent
         Next
 
         task.lpList.Clear()
-        task.lpList.Add(New lpData(New cv.Point, New cv.Point)) ' placeholder for zero so we can distinguish line 1 from the background which is 0.
+        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
+        task.lpList.Add(New lpData(New cv.Point, New cv.Point))
+
         dst2 = src
-        Dim intLengths As New List(Of Integer), lenPrev As Single = -1
         For Each lp In sortlines.Values
-            If lenPrev <> lp.length Then
-                lp.index = task.lpList.Count
+            lp.index = task.lpList.Count
 
-                Dim gcCenter = task.gcList(lp.gcIndex(0))
-                If gcCenter.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
+            Dim gc = task.gcList(lp.gcIndex(0))
+            If gc.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
 
-                task.lpList.Add(lp)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            End If
-            lenPrev = lp.length
+            task.lpList.Add(lp)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
         labels(2) = CStr(task.lpList.Count) + " lines were found."
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Line_BasicsAlternative : Inherits TaskParent
+    Public lines As New Line_BasicsRaw
+    Public Sub New()
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect lines across frames using the motion mask.  Results are in task.lplist."
+    End Sub
+    Private Function getLineCounts(lpList As List(Of lpData)) As Single()
+        Dim histarray(lpList.Count - 1) As Single
+        If lpList.Count > 0 Then
+            Dim histogram As New cv.Mat
+            dst1.SetTo(0)
+            For Each lp In lpList
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            Next
+
+            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
+
+            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+        End If
+
+        Return histarray
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then task.lpList.Clear()
+
+        Dim histArray = getLineCounts(lines.lpList)
+        Dim newList As New List(Of lpData)
+        For i = histArray.Count - 1 To 0 Step -1
+            If histArray(i) = 0 Then
+                ' keep lines from the previous image NOT found in the current motion mask.
+                lines.lpList(i).age += 1 ' we are keeping this line around - no motion - so bump the age.
+                newList.Add(lines.lpList(i))
+            End If
+        Next
+
+        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable)
+
+        histArray = getLineCounts(task.lpList)
+        For i = histArray.Count - 1 To 1 Step -1
+            If histArray(i) Then
+                newList.Add(task.lpList(i)) ' Add the lines in the motion mask.
+            End If
+        Next
+
+        dst3.SetTo(0)
+        For Each lp In newList
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+        Next
+
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each lp In newList
+            If lp.length > 0 Then sortlines.Add(lp.length, lp)
+        Next
+
+        task.lpList.Clear()
+        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
+        task.lpList.Add(New lpData(New cv.Point, New cv.Point))
+
+        dst2 = src
+        For Each lp In sortlines.Values
+            lp.index = task.lpList.Count
+
+            Dim gc = task.gcList(lp.gcIndex(0))
+            If gc.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
+
+            task.lpList.Add(lp)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+
+        labels(2) = CStr(task.lpList.Count) + " lines were found."
+        labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
+    End Sub
+End Class
+
 
 
 
@@ -671,8 +750,3 @@ Public Class Line_Vertical3D : Inherits TaskParent
         labels(2) = "There are " + CStr(vertlist.Count) + " lines similar to the Gravity vector "
     End Sub
 End Class
-
-
-
-
-
