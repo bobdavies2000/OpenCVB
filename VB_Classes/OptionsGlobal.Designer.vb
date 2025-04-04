@@ -48,6 +48,7 @@ Partial Class OptionsGlobal
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.LRMeanSubtraction = New System.Windows.Forms.CheckBox()
         Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
+        Me.ColorGrid = New System.Windows.Forms.RadioButton()
         Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
         Me.ColorizedDepth = New System.Windows.Forms.RadioButton()
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
@@ -88,7 +89,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.ColorGrid = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -149,13 +149,13 @@ Partial Class OptionsGlobal
         'DepthDiffSlider
         '
         Me.DepthDiffSlider.Location = New System.Drawing.Point(185, 297)
-        Me.DepthDiffSlider.Maximum = 100
+        Me.DepthDiffSlider.Maximum = 1000
         Me.DepthDiffSlider.Minimum = 1
         Me.DepthDiffSlider.Name = "DepthDiffSlider"
         Me.DepthDiffSlider.Size = New System.Drawing.Size(506, 69)
         Me.DepthDiffSlider.TabIndex = 58
         Me.DepthDiffSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.DepthDiffSlider.Value = 10
+        Me.DepthDiffSlider.Value = 100
         '
         'Label6
         '
@@ -163,7 +163,7 @@ Partial Class OptionsGlobal
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(136, 55)
         Me.Label6.TabIndex = 57
-        Me.Label6.Text = "Depth Difference Threshold (cm's)"
+        Me.Label6.Text = "Depth Difference Threshold (mm's)"
         Me.Label6.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'DebugSliderLabel
@@ -407,6 +407,16 @@ Partial Class OptionsGlobal
         Me.DepthGroupBox.TabIndex = 78
         Me.DepthGroupBox.TabStop = False
         Me.DepthGroupBox.Text = "Depth Display"
+        '
+        'ColorGrid
+        '
+        Me.ColorGrid.AutoSize = True
+        Me.ColorGrid.Location = New System.Drawing.Point(16, 103)
+        Me.ColorGrid.Name = "ColorGrid"
+        Me.ColorGrid.Size = New System.Drawing.Size(113, 24)
+        Me.ColorGrid.TabIndex = 3
+        Me.ColorGrid.Text = "Grid Colors"
+        Me.ColorGrid.UseVisualStyleBackColor = True
         '
         'DepthCorrelations
         '
@@ -818,16 +828,6 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'ColorGrid
-        '
-        Me.ColorGrid.AutoSize = True
-        Me.ColorGrid.Location = New System.Drawing.Point(16, 103)
-        Me.ColorGrid.Name = "ColorGrid"
-        Me.ColorGrid.Size = New System.Drawing.Size(113, 24)
-        Me.ColorGrid.TabIndex = 3
-        Me.ColorGrid.Text = "Grid Colors"
-        Me.ColorGrid.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
