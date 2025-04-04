@@ -2205,40 +2205,91 @@ End Class
 
 
 
-'Public Class XO_OpenGL_DrawLines3D : Inherits TaskParent
-'    Dim lines As New Structured_Lines
-'    Public Sub New()
-'        task.ogl.oglFunction = oCase.drawLines
-'        desc = "Draw all the lines found with Line3D_Basics"
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        lines.Run(src)
-'        dst2 = lines.dst2
-'        dst3 = lines.dst3
+Public Class XO_PointCloud_Histograms : Inherits TaskParent
+    Dim plot2D As New Plot_Histogram2D
+    Dim plot As New Plot_Histogram
+    Dim hcloud As New Hist3Dcloud_Basics
+    Dim grid As New Grid_Basics
+    Public histogram As New cv.Mat
+    Public Sub New()
+        task.gOptions.setHistogramBins(9)
+        task.redOptions.XYReduction.Checked = True
+        labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
+        desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.redOptions.Sync() ' make sure settings are consistent
 
-'        Dim vec(8) As Single
-'        Dim lineData As New List(Of Single)
-'        lineData.Add(0) ' fill this in below
-'        For Each lp In task.lpList
-'            lp3d = findEdgePoints(lp)
-'            If lp.p1.Z > 0 And lp.p2.Z > 0 Then
-'                If lp.vertical Then
-'                    lp.p2.X = lp.p1.X
-'                    lp.p2.Z = lp.p1.Z
-'                Else
-'                    lp.p2.Y = lp.p1.Y
-'                End If
-'                Dim c = task.scalarColors(lp.colorIndex)
-'                vec = {c(0) / 255, c(1) / 255, c(2) / 255, lp.p1.X, lp.p1.Y, lp.p1.Z, lp.p2.X, lp.p2.Y, lp.p2.Z}
-'                For i = 0 To vec.Length - 1
-'                    lineData.Add(vec(i))
-'                Next
-'            End If
-'        Next
-'        lineData(0) = lineData.Count
-'        task.ogl.dataInput = cv.Mat.FromPixelData(lineData.Count, 1, cv.MatType.CV_32F,
-'                                                   lineData.ToArray)
+        cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
+                        task.redOptions.histBinList, task.redOptions.ranges)
 
-'        task.ogl.Run(task.color)
-'    End Sub
-'End Class
+        Select Case task.redOptions.PointCloudReduction
+            Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
+                plot.Run(histogram)
+                dst2 = plot.histogram
+                labels(2) = "2D plot of 1D histogram."
+            Case 3, 4, 5 ' "XY Reduction", "XZ Reduction", "YZ Reduction"
+                plot2D.Run(histogram)
+                dst2 = plot2D.dst2
+                labels(2) = "2D plot of 2D histogram."
+            Case 6 ' "XYZ Reduction"
+                If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+
+                hcloud.Run(task.pointCloud)
+
+                histogram = hcloud.histogram
+                Dim histData(histogram.Total - 1) As Single
+                Marshal.Copy(histogram.Data, histData, 0, histData.Length)
+
+                If histData.Count > 255 And task.histogramBins > 3 Then
+                    task.histogramBins -= 1
+                End If
+                If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
+                    task.histogramBins += 1
+                End If
+                If task.gridRects.Count < histData.Length And task.cellSize > 2 Then
+                    task.cellSize -= 1
+                    grid.Run(src)
+                    dst2.SetTo(0)
+                End If
+                histData(0) = 0 ' count of zero pixels - distorts results..
+
+                Dim maxVal = histData.ToList.Max
+                For i = 0 To task.gridRects.Count - 1
+                    Dim roi = task.gridRects(i)
+                    If i >= histData.Length Then
+                        dst2(roi).SetTo(0)
+                    Else
+                        dst2(roi).SetTo(255 * histData(i) / maxVal)
+                    End If
+                Next
+                labels(2) = "2D plot of the resulting 3D histogram."
+        End Select
+
+        dst3 = ShowPalette(dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_PointCloud_Infinities : Inherits TaskParent
+    Public Sub New()
+        desc = "Find out if pointcloud has an nan's or inf's.  StereoLabs had some... look for PatchNans."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim infTotal(2) As Integer
+        For y = 0 To src.Rows - 1
+            For x = 0 To src.Cols - 1
+                Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
+                If Single.IsInfinity(vec(0)) Then infTotal(0) += 1
+                If Single.IsInfinity(vec(1)) Then infTotal(1) += 1
+                If Single.IsInfinity(vec(2)) Then infTotal(2) += 1
+            Next
+        Next
+        SetTrueText("infinities: X " + CStr(infTotal(0)) + ", Y = " + CStr(infTotal(1)) + " Z = " +
+                    CStr(infTotal(2)))
+    End Sub
+End Class

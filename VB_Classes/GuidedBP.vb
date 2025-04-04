@@ -175,7 +175,7 @@ End Class
 
 
 Public Class GuidedBP_Depth : Inherits TaskParent
-    Public hist As New PointCloud_Histograms
+    Public hist As New XO_PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public classCount As Integer
     Public Sub New()

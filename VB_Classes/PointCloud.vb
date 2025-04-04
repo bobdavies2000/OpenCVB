@@ -119,21 +119,6 @@ End Class
 
 
 
-Public Class PointCloud_Point3f : Inherits TaskParent
-    Public Sub New()
-        desc = "Display the point cloud CV_32FC3 format"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = task.pointCloud
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class PointCloud_Spin : Inherits TaskParent
     Dim options As New Options_IMU
     Dim gMat As New IMU_GMatrixWithOptions
@@ -207,44 +192,6 @@ Public Class PointCloud_Spin2 : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class PointCloud_Continuous_VB : Inherits TaskParent
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
-        End If
-
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Show where the pointcloud is continuous"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static thresholdSlider =optiBase.findslider("Threshold of continuity in mm")
-        Dim threshold = thresholdSlider.Value / 1000
-
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        For y = 0 To input.Height - 1
-            For x = 1 To input.Width - 1
-                Dim p1 = input.Get(Of Single)(y, x - 1)
-                Dim p2 = input.Get(Of Single)(y, x)
-                If Math.Abs(p1 - p2) <= threshold Then dst2.Set(Of Byte)(y, x, 255) Else dst3.Set(Of Byte)(y, x, 255)
-            Next
-        Next
-
-        dst3.SetTo(0, task.noDepthMask)
-        dst2.SetTo(0, task.noDepthMask)
-        labels(2) = "White pixels: Z-values within " + CStr(thresholdSlider.Value) + " mm's of X neighbor"
-        labels(3) = "Mask showing discontinuities > " + CStr(thresholdSlider.Value) + " mm's of X neighbor"
-    End Sub
-End Class
 
 
 
@@ -761,14 +708,13 @@ End Class
 
 
 
-Public Class PointCloud_Inspector : Inherits TaskParent
+Public Class PointCloud_GridInspector : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.mouseMovePoint.X = dst2.Width / 2
-        desc = "Inspect x, y, and z values in a row or column"
+        desc = "Inspect x, y, and z values by grid cell"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Dim yLines = 20
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim cLine = task.mouseMovePoint.X
 
         Dim input = src
@@ -779,16 +725,12 @@ Public Class PointCloud_Inspector : Inherits TaskParent
         dst2 = task.depthRGB
         DrawLine(dst2, topPt, botPt, 255)
 
-        Dim stepY = dst2.Height / yLines
-        SetTrueText(vbTab + "   X" + vbTab + "  Y" + vbTab + "  Z", 3)
-        For i = 1 To yLines - 1
-            Dim pt1 = New cv.Point2f(dst2.Width, i * stepY)
-            Dim pt2 = New cv.Point2f(0, i * stepY)
-            DrawLine(dst2, pt1, pt2, white)
-
-            Dim pt = New cv.Point2f(cLine, i * stepY)
-            Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            SetTrueText("Row " + CStr(i) + vbTab + Format(xyz(0), fmt2) + vbTab + Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
+        SetTrueText("Values show gc.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
+        For i = 0 To dst2.Height - 1 Step task.cellSize
+            Dim pt = New cv.Point2f(cLine, i)
+            Dim index = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            Dim xyz = task.gcList(index).pt3D
+            SetTrueText("Row " + Format(i, "00") + vbTab + vbTab + Format(xyz(0), fmt2) + vbTab + Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
         Next
         labels(2) = "Values displayed are the point cloud X, Y, and Z values for column " + CStr(cLine)
         labels(3) = "Move mouse in the image at left to see the point cloud X, Y, and Z values."
@@ -803,13 +745,13 @@ End Class
 
 
 
-Public Class PointCloud_Average : Inherits TaskParent
+Public Class PointCloud_XYZAverage : Inherits TaskParent
     Dim pcHistory As New List(Of cv.Mat)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         desc = "Average all 3 elements of the point cloud - not just depth."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         pcHistory.Add(task.pointCloud)
         If pcHistory.Count >= task.frameHistoryCount Then pcHistory.RemoveAt(0)
 
@@ -872,77 +814,6 @@ Public Class PointCloud_FrustrumSide : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class PointCloud_Histograms : Inherits TaskParent
-    Dim plot2D As New Plot_Histogram2D
-    Dim plot As New Plot_Histogram
-    Dim hcloud As New Hist3Dcloud_Basics
-    Dim grid As New Grid_Basics
-    Public histogram As New cv.Mat
-    Public Sub New()
-        task.gOptions.setHistogramBins(9)
-        task.redOptions.XYReduction.Checked = True
-        labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
-        desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        task.redOptions.Sync() ' make sure settings are consistent
-
-        cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
-                        task.redOptions.histBinList, task.redOptions.ranges)
-
-        Select Case task.redOptions.PointCloudReduction
-            Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
-                plot.Run(histogram)
-                dst2 = plot.histogram
-                labels(2) = "2D plot of 1D histogram."
-            Case 3, 4, 5 ' "XY Reduction", "XZ Reduction", "YZ Reduction"
-                plot2D.Run(histogram)
-                dst2 = plot2D.dst2
-                labels(2) = "2D plot of 2D histogram."
-            Case 6 ' "XYZ Reduction"
-                If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-
-                hcloud.Run(task.pointCloud)
-
-                histogram = hcloud.histogram
-                Dim histData(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histData, 0, histData.Length)
-
-                If histData.Count > 255 And task.histogramBins > 3 Then
-                    task.histogramBins -= 1
-                End If
-                If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
-                    task.histogramBins += 1
-                End If
-                If task.gridRects.Count < histData.Length And task.cellSize > 2 Then
-                    task.cellSize -= 1
-                    grid.Run(src)
-                    dst2.SetTo(0)
-                End If
-                histData(0) = 0 ' count of zero pixels - distorts results..
-
-                Dim maxVal = histData.ToList.Max
-                For i = 0 To task.gridRects.Count - 1
-                    Dim roi = task.gridRects(i)
-                    If i >= histData.Length Then
-                        dst2(roi).SetTo(0)
-                    Else
-                        dst2(roi).SetTo(255 * histData(i) / maxVal)
-                    End If
-                Next
-                labels(2) = "2D plot of the resulting 3D histogram."
-        End Select
-
-        dst3 = ShowPalette(dst2)
-    End Sub
-End Class
 
 
 
@@ -1116,21 +987,77 @@ End Class
 
 
 
-Public Class PointCloud_Infinities : Inherits TaskParent
+
+
+Public Class PointCloud_Continuous_VB : Inherits TaskParent
     Public Sub New()
-        desc = "Find out if pointcloud has an nan's or inf's."
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
+        End If
+
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Show where the pointcloud is continuous"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Dim infTotal(2) As Integer
-        For y = 0 To src.Rows - 1
-            For x = 0 To src.Cols - 1
-                Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
-                If Single.IsInfinity(vec(0)) Then infTotal(0) += 1
-                If Single.IsInfinity(vec(1)) Then infTotal(1) += 1
-                If Single.IsInfinity(vec(2)) Then infTotal(2) += 1
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = optiBase.FindSlider("Threshold of continuity in mm")
+        Dim threshold = thresholdSlider.Value / 1000
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        For y = 0 To input.Height - 1
+            For x = 1 To input.Width - 1
+                Dim p1 = input.Get(Of Single)(y, x - 1)
+                Dim p2 = input.Get(Of Single)(y, x)
+                If Math.Abs(p1 - p2) <= threshold Then dst2.Set(Of Byte)(y, x, 255) Else dst3.Set(Of Byte)(y, x, 255)
             Next
         Next
-        SetTrueText("infinities: X " + CStr(infTotal(0)) + ", Y = " + CStr(infTotal(1)) + " Z = " +
-                    CStr(infTotal(2)))
+
+        dst3.SetTo(0, task.noDepthMask)
+        dst2.SetTo(0, task.noDepthMask)
+        labels(2) = "White pixels: Z-values within " + CStr(thresholdSlider.Value) + " mm's of X neighbor"
+        labels(3) = "Mask showing discontinuities > " + CStr(thresholdSlider.Value) + " mm's of X neighbor"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_Continuous_Grid : Inherits TaskParent
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
+        End If
+
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Show where the pointcloud is continuous"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = optiBase.FindSlider("Threshold of continuity in mm")
+        Dim threshold = thresholdSlider.Value / 1000
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        For y = 0 To input.Height - 1
+            For x = 1 To input.Width - 1
+                Dim p1 = input.Get(Of Single)(y, x - 1)
+                Dim p2 = input.Get(Of Single)(y, x)
+                If Math.Abs(p1 - p2) <= threshold Then dst2.Set(Of Byte)(y, x, 255) Else dst3.Set(Of Byte)(y, x, 255)
+            Next
+        Next
+
+        dst3.SetTo(0, task.noDepthMask)
+        dst2.SetTo(0, task.noDepthMask)
+        labels(2) = "White pixels: Z-values within " + CStr(thresholdSlider.Value) + " mm's of X neighbor"
+        labels(3) = "Mask showing discontinuities > " + CStr(thresholdSlider.Value) + " mm's of X neighbor"
     End Sub
 End Class

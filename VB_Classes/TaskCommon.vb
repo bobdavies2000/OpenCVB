@@ -600,6 +600,7 @@ Public Class gcData
     Public depthRanges As New List(Of Single)
     Public disparity As Single
     Public depthStdev As Single
+    Public pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this grid cell.
 
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
@@ -608,7 +609,7 @@ Public Class gcData
     Public hoodRect As cv.Rect ' a rect describing the neighborhood of the center cell...
     Public rHoodRect As cv.Rect ' a rect describing the neighborhood of the center cell for the right image.
     Sub New()
-        Dim stdev As cv.Scalar, mean As cv.Scalar
+        Dim stdev As cv.Scalar
         index = task.gcList.Count
         rect = task.gridRects(index)
         lRect = rect
@@ -621,9 +622,9 @@ Public Class gcData
         lRect = rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
         center = New cv.Point(rect.TopLeft.X + rect.Width / 2, rect.TopLeft.Y + rect.Height / 2)
         If task.depthMask(rect).CountNonZero Then
-            cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), mean, stdev, task.depthMask(rect))
-            depth = mean(0)
-            depthStdev = stdev(0)
+            cv.Cv2.MeanStdDev(task.pointCloud(rect), pt3D, stdev, task.depthMask(rect))
+            depth = pt3D(2)
+            depthStdev = stdev(2)
         End If
 
         For Each index In task.gridNeighbors(index)
