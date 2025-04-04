@@ -5,6 +5,7 @@ Public Class TreeviewForm
     Dim treeData As New List(Of String)
     Dim moduleList As New List(Of String) ' the list of all active algorithms.
     Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingle)
+    Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
         PercentTime.Height = TreeView1.Height
@@ -26,7 +27,6 @@ Public Class TreeviewForm
         Next
         Return Nothing
     End Function
-    Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub updateTree(callTrace As List(Of String))
         If callTrace.Count = 0 Then Exit Sub
         moduleList.Clear()
@@ -34,8 +34,10 @@ Public Class TreeviewForm
         Dim tv = TreeView1
         tv.Nodes.Clear()
         Dim rootcall = Trim(callTrace(0))
+
         Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
         Me.Text = title + titleStr
+
         Dim n = tv.Nodes.Add(title)
         n.Tag = rootcall
 
@@ -104,39 +106,46 @@ Public Class TreeviewForm
             sumTime += algorithm_ms(i)
         Next
 
-        Dim saveWaitTime As String = ""
+        For Each percent In algorithm_ms
+            percent /= sumTime
+        Next
 
-        Dim otherTime As Single
-        Dim otherCount As Integer
+        Dim saveWaitTime As String = ""
         PercentTimes.Clear()
+        Dim percentStr As String
         For i = 0 To algorithm_ms.Count - 1
-            Dim percent = algorithm_ms(i) / sumTime
-            If percent < 0 Then percent = 0
-            Dim str = Format(percent, "00.0%") + " " + task.algorithmNames(i)
+            algorithm_ms(i) /= sumTime
+            If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0
+            Dim str = Format(algorithm_ms(i), "00.0%") + " " + task.algorithmNames(i)
+            If task.displayObjectName.Length > 0 Then
+                If str.Contains(task.displayObjectName) Then percentStr = str
+            End If
             If task.algorithmNames(i).Contains("waitingForInput") Then
                 saveWaitTime = str + "  <<<<<<<<<< "
             Else
-                If percent < 0.01 Then
-                    otherTime += percent
-                    otherCount += 1
-                Else
-                    PercentTimes.Add(percent, str)
-                End If
+                PercentTimes.Add(algorithm_ms(i), str)
             End If
         Next
 
-        PercentTime.Text = ""
-        PercentTime.Text = "Algorithm FPS = " + Format(task.fpsAlgorithm, "0") + vbCrLf
+        Dim otherTimes As New List(Of Single)
+        For Each percent In PercentTimes.Keys
+            If percent < 0.01 Then otherTimes.Add(percent)
+        Next
+
+        PercentTime.Text = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
+        PercentTime.Text += "Algorithm FPS = " + Format(task.fpsAlgorithm, "0") + vbCrLf
         PercentTime.Text += "Camera FPS = " + Format(task.fpsCamera, "0") + vbCrLf
         Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)
         Static regularFont = New Font(PercentTime.Font, FontStyle.Regular)
 
         Dim timeDataTree As New List(Of String)(treeData)
         For i = 0 To PercentTimes.Count - 1
-            Dim str = PercentTimes.ElementAt(i).Value
-            Dim index = treeData.IndexOf(str.Substring(6))
-            PercentTime.Text += str + vbCrLf
-            If index >= 0 Then timeDataTree(index) = str.Substring(0, 5) + " " + timeDataTree(index)
+            If PercentTimes.ElementAt(i).Key > 0.01 Then
+                Dim str = PercentTimes.ElementAt(i).Value
+                Dim index = treeData.IndexOf(str.Substring(6))
+                PercentTime.Text += str + vbCrLf
+                If index >= 0 Then timeDataTree(index) = str.Substring(0, 5) + " " + timeDataTree(index)
+            End If
         Next
 
         PercentTime.Text += saveWaitTime + vbCrLf
@@ -145,8 +154,10 @@ Public Class TreeviewForm
             If sn.Contains("%") Then PercentTime.Text += sn + vbCrLf
         Next
 
-        PercentTime.Text += vbCrLf + Format(otherTime, "00.0%") + " " + CStr(otherCount) +
-                                    " algorithms each < 1.0%" + vbCrLf
+        PercentTime.Text += vbCrLf + Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
+                            vbCrLf + vbCrLf + "Click an algorithm at left to see it below:" + vbCrLf
+
+        PercentTime.Text += If(percentStr Is Nothing, "Inactive algorithm selected", percentStr)
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TreeView1.Dock = DockStyle.Fill
