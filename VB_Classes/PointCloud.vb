@@ -1,119 +1,22 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-
 Public Class PointCloud_Basics : Inherits TaskParent
-    Public actualCount As Integer
-
-    Public allPointsH As New List(Of cv.Point3f)
-    Public allPointsV As New List(Of cv.Point3f)
-
-    Public hList As New List(Of List(Of cv.Point3f))
-    Public xyHList As New List(Of List(Of cv.Point))
-
-    Public vList As New List(Of List(Of cv.Point3f))
-    Public xyVList As New List(Of List(Of cv.Point))
-    Dim options As New Options_PointCloud()
+    Dim pcHistory As New List(Of cv.Mat)
     Public Sub New()
-        setPointCloudGrid()
-        desc = "Reduce the point cloud to a manageable number points in 3D"
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
+        desc = "Average all 3 elements of the point cloud - not just depth."
     End Sub
-    Public Function findHorizontalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
-        Dim ptlist As New List(Of List(Of cv.Point3f))
-        Dim lastVec = New cv.Point3f
-        For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
-            Dim vecList As New List(Of cv.Point3f)
-            Dim xyVec As New List(Of cv.Point)
-            For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
-                Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
-                Dim jumpZ As Boolean = False
-                If vec.Z > 0 Then
-                    If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
-                        actualCount += 1
-                        DrawCircle(dst2, New cv.Point(x, y), task.DotSize, white)
-                        vecList.Add(vec)
-                        xyVec.Add(New cv.Point(x, y))
-                    Else
-                        jumpZ = True
-                    End If
-                End If
-                If vec.Z = 0 Or jumpZ Then
-                    If vecList.Count > 1 Then
-                        ptlist.Add(New List(Of cv.Point3f)(vecList))
-                        xyList.Add(New List(Of cv.Point)(xyVec))
-                    End If
-                    vecList.Clear()
-                    xyVec.Clear()
-                End If
-                lastVec = vec
-            Next
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        pcHistory.Add(task.pointCloud)
+        If pcHistory.Count >= task.frameHistoryCount Then pcHistory.RemoveAt(0)
+
+        dst2.SetTo(0)
+        For Each m In pcHistory
+            dst2 += m
         Next
-        Return ptlist
-    End Function
-    Public Function findVerticalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
-        Dim ptlist As New List(Of List(Of cv.Point3f))
-        Dim lastVec = New cv.Point3f
-        For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
-            Dim vecList As New List(Of cv.Point3f)
-            Dim xyVec As New List(Of cv.Point)
-            For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
-                Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
-                Dim jumpZ As Boolean = False
-                If vec.Z > 0 Then
-                    If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
-                        actualCount += 1
-                        DrawCircle(dst2, New cv.Point(x, y), task.DotSize, white)
-                        vecList.Add(vec)
-                        xyVec.Add(New cv.Point(x, y))
-                    Else
-                        jumpZ = True
-                    End If
-                End If
-                If vec.Z = 0 Or jumpZ Then
-                    If vecList.Count > 1 Then
-                        ptlist.Add(New List(Of cv.Point3f)(vecList))
-                        xyList.Add(New List(Of cv.Point)(xyVec))
-                    End If
-                    vecList.Clear()
-                    xyVec.Clear()
-                End If
-                lastVec = vec
-            Next
-        Next
-        Return ptlist
-    End Function
-
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        dst2 = src
-        actualCount = 0
-
-        xyHList.Clear()
-        hList = findHorizontalPoints(xyHList)
-
-        allPointsH.Clear()
-        For Each h In hList
-            For Each pt In h
-                allPointsH.Add(pt)
-            Next
-        Next
-
-        xyVList.Clear()
-        vList = findVerticalPoints(xyVList)
-
-        allPointsV.Clear()
-        For Each v In vList
-            For Each pt In v
-                allPointsV.Add(pt)
-            Next
-        Next
-
-        labels(2) = "Point series found = " + CStr(hList.Count + vList.Count)
+        dst2 *= 1 / pcHistory.Count
     End Sub
 End Class
-
-
-
 
 
 
@@ -676,37 +579,6 @@ End Class
 
 
 
-Public Class PointCloud_PCPointsPlane : Inherits TaskParent
-    Dim pcBasics As New PointCloud_Basics
-    Public pcPoints As New List(Of cv.Point3f)
-    Public xyList As New List(Of cv.Point)
-    Dim white32 = New cv.Point3f(1, 1, 1)
-    Public Sub New()
-        setPointCloudGrid()
-        desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        pcBasics.Run(src)
-
-        pcPoints.Clear()
-        ' points in both the vertical and horizontal lists are likely to designate a plane
-        For Each pt In pcBasics.allPointsH
-            If pcBasics.allPointsV.Contains(pt) Then
-                pcPoints.Add(white32)
-                pcPoints.Add(pt)
-            End If
-        Next
-
-        labels(2) = "Point series found = " + CStr(pcPoints.Count / 2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class PointCloud_GridInspector : Inherits TaskParent
     Public Sub New()
@@ -745,23 +617,7 @@ End Class
 
 
 
-Public Class PointCloud_XYZAverage : Inherits TaskParent
-    Dim pcHistory As New List(Of cv.Mat)
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
-        desc = "Average all 3 elements of the point cloud - not just depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pcHistory.Add(task.pointCloud)
-        If pcHistory.Count >= task.frameHistoryCount Then pcHistory.RemoveAt(0)
 
-        dst3.SetTo(0)
-        For Each m In pcHistory
-            dst3 += m
-        Next
-        dst3 *= 1 / pcHistory.Count
-    End Sub
-End Class
 
 
 
@@ -1030,13 +886,11 @@ End Class
 
 Public Class PointCloud_Continuous_Grid : Inherits TaskParent
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
 
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Show where the pointcloud is continuous"
+        desc = "Show where the pointcloud is continuous at the grid cell resolution"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static thresholdSlider = optiBase.FindSlider("Threshold of continuity in mm")
@@ -1058,6 +912,6 @@ Public Class PointCloud_Continuous_Grid : Inherits TaskParent
         dst3.SetTo(0, task.noDepthMask)
         dst2.SetTo(0, task.noDepthMask)
         labels(2) = "White pixels: Z-values within " + CStr(thresholdSlider.Value) + " mm's of X neighbor"
-        labels(3) = "Mask showing discontinuities > " + CStr(thresholdSlider.Value) + " mm's of X neighbor"
+        labels(3) = "Mask showing discontinuities > " + CStr(thresholdSlider.Value) + " mm's of Y neighbor"
     End Sub
 End Class

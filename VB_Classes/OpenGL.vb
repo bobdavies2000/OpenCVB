@@ -776,30 +776,6 @@ End Class
 
 
 
-Public Class OpenGL_PCLineCandidates : Inherits TaskParent
-    Dim pts As New PointCloud_Basics
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pcPointsAlone
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
-        desc = "Display the output of the PointCloud_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pts.Run(src)
-        dst2 = pts.dst2
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(pts.allPointsH.Count, 1, cv.MatType.CV_32FC3, pts.allPointsH.ToArray)
-        task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = "Point cloud points found = " + CStr(pts.actualCount / 2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class OpenGL_PatchHorizontal : Inherits TaskParent
     Dim patch As New Pixel_NeighborsPatchNeighbors
     Public Sub New()
@@ -850,7 +826,7 @@ End Class
 
 
 Public Class OpenGL_PCpointsPlane : Inherits TaskParent
-    Dim pts As New PointCloud_PCPointsPlane
+    Dim pts As New XO_PointCloud_PCPointsPlane
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
         optiBase.FindSlider("OpenGL Point Size").Value = 10
@@ -2167,32 +2143,6 @@ Public Class OpenGL_Connected : Inherits TaskParent
             task.ogl.pointCloudInput = pc
         End If
         task.ogl.Run(src)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class OpenGL_PClinesFirstLast : Inherits TaskParent
-    Dim lines As New Line3D_CandidatesFirstLast
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pcLines
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
-        desc = "Draw the 3D lines found from the PCpoints"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
-
-        If lines.pcLinesMat.Rows = 0 Then task.ogl.dataInput = New cv.Mat Else task.ogl.dataInput = lines.pcLinesMat
-        'task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = "OpenGL_PClines found " + CStr(lines.pcLinesMat.Rows / 3) + " lines"
     End Sub
 End Class
 

@@ -186,50 +186,5 @@ Public Class Line3D_Constructed : Inherits TaskParent
         dst2 = lines.dst2
         dst3 = lines.dst3
         labels(2) = lines.labels(2)
-
-
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line3D_CandidatesFirstLast : Inherits TaskParent
-    Dim pts As New PointCloud_Basics
-    Public pcLines As New List(Of cv.Point3f)
-    Public pcLinesMat As cv.Mat
-    Public actualCount As Integer
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line " +
-               "in the sequence"
-    End Sub
-    Private Sub addLines(nextList As List(Of List(Of cv.Point3f)), xyList As List(Of List(Of cv.Point)))
-        Dim white32 As New cv.Point3f(0, 1, 1)
-        For i = 0 To nextList.Count - 1
-            pcLines.Add(white32)
-            pcLines.Add(nextList(i)(0))
-            pcLines.Add(nextList(i)(nextList(i).Count - 1))
-        Next
-
-        For Each ptlist In xyList
-            Dim p1 = ptlist(0)
-            Dim p2 = ptlist(ptlist.Count - 1)
-            DrawLine(dst2, p1, p2, white)
-        Next
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pts.Run(src)
-        dst2 = pts.dst2
-
-        pcLines.Clear()
-        addLines(pts.hList, pts.xyHList)
-        addLines(pts.vList, pts.xyVList)
-
-        pcLinesMat = cv.Mat.FromPixelData(pcLines.Count, 1, cv.MatType.CV_32FC3, pcLines.ToArray)
-        labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
     End Sub
 End Class

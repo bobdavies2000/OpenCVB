@@ -2293,3 +2293,240 @@ Public Class XO_PointCloud_Infinities : Inherits TaskParent
                     CStr(infTotal(2)))
     End Sub
 End Class
+
+
+
+
+
+Public Class XO_PointCloud_VerticalHorizontal : Inherits TaskParent
+    Public actualCount As Integer
+
+    Public allPointsH As New List(Of cv.Point3f)
+    Public allPointsV As New List(Of cv.Point3f)
+
+    Public hList As New List(Of List(Of cv.Point3f))
+    Public xyHList As New List(Of List(Of cv.Point))
+
+    Public vList As New List(Of List(Of cv.Point3f))
+    Public xyVList As New List(Of List(Of cv.Point))
+    Dim options As New Options_PointCloud()
+    Public Sub New()
+        setPointCloudGrid()
+        desc = "Reduce the point cloud to a manageable number points in 3D"
+    End Sub
+    Public Function findHorizontalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
+        Dim ptlist As New List(Of List(Of cv.Point3f))
+        Dim lastVec = New cv.Point3f
+        For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
+            Dim vecList As New List(Of cv.Point3f)
+            Dim xyVec As New List(Of cv.Point)
+            For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
+                Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
+                Dim jumpZ As Boolean = False
+                If vec.Z > 0 Then
+                    If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
+                        actualCount += 1
+                        DrawCircle(dst2, New cv.Point(x, y), task.DotSize, white)
+                        vecList.Add(vec)
+                        xyVec.Add(New cv.Point(x, y))
+                    Else
+                        jumpZ = True
+                    End If
+                End If
+                If vec.Z = 0 Or jumpZ Then
+                    If vecList.Count > 1 Then
+                        ptlist.Add(New List(Of cv.Point3f)(vecList))
+                        xyList.Add(New List(Of cv.Point)(xyVec))
+                    End If
+                    vecList.Clear()
+                    xyVec.Clear()
+                End If
+                lastVec = vec
+            Next
+        Next
+        Return ptlist
+    End Function
+    Public Function findVerticalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
+        Dim ptlist As New List(Of List(Of cv.Point3f))
+        Dim lastVec = New cv.Point3f
+        For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
+            Dim vecList As New List(Of cv.Point3f)
+            Dim xyVec As New List(Of cv.Point)
+            For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
+                Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
+                Dim jumpZ As Boolean = False
+                If vec.Z > 0 Then
+                    If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
+                        actualCount += 1
+                        DrawCircle(dst2, New cv.Point(x, y), task.DotSize, white)
+                        vecList.Add(vec)
+                        xyVec.Add(New cv.Point(x, y))
+                    Else
+                        jumpZ = True
+                    End If
+                End If
+                If vec.Z = 0 Or jumpZ Then
+                    If vecList.Count > 1 Then
+                        ptlist.Add(New List(Of cv.Point3f)(vecList))
+                        xyList.Add(New List(Of cv.Point)(xyVec))
+                    End If
+                    vecList.Clear()
+                    xyVec.Clear()
+                End If
+                lastVec = vec
+            Next
+        Next
+        Return ptlist
+    End Function
+
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst2 = src
+        actualCount = 0
+
+        xyHList.Clear()
+        hList = findHorizontalPoints(xyHList)
+
+        allPointsH.Clear()
+        For Each h In hList
+            For Each pt In h
+                allPointsH.Add(pt)
+            Next
+        Next
+
+        xyVList.Clear()
+        vList = findVerticalPoints(xyVList)
+
+        allPointsV.Clear()
+        For Each v In vList
+            For Each pt In v
+                allPointsV.Add(pt)
+            Next
+        Next
+
+        labels(2) = "Point series found = " + CStr(hList.Count + vList.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Line3D_CandidatesFirstLast : Inherits TaskParent
+    Public pts As New XO_PointCloud_VerticalHorizontal
+    Public pcLines As New List(Of cv.Point3f)
+    Public pcLinesMat As cv.Mat
+    Public actualCount As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line " +
+               "in the sequence"
+    End Sub
+    Private Sub addLines(nextList As List(Of List(Of cv.Point3f)), xyList As List(Of List(Of cv.Point)))
+        Dim white32 As New cv.Point3f(0, 1, 1)
+        For i = 0 To nextList.Count - 1
+            pcLines.Add(white32)
+            pcLines.Add(nextList(i)(0))
+            pcLines.Add(nextList(i)(nextList(i).Count - 1))
+        Next
+
+        For Each ptlist In xyList
+            Dim p1 = ptlist(0)
+            Dim p2 = ptlist(ptlist.Count - 1)
+            DrawLine(dst2, p1, p2, white)
+        Next
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        pts.Run(src)
+        dst2 = pts.dst2
+
+        pcLines.Clear()
+        addLines(pts.hList, pts.xyHList)
+        addLines(pts.vList, pts.xyVList)
+
+        pcLinesMat = cv.Mat.FromPixelData(pcLines.Count, 1, cv.MatType.CV_32FC3, pcLines.ToArray)
+        labels(2) = "Point series found = " + CStr(pts.hList.Count + pts.vList.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_PointCloud_PCPointsPlane : Inherits TaskParent
+    Dim pcBasics As New XO_Line3D_CandidatesFirstLast
+    Public pcPoints As New List(Of cv.Point3f)
+    Public xyList As New List(Of cv.Point)
+    Dim white32 = New cv.Point3f(1, 1, 1)
+    Public Sub New()
+        setPointCloudGrid()
+        desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        pcBasics.Run(src)
+
+        pcPoints.Clear()
+        ' points in both the vertical and horizontal lists are likely to designate a plane
+        For Each pt In pcBasics.pts.allPointsH
+            If pcBasics.pts.allPointsV.Contains(pt) Then
+                pcPoints.Add(white32)
+                pcPoints.Add(pt)
+            End If
+        Next
+
+        labels(2) = "Point series found = " + CStr(pcPoints.Count / 2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_OpenGL_PClinesFirstLast : Inherits TaskParent
+    Dim lines As New XO_Line3D_CandidatesFirstLast
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pcLines
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        desc = "Draw the 3D lines found from the PCpoints"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+
+        If lines.pcLinesMat.Rows = 0 Then task.ogl.dataInput = New cv.Mat Else task.ogl.dataInput = lines.pcLinesMat
+        'task.ogl.pointCloudInput = task.pointCloud
+        task.ogl.Run(New cv.Mat)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        labels(2) = "OpenGL_PClines found " + CStr(lines.pcLinesMat.Rows / 3) + " lines"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_OpenGL_PCLineCandidates : Inherits TaskParent
+    Dim pts As New XO_PointCloud_VerticalHorizontal
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pcPointsAlone
+        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        desc = "Display the output of the PointCloud_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        pts.Run(src)
+        dst2 = pts.dst2
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(pts.allPointsH.Count, 1, cv.MatType.CV_32FC3, pts.allPointsH.ToArray)
+        task.ogl.Run(New cv.Mat)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        labels(2) = "Point cloud points found = " + CStr(pts.actualCount / 2)
+    End Sub
+End Class
