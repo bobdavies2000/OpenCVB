@@ -566,6 +566,7 @@ Public Class Line_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
+        If task.lpList.Count <= 1 Then Exit Sub
         Dim lp As lpData
         dst2.SetTo(0)
         For Each lp In task.lpList

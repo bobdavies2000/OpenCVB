@@ -22,7 +22,7 @@ Public Class Swarm_Basics : Inherits TaskParent
         For i = 0 To queries.Count - 1
             Dim nabList = neighbors(i)
             Dim pt = queries(i)
-            For j = 0 To Math.Min(nabList.Count, options.ptCount)
+            For j = 0 To Math.Min(nabList.Count, options.ptCount) - 1
                 Dim ptNew = trainInput(nabList(j))
                 DrawLine(dst, pt, ptNew, white, task.lineWidth)
                 If ptNew.X < options.border Then DrawLine(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth)

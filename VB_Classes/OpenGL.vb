@@ -796,35 +796,6 @@ End Class
 
 
 
-
-
-
-Public Class OpenGL_PCpoints : Inherits TaskParent
-    Dim pts As New PointCloud_PCPoints
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pcPoints
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
-        desc = "Display the output of the PointCloud_Points"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pts.Run(src)
-        dst2 = pts.dst2
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
-        task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class OpenGL_PCpointsPlane : Inherits TaskParent
     Dim pts As New XO_PointCloud_PCPointsPlane
     Public Sub New()
@@ -918,7 +889,7 @@ Public Class OpenGL_Profile : Inherits TaskParent
             Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
             rotate.Run(src)
-            Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
+            Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gmat.gMatrix ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             vecMat = output.Reshape(3, vecMat.Rows)
 
             ogl.pointCloudInput = New cv.Mat

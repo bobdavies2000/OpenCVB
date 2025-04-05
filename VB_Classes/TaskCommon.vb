@@ -627,8 +627,8 @@ Public Class gcData
             depthStdev = stdev(2)
         End If
 
-        For Each index In task.gridNeighbors(index)
-            hoodRect = hoodRect.Union(task.gridRects(index))
+        For Each rectIndex In task.gridNeighbors(index)
+            hoodRect = hoodRect.Union(task.gridRects(rectIndex))
         Next
 
         If depth > 0 Then

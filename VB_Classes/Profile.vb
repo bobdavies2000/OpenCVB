@@ -95,7 +95,6 @@ End Class
 
 
 Public Class Profile_Rotation : Inherits TaskParent
-    Public gMat As New IMU_GMatrix
     Public strMsg As String = "Then use the 'Options_IMU' sliders to rotate the cell" + vbCrLf +
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
     Dim options As New Options_IMU
@@ -112,14 +111,12 @@ Public Class Profile_Rotation : Inherits TaskParent
             SetTrueText("When running standaloneTest(), the Y-axis slider is rotating from -90 to 90.", 3)
         End If
 
-        gMat.Run(src)
-
         If standaloneTest() Then
             options.Run()
             strOut = "Gravity-oriented gMatrix" + vbCrLf
             strOut += task.gmat.strOut + vbCrLf
             strOut += vbCrLf + "New gMatrix from sliders" + vbCrLf
-            strOut += gMatrixToStr(gMat.gMatrix) + vbCrLf + vbCrLf
+            strOut += gMatrixToStr(task.gmat.gMatrix) + vbCrLf + vbCrLf
             strOut += "Angle X = " + Format(options.rotateX, fmt1) + vbCrLf
             strOut += "Angle Y = " + Format(options.rotateY, fmt1) + vbCrLf
             strOut += "Angle Z = " + Format(options.rotateZ, fmt1) + vbCrLf
@@ -254,7 +251,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
 
         ySlider.Value += 1
         rotate.Run(src)
-        Dim output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
+        Dim output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gmat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
         vecMat = output.Reshape(3, vecMat.Rows)
 
         heat.Run(vecMat)
@@ -311,7 +308,7 @@ Public Class Profile_OpenGL : Inherits TaskParent
         If rc.contour3D.Count > 0 Then
             Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
             rotate.Run(src)
-            Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
+            Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gmat.gMatrix  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             task.ogl.dataInput = output.Reshape(3, vecMat.Rows)
             task.ogl.pointCloudInput = New cv.Mat
 

@@ -1,4 +1,6 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows
+Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Regions_Basics : Inherits TaskParent
     Public hTuples As New List(Of Tuple(Of Integer, Integer))
     Public vTuples As New List(Of Tuple(Of Integer, Integer))
@@ -414,14 +416,27 @@ End Class
 
 
 
-Public Class Regions_Lines : Inherits TaskParent
-    Dim cellLine As New GridCell_Lines
-    Public Sub New()
-        desc = "Display grid cells that are connected by lines."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        cellLine.Run(src)
-        dst2 = cellLine.dst2
+'Public Class Regions_Flood : Inherits TaskParent
+'    Public Sub New()
+'        desc = "Display grid cells that are connected by lines."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        Dim inputData As New List(Of Single)
+'        For Each gc In task.gcList
+'            inputData.Add(gc.depth)
+'        Next
 
-    End Sub
-End Class
+'        Dim inputMat = cv.Mat.FromPixelData(task.grid.tilesPerCol, task.grid.tilesPerRow, cv.MatType.CV_32F, inputData.ToArray)
+
+'        cv.Cv2.FloodFill(inputMat, New , pt, red, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+'        Dim mm = GetMinMax(inputMat)
+'        dst3 = ShowPalette(inputMat * 255 / mm.maxVal)
+'    End Sub
+'End Class
+
+
+
+
+
+

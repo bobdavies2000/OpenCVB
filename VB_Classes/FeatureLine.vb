@@ -213,7 +213,6 @@ End Class
 
 
 Public Class FeatureLine_Tutorial2 : Inherits TaskParent
-    Dim gMat As New IMU_GMatrix
     Dim options As New Options_LineFinder()
     Public Sub New()
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
@@ -243,10 +242,8 @@ Public Class FeatureLine_Tutorial2 : Inherits TaskParent
         If raw3D.Count = 0 Then
             SetTrueText("No vertical or horizontal lines were found")
         Else
-            gMat.Run(src)
-            task.gMatrix = gMat.gMatrix
-            Dim matLines3D As cv.Mat = (cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F,
-                                                             raw3D.ToArray)) * task.gMatrix
+            task.gMatrix = task.gmat.gMatrix
+            Dim matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray) * task.gmat.gMatrix
         End If
     End Sub
 End Class

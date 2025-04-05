@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Threading
-Imports System.Windows.Media.Media3D
 Public Class Grid_Basics : Inherits TaskParent
     Public tilesPerCol As Integer, tilesPerRow As Integer
     Public Sub New()

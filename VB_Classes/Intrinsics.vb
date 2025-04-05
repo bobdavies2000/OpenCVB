@@ -6,17 +6,21 @@ Public Class Intrinsics_Basics : Inherits TaskParent
         desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
     End Sub
     Public Function translatePixel(pt As cv.Point3f) As cv.Point2f
-        ptTranslated3D.X = task.calibData.rotation(0) * pt.X +
-                           task.calibData.rotation(1) * pt.Y +
-                           task.calibData.rotation(2) * pt.Z + task.calibData.translation(0)
-        ptTranslated3D.Y = task.calibData.rotation(3) * pt.X +
+        If task.calibData.translation Is Nothing Then
+            ptTranslated3D = pt ' no translation or rotation - they are likely the same camera...
+        Else
+            ptTranslated3D.X = task.calibData.rotation(0) * pt.X +
+                               task.calibData.rotation(1) * pt.Y +
+                               task.calibData.rotation(2) * pt.Z + task.calibData.translation(0)
+            ptTranslated3D.Y = task.calibData.rotation(3) * pt.X +
                            task.calibData.rotation(4) * pt.Y +
                            task.calibData.rotation(5) * pt.Z + task.calibData.translation(1)
-        ptTranslated3D.Z = task.calibData.rotation(6) * pt.X +
-                           task.calibData.rotation(7) * pt.Y +
-                           task.calibData.rotation(8) * pt.Z + task.calibData.translation(2)
-        ptTranslated.X = task.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppx
-        ptTranslated.Y = task.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppy
+            ptTranslated3D.Z = task.calibData.rotation(6) * pt.X +
+                               task.calibData.rotation(7) * pt.Y +
+                               task.calibData.rotation(8) * pt.Z + task.calibData.translation(2)
+            ptTranslated.X = task.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppx
+            ptTranslated.Y = task.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppy
+        End If
 
         Return ptTranslated
     End Function
