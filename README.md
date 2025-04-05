@@ -1,33 +1,34 @@
-# March 2025 (Part 4) – Azure Support, FitLine, Eigen, Feature, XO, Depth Correlation Updates.
+# 2025 April (1) – Camera Support, Depth Edges, FitLine, LineTrack, Gravity/Horizon, TreeView.
 
--   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
--   Support for the Azure Kinect 4K is present but \#ifdef’d out
-    -   With no left/right image, the support required too much special handling.
-    -   Look for the “AZURE_SUPPORT” \#define to reenable support.
-    -   “Update_All.bat” install script has commented the Azure-related commands.
-    -   The camera order has changed in the OpenCVB options.
-        -   Stereolabs’ camera is the preferred camera at the top of the list.
-        -   Orbbec Gemini 335L next best.
-        -   Then Oak-D because Intel cameras are no longer available.
-        -   Mynt is still there in case anyone still has their camera.
--   The FitLine and Eigen algorithms were reviewed and updated.
-    -   There are 2 ways to fit a line to raw data but FitLine looks a little better.
--   All the Feature methods use the motion mask to manage the features.
-    -   Feature points are stable across frames if there is no motion nearby.
--   Algorithms starting with “XO_” are obsolete and not included in overnight testing.
-    -   The obsolete examples should still run when selected manually.
-    -   The obsolete examples can be useful for exploring OpenCV API’s.
--   The “Depth Correlation” view includes the depth shadow – see below.
-    -   This change is motivated by the difficulty of tracking motion in depth.
-        -   There is simply too much volatility in regions with zero depth.
-        -   Grid cells impacted by RGB motion get a full update.
-        -   And so do grid cells with low depth correlation (unreliable depth.)
-    -   RGB motion cannot cover changes in depth shadow from foreground objects.
+-   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
+-   Camera support for color and left aligned images is still under development.
+    -   StereoLabs ZED – working – camera aligns color and left view.
+    -   Orbbec Gemini 335L – working – camera aligns color and left view.
+    -   Intel RealSense – not working – camera does not align left and color views.
+        -   Manual alternative is not working either.
+        -   Translation and rotation parameters from the camera look incorrect.
+    -   Oak-D Pro 4 – new camera coming – status is TBD.
+-   Depth data is filtered with HighVis_Basics to produce higher quality values.
+    -   Grid cells can’t be neighbors if disparities are significantly different.
+    -   Disparity differences can define coarse edges in depth data.
+    -   Grid cells with a large range of depth values also define depth edges.
+    -   GIF below demonstrates that poor depth data is trimmed carefully.
+-   Disparity differences can also be too close – left and right can’t be the same.
+    -   If the change is less than 1 pixel, the depth data is not reliable.
+    -   Left and right images are unlikely to have identical locations.
+-   FitLine_Basics was redone and is now more accurate.
+    -   Fit the points with an ellipse and use the ellipse center line.
+    -   The result is better than either FitLine or Eigen functions.
+-   Line tracking algorithms were reworked and simplified.
+    -   RedColor is used to identify the lines and track their movement.
+-   Gravity and Horizon were incorrect at the highest resolution.
+    -   FindNonZero found plenty of pixels but all in row zero. Problem fixed.
+-   The TreeView output was updated to show detail of algorithms \< 1% utilization.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/5411c8981b86e7bc4779ffc60a1a8309.gif)
+![](media/ef742dde619d31abd091b68a09c09191.gif)
 
-**RedColor_Basics :** *The same algorithm as the previous update but with the improved representation of the “Depth Correlation”. The upper right image is switching between the previous view of the depth and the current one that includes the regions with zero depth.*
+**GridCell_Info :** *This algorithm displays the contents of the grid cell under the mouse cursor but the goal here is to show the impact of removing cells that have a high difference from the disparity in the cell’s neighbor. Essentially, this is edge detection in depth and removes the cells with unreliable depth data – visible in the upper right image..*
 
 # Introduction
 
@@ -346,13 +347,13 @@ The list of people who have made OpenCVB possible is long but starts with the Op
 
 # Addendum 1: Change Log
 
-# Recent Changes - September 2020
+# 2020 September - Recent Changes
 
 -   Dropped support for Intel T265 camera (no point cloud) and the Intel RealSense L515 (no IMU). All supported cameras should have a point cloud and IMU.
 -   TreeView – some of the algorithms are a combination of several other algorithms. A TreeView was built to display the hierarchy.
 -   There are now over 750 algorithms implemented.
 
-# Recent Changes – December 2020
+# 2020 December - Recent Changes
 
 -   Over 800 algorithms – almost all less than a page of code.
 -   Depth updates are guided by motion – produces more stable 3D images. See Depth_SmoothMin algorithm.
@@ -361,7 +362,7 @@ The list of people who have made OpenCVB possible is long but starts with the Op
 -   Algorithm options are now collected in a single form – easier usage on laptops or smaller screens.
 -   Intel Realsense cameras are supported in native 640x480 modes (as well as 1280x720.)
 
-# Recent Changes – January 2021
+# 2021 January - Recent Changes
 
 -   Over 870 algorithms – almost all less than a page of code.
 -   The new “Best Of” module contains the best example of common techniques. Need an example of contours, look in the BestOf.vb first.
@@ -373,7 +374,7 @@ The list of people who have made OpenCVB possible is long but starts with the Op
 -   StructuredDepth shows promise as a path to exploiting structured light technology.
 -   PythonDebug project is now integrated into the OpenCVB.sln. Python debugging is easier.
 
-# Recent Changes – February 2021
+# 2021 February - Recent Changes
 
 -   Over 900 algorithms – almost all less than a page of code
 -   New pixel viewer to inspect image pixels in 8UC1, 8UC3, 32F, and 32FC3 formats
@@ -384,7 +385,7 @@ The list of people who have made OpenCVB possible is long but starts with the Op
 -   Upgraded to the latest RealSense2, OpenCVSharp, and Kinect4Azure software
 -   Motion Filtered Data series of algorithms – an attempt at reducing data analysis at input
 
-# Recent Changes – March 2021
+# 2021 March - Recent Changes
 
 -   Almost 940 algorithms – almost all less than a page of code
 -   Stream-lined install: no environmental variable, library builds are automated.
@@ -398,7 +399,7 @@ The list of people who have made OpenCVB possible is long but starts with the Op
 -   Emgu examples removed. LineDetector library removed – it was redundant
 -   Version 1.0.0 defined and released
 
-# Recent Changes – May 2021
+# 2021 May - Recent Changes
 
 -   980 algorithms – almost all less than a page of code
 -   Global variables introduced – settings that apply to all algorithms, line width, max depth, font size.
@@ -413,7 +414,7 @@ The list of people who have made OpenCVB possible is long but starts with the Op
 -   Image microscope works even when stream is paused, allowing more detailed image analysis.
 -   Improved tree view to study how algorithm was constructed from other algorithms.
 
-# Recent Changes – July 2021
+# 2021 July - Recent Changes
 
 -   Over 1000 algorithms – almost all less than a page of code. Average algorithm is 31 lines of code
 -   TreeView now shows algorithm cost in addition to algorithm components
@@ -433,7 +434,7 @@ The ‘waitingForInput’ entry is important to understanding performance. The p
 
 The Tree View provides a structure and performance analysis for every algorithm in OpenCVB – automatically.
 
-# Recent Changes – September 2021
+# 2021 September - Recent Changes
 
 -   Almost 1100 algorithms – almost all less than a page of code. Average algorithm is 31 lines of code
 -   Improvements to the TreeView indicate how many cycles are available (see Highlight below.)
@@ -443,7 +444,7 @@ The Tree View provides a structure and performance analysis for every algorithm 
 -   First example of using low resolution internally while displaying full resolution
 -   RGB Depth can be displayed with numerous different palettes. You can create your own.
 
-# Recent Changes –November 2021
+# 2021 November - Recent Changes
 
 -   Almost 1100 algorithms – almost all less than a page of code. Average algorithm is 31 lines of code
 -   The reduced point cloud predictably divides an image for analysis.
@@ -461,7 +462,7 @@ What is the algorithm most often reused in OpenCVB? The “Thread_Grid” which 
 
 The Value Rank is manually updated so there are some lag between an algorithm’s arrival and an update to its value rank.
 
-# Recent Changes –November 2021
+# 2021 November - Recent Changes
 
 -   Almost 1100 algorithms – almost all less than a page of code. Average algorithm is 32 lines of code
 -   This version includes point cloud heat maps (see Highlight below)
@@ -477,7 +478,7 @@ The Value Rank is manually updated so there are some lag between an algorithm’
 
 The heat map is a well-known method to display populations – blue is cool or low population while red is hot and high population. The plots are actually just histograms of the point cloud data projected into a plane at the side (bottom left) and top (bottom right) of the point cloud. The field of view of the camera is outlined in the markings and the distances are noted as well. The projection can be rotated to align with gravity. The short red lines emanating from the camera can show the field of view (FOV) after rotation. The snapshot was taken using the low-resolution Intel RealSense D435i.
 
-# Recent Changes –January 2022
+# 2022 January - Recent Changes
 
 -   Oak-D and Oak-D Lite support is now included.
 -   All OpenCVB’s 1100+ algorithms are now accessible using the Oak-D and Oak-D Lite cameras
@@ -501,7 +502,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 *The images above were captured at the same time as the OpenGL image above. The upper left image is the RGB captured from the Oak-D Lite camera and the upper right is the point cloud (computed on the host using the calibration metrics provided by the camera.) The bottom left image is a representation of the depth data used to create the point cloud.*
 
-# Recent Changes –February 2022
+# 2022 February - Recent Changes
 
 -   Switched to Visual Studio 2022! The Community Edition is free and an easy install.
     -   Post with any problems transitioning to VS 2022. They will be high priority.
@@ -511,7 +512,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   Added a heartbeat available to all algorithms for once-a-second activity.
 -   Added a global motion test to update a motion threshold flag available to all algorithms. Redo an image if flag is set.
 
-# Recent Changes – March 2022
+# 2022 March - Recent Changes
 
 -   Reviewed and reworked the RedCloud algorithms for speed and simplicity.
 -   Convex Hull algorithm applied to the RedCloud output (see below)
@@ -524,7 +525,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 *The image in the bottom left is the output of the RedCloud_Basics algorithm where each cell is consistently identified by applying reduction in X and Y to the point cloud image. The bottom right image shows the RedCloud output after processing with OpenCV’s ConvexHull API. The upper left and right images appear with every algorithm – RGB on the left and the point cloud on the right.*
 
-# Recent Changes – April 2022
+# 2022 April - Recent Changes
 
 -   KNN examples now have higher dimensions – 2, 3, 4 and N dimensions.
 -   KNN improvement provides a 1:1 matching of points in a series of images.
@@ -538,7 +539,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 *In this first version of the Match_TrackFeatures algorithm, OpenCV”s MatchTemplate (correlation coefficient calculator) is used to track the output of OpenCV’s GoodFeatures. The points are matched with the previous frame using KNN 1:1 matching. In the lower right image, the blue dots were matched to the previous frame while the yellow dots were not matched. In the lower left frame, the correlation coefficient of the region around the feature is shown using the previous and current frame.*
 
-# Recent Changes – May 2022
+# 2022 May - Recent Changes
 
 -   The first tutorial on OpenCVB is now available in the OpenCVB tree. See “Tutorial – Introduction”
 -   EMax algorithms reviewed – now more general and useful with consistent colors. A new example is provided.
@@ -556,7 +557,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 *In this example from “Features_GoodFeatureTrace”, the upper left image shows the good features to track in the current image. The lower right image shows a trace of those same points as the camera is rotated. The motion of the camera is more pronounced in the lower left image.*
 
-# Recent Changes – June 2022
+# 2022 June - Recent Changes
 
 -   Over 1200 working algorithms. Average algorithm length is 31 lines of code.
 -   A new tutorial was added describing how to find the longest vertical line:
@@ -583,7 +584,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Related_MouseClick:** *In this example, 4 different algorithms are featured. They are “Related” algorithms in the sense that all 4 use the mouse to perform various tricks – the upper left image uses the mouse to highlight an entry in the histogram for back projection, the upper right uses the mouse to slice through the projected side view, the lower left provides the back projection for the mouse selection from the histogram (look at the floor), and finally the lower right uses the mouse for both the x and y coordinates to use in a 2D histogram. The “Related” series of algorithms might be a good place to start looking when the output is remembered but not the name of the algorithm. The Related algorithms are new with the June release of OpenCVB.*
 
-# Recent Changes – July 2022
+# 2022 July - Recent Changes
 
 -   Install tested with the latest Visual Studio 2022 (17.2.6) and OpenCV 4.6 release
     -   Keep Visual Studio 2019 around – only way to keep the .Net Framework 4.0 (required for librealsense)
@@ -605,7 +606,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **OpenGL_3DLines:** *In the lower left, the horizontal lines are shown in yellow and the vertical lines in blue. In the lower right, the OpenGL output shows the vertical lines in 3D. The OpenGL point cloud is reoriented to gravity so the lines can be verified as vertical or horizontal.*
 
-# Recent Changes – August 2022
+# 2022 August - Recent Changes
 
 -   All the OpenGL algorithms were reviewed and updated with many new features and a simpler interface.
     -   More code reuse was main objective
@@ -627,7 +628,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **OpenGL_QuadMinMax:** *The RedCloud image cells (lower left) are presented in OpenGL (lower right) as OpenGL quads – rectangles with min and max depth. The colors in the RedCloud cells are the same as those in the OpenGL presentation. The highlighted cell shown in white in the lower left is also shown as white in the OpenGL presentation in the lower right.*
 
-# Recent Changes – September 2022
+# 2022 September - Recent Changes
 
 -   Over 1200 algorithms are included with an average of 31 lines of code per algorithm
 -   BackProject_Full builds a histogram and backprojects it into a segmented color image
@@ -650,7 +651,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_ColorAndCloud:** *The output of the “BackProject_Full” can be input into the RedCloud image segmentation and the results are in the lower left image. Previously, the reduced point cloud was the source of all the RedCloud input – it is shown on the lower right image. With the latest version of OpenCVB, both the color data and depth data can be used to segment the image.*
 
-# Recent Changes –November 2022
+# 2022 November - Recent Changes
 
 -   Over 1300 algorithms are included with an average of 31 lines of code per algorithm
 -   A new series of algorithms using the “feature polygon” is available for use in camera stabilization and tracking.
@@ -675,7 +676,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **FPoly_Basics:** *The FPoly (Feature Polygon) series of algorithms use the “good” features of the current image to create a vector describing the orientation of the camera. The white double bar line was captured in an earlier frame while the yellow double bar line is the current orientation of the same vector. A rotate and shift allows a rough comparison between frames separated by time. The values in the figure in the bottom left indicate how many generations (or frames) that the Delaunay region has been present in the image. The older the polygon, the more stability the feature polygon will exhibit. In the lower left image, the black region (highlighted with a yellow edge) shows the oldest of the regions.*
 
-# Recent Changes – December 2022
+# 2022 December - Recent Changes
 
 -   Over 1370 algorithms are included with an average of 31 lines of code per algorithm
 -   C++ Translator: an OpenCVB-specific tool translates the VB.Net algorithms to C++
@@ -702,7 +703,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **CPP_RedColor_FeatureLess:** *The scene in the upper left is segmented into different featureless regions using only RGB. The image in the bottom right is the output of the edge-drawing C++ algorithm and is the input to a distance transform. A mask created by the distance transform is used to create the identified regions in the lower left image with RedCloud_Basics.*
 
-# Recent Changes – January 2023
+# 2023 January - Recent Changes
 
 -   Almost 1400 algorithms are included with an average of 31 lines of code per algorithm
 -   Python scripts were all moved to the end of the list of project files in Visual Studio’s Project Explorer
@@ -722,7 +723,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Profile_Derivative:** *A new series of algorithms was added to work with the contour of RedCloud cells. In this example some key points on the contour of a cell are explored. The upper left image outlines in yellow the selected RedCloud cell in the RGB image. The upper right image shows the RedCloud_Basics output (click to select another cell.) The lower left image shows the derivative of the contour in depth with yellow highlighting where contour points are closest to the camera and blue shows where contour points are farther away from the camera. The information in the lower right image shows the point cloud coordinates of the rightmost, leftmost, highest, lowest, closest and farthest points (see the key in the lower right image for color definitions.)*
 
-# Recent Changes – January 2023
+# 2023 January - Recent Changes
 
 -   Over 1400 algorithms are included with an average of 31 lines of code per algorithm
 -   Oak-D Pro camera support is now installed by default. Oak-D Lite cameras have no IMU but will work as well for most algorithms.
@@ -736,7 +737,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Flood_LRMatchLargest:** *Using the Oak-D camera’s left and right images (bottom left and bottom right) the RedCloud cells can be identified in one image and matched in the other image. The approach is searching for a way to match objects in the left and right image to determine their distance. The distance will be a single number and won’t identify and variations across the cell.*
 
-# Recent Changes – February 2023
+# 2023 February - Recent Changes
 
 -   Over 1400 algorithms are included with an average of 31 lines of code per algorithm
 -   Oak-D Pro and Oak-D S2 camera support is now installed by default.
@@ -761,7 +762,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_Basics:** *Depth shadow is a significant problem – there is no depth data in the shadow of objects close to the camera because one camera cannot see what the other camera can. The depth shadow around the hand is black in the RGB representation of the depth data in the upper right. Note that the RedCloud output in the lower left has identified regions in the depth shadow of the hand. These regions are found with color – not depth. The next step is to …*
 
-# Recent Changes – February 2023
+# 2023 February - Recent Changes
 
 -   Over 1400 algorithms are included with an average of 31 lines of code per algorithm
 -   Adding a new OpenCVB algorithm using the ‘Blue Plus’ button *![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png)* is now expanded and easier.
@@ -780,7 +781,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Plane_Basics:** *Improvements in the RedCloud cells have made it easier to detect the plane for a cell. Selecting a cell will create a plane equation that can be used to describe the plane to OpenGL. Also included in the display is an estimate of the Root-Mean-Square error. The selected RedCloud cell is outlined in the RGB image in the upper left. In the lower left, the selected cell is highlighted in white.*
 
-# Recent Changes – March 2023
+# 2023 March - Recent Changes
 
 -   Over 1450 algorithms are included with an average of 30 lines of code per algorithm
     -   Earlier versions of OpenCVB had an average of 31 lines on code.
@@ -807,7 +808,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **OpenGL_PCLinesAll:** *Vertical and horizontal depth lines are detected in the scene and joined. The grid of lines in the lower left image shows lines and cross-hatching where there is likely to be a plane. The background of the lower left image confirms that the estimate for planes is correct. The lower right image is a snap shot from the OpenGL window with the resulting grid of points. The OpenGL output is normally in a separate window and manipulated with the mouse but can be optionally captured in an OpenCVB image.*
 
-# Recent Changes – March 2023
+# 2023 March - Recent Changes
 
 -   Over 1460 algorithms are included with an average of 30 lines of code per algorithm
 -   Missing depth data is now tracked over multiple frames.
@@ -833,7 +834,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_ColorAndCloud:** *This algorithm allows comparison of cells created using the reduced point cloud and cells created using reduced color images. The image in the lower left is segmented using the point cloud and cells don’t penetrate deeply into the scene. The image in the lower right uses color to segment the same scene and some cells will contain foreground and background items. However, there are cells where color segmentation is superior in joining cells that are separated in the point cloud segmentation. Edges in the color image assist with segmentation in the reduced point cloud and may be toggled on an off to see the benefit – see the RedCloud option labelled “Use color edges to better separate RedCloud cells”.*
 
-# Recent Changes – April 2023
+# 2023 April - Recent Changes
 
 -   Over 1510 algorithms are included with an average of 30 lines of code per algorithm
     -   Algorithms contain only the code for the algorithm – no infrastructure.
@@ -857,7 +858,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Depth_Tiers2** *– The choice of K for K Means is critical. Here the depth ‘valleys’ provide a natural way to find K in the histogram of the depth. The white lines in the upper right indicate valley bottoms and provide K to the K Means algorithm. The K Means output of the depth data is depicted in the bottom images.*
 
-# Recent Changes – May 2023
+# 2023 May - Recent Changes
 
 -   Over 1520 algorithms are included with an average of 30 lines of code per algorithm
     -   Compile OpenCVB and all algorithms can be selected using a combo box.
@@ -875,7 +876,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **![A screenshot of a computer screen Description automatically generated with low confidence](media/f230dfdcb1bde53dd59d720e7b8953d4.png)Motion_Rect** *– Motion in the image is isolated by the Motion_Rect algorithm. The lower left image shows the motion detail while the rectangle in the lower right shows the* **maximum** *extent of this motion. OpenCVB’s heartbeat (roughly once a second) updates the entire image. Artifacts may be produced when the color image is updated only with the data from the motion rectangle. One such artifact is highlighted in yellow in the upper left image. The question: how important is it to avoid artifacts? The motion rectangle is produced with every new image as the cost is low – note the frame rate in the top of the image is 90 fps at 320x240 resolution.*
 
-# Recent Changes – May 2023
+# 2023 May - Recent Changes
 
 \- Over 1520 algorithms are included with an average of 30 lines of code per algorithm
 
@@ -903,7 +904,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 \- Simpler interface, neighbors identified, RGB and depth merged.
 
-# Recent Changes – May 2023
+# 2023 May - Recent Changes
 
 -   Over 1550 algorithms are included with an average of 30 lines of code per algorithm
     -   Compile OpenCVB and all algorithms can be selected using a combo box.
@@ -940,7 +941,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A picture containing text, screenshot, multimedia software, art Description automatically generated](media/195f7fde1649a871e7cb3cab7ca8f4fe.png)**RedCloud_Planes** *– The data for each cell now contains the plane equation for the cell and a list of neighboring cells. The lower left shows the numbered cells with the selected cell shown in white. The selected cell and its neighbors are shown in the upper right image. The upper left image highlights the selected cell in the RGB image. In the lower right are the same cells colored with the direction of the principal axis of the plane equation – red cells are oriented along the Z-axis, blue for X-axis, and green along the Y-axis (floor and ceiling).*
 
-# Recent Changes – June 2023
+# 2023 June - Recent Changes
 
 -   Over 1680 algorithms are included with an average of 30 lines of code per algorithm
     -   Compile OpenCVB and all algorithms can be selected using a combo box.
@@ -968,7 +969,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **KWhere_DoctoredBP** *– The algorithm finds the K objects present in the image and where they are. It is based on a “doctored backprojection” of the top-down view (upper left) and side view (upper right). The result identifies K objects in the lower left image with individual colors. For more information, see the tutorial on “Finding K”.*
 
-# Recent Changes – June 2023
+# 2023 June - Recent Changes
 
 -   StereoLab’s ZED 2 cameras are now required in the default installation.
     -   “Update_All.bat” asks to install StereoLabs ZED 2/2i camera support.
@@ -992,7 +993,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   Similar to the “Fun Checkbox” that can toggle a feature.
 -   A log of the monthly changes is included at the bottom of this document.
 
-# Recent Changes – July 2023
+# 2023 July - Recent Changes
 
 -   StereoLabs camera support upgraded to Zed SDK 4.0.
     -   Camera calibration data moved to “camera_Configuration” structure.
@@ -1017,7 +1018,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![](media/62ec1d7073fbf71e996e7ada7bec557b.gif)**RedCloud_BasicsColor:** *An example of using the GIF interface to capture an OpenCVB algorithm. The bottom left image is the RedCloud_BasicsColor output that uses both color and cloud data..*
 
-# Recent Changes – July 2023
+# 2023 July - Recent Changes
 
 -   Almost 1700 algorithms are included, averaging 30 lines of code per algorithm.
 -   Separators in the list of algorithms make it easier to find algorithms.
@@ -1039,7 +1040,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_MotionBGSubtract:** *The GIF above shows another way to detect motion in an image. The lower right shows the conventional difference between images – a standard way to detect changes in pixel values by comparing images. The lower left image is the RedCloud_Basics output with cells for each reduced color segment. The upper right image shows the RedCloud cells that contain pixels that changed.*
 
-# Recent Changes – July 2023
+# 2023 July - Recent Changes
 
 -   Almost 1700 algorithms are included, averaging 30 lines of code per algorithm.
 -   A tutorial on the option “Synchronize Debug with Output” is now available.
@@ -1061,7 +1062,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **OpenGL_RedCloud:** *The same algorithm as above running with the raw point cloud. The history cloud is different from the raw point cloud because it averages the point cloud over 10 frames and masks out pixels that were not present in all 10 frames.*
 
-# Recent Changes – August 2023
+# 2023 August - Recent Changes
 
 -   Almost 1700 algorithms are included, averaging 30 lines of code per algorithm.
 -   Improvements to tracking RedCloud cells. Below is an example GIF.
@@ -1089,7 +1090,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedColor_Basics:** *RedColor_Basics builds cells from a reduced color image (reduced color = RedColor.) All cells are tracked even with camera motion. Note that the highlighted floor cell is tracked despite changing size and shape. A cell will maintain its color (indicating the cell was tracked) if it was present in the previous frame. The black dot in the selected (white) cell represents the point with the maximum distance from surrounding cells and is defined for each cell for use with tracking.*
 
-# Recent Changes – August 2023
+# 2023 August - Recent Changes
 
 -   Over 1700 algorithms are included, averaging 30 lines of code per algorithm.
 -   OpenCVB has moved to OpenCV 4.8 – see “PragmaLibs.h” for the update.
@@ -1110,7 +1111,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **FeatureMatch_Basics:** *OpenCV’s GoodFeatures function is called twice, once with the left image and then with the right image. Features with a high correlation coefficient between left and right images are considered matched and this GIF image confirms that the matches are largely correct. AddWeighted_Basics is used to combine the left and right images and the white line segments connect the points that are confirmed matches. The closer the feature is to the camera the longer the line segment. In this test, there are two line segments that look incorrect. Can you find them? Why is there any variability in the highlighted line segments? GoodFeatures is not precise and will often pick a point above or below the corresponding one in the other image. Points must be in the exact same row, or they are not considered candidates. BRISK features may also be selected for input to this algorithm.*
 
-# Recent Changes – September 2023
+# 2023 September - Recent Changes
 
 -   Over 1700 algorithms are included, averaging 30 lines of code per algorithm.
 -   Guided back projection assists in image segmentation.
@@ -1131,7 +1132,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_Color:** *This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the entire image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
 
-# Recent Changes – October 2023
+# 2023 October - Recent Changes
 
 -   Over 1700 algorithms are included, averaging 30 lines of code per algorithm.
 -   Improvements to image segmentation now classify all pixels in the image.
@@ -1160,7 +1161,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_Basics** *(This is the previous version of RedCloud_Basics from September 2023.) This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the whole image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
 
-# Recent Changes – November 2023
+# 2023 November - Recent Changes
 
 -   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
 -   RedCloud and RedColor algorithms were reorganized and reviewed.
@@ -1186,7 +1187,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_Neighbors:** *The neighbors for each cell can be included in the cell information. Here the neighbors of the highlighted cell were requested and are shown in the lower right image.*
 
-# Recent Changes – December 2023
+# 2023 December - Recent Changes
 
 -   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
 -   The 3D histogram improves the point cloud “blowback” pixels.
@@ -1217,7 +1218,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **OpenGL_Filtered3D:** *The histogram interface in OpenCV supports 3D point clouds where the bins can be thought of as 3D bricks in the 3D point cloud. The ‘Histogram Bins’ slider controls a threshold that is used to zero out bricks that have fewer samples than the threshold. When the slider is set to zero, all the blowback pixels appear and extend behind the wall in this side angle view in OpenGL. Bins with less than the specified threshold are set to zero and the backprojection creates a mask that reduces the blowback. The camera used in this example is the Intel D455. The Microsoft Kinect for Azure camera is more accurate and does not have much blowback.*
 
-# Recent Changes – January 2024
+# 2024 January (1) - Recent Changes
 
 -   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
 -   Algorithm complexity can now be visualized with OpenCVB.
@@ -1243,7 +1244,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Complexity_Basics:** *To collect complexity data, select any OpenCVB algorithm and click the ‘O’ button in the toolbar. This will run the algorithm for 30 seconds at each of the available resolutions – click the same button to stop data collection. After the data has been collected, use the “Complexity_Basics” algorithm to review the data. The right side of the image above shows all the algorithms that have data in the directory. The plot on the left side shows the plot for the algorithm selected in the options using the same scale. By default, the selected algorithm is the last one collected but a set of radio buttons in the options allows the data for other algorithms to be selected.*
 
-# Recent Changes – January 2024 (Part 2)
+# 2024 January (2) - Recent Changes
 
 -   Over 1800 algorithms are included, averaging 29 lines of code per algorithm.
 -   The jump in the algorithm count is due to the AI generated C++ copies.
@@ -1278,7 +1279,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_BinarizeFourWay:** *The image pixels are classified into four categories based on their brightness. The grayscale image is binarized, and each half is binarized again to produce four classifications of pixels. The image in the lower right is the colorized version of the pixels after classification with the Binarize_FourWay algorithm. RedCloud is then used to identify each resulting regions and produce the image in the lower left image.*
 
-# Recent Changes – February 2024
+# 2024 February - Recent Changes
 
 -   Over 1800 algorithms are included, averaging 32 lines of code per algorithm.
     -   Average went up because counting hadn’t included some of the new C++ code.
@@ -1306,7 +1307,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_BasicsColor:** *The color input for RedCloud_BasicsColor and any other OpenCVB algorithm can be motion-filtered using a global option. The frame is only processed if there is scene motion. The objective is to improve the consistency of the cells produced which can be seen in the cells away from the motion – look to the right side of the image. Cells without motion are updated on a heartbeat (once a second.) There is little benefit to capturing cell perturbations when there is no motion in the color image for that cell. Motion-filtered color images often display artifacts from a previous frame but when the image data is already so variable from frame to frame, there is little downside to motion-filtering for image segmentation using depth and color. A new global option allows the motion rectangle to be displayed in the upper left image (in white.)*
 
-# Recent Changes – March 2024
+# 2024 March - Recent Changes
 
 -   Over 1900 algorithms are included, averaging 31 lines of code per algorithm.
 -   Gravity and horizon vectors are now available in the image coordinates.
@@ -1331,7 +1332,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Line_Gravity:** *The bottom right image shows all the lines detected in the image. The bottom left image shows the vertical lines in yellow and the horizontal lines in red. The vertical lines are aligned to the gravity vector and the horizontal lines are aligned with the horizon vector. The method to find the gravity vector is to locate two points where the X-values in the point cloud transition from negative to positive. Similarly, the horizon vector is defined by 2 points where the Y-values in the point cloud transition from negative to positive. Because the point cloud is aligned with the color image, the horizon and gravity vectors are defined in the image coordinate system. The camera is deliberately tilted for this example but both vectors move as the camera moves.*
 
-# Recent Changes – April 2024
+# 2024 April - Recent Changes
 
 -   Over 1900 algorithms are included, averaging 31 lines of code per algorithm.
 -   Recently used algorithms are now accessible with the main toolbar “Recent” button.
@@ -1341,7 +1342,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Line_Gravity:** *The bottom right image shows all the lines detected in the image. The bottom left image shows the vertical lines in yellow and the horizontal lines in red. The vertical lines are aligned to the gravity vector and the horizontal lines are aligned with the horizon vector. The method to find the gravity vector is to locate two points where the X-values in the point cloud transition from negative to positive. Similarly, the horizon vector is defined by 2 points where the Y-values in the point cloud transition from negative to positive. Because the point cloud is aligned with the color image, the horizon and gravity vectors are defined in the image coordinate system. The camera is deliberately tilted for this example but both vectors move as the camera moves.*
 
-# Recent Changes – May 2024
+# 2024 May - Recent Changes
 
 -   Over 2000 algorithms are included, averaging 32 lines of code per algorithm.
 -   Last month’s horizon and gravity vectors are now faster and more robust.
@@ -1368,7 +1369,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Bin3Way_RedCloud:** *RedCloud is run against the darkest and the lightest frames in the Bin3Way_Basics algorithm. While there is more unclassified space in the lower right image, the cells identified are more consistently present than in other RedCloud algorithms that attempt to classify each pixel in the image. This algorithm produces fewer cells but they are more robust and stable. This sample output also shows the output for the global options to “Display Cell Stats”. The upper right frame shows the histogram of the depth for the selected cell while the lower right frame shows the statistics for the selected cell.*
 
-# Recent Changes – June 2024
+# 2024 June - Recent Changes
 
 -   Over 2000 algorithms are included, averaging 31 lines of code per algorithm.
 -   Support for the Orbbec Gemini 335L camera was added but there are limitations.
@@ -1403,7 +1404,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **OpenGL_Basics:** *This output shows the Orbbec Gemini 335L camera while toggling the checkbox to adjust the 3D point cloud with and without correcting for gravity. The same algorithm to adjust for gravity works with all the cameras supported by OpenCVB. Similarly, all 2000+ algorithms in OpenCVB work for the 335L camera after adding an interface to the Orbbec SDK.*
 
-# Recent Changes – July 2024
+# 2024 July - Recent Changes
 
 -   Over 2400 algorithms are included, averaging 31 lines of code per algorithm.
 -   Please Note: the June version of OpenCVSharp has compile-time issues in VB.Net.
@@ -1434,7 +1435,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A screenshot of a computer program Description automatically generated](media/498a747eed8b64cf8e4aab79d498d0c7.png)
 
-# Recent Changes – August 2024
+# 2024 August - Recent Changes
 
 -   Over 3700 algorithms are included, averaging 37 lines of code per algorithm.
 -   OpenCVB has been upgraded to the latest version of OpenCVSharp.
@@ -1481,7 +1482,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP_VB. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
 
-# Recent Changes – September 2024
+# 2024 September (1) - Recent Changes
 
 -   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
 -   Visual Studio Community Edition upgraded to 17.11.
@@ -1517,7 +1518,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Code Translator:** *The user interface for the code translator is shown above with the results shown at the bottom. It is invoked in OpenCVB using the ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button in the main panel. The web page for CodeConvert.ai is contained in a WebView2 control. The ComboBox and buttons at the top provide a 3-step process to translate the code. Here AddWeighted_CS, a C\# algorithm, is translated to C++. The formatting of the results is corrected when the code is pasted into CPP_Managed.cpp.*
 
-# Recent Changes – September 2024 (Part 2)
+# 2024 September (2) - Recent Changes
 
 -   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
 -   This OpenCVB update is focused almost exclusively on the camera interfaces.
@@ -1555,7 +1556,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Motion_FromEdgeColorize:** *This algorithm uses the palette to identify motion. Motion is blue while red is not.*
 
-# Recent Changes – October 2024
+# 2024 October - Recent Changes
 
 -   Over 3700 algorithms are included, averaging 33 lines of code per algorithm.
 -   A magnifying glass button was added to the OpenCVB toolbar.
@@ -1586,7 +1587,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **LowRes_MLColorDepth:** *ML is used to segment the image between cells with features (Laplacian edges) and featureless regions. The lower left image shows all the cells with featureless areas while the lower right image shows the more work is required for complete segmentation. The ML input is color and depth.*
 
-# Recent Changes – October 2024 (Part 2)
+# 2024 October - Recent Changes
 
 -   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
 -   Motion_Basics was replaced with another motion detection algorithm.
@@ -1616,7 +1617,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Motion_Basics:** *This motion detection algorithm uses low resolution mean values to find areas that contain motion. The top left image is the original color image (optionally overlaid with cells where motion was detected) while the image below left was constructed from an earlier image (often seconds earlier) updated with cells containing motion. The depth data in the upper right is also a composite of an earlier image and the latest depth where motion was found. The image in the lower right is the difference between the current color image and the image in the lower left. The implication is that almost all motion has been detected and no artifacts have been generated in the color image. Depth data has visible artifacts and will require more work because of shadow.*
 
-# Recent Changes – November 2024
+# 2024 November - Recent Changes
 
 -   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
 -   The “A-Z” toolbar button in the main OpenCVB form allows speedy group access.
@@ -1641,7 +1642,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **“A-Z” Toolbar Button:** *There are almost 250 algorithm groups in OpenCVB, and the “A-Z” toolbar button allows speedy access to any of the groups. Clicking on any of grid entries will land the user at the first algorithm in the group in one click. Accessing a specific algorithm in that group is a click away in the pulldown of the list of available algorithms.*
 
-# Recent Changes – December 2024
+# 2024 December - Recent Changes
 
 -   Over 3800 algorithms are included, averaging 33 lines of code per algorithm.
 -   RedCloud algorithm default is the featureless option (see below.)
@@ -1670,7 +1671,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedCloud_Basics:** *All the RedCloud algorithms were reviewed and updated with the best segmentation approach – featureless regions built with Edge_Draw. Edge_Draw is an OpenCV user-contribution and is better suited to detect edges than conventional alternatives like Canny or Sobel. The lower left image uses the mean color of the pixels to paint the entire cell while the lower right image uses a random ‘tracking’ color which changes whenever the cell is split or lost.*
 
-# January 2025 – Task Algorithms, Upgraded Toolbar, and Translation Changes
+# 2025 January (1) – Task Algorithms, Upgraded Toolbar, and Translation Changes
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   ‘Task algorithms’ are algorithms that are present on every run.
@@ -1711,7 +1712,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **RedColor_Basics:** *OpenCVB’s TreeView (at right above) shows all the algorithms that contribute to the output of the requested algorithm – in this case RedColor_Basics. As each algorithm in the tree is selected, it is highlighted (albeit faintly here) and the algorithm’s output is shown (now including labels and TrueText.) This capability enables a further understanding of how the algorithm was constructed. Task algorithms are run on every frame and are included in the TreeView even though they are not explicitly called by the algorithm. The frame rate of 99 fps is not a mistake. The Stereolabs Gemini camera runs at that rate when capturing 640x480 images.*
 
-# January 2025 (Part 2) – GifBuilder updates, RGBFilter, Ideal Depth.
+# 2025 January (2) – GifBuilder updates, RGBFilter, Ideal Depth.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   GifBuilder was reworked to capture the screen and use AnimatedGif.
@@ -1729,7 +1730,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **![A collage of a person using a computer Description automatically generated](media/1c85b62195b05f1695bd32287f38eac8.gif)Depth_Ideal :** *The cells marked in the lower left image have ideal depth data with a high percentage of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
 
-# February 2025 – Ideal Depth, OpenGL Triangles and Quads.
+# 2025 February (1) – Ideal Depth, OpenGL Triangles and Quads.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   Ideal depth is a grid of cells that each contain a healthy amount of depth data.
@@ -1749,7 +1750,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A screen shot of a computer screen Description automatically generated](media/9f00f342149e24119ff7d554df58f31b.png)  ![A screenshot of a computer screen Description automatically generated](media/ed0ab23749b244a50928420654c93c93.png) **OpenGL Multiple Buffers:** *Since the point cloud is different on every frame (depth is only an approximation), using multiple buffers allows a cosmetic improvement to the appearance of the point cloud. The first point cloud is what one buffer looks like while the next uses the last 10 frames. The frame rate for this example was 60 fps at 320x240 with significant magnification (approximately 4X.)*
 
-# February 2025 (Part 2) – Improved Depth Display, QuadDepth OpenGL display, and Left/Right Cameras.
+# 2025 February (2) – Improved Depth Display, QuadDepth OpenGL display, and Left/Right Cameras.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   The least used OpenCVB image is the “DepthRGB” in the upper right.
@@ -1779,7 +1780,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **OpenGL_QuadDepth:** *The “QuadDepth” data that is displayed in the upper right image of the output for all the algorithms can also be displayed in OpenGL. Each cell is provided to OpenGL as a quad that is always filled with the mean color for the cell. In the sequence above the last image is zoomed sufficiently to show that each cell is a rectangle, not a set of points.*
 
-# February 2025 (Part 2) – More ‘QuadDepth’ improvements, OpenGL display changes, Extrinsics/Intrinsics, and Connected Depth Cells
+# 2025 February (2) – More ‘QuadDepth’ improvements, OpenGL display changes, Extrinsics/Intrinsics, and Connected Depth Cells
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   The ‘QuadDepth’ display was configured to show OpenGL quad’s or rectangles.
@@ -1813,7 +1814,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **OpenGL_QuadCompare :** *The 3 different OpenGL display formats are shown above – raw point cloud, flat depth cells, and connected depth cells. The flat and connected depth cells are OpenGL quads, not points. Note that the connected depth cells remove some of the floating artifacts. A cell is connected to its neighbors if their depths are within X centimeters (controlled with an option.) The depth cells are then connected in vertical and horizontal directions to produce a solid appearance.*
 
-# February 2025 (Part 3) – Azure Kinect Support, Depth Views, Grid Cells, and Motion Detection Compromise.
+# 2025 February (3) – Azure Kinect Support, Depth Views, Grid Cells, and Motion Detection Compromise.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   The Azure Kinect camera updated with access to extrinsics but it is limited.
@@ -1842,7 +1843,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **GridCell_LeftToColor :** *The upper right image rotates between the 3 different representations of the depth data. The correlation coefficients are highlighted in red for grid cells that have 90%+ correlation between the left and right images, indicating that the grid cell is highly visible to both the left and right and is likely to have excellent depth data. The lower left image shows the corresponding points for the RGB data (upper left.) The camera is the Intel RealSense D435i and the left image is grayscale. The lower right image has the same pixels highlighted as the lower left image but is more readable. Use the mouse cursor to display the correlation coefficient and pixel count percentage for the grid cell under the cursor.*
 
-# March 2025 – GridCell Updates and Task Algorithms.
+# 2025 March (1) – GridCell Updates and Task Algorithms.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   The GridCell algorithms continue to grow with this version of OpenCVB.
@@ -1868,7 +1869,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **GridCell_Connected:** *Grid cells in the lower left image are combined horizontally if their depth is within X centimeters. The same grid cells are combined vertically in the lower right image. Note that many grid cells are not combined vertically or horizontally. Their depth is not close to any of their neighbors. Cells with no depth can still be combined. An example is the entire vertical column at the left of the image where there are no depth values.*
 
-# March 2025 (Part 2) – GridCell and EdgeLine Updates.
+# 2025 March (2) – GridCell and EdgeLine Updates.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   GridCell_Regions expands the horizontal and vertical rectangles.
@@ -1899,7 +1900,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 **Connected_Contours :** *Each region contains grid cells and neighbors which are at approximately the same depth. For instance, the green cell in the lower left consistently defines and tracks the person seated at the desk (our humble programmer.) The wall and painting are tracked as well. The lower right image confirms this by showing the color image and the contours using OpenCV’s AddWeighted method. The tracking color of the wall changes because it is shrinking in size as the contours are colored by order of size in this version.*
 
-# March 2025 (Part 3) – RedColor, Color8U, Left/Right Mean Subtraction, Gravity/Horizon, and the XO algorithms.
+# 2025 March (3) – RedColor, Color8U, Left/Right Mean Subtraction, Gravity/Horizon, and the XO algorithms.
 
 -   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
 -   For RedCloud output, a coloring scheme may be selected in the RedCloud options.
@@ -1943,3 +1944,34 @@ The heat map is a well-known method to display populations – blue is cool or l
 *![A collage of a room with a door and a room with a computer screen AI-generated content may be incorrect.](media/44e21adc20afb2490256ae9462af7c56.gif)*
 
 **Mean Subtraction :** *An OpenCVB global option enables using mean subtraction of the left and right images as input to the depth correlation. The featureless regions are highlighted in the output with solid red regions. The improved output is available to all algorithms in the DepthRGB Mat. More testing is needed to confirm the value of mean subtraction.*
+
+# 2025 March (4) – Azure Support, FitLine, Eigen, Feature, XO, Depth Correlation Updates.
+
+-   Over 1700 algorithms are included, averaging 38 lines of code per algorithm.
+-   Support for the Azure Kinect 4K is present but \#ifdef’d out
+    -   With no left/right image, the support required too much special handling.
+    -   Look for the “AZURE_SUPPORT” \#define to reenable support.
+    -   “Update_All.bat” install script has commented the Azure-related commands.
+    -   The camera order has changed in the OpenCVB options.
+        -   Stereolabs’ camera is the preferred camera at the top of the list.
+        -   Orbbec Gemini 335L next best.
+        -   Then Oak-D because Intel cameras are no longer available.
+        -   Mynt is still there in case anyone still has their camera.
+-   The FitLine and Eigen algorithms were reviewed and updated.
+    -   There are 2 ways to fit a line to raw data but FitLine looks a little better.
+-   All the Feature methods use the motion mask to manage the features.
+    -   Feature points are stable across frames if there is no motion nearby.
+-   Algorithms starting with “XO_” are obsolete and not included in overnight testing.
+    -   The obsolete examples should still run when selected manually.
+    -   The obsolete examples can be useful for exploring OpenCV API’s.
+-   The “Depth Correlation” view includes the depth shadow – see below.
+    -   This change is motivated by the difficulty of tracking motion in depth.
+        -   There is simply too much volatility in regions with zero depth.
+        -   Grid cells impacted by RGB motion get a full update.
+        -   And so do grid cells with low depth correlation (unreliable depth.)
+    -   RGB motion cannot cover changes in depth shadow from foreground objects.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer AI-generated content may be incorrect.](media/5411c8981b86e7bc4779ffc60a1a8309.gif)
+
+**RedColor_Basics :** *The same algorithm as the previous update but with the improved representation of the “Depth Correlation”. The upper right image is switching between the previous view of the depth and the current one that includes the regions with zero depth.*
