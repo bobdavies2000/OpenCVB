@@ -2759,8 +2759,8 @@ End Class
 
 
 Public Class XO_Regions_Palette : Inherits TaskParent
-    Dim hRects As New Regions_RectsH
-    Dim vRects As New Regions_RectsV
+    Dim hRects As New XO_Regions_RectsH
+    Dim vRects As New XO_Regions_RectsV
     Dim mats As New Mat_4Click
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -2855,5 +2855,124 @@ Public Class XO_Sort_FeatureLess : Inherits TaskParent
 
         plot.Run(sort.dst2)
         dst3 = plot.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Regions_RectsH : Inherits TaskParent
+    Public hRects As New List(Of cv.Rect)
+    Dim connect As New Regions_Core
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect grid cells with similar depth - horizontally scanning."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        hRects.Clear()
+        Dim index As Integer
+        For Each tup In connect.hTuples
+            If tup.Item1 = tup.Item2 Then Continue For
+            Dim gc1 = task.gcList(tup.Item1)
+            Dim gc2 = task.gcList(tup.Item2)
+
+            Dim w = gc2.rect.BottomRight.X - gc1.rect.TopLeft.X
+            Dim h = gc1.rect.Height
+
+            Dim r = New cv.Rect(gc1.rect.TopLeft.X + 1, gc1.rect.TopLeft.Y, w - 1, h)
+
+            hRects.Add(r)
+            dst2(r).SetTo(255)
+
+            index += 1
+            dst3(r).SetTo(task.scalarColors(index Mod 256))
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Regions_RectsV : Inherits TaskParent
+    Public vRects As New List(Of cv.Rect)
+    Dim connect As New Regions_Core
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Connect grid cells with similar depth - vertically scanning."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        vRects.Clear()
+        Dim index As Integer
+        For Each tup In connect.vTuples
+            If tup.Item1 = tup.Item2 Then Continue For
+            Dim gc1 = task.gcList(tup.Item1)
+            Dim gc2 = task.gcList(tup.Item2)
+
+            Dim w = gc1.rect.Width
+            Dim h = gc2.rect.BottomRight.Y - gc1.rect.TopLeft.Y
+
+            Dim r = New cv.Rect(gc1.rect.TopLeft.X, gc1.rect.TopLeft.Y + 1, w, h - 1)
+            vRects.Add(r)
+            dst2(r).SetTo(255)
+
+            index += 1
+            dst3(r).SetTo(task.scalarColors(index Mod 256))
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Regions_Rects : Inherits TaskParent
+    Dim hConn As New XO_Regions_RectsH
+    Dim vConn As New XO_Regions_RectsV
+    Public Sub New()
+        desc = "Isolate the connected depth grid cells both vertically and horizontally."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hConn.Run(src)
+        vConn.Run(src)
+
+        dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+        dst3 = src
+        dst3.SetTo(0, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Regions_RedColor : Inherits TaskParent
+    Dim connect As New XO_Regions_Contours
+    Public Sub New()
+        desc = "Color each redCell with the color of the nearest grid cell region."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+
+        dst3 = runRedC(src, labels(3))
+        For Each rc In task.rcList
+            Dim index = connect.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            dst2(rc.rect).SetTo(task.scalarColors(index), rc.mask)
+        Next
     End Sub
 End Class

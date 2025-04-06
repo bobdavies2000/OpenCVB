@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class DepthRegion_Basics : Inherits TaskParent
     Public redM As New RedMask_Basics
-    Public connect As New Regions_Rects
+    Public connect As New XO_Regions_Rects
     Public mdLargest As New List(Of maskData)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -80,3 +80,36 @@ Public Class DepthRegion_Correlation : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+Public Class XO_Regions_Contours : Inherits TaskParent
+    Public redM As New RedMask_Basics
+    Public connect As New XO_Regions_Rects
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        task.gOptions.TruncateDepth.Checked = True
+        desc = "Find the main regions connected in depth and build a contour for each."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src.Clone)
+        task.rcPixelThreshold = task.cellSize * task.cellSize ' eliminate singles...
+        redM.Run(Not connect.dst2)
+
+        dst1.SetTo(0)
+        For Each md In redM.mdList
+            md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            dst1(md.rect).SetTo(md.index, md.mask)
+        Next
+
+        dst2 = ShowPalette(dst1)
+        dst2.SetTo(0, connect.dst2)
+        dst3 = ShowAddweighted(src, dst2, labels(3))
+        If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
+    End Sub
+End Class

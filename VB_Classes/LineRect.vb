@@ -67,9 +67,9 @@ Public Class LineRect_CenterDepth : Inherits TaskParent
             Dim lpPerp = lp.perpendicularPoints(lp.center, task.cellSize)
             Dim index1 As Integer = task.gcMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
             Dim index2 As Integer = task.gcMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
-            Dim idd1 = task.gcList(index1)
-            Dim idd2 = task.gcList(index2)
-            If Math.Abs(idd1.depth - idd2.depth) > depthThreshold Then
+            Dim gc1 = task.gcList(index1)
+            Dim gc2 = task.gcList(index2)
+            If Math.Abs(gc1.depth - gc2.depth) > depthThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else
@@ -110,12 +110,12 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
             Dim nabeList = task.gridNeighbors(index)
             Dim foundObjectLine As Boolean = False
             For i = 1 To nabeList.Count - 1
-                Dim idd1 = task.gcList(nabeList(i))
-                If idd1.depth = 0 Then Continue For
+                Dim gc1 = task.gcList(nabeList(i))
+                If gc1.depth = 0 Then Continue For
                 For j = i + 1 To nabeList.Count - 1
-                    Dim idd2 = task.gcList(nabeList(j))
-                    If idd2.depth = 0 Then Continue For
-                    If Math.Abs(idd1.depth - idd2.depth) > depthThreshold Then
+                    Dim gc2 = task.gcList(nabeList(j))
+                    If gc2.depth = 0 Then Continue For
+                    If Math.Abs(gc1.depth - gc2.depth) > depthThreshold Then
                         foundObjectLine = True
                         Exit For
                     End If
@@ -160,8 +160,8 @@ Public Class LineRect_CenterRange : Inherits TaskParent
         Dim depthLines As Integer, colorLines As Integer
         For Each lp In task.lpList
             Dim index As Integer = task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X)
-            Dim idd = task.gcList(index)
-            If idd.mm.maxVal - idd.mm.minVal > depthThreshold Then
+            Dim gc = task.gcList(index)
+            If gc.mm.maxVal - gc.mm.minVal > depthThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else

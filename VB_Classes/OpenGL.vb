@@ -2096,7 +2096,7 @@ End Class
 
 
 Public Class OpenGL_Connected : Inherits TaskParent
-    Dim connect As New Regions_Contours
+    Dim connect As New XO_Regions_Contours
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the connected contours in OpenGL"

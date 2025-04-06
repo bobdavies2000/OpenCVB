@@ -691,7 +691,7 @@ End Class
 
 
 Public Class GridCell_EdgeDraw : Inherits TaskParent
-    Dim regions As New Regions_Contours
+    Dim regions As New XO_Regions_Contours
     Public edges As New EdgeLine_Basics
     Public Sub New()
         desc = "Lines can mean cells are connected."
@@ -808,7 +808,7 @@ End Class
 
 
 Public Class GridCell_RegionLines : Inherits TaskParent
-    Dim regions As New Regions_Contours
+    Dim regions As New XO_Regions_Contours
     Public Sub New()
         desc = "Lines can mean cells are connected."
     End Sub
