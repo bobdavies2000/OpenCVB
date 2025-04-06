@@ -2752,3 +2752,108 @@ Public Class OpenGL_PCpoints : Inherits TaskParent
         labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_Regions_Palette : Inherits TaskParent
+    Dim hRects As New Regions_RectsH
+    Dim vRects As New Regions_RectsV
+    Dim mats As New Mat_4Click
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Assign an index to each of vertical and horizontal rects in Regions_Rects"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hRects.Run(src)
+
+        Dim indexH As Integer
+        dst1.SetTo(0)
+        For Each r In hRects.hRects
+            If r.Y = 0 Then
+                indexH += 1
+                dst1(r).SetTo(indexH)
+            Else
+                Dim foundLast As Boolean
+                For x = r.X To r.X + r.Width - 1
+                    Dim lastIndex = dst1.Get(Of Byte)(r.Y - 1, x)
+                    If lastIndex <> 0 Then
+                        dst1(r).SetTo(lastIndex)
+                        foundLast = True
+                        Exit For
+                    End If
+                Next
+                If foundLast = False Then
+                    indexH += 1
+                    dst1(r).SetTo(indexH)
+                End If
+            End If
+        Next
+        mats.mat(0) = ShowPalette(dst1)
+
+        mats.mat(1) = ShowAddweighted(src, mats.mat(0), labels(3))
+
+        vRects.Run(src)
+        Dim indexV As Integer
+        dst1.SetTo(0)
+        For Each r In vRects.vRects
+            If r.X = 0 Then
+                indexV += 1
+                dst1(r).SetTo(indexV)
+            Else
+                Dim foundLast As Boolean
+                For y = r.Y To r.Y + r.Height - 1
+                    Dim lastIndex = dst1.Get(Of Byte)(y, r.X - 1)
+                    If lastIndex <> 0 Then
+                        dst1(r).SetTo(lastIndex)
+                        foundLast = True
+                        Exit For
+                    End If
+                Next
+                If foundLast = False Then
+                    indexV += 1
+                    dst1(r).SetTo(indexV)
+                End If
+            End If
+        Next
+        mats.mat(2) = ShowPalette(dst1)
+
+        mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
+        If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
+
+        mats.Run(src)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Sort_FeatureLess : Inherits TaskParent
+    Public connect As New XO_Regions_Palette
+    Public sort As New Sort_Basics
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        plot.createHistogram = True
+        task.gOptions.setHistogramBins(256)
+        task.gOptions.GridSlider.Value = 8
+        desc = "Sort all the featureless grayscale pixels."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+        dst2 = connect.dst3
+        labels(2) = connect.labels(2)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(0, Not connect.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary))
+
+        sort.Run(dst1)
+
+        plot.Run(sort.dst2)
+        dst3 = plot.dst2
+    End Sub
+End Class

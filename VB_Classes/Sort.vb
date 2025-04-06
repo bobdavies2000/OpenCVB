@@ -189,35 +189,6 @@ End Class
 
 
 
-Public Class Sort_FeatureLess : Inherits TaskParent
-    Public connect As New Regions_Palette
-    Public sort As New Sort_Basics
-    Dim plot As New Plot_Histogram
-    Public Sub New()
-        plot.createHistogram = True
-        task.gOptions.setHistogramBins(256)
-        task.gOptions.GridSlider.Value = 8
-        desc = "Sort all the featureless grayscale pixels."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-        dst2 = connect.dst3
-        labels(2) = connect.labels(2)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1.SetTo(0, Not connect.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary))
-
-        sort.Run(dst1)
-
-        plot.Run(sort.dst2)
-        dst3 = plot.dst2
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 

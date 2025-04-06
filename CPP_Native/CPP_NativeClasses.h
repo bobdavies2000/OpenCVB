@@ -2146,12 +2146,12 @@ int* WhiteBalance_Run(WhiteBalance* cPtr, int* rgb, int rows, int cols, float th
 
 
 
-class xPhoto_OilPaint
+class ExPhoto_OilPaint
 {
 private:
 public:
     Mat src, dst;
-    xPhoto_OilPaint() {}
+    ExPhoto_OilPaint() {}
     void Run(int size, int dynRatio, int colorCode)
     {
         xphoto::oilPainting(src, dst, size, dynRatio, colorCode);
@@ -2159,21 +2159,21 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-xPhoto_OilPaint* xPhoto_OilPaint_Open()
+ExPhoto_OilPaint* ExPhoto_OilPaint_Open()
 {
-    xPhoto_OilPaint* cPtr = new xPhoto_OilPaint();
+    ExPhoto_OilPaint* cPtr = new ExPhoto_OilPaint();
     return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* xPhoto_OilPaint_Close(xPhoto_OilPaint* cPtr)
+int* ExPhoto_OilPaint_Close(ExPhoto_OilPaint* cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
 extern "C" __declspec(dllexport)
-int* xPhoto_OilPaint_Run(xPhoto_OilPaint* cPtr, int* imagePtr, int rows, int cols, int size, int dynRatio, int colorCode)
+int* ExPhoto_OilPaint_Run(ExPhoto_OilPaint* cPtr, int* imagePtr, int rows, int cols, int size, int dynRatio, int colorCode)
 {
     cPtr->src = Mat(rows, cols, CV_8UC3, imagePtr);
     cPtr->Run(size, dynRatio, colorCode);
@@ -2185,12 +2185,12 @@ int* xPhoto_OilPaint_Run(xPhoto_OilPaint* cPtr, int* imagePtr, int rows, int col
 
 
 
-class xPhoto_Inpaint
+class ExPhoto_Inpaint
 {
 private:
 public:
     Mat src, dst;
-    xPhoto_Inpaint() {}
+    ExPhoto_Inpaint() {}
     void Run(Mat mask, int iType)
     {
         dst.setTo(0);
@@ -2199,21 +2199,21 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-xPhoto_Inpaint* xPhoto_Inpaint_Open()
+ExPhoto_Inpaint* ExPhoto_Inpaint_Open()
 {
-    xPhoto_Inpaint* cPtr = new xPhoto_Inpaint();
+    ExPhoto_Inpaint* cPtr = new ExPhoto_Inpaint();
     return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* xPhoto_Inpaint_Close(xPhoto_Inpaint* cPtr)
+int* ExPhoto_Inpaint_Close(ExPhoto_Inpaint* cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
 extern "C" __declspec(dllexport)
-int* xPhoto_Inpaint_Run(xPhoto_Inpaint* cPtr, int* imagePtr, int* maskPtr, int rows, int cols, int iType)
+int* ExPhoto_Inpaint_Run(ExPhoto_Inpaint* cPtr, int* imagePtr, int* maskPtr, int rows, int cols, int iType)
 {
     cPtr->src = Mat(rows, cols, CV_8UC3, imagePtr);
     cPtr->dst = Mat(rows, cols, CV_8UC3);

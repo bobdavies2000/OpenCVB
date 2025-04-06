@@ -1,7 +1,80 @@
-﻿Imports System.Windows
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Regions_Basics : Inherits TaskParent
+    Dim regions As New Regions_Core
+    Dim hRects As New List(Of cv.Rect)
+    Dim vRects As New List(Of cv.Rect)
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
+        labels(2) = "Move mouse over a line to see the depth values.  Results will be in Labels(3)"
+        desc = "Display grid cells that are connected by depth vertically and horizontally."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim tilesPerRow = task.grid.tilesPerRow
+        Dim tilesPerCol = task.grid.tilesPerCol
+        regions.Run(src)
+
+        hRects.Clear()
+        dst0.SetTo(0)
+        dst2.SetTo(0)
+        For Each tuple In regions.hTuples
+            Dim gc1 = task.gcList(tuple.Item1)
+            Dim gc2 = task.gcList(tuple.Item2)
+            If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
+            If gc1.center.DistanceTo(gc2.center) > task.cellSize Then
+                Dim r = gc1.rect
+                For i = gc1.index + 1 To gc2.index - 1
+                    r = r.Union(task.gcList(i).rect)
+                Next
+                hRects.Add(r)
+                dst0(r).SetTo(hRects.Count)
+
+                Dim color = task.scalarColors(CInt(tilesPerCol * r.Y / dst2.Height) Mod 255)
+                dst2(r).SetTo(color)
+            End If
+        Next
+
+        vRects.Clear()
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+        For Each tuple In regions.vTuples
+            Dim gc1 = task.gcList(tuple.Item1)
+            Dim gc2 = task.gcList(tuple.Item2)
+            If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
+            If gc1.center.DistanceTo(gc2.center) > task.cellSize Then
+                Dim r = gc1.rect
+                For i = gc1.index + tilesPerRow To gc2.index - 1 Step tilesPerRow
+                    r = r.Union(task.gcList(i).rect)
+                Next
+                vRects.Add(r)
+                dst1(r).SetTo(vRects.Count)
+
+                Dim color = task.scalarColors(CInt(tilesPerRow * r.X / dst2.Width) Mod 255)
+                dst3(r).SetTo(color)
+            End If
+        Next
+
+        Dim rect As cv.Rect
+        If task.mousePicTag = 2 Then
+            Dim index = dst0.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            If index = 0 Then Exit Sub
+            rect = hRects(index - 1)
+        Else
+            Dim index = dst1.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            If index = 0 Then Exit Sub
+            rect = vRects(index - 1)
+        End If
+
+        labels(3) = ""
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Regions_Core : Inherits TaskParent
     Public hTuples As New List(Of Tuple(Of Integer, Integer))
     Public vTuples As New List(Of Tuple(Of Integer, Integer))
     Public width As Integer, height As Integer
@@ -82,7 +155,7 @@ End Class
 
 
 Public Class Regions_Gaps : Inherits TaskParent
-    Dim connect As New Regions_Basics
+    Dim connect As New Regions_Core
     Public Sub New()
         labels(2) = "Grid cells with single cells removed for both vertical and horizontal connected cells."
         labels(3) = "Vertical cells with single cells removed."
@@ -111,82 +184,6 @@ Public Class Regions_Gaps : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Regions_Palette : Inherits TaskParent
-    Dim hRects As New Regions_RectsH
-    Dim vRects As New Regions_RectsV
-    Dim mats As New Mat_4Click
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Assign an index to each of vertical and horizontal rects in Regions_Rects"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hRects.Run(src)
-
-        Dim indexH As Integer
-        dst1.SetTo(0)
-        For Each r In hRects.hRects
-            If r.Y = 0 Then
-                indexH += 1
-                dst1(r).SetTo(indexH)
-            Else
-                Dim foundLast As Boolean
-                For x = r.X To r.X + r.Width - 1
-                    Dim lastIndex = dst1.Get(Of Byte)(r.Y - 1, x)
-                    If lastIndex <> 0 Then
-                        dst1(r).SetTo(lastIndex)
-                        foundLast = True
-                        Exit For
-                    End If
-                Next
-                If foundLast = False Then
-                    indexH += 1
-                    dst1(r).SetTo(indexH)
-                End If
-            End If
-        Next
-        mats.mat(0) = ShowPalette(dst1)
-
-        mats.mat(1) = ShowAddweighted(src, mats.mat(0), labels(3))
-
-        vRects.Run(src)
-        Dim indexV As Integer
-        dst1.SetTo(0)
-        For Each r In vRects.vRects
-            If r.X = 0 Then
-                indexV += 1
-                dst1(r).SetTo(indexV)
-            Else
-                Dim foundLast As Boolean
-                For y = r.Y To r.Y + r.Height - 1
-                    Dim lastIndex = dst1.Get(Of Byte)(y, r.X - 1)
-                    If lastIndex <> 0 Then
-                        dst1(r).SetTo(lastIndex)
-                        foundLast = True
-                        Exit For
-                    End If
-                Next
-                If foundLast = False Then
-                    indexV += 1
-                    dst1(r).SetTo(indexV)
-                End If
-            End If
-        Next
-        mats.mat(2) = ShowPalette(dst1)
-
-        mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
-        If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
-
-        mats.Run(src)
-        dst2 = mats.dst2
-        dst3 = mats.dst3
-    End Sub
-End Class
 
 
 
@@ -245,84 +242,10 @@ End Class
 
 
 
-Public Class Regions_BasicsNewBad : Inherits TaskParent
-    Public hTuples As New List(Of Tuple(Of Integer, Integer))
-    Public width As Integer, height As Integer
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
-        desc = "Connect cells that are close in depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        width = dst2.Width / task.cellSize
-        If width * task.cellSize <> dst2.Width Then width += 1
-        height = Math.Floor(dst2.Height / task.cellSize)
-        If height * task.cellSize <> dst2.Height Then height += 1
-
-        Dim newCount(task.gcList.Count - 1) As Integer
-        For i = 0 To height - 2
-            For j = 1 To width - 1
-                Dim gc1 = task.gcList(i * width + j - 1)
-                Dim gc2 = task.gcList(i * width + j)
-                Dim gc3 = task.gcList((i + 1) * width + j - 1)
-                Dim gc4 = task.gcList((i + 1) * width + j)
-                If gc1.index <> gc2.index Then
-                    If Math.Abs(gc1.depth - gc2.depth) < task.depthDiffMeters Then
-                        gc2.index = gc1.index
-                        task.gcList(i * width + j) = gc2
-                        newCount(gc2.index) += 1
-                    End If
-                End If
-
-                If gc3.index <> gc1.index Then
-                    If Math.Abs(gc1.depth - gc3.depth) < task.depthDiffMeters Then
-                        gc3.index = gc1.index
-                        task.gcList((i + 1) * width + j - 1) = gc3
-                        newCount(gc3.index) += 1
-                    End If
-                End If
-
-                If gc4.index <> gc2.index Then
-                    If Math.Abs(gc2.depth - gc4.depth) < task.depthDiffMeters Then
-                        gc4.index = gc2.index
-                        task.gcList((i + 1) * width + j) = gc4
-                        newCount(gc4.index) += 1
-                    End If
-                End If
-            Next
-        Next
-
-        Dim sortedCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To newCount.Count - 1
-            sortedCounts.Add(newCount(i), i)
-        Next
-
-        Dim indexList As New List(Of Integer)
-        For i = 0 To 10 - 1
-            Dim index = sortedCounts.ElementAt(i).Value
-            indexList.Add(index)
-        Next
-
-        dst3.SetTo(0)
-        For Each gc In task.gcList
-            If indexList.Contains(gc.index) Then
-                dst3(gc.rect).SetTo(gc.index)
-            End If
-        Next
-
-        dst2 = ShowPalette(dst3)
-
-        labels(2) = CStr(task.gcList.Count) + " grid cells consolidated into the top 10 cells."
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Regions_RectsH : Inherits TaskParent
     Public hRects As New List(Of cv.Rect)
-    Dim connect As New Regions_Basics
+    Dim connect As New Regions_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Connect grid cells with similar depth - horizontally scanning."
@@ -360,7 +283,7 @@ End Class
 
 Public Class Regions_RectsV : Inherits TaskParent
     Public vRects As New List(Of cv.Rect)
-    Dim connect As New Regions_Basics
+    Dim connect As New Regions_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Connect grid cells with similar depth - vertically scanning."
@@ -411,29 +334,6 @@ Public Class Regions_Rects : Inherits TaskParent
         dst3.SetTo(0, dst2)
     End Sub
 End Class
-
-
-
-
-
-'Public Class Regions_Flood : Inherits TaskParent
-'    Public Sub New()
-'        desc = "Display grid cells that are connected by lines."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        Dim inputData As New List(Of Single)
-'        For Each gc In task.gcList
-'            inputData.Add(gc.depth)
-'        Next
-
-'        Dim inputMat = cv.Mat.FromPixelData(task.grid.tilesPerCol, task.grid.tilesPerRow, cv.MatType.CV_32F, inputData.ToArray)
-
-'        cv.Cv2.FloodFill(inputMat, New , pt, red, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
-
-'        Dim mm = GetMinMax(inputMat)
-'        dst3 = ShowPalette(inputMat * 255 / mm.maxVal)
-'    End Sub
-'End Class
 
 
 

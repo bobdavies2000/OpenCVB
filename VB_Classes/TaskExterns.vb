@@ -1173,25 +1173,25 @@ Module TaskExterns
 
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_OilPaint_Open() As IntPtr
+    Public Function ExPhoto_OilPaint_Open() As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_OilPaint_Close(cPtr As IntPtr) As IntPtr
+    Public Function ExPhoto_OilPaint_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_OilPaint_Run(xPhoto_OilPaint_Ptr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer,
+    Public Function ExPhoto_OilPaint_Run(ExPhoto_OilPaint_Ptr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer,
                                        size As Integer, dynRatio As Integer, colorCode As Integer) As IntPtr
     End Function
 
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_Inpaint_Open() As IntPtr
+    Public Function ExPhoto_Inpaint_Open() As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_Inpaint_Close(cPtr As IntPtr) As IntPtr
+    Public Function ExPhoto_Inpaint_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_Inpaint_Run(xPhoto_Inpaint_Ptr As IntPtr, bgrPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer, iType As Integer) As IntPtr
+    Public Function ExPhoto_Inpaint_Run(ExPhoto_Inpaint_Ptr As IntPtr, bgrPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer, iType As Integer) As IntPtr
     End Function
 
 

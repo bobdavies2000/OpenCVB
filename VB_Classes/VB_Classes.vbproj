@@ -448,7 +448,7 @@
     <Compile Include="WarpAffine.vb" />
     <Compile Include="Watershed.vb" />
     <Compile Include="XO.vb" />
-    <Compile Include="XPhoto.vb" />
+    <Compile Include="ExPhoto.vb" />
     <Compile Include="Magnify.vb" />
   </ItemGroup>
   <ItemGroup>

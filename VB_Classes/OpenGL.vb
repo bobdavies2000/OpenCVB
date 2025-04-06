@@ -1967,7 +1967,7 @@ End Class
 
 
 Public Class OpenGL_QuadConnect : Inherits TaskParent
-    Dim connect As New Regions_Basics
+    Dim connect As New Regions_Core
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Build connected grid cells and remove cells that are not connected."

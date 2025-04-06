@@ -31,6 +31,7 @@ Public Class Intrinsics_Basics : Inherits TaskParent
                 Dim pt = translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X))
                 If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
                 If Single.IsInfinity(pt.X) Or Single.Isinfinity(pt.Y) Then Continue For
+                pt = validatePoint(pt)
                 dst2.Set(Of Byte)(pt.Y, pt.X, 128)
             Next
         End If
