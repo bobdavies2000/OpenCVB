@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Regions_Basics : Inherits TaskParent
-    Dim regions As New Regions_Core
+Public Class Region_Basics : Inherits TaskParent
+    Dim regions As New Region_Core
     Dim hRects As New List(Of cv.Rect)
     Dim vRects As New List(Of cv.Rect)
     Public Sub New()
@@ -74,7 +74,7 @@ End Class
 
 
 
-Public Class Regions_Core : Inherits TaskParent
+Public Class Region_Core : Inherits TaskParent
     Public hTuples As New List(Of Tuple(Of Integer, Integer))
     Public vTuples As New List(Of Tuple(Of Integer, Integer))
     Public width As Integer, height As Integer
@@ -148,46 +148,3 @@ Public Class Regions_Core : Inherits TaskParent
                     CStr(task.depthDiffMeters) + " meters"
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Regions_Gaps : Inherits TaskParent
-    Dim connect As New Regions_Core
-    Public Sub New()
-        labels(2) = "Grid cells with single cells removed for both vertical and horizontal connected cells."
-        labels(3) = "Vertical cells with single cells removed."
-        desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-        dst2 = connect.dst2
-        dst3 = connect.dst3
-
-        For Each tup In connect.hTuples
-            If tup.Item2 - tup.Item1 = 0 Then
-                Dim gc = task.gcList(tup.Item1)
-                dst2(gc.rect).SetTo(0)
-            End If
-        Next
-
-        For Each tup In connect.vTuples
-            Dim gc1 = task.gcList(tup.Item1)
-            Dim gc2 = task.gcList(tup.Item2)
-            If gc2.rect.TopLeft.Y - gc1.rect.TopLeft.Y = 0 Then
-                dst2(gc1.rect).SetTo(0)
-                dst3(gc1.rect).SetTo(0)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-

@@ -198,7 +198,7 @@ RedColor
 RedMask
 RedTrack
 Reduction
-Regions
+Region
 Reliable
 Remap
 Replay

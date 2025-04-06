@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class DepthRegion_Basics : Inherits TaskParent
     Public redM As New RedMask_Basics
-    Public connect As New XO_Regions_Rects
+    Public connect As New XO_Region_Rects
     Public mdLargest As New List(Of maskData)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -88,9 +88,9 @@ End Class
 
 
 
-Public Class XO_Regions_Contours : Inherits TaskParent
+Public Class XO_Region_Contours : Inherits TaskParent
     Public redM As New RedMask_Basics
-    Public connect As New XO_Regions_Rects
+    Public connect As New XO_Region_Rects
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.gOptions.TruncateDepth.Checked = True

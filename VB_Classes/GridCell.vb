@@ -558,23 +558,6 @@ End Class
 
 
 
-Public Class GridCell_FeatureGaps : Inherits TaskParent
-    Dim feat As New GridCell_Features
-    Dim gaps As New Regions_Gaps
-    Public Sub New()
-        labels(2) = "The output of GridCell_Gaps overlaid with the output of the GridCell_Features"
-        desc = "Overlay the features on the image of the gaps"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(src)
-        gaps.Run(src)
-        dst2 = ShowAddweighted(feat.dst2, gaps.dst2, labels(3))
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -691,7 +674,7 @@ End Class
 
 
 Public Class GridCell_EdgeDraw : Inherits TaskParent
-    Dim regions As New XO_Regions_Contours
+    Dim regions As New XO_Region_Contours
     Public edges As New EdgeLine_Basics
     Public Sub New()
         desc = "Lines can mean cells are connected."
@@ -808,7 +791,7 @@ End Class
 
 
 Public Class GridCell_RegionLines : Inherits TaskParent
-    Dim regions As New XO_Regions_Contours
+    Dim regions As New XO_Region_Contours
     Public Sub New()
         desc = "Lines can mean cells are connected."
     End Sub

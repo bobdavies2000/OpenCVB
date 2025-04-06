@@ -2758,13 +2758,13 @@ End Class
 
 
 
-Public Class XO_Regions_Palette : Inherits TaskParent
-    Dim hRects As New XO_Regions_RectsH
-    Dim vRects As New XO_Regions_RectsV
+Public Class XO_Region_Palette : Inherits TaskParent
+    Dim hRects As New XO_Region_RectsH
+    Dim vRects As New XO_Region_RectsV
     Dim mats As New Mat_4Click
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Assign an index to each of vertical and horizontal rects in Regions_Rects"
+        desc = "Assign an index to each of vertical and horizontal rects in Region_Rects"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hRects.Run(src)
@@ -2835,7 +2835,7 @@ End Class
 
 
 Public Class XO_Sort_FeatureLess : Inherits TaskParent
-    Public connect As New XO_Regions_Palette
+    Public connect As New XO_Region_Palette
     Public sort As New Sort_Basics
     Dim plot As New Plot_Histogram
     Public Sub New()
@@ -2864,9 +2864,9 @@ End Class
 
 
 
-Public Class XO_Regions_RectsH : Inherits TaskParent
+Public Class XO_Region_RectsH : Inherits TaskParent
     Public hRects As New List(Of cv.Rect)
-    Dim connect As New Regions_Core
+    Dim connect As New Region_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Connect grid cells with similar depth - horizontally scanning."
@@ -2902,9 +2902,9 @@ End Class
 
 
 
-Public Class XO_Regions_RectsV : Inherits TaskParent
+Public Class XO_Region_RectsV : Inherits TaskParent
     Public vRects As New List(Of cv.Rect)
-    Dim connect As New Regions_Core
+    Dim connect As New Region_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Connect grid cells with similar depth - vertically scanning."
@@ -2939,9 +2939,9 @@ End Class
 
 
 
-Public Class XO_Regions_Rects : Inherits TaskParent
-    Dim hConn As New XO_Regions_RectsH
-    Dim vConn As New XO_Regions_RectsV
+Public Class XO_Region_Rects : Inherits TaskParent
+    Dim hConn As New XO_Region_RectsH
+    Dim vConn As New XO_Region_RectsV
     Public Sub New()
         desc = "Isolate the connected depth grid cells both vertically and horizontally."
     End Sub
@@ -2961,8 +2961,8 @@ End Class
 
 
 
-Public Class XO_Regions_RedColor : Inherits TaskParent
-    Dim connect As New XO_Regions_Contours
+Public Class XO_Region_RedColor : Inherits TaskParent
+    Dim connect As New XO_Region_Contours
     Public Sub New()
         desc = "Color each redCell with the color of the nearest grid cell region."
     End Sub
@@ -2974,5 +2974,58 @@ Public Class XO_Regions_RedColor : Inherits TaskParent
             Dim index = connect.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             dst2(rc.rect).SetTo(task.scalarColors(index), rc.mask)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Region_Gaps : Inherits TaskParent
+    Dim connect As New Region_Core
+    Public Sub New()
+        labels(2) = "Grid cells with single cells removed for both vertical and horizontal connected cells."
+        labels(3) = "Vertical cells with single cells removed."
+        desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+        dst2 = connect.dst2
+        dst3 = connect.dst3
+
+        For Each tup In connect.hTuples
+            If tup.Item2 - tup.Item1 = 0 Then
+                Dim gc = task.gcList(tup.Item1)
+                dst2(gc.rect).SetTo(0)
+            End If
+        Next
+
+        For Each tup In connect.vTuples
+            Dim gc1 = task.gcList(tup.Item1)
+            Dim gc2 = task.gcList(tup.Item2)
+            If gc2.rect.TopLeft.Y - gc1.rect.TopLeft.Y = 0 Then
+                dst2(gc1.rect).SetTo(0)
+                dst3(gc1.rect).SetTo(0)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_GridCell_FeatureGaps : Inherits TaskParent
+    Dim feat As New GridCell_Features
+    Dim gaps As New XO_Region_Gaps
+    Public Sub New()
+        labels(2) = "The output of GridCell_Gaps overlaid with the output of the GridCell_Features"
+        desc = "Overlay the features on the image of the gaps"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(src)
+        gaps.Run(src)
+        dst2 = ShowAddweighted(feat.dst2, gaps.dst2, labels(3))
     End Sub
 End Class

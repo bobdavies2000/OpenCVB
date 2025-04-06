@@ -1967,7 +1967,7 @@ End Class
 
 
 Public Class OpenGL_QuadConnect : Inherits TaskParent
-    Dim connect As New Regions_Core
+    Dim connect As New Region_Core
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Build connected grid cells and remove cells that are not connected."
@@ -2096,7 +2096,7 @@ End Class
 
 
 Public Class OpenGL_Connected : Inherits TaskParent
-    Dim connect As New XO_Regions_Contours
+    Dim connect As New XO_Region_Contours
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the connected contours in OpenGL"
@@ -2139,5 +2139,18 @@ Public Class OpenGL_Lines3D : Inherits TaskParent
         End If
 
         SetTrueText(lines.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_Regions : Inherits TaskParent
+    Public Sub New()
+        desc = "Display the Region_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
