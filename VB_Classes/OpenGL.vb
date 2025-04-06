@@ -5,6 +5,7 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.Threading
 Imports cvext = OpenCvSharp.Extensions
+Imports System.Security.Cryptography
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim startInfo As New ProcessStartInfo
@@ -1966,77 +1967,6 @@ End Class
 
 
 
-Public Class OpenGL_QuadConnect : Inherits TaskParent
-    Dim connect As New Region_Core
-    Public Sub New()
-        task.ogl.oglFunction = oCase.quadBasics
-        desc = "Build connected grid cells and remove cells that are not connected."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-        dst2 = connect.dst2
-        dst3 = connect.dst3
-
-        Dim quadData As New List(Of cv.Point3f)
-        Dim gc1 As gcData, gc2 As gcData
-        For Each tup In connect.hTuples
-            gc1 = task.gcList(tup.Item1)
-            gc2 = task.gcList(tup.Item2)
-            For i = tup.Item1 + 1 To tup.Item2 - 1
-                gc1 = task.gcList(i - 1)
-                gc2 = task.gcList(i)
-                If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
-                If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
-
-                quadData.Add(gc1.color)
-                quadData.Add(gc1.corners(0))
-                quadData.Add(gc2.corners(0))
-                quadData.Add(gc2.corners(3))
-                quadData.Add(gc1.corners(3))
-            Next
-            If gc1.corners.Count > 0 And gc2.corners.Count > 0 Then
-                quadData.Add(gc2.color)
-                quadData.Add(gc2.corners(0))
-                quadData.Add(gc2.corners(1))
-                quadData.Add(gc2.corners(2))
-                quadData.Add(gc2.corners(3))
-            End If
-        Next
-
-        Dim width = dst2.Width / task.cellSize
-        For Each tup In connect.vTuples
-            For i = tup.Item1 To tup.Item2 - width Step width
-                gc1 = task.gcList(i)
-                gc2 = task.gcList(i + width)
-                If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
-                If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
-
-                quadData.Add(gc1.color)
-                quadData.Add(gc1.corners(0))
-                quadData.Add(gc1.corners(1))
-                quadData.Add(gc2.corners(1))
-                quadData.Add(gc2.corners(0))
-            Next
-            If gc1.corners.Count > 0 And gc2.corners.Count > 0 Then
-                quadData.Add(gc2.color)
-                quadData.Add(gc2.corners(0))
-                quadData.Add(gc2.corners(1))
-                quadData.Add(gc2.corners(2))
-                quadData.Add(gc2.corners(3))
-            End If
-        Next
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
-        task.ogl.pointCloudInput = New cv.Mat()
-        task.ogl.Run(src)
-        labels = task.gCell.labels
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class OpenGL_PCdiff : Inherits TaskParent
@@ -2113,38 +2043,124 @@ End Class
 
 
 
+
+Public Class OpenGL_QuadConnected : Inherits TaskParent
+    Dim connect As New Region_Core
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        desc = "Build connected grid cells and remove cells that are not connected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+        dst2 = connect.dst2
+        dst3 = connect.dst3
+
+        Dim quadData As New List(Of cv.Point3f)
+        Dim gc1 As gcData, gc2 As gcData
+        For Each tup In connect.hTuples
+            gc1 = task.gcList(tup.Item1)
+            gc2 = task.gcList(tup.Item2)
+            For i = tup.Item1 + 1 To tup.Item2 - 1
+                gc1 = task.gcList(i - 1)
+                gc2 = task.gcList(i)
+                If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
+                If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
+
+                quadData.Add(gc1.color)
+                quadData.Add(gc1.corners(0))
+                quadData.Add(gc2.corners(0))
+                quadData.Add(gc2.corners(3))
+                quadData.Add(gc1.corners(3))
+            Next
+            If gc1.corners.Count > 0 And gc2.corners.Count > 0 Then
+                quadData.Add(gc2.color)
+                quadData.Add(gc2.corners(0))
+                quadData.Add(gc2.corners(1))
+                quadData.Add(gc2.corners(2))
+                quadData.Add(gc2.corners(3))
+            End If
+        Next
+
+        Dim width = dst2.Width / task.cellSize
+        For Each tup In connect.vTuples
+            For i = tup.Item1 To tup.Item2 - width Step width
+                gc1 = task.gcList(i)
+                gc2 = task.gcList(i + width)
+                If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
+                If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
+
+                quadData.Add(gc1.color)
+                quadData.Add(gc1.corners(0))
+                quadData.Add(gc1.corners(1))
+                quadData.Add(gc2.corners(1))
+                quadData.Add(gc2.corners(0))
+            Next
+            If gc1.corners.Count > 0 And gc2.corners.Count > 0 Then
+                quadData.Add(gc2.color)
+                quadData.Add(gc2.corners(0))
+                quadData.Add(gc2.corners(1))
+                quadData.Add(gc2.corners(2))
+                quadData.Add(gc2.corners(3))
+            End If
+        Next
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+        task.ogl.pointCloudInput = New cv.Mat()
+        task.ogl.Run(src)
+        labels = task.gCell.labels
+    End Sub
+End Class
+
+
+
+
 Public Class OpenGL_Regions : Inherits TaskParent
     Dim options As New Options_Regions
     Dim qDepth As New OpenGL_QuadDepth
-    Dim connect As New OpenGL_QuadConnect
+    Dim connect As New OpenGL_QuadConnected
     Dim regions As New Region_Basics
+    Dim regionQuads As New Region_Quads
     Public Sub New()
-        task.ogl.oglFunction = oCase.quadBasics
         desc = "Compare different representations of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
+        task.ogl.oglFunction = oCase.quadBasics ' only the first case needs something else.
+        task.ogl.pointCloudInput = New cv.Mat()
         Select Case options.displayIndex
             Case 0
                 task.ogl.oglFunction = oCase.drawPointCloudRGB
                 task.ogl.pointCloudInput = task.pointCloud
                 task.ogl.Run(src)
             Case 1
-                task.ogl.oglFunction = oCase.quadBasics
                 qDepth.Run(src)
                 dst2 = qDepth.dst2
                 dst3 = qDepth.dst3
             Case 2
-                task.ogl.oglFunction = oCase.quadBasics
                 connect.Run(src)
                 dst2 = connect.dst2
                 dst3 = connect.dst3
             Case 3
-                task.ogl.oglFunction = oCase.quadBasics
                 regions.Run(src)
                 dst2 = regions.dst2
-                dst3 = regions.dst3
+
+                regionQuads.inputRects = regions.vRects
+                regionQuads.Run(src)
+
+                task.ogl.dataInput = regionQuads.quadMat
+                task.ogl.Run(src)
+                labels = regions.labels
+            Case 4
+                regions.Run(src)
+                dst2 = regions.dst3
+
+                regionQuads.inputRects = regions.hRects
+                regionQuads.Run(src)
+
+                task.ogl.dataInput = regionQuads.quadMat
+                task.ogl.Run(src)
+                labels = regions.labels
         End Select
     End Sub
 End Class

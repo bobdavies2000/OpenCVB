@@ -7829,19 +7829,15 @@ Public Class Options_Regions : Inherits OptionParent
             radio.addRadio("Raw Pointcloud")
             radio.addRadio("Flat grid cells")
             radio.addRadio("Connected grid cells")
-            radio.addRadio("Vertical/Horizontal Rects")
+            radio.addRadio("Vertical Cells")
+            radio.addRadio("Horizontal Cells")
             radio.check(3).Checked = True
         End If
     End Sub
     Public Sub Run()
-        Static rawRadio = findRadio("Raw Pointcloud")
-        Static flatRadio = findRadio("Flat grid cells")
-        displayIndex = 2
-        If rawRadio.checked Then
-            displayIndex = 0
-        ElseIf flatRadio.checked Then
-            displayIndex = 1
-        End If
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then displayIndex = i
+        Next
     End Sub
 End Class
 

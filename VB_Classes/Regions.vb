@@ -1,8 +1,9 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Security.Cryptography
+Imports cv = OpenCvSharp
 Public Class Region_Basics : Inherits TaskParent
     Dim regions As New Region_Core
-    Dim hRects As New List(Of cv.Rect)
-    Dim vRects As New List(Of cv.Rect)
+    Public hRects As New List(Of cv.Rect)
+    Public vRects As New List(Of cv.Rect)
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
@@ -75,6 +76,51 @@ Public Class Region_Basics : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Region_Quads : Inherits TaskParent
+    Public quadMat As New cv.Mat
+    Public inputRects As New List(Of cv.Rect)
+    Public Sub New()
+        desc = "Build Quads for each rectangle in the list horizontal rectangles."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static regions As New Region_Basics
+            regions.Run(src)
+            dst2 = regions.dst2
+            dst3 = regions.dst3
+            inputRects = regions.hRects
+        End If
+
+        Dim quadData As New List(Of cv.Point3f)
+        For Each rect In inputRects
+            Dim index1 = task.gcMap.Get(Of Single)(rect.Y, rect.X)
+            Dim index2 = task.gcMap.Get(Of Single)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
+            If index1 = 0 Or index2 = 0 Then Continue For
+
+            Dim gc1 = task.gcList(index1)
+            Dim gc2 = task.gcList(index2)
+
+            quadData.Add(gc1.color)
+
+            Dim p0 = getWorldCoordinates(rect.TopLeft, gc1.depth)
+            Dim p1 = getWorldCoordinates(rect.BottomRight, gc2.depth)
+
+            quadData.Add(New cv.Point3f(p0.X, p0.Y, gc1.depth))
+            quadData.Add(New cv.Point3f(p1.X, p0.Y, gc2.depth))
+            quadData.Add(New cv.Point3f(p1.X, p1.Y, gc2.depth))
+            quadData.Add(New cv.Point3f(p0.X, p1.Y, gc1.depth))
+        Next
+
+        quadMat = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+    End Sub
+End Class
+
 
 
 
