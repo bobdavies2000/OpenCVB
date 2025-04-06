@@ -7821,7 +7821,7 @@ End Class
 
 
 
-Public Class Options_QuadCompare : Inherits OptionParent
+Public Class Options_Regions : Inherits OptionParent
     Public displayIndex As Integer
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -7829,7 +7829,8 @@ Public Class Options_QuadCompare : Inherits OptionParent
             radio.addRadio("Raw Pointcloud")
             radio.addRadio("Flat grid cells")
             radio.addRadio("Connected grid cells")
-            radio.check(2).Checked = True
+            radio.addRadio("Vertical/Horizontal Rects")
+            radio.check(3).Checked = True
         End If
     End Sub
     Public Sub Run()

@@ -771,7 +771,7 @@ Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
         options.Run()
         Dim threshold = options.stdevThreshold
 
-        Dim pt = task.mouseD.ptTopLeft
+        Dim pt = task.mouseD.ptCursor
         Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
         Dim ColorMean As cv.Scalar, colorStdev As cv.Scalar
         Static saveTrueData As New List(Of TrueText)

@@ -112,6 +112,8 @@ End Class
 
 
 Public Class GridCell_MouseDepth : Inherits TaskParent
+    Public ptCursor As New cv.Point
+    Public ptTextLoc As New cv.Point
     Public ptTopLeft As New cv.Point
     Public depthAndCorrelationText As String
     Public Sub New()
@@ -135,8 +137,10 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
                                   "m stdev " + Format(task.gcD.depthStdev, fmt1) + " ID=" +
                                   CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt3) + "m - " +
                                   Format(task.gcD.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
-        ptTopLeft = pt
-        If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptTopLeft, 2)
+        ptCursor = validatePoint(task.mouseMovePoint)
+        ptTextLoc = pt
+        ptTopLeft = task.gcD.rect.TopLeft
+        If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptCursor, 2)
     End Sub
 End Class
 
@@ -841,7 +845,7 @@ Public Class GridCell_Correlation : Inherits TaskParent
         If index < 0 Or index > task.gcList.Count Then Exit Sub
 
         Dim gc = task.gcList(index)
-        Dim pt = task.mouseD.ptTopLeft
+        Dim pt = task.mouseD.ptCursor
         Dim corr = gc.correlation
         dst2.Circle(gc.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)

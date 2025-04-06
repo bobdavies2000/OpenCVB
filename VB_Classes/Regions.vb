@@ -65,7 +65,14 @@ Public Class Region_Basics : Inherits TaskParent
             rect = vRects(index - 1)
         End If
 
-        labels(3) = ""
+        Dim gcIndex = task.gcMap.Get(Of Single)(rect.Y, rect.X)
+        If gcIndex > 0 Then
+            labels(3) = "Depth = " + Format(task.gcList(gcIndex).depth, fmt1) + "m"
+            gcIndex = task.gcMap.Get(Of Single)(rect.BottomRight.Y, rect.BottomRight.X)
+            labels(3) += " to " + Format(task.gcList(gcIndex).depth, fmt1) + "m"
+        Else
+            labels(3) = "No depth region present..."
+        End If
     End Sub
 End Class
 

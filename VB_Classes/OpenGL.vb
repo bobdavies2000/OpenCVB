@@ -2037,39 +2037,6 @@ End Class
 
 
 
-Public Class OpenGL_QuadCompare : Inherits TaskParent
-    Dim options As New Options_QuadCompare
-    Dim quadD As New OpenGL_QuadDepth
-    Dim quadC As New OpenGL_QuadConnect
-    Public Sub New()
-        task.ogl.oglFunction = oCase.quadBasics
-        desc = "Compare different representations of the point cloud"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Select Case options.displayIndex
-            Case 0
-                task.ogl.oglFunction = oCase.drawPointCloudRGB
-                task.ogl.pointCloudInput = task.pointCloud
-                task.ogl.Run(src)
-            Case 1
-                task.ogl.oglFunction = oCase.quadBasics
-                quadD.Run(src)
-                dst2 = quadD.dst2
-                dst3 = quadD.dst3
-            Case 2
-                task.ogl.oglFunction = oCase.quadBasics
-                quadC.Run(src)
-                dst2 = quadC.dst2
-                dst3 = quadC.dst3
-        End Select
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class OpenGL_PCdiff : Inherits TaskParent
@@ -2147,10 +2114,37 @@ End Class
 
 
 Public Class OpenGL_Regions : Inherits TaskParent
+    Dim options As New Options_Regions
+    Dim qDepth As New OpenGL_QuadDepth
+    Dim connect As New OpenGL_QuadConnect
+    Dim regions As New Region_Basics
     Public Sub New()
-        desc = "Display the Region_Basics output"
+        task.ogl.oglFunction = oCase.quadBasics
+        desc = "Compare different representations of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        options.Run()
+
+        Select Case options.displayIndex
+            Case 0
+                task.ogl.oglFunction = oCase.drawPointCloudRGB
+                task.ogl.pointCloudInput = task.pointCloud
+                task.ogl.Run(src)
+            Case 1
+                task.ogl.oglFunction = oCase.quadBasics
+                qDepth.Run(src)
+                dst2 = qDepth.dst2
+                dst3 = qDepth.dst3
+            Case 2
+                task.ogl.oglFunction = oCase.quadBasics
+                connect.Run(src)
+                dst2 = connect.dst2
+                dst3 = connect.dst3
+            Case 3
+                task.ogl.oglFunction = oCase.quadBasics
+                regions.Run(src)
+                dst2 = regions.dst2
+                dst3 = regions.dst3
+        End Select
     End Sub
 End Class

@@ -2135,10 +2135,10 @@ public:
 	Options_Grid() {
 	}
 };
-class Options_QuadCompare {
+class Options_Regions {
 public:
 	void Run() {}
-	Options_QuadCompare() {
+	Options_Regions() {
 	}
 };
 class Options_RGBAlign {
