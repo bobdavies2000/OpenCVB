@@ -655,7 +655,7 @@ Public Class ML_LearnRegions : Inherits TaskParent
     Dim regions As New GuidedBP_Regions
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
         desc = "Learn region from X, Y, and grayscale for the RedCloud cells."
     End Sub

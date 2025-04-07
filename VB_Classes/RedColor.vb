@@ -31,11 +31,11 @@ Public Class RedColor_Basics : Inherits TaskParent
         labels(2) = cellGen.labels(2)
 
         If task.redOptions.DisplayCellStats.Checked Then
+            If standalone And task.optionsChanged Then task.gOptions.displayDst1.Checked = True
             Static stats As New RedCell_Basics
-            task.gOptions.displayDst1.Checked = True
             stats.Run(src)
             strOut = stats.strOut
-            SetTrueText(strOut, newPoint, 1)
+            If standalone Then SetTrueText(strOut, newPoint, 1)
             dst3 = stats.dst3.Clone
 
             labels(3) = stats.labels(3)

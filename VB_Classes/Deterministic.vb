@@ -78,7 +78,7 @@ Public Class Deterministic_Histogram : Inherits TaskParent
         plothist.createHistogram = True
         task.gOptions.HistBinBar.Value = 255
         labels(2) = "Histogram bins range from 0 to 255."
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build a histogram from the differences in an attempt to answer why are the images different."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -103,8 +103,8 @@ Public Class Deterministic_BackProject : Inherits TaskParent
     Dim deter As New Deterministic_MotionMask
     Dim bProject As New BackProject_Basics
     Public Sub New()
-        task.gOptions.displayDst0.Checked = True
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         task.gOptions.CrossHairs.Checked = False
         labels(3) = "Mask of pixels that differ between original image and motion-filtered image."
         desc = "Build a histogram from the differences in an attempt to answer why are the images different."

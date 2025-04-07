@@ -121,7 +121,6 @@
     <Compile Include="DepthRegion.vb" />
     <Compile Include="Deterministic.vb" />
     <Compile Include="FCS.vb" />
-    <Compile Include="FCSLine.vb" />
     <Compile Include="Grid.vb" />
     <Compile Include="GridCell.vb" />
     <Compile Include="ImageOffset.vb" />

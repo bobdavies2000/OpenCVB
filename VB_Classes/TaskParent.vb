@@ -423,9 +423,6 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Sub fpDisplayCell()
         If task.fpList.Count = 0 Then Exit Sub
-        If task.ClickPoint.X = 0 And task.ClickPoint.Y = 0 Then
-            task.ClickPoint = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
-        End If
         Dim index As Integer = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.fpD = task.fpList(index)
         SetTrueText(CStr(task.fpD.age), task.fpD.ptCenter, 0)

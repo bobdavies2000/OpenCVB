@@ -241,7 +241,7 @@ Public Class Reduction_MotionTest : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()
         reduction.alwaysDisplay = True
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Compare reduction with and without motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

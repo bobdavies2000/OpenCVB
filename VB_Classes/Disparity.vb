@@ -7,7 +7,6 @@ Public Class Disparity_Basics : Inherits TaskParent
     Public rect As cv.Rect
     Public matchRect As cv.Rect
     Public Sub New()
-        task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         desc = "Given a grid cell, find the match in the right view image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -214,7 +213,6 @@ Public Class Disparity_Color8u : Inherits TaskParent
     Dim disparity As New Disparity_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         desc = "Measure the impact of the color8u transforms on the grid cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

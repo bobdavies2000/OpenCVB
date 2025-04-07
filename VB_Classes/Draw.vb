@@ -366,9 +366,7 @@ Public Class Draw_Line : Inherits TaskParent
     Public Sub New()
         desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If task.firstPass Then task.ClickPoint = New cv.Point
-
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If p1 <> newPoint And p2 <> New cv.Point And task.ClickPoint <> newPoint Then
             p1 = newPoint
             p2 = newPoint
@@ -383,7 +381,6 @@ Public Class Draw_Line : Inherits TaskParent
         End If
         SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
                     "P1 = " + p1.ToString + vbCrLf + "P2 = " + p2.ToString, 3)
-        task.ClickPoint = New cv.Point
     End Sub
 End Class
 

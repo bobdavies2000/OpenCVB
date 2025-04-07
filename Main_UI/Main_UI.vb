@@ -1680,6 +1680,7 @@ Public Class Main_UI
                         End If
                         task.mouseMovePoint = validatePoint(task.mouseMovePoint)
                         task.mousePicTag = mousePicTag
+                        If task.ClickPoint = New cv.Point Then task.ClickPoint = New cv.Point(task.workingRes.Width / 2, task.workingRes.Height / 2)
                         If mouseClickFlag Then
                             task.mouseClickFlag = mouseClickFlag
                             task.ClickPoint = mouseDisplayPoint

@@ -21,22 +21,12 @@ End Class
 Public Class Flood_CellStatsPlot : Inherits TaskParent
     Public Sub New()
         task.redOptions.DisplayCellStats.Checked = True
-        If standalone Then task.gOptions.displaydst1.checked = true
         task.gOptions.setHistogramBins(1000)
-        labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to RedCell_FloodFill"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
-        dst1 = task.redC.dst1
         SetTrueText(task.redC.strOut, 3)
-
-        If task.ClickPoint = newPoint Then
-            If task.rcList.Count > 1 Then
-                task.rcD = task.rcList(1)
-                task.ClickPoint = task.rcD.maxDist
-            End If
-        End If
     End Sub
 End Class
 

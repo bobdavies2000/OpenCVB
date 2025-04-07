@@ -19,8 +19,8 @@ Public Class VBtask : Implements IDisposable
 
     Public gcMap As New cv.Mat ' grid cell map
     Public fpMap As New cv.Mat ' feature map
-    Public fcsMap As New cv.Mat ' line-based feature coordinate system (FCS) map
     Public rcMap As cv.Mat ' redColor map
+
     Public gcD As gcData ' the currently selected grid cell
     Public rcD As New rcData ' the currently selected red Cell
     Public lpD As New lpData ' the currently seleccted line pair
@@ -40,7 +40,8 @@ Public Class VBtask : Implements IDisposable
     Public depthDiffMeters As Single ' grid cells > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean
 
-    Public fpListLast As New List(Of fpXData)
+    Public fpLastList As New List(Of fpXData)
+    Public fpLastMap As New cv.Mat
     Public fpIDlist As New List(Of Single)
 
     Public fpOutline As New cv.Mat
@@ -605,9 +606,8 @@ Public Class VBtask : Implements IDisposable
         trueData.Add(str)
     End Sub
     Public Sub setSelectedCell(ByRef rcList As List(Of rcData), ByRef cellMap As cv.Mat)
-        Static ptNew As New cv.Point
         If rcList.Count = 0 Then Exit Sub
-        If ClickPoint = ptNew And rcList.Count > 1 Then ClickPoint = rcList(1).maxDist
+        If ClickPoint = newPoint And rcList.Count > 1 Then ClickPoint = rcList(1).maxDist
         Dim index = cellMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
         task.rcD = rcList(index)
         If index > 0 And index < rcList.Count Then
@@ -919,7 +919,6 @@ Public Class VBtask : Implements IDisposable
                 dst3 = dst3.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
 
-
             If gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, gridMask)
 
             If gOptions.showMotionMask.Checked Then
@@ -951,15 +950,6 @@ Public Class VBtask : Implements IDisposable
 
             trueData = New List(Of TrueText)(displayObject.trueData)
             displayObject.trueData.Clear()
-            If redOptions.DisplayCellStats.Checked Then
-                If redC IsNot Nothing Then
-                    dst1.SetTo(0)
-                    For Each tt In redC.trueData
-                        trueData.Add(tt)
-                    Next
-                End If
-            End If
-
             labels = displayObject.labels
         End If
         Return saveOptionsChanged
