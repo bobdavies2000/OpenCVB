@@ -11,8 +11,6 @@ Public Class FCS_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        runFeature(src)
-
         task.fpListLast = New List(Of fpXData)(task.fpList)
         Dim lastMap = task.fpMap.Clone
         Static fpLastSrc = src.Clone
@@ -44,6 +42,7 @@ Public Class FCS_Basics : Inherits TaskParent
             fpDisplayMotion()
             fpDisplayCell()
         End If
+        fpCellContour(task.fpD, dst2)
 
         Dim matchPercent = matchCount / task.features.Count
         If task.heartBeat Then
