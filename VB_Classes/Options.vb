@@ -3957,25 +3957,6 @@ End Class
 
 
 
-Public Class Options_FeatureGather : Inherits OptionParent
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("GoodFeatures (ShiTomasi) full image")
-            radio.addRadio("GoodFeatures (ShiTomasi) grid")
-            radio.addRadio("Agast Features")
-            radio.addRadio("BRISK Features")
-            radio.addRadio("Harris Features")
-            radio.addRadio("FAST Features")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub Run()
-
-    End Sub
-End Class
-
-
 
 
 
@@ -7697,106 +7678,6 @@ End Class
 
 
 
-Public Class Options_FeaturesEx : Inherits OptionParent
-    Public templatePad As Integer = 10
-    Public templateSize As Integer = 0
-    Public correlationMin As Double = 0.75
-    Public resyncThreshold As Double = 0.95
-    Public agastThreshold As Integer = 20
-    Public useVertical As Boolean = False
-    Public useBRISK As Boolean = False
-    Public Sub New()
-        correlationMin = If(task.cols > 336, 0.8, 0.9)
-        templatePad = If(task.cols > 336, 20, 10)
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
-            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
-            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
-            sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
-            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
-        End If
-        Application.DoEvents()
-    End Sub
-    Public Sub Run()
-        Static corrSlider = FindSlider("Feature Correlation Threshold")
-        Static cellSlider = FindSlider("MatchTemplate Cell Size")
-        Static resyncSlider = FindSlider("Threshold Percent for Resync")
-        Static agastslider = FindSlider("Agast Threshold")
-        Static FASTslider = FindSlider("FAST Threshold")
-        Static vertRadio = findRadio("Vertical lines")
-        useVertical = vertRadio.checked
-        task.FASTthreshold = FASTslider.value
-
-        correlationMin = corrSlider.value / 100
-        templatePad = CInt(cellSlider.value / 2)
-        templateSize = cellSlider.value Or 1
-        resyncThreshold = resyncSlider.value / 100
-        agastThreshold = agastslider.value
-    End Sub
-End Class
-
-
-
-
-
-Public Class Options_Features : Inherits OptionParent
-    Public quality As Double = 0.01
-    Public minDistance As Double = 10
-    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
-    Public matchText As String = ""
-    Public k As Double = 0.04
-    Public blockSize As Integer = 3
-    Public featurePoints As Integer = 400
-
-    Dim optionsEx As New Options_FeaturesEx
-    Public templatePad As Integer = 10
-    Public templateSize As Integer = 0
-    Public correlationMin As Double = 0.75
-    Public resyncThreshold As Double = 0.95
-    Public agastThreshold As Integer = 20
-    Public useVertical As Boolean = False
-    Public useBRISK As Boolean = False
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Vertical lines")
-            radio.addRadio("Horizontal lines")
-            radio.check(0).Checked = True
-        End If
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
-            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
-            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
-            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
-        End If
-    End Sub
-    Public Sub Run()
-        optionsEx.Run()
-        templatePad = optionsEx.templatePad
-        templateSize = optionsEx.templateSize
-        correlationMin = optionsEx.correlationMin
-        resyncThreshold = optionsEx.resyncThreshold
-        agastThreshold = optionsEx.agastThreshold
-        useVertical = optionsEx.useVertical
-        useBRISK = optionsEx.useBRISK
-
-        Static qualitySlider = FindSlider("Quality Level")
-        Static distSlider = FindSlider("Min Distance to next")
-        Static kSlider = FindSlider("k X1000")
-        Static featureSlider = FindSlider("Feature Sample Size")
-        Static vertRadio = findRadio("Vertical lines")
-        useVertical = vertRadio.checked
-        k = kSlider.value / 1000
-
-        featurePoints = featureSlider.value
-        quality = qualitySlider.Value / 100
-        minDistance = distSlider.Value
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Options_Grid : Inherits OptionParent
@@ -8150,5 +8031,143 @@ Public Class Options_GridCells : Inherits OptionParent
         disparityThreshold = shiftSlider.value
         colorDifferenceThreshold = diffSlider.value
         correlationThreshold = corrSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_FeaturesEx : Inherits OptionParent
+    Public templatePad As Integer = 10
+    Public templateSize As Integer = 0
+    Public correlationMin As Double = 0.75
+    Public resyncThreshold As Double = 0.95
+    Public agastThreshold As Integer = 20
+    Public useVertical As Boolean = False
+    Public useBRISK As Boolean = False
+    Public Sub New()
+        correlationMin = If(task.cols > 336, 0.8, 0.9)
+        templatePad = If(task.cols > 336, 20, 10)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
+            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
+            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
+            sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
+            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
+        End If
+        Application.DoEvents()
+    End Sub
+    Public Sub Run()
+        Static corrSlider = FindSlider("Feature Correlation Threshold")
+        Static cellSlider = FindSlider("MatchTemplate Cell Size")
+        Static resyncSlider = FindSlider("Threshold Percent for Resync")
+        Static agastslider = FindSlider("Agast Threshold")
+        Static FASTslider = FindSlider("FAST Threshold")
+        Static vertRadio = findRadio("Vertical lines")
+        useVertical = vertRadio.checked
+        task.FASTthreshold = FASTslider.value
+
+        correlationMin = corrSlider.value / 100
+        templatePad = CInt(cellSlider.value / 2)
+        templateSize = cellSlider.value Or 1
+        resyncThreshold = resyncSlider.value / 100
+        agastThreshold = agastslider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Features : Inherits OptionParent
+    Public quality As Double = 0.01
+    Public minDistance As Double = 25
+    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
+    Public matchText As String = ""
+    Public k As Double = 0.04
+    Public blockSize As Integer = 3
+    Public featurePoints As Integer = 400
+    Public featureSource As Integer
+
+    Dim options As New Options_FeaturesEx
+    Dim optionsEx As New Options_FeatureGather
+
+    Public templatePad As Integer = 10
+    Public templateSize As Integer = 0
+    Public correlationMin As Double = 0.75
+    Public resyncThreshold As Double = 0.95
+    Public agastThreshold As Integer = 20
+    Public useVertical As Boolean = False
+    Public useBRISK As Boolean = False
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Vertical lines")
+            radio.addRadio("Horizontal lines")
+            radio.check(0).Checked = True
+        End If
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
+            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
+            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
+            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
+        End If
+    End Sub
+    Public Sub Run()
+        options.Run()
+        optionsEx.Run()
+        featureSource = optionsEx.featureSource
+
+        templatePad = options.templatePad
+        templateSize = options.templateSize
+        correlationMin = options.correlationMin
+        resyncThreshold = options.resyncThreshold
+        agastThreshold = options.agastThreshold
+        useVertical = options.useVertical
+        useBRISK = options.useBRISK
+
+        Static qualitySlider = FindSlider("Quality Level")
+        Static distSlider = FindSlider("Min Distance to next")
+        Static kSlider = FindSlider("k X1000")
+        Static featureSlider = FindSlider("Feature Sample Size")
+        Static vertRadio = findRadio("Vertical lines")
+        useVertical = vertRadio.checked
+        k = kSlider.value / 1000
+
+        featurePoints = featureSlider.value
+        quality = qualitySlider.Value / 100
+        minDistance = distSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_FeatureGather : Inherits OptionParent
+    Public featureSource As Integer
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("GoodFeatures (ShiTomasi) full image")
+            radio.addRadio("GoodFeatures (ShiTomasi) grid")
+            radio.addRadio("Agast Features")
+            radio.addRadio("BRISK Features")
+            radio.addRadio("Harris Features")
+            radio.addRadio("FAST Features")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub Run()
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                featureSource = Choose(i + 1, FeatureSrc.GoodFeaturesFull, FeatureSrc.GoodFeaturesGrid,
+                                              FeatureSrc.Agast, FeatureSrc.BRISK, FeatureSrc.Harris,
+                                              FeatureSrc.FAST)
+                Exit For
+            End If
+        Next
     End Sub
 End Class

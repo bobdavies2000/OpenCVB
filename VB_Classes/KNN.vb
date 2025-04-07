@@ -724,71 +724,6 @@ End Class
 
 
 
-Public Class KNN_MinDistance : Inherits TaskParent
-    Dim knn As New KNN_Basics
-    Public inputPoints As New List(Of cv.Point2f)
-    Public outputPoints2f As New List(Of cv.Point2f)
-    Public outputPoints As New List(Of cv.Point)
-    Dim options As New Options_FeatureGather
-    Public Sub New()
-        If standalone Then optiBase.findRadio("Agast Features").Checked = True
-        desc = "Enforce a minimum distance to the next feature threshold"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        If standalone Then
-            runFeature(src)
-            inputPoints = task.features
-        End If
-
-        Static minSlider = optiBase.FindSlider("Min Distance to next")
-        Dim minDistance = minSlider.value
-
-        knn.queries = New List(Of cv.Point2f)(inputPoints)
-        knn.trainInput = knn.queries
-        knn.Run(src)
-
-        dst3.SetTo(0)
-        For Each pt In inputPoints
-            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.White)
-        Next
-        labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
-
-        Dim tooClose As New List(Of (cv.Point2f, cv.Point2f))
-        For i = 0 To knn.result.GetUpperBound(0)
-            For j = 1 To knn.result.GetUpperBound(1)
-                Dim p1 = knn.queries(knn.result(i, j))
-                Dim p2 = knn.queries(knn.result(i, j - 1))
-                If p1.DistanceTo(p2) > minDistance Then Exit For
-                If tooClose.Contains((p2, p1)) = False Then tooClose.Add((p1, p2))
-            Next
-        Next
-
-        For Each tuple In tooClose
-            Dim p1 = tuple.Item1
-            Dim p2 = tuple.Item2
-            Dim pt = If(p1.X <= p2.X, p1, p2)  ' trim the point with lower x to avoid flickering...
-            If p1.X = p2.X Then pt = If(p1.Y <= p2.Y, p1, p2)
-            If knn.queries.Contains(pt) Then knn.queries.RemoveAt(knn.queries.IndexOf(pt))
-        Next
-
-        dst2 = src
-        outputPoints.Clear()
-        outputPoints2f.Clear()
-        For Each pt In knn.queries
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
-            outputPoints.Add(pt)
-            outputPoints2f.Add(pt)
-        Next
-        labels(2) = "After filtering for min distance = " + CStr(minDistance) + " there are " +
-                    CStr(knn.queries.Count) + " points"
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -1111,7 +1046,7 @@ Public Class KNN_OneToOne : Inherits TaskParent
         labels(2) = "KNN_OneToOne output with just the closest match.  Red = training data, yellow = queries."
         desc = "Map points 1:1 with neighbor.  Keep only the nearest."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 random.Run(src)
@@ -1184,5 +1119,67 @@ Public Class KNN_OneToOne : Inherits TaskParent
             End If
         Next
         If standaloneTest() = False Then knn.trainInput = New List(Of cv.Point2f)(queries)
+    End Sub
+End Class
+
+
+
+
+Public Class KNN_MinDistance : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Public inputPoints As New List(Of cv.Point2f)
+    Public outputPoints2f As New List(Of cv.Point2f)
+    Public outputPoints As New List(Of cv.Point)
+    Dim options As New Options_Features
+    Public Sub New()
+        If standalone Then optiBase.findRadio("Agast Features").Checked = True
+        desc = "Enforce a minimum distance to the next feature threshold"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If standalone Then
+            runFeature(src)
+            inputPoints = task.features
+        End If
+
+        knn.queries = New List(Of cv.Point2f)(inputPoints)
+        knn.trainInput = knn.queries
+        knn.Run(src)
+
+        dst3.SetTo(0)
+        For Each pt In inputPoints
+            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.White)
+        Next
+        labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
+
+        Dim tooClose As New List(Of (cv.Point2f, cv.Point2f))
+        For i = 0 To knn.result.GetUpperBound(0)
+            For j = 1 To knn.result.GetUpperBound(1)
+                Dim p1 = knn.queries(knn.result(i, j))
+                Dim p2 = knn.queries(knn.result(i, j - 1))
+                If p1.DistanceTo(p2) > options.minDistance Then Exit For
+                If tooClose.Contains((p2, p1)) = False Then tooClose.Add((p1, p2))
+            Next
+        Next
+
+        For Each tuple In tooClose
+            Dim p1 = tuple.Item1
+            Dim p2 = tuple.Item2
+            Dim pt = If(p1.X <= p2.X, p1, p2)  ' trim the point with lower x to avoid flickering...
+            If p1.X = p2.X Then pt = If(p1.Y <= p2.Y, p1, p2)
+            If knn.queries.Contains(pt) Then knn.queries.RemoveAt(knn.queries.IndexOf(pt))
+        Next
+
+        dst2 = src
+        outputPoints.Clear()
+        outputPoints2f.Clear()
+        For Each pt In knn.queries
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
+            outputPoints.Add(pt)
+            outputPoints2f.Add(pt)
+        Next
+        labels(2) = "After filtering for min distance = " + CStr(options.minDistance) + " there are " +
+                    CStr(knn.queries.Count) + " points"
     End Sub
 End Class

@@ -1,15 +1,11 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes.OptionParent
-Imports OpenCvSharp
-Imports System.Windows.Documents
 Public Class Feature_Basics : Inherits TaskParent
     Dim harris As Corners_HarrisDetector_CPP
     Dim FAST As Corners_Basics
-    Dim featureMethod As New Options_FeatureGather
     Dim brisk As BRISK_Basics
     Public options As New Options_Features
-    Dim methodList As New List(Of Integer)({})
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U mask with all the features present."
@@ -17,17 +13,6 @@ Public Class Feature_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        featureMethod.Run()
-        Static frm = optiBase.FindFrm("Options_FeatureGather Radio Buttons")
-        Dim featureSource As Integer
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).Checked Then
-                featureSource = Choose(i + 1, FeatureSrc.GoodFeaturesFull, FeatureSrc.GoodFeaturesGrid,
-                                              FeatureSrc.Agast, FeatureSrc.BRISK, FeatureSrc.Harris,
-                                              FeatureSrc.FAST)
-                Exit For
-            End If
-        Next
 
         Dim features As New List(Of cv.Point2f)
         Dim ptNew As New List(Of cv.Point2f)
@@ -36,7 +21,7 @@ Public Class Feature_Basics : Inherits TaskParent
             If val = 0 Then ptNew.Add(pt)
         Next
 
-        Select Case featureSource
+        Select Case options.featureSource
             Case FeatureSrc.GoodFeaturesFull
                 features = cv.Cv2.GoodFeaturesToTrack(task.gray, options.featurePoints, options.quality,
                                                       options.minDistance, New cv.Mat,

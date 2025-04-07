@@ -594,75 +594,6 @@ End Class
 
 
 
-Public Class FCS_Info : Inherits TaskParent
-    Public fpSelection As fpXData
-    Public Sub New()
-        desc = "Display the contents of the Feature Coordinate System (FCS) cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
-        Dim fp = fpSelection
-        If fp Is Nothing Then fp = task.fpSelected
-        If task.fpList.Count = 0 Then
-            SetTrueText("FCS_Info can be called in any algorithm that has setup the task.fplist" + vbCrLf +
-                        "It does not appear that task.fpList has any contents so no results to show.")
-            Exit Sub
-        Else
-            If fp Is Nothing Then fp = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
-        End If
-
-        strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
-        strOut += "Travel distance: " + Format(fp.travelDistance, fmt1) + vbCrLf
-        strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
-        strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
-        strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
-        strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf + "indexLast = " + CStr(fp.indexLast) + vbCrLf
-        strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
-        strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
-        Dim vec = task.pointCloud.Get(Of cv.Point3f)(fp.pt.Y, fp.pt.X)
-        strOut += "Pointcloud at fp.pt: " + Format(vec.X, fmt1) + "/" +
-                                            Format(vec.Y, fmt1) + "/" +
-                                            Format(vec.Z, fmt1) + vbCrLf
-        strOut += "Depth min/mean/max: " + Format(fp.depthMin, fmt1) + "/" + Format(fp.depthMean, fmt1) + "/" +
-                                           Format(fp.depthMax, fmt1) + vbCrLf
-        strOut += vbCrLf
-        strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
-        For i = 0 To fp.facets.Count - 1
-            strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
-        Next
-
-        If standalone Then
-            SetTrueText("Select a feature grid cell to get more information.", 2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class FCS_InfoTest : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Dim info As New FCS_Info
-    Public Sub New()
-        desc = "Invoke FCS_Basics and display the contents of the selected feature point cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-
-        info.Run(src)
-        SetTrueText(info.strOut, 3)
-
-        fpDisplayCell()
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class FCS_ByDepth : Inherits TaskParent
     Dim plot As New Plot_Histogram
@@ -1002,5 +933,75 @@ Public Class FCS_RedCloud1 : Inherits TaskParent
             Dim val = dst2.Get(Of cv.Vec3b)(fp.ptCenter.Y, fp.ptCenter.X)
             dst3(fp.rect).SetTo(val, fp.mask)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_Info : Inherits TaskParent
+    Public fpSelection As fpXData
+    Public Sub New()
+        desc = "Display the contents of the Feature Coordinate System (FCS) cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then runFeature(src)
+        Dim fp = fpSelection
+        If fp Is Nothing Then fp = task.fpSelected
+        If task.fpList.Count = 0 Then
+            SetTrueText("FCS_Info can be called in any algorithm that has setup the task.fplist" + vbCrLf +
+                        "It does not appear that task.fpList has any contents so no results to show.")
+            Exit Sub
+        Else
+            If fp Is Nothing Then fp = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
+        End If
+
+        strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
+        strOut += "Travel distance: " + Format(fp.travelDistance, fmt1) + vbCrLf
+        strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
+        strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
+        strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
+        strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf + "indexLast = " + CStr(fp.indexLast) + vbCrLf
+        strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
+        strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
+        Dim vec = task.pointCloud.Get(Of cv.Point3f)(fp.pt.Y, fp.pt.X)
+        strOut += "Pointcloud at fp.pt: " + Format(vec.X, fmt1) + "/" +
+                                            Format(vec.Y, fmt1) + "/" +
+                                            Format(vec.Z, fmt1) + vbCrLf
+        strOut += "Depth min/mean/max: " + Format(fp.depthMin, fmt1) + "/" + Format(fp.depthMean, fmt1) + "/" +
+                                           Format(fp.depthMax, fmt1) + vbCrLf
+        strOut += vbCrLf
+        strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
+        For i = 0 To fp.facets.Count - 1
+            strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
+        Next
+
+        If standalone Then
+            SetTrueText("Select a feature grid cell to get more information.", 2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_InfoTest : Inherits TaskParent
+    Dim fcs As New FCS_Basics
+    Dim info As New FCS_Info
+    Public Sub New()
+        desc = "Invoke FCS_Basics and display the contents of the selected feature point cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fcs.Run(src)
+        dst2 = fcs.dst2
+
+        info.Run(src)
+        SetTrueText(info.strOut, 3)
+
+        fpDisplayCell()
     End Sub
 End Class
