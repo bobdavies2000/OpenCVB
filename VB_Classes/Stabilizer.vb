@@ -88,7 +88,7 @@ End Class
 
 
 Public Class Stabilizer_BasicsRandomInput : Inherits TaskParent
-    Dim options As New Options_StabilizerOther
+    Dim options As New Options_Corners
     Dim lastShiftX As Integer
     Dim lastShiftY As Integer
 
@@ -334,7 +334,6 @@ Public Class Stabilizer_CornerPoints : Inherits TaskParent
     Public features As New List(Of cv.Point2f)
     Dim ul As cv.Rect, ur As cv.Rect, ll As cv.Rect, lr As cv.Rect
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
         desc = "Track the FAST feature points found in the corners of the BGR image."
     End Sub
     Private Sub getKeyPoints(src As cv.Mat, r As cv.Rect)

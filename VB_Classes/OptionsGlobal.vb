@@ -131,6 +131,8 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 10
         End Select
 
+        task.FASTthreshold = 100
+
         task.depthThresholdPercent = 0.01
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize

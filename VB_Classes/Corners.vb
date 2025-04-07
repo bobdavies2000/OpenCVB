@@ -3,18 +3,16 @@ Imports System.Runtime.InteropServices
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class Corners_Basics : Inherits TaskParent
     Public features As New List(Of cv.Point2f)
-    Dim options As New Options_Features
-    Dim optionCorner As New Options_Corners
+    Dim options As New Options_Corners
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U)
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        optionCorner.Run()
         options.Run()
 
         dst2 = src.Clone
-        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, task.FASTthreshold, optionCorner.useNonMax)
+        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, task.FASTthreshold, options.useNonMax)
 
         features.Clear()
         For Each kp As cv.KeyPoint In kpoints

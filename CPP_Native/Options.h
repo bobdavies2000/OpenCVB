@@ -1199,13 +1199,6 @@ public:
 	Options_Convex() {
 	}
 };
-class Options_Corners {
-public:
-	bool useNonMax = true;
-	void Run() {}
-	Options_Corners() {
-	}
-};
 class Options_PreCorners {
 public:
 	int kernelSize =  19;
@@ -1784,14 +1777,6 @@ public:
 	Options_SLRImages() {
 	}
 };
-class Options_StabilizerOther {
-public:
-	int fastThreshold =  0;
-	int range =  8;
-	void Run() {}
-	Options_StabilizerOther() {
-	}
-};
 class Options_Stabilizer {
 public:
 	double lostMax =  0.1;
@@ -2227,6 +2212,14 @@ public:
 	bool useBRISK = false;
 	void Run() {}
 	Options_Features() {
+	}
+};
+class Options_Corners {
+public:
+	bool useNonMax = true;
+	int range =  8;
+	void Run() {}
+	Options_Corners() {
 	}
 };
 class Options_FeatureGather {

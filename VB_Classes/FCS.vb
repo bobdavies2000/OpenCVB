@@ -42,9 +42,10 @@ Public Class FCS_Basics : Inherits TaskParent
         End If
 
         Dim index As Integer = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        task.fpD = task.fpList(index)
-        DrawContour(dst2, task.fpD.facets, white, task.lineWidth)
-
+        If index < task.fpList.Count Then
+            task.fpD = task.fpList(index)
+            DrawContour(dst2, task.fpD.facets, white, task.lineWidth)
+        End If
         Dim matchPercent = matchCount / task.features.Count
         labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
         If task.heartBeat Then

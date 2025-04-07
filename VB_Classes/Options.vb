@@ -4788,24 +4788,6 @@ End Class
 
 
 
-
-
-
-Public Class Options_Corners : Inherits OptionParent
-    Public useNonMax As Boolean = True
-    Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Use Non-Max = True")
-            check.Box(0).Checked = True
-        End If
-    End Sub
-    Public Sub Run()
-        Static nonMaxCheck = FindCheckBox("Use Non-Max = True")
-        useNonMax = nonMaxCheck.checked
-    End Sub
-End Class
-
-
 Public Class Options_PreCorners : Inherits OptionParent
     Public kernelSize As Integer = 19
     Public subpixSize As Integer = 3
@@ -6637,28 +6619,6 @@ End Class
 
 
 
-Public Class Options_StabilizerOther : Inherits OptionParent
-    Public fastThreshold As Integer = 0
-    Public range As Integer = 8
-    Public Sub New()
-        fastThreshold = task.FASTthreshold
-        If (sliders.Setup(traceName)) Then
-            sliders.setupTrackBar("FAST Threshold", 0, 200, fastThreshold)
-            sliders.setupTrackBar("Range of random motion introduced (absolute value in pixels)", 0, 30, fastThreshold)
-        End If
-    End Sub
-    Public Sub Run()
-        Static thresholdSlider = FindSlider("FAST Threshold")
-        Static rangeSlider = FindSlider("Range of random motion introduced (absolute value in pixels)")
-        range = rangeSlider.Value
-        fastThreshold = thresholdSlider.value
-    End Sub
-End Class
-
-
-
-
-
 Public Class Options_Stabilizer : Inherits OptionParent
     Public lostMax As Double = 0.1
     Public width As Integer = 128
@@ -8054,7 +8014,7 @@ Public Class Options_FeaturesEx : Inherits OptionParent
             sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
             sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
             sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
-            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
+            sliders.setupTrackBar("FAST Threshold", 0, 200, 100)
         End If
         Application.DoEvents()
     End Sub
@@ -8138,6 +8098,31 @@ Public Class Options_Features : Inherits OptionParent
         featurePoints = featureSlider.value
         quality = qualitySlider.Value / 100
         minDistance = distSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Corners : Inherits OptionParent
+    Public useNonMax As Boolean = True
+    Public range As Integer = 8
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Use Non-Max = True")
+            check.Box(0).Checked = True
+        End If
+        If (sliders.Setup(traceName)) Then
+            sliders.setupTrackBar("Range of random motion introduced (absolute value in pixels)", 0, 30, range)
+        End If
+    End Sub
+    Public Sub Run()
+        Static nonMaxCheck = FindCheckBox("Use Non-Max = True")
+        Static rangeSlider = FindSlider("Range of random motion introduced (absolute value in pixels)")
+        range = rangeSlider.Value
+        useNonMax = nonMaxCheck.checked
     End Sub
 End Class
 
