@@ -834,7 +834,7 @@ Public Class KNN_MaxDistance : Inherits TaskParent
                 For Each pair In pairList
                     Dim p1 = pair.Item1
                     Dim p2 = pair.Item2
-                    Dim val = task.fpMap.Get(Of Integer)(p1.Y, p1.X)
+                    Dim val = task.fpMap.Get(Of Single)(p1.Y, p1.X)
                     Dim fp = task.fpList(val)
                     Dim index = inputIDs.IndexOf(fp.ID)
                     If index >= 0 Then

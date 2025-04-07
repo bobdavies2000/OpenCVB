@@ -546,7 +546,7 @@ End Class
 
 
 
-Public Class fpXData ' feature point -  excessive - trim this to fpData...
+Public Class fpXData ' feature point -  excessive - trim this to fcsData...
     Public index As Integer
     Public indexLast As Integer = -1
     Public age As Integer

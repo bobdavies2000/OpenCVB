@@ -24,6 +24,7 @@ Public Class VBtask : Implements IDisposable
     Public gcD As gcData ' the currently selected grid cell
     Public rcD As New rcData ' the currently selected red Cell
     Public lpD As New lpData ' the currently seleccted line pair
+    Public fpD As New fpXData ' the currently seleccted feature point.
 
     Public cellSize As Integer
     Public tilesPerCol As Integer
@@ -43,7 +44,6 @@ Public Class VBtask : Implements IDisposable
     Public fpIDlist As New List(Of Single)
 
     Public fpOutline As New cv.Mat
-    Public fpSelected As fpXData
     Public fpMotion As cv.Point2f
 
     Public topFeatures As New List(Of cv.Point2f)
@@ -544,6 +544,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
+        feat = New Feature_Basics
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
@@ -823,6 +824,7 @@ Public Class VBtask : Implements IDisposable
 
         motionBasics.Run(src)
         gCell.Run(src)
+        feat.Run(src)
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 

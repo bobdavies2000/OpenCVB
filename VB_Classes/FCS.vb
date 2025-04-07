@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
-    Dim delaunay As New FCS_Delaunay
+    Dim fcsCreate As New FCS_Create
     Dim match As New Match_Basics
     Dim options As New Options_MatchCorrelation
     Public Sub New()
@@ -17,13 +17,13 @@ Public Class FCS_Basics : Inherits TaskParent
         Dim lastMap = task.fpMap.Clone
         Static fpLastSrc = src.Clone
 
-        delaunay.Run(src)
+        fcsCreate.Run(src)
 
         Dim matchCount As Integer
         If task.firstPass = False Then
             For i = 0 To task.fpList.Count - 1
                 Dim fp = task.fpList(i)
-                Dim indexLast = lastMap.Get(Of Integer)(fp.ptCenter.Y, fp.ptCenter.X)
+                Dim indexLast = lastMap.Get(Of Single)(fp.ptCenter.Y, fp.ptCenter.X)
                 Dim fpLast = task.fpListLast(indexLast)
                 ' is this the same point?
                 match.template = fpLastSrc(fpLast.rect)
@@ -298,7 +298,7 @@ Public Class FCS_Periphery : Inherits TaskParent
             End If
         Next
         fpDisplayCell()
-        dst3.Rectangle(task.fpSelected.rect, task.highlight, task.lineWidth)
+        dst3.Rectangle(task.fpD.rect, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -371,7 +371,7 @@ Public Class FCS_Neighbors : Inherits TaskParent
                                                New cv.Point(pt.X + 1, pt.Y + 1))
                     If ptNabe.x >= 0 And ptNabe.x < dst2.Width And
                        ptNabe.y >= 0 And ptNabe.y < dst2.Height Then
-                        index = task.fpMap.Get(Of Integer)(ptNabe.y, ptNabe.x)
+                        index = CInt(task.fpMap.Get(Of Single)(ptNabe.y, ptNabe.x))
                     End If
                     If fp.nabeList.Contains(index) = False Then
                         fp.nabeList.Add(index)
@@ -396,7 +396,7 @@ Public Class FCS_Neighbors : Inherits TaskParent
         buildNeighbors()
 
         dst3.SetTo(0)
-        Dim fp = task.fpSelected
+        Dim fp = task.fpD
         If fp IsNot Nothing Then
             For Each index In fp.nabeList
                 Dim nabe = task.fpList(index)
@@ -404,7 +404,7 @@ Public Class FCS_Neighbors : Inherits TaskParent
                 Dim color = New cv.Scalar(vec.Item0, vec.Item1, vec.Item2)
                 dst3(nabe.rect).SetTo(color, nabe.mask)
             Next
-            fpCellContour(task.fpSelected, dst3)
+            fpCellContour(task.fpD, dst3)
             fpDisplayCell()
         End If
     End Sub
@@ -468,16 +468,15 @@ End Class
 
 
 
-Public Class FCS_Delaunay : Inherits TaskParent
+Public Class FCS_Create : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
-        task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
-
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
@@ -698,7 +697,7 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
 
         Static fpSave As fpXData
         If task.firstPass Or task.mouseClickFlag Then
-            fpSave = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
+            fpSave = task.fpList(task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X))
         End If
 
         info.Run(src)
@@ -722,17 +721,17 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
         knn.Run(src)
 
         fpDisplayCell()
-        fpCellContour(task.fpSelected, dst2)
+        fpCellContour(task.fpD, dst2)
         For i = 0 To 10
             Dim fp = task.fpList(knn.result(0, i))
             fpCellContour(fp, task.color, 1)
             SetTrueText(CStr(i), fp.ptCenter, 3)
         Next
 
-        info.fpSelection = task.fpList(knn.result(0, 0))
+        task.fpD = task.fpList(knn.result(0, 0))
         info.Run(src)
         SetTrueText(info.strOut, 3)
-        task.ClickPoint = info.fpSelection.ptCenter
+        task.ClickPoint = task.fpD.ptCenter
     End Sub
 End Class
 
@@ -768,7 +767,7 @@ Public Class FCS_Tracker : Inherits TaskParent
             colors.Add(fp.colorTracking)
         Next
 
-        task.ClickPoint = task.fpSelected.ptCenter
+        task.ClickPoint = task.fpD.ptCenter
     End Sub
 End Class
 
@@ -942,22 +941,18 @@ End Class
 
 
 Public Class FCS_Info : Inherits TaskParent
-    Public fpSelection As fpXData
     Public Sub New()
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then runFeature(src)
-        Dim fp = fpSelection
-        If fp Is Nothing Then fp = task.fpSelected
-        If task.fpList.Count = 0 Then
-            SetTrueText("FCS_Info can be called in any algorithm that has setup the task.fplist" + vbCrLf +
-                        "It does not appear that task.fpList has any contents so no results to show.")
-            Exit Sub
-        Else
-            If fp Is Nothing Then fp = task.fpList(task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X))
+        If standalone Then
+            If task.fpList.Count = 0 Then Exit Sub
+            dst2 = task.feat.fcsCreate.dst2
+            Dim index = task.fcsMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.fpD = task.fpList(index)
         End If
 
+        Dim fp = task.fpD
         strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
         strOut += "Travel distance: " + Format(fp.travelDistance, fmt1) + vbCrLf
         strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
@@ -978,9 +973,7 @@ Public Class FCS_Info : Inherits TaskParent
             strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
         Next
 
-        If standalone Then
-            SetTrueText("Select a feature grid cell to get more information.", 2)
-        End If
+        If standalone Then SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -1003,5 +996,27 @@ Public Class FCS_InfoTest : Inherits TaskParent
         SetTrueText(info.strOut, 3)
 
         fpDisplayCell()
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_CompareFPMap : Inherits TaskParent
+    Public Sub New()
+        labels = {"", "", "fpMap", "fcsMap"}
+        desc = "just comparing fcs map and fp map."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim mm = GetMinMax(task.fpMap)
+        task.fpMap.ConvertTo(dst0, cv.MatType.CV_8U)
+        dst2 = ShowPalette(dst0 * 255 / mm.maxVal)
+        dst0 = task.fpMap
+
+        mm = GetMinMax(task.fcsMap)
+        task.fcsMap.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3 = ShowPalette(dst1 * 255 / mm.maxVal)
+        dst1 = task.fcsMap
     End Sub
 End Class

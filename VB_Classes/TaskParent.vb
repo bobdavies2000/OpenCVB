@@ -426,10 +426,10 @@ Public Class TaskParent : Implements IDisposable
         If task.ClickPoint.X = 0 And task.ClickPoint.Y = 0 Then
             task.ClickPoint = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
         End If
-        Dim index As Integer = task.fpMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        task.fpSelected = task.fpList(index)
-        SetTrueText(CStr(task.fpSelected.age), task.fpSelected.ptCenter, 0)
-        fpCellContour(task.fpSelected, task.color)
+        Dim index As Integer = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        task.fpD = task.fpList(index)
+        SetTrueText(CStr(task.fpD.age), task.fpD.ptCenter, 0)
+        fpCellContour(task.fpD, task.color)
     End Sub
     Public Sub fpDisplayMotion()
         dst1.SetTo(0)
@@ -629,8 +629,6 @@ Public Class TaskParent : Implements IDisposable
         task.redC.Run(src)
     End Sub
     Public Function runFeature(src As cv.Mat) As cv.Mat
-        If task.feat Is Nothing Then task.feat = New Feature_Basics
-        task.feat.Run(src)
         Return task.feat.dst2
     End Function
     Public Function runFeature(src As cv.Mat, ByRef labels As String) As cv.Mat

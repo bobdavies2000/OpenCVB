@@ -5,6 +5,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Dim harris As Corners_HarrisDetector_CPP
     Dim FAST As Corners_Basics
     Dim brisk As BRISK_Basics
+    Public fcsCreate As New FCS_Create
     Public options As New Options_Features
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -104,6 +105,8 @@ Public Class Feature_Basics : Inherits TaskParent
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         End If
+
+        fcsCreate.Run(src) ' convert the features to fplist.
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
