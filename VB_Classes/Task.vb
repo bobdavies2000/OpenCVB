@@ -267,6 +267,7 @@ Public Class VBtask : Implements IDisposable
     Public fpsCamera As Integer
     Public densityMetric As Integer ' how dense is the pointcloud in z - heuristic.
     Public FASTthreshold As Integer
+    Public minDistance As Integer ' minimum distance between features
 
     Public externalPythonInvocation As Boolean
     Public useRecordedData As Boolean
@@ -687,6 +688,7 @@ Public Class VBtask : Implements IDisposable
         redOptions.Sync()
 
         Dim src = color
+        task.gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If src.Size <> New cv.Size(dst2.Cols, dst2.Rows) Then dst2 = dst2.Resize(src.Size)
         If src.Size <> New cv.Size(dst3.Cols, dst3.Rows) Then dst3 = dst3.Resize(src.Size)
@@ -828,7 +830,6 @@ Public Class VBtask : Implements IDisposable
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
-        gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
         task.colorizer.Run(src)

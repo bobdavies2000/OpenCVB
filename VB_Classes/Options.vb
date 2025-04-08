@@ -8106,7 +8106,7 @@ End Class
 
 
 
-Public Class Options_Corners : Inherits OptionParent
+Public Class Options_FAST : Inherits OptionParent
     Public useNonMax As Boolean = True
     Public range As Integer = 8
     Public Sub New()
@@ -8114,7 +8114,7 @@ Public Class Options_Corners : Inherits OptionParent
             check.addCheckBox("Use Non-Max = True")
             check.Box(0).Checked = True
         End If
-        If (sliders.Setup(traceName)) Then
+        If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Range of random motion introduced (absolute value in pixels)", 0, 30, range)
         End If
     End Sub

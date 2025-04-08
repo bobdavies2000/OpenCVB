@@ -77,6 +77,7 @@ Public Class OptionsGlobal
                 task.DotSize = 4
                 task.disparityAdjustment = 1.1
                 task.densityMetric = 40
+                task.minDistance = 25
                 task.FASTthreshold = 25
             Case 960
                 task.cvFontSize = 2.0
@@ -84,11 +85,13 @@ Public Class OptionsGlobal
                 task.DotSize = 2
                 task.disparityAdjustment = 2.2
                 task.densityMetric = 200
+                task.minDistance = 25
                 task.FASTthreshold = 40
             Case 480
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
                 task.densityMetric = 650
+                task.minDistance = 25
                 task.FASTthreshold = 10
             Case 1280
                 task.cvFontSize = 2.5
@@ -96,42 +99,47 @@ Public Class OptionsGlobal
                 task.DotSize = 5
                 task.disparityAdjustment = 2.2
                 task.densityMetric = 150
+                task.minDistance = 25
                 task.FASTthreshold = 40
             Case 640
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
                 task.densityMetric = 200
+                task.minDistance = 25
                 task.FASTthreshold = 30
             Case 320
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
                 task.densityMetric = 500
+                task.minDistance = 25
                 task.FASTthreshold = 10
             Case 160
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
                 task.densityMetric = 100
+                task.minDistance = 25
                 task.FASTthreshold = 10
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 1
                 task.disparityAdjustment = 4.4
                 task.densityMetric = 300
+                task.minDistance = 25
                 task.FASTthreshold = 10
             Case 336
                 task.cvFontSize = 1.0
                 task.DotSize = 1
                 task.disparityAdjustment = 8.8
+                task.minDistance = 25
                 task.FASTthreshold = 10
             Case 168
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
                 task.densityMetric = 1700
+                task.minDistance = 10
                 task.FASTthreshold = 10
         End Select
-
-        task.FASTthreshold = 100
 
         task.depthThresholdPercent = 0.01
         task.gOptions.DotSizeSlider.Value = task.DotSize

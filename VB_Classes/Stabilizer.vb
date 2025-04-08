@@ -88,7 +88,7 @@ End Class
 
 
 Public Class Stabilizer_BasicsRandomInput : Inherits TaskParent
-    Dim options As New Options_Corners
+    Dim options As New Options_FAST
     Dim lastShiftX As Integer
     Dim lastShiftY As Integer
 

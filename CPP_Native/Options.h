@@ -2214,12 +2214,12 @@ public:
 	Options_Features() {
 	}
 };
-class Options_Corners {
+class Options_FAST {
 public:
 	bool useNonMax = true;
 	int range =  8;
 	void Run() {}
-	Options_Corners() {
+	Options_FAST() {
 	}
 };
 class Options_FeatureGather {

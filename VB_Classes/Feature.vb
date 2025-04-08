@@ -24,16 +24,10 @@ Public Class Feature_Basics : Inherits TaskParent
 
         Select Case options.featureSource
             Case FeatureSrc.GoodFeaturesFull
-                If task.firstPass Then ' goodFeatures returns nothing on the first pass so build a fake list of points so things work...
-                    For Each r In task.gridRects
-                        features.Add(r.TopLeft)
-                    Next
-                Else
-                    features = cv.Cv2.GoodFeaturesToTrack(task.gray, options.featurePoints, options.quality,
-                                                          options.minDistance, New cv.Mat,
-                                                          options.blockSize, True, options.k).ToList
-                    labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-                End If
+                features = cv.Cv2.GoodFeaturesToTrack(task.gray, options.featurePoints, options.quality,
+                                                      options.minDistance, New cv.Mat,
+                                                      options.blockSize, True, options.k).ToList
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.GoodFeaturesGrid
                 options.featurePoints = 4
                 features.Clear()
