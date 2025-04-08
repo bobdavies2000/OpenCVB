@@ -700,17 +700,15 @@ Public Class FCS_Lines : Inherits TaskParent
         desc = "Use lines as input to FCS."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static minSlider = optiBase.FindSlider("Min Distance to next")
-        Dim minDistance = minSlider.value
         lines.Run(src)
 
         task.features.Clear()
         For Each lp In task.lpList
-            Dim lpPerp = lp.perpendicularPoints(lp.p1, minDistance)
+            Dim lpPerp = lp.perpendicularPoints(lp.p1, task.minDistance)
             task.features.Add(lpPerp.p1)
             task.features.Add(lpPerp.p2)
 
-            lpPerp = lp.perpendicularPoints(lp.p2, minDistance)
+            lpPerp = lp.perpendicularPoints(lp.p2, task.minDistance)
             task.features.Add(lpPerp.p1)
             task.features.Add(lpPerp.p2)
 

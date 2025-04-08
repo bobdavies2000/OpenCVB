@@ -67,7 +67,7 @@ Public Class LeftRight_BRISK : Inherits TaskParent
     Dim brisk As New BRISK_Basics
     Dim options As New Options_Features
     Public Sub New()
-        optiBase.FindSlider("Min Distance").Value = 20
+        task.featureOptions.DistanceSlider.Value = 20
         labels = {"", "", "Left Image", "Right Image"}
         desc = "Add color to the 8-bit infrared images."
     End Sub

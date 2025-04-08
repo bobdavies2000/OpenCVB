@@ -25,7 +25,7 @@ Public Class Feature_Basics : Inherits TaskParent
         Select Case options.featureSource
             Case FeatureSrc.GoodFeaturesFull
                 features = cv.Cv2.GoodFeaturesToTrack(task.gray, options.featurePoints, options.quality,
-                                                      options.minDistance, New cv.Mat,
+                                                      task.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.GoodFeaturesGrid
@@ -33,8 +33,9 @@ Public Class Feature_Basics : Inherits TaskParent
                 features.Clear()
                 For i = 0 To task.gridRects.Count - 1
                     Dim roi = task.gridRects(i)
-                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(task.gray(roi), options.featurePoints, options.quality, options.minDistance, New cv.Mat,
-                                                                 options.blockSize, True, options.k).ToList
+                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(task.gray(roi), options.featurePoints, options.quality,
+                                                                 task.minDistance, New cv.Mat, options.blockSize,
+                                                                 True, options.k).ToList
                     For j = 0 To tmpFeatures.Count - 1
                         features.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
                     Next
@@ -165,7 +166,7 @@ Public Class Feature_KNN : Inherits TaskParent
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.trainInput(trainIndex)
             Dim qPt = task.features(i)
-            If pt.DistanceTo(qPt) > task.feat.options.minDistance Then knn.trainInput(trainIndex) = task.features(i)
+            If pt.DistanceTo(qPt) > task.minDistance Then knn.trainInput(trainIndex) = task.features(i)
         Next
         featurePoints = New List(Of cv.Point2f)(knn.trainInput)
 
@@ -269,7 +270,7 @@ Public Class Feature_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Contours
     Dim options As New Options_Features
     Public Sub New()
-        optiBase.FindSlider("Min Distance to next").Value = 10
+        task.featureOptions.DistanceSlider.Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

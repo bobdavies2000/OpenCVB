@@ -616,7 +616,7 @@ End Class
 Public Class GridCell_Features : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
-        optiBase.FindSlider("Min Distance to next").Value = 3
+        task.featureOptions.DistanceSlider.Value = 3
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Featureless areas"
         task.feat = New Feature_Basics

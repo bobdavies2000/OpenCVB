@@ -14,6 +14,7 @@
         FeatureMethod.SelectedItem() = "GoodFeatures Full Image"
     End Sub
     Public Sub sync()
+        task.minDistance = task.featureOptions.DistanceSlider.Value
 
     End Sub
     Private Sub DistanceSlider_ValueChanged(sender As Object, e As EventArgs) Handles DistanceSlider.ValueChanged

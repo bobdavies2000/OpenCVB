@@ -8042,7 +8042,6 @@ End Class
 
 Public Class Options_Features : Inherits OptionParent
     Public quality As Double = 0.01
-    Public minDistance As Double = 25
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public k As Double = 0.04
@@ -8068,7 +8067,6 @@ Public Class Options_Features : Inherits OptionParent
             radio.check(0).Checked = True
         End If
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
             sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
@@ -8088,7 +8086,6 @@ Public Class Options_Features : Inherits OptionParent
         useBRISK = options.useBRISK
 
         Static qualitySlider = FindSlider("Quality Level")
-        Static distSlider = FindSlider("Min Distance to next")
         Static kSlider = FindSlider("k X1000")
         Static featureSlider = FindSlider("Feature Sample Size")
         Static vertRadio = findRadio("Vertical lines")
@@ -8097,7 +8094,6 @@ Public Class Options_Features : Inherits OptionParent
 
         featurePoints = featureSlider.value
         quality = qualitySlider.Value / 100
-        minDistance = distSlider.Value
     End Sub
 End Class
 

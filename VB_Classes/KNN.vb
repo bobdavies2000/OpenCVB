@@ -689,7 +689,8 @@ Public Class KNN_TrackEach : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         runFeature(src)
 
-        Dim minDistance = task.feat.options.minDistance
+        Dim minDistance = task.minDistance
+
         ' if there was no motion, use minDistance to eliminate the unstable points.
         If task.optionsChanged = False Then minDistance = 2
 
@@ -1158,7 +1159,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
             For j = 1 To knn.result.GetUpperBound(1)
                 Dim p1 = knn.queries(knn.result(i, j))
                 Dim p2 = knn.queries(knn.result(i, j - 1))
-                If p1.DistanceTo(p2) > options.minDistance Then Exit For
+                If p1.DistanceTo(p2) > task.minDistance Then Exit For
                 If tooClose.Contains((p2, p1)) = False Then tooClose.Add((p1, p2))
             Next
         Next
@@ -1179,7 +1180,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
             outputPoints.Add(pt)
             outputPoints2f.Add(pt)
         Next
-        labels(2) = "After filtering for min distance = " + CStr(options.minDistance) + " there are " +
+        labels(2) = "After filtering for min distance = " + CStr(task.minDistance) + " there are " +
                     CStr(knn.queries.Count) + " points"
     End Sub
 End Class
