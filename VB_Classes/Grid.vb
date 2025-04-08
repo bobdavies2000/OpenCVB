@@ -392,7 +392,7 @@ Public Class Grid_TrackCenter : Inherits TaskParent
         desc = "Track a cell near the center of the grid"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If match.correlation < match.options.correlationMin Or task.gOptions.DebugCheckBox.Checked Then
+        If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
             Dim index As Integer = task.gcMap.Get(Of Single)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridRects(index)

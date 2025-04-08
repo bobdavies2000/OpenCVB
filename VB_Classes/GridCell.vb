@@ -2,7 +2,7 @@
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
     Public instantUpdate As Boolean
-    Dim buildCorr As New GridCell_CorrelationMap
+    Public buildCorr As New GridCell_CorrelationMap
     Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
@@ -19,7 +19,6 @@ Public Class GridCell_Basics : Inherits TaskParent
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
         Dim gcLast As New List(Of gcData)(task.gcList), unchangedCount As Integer
-        Dim threshold = task.gCell.options.correlationThreshold
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.gcList.Clear()
@@ -29,7 +28,7 @@ Public Class GridCell_Basics : Inherits TaskParent
             If gc.depth > 0 Then
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute gc.
                 Dim lastCorrelation = If(task.optionsChanged, 0, gcLast(i).correlation)
-                If gc.age > 1 And lastCorrelation > threshold And instantUpdate = False Then
+                If gc.age > 1 And lastCorrelation > task.fCorrThreshold And instantUpdate = False Then
                     ' no need to recompute everything when there is no motion in the cell.
                     gc = gcLast(i)
                     gc.age = task.motionBasics.cellAge(i)
@@ -75,15 +74,17 @@ Public Class GridCell_Basics : Inherits TaskParent
                 End If
                 gc.depthRanges.Add(gc.mm.range)
                 gc.corrHistory.Add(gc.correlation)
-                If gc.corrHistory.Average > threshold Then gc.highlyVisible = True Else gc.highlyVisible = False
+                If gc.corrHistory.Average > task.fCorrThreshold Then gc.highlyVisible = True Else gc.highlyVisible = False
             End If
 
-            If Math.Abs(prevDisparity - gc.disparity) > options.disparityThreshold Then
-                task.depthMask(gc.rect).SetTo(0)
-                task.noDepthMask(gc.rect).SetTo(255)
-                gc.depth = 0
-                gc.correlation = 0
-                gc.highlyVisible = False
+            If gc.rect.X > 0 Then
+                If Math.Abs(prevDisparity - gc.disparity) > options.disparityThreshold Then
+                    task.depthMask(gc.rect).SetTo(0)
+                    task.noDepthMask(gc.rect).SetTo(255)
+                    gc.depth = 0
+                    gc.correlation = 0
+                    gc.highlyVisible = False
+                End If
             End If
             dst2(gc.rect).SetTo(gc.color)
 
@@ -99,7 +100,6 @@ Public Class GridCell_Basics : Inherits TaskParent
         Next
 
         buildCorr.Run(src)
-        dst3 = buildCorr.dst2
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.gcList.Count) + " grid cells, " + CStr(depthCount) +
                                            " have useful depth data and " + CStr(unchangedCount) +
@@ -908,37 +908,6 @@ Public Class GridCell_Info : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class GridCell_Disparity : Inherits TaskParent
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Highlight the gridcells where the disparity changes."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim prevShift As New Single
-        dst2 = task.gCell.dst3
-        dst1.SetTo(0)
-        For Each gc In task.gcList
-            If gc.disparity <> 0 And prevShift <> 0 Then
-                If Math.Abs(gc.disparity - prevShift) > task.gCell.options.disparityThreshold Then
-                    If gc.correlation > 0 Then
-                        dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
-                    Else
-                        dst1(gc.rect).SetTo(0)
-                    End If
-                End If
-            End If
-            prevShift = gc.disparity
-        Next
-
-        dst3 = ShowPaletteDepth(dst1)
-        labels(2) = task.gCell.labels(2)
-    End Sub
-End Class
 
 
 

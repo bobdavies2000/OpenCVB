@@ -9,7 +9,7 @@ Public Class MatchRect_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then match.correlation = 0
-        If match.correlation < match.options.correlationMin Or rectSave <> rectInput Or task.mouseClickFlag Then
+        If match.correlation < task.fCorrThreshold Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
                 dst2 = runRedC(src, labels(2)).Clone
                 rectInput = task.rcD.rect

@@ -155,7 +155,7 @@ Public Class TreeviewForm
         Next
 
         PercentTime.Text += vbCrLf + Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
-                            vbCrLf + vbCrLf + "Click an algorithm at left to see it below:" + vbCrLf
+                            vbCrLf + vbCrLf + "Click an algorithm at left to see it below:" + vbCrLf + vbCrLf
 
         PercentTime.Text += If(percentStr Is Nothing, "Inactive algorithm selected", percentStr)
     End Sub

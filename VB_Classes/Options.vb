@@ -7976,21 +7976,17 @@ End Class
 Public Class Options_GridCells : Inherits OptionParent
     Public disparityThreshold As Integer
     Public colorDifferenceThreshold As Integer = 6
-    Public correlationThreshold As Single = 0.5
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Correlation threshold X100", 0, 100, correlationThreshold * 100)
             sliders.setupTrackBar("LowRes Color difference threshold", 0, 100, colorDifferenceThreshold)
             sliders.setupTrackBar("Disparity Threshold", 0, 20, 3)
         End If
     End Sub
     Public Sub Run()
-        Static corrSlider = FindSlider("Correlation threshold X100")
         Static diffSlider = FindSlider("LowRes Color difference threshold")
         Static shiftSlider = FindSlider("Disparity Threshold")
         disparityThreshold = shiftSlider.value
         colorDifferenceThreshold = diffSlider.value
-        correlationThreshold = corrSlider.value / 100
     End Sub
 End Class
 
@@ -8001,16 +7997,13 @@ End Class
 Public Class Options_FeaturesEx : Inherits OptionParent
     Public templatePad As Integer = 10
     Public templateSize As Integer = 0
-    Public correlationMin As Double = 0.75
     Public resyncThreshold As Double = 0.95
     Public agastThreshold As Integer = 20
     Public useVertical As Boolean = False
     Public useBRISK As Boolean = False
     Public Sub New()
-        correlationMin = If(task.cols > 336, 0.8, 0.9)
         templatePad = If(task.cols > 336, 20, 10)
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
             sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
             sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
             sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
@@ -8019,7 +8012,6 @@ Public Class Options_FeaturesEx : Inherits OptionParent
         Application.DoEvents()
     End Sub
     Public Sub Run()
-        Static corrSlider = FindSlider("Feature Correlation Threshold")
         Static cellSlider = FindSlider("MatchTemplate Cell Size")
         Static resyncSlider = FindSlider("Threshold Percent for Resync")
         Static agastslider = FindSlider("Agast Threshold")
@@ -8028,7 +8020,6 @@ Public Class Options_FeaturesEx : Inherits OptionParent
         useVertical = vertRadio.checked
         task.FASTthreshold = FASTslider.value
 
-        correlationMin = corrSlider.value / 100
         templatePad = CInt(cellSlider.value / 2)
         templateSize = cellSlider.value Or 1
         resyncThreshold = resyncSlider.value / 100
@@ -8052,7 +8043,6 @@ Public Class Options_Features : Inherits OptionParent
 
     Public templatePad As Integer = 10
     Public templateSize As Integer = 0
-    Public correlationMin As Double = 0.75
     Public resyncThreshold As Double = 0.95
     Public agastThreshold As Integer = 20
     Public useVertical As Boolean = False
@@ -8075,7 +8065,6 @@ Public Class Options_Features : Inherits OptionParent
 
         templatePad = options.templatePad
         templateSize = options.templateSize
-        correlationMin = options.correlationMin
         resyncThreshold = options.resyncThreshold
         agastThreshold = options.agastThreshold
         useVertical = options.useVertical

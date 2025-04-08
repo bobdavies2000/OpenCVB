@@ -225,7 +225,6 @@ Public Class Feature_PointTracker : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        Dim correlationMin = options.correlationMin
         Dim templatePad = options.templatePad
         Dim templateSize = options.templateSize
 
@@ -242,7 +241,7 @@ Public Class Feature_PointTracker : Inherits TaskParent
 
         dst2 = src.Clone
         For i = mPoints.ptx.Count - 1 To 0 Step -1
-            If mPoints.correlation(i) > correlationMin Then
+            If mPoints.correlation(i) > task.fCorrThreshold Then
                 DrawCircle(dst2, mPoints.ptx(i), task.DotSize, task.highlight)
                 strOut += Format(mPoints.correlation(i), fmt3) + ", "
             Else
@@ -255,7 +254,7 @@ Public Class Feature_PointTracker : Inherits TaskParent
         End If
 
         labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
-                    " points were tracked with correlation above " + Format(correlationMin, fmt2)
+                    " points were tracked with correlation above " + Format(task.fCorrThreshold, fmt2)
     End Sub
 End Class
 
@@ -717,7 +716,7 @@ Public Class Feature_SteadyCam : Inherits TaskParent
             Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
             Dim r = task.gridRects(index)
             cv.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
-            If correlationMat.Get(Of Single)(0, 0) >= options.correlationMin Then
+            If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then
                 features.Add(pt)
             End If
         Next

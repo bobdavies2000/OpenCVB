@@ -12,6 +12,8 @@
         FeatureMethod.Items.Add("Harris")
         FeatureMethod.Items.Add("FAST")
         FeatureMethod.SelectedItem() = "GoodFeatures Full Image"
+
+        verticalRadio.Checked = True
     End Sub
     Public Sub sync()
 
@@ -21,9 +23,17 @@
         task.minDistance = DistanceSlider.Value
         task.optionsChanged = True
     End Sub
-
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
         task.featureSource = FeatureMethod.SelectedIndex
         task.optionsChanged = True
+    End Sub
+    Private Sub TrackBar1_ValueChanged(sender As Object, e As EventArgs) Handles FCorrSlider.ValueChanged
+        task.fCorrThreshold = FCorrSlider.Value / 100
+        task.optionsChanged = True
+        FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
+    End Sub
+
+    Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs) Handles verticalRadio.CheckedChanged
+
     End Sub
 End Class

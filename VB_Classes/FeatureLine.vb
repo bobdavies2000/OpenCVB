@@ -41,8 +41,7 @@ Public Class FeatureLine_BasicsRaw : Inherits TaskParent
         Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
         Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
 
-        Dim correlationMin = options.correlationMin
-        Dim correlationTest = tcells(0).correlation <= correlationMin Or tcells(1).correlation <= correlationMin
+        Dim correlationTest = tcells(0).correlation <= task.fCorrThreshold Or tcells(1).correlation <= task.fCorrThreshold
         lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
         If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
             Dim templatePad = options.templatePad
@@ -141,8 +140,7 @@ Public Class FeatureLine_VH : Inherits TaskParent
             match.tCells.Add(gc.tc2)
 
             match.Run(src)
-            Dim correlationMin = options.correlationMin
-            If match.tCells(0).correlation >= correlationMin And match.tCells(1).correlation >= correlationMin Then
+            If match.tCells(0).correlation >= task.fCorrThreshold And match.tCells(1).correlation >= task.fCorrThreshold Then
                 gc.tc1 = match.tCells(0)
                 gc.tc2 = match.tCells(1)
                 gc = gLines.updateGLine(src, gc, gc.tc1.center, gc.tc2.center)
@@ -530,7 +528,7 @@ Public Class FeatureLine_LongestKNN : Inherits TaskParent
         Dim rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
         match.template = src(rect)
         match.Run(src)
-        If match.correlation >= options.correlationMin Then
+        If match.correlation >= task.fCorrThreshold Then
             dst3 = match.dst0.Resize(dst3.Size)
             DrawLine(dst2, p1, p2, task.highlight)
             DrawCircle(dst2, p1, task.DotSize, task.highlight)
@@ -564,12 +562,11 @@ Public Class FeatureLine_Longest : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
         dst2 = src.Clone
-        Dim correlationMin = match1.options.correlationMin
         Dim templatePad = match1.options.templatePad
         Dim templateSize = match1.options.templateSize
 
         Static p1 As cv.Point, p2 As cv.Point
-        If task.heartBeat Or match1.correlation < correlationMin And match2.correlation < correlationMin Then
+        If task.heartBeat Or match1.correlation < task.fCorrThreshold And match2.correlation < task.fCorrThreshold Then
             knn.Run(src.Clone)
 
             p1 = knn.lastPair.p1

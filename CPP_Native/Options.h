@@ -2176,7 +2176,6 @@ public:
 class Options_GridCells {
 public:
 	int colorDifferenceThreshold =  6;
-	float correlationThreshold =  0.5;
 	void Run() {}
 	Options_GridCells() {
 	}
@@ -2185,7 +2184,6 @@ class Options_FeaturesEx {
 public:
 	int templatePad =  10;
 	int templateSize =  0;
-	double correlationMin =  0.75;
 	double resyncThreshold =  0.95;
 	int agastThreshold =  20;
 	bool useVertical = false;
@@ -2204,7 +2202,6 @@ public:
 	int featurePoints =  400;
 	int templatePad =  10;
 	int templateSize =  0;
-	double correlationMin =  0.75;
 	double resyncThreshold =  0.95;
 	int agastThreshold =  20;
 	bool useVertical = false;

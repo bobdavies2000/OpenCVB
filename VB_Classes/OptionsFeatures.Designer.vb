@@ -23,6 +23,9 @@ Partial Class OptionsFeatures
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.FeaturesGroup = New System.Windows.Forms.GroupBox()
+        Me.FeatureCorrelationLabel = New System.Windows.Forms.Label()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.FCorrSlider = New System.Windows.Forms.TrackBar()
         Me.DistanceLabel = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.DistanceSlider = New System.Windows.Forms.TrackBar()
@@ -30,12 +33,20 @@ Partial Class OptionsFeatures
         Me.FeatureMethod = New System.Windows.Forms.ComboBox()
         Me.LineGroup = New System.Windows.Forms.GroupBox()
         Me.MaskGroup = New System.Windows.Forms.GroupBox()
+        Me.verticalRadio = New System.Windows.Forms.RadioButton()
+        Me.HorizRadio = New System.Windows.Forms.RadioButton()
+        Me.BothRadio = New System.Windows.Forms.RadioButton()
         Me.FeaturesGroup.SuspendLayout()
+        CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.LineGroup.SuspendLayout()
         Me.SuspendLayout()
         '
         'FeaturesGroup
         '
+        Me.FeaturesGroup.Controls.Add(Me.FeatureCorrelationLabel)
+        Me.FeaturesGroup.Controls.Add(Me.Label4)
+        Me.FeaturesGroup.Controls.Add(Me.FCorrSlider)
         Me.FeaturesGroup.Controls.Add(Me.DistanceLabel)
         Me.FeaturesGroup.Controls.Add(Me.Label2)
         Me.FeaturesGroup.Controls.Add(Me.DistanceSlider)
@@ -47,6 +58,34 @@ Partial Class OptionsFeatures
         Me.FeaturesGroup.TabIndex = 0
         Me.FeaturesGroup.TabStop = False
         Me.FeaturesGroup.Text = "Features"
+        '
+        'FeatureCorrelationLabel
+        '
+        Me.FeatureCorrelationLabel.AutoSize = True
+        Me.FeatureCorrelationLabel.Location = New System.Drawing.Point(526, 218)
+        Me.FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
+        Me.FeatureCorrelationLabel.Size = New System.Drawing.Size(146, 20)
+        Me.FeatureCorrelationLabel.TabIndex = 11
+        Me.FeatureCorrelationLabel.Text = "Feature Correlation"
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(24, 195)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(220, 20)
+        Me.Label4.TabIndex = 10
+        Me.Label4.Text = "Feature Correlation Threshold"
+        '
+        'FCorrSlider
+        '
+        Me.FCorrSlider.Location = New System.Drawing.Point(20, 218)
+        Me.FCorrSlider.Maximum = 100
+        Me.FCorrSlider.Minimum = 1
+        Me.FCorrSlider.Name = "FCorrSlider"
+        Me.FCorrSlider.Size = New System.Drawing.Size(475, 69)
+        Me.FCorrSlider.TabIndex = 9
+        Me.FCorrSlider.Value = 75
         '
         'DistanceLabel
         '
@@ -95,6 +134,9 @@ Partial Class OptionsFeatures
         '
         'LineGroup
         '
+        Me.LineGroup.Controls.Add(Me.BothRadio)
+        Me.LineGroup.Controls.Add(Me.HorizRadio)
+        Me.LineGroup.Controls.Add(Me.verticalRadio)
         Me.LineGroup.Location = New System.Drawing.Point(796, 12)
         Me.LineGroup.Name = "LineGroup"
         Me.LineGroup.Size = New System.Drawing.Size(328, 568)
@@ -111,6 +153,39 @@ Partial Class OptionsFeatures
         Me.MaskGroup.TabStop = False
         Me.MaskGroup.Text = "Masks"
         '
+        'verticalRadio
+        '
+        Me.verticalRadio.AutoSize = True
+        Me.verticalRadio.Location = New System.Drawing.Point(27, 50)
+        Me.verticalRadio.Name = "verticalRadio"
+        Me.verticalRadio.Size = New System.Drawing.Size(129, 24)
+        Me.verticalRadio.TabIndex = 0
+        Me.verticalRadio.TabStop = True
+        Me.verticalRadio.Text = "Vertical Lines"
+        Me.verticalRadio.UseVisualStyleBackColor = True
+        '
+        'HorizRadio
+        '
+        Me.HorizRadio.AutoSize = True
+        Me.HorizRadio.Location = New System.Drawing.Point(27, 80)
+        Me.HorizRadio.Name = "HorizRadio"
+        Me.HorizRadio.Size = New System.Drawing.Size(148, 24)
+        Me.HorizRadio.TabIndex = 1
+        Me.HorizRadio.TabStop = True
+        Me.HorizRadio.Text = "Horizontal Lines"
+        Me.HorizRadio.UseVisualStyleBackColor = True
+        '
+        'BothRadio
+        '
+        Me.BothRadio.AutoSize = True
+        Me.BothRadio.Location = New System.Drawing.Point(27, 110)
+        Me.BothRadio.Name = "BothRadio"
+        Me.BothRadio.Size = New System.Drawing.Size(201, 24)
+        Me.BothRadio.TabIndex = 2
+        Me.BothRadio.TabStop = True
+        Me.BothRadio.Text = "Both Vertical/Horizontal"
+        Me.BothRadio.UseVisualStyleBackColor = True
+        '
         'OptionsFeatures
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -123,7 +198,10 @@ Partial Class OptionsFeatures
         Me.Text = "OptionsFeatures"
         Me.FeaturesGroup.ResumeLayout(False)
         Me.FeaturesGroup.PerformLayout()
+        CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.LineGroup.ResumeLayout(False)
+        Me.LineGroup.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -136,4 +214,10 @@ Partial Class OptionsFeatures
     Friend WithEvents Label2 As Windows.Forms.Label
     Friend WithEvents DistanceSlider As Windows.Forms.TrackBar
     Friend WithEvents DistanceLabel As Windows.Forms.Label
+    Friend WithEvents FeatureCorrelationLabel As Windows.Forms.Label
+    Friend WithEvents Label4 As Windows.Forms.Label
+    Friend WithEvents FCorrSlider As Windows.Forms.TrackBar
+    Friend WithEvents BothRadio As Windows.Forms.RadioButton
+    Friend WithEvents HorizRadio As Windows.Forms.RadioButton
+    Friend WithEvents verticalRadio As Windows.Forms.RadioButton
 End Class

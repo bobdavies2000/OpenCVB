@@ -242,9 +242,8 @@ Public Class OptionsGlobal
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
         SaveSetting("Opencv", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
     End Sub
-    Private Sub tempSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
+    Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
-        task.optionsChanged = True
     End Sub
     Private Sub DepthDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles DepthDiffSlider.ValueChanged
         task.optionsChanged = True

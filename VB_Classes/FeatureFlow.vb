@@ -10,8 +10,6 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
     Public Sub buildCorrelations(prevFeatures As List(Of cv.Point), currFeatures As List(Of cv.Point))
-        Dim correlationMin = task.feat.options.correlationMin
-
         Dim correlationmat As New cv.Mat
         lpList.Clear()
         mpCorrelation.Clear()
@@ -25,7 +23,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
             Dim maxCorrelation = correlations.Max
-            If maxCorrelation >= correlationMin Then
+            If maxCorrelation >= task.fCorrThreshold Then
                 Dim index = correlations.IndexOf(maxCorrelation)
                 lpList.Add(New lpData(p1, currFeatures(index)))
                 mpCorrelation.Add(maxCorrelation)

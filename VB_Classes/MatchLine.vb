@@ -23,8 +23,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
-        Dim correlationMin = match.options.correlationMin
-        If task.quarterBeat Or match.correlation < correlationMin Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
+        If task.quarterBeat Or match.correlation < task.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
             lpSave = lpInput
             If standalone Then
                 knn.Run(src.Clone)
@@ -53,8 +52,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
         End If
 
         match.Run(src)
-        correlationMin = match.options.correlationMin
-        If match.correlation >= correlationMin Then
+        If match.correlation >= task.fCorrThreshold Then
             If standaloneTest() Then dst3 = match.dst0.Resize(dst3.Size)
             Dim p1 = cornerToPoint(corner1, match.matchRect)
             Dim p2 = cornerToPoint(corner2, match.matchRect)

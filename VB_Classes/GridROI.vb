@@ -247,8 +247,8 @@ Public Class GridROI_CorrelationMotion : Inherits TaskParent
             If gather.stdevList(i) >= gather.stdevAverage Then
                 cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
-                If corr < options.correlationMin Then SetTrueText(Format(corr, fmt1), roi.TopLeft)
-                If corr < options.correlationMin Then motionCount += 1
+                If corr < task.fCorrThreshold Then SetTrueText(Format(corr, fmt1), roi.TopLeft)
+                If corr < task.fCorrThreshold Then motionCount += 1
             End If
         Next
 
@@ -335,8 +335,8 @@ Public Class GridROI_LowStdevCorrelation : Inherits TaskParent
             Next
         End If
         For i = 0 To saveRects.Count - 1
-            If saveCorrs(i) < options.correlationMin Then SetTrueText(Format(saveCorrs(i), fmt2), saveRects(i).TopLeft)
-            If saveCorrs(i) < options.correlationMin Then SetTrueText(Format(saveStdev(i), fmt2), saveRects(i).TopLeft, 3)
+            If saveCorrs(i) < task.fCorrThreshold Then SetTrueText(Format(saveCorrs(i), fmt2), saveRects(i).TopLeft)
+            If saveCorrs(i) < task.fCorrThreshold Then SetTrueText(Format(saveStdev(i), fmt2), saveRects(i).TopLeft, 3)
         Next
 
         lastImage = dst1.Clone
@@ -417,8 +417,8 @@ Public Class GridROI_LRClick : Inherits TaskParent
             SetTrueText("No corresponding roi found", 2)
         Else
             Dim maxCorr = corr.Max
-            If maxCorr < options.correlationMin Then
-                SetTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(options.correlationMin, fmt1), 1)
+            If maxCorr < task.fCorrThreshold Then
+                SetTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(task.fCorrThreshold, fmt1), 1)
             Else
                 Dim index = corr.IndexOf(maxCorr)
                 Dim rectRight = New cv.Rect(index, roi.Y, roi.Width, roi.Height)
@@ -479,9 +479,9 @@ Public Class GridROI_LRAll : Inherits TaskParent
             Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
             cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm = GetMinMax(correlationMat)
-            If mm.maxVal >= options.correlationMin Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
+            If mm.maxVal >= task.fCorrThreshold Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
         Next
-        labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(options.correlationMin, fmt3)
+        labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(task.fCorrThreshold, fmt3)
 
         For Each roi In sortedRects.Values
             dst3.Rectangle(roi, task.highlight, task.lineWidth)

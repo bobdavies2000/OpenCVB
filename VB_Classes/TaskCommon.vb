@@ -686,8 +686,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         length = p1.DistanceTo(p2)
         age = 1
 
-        Dim threshold = task.gCell.options.correlationThreshold
-
         Dim ptlist = {center, p1, p2}
         For Each pt In ptlist
             Dim nextIndex As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
