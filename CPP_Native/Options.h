@@ -2186,7 +2186,6 @@ public:
 	int templateSize =  0;
 	double resyncThreshold =  0.95;
 	int agastThreshold =  20;
-	bool useVertical = false;
 	bool useBRISK = false;
 	void Run() {}
 	Options_FeaturesEx() {
@@ -2204,7 +2203,6 @@ public:
 	int templateSize =  0;
 	double resyncThreshold =  0.95;
 	int agastThreshold =  20;
-	bool useVertical = false;
 	bool useBRISK = false;
 	void Run() {}
 	Options_Features() {

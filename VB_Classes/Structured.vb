@@ -466,7 +466,7 @@ End Class
 
 Public Class Structured_FeatureLines : Inherits TaskParent
     Dim struct As New Structured_MultiSlice
-    Public lines As New FeatureLine_Finder
+    Public lines As New FeatureLine_Finder3D
     Public Sub New()
         desc = "Find the lines in the Structured_MultiSlice algorithm output"
     End Sub

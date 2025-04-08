@@ -726,3 +726,267 @@ Public Class BackProject_MaskList : Inherits TaskParent
         dst3 = inputMatList(index)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_Tutorial1 : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "The highlighted lines are also lines in 3D."
+        desc = "Find all the lines in the image and determine which are in the depth data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+
+        Dim raw2D As New List(Of lpData)
+        Dim raw3D As New List(Of cv.Scalar)
+        For Each lp In task.lpList
+            raw2D.Add(lp)
+            If lp.depth > 0 Then
+                raw3D.Add(lp.pcMeans(1))
+                raw3D.Add(lp.pcMeans(2))
+            End If
+        Next
+
+        dst3 = src
+        For i = 0 To raw2D.Count - 2 Step 2
+            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlight)
+        Next
+        If task.heartBeat Then labels(2) = "Starting with " + Format(task.lpList.Count, "000") +
+                                           " lines, there are " + Format(raw3D.Count / 2, "000") +
+                                           " with depth data."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_Tutorial2 : Inherits TaskParent
+    Dim options As New Options_LineFinder()
+    Public Sub New()
+        desc = "Find all the lines in the image and determine which are vertical and horizontal"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst2 = task.lines.dst2
+
+        Dim raw3D As New List(Of cv.Point3f)
+        For Each lp In task.lpList
+            Dim pt1 As cv.Point3f, pt2 As cv.Point3f
+            For j = 0 To 1
+                Dim pt = Choose(j + 1, lp.p1, lp.p2)
+                Dim rect = ValidateRect(New cv.Rect(pt.x - options.kSize, pt.y - options.kSize, options.kernelSize, options.kernelSize))
+                Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
+                If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
+            Next
+            If pt1.Z > 0 And pt2.Z > 0 Then
+                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
+                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
+            End If
+        Next
+
+        If task.heartBeat Then labels(2) = "Starting with " + Format(task.lpList.Count, "000") +
+                               " lines, there are " + Format(raw3D.Count, "000") + " with depth data."
+        If raw3D.Count = 0 Then
+            SetTrueText("No vertical or horizontal lines were found")
+        Else
+            task.gMatrix = task.gmat.gMatrix
+            Dim matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray) * task.gmat.gMatrix
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_LongestVerticalKNN : Inherits TaskParent
+    Dim gLines As New XO_Line_GCloud
+    Dim longest As New XO_FeatureLine_Longest
+    Public Sub New()
+        labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
+        desc = "Find all the vertical lines and then track the longest one with a lightweight KNN."
+    End Sub
+    Private Function testLastPair(lastPair As lpData, gc As gravityLine) As Boolean
+        Dim distance1 = lastPair.p1.DistanceTo(lastPair.p2)
+        Dim p1 = gc.tc1.center
+        Dim p2 = gc.tc2.center
+        If distance1 < 0.75 * p1.DistanceTo(p2) Then Return True ' it the longest vertical * 0.75 > current lastPair, then use the longest vertical...
+        Return False
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gLines.Run(src)
+        If gLines.sortedVerticals.Count = 0 Then
+            SetTrueText("No vertical lines were present", 3)
+            Exit Sub
+        End If
+
+        dst3 = src.Clone
+        Dim index As Integer
+
+        If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New lpData
+        For Each gc In gLines.sortedVerticals.Values
+            If index >= 10 Then Exit For
+
+            Dim p1 = gc.tc1.center
+            Dim p2 = gc.tc2.center
+            If longest.knn.lastPair.compare(New lpData) Then longest.knn.lastPair = New lpData(p1, p2)
+            Dim pt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+            SetTrueText(CStr(index) + vbCrLf + Format(gc.arcY, fmt1), pt, 3)
+            index += 1
+
+            DrawLine(dst3, p1, p2, task.highlight)
+            longest.knn.trainInput.Add(p1)
+            longest.knn.trainInput.Add(p2)
+        Next
+
+        longest.Run(src)
+        dst2 = longest.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_LongestV_Tutorial1 : Inherits TaskParent
+    Dim lines As New FeatureLine_Finder3D
+    Public Sub New()
+        desc = "Use FeatureLine_Finder to find all the vertical lines and show the longest."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        lines.Run(src)
+
+        If lines.sortedVerticals.Count = 0 Then
+            SetTrueText("No vertical lines were found", 3)
+            Exit Sub
+        End If
+
+        Dim index = lines.sortedVerticals.ElementAt(0).Value
+        Dim p1 = lines.lines2D(index)
+        Dim p2 = lines.lines2D(index + 1)
+        DrawLine(dst2, p1, p2, task.highlight)
+        dst3.SetTo(0)
+        DrawLine(dst3, p1, p2, task.highlight)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_FeatureLine_LongestV_Tutorial2 : Inherits TaskParent
+    Dim lines As New FeatureLine_Finder3D
+    Dim knn As New KNN_N4Basics
+    Public pt1 As New cv.Point3f
+    Public pt2 As New cv.Point3f
+    Dim lengthReject As Integer
+    Public Sub New()
+        desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Basics4D to track each line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        lines.Run(src)
+        dst1 = lines.dst3
+
+        If lines.sortedVerticals.Count = 0 Then
+            SetTrueText("No vertical lines were found", 3)
+            Exit Sub
+        End If
+
+        Dim match3D As New List(Of cv.Point3f)
+        knn.trainInput.Clear()
+        For i = 0 To lines.sortedVerticals.Count - 1
+            Dim sIndex = lines.sortedVerticals.ElementAt(i).Value
+            Dim x1 = lines.lines2D(sIndex)
+            Dim x2 = lines.lines2D(sIndex + 1)
+            Dim vec = If(x1.Y < x2.Y, New cv.Vec4f(x1.X, x1.Y, x2.X, x2.Y), New cv.Vec4f(x2.X, x2.Y, x1.X, x1.Y))
+            If knn.queries.Count = 0 Then knn.queries.Add(vec)
+            knn.trainInput.Add(vec)
+            match3D.Add(lines.lines3D(sIndex))
+            match3D.Add(lines.lines3D(sIndex + 1))
+        Next
+
+        Dim saveVec = knn.queries(0)
+        knn.Run(src)
+
+        Dim index = knn.result(0, 0)
+        Dim p1 = New cv.Point2f(knn.trainInput(index)(0), knn.trainInput(index)(1))
+        Dim p2 = New cv.Point2f(knn.trainInput(index)(2), knn.trainInput(index)(3))
+        pt1 = match3D(index * 2)
+        pt2 = match3D(index * 2 + 1)
+        DrawLine(dst2, p1, p2, task.highlight)
+        dst3.SetTo(0)
+        DrawLine(dst3, p1, p2, task.highlight)
+
+        Static lastLength = lines.sorted2DV.ElementAt(0).Key
+        Dim bestLength = lines.sorted2DV.ElementAt(0).Key
+        knn.queries.Clear()
+        If lastLength > 0.5 * bestLength Then
+            knn.queries.Add(New cv.Vec4f(p1.X, p1.Y, p2.X, p2.Y))
+            lastLength = p1.DistanceTo(p2)
+        Else
+            lengthReject += 1
+            lastLength = bestLength
+        End If
+        labels(3) = "Length rejects = " + Format(lengthReject / (task.frameCount + 1), "0%")
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_VerticalLongLine : Inherits TaskParent
+    Dim lines As New FeatureLine_Finder3D
+    Public Sub New()
+        desc = "Use FeatureLine_Finder data to identify the longest lines and show its angle."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            dst2 = src.Clone
+            lines.Run(src)
+
+            If lines.sortedVerticals.Count = 0 Then
+                SetTrueText("No vertical lines were found", 3)
+                Exit Sub
+            End If
+        End If
+
+        If lines.sortedVerticals.Count = 0 Then Exit Sub ' nothing found...
+        Dim index = lines.sortedVerticals.ElementAt(0).Value
+        Dim p1 = lines.lines2D(index)
+        Dim p2 = lines.lines2D(index + 1)
+        DrawLine(dst2, p1, p2, task.highlight)
+        dst3.SetTo(0)
+        DrawLine(dst3, p1, p2, task.highlight)
+        Dim pt1 = lines.lines3D(index)
+        Dim pt2 = lines.lines3D(index + 1)
+        Dim len3D = distance3D(pt1, pt2)
+        Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
+        SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m dist", p1)
+        SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m distant", p1, 3)
+    End Sub
+End Class

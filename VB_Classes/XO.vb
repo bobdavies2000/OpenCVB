@@ -3115,3 +3115,25 @@ Public Class XO_FCSLine_Vertical : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_VerticalVerify : Inherits TaskParent
+    Dim linesVH As New FeatureLine_VH
+    Public verify As New IMU_VerticalVerify
+    Public Sub New()
+        desc = "Select a line or group of lines and track the result"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        linesVH.Run(src)
+
+        verify.gCells = New List(Of gravityLine)(linesVH.gCells)
+        verify.Run(src)
+        dst2 = verify.dst2
+    End Sub
+End Class

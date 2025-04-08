@@ -1654,7 +1654,7 @@ End Class
 
 
 Public Class OpenGL_VerticalOrHorizontal : Inherits TaskParent
-    Dim vLine As New FeatureLine_Finder
+    Dim vLine As New FeatureLine_Finder3D
     Public Sub New()
         If optiBase.FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -1851,32 +1851,6 @@ Public Class OpenGL_PClinesAll : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class OpenGL_VerticalSingle : Inherits TaskParent
-    Dim vLine As New FeatureLine_LongestV_Tutorial2
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawLineAndCloud
-        desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        vLine.Run(src)
-        dst2 = vLine.dst2
-        dst3 = vLine.dst3
-
-        Dim pt1 = vLine.pt1
-        Dim pt2 = vLine.pt2
-        Dim linePairs3D As New List(Of cv.Point3f)({New cv.Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2), New cv.Point3f(pt1.X, pt2.Y, pt1.Z)})
-        task.ogl.dataInput = cv.Mat.FromPixelData(linePairs3D.Count, 1, cv.MatType.CV_32FC3, linePairs3D.ToArray)
-
-        task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(task.color)
-    End Sub
-End Class
 
 
 
@@ -2162,5 +2136,228 @@ Public Class OpenGL_Regions : Inherits TaskParent
                 task.ogl.Run(src)
                 labels = regions.labels
         End Select
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
+    Dim lines As New Line_RawSubset
+    Dim lineDisp As New XO_Line_DisplayInfoOld
+    Dim options As New Options_Features
+    Dim match As New Match_tCell
+    Public tcells As List(Of tCell)
+    Public Sub New()
+        Dim tc As tCell
+        tcells = New List(Of tCell)({tc, tc})
+        labels = {"", "", "Longest line present.", ""}
+        desc = "Find and track a line using the end points"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
+        Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
+
+        Dim correlationTest = tcells(0).correlation <= task.fCorrThreshold Or tcells(1).correlation <= task.fCorrThreshold
+        lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
+        If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
+            Dim templatePad = options.templatePad
+            lines.subsetRect = New cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
+            lines.Run(src.Clone)
+
+            If lines.lpList.Count = 0 Then
+                SetTrueText("No lines found.", 3)
+                Exit Sub
+            End If
+            Dim lp = lines.lpList(0)
+
+            tcells(0) = match.createCell(src, 0, lp.p1)
+            tcells(1) = match.createCell(src, 0, lp.p2)
+        End If
+
+        dst2 = src.Clone
+        For i = 0 To tcells.Count - 1
+            match.tCells(0) = tcells(i)
+            match.Run(src)
+            tcells(i) = match.tCells(0)
+            SetTrueText(tcells(i).strOut, New cv.Point(tcells(i).rect.X, tcells(i).rect.Y))
+            SetTrueText(tcells(i).strOut, New cv.Point(tcells(i).rect.X, tcells(i).rect.Y), 3)
+        Next
+
+        lineDisp.tcells = New List(Of tCell)(tcells)
+        lineDisp.Run(src)
+        dst2 = lineDisp.dst2
+        SetTrueText(lineDisp.strOut, New cv.Point(10, 40), 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_DetailsAll : Inherits TaskParent
+    Dim lines As New FeatureLine_Finder3D
+    Dim flow As New Font_FlowText
+    Dim arcList As New List(Of Single)
+    Dim arcLongAverage As New List(Of Single)
+    Dim firstAverage As New List(Of Single)
+    Dim firstBest As Integer
+    Dim title = "ID" + vbTab + "length" + vbTab + "distance "
+    Public Sub New()
+        flow.parentData = Me
+        flow.dst = 3
+        desc = "Use FeatureLine_Finder data to collect vertical lines and measure accuracy of each."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            dst2 = src.Clone
+            lines.Run(src)
+
+            If lines.sortedVerticals.Count = 0 Then
+                SetTrueText("No vertical lines were found", 3)
+                Exit Sub
+            End If
+
+            dst3.SetTo(0)
+            arcList.Clear()
+            flow.nextMsg = title
+            For i = 0 To Math.Min(10, lines.sortedVerticals.Count) - 1
+                Dim index = lines.sortedVerticals.ElementAt(i).Value
+                Dim p1 = lines.lines2D(index)
+                Dim p2 = lines.lines2D(index + 1)
+                DrawLine(dst2, p1, p2, task.highlight)
+                SetTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
+                DrawLine(dst3, p1, p2, task.highlight)
+
+                Dim pt1 = lines.lines3D(index)
+                Dim pt2 = lines.lines3D(index + 1)
+                Dim len3D = distance3D(pt1, pt2)
+                If len3D > 0 Then
+                    Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
+                    arcList.Add(arcY)
+                    flow.nextMsg += Format(arcY, fmt3) + " degrees" + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m"
+                End If
+            Next
+            If flow.nextMsg = title Then flow.nextMsg = "No feature line found..."
+        End If
+        flow.Run(src)
+        If arcList.Count = 0 Then Exit Sub
+
+        Dim mostAccurate = arcList(0)
+        firstAverage.Add(mostAccurate)
+        For Each arc In arcList
+            If arc > mostAccurate Then
+                mostAccurate = arc
+                Exit For
+            End If
+        Next
+        If mostAccurate = arcList(0) Then firstBest += 1
+
+        Dim avg = arcList.Average()
+        arcLongAverage.Add(avg)
+        labels(3) = "arcY avg = " + Format(avg, fmt1) + ", long term average = " + Format(arcLongAverage.Average, fmt1) +
+                    ", first was best " + Format(firstBest / task.frameCount, "0%") + " of the time, Avg of longest line " + Format(firstAverage.Average, fmt1)
+        If arcLongAverage.Count > 1000 Then
+            arcLongAverage.RemoveAt(0)
+            firstAverage.RemoveAt(0)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
+    Dim glines As New XO_Line_GCloud
+    Public knn As New KNN_ClosestTracker
+    Public options As New Options_Features
+    Public gline As gravityLine
+    Public match As New Match_Basics
+    Dim p1 As cv.Point, p2 As cv.Point
+    Public Sub New()
+        desc = "Find and track the longest line in the BGR image with a lightweight KNN."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        dst2 = src
+
+        knn.Run(src.Clone)
+        p1 = knn.lastPair.p1
+        p2 = knn.lastPair.p2
+        gline = glines.updateGLine(src, gline, p1, p2)
+
+        Dim rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
+        match.template = src(rect)
+        match.Run(src)
+        If match.correlation >= task.fCorrThreshold Then
+            dst3 = match.dst0.Resize(dst3.Size)
+            DrawLine(dst2, p1, p2, task.highlight)
+            DrawCircle(dst2, p1, task.DotSize, task.highlight)
+            DrawCircle(dst2, p2, task.DotSize, task.highlight)
+            rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
+            match.template = src(rect).Clone
+        Else
+            task.highlight = If(task.highlight = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
+            knn.lastPair = New lpData(New cv.Point2f, New cv.Point2f)
+        End If
+        labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_FeatureLine_Longest : Inherits TaskParent
+    Dim glines As New XO_Line_GCloud
+    Public knn As New KNN_ClosestTracker
+    Public options As New Options_Features
+    Public gline As gravityLine
+    Public match1 As New Match_Basics
+    Public match2 As New Match_Basics
+    Public Sub New()
+        labels(2) = "Longest line end points are highlighted "
+        desc = "Find and track the longest line in the BGR image with a lightweight KNN."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        dst2 = src.Clone
+        Dim templatePad = match1.options.templatePad
+        Dim templateSize = match1.options.templateSize
+
+        Static p1 As cv.Point, p2 As cv.Point
+        If task.heartBeat Or match1.correlation < task.fCorrThreshold And match2.correlation < task.fCorrThreshold Then
+            knn.Run(src.Clone)
+
+            p1 = knn.lastPair.p1
+            Dim r1 = ValidateRect(New cv.Rect(p1.X - templatePad, p1.Y - templatePad, templateSize, templateSize))
+            match1.template = src(r1).Clone
+
+            p2 = knn.lastPair.p2
+            Dim r2 = ValidateRect(New cv.Rect(p2.X - templatePad, p2.Y - templatePad, templateSize, templateSize))
+            match2.template = src(r2).Clone
+        End If
+
+        match1.Run(src)
+        p1 = match1.matchCenter
+
+        match2.Run(src)
+        p2 = match2.matchCenter
+
+        gline = glines.updateGLine(src, gline, p1, p2)
+        DrawLine(dst2, p1, p2, task.highlight)
+        DrawCircle(dst2, p1, task.DotSize, task.highlight)
+        DrawCircle(dst2, p2, task.DotSize, task.highlight)
+        SetTrueText(Format(match1.correlation, fmt3), p1)
+        SetTrueText(Format(match2.correlation, fmt3), p2)
     End Sub
 End Class

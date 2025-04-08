@@ -32,8 +32,10 @@
         task.optionsChanged = True
         FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
     End Sub
-
     Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs) Handles verticalRadio.CheckedChanged
-
+        task.verticalLines = True
+    End Sub
+    Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs) Handles HorizRadio.CheckedChanged
+        task.verticalLines = False
     End Sub
 End Class

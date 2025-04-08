@@ -7999,7 +7999,6 @@ Public Class Options_FeaturesEx : Inherits OptionParent
     Public templateSize As Integer = 0
     Public resyncThreshold As Double = 0.95
     Public agastThreshold As Integer = 20
-    Public useVertical As Boolean = False
     Public useBRISK As Boolean = False
     Public Sub New()
         templatePad = If(task.cols > 336, 20, 10)
@@ -8016,8 +8015,6 @@ Public Class Options_FeaturesEx : Inherits OptionParent
         Static resyncSlider = FindSlider("Threshold Percent for Resync")
         Static agastslider = FindSlider("Agast Threshold")
         Static FASTslider = FindSlider("FAST Threshold")
-        Static vertRadio = findRadio("Vertical lines")
-        useVertical = vertRadio.checked
         task.FASTthreshold = FASTslider.value
 
         templatePad = CInt(cellSlider.value / 2)
@@ -8045,15 +8042,8 @@ Public Class Options_Features : Inherits OptionParent
     Public templateSize As Integer = 0
     Public resyncThreshold As Double = 0.95
     Public agastThreshold As Integer = 20
-    Public useVertical As Boolean = False
     Public useBRISK As Boolean = False
     Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Vertical lines")
-            radio.addRadio("Horizontal lines")
-            radio.check(0).Checked = True
-        End If
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
@@ -8067,14 +8057,12 @@ Public Class Options_Features : Inherits OptionParent
         templateSize = options.templateSize
         resyncThreshold = options.resyncThreshold
         agastThreshold = options.agastThreshold
-        useVertical = options.useVertical
         useBRISK = options.useBRISK
 
         Static qualitySlider = FindSlider("Quality Level")
         Static kSlider = FindSlider("k X1000")
         Static featureSlider = FindSlider("Feature Sample Size")
         Static vertRadio = findRadio("Vertical lines")
-        useVertical = vertRadio.checked
         k = kSlider.value / 1000
 
         featurePoints = featureSlider.value

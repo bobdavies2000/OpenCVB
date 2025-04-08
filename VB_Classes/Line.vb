@@ -437,7 +437,7 @@ End Class
 
 
 Public Class Line_VerticalHorizontalCells : Inherits TaskParent
-    Dim lines As New FeatureLine_Finder
+    Dim lines As New FeatureLine_Finder3D
     Dim hulls As New RedColor_Hulls
     Public Sub New()
         labels(2) = "RedColor_Hulls output with lines highlighted"

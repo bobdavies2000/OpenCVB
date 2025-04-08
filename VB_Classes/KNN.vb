@@ -631,7 +631,7 @@ End Class
 
 
 Public Class KNN_ClosestVertical : Inherits TaskParent
-    Public lines As New FeatureLine_Finder
+    Public lines As New FeatureLine_Finder3D
     Public knn As New KNN_ClosestLine
     Public pt1 As New cv.Point3f
     Public pt2 As New cv.Point3f

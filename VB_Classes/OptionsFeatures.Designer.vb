@@ -35,7 +35,6 @@ Partial Class OptionsFeatures
         Me.MaskGroup = New System.Windows.Forms.GroupBox()
         Me.verticalRadio = New System.Windows.Forms.RadioButton()
         Me.HorizRadio = New System.Windows.Forms.RadioButton()
-        Me.BothRadio = New System.Windows.Forms.RadioButton()
         Me.FeaturesGroup.SuspendLayout()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -134,7 +133,6 @@ Partial Class OptionsFeatures
         '
         'LineGroup
         '
-        Me.LineGroup.Controls.Add(Me.BothRadio)
         Me.LineGroup.Controls.Add(Me.HorizRadio)
         Me.LineGroup.Controls.Add(Me.verticalRadio)
         Me.LineGroup.Location = New System.Drawing.Point(796, 12)
@@ -175,17 +173,6 @@ Partial Class OptionsFeatures
         Me.HorizRadio.Text = "Horizontal Lines"
         Me.HorizRadio.UseVisualStyleBackColor = True
         '
-        'BothRadio
-        '
-        Me.BothRadio.AutoSize = True
-        Me.BothRadio.Location = New System.Drawing.Point(27, 110)
-        Me.BothRadio.Name = "BothRadio"
-        Me.BothRadio.Size = New System.Drawing.Size(201, 24)
-        Me.BothRadio.TabIndex = 2
-        Me.BothRadio.TabStop = True
-        Me.BothRadio.Text = "Both Vertical/Horizontal"
-        Me.BothRadio.UseVisualStyleBackColor = True
-        '
         'OptionsFeatures
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -217,7 +204,6 @@ Partial Class OptionsFeatures
     Friend WithEvents FeatureCorrelationLabel As Windows.Forms.Label
     Friend WithEvents Label4 As Windows.Forms.Label
     Friend WithEvents FCorrSlider As Windows.Forms.TrackBar
-    Friend WithEvents BothRadio As Windows.Forms.RadioButton
     Friend WithEvents HorizRadio As Windows.Forms.RadioButton
     Friend WithEvents verticalRadio As Windows.Forms.RadioButton
 End Class
