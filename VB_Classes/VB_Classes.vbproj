@@ -116,6 +116,18 @@
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
     <Compile Include="Intrinsics.vb" />
+    <Compile Include="OptionFeatures.Designer.vb">
+      <DependentUpon>OptionFeatures.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionFeatures.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsFeatures.Designer.vb">
+      <DependentUpon>OptionsFeatures.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsFeatures.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Regions.vb" />
     <Compile Include="DepthColorizer.vb" />
     <Compile Include="DepthRegion.vb" />
@@ -451,12 +463,18 @@
     <Compile Include="Magnify.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="OptionFeatures.resx">
+      <DependentUpon>OptionFeatures.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="OptionsCombo.resx">
       <DependentUpon>OptionsCombo.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsContainer.resx">
       <DependentUpon>OptionsContainer.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsFeatures.resx">
+      <DependentUpon>OptionsFeatures.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsFileName.resx">
       <DependentUpon>OptionsFileName.vb</DependentUpon>

@@ -213,6 +213,7 @@ Public Class VBtask : Implements IDisposable
 
     Public gOptions As OptionsGlobal
     Public redOptions As OptionsRedCloud
+    Public featureOptions As OptionsFeatures
     Public treeView As TreeviewForm
 
     Public paletteIndex As Integer
@@ -533,6 +534,7 @@ Public Class VBtask : Implements IDisposable
 
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
+        featureOptions = New OptionsFeatures
         If testAllRunning = False Then treeView = New TreeviewForm
 
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -562,8 +564,10 @@ Public Class VBtask : Implements IDisposable
         Next
 
         updateSettings()
-        redOptions.Show()
-        gOptions.Show()
+        featureOptions.Show() ' behind redOptions
+        redOptions.Show()     ' behind gOptions
+        gOptions.Show()       ' In front of both...
+
         If testAllRunning = False Then treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 
@@ -685,7 +689,8 @@ Public Class VBtask : Implements IDisposable
         End If
         If useRecordedData Then recordedData.Run(color.Clone)
 
-        redOptions.Sync()
+        redOptions.Sync() ' update the task with redCloud variables
+        featureOptions.sync() ' update the task with featureOptions variables.
 
         Dim src = color
         task.gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

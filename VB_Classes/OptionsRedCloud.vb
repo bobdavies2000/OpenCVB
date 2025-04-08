@@ -30,7 +30,7 @@ Public Class OptionsRedCloud
                                        "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsRedColor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
-        Me.Text = "Options mostly for RedColor_Basics but other related algorithms too."
+        Me.Text = "Options RedColor, RedCloud, RedMask and related algorithms"
 
         ' The following lines control the pointcloud histograms for X and Y, and the camera location.
 
@@ -113,7 +113,7 @@ Public Class OptionsRedCloud
         Label3.Text = CStr(rcReductionSlider.Value)
 
         Me.Left = 0
-        Me.Top = 0
+        Me.Top = 30
     End Sub
     Public Sub Sync()
         task.MaxZmeters = task.gOptions.maxDepth + 0.01 ' why add anything?  Because histograms are exclusive on ranges.
