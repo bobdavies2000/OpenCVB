@@ -630,56 +630,6 @@ End Class
 
 
 
-Public Class KNN_ClosestVertical : Inherits TaskParent
-    Public lines As New FeatureLine_Finder3D
-    Public knn As New KNN_ClosestLine
-    Public pt1 As New cv.Point3f
-    Public pt2 As New cv.Point3f
-    Public Sub New()
-        labels = {"", "", "Highlight the tracked line", "Candidate vertical lines are in Blue"}
-        desc = "Test the code find the longest line and track it using a minimized KNN test."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-
-        lines.Run(src)
-        If lines.sortedVerticals.Count = 0 Then
-            SetTrueText("No vertical lines were found.")
-            Exit Sub
-        End If
-
-        Dim index = lines.sortedVerticals.ElementAt(0).Value
-        Dim lastDistance = knn.lastP1.DistanceTo(knn.lastP2)
-        Dim bestDistance = lines.lines2D(index).DistanceTo(lines.lines2D(index + 1))
-        If knn.lastP1 = New cv.Point2f Or lastDistance < 0.75 * bestDistance Then
-            knn.lastP1 = lines.lines2D(index)
-            knn.lastP2 = lines.lines2D(index + 1)
-        End If
-
-        knn.trainInput.Clear()
-        For i = 0 To lines.sortedVerticals.Count - 1
-            index = lines.sortedVerticals.ElementAt(i).Value
-            knn.trainInput.Add(lines.lines2D(index))
-            knn.trainInput.Add(lines.lines2D(index + 1))
-        Next
-
-        knn.Run(src)
-
-        pt1 = lines.lines3D(knn.lastIndex)
-        pt2 = lines.lines3D(knn.lastIndex + 1)
-
-        dst3 = lines.dst3
-        DrawLine(dst2, knn.lastP1, knn.lastP2, task.highlight)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class KNN_TrackEach : Inherits TaskParent
     Dim knn As New KNN_OneToOne
     Dim trackAll As New List(Of List(Of lpData))

@@ -435,102 +435,6 @@ End Class
 
 
 
-
-Public Class Line_VerticalHorizontalCells : Inherits TaskParent
-    Dim lines As New FeatureLine_Finder3D
-    Dim hulls As New RedColor_Hulls
-    Public Sub New()
-        labels(2) = "RedColor_Hulls output with lines highlighted"
-        desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst2
-
-        lines.Run(dst2.Clone)
-        dst3 = src
-        For i = 0 To lines.sortedHorizontals.Count - 1
-            Dim index = lines.sortedHorizontals.ElementAt(i).Value
-            Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
-            DrawLine(dst3, p1, p2, cv.Scalar.Yellow)
-        Next
-        For i = 0 To lines.sortedVerticals.Count - 1
-            Dim index = lines.sortedVerticals.ElementAt(i).Value
-            Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
-            DrawLine(dst3, p1, p2, cv.Scalar.Blue)
-        Next
-        labels(3) = CStr(lines.sortedVerticals.Count) + " vertical and " + CStr(lines.sortedHorizontals.Count) + " horizontal lines identified in the RedCloud output"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_VerticalHorizontal1 : Inherits TaskParent
-    Dim nearest As New XO_Line_Nearest
-    Public Sub New()
-        task.gOptions.LineWidth.Value = 2
-        desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim pixelDiff = task.gOptions.pixelDiffThreshold
-
-        dst2 = src.Clone
-        If standaloneTest() Then dst3 = task.lines.dst2
-
-        nearest.lp = task.gravityVec
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
-        For Each lp In task.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2)
-            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
-                Continue For
-            End If
-
-            nearest.pt = lp.p1
-            nearest.Run(Nothing)
-            Dim d1 = nearest.distance
-
-            nearest.pt = lp.p2
-            nearest.Run(Nothing)
-            Dim d2 = nearest.distance
-
-            If Math.Abs(d1 - d2) <= pixelDiff Then
-                DrawLine(dst2, lp.p1, lp.p2, task.highlight)
-            End If
-        Next
-
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
-        nearest.lp = task.horizonVec
-        For Each lp In task.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2)
-            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
-
-            nearest.pt = lp.p1
-            nearest.Run(Nothing)
-            Dim d1 = nearest.distance
-
-            nearest.pt = lp.p2
-            nearest.Run(Nothing)
-            Dim d2 = nearest.distance
-
-            If Math.Abs(d1 - d2) <= pixelDiff Then
-                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
-            End If
-        Next
-        labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Line_Perpendicular : Inherits TaskParent
     Public input As lpData
     Public output As lpData
@@ -749,5 +653,79 @@ Public Class Line_Vertical3D : Inherits TaskParent
         Next
 
         labels(2) = "There are " + CStr(vertlist.Count) + " lines similar to the Gravity vector "
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_GCloud : Inherits TaskParent
+    Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public options As New Options_LineFinder
+    Dim match As New Match_tCell
+    Dim angleSlider As System.Windows.Forms.TrackBar
+    Dim lines As New Line_BasicsRaw
+    Public Sub New()
+        angleSlider = optiBase.FindSlider("Angle tolerance in degrees")
+        labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
+        desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
+    End Sub
+    Public Function updateGLine(src As cv.Mat, gc As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
+        gc.tc1.center = p1
+        gc.tc2.center = p2
+        gc.tc1 = match.createCell(src, gc.tc1.correlation, p1)
+        gc.tc2 = match.createCell(src, gc.tc2.correlation, p2)
+        gc.tc1.strOut = Format(gc.tc1.correlation, fmt2) + vbCrLf + Format(gc.tc1.depth, fmt2) + "m"
+        gc.tc2.strOut = Format(gc.tc2.correlation, fmt2) + vbCrLf + Format(gc.tc2.depth, fmt2) + "m"
+
+        Dim mean = task.pointCloud(gc.tc1.rect).Mean(task.depthMask(gc.tc1.rect))
+        gc.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
+        gc.tc1.depth = gc.pt1.Z
+        mean = task.pointCloud(gc.tc2.rect).Mean(task.depthMask(gc.tc2.rect))
+        gc.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
+        gc.tc2.depth = gc.pt2.Z
+
+        gc.len3D = distance3D(gc.pt1, gc.pt2)
+        If gc.pt1 = New cv.Point3f Or gc.pt2 = New cv.Point3f Then
+            gc.len3D = 0
+        Else
+            gc.arcX = Math.Asin((gc.pt1.X - gc.pt2.X) / gc.len3D) * 57.2958
+            gc.arcY = Math.Abs(Math.Asin((gc.pt1.Y - gc.pt2.Y) / gc.len3D) * 57.2958)
+            If gc.arcY > 90 Then gc.arcY -= 90
+            gc.arcZ = Math.Asin((gc.pt1.Z - gc.pt2.Z) / gc.len3D) * 57.2958
+        End If
+
+        Return gc
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim maxAngle = angleSlider.Value
+
+        dst2 = src.Clone
+        lines.Run(src.Clone)
+
+        sortedVerticals.Clear()
+        sortedHorizontals.Clear()
+        For Each lp In task.lpList
+            Dim gc As gravityLine
+            gc = updateGLine(src, gc, lp.p1, lp.p2)
+            allLines.Add(lp.p1.DistanceTo(lp.p2), gc)
+            If Math.Abs(90 - gc.arcY) < maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
+                sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gc)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
+            End If
+            If Math.Abs(gc.arcY) <= maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
+                sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gc)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+            End If
+        Next
+
+        labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
+                    Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
     End Sub
 End Class

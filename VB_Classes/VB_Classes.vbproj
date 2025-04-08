@@ -130,7 +130,6 @@
     </Compile>
     <Compile Include="Regions.vb" />
     <Compile Include="DepthColorizer.vb" />
-    <Compile Include="DepthRegion.vb" />
     <Compile Include="Deterministic.vb" />
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />

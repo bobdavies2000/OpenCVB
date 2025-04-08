@@ -464,29 +464,6 @@ End Class
 
 
 
-Public Class Structured_FeatureLines : Inherits TaskParent
-    Dim struct As New Structured_MultiSlice
-    Public lines As New FeatureLine_Finder3D
-    Public Sub New()
-        desc = "Find the lines in the Structured_MultiSlice algorithm output"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        struct.Run(src)
-        dst2 = struct.dst2
-
-        lines.Run(struct.dst2)
-        dst3 = src.Clone
-        For i = 0 To lines.lines2D.Count - 1 Step 2
-            Dim p1 = lines.lines2D(i), p2 = lines.lines2D(i + 1)
-            dst3.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Structured_FloorCeiling : Inherits TaskParent
     Public slice As New Structured_SliceEither
