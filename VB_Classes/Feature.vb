@@ -22,7 +22,7 @@ Public Class Feature_Basics : Inherits TaskParent
             If val = 0 Then ptNew.Add(pt)
         Next
 
-        Select Case options.featureSource
+        Select Case task.featureSource
             Case FeatureSrc.GoodFeaturesFull
                 features = cv.Cv2.GoodFeaturesToTrack(task.gray, options.featurePoints, options.quality,
                                                       task.minDistance, New cv.Mat,

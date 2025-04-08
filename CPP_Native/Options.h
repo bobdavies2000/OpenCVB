@@ -2221,9 +2221,3 @@ public:
 	Options_FAST() {
 	}
 };
-class Options_FeatureGather {
-public:
-	void Run() {}
-	Options_FeatureGather() {
-	}
-};

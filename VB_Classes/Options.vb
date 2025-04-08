@@ -8047,10 +8047,8 @@ Public Class Options_Features : Inherits OptionParent
     Public k As Double = 0.04
     Public blockSize As Integer = 3
     Public featurePoints As Integer = 400
-    Public featureSource As Integer
 
     Dim options As New Options_FeaturesEx
-    Dim optionsEx As New Options_FeatureGather
 
     Public templatePad As Integer = 10
     Public templateSize As Integer = 0
@@ -8074,8 +8072,6 @@ Public Class Options_Features : Inherits OptionParent
     End Sub
     Public Sub Run()
         options.Run()
-        optionsEx.Run()
-        featureSource = optionsEx.featureSource
 
         templatePad = options.templatePad
         templateSize = options.templateSize
@@ -8119,36 +8115,5 @@ Public Class Options_FAST : Inherits OptionParent
         Static rangeSlider = FindSlider("Range of random motion introduced (absolute value in pixels)")
         range = rangeSlider.Value
         useNonMax = nonMaxCheck.checked
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Options_FeatureGather : Inherits OptionParent
-    Public featureSource As Integer
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("GoodFeatures (ShiTomasi) full image")
-            radio.addRadio("GoodFeatures (ShiTomasi) grid")
-            radio.addRadio("Agast Features")
-            radio.addRadio("BRISK Features")
-            radio.addRadio("Harris Features")
-            radio.addRadio("FAST Features")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub Run()
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
-                featureSource = Choose(i + 1, FeatureSrc.GoodFeaturesFull, FeatureSrc.GoodFeaturesGrid,
-                                              FeatureSrc.Agast, FeatureSrc.BRISK, FeatureSrc.Harris,
-                                              FeatureSrc.FAST)
-                Exit For
-            End If
-        Next
     End Sub
 End Class
