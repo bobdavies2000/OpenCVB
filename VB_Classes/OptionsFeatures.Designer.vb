@@ -23,32 +23,79 @@ Partial Class OptionsFeatures
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.FeaturesGroup = New System.Windows.Forms.GroupBox()
+        Me.DistanceLabel = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.DistanceSlider = New System.Windows.Forms.TrackBar()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.FeatureMethod = New System.Windows.Forms.ComboBox()
         Me.LineGroup = New System.Windows.Forms.GroupBox()
         Me.MaskGroup = New System.Windows.Forms.GroupBox()
-        Me.FeatureMethods = New System.Windows.Forms.GroupBox()
-        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton2 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton3 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton4 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton5 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton6 = New System.Windows.Forms.RadioButton()
         Me.FeaturesGroup.SuspendLayout()
-        Me.FeatureMethods.SuspendLayout()
+        CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'FeaturesGroup
         '
-        Me.FeaturesGroup.Controls.Add(Me.FeatureMethods)
+        Me.FeaturesGroup.Controls.Add(Me.DistanceLabel)
+        Me.FeaturesGroup.Controls.Add(Me.Label2)
+        Me.FeaturesGroup.Controls.Add(Me.DistanceSlider)
+        Me.FeaturesGroup.Controls.Add(Me.Label1)
+        Me.FeaturesGroup.Controls.Add(Me.FeatureMethod)
         Me.FeaturesGroup.Location = New System.Drawing.Point(28, 12)
         Me.FeaturesGroup.Name = "FeaturesGroup"
-        Me.FeaturesGroup.Size = New System.Drawing.Size(328, 568)
+        Me.FeaturesGroup.Size = New System.Drawing.Size(762, 568)
         Me.FeaturesGroup.TabIndex = 0
         Me.FeaturesGroup.TabStop = False
         Me.FeaturesGroup.Text = "Features"
         '
+        'DistanceLabel
+        '
+        Me.DistanceLabel.AutoSize = True
+        Me.DistanceLabel.Location = New System.Drawing.Point(526, 133)
+        Me.DistanceLabel.Name = "DistanceLabel"
+        Me.DistanceLabel.Size = New System.Drawing.Size(72, 20)
+        Me.DistanceLabel.TabIndex = 8
+        Me.DistanceLabel.Text = "Distance"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(24, 110)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(229, 20)
+        Me.Label2.TabIndex = 7
+        Me.Label2.Text = "Min Distance between features"
+        '
+        'DistanceSlider
+        '
+        Me.DistanceSlider.Location = New System.Drawing.Point(20, 133)
+        Me.DistanceSlider.Maximum = 100
+        Me.DistanceSlider.Minimum = 1
+        Me.DistanceSlider.Name = "DistanceSlider"
+        Me.DistanceSlider.Size = New System.Drawing.Size(475, 69)
+        Me.DistanceSlider.TabIndex = 6
+        Me.DistanceSlider.Value = 25
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(24, 37)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(63, 20)
+        Me.Label1.TabIndex = 5
+        Me.Label1.Text = "Method"
+        '
+        'FeatureMethod
+        '
+        Me.FeatureMethod.FormattingEnabled = True
+        Me.FeatureMethod.Location = New System.Drawing.Point(20, 62)
+        Me.FeatureMethod.Name = "FeatureMethod"
+        Me.FeatureMethod.Size = New System.Drawing.Size(246, 28)
+        Me.FeatureMethod.TabIndex = 4
+        '
         'LineGroup
         '
-        Me.LineGroup.Location = New System.Drawing.Point(381, 12)
+        Me.LineGroup.Location = New System.Drawing.Point(796, 12)
         Me.LineGroup.Name = "LineGroup"
         Me.LineGroup.Size = New System.Drawing.Size(328, 568)
         Me.LineGroup.TabIndex = 1
@@ -57,93 +104,12 @@ Partial Class OptionsFeatures
         '
         'MaskGroup
         '
-        Me.MaskGroup.Location = New System.Drawing.Point(738, 21)
+        Me.MaskGroup.Location = New System.Drawing.Point(1038, 12)
         Me.MaskGroup.Name = "MaskGroup"
         Me.MaskGroup.Size = New System.Drawing.Size(328, 568)
         Me.MaskGroup.TabIndex = 2
         Me.MaskGroup.TabStop = False
         Me.MaskGroup.Text = "Masks"
-        '
-        'FeatureMethods
-        '
-        Me.FeatureMethods.Controls.Add(Me.RadioButton6)
-        Me.FeatureMethods.Controls.Add(Me.RadioButton5)
-        Me.FeatureMethods.Controls.Add(Me.RadioButton4)
-        Me.FeatureMethods.Controls.Add(Me.RadioButton3)
-        Me.FeatureMethods.Controls.Add(Me.RadioButton2)
-        Me.FeatureMethods.Controls.Add(Me.RadioButton1)
-        Me.FeatureMethods.Location = New System.Drawing.Point(6, 34)
-        Me.FeatureMethods.Name = "FeatureMethods"
-        Me.FeatureMethods.Size = New System.Drawing.Size(263, 190)
-        Me.FeatureMethods.TabIndex = 3
-        Me.FeatureMethods.TabStop = False
-        Me.FeatureMethods.Text = "Method"
-        '
-        'RadioButton1
-        '
-        Me.RadioButton1.AutoSize = True
-        Me.RadioButton1.Location = New System.Drawing.Point(17, 30)
-        Me.RadioButton1.Name = "RadioButton1"
-        Me.RadioButton1.Size = New System.Drawing.Size(220, 24)
-        Me.RadioButton1.TabIndex = 0
-        Me.RadioButton1.TabStop = True
-        Me.RadioButton1.Text = "Good Features Full Image"
-        Me.RadioButton1.UseVisualStyleBackColor = True
-        '
-        'RadioButton2
-        '
-        Me.RadioButton2.AutoSize = True
-        Me.RadioButton2.Location = New System.Drawing.Point(17, 54)
-        Me.RadioButton2.Name = "RadioButton2"
-        Me.RadioButton2.Size = New System.Drawing.Size(176, 24)
-        Me.RadioButton2.TabIndex = 1
-        Me.RadioButton2.TabStop = True
-        Me.RadioButton2.Text = "Good Features Grid"
-        Me.RadioButton2.UseVisualStyleBackColor = True
-        '
-        'RadioButton3
-        '
-        Me.RadioButton3.AutoSize = True
-        Me.RadioButton3.Location = New System.Drawing.Point(17, 78)
-        Me.RadioButton3.Name = "RadioButton3"
-        Me.RadioButton3.Size = New System.Drawing.Size(89, 24)
-        Me.RadioButton3.TabIndex = 2
-        Me.RadioButton3.TabStop = True
-        Me.RadioButton3.Text = "AGAST"
-        Me.RadioButton3.UseVisualStyleBackColor = True
-        '
-        'RadioButton4
-        '
-        Me.RadioButton4.AutoSize = True
-        Me.RadioButton4.Location = New System.Drawing.Point(17, 102)
-        Me.RadioButton4.Name = "RadioButton4"
-        Me.RadioButton4.Size = New System.Drawing.Size(83, 24)
-        Me.RadioButton4.TabIndex = 3
-        Me.RadioButton4.TabStop = True
-        Me.RadioButton4.Text = "BRISK"
-        Me.RadioButton4.UseVisualStyleBackColor = True
-        '
-        'RadioButton5
-        '
-        Me.RadioButton5.AutoSize = True
-        Me.RadioButton5.Location = New System.Drawing.Point(17, 126)
-        Me.RadioButton5.Name = "RadioButton5"
-        Me.RadioButton5.Size = New System.Drawing.Size(76, 24)
-        Me.RadioButton5.TabIndex = 4
-        Me.RadioButton5.TabStop = True
-        Me.RadioButton5.Text = "Harris"
-        Me.RadioButton5.UseVisualStyleBackColor = True
-        '
-        'RadioButton6
-        '
-        Me.RadioButton6.AutoSize = True
-        Me.RadioButton6.Location = New System.Drawing.Point(17, 150)
-        Me.RadioButton6.Name = "RadioButton6"
-        Me.RadioButton6.Size = New System.Drawing.Size(75, 24)
-        Me.RadioButton6.TabIndex = 5
-        Me.RadioButton6.TabStop = True
-        Me.RadioButton6.Text = "FAST"
-        Me.RadioButton6.UseVisualStyleBackColor = True
         '
         'OptionsFeatures
         '
@@ -156,20 +122,18 @@ Partial Class OptionsFeatures
         Me.Name = "OptionsFeatures"
         Me.Text = "OptionsFeatures"
         Me.FeaturesGroup.ResumeLayout(False)
-        Me.FeatureMethods.ResumeLayout(False)
-        Me.FeatureMethods.PerformLayout()
+        Me.FeaturesGroup.PerformLayout()
+        CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents FeaturesGroup As Windows.Forms.GroupBox
-    Friend WithEvents FeatureMethods As Windows.Forms.GroupBox
     Friend WithEvents LineGroup As Windows.Forms.GroupBox
     Friend WithEvents MaskGroup As Windows.Forms.GroupBox
-    Friend WithEvents RadioButton6 As Windows.Forms.RadioButton
-    Friend WithEvents RadioButton5 As Windows.Forms.RadioButton
-    Friend WithEvents RadioButton4 As Windows.Forms.RadioButton
-    Friend WithEvents RadioButton3 As Windows.Forms.RadioButton
-    Friend WithEvents RadioButton2 As Windows.Forms.RadioButton
-    Friend WithEvents RadioButton1 As Windows.Forms.RadioButton
+    Friend WithEvents FeatureMethod As Windows.Forms.ComboBox
+    Friend WithEvents Label1 As Windows.Forms.Label
+    Friend WithEvents Label2 As Windows.Forms.Label
+    Friend WithEvents DistanceSlider As Windows.Forms.TrackBar
+    Friend WithEvents DistanceLabel As Windows.Forms.Label
 End Class
