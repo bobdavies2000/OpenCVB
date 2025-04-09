@@ -45,7 +45,7 @@ Public Class VBtask : Implements IDisposable
 
     Public topFeatures As New List(Of cv.Point2f)
     Public features As New List(Of cv.Point2f)
-    Public fpToGridCell As New List(Of Integer)
+    Public fpFromGridCell As New List(Of Integer)
     Public featurePoints As New List(Of cv.Point)
 
     Public featureMask As New cv.Mat
@@ -580,7 +580,6 @@ Public Class VBtask : Implements IDisposable
 
         fpList.Clear()
         fpOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        fpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
 

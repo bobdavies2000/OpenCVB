@@ -418,7 +418,7 @@ Public Class TaskParent : Implements IDisposable
     Public Sub fpDisplayAge()
         dst3 = task.fpOutline
         For Each fp In task.fpList
-            SetTrueText(CStr(fp.age), fp.ptCenter, 3)
+            SetTrueText(CStr(fp.age), fp.pt, 3)
         Next
     End Sub
     Public Sub fpDisplayCell()
@@ -453,8 +453,6 @@ Public Class TaskParent : Implements IDisposable
         mask32s(fp.rect).SetTo(0)
         mask32s.FillConvexPoly(fp.facets, white, task.lineType)
         mask32s(fp.rect).ConvertTo(fp.mask, cv.MatType.CV_8U)
-        'fp.mask.SetTo(0, task.noDepthMask(fp.rect))
-        'If fp.mask.CountNonZero = 0 Then fp.mask.SetTo(255)
 
         Return fp
     End Function

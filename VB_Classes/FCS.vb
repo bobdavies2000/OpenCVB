@@ -30,12 +30,17 @@ Public Class FCS_Basics : Inherits TaskParent
             fp.index = i
 
             Dim gcIndex = task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
-            Dim fpIndex = task.fpToGridCell.IndexOf(gcIndex)
-            If fpIndex >= 0 And fpIndex < fpLastList.Count Then
-                Dim fpLast = fpLastList(fpIndex)
-                fp.age = fpLast.age + 1
-                matchCount += 1
+            If task.fpFromGridCell.Contains(gcIndex) Then
+                Dim fpIndex = task.fpFromGridCell.IndexOf(gcIndex)
+                If fpIndex >= 0 And fpIndex < fpLastList.Count Then
+                    Dim fpLast = fpLastList(fpIndex)
+                    fp.age = fpLast.age + 1
+                    matchCount += 1
+                End If
+            Else
+                Dim k = 0
             End If
+
 
             fp.facets = New List(Of cv.Point)
             Dim xlist As New List(Of Integer), ylist As New List(Of Integer)
@@ -45,16 +50,13 @@ Public Class FCS_Basics : Inherits TaskParent
                 ylist.Add(pt.Y)
                 fp.facets.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
-            task.fpMap.FillConvexPoly(fp.facets, CSng(gcIndex), task.lineType)
-            dst1.FillConvexPoly(fp.facets, gcIndex Mod 255, task.lineType)
 
             Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
-            Dim mms() As Single = {minX, minY, maxX, maxY}
-            fp = buildRect(fp, mms)
+            fp = buildRect(fp, {minX, minY, maxX, maxY})
             fp.ptCenter = GetMaxDist(fp)
 
             If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then
-                fp = findRect(fp, mms)
+                fp = findRect(fp, {minX, minY, maxX, maxY})
                 fp.periph = True
             End If
 
@@ -71,6 +73,9 @@ Public Class FCS_Basics : Inherits TaskParent
             fp.colorTracking = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
 
             task.fpList.Add(fp)
+
+            task.fpMap.FillConvexPoly(fp.facets, CSng(gcIndex), task.lineType)
+            dst1.FillConvexPoly(fp.facets, gcIndex Mod 255, task.lineType)
             DrawContour(task.fpOutline, fp.facets, 255, 1)
         Next
 
@@ -84,7 +89,7 @@ Public Class FCS_Basics : Inherits TaskParent
         End If
 
         Dim index As Integer = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        Dim fpDindex = task.fpToGridCell.IndexOf(index)
+        Dim fpDindex = task.fpFromGridCell.IndexOf(index)
         task.fpD = task.fpList(fpDindex)
         DrawContour(dst2, task.fpD.facets, white, task.lineWidth)
 
