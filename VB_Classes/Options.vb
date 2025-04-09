@@ -7159,35 +7159,6 @@ End Class
 
 
 
-Public Class Options_Edge_Basics : Inherits OptionParent
-    Public edgeSelection As String = "Canny"
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Canny")
-            radio.addRadio("Scharr")
-            radio.addRadio("Sobel")
-            radio.addRadio("Resize And Add")
-            radio.addRadio("Binarized Reduction")
-            radio.addRadio("Binarized Sobel")
-            radio.addRadio("Color Gap")
-            radio.addRadio("Deriche")
-            radio.addRadio("Laplacian")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub Run()
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        edgeSelection = frm.check(findRadioIndex(frm.check)).text
-
-        If task.frameCount < 100 Or task.optionsChanged Then frm.left = task.gOptions.Width / 2
-    End Sub
-End Class
-
-
-
-
-
 Public Class Options_ColorMethod : Inherits OptionParent
     Public Sub New()
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then

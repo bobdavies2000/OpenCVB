@@ -187,9 +187,7 @@ Public Class Match_Motion : Inherits TaskParent
     Dim options As New Options_Features
     Public mask As cv.Mat
     Dim optionsMatch As New Options_Match
-    Dim correlationSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        correlationSlider = optiBase.FindSlider("Feature Correlation Threshold")
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         dst3 = mask.Clone
         desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
@@ -197,7 +195,6 @@ Public Class Match_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         optionsMatch.Run()
-        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
         dst2 = src.Clone
         If dst2.Channels() = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -215,7 +212,7 @@ Public Class Match_Motion : Inherits TaskParent
             If stdev > optionsMatch.stdevThreshold Then
                 cv.Cv2.MatchTemplate(dst2(roi), lastFrame(roi), correlation, options.matchOption)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If correlation.Get(Of Single)(0, 0) < CCthreshold Then
+                If correlation.Get(Of Single)(0, 0) < task.fCorrThreshold Then
                     Interlocked.Increment(updateCount)
                 Else
                     mask(roi).SetTo(255)
@@ -231,7 +228,7 @@ Public Class Match_Motion : Inherits TaskParent
         dst3.SetTo(0)
         saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
-        Dim corrPercent = Format(correlationSlider.Value / 100, "0.0%") + " correlation"
+        Dim corrPercent = Format(task.fCorrThreshold, "0.0%") + " correlation"
         labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " + CStr(task.gridRects.Count) + " with < " + corrPercent +
                     " or stdev < " + Format(optionsMatch.stdevThreshold, fmt0)
         labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " + corrPercent
@@ -446,8 +443,6 @@ Public Class Match_LinePairTest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static cellSlider = optiBase.FindSlider("MatchTemplate Cell Size")
-        Static corrSlider = optiBase.FindSlider("Feature Correlation Threshold")
-        Dim minCorrelation = corrSlider.Value / 100
         Dim rSize = cellSlider.Value
         Dim radius = rSize / 2
 
@@ -455,7 +450,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
 
         options.Run()
 
-        If (target(0) IsNot Nothing And correlation(0) < minCorrelation) Then target(0) = Nothing
+        If (target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold) Then target(0) = Nothing
         If task.mouseClickFlag Then
             ptx(0) = task.ClickPoint
             ptx(1) = New cv.Point2f(msRNG.Next(rSize, dst2.Width - 2 * rSize), msRNG.Next(rSize, dst2.Height - 2 * rSize))
@@ -484,7 +479,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
             correlation(i) = mmData.maxVal
             If i = 0 Then
                 dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
-                dst2 = dst2.Threshold(minCorrelation, 255, cv.ThresholdTypes.Binary)
+                dst2 = dst2.Threshold(task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
             DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)

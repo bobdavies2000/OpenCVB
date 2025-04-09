@@ -1,5 +1,4 @@
-﻿Imports System.Runtime.CompilerServices
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class OptionsGlobal
     Public maxDepth As Integer
     Public pixelDiffThreshold As Integer

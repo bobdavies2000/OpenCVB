@@ -32,9 +32,11 @@ Partial Class OptionsFeatures
         Me.Label1 = New System.Windows.Forms.Label()
         Me.FeatureMethod = New System.Windows.Forms.ComboBox()
         Me.LineGroup = New System.Windows.Forms.GroupBox()
-        Me.MaskGroup = New System.Windows.Forms.GroupBox()
-        Me.verticalRadio = New System.Windows.Forms.RadioButton()
         Me.HorizRadio = New System.Windows.Forms.RadioButton()
+        Me.verticalRadio = New System.Windows.Forms.RadioButton()
+        Me.MaskGroup = New System.Windows.Forms.GroupBox()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.EdgeMethods = New System.Windows.Forms.ComboBox()
         Me.FeaturesGroup.SuspendLayout()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -43,6 +45,8 @@ Partial Class OptionsFeatures
         '
         'FeaturesGroup
         '
+        Me.FeaturesGroup.Controls.Add(Me.Label3)
+        Me.FeaturesGroup.Controls.Add(Me.EdgeMethods)
         Me.FeaturesGroup.Controls.Add(Me.FeatureCorrelationLabel)
         Me.FeaturesGroup.Controls.Add(Me.Label4)
         Me.FeaturesGroup.Controls.Add(Me.FCorrSlider)
@@ -56,7 +60,6 @@ Partial Class OptionsFeatures
         Me.FeaturesGroup.Size = New System.Drawing.Size(762, 568)
         Me.FeaturesGroup.TabIndex = 0
         Me.FeaturesGroup.TabStop = False
-        Me.FeaturesGroup.Text = "Features"
         '
         'FeatureCorrelationLabel
         '
@@ -119,9 +122,9 @@ Partial Class OptionsFeatures
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(24, 37)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(63, 20)
+        Me.Label1.Size = New System.Drawing.Size(123, 20)
         Me.Label1.TabIndex = 5
-        Me.Label1.Text = "Method"
+        Me.Label1.Text = "Feature Method"
         '
         'FeatureMethod
         '
@@ -142,14 +145,16 @@ Partial Class OptionsFeatures
         Me.LineGroup.TabStop = False
         Me.LineGroup.Text = "Lines"
         '
-        'MaskGroup
+        'HorizRadio
         '
-        Me.MaskGroup.Location = New System.Drawing.Point(1038, 12)
-        Me.MaskGroup.Name = "MaskGroup"
-        Me.MaskGroup.Size = New System.Drawing.Size(328, 568)
-        Me.MaskGroup.TabIndex = 2
-        Me.MaskGroup.TabStop = False
-        Me.MaskGroup.Text = "Masks"
+        Me.HorizRadio.AutoSize = True
+        Me.HorizRadio.Location = New System.Drawing.Point(27, 80)
+        Me.HorizRadio.Name = "HorizRadio"
+        Me.HorizRadio.Size = New System.Drawing.Size(148, 24)
+        Me.HorizRadio.TabIndex = 1
+        Me.HorizRadio.TabStop = True
+        Me.HorizRadio.Text = "Horizontal Lines"
+        Me.HorizRadio.UseVisualStyleBackColor = True
         '
         'verticalRadio
         '
@@ -162,16 +167,31 @@ Partial Class OptionsFeatures
         Me.verticalRadio.Text = "Vertical Lines"
         Me.verticalRadio.UseVisualStyleBackColor = True
         '
-        'HorizRadio
+        'MaskGroup
         '
-        Me.HorizRadio.AutoSize = True
-        Me.HorizRadio.Location = New System.Drawing.Point(27, 80)
-        Me.HorizRadio.Name = "HorizRadio"
-        Me.HorizRadio.Size = New System.Drawing.Size(148, 24)
-        Me.HorizRadio.TabIndex = 1
-        Me.HorizRadio.TabStop = True
-        Me.HorizRadio.Text = "Horizontal Lines"
-        Me.HorizRadio.UseVisualStyleBackColor = True
+        Me.MaskGroup.Location = New System.Drawing.Point(1038, 12)
+        Me.MaskGroup.Name = "MaskGroup"
+        Me.MaskGroup.Size = New System.Drawing.Size(328, 568)
+        Me.MaskGroup.TabIndex = 2
+        Me.MaskGroup.TabStop = False
+        Me.MaskGroup.Text = "Masks"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(430, 37)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(105, 20)
+        Me.Label3.TabIndex = 13
+        Me.Label3.Text = "Edge Method"
+        '
+        'EdgeMethods
+        '
+        Me.EdgeMethods.FormattingEnabled = True
+        Me.EdgeMethods.Location = New System.Drawing.Point(426, 62)
+        Me.EdgeMethods.Name = "EdgeMethods"
+        Me.EdgeMethods.Size = New System.Drawing.Size(246, 28)
+        Me.EdgeMethods.TabIndex = 12
         '
         'OptionsFeatures
         '
@@ -206,4 +226,6 @@ Partial Class OptionsFeatures
     Friend WithEvents FCorrSlider As Windows.Forms.TrackBar
     Friend WithEvents HorizRadio As Windows.Forms.RadioButton
     Friend WithEvents verticalRadio As Windows.Forms.RadioButton
+    Friend WithEvents Label3 As Windows.Forms.Label
+    Friend WithEvents EdgeMethods As Windows.Forms.ComboBox
 End Class

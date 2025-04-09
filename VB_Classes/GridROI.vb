@@ -228,7 +228,7 @@ Public Class GridROI_CorrelationMotion : Inherits TaskParent
     Dim plot As New Plot_OverTimeSingle
     Dim options As New Options_Features
     Public Sub New()
-        optiBase.FindSlider("Feature Correlation Threshold").Value = 90
+        task.featureOptions.FCorrSlider.Value = 90
         desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -301,7 +301,7 @@ Public Class GridROI_LowStdevCorrelation : Inherits TaskParent
     Dim options As New Options_Features
     Dim saveStdev As New List(Of Single)
     Public Sub New()
-        optiBase.FindSlider("Feature Correlation Threshold").Value = 50
+        task.featureOptions.FCorrSlider.Value = 50
         desc = "Display the correlation coefficients for roi's with low standard deviation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -376,7 +376,7 @@ Public Class GridROI_LRClick : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
         task.gOptions.GridSlider.Value = 16
-        optiBase.FindSlider("Feature Correlation Threshold").Value = 80
+        task.featureOptions.FCorrSlider.Value = 80
         If standalone Then task.gOptions.displayDst1.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
@@ -456,7 +456,7 @@ Public Class GridROI_LRAll : Inherits TaskParent
     Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
         task.gOptions.GridSlider.Value = 16
-        optiBase.FindSlider("Feature Correlation Threshold").Value = 95
+        task.featureOptions.FCorrSlider.Value = 95
         labels(3) = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images."
         desc = "Find all the roi's with high stdev and high correlation between left and right images."
     End Sub

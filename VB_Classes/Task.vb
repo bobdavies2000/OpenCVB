@@ -272,6 +272,7 @@ Public Class VBtask : Implements IDisposable
     Public minDistance As Integer ' minimum distance between features
     Public featureSource As Integer ' which Feature_Basics method...
     Public fCorrThreshold As Single ' feature correlation threshold
+    Public edgeMethod As String
     Public verticalLines As Boolean
 
     Public externalPythonInvocation As Boolean
@@ -694,7 +695,6 @@ Public Class VBtask : Implements IDisposable
         If useRecordedData Then recordedData.Run(color.Clone)
 
         redOptions.Sync() ' update the task with redCloud variables
-        featureOptions.sync() ' update the task with featureOptions variables.
 
         Dim src = color
         task.gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

@@ -12,18 +12,15 @@ Public Class Edge_Basics : Inherits TaskParent
     Dim Laplacian As Edge_Laplacian
     Dim resizeAdd As Edge_ResizeAdd
     Dim regions As Edge_Regions
-    Public options As New Options_Edge_Basics
     Dim edges As Object
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-
         Static saveSelection As String = ""
-        If saveSelection <> options.edgeSelection Then
-            saveSelection = options.edgeSelection
-            Select Case options.edgeSelection
+        If saveSelection <> task.edgeMethod Then
+            saveSelection = task.edgeMethod
+            Select Case task.edgeMethod
                 Case "Canny"
                     edges = New Edge_Canny
                 Case "Scharr"
@@ -49,7 +46,7 @@ Public Class Edge_Basics : Inherits TaskParent
 
         If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If dst2.Type <> cv.MatType.CV_8UC1 Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        labels(2) = traceName + " - selection = " + options.edgeSelection
+        labels(2) = traceName + " - selection = " + task.edgeMethod
     End Sub
 End Class
 

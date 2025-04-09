@@ -1950,13 +1950,6 @@ public:
 	Options_Density() {
 	}
 };
-class Options_Edge_Basics {
-public:
-	string edgeSelection =  "Canny";
-	void Run() {}
-	Options_Edge_Basics() {
-	}
-};
 class Options_ColorMethod {
 public:
 	void Run() {}

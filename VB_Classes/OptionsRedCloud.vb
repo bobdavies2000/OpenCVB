@@ -118,9 +118,6 @@ Public Class OptionsRedCloud
     Public Sub Sync()
         task.MaxZmeters = task.gOptions.maxDepth + 0.01 ' why add anything?  Because histograms are exclusive on ranges.
 
-        task.xRange = XRangeBar.Value / 100
-        task.yRange = YRangeSlider.Value / 100
-
         task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.MaxZmeters + 0.1),
                                            New cv.Rangef(-task.xRange, task.xRange)}
         task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
@@ -185,10 +182,12 @@ Public Class OptionsRedCloud
 
     Private Sub XRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles XRangeBar.ValueChanged
         task.optionsChanged = True
+        task.xRange = XRangeBar.Value / 100
         XLabel.Text = CStr(XRangeBar.Value)
     End Sub
     Private Sub YRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles YRangeSlider.ValueChanged
         task.optionsChanged = True
+        task.yRange = YRangeSlider.Value / 100
         YLabel.Text = CStr(YRangeSlider.Value)
     End Sub
     Private Sub ProjectionThreshold_ValueChanged(sender As Object, e As EventArgs) Handles ProjectionThresholdBar.ValueChanged
@@ -325,12 +324,6 @@ Public Class OptionsRedCloud
     Public Sub setProjection(val As Integer)
         ProjectionThresholdBar.Value = val
     End Sub
-    Public Sub setYRangeSlider(val As Integer)
-        YRangeSlider.Value = val
-    End Sub
-    Public Function getYRangeSlider() As Integer
-        Return YRangeSlider.Value
-    End Function
     Public Sub setXZReduction(val As Boolean)
         XZReduction.Checked = val
     End Sub
