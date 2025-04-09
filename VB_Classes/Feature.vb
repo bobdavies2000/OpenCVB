@@ -104,16 +104,13 @@ Public Class Feature_Basics : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To sortByGrid.Count - 1
             Dim pt = sortByGrid.ElementAt(i).Value
-            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
-            If depth > 0 Then
-                task.features.Add(pt)
-                task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+            task.features.Add(pt)
+            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
 
-                Dim nextIndex = task.gcMap.Get(Of Single)(pt.Y, pt.X)
-                task.fpFromGridCell.Add(nextIndex)
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                dst3.Set(Of Byte)(pt.Y, pt.X, 255)
-            End If
+            Dim nextIndex = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            task.fpFromGridCell.Add(nextIndex)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
         If standaloneTest() Then

@@ -5,10 +5,11 @@ Public Class FCS_Basics : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
-        labels(3) = "CV_8U map of Delaunay cells"
+        labels(3) = "CV_8U map of Delaunay cells."
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         Dim fpLastList = New List(Of fpXData)(task.fpList)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
@@ -30,7 +31,7 @@ Public Class FCS_Basics : Inherits TaskParent
 
             Dim gcIndex = task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(gcIndex)
-            If fpIndex >= 0 And fpIndex < fpLastList.Count Then
+            If fpIndex >= 0 Then
                 Dim fpLast = fpLastList(fpIndex)
                 fp.age = fpLast.age + 1
                 matchCount += 1
@@ -71,6 +72,10 @@ Public Class FCS_Basics : Inherits TaskParent
         Next
 
         dst2 = ShowPalette(dst1)
+        For Each fp In task.fpList
+            Dim depth = task.pcSplit(2).Get(Of Single)(fp.pt.Y, fp.pt.X)
+            If depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
+        Next
         dst3 = task.fpOutline
 
         dst2.SetTo(black, task.fpOutline)
@@ -86,7 +91,7 @@ Public Class FCS_Basics : Inherits TaskParent
 
         If task.heartBeat Then
             labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells found.  Matched = " +
-                        CStr(matchCount) + " of " + CStr(task.features.Count)
+                        CStr(matchCount) + " of " + CStr(task.features.Count) + ".  NOTE: highlighted points show features with depth."
         End If
     End Sub
 End Class
@@ -264,7 +269,6 @@ End Class
 
 Public Class FCS_FloodFill : Inherits TaskParent
     Dim flood As New Flood_Basics
-    Dim fcs As New FCS_Basics
     Dim edges As New Edge_Canny
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -274,8 +278,7 @@ Public Class FCS_FloodFill : Inherits TaskParent
         flood.Run(src)
         dst2 = flood.dst2
 
-        fcs.Run(src)
-        dst1 = src
+        dst1 = src.Clone
 
         edges.Run(src)
         dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

@@ -559,8 +559,6 @@ Public Class fpXData ' feature point -  excessive - trim this to fcsData...
     Public ptCenter As cv.Point
     Public center As cv.Point
     Public rcIndex As Integer
-    Public nabeList As List(Of Integer)
-    Public nabeRect As cv.Rect
     Public depthMean As Single
     Public depthMin As Single
     Public depthMax As Single
@@ -569,7 +567,6 @@ Public Class fpXData ' feature point -  excessive - trim this to fcsData...
         facet2f = New List(Of cv.Point2f)
         facets = New List(Of cv.Point)
         ptHistory = New List(Of cv.Point)
-        nabeList = New List(Of Integer)
     End Sub
 End Class
 
