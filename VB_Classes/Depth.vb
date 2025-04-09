@@ -830,8 +830,8 @@ Public Class Depth_Regions : Inherits TaskParent
         desc = "Separate the scene into a specified number of regions by depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.pcSplit(2).Threshold(task.gOptions.maxDepth, task.gOptions.maxDepth, cv.ThresholdTypes.Binary)
-        dst0 = (task.pcSplit(2) / task.gOptions.maxDepth) * 255 / classCount
+        dst1 = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Binary)
+        dst0 = (task.pcSplit(2) / task.MaxZmeters) * 255 / classCount
         dst0.ConvertTo(dst2, cv.MatType.CV_8U)
         dst2.SetTo(0, task.noDepthMask)
 

@@ -312,11 +312,11 @@ Public Class ML_DepthFromColor : Inherits TaskParent
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth = task.pcSplit(2).Resize(color32f.Size())
 
-        Dim mask = depth.Threshold(task.gOptions.maxDepth, 255, cv.ThresholdTypes.Binary)
+        Dim mask = depth.Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         mats.mat(2) = mask.Resize(src.Size())
 
-        depth.SetTo(task.gOptions.maxDepth, Not mask)
+        depth.SetTo(task.MaxZmeters, Not mask)
 
         colorPal.Run(depth.ConvertScaleAbs())
         mats.mat(3) = colorPal.dst2.Clone()
@@ -343,7 +343,7 @@ Public Class ML_DepthFromColor : Inherits TaskParent
 
         mats.Run(src)
         dst2 = mats.dst2
-        labels(2) = "prediction, shadow, Depth Mask < " + CStr(task.gOptions.maxDepth) + ", Learn Input"
+        labels(2) = "prediction, shadow, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
         dst3 = mats.dst3
     End Sub
 End Class
@@ -372,13 +372,13 @@ Public Class ML_DepthFromXYColor : Inherits TaskParent
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = task.pcSplit(2).Resize(color32f.Size())
 
-        Dim mask = depth32f.Threshold(task.gOptions.maxDepth, task.gOptions.maxDepth, cv.ThresholdTypes.BinaryInv)
+        Dim mask = depth32f.Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.BinaryInv)
         mask.SetTo(0, shadowSmall) ' remove the unknown depth...
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         mats.mat(2) = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
 
         mask = Not mask
-        depth32f.SetTo(task.gOptions.maxDepth, mask)
+        depth32f.SetTo(task.MaxZmeters, mask)
 
         colorizer.Run(depth32f.ConvertScaleAbs)
         mats.mat(3) = colorizer.dst2.Clone()
@@ -421,7 +421,7 @@ Public Class ML_DepthFromXYColor : Inherits TaskParent
 
         mats.Run(src)
         dst3 = mats.dst2
-        labels(3) = "shadow, empty, Depth Mask < " + CStr(task.gOptions.maxDepth) + ", Learn Input"
+        labels(3) = "shadow, empty, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
     End Sub
 End Class
 

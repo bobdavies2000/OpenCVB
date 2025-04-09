@@ -163,7 +163,6 @@ Public Module vbc
         task.lineWidth = task.gOptions.LineWidth.Value
         task.DotSize = task.gOptions.DotSizeSlider.Value
 
-        task.MaxZmeters = task.gOptions.maxDepth
         task.metersPerPixel = task.MaxZmeters / task.dst2.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
         task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 1000

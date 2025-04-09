@@ -116,12 +116,10 @@ Public Class OptionsRedCloud
         Me.Top = 30
     End Sub
     Public Sub Sync()
-        task.MaxZmeters = task.gOptions.maxDepth + 0.01 ' why add anything?  Because histograms are exclusive on ranges.
-
         task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.MaxZmeters + 0.1),
-                                           New cv.Rangef(-task.xRange, task.xRange)}
+                                          New cv.Rangef(-task.xRange, task.xRange)}
         task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
-                                            New cv.Rangef(0.1, task.MaxZmeters + 0.1)}
+                                           New cv.Rangef(0.1, task.MaxZmeters + 0.1)}
 
         task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
         task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
@@ -130,7 +128,7 @@ Public Class OptionsRedCloud
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.maxZmeters)
+        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
         rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
 
         channelCount = 1

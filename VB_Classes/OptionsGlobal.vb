@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsGlobal
-    Public maxDepth As Integer
     Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
@@ -32,7 +31,6 @@ Public Class OptionsGlobal
         MotionFilteredColorAndCloud.Checked = True
         gravityPointCloud.Checked = True
 
-        maxCount.Text = CStr(MaxDepthBar.Value)
         labelBinsCount.Text = CStr(HistBinBar.Value)
         PixelDiff.Text = CStr(PixelDiffBar.Value)
         fHist.Text = CStr(FrameHistory.Value)
@@ -186,7 +184,7 @@ Public Class OptionsGlobal
     End Sub
     Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepthBar.ValueChanged
         maxCount.Text = CStr(MaxDepthBar.Value)
-        maxDepth = MaxDepthBar.Value
+        task.MaxZmeters = MaxDepthBar.Value + 0.01 ' why add anything?  Because histograms are exclusive on ranges.
         task.optionsChanged = True
     End Sub
     Private Sub GridSlider_Scroll(sender As Object, e As EventArgs) Handles GridSlider.Scroll
@@ -392,5 +390,9 @@ Public Class OptionsGlobal
     End Sub
     Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
         task.optionsChanged = True
+    End Sub
+
+    Private Sub MaxDepthBar_Scroll(sender As Object, e As EventArgs) Handles MaxDepthBar.Scroll
+
     End Sub
 End Class
