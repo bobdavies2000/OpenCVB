@@ -547,8 +547,7 @@ End Class
 
 Public Class fpXData ' feature point -  excessive - trim this to fcsData...
     Public index As Integer
-    Public indexLast As Integer = -1
-    Public age As Integer
+    Public age As Integer = 1
     Public ID As Single
     Public travelDistance As Single
     Public periph As Boolean
@@ -566,7 +565,6 @@ Public Class fpXData ' feature point -  excessive - trim this to fcsData...
     Public depthMean As Single
     Public depthMin As Single
     Public depthMax As Single
-    Public gcIndex As Integer
 
     Public colorTracking As cv.Scalar
     Sub New()

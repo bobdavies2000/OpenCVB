@@ -5,7 +5,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Dim harris As Corners_HarrisDetector_CPP
     Dim FAST As Corners_Basics
     Dim brisk As BRISK_Basics
-    Public fcsCreate As New FCS_Create
+    Public fcs As New FCS_Basics
     Public options As New Options_Features
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -90,12 +90,22 @@ Public Class Feature_Basics : Inherits TaskParent
             Next
         End If
 
+        Dim sortByGrid As New SortedList(Of Single, cv.Point2f)(New compareAllowIdenticalSingle)
+        For Each pt In ptNew
+            Dim index = task.gcMap.Get(Of Integer)(pt.Y, pt.X)
+            sortByGrid.Add(index, pt)
+        Next
+
         task.features.Clear()
         task.featurePoints.Clear()
+        task.fpToGridCell.Clear()
         dst3.SetTo(0)
-        For Each pt In ptNew
+        For i = 0 To sortByGrid.Count - 1
+            Dim pt = sortByGrid.ElementAt(i).Value
             task.features.Add(pt)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+            Dim nextIndex = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            task.fpToGridCell.Add(nextIndex)
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
@@ -107,7 +117,7 @@ Public Class Feature_Basics : Inherits TaskParent
             Next
         End If
 
-        fcsCreate.Run(src) ' convert the features to fplist.
+        fcs.Run(src) ' convert the features to fplist.
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
