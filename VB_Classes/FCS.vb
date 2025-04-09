@@ -10,7 +10,6 @@ Public Class FCS_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim fpLastList = New List(Of fpXData)(task.fpList)
-        Dim fpLastMap = task.fpMap.Clone
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
         subdiv.Insert(task.features)
@@ -30,17 +29,14 @@ Public Class FCS_Basics : Inherits TaskParent
             fp.index = i
 
             Dim gcIndex = task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
-            If task.fpFromGridCell.Contains(gcIndex) Then
-                Dim fpIndex = task.fpFromGridCell.IndexOf(gcIndex)
-                If fpIndex >= 0 And fpIndex < fpLastList.Count Then
-                    Dim fpLast = fpLastList(fpIndex)
-                    fp.age = fpLast.age + 1
-                    matchCount += 1
-                End If
-            Else
-                Dim k = 0
+            Dim fpIndex = task.fpFromGridCellLast.IndexOf(gcIndex)
+            If fpIndex >= 0 And fpIndex < fpLastList.Count Then
+                Dim fpLast = fpLastList(fpIndex)
+                fp.age = fpLast.age + 1
+                matchCount += 1
             End If
 
+            fp.gcIndex = gcIndex
 
             fp.facets = New List(Of cv.Point)
             Dim xlist As New List(Of Integer), ylist As New List(Of Integer)
@@ -52,25 +48,20 @@ Public Class FCS_Basics : Inherits TaskParent
             Next
 
             Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
-            fp = buildRect(fp, {minX, minY, maxX, maxY})
-            fp.ptCenter = GetMaxDist(fp)
+            fp.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1))
+            fp.ptCenter = fp.pt
 
-            If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then
-                fp = findRect(fp, {minX, minY, maxX, maxY})
-                fp.periph = True
-            End If
+            If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
 
             If fp.pt.X >= dst2.Width Or fp.pt.X < 0 Or fp.pt.Y >= dst2.Height Or fp.pt.Y < 0 Then
                 fp.pt = fp.ptCenter
             End If
 
-            cv.Cv2.MeanStdDev(task.pcSplit(2)(fp.rect), depthMean, stdev, fp.mask)
+            cv.Cv2.MeanStdDev(task.pcSplit(2)(fp.rect), depthMean, stdev, task.depthMask(fp.rect))
             fp.depthMean = depthMean(0)
-            Dim mask As cv.Mat = fp.mask And task.depthMask(fp.rect)
-            Dim mm = GetMinMax(task.pcSplit(2)(fp.rect), mask)
+            Dim mm = GetMinMax(task.pcSplit(2)(fp.rect), task.depthMask(fp.rect))
             fp.depthMin = mm.minVal
             fp.depthMax = mm.maxVal
-            fp.colorTracking = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
 
             task.fpList.Add(fp)
 
@@ -329,7 +320,7 @@ Public Class FCS_Periphery : Inherits TaskParent
 
         For Each fp In task.fpList
             If fp.periph Then
-                dst3(fp.rect).SetTo(cv.Scalar.Gray, fp.mask)
+                dst3.FillConvexPoly(fp.facets, cv.Scalar.Gray, task.lineType)
                 DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
                 ptOutside.Add(fp.pt)
                 ptOutID.Add(fp.ID)
@@ -378,78 +369,78 @@ End Class
 
 
 
-Public Class FCS_Neighbors : Inherits TaskParent
-    Dim fInfo As New FCS_Info
-    Dim fcs As New FCS_Basics
-    Public Sub New()
-        labels(3) = "The neighbor cells with the corner feature rectangles."
-        desc = "Show the midpoints in each cell and build the nabelist for each cell"
-    End Sub
-    Public Sub buildNeighbors()
-        For i = 0 To task.fpList.Count - 1
-            Dim fp = task.fpList(i)
-            Dim facets As New List(Of cv.Point)(fp.facets)
-            If fp.periph Then
-                facets.Add(fp.rect.TopLeft)
-                facets.Add(fp.rect.Location)
-                facets.Add(fp.rect.BottomRight)
-                facets.Add(New cv.Point(fp.rect.Location.X + fp.rect.Width, fp.rect.Location.Y))
-            End If
-            fp.nabeRect = fp.rect
-            For Each pt In facets
-                If pt.X < 0 Or pt.X > dst2.Width Then Continue For
-                If pt.Y < 0 Or pt.Y > dst2.Height Then Continue For
-                Dim index As Integer
-                For j = 0 To 8
-                    Dim ptNabe = Choose(j + 1, New cv.Point(pt.X - 1, pt.Y - 1),
-                                               New cv.Point(pt.X, pt.Y - 1),
-                                               New cv.Point(pt.X + 1, pt.Y - 1),
-                                               New cv.Point(pt.X - 1, pt.Y),
-                                               New cv.Point(pt.X, pt.Y),
-                                               New cv.Point(pt.X + 1, pt.Y),
-                                               New cv.Point(pt.X - 1, pt.Y + 1),
-                                               New cv.Point(pt.X, pt.Y + 1),
-                                               New cv.Point(pt.X + 1, pt.Y + 1))
-                    If ptNabe.x >= 0 And ptNabe.x < dst2.Width And
-                       ptNabe.y >= 0 And ptNabe.y < dst2.Height Then
-                        index = CInt(task.fpMap.Get(Of Single)(ptNabe.y, ptNabe.x))
-                    End If
-                    If fp.nabeList.Contains(index) = False Then
-                        fp.nabeList.Add(index)
-                        fp.nabeRect = fp.nabeRect.Union(task.fpList(index).rect)
-                    End If
-                Next
-            Next
-            task.fpList(i) = fp
-        Next
-    End Sub
-    Private Function verifyRect(r As cv.Rect, sz As Integer, szNew As Integer) As cv.Rect
-        If r.X < 0 Then r.X = 0
-        If r.Y < 0 Then r.Y = 0
-        If r.BottomRight.X >= dst2.Width Then r.X = dst2.Width - szNew
-        If r.BottomRight.Y >= dst2.Height Then r.Y = dst2.Height - szNew
-        Return r
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(src)
-        dst2 = fcs.dst2
+'Public Class FCS_Neighbors : Inherits TaskParent
+'    Dim fInfo As New FCS_Info
+'    Dim fcs As New FCS_Basics
+'    Public Sub New()
+'        labels(3) = "The neighbor cells with the corner feature rectangles."
+'        desc = "Show the midpoints in each cell and build the nabelist for each cell"
+'    End Sub
+'    Public Sub buildNeighbors()
+'        For i = 0 To task.fpList.Count - 1
+'            Dim fp = task.fpList(i)
+'            Dim facets As New List(Of cv.Point)(fp.facets)
+'            If fp.periph Then
+'                facets.Add(fp.rect.TopLeft)
+'                facets.Add(fp.rect.Location)
+'                facets.Add(fp.rect.BottomRight)
+'                facets.Add(New cv.Point(fp.rect.Location.X + fp.rect.Width, fp.rect.Location.Y))
+'            End If
+'            fp.nabeRect = fp.rect
+'            For Each pt In facets
+'                If pt.X < 0 Or pt.X > dst2.Width Then Continue For
+'                If pt.Y < 0 Or pt.Y > dst2.Height Then Continue For
+'                Dim index As Integer
+'                For j = 0 To 8
+'                    Dim ptNabe = Choose(j + 1, New cv.Point(pt.X - 1, pt.Y - 1),
+'                                               New cv.Point(pt.X, pt.Y - 1),
+'                                               New cv.Point(pt.X + 1, pt.Y - 1),
+'                                               New cv.Point(pt.X - 1, pt.Y),
+'                                               New cv.Point(pt.X, pt.Y),
+'                                               New cv.Point(pt.X + 1, pt.Y),
+'                                               New cv.Point(pt.X - 1, pt.Y + 1),
+'                                               New cv.Point(pt.X, pt.Y + 1),
+'                                               New cv.Point(pt.X + 1, pt.Y + 1))
+'                    If ptNabe.x >= 0 And ptNabe.x < dst2.Width And
+'                       ptNabe.y >= 0 And ptNabe.y < dst2.Height Then
+'                        index = CInt(task.fpMap.Get(Of Single)(ptNabe.y, ptNabe.x))
+'                    End If
+'                    If fp.nabeList.Contains(index) = False Then
+'                        fp.nabeList.Add(index)
+'                        fp.nabeRect = fp.nabeRect.Union(task.fpList(index).rect)
+'                    End If
+'                Next
+'            Next
+'            task.fpList(i) = fp
+'        Next
+'    End Sub
+'    Private Function verifyRect(r As cv.Rect, sz As Integer, szNew As Integer) As cv.Rect
+'        If r.X < 0 Then r.X = 0
+'        If r.Y < 0 Then r.Y = 0
+'        If r.BottomRight.X >= dst2.Width Then r.X = dst2.Width - szNew
+'        If r.BottomRight.Y >= dst2.Height Then r.Y = dst2.Height - szNew
+'        Return r
+'    End Function
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        fcs.Run(src)
+'        dst2 = fcs.dst2
 
-        buildNeighbors()
+'        buildNeighbors()
 
-        dst3.SetTo(0)
-        Dim fp = task.fpD
-        If fp IsNot Nothing Then
-            For Each index In fp.nabeList
-                Dim nabe = task.fpList(index)
-                Dim vec = dst2.Get(Of cv.Vec3b)(nabe.ptCenter.Y, nabe.ptCenter.X)
-                Dim color = New cv.Scalar(vec.Item0, vec.Item1, vec.Item2)
-                dst3(nabe.rect).SetTo(color, nabe.mask)
-            Next
-            fpCellContour(task.fpD, dst3)
-            fpDisplayCell()
-        End If
-    End Sub
-End Class
+'        dst3.SetTo(0)
+'        Dim fp = task.fpD
+'        If fp IsNot Nothing Then
+'            For Each index In fp.nabeList
+'                Dim nabe = task.fpList(index)
+'                Dim vec = dst2.Get(Of cv.Vec3b)(nabe.ptCenter.Y, nabe.ptCenter.X)
+'                Dim color = New cv.Scalar(vec.Item0, vec.Item1, vec.Item2)
+'                dst3.FillConvexPoly(nabe.facets, color, task.lineType)
+'            Next
+'            fpCellContour(task.fpD, dst3)
+'            fpDisplayCell()
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -509,43 +500,6 @@ End Class
 
 
 
-Public Class FCS_TravelDistance : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Display the travel distance "
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        dst2.SetTo(0, task.fpOutline)
-        labels(2) = fcs.labels(2)
-
-        dst3.SetTo(0)
-        Dim travelCount As Integer
-        Dim distanceList As New List(Of Single)
-        distanceList.Add(0)
-        For Each fp In task.fpList
-            If fp.age > 20 Then
-                If fp.travelDistance > 0.5 Then
-                    SetTrueText(Format(fp.travelDistance, fmt0), fp.ptCenter, 3)
-                    travelCount += 1
-                    distanceList.Add(fp.travelDistance)
-                End If
-            End If
-        Next
-        labels(3) = "Travel distance average = " + Format(distanceList.Average, fmt1) + ", max = " +
-                    Format(distanceList.Max, fmt1)
-        fpDisplayMotion()
-        fpDisplayCell()
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class FCS_ByDepth : Inherits TaskParent
     Dim plot As New Plot_Histogram
@@ -594,7 +548,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
             If fp.depthMean > depthStart And fp.depthMean < depthEnd Then
                 Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
                 If val = 0 Then
-                    palInput(fp.rect).SetTo(fp.index, fp.mask)
+                    palInput.FillConvexPoly(fp.facets, fp.gcIndex Mod 255)
                     fpCells.Add((fp, task.frameCount))
                 End If
             End If
@@ -688,41 +642,6 @@ Public Class FCS_KNNfeatures : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class FCS_Tracker : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Track the selected cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(src)
-        dst1 = fcs.dst2
-        labels(2) = fcs.labels(2)
-        labels(1) = labels(2)
-
-        fpDisplayCell()
-
-        Dim colors As New List(Of cv.Scalar)
-        For i = 0 To task.fpList.Count - 1
-            Dim fp = task.fpList(i)
-            If colors.Contains(fp.colorTracking) Then
-                fp.colorTracking = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                task.fpList(i) = fp
-            End If
-            dst2(fp.rect).SetTo(fp.colorTracking, fp.mask)
-
-            colors.Add(fp.colorTracking)
-        Next
-
-        task.ClickPoint = task.fpD.ptCenter
-    End Sub
-End Class
 
 
 
@@ -881,7 +800,7 @@ Public Class FCS_RedCloud1 : Inherits TaskParent
         labels(3) = fcs.labels(2)
         For Each fp In task.fpList
             Dim val = dst2.Get(Of cv.Vec3b)(fp.ptCenter.Y, fp.ptCenter.X)
-            dst3(fp.rect).SetTo(val, fp.mask)
+            dst3.FillConvexPoly(fp.facets, val)
         Next
     End Sub
 End Class
@@ -905,7 +824,6 @@ Public Class FCS_Info : Inherits TaskParent
 
         Dim fp = task.fpD
         strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
-        strOut += "Travel distance: " + Format(fp.travelDistance, fmt1) + vbCrLf
         strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
         strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
         strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf

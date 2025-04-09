@@ -446,47 +446,6 @@ Public Class TaskParent : Implements IDisposable
             dst.Line(p1, p2, color, task.lineWidth, task.lineType)
         Next
     End Sub
-    Public Function buildRect(fp As fpXData, mms() As Single) As fpXData
-        fp.rect = ValidateRect(New cv.Rect(mms(0), mms(1), mms(2) - mms(0) + 1, mms(3) - mms(1) + 1))
-
-        Static mask32s As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        mask32s(fp.rect).SetTo(0)
-        mask32s.FillConvexPoly(fp.facets, white, task.lineType)
-        mask32s(fp.rect).ConvertTo(fp.mask, cv.MatType.CV_8U)
-
-        Return fp
-    End Function
-    Public Function findRect(fp As fpXData, mms() As Single) As fpXData
-        Dim pts As cv.Mat = fp.mask.FindNonZero()
-
-        Dim points(pts.Total * 2 - 1) As Integer
-        Marshal.Copy(pts.Data, points, 0, points.Length)
-
-        Dim minX As Integer = Integer.MaxValue, miny As Integer = Integer.MaxValue
-        Dim maxX As Integer, maxY As Integer
-        For i = 0 To points.Length - 1 Step 2
-            Dim x = points(i)
-            Dim y = points(i + 1)
-            If x < minX Then minX = x
-            If y < miny Then miny = y
-            If x > maxX Then maxX = x
-            If y > maxY Then maxY = y
-        Next
-
-        fp.mask = fp.mask(New cv.Rect(minX, miny, maxX - minX + 1, maxY - miny + 1))
-        fp.rect = New cv.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX + 1, maxY - miny + 1)
-        Return fp
-    End Function
-    Public Function GetMaxDist(ByRef fp As fpXData) As cv.Point
-        Dim mask = fp.mask.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm As mmData = GetMinMax(distance32f)
-        mm.maxLoc.X += fp.rect.X
-        mm.maxLoc.Y += fp.rect.Y
-
-        Return mm.maxLoc
-    End Function
     Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then

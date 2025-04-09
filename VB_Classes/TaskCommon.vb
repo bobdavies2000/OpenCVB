@@ -551,7 +551,6 @@ Public Class fpXData ' feature point -  excessive - trim this to fcsData...
     Public ID As Single
     Public travelDistance As Single
     Public periph As Boolean
-    Public mask As cv.Mat
     Public rect As cv.Rect
     Public facet2f As List(Of cv.Point2f)
     Public facets As List(Of cv.Point)
@@ -565,10 +564,8 @@ Public Class fpXData ' feature point -  excessive - trim this to fcsData...
     Public depthMean As Single
     Public depthMin As Single
     Public depthMax As Single
-
-    Public colorTracking As cv.Scalar
+    Public gcIndex As Integer
     Sub New()
-        mask = New cv.Mat
         facet2f = New List(Of cv.Point2f)
         facets = New List(Of cv.Point)
         ptHistory = New List(Of cv.Point)

@@ -9,7 +9,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "CV_8U mask with all the features present."
+        labels(3) = "CV_8U mask with all the features present.  NOTE: a feature must have depth or it is excluded."
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -96,23 +96,29 @@ Public Class Feature_Basics : Inherits TaskParent
             sortByGrid.Add(index, pt)
         Next
 
+        task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)
+
         task.features.Clear()
         task.featurePoints.Clear()
         task.fpFromGridCell.Clear()
         dst3.SetTo(0)
         For i = 0 To sortByGrid.Count - 1
             Dim pt = sortByGrid.ElementAt(i).Value
-            task.features.Add(pt)
-            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
-            Dim nextIndex = task.gcMap.Get(Of Single)(pt.Y, pt.X)
-            task.fpFromGridCell.Add(nextIndex)
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If depth > 0 Then
+                task.features.Add(pt)
+                task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+
+                Dim nextIndex = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+                task.fpFromGridCell.Add(nextIndex)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+            End If
         Next
 
         If standaloneTest() Then
             dst2 = task.color.Clone
-            For Each pt In features
+            For Each pt In task.features
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         End If
