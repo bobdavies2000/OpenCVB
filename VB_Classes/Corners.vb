@@ -339,7 +339,6 @@ Public Class Corners_SubPix : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
-        runFeature(src)
 
         dst2 = src.Clone
 

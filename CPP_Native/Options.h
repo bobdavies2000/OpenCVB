@@ -2030,12 +2030,6 @@ public:
 	Options_OpenGLFunctions() {
 	}
 };
-class Options_MatchCorrelation {
-public:
-	void Run() {}
-	Options_MatchCorrelation() {
-	}
-};
 class Options_Sobel {
 public:
 	int kernelSize =  3;

@@ -156,8 +156,6 @@ Public Class Feature_KNN : Inherits TaskParent
         desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
-
         knn.queries = New List(Of cv.Point2f)(task.features)
         If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
@@ -182,30 +180,6 @@ Public Class Feature_KNN : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Feature_Reduction : Inherits TaskParent
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        labels = {"", "", "Good features", "History of good features"}
-        desc = "Get the features in a reduction grayscale image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(src)
-        dst2 = src
-
-        runFeature(reduction.dst2)
-        If task.heartBeat Then dst3.SetTo(0)
-        For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, white)
-            DrawCircle(dst3, pt, task.DotSize, white)
-        Next
-    End Sub
-End Class
 
 
 
@@ -275,7 +249,6 @@ Public Class Feature_Delaunay : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = runFeature(src)
         labels(2) = task.feat.labels(2)
 
         delaunay.Run(src)
@@ -341,7 +314,6 @@ Public Class Feature_Points : Inherits TaskParent
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runFeature(src)
         If task.heartBeat Then dst3.SetTo(0)
 
         For Each pt In task.features
@@ -450,8 +422,6 @@ Public Class Feature_Generations : Inherits TaskParent
         desc = "Find feature age maximum and average."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
-
         Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         For Each pt In task.featurePoints
             Dim index = features.IndexOf(pt)
@@ -546,8 +516,6 @@ Public Class Feature_GridPopulation : Inherits TaskParent
         desc = "Find the feature population for each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runFeature(src)
-
         labels(2) = task.feat.labels(2)
 
         dst3.SetTo(0)
@@ -617,8 +585,6 @@ Public Class Feature_WithDepth : Inherits TaskParent
         desc = "Show the feature points that have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runFeature(src)
-
         dst3 = src
         Dim depthCount As Integer
         For Each pt In task.featurePoints
@@ -642,14 +608,11 @@ Public Class Feature_Matching : Inherits TaskParent
     Public motionPoints As New List(Of cv.Point)
     Dim match As New Match_Basics
     Dim feat As New Feature_Basics
-    Dim options As New Options_MatchCorrelation
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 150
         desc = "Use correlation coefficient to keep features from frame to frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
         Static fpLastSrc = src.Clone
 
         Dim matched As New List(Of cv.Point)
@@ -661,7 +624,7 @@ Public Class Feature_Matching : Inherits TaskParent
                 Dim r = task.gridRects(index)
                 match.template = fpLastSrc(r)
                 match.Run(src(r))
-                If match.correlation > options.MinCorrelation Then matched.Add(pt)
+                If match.correlation > task.fCorrThreshold Then matched.Add(pt)
             Else
                 motionPoints.Add(pt)
             End If
@@ -891,8 +854,6 @@ Public Class Feature_NoMotion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         dst2 = src.Clone
-
-        runFeature(src)
 
         dst3.SetTo(0)
         For Each pt In task.featurePoints

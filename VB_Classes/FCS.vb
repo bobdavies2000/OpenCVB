@@ -3,25 +3,25 @@ Imports cv = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim fcsCreate As New FCS_Create
     Dim match As New Match_Basics
-    Dim options As New Options_MatchCorrelation
     Public Sub New()
         labels(1) = "The feature point of each cell."
         desc = "Build a Feature Coordinate System by subdividing an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
         Static fpLastSrc = src.Clone
+        Dim fpLastList = New List(Of fpXData)(task.fpList)
+        Dim fpLastMap = task.fpMap.Clone
+
         fcsCreate.Run(src)
 
         Dim matchCount As Integer, newList As New List(Of fpXData)
         For Each fp In task.fpList
-            Dim indexLast = task.fpLastMap.Get(Of Single)(fp.ptCenter.Y, fp.ptCenter.X)
-            Dim fpLast = task.fpLastList(indexLast)
+            Dim indexLast = fpLastMap.Get(Of Single)(fp.ptCenter.Y, fp.ptCenter.X)
+            Dim fpLast = fpLastList(indexLast)
             ' is this the same point?
             match.template = fpLastSrc(fpLast.rect)
             match.Run(src(fpLast.rect))
-            If match.correlation > options.MinCorrelation Then
+            If match.correlation > task.fCorrThreshold Then
                 fp = fpLast
                 fp.indexLast = indexLast
                 fp.age += 1
@@ -50,7 +50,7 @@ Public Class FCS_Basics : Inherits TaskParent
         labels(3) = Format(matchPercent, "0%") + " matched to previous frame (instantaneous update)"
         If task.heartBeat Then
             labels(2) = Format(matchPercent, "0%") + " were found and matched to the previous frame or " +
-                                                     CStr(matchCount) + " of " + CStr(task.features.Count)
+                        CStr(matchCount) + " of " + CStr(task.features.Count)
         End If
         fpLastSrc = src.Clone
         ' DrawCircle(task.color, task.ClickPoint, task.DotSize, task.highlight)
@@ -122,10 +122,11 @@ Public Class FCS_Motion : Inherits TaskParent
         desc = "Highlight the motion of each feature identified in the current and previous frame"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim fpLastList = New List(Of fpXData)(task.fpList)
+
         fcs.Run(src)
         dst2 = fcs.dst1
 
-        runFeature(src)
         For Each fp In task.fpList
             DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
         Next
@@ -139,7 +140,7 @@ Public Class FCS_Motion : Inherits TaskParent
         For Each fp In task.fpList
             If fp.indexLast >= 0 Then linkedCount += 1
             Dim p1 = fp.pt
-            Dim p2 = If(fp.indexLast < 0, fp.pt, task.fpLastList(fp.indexLast).pt)
+            Dim p2 = If(fp.indexLast < 0, fp.pt, fpLastList(fp.indexLast).pt)
             dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             If p1 <> p2 Then
                 motionCount += 1
@@ -923,9 +924,6 @@ Public Class FCS_Create : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.fpLastList = New List(Of fpXData)(task.fpList)
-        task.fpLastMap = task.fpMap.Clone
-
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
@@ -933,7 +931,6 @@ Public Class FCS_Create : Inherits TaskParent
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         task.fpList.Clear()
-        task.fpIDlist.Clear()
         task.fpOutline.SetTo(0)
         Dim depthMean As cv.Scalar, stdev As cv.Scalar
         For i = 0 To facets.Length - 1
@@ -943,12 +940,6 @@ Public Class FCS_Create : Inherits TaskParent
             fp.index = i
 
             fp.ID = CSng(task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X))
-
-            While 1
-                If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
-            End While
-
-            task.fpIDlist.Add(fp.ID)
 
             fp.facets = New List(Of cv.Point)
             For j = 0 To facets(i).Length - 1

@@ -356,8 +356,6 @@ Public Class Delaunay_Points : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Static ptSlider = optiBase.FindSlider("Points to use in Feature Poly")
 
-        runFeature(src)
-
         fPoly.Run(src)
         dst3 = fPoly.dst3
 

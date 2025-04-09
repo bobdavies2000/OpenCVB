@@ -40,10 +40,6 @@ Public Class VBtask : Implements IDisposable
     Public depthDiffMeters As Single ' grid cells > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean
 
-    Public fpLastList As New List(Of fpXData)
-    Public fpLastMap As New cv.Mat
-    Public fpIDlist As New List(Of Single)
-
     Public fpOutline As New cv.Mat
     Public fpMotion As cv.Point2f
 

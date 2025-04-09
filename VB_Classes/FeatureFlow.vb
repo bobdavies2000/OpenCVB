@@ -31,8 +31,6 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Next
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        runFeature(src)
-
         labels = task.feat.labels
 
         dst3 = If(task.firstPass, src.Clone, dst2.Clone)

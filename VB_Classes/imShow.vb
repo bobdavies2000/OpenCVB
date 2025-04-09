@@ -21,7 +21,6 @@ Public Class ImShow_WaitKey : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
-        dst2 = runFeature(src)
         cv.Cv2.ImShow("Hit space bar to advance to the next frame", dst2)
         cv.Cv2.WaitKey(1000) ' No need for waitkey with imshow in OpenCVB - finishing a buffer is the same thing so waitkey just delays by 1 second here.
     End Sub

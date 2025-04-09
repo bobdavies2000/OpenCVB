@@ -479,19 +479,6 @@ Public Class TaskParent : Implements IDisposable
         fp.rect = New cv.Rect(fp.rect.X + minX, fp.rect.Y + miny, maxX - minX + 1, maxY - miny + 1)
         Return fp
     End Function
-    Public Function fpUpdate(fp As fpXData, fpLast As fpXData) As fpXData
-        While 1
-            If task.fpIDlist.Contains(fp.ID) Then fp.ID += 0.1 Else Exit While
-        End While
-        fp.ID = fpLast.ID
-        fp.indexLast = fpLast.index
-        fp.colorTracking = fpLast.colorTracking
-        fp.age = fpLast.age + 1
-        fp.ptHistory = New List(Of cv.Point)(fpLast.ptHistory) From {fp.pt}
-        fp.travelDistance = fp.pt.DistanceTo(fp.ptHistory(0))
-        If fp.ptHistory.Count > 20 Then fp.ptHistory.RemoveAt(0)
-        Return fp
-    End Function
     Public Function GetMaxDist(ByRef fp As fpXData) As cv.Point
         Dim mask = fp.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
@@ -627,15 +614,6 @@ Public Class TaskParent : Implements IDisposable
         If task.redC Is Nothing Then task.redC = New RedColor_Basics
         task.redC.Run(src)
     End Sub
-    Public Function runFeature(src As cv.Mat) As cv.Mat
-        Return task.feat.dst2
-    End Function
-    Public Function runFeature(src As cv.Mat, ByRef labels As String) As cv.Mat
-        If task.feat Is Nothing Then task.feat = New Feature_Basics
-        task.feat.Run(src)
-        labels = task.feat.labels(2)
-        Return task.feat.dst2
-    End Function
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))

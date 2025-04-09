@@ -62,7 +62,6 @@ Public Class Disparity_Features : Inherits TaskParent
         desc = "Use features in grid cells to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
         dst2 = task.feat.dst3
         labels(2) = featNo.labels(2)
 

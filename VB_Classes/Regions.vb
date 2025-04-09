@@ -289,7 +289,6 @@ End Class
 
 
 Public Class Region_DepthCorrelation : Inherits TaskParent
-    Dim options As New Options_MatchCorrelation
     Public Sub New()
         optiBase.FindSlider("Min Correlation Coefficient").Value = 99
         dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -298,14 +297,11 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
         desc = "Create depth region markers using a correlation threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim minCorr = options.MinCorrelation
-
         dst0.SetTo(0)
         dst1.SetTo(0)
         Dim count As Integer
         For Each gc In task.gcList
-            If gc.correlation > minCorr Then
+            If gc.correlation > task.fCorrThreshold Then
                 dst0.Rectangle(gc.rRect, 255, -1)
                 dst1.Rectangle(gc.rect, 255, -1)
                 count += 1
@@ -318,6 +314,7 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
         dst3.SetTo(0)
         task.rightView.CopyTo(dst3, dst0)
 
-        labels(2) = Format(count / task.gcList.Count, "0%") + " of grid cells had color correlation of " + Format(minCorr, "0.0%") + " or better"
+        labels(2) = Format(count / task.gcList.Count, "0%") + " of grid cells had color correlation of " +
+                    Format(task.fCorrThreshold, "0.0%") + " or better"
     End Sub
 End Class

@@ -22,7 +22,12 @@ Partial Class OptionsFeatures
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.FeaturesGroup = New System.Windows.Forms.GroupBox()
+        Me.LineGroup = New System.Windows.Forms.GroupBox()
+        Me.HorizRadio = New System.Windows.Forms.RadioButton()
+        Me.verticalRadio = New System.Windows.Forms.RadioButton()
+        Me.MaskGroup = New System.Windows.Forms.GroupBox()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.EdgeMethods = New System.Windows.Forms.ComboBox()
         Me.FeatureCorrelationLabel = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.FCorrSlider = New System.Windows.Forms.TrackBar()
@@ -31,108 +36,10 @@ Partial Class OptionsFeatures
         Me.DistanceSlider = New System.Windows.Forms.TrackBar()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.FeatureMethod = New System.Windows.Forms.ComboBox()
-        Me.LineGroup = New System.Windows.Forms.GroupBox()
-        Me.HorizRadio = New System.Windows.Forms.RadioButton()
-        Me.verticalRadio = New System.Windows.Forms.RadioButton()
-        Me.MaskGroup = New System.Windows.Forms.GroupBox()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.EdgeMethods = New System.Windows.Forms.ComboBox()
-        Me.FeaturesGroup.SuspendLayout()
+        Me.LineGroup.SuspendLayout()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.LineGroup.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'FeaturesGroup
-        '
-        Me.FeaturesGroup.Controls.Add(Me.Label3)
-        Me.FeaturesGroup.Controls.Add(Me.EdgeMethods)
-        Me.FeaturesGroup.Controls.Add(Me.FeatureCorrelationLabel)
-        Me.FeaturesGroup.Controls.Add(Me.Label4)
-        Me.FeaturesGroup.Controls.Add(Me.FCorrSlider)
-        Me.FeaturesGroup.Controls.Add(Me.DistanceLabel)
-        Me.FeaturesGroup.Controls.Add(Me.Label2)
-        Me.FeaturesGroup.Controls.Add(Me.DistanceSlider)
-        Me.FeaturesGroup.Controls.Add(Me.Label1)
-        Me.FeaturesGroup.Controls.Add(Me.FeatureMethod)
-        Me.FeaturesGroup.Location = New System.Drawing.Point(28, 12)
-        Me.FeaturesGroup.Name = "FeaturesGroup"
-        Me.FeaturesGroup.Size = New System.Drawing.Size(762, 568)
-        Me.FeaturesGroup.TabIndex = 0
-        Me.FeaturesGroup.TabStop = False
-        '
-        'FeatureCorrelationLabel
-        '
-        Me.FeatureCorrelationLabel.AutoSize = True
-        Me.FeatureCorrelationLabel.Location = New System.Drawing.Point(526, 218)
-        Me.FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
-        Me.FeatureCorrelationLabel.Size = New System.Drawing.Size(146, 20)
-        Me.FeatureCorrelationLabel.TabIndex = 11
-        Me.FeatureCorrelationLabel.Text = "Feature Correlation"
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(24, 195)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(220, 20)
-        Me.Label4.TabIndex = 10
-        Me.Label4.Text = "Feature Correlation Threshold"
-        '
-        'FCorrSlider
-        '
-        Me.FCorrSlider.Location = New System.Drawing.Point(20, 218)
-        Me.FCorrSlider.Maximum = 100
-        Me.FCorrSlider.Minimum = 1
-        Me.FCorrSlider.Name = "FCorrSlider"
-        Me.FCorrSlider.Size = New System.Drawing.Size(475, 69)
-        Me.FCorrSlider.TabIndex = 9
-        Me.FCorrSlider.Value = 75
-        '
-        'DistanceLabel
-        '
-        Me.DistanceLabel.AutoSize = True
-        Me.DistanceLabel.Location = New System.Drawing.Point(526, 133)
-        Me.DistanceLabel.Name = "DistanceLabel"
-        Me.DistanceLabel.Size = New System.Drawing.Size(72, 20)
-        Me.DistanceLabel.TabIndex = 8
-        Me.DistanceLabel.Text = "Distance"
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(24, 110)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(229, 20)
-        Me.Label2.TabIndex = 7
-        Me.Label2.Text = "Min Distance between features"
-        '
-        'DistanceSlider
-        '
-        Me.DistanceSlider.Location = New System.Drawing.Point(20, 133)
-        Me.DistanceSlider.Maximum = 100
-        Me.DistanceSlider.Minimum = 1
-        Me.DistanceSlider.Name = "DistanceSlider"
-        Me.DistanceSlider.Size = New System.Drawing.Size(475, 69)
-        Me.DistanceSlider.TabIndex = 6
-        Me.DistanceSlider.Value = 25
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(24, 37)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(123, 20)
-        Me.Label1.TabIndex = 5
-        Me.Label1.Text = "Feature Method"
-        '
-        'FeatureMethod
-        '
-        Me.FeatureMethod.FormattingEnabled = True
-        Me.FeatureMethod.Location = New System.Drawing.Point(20, 62)
-        Me.FeatureMethod.Name = "FeatureMethod"
-        Me.FeatureMethod.Size = New System.Drawing.Size(246, 28)
-        Me.FeatureMethod.TabIndex = 4
         '
         'LineGroup
         '
@@ -179,53 +86,132 @@ Partial Class OptionsFeatures
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(430, 37)
+        Me.Label3.Location = New System.Drawing.Point(32, 67)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(105, 20)
-        Me.Label3.TabIndex = 13
+        Me.Label3.TabIndex = 23
         Me.Label3.Text = "Edge Method"
         '
         'EdgeMethods
         '
         Me.EdgeMethods.FormattingEnabled = True
-        Me.EdgeMethods.Location = New System.Drawing.Point(426, 62)
+        Me.EdgeMethods.Location = New System.Drawing.Point(28, 92)
         Me.EdgeMethods.Name = "EdgeMethods"
         Me.EdgeMethods.Size = New System.Drawing.Size(246, 28)
-        Me.EdgeMethods.TabIndex = 12
+        Me.EdgeMethods.TabIndex = 22
+        '
+        'FeatureCorrelationLabel
+        '
+        Me.FeatureCorrelationLabel.AutoSize = True
+        Me.FeatureCorrelationLabel.Location = New System.Drawing.Point(534, 248)
+        Me.FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
+        Me.FeatureCorrelationLabel.Size = New System.Drawing.Size(146, 20)
+        Me.FeatureCorrelationLabel.TabIndex = 21
+        Me.FeatureCorrelationLabel.Text = "Feature Correlation"
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(32, 225)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(220, 20)
+        Me.Label4.TabIndex = 20
+        Me.Label4.Text = "Feature Correlation Threshold"
+        '
+        'FCorrSlider
+        '
+        Me.FCorrSlider.Location = New System.Drawing.Point(28, 248)
+        Me.FCorrSlider.Maximum = 100
+        Me.FCorrSlider.Minimum = 1
+        Me.FCorrSlider.Name = "FCorrSlider"
+        Me.FCorrSlider.Size = New System.Drawing.Size(475, 69)
+        Me.FCorrSlider.TabIndex = 19
+        Me.FCorrSlider.Value = 75
+        '
+        'DistanceLabel
+        '
+        Me.DistanceLabel.AutoSize = True
+        Me.DistanceLabel.Location = New System.Drawing.Point(534, 163)
+        Me.DistanceLabel.Name = "DistanceLabel"
+        Me.DistanceLabel.Size = New System.Drawing.Size(72, 20)
+        Me.DistanceLabel.TabIndex = 18
+        Me.DistanceLabel.Text = "Distance"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(32, 140)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(229, 20)
+        Me.Label2.TabIndex = 17
+        Me.Label2.Text = "Min Distance between features"
+        '
+        'DistanceSlider
+        '
+        Me.DistanceSlider.Location = New System.Drawing.Point(28, 163)
+        Me.DistanceSlider.Maximum = 100
+        Me.DistanceSlider.Minimum = 1
+        Me.DistanceSlider.Name = "DistanceSlider"
+        Me.DistanceSlider.Size = New System.Drawing.Size(475, 69)
+        Me.DistanceSlider.TabIndex = 16
+        Me.DistanceSlider.Value = 25
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(32, 11)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(123, 20)
+        Me.Label1.TabIndex = 15
+        Me.Label1.Text = "Feature Method"
+        '
+        'FeatureMethod
+        '
+        Me.FeatureMethod.FormattingEnabled = True
+        Me.FeatureMethod.Location = New System.Drawing.Point(28, 36)
+        Me.FeatureMethod.Name = "FeatureMethod"
+        Me.FeatureMethod.Size = New System.Drawing.Size(246, 28)
+        Me.FeatureMethod.TabIndex = 14
         '
         'OptionsFeatures
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1419, 616)
+        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.EdgeMethods)
+        Me.Controls.Add(Me.FeatureCorrelationLabel)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.FCorrSlider)
+        Me.Controls.Add(Me.DistanceLabel)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.DistanceSlider)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.FeatureMethod)
         Me.Controls.Add(Me.MaskGroup)
         Me.Controls.Add(Me.LineGroup)
-        Me.Controls.Add(Me.FeaturesGroup)
         Me.Name = "OptionsFeatures"
-        Me.Text = "OptionsFeatures"
-        Me.FeaturesGroup.ResumeLayout(False)
-        Me.FeaturesGroup.PerformLayout()
-        CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.Text = "Important Options for Features, Edges, Lines, and Masks"
         Me.LineGroup.ResumeLayout(False)
         Me.LineGroup.PerformLayout()
+        CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
-
-    Friend WithEvents FeaturesGroup As Windows.Forms.GroupBox
     Friend WithEvents LineGroup As Windows.Forms.GroupBox
     Friend WithEvents MaskGroup As Windows.Forms.GroupBox
-    Friend WithEvents FeatureMethod As Windows.Forms.ComboBox
-    Friend WithEvents Label1 As Windows.Forms.Label
-    Friend WithEvents Label2 As Windows.Forms.Label
-    Friend WithEvents DistanceSlider As Windows.Forms.TrackBar
-    Friend WithEvents DistanceLabel As Windows.Forms.Label
-    Friend WithEvents FeatureCorrelationLabel As Windows.Forms.Label
-    Friend WithEvents Label4 As Windows.Forms.Label
-    Friend WithEvents FCorrSlider As Windows.Forms.TrackBar
     Friend WithEvents HorizRadio As Windows.Forms.RadioButton
     Friend WithEvents verticalRadio As Windows.Forms.RadioButton
     Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents EdgeMethods As Windows.Forms.ComboBox
+    Friend WithEvents FeatureCorrelationLabel As Windows.Forms.Label
+    Friend WithEvents Label4 As Windows.Forms.Label
+    Friend WithEvents FCorrSlider As Windows.Forms.TrackBar
+    Friend WithEvents DistanceLabel As Windows.Forms.Label
+    Friend WithEvents Label2 As Windows.Forms.Label
+    Friend WithEvents DistanceSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label1 As Windows.Forms.Label
+    Friend WithEvents FeatureMethod As Windows.Forms.ComboBox
 End Class

@@ -48,7 +48,6 @@ Public Class Mouse_ClickPointUsage : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
-        dst2 = runFeature(src)
 
         For Each pt In task.features
             If pt = task.ClickPoint Then

@@ -450,8 +450,6 @@ Public Class KNN_TrackMean : Inherits TaskParent
         options.Run()
         optionsEx.Run()
 
-        runFeature(src)
-
         If task.firstPass Then lastImage = src.Clone
         Dim multiplier = dotSlider.Value
 
@@ -637,8 +635,6 @@ Public Class KNN_TrackEach : Inherits TaskParent
         desc = "Track each good feature with KNN and match the features from frame to frame"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
-
         Dim minDistance = task.minDistance
 
         ' if there was no motion, use minDistance to eliminate the unstable points.
@@ -1089,10 +1085,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standalone Then
-            runFeature(src)
-            inputPoints = task.features
-        End If
+        If standalone Then inputPoints = task.features
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)
         knn.trainInput = knn.queries

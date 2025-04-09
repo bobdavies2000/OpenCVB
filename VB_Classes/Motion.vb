@@ -684,8 +684,6 @@ Public Class Motion_FPolyRect : Inherits TaskParent
         desc = "Confirm the FPoly_LineRect matched the previous image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
-
         fRect.Run(src)
 
         If task.heartBeatLT Or match.correlation < 0.5 Then

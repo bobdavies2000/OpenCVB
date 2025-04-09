@@ -1160,8 +1160,6 @@ Public Class XO_Line_KNN : Inherits TaskParent
         desc = "Use KNN to find the nearest point to an endpoint and connect the 2 lines with a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runFeature(src)
-
         swarm.options.Run()
         dst2 = task.lines.dst2
 
