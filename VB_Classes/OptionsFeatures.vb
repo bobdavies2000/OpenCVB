@@ -22,19 +22,20 @@
         EdgeMethods.Items.Add("Deriche")
         EdgeMethods.Items.Add("Laplacian")
         EdgeMethods.SelectedItem() = "Canny"
+        task.edgeMethod = "Canny"
 
         verticalRadio.Checked = True
     End Sub
-    Private Sub DistanceSlider_ValueChanged(sender As Object, e As EventArgs)
+    Private Sub DistanceSlider_ValueChanged(sender As Object, e As EventArgs) Handles DistanceSlider.ValueChanged
         DistanceLabel.Text = CStr(DistanceSlider.Value)
         task.minDistance = DistanceSlider.Value
         task.optionsChanged = True
     End Sub
-    Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs)
+    Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
         task.featureSource = FeatureMethod.SelectedIndex
         task.optionsChanged = True
     End Sub
-    Private Sub TrackBar1_ValueChanged(sender As Object, e As EventArgs)
+    Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles FCorrSlider.ValueChanged
         task.fCorrThreshold = FCorrSlider.Value / 100
         task.optionsChanged = True
         FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
@@ -45,8 +46,7 @@
     Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs) Handles HorizRadio.CheckedChanged
         task.verticalLines = False
     End Sub
-
-    Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs)
+    Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged
         task.edgeMethod = EdgeMethods.Text
         task.optionsChanged = True
     End Sub

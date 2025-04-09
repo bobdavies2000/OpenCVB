@@ -37,7 +37,7 @@ Public Class Edge_Basics : Inherits TaskParent
                     edges = New Edge_Deriche_CPP
                 Case "Laplacian"
                     edges = New Edge_Laplacian
-                Case "Resize And Add"
+                Case "Resize and Add"
                     edges = New Edge_ResizeAdd
             End Select
         End If
@@ -261,9 +261,6 @@ Public Class Edge_Consistent : Inherits TaskParent
 
         dst3 = src
         dst3.SetTo(cv.Scalar.Black, dst2)
-
-        Static frm = optiBase.FindFrm("Options_Edge_Basics Radio Buttons")
-        frm.left = task.gOptions.Width / 2
     End Sub
 End Class
 
@@ -297,13 +294,15 @@ Public Class Edge_BinarizedBrightness : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim bright As New Brightness_Basics
     Public Sub New()
-        optiBase.FindRadio("Binarized Sobel").Checked = True
-        desc = "Visualize the impact of brightness on Bin4Way_Sobel"
+        labels(2) = "Edges for the same image before brightness."
+        desc = "Visualize the impact of brightness on Edge Detection"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+
         bright.Run(src)
-        dst2 = bright.dst3
-        edges.Run(bright.dst3)
+        edges.Run(bright.dst2)
         dst3 = edges.dst2
         labels(3) = edges.labels(2)
     End Sub
@@ -1318,17 +1317,16 @@ Public Class Edge_Sweep : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static frm = optiBase.FindFrm("Options_Edge_Basics Radio Buttons")
 
-        Static index As Integer = -1
         If task.heartBeatLT Then
-            index += 1
-            If index >= frm.check.count Then index = 0
+            Dim index = task.featureOptions.EdgeMethods.SelectedIndex + 1
+            If index >= task.featureOptions.EdgeMethods.Items.Count Then index = 0
+            task.featureOptions.EdgeMethods.SelectedIndex = index
         End If
 
         edges.Run(src)
         dst2 = edges.dst2
 
-        If optiBase.findRadioIndex(frm.check) <> index Then frm.check(index).checked = True
-        strOut = "Current edge algorithm is " + frm.check(index).text
+        strOut = "Current edge algorithm is " + task.featureOptions.EdgeMethods.SelectedText
         labels(2) = strOut
         SetTrueText(strOut, 3)
     End Sub

@@ -733,7 +733,6 @@ Public Class KNN_MaxDistance : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Static pairList As New List(Of (cv.Point2f, cv.Point2f))
-        Static pairIDs As New List(Of Single)
         options.Run()
 
         If standalone Or inputPoints.Count = 0 Or task.optionsChanged Then
@@ -768,7 +767,6 @@ Public Class KNN_MaxDistance : Inherits TaskParent
                     distances.Add(p1.DistanceTo(p2), (p1, p2))
                 Next
 
-                pairList.Clear()
                 For i = 0 To Math.Min(options.topXDistances, distances.Count) - 1
                     Dim pair = distances.ElementAt(i).Value
                     If pairList.Contains(pair) = False Then
@@ -793,24 +791,24 @@ Public Class KNN_MaxDistance : Inherits TaskParent
                 Next
 
                 pairList.Clear()
-                pairIDs.Clear()
                 For i = 0 To nextPairs.Count - 1
                     If nextIDs(i) >= 0 Then
                         pairList.Add(nextPairs(i))
-                        pairIDs.Add(nextIDs(i))
                     End If
                 Next
             End If
         End If
 
-        dst2 = src
-        outputPoints.Clear()
-        For Each pair In pairList
-            Dim p1 = New cv.Point(pair.Item1.X, pair.Item1.Y)
-            Dim p2 = New cv.Point(pair.Item2.X, pair.Item2.Y)
-            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
-            outputPoints.Add(pair)
-        Next
+        If task.heartBeat Or task.optionsChanged Then
+            dst2 = src
+            outputPoints.Clear()
+            For Each pair In pairList
+                Dim p1 = New cv.Point(pair.Item1.X, pair.Item1.Y)
+                Dim p2 = New cv.Point(pair.Item2.X, pair.Item2.Y)
+                dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+                outputPoints.Add(pair)
+            Next
+        End If
         labels(2) = "There were " + CStr(inputPoints.Count) + " input points and " +
                     CStr(outputPoints.Count) + " pairs output."
     End Sub

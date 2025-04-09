@@ -267,8 +267,6 @@ End Class
 
 
 Public Class FCS_Periphery : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-
     Public ptOutside As New List(Of cv.Point2f)
     Public ptOutID As New List(Of Single)
 
@@ -278,8 +276,7 @@ Public Class FCS_Periphery : Inherits TaskParent
         desc = "Display the cells which are on the periphery of the image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(src)
-        dst2 = fcs.dst2
+        dst2 = task.feat.fcsCreate.dst2
 
         dst3 = dst2.Clone
         ptOutside.Clear()
@@ -924,7 +921,7 @@ Public Class FCS_Create : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
         subdiv.Insert(task.features)
 
         Dim facets = New cv.Point2f()() {Nothing}

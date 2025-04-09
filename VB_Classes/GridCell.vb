@@ -345,7 +345,7 @@ Public Class GridCell_Edges : Inherits TaskParent
     Public Sub New()
         task.featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        optiBase.findRadio("Laplacian").Checked = True
+        task.featureOptions.EdgeMethods.SelectedItem() = "Laplacian"
         desc = "Add edges to features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
