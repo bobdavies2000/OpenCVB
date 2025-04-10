@@ -552,19 +552,14 @@ Public Class fpXData ' feature point -  excessive - trim this to fcsData...
     Public travelDistance As Single
     Public periph As Boolean
     Public rect As cv.Rect
-    Public facet2f As List(Of cv.Point2f)
     Public facets As List(Of cv.Point)
     Public pt As cv.Point
+    Public ptLast As cv.Point
     Public ptHistory As List(Of cv.Point)
-    Public ptCenter As cv.Point
-    Public center As cv.Point
     Public rcIndex As Integer
-    Public depthMean As Single
-    Public depthMin As Single
-    Public depthMax As Single
+    Public depth As Single
     Public gcIndex As Integer
     Sub New()
-        facet2f = New List(Of cv.Point2f)
         facets = New List(Of cv.Point)
         ptHistory = New List(Of cv.Point)
     End Sub

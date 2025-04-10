@@ -423,12 +423,9 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Sub fpDisplayCell()
         If task.fpList.Count = 0 Then Exit Sub
-        Dim index As Integer = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        If index < task.fpList.Count Then
-            task.fpD = task.fpList(index)
-            SetTrueText(CStr(task.fpD.age), task.fpD.ptCenter, 0)
-            fpCellContour(task.fpD, task.color)
-        End If
+        Dim gcIndex = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim fpIndex = task.fpFromGridCell.IndexOf(gcIndex)
+        If fpIndex >= 0 Then task.fpD = task.fpList(fpIndex)
     End Sub
     Public Sub fpDisplayMotion()
         dst1.SetTo(0)
