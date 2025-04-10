@@ -10,7 +10,6 @@ Public Class FCS_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
-        Dim fpLastList = New List(Of fpData)(task.fpList)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
         subdiv.Insert(task.features)
@@ -22,7 +21,7 @@ Public Class FCS_Basics : Inherits TaskParent
         task.fpOutline.SetTo(0)
         Dim matchCount As Integer
         dst1.SetTo(0)
-        For i = 0 To facets.Length - 1
+        For i = 0 To Math.Min(task.features.Count, facets.Count) - 1
             Dim fp As New fpData
             fp.pt = task.features(i)
             fp.ptHistory.Add(fp.pt)
@@ -32,7 +31,7 @@ Public Class FCS_Basics : Inherits TaskParent
             Dim gc = task.gcList(gcIndex)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(gcIndex)
             If fpIndex >= 0 Then
-                Dim fpLast = fpLastList(fpIndex)
+                Dim fpLast = task.fpLastList(fpIndex)
                 fp.ptLast = fpLast.pt
                 fp.age = fpLast.age + 1
                 matchCount += 1
@@ -61,6 +60,15 @@ Public Class FCS_Basics : Inherits TaskParent
             dst1.FillConvexPoly(fp.facets, gcIndex Mod 255, task.lineType)
             DrawContour(task.fpOutline, fp.facets, 255, 1)
         Next
+
+
+        If task.features.Count <> facets.Length Then
+            task.fpFromGridCell.Clear()
+            For Each fp In task.fpList
+                Dim nextIndex = task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+                task.fpFromGridCell.Add(nextIndex)
+            Next
+        End If
 
         dst2 = ShowPalette(dst1)
         For Each fp In task.fpList
@@ -389,34 +397,14 @@ End Class
 
 
 Public Class FCS_Lines : Inherits TaskParent
-    Dim fcs As New FCS_Basics
-    Dim lines As New Line_Basics
-    Dim options As New Options_Line
     Public Sub New()
-        optiBase.FindSlider("Min Line Length").Value = 60
-        optiBase.FindSlider("Distance to next center").Value = 1
+        task.featureOptions.DistanceSlider.Value = 60
+        task.featureOptions.FeatureMethod.SelectedItem() = "LineInput"
         labels(3) = "Cell boundaries with the age (in frames) for each cell."
         desc = "Use lines as input to FCS."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-
-        task.features.Clear()
-        For Each lp In task.lpList
-            Dim lpPerp = lp.perpendicularPoints(lp.p1, task.minDistance)
-            task.features.Add(lpPerp.p1)
-            task.features.Add(lpPerp.p2)
-
-            lpPerp = lp.perpendicularPoints(lp.p2, task.minDistance)
-            task.features.Add(lpPerp.p1)
-            task.features.Add(lpPerp.p2)
-
-            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-        Next
-
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        dst2.SetTo(white, lines.dst2)
+        dst2 = task.feat.fcs.dst2
 
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
@@ -434,15 +422,13 @@ End Class
 
 
 Public Class FCS_WithAge : Inherits TaskParent
-    Dim fcs As New FCS_Basics
     Public Sub New()
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the age of each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        labels(2) = fcs.labels(2)
+        dst2 = task.feat.fcs.dst2
+        labels(2) = task.feat.fcs.labels(2)
 
         dst3.SetTo(0)
         For Each fp In task.fpList
@@ -458,15 +444,13 @@ End Class
 
 
 Public Class FCS_BestAge : Inherits TaskParent
-    Dim fcs As New FCS_Basics
     Public Sub New()
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the top X oldest (best) cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        labels(2) = fcs.labels(2)
+        dst2 = task.feat.fcs.dst2
+        labels(2) = task.feat.fcs.labels(2)
 
         Dim fpSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each fp In task.fpList
@@ -486,37 +470,6 @@ Public Class FCS_BestAge : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class FCS_RedCloud : Inherits TaskParent
-    Dim redCombo As New RedColor_Basics
-    Dim fcs As New FCS_Basics
-    Dim knnMin As New KNN_MinDistance
-    Public Sub New()
-        desc = "Use the RedCloud maxDist points as feature points in an FCS display."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redCombo.Run(src)
-        dst3 = redCombo.dst2
-        labels(2) = redCombo.labels(2)
-
-        knnMin.inputPoints.Clear()
-        For Each rc In task.rcList
-            knnMin.inputPoints.Add(rc.maxDist)
-        Next
-        knnMin.Run(src)
-
-        task.features = New List(Of cv.Point2f)(knnMin.outputPoints2f)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        fpDSet()
-        labels(3) = fcs.labels(2)
-    End Sub
-End Class
 
 
 
@@ -726,3 +679,36 @@ Public Class FCS_Info : Inherits TaskParent
         If standalone Then SetTrueText(strOut, 3)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+'Public Class FCS_RedCloud : Inherits TaskParent
+'    Dim redCombo As New RedColor_Basics
+'    Dim fcs As New FCS_Basics
+'    Dim knnMin As New KNN_MinDistance
+'    Public Sub New()
+'        desc = "Use the RedCloud maxDist points as feature points in an FCS display."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        redCombo.Run(src)
+'        dst3 = redCombo.dst2
+'        labels(2) = redCombo.labels(2)
+
+'        knnMin.inputPoints.Clear()
+'        For Each rc In task.rcList
+'            knnMin.inputPoints.Add(rc.maxDist)
+'        Next
+'        knnMin.Run(src)
+
+'        task.features = New List(Of cv.Point2f)(knnMin.outputPoints2f)
+'        fcs.Run(src)
+'        dst2 = task.feat.fcs.dst2
+'        fpDSet()
+'        labels(3) = fcs.labels(2)
+'    End Sub
+'End Class

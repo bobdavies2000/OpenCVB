@@ -47,6 +47,7 @@ Public Class VBtask : Implements IDisposable
     Public features As New List(Of cv.Point2f)
     Public fpFromGridCell As New List(Of Integer)
     Public fpFromGridCellLast As New List(Of Integer)
+    Public fpLastList As New List(Of fpData)
     Public featurePoints As New List(Of cv.Point)
 
     Public featureMask As New cv.Mat

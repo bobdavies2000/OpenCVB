@@ -10,6 +10,7 @@
         FeatureMethod.Items.Add("BRISK")
         FeatureMethod.Items.Add("Harris")
         FeatureMethod.Items.Add("FAST")
+        FeatureMethod.Items.Add("LineInput")
         FeatureMethod.SelectedItem() = "GoodFeatures Full Image"
 
         EdgeMethods.Items.Add("Canny")

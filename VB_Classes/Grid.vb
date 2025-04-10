@@ -28,7 +28,6 @@ Public Class Grid_Basics : Inherits TaskParent
                 For x = 0 To src.Width - 1 Step cellSize
                     Dim roi = ValidateRect(New cv.Rect(x, y, cellSize, cellSize))
 
-                    If roi.Height <> cellSize Then Dim k = 0
                     If roi.Bottom = dst2.Height - 1 Then roi.Height += 1
                     If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
 

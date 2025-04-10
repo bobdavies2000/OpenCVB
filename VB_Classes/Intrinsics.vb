@@ -93,10 +93,6 @@ Public Class Intrinsics_PixelByPixel : Inherits TaskParent
         strOut += "Max Y Color = " + CStr(cMaxY) + " with Max Y Left = " + Format(maxY, fmt1) + vbCrLf
 
         Dim delta = (maxX - minX) / (dst2.Width) ' pixel dimensions are the same in x and y for both cameras.
-        If cMinX > 0 Then Dim k = 0
-        If cMinY > 0 Then Dim k = 0
-        If cMaxX < dst2.Width - 1 Then Dim k = 0
-        If cMaxY < dst2.Height - 1 Then Dim k = 0
 
         rect = New cv.Rect(CInt(minX), CInt(minY), delta * dst2.Width, delta * dst2.Height)
         dst2.Rectangle(rect, 0, task.lineWidth, task.lineType)

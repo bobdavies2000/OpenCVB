@@ -102,5 +102,6 @@ Public Class OptionParent : Implements IDisposable
         BRISK = 3
         Harris = 4
         FAST = 5
+        LineInput = 6
     End Enum
 End Class

@@ -2,9 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
-    Dim harris As Corners_HarrisDetector_CPP
-    Dim FAST As Corners_Basics
-    Dim brisk As BRISK_Basics
     Public fcs As New FCS_Basics
     Public options As New Options_Features
     Public Sub New()
@@ -13,6 +10,7 @@ Public Class Feature_Basics : Inherits TaskParent
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         options.Run()
 
         Dim features As New List(Of cv.Point2f)
@@ -53,7 +51,6 @@ Public Class Feature_Basics : Inherits TaskParent
 
                 Dim ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
                 features.Clear()
-                If standaloneTest() Then dst2 = src
 
                 For i = 0 To ptMat.Rows - 1
                     Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
@@ -63,21 +60,39 @@ Public Class Feature_Basics : Inherits TaskParent
 
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.BRISK
-                If brisk Is Nothing Then brisk = New BRISK_Basics
+                Static brisk As New BRISK_Basics
                 brisk.Run(task.gray)
                 features = brisk.features
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.Harris
-                If harris Is Nothing Then harris = New Corners_HarrisDetector_CPP
+                Static harris As New Corners_HarrisDetector_CPP
                 harris.Run(task.gray)
                 features = harris.features
                 labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
             Case FeatureSrc.FAST
-                If FAST Is Nothing Then FAST = New Corners_Basics
+                Static FAST As New Corners_Basics
                 FAST.Run(task.gray)
                 features = FAST.features
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.LineInput
+                task.lines.Run(task.gray)
+                For Each lp In task.lpList
+                    If lp.p1 <> lp.p2 Then
+                        features.Add(lp.p1)
+                        features.Add(lp.p2)
+                        'Dim lpPerp = lp.perpendicularPoints(lp.p1, task.minDistance)
+                        'features.Add(lpPerp.p1)
+                        'features.Add(lpPerp.p2)
+
+                        'lpPerp = lp.perpendicularPoints(lp.p2, task.minDistance)
+                        'features.Add(lpPerp.p1)
+                        'features.Add(lpPerp.p2)
+                    End If
+                Next
         End Select
+
+        task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)
+        task.fpLastList = New List(Of fpData)(task.fpList)
 
         If task.optionsChanged Or ptNew.Count = 0 Then
             For Each pt In features
@@ -96,8 +111,6 @@ Public Class Feature_Basics : Inherits TaskParent
             sortByGrid.Add(index, pt)
         Next
 
-        task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)
-
         task.features.Clear()
         task.featurePoints.Clear()
         task.fpFromGridCell.Clear()
@@ -114,12 +127,11 @@ Public Class Feature_Basics : Inherits TaskParent
         Next
 
         If standaloneTest() Then
-            dst2 = task.color.Clone
+            dst2 = src
             For Each pt In task.features
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         End If
-
         fcs.Run(src) ' convert the features to fplist.
     End Sub
     Public Sub Close()
