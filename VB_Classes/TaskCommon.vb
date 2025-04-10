@@ -531,32 +531,17 @@ End Enum
 
 
 
-Public Class fcsData ' feature coordinate system (Line centers are the input)
-    Public index As Integer
-    Public age As Integer
-    Public pt As cv.Point
-    Sub New()
 
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class fpXData ' feature point -  excessive - trim this to fcsData...
+Public Class fpData ' feature point -  excessive - trim this to fcsData...
     Public index As Integer
     Public age As Integer = 1
     Public ID As Single
     Public travelDistance As Single
     Public periph As Boolean
-    Public rect As cv.Rect
     Public facets As List(Of cv.Point)
     Public pt As cv.Point
     Public ptLast As cv.Point
     Public ptHistory As List(Of cv.Point)
-    Public rcIndex As Integer
     Public depth As Single
     Public gcIndex As Integer
     Sub New()

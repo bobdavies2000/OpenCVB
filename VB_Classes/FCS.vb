@@ -10,7 +10,7 @@ Public Class FCS_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
-        Dim fpLastList = New List(Of fpXData)(task.fpList)
+        Dim fpLastList = New List(Of fpData)(task.fpList)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
         subdiv.Insert(task.features)
@@ -23,7 +23,7 @@ Public Class FCS_Basics : Inherits TaskParent
         Dim matchCount As Integer
         dst1.SetTo(0)
         For i = 0 To facets.Length - 1
-            Dim fp As New fpXData
+            Dim fp As New fpData
             fp.pt = task.features(i)
             fp.ptHistory.Add(fp.pt)
             fp.index = i
@@ -50,7 +50,6 @@ Public Class FCS_Basics : Inherits TaskParent
             Next
 
             Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
-            fp.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1))
 
             If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
 
@@ -70,9 +69,11 @@ Public Class FCS_Basics : Inherits TaskParent
         dst3 = task.fpOutline
 
         dst2.SetTo(black, task.fpOutline)
-        If standalone Then fpDisplayAge()
-        fpDisplayCell()
-        fpCellContour(task.fpD, task.color)
+        If standalone Then
+            fpDisplayAge()
+            fpCellContour(task.fpD, task.color)
+        End If
+        fpDSet()
 
         DrawContour(dst2, task.fpD.facets, white, task.lineWidth)
 
@@ -100,7 +101,7 @@ Public Class FCS_ViewLeft : Inherits TaskParent
         dst3 = fcs.dst3
 
         fpDisplayAge()
-        fpDisplayCell()
+        fpDSet()
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -122,7 +123,7 @@ Public Class FCS_ViewRight : Inherits TaskParent
         dst3 = fcs.dst3
 
         fpDisplayAge()
-        fpDisplayCell()
+        fpDSet()
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -153,7 +154,6 @@ Public Class FCS_FloodFill : Inherits TaskParent
             Dim fp = task.fpList(i)
             DrawCircle(dst1, fp.pt, task.DotSize, task.highlight)
             DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
-            fp.rcIndex = task.rcMap.Get(Of Byte)(fp.pt.Y, fp.pt.X)
 
             task.fpList(i) = fp
             DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
@@ -198,8 +198,7 @@ Public Class FCS_Periphery : Inherits TaskParent
                 ptInID.Add(fp.ID)
             End If
         Next
-        fpDisplayCell()
-        dst3.Rectangle(task.fpD.rect, task.highlight, task.lineWidth)
+        fpDSet()
     End Sub
 End Class
 
@@ -229,7 +228,7 @@ Public Class FCS_Edges : Inherits TaskParent
             End If
         Next
         dst3.SetTo(cv.Scalar.White, task.fpOutline)
-        fpDisplayCell()
+        fpDSet()
     End Sub
 End Class
 
@@ -275,7 +274,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
         Dim depthStart = histIndex * depthIncr
         Dim depthEnd = (histIndex + 1) * depthIncr
 
-        Static fpCells As New List(Of (fpXData, Integer))
+        Static fpCells As New List(Of (fpData, Integer))
         Static histIndexSave = histIndex
 
         If histIndexSave <> histIndex Or task.optionsChanged Then
@@ -295,7 +294,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
         Next
 
         For Each ele In fpCells
-            Dim fp As fpXData = ele.Item1
+            Dim fp As fpData = ele.Item1
             SetTrueText(Format(fp.age, fmt0), fp.pt, 0)
             fpCellContour(fp, task.color, 0)
         Next
@@ -328,7 +327,7 @@ End Class
 '        optiBase.FindSlider("KNN Dimension").Value = 3
 '        desc = "Can we distinguish each feature point cell with color, depth, and grid."
 '    End Sub
-'    Private Function buildEntry(fp As fpXData) As List(Of Single)
+'    Private Function buildEntry(fp As fpData) As List(Of Single)
 '        Dim dataList As New List(Of Single)
 '        For i = 0 To dimension - 1
 '            dataList.Add(Choose(i + 1, fp.depth, fp.depthMin, fp.depthMax))
@@ -342,7 +341,7 @@ End Class
 '        fcs.Run(src)
 '        dst2 = fcs.dst2
 
-'        Static fpSave As fpXData
+'        Static fpSave As fpData
 '        If task.firstPass Or task.mouseClickFlag Then
 '            fpSave = task.fpList(task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X))
 '        End If
@@ -367,7 +366,7 @@ End Class
 
 '        knn.Run(src)
 
-'        fpDisplayCell()
+'        fpDSet()
 '        fpCellContour(task.fpD, dst2)
 '        For i = 0 To 10
 '            Dim fp = task.fpList(knn.result(0, i))
@@ -514,7 +513,7 @@ Public Class FCS_RedCloud : Inherits TaskParent
         task.features = New List(Of cv.Point2f)(knnMin.outputPoints2f)
         fcs.Run(src)
         dst2 = fcs.dst2
-        fpDisplayCell()
+        fpDSet()
         labels(3) = fcs.labels(2)
     End Sub
 End Class
@@ -563,7 +562,7 @@ Public Class FCS_InfoTest : Inherits TaskParent
         info.Run(src)
         SetTrueText(info.strOut, 3)
 
-        fpDisplayCell()
+        fpDSet()
     End Sub
 End Class
 
@@ -625,7 +624,7 @@ Public Class FCS_Motion : Inherits TaskParent
         plot.plotData = New cv.Scalar(motionPercent, 0, 0)
         plot.Run(src)
         dst1 = plot.dst2
-        fpDisplayCell()
+        fpDSet()
     End Sub
 End Class
 
@@ -684,7 +683,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         SetTrueText("X distances" + rangeText, 2)
         SetTrueText("Y distances " + rangeText, New cv.Point(dst2.Width / 2 + 2, 0), 2)
         labels = fcsM.labels
-        fpDisplayCell()
+        fpDSet()
     End Sub
 End Class
 
@@ -705,9 +704,7 @@ Public Class FCS_Info : Inherits TaskParent
 
         Dim fp = task.fpD
         strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
-        strOut += "Rect: x/y " + CStr(fp.rect.X) + "/" + CStr(fp.rect.Y) + " w/h "
-        strOut += CStr(fp.rect.Width) + "/" + CStr(fp.rect.Height) + vbCrLf
-        strOut += "ID = " + Format(fp.ID, fmt1) + ", index = " + CStr(fp.index) + vbCrLf
+        strOut += "index = " + CStr(fp.index) + vbCrLf
         strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf
         strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf

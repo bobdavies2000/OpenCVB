@@ -421,7 +421,7 @@ Public Class TaskParent : Implements IDisposable
             SetTrueText(CStr(fp.age), fp.pt, 3)
         Next
     End Sub
-    Public Sub fpDisplayCell()
+    Public Sub fpDSet()
         If task.fpList.Count = 0 Then Exit Sub
         Dim gcIndex = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         Dim fpIndex = task.fpFromGridCell.IndexOf(gcIndex)
@@ -435,7 +435,7 @@ Public Class TaskParent : Implements IDisposable
             Next
         Next
     End Sub
-    Public Sub fpCellContour(fp As fpXData, dst As cv.Mat, Optional colorIndex As Integer = 0)
+    Public Sub fpCellContour(fp As fpData, dst As cv.Mat, Optional colorIndex As Integer = 0)
         Dim color = Choose(colorIndex + 1, cv.Scalar.White, cv.Scalar.Black)
         For i = 0 To fp.facets.Count - 1
             Dim p1 = fp.facets(i)

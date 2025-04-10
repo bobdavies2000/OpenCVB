@@ -15,7 +15,7 @@ Public Class VBtask : Implements IDisposable
     Public lpList As New List(Of lpData) ' line pair list
     Public gcList As New List(Of gcData)
     Public rcList As New List(Of rcData)
-    Public fpList As New List(Of fpXData)
+    Public fpList As New List(Of fpData)
 
     Public gcMap As New cv.Mat ' grid cell map
     Public fpMap As New cv.Mat ' feature map
@@ -24,7 +24,7 @@ Public Class VBtask : Implements IDisposable
     Public gcD As gcData ' the currently selected grid cell
     Public rcD As New rcData ' the currently selected red Cell
     Public lpD As New lpData ' the currently seleccted line pair
-    Public fpD As New fpXData ' the currently seleccted feature point.
+    Public fpD As New fpData ' the currently seleccted feature point.
 
     Public cellSize As Integer
     Public tilesPerCol As Integer
