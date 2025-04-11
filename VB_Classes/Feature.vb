@@ -1013,7 +1013,8 @@ Public Class Feature_SobelMaxGrid : Inherits TaskParent
         For Each gc In task.gcList
             Dim mm = GetMinMax(dst3(gc.rect))
             Dim val = dst3(gc.rect).Get(Of Byte)(mm.maxLoc.Y, mm.maxLoc.X)
-            If val = 255 Then bestPoints.Add(gc.index, New cv.Point(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y))
+            gc.prevFeature = New cv.Point2f(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y)
+            If val = 255 Then bestPoints.Add(gc.index, gc.feature)
         Next
 
         features.Clear()
@@ -1021,7 +1022,9 @@ Public Class Feature_SobelMaxGrid : Inherits TaskParent
         For Each ele In bestPoints
             If dst1.Get(Of Byte)(ele.Value.Y, ele.Value.X) Then
                 Dim gc = task.gcList(ele.Key)
-                features.Add(gc.feature)
+                features.Add(gc.prevFeature)
+                gc.feature = gc.prevFeature
+                task.gcList(ele.Key) = gc
             End If
         Next
 
@@ -1029,7 +1032,7 @@ Public Class Feature_SobelMaxGrid : Inherits TaskParent
         dst1.SetTo(0)
         For Each pt In features
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
-            dst1.Circle(pt, task.DotSize, 255, -1)
+            dst1.Circle(pt, task.DotSize + 1, 255, -1)
         Next
         If task.heartBeat Then labels(2) = CStr(features.Count) + " features were found with maximum Sobel difference."
     End Sub
@@ -1057,7 +1060,8 @@ Public Class Feature_SobelMax : Inherits TaskParent
         For Each gc In task.gcList
             Dim mm = GetMinMax(dst3(gc.rect))
             Dim val = dst3(gc.rect).Get(Of Byte)(mm.maxLoc.Y, mm.maxLoc.X)
-            sortedPoints.Add(val, New cv.Point2f(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y))
+            gc.feature = New cv.Point2f(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y)
+            sortedPoints.Add(val, gc.feature)
         Next
 
         Dim nextList As New List(Of cv.Point)
