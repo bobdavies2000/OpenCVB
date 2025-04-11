@@ -71,7 +71,7 @@ Public Module vbc
 
             task.rcList.Add(rc)
             task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
-
+            DisplayCells.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
             If rc.index >= 255 Then Exit For
         Next
         saveColorSetting = task.redOptions.trackingIndex

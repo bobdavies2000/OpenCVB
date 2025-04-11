@@ -1090,12 +1090,6 @@ Public Class Main_UI
         jsonWrite()
 
         cameraTaskHandle = Nothing
-
-        killThread("python")
-
-        If algorithmTaskHandle IsNot Nothing Then
-            If algorithmTaskHandle.IsAlive Then algorithmTaskHandle.Abort()
-        End If
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastTime As DateTime = Now

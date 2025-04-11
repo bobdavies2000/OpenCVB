@@ -107,7 +107,7 @@ Public Class OptionsRedCloud
         End Select
 
         task.redOptions.setBitReductionBar(5)
-        TrackingMeanColor.Checked = True
+        TrackingColor.Checked = True
 
         rcReductionSlider.Value = 50
         Label3.Text = CStr(rcReductionSlider.Value)

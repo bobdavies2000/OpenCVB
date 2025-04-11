@@ -542,6 +542,7 @@ Public Class VBtask : Implements IDisposable
         If testAllRunning = False Then treeView = New TreeviewForm
 
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.rcList = New List(Of rcData)
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)

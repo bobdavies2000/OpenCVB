@@ -254,8 +254,6 @@ End Class
 Public Class RedCell_Generate : Inherits TaskParent
     Public mdList As New List(Of maskData)
     Public Sub New()
-        task.rcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.rcList = New List(Of rcData)
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -282,7 +280,6 @@ Public Class RedCell_Generate : Inherits TaskParent
             If rc.indexLast > 0 Then
                 Dim lrc = task.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
-                rc.color = lrc.color
                 rc.depth = lrc.depth
                 rc.depthMask = lrc.depthMask
                 rc.depthPixels = lrc.depthPixels
@@ -300,19 +297,20 @@ Public Class RedCell_Generate : Inherits TaskParent
                         rc.maxDStable = rc.maxDist
 
                         rc.age = 1 ' a new cell was found that was probably part of another in the previous frame.
-                        rc.color = randomCellColor()
                     End If
                 End If
             Else
                 rc.age = 1
-                rc.color = randomCellColor()
             End If
 
+            Dim gcIndex = task.gcMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
+            rc.color = task.scalarColors(gcIndex Mod 255)
             initialList.Add(rc)
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
 
+        Dim rcNewCount As Integer
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         For Each rc In initialList
             rc.pixels = rc.mask.CountNonZero
@@ -332,12 +330,8 @@ Public Class RedCell_Generate : Inherits TaskParent
                 If Single.IsNaN(rc.depth) Or rc.depth < 0 Then rc.depth = 0
             End If
 
-            sortedCells.Add(rc.pixels, rc)
-        Next
-
-        Dim rcNewCount As Integer
-        For Each rc In task.rcList
             If rc.age = 1 Then rcNewCount += 1
+            sortedCells.Add(rc.pixels, rc)
         Next
 
         If task.heartBeat Then

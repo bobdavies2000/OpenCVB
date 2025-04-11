@@ -81,7 +81,7 @@ Public Class OptionsContainer
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         layoutOptions(normalRequest:=False)
     End Sub
-    Private Sub OptionsContainer_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+    Private Sub OptionsContainer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         SaveSetting("Opencv", "gOptionsLeft", "gOptionsLeft", Math.Abs(Me.Left))
         SaveSetting("Opencv", "gOptionsTop", "gOptionsTop", Me.Top)
         SaveSetting("Opencv", "gOptionsWidth", "gOptionsWidth", Me.Width)
