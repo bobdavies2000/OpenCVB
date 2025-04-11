@@ -577,6 +577,7 @@ Public Class gcData
     Public corners As New List(Of cv.Point3f)
     Public highlyVisible As Boolean
     Public features As New List(Of cv.Point)
+    Public feature As cv.Point ' the max grid output
     Public hoodRect As cv.Rect ' a rect describing the neighborhood of the center cell...
     Public rHoodRect As cv.Rect ' a rect describing the neighborhood of the center cell for the right image.
     Sub New()

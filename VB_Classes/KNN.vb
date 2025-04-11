@@ -751,12 +751,6 @@ Public Class KNN_MaxDistance : Inherits TaskParent
                 knn.trainInput = knn.queries
                 knn.Run(src)
 
-                dst3 = src.Clone
-                For Each pt In inputPoints
-                    DrawCircle(dst3, pt, task.DotSize, cv.Scalar.White)
-                Next
-                labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
-
                 Dim distances As New SortedList(Of Single, (cv.Point2f, cv.Point2f))(
                                                 New compareAllowIdenticalSingleInverted)
 
@@ -779,14 +773,17 @@ Public Class KNN_MaxDistance : Inherits TaskParent
                 For Each pair In pairList
                     Dim p1 = pair.Item1
                     Dim p2 = pair.Item2
-                    Dim val = task.fpMap.Get(Of Single)(p1.Y, p1.X)
-                    Dim fp = task.fpList(val)
-                    Dim index = inputIDs.IndexOf(fp.ID)
-                    If index >= 0 Then
-                        nextPairs.Add((p1, p2))
-                        nextIDs.Add(inputIDs(index))
-                    Else
-                        nextIDs.Add(-1)
+                    Dim gcIndex = task.gcMap.Get(Of Single)(p1.Y, p1.X)
+                    Dim fpIndex = task.fpFromGridCell.IndexOf(gcIndex)
+                    If fpIndex >= 0 Then
+                        Dim fp = task.fpList(fpIndex)
+                        Dim index = inputIDs.IndexOf(fp.ID)
+                        If index >= 0 Then
+                            nextPairs.Add((p1, p2))
+                            nextIDs.Add(inputIDs(index))
+                        Else
+                            nextIDs.Add(-1)
+                        End If
                     End If
                 Next
 
@@ -805,6 +802,8 @@ Public Class KNN_MaxDistance : Inherits TaskParent
             For Each pair In pairList
                 Dim p1 = New cv.Point(pair.Item1.X, pair.Item1.Y)
                 Dim p2 = New cv.Point(pair.Item2.X, pair.Item2.Y)
+                DrawCircle(dst2, p1, task.DotSize, cv.Scalar.White)
+                DrawCircle(dst2, p2, task.DotSize, cv.Scalar.White)
                 dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
                 outputPoints.Add(pair)
             Next

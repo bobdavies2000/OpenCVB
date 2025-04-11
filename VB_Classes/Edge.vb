@@ -898,36 +898,6 @@ End Class
 
 
 
-
-
-'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Sobel : Inherits TaskParent
-    Dim options As New Options_Sobel
-    Public Sub New()
-        desc = "Show Sobel edge detection with varying kernel sizes"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
-        If options.horizontalDerivative And options.verticalDerivative Then
-            dst1 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
-            If standaloneTest() Then
-                dst2 = ShowAddweighted(dst1, dst0, labels(2))
-            Else
-                dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
-            End If
-        Else
-            dst2 = dst0.ConvertScaleAbs()
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edge_SobelHorizontal : Inherits TaskParent
     Dim edges As New Edge_Sobel
@@ -1406,5 +1376,57 @@ Public Class Edge_MeanSubtraction : Inherits TaskParent
         canny.Run(src)
 
         If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motionMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_Sobel : Inherits TaskParent
+    Dim options As New Options_Sobel
+    Public Sub New()
+        desc = "Show Sobel edge detection with varying kernel sizes"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
+        If options.horizontalDerivative And options.verticalDerivative Then
+            dst1 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
+            If standaloneTest() Then
+                dst2 = ShowAddweighted(dst1, dst0, labels(2))
+            Else
+                dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
+            End If
+        Else
+            dst2 = dst0.ConvertScaleAbs()
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelQT : Inherits TaskParent
+    Public Sub New()
+        desc = "Show Sobel vertical and horizontal edge detection no options."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, 3)
+        dst1 = src.Sobel(cv.MatType.CV_32F, 0, 1, 3)
+        dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
     End Sub
 End Class

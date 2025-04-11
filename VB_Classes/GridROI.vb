@@ -88,29 +88,6 @@ End Class
 
 
 
-Public Class GridROI_Canny : Inherits TaskParent
-    Dim canny As New Edge_Basics
-    Dim devGrid As New GridCell_Basics
-    Public Sub New()
-        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-        desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(src)
-        dst3 = canny.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        devGrid.Run(src Or dst3)
-        dst2 = devGrid.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class GridROI_Sorted : Inherits TaskParent
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
     Public bgrList As New List(Of cv.Vec3b)
@@ -490,3 +467,44 @@ Public Class GridROI_LRAll : Inherits TaskParent
 End Class
 
 
+
+
+
+
+Public Class GridROI_Canny : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        desc = "Find all the GridCells with edges in them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        dst3 = edges.dst2
+
+        dst2.SetTo(0)
+        For Each gc In task.gcList
+            If dst3(gc.rect).CountNonZero Then src(gc.rect).CopyTo(dst2(gc.rect))
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridROI_Sobel : Inherits TaskParent
+    Dim edges As New GridROI_Canny
+    Dim sobel As New Edge_Sobel
+    Public Sub New()
+        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        desc = "Find all the GridCells with edges in them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+
+        sobel.Run(dst2)
+        dst3 = sobel.dst2
+    End Sub
+End Class

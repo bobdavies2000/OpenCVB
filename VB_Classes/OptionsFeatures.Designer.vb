@@ -45,9 +45,11 @@ Partial Class OptionsFeatures
         '
         Me.LineGroup.Controls.Add(Me.HorizRadio)
         Me.LineGroup.Controls.Add(Me.verticalRadio)
-        Me.LineGroup.Location = New System.Drawing.Point(796, 12)
+        Me.LineGroup.Location = New System.Drawing.Point(531, 8)
+        Me.LineGroup.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.LineGroup.Name = "LineGroup"
-        Me.LineGroup.Size = New System.Drawing.Size(328, 568)
+        Me.LineGroup.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.LineGroup.Size = New System.Drawing.Size(219, 369)
         Me.LineGroup.TabIndex = 1
         Me.LineGroup.TabStop = False
         Me.LineGroup.Text = "Lines"
@@ -55,9 +57,10 @@ Partial Class OptionsFeatures
         'HorizRadio
         '
         Me.HorizRadio.AutoSize = True
-        Me.HorizRadio.Location = New System.Drawing.Point(27, 80)
+        Me.HorizRadio.Location = New System.Drawing.Point(18, 52)
+        Me.HorizRadio.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.HorizRadio.Name = "HorizRadio"
-        Me.HorizRadio.Size = New System.Drawing.Size(148, 24)
+        Me.HorizRadio.Size = New System.Drawing.Size(100, 17)
         Me.HorizRadio.TabIndex = 1
         Me.HorizRadio.TabStop = True
         Me.HorizRadio.Text = "Horizontal Lines"
@@ -66,9 +69,10 @@ Partial Class OptionsFeatures
         'verticalRadio
         '
         Me.verticalRadio.AutoSize = True
-        Me.verticalRadio.Location = New System.Drawing.Point(27, 50)
+        Me.verticalRadio.Location = New System.Drawing.Point(18, 32)
+        Me.verticalRadio.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.verticalRadio.Name = "verticalRadio"
-        Me.verticalRadio.Size = New System.Drawing.Size(129, 24)
+        Me.verticalRadio.Size = New System.Drawing.Size(88, 17)
         Me.verticalRadio.TabIndex = 0
         Me.verticalRadio.TabStop = True
         Me.verticalRadio.Text = "Vertical Lines"
@@ -76,9 +80,11 @@ Partial Class OptionsFeatures
         '
         'MaskGroup
         '
-        Me.MaskGroup.Location = New System.Drawing.Point(1038, 12)
+        Me.MaskGroup.Location = New System.Drawing.Point(692, 8)
+        Me.MaskGroup.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.MaskGroup.Name = "MaskGroup"
-        Me.MaskGroup.Size = New System.Drawing.Size(328, 568)
+        Me.MaskGroup.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.MaskGroup.Size = New System.Drawing.Size(219, 369)
         Me.MaskGroup.TabIndex = 2
         Me.MaskGroup.TabStop = False
         Me.MaskGroup.Text = "Masks"
@@ -86,98 +92,108 @@ Partial Class OptionsFeatures
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(32, 67)
+        Me.Label3.Location = New System.Drawing.Point(21, 44)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(105, 20)
+        Me.Label3.Size = New System.Drawing.Size(71, 13)
         Me.Label3.TabIndex = 23
         Me.Label3.Text = "Edge Method"
         '
         'EdgeMethods
         '
         Me.EdgeMethods.FormattingEnabled = True
-        Me.EdgeMethods.Location = New System.Drawing.Point(28, 92)
+        Me.EdgeMethods.Location = New System.Drawing.Point(19, 60)
+        Me.EdgeMethods.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.EdgeMethods.Name = "EdgeMethods"
-        Me.EdgeMethods.Size = New System.Drawing.Size(246, 28)
+        Me.EdgeMethods.Size = New System.Drawing.Size(165, 21)
         Me.EdgeMethods.TabIndex = 22
         '
         'FeatureCorrelationLabel
         '
         Me.FeatureCorrelationLabel.AutoSize = True
-        Me.FeatureCorrelationLabel.Location = New System.Drawing.Point(534, 248)
+        Me.FeatureCorrelationLabel.Location = New System.Drawing.Point(356, 161)
+        Me.FeatureCorrelationLabel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
-        Me.FeatureCorrelationLabel.Size = New System.Drawing.Size(146, 20)
+        Me.FeatureCorrelationLabel.Size = New System.Drawing.Size(96, 13)
         Me.FeatureCorrelationLabel.TabIndex = 21
         Me.FeatureCorrelationLabel.Text = "Feature Correlation"
         '
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(32, 225)
+        Me.Label4.Location = New System.Drawing.Point(21, 146)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(220, 20)
+        Me.Label4.Size = New System.Drawing.Size(146, 13)
         Me.Label4.TabIndex = 20
         Me.Label4.Text = "Feature Correlation Threshold"
         '
         'FCorrSlider
         '
-        Me.FCorrSlider.Location = New System.Drawing.Point(28, 248)
+        Me.FCorrSlider.Location = New System.Drawing.Point(19, 161)
+        Me.FCorrSlider.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.FCorrSlider.Maximum = 100
         Me.FCorrSlider.Minimum = 1
         Me.FCorrSlider.Name = "FCorrSlider"
-        Me.FCorrSlider.Size = New System.Drawing.Size(475, 69)
+        Me.FCorrSlider.Size = New System.Drawing.Size(317, 45)
         Me.FCorrSlider.TabIndex = 19
         Me.FCorrSlider.Value = 75
         '
         'DistanceLabel
         '
         Me.DistanceLabel.AutoSize = True
-        Me.DistanceLabel.Location = New System.Drawing.Point(534, 163)
+        Me.DistanceLabel.Location = New System.Drawing.Point(356, 106)
+        Me.DistanceLabel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.DistanceLabel.Name = "DistanceLabel"
-        Me.DistanceLabel.Size = New System.Drawing.Size(72, 20)
+        Me.DistanceLabel.Size = New System.Drawing.Size(49, 13)
         Me.DistanceLabel.TabIndex = 18
         Me.DistanceLabel.Text = "Distance"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(32, 140)
+        Me.Label2.Location = New System.Drawing.Point(21, 91)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(229, 20)
+        Me.Label2.Size = New System.Drawing.Size(154, 13)
         Me.Label2.TabIndex = 17
         Me.Label2.Text = "Min Distance between features"
         '
         'DistanceSlider
         '
-        Me.DistanceSlider.Location = New System.Drawing.Point(28, 163)
+        Me.DistanceSlider.Location = New System.Drawing.Point(19, 106)
+        Me.DistanceSlider.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.DistanceSlider.Maximum = 100
         Me.DistanceSlider.Minimum = 1
         Me.DistanceSlider.Name = "DistanceSlider"
-        Me.DistanceSlider.Size = New System.Drawing.Size(475, 69)
+        Me.DistanceSlider.Size = New System.Drawing.Size(317, 45)
         Me.DistanceSlider.TabIndex = 16
         Me.DistanceSlider.Value = 25
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(32, 11)
+        Me.Label1.Location = New System.Drawing.Point(21, 7)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(123, 20)
+        Me.Label1.Size = New System.Drawing.Size(82, 13)
         Me.Label1.TabIndex = 15
         Me.Label1.Text = "Feature Method"
         '
         'FeatureMethod
         '
         Me.FeatureMethod.FormattingEnabled = True
-        Me.FeatureMethod.Location = New System.Drawing.Point(28, 36)
+        Me.FeatureMethod.Location = New System.Drawing.Point(19, 23)
+        Me.FeatureMethod.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.FeatureMethod.Name = "FeatureMethod"
-        Me.FeatureMethod.Size = New System.Drawing.Size(246, 28)
+        Me.FeatureMethod.Size = New System.Drawing.Size(165, 21)
         Me.FeatureMethod.TabIndex = 14
         '
         'OptionsFeatures
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1419, 616)
+        Me.ClientSize = New System.Drawing.Size(946, 400)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.EdgeMethods)
         Me.Controls.Add(Me.FeatureCorrelationLabel)
@@ -190,6 +206,7 @@ Partial Class OptionsFeatures
         Me.Controls.Add(Me.FeatureMethod)
         Me.Controls.Add(Me.MaskGroup)
         Me.Controls.Add(Me.LineGroup)
+        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Name = "OptionsFeatures"
         Me.Text = "Important Options for Features, Edges, Lines, and Masks"
         Me.LineGroup.ResumeLayout(False)
