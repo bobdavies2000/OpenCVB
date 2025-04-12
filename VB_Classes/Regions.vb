@@ -290,7 +290,6 @@ End Class
 
 Public Class Region_DepthCorrelation : Inherits TaskParent
     Public Sub New()
-        optiBase.FindSlider("Min Correlation Coefficient").Value = 99
         dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "The matching grid cells in the right view that were used in the correlation computation"

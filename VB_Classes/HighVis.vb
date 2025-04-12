@@ -85,7 +85,7 @@ Public Class HighVis_Lines : Inherits TaskParent
 
             Dim ptRight() As cv.Point = {lp.p1, lp.p2}
             For i = 0 To 1
-                If task.rgbLeftAligned = False Then
+                If task.rgbLeftAligned Then
                     ptRight(i) = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X))
                 End If
                 ptRight(i).X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / lp.pcMeans(i + 1).Item(2)
