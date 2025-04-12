@@ -3,56 +3,48 @@ Public Class GridPoint_Basics : Inherits TaskParent
     Dim sobel As New Edge_SobelQT
     Public features As New List(Of cv.Point2f)
     Public featurePoints As New List(Of cv.Point)
-    Public matchedPoints As New List(Of cv.Point)
+    Public sortedPoints As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         desc = "Find the max Sobel point in each grid cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        sobel.Run(task.gray)
+        dst2 = src
+
+        sobel.Run(task.grayStable)
         dst3 = sobel.dst2
 
-        Dim bestPoints As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-
+        sortedPoints.Clear()
         For Each gc In task.gcList
             Dim mm = GetMinMax(dst3(gc.rect))
             Dim pt = New cv.Point(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y)
-            Dim val = dst3.Get(Of Byte)(mm.maxLoc.Y, mm.maxLoc.X)
-            bestPoints.Add(val, pt)
+            Dim val = dst3.Get(Of Byte)(pt.Y, pt.X)
+            sortedPoints.Add(val, pt)
         Next
 
         dst1.SetTo(255, task.motionMask)
         featurePoints.Clear()
-        matchedPoints.Clear()
-        For Each ele In bestPoints
+        For Each ele In sortedPoints
             Dim pt = ele.Value
             If dst1.Get(Of Byte)(pt.Y, pt.X) Then
                 Dim gc = task.gcList(task.gcMap.Get(Of Single)(pt.Y, pt.X))
-                If gc.feature <> newPoint Then
-                    matchedPoints.Add(gc.feature)
-                    featurePoints.Add(gc.feature)
-                Else
-                    featurePoints.Add(pt)
-                End If
+                If gc.feature <> newPoint Then featurePoints.Add(gc.feature) Else featurePoints.Add(pt)
             End If
         Next
 
         dst1.SetTo(0)
         features.Clear()
         For Each pt In featurePoints
-            Dim gc = task.gcList(task.gcMap.Get(Of Single)(pt.Y, pt.X))
+            Dim gcIndex = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            Dim gc = task.gcList(gcIndex)
             gc.feature = pt
-            dst1.Circle(pt, task.DotSize + 2, 255, -1)
+            task.gcList(gcIndex) = gc
+            dst1.Circle(pt, task.DotSize, 255, -1, cv.LineTypes.Link8)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1)
             features.Add(New cv.Point2f(pt.X, pt.Y))
         Next
 
-        dst2 = src.Clone
-        For Each pt In matchedPoints
-            dst2.Circle(pt, task.DotSize, task.highlight, -1)
-        Next
-
-        labels(2) = "Of the " + CStr(bestPoints.Count) + " candidates, " + CStr(features.Count) + " were saved and " +
-                    CStr(matchedPoints.Count) + " were matched to a previous grid point"
+        labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(features.Count) + " were saved "
     End Sub
 End Class
 

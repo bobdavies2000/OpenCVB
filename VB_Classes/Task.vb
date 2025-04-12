@@ -834,11 +834,11 @@ Public Class VBtask : Implements IDisposable
 
         motionBasics.Run(src)
         gCell.Run(src)
-        feat.Run(src)
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
+        feat.Run(src.Clone)
 
         task.colorizer.Run(src)
 
