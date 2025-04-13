@@ -7,7 +7,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Public gridPoint As New GridPoint_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "CV_8U mask with all the features present.  NOTE: a feature must have depth or it is excluded."
+        labels(3) = "CV_8U mask with all the features present."
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

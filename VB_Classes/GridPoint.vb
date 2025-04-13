@@ -152,3 +152,23 @@ End Class
 
 
 
+
+Public Class GridPoint_Lines : Inherits TaskParent
+    Public Sub New()
+        desc = "Find lines in the grid points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
+        dst3.SetTo(0)
+        For Each gc In task.gcList
+            For Each index In task.gridNeighbors(gc.index)
+                If task.gcList(index).feature.X = gc.feature.X And task.gcList(index).feature.Y = gc.feature.Y Then
+                    If gc.pt <> task.gcList(index).pt Then
+                        dst2.Line(gc.pt, task.gcList(index).pt, task.highlight, task.lineWidth)
+                        dst3.Line(gc.pt, task.gcList(index).pt, task.highlight, task.lineWidth)
+                    End If
+                End If
+            Next
+        Next
+    End Sub
+End Class

@@ -482,7 +482,7 @@ Public Class BackProject_Image : Inherits TaskParent
 
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
-        Dim histIndex = Math.Round(task.mouseMovePoint.X / brickWidth)
+        Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
 
         Dim minRange = New cv.Scalar(histIndex * incr)
         Dim maxRange = New cv.Scalar((histIndex + 1) * incr + 1)
@@ -492,14 +492,14 @@ Public Class BackProject_Image : Inherits TaskParent
         End If
         If useInrange Then
             If histIndex = 0 And hist.plot.removeZeroEntry Then
-                mask = New cv.Mat(task.gray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+                mask = New cv.Mat(task.grayStable.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Else
-                mask = task.gray.InRange(minRange, maxRange)
+                mask = task.grayStable.InRange(minRange, maxRange)
             End If
         Else
             Dim bRange = New cv.Rangef(minRange(0), maxRange(0))
             Dim ranges() = New cv.Rangef() {bRange}
-            cv.Cv2.CalcBackProject({task.gray}, {0}, hist.histogram, mask, ranges)
+            cv.Cv2.CalcBackProject({task.grayStable}, {0}, hist.histogram, mask, ranges)
         End If
         dst3 = src
         If mask.Type <> cv.MatType.CV_8U Then mask.ConvertTo(mask, cv.MatType.CV_8U)
