@@ -3761,6 +3761,7 @@ public:
         eDraw = new EdgeLine_Image();
     }
     void RunCPP(int lineWidth) {
+        dst8U.setTo(0);
         edgeList.clear();
         edgeList.push_back(emptyList); // placeholder for zeros...
         if (segments.size() > 0)
@@ -3794,6 +3795,7 @@ public:
             polylines(edgeMap, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
         }
 
+        if (segments.size() == 0) return;
         float hRange[] = { 0, (float)segments.size()};
         const float* range[] = { hRange };
         int hbins[] = { (int)segments.size() };
@@ -3804,6 +3806,7 @@ public:
 
         calcHist(&edgeMap, 1, { 0 }, motionMask, histogram, 1, hbins, range);
 
+        edgeMap.setTo(0);
         float* hData = (float*)histogram.data;
         for (size_t i = 1; i < segments.size(); i++)
         {
@@ -3811,8 +3814,6 @@ public:
         }
 
         segments.clear();
-        edgeMap.setTo(0);
-        dst8U.setTo(0);
         for (size_t i = 1; i < edgeList.size(); i++)
         {
             const Point* pts = &edgeList[i][0];

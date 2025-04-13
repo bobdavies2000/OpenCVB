@@ -183,7 +183,7 @@ Public Class EdgeLine_BasicsMotion : Inherits TaskParent
         desc = "Native C++ version to find edges/lines using motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.grayStable
 
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
