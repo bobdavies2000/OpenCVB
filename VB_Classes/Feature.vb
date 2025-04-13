@@ -4,6 +4,7 @@ Imports VB_Classes.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
     Public fcs As New FCS_Basics
     Public options As New Options_Features
+    Public gridPoint As New GridPoint_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U mask with all the features present.  NOTE: a feature must have depth or it is excluded."
@@ -89,10 +90,9 @@ Public Class Feature_Basics : Inherits TaskParent
                         'features.Add(lpPerp.p2)
                     End If
                 Next
-            Case FeatureSrc.SobelMaxGrid
-                Static sobelMax As New GridPoint_SobelMax
-                sobelMax.Run(src)
-                features = sobelMax.features
+            Case FeatureSrc.gridPoints
+                gridPoint.Run(src)
+                features = gridPoint.features
         End Select
 
         task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)

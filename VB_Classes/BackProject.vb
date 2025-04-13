@@ -9,7 +9,7 @@ Public Class BackProject_Basics : Inherits TaskParent
         desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        hist.Run(task.gray)
+        hist.Run(task.grayStable)
         If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
             Exit Sub
@@ -30,7 +30,7 @@ Public Class BackProject_Basics : Inherits TaskParent
         '     cv.Cv2.CalcBackProject({task.gray}, {0}, histK.hist.histogram, dst0, ranges)
         ' for single dimension histograms, backprojection is the same as inrange
         ' (and this works for backproject_FeatureLess below)
-        dst0 = task.gray.InRange(minRange, maxRange)
+        dst0 = task.grayStable.InRange(minRange, maxRange)
 
         Dim actualCount = dst0.CountNonZero
         dst3 = task.color.Clone

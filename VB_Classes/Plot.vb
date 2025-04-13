@@ -377,7 +377,7 @@ Public Class Plot_Beats : Inherits TaskParent
         plot.fixedScale = True
         plot.minScale = 0
         plot.maxScale = 5
-        desc = "Plot the beats."
+        desc = "Plot the beats to validate things are working."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         plot.plotData(0) = If(task.heartBeat, 1, -1)
@@ -485,7 +485,7 @@ Public Class Plot_Histogram : Inherits TaskParent
         Dim min = minRange
         Dim max = maxRange
         If standaloneTest() Or createHistogram Then
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.graystable
             If minRange = 0 And maxRange = 0 Then
                 Dim mm = GetMinMax(src)
                 min = mm.minVal
@@ -553,7 +553,7 @@ Public Class Plot_Points : Inherits TaskParent
         Next
         desc = "Plot the requested points..."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         output.Clear()
         For i = 0 To input.Count - 1

@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Documents
+Imports cv = OpenCvSharp
 Public Class GridPoint_Basics : Inherits TaskParent
     Dim sobel As New Edge_SobelQT
     Public features As New List(Of cv.Point2f)
@@ -53,48 +54,22 @@ End Class
 
 
 
-Public Class GridPoint_SobelMax : Inherits TaskParent
-    Dim sobel As New Edge_SobelQT
-    Public features As New List(Of cv.Point2f)
+Public Class GridPoint_PeakOver100 : Inherits TaskParent
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
-        desc = "Find the maximum Sobel entry in each GridCell"
+        desc = "Thresold the Sobel max values from GridPoint_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        sobel.Run(task.gray)
-        dst3 = sobel.dst2
+        dst3 = task.feat.gridPoint.dst2
 
-        Dim bestPoints As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-
-        For Each gc In task.gcList
-            Dim mm = GetMinMax(dst3(gc.rect))
-            Dim val = dst3(gc.rect).Get(Of Byte)(mm.maxLoc.Y, mm.maxLoc.X)
-            gc.prevFeature = New cv.Point2f(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y)
-            If val = 255 Then bestPoints.Add(gc.index, gc.feature)
-        Next
-
-        features.Clear()
-        dst1.SetTo(255, task.motionMask)
-        For Each ele In bestPoints
-            If dst1.Get(Of Byte)(ele.Value.Y, ele.Value.X) Then
-                If task.toggleOn Then
-                    Dim gc = task.gcList(ele.Key)
-                    features.Add(gc.prevFeature)
-                    gc.feature = gc.prevFeature
-                    task.gcList(ele.Key) = gc
-                Else
-                    features.Add(ele.Value)
-                End If
+        dst2 = src
+        Dim hitCount As Integer, peak = 100
+        For Each ele In task.feat.gridPoint.sortedPoints
+            If ele.Key >= peak Then
+                dst2.Circle(ele.Value, task.DotSize, task.highlight, -1)
+                hitCount += 1
             End If
         Next
-
-        dst2 = src.Clone
-        dst1.SetTo(0)
-        For Each pt In features
-            dst2.Circle(pt, task.DotSize, task.highlight, -1)
-            dst1.Circle(pt, task.DotSize + 2, 255, -1)
-        Next
-        If task.heartBeat Then labels(2) = CStr(features.Count) + " features were found with maximum Sobel difference."
+        labels(2) = traceName + " found " + CStr(hitCount) + " points with peak  value greater than " + CStr(peak)
     End Sub
 End Class
 
@@ -103,46 +78,35 @@ End Class
 
 
 
-Public Class GridPoint_TopSobel : Inherits TaskParent
-    Dim sobel As New Edge_SobelQT
-    Public features As New List(Of cv.Point2f)
+
+Public Class GridPoint_Plot : Inherits TaskParent
+    Dim plotHist As New Plot_Histogram
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
-        desc = "Find the maximum Sobel entry in each GridCell"
+        task.gOptions.HistBinBar.Value = 3
+        plotHist.maxRange = 255
+        plotHist.minRange = 0
+        plotHist.removeZeroEntry = False
+        plotHist.createHistogram = True
+        desc = "Plot the distribution of Sobel values for each gridPoint cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
-        sobel.Run(task.gray)
-        dst3 = sobel.dst2
-        labels(3) = sobel.labels(2)
-
-        Dim sortedPoints As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-
-        For Each gc In task.gcList
-            Dim mm = GetMinMax(dst3(gc.rect))
-            Dim val = dst3(gc.rect).Get(Of Byte)(mm.maxLoc.Y, mm.maxLoc.X)
-            sortedPoints.Add(val, New cv.Point2f(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y))
+        Dim sobelValues As New List(Of Byte)
+        For Each i In task.feat.gridPoint.sortedPoints.Keys
+            sobelValues.Add(i)
         Next
+        plotHist.Run(cv.Mat.FromPixelData(sobelValues.Count, 1, cv.MatType.CV_8U, sobelValues.ToArray))
+        dst2 = plotHist.dst2
 
-        Dim nextList As New List(Of cv.Point)
-        For Each ele In sortedPoints
-            If ele.Key < 200 Then Exit For
-            nextList.Add(ele.Value)
-        Next
+        Dim incr = (plotHist.maxRange - plotHist.minRange) / task.histogramBins
+        Dim histIndex = Math.Floor(task.mouseMovePoint.X / (dst2.Width / task.histogramBins))
+        Dim minVal = CInt(histIndex * incr)
+        Dim maxVal = CInt((histIndex + 1) * incr)
+        labels(3) = "Sobel peak values from " + CStr(minVal) + " to " + CStr(maxVal)
 
-        features.Clear()
-        dst1.SetTo(255, task.motionMask)
-        For Each pt In nextList
-            If dst1.Get(Of Byte)(pt.Y, pt.X) Then features.Add(pt)
+        dst3 = src
+        For Each ele In task.feat.gridPoint.sortedPoints
+            If ele.Key <= maxVal And ele.Key >= minVal Then dst3.Circle(ele.Value, task.DotSize, task.highlight, -1)
         Next
-
-        dst2 = src.Clone
-        dst1.SetTo(0)
-        For Each pt In features
-            dst2.Circle(pt, task.DotSize, task.highlight, -1)
-            dst1.Circle(pt, task.DotSize, 255, -1)
-        Next
-        If task.heartBeat Then labels(2) = CStr(features.Count) + " features were found with maximum Sobel difference."
-        If task.toggleOn Then labels(3) = "ToggleOn"
+        labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see they originated from"
     End Sub
 End Class
