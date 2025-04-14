@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class GridPoint_Basics : Inherits TaskParent
     Dim sobel As New Edge_SobelQT
     Public features As New List(Of cv.Point2f)
@@ -162,8 +161,11 @@ Public Class GridPoint_Lines : Inherits TaskParent
         dst2 = src
         dst3.SetTo(0)
         For Each gc In task.gcList
+            If gc.intensity <= 100 Then Continue For
             For Each index In task.gridNeighbors(gc.index)
-                If task.gcList(index).feature.X = gc.feature.X And task.gcList(index).feature.Y = gc.feature.Y Then
+                Dim gcNabe = task.gcList(index)
+                If gcNabe.intensity <= 100 Then Continue For
+                If gcNabe.feature.X = gc.feature.X And gcNabe.feature.Y = gc.feature.Y Then
                     If gc.pt <> task.gcList(index).pt Then
                         dst2.Line(gc.pt, task.gcList(index).pt, task.highlight, task.lineWidth)
                         dst3.Line(gc.pt, task.gcList(index).pt, task.highlight, task.lineWidth)
@@ -174,27 +176,6 @@ Public Class GridPoint_Lines : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class GridPoint_FeatureLess : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "Mask for the featureless regions"
-        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Isolate the featureless regions using the sobel intensity."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3.SetTo(0)
-        For Each gc In task.gcList
-            If gc.intensity <= 100 Then dst3(gc.rect).SetTo(255)
-        Next
-
-        dst2 = ShowAddweighted(src, dst3, labels(2))
-    End Sub
-End Class
 
 
 
@@ -212,5 +193,50 @@ Public Class GridPoint_FeatureLessCompare : Inherits TaskParent
         gpLess.Run(src)
 
         dst2 = ShowAddweighted(fLess.dst2, gpLess.dst3, labels(2))
+        dst3 = ShowAddweighted(src, gpLess.dst3, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridPoint_FeatureLess : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "Mask for the featureless regions"
+        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Isolate the featureless regions using the sobel intensity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3.SetTo(0)
+        Dim gcPrev As gcData = task.gcList(0), gcPrevAbove = task.gcList(0)
+        For Each gc In task.gcList
+            If gc.intensity <= 100 And Math.Abs(gc.depth - gcPrev.depth) < task.depthDiffMeters And
+                Math.Abs(gc.depth - gcPrevAbove.depth) < task.depthDiffMeters Then
+                dst3(gc.rect).SetTo(255)
+            End If
+        Next
+
+        If standaloneTest() Then dst2 = ShowAddweighted(src, dst3, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+Public Class GridPoint_MaskRedColor : Inherits TaskParent
+    Dim fLess As New GridPoint_FeatureLess
+    Public Sub New()
+        task.redC = New RedColor_Basics
+        desc = "Run RedColor with the featureless mask from GridPoint_FeatureLess"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+
+        task.redC.inputRemoved = fLess.dst3
+        dst2 = runRedC(src, labels(2))
     End Sub
 End Class

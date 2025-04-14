@@ -730,16 +730,11 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
         For Each gc In task.gcList
             gcPrevAbove = task.gcList(CInt(gc.index Mod task.grid.tilesPerRow))
             If gc.highlyVisible Then
-                If gc.rect.Y > 0 Then
-                    If gc.rect.X > 0 Then
-                        If Math.Abs(gc.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then
-                            dst2(gc.rect).SetTo(128)
-                        End If
-                    End If
-                    If Math.Abs(gc.pt3D(2) - gcPrevAbove.pt3D(2)) <= task.depthDiffMeters And
-                    gc.rect.Width = cellMat.Width And gc.rect.Height = cellMat.Height Then
-                        cv.Cv2.Add(dst2(gc.rect), cellMat, dst2(gc.rect))
-                    End If
+                If gc.rect.Y = 0 Or gc.rect.X = 0 Then Continue For
+                If Math.Abs(gc.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(gc.rect).SetTo(128)
+                If Math.Abs(gc.pt3D(2) - gcPrevAbove.pt3D(2)) <= task.depthDiffMeters And
+                gc.rect.Width = cellMat.Width And gc.rect.Height = cellMat.Height Then
+                    cv.Cv2.Add(dst2(gc.rect), cellMat, dst2(gc.rect))
                 End If
             End If
             gcPrev = gc

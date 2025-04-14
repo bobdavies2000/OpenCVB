@@ -650,9 +650,12 @@ Public Class Motion_EdgeStability : Inherits TaskParent
             dst2.Rectangle(roi, 255, task.lineWidth)
         Next
 
+        Dim popAverage = If(pops.Count > 0, pops.Average, 0)
+        Dim popMin = If(pops.Count > 0, pops.Min, 0)
+        Dim popMax = If(pops.Count > 0, pops.Min, 0)
         labels(2) = CStr(task.featureRects.Count) + " feature rects with an average population of " +
-                         Format(pops.Average, fmt1) + " and with min = " + CStr(pops.Min) +
-                         " and max = " + CStr(pops.Max) + ".  Circled cell has max features."
+                         Format(popAverage, fmt1) + " and with min = " + CStr(popMin) +
+                         " and max = " + CStr(popMax) + ".  Circled cell has max features."
 
         Dim index = pops.IndexOf(pops.Max)
         Dim gSize = task.gOptions.GridSlider.Value
