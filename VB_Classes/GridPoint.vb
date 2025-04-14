@@ -21,6 +21,7 @@ Public Class GridPoint_Basics : Inherits TaskParent
             gc.pt = New cv.Point(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y)
             gc.feature = mm.maxLoc
             Dim val = dst3.Get(Of Byte)(gc.pt.Y, gc.pt.X)
+            gc.intensity = val
             sortedPoints.Add(val, gc.pt)
         Next
 
@@ -86,8 +87,8 @@ Public Class GridPoint_Plot : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim sobelValues As New List(Of Byte)
-        For Each i In task.feat.gridPoint.sortedPoints.Keys
-            sobelValues.Add(i)
+        For Each gc In task.gcList
+            sobelValues.Add(gc.intensity)
         Next
         plotHist.Run(cv.Mat.FromPixelData(sobelValues.Count, 1, cv.MatType.CV_8U, sobelValues.ToArray))
         dst2 = plotHist.dst2
@@ -170,5 +171,46 @@ Public Class GridPoint_Lines : Inherits TaskParent
                 End If
             Next
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridPoint_FeatureLess : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "Mask for the featureless regions"
+        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Isolate the featureless regions using the sobel intensity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3.SetTo(0)
+        For Each gc In task.gcList
+            If gc.intensity <= 100 Then dst3(gc.rect).SetTo(255)
+        Next
+
+        dst2 = ShowAddweighted(src, dst3, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridPoint_FeatureLessCompare : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Dim gpLess As New GridPoint_FeatureLess
+    Public Sub New()
+        desc = "Compare the grid point featureless output to the earlier version - FeatureLess_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+        gpLess.Run(src)
+
+        dst2 = ShowAddweighted(fLess.dst2, gpLess.dst3, labels(2))
     End Sub
 End Class

@@ -63,7 +63,7 @@ Public Class BackProject_Full : Inherits TaskParent
         classCount = task.histogramBins
 
         Dim histogram As New cv.Mat
-        cv.Cv2.CalcHist({task.gray}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
+        cv.Cv2.CalcHist({task.grayStable}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
         histogram = histogram.Normalize(0, classCount, cv.NormTypes.MinMax)
 
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)

@@ -725,9 +725,10 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
         dst2.SetTo(0)
-        Dim gcPrev = task.gcList(0), gcPrevAbove As gcData
+        Dim gcPrev = task.gcList(0), gcPrevAbove
         Dim cellMat As New cv.Mat(task.cellSize, task.cellSize, cv.MatType.CV_8U, cv.Scalar.All(127))
         For Each gc In task.gcList
+            gcPrevAbove = task.gcList(CInt(gc.index Mod task.grid.tilesPerRow))
             If gc.highlyVisible Then
                 If gc.rect.Y > 0 Then
                     If gc.rect.X > 0 Then
@@ -742,7 +743,6 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
                 End If
             End If
             gcPrev = gc
-            If gc.index >= task.grid.tilesPerRow Then gcPrevAbove = task.gcList(gc.index - task.grid.tilesPerRow)
         Next
 
         labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
