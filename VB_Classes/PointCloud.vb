@@ -725,14 +725,14 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
         dst2.SetTo(0)
-        Dim gcPrev = task.gcList(0), gcPrevAbove
+        Dim gcPrev = task.gcList(0)
         Dim cellMat As New cv.Mat(task.cellSize, task.cellSize, cv.MatType.CV_8U, cv.Scalar.All(127))
         For Each gc In task.gcList
-            gcPrevAbove = task.gcList(CInt(gc.index Mod task.grid.tilesPerRow))
+            Dim gcAbove = task.gcList(CInt(gc.index Mod task.grid.tilesPerRow))
             If gc.highlyVisible Then
                 If gc.rect.Y = 0 Or gc.rect.X = 0 Then Continue For
                 If Math.Abs(gc.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(gc.rect).SetTo(128)
-                If Math.Abs(gc.pt3D(2) - gcPrevAbove.pt3D(2)) <= task.depthDiffMeters And
+                If Math.Abs(gc.pt3D(2) - gcAbove.pt3D(2)) <= task.depthDiffMeters And
                 gc.rect.Width = cellMat.Width And gc.rect.Height = cellMat.Height Then
                     cv.Cv2.Add(dst2(gc.rect), cellMat, dst2(gc.rect))
                 End If

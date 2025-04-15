@@ -4,11 +4,14 @@ Public Class GridPoint_Basics : Inherits TaskParent
     Public features As New List(Of cv.Point2f)
     Public featurePoints As New List(Of cv.Point)
     Public sortedPoints As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+    Public options As New Options_GridPoint
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         desc = "Find the max Sobel point in each grid cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         dst2 = src
 
         sobel.Run(task.grayStable)
@@ -48,16 +51,18 @@ End Class
 
 
 
-Public Class GridPoint_PeakOver100 : Inherits TaskParent
+Public Class GridPoint_PeakThreshold : Inherits TaskParent
     Public Sub New()
         labels(3) = "All the points found by GridPoint_Basics"
         desc = "Thresold the Sobel max values from GridPoint_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static peakSlider = optiBase.FindSlider("Sobel Threshold")
+        Dim peak = peakSlider.value
         dst3 = task.feat.gridPoint.dst2
 
         dst2 = src
-        Dim hitCount As Integer, peak = 100
+        Dim hitCount As Integer
         For Each ele In task.feat.gridPoint.sortedPoints
             If ele.Key >= peak Then
                 dst2.Circle(ele.Value, task.DotSize, task.highlight, -1)
@@ -158,13 +163,16 @@ Public Class GridPoint_Lines : Inherits TaskParent
         desc = "Find lines in the grid points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static peakSlider = optiBase.FindSlider("Sobel Threshold")
+        Dim peak = peakSlider.value
+
         dst2 = src
         dst3.SetTo(0)
         For Each gc In task.gcList
-            If gc.intensity <= 100 Then Continue For
+            If gc.intensity <= peak Then Continue For
             For Each index In task.gridNeighbors(gc.index)
                 Dim gcNabe = task.gcList(index)
-                If gcNabe.intensity <= 100 Then Continue For
+                If gcNabe.intensity <= peak Then Continue For
                 If gcNabe.feature.X = gc.feature.X And gcNabe.feature.Y = gc.feature.Y Then
                     If gc.pt <> task.gcList(index).pt Then
                         dst2.Line(gc.pt, task.gcList(index).pt, task.highlight, task.lineWidth)
@@ -203,20 +211,25 @@ End Class
 
 
 
-Public Class GridPoint_FeatureLess : Inherits TaskParent
+Public Class GridPoint_FeatureLess1 : Inherits TaskParent
     Public Sub New()
         labels(3) = "Mask for the featureless regions"
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Isolate the featureless regions using the sobel intensity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static peakSlider = optiBase.FindSlider("Sobel Threshold")
+        Dim peak = peakSlider.value
+
         dst3.SetTo(0)
-        Dim gcPrev As gcData = task.gcList(0), gcPrevAbove = task.gcList(0)
+        Dim gcPrev As gcData = task.gcList(0), gcAbove = task.gcList(0)
         For Each gc In task.gcList
-            If gc.intensity <= 100 And Math.Abs(gc.depth - gcPrev.depth) < task.depthDiffMeters And
-                Math.Abs(gc.depth - gcPrevAbove.depth) < task.depthDiffMeters Then
+            If gc.intensity <= peak And Math.Abs(gc.depth - gcPrev.depth) < task.depthDiffMeters And
+                Math.Abs(gc.depth - gcAbove.depth) < task.depthDiffMeters Then
                 dst3(gc.rect).SetTo(255)
             End If
+            gcPrev = gc
+            gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
         Next
 
         If standaloneTest() Then dst2 = ShowAddweighted(src, dst3, labels(2))
@@ -238,5 +251,65 @@ Public Class GridPoint_MaskRedColor : Inherits TaskParent
 
         task.redC.inputRemoved = fLess.dst3
         dst2 = runRedC(src, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridPoint_FeatureLess : Inherits TaskParent
+    Public edges As New EdgeLine_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "CV_8U Mask for the featureless regions"
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        desc = "Isolate the featureless regions using the sobel intensity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.grayStable)
+
+        dst0.SetTo(0)
+        Dim gcPrev = task.gcList(0)
+        Dim fLessCount As Integer = 1
+        For Each gc In task.gcList
+            If gc.index = 93 Then Dim k = 0
+            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
+
+            Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
+            Dim val = gcAbove.fLessIndex
+            If val = 0 Then val = dst0.Get(Of Byte)(gcPrev.rect.TopLeft.Y, gcPrev.rect.TopLeft.X)
+            Dim count = edges.dst2(gc.rect).CountNonZero
+            If val = 0 And count = 0 Then
+                val = fLessCount
+                fLessCount += 1
+            End If
+            If count = 0 Then
+                gc.fLessIndex = val
+                dst0(gc.rect).SetTo(val Mod 255)
+            End If
+            gcPrev = gc
+        Next
+
+        For i = task.gcList.Count - 1 To 1 Step -1
+            Dim gc = task.gcList(i)
+            If gc.index = 93 Then Dim k = 0
+            If gc.fLessIndex > 0 Then
+                gcPrev = task.gcList(i - 1)
+                If gcPrev.fLessIndex > 0 And gcPrev.fLessIndex <> 0 And gcPrev.fLessIndex <> gc.fLessIndex And gcPrev.fLessIndex <> 0 Then
+                    gcPrev.fLessIndex = gc.fLessIndex
+                    dst0(gcPrev.rect).SetTo(gc.fLessIndex)
+                    task.gcList(i - 1) = gcPrev
+                End If
+            End If
+        Next
+
+        labels(3) = "Mask for the " + CStr(fLessCount) + " featureless regions."
+        If standaloneTest() Then
+            dst1 = ShowPalette(dst0 * 255 / fLessCount)
+            dst2 = ShowAddweighted(src, dst1, labels(2))
+        End If
     End Sub
 End Class

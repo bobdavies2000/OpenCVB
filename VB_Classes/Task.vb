@@ -343,6 +343,7 @@ Public Class VBtask : Implements IDisposable
 #End If
         Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
                                                           "Orbbec Gemini 335L",
+                                                          "Orbbec Gemini 336L",
                                                           "Oak-D camera",
                                                           "Intel(R) RealSense(TM) Depth Camera 435i",
                                                           "Intel(R) RealSense(TM) Depth Camera 455",
@@ -508,7 +509,7 @@ Public Class VBtask : Implements IDisposable
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
             Case "Intel(R) RealSense(TM) Depth Camera 455"
             Case "Oak-D camera"
-            Case "Orbbec Gemini 335L"
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L"
             Case "MYNT-EYE-D1000"
 #If AZURE_SUPPORT Then
             Case "Azure Kinect 4K"

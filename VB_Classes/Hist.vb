@@ -1456,3 +1456,16 @@ Public Class Hist_GridCell : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Hist_FeatureLess : Inherits TaskParent
+    Public Sub New()
+        desc = "Build a histogram of the featureless regions found with grid points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+    End Sub
+End Class

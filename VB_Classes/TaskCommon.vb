@@ -561,6 +561,7 @@ Public Class gcData
     Public correlation As Single
     Public corrHistory As New List(Of Single)
     Public index As Integer
+    Public fLessIndex As Integer
 
     Public rect As cv.Rect ' rectange under the cursor in the color image.
     Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.

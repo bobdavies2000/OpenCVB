@@ -2203,3 +2203,9 @@ public:
 	Options_FAST() {
 	}
 };
+class Options_GridPoint {
+public:
+	void Run() {}
+	Options_GridPoint() {
+	}
+};
