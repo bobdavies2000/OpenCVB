@@ -1462,10 +1462,75 @@ End Class
 
 
 
-Public Class Hist_FeatureLess : Inherits TaskParent
+Public Class Hist_ToggleFeatureLess : Inherits TaskParent
+    Dim fLess As New GridPoint_FeatureLess
+    Dim plotHist As New Plot_Histogram
     Public Sub New()
-        desc = "Build a histogram of the featureless regions found with grid points."
+        plotHist.maxRange = 255
+        plotHist.minRange = 0
+        plotHist.removeZeroEntry = False
+        plotHist.createHistogram = True
+        task.gOptions.HistBinBar.Value = 255
+        desc = "Toggle between a histogram of the entire image and one of the featureless regions found with grid points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.grayStable)
+        dst3 = fLess.dst2
+
+        If task.toggleOn Then plotHist.histMask.SetTo(255) Else plotHist.histMask = fLess.dst1
+        plotHist.Run(task.grayStable)
+        dst2 = plotHist.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Hist_GridPointRegions : Inherits TaskParent
+    Dim fLess As New GridPoint_FeatureLess
+    Dim ranges() As cv.Rangef
+    Public Sub New()
+        ranges = {New cv.Rangef(0, 256)}
+        task.gOptions.HistBinBar.Value = 255
+        desc = "Build a histogram of one cell and predict any neighbors with an fLessIndex"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.grayStable)
+        dst2 = ShowPalette(fLess.dst1 * 255 / fLess.classCount)
+
+        Dim histList = New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+        Dim predictList As New List(Of Integer)
+        For Each gc In task.gcList
+            If gc.fLessIndex Then
+                Dim nabes = task.gridNeighbors(gc.index)
+                For i = 1 To nabes.Count - 1 ' the first entry is for the gc...
+                    If task.gcList(nabes(i)).fLessIndex = 0 Then
+                        If predictList.Contains(nabes(i)) = False Then histList.Add(gc.index, nabes(i))
+                    End If
+                Next
+            End If
+        Next
+
+        Dim buildIndex = -1, gc1 As gcData, histogram As New cv.Mat, histArray(255 - 1) As Single
+        dst1 = fLess.dst1.Clone
+        For Each ele In histList
+            If buildIndex <> ele.Key Then
+                buildIndex = ele.Key
+                gc1 = task.gcList(buildIndex)
+
+                cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, emptyMat, histogram, 1, {task.histogramBins}, ranges)
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                For i = 0 To histArray.Count - 1
+                    If histArray(i) Then histArray(i) = gc1.fLessIndex
+                Next
+                Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
+            End If
+            Dim gc2 = task.gcList(ele.Value)
+            cv.Cv2.CalcBackProject({task.grayStable(gc2.rect)}, {0}, histogram, dst1(gc2.rect), ranges)
+            dst3 = ShowPalette(dst1 * 255 / fLess.classCount)
+        Next
+    End Sub
+End Class
+

@@ -3916,3 +3916,92 @@ Public Class XO_Swarm_Flood3 : Inherits TaskParent
         labels(3) = swarm.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class XO_GridPoint_FeatureLess1 : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "Mask for the featureless regions"
+        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Isolate the featureless regions using the sobel intensity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static peakSlider = optiBase.FindSlider("Sobel Threshold")
+        Dim peak = peakSlider.value
+
+        dst3.SetTo(0)
+        Dim gcPrev As gcData = task.gcList(0), gcAbove = task.gcList(0)
+        For Each gc In task.gcList
+            If gc.intensity <= peak And Math.Abs(gc.depth - gcPrev.depth) < task.depthDiffMeters And
+                Math.Abs(gc.depth - gcAbove.depth) < task.depthDiffMeters Then
+                dst3(gc.rect).SetTo(255)
+            End If
+            gcPrev = gc
+            gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
+        Next
+
+        If standaloneTest() Then dst2 = ShowAddweighted(src, dst3, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_GridPoint_FeatureLess2 : Inherits TaskParent
+    Public edges As New EdgeLine_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "CV_8U Mask for the featureless regions"
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        desc = "Isolate the featureless regions using the sobel intensity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.grayStable)
+
+        dst0.SetTo(0)
+        Dim gcPrev = task.gcList(0)
+        Dim fLessCount As Integer = 1
+        For Each gc In task.gcList
+            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
+
+            Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
+            Dim val = gcAbove.fLessIndex
+            If val = 0 Then val = dst0.Get(Of Byte)(gcPrev.rect.TopLeft.Y, gcPrev.rect.TopLeft.X)
+            Dim count = edges.dst2(gc.rect).CountNonZero
+            If val = 0 And count = 0 Then
+                val = fLessCount
+                fLessCount += 1
+            End If
+            If count = 0 Then
+                gc.fLessIndex = val
+                dst0(gc.rect).SetTo(val Mod 255)
+            End If
+            gcPrev = gc
+        Next
+
+        For i = task.gcList.Count - 1 To 1 Step -1
+            Dim gc = task.gcList(i)
+            If gc.fLessIndex > 0 Then
+                gcPrev = task.gcList(i - 1)
+                If gcPrev.fLessIndex > 0 And gcPrev.fLessIndex <> 0 And gcPrev.fLessIndex <> gc.fLessIndex And gcPrev.fLessIndex <> 0 Then
+                    gcPrev.fLessIndex = gc.fLessIndex
+                    dst0(gcPrev.rect).SetTo(gc.fLessIndex)
+                    task.gcList(i - 1) = gcPrev
+                End If
+            End If
+        Next
+
+        labels(3) = "Mask for the " + CStr(fLessCount) + " featureless regions."
+        If standaloneTest() Then
+            dst1 = ShowPalette(dst0 * 255 / fLessCount)
+            dst2 = ShowAddweighted(src, dst1, labels(2))
+        End If
+    End Sub
+End Class

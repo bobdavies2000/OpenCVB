@@ -136,7 +136,7 @@ Public Class Feature_Basics : Inherits TaskParent
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         End If
-        fcs.Run(src) ' convert the features to fplist.
+        ' fcs.Run(src) ' convert the features to fplist.
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
