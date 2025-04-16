@@ -121,6 +121,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gCell As GridCell_Basics
+    Public gridPoint As GridPoint_Basics
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
@@ -834,7 +835,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         motionBasics.Run(src)
-        gCell.Run(src)
+        gCell.Run(grayStable.Clone)
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
