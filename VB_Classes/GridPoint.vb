@@ -1,15 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 Public Class GridPoint_Basics : Inherits TaskParent
     Dim sobel As New Edge_SobelQT
-    Public features As New List(Of cv.Point2f)
-    Public featurePoints As New List(Of cv.Point)
-    Public sortedPoints As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+    Public sortedPoints As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
     Public options As New Options_GridPoint
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         desc = "Find the max Sobel point in each grid cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' we have already been run as part of the algorithm setup.
+
         options.Run()
 
         dst2 = src
@@ -28,21 +28,20 @@ Public Class GridPoint_Basics : Inherits TaskParent
         Next
 
         dst1.SetTo(255, task.motionMask)
-        featurePoints.Clear()
+        task.gFeatures.Clear()
         For Each ele In sortedPoints
             Dim pt = ele.Value
-            If dst1.Get(Of Byte)(pt.Y, pt.X) Then featurePoints.Add(pt)
+            If dst1.Get(Of Byte)(pt.Y, pt.X) Then task.gFeatures.Add(pt)
         Next
 
         dst1.SetTo(0)
-        features.Clear()
-        For Each pt In featurePoints
+        For Each pt In task.gFeatures
             dst1.Circle(pt, task.DotSize, 255, -1, cv.LineTypes.Link8)
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
-            features.Add(New cv.Point2f(pt.X, pt.Y))
         Next
 
-        labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(features.Count) + " were saved "
+        labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(task.gFeatures.Count) +
+                    " were retained from the previous image."
     End Sub
 End Class
 

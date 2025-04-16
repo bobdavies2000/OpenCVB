@@ -9,7 +9,7 @@ Public Class FCS_Basics : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
+        If standalone Then task.feat.Run(task.grayStable)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
         subdiv.Insert(task.features)
@@ -60,7 +60,6 @@ Public Class FCS_Basics : Inherits TaskParent
             dst1.FillConvexPoly(fp.facets, gcIndex Mod 255, task.lineType)
             DrawContour(task.fpOutline, fp.facets, 255, 1)
         Next
-
 
         If task.features.Count <> facets.Length Then
             task.fpFromGridCell.Clear()
@@ -187,7 +186,7 @@ Public Class FCS_Periphery : Inherits TaskParent
         desc = "Display the cells which are on the periphery of the image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.feat.fcs.dst2
+        dst2 = task.fcs.dst2
 
         dst3 = dst2.Clone
         ptOutside.Clear()
@@ -394,41 +393,14 @@ End Class
 
 
 
-
-
-Public Class FCS_Lines : Inherits TaskParent
-    Public Sub New()
-        task.featureOptions.DistanceSlider.Value = 60
-        task.featureOptions.FeatureMethod.SelectedItem() = "LineInput"
-        labels(3) = "Cell boundaries with the age (in frames) for each cell."
-        desc = "Use lines as input to FCS."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.feat.fcs.dst2
-
-        For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-        Next
-        task.color.SetTo(0, task.fpOutline)
-        fpDisplayAge()
-
-        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were used to create " +
-                                           CStr(task.fpList.Count) + " cells"
-    End Sub
-End Class
-
-
-
-
-
 Public Class FCS_WithAge : Inherits TaskParent
     Public Sub New()
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the age of each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.feat.fcs.dst2
-        labels(2) = task.feat.fcs.labels(2)
+        dst2 = task.fcs.dst2
+        labels(2) = task.fcs.labels(2)
 
         dst3.SetTo(0)
         For Each fp In task.fpList
@@ -449,8 +421,8 @@ Public Class FCS_BestAge : Inherits TaskParent
         desc = "Display the top X oldest (best) cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.feat.fcs.dst2
-        labels(2) = task.feat.fcs.labels(2)
+        dst2 = task.fcs.dst2
+        labels(2) = task.fcs.labels(2)
 
         Dim fpSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each fp In task.fpList
@@ -540,7 +512,7 @@ Public Class FCS_Motion : Inherits TaskParent
         desc = "Highlight the motion of each feature identified in the current and previous frame"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.feat.fcs.dst2
+        dst2 = task.fcs.dst2
 
         For Each fp In task.fpList
             If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
@@ -652,7 +624,7 @@ Public Class FCS_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.fpList.Count = 0 Then Exit Sub
-            dst2 = task.feat.fcs.dst2
+            dst2 = task.fcs.dst2
         End If
 
         Dim fp = task.fpD
@@ -712,3 +684,30 @@ End Class
 '        labels(3) = fcs.labels(2)
 '    End Sub
 'End Class
+
+
+
+
+
+
+
+
+Public Class FCS_Lines : Inherits TaskParent
+    Public Sub New()
+        task.featureOptions.DistanceSlider.Value = 60
+        task.featureOptions.FeatureMethod.SelectedItem() = "LineInput"
+        labels(3) = "Cell boundaries with the age (in frames) for each cell."
+        desc = "Use lines as input to FCS."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.feat.Run(task.grayStable)
+
+        task.fcs.Run(task.grayStable)
+        dst2 = task.fcs.dst2
+
+        fpDisplayAge()
+
+        If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were used to create " +
+                                           CStr(task.fpList.Count) + " cells"
+    End Sub
+End Class

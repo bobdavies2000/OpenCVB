@@ -28,46 +28,24 @@ Public Class Disparity_Basics : Inherits TaskParent
                                  rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
         If standalone Then rightView = task.rightView
 
-        dst2.Rectangle(rect, 255, task.lineWidth)
+        dst2.Rectangle(rect, black, task.lineWidth)
         match.Run(rightView)
         dst3 = rightView
         matchRect = match.matchRect
 
-        dst3.Rectangle(match.searchRect, 255, task.lineWidth)
-        dst3.Rectangle(match.matchRect, 255, task.lineWidth)
+        dst3.Rectangle(match.searchRect, black, task.lineWidth)
+        dst3.Rectangle(match.matchRect, black, task.lineWidth)
         saveCorrelations.Add(match.correlation)
 
         Dim min = saveCorrelations.Min
         Dim max = saveCorrelations.Max
 
         If max = match.correlation And max > 0.8 Then bestRect = match.matchRect
-        dst3.Rectangle(bestRect, 255, task.lineWidth + 1)
+        dst3.Rectangle(bestRect, black, task.lineWidth + 1)
 
         If saveCorrelations.Count > 100 Then saveCorrelations.RemoveAt(0)
 
         labels(3) = "Correlation Min/Max = " + Format(min, fmt3) + "/" + Format(max, fmt3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Disparity_Features : Inherits TaskParent
-    Dim featNo As New Feature_NoMotion
-    Public Sub New()
-        desc = "Use features in grid cells to confirm depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.feat.dst3
-        labels(2) = featNo.labels(2)
-
-        featNo.Run(task.rightView)
-        dst3 = featNo.dst2
-        labels(3) = featNo.labels(2)
     End Sub
 End Class
 

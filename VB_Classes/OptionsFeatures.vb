@@ -11,8 +11,7 @@
         FeatureMethod.Items.Add("Harris")
         FeatureMethod.Items.Add("FAST")
         FeatureMethod.Items.Add("LineInput")
-        FeatureMethod.Items.Add("Sobel Max Grid")
-        FeatureMethod.SelectedItem() = "Sobel Max Grid"
+        FeatureMethod.SelectedItem() = "GoodFeatures Full Image"
 
         EdgeMethods.Items.Add("Canny")
         EdgeMethods.Items.Add("Scharr")

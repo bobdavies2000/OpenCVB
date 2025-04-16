@@ -82,8 +82,6 @@ Public Class Cluster_Hulls : Inherits TaskParent
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-
         cluster.ptInput = task.featurePoints
         cluster.Run(src)
         dst2 = cluster.dst2
@@ -106,6 +104,6 @@ Public Class Cluster_Hulls : Inherits TaskParent
             hulls.Add(hull)
             If (hull.Count > 0) Then DrawContour(dst3, hull, white, task.lineWidth)
         Next
-        labels(3) = task.feat.labels(3)
+        labels(3) = task.gridPoint.labels(2)
     End Sub
 End Class

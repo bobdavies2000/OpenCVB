@@ -36,9 +36,10 @@ Public Class VBtask : Implements IDisposable
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
-    Public gridPoints As New List(Of cv.Point) ' the list of each gridRect corner 
     Public depthDiffMeters As Single ' grid cells > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean
+
+    Public gFeatures As New List(Of cv.Point2f)
 
     Public fpOutline As New cv.Mat
     Public fpMotion As cv.Point2f
@@ -49,6 +50,8 @@ Public Class VBtask : Implements IDisposable
     Public fpFromGridCellLast As New List(Of Integer)
     Public fpLastList As New List(Of fpData)
     Public featurePoints As New List(Of cv.Point)
+
+    'Public gridPoints As New List(Of cv.Point2f)
 
     Public featureMask As New cv.Mat
     Public fLessMask As New cv.Mat
@@ -121,6 +124,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gCell As GridCell_Basics
+    Public fcs As FCS_Basics
     Public gridPoint As GridPoint_Basics
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
@@ -555,6 +559,8 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
+        fcs = New FCS_Basics
+        gridPoint = New GridPoint_Basics
         feat = New Feature_Basics
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
@@ -840,7 +846,7 @@ Public Class VBtask : Implements IDisposable
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
-        feat.Run(src.Clone)
+        gridPoint.Run(src.Clone)
 
         task.colorizer.Run(src)
 

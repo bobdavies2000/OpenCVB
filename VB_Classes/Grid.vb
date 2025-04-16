@@ -18,7 +18,6 @@ Public Class Grid_Basics : Inherits TaskParent
             tilesPerRow = 0
             task.gridNabeRects.Clear()
             task.gridNeighbors.Clear()
-            task.gridPoints.Clear()
 
             cellSize = task.gOptions.GridSlider.Value
 
@@ -85,28 +84,6 @@ Public Class Grid_Basics : Inherits TaskParent
                     yList.Add(roi.BottomRight.Y)
                 Next
                 task.gridNabeRects.Add(New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min))
-            Next
-
-            task.gridPoints.Clear()
-            For Each roi In task.gridRects
-                Dim xSub = roi.X + roi.Width
-                Dim ySub = roi.Y + roi.Height
-                If ySub <= dst2.Height / 3 Then
-                    If xSub <= dst2.Width / 3 Then task.subDivisions.Add(0)
-                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then task.subDivisions.Add(1)
-                    If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(2)
-                End If
-                If ySub > dst2.Height / 3 And ySub <= dst2.Height * 2 / 3 Then
-                    If xSub <= dst2.Width / 3 Then task.subDivisions.Add(3)
-                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then task.subDivisions.Add(4)
-                    If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(5)
-                End If
-                If ySub > dst2.Height * 2 / 3 Then
-                    If xSub <= dst2.Width / 3 Then task.subDivisions.Add(6)
-                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then task.subDivisions.Add(7)
-                    If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(8)
-                End If
-                task.gridPoints.Add(roi.TopLeft)
             Next
 
             task.cellSize = cellSize

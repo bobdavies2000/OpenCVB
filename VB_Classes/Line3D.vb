@@ -57,54 +57,6 @@ End Class
 
 
 
-Public Class Line3D_Correlation : Inherits TaskParent
-    Dim gpoints As New Feature_GridPoints
-    Public Sub New()
-        task.gOptions.GridSlider.Minimum = 2 ' smaller will hang
-        desc = "Find the correlation of image coordinates to pointcloud coordinates"
-    End Sub
-    Private Function getCorrelation(A As cv.Mat, B As cv.Mat) As Single
-        Dim correlation As New cv.Mat
-        cv.Cv2.MatchTemplate(A, B, correlation, cv.TemplateMatchModes.CCoeffNormed)
-        Return correlation.Get(Of Single)(0, 0)
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then runRedC(src)
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
-
-        gpoints.Run(src)
-
-        Dim xList As New List(Of Single), yList As New List(Of Single), zList As New List(Of Single)
-        For Each pt In task.rcD.ptList
-            Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
-            xList.Add(vec.X)
-            yList.Add(vec.Y)
-            zList.Add(vec.Z)
-        Next
-
-        If xList.Count > 0 Then
-            Dim xMat As cv.Mat = cv.Mat.FromPixelData(xList.Count, 1, cv.MatType.CV_32F, xList.ToArray)
-            Dim yMat As cv.Mat = cv.Mat.FromPixelData(xList.Count, 1, cv.MatType.CV_32F, yList.ToArray)
-            Dim zMat As cv.Mat = cv.Mat.FromPixelData(xList.Count, 1, cv.MatType.CV_32F, zList.ToArray)
-
-            Dim correlationXZ As Single = getCorrelation(xMat, zMat)
-            Dim correlationYZ As Single = getCorrelation(yMat, zMat)
-
-            strOut = "X to Z correlation = " + Format(correlationXZ, fmt3) + vbCrLf +
-                     "Y to Z correlation = " + Format(correlationYZ, fmt3) + vbCrLf
-        End If
-        If task.heartBeat Then SetTrueText(strOut, 3)
-        For Each pt In task.rcD.ptList
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Line3D_Draw : Inherits TaskParent
     Public p1 As cv.Point, p2 As cv.Point

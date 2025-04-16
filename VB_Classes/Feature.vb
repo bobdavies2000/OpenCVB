@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VB_Classes.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
-    Public fcs As New FCS_Basics
     Public options As New Options_Features
     Public gridPoint As New GridPoint_Basics
     Public Sub New()
@@ -11,8 +10,9 @@ Public Class Feature_Basics : Inherits TaskParent
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         options.Run()
+
+        dst2 = src
 
         Dim features As New List(Of cv.Point2f)
         Dim ptNew As New List(Of cv.Point2f)
@@ -81,18 +81,8 @@ Public Class Feature_Basics : Inherits TaskParent
                     If lp.p1 <> lp.p2 Then
                         features.Add(lp.p1)
                         features.Add(lp.p2)
-                        'Dim lpPerp = lp.perpendicularPoints(lp.p1, task.minDistance)
-                        'features.Add(lpPerp.p1)
-                        'features.Add(lpPerp.p2)
-
-                        'lpPerp = lp.perpendicularPoints(lp.p2, task.minDistance)
-                        'features.Add(lpPerp.p1)
-                        'features.Add(lpPerp.p2)
                     End If
                 Next
-            Case FeatureSrc.gridPoints
-                gridPoint.Run(src)
-                features = gridPoint.features
         End Select
 
         task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)
@@ -136,7 +126,6 @@ Public Class Feature_Basics : Inherits TaskParent
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         End If
-        ' fcs.Run(src) ' convert the features to fplist.
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
@@ -782,42 +771,6 @@ Public Class Feature_FacetPoints : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Feature_GridPoints : Inherits TaskParent
-    Public Sub New()
-        desc = "Assign each corner of a grid rect to a RedCell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then runRedC(src)
-
-        For Each pt In task.gridPoints
-            Dim index = task.rcMap.Get(Of Byte)(pt.Y, pt.X)
-            If index = 0 Then Continue For
-            Dim rc = task.rcList(index)
-            Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
-            If val <> 0 Then
-                rc.ptList.Add(pt)
-                task.rcList(index) = rc
-            End If
-        Next
-
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
-
-        If standalone Then
-            Dim rc = task.rcList(task.rcD.index)
-            dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
-            For Each pt In rc.ptList
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            Next
-        End If
-    End Sub
-End Class
 
 
 
