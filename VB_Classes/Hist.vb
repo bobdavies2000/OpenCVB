@@ -1498,7 +1498,6 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayStable)
-        dst2 = ShowPalette(fLess.dst1 * 255 / fLess.classCount)
 
         Dim histList = New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim predictList As New List(Of Integer)
@@ -1513,24 +1512,38 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
             End If
         Next
 
-        Dim buildIndex = -1, gc1 As gcData, histogram As New cv.Mat, histArray(255 - 1) As Single
-        dst1 = fLess.dst1.Clone
+        Dim buildIndex = -1, gc1 As gcData, histogram As New cv.Mat, histArray(256 - 1) As Single
+        dst1 = fLess.fLessMask.Clone
         For Each ele In histList
             If buildIndex <> ele.Key Then
                 buildIndex = ele.Key
                 gc1 = task.gcList(buildIndex)
 
-                cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, emptyMat, histogram, 1, {task.histogramBins}, ranges)
+                cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, Not fLess.edges.dst2(gc1.rect), histogram, 1, {task.histogramBins}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                Dim arrayStart = -1, arrayEnd As Integer
                 For i = 0 To histArray.Count - 1
-                    If histArray(i) Then histArray(i) = gc1.fLessIndex
+                    If histArray(i) Then
+                        If arrayStart = -1 Then arrayStart = i
+                        histArray(i) = gc1.fLessIndex
+                        arrayEnd = i
+                    End If
                 Next
+                For i = arrayStart To arrayEnd
+                    histArray(i) = gc1.fLessIndex
+                Next
+                If arrayStart > 0 Then histArray(arrayStart - 1) = gc1.fLessIndex
+                If arrayEnd < 255 Then histArray(arrayEnd + 1) = gc1.fLessIndex
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If
             Dim gc2 = task.gcList(ele.Value)
             cv.Cv2.CalcBackProject({task.grayStable(gc2.rect)}, {0}, histogram, dst1(gc2.rect), ranges)
-            dst3 = ShowPalette(dst1 * 255 / fLess.classCount)
         Next
+        dst3 = ShowPalette(dst1 * 255 / fLess.classCount)
+        dst0 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = ShowAddweighted(dst0, src, labels(2))
+        dst2.SetTo(0, fLess.edges.dst2)
     End Sub
 End Class
 

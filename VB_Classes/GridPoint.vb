@@ -230,21 +230,21 @@ End Class
 Public Class GridPoint_FeatureLess : Inherits TaskParent
     Public edges As New EdgeLine_Basics
     Public classCount As Integer
+    Public fLessMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
     Public Sub New()
         labels(3) = "CV_8U Mask for the featureless regions"
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0) ' mask for the featureless regions.
         desc = "Isolate the featureless regions using the sobel intensity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.grayStable)
 
-        dst1.SetTo(0)
+        fLessMask.SetTo(0)
         For Each gc In task.gcList
             If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
 
             If edges.dst2(gc.rect).CountNonZero = 0 Then
                 gc.fLessIndex = 255
-                dst1(gc.rect).SetTo(255)
+                fLessMask(gc.rect).SetTo(255)
             End If
         Next
 
@@ -263,7 +263,7 @@ Public Class GridPoint_FeatureLess : Inherits TaskParent
                 End If
                 If val <> 0 Then
                     gc.fLessIndex = val
-                    dst1(gc.rect).SetTo(gc.fLessIndex)
+                    fLessMask(gc.rect).SetTo(gc.fLessIndex)
                 End If
             End If
             gcPrev = gc
@@ -271,7 +271,7 @@ Public Class GridPoint_FeatureLess : Inherits TaskParent
 
         labels(3) = "Mask for the " + CStr(classCount) + " featureless regions."
         If standaloneTest() Then
-            dst3 = ShowPalette(dst1 * 255 / classCount)
+            dst3 = ShowPalette(fLessMask * 255 / classCount)
             dst2 = ShowAddweighted(src, dst3, labels(2))
         End If
     End Sub
