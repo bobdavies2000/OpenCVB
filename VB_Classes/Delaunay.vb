@@ -49,7 +49,8 @@ Public Class Delaunay_Contours : Inherits TaskParent
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then task.features = task.gcFeatures
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
@@ -353,7 +354,8 @@ Public Class Delaunay_Points : Inherits TaskParent
        optiBase.findslider("Points to use in Feature Poly").Value = 2
         desc = "This algorithm explores what happens when Delaunay is used on 2 points"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then task.features = task.gcFeatures
         Static ptSlider = optiBase.FindSlider("Points to use in Feature Poly")
 
         fPoly.Run(src)

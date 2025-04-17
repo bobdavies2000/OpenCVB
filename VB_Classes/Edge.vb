@@ -1419,7 +1419,7 @@ End Class
 
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_SobelQT : Inherits TaskParent
+Public Class Edge_SobelNoOpt : Inherits TaskParent
     Public Sub New()
         desc = "Show Sobel vertical and horizontal edge detection no options."
     End Sub
@@ -1427,6 +1427,7 @@ Public Class Edge_SobelQT : Inherits TaskParent
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, 3)
         dst1 = src.Sobel(cv.MatType.CV_32F, 0, 1, 3)
-        dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
+        Dim tmp = src.Sobel(cv.MatType.CV_32F, 1, 1, 3)
+        dst2 = (dst1 + dst0 + tmp).ToMat.ConvertScaleAbs()
     End Sub
 End Class

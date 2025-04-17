@@ -1527,11 +1527,15 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
                 Dim arrayStart = -1
                 Dim arrayEnd = 0
-                For i = 0 To histArray.Count - 1
+                For i = 0 To histArray.Count - 1 ' there is often garbage in histarray(255) but why?  Eliminate it here.
                     If histArray(i) >= 1 Then
                         If arrayStart = -1 Then arrayStart = i
                         histArray(i) = gc1.fLessIndex
-                        arrayEnd = i
+                        If arrayStart < 255 Then
+                            If i <> 255 Then arrayEnd = i
+                        Else
+                            If i = 255 Then arrayEnd = i
+                        End If
                     End If
                 Next
 

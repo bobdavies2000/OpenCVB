@@ -63,7 +63,7 @@ Public Class Stable_BasicsCount : Inherits TaskParent
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         basics.Run(src)
         dst2 = basics.dst2

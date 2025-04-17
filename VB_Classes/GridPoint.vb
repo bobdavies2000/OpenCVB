@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class GridPoint_Basics : Inherits TaskParent
-    Dim sobel As New Edge_SobelQT
+    Dim sobel As New Edge_SobelNoOpt
     Public sortedPoints As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
     Public options As New Options_GridPoint
     Public Sub New()
@@ -261,7 +261,7 @@ Public Class GridPoint_FeatureLess : Inherits TaskParent
             classCount += 1
         Next
 
-        dst3 = ShowPalette(dst2)
+        If standaloneTest() Then dst3 = ShowPalette(dst2)
 
         labels(2) = "CV_8U Mask for the " + CStr(classCount) + " featureless regions enumerated."
         labels(3) = CStr(classCount) + " featureless regions colored using the gc.index of the first grid cell member."
