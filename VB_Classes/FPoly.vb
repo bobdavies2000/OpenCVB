@@ -1298,6 +1298,7 @@ Public Class FPoly_Line : Inherits TaskParent
         desc = "Identify the longest line in task.topFeatures"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        task.features = task.gFeatures
         topFeatures.Run(src)
         dst2.SetTo(0)
         Dim pts = task.topFeatures
