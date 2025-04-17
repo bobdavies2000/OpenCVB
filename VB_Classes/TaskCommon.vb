@@ -675,6 +675,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         depth = gcCenter.depth
         color = gcCenter.color
 
+        rotatedRect = cv.Cv2.MinAreaRect({p1, p2})
+
         If gcCenter.highlyVisible Then highlyVisible = True Else highlyVisible = False
     End Sub
     Sub New()

@@ -1331,12 +1331,7 @@ Public Class FPoly_LineRect : Inherits TaskParent
         fLine.Run(src)
 
         Dim lp = fLine.lp
-        Dim x = If(lp.p1.X < lp.p2.X, lp.p1.X, lp.p2.X)
-        Dim y = If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y)
-        lpRect = New cv.Rect(x, y, Math.Abs(lp.p1.X - lp.p2.X), Math.Abs(lp.p1.Y - lp.p2.Y))
-        If lpRect.Width < task.cellSize Then lpRect.Width = task.cellSize
-        If lpRect.Height < task.cellSize Then lpRect.Height = task.cellSize
-        lpRect = ValidateRect(lpRect)
+        lpRect = lp.rotatedRect.BoundingRect
 
         dst2 = src
         DrawLine(dst2, lp.p1, lp.p2, task.highlight)
