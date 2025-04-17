@@ -244,85 +244,6 @@ End Class
 
 
 
-
-
-
-Public Class FCS_ByDepth : Inherits TaskParent
-    Dim plot As New Plot_Histogram
-    Dim fcs As New FCS_Basics
-    Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public Sub New()
-        plot.addLabels = False
-        plot.removeZeroEntry = True
-        plot.createHistogram = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        task.gOptions.setHistogramBins(20)
-        desc = "Use cell depth to break down the layers in an image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(src)
-        dst2 = fcs.dst2
-        labels(2) = fcs.labels(2)
-
-        Dim cellList As New List(Of Single)
-        For Each fp In task.fpList
-            cellList.Add(fp.depth)
-        Next
-
-        plot.minRange = 0
-        plot.maxRange = task.MaxZmeters
-        plot.Run(cv.Mat.FromPixelData(cellList.Count, 1, cv.MatType.CV_32F, cellList.ToArray))
-        dst1 = plot.dst2
-
-        Dim incr = dst1.Width / task.histogramBins
-        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / incr)
-        dst1.Rectangle(New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-        Dim depthIncr = (plot.maxRange - plot.minRange) / task.histogramBins
-        Dim depthStart = histIndex * depthIncr
-        Dim depthEnd = (histIndex + 1) * depthIncr
-
-        Static fpCells As New List(Of (fpData, Integer))
-        Static histIndexSave = histIndex
-
-        If histIndexSave <> histIndex Or task.optionsChanged Then
-            histIndexSave = histIndex
-            fpCells.Clear()
-        End If
-        palInput.SetTo(0)
-
-        For Each fp In task.fpList
-            If fp.depth > depthStart And fp.depth < depthEnd Then
-                Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
-                If val = 0 Then
-                    palInput.FillConvexPoly(fp.facets, fp.gcIndex Mod 255)
-                    fpCells.Add((fp, task.frameCount))
-                End If
-            End If
-        Next
-
-        For Each ele In fpCells
-            Dim fp As fpData = ele.Item1
-            SetTrueText(Format(fp.age, fmt0), fp.pt, 0)
-            fpCellContour(fp, task.color, 0)
-        Next
-        dst3 = ShowPalette(palInput)
-        dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
-
-
-        Dim removeFrame As Integer = If(task.frameCount > task.frameHistoryCount, task.frameCount - task.frameHistoryCount, -1)
-        For i = fpCells.Count - 1 To 0 Step -1
-            Dim frame = fpCells(i).Item2
-            If frame = removeFrame Then fpCells.RemoveAt(i)
-        Next
-
-        labels(3) = "Cells with depth between " + Format(depthStart, fmt1) + "m to " + Format(depthEnd, fmt1) + "m"
-    End Sub
-End Class
-
-
-
-
-
 'Public Class FCS_KNNfeatures : Inherits TaskParent
 '    Dim fcs As New FCS_Basics
 '    Dim knn As New KNNorm_Basics
@@ -709,5 +630,86 @@ Public Class FCS_Lines : Inherits TaskParent
 
         If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were used to create " +
                                            CStr(task.fpList.Count) + " cells"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class FCS_ByDepth : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Dim fcs As New FCS_Basics
+    Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        plot.addLabels = False
+        plot.removeZeroEntry = True
+        plot.createHistogram = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        task.gOptions.setHistogramBins(20)
+        desc = "Use cell depth to break down the layers in an image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then task.features = task.gFeatures ' use the gridpoints when standalone
+        fcs.Run(src)
+        dst2 = fcs.dst2
+        labels(2) = fcs.labels(2)
+
+        Dim cellList As New List(Of Single)
+        For Each fp In task.fpList
+            cellList.Add(fp.depth)
+        Next
+
+        plot.minRange = 0
+        plot.maxRange = task.MaxZmeters
+        plot.Run(cv.Mat.FromPixelData(cellList.Count, 1, cv.MatType.CV_32F, cellList.ToArray))
+        dst1 = plot.dst2
+
+        Dim incr = dst1.Width / task.histogramBins
+        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / incr)
+        dst1.Rectangle(New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        Dim depthIncr = (plot.maxRange - plot.minRange) / task.histogramBins
+        Dim depthStart = histIndex * depthIncr
+        Dim depthEnd = (histIndex + 1) * depthIncr
+
+        Static fpCells As New List(Of (fpData, Integer))
+        Static histIndexSave = histIndex
+
+        If histIndexSave <> histIndex Or task.optionsChanged Then
+            histIndexSave = histIndex
+            fpCells.Clear()
+        End If
+        palInput.SetTo(0)
+
+        For Each fp In task.fpList
+            If fp.depth > depthStart And fp.depth < depthEnd Then
+                Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
+                If val = 0 Then
+                    palInput.FillConvexPoly(fp.facets, fp.gcIndex Mod 255)
+                    fpCells.Add((fp, task.frameCount))
+                End If
+            End If
+        Next
+
+        For Each ele In fpCells
+            Dim fp As fpData = ele.Item1
+            SetTrueText(Format(fp.age, fmt0), fp.pt, 0)
+            fpCellContour(fp, task.color, 0)
+        Next
+        dst3 = ShowPalette(palInput)
+        dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
+
+
+        Dim removeFrame As Integer = If(task.frameCount > task.frameHistoryCount, task.frameCount - task.frameHistoryCount, -1)
+        For i = fpCells.Count - 1 To 0 Step -1
+            Dim frame = fpCells(i).Item2
+            If frame = removeFrame Then fpCells.RemoveAt(i)
+        Next
+
+        labels(3) = "Cells with depth between " + Format(depthStart, fmt1) + "m to " + Format(depthEnd, fmt1) + "m"
     End Sub
 End Class
