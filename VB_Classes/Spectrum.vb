@@ -326,14 +326,14 @@ Public Class Spectrum_Mask : Inherits TaskParent
     Dim gSpec As New Spectrum_Gray
     Public Sub New()
         If standalone Then strOut = "Select a cell to see its depth spectrum"
-        If standalone Then task.gOptions.displaydst1.checked = true
         desc = "Create a mask from the Spectrum ranges"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         gSpec.Run(src)
-        dst1 = gSpec.dst2
+        dst2 = gSpec.dst2
         labels(2) = gSpec.labels(2)
         If task.heartBeat Then strOut = gSpec.strOut
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -352,7 +352,7 @@ Public Class Spectrum_Gray : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() Then dst2 = runRedC(src, labels(2))
+        dst2 = runRedC(src, labels(2))
 
         Dim input = src(task.rcD.rect)
         If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

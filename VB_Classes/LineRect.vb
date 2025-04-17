@@ -161,7 +161,7 @@ Public Class LineRect_CenterRange : Inherits TaskParent
 
         If task.heartBeat Then
             labels(2) = CStr(depthLines) + " lines were found between objects (External Lines)"
-            labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
+            labels(3) = CStr(colorLines) + " internal lines were indentified"
         End If
     End Sub
 End Class

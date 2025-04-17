@@ -28,19 +28,19 @@ Public Class GridPoint_Basics : Inherits TaskParent
         Next
 
         dst1.SetTo(255, task.motionMask)
-        task.gFeatures.Clear()
+        task.gcFeatures.Clear()
         For Each ele In sortedPoints
             Dim pt = ele.Value
-            If dst1.Get(Of Byte)(pt.Y, pt.X) Then task.gFeatures.Add(pt)
+            If dst1.Get(Of Byte)(pt.Y, pt.X) Then task.gcFeatures.Add(pt)
         Next
 
         dst1.SetTo(0)
-        For Each pt In task.gFeatures
+        For Each pt In task.gcFeatures
             dst1.Circle(pt, task.DotSize, 255, -1, cv.LineTypes.Link8)
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
         Next
 
-        labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(task.gFeatures.Count) +
+        labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(task.gcFeatures.Count) +
                     " were retained from the previous image."
     End Sub
 End Class
