@@ -2198,7 +2198,6 @@ public:
 class Options_FAST {
 public:
 	bool useNonMax = true;
-	int range =  8;
 	void Run() {}
 	Options_FAST() {
 	}

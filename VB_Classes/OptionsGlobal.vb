@@ -11,13 +11,6 @@ Public Class OptionsGlobal
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 
-        Dim cellSize = 8
-        If task.dst2.Width >= 640 Then cellSize = 16
-        If task.dst2.Width >= 1280 Then cellSize = 32
-        If task.dst2.Width >= 1920 Then cellSize = 48
-        GridSlider.Value = cellSize
-        GridSizeLabel.Text = CStr(cellSize)
-
         DotSizeSlider.Value = 1
         LineWidth.Value = 1
         If task.dst2.Width <= 320 Then
@@ -67,6 +60,7 @@ Public Class OptionsGlobal
 
         task.DotSize = 1
         task.cvFontThickness = 1
+        task.gOptions.GridSlider.Value = 8
         Select Case task.dst2.Width
             Case 1920
                 task.cvFontSize = 3.5
@@ -75,21 +69,8 @@ Public Class OptionsGlobal
                 task.disparityAdjustment = 1.1
                 task.densityMetric = 40
                 task.minDistance = 25
+                task.gOptions.GridSlider.Value = 48
                 task.FASTthreshold = 25
-            Case 960
-                task.cvFontSize = 2.0
-                task.cvFontThickness = 2
-                task.DotSize = 2
-                task.disparityAdjustment = 2.2
-                task.densityMetric = 200
-                task.minDistance = 25
-                task.FASTthreshold = 40
-            Case 480
-                task.cvFontSize = 1.2
-                task.disparityAdjustment = 4.4
-                task.densityMetric = 650
-                task.minDistance = 25
-                task.FASTthreshold = 10
             Case 1280
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
@@ -97,31 +78,37 @@ Public Class OptionsGlobal
                 task.disparityAdjustment = 2.2
                 task.densityMetric = 150
                 task.minDistance = 25
+                task.gOptions.GridSlider.Value = 32
                 task.FASTthreshold = 40
+            Case 960
+                task.cvFontSize = 2.0
+                task.cvFontThickness = 2
+                task.DotSize = 2
+                task.disparityAdjustment = 2.2
+                task.densityMetric = 200
+                task.minDistance = 25
+                task.gOptions.GridSlider.Value = 16
+                task.FASTthreshold = 40
+            Case 672
+                task.cvFontSize = 1.5
+                task.DotSize = 1
+                task.disparityAdjustment = 4.4
+                task.densityMetric = 300
+                task.minDistance = 25
+                task.gOptions.GridSlider.Value = 16
+                task.FASTthreshold = 10
             Case 640
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.disparityAdjustment = 4.2
                 task.densityMetric = 200
                 task.minDistance = 25
+                task.gOptions.GridSlider.Value = 16
                 task.FASTthreshold = 30
-            Case 320
-                task.cvFontSize = 1.0
-                task.disparityAdjustment = 8.4
-                task.densityMetric = 500
-                task.minDistance = 25
-                task.FASTthreshold = 10
-            Case 160
-                task.cvFontSize = 1.0
+            Case 480
+                task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
-                task.densityMetric = 100
-                task.minDistance = 25
-                task.FASTthreshold = 10
-            Case 672
-                task.cvFontSize = 1.5
-                task.DotSize = 1
-                task.disparityAdjustment = 4.4
-                task.densityMetric = 300
+                task.densityMetric = 650
                 task.minDistance = 25
                 task.FASTthreshold = 10
             Case 336
@@ -130,11 +117,23 @@ Public Class OptionsGlobal
                 task.disparityAdjustment = 8.8
                 task.minDistance = 25
                 task.FASTthreshold = 10
+            Case 320
+                task.cvFontSize = 1.0
+                task.disparityAdjustment = 8.4
+                task.densityMetric = 500
+                task.minDistance = 25
+                task.FASTthreshold = 10
             Case 168
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
                 task.densityMetric = 1700
                 task.minDistance = 10
+                task.FASTthreshold = 10
+            Case 160
+                task.cvFontSize = 1.0
+                task.disparityAdjustment = 4.4
+                task.densityMetric = 100
+                task.minDistance = 25
                 task.FASTthreshold = 10
         End Select
 

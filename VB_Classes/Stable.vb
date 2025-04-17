@@ -137,7 +137,7 @@ Public Class Stable_FAST : Inherits TaskParent
         fast.Run(src)
 
         basics.facetGen.inputPoints.Clear()
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(fast.features)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         basics.Run(src)
         dst3 = basics.dst3
         dst2 = basics.dst2
@@ -149,7 +149,7 @@ Public Class Stable_FAST : Inherits TaskParent
             End If
         Next
         labels(2) = basics.labels(2)
-        labels(3) = CStr(fast.features.Count) + " features were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(3) = CStr(task.features.Count) + " features were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class
 

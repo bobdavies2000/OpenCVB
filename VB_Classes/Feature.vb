@@ -73,7 +73,7 @@ Public Class Feature_Basics : Inherits TaskParent
             Case FeatureSrc.FAST
                 Static FAST As New Corners_Basics
                 FAST.Run(task.gray)
-                features = FAST.features
+                features = task.features
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
             Case FeatureSrc.LineInput
                 task.lines.Run(task.gray)

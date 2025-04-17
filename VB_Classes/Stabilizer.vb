@@ -103,8 +103,8 @@ Public Class Stabilizer_BasicsRandomInput : Inherits TaskParent
         Dim input = src
         If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim shiftX = msRNG.Next(-options.range, options.range)
-        Dim shiftY = msRNG.Next(-options.range, options.range)
+        Dim shiftX = msRNG.Next(-task.FASTthreshold, task.FASTthreshold)
+        Dim shiftY = msRNG.Next(-task.FASTthreshold, task.FASTthreshold)
 
         If task.firstPass Then
             lastShiftX = shiftX
