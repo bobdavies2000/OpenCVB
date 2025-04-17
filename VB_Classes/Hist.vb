@@ -1492,6 +1492,7 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
     Dim fLess As New GridPoint_FeatureLess
     Dim ranges() As cv.Rangef
     Public Sub New()
+        optiBase.FindSlider("LowRes Color difference threshold").Value = 10
         ranges = {New cv.Rangef(0, 256)}
         task.gOptions.HistBinBar.Value = 255
         desc = "Build a histogram of one cell and predict any neighbors with an fLessIndex"
@@ -1500,13 +1501,16 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
         fLess.Run(task.grayStable)
 
         Dim histList = New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-        Dim predictList As New List(Of Integer)
+        Dim predictedList As New List(Of Integer)
         For Each gc In task.gcList
             If gc.fLessIndex Then
                 Dim nabes = task.gridNeighbors(gc.index)
                 For i = 1 To nabes.Count - 1 ' the first entry is for the gc...
                     If task.gcList(nabes(i)).fLessIndex = 0 Then
-                        If predictList.Contains(nabes(i)) = False Then histList.Add(gc.index, nabes(i))
+                        If predictedList.Contains(nabes(i)) = False Then
+                            histList.Add(gc.index, nabes(i))
+                            predictedList.Add(nabes(i))
+                        End If
                     End If
                 Next
             End If
@@ -1521,24 +1525,24 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
 
                 cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, Not fLess.edges.dst2(gc1.rect), histogram, 1, {task.histogramBins}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-                Dim arrayStart = -1, arrayEnd As Integer
+                Dim arrayStart = -1
+                Dim arrayEnd = 0
                 For i = 0 To histArray.Count - 1
-                    If histArray(i) Then
+                    If histArray(i) >= 1 Then
                         If arrayStart = -1 Then arrayStart = i
                         histArray(i) = gc1.fLessIndex
                         arrayEnd = i
                     End If
                 Next
+
+                ' fill in any gaps in the series!
                 For i = arrayStart To arrayEnd
                     histArray(i) = gc1.fLessIndex
                 Next
-                If arrayStart > 0 Then histArray(arrayStart - 1) = gc1.fLessIndex
-                If arrayEnd < 255 Then histArray(arrayEnd + 1) = gc1.fLessIndex
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If
             Dim gc2 = task.gcList(ele.Value)
             cv.Cv2.CalcBackProject({task.grayStable(gc2.rect)}, {0}, histogram, dst1(gc2.rect), ranges)
-            Dim k = 0
         Next
         dst3 = ShowPalette(dst1)
         dst0 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

@@ -250,11 +250,15 @@ Public Class GridPoint_FeatureLess : Inherits TaskParent
         For Each gc In task.gcList
             Dim pt = gc.rect.TopLeft
             If dst2.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
-            If dst2.Get(Of Byte)(pt.Y, pt.X) <> 255 Then Continue For
+            Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
+            If val <> 255 Then
+                gc.fLessIndex = val
+                Continue For
+            End If
+
             dst2.FloodFill(pt, gc.index Mod 255)
             gc.fLessIndex = gc.index Mod 255
             classCount += 1
-            ' dst3.FloodFill(pt, task.scalarColors(gc.index Mod 255))
         Next
 
         dst3 = ShowPalette(dst2)
@@ -263,6 +267,26 @@ Public Class GridPoint_FeatureLess : Inherits TaskParent
         labels(3) = CStr(classCount) + " featureless regions colored using the gc.index of the first grid cell member."
     End Sub
 End Class
+
+
+
+
+
+
+Public Class GridPoint_FLessContours : Inherits TaskParent
+    Dim hist As New Hist_GridPointRegions
+    Dim contour As New Contour_Basics
+    Public Sub New()
+        desc = "Build contours for the featureless regions fleshed out by Hist_GridPointRegions"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hist.Run(src)
+        dst3 = hist.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+
+    End Sub
+End Class
+
 
 
 

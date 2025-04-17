@@ -34,7 +34,7 @@ Public Class Contour_Basics : Inherits TaskParent
 
         dst3.SetTo(0)
         contourlist.Clear()
-        dst2 = color8U.dst3
+        dst2 = color8U.dst2
         For i = 0 To sortedList.Count - 1
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             contourlist.Add(tour)
