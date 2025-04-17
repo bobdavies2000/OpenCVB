@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class Corners_Basics : Inherits TaskParent
+    Public featurePoints As New List(Of cv.Point)
     Public features As New List(Of cv.Point2f)
     Dim options As New Options_FAST
     Public Sub New()
@@ -15,7 +16,9 @@ Public Class Corners_Basics : Inherits TaskParent
         Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, task.FASTthreshold, options.useNonMax)
 
         features.Clear()
+        featurePoints.Clear()
         For Each kp As cv.KeyPoint In kpoints
+            featurePoints.Add(New cv.Point(kp.Pt.X, kp.Pt.Y))
             features.Add(kp.Pt)
         Next
 
@@ -166,37 +169,6 @@ End Class
 
 
 
-Public Class Corners_BasicsStablePoints : Inherits TaskParent
-    Dim fast As New Corners_Basics
-    Public Sub New()
-        labels = {"", "", "", "FAST stable points without context"}
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find and save only the stable points in the FAST output"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        fast.Run(src)
-
-        Dim newPts As New List(Of cv.Point)
-        dst2 = src
-        dst3.SetTo(0)
-        For Each pt In fast.features
-            Dim test = New cv.Point(pt.X, pt.Y)
-            If task.features.Contains(test) Then
-                DrawCircle(dst2, test, task.DotSize, cv.Scalar.Yellow)
-                newPts.Add(test)
-                dst3.Set(Of Byte)(test.Y, test.X, 255)
-            End If
-        Next
-
-        task.featurePoints = New List(Of cv.Point)(newPts)
-        labels(2) = Format(task.features.Count, "000") + " identified FAST stable points - slider adjusts threshold"
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Corners_BasicsCentroids : Inherits TaskParent
@@ -332,21 +304,57 @@ End Class
 
 
 Public Class Corners_SubPix : Inherits TaskParent
+    Dim fast As New Corners_Basics
     Dim options As New Options_PreCorners
     Public Sub New()
         labels(2) = "Output of PreCornerDetect"
         desc = "Use PreCornerDetect to refine the feature points to sub-pixel accuracy."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = src.Clone
+        fast.Run(src)
 
-        If task.features.Count = 0 Then Exit Sub ' completely dark?  No features...
-        cv.Cv2.CornerSubPix(task.gray, task.features, New cv.Size(options.subpixSize, options.subpixSize), New cv.Size(-1, -1), term)
+        If fast.features.Count = 0 Then Exit Sub ' completely dark?  No features...
+        cv.Cv2.CornerSubPix(task.gray, fast.features, New cv.Size(options.subpixSize, options.subpixSize), New cv.Size(-1, -1), term)
 
-        For Each pt In task.features
+        dst2 = src
+        For Each pt In fast.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Corners_BasicsStablePoints : Inherits TaskParent
+    Dim fast As New Corners_Basics
+    Public Sub New()
+        labels = {"", "", "", "FAST stable points without context"}
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Find and save only the stable points in the FAST output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fast.Run(src)
+
+        Dim threshold = fast.featurePoints.Count / 10
+
+        dst2 = src
+        dst3.SetTo(0)
+        Dim newPts As New List(Of cv.Point)
+        For Each pt In fast.featurePoints
+            If task.featurePoints.Contains(pt) Then
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
+                newPts.Add(pt)
+                dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+            End If
+        Next
+
+        task.featurePoints = If(newPts.Count < threshold, fast.featurePoints, New List(Of cv.Point)(newPts))
+        task.features = New List(Of cv.Point2f)(fast.features)
+        labels(2) = Format(task.features.Count, "000") + " identified FAST stable points - slider adjusts threshold"
     End Sub
 End Class
