@@ -199,7 +199,7 @@ Public Class GridPoint_FeatureLessCompare : Inherits TaskParent
         fLess.Run(src)
         gpLess.Run(src)
 
-        dst2 = ShowAddweighted(fLess.dst2, gpLess.dst3, labels(2))
+        dst2 = ShowAddweighted(fLess.dst2, gpLess.dst3, labels(2)).Clone
         dst3 = ShowAddweighted(src, gpLess.dst3, labels(2))
     End Sub
 End Class
@@ -229,50 +229,38 @@ End Class
 Public Class GridPoint_FeatureLess : Inherits TaskParent
     Public edges As New EdgeLine_Basics
     Public classCount As Integer
-    Public fLessMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
     Public Sub New()
-        labels(3) = "CV_8U Mask for the featureless regions"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
         desc = "Isolate the featureless regions using the sobel intensity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.grayStable)
 
-        fLessMask.SetTo(0)
+        dst2.SetTo(0)
         For Each gc In task.gcList
             If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
-
             If edges.dst2(gc.rect).CountNonZero = 0 Then
                 gc.fLessIndex = 255
-                fLessMask(gc.rect).SetTo(255)
+                dst2(gc.rect).SetTo(255)
             End If
         Next
 
-        Dim gcPrev = task.gcList(0)
-        classCount = 0
+        classCount = 1
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each gc In task.gcList
-            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
-            If gc.index = 55 Then Dim k = 0
-            If gc.fLessIndex = 255 Then
-                Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
-                Dim val = gcAbove.fLessIndex
-                If val = 0 Then val = gcPrev.fLessIndex
-                If val = 0 And gc.fLessIndex <> 0 Then
-                    classCount += 1
-                    val = classCount
-                End If
-                If val <> 0 Then
-                    gc.fLessIndex = val
-                    fLessMask(gc.rect).SetTo(gc.fLessIndex)
-                End If
-            End If
-            gcPrev = gc
+            Dim pt = gc.rect.TopLeft
+            If dst2.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
+            If dst2.Get(Of Byte)(pt.Y, pt.X) <> 255 Then Continue For
+            dst2.FloodFill(pt, gc.index Mod 255)
+            gc.fLessIndex = gc.index Mod 255
+            classCount += 1
+            ' dst3.FloodFill(pt, task.scalarColors(gc.index Mod 255))
         Next
 
-        labels(3) = "Mask for the " + CStr(classCount) + " featureless regions."
-        If standaloneTest() Then
-            dst3 = ShowPalette(fLessMask * 255 / classCount)
-            dst2 = ShowAddweighted(src, dst3, labels(2))
-        End If
+        dst3 = ShowPalette(dst2)
+
+        labels(2) = "CV_8U Mask for the " + CStr(classCount) + " featureless regions enumerated."
+        labels(3) = CStr(classCount) + " featureless regions colored using the gc.index of the first grid cell member."
     End Sub
 End Class
 

@@ -4005,3 +4005,54 @@ Public Class XO_GridPoint_FeatureLess2 : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+Public Class XO_GridPoint_FeatureLess : Inherits TaskParent
+    Public edges As New EdgeLine_Basics
+    Public classCount As Integer
+    Public fLessMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
+    Public Sub New()
+        labels(3) = "CV_8U Mask for the featureless regions"
+        desc = "Isolate the featureless regions using the sobel intensity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.grayStable)
+
+        fLessMask.SetTo(0)
+        For Each gc In task.gcList
+            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
+
+            If edges.dst2(gc.rect).CountNonZero = 0 Then
+                gc.fLessIndex = 255
+                fLessMask(gc.rect).SetTo(255)
+            End If
+        Next
+
+        Dim gcPrev = task.gcList(0)
+        classCount = 0
+        For Each gc In task.gcList
+            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
+            If gc.index = 55 Then Dim k = 0
+            If gc.fLessIndex = 255 Then
+                Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
+                Dim val = gcAbove.fLessIndex
+                If val = 0 Then val = gcPrev.fLessIndex
+                If val = 0 And gc.fLessIndex <> 0 Then
+                    classCount += 1
+                    val = classCount
+                End If
+                If val <> 0 Then
+                    gc.fLessIndex = val
+                    fLessMask(gc.rect).SetTo(gc.fLessIndex)
+                End If
+            End If
+            gcPrev = gc
+        Next
+
+        labels(3) = "Mask for the " + CStr(classCount) + " featureless regions."
+        dst3 = ShowPalette(fLessMask * 255 / classCount)
+        If standaloneTest() Then dst2 = ShowAddweighted(src, dst3, labels(2))
+    End Sub
+End Class

@@ -1512,12 +1512,12 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
             End If
         Next
 
-        Dim buildIndex = -1, gc1 As gcData, histogram As New cv.Mat, histArray(256 - 1) As Single
-        dst1 = fLess.fLessMask.Clone
+        Dim gcIndex = -1, gc1 As gcData, histogram As New cv.Mat, histArray(256 - 1) As Single
+        dst1 = fLess.dst2.Clone
         For Each ele In histList
-            If buildIndex <> ele.Key Then
-                buildIndex = ele.Key
-                gc1 = task.gcList(buildIndex)
+            If gcIndex <> ele.Key Then
+                gcIndex = ele.Key
+                gc1 = task.gcList(gcIndex)
 
                 cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, Not fLess.edges.dst2(gc1.rect), histogram, 1, {task.histogramBins}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -1538,10 +1538,10 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
             End If
             Dim gc2 = task.gcList(ele.Value)
             cv.Cv2.CalcBackProject({task.grayStable(gc2.rect)}, {0}, histogram, dst1(gc2.rect), ranges)
+            Dim k = 0
         Next
-        dst3 = ShowPalette(dst1 * 255 / fLess.classCount)
+        dst3 = ShowPalette(dst1)
         dst0 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst2 = ShowAddweighted(dst0, src, labels(2))
         dst2.SetTo(0, fLess.edges.dst2)
     End Sub

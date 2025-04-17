@@ -38,7 +38,6 @@ Public Class Grid_Basics : Inherits TaskParent
                     End If
                 Next
             Next
-            task.subDivisionCount = 9
 
             task.gridMask.SetTo(0)
             For x = cellSize To src.Width - 1 Step cellSize

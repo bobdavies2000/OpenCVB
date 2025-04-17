@@ -30,8 +30,6 @@ Public Class VBtask : Implements IDisposable
     Public tilesPerCol As Integer
     Public tilesPerRow As Integer
     Public gridRects As List(Of cv.Rect)
-    Public subDivisions As New List(Of Integer)
-    Public subDivisionCount As Integer = 9
     Public gridMask As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect

@@ -167,23 +167,61 @@ Public Class Entropy_SubDivisions : Inherits TaskParent
     Dim entropy As New Entropy_Rectangle
     Dim entropies As New List(Of List(Of Single))
     Dim eROI As New List(Of List(Of cv.Rect))
-    Public roiList As New List(Of cv.Rect)
+    Public subDivisions As New List(Of Integer)
+    Public subDivisionCount As Integer = 9
     Public Sub New()
-        labels(2) = "The top entropy values in each subdivision"
-        For i = 0 To task.subDivisionCount - 1
+        labels(2) = "Highlighted rectangles are the top entropy in each of the 9 subdivisions."
+        For i = 0 To subDivisionCount - 1
             entropies.Add(New List(Of Single)) ' 4 quadrants
             eROI.Add(New List(Of cv.Rect)) ' 4 quadrants
         Next
+
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         desc = "Find the highest entropy in each quadrant"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.firstPass Then
+            For Each roi In task.gridRects
+                Dim xSub = roi.X + roi.Width
+                Dim ySub = roi.Y + roi.Height
+                If ySub <= dst2.Height / 3 Then
+                    If xSub <= dst2.Width / 3 Then subDivisions.Add(0)
+                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then subDivisions.Add(1)
+                    If xSub > dst2.Width * 2 / 3 Then subDivisions.Add(2)
+                End If
+                If ySub > dst2.Height / 3 And ySub <= dst2.Height * 2 / 3 Then
+                    If xSub <= dst2.Width / 3 Then subDivisions.Add(3)
+                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then subDivisions.Add(4)
+                    If xSub > dst2.Width * 2 / 3 Then subDivisions.Add(5)
+                End If
+                If ySub > dst2.Height * 2 / 3 Then
+                    If xSub <= dst2.Width / 3 Then subDivisions.Add(6)
+                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then subDivisions.Add(7)
+                    If xSub > dst2.Width * 2 / 3 Then subDivisions.Add(8)
+                End If
+            Next
+
+            Dim p1 = New cv.Point(0, dst2.Height / 3)
+            Dim p2 = New cv.Point(dst2.Width, dst2.Height / 3)
+            DrawLine(dst0, p1, p2, white)
+            p1 = New cv.Point(0, dst2.Height * 2 / 3)
+            p2 = New cv.Point(dst2.Width, dst2.Height * 2 / 3)
+            DrawLine(dst0, p1, p2, white)
+            p1 = New cv.Point(dst2.Width / 3, 0)
+            p2 = New cv.Point(dst2.Width / 3, dst2.Height)
+            DrawLine(dst0, p1, p2, white)
+            p1 = New cv.Point(dst2.Width * 2 / 3, 0)
+            p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
+            DrawLine(dst0, p1, p2, white)
+        End If
+
         dst2 = task.color.Clone
-        For i = 0 To task.subDivisionCount - 1
+        For i = 0 To subDivisionCount - 1
             entropies(i).Clear()
             eROI(i).Clear()
         Next
 
-        dst1 = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2Gray))
+        dst1 = task.grayStable.Clone
         Dim dimensions() = New Integer() {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
         Dim hist As New cv.Mat
@@ -194,32 +232,22 @@ Public Class Entropy_SubDivisions : Inherits TaskParent
 
             Dim nextEntropy = entropy.channelEntropy(dst1(roi).Total, hist) * 1000
 
-            entropies(task.subDivisions(i)).Add(nextEntropy)
-            eROI(task.subDivisions(i)).Add(roi)
-            If standaloneTest() Then SetTrueText(Format(nextEntropy, fmt2), New cv.Point(roi.X, roi.Y), 3)
+            entropies(subDivisions(i)).Add(nextEntropy)
+            eROI(subDivisions(i)).Add(roi)
         Next
 
-        roiList.Clear()
-        For i = 0 To task.subDivisionCount - 1
-            Dim eList = entropies(i)
-            Dim maxEntropy = eList.Max
-            Dim roi = eROI(i)(eList.IndexOf(maxEntropy))
-            roiList.Add(roi)
+        Dim str = If(task.toggleOn, "minimum", "maximum")
+        labels(3) = "The " + str + " entropy values in each subdivision"
+        For i = 0 To entropies.Count - 1
+            Dim val = If(task.toggleOn, entropies(i).Min, entropies(i).Max)
+            Dim index = entropies(i).IndexOf(val)
+            Dim roi = eROI(i)(index)
             dst2.Rectangle(roi, white)
+            If standaloneTest() Then SetTrueText(Format(entropies(i)(index), fmt2), roi.TopLeft, 3)
         Next
 
-        Dim p1 = New cv.Point(0, dst2.Height / 3)
-        Dim p2 = New cv.Point(dst2.Width, dst2.Height / 3)
-        DrawLine(dst2, p1, p2, white)
-        p1 = New cv.Point(0, dst2.Height * 2 / 3)
-        p2 = New cv.Point(dst2.Width, dst2.Height * 2 / 3)
-        DrawLine(dst2, p1, p2, white)
-        p1 = New cv.Point(dst2.Width / 3, 0)
-        p2 = New cv.Point(dst2.Width / 3, dst2.Height)
-        DrawLine(dst2, p1, p2, white)
-        p1 = New cv.Point(dst2.Width * 2 / 3, 0)
-        p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
-        DrawLine(dst2, p1, p2, white)
+        dst2.SetTo(white, dst0)
+        dst3.SetTo(white, dst0)
     End Sub
 End Class
 
