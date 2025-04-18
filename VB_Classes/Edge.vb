@@ -1426,7 +1426,7 @@ Public Class Edge_SobelQT : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = task.grayStable.Sobel(cv.MatType.CV_32F, 1, 0, 3)
         dst1 = task.grayStable.Sobel(cv.MatType.CV_32F, 0, 1, 3)
-        Dim tmp = task.grayStable.Sobel(cv.MatType.CV_32F, 1, 1, 3)
-        dst2 = (dst1 + dst0 + tmp).ToMat.ConvertScaleAbs()
+        Dim diagonal = task.grayStable.Sobel(cv.MatType.CV_32F, 1, 1, 3)
+        dst2 = (dst1 + dst0 + diagonal).ToMat.ConvertScaleAbs()
     End Sub
 End Class

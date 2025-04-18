@@ -41,7 +41,8 @@ Public Class GridPoint_Basics : Inherits TaskParent
         Next
 
         labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(task.gcFeatures.Count) +
-                    " were retained from the previous image."
+                    " were retained from the previous image. "
+        labels(3) = If(task.toggleOn, "Toggle On", "Toggle Off")
     End Sub
 End Class
 
