@@ -38,7 +38,7 @@ Public Class Line_Basics : Inherits TaskParent
             End If
         Next
 
-        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable)
+        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable.Clone)
 
         Dim histArray = getLineCounts(task.lpList)
         For i = 0 To histArray.Count - 1
@@ -118,7 +118,7 @@ Public Class Line_BasicsAlternative : Inherits TaskParent
             End If
         Next
 
-        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable)
+        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable.Clone)
 
         histArray = getLineCounts(task.lpList)
         For i = histArray.Count - 1 To 1 Step -1

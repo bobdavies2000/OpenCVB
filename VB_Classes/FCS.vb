@@ -9,7 +9,7 @@ Public Class FCS_Basics : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then task.feat.Run(task.grayStable)
+        If standalone Then task.feat.Run(task.grayStable.Clone)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
         subdiv.Insert(task.features)
@@ -621,9 +621,9 @@ Public Class FCS_Lines : Inherits TaskParent
         desc = "Use lines as input to FCS."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.feat.Run(task.grayStable)
+        task.feat.Run(task.grayStable.Clone)
 
-        task.fcs.Run(task.grayStable)
+        task.fcs.Run(task.grayStable.Clone)
         dst2 = task.fcs.dst2
 
         fpDisplayAge()

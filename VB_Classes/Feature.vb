@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 Imports VB_Classes.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
-    Public gridPoint As New GridPoint_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U mask with all the features present."

@@ -1474,11 +1474,11 @@ Public Class Hist_ToggleFeatureLess : Inherits TaskParent
         desc = "Toggle between a histogram of the entire image and one of the featureless regions found with grid points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.grayStable)
+        fLess.Run(task.grayStable.Clone)
         dst3 = fLess.dst2
 
         If task.toggleOn Then plotHist.histMask.SetTo(255) Else plotHist.histMask = fLess.dst1
-        plotHist.Run(task.grayStable)
+        plotHist.Run(task.grayStable.Clone)
         dst2 = plotHist.dst2
     End Sub
 End Class
@@ -1498,7 +1498,7 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
         desc = "Build a histogram of one cell and predict any neighbors with an fLessIndex"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.grayStable)
+        fLess.Run(task.grayStable.Clone)
 
         Dim histList = New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim predictedList As New List(Of Integer)

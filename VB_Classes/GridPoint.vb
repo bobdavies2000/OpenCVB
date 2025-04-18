@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class GridPoint_Basics : Inherits TaskParent
-    Dim sobel As New Edge_SobelNoOpt
+    Dim sobel As New Edge_SobelQT
     Public sortedPoints As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
     Public options As New Options_GridPoint
     Public Sub New()
@@ -14,7 +14,7 @@ Public Class GridPoint_Basics : Inherits TaskParent
 
         dst2 = src
 
-        sobel.Run(task.grayStable)
+        sobel.Run(task.grayStable.Clone)
         dst3 = sobel.dst2
 
         sortedPoints.Clear()
@@ -58,11 +58,11 @@ Public Class GridPoint_PeakThreshold : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static peakSlider = optiBase.FindSlider("Sobel Threshold")
         Dim peak = peakSlider.value
-        dst3 = task.feat.gridPoint.dst2
+        dst3 = task.gridPoint.dst2
 
         dst2 = src
         Dim hitCount As Integer
-        For Each ele In task.feat.gridPoint.sortedPoints
+        For Each ele In task.gridPoint.sortedPoints
             If ele.Key >= peak Then
                 dst2.Circle(ele.Value, task.DotSize, task.highlight, -1)
                 hitCount += 1
@@ -103,7 +103,7 @@ Public Class GridPoint_Plot : Inherits TaskParent
         labels(3) = "Sobel peak values from " + CStr(minVal) + " to " + CStr(maxVal)
 
         dst3 = src
-        For Each ele In task.feat.gridPoint.sortedPoints
+        For Each ele In task.gridPoint.sortedPoints
             If ele.Key <= maxVal And ele.Key >= minVal Then dst3.Circle(ele.Value, task.DotSize, task.highlight, -1)
         Next
         labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
@@ -121,7 +121,7 @@ Public Class GridPoint_PopulationSurvey : Inherits TaskParent
         desc = "Monitor the location of each grid point in the grid cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.feat.gridPoint.dst2
+        dst1 = task.gridPoint.dst2
         dst3 = src
         Dim survey(task.cellSize - 1, task.cellSize - 1) As Single
         For Each gc In task.gcList
@@ -234,7 +234,7 @@ Public Class GridPoint_FeatureLess : Inherits TaskParent
         desc = "Isolate the featureless regions using the sobel intensity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.grayStable)
+        edges.Run(task.grayStable.Clone)
 
         dst2.SetTo(0)
         For Each gc In task.gcList

@@ -9,7 +9,7 @@ Public Class BackProject_Basics : Inherits TaskParent
         desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        hist.Run(task.grayStable)
+        hist.Run(task.grayStable.Clone)
         If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
             Exit Sub

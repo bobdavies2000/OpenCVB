@@ -3963,7 +3963,7 @@ Public Class XO_GridPoint_FeatureLess2 : Inherits TaskParent
         desc = "Isolate the featureless regions using the sobel intensity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.grayStable)
+        edges.Run(task.grayStable.Clone)
 
         dst0.SetTo(0)
         Dim gcPrev = task.gcList(0)
@@ -4018,7 +4018,7 @@ Public Class XO_GridPoint_FeatureLess : Inherits TaskParent
         desc = "Isolate the featureless regions using the sobel intensity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.grayStable)
+        edges.Run(task.grayStable.Clone)
 
         fLessMask.SetTo(0)
         For Each gc In task.gcList

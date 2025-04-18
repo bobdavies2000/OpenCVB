@@ -9,7 +9,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         desc = "Access the EdgeLine_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.grayStable)
+        edges.Run(task.grayStable.Clone)
         dst2 = src.Clone
         dst2.SetTo(1, edges.dst2)
     End Sub

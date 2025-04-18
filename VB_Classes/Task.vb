@@ -702,7 +702,7 @@ Public Class VBtask : Implements IDisposable
         redOptions.Sync() ' update the task with redCloud variables
 
         Dim src = color
-        task.gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If src.Size <> New cv.Size(dst2.Cols, dst2.Rows) Then dst2 = dst2.Resize(src.Size)
         If src.Size <> New cv.Size(dst3.Cols, dst3.Rows) Then dst3 = dst3.Resize(src.Size)
@@ -757,7 +757,7 @@ Public Class VBtask : Implements IDisposable
             End If
             rgbFilter.Run(src)
             src = rgbFilter.dst2
-            ' src is always color and leftview is always grayscale
+            ' src is always color and leftview is grayscale (because some are only gray - StereoLabs is color.)
             leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             task.color = rgbFilter.dst2
 
@@ -839,7 +839,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         motionBasics.Run(src)
-        gCell.Run(grayStable.Clone)
+        gCell.Run(src)
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
