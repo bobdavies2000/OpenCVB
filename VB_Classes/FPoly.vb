@@ -22,7 +22,7 @@ Public Class FPoly_Basics : Inherits TaskParent
         sides.options.Run()
 
         topFeatures.Run(src)
-        dst2 = topFeatures.dst2
+        dst2 = src.Clone
         sides.currPoly = New List(Of cv.Point2f)(task.topFeatures)
         If sides.currPoly.Count < task.polyCount Then Exit Sub
         sides.Run(src)
@@ -30,6 +30,7 @@ Public Class FPoly_Basics : Inherits TaskParent
 
         For i = 0 To sides.currPoly.Count - 1
             SetTrueText(CStr(i), sides.currPoly(i), 3)
+            dst2.Line(sides.currPoly(i), sides.currPoly((i + 1) Mod sides.currPoly.Count), task.highlight, task.lineWidth, task.lineType)
         Next
 
         Dim causes As String = ""
@@ -79,10 +80,13 @@ Public Class FPoly_Basics : Inherits TaskParent
         strOut += "Frames since last resync: " + Format(resyncFrames, "000") + vbCrLf + vbCrLf
         strOut += "Resync last caused by: " + vbCrLf + resyncCause
 
-        For Each keyval In topFeatures.stable.goodCounts
-            Dim pt = topFeatures.stable.basics.ptList(keyval.Value)
-            Dim g = topFeatures.stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
-            SetTrueText(CStr(g), pt)
+        For Each pt In sides.currPoly ' topFeatures.stable.goodCounts
+            Dim index = topFeatures.stable.basics.ptList.IndexOf(pt)
+            If index >= 0 Then
+                pt = topFeatures.stable.basics.ptList(index)
+                Dim g = topFeatures.stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
+                SetTrueText(CStr(g), pt)
+            End If
         Next
 
         SetTrueText(strOut, 1)
@@ -1268,6 +1272,7 @@ Public Class FPoly_TopFeatures : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
+
         stable.Run(src)
         dst2 = stable.dst2
         task.topFeatures.Clear()

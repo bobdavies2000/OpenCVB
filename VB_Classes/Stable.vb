@@ -64,7 +64,11 @@ Public Class Stable_BasicsCount : Inherits TaskParent
         desc = "Track the stable good features found in the BGR image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
+        If task.features.Count > 0 Then
+            basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
+        Else
+            basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.gcFeatures)
+        End If
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
@@ -79,8 +83,7 @@ Public Class Stable_BasicsCount : Inherits TaskParent
             SetTrueText(CStr(g), pt)
         Next
 
-        labels(2) = CStr(task.features.Count) + " good features were found and " +
-                    CStr(basics.ptList.Count) + " were stable"
+        labels(2) = CStr(basics.ptList.Count) + " good features stable"
     End Sub
 End Class
 
