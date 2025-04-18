@@ -11,13 +11,21 @@ Public Class KNN_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Default unnormalized KNN with dimension 2"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then trainInput = task.gcFeatures
         knn2.trainInput = trainInput
         knn2.queries = queries
         knn2.desiredMatches = desiredMatches
         knn2.Run(src)
         neighbors = knn2.neighbors
         result = knn2.result
+
+        If standaloneTest() Then
+            dst2 = src
+            For Each pt In trainInput
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Red)
+            Next
+        End If
     End Sub
 End Class
 
@@ -736,18 +744,18 @@ Public Class KNN_MaxDistance : Inherits TaskParent
         options.Run()
 
         If standalone Or inputPoints.Count = 0 Or task.optionsChanged Then
-            Static peri As New FCS_Periphery
-            peri.Run(src)
+            Static perif As New FCS_Periphery
+            perif.Run(src)
             If task.heartBeat Or task.optionsChanged Then
                 If options.useOutSide Then
-                    inputPoints = peri.ptOutside
-                    inputIDs = peri.ptOutID
+                    inputPoints = perif.ptOutside
+                    inputIDs = perif.ptOutID
                 Else
-                    inputPoints = peri.ptInside
-                    inputIDs = peri.ptInID
+                    inputPoints = perif.ptInside
+                    inputIDs = perif.ptInID
                 End If
 
-                knn.queries = New List(Of cv.Point2f)(inputPoints)
+                knn.queries = New List(Of cv.Point2f)(If(standalone, task.gcFeatures, inputPoints))
                 knn.trainInput = knn.queries
                 knn.Run(src)
 
@@ -1082,7 +1090,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standalone Then inputPoints = task.features
+        If standalone Then inputPoints = task.gcFeatures
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)
         knn.trainInput = knn.queries
@@ -1116,7 +1124,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
         outputPoints.Clear()
         outputPoints2f.Clear()
         For Each pt In knn.queries
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.White)
             outputPoints.Add(pt)
             outputPoints2f.Add(pt)
         Next

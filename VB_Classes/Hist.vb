@@ -1462,31 +1462,6 @@ End Class
 
 
 
-Public Class Hist_ToggleFeatureLess : Inherits TaskParent
-    Dim fLess As New GridPoint_FeatureLess
-    Dim plotHist As New Plot_Histogram
-    Public Sub New()
-        plotHist.maxRange = 255
-        plotHist.minRange = 0
-        plotHist.removeZeroEntry = False
-        plotHist.createHistogram = True
-        task.gOptions.HistBinBar.Value = 255
-        desc = "Toggle between a histogram of the entire image and one of the featureless regions found with grid points."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.grayStable.Clone)
-        dst3 = fLess.dst2
-
-        If task.toggleOn Then plotHist.histMask.SetTo(255) Else plotHist.histMask = fLess.dst1
-        plotHist.Run(task.grayStable.Clone)
-        dst2 = plotHist.dst2
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Hist_GridPointRegions : Inherits TaskParent
     Dim fLess As New GridPoint_FeatureLess
@@ -1555,3 +1530,30 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Hist_ToggleFeatureLess : Inherits TaskParent
+    Dim fLess As New GridPoint_FeatureLess
+    Dim plotHist As New Plot_Histogram
+    Public Sub New()
+        plotHist.maxRange = 255
+        plotHist.minRange = 0
+        plotHist.removeZeroEntry = False
+        plotHist.createHistogram = True
+        task.gOptions.HistBinBar.Value = 255
+        desc = "Toggle between a histogram of the entire image and one of the featureless regions found with grid points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.grayStable.Clone)
+        dst3 = fLess.dst2
+
+        If task.toggleOn Then plotHist.histMask = New cv.Mat Else plotHist.histMask = fLess.dst2.Clone
+        plotHist.Run(task.grayStable.Clone)
+        dst2 = plotHist.dst2
+    End Sub
+End Class
