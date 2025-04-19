@@ -3190,43 +3190,6 @@ End Class
 
 
 
-
-
-
-Public Class XO_FeatureLine_Tutorial1 : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "The highlighted lines are also lines in 3D."
-        desc = "Find all the lines in the image and determine which are in the depth data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
-
-        Dim raw2D As New List(Of lpData)
-        Dim raw3D As New List(Of cv.Scalar)
-        For Each lp In task.lpList
-            raw2D.Add(lp)
-            If lp.depth > 0 Then
-                raw3D.Add(lp.pcMeans(1))
-                raw3D.Add(lp.pcMeans(2))
-            End If
-        Next
-
-        dst3 = src
-        For i = 0 To raw2D.Count - 2 Step 2
-            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlight)
-        Next
-        If task.heartBeat Then labels(2) = "Starting with " + Format(task.lpList.Count, "000") +
-                                           " lines, there are " + Format(raw3D.Count / 2, "000") +
-                                           " with depth data."
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class XO_FeatureLine_Tutorial2 : Inherits TaskParent
     Dim options As New Options_LineFinder()
     Public Sub New()

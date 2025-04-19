@@ -75,7 +75,7 @@ Public Class Line_Basics : Inherits TaskParent
             usedlist.Add(p1)
             usedlist.Add(p2)
 
-            Dim gc = task.gcList(lp.gcIndex(0))
+            Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
             If gc.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
 
             lp.index = task.lpList.Count
@@ -158,7 +158,7 @@ Public Class Line_BasicsAlternative : Inherits TaskParent
         For Each lp In sortlines.Values
             lp.index = task.lpList.Count
 
-            Dim gc = task.gcList(lp.gcIndex(0))
+            Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
             If gc.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
 
             task.lpList.Add(lp)

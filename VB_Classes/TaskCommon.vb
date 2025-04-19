@@ -630,8 +630,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public index As Integer
     Public rotatedRect As cv.RotatedRect
 
-    Public gcIndex As New List(Of Integer)
-
     Public highlyVisible As Boolean
     Public facets As New List(Of cv.Point)
     Public gcList As New List(Of Integer)
@@ -657,21 +655,11 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Else
             slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
-
-        center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
         length = p1.DistanceTo(p2)
         age = 1
+        center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
 
-        Dim ptlist = {center, p1, p2}
-        For Each pt In ptlist
-            Dim nextIndex As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
-            gcIndex.Add(nextIndex)
-            Dim gc = task.gcList(nextIndex)
-            Dim r = gc.rect
-            pcMeans.Add(task.pointCloud(gc.rect).Mean(task.depthMask(gc.rect)))
-        Next
-
-        Dim gcCenter = task.gcList(gcIndex(0))
+        Dim gcCenter = task.gcList(task.gcMap.Get(Of Single)(center.Y, center.X))
         depth = gcCenter.depth
         color = gcCenter.color
 
