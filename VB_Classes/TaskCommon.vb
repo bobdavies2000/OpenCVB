@@ -624,7 +624,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p2 As cv.Point2f
     Public slope As Single
     Public depth As Single
-    Public pcMeans As New List(Of cv.Scalar) ' point cloud means for all cells in gridList below.
+    Public pcMeans As New List(Of cv.Scalar) ' point cloud means for all cells in gcList below.
     Public length As Single
     Public color As cv.Vec3f
     Public index As Integer
@@ -634,7 +634,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
 
     Public highlyVisible As Boolean
     Public facets As New List(Of cv.Point)
-    Public gridList As New List(Of Integer)
+    Public gcList As New List(Of Integer)
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
         If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1

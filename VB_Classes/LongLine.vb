@@ -1,24 +1,46 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
+Imports cv = OpenCvSharp
 Public Class LongLine_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData) ' The top X longest lines
+    Dim hist As New Hist_GridCell
     Public Sub New()
-        desc = "Isolate the longest X lines."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        desc = "Isolate the longest X lines and update the list of grid cells containing each line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
+        dst1.SetTo(0)
         lpList.Clear()
+        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
+        task.lpList.Add(New lpData(New cv.Point, New cv.Point))
         Dim usedList As New List(Of cv.Point)
         For i = 1 To task.lpList.Count - 1
             Dim lp = task.lpList(i)
+            lp.index = lpList.Count
 
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
+            lp.gcList.Clear()
             lpList.Add(lp)
-            DrawLine(dst2, lp.p1, lp.p2, task.highlight)
+
             If lpList.Count >= task.numberLines Then Exit For
-            SetTrueText(CStr(lp.index), lp.p1, 3)
         Next
 
+        For Each gc In task.gcList
+            hist.Run(dst1(gc.rect))
+            For i = 1 To hist.histarray.Count - 1
+                If hist.histarray(i) > 0 Then lpList(i).gcList.Add(gc.index)
+            Next
+        Next
+
+        For Each lp In lpList
+            For Each index In lp.gcList
+                dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+            Next
+        Next
         labels(2) = CStr(lpList.Count) + " longest lines in the image in " + CStr(task.lpList.Count) + " total lines."
     End Sub
 End Class
@@ -59,46 +81,56 @@ End Class
 
 
 Public Class LongLine_Depth : Inherits TaskParent
-    Dim plot As New Plot_OverTimeScalar
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        plot.dst2 = dst3
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lpList.Count <= 1 Then Exit Sub
-        Dim ptLong = task.lpList(1)
+        Dim lp = task.lpList(1)
         dst2 = src
 
-        dst2.Line(ptLong.p1, ptLong.p2, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+        dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
+
+        Dim gcMin = task.gcList(task.gcMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+        Dim gcMax = task.gcList(task.gcMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
 
         dst0.SetTo(0)
-        dst0.Line(ptLong.p1, ptLong.p2, 255, 3, task.lineType)
+        dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
         dst0.SetTo(0, task.noDepthMask)
 
-        Dim mm As mmData = GetMinMax(task.pcSplit(2), dst0)
+        Dim mm = GetMinMax(task.pcSplit(2), dst0)
+        If gcMin.pt.DistanceTo(mm.minLoc) > gcMin.pt.DistanceTo(mm.maxLoc) Then
+            Dim tmp = gcMin
+            gcMin = gcMax
+            gcMax = tmp
+        End If
 
-        task.kalman.kInput = {mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y}
-        task.kalman.Run(src)
-        mm.minLoc = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
-        mm.maxLoc = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
+        Dim depthMin = If(gcMin.depth > 0, gcMin.depth, mm.minVal)
+        Dim depthMax = If(gcMax.depth > 0, gcMax.depth, mm.maxVal)
 
-        DrawCircle(dst2, mm.minLoc, task.DotSize + 3, cv.Scalar.Red)
-        DrawCircle(dst2, mm.maxLoc, task.DotSize + 3, cv.Scalar.Blue)
-        SetTrueText(Format(mm.minVal, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
-        SetTrueText(Format(mm.maxVal, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
+        Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
+        DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)
+        DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue)
 
-        Dim depth = task.pcSplit(2).Mean(dst0)(0)
+        If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
+            mm.minLoc = lp.p1
+            mm.maxLoc = lp.p2
+        Else
+            mm.minLoc = lp.p2
+            mm.maxLoc = lp.p1
+        End If
 
-        SetTrueText("Average Depth = " + Format(depth, fmt1) + "m", New cv.Point((ptLong.p1.X + ptLong.p2.X) / 2 + 30,
-                                                                                 (ptLong.p1.Y + ptLong.p2.Y) / 2), 1)
+        If depthMax < 1.1 Then Dim k = 0
+        If task.heartBeat Then
+            SetTrueText("Average Depth = " + Format(depthMean, fmt1) + "m", New cv.Point((lp.p1.X + lp.p2.X) / 2,
+                                                                                     (lp.p1.Y + lp.p2.Y) / 2), 2)
+            labels(2) = "Min Distance = " + Format(depthMin, fmt1) + ", Max Distance = " + Format(depthMax, fmt1) +
+                    ", Mean Distance = " + Format(depthMean, fmt1) + " meters "
 
-        labels(3) = "Mean Distance (blue), Min Distance (green), Max Distance (red) " + Format(depth, fmt1) + ", " +
-                    Format(mm.minVal, fmt1) + ", " + Format(mm.maxVal, fmt1) + " meters "
-
-        plot.plotData = New cv.Scalar(depth, mm.minVal, mm.maxVal)
-        plot.Run(src)
-        dst3 = plot.dst2
+            SetTrueText(Format(depthMin, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
+            SetTrueText(Format(depthMax, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
+        End If
     End Sub
 End Class
 
@@ -114,7 +146,7 @@ Public Class LongLine_Point : Inherits TaskParent
     Public Sub New()
         desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lp = task.lpList(1)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         task.kalman.Run(src)
@@ -139,7 +171,7 @@ Public Class LongLine_ExtendTest : Inherits TaskParent
         desc = "Test lpData constructor with random values to make sure lines are extended properly"
     End Sub
 
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             Dim p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -192,7 +224,7 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
         labels = {"", "", "Image output from Line_Core", "Parallel extended lines"}
         desc = "Use KNN to find which lines are near each other and parallel"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         extendAll.Run(src)
         dst3 = extendAll.dst2
 
@@ -269,7 +301,7 @@ Public Class LongLine_Extend : Inherits TaskParent
         labels = {"", "", "Original Line", "Original line Extended"}
         desc = "Given 2 points, extend the line to the edges of the image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
             p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))

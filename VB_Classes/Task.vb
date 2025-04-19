@@ -946,10 +946,8 @@ Public Class VBtask : Implements IDisposable
             End If
 
             If gOptions.CrossHairs.Checked Then
-                If paused = False Then
-                    DrawLine(dst0, horizonVec.p1, horizonVec.p2, cv.Scalar.White)
-                    DrawLine(dst0, gravityVec.p1, gravityVec.p2, cv.Scalar.White)
-                End If
+                DrawLine(dst0, horizonVec.p1, horizonVec.p2, cv.Scalar.White)
+                DrawLine(dst0, gravityVec.p1, gravityVec.p2, cv.Scalar.White)
             End If
 
             ' if there were no cycles spent on this routine, then it was inactive.
