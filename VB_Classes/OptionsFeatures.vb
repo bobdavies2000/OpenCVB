@@ -36,11 +36,6 @@
         task.featureSource = FeatureMethod.SelectedIndex
         task.optionsChanged = True
     End Sub
-    Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles FCorrSlider.ValueChanged
-        task.fCorrThreshold = FCorrSlider.Value / 100
-        task.optionsChanged = True
-        FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
-    End Sub
     Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs) Handles verticalRadio.CheckedChanged
         task.verticalLines = True
     End Sub
@@ -50,5 +45,19 @@
     Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged
         task.edgeMethod = EdgeMethods.Text
         task.optionsChanged = True
+    End Sub
+
+
+
+
+    Private Sub LinesSlider_ValueChanged(sender As Object, e As EventArgs) Handles NumberLinesSlider.ValueChanged
+        task.numberLines = NumberLinesSlider.Value
+        task.optionsChanged = True
+        numLinesLabel.Text = CStr(task.numberLines)
+    End Sub
+    Private Sub FCorrSlider_Scroll_1(sender As Object, e As EventArgs) Handles FCorrSlider.Scroll
+        task.fCorrThreshold = NumberLinesSlider.Value / 100
+        task.optionsChanged = True
+        FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
     End Sub
 End Class

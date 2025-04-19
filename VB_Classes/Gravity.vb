@@ -1,4 +1,6 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports Microsoft.SqlServer
+Imports OpenCvSharp.Flann
+Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Dim gravity As New Gravity_Raw
     Public Sub New()
@@ -106,10 +108,70 @@ End Class
 
 
 
+Public Class Gravity_RGB : Inherits TaskParent
+    Dim survey As New GridPoint_PopulationSurvey
+    Public Sub New()
+        desc = "Rotate the RGB image using the offset from gravity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static rotateAngle As Double = task.verticalizeAngle - 2
+        Static rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+
+        rotateAngle += 0.1
+        If rotateAngle >= task.verticalizeAngle + 2 Then rotateAngle = task.verticalizeAngle - 2
+
+        Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+        dst3 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest)
+
+        survey.Run(dst3)
+        dst2 = survey.dst2
+
+        Dim incrX = dst1.Width / task.cellSize
+        Dim incrY = dst1.Height / task.cellSize
+        For y = 0 To task.cellSize - 1
+            For x = 0 To task.cellSize - 1
+                SetTrueText(CStr(survey.results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
+            Next
+        Next
+    End Sub
+End Class
 
 
 
 
 
 
+Public Class Gravity_GridPoints : Inherits TaskParent
+    Dim survey As New GridPoint_PopulationSurvey
+    Public Sub New()
+        desc = "Rotate the gric point using the offset from gravity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim angle = Math.Abs(task.verticalizeAngle)
+        Static rotateAngle As Double = -angle
+        Static rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+
+        rotateAngle += 0.1
+        If rotateAngle >= angle Then rotateAngle = -angle
+
+        dst1 = src
+        For Each gc In task.gcList
+            If gc.pt.Y = gc.rect.TopLeft.Y Then dst1.Circle(gc.pt, task.DotSize, task.highlight, -1, task.lineType)
+        Next
+
+        Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+        dst3 = dst1.WarpAffine(M, dst1.Size(), cv.InterpolationFlags.Nearest)
+
+        survey.Run(dst3)
+        dst2 = survey.dst2
+
+        Dim incrX = dst1.Width / task.cellSize
+        Dim incrY = dst1.Height / task.cellSize
+        For y = 0 To task.cellSize - 1
+            For x = 0 To task.cellSize - 1
+                SetTrueText(CStr(survey.results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
+            Next
+        Next
+    End Sub
+End Class
 

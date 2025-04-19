@@ -1504,14 +1504,6 @@ public:
 	Options_LeftRight() {
 	}
 };
-class Options_LongLine {
-public:
-	int maxCount =  25;
-	int pad =  3;
-	void Run() {}
-	Options_LongLine() {
-	}
-};
 class Options_LUT_Create {
 public:
 	int lutThreshold =  10;

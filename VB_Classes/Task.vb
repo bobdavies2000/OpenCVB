@@ -274,6 +274,7 @@ Public Class VBtask : Implements IDisposable
     Public minDistance As Integer ' minimum distance between features
     Public featureSource As Integer ' which Feature_Basics method...
     Public fCorrThreshold As Single ' feature correlation threshold
+    Public numberLines As Integer ' number of lines to display/use
     Public edgeMethod As String
     Public verticalLines As Boolean
 

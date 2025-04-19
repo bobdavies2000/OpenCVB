@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineCoin_Basics : Inherits TaskParent
-    Public longLines As New LongLine_Basics
+    Public longLines As New LongLine_BasicsEx
     Public lpList As New List(Of lpData)
     Dim lpLists As New List(Of List(Of lpData))
     Public Sub New()
@@ -18,7 +18,7 @@ Public Class LineCoin_Basics : Inherits TaskParent
                 If mp.slope = 0 Then
                     lp = New lpData(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
                 Else
-                    lp = longLines.BuildLongLine(mp)
+                    lp = lp.BuildLongLine(mp)
                 End If
                 Dim index = p1List.IndexOf(lp.p1)
                 If index >= 0 Then

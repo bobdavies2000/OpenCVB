@@ -5818,27 +5818,6 @@ End Class
 
 
 
-Public Class Options_LongLine : Inherits OptionParent
-    Public maxCount As Integer = 25
-    Public pad As Integer = 3
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of lines to display", 0, 100, maxCount)
-            sliders.setupTrackBar("Reduction for width/height in pixels", 1, 20, pad)
-        End If
-    End Sub
-    Public Sub Run()
-        Static countSlider = FindSlider("Number of lines to display")
-        Static searchSlider = FindSlider("Reduction for width/height in pixels")
-        maxCount = countSlider.value
-        pad = searchSlider.Value
-    End Sub
-End Class
-
-
-
-
-
 Public Class Options_LUT_Create : Inherits OptionParent
     Public lutThreshold As Integer = 10
     Public Sub New()
@@ -6564,11 +6543,11 @@ End Class
 Public Class Options_Rotate : Inherits OptionParent
     Public rotateAngle As Double = 24
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees", -180, 180, rotateAngle)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees X100", -18000, 18000, rotateAngle * 100)
     End Sub
     Public Sub Run()
-        Static angleSlider = FindSlider("Rotation Angle in degrees")
-        rotateAngle = angleSlider.Value
+        Static angleSlider = FindSlider("Rotation Angle in degrees X100")
+        rotateAngle = angleSlider.Value / 100
     End Sub
 End Class
 

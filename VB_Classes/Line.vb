@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Public lines As New Line_BasicsRaw
+    Public linesRaw As New Line_BasicsRaw
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -29,7 +29,7 @@ Public Class Line_Basics : Inherits TaskParent
         If task.optionsChanged Then task.lpList.Clear()
 
         Dim newList As New List(Of lpData)
-        For Each lp In lines.lpList ' 
+        For Each lp In linesRaw.lpList
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If val1 = 0 And val2 = 0 Then
@@ -38,7 +38,7 @@ Public Class Line_Basics : Inherits TaskParent
             End If
         Next
 
-        If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable.Clone)
+        If src.Channels = 1 Then linesRaw.Run(src) Else linesRaw.Run(task.grayStable.Clone)
 
         Dim histArray = getLineCounts(task.lpList)
         For i = 0 To histArray.Count - 1
@@ -62,18 +62,31 @@ Public Class Line_Basics : Inherits TaskParent
         task.lpList.Add(New lpData(New cv.Point, New cv.Point))
 
         dst2 = src
+        Dim usedlist As New List(Of cv.Point)
+        Dim duplicates As Integer
         For Each lp In sortlines.Values
-            lp.index = task.lpList.Count
+
+            Dim p1 = New cv.Point(lp.p1.X, lp.p1.Y)
+            Dim p2 = New cv.Point(lp.p2.X, lp.p2.Y)
+            If usedlist.Contains(p1) Or usedlist.Contains(p2) Then
+                duplicates += 1
+                Continue For
+            End If
+            usedlist.Add(p1)
+            usedlist.Add(p2)
 
             Dim gc = task.gcList(lp.gcIndex(0))
             If gc.highlyVisible Then lp.highlyVisible = True Else lp.highlyVisible = False
 
+            lp.index = task.lpList.Count
             task.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
-        labels(2) = CStr(task.lpList.Count) + " lines were found."
-        labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
+        If task.optionsChanged Then task.lpList = linesRaw.lpList
+
+        labels(2) = CStr(task.lpList.Count) + " lines were found and " + CStr(duplicates) + " were duplicates (coincident endpoints)."
+        labels(3) = CStr(linesRaw.lpList.Count) + " lines were in the motion mask."
     End Sub
 End Class
 
@@ -280,7 +293,7 @@ Public Class Line_Intercepts : Inherits TaskParent
     Public extended As New LongLine_Extend
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
-    Dim longLine As New LongLine_Basics
+    Dim longLine As New LongLine_BasicsEx
     Public options As New Options_Intercepts
     Public intercept As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -320,7 +333,7 @@ Public Class Line_Intercepts : Inherits TaskParent
 
             Dim saveP1 = lp.p1, saveP2 = lp.p2
 
-            Dim emps = longLine.BuildLongLine(lp)
+            Dim emps = lp.BuildLongLine(lp)
             If emps.p1.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
             If emps.p1.Y = 0 Then topIntercepts.Add(saveP1.X, index)
             If emps.p1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)

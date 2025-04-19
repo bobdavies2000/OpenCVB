@@ -31,25 +31,6 @@ End Class
 
 
 
-' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-Public Class Rotate_BasicsQT : Inherits TaskParent
-    Public rotateAngle As Single = 24
-    Public rotateCenter As cv.Point2f
-    Public Sub New()
-        rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
-        desc = "Rotate a rectangle by a specified angle"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-        dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Rotate_Box : Inherits TaskParent
     Dim rotation As New Rotate_Basics
     Public Sub New()
@@ -207,17 +188,38 @@ End Class
 
 
 
+
+' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
+Public Class Rotate_BasicsQT : Inherits TaskParent
+    Public rotateAngle As Double
+    Public rotateCenter As cv.Point2f
+    Public Sub New()
+        rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+        desc = "Rotate a rectangle by a specified angle"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+        dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest)
+    End Sub
+End Class
+
+
+
+
+
 Public Class Rotate_Verticalize : Inherits TaskParent
     Dim rotate As New Rotate_Basics
-    Dim angleSlider As New System.Windows.Forms.TrackBar
+    Public angleSlider As New System.Windows.Forms.TrackBar
     Public Sub New()
-        angleSlider =optiBase.findslider("Rotation Angle in degrees")
-        optibase.findRadio("Nearest (preserves pixel values best)").Checked = True
+        angleSlider = optiBase.FindSlider("Rotation Angle in degrees X100")
+        angleSlider.Value = task.verticalizeAngle / 100
+        optiBase.findRadio("Nearest (preserves pixel values best)").Checked = True
         desc = "Use gravity vector to rotate the image to be vertical"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then angleSlider.Value = task.verticalizeAngle
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then angleSlider.Value = task.verticalizeAngle * 100
         rotate.Run(src)
         dst2 = rotate.dst2
+        SetTrueText("Angle offset from gravity = " + Format(angleSlider.Value / 100, fmt2))
     End Sub
 End Class

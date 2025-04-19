@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports NAudio.Utils
+Imports cv = OpenCvSharp
 Public Class GridPoint_Basics : Inherits TaskParent
     Dim sobel As New Edge_SobelQT
     Public sortedPoints As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
@@ -111,47 +112,6 @@ Public Class GridPoint_Plot : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class GridPoint_PopulationSurvey : Inherits TaskParent
-    Public Sub New()
-        labels(2) = "Cursor over each brick to see where the grid points are."
-        desc = "Monitor the location of each grid point in the grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.gridPoint.dst2
-        dst3 = src
-        Dim survey(task.cellSize - 1, task.cellSize - 1) As Single
-        For Each gc In task.gcList
-            survey(gc.feature.X, gc.feature.Y) += 1
-        Next
-
-        Dim incrX = dst1.Width / task.cellSize
-        Dim incrY = dst1.Height / task.cellSize
-        Dim row = Math.Floor(task.mouseMovePoint.Y / incrY)
-        Dim col = Math.Floor(task.mouseMovePoint.X / incrX)
-
-        dst2 = cv.Mat.FromPixelData(task.cellSize, task.cellSize, cv.MatType.CV_32F, survey)
-
-        For Each gc In task.gcList
-            If gc.feature.X = col And gc.feature.Y = row Then dst3.Circle(gc.pt, task.DotSize, task.highlight, -1)
-        Next
-
-        For y = 0 To task.cellSize - 1
-            For x = 0 To task.cellSize - 1
-                SetTrueText(CStr(survey(x, y)), New cv.Point(x * incrX, y * incrY), 2)
-            Next
-        Next
-
-        dst2 = dst2.Resize(dst0.Size, 0, 0, cv.InterpolationFlags.Nearest).ConvertScaleAbs
-        Dim mm = GetMinMax(dst2)
-        dst2 *= 255 / mm.maxVal
-        labels(3) = "There were " + CStr(survey(col, row)) + " features at row/col " + CStr(row) + "/" + CStr(col)
-    End Sub
-End Class
 
 
 
@@ -293,3 +253,123 @@ End Class
 
 
 
+Public Class GridPoint_PopulationSurvey : Inherits TaskParent
+    Public results(,) As Single
+    Public Sub New()
+        labels(2) = "Cursor over each brick to see where the grid points are."
+        task.mouseMovePoint = New cv.Point(0, 0) ' this brick is often the most populated.
+        desc = "Monitor the location of each grid point in the grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.gridPoint.dst2
+        dst3 = src
+
+        ReDim results(task.cellSize - 1, task.cellSize - 1)
+
+        For Each gc In task.gcList
+            results(gc.feature.X, gc.feature.Y) += 1
+        Next
+
+        Dim incrX = dst1.Width / task.cellSize
+        Dim incrY = dst1.Height / task.cellSize
+        Dim row = Math.Floor(task.mouseMovePoint.Y / incrY)
+        Dim col = Math.Floor(task.mouseMovePoint.X / incrX)
+
+        dst2 = cv.Mat.FromPixelData(task.cellSize, task.cellSize, cv.MatType.CV_32F, results)
+
+        For Each gc In task.gcList
+            If gc.feature.X = col And gc.feature.Y = row Then dst3.Circle(gc.pt, task.DotSize, task.highlight, -1)
+        Next
+
+        For y = 0 To task.cellSize - 1
+            For x = 0 To task.cellSize - 1
+                SetTrueText(CStr(results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
+            Next
+        Next
+
+        dst2 = dst2.Resize(dst0.Size, 0, 0, cv.InterpolationFlags.Nearest).ConvertScaleAbs
+        Dim mm = GetMinMax(dst2)
+        dst2 *= 255 / mm.maxVal
+        labels(3) = "There were " + CStr(results(col, row)) + " features at row/col " + CStr(row) + "/" + CStr(col)
+    End Sub
+End Class
+
+
+
+
+
+Public Class GridPoint_TopRow : Inherits TaskParent
+    Public results(,) As Single
+    Public Sub New()
+        desc = "BackProject the top row of the survey results into the RGB image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
+
+        ReDim results(task.cellSize - 1, task.cellSize - 1)
+
+        For Each gc In task.gcList
+            results(gc.feature.X, gc.feature.Y) += 1
+        Next
+
+        For Each gc In task.gcList
+            If gc.rect.Height <> task.cellSize Or gc.rect.Width <> task.cellSize Then Continue For
+            If gc.feature.Y = 0 Then dst2(gc.rect).Circle(gc.feature, task.DotSize, task.highlight, -1, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridPoint_DistanceAbove : Inherits TaskParent
+    Dim plotHist As New Plot_Histogram
+    Public Sub New()
+        plotHist.createHistogram = True
+        plotHist.removeZeroEntry = False
+        desc = "Show grid points based on their distance to the grid point above."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lpList As New List(Of lpData)
+
+        Dim lpZero As New lpData(New cv.Point, New cv.Point)
+        For Each gc In task.gcList
+            If gc.rect.TopLeft.Y = 0 Then
+                lpList.Add(lpZero)
+            Else
+                Dim gc1 = task.gcList(gc.index - task.grid.tilesPerRow)
+                Dim lp = New lpData(gc.pt, gc1.pt)
+                lpList.Add(lp)
+                If lp.length > 33 Then Dim k = 0
+            End If
+        Next
+
+        Dim lengths As New List(Of Single)
+        For Each lp In lpList
+            lengths.Add(lp.length)
+        Next
+
+        Dim minLen = lengths.Min, maxLen = lengths.Max
+        If maxLen = task.cellSize And minLen = task.cellSize Then Exit Sub
+
+        plotHist.Run(cv.Mat.FromPixelData(lengths.Count, 1, cv.MatType.CV_32F, lengths.ToArray))
+        dst2 = plotHist.dst2
+
+        Dim brickRange = (maxLen - minLen) / task.histogramBins
+        Dim histList = plotHist.histArray.ToList
+        Dim histindex = histList.IndexOf(histList.Max)
+        histList(histindex) = 0
+        Dim histindex1 = histList.IndexOf(histList.Max)
+        Dim min = Math.Min(CInt((histindex) * brickRange), CInt((histindex1) * brickRange))
+        Dim max = Math.Max(CInt((histindex + 1) * brickRange), CInt((histindex1 + 1) * brickRange))
+
+        dst3 = src
+        For Each gc In task.gcList
+            Dim lp = lpList(gc.index)
+            If lp.length < min Or lp.length > max Then Continue For
+            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+    End Sub
+End Class

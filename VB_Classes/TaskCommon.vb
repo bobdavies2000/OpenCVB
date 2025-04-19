@@ -683,6 +683,27 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
     End Sub
+    Public Function BuildLongLine(lp As lpData) As lpData
+        If lp.p1.X <> lp.p2.X Then
+            Dim b = lp.p1.Y - lp.p1.X * lp.slope
+            If lp.p1.Y = lp.p2.Y Then
+                Return New lpData(New cv.Point(0, lp.p1.Y), New cv.Point(task.workingRes.Width, lp.p1.Y))
+            Else
+                Dim xint1 = CInt(-b / lp.slope)
+                Dim xint2 = CInt((task.workingRes.Height - b) / lp.slope)
+                Dim yint1 = CInt(b)
+                Dim yint2 = CInt(lp.slope * task.workingRes.Width + b)
+
+                Dim points As New List(Of cv.Point)
+                If xint1 >= 0 And xint1 <= task.workingRes.Width Then points.Add(New cv.Point(xint1, 0))
+                If xint2 >= 0 And xint2 <= task.workingRes.Width Then points.Add(New cv.Point(xint2, task.workingRes.Height))
+                If yint1 >= 0 And yint1 <= task.workingRes.Height Then points.Add(New cv.Point(0, yint1))
+                If yint2 >= 0 And yint2 <= task.workingRes.Height Then points.Add(New cv.Point(task.workingRes.Width, yint2))
+                Return New lpData(points(0), points(1))
+            End If
+        End If
+        Return New lpData(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, task.workingRes.Height))
+    End Function
     Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
         Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)

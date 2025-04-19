@@ -584,7 +584,7 @@ Public Class XO_Rotate_Horizon : Inherits TaskParent
     Dim rotate As New Rotate_Basics
     Dim edges As New XO_CameraMotion_WithRotation
     Public Sub New()
-        optiBase.FindSlider("Rotation Angle in degrees").Value = 3
+        optiBase.FindSlider("Rotation Angle in degrees X100").Value = 3
         labels(2) = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector."
         desc = "Rotate the horizon independently from the rotation of the image to validate the Edge_CameraMotion algorithm."
     End Sub

@@ -698,30 +698,6 @@ End Class
 
 
 
-Public Class GridCell_ColorLines : Inherits TaskParent
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Remove lines which cross grid cells that have the same depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
-        dst3.SetTo(0)
-        For Each lp In task.lpList
-            Dim gc1 = task.gcList(task.gcMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-            Dim gc2 = task.gcList(task.gcMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
-            dst3.Line(lp.p1, lp.p2, 128, task.lineWidth)
-            If Math.Abs(gc1.depth - gc2.depth) >= task.depthDiffMeters Then
-                dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
-                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class GridCell_MeanSubtraction : Inherits TaskParent
@@ -926,9 +902,7 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
         For Each gc In task.gcList
-            If gc.depth > 0 And gc.corrHistory.Count = task.historyCount Then
-                dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
-            End If
+            If gc.depth > 0 Then dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
         Next
 
         dst2 = ShowPaletteDepth(dst1)
@@ -1040,5 +1014,28 @@ Public Class GridCell_Lines : Inherits TaskParent
             info.Run(src)
             SetTrueText(info.strOut, 3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class GridCell_ColorLines : Inherits TaskParent
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Input from Line_Basics"
+        desc = "Display lines which are highly visible."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
+        dst3 = task.lines.dst2
+        For Each lp In task.lpList
+            Dim gc1 = task.gcList(task.gcMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            Dim gc2 = task.gcList(task.gcMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+            If gc1.highlyVisible = False And gc2.highlyVisible = False Then Continue For
+
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
+        Next
     End Sub
 End Class
