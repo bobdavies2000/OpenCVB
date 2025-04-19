@@ -2986,7 +2986,8 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
 
             DrawContour(dst1, lp.facets, 255, task.lineWidth)
             DrawContour(task.fpMap, lp.facets, lp.index)
-            DrawContour(dst3, lp.facets, lp.color)
+            Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
+            DrawContour(dst3, lp.facets, gc.color)
             task.lpList(i) = lp
         Next
 

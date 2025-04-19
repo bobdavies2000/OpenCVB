@@ -1,5 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
+﻿Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class LongLine_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData) ' The top X longest lines
@@ -15,7 +14,7 @@ Public Class LongLine_Basics : Inherits TaskParent
         dst1.SetTo(0)
         lpList.Clear()
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-        task.lpList.Add(New lpData(New cv.Point, New cv.Point))
+        lpList.Add(New lpData(New cv.Point, New cv.Point))
         Dim usedList As New List(Of cv.Point)
         For i = 1 To task.lpList.Count - 1
             Dim lp = task.lpList(i)
@@ -26,7 +25,7 @@ Public Class LongLine_Basics : Inherits TaskParent
             lp.gcList.Clear()
             lpList.Add(lp)
 
-            If lpList.Count >= task.numberLines Then Exit For
+            If lpList.Count - 1 >= task.numberLines Then Exit For
         Next
 
         For Each gc In task.gcList

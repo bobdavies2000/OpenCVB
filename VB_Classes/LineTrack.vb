@@ -64,22 +64,3 @@ Public Class LineTrack_Map : Inherits TaskParent
         labels(3) = "The redCloud cells are completely covered by " + CStr(count) + " grid cells"
     End Sub
 End Class
-
-
-
-
-
-
-Public Class LineTrack_Depth : Inherits TaskParent
-    Public Sub New()
-        desc = "Track lines and separate them by depth value."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2.SetTo(0)
-        Dim lp As New lpData
-        For Each lp In task.lpList
-            Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
-        Next
-    End Sub
-End Class

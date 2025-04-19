@@ -125,12 +125,12 @@ Partial Class OptionsFeatures
         'NumberLinesSlider
         '
         Me.NumberLinesSlider.Location = New System.Drawing.Point(28, 238)
-        Me.NumberLinesSlider.Maximum = 100
+        Me.NumberLinesSlider.Maximum = 200
         Me.NumberLinesSlider.Minimum = 1
         Me.NumberLinesSlider.Name = "NumberLinesSlider"
         Me.NumberLinesSlider.Size = New System.Drawing.Size(476, 69)
         Me.NumberLinesSlider.TabIndex = 19
-        Me.NumberLinesSlider.Value = 75
+        Me.NumberLinesSlider.Value = 50
         '
         'DistanceLabel
         '

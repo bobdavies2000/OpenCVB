@@ -65,7 +65,6 @@ Public Class Line_Basics : Inherits TaskParent
         Dim usedlist As New List(Of cv.Point)
         Dim duplicates As Integer
         For Each lp In sortlines.Values
-
             Dim p1 = New cv.Point(lp.p1.X, lp.p1.Y)
             Dim p2 = New cv.Point(lp.p2.X, lp.p2.Y)
             If usedlist.Contains(p1) Or usedlist.Contains(p2) Then
@@ -610,62 +609,6 @@ Public Class Line_Vertical : Inherits TaskParent
             End If
         Next
         labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line_Horizontal3D : Inherits TaskParent
-    Public horizList As New List(Of lpData)
-    Public dimension As Integer = 1 ' 0 for vertical, 1 for horizontal.
-    Public Sub New()
-        desc = "Find all the horizontal lines in 3D using the grid cells and their depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        dst3 = task.lines.dst2
-
-        horizList.Clear()
-        For Each lp In task.lpList
-            If lp.pcMeans(1).Item(dimension) = 0 Or lp.pcMeans(2).Item(dimension) = 0 Then Continue For ' no depth...
-
-            If Math.Abs(lp.pcMeans(1).Item(dimension) - lp.pcMeans(2).Item(dimension)) < 0.01 Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                horizList.Add(lp)
-            End If
-        Next
-
-        labels(2) = "There are " + CStr(horizList.Count) + " lines similar to the horizon vector "
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line_Vertical3D : Inherits TaskParent
-    Public vertlist As New List(Of lpData)
-    Public dimension As Integer = 0 ' 0 for vertical, 1 for horizontal.
-    Public Sub New()
-        desc = "Find all the vertical lines in 3D using the grid cells and their depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        dst3 = task.lines.dst2
-
-        vertlist.Clear()
-        For Each lp In task.lpList
-            If lp.pcMeans(1).Item(dimension) = 0 Or lp.pcMeans(2).Item(dimension) = 0 Then Continue For ' no depth...
-
-            If Math.Abs(lp.pcMeans(1).Item(dimension) - lp.pcMeans(2).Item(dimension)) < 0.01 Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                vertlist.Add(lp)
-            End If
-        Next
-
-        labels(2) = "There are " + CStr(vertlist.Count) + " lines similar to the Gravity vector "
     End Sub
 End Class
 

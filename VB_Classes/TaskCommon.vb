@@ -623,10 +623,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public slope As Single
-    Public depth As Single
-    Public pcMeans As New List(Of cv.Scalar) ' point cloud means for all cells in gcList below.
     Public length As Single
-    Public color As cv.Vec3f
     Public index As Integer
     Public rotatedRect As cv.RotatedRect
 
@@ -660,8 +657,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
 
         Dim gcCenter = task.gcList(task.gcMap.Get(Of Single)(center.Y, center.X))
-        depth = gcCenter.depth
-        color = gcCenter.color
 
         rotatedRect = cv.Cv2.MinAreaRect({p1, p2})
 
