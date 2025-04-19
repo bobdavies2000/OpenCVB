@@ -2032,7 +2032,7 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
             gc.rect = gc.rect
             gc.color = task.motionBasics.lastColor(i) ' the last color is actually the current color - motion basics runs first.
             gc.lRect = gc.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
-            gc.center = New cv.Point(gc.rect.TopLeft.X + gc.rect.Width / 2, gc.rect.TopLeft.Y + gc.rect.Height / 2)
+            gc.center = New cv.Point(gc.rect.X + gc.rect.Width / 2, gc.rect.Y + gc.rect.Height / 2)
             If task.depthMask(gc.rect).CountNonZero Then
                 cv.Cv2.MeanStdDev(task.pcSplit(2)(gc.rect), mean, stdev, task.depthMask(gc.rect))
                 gc.depth = mean(0)
@@ -2053,7 +2053,7 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
 
                     gc.correlation = correlationMat.Get(Of Single)(0, 0)
                 Else
-                    Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X))
+                    Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.Y, gc.rect.X))
                     If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                         gc.depth = 0 ' off the grid.
                         gc.lRect = emptyRect
@@ -2808,10 +2808,10 @@ Public Class XO_Region_RectsH : Inherits TaskParent
             Dim gc1 = task.gcList(tup.Item1)
             Dim gc2 = task.gcList(tup.Item2)
 
-            Dim w = gc2.rect.BottomRight.X - gc1.rect.TopLeft.X
+            Dim w = gc2.rect.BottomRight.X - gc1.rect.X
             Dim h = gc1.rect.Height
 
-            Dim r = New cv.Rect(gc1.rect.TopLeft.X + 1, gc1.rect.TopLeft.Y, w - 1, h)
+            Dim r = New cv.Rect(gc1.rect.X + 1, gc1.rect.Y, w - 1, h)
 
             hRects.Add(r)
             dst2(r).SetTo(255)
@@ -2847,9 +2847,9 @@ Public Class XO_Region_RectsV : Inherits TaskParent
             Dim gc2 = task.gcList(tup.Item2)
 
             Dim w = gc1.rect.Width
-            Dim h = gc2.rect.BottomRight.Y - gc1.rect.TopLeft.Y
+            Dim h = gc2.rect.BottomRight.Y - gc1.rect.Y
 
-            Dim r = New cv.Rect(gc1.rect.TopLeft.X, gc1.rect.TopLeft.Y + 1, w, h - 1)
+            Dim r = New cv.Rect(gc1.rect.X, gc1.rect.Y + 1, w, h - 1)
             vRects.Add(r)
             dst2(r).SetTo(255)
 
@@ -2928,7 +2928,7 @@ Public Class XO_Region_Gaps : Inherits TaskParent
         For Each tup In connect.vTuples
             Dim gc1 = task.gcList(tup.Item1)
             Dim gc2 = task.gcList(tup.Item2)
-            If gc2.rect.TopLeft.Y - gc1.rect.TopLeft.Y = 0 Then
+            If gc2.rect.Y - gc1.rect.Y = 0 Then
                 dst2(gc1.rect).SetTo(0)
                 dst3(gc1.rect).SetTo(0)
             End If
@@ -3933,11 +3933,11 @@ Public Class XO_GridPoint_FeatureLess2 : Inherits TaskParent
         Dim gcPrev = task.gcList(0)
         Dim fLessCount As Integer = 1
         For Each gc In task.gcList
-            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
+            If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
 
             Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
             Dim val = gcAbove.fLessIndex
-            If val = 0 Then val = dst0.Get(Of Byte)(gcPrev.rect.TopLeft.Y, gcPrev.rect.TopLeft.X)
+            If val = 0 Then val = dst0.Get(Of Byte)(gcPrev.rect.Y, gcPrev.rect.X)
             Dim count = edges.dst2(gc.rect).CountNonZero
             If val = 0 And count = 0 Then
                 val = fLessCount
@@ -3986,7 +3986,7 @@ Public Class XO_GridPoint_FeatureLess : Inherits TaskParent
 
         fLessMask.SetTo(0)
         For Each gc In task.gcList
-            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
+            If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
 
             If edges.dst2(gc.rect).CountNonZero = 0 Then
                 gc.fLessIndex = 255
@@ -3997,7 +3997,7 @@ Public Class XO_GridPoint_FeatureLess : Inherits TaskParent
         Dim gcPrev = task.gcList(0)
         classCount = 0
         For Each gc In task.gcList
-            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
+            If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
             If gc.index = 55 Then Dim k = 0
             If gc.fLessIndex = 255 Then
                 Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)

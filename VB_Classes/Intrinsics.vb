@@ -28,7 +28,7 @@ Public Class Intrinsics_Basics : Inherits TaskParent
         If standalone Then
             dst2 = task.leftView.Clone
             For Each gc In task.gcList
-                Dim pt = translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X))
+                Dim pt = translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.Y, gc.rect.X))
                 If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
                 If Single.IsInfinity(pt.X) Or Single.Isinfinity(pt.Y) Then Continue For
                 pt = validatePoint(pt)

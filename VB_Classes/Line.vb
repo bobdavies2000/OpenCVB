@@ -2,6 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public linesRaw As New Line_BasicsRaw
+    Dim LLines As New LongLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -61,7 +62,7 @@ Public Class Line_Basics : Inherits TaskParent
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
         task.lpList.Add(New lpData(New cv.Point, New cv.Point))
 
-        dst2 = src
+        dst2 = src.Clone
         Dim usedlist As New List(Of cv.Point)
         Dim duplicates As Integer
         For Each lp In sortlines.Values
@@ -86,6 +87,10 @@ Public Class Line_Basics : Inherits TaskParent
 
         labels(2) = CStr(task.lpList.Count) + " lines were found and " + CStr(duplicates) + " were duplicates (coincident endpoints)."
         labels(3) = CStr(linesRaw.lpList.Count) + " lines were in the motion mask."
+
+        ' select only the top X lines...
+        LLines.Run(src)
+        task.lpList = New List(Of lpData)(LLines.lpList)
     End Sub
 End Class
 

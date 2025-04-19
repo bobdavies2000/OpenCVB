@@ -596,7 +596,7 @@ Public Class gcData
         age = task.motionBasics.cellAge(index)
         color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
         lRect = rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
-        center = New cv.Point(rect.TopLeft.X + rect.Width / 2, rect.TopLeft.Y + rect.Height / 2)
+        center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
         If task.depthMask(rect).CountNonZero Then
             cv.Cv2.MeanStdDev(task.pointCloud(rect), pt3D, stdev, task.depthMask(rect))
             depth = pt3D(2)

@@ -199,7 +199,7 @@ Public Class GridPoint_FeatureLess : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each gc In task.gcList
-            If gc.rect.TopLeft.X = 0 Or gc.rect.TopLeft.Y = 0 Then Continue For
+            If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
             If edges.dst2(gc.rect).CountNonZero = 0 Then
                 gc.fLessIndex = 255
                 dst2(gc.rect).SetTo(255)
@@ -336,7 +336,7 @@ Public Class GridPoint_DistanceAbove : Inherits TaskParent
 
         Dim lpZero As New lpData(New cv.Point, New cv.Point)
         For Each gc In task.gcList
-            If gc.rect.TopLeft.Y = 0 Then
+            If gc.rect.Y = 0 Then
                 lpList.Add(lpZero)
             Else
                 Dim gc1 = task.gcList(gc.index - task.grid.tilesPerRow)

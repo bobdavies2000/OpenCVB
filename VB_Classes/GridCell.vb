@@ -40,7 +40,7 @@ Public Class GridCell_Basics : Inherits TaskParent
                     If task.rgbLeftAligned Then
                         gc.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
                     Else
-                        Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X))
+                        Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.Y, gc.rect.X))
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                             gc.depth = 0 ' off the grid.
                             gc.lRect = emptyRect
@@ -751,12 +751,12 @@ Public Class GridCell_LeftRight : Inherits TaskParent
         Dim gc1 = task.gcList(indexTop)
         Dim gc2 = task.gcList(indexBot)
 
-        Dim w = gc2.lRect.BottomRight.X - gc1.lRect.TopLeft.X
-        Dim h = gc2.lRect.BottomRight.Y - gc1.lRect.TopLeft.Y
+        Dim w = gc2.lRect.BottomRight.X - gc1.lRect.X
+        Dim h = gc2.lRect.BottomRight.Y - gc1.lRect.Y
         Dim rectLeft = New cv.Rect(gc1.lRect.X, gc1.lRect.Y, w, h)
 
-        w = gc2.rRect.BottomRight.X - gc1.rRect.TopLeft.X
-        h = gc2.rRect.BottomRight.Y - gc1.rRect.TopLeft.Y
+        w = gc2.rRect.BottomRight.X - gc1.rRect.X
+        h = gc2.rRect.BottomRight.Y - gc1.rRect.Y
         Dim rectRight = New cv.Rect(gc1.rRect.X, gc1.rRect.Y, w, h)
 
         dst2.Rectangle(rectLeft, 0, task.lineWidth)

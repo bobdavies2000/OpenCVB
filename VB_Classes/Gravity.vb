@@ -156,7 +156,7 @@ Public Class Gravity_GridPoints : Inherits TaskParent
 
         dst1 = src
         For Each gc In task.gcList
-            If gc.pt.Y = gc.rect.TopLeft.Y Then dst1.Circle(gc.pt, task.DotSize, task.highlight, -1, task.lineType)
+            If gc.pt.Y = gc.rect.Y Then dst1.Circle(gc.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)

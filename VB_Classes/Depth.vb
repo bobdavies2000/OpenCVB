@@ -1577,7 +1577,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
         dst1.SetTo(white, task.gridMask)
         for each gc in task.gcList
             Dim pt = gc.mm.minLoc
-            subdiv.Insert(New cv.Point(pt.X + gc.rect.TopLeft.X, pt.Y + gc.rect.TopLeft.Y))
+            subdiv.Insert(New cv.Point(pt.X + gc.rect.X, pt.Y + gc.rect.Y))
             DrawCircle(dst1(gc.rect), gc.mm.minLoc, task.DotSize, cv.Scalar.Red)
             DrawCircle(dst1(gc.rect), gc.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
         Next

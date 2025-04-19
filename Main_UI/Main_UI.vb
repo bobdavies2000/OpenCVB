@@ -1326,7 +1326,7 @@ Public Class Main_UI
         If pixelViewerOn And mousePicTag = pic.Tag Then
             Dim r = pixelViewerRect
             Dim rect = New cv.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
-                                       CInt(r.Width * ratio), CInt(r.Height * ratio))
+                                   CInt(r.Width * ratio), CInt(r.Height * ratio))
             g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
         End If
 

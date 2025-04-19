@@ -8,6 +8,7 @@ Public Class LongLine_Basics : Inherits TaskParent
         desc = "Isolate the longest X lines and update the list of grid cells containing each line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.lpList.Count = 0 Then Exit Sub
 
         dst2 = src

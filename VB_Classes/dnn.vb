@@ -126,7 +126,7 @@ Public Class DNN_Basics : Inherits TaskParent
                     rect = New cv.Rect(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top, (vec(2) - vec(0)) * cols, (vec(3) - vec(1)) * rows)
                     rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
 
-                    Dim pt = New cv.Point(rect.X, rect.Y)
+                    Dim pt = rect.TopLeft
                     Dim minIndex As Integer
                     Dim minDistance As Single = Single.MaxValue
                     For j = 0 To kPoints.Count - 1
