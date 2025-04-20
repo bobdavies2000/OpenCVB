@@ -973,11 +973,10 @@ Public Class GridCell_Lines : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Lines can mean cells are connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
+        dst2 = task.longLines.dst2
         dst1.SetTo(0)
         For Each lp In task.lpList
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)

@@ -1440,7 +1440,7 @@ Public Class Hist_GridCell : Inherits TaskParent
         desc = "Build a histogram of the cell contents"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then src = task.gray
+        If standalone And src.Channels = 3 Then src = task.grayStable
         Dim mm = GetMinMax(src)
         ReDim histarray(mm.maxVal)
         If mm.maxVal > 0 Then
@@ -1449,7 +1449,7 @@ Public Class Hist_GridCell : Inherits TaskParent
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
             End If
         End If
-        If standalone Then
+        If standalone And histarray.Count > 0 Then
             Static plotHist As New Plot_Histogram
             plotHist.Run(histogram)
             dst2 = plotHist.dst2

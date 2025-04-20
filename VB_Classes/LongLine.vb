@@ -11,7 +11,6 @@ Public Class LongLine_Basics : Inherits TaskParent
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.lpList.Count = 0 Then Exit Sub
 
-        dst2 = src
         dst1.SetTo(0)
         lpList.Clear()
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
@@ -21,7 +20,6 @@ Public Class LongLine_Basics : Inherits TaskParent
             Dim lp = task.lpList(i)
             lp.index = lpList.Count
 
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
             lp.gcList.Clear()
             lpList.Add(lp)
@@ -36,7 +34,9 @@ Public Class LongLine_Basics : Inherits TaskParent
             Next
         Next
 
+        dst2 = src
         For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             For Each index In lp.gcList
                 dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
             Next
