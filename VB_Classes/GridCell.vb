@@ -907,8 +907,6 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
 
         dst2 = ShowPaletteDepth(dst1)
         labels(2) = task.gCell.labels(2)
-
-        If standaloneTest() Then dst3 = task.gcMap
     End Sub
 End Class
 

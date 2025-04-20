@@ -1467,7 +1467,6 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
     Dim fLess As New GridPoint_FeatureLess
     Dim ranges() As cv.Rangef
     Public Sub New()
-        optiBase.FindSlider("LowRes Color difference threshold").Value = 10
         ranges = {New cv.Rangef(0, 256)}
         task.gOptions.HistBinBar.Value = 255
         desc = "Build a histogram of one cell and predict any neighbors with an fLessIndex"

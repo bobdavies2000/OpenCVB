@@ -25,6 +25,9 @@
         EdgeMethods.SelectedItem() = "Canny"
         task.edgeMethod = "Canny"
 
+        ColorDiffSlider.Value = 10
+        FCorrSlider.Value = 50
+
         verticalRadio.Checked = True
     End Sub
     Private Sub DistanceSlider_ValueChanged(sender As Object, e As EventArgs) Handles DistanceSlider.ValueChanged
@@ -55,9 +58,14 @@
         task.optionsChanged = True
         numLinesLabel.Text = CStr(task.numberLines)
     End Sub
-    Private Sub FCorrSlider_Scroll_1(sender As Object, e As EventArgs) Handles FCorrSlider.Scroll
-        task.fCorrThreshold = NumberLinesSlider.Value / 100
+    Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles FCorrSlider.ValueChanged
+        task.fCorrThreshold = FCorrSlider.Value / 100
         task.optionsChanged = True
         FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
+    End Sub
+    Private Sub ColorDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorDiffSlider.ValueChanged
+        task.colorDiffThreshold = ColorDiffSlider.Value
+        task.optionsChanged = True
+        ColorDiffLabel.Text = CStr(task.colorDiffThreshold)
     End Sub
 End Class

@@ -18,7 +18,6 @@ Public Class Motion_Basics : Inherits TaskParent
         End If
 
         If task.frameCount < 3 Then dst2 = src.Clone
-        Dim threshold = task.gCell.options.colorDifferenceThreshold
         Dim colorstdev As cv.Scalar, colorMean As cv.Scalar
         ReDim motionFlags(task.gridRects.Count - 1)
         Dim motionList As New List(Of Integer)
@@ -27,7 +26,7 @@ Public Class Motion_Basics : Inherits TaskParent
             cv.Cv2.MeanStdDev(src(rect), colorMean, colorstdev)
             Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
             Dim colorChange = distance3D(colorVec, lastColor(i))
-            If colorChange > threshold Then
+            If colorChange > task.colorDiffThreshold Then
                 lastColor(i) = colorVec
                 cellAge(i) = 1
                 For Each index In task.gridNeighbors(i)

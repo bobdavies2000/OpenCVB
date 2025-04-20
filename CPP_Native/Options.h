@@ -2154,7 +2154,6 @@ public:
 };
 class Options_GridCells {
 public:
-	int colorDifferenceThreshold =  6;
 	void Run() {}
 	Options_GridCells() {
 	}

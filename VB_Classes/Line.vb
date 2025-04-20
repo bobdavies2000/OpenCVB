@@ -2,29 +2,12 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public linesRaw As New Line_BasicsRaw
-    Dim LLines As New LongLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Toss any line in the previous image if that line had either end in the motion mask.  " +
                "If both ends are NOT in motion mask for the current image, the keep the line."
     End Sub
-    Private Function getLineCounts(lpList As List(Of lpData)) As Single()
-        Dim histarray(lpList.Count - 1) As Single
-        If lpList.Count > 0 Then
-            Dim histogram As New cv.Mat
-            dst1.SetTo(0)
-            For Each lp In lpList
-                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
-            Next
-
-            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
-
-            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
-        End If
-
-        Return histarray
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.optionsChanged Then task.lpList.Clear()
@@ -39,18 +22,23 @@ Public Class Line_Basics : Inherits TaskParent
             End If
         Next
 
+        If newList.Count = 0 Then Dim k = 0
         If src.Channels = 1 Then linesRaw.Run(src) Else linesRaw.Run(task.grayStable.Clone)
 
-        Dim histArray = getLineCounts(task.lpList)
-        For i = 0 To histArray.Count - 1
-            If histArray(i) Then
-                newList.Add(task.lpList(i)) ' Add the lines in the motion mask.
-            End If
-        Next
+        Dim histarray(linesRaw.lpList.Count - 1) As Single
+        If linesRaw.lpList.Count > 0 Then
+            Dim histogram As New cv.Mat
+            dst1.SetTo(0)
+            For Each lp In linesRaw.lpList
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            Next
 
-        dst3.SetTo(0)
-        For Each lp In newList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {linesRaw.lpList.Count},
+                            New cv.Rangef() {New cv.Rangef(0, linesRaw.lpList.Count)})
+            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+        End If
+        For i = 0 To histarray.Count - 1
+            If histarray(i) Then newList.Add(linesRaw.lpList(i)) ' Add any lines in the motion mask.
         Next
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -62,7 +50,6 @@ Public Class Line_Basics : Inherits TaskParent
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
         task.lpList.Add(New lpData(New cv.Point, New cv.Point))
 
-        dst2 = src.Clone
         Dim usedlist As New List(Of cv.Point)
         Dim duplicates As Integer
         For Each lp In sortlines.Values
@@ -80,17 +67,19 @@ Public Class Line_Basics : Inherits TaskParent
 
             lp.index = task.lpList.Count
             task.lpList.Add(lp)
+        Next
+
+        dst2 = src.Clone
+        dst3.SetTo(0)
+        For Each lp In task.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
         Next
 
         If task.optionsChanged Then task.lpList = linesRaw.lpList
 
         labels(2) = CStr(task.lpList.Count) + " lines were found and " + CStr(duplicates) + " were duplicates (coincident endpoints)."
         labels(3) = CStr(linesRaw.lpList.Count) + " lines were in the motion mask."
-
-        ' select only the top X lines...
-        LLines.Run(src)
-        task.lpList = New List(Of lpData)(LLines.lpList)
     End Sub
 End Class
 
@@ -690,3 +679,5 @@ Public Class Line_GCloud : Inherits TaskParent
                     Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
     End Sub
 End Class
+
+

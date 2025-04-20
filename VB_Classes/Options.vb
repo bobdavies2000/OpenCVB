@@ -7908,18 +7908,14 @@ End Class
 
 Public Class Options_GridCells : Inherits OptionParent
     Public disparityThreshold As Integer
-    Public colorDifferenceThreshold As Integer = 6
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("LowRes Color difference threshold", 0, 100, colorDifferenceThreshold)
             sliders.setupTrackBar("Disparity Threshold", 0, 20, 3)
         End If
     End Sub
     Public Sub Run()
-        Static diffSlider = FindSlider("LowRes Color difference threshold")
         Static shiftSlider = FindSlider("Disparity Threshold")
         disparityThreshold = shiftSlider.value
-        colorDifferenceThreshold = diffSlider.value
     End Sub
 End Class
 
