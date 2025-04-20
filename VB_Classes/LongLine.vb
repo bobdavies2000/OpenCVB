@@ -11,6 +11,17 @@ Public Class LongLine_Basics : Inherits TaskParent
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.lpList.Count = 0 Then Exit Sub
 
+        Dim lpLast As New List(Of lpData)
+        Dim ptLast As New List(Of cv.Point)
+        Dim indexLast As New List(Of Integer)
+        For Each lp In lpList
+            ptLast.Add(lp.p1)
+            ptLast.Add(lp.p2)
+            lp.index = lpLast.Count
+            lpLast.Add(lp)
+            indexLast.Add(lp.index)
+        Next
+
         dst1.SetTo(0)
         lpList.Clear()
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
@@ -41,6 +52,14 @@ Public Class LongLine_Basics : Inherits TaskParent
                 dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
             Next
         Next
+
+        For Each lp In lpList
+            Dim index As Integer = ptLast.IndexOf(lp.p1) / 2
+            If index >= 0 And ptLast.Contains(lp.p2) Then
+                lp.age = lpLast(index).age + 1
+            End If
+        Next
+
         labels(2) = CStr(lpList.Count) + " longest lines in the image in " + CStr(task.lpList.Count) + " total lines."
     End Sub
 End Class

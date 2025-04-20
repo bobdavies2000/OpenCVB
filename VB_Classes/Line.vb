@@ -16,10 +16,7 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In linesRaw.lpList
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-            If val1 = 0 And val2 = 0 Then
-                lp.age += 1
-                newList.Add(lp)
-            End If
+            If val1 = 0 And val2 = 0 Then newList.Add(lp)
         Next
 
         If newList.Count = 0 Then Dim k = 0
