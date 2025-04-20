@@ -2,7 +2,6 @@
 Public Class GridCell_Basics : Inherits TaskParent
     Public options As New Options_GridCells
     Public instantUpdate As Boolean
-    Public buildCorr As New GridCell_CorrelationMap
     Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName = "Orbbec Gemini 335L", True, False)
@@ -100,8 +99,6 @@ Public Class GridCell_Basics : Inherits TaskParent
             task.gcList.Add(gc)
             prevDisparity = gc.disparity
         Next
-
-        buildCorr.Run(src)
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.gcList.Count) + " grid cells, " + CStr(depthCount) +
                                            " have useful depth data and " + CStr(unchangedCount) +
@@ -900,6 +897,7 @@ Public Class GridCell_CorrelationMap : Inherits TaskParent
         desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         dst1.SetTo(0)
         For Each gc In task.gcList
             If gc.depth > 0 Then dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)

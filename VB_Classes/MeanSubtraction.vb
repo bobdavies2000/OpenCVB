@@ -53,3 +53,19 @@ Public Class MeanSubtraction_Gray : Inherits TaskParent
         dst3 = 255 - dst2
     End Sub
 End Class
+
+
+
+
+
+Public Class MeanSubtraction_Left : Inherits TaskParent
+    Public scaleValue As Single = 16
+    Public Sub New()
+        desc = "Apply mean subtraction to the left image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim mean = cv.Cv2.Mean(task.leftView)
+        cv.Cv2.Subtract(mean, task.leftView, dst2)
+        dst2 *= 100 / scaleValue
+    End Sub
+End Class

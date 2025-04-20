@@ -14,7 +14,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
             cv.Cv2.ApplyColorMap(depthNorm, task.depthRGB, task.depthColorMap)
         Else
-            task.depthRGB = task.gCell.buildCorr.dst2.Clone
+            task.depthRGB = task.buildCorr.dst2.Clone
         End If
         If standaloneTest() Then dst2 = task.depthRGB.Clone
     End Sub

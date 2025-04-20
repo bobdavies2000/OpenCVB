@@ -123,6 +123,7 @@ Public Class VBtask : Implements IDisposable
     Public lines As Line_Basics
     Public longLines As LongLine_Basics
     Public gCell As GridCell_Basics
+    Public buildCorr As GridCell_CorrelationMap
     Public fcs As FCS_Basics
     Public gridPoint As GridPoint_Basics
     Public LRMeanSub As MeanSubtraction_LeftRight
@@ -560,6 +561,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
+        buildCorr = New GridCell_CorrelationMap
         fcs = New FCS_Basics
         gridPoint = New GridPoint_Basics
         feat = New Feature_Basics
@@ -844,6 +846,7 @@ Public Class VBtask : Implements IDisposable
 
         motionBasics.Run(src)
         gCell.Run(src)
+        buildCorr.Run(src)
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
