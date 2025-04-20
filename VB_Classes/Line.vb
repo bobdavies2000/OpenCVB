@@ -280,7 +280,7 @@ End Class
 
 
 Public Class Line_Intercepts : Inherits TaskParent
-    Public extended As New LongLine_Extend
+    Public extended As New LongLine_ExtendTest
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
     Dim longLine As New LongLine_BasicsEx

@@ -1,4 +1,5 @@
 ﻿Imports System.Windows.Documents
+Imports System.Windows.Forms
 Imports cv = OpenCvSharp
 Public Class LongLine_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData) ' The top X longest lines
@@ -166,15 +167,14 @@ Public Class LongLine_Point : Inherits TaskParent
         desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeatLT Then dst2 = task.longLines.dst2
+        If task.heartBeatLT Then dst2 = src
         Dim lp = task.lpList(1)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         task.kalman.Run(src)
         lp.p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
         lp.p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
-        longPt = New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
 
-        DrawCircle(dst2, longPt, task.DotSize, cv.Scalar.Red)
+        dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth)
     End Sub
 End Class
 
@@ -223,14 +223,13 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
         dst2 = task.lines.dst2
 
         dst3 = src.Clone
-        lpList.Clear()
         For Each lp In task.lpList
-            lpList.Add(lp)
-            DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+            Dim elp = lp.BuildLongLine(lp)
+            DrawLine(dst3, elp.p1, elp.p2, task.highlight)
+            lpList.Add(elp)
         Next
     End Sub
 End Class
-
 
 
 
@@ -313,102 +312,21 @@ End Class
 
 
 
-
-Public Class LongLine_Extend : Inherits TaskParent
-    Dim lines As New LongLine_BasicsEx
-    Dim saveP1 As cv.Point, saveP2 As cv.Point, p1 As cv.Point, p2 As cv.Point
-    Public Sub New()
-        labels = {"", "", "Original Line", "Original line Extended"}
-        desc = "Given 2 points, extend the line to the edges of the image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() And task.heartBeat Then
-            p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            saveP1 = p1
-            saveP2 = p2
-        End If
-
-        Dim mps = New lpData(p1, p2)
-        Dim emps = mps.BuildLongLine(mps)
-
-        If standaloneTest() Then
-            labels(2) = emps.p1.ToString + " and " + emps.p2.ToString + " started with " + saveP1.ToString + " and " + saveP2.ToString
-            dst2 = src
-            DrawLine(dst2, emps.p1, emps.p2, task.highlight)
-            DrawCircle(dst2, saveP1, task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst2, saveP2, task.DotSize, cv.Scalar.Red)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class LongLine_NoDepth : Inherits TaskParent
-    Dim lineHist As New LineCoin_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find any lines in regions without depth."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        lineHist.Run(src)
-        dst2 = lineHist.dst2
-        dst2.SetTo(0, task.depthMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 Public Class LongLine_History : Inherits TaskParent
-    Dim lines As New LongLine_BasicsEx
-    Public lpList As New List(Of lpData)
-    Dim lpListList As New List(Of List(Of lpData))
     Public Sub New()
         desc = "Find the longest lines and toss any that are intermittant."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
-
-        lpListList.Add(lines.lpList)
-
-        Dim tmplist As New List(Of lpData)
-        Dim lpCount As New List(Of Integer)
-        For Each list In lpListList
-            For Each lp In list
-                Dim index = tmplist.IndexOf(lp)
-                If index < 0 Then
-                    tmplist.Add(lp)
-                    lpCount.Add(1)
-                Else
-                    lpCount(index) += 1
-                End If
-            Next
+        dst2 = src
+        Dim lineCount As Integer
+        For Each lp In task.lpList
+            If lp.age > task.frameHistoryCount Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                lineCount += 1
+            End If
         Next
 
-        lpList.Clear
-        For i = 0 To lpCount.Count - 1
-            Dim count = lpCount(i)
-            If count >= task.frameHistoryCount Then lpList.Add(tmplist(i))
-        Next
-
-        For Each lp In lpList
-            DrawLine(dst2, lp.p1, lp.p2, white)
-        Next
-        If lpList.Count > task.frameHistoryCount Then lpList.RemoveAt(0)
-
-        labels(2) = $"{lpList.Count} were found that were present for every one of the last {task.frameHistoryCount} frames."
+        labels(2) = $"{lineCount} were found that were present for every one of the last {task.frameHistoryCount} frames."
     End Sub
 End Class
 
@@ -443,5 +361,22 @@ Public Class LongLine_Consistent : Inherits TaskParent
         labels(2) = "minDistance = " + Format(minDistance, fmt1)
         DrawLine(dst2, ptLong.p1, ptLong.p2, task.highlight)
         ptLong = lpMin
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LongLine_DepthDirection : Inherits TaskParent
+    Dim lineHist As New LineCoin_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Display the direction of each line in depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lineHist.Run(src)
+        dst2 = lineHist.dst2
     End Sub
 End Class
