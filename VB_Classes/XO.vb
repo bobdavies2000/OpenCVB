@@ -3998,7 +3998,6 @@ Public Class XO_GridPoint_FeatureLess : Inherits TaskParent
         classCount = 0
         For Each gc In task.gcList
             If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
-            If gc.index = 55 Then Dim k = 0
             If gc.fLessIndex = 255 Then
                 Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
                 Dim val = gcAbove.fLessIndex

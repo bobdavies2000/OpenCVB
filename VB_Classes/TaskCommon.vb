@@ -641,7 +641,10 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         p1 = validatePoint(_p1)
         p2 = validatePoint(_p2)
 
-        If p1.X > p2.X Then
+        ' convention: p1 has closer depth than p2.  Switch if not...
+        Dim gc1 = task.gcList(task.gcMap.Get(Of Single)(p1.Y, p1.X))
+        Dim gc2 = task.gcList(task.gcMap.Get(Of Single)(p2.Y, p2.X))
+        If gc1.depth > gc2.depth Then
             Dim ptTemp = p1
             p1 = p2
             p2 = ptTemp

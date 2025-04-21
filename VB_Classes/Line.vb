@@ -19,7 +19,6 @@ Public Class Line_Basics : Inherits TaskParent
             If val1 = 0 And val2 = 0 Then newList.Add(lp)
         Next
 
-        If newList.Count = 0 Then Dim k = 0
         If src.Channels = 1 Then linesRaw.Run(src) Else linesRaw.Run(task.grayStable.Clone)
 
         Dim histarray(linesRaw.lpList.Count - 1) As Single

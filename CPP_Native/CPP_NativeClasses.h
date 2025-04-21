@@ -341,41 +341,6 @@ int* Density_Count_RunCPP(Density_Count* cPtr, int* dataPtr, int rows, int cols,
 
 
 
-
-
-class Depth_Colorizer
-{
-private:
-public:
-    Mat depth32f, output;
-    int histSize = 255;
-    Depth_Colorizer() {}
-    void Run(float maxDepth)
-    {
-        float nearColor[3] = { 0, 1.0f, 1.0f };
-        float farColor[3] = { 1.0f, 0, 0 };
-        output = Mat(depth32f.size(), CV_8UC3);
-        auto rgb = (unsigned char*)output.data;
-        float* depthImage = (float*)depth32f.data;
-        for (int i = 0; i < output.total(); i++)
-        {
-            float t = depthImage[i] / maxDepth;
-            if (t > 0 && t <= 1)
-            {
-                *rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
-                *rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
-                *rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
-            }
-            else {
-                *rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
-            }
-        }
-    }
-};
-
-
-
-
 class DepthXYZ
 {
 private:
@@ -413,6 +378,41 @@ public:
             {
                 float d = float(depth.at<float>(y, x)) * 0.001f;
                 if (d > 0) depthxyz.at< Vec3f >(y, x) = Vec3f(float((x - ppx) / fx), float((y - ppy) / fy), d);
+            }
+        }
+    }
+};
+
+
+
+
+
+
+class Depth_Colorizer
+{
+private:
+public:
+    Mat depth32f, output;
+    int histSize = 255;
+    Depth_Colorizer() {}
+    void Run(float maxDepth)
+    {
+        float nearColor[3] = { 0, 1.0f, 1.0f };
+        float farColor[3] = { 1.0f, 0, 0 };
+        output = Mat(depth32f.size(), CV_8UC3);
+        auto rgb = (unsigned char*)output.data;
+        float* depthImage = (float*)depth32f.data;
+        for (int i = 0; i < output.total(); i++)
+        {
+            float t = depthImage[i] / maxDepth;
+            if (t > 0 && t <= 1)
+            {
+                *rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
+                *rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
+                *rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
+            }
+            else {
+                *rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
             }
         }
     }

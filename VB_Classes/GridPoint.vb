@@ -342,7 +342,6 @@ Public Class GridPoint_DistanceAbove : Inherits TaskParent
                 Dim gc1 = task.gcList(gc.index - task.grid.tilesPerRow)
                 Dim lp = New lpData(gc.pt, gc1.pt)
                 lpList.Add(lp)
-                If lp.length > 33 Then Dim k = 0
             End If
         Next
 
