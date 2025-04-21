@@ -70,8 +70,10 @@ End Class
 
 
 Public Class LongLine_DepthDirection : Inherits TaskParent
+    Public gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
         If standalone Then task.gOptions.DebugSlider.Value = 1
+        labels(2) = "Use the global options 'DebugSlider' to select different lines."
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the direction of each line in depth"
     End Sub
@@ -79,6 +81,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         dst2 = task.longLines.dst3
 
         dst1.SetTo(0)
+        gcUpdates.Clear()
         Dim debugmode As Boolean = task.gOptions.DebugSlider.Value <> 0, avg1 As Single, avg2 As Single
         For Each lp In task.lpList
             If lp.gcList.Count = 0 Then Continue For
@@ -95,6 +98,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
 
             Dim halfSum1 As New List(Of Single), halfsum2 As New List(Of Single)
             Dim halfCount As Integer = Math.Floor(If(lp.gcList.Count Mod 2 = 0, lp.gcList.Count, lp.gcList.Count - 1) / 2)
+            Dim depthValues As New List(Of Single)
             For i = 0 To halfCount - 1
                 Dim gc1 = task.gcList(lp.gcList(i))
                 Dim gc2 = task.gcList(lp.gcList(lp.gcList.Count - i - 1))
@@ -105,30 +109,45 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                 Dim p1 = gc1.rect.TopLeft
                 Dim p2 = gc2.rect.TopLeft
 
-                If debugmode Then
-                    SetTrueText(Format(d1, fmt3), New cv.Point(p1.X + 20, p1.Y), 3)
-                    SetTrueText(Format(d2, fmt3), New cv.Point(p2.X - 20, p2.Y), 3)
+                If gc1.correlation >= task.fCorrThreshold Then
+                    halfSum1.Add(d1)
+                    depthValues.Add(d1)
+                    If debugmode Then SetTrueText(Format(d1, fmt3), New cv.Point(p1.X + 20, p1.Y), 3)
                 End If
 
-                If d1 > 0 Then halfSum1.Add(d1)
-                If d2 > 0 Then halfsum2.Add(d2)
+                If gc2.correlation >= task.fCorrThreshold Then
+                    halfsum2.Add(d2)
+                    depthValues.Add(d2)
+                    If debugmode Then SetTrueText(Format(d2, fmt3), New cv.Point(p2.X - 20, p2.Y), 3)
+                End If
             Next
             Dim incr = 255 / gcSorted.Count
             Dim offset As Integer
             avg1 = If(halfSum1.Count > 0, halfSum1.Average, 0)
             avg2 = If(halfsum2.Count > 0, halfsum2.Average, 0)
+
             If avg1 < avg2 Then offset = gcSorted.Count
-            If Math.Abs(avg1 - avg2) < task.depthDiffMeters Then
+            If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
                 For Each index In lp.gcList
                     Dim gc = task.gcList(index)
                     dst1(gc.rect).SetTo(1)
                     If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
+                    gcUpdates.Add(New Tuple(Of Integer, Single)(index, (avg1 + avg2) / 2))
                 Next
             Else
+                Dim min = If(depthValues.Count, depthValues.Min, 0)
+                Dim max = If(depthValues.Count, depthValues.Max, 0)
+                Dim depthIncr = (max - min) / lp.gcList.Count
                 For i = 0 To gcSorted.Count - 1
                     Dim index = gcSorted.ElementAt(i).Value
                     Dim gc = task.gcList(index)
-                    If offset > 0 Then dst1(gc.rect).SetTo((offset - i + 1) * incr) Else dst1(gc.rect).SetTo(i * incr + 1)
+                    If offset > 0 Then
+                        dst1(gc.rect).SetTo((offset - i + 1) * incr)
+                        gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
+                    Else
+                        dst1(gc.rect).SetTo(i * incr + 1)
+                        gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + i * depthIncr))
+                    End If
                     If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
                 Next
             End If
@@ -140,10 +159,10 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         If debugmode Then
             If task.heartBeat Then
                 labels(3) = "Average depth for first half = " + Format(avg1) + ", average depth for second half = " + Format(avg2, fmt1) + ", " +
-                            "'All yellow' grid cells indicate the line is likely vertical."
+                            "'All yellow' grid cells indicate the line is likely a 3D vertical line."
             End If
         Else
-            labels(3) = "Yellow is closer than blue but 'all yellow' is a likely vertical line where depths are within " +
+            labels(3) = "Yellow is closer than blue but 'all yellow' is a likely vertical line in 3D where depths are within " +
                         CStr(task.depthDiffMeters) + "m of each other."
         End If
     End Sub
@@ -422,5 +441,23 @@ Public Class LongLine_Consistent : Inherits TaskParent
         labels(2) = "minDistance = " + Format(minDistance, fmt1)
         DrawLine(dst2, ptLong.p1, ptLong.p2, task.highlight)
         ptLong = lpMin
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LongLine_DepthUpdate : Inherits TaskParent
+    Dim direction As New LongLine_DepthDirection
+    Public Sub New()
+        desc = "Update the line grid cells with a better estimate of the distance."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        direction.Run(src)
+        dst2 = direction.dst3
+        labels(2) = direction.labels(3)
     End Sub
 End Class
