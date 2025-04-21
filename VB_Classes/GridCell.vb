@@ -132,10 +132,10 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
             pt.Y -= task.gcD.rect.Height * 3
         End If
 
-        depthAndCorrelationText = Format(task.gcD.depth, fmt2) +
+        depthAndCorrelationText = Format(task.gcD.depth, fmt3) +
                                   "m stdev " + Format(task.gcD.depthStdev, fmt1) + " ID=" +
-                                  CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt3) + "m - " +
-                                  Format(task.gcD.mm.maxVal, fmt3) + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
+                                  CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
+                                  Format(task.gcD.mm.maxVal, fmt1) + "m" + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
         ptCursor = validatePoint(task.mouseMovePoint)
         ptTextLoc = pt
         ptTopLeft = task.gcD.rect.TopLeft

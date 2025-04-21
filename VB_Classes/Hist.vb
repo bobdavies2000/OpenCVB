@@ -1449,7 +1449,7 @@ Public Class Hist_GridCell : Inherits TaskParent
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
             End If
         End If
-        If standalone And histarray.Count > 0 Then
+        If standalone And histarray.Count > 1 Then
             Static plotHist As New Plot_Histogram
             plotHist.Run(histogram)
             dst2 = plotHist.dst2

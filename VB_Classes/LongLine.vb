@@ -59,7 +59,8 @@ Public Class LongLine_Basics : Inherits TaskParent
             End If
         Next
 
-        labels(2) = CStr(lpList.Count) + " longest lines in the image in " + CStr(task.lpList.Count) + " total lines."
+        labels(2) = CStr(lpList.Count - 1) + " longest lines in the image in " + CStr(task.lpList.Count) + " total lines."
+        labels(3) = labels(2)
     End Sub
 End Class
 
@@ -70,6 +71,7 @@ End Class
 
 Public Class LongLine_DepthDirection : Inherits TaskParent
     Public Sub New()
+        If standalone Then task.gOptions.DebugSlider.Value = 1
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the direction of each line in depth"
     End Sub
@@ -77,12 +79,11 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         dst2 = task.longLines.dst3
 
         dst1.SetTo(0)
+        Dim debugmode As Boolean = task.gOptions.DebugSlider.Value <> 0, avg1 As Single, avg2 As Single
         For Each lp In task.lpList
             If lp.gcList.Count = 0 Then Continue For
             Dim gcSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-            If task.gOptions.DebugSlider.Value <> 0 Then
-                If task.gOptions.DebugSlider.Value <> lp.index Then Continue For
-            End If
+            If debugmode Then If task.gOptions.DebugSlider.Value <> lp.index Then Continue For
             Dim lastDepth = -1
             For Each index In lp.gcList
                 Dim gc = task.gcList(index)
@@ -92,28 +93,59 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                 lastDepth = gc.depth
             Next
 
-            Dim halfSum1 As New List(Of Single), halfsum2 As New List(Of Single), halfCount As Integer = lp.gcList.Count / 2
+            Dim halfSum1 As New List(Of Single), halfsum2 As New List(Of Single)
+            Dim halfCount As Integer = Math.Floor(If(lp.gcList.Count Mod 2 = 0, lp.gcList.Count, lp.gcList.Count - 1) / 2)
             For i = 0 To halfCount - 1
-                Dim d1 = task.gcList(lp.gcList(i)).depth
-                Dim d2 = task.gcList(lp.gcList.Count - i - 1).depth
+                Dim gc1 = task.gcList(lp.gcList(i))
+                Dim gc2 = task.gcList(lp.gcList(lp.gcList.Count - i - 1))
+
+                Dim d1 = gc1.depth
+                Dim d2 = gc2.depth
+
+                Dim p1 = gc1.rect.TopLeft
+                Dim p2 = gc2.rect.TopLeft
+
+                If debugmode Then
+                    SetTrueText(Format(d1, fmt3), New cv.Point(p1.X + 20, p1.Y), 3)
+                    SetTrueText(Format(d2, fmt3), New cv.Point(p2.X - 20, p2.Y), 3)
+                End If
+
                 If d1 > 0 Then halfSum1.Add(d1)
                 If d2 > 0 Then halfsum2.Add(d2)
             Next
             Dim incr = 255 / gcSorted.Count
             Dim offset As Integer
-            Dim avg1 = If(halfSum1.Count > 0, halfSum1.Average, 0)
-            Dim avg2 = If(halfsum2.Count > 0, halfsum2.Average, 0)
-            If avg1 > avg2 Then offset = gcSorted.Count
-            For i = 0 To gcSorted.Count - 1
-                Dim index = gcSorted.ElementAt(i).Value
-                Dim gc = task.gcList(index)
-                If offset > 0 Then dst1(gc.rect).SetTo((offset - i) * incr) Else dst1(gc.rect).SetTo(i * incr)
-            Next
+            avg1 = If(halfSum1.Count > 0, halfSum1.Average, 0)
+            avg2 = If(halfsum2.Count > 0, halfsum2.Average, 0)
+            If avg1 < avg2 Then offset = gcSorted.Count
+            If Math.Abs(avg1 - avg2) < task.depthDiffMeters Then
+                For Each index In lp.gcList
+                    Dim gc = task.gcList(index)
+                    dst1(gc.rect).SetTo(1)
+                    If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
+                Next
+            Else
+                For i = 0 To gcSorted.Count - 1
+                    Dim index = gcSorted.ElementAt(i).Value
+                    Dim gc = task.gcList(index)
+                    If offset > 0 Then dst1(gc.rect).SetTo((offset - i + 1) * incr) Else dst1(gc.rect).SetTo(i * incr + 1)
+                    If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
+                Next
+            End If
         Next
 
         cv.Cv2.ApplyColorMap(dst1, dst0, task.depthColorMap)
         dst3 = src.Clone
         dst0.CopyTo(dst3, dst1)
+        If debugmode Then
+            If task.heartBeat Then
+                labels(3) = "Average depth for first half = " + Format(avg1) + ", average depth for second half = " + Format(avg2, fmt1) + ", " +
+                            "'All yellow' grid cells indicate the line is likely vertical."
+            End If
+        Else
+            labels(3) = "Yellow is closer than blue but 'all yellow' is a likely vertical line where depths are within " +
+                        CStr(task.depthDiffMeters) + "m of each other."
+        End If
     End Sub
 End Class
 
