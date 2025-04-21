@@ -23,7 +23,7 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.gcList.Clear()
-        Dim depthCount As Integer, visibleCount As Integer, prevDisparity As Single
+        Dim depthCount As Integer, prevDisparity As Single
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
             If gc.depth > 0 Then
@@ -75,7 +75,6 @@ Public Class GridCell_Basics : Inherits TaskParent
                 End If
                 gc.depthRanges.Add(gc.mm.range)
                 gc.corrHistory.Add(gc.correlation)
-                If gc.corrHistory.Average > task.fCorrThreshold Then gc.highlyVisible = True Else gc.highlyVisible = False
             End If
 
             If gc.rect.X > 0 Then
@@ -84,13 +83,11 @@ Public Class GridCell_Basics : Inherits TaskParent
                     task.noDepthMask(gc.rect).SetTo(255)
                     gc.depth = 0
                     gc.correlation = 0
-                    gc.highlyVisible = False
                 End If
             End If
             dst2(gc.rect).SetTo(gc.color)
 
             If gc.depth > 0 Then depthCount += 1
-            If gc.highlyVisible Then visibleCount += 1
             If gc.depthRanges.Count > task.historyCount Then
                 gc.depthRanges.RemoveAt(0)
                 gc.corrHistory.RemoveAt(0)
@@ -101,8 +98,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.gcList.Count) + " grid cells, " + CStr(depthCount) +
-                                           " have useful depth data and " + CStr(unchangedCount) +
-                                           " were unchanged and " + CStr(visibleCount) + " were highly visible."
+                                           " have useful depth data and " + CStr(unchangedCount) + " were unchanged and "
     End Sub
 End Class
 
@@ -864,7 +860,6 @@ Public Class GridCell_Info : Inherits TaskParent
         strOut += Format(gc.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
         strOut += Format(gc.depthStdev, fmt3) + vbTab + "Depth stdev" + vbCrLf
         strOut += Format(gc.depth, fmt3) + vbTab + "Depth" + vbCrLf
-        strOut += CStr(gc.highlyVisible) + vbTab + "HighlyVisible" + vbCrLf
         strOut += Format(gc.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
         strOut += Format(gc.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
         strOut += Format(gc.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
@@ -1005,28 +1000,5 @@ Public Class GridCell_Lines : Inherits TaskParent
             info.Run(src)
             SetTrueText(info.strOut, 3)
         End If
-    End Sub
-End Class
-
-
-
-
-
-Public Class GridCell_ColorLines : Inherits TaskParent
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Input from Line_Basics"
-        desc = "Display lines which are highly visible."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
-        dst3 = task.lines.dst2
-        For Each lp In task.lpList
-            Dim gc1 = task.gcList(task.gcMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-            Dim gc2 = task.gcList(task.gcMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
-            If gc1.highlyVisible = False And gc2.highlyVisible = False Then Continue For
-
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
-        Next
     End Sub
 End Class

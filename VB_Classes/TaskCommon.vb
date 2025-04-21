@@ -576,7 +576,6 @@ Public Class gcData
 
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
-    Public highlyVisible As Boolean
     Public features As New List(Of cv.Point)
     Public prevFeature As cv.Point ' the max grid output from the previous image
     Public feature As cv.Point ' the max grid output from the current image
@@ -626,8 +625,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public index As Integer
     Public rotatedRect As cv.RotatedRect
-
-    Public highlyVisible As Boolean
     Public facets As New List(Of cv.Point)
     Public gcList As New List(Of Integer)
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
@@ -659,11 +656,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         age = 1
         center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
 
-        Dim gcCenter = task.gcList(task.gcMap.Get(Of Single)(center.Y, center.X))
-
         rotatedRect = cv.Cv2.MinAreaRect({p1, p2})
-
-        If gcCenter.highlyVisible Then highlyVisible = True Else highlyVisible = False
     End Sub
     Sub New()
         p1 = New cv.Point2f()

@@ -560,7 +560,6 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += CStr(gc.age) + vbTab + "Age" + vbTab + vbCrLf
         strOut += Format(gc.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
         strOut += Format(gc.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
-        strOut += CStr(gc.highlyVisible) + vbTab + "HighlyVisible" + vbCrLf + vbCrLf
 
         strOut += "Depth = " + Format(fp.depth, fmt1)
         strOut += vbCrLf
