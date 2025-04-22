@@ -72,7 +72,6 @@ End Class
 Public Class LongLine_DepthDirection : Inherits TaskParent
     Public gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
-        If standalone Then task.gOptions.DebugSlider.Value = 1
         labels(2) = "Use the global options 'DebugSlider' to select different lines."
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the direction of each line in depth"

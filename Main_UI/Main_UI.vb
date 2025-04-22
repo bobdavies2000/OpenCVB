@@ -137,7 +137,7 @@ Public Class Main_UI
     Public Sub jsonRead()
         jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
         settings = jsonfs.Load()(0)
-        ' the only place the names are define is here: VBtask.algParms.cameraNames
+        ' The camera names are defined in VBtask.algParms.cameraNames
         ' the 3 lists below must have an entry for each camera - supported/640x480/1920...
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
         With settings
