@@ -59,8 +59,8 @@ Public Class ApproxPoly_FindandDraw : Inherits TaskParent
 
         Dim nextContour As cv.Point()
         Dim contours As New List(Of cv.Point())
-        For i = 0 To allContours.Count - 1
-            nextContour = cv.Cv2.ApproxPolyDP(allContours(i), 3, True)
+        For Each tour In allContours
+            nextContour = cv.Cv2.ApproxPolyDP(tour, 3, True)
             If nextContour.Count > 2 Then contours.Add(nextContour)
         Next
 

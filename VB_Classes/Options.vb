@@ -733,38 +733,6 @@ End Class
 
 
 
-Public Class Options_MinArea : Inherits OptionParent
-    Public srcPoints As New List(Of cv.Point2f)
-    Public squareWidth As Integer = 100
-    Public numPoints As Integer = 5
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
-            sliders.setupTrackBar("Area size", 10, 300, squareWidth * 2)
-        End If
-    End Sub
-    Public Sub Run()
-        Static numSlider = FindSlider("Area Number of Points")
-        Static sizeSlider = FindSlider("Area size")
-        Dim squareWidth = sizeSlider.Value / 2
-        srcPoints.Clear()
-
-        Dim pt As cv.Point2f
-        numPoints = numSlider.Value
-        For i = 0 To numPoints - 1
-            pt.X = msRNG.Next(task.cols / 2 - squareWidth, task.cols / 2 + squareWidth)
-            pt.Y = msRNG.Next(task.rows / 2 - squareWidth, task.rows / 2 + squareWidth)
-            srcPoints.Add(pt)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Options_DCT : Inherits OptionParent
     Public dctFlag As cv.DctFlags = New cv.DctFlags
@@ -8035,5 +8003,36 @@ Public Class Options_GridPoint : Inherits OptionParent
     Public Sub Run()
         Static minSlider = FindSlider("Sobel Threshold")
         sobelThreshhold = minSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_MinArea : Inherits OptionParent
+    Public srcPoints As New List(Of cv.Point2f)
+    Public squareWidth As Integer = 100
+    Public numPoints As Integer = 5
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
+            sliders.setupTrackBar("Area size", 10, 300, squareWidth * 2)
+        End If
+    End Sub
+    Public Sub Run()
+        Static numSlider = FindSlider("Area Number of Points")
+        Static sizeSlider = FindSlider("Area size")
+        Dim squareWidth = sizeSlider.Value / 2
+        srcPoints.Clear()
+
+        Dim pt As cv.Point2f
+        numPoints = numSlider.Value
+        For i = 0 To numPoints - 1
+            pt.X = msRNG.Next(task.cols / 2 - squareWidth, task.cols / 2 + squareWidth)
+            pt.Y = msRNG.Next(task.rows / 2 - squareWidth, task.rows / 2 + squareWidth)
+            srcPoints.Add(pt)
+        Next
     End Sub
 End Class

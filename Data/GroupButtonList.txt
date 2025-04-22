@@ -2,7 +2,6 @@ AddWeighted
 AlphaChannel
 Annealing
 ApproxPoly
-Area
 AsciiArt
 BackProject
 BackProject2D
@@ -75,6 +74,9 @@ FeatureLess
 FeatureLine
 Fibonacci
 Filter
+FindMinRect
+FindNonZero
+FindTriangle
 FitEllipse
 FitLine
 FLANN

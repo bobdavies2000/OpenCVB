@@ -115,8 +115,10 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
+    <Compile Include="FindNonZero.vb" />
     <Compile Include="GridPoint.vb" />
     <Compile Include="Intrinsics.vb" />
+    <Compile Include="FindTriangle.vb" />
     <Compile Include="OptionFeatures.Designer.vb">
       <DependentUpon>OptionFeatures.vb</DependentUpon>
     </Compile>
@@ -325,7 +327,7 @@
     <Compile Include="CellularAutomata.vb" />
     <Compile Include="GeneticDrawing.vb" />
     <Compile Include="Rotate.vb" />
-    <Compile Include="Area.vb" />
+    <Compile Include="FindMinRect.vb" />
     <Compile Include="Binarize.vb" />
     <Compile Include="Blob.vb" />
     <Compile Include="BlockMatching.vb" />

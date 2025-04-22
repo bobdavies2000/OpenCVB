@@ -182,15 +182,6 @@ public:
 	Options_MinMaxNone() {
 	}
 };
-class Options_MinArea {
-public:
-vector<cv::Point2f> srcPoints;
-	int squareWidth =  100;
-	int numPoints =  5;
-	void Run() {}
-	Options_MinArea() {
-	}
-};
 class Options_DCT {
 public:
 	int dctFlag =  cv::DCT_INVERSE | cv::DCT_ROWS;
@@ -2197,5 +2188,14 @@ class Options_GridPoint {
 public:
 	void Run() {}
 	Options_GridPoint() {
+	}
+};
+class Options_MinArea {
+public:
+vector<cv::Point2f> srcPoints;
+	int squareWidth =  100;
+	int numPoints =  5;
+	void Run() {}
+	Options_MinArea() {
 	}
 };

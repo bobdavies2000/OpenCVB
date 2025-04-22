@@ -152,7 +152,7 @@ End Class
 
 ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_3Points : Inherits TaskParent
-    Dim triangle As New Area_MinTriangle_CPP
+    Dim triangle As New FindTriangle_Basics
     Dim M As New cv.Mat
     Public Sub New()
         desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
@@ -220,7 +220,7 @@ End Class
 
 ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_4Points : Inherits TaskParent
-    Dim mRect As New Area_MinRect
+    Dim mRect As New FindMinRect_Basics
     Dim options As New Options_MinArea
     Dim M As New cv.Mat
     Public Sub New()

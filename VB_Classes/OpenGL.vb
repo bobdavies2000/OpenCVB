@@ -1428,7 +1428,7 @@ End Class
 
 
 Public Class OpenGL_SoloPointsRemoved : Inherits TaskParent
-    Dim solos As New Area_SoloPoints
+    Dim solos As New FindNonZero_SoloPoints
     Public Sub New()
         task.gOptions.unFiltered.Checked = True ' show all the unfiltered points so removing the points is obvious.
         task.ogl.oglFunction = oCase.drawPointCloudRGB
