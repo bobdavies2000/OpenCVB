@@ -3,6 +3,7 @@ Public Class LongLine_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData) ' The top X longest lines
     Dim hist As New Hist_GridCell
     Public Sub New()
+        task.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Isolate the longest X lines and update the list of grid cells containing each line."
     End Sub
@@ -29,7 +30,7 @@ Public Class LongLine_Basics : Inherits TaskParent
             lp.index = lpList.Count
 
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-            lp.gcList.Clear()
+            lp.cellList.Clear()
             lpList.Add(lp)
 
             If lpList.Count - 1 >= task.numberLines Then Exit For
@@ -38,7 +39,7 @@ Public Class LongLine_Basics : Inherits TaskParent
         For Each gc In task.gcList
             hist.Run(dst1(gc.rect))
             For i = 1 To hist.histarray.Count - 1
-                If hist.histarray(i) > 0 Then lpList(i).gcList.Add(gc.index)
+                If hist.histarray(i) > 0 Then lpList(i).cellList.Add(gc.index)
             Next
         Next
 
@@ -47,7 +48,7 @@ Public Class LongLine_Basics : Inherits TaskParent
         For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            For Each index In lp.gcList
+            For Each index In lp.cellList
                 dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
             Next
         Next
@@ -83,11 +84,11 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         gcUpdates.Clear()
         Dim debugmode As Boolean = task.gOptions.DebugSlider.Value <> 0, avg1 As Single, avg2 As Single
         For Each lp In task.lpList
-            If lp.gcList.Count = 0 Then Continue For
+            If lp.cellList.Count = 0 Then Continue For
             Dim gcSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
             If debugmode Then If task.gOptions.DebugSlider.Value <> lp.index Then Continue For
             Dim lastDepth = -1
-            For Each index In lp.gcList
+            For Each index In lp.cellList
                 Dim gc = task.gcList(index)
                 If lastDepth < 0 Then lastDepth = gc.depth
                 If gc.depth = 0 Then gc.depth = lastDepth
@@ -96,11 +97,11 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             Next
 
             Dim halfSum1 As New List(Of Single), halfsum2 As New List(Of Single)
-            Dim halfCount As Integer = Math.Floor(If(lp.gcList.Count Mod 2 = 0, lp.gcList.Count, lp.gcList.Count - 1) / 2)
+            Dim halfCount As Integer = Math.Floor(If(lp.cellList.Count Mod 2 = 0, lp.cellList.Count, lp.cellList.Count - 1) / 2)
             Dim depthValues As New List(Of Single)
             For i = 0 To halfCount - 1
-                Dim gc1 = task.gcList(lp.gcList(i))
-                Dim gc2 = task.gcList(lp.gcList(lp.gcList.Count - i - 1))
+                Dim gc1 = task.gcList(lp.cellList(i))
+                Dim gc2 = task.gcList(lp.cellList(lp.cellList.Count - i - 1))
 
                 Dim d1 = gc1.depth
                 Dim d2 = gc2.depth
@@ -127,7 +128,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
 
             If avg1 < avg2 Then offset = gcSorted.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
-                For Each index In lp.gcList
+                For Each index In lp.cellList
                     Dim gc = task.gcList(index)
                     dst1(gc.rect).SetTo(1)
                     If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
@@ -136,7 +137,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             Else
                 Dim min = If(depthValues.Count, depthValues.Min, 0)
                 Dim max = If(depthValues.Count, depthValues.Max, 0)
-                Dim depthIncr = (max - min) / lp.gcList.Count
+                Dim depthIncr = (max - min) / lp.cellList.Count
                 For i = 0 To gcSorted.Count - 1
                     Dim index = gcSorted.ElementAt(i).Value
                     Dim gc = task.gcList(index)
@@ -458,5 +459,16 @@ Public Class LongLine_DepthUpdate : Inherits TaskParent
         direction.Run(src)
         dst2 = direction.dst3
         labels(2) = direction.labels(3)
+
+
+        If standalone Then
+            If task.heartBeat Then
+                If task.gOptions.DebugSlider.Value < task.gOptions.DebugSlider.Maximum Then
+                    task.gOptions.DebugSlider.Value += 1
+                Else
+                    task.gOptions.DebugSlider.Value = 1
+                End If
+            End If
+        End If
     End Sub
 End Class

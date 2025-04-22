@@ -973,13 +973,13 @@ Public Class GridCell_Lines : Inherits TaskParent
         dst1.SetTo(0)
         For Each lp In task.lpList
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-            lp.gcList.Clear()
+            lp.cellList.Clear()
         Next
 
         For Each gc In task.gcList
             hist.Run(dst1(gc.rect).Clone)
             For i = 1 To hist.histarray.Count - 1
-                If hist.histarray(i) > 0 Then task.lpList(i).gcList.Add(gc.index)
+                If hist.histarray(i) > 0 Then task.lpList(i).cellList.Add(gc.index)
             Next
         Next
 
@@ -988,7 +988,7 @@ Public Class GridCell_Lines : Inherits TaskParent
         Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
         If index >= 0 And index < task.lpList.Count Then
             task.lpD = task.lpList(index)
-            For Each index In task.lpD.gcList
+            For Each index In task.lpD.cellList
                 Dim gc = task.gcList(index)
                 If lineRect.Width = 0 Then lineRect = gc.rect Else lineRect = lineRect.Union(gc.rect)
                 dst3.Rectangle(gc.rect, 255, 1, task.lineType)

@@ -626,7 +626,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public index As Integer
     Public rotatedRect As cv.RotatedRect
     Public facets As New List(Of cv.Point)
-    Public gcList As New List(Of Integer)
+    Public cellList As New List(Of Integer)
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
         If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
