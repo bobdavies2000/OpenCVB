@@ -36,10 +36,14 @@ Public Class LongLine_Basics : Inherits TaskParent
             If lpList.Count - 1 >= task.numberLines Then Exit For
         Next
 
+        task.lpMap.SetTo(0)
         For Each gc In task.gcList
             hist.Run(dst1(gc.rect))
-            For i = 1 To hist.histarray.Count - 1
-                If hist.histarray(i) > 0 Then lpList(i).cellList.Add(gc.index)
+            For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
+                If hist.histarray(i) > 0 Then
+                    lpList(i).cellList.Add(gc.index)
+                    task.lpMap(task.gcList(gc.index).rect).SetTo(gc.index)
+                End If
             Next
         Next
 
@@ -83,6 +87,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         dst1.SetTo(0)
         gcUpdates.Clear()
         Dim debugmode As Boolean = task.gOptions.DebugSlider.Value <> 0, avg1 As Single, avg2 As Single
+
         For Each lp In task.lpList
             If lp.cellList.Count = 0 Then Continue For
             Dim gcSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
@@ -460,15 +465,5 @@ Public Class LongLine_DepthUpdate : Inherits TaskParent
         dst2 = direction.dst3
         labels(2) = direction.labels(3)
 
-
-        If standalone Then
-            If task.heartBeat Then
-                If task.gOptions.DebugSlider.Value < task.gOptions.DebugSlider.Maximum Then
-                    task.gOptions.DebugSlider.Value += 1
-                Else
-                    task.gOptions.DebugSlider.Value = 1
-                End If
-            End If
-        End If
     End Sub
 End Class
