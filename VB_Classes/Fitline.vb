@@ -217,6 +217,7 @@ End Class
 
 
 Public Class FitLine_Grid : Inherits TaskParent
+    Dim nZero As New FindNonZero_Basics
     Dim edges As New Edge_Basics
     Dim fitline As New FitLine_Basics
     Public Sub New()
@@ -228,14 +229,13 @@ Public Class FitLine_Grid : Inherits TaskParent
         dst2 = edges.dst2
 
         dst3.SetTo(0)
-        Dim ptMat As New cv.Mat
         For Each gc In task.gcList
             If dst2(gc.rect).CountNonZero >= 5 Then
-                ptMat = dst2(gc.rect).FindNonZero()
+                nZero.Run(dst2(gc.rect))
 
                 fitline.ptList.Clear()
-                For i = 0 To ptMat.Rows - 1
-                    fitline.ptList.Add(ptMat.Get(Of cv.Point)(i, 0))
+                For i = 0 To nZero.ptMat.Rows - 1
+                    fitline.ptList.Add(nZero.ptMat.Get(Of cv.Point)(i, 0))
                 Next
 
                 fitline.Run(dst2(gc.rect))

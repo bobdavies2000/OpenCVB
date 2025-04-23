@@ -42,11 +42,15 @@ Partial Class OptionsFeatures
         Me.ColorDiffLabel = New System.Windows.Forms.Label()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.ColorDiffSlider = New System.Windows.Forms.TrackBar()
+        Me.SelectedLabel = New System.Windows.Forms.Label()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.SelectedFeature = New System.Windows.Forms.TrackBar()
         Me.LineGroup.SuspendLayout()
         CType(Me.NumberLinesSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'LineGroup
@@ -111,7 +115,7 @@ Partial Class OptionsFeatures
         'numLinesLabel
         '
         Me.numLinesLabel.AutoSize = True
-        Me.numLinesLabel.Location = New System.Drawing.Point(499, 183)
+        Me.numLinesLabel.Location = New System.Drawing.Point(499, 187)
         Me.numLinesLabel.Name = "numLinesLabel"
         Me.numLinesLabel.Size = New System.Drawing.Size(125, 20)
         Me.numLinesLabel.TabIndex = 21
@@ -120,7 +124,7 @@ Partial Class OptionsFeatures
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(32, 150)
+        Me.Label4.Location = New System.Drawing.Point(32, 154)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(125, 20)
         Me.Label4.TabIndex = 20
@@ -128,7 +132,7 @@ Partial Class OptionsFeatures
         '
         'NumberLinesSlider
         '
-        Me.NumberLinesSlider.Location = New System.Drawing.Point(28, 173)
+        Me.NumberLinesSlider.Location = New System.Drawing.Point(28, 177)
         Me.NumberLinesSlider.Maximum = 200
         Me.NumberLinesSlider.Minimum = 1
         Me.NumberLinesSlider.Name = "NumberLinesSlider"
@@ -184,7 +188,7 @@ Partial Class OptionsFeatures
         'FeatureCorrelationLabel
         '
         Me.FeatureCorrelationLabel.AutoSize = True
-        Me.FeatureCorrelationLabel.Location = New System.Drawing.Point(499, 367)
+        Me.FeatureCorrelationLabel.Location = New System.Drawing.Point(499, 441)
         Me.FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
         Me.FeatureCorrelationLabel.Size = New System.Drawing.Size(146, 20)
         Me.FeatureCorrelationLabel.TabIndex = 26
@@ -193,7 +197,7 @@ Partial Class OptionsFeatures
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(32, 334)
+        Me.Label6.Location = New System.Drawing.Point(32, 408)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(220, 20)
         Me.Label6.TabIndex = 25
@@ -201,7 +205,7 @@ Partial Class OptionsFeatures
         '
         'FCorrSlider
         '
-        Me.FCorrSlider.Location = New System.Drawing.Point(28, 357)
+        Me.FCorrSlider.Location = New System.Drawing.Point(28, 431)
         Me.FCorrSlider.Maximum = 100
         Me.FCorrSlider.Minimum = 1
         Me.FCorrSlider.Name = "FCorrSlider"
@@ -212,7 +216,7 @@ Partial Class OptionsFeatures
         'ColorDiffLabel
         '
         Me.ColorDiffLabel.AutoSize = True
-        Me.ColorDiffLabel.Location = New System.Drawing.Point(499, 269)
+        Me.ColorDiffLabel.Location = New System.Drawing.Point(499, 343)
         Me.ColorDiffLabel.Name = "ColorDiffLabel"
         Me.ColorDiffLabel.Size = New System.Drawing.Size(146, 20)
         Me.ColorDiffLabel.TabIndex = 29
@@ -221,7 +225,7 @@ Partial Class OptionsFeatures
         'Label7
         '
         Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(32, 236)
+        Me.Label7.Location = New System.Drawing.Point(32, 310)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(260, 20)
         Me.Label7.TabIndex = 28
@@ -229,7 +233,7 @@ Partial Class OptionsFeatures
         '
         'ColorDiffSlider
         '
-        Me.ColorDiffSlider.Location = New System.Drawing.Point(28, 262)
+        Me.ColorDiffSlider.Location = New System.Drawing.Point(28, 336)
         Me.ColorDiffSlider.Maximum = 100
         Me.ColorDiffSlider.Minimum = 1
         Me.ColorDiffSlider.Name = "ColorDiffSlider"
@@ -237,11 +241,41 @@ Partial Class OptionsFeatures
         Me.ColorDiffSlider.TabIndex = 27
         Me.ColorDiffSlider.Value = 75
         '
+        'SelectedLabel
+        '
+        Me.SelectedLabel.AutoSize = True
+        Me.SelectedLabel.Location = New System.Drawing.Point(507, 255)
+        Me.SelectedLabel.Name = "SelectedLabel"
+        Me.SelectedLabel.Size = New System.Drawing.Size(175, 20)
+        Me.SelectedLabel.TabIndex = 32
+        Me.SelectedLabel.Text = "Selected Feature Index"
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(32, 222)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(132, 20)
+        Me.Label8.TabIndex = 31
+        Me.Label8.Text = "Selected Feature"
+        '
+        'SelectedFeature
+        '
+        Me.SelectedFeature.Location = New System.Drawing.Point(28, 245)
+        Me.SelectedFeature.Maximum = 100
+        Me.SelectedFeature.Name = "SelectedFeature"
+        Me.SelectedFeature.Size = New System.Drawing.Size(476, 69)
+        Me.SelectedFeature.TabIndex = 30
+        Me.SelectedFeature.Value = 1
+        '
         'OptionsFeatures
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1419, 615)
+        Me.Controls.Add(Me.SelectedLabel)
+        Me.Controls.Add(Me.Label8)
+        Me.Controls.Add(Me.SelectedFeature)
         Me.Controls.Add(Me.ColorDiffLabel)
         Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.ColorDiffSlider)
@@ -268,6 +302,7 @@ Partial Class OptionsFeatures
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -292,4 +327,7 @@ Partial Class OptionsFeatures
     Friend WithEvents ColorDiffLabel As Windows.Forms.Label
     Friend WithEvents Label7 As Windows.Forms.Label
     Friend WithEvents ColorDiffSlider As Windows.Forms.TrackBar
+    Friend WithEvents SelectedLabel As Windows.Forms.Label
+    Friend WithEvents Label8 As Windows.Forms.Label
+    Friend WithEvents SelectedFeature As Windows.Forms.TrackBar
 End Class

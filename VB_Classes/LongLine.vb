@@ -77,7 +77,7 @@ End Class
 Public Class LongLine_DepthDirection : Inherits TaskParent
     Public gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
-        labels(2) = "Use the global options 'DebugSlider' to select different lines."
+        labels(2) = "Use the 'Features' option slider to select different lines."
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the direction of each line in depth"
     End Sub
@@ -86,12 +86,13 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
 
         dst1.SetTo(0)
         gcUpdates.Clear()
-        Dim debugmode As Boolean = task.gOptions.DebugSlider.Value <> 0, avg1 As Single, avg2 As Single
+        Dim avg1 As Single, avg2 As Single
+        Dim debugmode = If(task.selectedFeature = 0, False, True)
 
         For Each lp In task.lpList
             If lp.cellList.Count = 0 Then Continue For
             Dim gcSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-            If debugmode Then If task.gOptions.DebugSlider.Value <> lp.index Then Continue For
+            If debugmode Then If task.selectedFeature <> lp.index Then Continue For
             Dim lastDepth = -1
             For Each index In lp.cellList
                 Dim gc = task.gcList(index)

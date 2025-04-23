@@ -14,6 +14,7 @@ Public Class VBtask : Implements IDisposable
 
     Public lpList As New List(Of lpData) ' line pair list
     Public gcList As New List(Of gcData)
+    Public featList As New List(Of List(Of Integer))
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
 
@@ -23,9 +24,9 @@ Public Class VBtask : Implements IDisposable
     Public rcMap As cv.Mat ' redColor map
 
     Public gcD As gcData ' the currently selected grid cell
-    Public rcD As New rcData ' the currently selected red Cell
-    Public lpD As New lpData ' the currently seleccted line pair
-    Public fpD As New fpData ' the currently seleccted feature point.
+    Public rcD As rcData ' the currently selected red Cell
+    Public lpD As lpData ' the currently seleccted line pair
+    Public fpD As fpData ' the currently seleccted feature point.
 
     Public cellSize As Integer
     Public tilesPerCol As Integer
@@ -278,6 +279,7 @@ Public Class VBtask : Implements IDisposable
     Public featureSource As Integer ' which Feature_Basics method...
     Public fCorrThreshold As Single ' feature correlation threshold
     Public colorDiffThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
+    Public selectedFeature As Integer ' index of the feature to display.
     Public numberLines As Integer ' number of lines to display/use
     Public edgeMethod As String
     Public verticalLines As Boolean

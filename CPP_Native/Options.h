@@ -2193,7 +2193,7 @@ public:
 class Options_MinArea {
 public:
 vector<cv::Point2f> srcPoints;
-	int squareWidth =  100;
+	int minSize =  10;
 	int numPoints =  5;
 	void Run() {}
 	Options_MinArea() {

@@ -27,14 +27,13 @@
 
         ColorDiffSlider.Value = 10
         FCorrSlider.Value = 50
+        SelectedFeature.Value = 0
 
         verticalRadio.Checked = True
     End Sub
-    Private Sub DistanceSlider_ValueChanged(sender As Object, e As EventArgs) Handles DistanceSlider.ValueChanged
-        DistanceLabel.Text = CStr(DistanceSlider.Value)
-        task.minDistance = DistanceSlider.Value
-        task.optionsChanged = True
-    End Sub
+
+
+
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
         task.featureSource = FeatureMethod.SelectedIndex
         task.optionsChanged = True
@@ -53,6 +52,11 @@
 
 
 
+    Private Sub DistanceSlider_ValueChanged(sender As Object, e As EventArgs) Handles DistanceSlider.ValueChanged
+        DistanceLabel.Text = CStr(DistanceSlider.Value)
+        task.minDistance = DistanceSlider.Value
+        task.optionsChanged = True
+    End Sub
     Private Sub LinesSlider_ValueChanged(sender As Object, e As EventArgs) Handles NumberLinesSlider.ValueChanged
         task.numberLines = NumberLinesSlider.Value
         task.optionsChanged = True
@@ -67,5 +71,10 @@
         task.colorDiffThreshold = ColorDiffSlider.Value
         task.optionsChanged = True
         ColorDiffLabel.Text = CStr(task.colorDiffThreshold)
+    End Sub
+    Private Sub SelectedFeature_ValueChanged(sender As Object, e As EventArgs) Handles SelectedFeature.ValueChanged
+        task.selectedFeature = SelectedFeature.Value
+        task.optionsChanged = True
+        SelectedLabel.Text = CStr(task.selectedFeature)
     End Sub
 End Class

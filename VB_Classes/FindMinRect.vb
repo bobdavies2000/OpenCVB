@@ -3,6 +3,7 @@ Public Class FindMinRect_Basics : Inherits TaskParent
     Public minRect As cv.RotatedRect
     Dim options As New Options_MinArea
     Public inputPoints As New List(Of cv.Point2f)
+    Public inputContour() As cv.Point
     Public Sub New()
         desc = "Find minimum containing rectangle for a set of points."
     End Sub
@@ -13,8 +14,11 @@ Public Class FindMinRect_Basics : Inherits TaskParent
             inputPoints = quickRandomPoints(options.numPoints)
         End If
 
-        minRect = cv.Cv2.MinAreaRect(inputPoints.ToArray)
-
+        If inputPoints.Count = 0 Then
+            minRect = cv.Cv2.MinAreaRect(inputContour)
+        Else
+            minRect = cv.Cv2.MinAreaRect(inputPoints.ToArray)
+        End If
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In inputPoints
@@ -56,33 +60,5 @@ Public Class FindMinRect_Motion : Inherits TaskParent
         dst2 = ShowPalette(dst1)
         labels(2) = "There were " + CStr(contourCount) + " contours found"
         SetTrueText("Wave at the camera to see algorithm working...", 3)
-    End Sub
-End Class
-
-
-
-
-
-Public Class FindMinRect_Contours : Inherits TaskParent
-    Public Sub New()
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use minRectArea to busy areas in an image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim offset = 2
-        dst1(New cv.Rect(0, 0, dst2.Width - offset, dst2.Height - offset)) = task.grayStable(New cv.Rect(offset, offset, dst2.Width - offset, dst2.Height - offset))
-        dst1 = dst1 And task.grayStable
-        Dim contours = cv.Cv2.FindContoursAsArray(dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-
-        Dim countTours As Integer
-        For i = 0 To contours.Length - 1
-            Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-            If minRect.BoundingRect.Width > 1 And minRect.BoundingRect.Height > 1 Then
-                DrawRotatedRect(minRect, dst1, i Mod 256)
-                countTours += 1
-            End If
-        Next
-        dst2 = ShowPalette(dst1)
-        labels(2) = "There were " + CStr(countTours) + " contours found in the image."
     End Sub
 End Class

@@ -627,11 +627,12 @@ Public Class TaskParent : Implements IDisposable
         Catch ex As Exception
         End Try
     End Sub
-    Public Sub DrawContour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1)
+    Public Sub DrawContour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
+                           Optional lineType As cv.LineTypes = cv.LineTypes.AntiAlias)
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cv.Point))
         listOfPoints.Add(contour)
-        cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
+        cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, lineType)
     End Sub
     Public Sub DrawPoly(result As cv.Mat, polyPoints As List(Of cv.Point), color As cv.Scalar)
         If polyPoints.Count < 3 Then Exit Sub

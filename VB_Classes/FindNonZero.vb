@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FindNonZero_Basics : Inherits TaskParent
-    Public nonZero As cv.Mat
+    Public ptMat As cv.Mat
     Public Sub New()
         labels(2) = "Coordinates of non-zero points"
         labels(3) = "Non-zero original points"
@@ -17,21 +17,23 @@ Public Class FindNonZero_Basics : Inherits TaskParent
             Next
         End If
 
-        nonZero = src.FindNonZero()
+        ptMat = src.FindNonZero()
 
-        dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        ' mark the points so they are visible...
-        For i = 0 To nonZero.Rows - 1
-            DrawCircle(dst3, nonZero.Get(Of cv.Point)(0, i), task.DotSize, white)
-        Next
+        If standaloneTest() Then
+            dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            ' mark the points so they are visible...
+            For i = 0 To ptMat.Rows - 1
+                DrawCircle(dst3, ptMat.Get(Of cv.Point)(0, i), task.DotSize, white)
+            Next
 
-        Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
-        For i = 0 To nonZero.Rows - 1
-            Dim pt = nonZero.Get(Of cv.Point)(0, i)
-            outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
-            If i > 100 Then Exit For ' for when there are way too many points found...
-        Next
-        SetTrueText(outstr)
+            Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
+            For i = 0 To ptMat.Rows - 1
+                Dim pt = ptMat.Get(Of cv.Point)(0, i)
+                outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
+                If i > 100 Then Exit For ' for when there are way too many points found...
+            Next
+            SetTrueText(outstr)
+        End If
     End Sub
 End Class
 
@@ -58,8 +60,8 @@ Public Class FindNonZero_SoloPoints : Inherits TaskParent
 
         nZero.Run(dst2)
         soloPoints.Clear()
-        For i = 0 To nZero.nonZero.Rows - 1
-            soloPoints.Add(nZero.nonZero.Get(Of cv.Point)(i, 0))
+        For i = 0 To nZero.ptMat.Rows - 1
+            soloPoints.Add(nZero.ptMat.Get(Of cv.Point)(i, 0))
         Next
 
         If task.heartBeat Then labels(2) = $"There were {soloPoints.Count} points found"

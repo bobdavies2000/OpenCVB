@@ -115,6 +115,8 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
+    <Compile Include="FindCells.vb" />
+    <Compile Include="FindContours.vb" />
     <Compile Include="FindNonZero.vb" />
     <Compile Include="GridPoint.vb" />
     <Compile Include="Intrinsics.vb" />
