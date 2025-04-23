@@ -4,6 +4,7 @@ Public Class FindCells_Basics : Inherits TaskParent
     Public edgeRequest As Boolean
     Public Sub New()
         If standalone Then task.featureOptions.SelectedFeature.Value = 1
+        labels(2) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
         desc = "Given lines or edges, build a grid of cells that cover them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -70,6 +71,7 @@ Public Class FindCells_Basics : Inherits TaskParent
                 Next
             Next
         End If
+        labels(3) = CStr(task.featList.Count) + " features are present in the input lines or edges"
     End Sub
 End Class
 
@@ -128,16 +130,20 @@ End Class
 
 
 
-Public Class FindCells_EdgeGaps : Inherits TaskParent
+Public Class FindCells_Gaps : Inherits TaskParent
     Dim findCells As New FindCells_Basics
     Public Sub New()
-        findCells.edgeRequest = True
         task.featureOptions.SelectedFeature.Value = 0
-        labels(2) = "Cells highlighted below have a significant gap in depth from their edge neighbors."
-        desc = "Find all the cells mapping the edges which are not near any other cell - they are neighboring edges but not in depth."
+        labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
+        desc = "Find cells mapping the edges/lines which are not near any other cell - they are neighboring edges/lines but not in depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        findCells.Run(task.grayStable)
+        If standalone Then
+            findCells.edgeRequest = True
+            findCells.Run(task.grayStable)
+        Else
+            findCells.Run(src)
+        End If
 
         Dim gapCells As New List(Of Integer)
         For i = 0 To task.featList.Count - 1
@@ -167,5 +173,122 @@ Public Class FindCells_EdgeGaps : Inherits TaskParent
                 End If
             Next
         End If
+        labels(3) = CStr(task.featList.Count) + " features are present in the input lines or edges"
     End Sub
 End Class
+
+
+
+
+
+
+Public Class FindCells_LineGaps : Inherits TaskParent
+    Dim findCells As New FindCells_Gaps
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
+        desc = "Find cells that have a gap in depth from their neighbors."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lpList.Count = 0 Then Exit Sub
+
+        dst1.SetTo(0)
+        For Each lp In task.lpList
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+        Next
+
+        findCells.Run(dst1)
+        dst2 = findCells.dst2
+        dst3 = findCells.dst3
+        labels = findCells.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FindCells_FeatureLess : Inherits TaskParent
+    Dim findCells As New FindCells_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        findCells.edgeRequest = True
+        labels(3) = "Mask of featureless regions."
+        desc = "Use the edge/line cells to isolate the featureless regions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        findCells.Run(src)
+        labels = findCells.labels
+
+        dst3.SetTo(0)
+        For i = 0 To task.featList.Count - 1
+            For Each index In task.featList(i)
+                Dim gc = task.gcList(index)
+                dst3.Rectangle(gc.rect, 255, -1)
+            Next
+        Next
+
+        Dim regionCount As Integer = 1
+        For Each gc In task.gcList
+            If dst3.Get(Of Byte)(gc.pt.Y, gc.pt.X) = 0 Then
+                dst3.FloodFill(New cv.Point(gc.pt.X, gc.pt.Y), regionCount)
+                regionCount += 1
+            End If
+        Next
+
+        Dim fless As New List(Of List(Of Integer))
+        For i = 0 To regionCount - 1
+            fless.Add(New List(Of Integer))
+        Next
+
+        dst1.SetTo(0)
+        For Each gc In task.gcList
+            Dim val = dst3.Get(Of Byte)(gc.pt.Y, gc.pt.X)
+            If val = 255 Then Continue For
+            If val Then
+                fless(val).Add(gc.index)
+                dst1(gc.rect).SetTo(val)
+            End If
+        Next
+
+        Dim regionSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To fless.Count - 1
+            If fless(i).Count = 1 Then
+                Dim gc = task.gcList(fless(i)(0))
+                dst1(gc.rect).SetTo(0)
+            Else
+                regionSorted.Add(fless(i).Count, i)
+            End If
+        Next
+
+        task.fLess.Clear()
+        For Each ele In regionSorted
+            If ele.Key > 1 Then task.fLess.Add(fless(ele.Value))
+        Next
+
+        dst1.SetTo(0)
+        For i = 0 To task.fLess.Count - 1
+            For Each index In task.fLess(i)
+                Dim gc = task.gcList(index)
+                dst1(gc.rect).SetTo(i + 1)
+            Next
+        Next
+
+        dst2 = ShowPalette(dst1)
+
+        For i = 0 To task.fLess.Count - 2
+            Dim gc = task.gcList(task.fLess(i)(0))
+            SetTrueText(CStr(task.fLess(i).Count), gc.pt)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+

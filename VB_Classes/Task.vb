@@ -14,9 +14,10 @@ Public Class VBtask : Implements IDisposable
 
     Public lpList As New List(Of lpData) ' line pair list
     Public gcList As New List(Of gcData)
-    Public featList As New List(Of List(Of Integer))
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
+    Public featList As New List(Of List(Of Integer))
+    Public fLess As New List(Of List(Of Integer))
 
     Public gcMap As New cv.Mat ' grid cell map
     Public lpMap As New cv.Mat ' map of each line's grid cells...
