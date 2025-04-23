@@ -209,6 +209,21 @@ Public Class Line_BasicsRaw : Inherits TaskParent
                 dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
         End If
+
+
+
+
+        For Each lp In lpList
+            If lp.p1.X < 0 Or lp.p1.X >= dst2.Width Or lp.p1.Y < 0 Or lp.p1.Y >= dst2.Height Or
+               lp.p2.X < 0 Or lp.p2.X >= dst2.Width Or lp.p2.Y < 0 Or lp.p2.Y >= dst2.Height Then
+                Dim k = 0
+            End If
+        Next
+
+
+
+
+
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
 End Class

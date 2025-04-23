@@ -156,7 +156,7 @@ Public Class FindCells_EdgeGaps : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            dst2 = findCells.dst2
+            dst2 = findCells.dst2.Clone
             Dim debugMode = task.selectedFeature <> 0
             For i = 0 To gapCells.Count - 1
                 If debugMode Then If i <> task.selectedFeature Then Continue For

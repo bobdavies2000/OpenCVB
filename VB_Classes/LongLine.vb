@@ -276,6 +276,7 @@ Public Class LongLine_Point : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then dst2 = src
+        If task.lpList.Count = 0 Then Exit Sub
         Dim lp = task.lpList(1)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         task.kalman.Run(src)

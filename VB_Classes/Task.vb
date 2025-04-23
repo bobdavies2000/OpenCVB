@@ -24,9 +24,9 @@ Public Class VBtask : Implements IDisposable
     Public rcMap As cv.Mat ' redColor map
 
     Public gcD As gcData ' the currently selected grid cell
-    Public rcD As rcData ' the currently selected red Cell
-    Public lpD As lpData ' the currently seleccted line pair
-    Public fpD As fpData ' the currently seleccted feature point.
+    Public rcD As New rcData ' the currently selected red Cell
+    Public lpD As New lpData ' the currently seleccted line pair
+    Public fpD As New fpData ' the currently seleccted feature point.
 
     Public cellSize As Integer
     Public tilesPerCol As Integer
