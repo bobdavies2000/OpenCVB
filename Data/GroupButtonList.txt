@@ -141,6 +141,7 @@ LinearRegression
 LineCoin
 LineRect
 LineTrack
+LogicalDepth
 LongLine
 LUT
 Magnify

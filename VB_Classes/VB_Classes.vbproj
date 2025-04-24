@@ -121,6 +121,7 @@
     <Compile Include="GridPoint.vb" />
     <Compile Include="Intrinsics.vb" />
     <Compile Include="FindTriangle.vb" />
+    <Compile Include="LogicalDepth.vb" />
     <Compile Include="OptionFeatures.Designer.vb">
       <DependentUpon>OptionFeatures.vb</DependentUpon>
     </Compile>

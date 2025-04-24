@@ -48,7 +48,7 @@ Partial Class OptionsGlobal
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.LRMeanSubtraction = New System.Windows.Forms.CheckBox()
         Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
-        Me.ColorGrid = New System.Windows.Forms.RadioButton()
+        Me.GridDepth = New System.Windows.Forms.RadioButton()
         Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
         Me.ColorizedDepth = New System.Windows.Forms.RadioButton()
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
@@ -398,7 +398,7 @@ Partial Class OptionsGlobal
         '
         'DepthGroupBox
         '
-        Me.DepthGroupBox.Controls.Add(Me.ColorGrid)
+        Me.DepthGroupBox.Controls.Add(Me.GridDepth)
         Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
         Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
         Me.DepthGroupBox.Location = New System.Drawing.Point(334, 265)
@@ -408,15 +408,15 @@ Partial Class OptionsGlobal
         Me.DepthGroupBox.TabStop = False
         Me.DepthGroupBox.Text = "Depth Display"
         '
-        'ColorGrid
+        'GridDepth
         '
-        Me.ColorGrid.AutoSize = True
-        Me.ColorGrid.Location = New System.Drawing.Point(16, 103)
-        Me.ColorGrid.Name = "ColorGrid"
-        Me.ColorGrid.Size = New System.Drawing.Size(113, 24)
-        Me.ColorGrid.TabIndex = 3
-        Me.ColorGrid.Text = "Grid Colors"
-        Me.ColorGrid.UseVisualStyleBackColor = True
+        Me.GridDepth.AutoSize = True
+        Me.GridDepth.Location = New System.Drawing.Point(16, 103)
+        Me.GridDepth.Name = "GridDepth"
+        Me.GridDepth.Size = New System.Drawing.Size(112, 24)
+        Me.GridDepth.TabIndex = 3
+        Me.GridDepth.Text = "Grid Depth"
+        Me.GridDepth.UseVisualStyleBackColor = True
         '
         'DepthCorrelations
         '
@@ -932,5 +932,5 @@ Partial Class OptionsGlobal
     Friend WithEvents DepthCorrelations As Windows.Forms.RadioButton
     Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
     Friend WithEvents LRMeanSubtraction As Windows.Forms.CheckBox
-    Friend WithEvents ColorGrid As Windows.Forms.RadioButton
+    Friend WithEvents GridDepth As Windows.Forms.RadioButton
 End Class

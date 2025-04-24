@@ -92,16 +92,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
 
         For Each lp In task.lpList
             If lp.cellList.Count = 0 Then Continue For
-            Dim gcSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
             If debugmode Then If task.selectedFeature <> lp.index Then Continue For
-            Dim lastDepth = -1
-            For Each index In lp.cellList
-                Dim gc = task.gcList(index)
-                If lastDepth < 0 Then lastDepth = gc.depth
-                If gc.depth = 0 Then gc.depth = lastDepth
-                gcSorted.Add(gc.index, gc.index)
-                lastDepth = gc.depth
-            Next
 
             Dim halfSum1 As New List(Of Single), halfsum2 As New List(Of Single)
             Dim halfCount As Integer = Math.Floor(If(lp.cellList.Count Mod 2 = 0, lp.cellList.Count, lp.cellList.Count - 1) / 2)
@@ -128,12 +119,13 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                     If debugmode Then SetTrueText(Format(d2, fmt3), New cv.Point(p2.X - 20, p2.Y), 3)
                 End If
             Next
-            Dim incr = 255 / gcSorted.Count
+
+            Dim incr = 255 / lp.cellList.Count
             Dim offset As Integer
             avg1 = If(halfSum1.Count > 0, halfSum1.Average, 0)
             avg2 = If(halfsum2.Count > 0, halfsum2.Average, 0)
 
-            If avg1 < avg2 Then offset = gcSorted.Count
+            If avg1 < avg2 Then offset = lp.cellList.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
                 For Each index In lp.cellList
                     Dim gc = task.gcList(index)
@@ -145,15 +137,15 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                 Dim min = If(depthValues.Count, depthValues.Min, 0)
                 Dim max = If(depthValues.Count, depthValues.Max, 0)
                 Dim depthIncr = (max - min) / lp.cellList.Count
-                For i = 0 To gcSorted.Count - 1
-                    Dim index = gcSorted.ElementAt(i).Value
-                    Dim gc = task.gcList(index)
+                For i = 0 To lp.cellList.Count - 1
+                    Dim index = lp.cellList(i)
+                    Dim gc = task.gcList(Index)
                     If offset > 0 Then
                         dst1(gc.rect).SetTo((offset - i + 1) * incr)
-                        gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
+                        gcUpdates.Add(New Tuple(Of Integer, Single)(Index, min + (offset - i) * depthIncr))
                     Else
                         dst1(gc.rect).SetTo(i * incr + 1)
-                        gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + i * depthIncr))
+                        gcUpdates.Add(New Tuple(Of Integer, Single)(Index, min + i * depthIncr))
                     End If
                     If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
                 Next

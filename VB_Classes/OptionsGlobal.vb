@@ -390,8 +390,4 @@ Public Class OptionsGlobal
     Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
         task.optionsChanged = True
     End Sub
-
-    Private Sub MaxDepthBar_Scroll(sender As Object, e As EventArgs) Handles MaxDepthBar.Scroll
-
-    End Sub
 End Class
