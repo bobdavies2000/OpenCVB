@@ -7335,10 +7335,8 @@ Public Class Options_Line : Inherits OptionParent
     Public correlation As Single
     Public topX As Integer
     Public overlapPercent As Single
-    Public minDistance As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min Line Length", 1, 100, minLength)
             sliders.setupTrackBar("Intersection Maximum Pixel Count", 1, 100, 15)
             sliders.setupTrackBar("Min Correlation", 1, 100, 95)
             sliders.setupTrackBar("Top X count", 1, 254, 3)
@@ -7360,7 +7358,6 @@ Public Class Options_Line : Inherits OptionParent
         correlation = correlSlider.value / 100
         topX = topXSlider.value
         overlapPercent = overlapSlider.value / 100
-        minDistance = distanceSlider.value
     End Sub
 End Class
 

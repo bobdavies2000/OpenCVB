@@ -58,9 +58,9 @@
         task.optionsChanged = True
     End Sub
     Private Sub LinesSlider_ValueChanged(sender As Object, e As EventArgs) Handles NumberLinesSlider.ValueChanged
-        task.numberLines = NumberLinesSlider.Value
+        task.numberOfLines = NumberLinesSlider.Value
         task.optionsChanged = True
-        numLinesLabel.Text = CStr(task.numberLines)
+        numLinesLabel.Text = CStr(task.numberOfLines)
     End Sub
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles FCorrSlider.ValueChanged
         task.fCorrThreshold = FCorrSlider.Value / 100

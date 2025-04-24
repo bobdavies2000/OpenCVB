@@ -33,7 +33,7 @@ Public Class LongLine_Basics : Inherits TaskParent
             lp.cellList.Clear()
             lpList.Add(lp)
 
-            If lpList.Count - 1 >= task.numberLines Then Exit For
+            If lpList.Count - 1 >= task.numberOfLines Then Exit For
         Next
 
         task.lpMap.SetTo(0)
@@ -197,7 +197,7 @@ Public Class LongLine_BasicsEx : Inherits TaskParent
             If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
             lp.index = lpList.Count
             lpList.Add(lp)
-            If lpList.Count >= task.numberLines Then Exit For
+            If lpList.Count >= task.numberOfLines Then Exit For
         Next
 
         labels(2) = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed."

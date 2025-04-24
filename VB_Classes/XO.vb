@@ -1878,11 +1878,11 @@ End Class
 
 
 Public Class XO_Structured_Lines : Inherits TaskParent
-    Dim struct As New Structured_Basics
+    Dim struct As New Structured_Core
     Public lineX As New Structured_LinesX
     Public lineY As New Structured_LinesY
     Public Sub New()
-        desc = "Find the lines in the Structured_Basics output"
+        desc = "Find the lines in the Structured_Core output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         struct.Run(src)
