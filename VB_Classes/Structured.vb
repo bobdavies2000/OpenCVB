@@ -14,38 +14,25 @@ Public Class Structured_Basics : Inherits TaskParent
 
         lines.Run(struct.dst2)
 
-        Dim sortlines As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-        For Each lp In lines.lpList
-            sortlines.Add(lp.length, lp.index)
-        Next
-
         dst2.SetTo(0)
         lpListX.Clear()
         lpListX.Add(New lpData)
-        For Each index In sortlines.Values
-            Dim lp = lines.lpList(index)
+        For Each lp In lines.lpList
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             lp.index = lpListX.Count
-            lpListX.Add(lines.lpList(index))
+            lpListX.Add(lp)
             If lpListX.Count >= task.numberOfLines Then Exit For
         Next
-
         labels(2) = CStr(lpListX.Count) + " lines found in Y-direction slices"
 
         lines.Run(struct.dst3)
 
-        sortlines.Clear()
-        For Each lp In lines.lpList
-            sortlines.Add(lp.length, lp.index)
-        Next
-
         dst3.SetTo(0)
         lpListY.Clear()
         lpListY.Add(New lpData)
-        For Each index In sortlines.Values
-            Dim lp = lines.lpList(index)
+        For Each lp In lines.lpList
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            lpListY.Add(lines.lpList(index))
+            lpListY.Add(lp)
             If lpListY.Count >= task.numberOfLines Then Exit For
         Next
         labels(3) = CStr(lpListY.Count) + " lines found in Y-direction slices"
