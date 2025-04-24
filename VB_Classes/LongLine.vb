@@ -38,6 +38,7 @@ Public Class LongLine_Basics : Inherits TaskParent
 
         task.lpMap.SetTo(0)
         For Each gc In task.gcList
+            If dst1(gc.rect).CountNonZero = 0 Then Continue For
             hist.Run(dst1(gc.rect))
             For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
                 If hist.histarray(i) > 0 Then

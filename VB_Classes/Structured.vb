@@ -1,41 +1,54 @@
+Imports System.Windows.Documents
+Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
     Public lpListY As New List(Of lpData)
     Dim lines As New Line_BasicsRaw
     Dim struct As New Structured_Core
+    Dim hist As New Hist_GridCell
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        task.structureMapX = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        task.structureMapY = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = dst0.Clone
         desc = "Find the lines in the X- and Y-direction of the Structured_Core output"
     End Sub
+    Private Function inventoryLines(dst As cv.Mat, lpList As List(Of lpData)) As List(Of lpData)
+        dst.SetTo(0)
+        lpList.Clear()
+        lpList.Add(New lpData)
+        For Each lp In lines.lpList
+            lp.index = lpList.Count
+            lp.cellList.Clear()
+            dst.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+            lpList.Add(lp)
+            If lpList.Count >= task.numberOfLines Then Exit For
+        Next
+
+        For Each gc In task.gcList
+            If dst(gc.rect).CountNonZero = 0 Then Continue For
+            hist.Run(dst(gc.rect))
+            For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
+                If hist.histarray(i) > 0 Then
+                    lpList(i).cellList.Add(gc.index)
+                End If
+            Next
+        Next
+        Return lpList
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         struct.Run(src)
 
         lines.Run(struct.dst2)
-
-        dst2.SetTo(0)
-        lpListX.Clear()
-        lpListX.Add(New lpData)
-        For Each lp In lines.lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            lp.index = lpListX.Count
-            lpListX.Add(lp)
-            If lpListX.Count >= task.numberOfLines Then Exit For
-        Next
-        labels(2) = CStr(lpListX.Count) + " lines found in Y-direction slices"
+        lpListX = inventoryLines(dst0, lpListX)
+        labels(2) = CStr(lpListX.Count) + " depth lines found in X-direction slices"
+        dst2 = ShowPalette(task.structureMapX).Clone
 
         lines.Run(struct.dst3)
-
-        dst3.SetTo(0)
-        lpListY.Clear()
-        lpListY.Add(New lpData)
-        For Each lp In lines.lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            lpListY.Add(lp)
-            If lpListY.Count >= task.numberOfLines Then Exit For
-        Next
-        labels(3) = CStr(lpListY.Count) + " lines found in Y-direction slices"
+        lpListY = inventoryLines(dst1, lpListY)
+        labels(3) = CStr(lpListY.Count) + " depth lines found in Y-direction slices"
+        dst3 = ShowPalette(task.structureMapY)
     End Sub
 End Class
 
@@ -91,7 +104,7 @@ Public Class Structured_LinearizeFloor : Inherits TaskParent
     Public Sub New()
         desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         floor.Run(src)
@@ -174,7 +187,7 @@ Public Class Structured_MultiSliceLines : Inherits TaskParent
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         multi.Run(src)
         dst3 = multi.dst3
         lines.Run(dst3)
@@ -191,11 +204,11 @@ End Class
 Public Class Structured_Depth : Inherits TaskParent
     Dim sliceH As New Structured_SliceH
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)"}
         desc = "Use the structured depth to enhance the depth away from the centerline."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         sliceH.Run(src)
         dst0 = sliceH.dst3
         dst2 = sliceH.dst2
@@ -276,7 +289,7 @@ Public Class Structured_Rebuild : Inherits TaskParent
         Next
         Return output
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim metersPerPixel = task.MaxZmeters / dst3.Height
@@ -310,7 +323,7 @@ Public Class Structured_CountTop : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Dim counts As New List(Of Single)
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub
@@ -327,7 +340,7 @@ Public Class Structured_CountTop : Inherits TaskParent
         counts.Add(sliceMask.CountNonZero)
         Return sliceMask
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         slice.Run(src)
         dst1 = slice.dst3.Clone
 
@@ -363,7 +376,7 @@ Public Class Structured_FloorCeiling : Inherits TaskParent
         optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Find the floor or ceiling plane"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         slice.Run(src)
         dst2 = slice.heat.dst3
 

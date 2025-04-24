@@ -39,6 +39,7 @@ Public Class Line_Basics : Inherits TaskParent
             If histarray(i) Then newList.Add(linesRaw.lpList(i)) ' Add any lines in the motion mask.
         Next
 
+        ' sort again because some lines came from the previous generation.
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each lp In newList
             If lp.length > 0 Then sortlines.Add(lp.length, lp)
