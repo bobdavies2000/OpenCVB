@@ -1,5 +1,3 @@
-Imports System.Windows.Documents
-Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
@@ -14,7 +12,7 @@ Public Class Structured_Basics : Inherits TaskParent
         dst1 = dst0.Clone
         desc = "Find the lines in the X- and Y-direction of the Structured_Core output"
     End Sub
-    Private Function inventoryLines(dst As cv.Mat, lpList As List(Of lpData)) As List(Of lpData)
+    Private Function inventoryLines(dst As cv.Mat, lpList As List(Of lpData), structureMap As cv.Mat) As List(Of lpData)
         dst.SetTo(0)
         lpList.Clear()
         lpList.Add(New lpData)
@@ -35,20 +33,37 @@ Public Class Structured_Basics : Inherits TaskParent
                 End If
             Next
         Next
+
+        structureMap.SetTo(0)
+        For Each lp In lpList
+            For Each index In lp.cellList
+                Dim gc = task.gcList(index)
+                structureMap(gc.rect).SetTo(lp.index)
+            Next
+        Next
+
         Return lpList
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         struct.Run(src)
 
         lines.Run(struct.dst2)
-        lpListX = inventoryLines(dst0, lpListX)
+        lpListX = inventoryLines(dst0, lpListX, task.structureMapX)
         labels(2) = CStr(lpListX.Count) + " depth lines found in X-direction slices"
         dst2 = ShowPalette(task.structureMapX).Clone
+        If task.toggleOn Then
+            Dim tmpX = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            dst2.SetTo(white, tmpX)
+        End If
 
         lines.Run(struct.dst3)
-        lpListY = inventoryLines(dst1, lpListY)
+        lpListY = inventoryLines(dst1, lpListY, task.structureMapY)
         labels(3) = CStr(lpListY.Count) + " depth lines found in Y-direction slices"
         dst3 = ShowPalette(task.structureMapY)
+        If task.toggleOn Then
+            Dim tmpy = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            dst3.SetTo(white, tmpy)
+        End If
     End Sub
 End Class
 
