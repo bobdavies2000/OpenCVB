@@ -1,20 +1,15 @@
 Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
-    Dim options As New Options_Structured
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Build structured slices through the point cloud."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim stepsize = options.stepSize
-
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
-        Static startingOffset As Integer = 0
         Dim depthMask As New cv.Mat
         Dim minVal As Double, maxVal As Double
-        For yCoordinate = startingOffset To src.Height - 1 Step stepsize
+        For yCoordinate = 0 To src.Height - 1 Step task.cellSize
             Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
             If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
             minVal = planeY - task.metersPerPixel
@@ -25,7 +20,7 @@ Public Class Structured_Basics : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        For xCoordinate = startingOffset To src.Width - 1 Step stepsize
+        For xCoordinate = 0 To src.Width - 1 Step task.cellSize
             Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
             minVal = planeX - task.metersPerPixel
@@ -34,8 +29,6 @@ Public Class Structured_Basics : Inherits TaskParent
             dst3.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
         Next
-        startingOffset += 1
-        If startingOffset >= stepsize Then startingOffset = 0
     End Sub
 End Class
 
@@ -1386,7 +1379,7 @@ Public Class Structured_LinesY : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the Y-direction of the Structured_Basics output"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             Static struct As New Structured_Basics
             struct.Run(src)
@@ -1402,5 +1395,41 @@ Public Class Structured_LinesY : Inherits TaskParent
         Next
 
         labels(2) = CStr(lpList.Count) + " lines found in Y-direction slices"
+    End Sub
+End Class
+
+
+
+
+Public Class Structured_LinesXY : Inherits TaskParent
+    Public lpListX As New List(Of lpData)
+    Public lpListY As New List(Of lpData)
+    Dim lines As New Line_BasicsRaw
+    Dim struct As New Structured_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the lines in the Y-direction of the Structured_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        struct.Run(src)
+
+        lines.Run(struct.dst2)
+        lpListX = New List(Of lpData)(lines.lpList)
+
+        dst2.SetTo(0)
+        For Each lp In lpListX
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(lpListX.Count) + " lines found in Y-direction slices"
+
+        lines.Run(struct.dst3)
+        lpListY = New List(Of lpData)(lines.lpList)
+
+        dst3.SetTo(0)
+        For Each lp In lpListY
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(3) = CStr(lpListY.Count) + " lines found in Y-direction slices"
     End Sub
 End Class

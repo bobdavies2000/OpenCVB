@@ -5,17 +5,17 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public redMask As New RedMask_Basics
     Dim rcMask As cv.Mat
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.redOptions.rcReductionSlider.Value = 100
         rcMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
-        Dim redColorMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        redColorMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         prep.Run(src)
-        redMask.Run(prep.dst2 And redColorMask)
+        redMask.Run(prep.dst2 And dst1)
         labels(1) = CStr(redMask.mdList.Count) + " maskData cells found in the point cloud."
 
         If task.heartBeat Then strOut = ""
@@ -42,6 +42,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         SetTrueText(strOut, 3)
     End Sub
 End Class
+
 
 
 
@@ -147,24 +148,66 @@ End Class
 
 
 
-
-Public Class RedCloud_YZ : Inherits TaskParent
-    Dim stats As New RedCell_Basics
+Public Class RedCloud_XYZ : Inherits TaskParent
+    Dim prep As New RedCloud_PrepData
+    Public redMask As New RedMask_Basics
+    Dim rcMask As cv.Mat
     Public Sub New()
-        task.redOptions.IdentifyCountBar.Value = 100
-        task.redOptions.YZReduction.Checked = True
-        stats.runRedCloud = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Build horizontal RedCloud cells"
+        task.redOptions.XYZReduction.Checked = True
+        rcMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        stats.Run(src)
-        dst1.SetTo(0)
-        dst2 = stats.dst2
-        dst3 = stats.dst3
-        SetTrueText(stats.strOut, 1)
+        prep.Run(src)
 
-        labels(2) = stats.labels(2)
+        dst2 = runRedC(prep.dst2, labels(2))
+
+        If task.heartBeat Then strOut = ""
+        For i = 0 To task.rcList.Count - 1
+            Dim rc = task.rcList(i)
+            rcMask.SetTo(0)
+            rcMask(rc.rect).SetTo(255, rc.mask)
+            rc.mdList = New List(Of maskData)
+            For Each md In redMask.mdList
+                Dim index = rcMask.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
+                If index > 0 Then rc.mdList.Add(md)
+            Next
+            If rc.mdList.Count > 0 Then
+                For j = 0 To rc.mdList.Count - 1
+                    Dim md = rc.mdList(j)
+                    rcMask(md.rect) = rcMask(md.rect) And md.mask
+                    md.mask = rcMask(md.rect).Clone
+                    rc.mdList(j) = md
+                Next
+                task.rcList(i) = rc
+            End If
+        Next
+
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_YZ : Inherits TaskParent
+    Dim prep As New RedCloud_PrepData
+    Dim stats As New RedCell_Basics
+    Public Sub New()
+        task.redOptions.YZReduction.Checked = True
+        labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Build YZ RedCloud cells"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+
+        dst2 = runRedC(prep.dst2, labels(2))
+
+        stats.Run(src)
+        dst1 = stats.dst3
+        SetTrueText(stats.strOut, 1)
     End Sub
 End Class
 
@@ -174,23 +217,45 @@ End Class
 
 
 Public Class RedCloud_XZ : Inherits TaskParent
+    Dim prep As New RedCloud_PrepData
     Dim stats As New RedCell_Basics
-    Dim rCloud As New RedCloud_Basics
     Public Sub New()
-        task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.XZReduction.Checked = True
+        labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Build vertical RedCloud cells."
+        desc = "Build XZ RedCloud cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        stats.Run(src)
-        dst2 = stats.dst2
-        SetTrueText(stats.strOut, 3)
+        prep.Run(src)
 
-        rCloud.Run(src)
-        dst1 = rCloud.dst1
-        dst2 = rCloud.dst2
-        labels(2) = rCloud.labels(2)
+        dst2 = runRedC(prep.dst2, labels(2))
+        stats.Run(src)
+        dst1 = stats.dst3
+        SetTrueText(stats.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Z : Inherits TaskParent
+    Dim prep As New RedCloud_PrepData
+    Dim stats As New RedCell_Basics
+    Public Sub New()
+        task.redOptions.ZReduction.Checked = True
+        labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Build Z RedCloud cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+
+        dst2 = runRedC(prep.dst2, labels(2))
+        stats.Run(src)
+        dst1 = stats.dst3
+        SetTrueText(stats.strOut, 3)
     End Sub
 End Class
 

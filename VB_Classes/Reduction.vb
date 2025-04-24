@@ -3,8 +3,6 @@ Public Class Reduction_Basics : Inherits TaskParent
     Public classCount As Integer
     Public alwaysDisplay As Boolean
     Public Sub New()
-        task.redOptions.enableReductionTypeGroup(True)
-        task.redOptions.enableReductionSliders(True)
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

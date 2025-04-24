@@ -293,8 +293,6 @@ Public Class OptionsRedCloud
         task.optionsChanged = True
         colorInputName = ColorSource.Text
         colorInputIndex = ColorSource.SelectedIndex
-        ReductionSliders.Enabled = colorInputName = "Reduction_Basics"
-        ReductionTypeGroup.Enabled = colorInputName = "Reduction_Basics"
         If colorInputName = "Reduction_Basics" Then
             SimpleReductionBar.Enabled = reductionType = "Use Simple Reduction"
             BitwiseReductionBar.Enabled = reductionType = "Use Bitwise Reduction"
@@ -322,39 +320,19 @@ Public Class OptionsRedCloud
     Public Sub setProjection(val As Integer)
         ProjectionThresholdBar.Value = val
     End Sub
-    Public Sub setXZReduction(val As Boolean)
-        XZReduction.Checked = val
-    End Sub
-    Public Sub setYZReduction(val As Boolean)
-        YZReduction.Checked = val
-    End Sub
     Public Sub setXRangeSlider(val As Integer)
         XRangeBar.Value = val
     End Sub
     Public Function getXRangeSlider() As Integer
         Return XRangeBar.Value
     End Function
-    Public Function getProjection() As Integer
-        Return ProjectionThresholdBar.Value
-    End Function
-    Public Function getHistBins3D() As Integer
-        Return histBins3D
-    End Function
-    Public Sub setHistBins3D(val As Integer)
-        HistBinBar3D.Value = val
-    End Sub
-    Public Sub setXYReduction(val As Boolean)
-        XYReduction.Checked = val
-    End Sub
-    Public Sub enableReductionTypeGroup(val As Boolean)
-        ReductionTypeGroup.Enabled = val
-    End Sub
-    Public Sub enableReductionSliders(val As Boolean)
-        ReductionSliders.Enabled = val
-    End Sub
-    Public Sub setSimpleReductionBarMax(val As Integer)
-        SimpleReductionBar.Maximum = val
-    End Sub
+
+
+
+
+
+
+
     Private Sub rcReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles rcReductionSlider.ValueChanged
         task.optionsChanged = True
         Label3.Text = CStr(rcReductionSlider.Value)

@@ -292,3 +292,20 @@ End Class
 
 
 
+Public Class FindCells_RedCloud : Inherits TaskParent
+    Dim findCells As New FindCells_FeatureLess
+    Public Sub New()
+        desc = "Run RedCloud after identifying all the featureless regions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        findCells.Run(task.grayStable)
+
+        dst2 = runRedC(src, labels(2), findCells.dst1)
+
+    End Sub
+End Class
+
+
+
+
+
