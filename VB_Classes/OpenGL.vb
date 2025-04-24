@@ -373,57 +373,6 @@ End Class
 
 
 
-
-Public Class OpenGL_StructuredCloud : Inherits TaskParent
-    Dim sCloud As New Structured_Cloud
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
-        labels(2) = "Structured cloud 32fC3 data"
-        desc = "Visualize the Structured_Cloud"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        sCloud.Run(src)
-
-        dst2 = runRedC(src, labels(2))
-        task.ogl.pointCloudInput = sCloud.dst2
-        task.ogl.Run(dst2)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
-Public Class OpenGL_Tiles : Inherits TaskParent
-    Dim sCloud As New Structured_Tiles
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawTiles
-        labels = {"", "", "Input from Structured_Tiles", ""}
-        desc = "Display the quads built by Structured_Tiles in OpenGL - uses OpenGL's point size"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        sCloud.Run(src)
-        dst2 = sCloud.dst2
-        dst3 = sCloud.dst3
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
-        task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
 Public Class OpenGL_OnlyPlanes : Inherits TaskParent
     Dim planes As New Plane_OnlyPlanes
     Public Sub New()
@@ -792,27 +741,6 @@ Public Class OpenGL_PatchHorizontal : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class OpenGL_PCpointsPlane : Inherits TaskParent
-    Dim pts As New XO_PointCloud_PCPointsPlane
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pcPoints
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
-        desc = "Display the points that are likely to be in a plane - found by both the vertical and horizontal searches"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pts.Run(src)
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
-        task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-        labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
-    End Sub
-End Class
 
 
 

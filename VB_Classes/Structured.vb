@@ -318,154 +318,6 @@ End Class
 
 
 
-
-Public Class Structured_Cloud2 : Inherits TaskParent
-    Dim mmPixel As New Pixel_Measure
-    Dim options As New Options_StructuredCloud
-    Public Sub New()
-        desc = "Attempt to impose a structure on the point cloud data."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
-
-        Dim stepX = dst2.Width / options.xLines
-        Dim stepY = dst2.Height / options.yLines
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
-        Dim midX = dst2.Width / 2
-        Dim midY = dst2.Height / 2
-        Dim halfStepX = stepX / 2
-        Dim halfStepy = stepY / 2
-        For y = 1 To options.yLines - 2
-            For x = 1 To options.xLines - 2
-                Dim p1 = New cv.Point2f(x * stepX, y * stepY)
-                Dim p2 = New cv.Point2f((x + 1) * stepX, y * stepY)
-                Dim d1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
-                Dim d2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
-                If stepX * options.threshold > Math.Abs(d1 - d2) And d1 > 0 And d2 > 0 Then
-                    Dim p = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-                    Dim mmPP = mmPixel.Compute(d1)
-                    If options.xConstraint Then
-                        p(0) = (p1.X - midX) * mmPP
-                        If p1.X = midX Then p(0) = mmPP
-                    End If
-                    If options.yConstraint Then
-                        p(1) = (p1.Y - midY) * mmPP
-                        If p1.Y = midY Then p(1) = mmPP
-                    End If
-                    Dim r = New cv.Rect(p1.X - halfStepX, p1.Y - halfStepy, stepX, stepY)
-                    Dim meanVal = cv.Cv2.Mean(task.pcSplit(2)(r), task.depthMask(r))
-                    p(2) = (d1 + d2) / 2
-                    dst3.Set(Of cv.Vec3f)(y, x, p)
-                End If
-            Next
-        Next
-        dst2 = dst3(New cv.Rect(0, 0, options.xLines, options.yLines)).Resize(dst2.Size(), 0, 0,
-                                                                              cv.InterpolationFlags.Nearest)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Structured_Cloud : Inherits TaskParent
-    Public options As New Options_StructuredCloud
-    Public Sub New()
-        task.gOptions.GridSlider.Value = 10
-        desc = "Attempt to impose a linear structure on the pointcloud."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim yLines = CInt(options.xLines * dst2.Height / dst2.Width)
-
-        Dim stepX = dst3.Width / options.xLines
-        Dim stepY = dst3.Height / yLines
-        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
-        For y = 0 To yLines - 1
-            For x = 0 To options.xLines - 1
-                Dim r = New cv.Rect(x * stepX, y * stepY, stepX - 1, stepY - 1)
-                Dim p1 = New cv.Point(r.X, r.Y)
-                Dim p2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
-                Dim vec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-                Dim vec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
-                If vec1(2) > 0 And vec2(2) > 0 Then dst2(r).SetTo(vec1)
-            Next
-        Next
-        labels(2) = "Structured_Cloud with " + CStr(yLines) + " rows " + CStr(options.xLines) + " columns"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Structured_ROI : Inherits TaskParent
-    Public data As New cv.Mat
-    Public oglData As New List(Of cv.Point3f)
-    Public Sub New()
-        task.gOptions.GridSlider.Value = 10
-        desc = "Simplify the point cloud so it can be represented as quads in OpenGL"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
-        For Each roi In task.gridRects
-            Dim d = task.pointCloud(roi).Mean(task.depthMask(roi))
-            Dim depth = New cv.Vec3f(d.Val0, d.Val1, d.Val2)
-            Dim pt = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-            Dim vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            If vec(2) > 0 Then dst2(roi).SetTo(depth)
-        Next
-
-        labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Structured_Tiles : Inherits TaskParent
-    Public oglData As New List(Of cv.Vec3f)
-    Dim hulls As New RedColor_Hulls
-    Public Sub New()
-        task.gOptions.GridSlider.Value = 10
-        desc = "Use the OpenGL point size to represent the point cloud as data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst3
-
-        dst3.SetTo(0)
-        oglData.Clear()
-        For Each roi In task.gridRects
-            Dim c = dst2.Get(Of cv.Vec3b)(roi.Y, roi.X)
-            If c = black Then Continue For
-            oglData.Add(New cv.Vec3f(c(2) / 255, c(1) / 255, c(0) / 255))
-
-            Dim v = task.pointCloud(roi).Mean(task.depthMask(roi))
-            oglData.Add(New cv.Vec3f(v.Val0, v.Val1, v.Val2))
-            dst3(roi).SetTo(c)
-        Next
-        labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Structured_CountTop : Inherits TaskParent
     Dim slice As New Structured_SliceV
     Dim plot As New Plot_Histogram
@@ -1237,80 +1089,6 @@ End Class
 
 
 
-
-Public Class Structured_Crosshairs : Inherits TaskParent
-    Dim sCloud As New Structured_Cloud
-    Dim minX As Single, maxX As Single, minY As Single, maxY As Single
-    Public Sub New()
-        desc = "Connect vertical and horizontal dots that are in the same column and row."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Dim xLines = sCloud.options.indexX
-        Dim yLines = CInt(xLines * dst2.Width / dst2.Height)
-        If sCloud.options.indexX > xLines Then sCloud.options.indexX = xLines - 1
-        If sCloud.options.indexY > yLines Then sCloud.options.indexY = yLines - 1
-
-        sCloud.Run(src)
-        Dim split = cv.Cv2.Split(sCloud.dst2)
-
-        Dim mmX = GetMinMax(split(0))
-        Dim mmY = GetMinMax(split(1))
-
-        minX = If(minX > mmX.minVal, mmX.minVal, minX)
-        minY = If(minY > mmY.minVal, mmY.minVal, minY)
-        maxX = If(maxX < mmX.maxVal, mmX.maxVal, maxX)
-        maxY = If(maxY < mmY.maxVal, mmY.maxVal, maxY)
-
-        SetTrueText("mmx min/max = " + Format(minX, "0.00") + "/" + Format(maxX, "0.00") + " mmy min/max " + Format(minY, "0.00") +
-                    "/" + Format(maxY, "0.00"), 3)
-
-        dst2.SetTo(0)
-        Dim white = New cv.Vec3b(255, 255, 255)
-        Dim pointX As New cv.Mat(sCloud.dst2.Size(), cv.MatType.CV_32S, 0)
-        Dim pointY As New cv.Mat(sCloud.dst2.Size(), cv.MatType.CV_32S, 0)
-        Dim yy As Integer, xx As Integer
-        For y = 1 To sCloud.dst2.Height - 1
-            For x = 1 To sCloud.dst2.Width - 1
-                Dim p = sCloud.dst2.Get(Of cv.Vec3f)(y, x)
-                If p(2) > 0 Then
-                    If Single.IsNaN(p(0)) Or Single.IsNaN(p(1)) Or Single.IsNaN(p(2)) Then Continue For
-                    xx = dst2.Width * (maxX - p(0)) / (maxX - minX)
-                    yy = dst2.Height * (maxY - p(1)) / (maxY - minY)
-                    If xx < 0 Then xx = 0
-                    If yy < 0 Then yy = 0
-                    If xx >= dst2.Width Then xx = dst2.Width - 1
-                    If yy >= dst2.Height Then yy = dst2.Height - 1
-                    yy = dst2.Height - yy - 1
-                    xx = dst2.Width - xx - 1
-                    dst2.Set(Of cv.Vec3b)(yy, xx, white)
-
-                    pointX.Set(Of Integer)(y, x, xx)
-                    pointY.Set(Of Integer)(y, x, yy)
-                    If x = sCloud.options.indexX Then
-                        Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
-                        If p1.X > 0 Then
-                            Dim p2 = New cv.Point(xx, yy)
-                            dst2.Line(p1, p2, task.highlight, task.lineWidth + 1, task.lineType)
-                        End If
-                    End If
-                    If y = sCloud.options.indexY Then
-                        Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
-                        If p1.X > 0 Then
-                            Dim p2 = New cv.Point(xx, yy)
-                            dst2.Line(p1, p2, task.highlight, task.lineWidth + 1, task.lineType)
-                        End If
-                    End If
-                End If
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Structured_MultiSlice : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public sliceMask As cv.Mat
@@ -1454,5 +1232,28 @@ Public Class Structured_LinesY : Inherits TaskParent
         Next
 
         labels(2) = CStr(lpList.Count) + " lines found in Y-direction slices"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_OpenGL_Tiles : Inherits TaskParent
+    Dim sCloud As New XO_Structured_Tiles
+    Public Sub New()
+        task.ogl.oglFunction = oCase.drawTiles
+        labels = {"", "", "Input from Structured_Tiles", ""}
+        desc = "Display the quads built by Structured_Tiles in OpenGL - uses OpenGL's point size"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        sCloud.Run(src)
+        dst2 = sCloud.dst2
+        dst3 = sCloud.dst3
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
+        task.ogl.Run(src)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class

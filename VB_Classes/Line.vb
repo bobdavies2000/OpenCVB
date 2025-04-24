@@ -14,6 +14,8 @@ Public Class Line_Basics : Inherits TaskParent
 
         Dim newList As New List(Of lpData)
         For Each lp In linesRaw.lpList
+            lp.p1 = validatePoint(lp.p1)
+            lp.p2 = validatePoint(lp.p2)
             Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If val1 = 0 And val2 = 0 Then newList.Add(lp)
@@ -62,6 +64,7 @@ Public Class Line_Basics : Inherits TaskParent
 
             lp.index = task.lpList.Count
             task.lpList.Add(lp)
+            If task.lpList.Count >= task.numberOfLines Then Exit For
         Next
 
         dst2 = src.Clone
@@ -78,6 +81,59 @@ Public Class Line_Basics : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Line_BasicsRaw : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src)
+
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
+                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
+                    Dim lp = New lpData(p1, p2)
+                    sortlines.Add(lp.length, lp)
+                End If
+            End If
+        Next
+
+        lpList.Clear()
+        For Each lp In sortlines.Values
+            lp.index = lpList.Count
+            lpList.Add(lp)
+            ' If task.lpList.Count >= task.numberOfLines Then Exit For
+        Next
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            For Each lp In lpList
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Next
+        End If
+
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+End Class
 
 
 
@@ -157,76 +213,6 @@ Public Class Line_BasicsAlternative : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Line_BasicsRaw : Inherits TaskParent
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src)
-
-        Dim lpDataList As New List(Of lpData)
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
-                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
-                    lpDataList.Add(New lpData(p1, p2))
-                End If
-            End If
-        Next
-
-        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-        For Each lp In lpDataList
-            sortlines.Add(lp.length, lp)
-        Next
-
-        lpList.Clear()
-        For Each lp In sortlines.Values
-            lp.index = lpList.Count
-            lpList.Add(lp)
-        Next
-
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Next
-        End If
-
-
-
-
-        For Each lp In lpList
-            If lp.p1.X < 0 Or lp.p1.X >= dst2.Width Or lp.p1.Y < 0 Or lp.p1.Y >= dst2.Height Or
-               lp.p2.X < 0 Or lp.p2.X >= dst2.Width Or lp.p2.Y < 0 Or lp.p2.Y >= dst2.Height Then
-                Dim k = 0
-            End If
-        Next
-
-
-
-
-
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-    End Sub
-End Class
 
 
 
