@@ -961,44 +961,30 @@ End Class
 
 
 Public Class GridCell_Lines : Inherits TaskParent
-    Dim hist As New Hist_GridCell
     Dim info As New Line_Info
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Lines can mean cells are connected."
+        desc = "Lines can mean cells are connected - click on any highlighted grid cell to see info on that line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.longLines.dst2
-        dst1.SetTo(0)
-        For Each lp In task.lpList
-            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-            lp.cellList.Clear()
-        Next
-
-        For Each gc In task.gcList
-            hist.Run(dst1(gc.rect).Clone)
-            For i = 1 To hist.histarray.Count - 1
-                If hist.histarray(i) > 0 Then task.lpList(i).cellList.Add(gc.index)
-            Next
-        Next
+        If task.ClickPoint = newPoint Then
+            If task.gcList.Count > 1 Then task.ClickPoint = task.gcList(1).rect.TopLeft
+        End If
+        dst2 = task.longLines.dst2 ' grid cells were already set by constructor.
 
         dst3.SetTo(0)
         Dim lineRect As cv.Rect
-        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-        If index >= 0 And index < task.lpList.Count Then
-            task.lpD = task.lpList(index)
-            For Each index In task.lpD.cellList
-                Dim gc = task.gcList(index)
-                If lineRect.Width = 0 Then lineRect = gc.rect Else lineRect = lineRect.Union(gc.rect)
-                dst3.Rectangle(gc.rect, 255, 1, task.lineType)
-            Next
+        Dim index = task.lpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        task.lpD = task.lpList(index)
+        For Each index In task.lpD.cellList
+            Dim gc = task.gcList(index)
+            If lineRect.Width = 0 Then lineRect = gc.rect Else lineRect = lineRect.Union(gc.rect)
+            ' dst3.Rectangle(gc.rect, 255, 1, task.lineType)
+        Next
 
-            dst1.Rectangle(lineRect, 255, task.lineWidth, task.lineType)
-            task.color.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
+        dst1.Rectangle(lineRect, 255, task.lineWidth, task.lineType)
+        task.color.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-            info.Run(src)
-            SetTrueText(info.strOut, 3)
-        End If
+        info.Run(src)
+        SetTrueText(info.strOut, 3)
     End Sub
 End Class
