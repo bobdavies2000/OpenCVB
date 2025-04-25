@@ -126,7 +126,6 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public longLines As LongLine_Basics
     Public gCell As GridCell_Basics
     Public buildCorr As GridCell_CorrelationMap
     Public fcs As FCS_Basics
@@ -574,7 +573,6 @@ Public Class VBtask : Implements IDisposable
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
-        longLines = New LongLine_Basics
         kalman = New Kalman_Basics
         mouseD = New GridCell_MouseDepth
 
@@ -897,9 +895,6 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon.Run(src)
 
         lines.Run(src.Clone)
-        ' select only the top X lines...
-        longLines.Run(src.Clone)
-        task.lpList = New List(Of lpData)(longLines.lpList)
 
         Dim saveOptionsChanged = optionsChanged
         mouseD.Run(src)

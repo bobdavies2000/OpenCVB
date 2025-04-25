@@ -1,46 +1,47 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Public linesRaw As New Line_BasicsRaw
+    Public rawLines As New Line_Raw
     Public Sub New()
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
+        task.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 255)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Toss any line in the previous image if that line had either end in the motion mask.  " +
-               "If both ends are NOT in motion mask for the current image, the keep the line."
+        desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.optionsChanged Then task.lpList.Clear()
+        Static lastList As New List(Of lpData)(task.lpList)
+        If task.optionsChanged Then lastList = rawLines.lpList
 
         Dim newList As New List(Of lpData)
-        For Each lp In linesRaw.lpList
-            lp.p1 = validatePoint(lp.p1)
-            lp.p2 = validatePoint(lp.p2)
-            Dim val1 = task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            Dim val2 = task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-            If val1 = 0 And val2 = 0 Then newList.Add(lp)
+        For Each lp In lastList
+            Dim noMotion As Boolean = True
+            For Each index In lp.cellList
+                Dim gc = task.gcList(index)
+                If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
+                    noMotion = False
+                    Exit For
+                End If
+            Next
+            If noMotion Then newList.Add(lp)
         Next
 
-        If src.Channels = 1 Then linesRaw.Run(src) Else linesRaw.Run(task.grayStable.Clone)
+        If src.Channels = 1 Then rawLines.Run(src) Else rawLines.Run(task.grayStable.Clone)
 
-        Dim histarray(linesRaw.lpList.Count - 1) As Single
-        If linesRaw.lpList.Count > 0 Then
-            Dim histogram As New cv.Mat
-            dst1.SetTo(0)
-            For Each lp In linesRaw.lpList
-                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+        For Each lp In rawLines.lpList
+            Dim motion As Boolean = False
+            For Each index In lp.cellList
+                Dim gc = task.gcList(index)
+                If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
+                    motion = True
+                    Exit For
+                End If
             Next
-
-            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {linesRaw.lpList.Count},
-                            New cv.Rangef() {New cv.Rangef(0, linesRaw.lpList.Count)})
-            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
-        End If
-        For i = 0 To histarray.Count - 1
-            If histarray(i) Then newList.Add(linesRaw.lpList(i)) ' Add any lines in the motion mask.
+            If motion Then newList.Add(lp)
         Next
 
         ' sort again because some lines came from the previous generation.
-        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingle)
         For Each lp In newList
             If lp.length > 0 Then sortlines.Add(lp.length, lp)
         Next
@@ -49,21 +50,14 @@ Public Class Line_Basics : Inherits TaskParent
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
         task.lpList.Add(New lpData(New cv.Point, New cv.Point))
 
-        Dim usedlist As New List(Of cv.Point)
-        Dim duplicates As Integer
+        ' update lpMap from smallest to largest so the largest lines own the grid cell.
+        task.lpMap.SetTo(0)
         For Each lp In sortlines.Values
-            Dim p1 = New cv.Point(lp.p1.X, lp.p1.Y)
-            Dim p2 = New cv.Point(lp.p2.X, lp.p2.Y)
-            If usedlist.Contains(p1) Or usedlist.Contains(p2) Then
-                duplicates += 1
-                Continue For
-            End If
-            usedlist.Add(p1)
-            usedlist.Add(p2)
-
             lp.index = task.lpList.Count
+            For Each index In lp.cellList
+                task.lpMap(task.gcList(index).rect).SetTo(lp.index)
+            Next
             task.lpList.Add(lp)
-            If task.lpList.Count >= task.numberOfLines Then Exit For
         Next
 
         dst2 = src.Clone
@@ -73,10 +67,9 @@ Public Class Line_Basics : Inherits TaskParent
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
         Next
 
-        If task.optionsChanged Then task.lpList = linesRaw.lpList
+        lastList = New List(Of lpData)(task.lpList)
 
-        labels(2) = CStr(task.lpList.Count) + " lines were found and " + CStr(duplicates) + " were duplicates (coincident endpoints)."
-        labels(3) = CStr(linesRaw.lpList.Count) + " lines were in the motion mask."
+        labels(2) = CStr(task.lpList.Count) + " lines were identified from the " + CStr(rawLines.lpList.Count) + " raw lines found."
     End Sub
 End Class
 
@@ -87,7 +80,7 @@ End Class
 
 
 
-Public Class Line_BasicsRaw : Inherits TaskParent
+Public Class Line_Raw : Inherits TaskParent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of lpData)
     Public Sub New()
@@ -119,8 +112,64 @@ Public Class Line_BasicsRaw : Inherits TaskParent
         lpList.Clear()
         For Each lp In sortlines.Values
             lp.index = lpList.Count
+            lp.p1 = validatePoint(lp.p1)
+            lp.p2 = validatePoint(lp.p2)
             lpList.Add(lp)
-            ' If task.lpList.Count >= task.numberOfLines Then Exit For
+        Next
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            For Each lp In lpList
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Next
+        End If
+
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_RawSorted : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src)
+
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
+                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
+                    Dim lp = New lpData(p1, p2)
+                    sortlines.Add(lp.length, lp)
+                End If
+            End If
+        Next
+
+        lpList.Clear()
+        For Each lp In sortlines.Values
+            lp.index = lpList.Count
+            lp.p1 = validatePoint(lp.p1)
+            lp.p2 = validatePoint(lp.p2)
+            lpList.Add(lp)
         Next
 
         If standaloneTest() Then
@@ -139,7 +188,7 @@ End Class
 
 
 Public Class Line_BasicsAlternative : Inherits TaskParent
-    Public lines As New Line_BasicsRaw
+    Public lines As New Line_RawSorted
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -277,7 +326,7 @@ Public Class Line_Intercepts : Inherits TaskParent
     Public extended As New LongLine_ExtendTest
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
-    Dim longLine As New LongLine_BasicsEx
+    Dim longLine As New XO_LongLine_BasicsEx
     Public options As New Options_Intercepts
     Public intercept As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -504,7 +553,7 @@ End Class
 
 Public Class Line_ViewLeftRight : Inherits TaskParent
     Dim lines As New Line_Basics
-    Dim linesRaw As New Line_BasicsRaw
+    Dim linesRaw As New Line_RawSorted
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Find lines in the left and right images."
@@ -571,7 +620,7 @@ Public Class Line_GCloud : Inherits TaskParent
     Public options As New Options_LineFinder
     Dim match As New Match_tCell
     Dim angleSlider As System.Windows.Forms.TrackBar
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         angleSlider = optiBase.FindSlider("Angle tolerance in degrees")
         labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."

@@ -655,21 +655,30 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         length = p1.DistanceTo(p2)
         age = 1
 
-        If p1.X = p2.X Then
+        If length > 180 Then Dim k = 0
+        If Math.Abs(p1.X - p2.X) <= 2 Then ' 
+            m = 100000 ' a big number for slope 
             ' handle the special case of slope 0
             Dim x = p1.X
-            For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y)
+            For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y) Step task.cellSize
                 Dim index = task.gcMap.Get(Of Single)(y, x)
                 If cellList.Contains(index) = False Then cellList.Add(index)
             Next
         Else
-            For x = Math.Min(p1.X, p2.X) To Math.Max(p1.X, p2.X)
-                Dim y = m * x + b
-                Dim index = task.gcMap.Get(Of Single)(y, x)
-                If cellList.Contains(index) = False Then cellList.Add(index)
-            Next
+            If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
+                For x = Math.Min(p1.X, p2.X) To Math.Max(p1.X, p2.X)
+                    Dim y = m * x + b
+                    Dim index = task.gcMap.Get(Of Single)(y, x)
+                    If cellList.Contains(index) = False Then cellList.Add(index)
+                Next
+            Else
+                For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y)
+                    Dim x = (y - b) / m
+                    Dim index = task.gcMap.Get(Of Single)(y, x)
+                    If cellList.Contains(index) = False Then cellList.Add(index)
+                Next
+            End If
         End If
-
     End Sub
     Sub New()
         p1 = New cv.Point2f()

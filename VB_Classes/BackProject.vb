@@ -176,7 +176,7 @@ End Class
 
 Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -212,7 +212,7 @@ Public Class BackProject_PointCloud : Inherits TaskParent
         labels = {"", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values"}
         desc = "Explore Backprojection of the cloud histogram."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim threshold = hist.options.threshold
         hist.Run(src)
 
@@ -247,7 +247,7 @@ Public Class BackProject_Display : Inherits TaskParent
         labels = {"", "", "Back projection", ""}
         desc = "Display the back projected color image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
         dst2 = backP.dst2
         dst3 = backP.dst3
@@ -268,7 +268,7 @@ Public Class BackProject_Unstable : Inherits TaskParent
         labels = {"", "", "Backprojection output", "Unstable pixels in the backprojection.  If flashing, set 'Color Difference Threshold' higher."}
         desc = "Highlight the unstable pixels in the backprojection."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
         dst2 = ShowPalette(backP.dst2)
 
@@ -294,7 +294,7 @@ Public Class BackProject_FullEqualized : Inherits TaskParent
         labels = {"", "", "BackProject_Full output without equalization", "BackProject_Full with equalization"}
         desc = "Create a histogram from the equalized color and then backproject it."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
         backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst2)
@@ -322,7 +322,7 @@ Public Class BackProject_Side : Inherits TaskParent
         labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
         desc = "Display the back projection of the hotspots in the Side View"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histSide.Run(src)
         autoY.Run(histSide.histogram)
 
@@ -344,7 +344,7 @@ Public Class BackProject_Top : Inherits TaskParent
         labels = {"", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View"}
         desc = "Display the back projection of the hotspots in the Top View"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
         dst2 = histTop.dst2
 
@@ -366,7 +366,7 @@ Public Class BackProject_Horizontal : Inherits TaskParent
     Public Sub New()
         desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bpTop.Run(src)
         task.pointCloud.SetTo(0, bpTop.dst3)
 
@@ -390,7 +390,7 @@ Public Class BackProject_Vertical : Inherits TaskParent
     Public Sub New()
         desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bpSide.Run(src)
         task.pointCloud.SetTo(0, bpSide.dst3)
 
@@ -413,7 +413,7 @@ Public Class BackProject_SoloSide : Inherits TaskParent
         labels = {"", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View"}
         desc = "Display the back projection of the solo samples in the Side View"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histSide.Run(src)
 
         dst3 = histSide.histogram.Threshold(1, 255, cv.ThresholdTypes.TozeroInv)
@@ -436,7 +436,7 @@ Public Class BackProject_SoloTop : Inherits TaskParent
         labels = {"", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View"}
         desc = "Display the back projection of the solo samples in the Top View"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
         dst3 = histTop.histogram.Threshold(1, 255, cv.ThresholdTypes.TozeroInv)
@@ -606,7 +606,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

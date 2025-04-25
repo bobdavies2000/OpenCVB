@@ -1103,7 +1103,7 @@ End Class
 
 Public Class XO_Line_Cells : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
@@ -1127,7 +1127,7 @@ End Class
 Public Class XO_Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         labels(3) = "Input to Line_Basics"
         optiBase.FindSlider("Canny Aperture").Value = 7
@@ -1381,7 +1381,7 @@ End Class
 
 Public Class XO_Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Lines for the current color class", "Color Class input"}
@@ -1407,7 +1407,7 @@ End Class
 Public Class XO_Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim contours As New Contour_Gray
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         task.gOptions.highlight.SelectedIndex = 3
@@ -1437,7 +1437,7 @@ End Class
 Public Class XO_Line_ViewSide : Inherits TaskParent
     Public autoY As New OpAuto_YRange
     Dim histSide As New Projection_HistSide
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
         desc = "Find lines in the hotspots for the side view."
@@ -1611,7 +1611,7 @@ Public Class XO_Line_Core : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_BasicsRaw in the current image with " +
+            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_RawSorted in the current image with " +
                             CStr(lpList.Count) + " after filtering with the motion mask."
         End If
     End Sub
@@ -1744,7 +1744,7 @@ End Class
 
 
 Public Class XO_Hough_Sudoku1 : Inherits TaskParent
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
@@ -4335,5 +4335,112 @@ Public Class XO_LineRect_CenterDepth : Inherits TaskParent
             labels(2) = CStr(depthLines) + " lines were found between objects (depth Lines)"
             labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_LongLine_BasicsEx : Inherits TaskParent
+    Public lines As New XO_LongLine_Basics
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        desc = "Identify the longest lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        lpList.Clear()
+        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
+        lpList.Add(New lpData(New cv.Point, New cv.Point))
+        For Each lp In task.lpList
+            lp = lp.BuildLongLine(lp)
+            DrawLine(dst2, lp.p1, lp.p2, white)
+            If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
+            lp.index = lpList.Count
+            lpList.Add(lp)
+            If lpList.Count >= task.numberOfLines Then Exit For
+        Next
+
+        labels(2) = $"{task.lpList.Count} lines found, longest {lpList.Count} displayed."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_LongLine_Basics : Inherits TaskParent
+    Public lpList As New List(Of lpData) ' The top X longest lines
+    Dim hist As New Hist_GridCell
+    Public Sub New()
+        task.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        desc = "Isolate the longest X lines and update the list of grid cells containing each line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
+        If task.lpList.Count = 0 Then Exit Sub
+
+        Dim lpLast As New List(Of lpData)
+        Dim ptLast As New List(Of cv.Point)
+        For Each lp In lpList
+            ptLast.Add(lp.p1)
+            ptLast.Add(lp.p2)
+            lp.index = lpLast.Count
+            lpLast.Add(lp)
+        Next
+
+        dst1.SetTo(0)
+        lpList.Clear()
+        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
+        lpList.Add(New lpData(New cv.Point, New cv.Point))
+        Dim usedList As New List(Of cv.Point)
+        For i = 1 To task.lpList.Count - 1
+            Dim lp = task.lpList(i)
+            lp.index = lpList.Count
+
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
+            lp.cellList.Clear()
+            lpList.Add(lp)
+
+            If lpList.Count - 1 >= task.numberOfLines Then Exit For
+        Next
+
+        task.lpMap.SetTo(0)
+        For Each gc In task.gcList
+            If dst1(gc.rect).CountNonZero = 0 Then Continue For
+            hist.Run(dst1(gc.rect))
+            For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
+                If hist.histarray(i) > 0 Then
+                    lpList(i).cellList.Add(gc.index)
+                    task.lpMap(task.gcList(gc.index).rect).SetTo(gc.index)
+                End If
+            Next
+        Next
+
+        dst3 = src.Clone
+        dst2 = src
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            For Each index In lp.cellList
+                dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+            Next
+        Next
+
+        For Each lp In lpList
+            Dim index As Integer = ptLast.IndexOf(lp.p1) / 2
+            If index > 0 And ptLast.Contains(lp.p2) And index < lpLast.Count Then
+                lp.age = lpLast(index).age + 1
+            End If
+        Next
+
+        labels(2) = CStr(lpList.Count - 1) + " longest lines in the image in " + CStr(task.lpList.Count) + " total lines."
+        labels(3) = labels(2)
     End Sub
 End Class

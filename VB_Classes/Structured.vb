@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
     Public lpListY As New List(Of lpData)
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Dim struct As New Structured_Core
     Dim hist As New Hist_GridCell
     Public Sub New()
@@ -198,7 +198,7 @@ End Class
 
 Public Class Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub
@@ -458,7 +458,7 @@ Public Class Structured_MultiSliceH : Inherits TaskParent
         optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim stepsize = options.stepSize
 
@@ -495,7 +495,7 @@ Public Class Structured_SliceXPlot : Inherits TaskParent
     Public Sub New()
         desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         multi.Run(src)
@@ -533,7 +533,7 @@ Public Class Structured_SliceYPlot : Inherits TaskParent
     Public Sub New()
         desc = "Find any plane around a peak value in the side view histogram"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         multi.Run(src)
@@ -569,13 +569,13 @@ End Class
 
 Public Class Structured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"
         desc = "Find the vertical center line with accurate depth data.."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
         slice.Run(src)
 
@@ -621,7 +621,7 @@ Public Class Structured_SliceEither : Inherits TaskParent
         optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Create slices in top and side views"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Static topRadio = optiBase.FindCheckBox("Top View (Unchecked Side View)")
         Dim topView = topRadio.checked
@@ -706,7 +706,7 @@ Public Class Structured_TransformH : Inherits TaskParent
 
         Return sliceMask
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim sliceMask = createSliceMaskH()
 
         histTop.Run(task.pointCloud.SetTo(0, Not sliceMask))
@@ -753,7 +753,7 @@ Public Class Structured_TransformV : Inherits TaskParent
 
         Return sliceMask
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim sliceMask = createSliceMaskV()
 
         histSide.Run(task.pointCloud.SetTo(0, Not sliceMask))
@@ -781,11 +781,11 @@ Public Class Structured_CountSide : Inherits TaskParent
     Public Sub New()
         rotate.rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Width / 2)
         rotate.rotateAngle = -90
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         slice.Run(src)
         dst2 = slice.dst3
 
@@ -830,7 +830,7 @@ Public Class Structured_CountSideSum : Inherits TaskParent
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of points found in each slice of the point cloud data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, dst2, 2, task.bins2D, task.rangesSide)
         dst2.Col(0).SetTo(0)
 
@@ -889,7 +889,7 @@ Public Class Structured_SliceV : Inherits TaskParent
         optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         desc = "Find and isolate planes using the top view histogram data"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
@@ -935,7 +935,7 @@ Public Class Structured_SliceH : Inherits TaskParent
     Public Sub New()
         desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         heat.Run(src)
@@ -980,7 +980,7 @@ Public Class Structured_SurveyH : Inherits TaskParent
         labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
         desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, dst3, 2, task.bins2D, task.rangesSide)
@@ -1027,7 +1027,7 @@ Public Class Structured_SurveyV : Inherits TaskParent
         labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
         desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, dst3, 2, task.bins2D, task.rangesTop)
@@ -1075,7 +1075,7 @@ Public Class Structured_MultiSlicePolygon : Inherits TaskParent
         labels(3) = "ApproxPolyDP 4-corner object from FindContours input"
         desc = "Detect polygons in the multiSlice output"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         multi.Run(src)
@@ -1113,7 +1113,7 @@ Public Class Structured_MultiSlice : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim stepSize = options.stepSize
 
@@ -1163,7 +1163,7 @@ Public Class Structured_MultiSliceV : Inherits TaskParent
         optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim stepsize = options.stepSize
 
@@ -1198,12 +1198,12 @@ End Class
 
 Public Class Structured_LinesX : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the X-direction of the Structured_Core output"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             Static struct As New Structured_Core
             struct.Run(src)
@@ -1226,7 +1226,7 @@ End Class
 
 Public Class Structured_LinesY : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_BasicsRaw
+    Dim lines As New Line_RawSorted
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the Y-direction of the Structured_Core output"

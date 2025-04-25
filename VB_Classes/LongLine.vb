@@ -1,80 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Public Class LongLine_Basics : Inherits TaskParent
-    Public lpList As New List(Of lpData) ' The top X longest lines
-    Dim hist As New Hist_GridCell
-    Public Sub New()
-        task.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        desc = "Isolate the longest X lines and update the list of grid cells containing each line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
-        If task.lpList.Count = 0 Then Exit Sub
-
-        Dim lpLast As New List(Of lpData)
-        Dim ptLast As New List(Of cv.Point)
-        For Each lp In lpList
-            ptLast.Add(lp.p1)
-            ptLast.Add(lp.p2)
-            lp.index = lpLast.Count
-            lpLast.Add(lp)
-        Next
-
-        dst1.SetTo(0)
-        lpList.Clear()
-        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-        lpList.Add(New lpData(New cv.Point, New cv.Point))
-        Dim usedList As New List(Of cv.Point)
-        For i = 1 To task.lpList.Count - 1
-            Dim lp = task.lpList(i)
-            lp.index = lpList.Count
-
-            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-            lp.cellList.Clear()
-            lpList.Add(lp)
-
-            If lpList.Count - 1 >= task.numberOfLines Then Exit For
-        Next
-
-        task.lpMap.SetTo(0)
-        For Each gc In task.gcList
-            If dst1(gc.rect).CountNonZero = 0 Then Continue For
-            hist.Run(dst1(gc.rect))
-            For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
-                If hist.histarray(i) > 0 Then
-                    lpList(i).cellList.Add(gc.index)
-                    task.lpMap(task.gcList(gc.index).rect).SetTo(gc.index)
-                End If
-            Next
-        Next
-
-        dst3 = src.Clone
-        dst2 = src
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            For Each index In lp.cellList
-                dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
-            Next
-        Next
-
-        For Each lp In lpList
-            Dim index As Integer = ptLast.IndexOf(lp.p1) / 2
-            If index > 0 And ptLast.Contains(lp.p2) And index < lpLast.Count Then
-                lp.age = lpLast(index).age + 1
-            End If
-        Next
-
-        labels(2) = CStr(lpList.Count - 1) + " longest lines in the image in " + CStr(task.lpList.Count) + " total lines."
-        labels(3) = labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class LongLine_DepthDirection : Inherits TaskParent
     Public gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
@@ -83,7 +7,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         desc = "Display the direction of each line in depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.longLines.dst3
+        dst2 = task.lines.dst3
 
         dst1.SetTo(0)
         gcUpdates.Clear()
@@ -139,13 +63,13 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                 Dim depthIncr = (max - min) / lp.cellList.Count
                 For i = 0 To lp.cellList.Count - 1
                     Dim index = lp.cellList(i)
-                    Dim gc = task.gcList(Index)
+                    Dim gc = task.gcList(index)
                     If offset > 0 Then
                         dst1(gc.rect).SetTo((offset - i + 1) * incr)
-                        gcUpdates.Add(New Tuple(Of Integer, Single)(Index, min + (offset - i) * depthIncr))
+                        gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
                     Else
                         dst1(gc.rect).SetTo(i * incr + 1)
-                        gcUpdates.Add(New Tuple(Of Integer, Single)(Index, min + i * depthIncr))
+                        gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + i * depthIncr))
                     End If
                     If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
                 Next
@@ -164,36 +88,6 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             labels(3) = "Yellow is closer than blue but 'all yellow' is a likely vertical line in 3D where depths are within " +
                         CStr(task.depthDiffMeters) + "m of each other."
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class LongLine_BasicsEx : Inherits TaskParent
-    Public lines As New LongLine_Basics
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        desc = "Identify the longest lines"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-
-        lpList.Clear()
-        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-        lpList.Add(New lpData(New cv.Point, New cv.Point))
-        For Each lp In task.lpList
-            lp = lp.BuildLongLine(lp)
-            DrawLine(dst2, lp.p1, lp.p2, white)
-            If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
-            lp.index = lpList.Count
-            lpList.Add(lp)
-            If lpList.Count >= task.numberOfLines Then Exit For
-        Next
-
-        labels(2) = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed."
     End Sub
 End Class
 
@@ -287,7 +181,7 @@ End Class
 
 
 Public Class LongLine_ExtendTest : Inherits TaskParent
-    Dim longLine As New LongLine_BasicsEx
+    Dim longLine As New XO_LongLine_BasicsEx
     Public Sub New()
         labels = {"", "", "Random Line drawn", ""}
         desc = "Test lpData constructor with random values to make sure lines are extended properly"
@@ -409,40 +303,6 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class LongLine_Consistent : Inherits TaskParent
-    Dim longest As New LongLine_Basics
-    Public ptLong As lpData
-    Public Sub New()
-        desc = "Isolate the line that is consistently among the longest lines present in the image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        longest.Run(src)
-        If task.lpList.Count = 0 Then Exit Sub
-        If ptLong Is Nothing Then ptLong = task.lpList(1)
-
-        Dim minDistance = Single.MaxValue
-        Dim lpMin As lpData
-        For Each lp In longest.lpList
-            Dim distance = lp.p1.DistanceTo(ptLong.p1) + lp.p2.DistanceTo(ptLong.p2)
-            If distance < minDistance Then
-                minDistance = distance
-                lpMin = lp
-            End If
-        Next
-
-        labels(2) = "minDistance = " + Format(minDistance, fmt1)
-        DrawLine(dst2, ptLong.p1, ptLong.p2, task.highlight)
-        ptLong = lpMin
-    End Sub
-End Class
 
 
 

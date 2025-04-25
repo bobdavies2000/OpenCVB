@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineCoin_Basics : Inherits TaskParent
-    Public longLines As New LongLine_BasicsEx
+    Public longLines As New XO_LongLine_BasicsEx
     Public lpList As New List(Of lpData)
     Dim lpLists As New List(Of List(Of lpData))
     Public Sub New()

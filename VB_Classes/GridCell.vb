@@ -963,28 +963,30 @@ End Class
 Public Class GridCell_Lines : Inherits TaskParent
     Dim info As New Line_Info
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Lines can mean cells are connected - click on any highlighted grid cell to see info on that line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.ClickPoint = newPoint Then
             If task.gcList.Count > 1 Then task.ClickPoint = task.gcList(1).rect.TopLeft
         End If
-        dst2 = task.longLines.dst2 ' grid cells were already set by constructor.
+        dst2 = task.lines.dst2
 
         dst3.SetTo(0)
         Dim lineRect As cv.Rect
         Dim index = task.lpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        If index = 0 Then Exit Sub
+        labels(2) = CStr(index)
         task.lpD = task.lpList(index)
         For Each index In task.lpD.cellList
             Dim gc = task.gcList(index)
             If lineRect.Width = 0 Then lineRect = gc.rect Else lineRect = lineRect.Union(gc.rect)
-            ' dst3.Rectangle(gc.rect, 255, 1, task.lineType)
+            dst2.Rectangle(gc.rect, task.highlight, 1, task.lineType)
         Next
 
-        dst1.Rectangle(lineRect, 255, task.lineWidth, task.lineType)
-        task.color.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
-
-        info.Run(src)
+        info.Run(emptyMat)
         SetTrueText(info.strOut, 3)
+
+        dst1 = ShowPalette(task.lpMap.ConvertScaleAbs())
     End Sub
 End Class
