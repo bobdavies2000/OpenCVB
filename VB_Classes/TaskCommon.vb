@@ -623,7 +623,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p2 As cv.Point2f
     Public length As Single
     Public index As Integer
-    Public facets As New List(Of cv.Point)
     Public cellList As New List(Of Integer)
     Public m As Single
     Public b As Single

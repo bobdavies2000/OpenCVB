@@ -2980,18 +2980,19 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
         dst1.SetTo(0)
         For i = 0 To delaunay.facetList.Count - 1
             Dim lp = task.lpList(i)
-            lp.facets = delaunay.facetList(i)
+            Dim facets = delaunay.facetList(i)
 
-            DrawContour(dst1, lp.facets, 255, task.lineWidth)
-            DrawContour(task.fpMap, lp.facets, lp.index)
+            DrawContour(dst1, facets, 255, task.lineWidth)
+            DrawContour(task.fpMap, facets, lp.index)
             Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
-            DrawContour(dst3, lp.facets, gc.color)
+            DrawContour(dst3, facets, gc.color)
             task.lpList(i) = lp
         Next
 
         Dim index = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.lpD = task.lpList(index)
-        DrawContour(dst2, task.lpD.facets, white, task.lineWidth)
+        Dim facetsD = delaunay.facetList(task.lpD.index)
+        DrawContour(dst2, facetsD, white, task.lineWidth)
 
         labels(2) = task.lines.labels(2)
         labels(3) = delaunay.labels(2)
