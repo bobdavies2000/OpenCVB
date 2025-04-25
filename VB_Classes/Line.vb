@@ -351,44 +351,6 @@ End Class
 
 
 
-' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-Public Class Line_Intersection : Inherits TaskParent
-    Public p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
-    Public intersectionPoint As cv.Point2f
-    Public Sub New()
-        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
-            p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-        End If
-
-        intersectionPoint = IntersectTest(p1, p2, p3, p4)
-        intersectionPoint = IntersectTest(New lpData(p1, p2), New lpData(p3, p4))
-
-        dst2.SetTo(0)
-        dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        If intersectionPoint <> New cv.Point2f Then
-            DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
-            labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
-        Else
-            labels(2) = "Parallel!!!"
-        End If
-        If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
-            labels(2) += " (off screen)"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Line_VerticalHorizontal : Inherits TaskParent
@@ -677,3 +639,84 @@ Public Class Line_GCloud : Inherits TaskParent
 End Class
 
 
+
+
+
+
+
+' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
+Public Class Line_Intersection : Inherits TaskParent
+    Public p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
+    Public intersectionPoint As cv.Point2f
+    Public Sub New()
+        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+        End If
+
+        intersectionPoint = IntersectTest(p1, p2, p3, p4)
+        intersectionPoint = IntersectTest(New lpData(p1, p2), New lpData(p3, p4))
+
+        dst2.SetTo(0)
+        dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        If intersectionPoint <> New cv.Point2f Then
+            DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
+            labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
+        Else
+            labels(2) = "Parallel!!!"
+        End If
+        If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
+            labels(2) += " (off screen)"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_CellList : Inherits TaskParent
+    Public lp As lpData
+    Public Sub New()
+        desc = "Create the grid rect for a given line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            If task.heartBeatLT Then
+                lp = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                                New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                dst2.SetTo(0)
+                dst3.SetTo(0)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+
+                DrawRotatedOutline(lp.rotatedRect, dst3, task.highlight)
+                dst2.Rectangle(lp.rotatedRect.BoundingRect, task.highlight, task.lineWidth)
+            End If
+        End If
+        lp.cellList.Clear()
+        If Math.Abs(lp.p1.X - lp.p2.X) > Math.Abs(lp.p1.Y - lp.p2.Y) Then
+            For x = Math.Min(lp.p1.X, lp.p2.X) To Math.Max(lp.p1.X, lp.p2.X)
+                Dim y = lp.slope * x + lp.b
+                Dim index = task.gcMap.Get(Of Single)(y, x)
+                dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+                If lp.cellList.Contains(index) = False Then lp.cellList.Add(index)
+            Next
+        Else
+            For y = Math.Min(lp.p1.Y, lp.p2.Y) To Math.Max(lp.p1.Y, lp.p2.Y)
+                Dim x = (y - lp.b) / lp.slope
+                Dim index = task.gcMap.Get(Of Single)(y, x)
+                dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+                If lp.cellList.Contains(index) = False Then lp.cellList.Add(index)
+            Next
+        End If
+        If lp.cellList.Count = 0 Then Dim k = 0
+        labels(2) = CStr(lp.cellList.Count) + " grid cells will cover the line."
+    End Sub
+End Class

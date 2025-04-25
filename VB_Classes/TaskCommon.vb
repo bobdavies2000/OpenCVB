@@ -627,6 +627,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public rotatedRect As cv.RotatedRect
     Public facets As New List(Of cv.Point)
     Public cellList As New List(Of Integer)
+    Public gridRect As cv.Rect
+    Public b As Single
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
         If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
@@ -652,6 +654,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Else
             slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
+        b = -p1.X * slope + p1.Y
+
         length = p1.DistanceTo(p2)
         age = 1
         center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
