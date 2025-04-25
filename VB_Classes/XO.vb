@@ -1,4 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
+Imports System.Windows
 Imports cv = OpenCvSharp
 Public Class XO_Gravity_HorizonRawOld : Inherits TaskParent
     Public yLeft As Integer, yRight As Integer, xTop As Integer, xBot As Integer
@@ -2971,7 +2972,8 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
         delaunay.inputPoints.Clear()
 
         For Each lp In task.lpList
-            delaunay.inputPoints.Add(lp.center)
+            Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
+            delaunay.inputPoints.Add(center)
         Next
 
         delaunay.Run(src)
@@ -2984,7 +2986,8 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
 
             DrawContour(dst1, facets, 255, task.lineWidth)
             DrawContour(task.fpMap, facets, lp.index)
-            Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
+            Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
+            Dim gc = task.gcList(task.gcMap.Get(Of Single)(center.Y, center.X))
             DrawContour(dst3, facets, gc.color)
             task.lpList(i) = lp
         Next
@@ -3023,9 +3026,10 @@ Public Class XO_FCSLine_Vertical : Inherits TaskParent
             Dim lp1 = verts.vertList(i)
             For j = i + 1 To verts.vertList.Count - 1
                 Dim lp2 = verts.vertList(j)
-                Dim lpPerp = lp1.perpendicularPoints(lp1.center, task.cellSize)
+                Dim center = New cv.Point(CInt((lp1.p1.X + lp1.p2.X) / 2), CInt((lp1.p1.Y + lp1.p2.Y) / 2))
+                Dim lpPerp = lp1.perpendicularPoints(center, task.cellSize)
                 Dim intersectionPoint = IntersectTest(lp1, lpPerp)
-                Dim distance = intersectionPoint.DistanceTo(lp1.center)
+                Dim distance = intersectionPoint.DistanceTo(center)
                 If distance <= options.proximity Then
                     minRect.lpInput1 = lp1
                     minRect.lpInput2 = lp2
@@ -4289,5 +4293,47 @@ Public Class XO_Structured_Tiles : Inherits TaskParent
             dst3(roi).SetTo(c)
         Next
         labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_LineRect_CenterDepth : Inherits TaskParent
+    Public options As New Options_LineRect
+    Public Sub New()
+        desc = "Remove lines which have similar depth in grid cells on either side of a line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst2 = src.Clone
+        dst3 = src.Clone
+
+        Dim depthThreshold = options.depthThreshold
+        Dim depthLines As Integer, colorLines As Integer
+        For Each lp In task.lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+            Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
+            Dim lpPerp = lp.perpendicularPoints(center, task.cellSize)
+            Dim index1 As Integer = task.gcMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
+            Dim index2 As Integer = task.gcMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
+            Dim gc1 = task.gcList(index1)
+            Dim gc2 = task.gcList(index2)
+            If Math.Abs(gc1.depth - gc2.depth) > depthThreshold Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                depthLines += 1
+            Else
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                colorLines += 1
+            End If
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(depthLines) + " lines were found between objects (depth Lines)"
+            labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
+        End If
     End Sub
 End Class

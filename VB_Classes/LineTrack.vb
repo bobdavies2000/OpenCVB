@@ -17,7 +17,8 @@ Public Class LineTrack_Basics : Inherits TaskParent
         dst3.SetTo(0)
         For Each lp In task.lpList
             DrawLine(dst3, lp.p1, lp.p2, white, task.lineWidth)
-            DrawCircle(dst3, lp.center, task.DotSize, task.highlight, -1)
+            Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
+            DrawCircle(dst3, center, task.DotSize, task.highlight, -1)
         Next
     End Sub
 End Class

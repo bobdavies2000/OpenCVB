@@ -617,7 +617,6 @@ End Class
 
 
 Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
-    Public center As cv.Point ' the point to use when identifying this line
     Public age As Integer
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
@@ -655,7 +654,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
 
         length = p1.DistanceTo(p2)
         age = 1
-        center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
 
         If p1.X = p2.X Then
             ' handle the special case of slope 0
@@ -713,7 +711,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
         If p2.Y < 0 Then p2.Y = 0
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
         Return New lpData(p1, p2)
     End Function

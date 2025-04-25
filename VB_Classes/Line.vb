@@ -61,8 +61,6 @@ Public Class Line_Basics : Inherits TaskParent
             usedlist.Add(p1)
             usedlist.Add(p2)
 
-            Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
-
             lp.index = task.lpList.Count
             task.lpList.Add(lp)
             If task.lpList.Count >= task.numberOfLines Then Exit For
@@ -202,9 +200,6 @@ Public Class Line_BasicsAlternative : Inherits TaskParent
         dst2 = src
         For Each lp In sortlines.Values
             lp.index = task.lpList.Count
-
-            Dim gc = task.gcList(task.gcMap.Get(Of Single)(lp.center.Y, lp.center.X))
-
             task.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
@@ -439,10 +434,10 @@ Public Class Line_Info : Inherits TaskParent
         dst2.SetTo(0)
         For Each lp In task.lpList
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
-            DrawCircle(dst2, lp.center, task.DotSize, task.highlight)
+            DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
         Next
 
-        If task.firstPass Then task.ClickPoint = task.lpList(0).center
+        If task.firstPass Then task.ClickPoint = task.lpList(0).p1
 
         strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
         strOut += CStr(task.lpList.Count) + " lines found " + vbCrLf + vbCrLf
