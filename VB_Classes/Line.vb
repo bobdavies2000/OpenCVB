@@ -457,7 +457,7 @@ Public Class Line_Info : Inherits TaskParent
         strOut += "Age = " + CStr(lp.age) + vbCrLf
 
         strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf
-        strOut += "Slope = " + Format(lp.slope, fmt3) + vbCrLf
+        strOut += "Slope = " + Format(lp.m, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted."
 
         SetTrueText(strOut, 3)
@@ -685,7 +685,7 @@ End Class
 Public Class Line_CellList : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
-        desc = "Create the grid rect for a given line."
+        desc = "Create the cellList for a given line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
@@ -693,30 +693,56 @@ Public Class Line_CellList : Inherits TaskParent
                 lp = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
                                 New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
                 dst2.SetTo(0)
-                dst3.SetTo(0)
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
-
-                DrawRotatedOutline(lp.rotatedRect, dst3, task.highlight)
-                dst2.Rectangle(lp.rotatedRect.BoundingRect, task.highlight, task.lineWidth)
+                Dim rotatedRect = cv.Cv2.MinAreaRect({lp.p1, lp.p2})
+                dst2.Rectangle(rotatedRect.BoundingRect, task.highlight, task.lineWidth)
             End If
         End If
+
+
         lp.cellList.Clear()
-        If Math.Abs(lp.p1.X - lp.p2.X) > Math.Abs(lp.p1.Y - lp.p2.Y) Then
-            For x = Math.Min(lp.p1.X, lp.p2.X) To Math.Max(lp.p1.X, lp.p2.X)
-                Dim y = lp.slope * x + lp.b
+        If lp.p1.X = lp.p2.X Then
+            ' handle the special case of slope 0
+            Dim x = lp.p1.X
+            For y = Math.Min(lp.p1.Y, lp.p2.Y) To Math.Max(lp.p1.Y, lp.p2.Y) Step task.cellSize
                 Dim index = task.gcMap.Get(Of Single)(y, x)
+                lp.cellList.Add(index)
                 dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
-                If lp.cellList.Contains(index) = False Then lp.cellList.Add(index)
             Next
         Else
-            For y = Math.Min(lp.p1.Y, lp.p2.Y) To Math.Max(lp.p1.Y, lp.p2.Y)
-                Dim x = (y - lp.b) / lp.slope
+            For x = Math.Min(lp.p1.X, lp.p2.X) To Math.Max(lp.p1.X, lp.p2.X)
+                Dim y = lp.m * x + lp.b
                 Dim index = task.gcMap.Get(Of Single)(y, x)
                 dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
                 If lp.cellList.Contains(index) = False Then lp.cellList.Add(index)
             Next
         End If
-        If lp.cellList.Count = 0 Then Dim k = 0
+        labels(2) = CStr(lp.cellList.Count) + " grid cells will cover the line."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_CellListValidate : Inherits TaskParent
+    Public lp As lpData
+    Public Sub New()
+        desc = "Validate the cellList for a given line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            If task.heartBeatLT Then
+                lp = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                                New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                dst2.SetTo(0)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+            End If
+        End If
+        For Each index In lp.cellList
+            dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+        Next
         labels(2) = CStr(lp.cellList.Count) + " grid cells will cover the line."
     End Sub
 End Class

@@ -182,14 +182,14 @@ Public Module vbc
 
     Public Function findEdgePoints(lp As lpData) As lpData
         ' compute the edge to edge line - might be useful...
-        Dim yIntercept = lp.p1.Y - lp.slope * lp.p1.X
+        Dim yIntercept = lp.p1.Y - lp.m * lp.p1.X
         Dim w = task.cols, h = task.rows
 
         Dim xp1 = New cv.Point2f(0, yIntercept)
-        Dim xp2 = New cv.Point2f(w, w * lp.slope + yIntercept)
-        Dim xIntercept = -yIntercept / lp.slope
+        Dim xp2 = New cv.Point2f(w, w * lp.m + yIntercept)
+        Dim xIntercept = -yIntercept / lp.m
         If xp1.Y > h Then
-            xp1.X = (h - yIntercept) / lp.slope
+            xp1.X = (h - yIntercept) / lp.m
             xp1.Y = h
         End If
         If xp1.Y < 0 Then
@@ -198,7 +198,7 @@ Public Module vbc
         End If
 
         If xp2.Y > h Then
-            xp2.X = (h - yIntercept) / lp.slope
+            xp2.X = (h - yIntercept) / lp.m
             xp2.Y = h
         End If
         If xp2.Y < 0 Then
@@ -621,13 +621,11 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public age As Integer
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
-    Public slope As Single
     Public length As Single
     Public index As Integer
-    Public rotatedRect As cv.RotatedRect
     Public facets As New List(Of cv.Point)
     Public cellList As New List(Of Integer)
-    Public gridRect As cv.Rect
+    Public m As Single
     Public b As Single
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
@@ -650,17 +648,31 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         End If
 
         If p1.X = p2.X Then
-            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+            m = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
         Else
-            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
+            m = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
-        b = -p1.X * slope + p1.Y
+        b = -p1.X * m + p1.Y
 
         length = p1.DistanceTo(p2)
         age = 1
         center = New cv.Point(CInt((p1.X + p2.X) / 2), CInt((p1.Y + p2.Y) / 2))
 
-        rotatedRect = cv.Cv2.MinAreaRect({p1, p2})
+        If p1.X = p2.X Then
+            ' handle the special case of slope 0
+            Dim x = p1.X
+            For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y)
+                Dim index = task.gcMap.Get(Of Single)(y, x)
+                If cellList.Contains(index) = False Then cellList.Add(index)
+            Next
+        Else
+            For x = Math.Min(p1.X, p2.X) To Math.Max(p1.X, p2.X)
+                Dim y = m * x + b
+                Dim index = task.gcMap.Get(Of Single)(y, x)
+                If cellList.Contains(index) = False Then cellList.Add(index)
+            Next
+        End If
+
     End Sub
     Sub New()
         p1 = New cv.Point2f()
@@ -668,14 +680,14 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     End Sub
     Public Function BuildLongLine(lp As lpData) As lpData
         If lp.p1.X <> lp.p2.X Then
-            Dim b = lp.p1.Y - lp.p1.X * lp.slope
+            Dim b = lp.p1.Y - lp.p1.X * lp.m
             If lp.p1.Y = lp.p2.Y Then
                 Return New lpData(New cv.Point(0, lp.p1.Y), New cv.Point(task.workingRes.Width, lp.p1.Y))
             Else
-                Dim xint1 = CInt(-b / lp.slope)
-                Dim xint2 = CInt((task.workingRes.Height - b) / lp.slope)
+                Dim xint1 = CInt(-b / lp.m)
+                Dim xint2 = CInt((task.workingRes.Height - b) / lp.m)
                 Dim yint1 = CInt(b)
-                Dim yint2 = CInt(lp.slope * task.workingRes.Width + b)
+                Dim yint2 = CInt(lp.m * task.workingRes.Width + b)
 
                 Dim points As New List(Of cv.Point)
                 If xint1 >= 0 And xint1 <= task.workingRes.Width Then points.Add(New cv.Point(xint1, 0))
@@ -688,7 +700,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Return New lpData(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, task.workingRes.Height))
     End Function
     Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
-        Dim perpSlope = -1 / slope
+        Dim perpSlope = -1 / m
         Dim angleRadians As Double = Math.Atan(perpSlope)
         Dim xShift = distance * Math.Cos(angleRadians)
         Dim yShift = distance * Math.Sin(angleRadians)

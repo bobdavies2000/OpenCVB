@@ -14,8 +14,8 @@ Public Class LineCoin_Basics : Inherits TaskParent
         Dim lp As lpData
         For Each lpList In lpLists
             For Each mp In lpList
-                mp.slope = CInt(mp.slope * 10) / 10
-                If mp.slope = 0 Then
+                mp.m = CInt(mp.m * 10) / 10
+                If mp.m = 0 Then
                     lp = New lpData(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
                 Else
                     lp = lp.BuildLongLine(mp)

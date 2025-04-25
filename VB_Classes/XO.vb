@@ -942,7 +942,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
         desc = "Combine lines that are approximately the same line."
     End Sub
     Private Function combine2Lines(lp1 As lpData, lp2 As lpData) As lpData
-        If Math.Abs(lp1.slope) >= 1 Then
+        If Math.Abs(lp1.m) >= 1 Then
             If lp1.p1.Y < lp2.p1.Y Then
                 Return New lpData(lp1.p1, lp2.p2)
             Else
@@ -975,7 +975,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
                 Dim val = lineMap.Get(Of Integer)(pt.Y, pt.X)
                 If val = 0 Then Continue For
                 Dim mp = lpList(val - 1)
-                If Math.Abs(mp.slope - lp.slope) < tolerance Then
+                If Math.Abs(mp.m - lp.m) < tolerance Then
                     Dim lpNew = combine2Lines(lp, mp)
                     If lpNew IsNot Nothing Then
                         addList.Add(lpNew)
@@ -1667,7 +1667,7 @@ Public Class XO_BackProject_LineSide : Inherits TaskParent
         Dim w = task.lineWidth + 5
         lpList.Clear()
         For Each lp In task.lpList
-            If Math.Abs(lp.slope) < 0.1 Then
+            If Math.Abs(lp.m) < 0.1 Then
                 lp = findEdgePoints(lp)
                 dst2.Line(lp.p1, lp.p2, 255, w, task.lineType)
                 lpList.Add(lp)
@@ -3028,8 +3028,8 @@ Public Class XO_FCSLine_Vertical : Inherits TaskParent
                 If distance <= options.proximity Then
                     minRect.lpInput1 = lp1
                     minRect.lpInput2 = lp2
-                    lp1.rotatedRect = minRect.rotatedRect
-                    lp2.rotatedRect = minRect.rotatedRect
+                    Dim rotatedRect1 = cv.Cv2.MinAreaRect({lp1.p1, lp1.p2})
+                    Dim rotatedRect2 = cv.Cv2.MinAreaRect({lp2.p1, lp2.p2})
                     minRect.Run(src)
                     dst2.Line(lp1.p1, lp1.p2, task.highlight, task.lineWidth, task.lineType)
                     dst2.Line(lp2.p1, lp2.p2, task.highlight, task.lineWidth, task.lineType)
@@ -3554,7 +3554,7 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
                 DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
             End If
         Next
-        labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
+        labels(2) = "Slope for gravity is " + Format(task.gravityVec.m, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.m, fmt1)
     End Sub
 End Class
 

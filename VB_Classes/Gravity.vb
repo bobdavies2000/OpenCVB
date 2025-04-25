@@ -8,7 +8,7 @@ Public Class Gravity_Basics : Inherits TaskParent
     End Sub
     Public Function computePerp(lp As lpData) As lpData
         Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
-        Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
+        Dim m = If(lp.m = 0, 100000, -1 / lp.m)
         Dim b = midPoint.Y - m * midPoint.X
         Dim p1 = New cv.Point2f(-b / m, 0)
         Dim p2 = New cv.Point2f((dst2.Height - b) / m, dst2.Height)

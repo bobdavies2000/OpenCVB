@@ -1336,7 +1336,8 @@ Public Class FPoly_LineRect : Inherits TaskParent
         fLine.Run(src)
 
         Dim lp = fLine.lp
-        lpRect = lp.rotatedRect.BoundingRect
+        Dim rotatedRect = cv.Cv2.MinAreaRect({lp.p1, lp.p2})
+        lpRect = rotatedRect.BoundingRect
 
         dst2 = src
         DrawLine(dst2, lp.p1, lp.p2, task.highlight)
