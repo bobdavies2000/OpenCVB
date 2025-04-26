@@ -68,7 +68,7 @@ Public Class Options
                     Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, False, False, False,
                                                         False, False, False, False, False, False})
-                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L"
+                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                     Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, True, True, True,
                                                         False, False, False, False, False, False})
@@ -97,7 +97,7 @@ Public Class Options
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, False, False, False,
                                                         False, False, False, False, False, False})
-            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L"
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                 Main_UI.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, True, True, True,
                                                         False, False, False, False, False, False})

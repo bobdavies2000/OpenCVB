@@ -4,8 +4,7 @@ Public Class GridCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
-        task.rgbLeftAligned = If(task.cameraName = "Orbbec Gemini 335L", True, False)
-        If task.cameraName = "Orbbec Gemini 336L" Then task.rgbLeftAligned = True
+        If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
         If task.cameraName.StartsWith("StereoLabs") Then task.rgbLeftAligned = True
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub

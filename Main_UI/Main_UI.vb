@@ -165,12 +165,7 @@ Public Class Main_UI
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
-                If searchname.EndsWith(" C++") Then
-                    searchname = searchname.Replace(" C++", "")
-                End If
-
-                If searchname.Contains("Orbbec") Then searchname = "Orbbec Gemini 335L"
-                If searchname.Contains("Orbbec") Then searchname = "Orbbec Gemini 336L"
+                If searchname.Contains("Orbbec") Then searchname = "Orbbec Gemini"
                 If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
@@ -1419,7 +1414,7 @@ Public Class Main_UI
                 Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
                 Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
-            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L"
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                 Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 ' Return New CameraORB_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
         End Select

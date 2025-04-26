@@ -1,34 +1,36 @@
-# 2025 April (1) – Camera Support, Depth Edges, FitLine, LineTrack, Gravity/Horizon, TreeView.
+# 2025 April (2) – Camera Support, Feature Options, FCS, Logical Depth, and RGB Lines.
 
 -   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
--   Camera support for color and left aligned images is still under development.
+-   Support added for some new cameras: Orbbec Gemini 335, Orbbec Gemini 336L
+-   UPDATE: Camera support for color and left aligned images:
     -   StereoLabs ZED – working – camera aligns color and left view.
     -   Orbbec Gemini 335L – working – camera aligns color and left view.
+    -   Orbbec Gemini 336L – working – camera aligns color and left view.
+    -   Orbbec Gemini 335 – working - camera aligns color and left view.
     -   Intel RealSense – not working – camera does not align left and color views.
         -   Manual alternative is not working either.
         -   Translation and rotation parameters from the camera look incorrect.
     -   Oak-D Pro 4 – new camera coming – status is TBD.
--   Depth data is filtered with HighVis_Basics to produce higher quality values.
-    -   Grid cells can’t be neighbors if disparities are significantly different.
-    -   Disparity differences can define coarse edges in depth data.
-    -   Grid cells with a large range of depth values also define depth edges.
-    -   GIF below demonstrates that poor depth data is trimmed carefully.
--   Disparity differences can also be too close – left and right can’t be the same.
-    -   If the change is less than 1 pixel, the depth data is not reliable.
-    -   Left and right images are unlikely to have identical locations.
--   FitLine_Basics was redone and is now more accurate.
-    -   Fit the points with an ellipse and use the ellipse center line.
-    -   The result is better than either FitLine or Eigen functions.
--   Line tracking algorithms were reworked and simplified.
-    -   RedColor is used to identify the lines and track their movement.
--   Gravity and Horizon were incorrect at the highest resolution.
-    -   FindNonZero found plenty of pixels but all in row zero. Problem fixed.
--   The TreeView output was updated to show detail of algorithms \< 1% utilization.
+-   Important feature options are presented the same way as Global and RedCloud.
+    -   Feature options also include some options for edges and lines.
+-   Feature coordinate system (FCS) interface was reworked with better colors and aging.
+-   Included in this version of OpenCVB is the notion of “LogicalDepth”.
+    -   LogicalDepth.vb code shows how lines in depth can enhance depth data.
+    -   Lines in depth indicate depth that is logically connected and linear.
+    -   How to get lines in depth? Structured.vb algorithms have long provided it.
+    -   Similar to structured light, structured.vb finds lines in X and Y directions.
+    -   Below is an example of showing how lines are found in structured depth.
+-   RGB lines can be used in a similar manner to depth lines but with a difference.
+    -   RGB lines will not have consistent depth on both sides of the line.
+    -   However, an edge in RGB suggests a disparity in depth.
+        -   Lines on a wall and painting frame will have similar depth values.
+    -   Lines in depth should have coherent depth for the length of the line.
+    -   Optical illusions are examples of when lines are not coherent, hopefully rare.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/ef742dde619d31abd091b68a09c09191.gif)
+![](media/8ecc1cc1682ce29ec4ba0dd0fdd6d9db.gif)
 
-**GridCell_Info :** *This algorithm displays the contents of the grid cell under the mouse cursor but the goal here is to show the impact of removing cells that have a high difference from the disparity in the cell’s neighbor. Essentially, this is edge detection in depth and removes the cells with unreliable depth data – visible in the upper right image..*
+**Structured_Core:** *The Structured_Core algorithm is similar in concept to structured light without additional hardware. All RGBD cameras can produce depth lines. By slicing through the point cloud with various increments, this example produces edges which line detection can use to find lines.  Note how lines change from one depth image to the next.  Depth data is fairly chaotic pixel by pixel. Depth lines should be coherent and will form the basis of ‘Logical Depth’.*
 
 # Introduction
 
@@ -1975,3 +1977,35 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A screenshot of a computer AI-generated content may be incorrect.](media/5411c8981b86e7bc4779ffc60a1a8309.gif)
 
 **RedColor_Basics :** *The same algorithm as the previous update but with the improved representation of the “Depth Correlation”. The upper right image is switching between the previous view of the depth and the current one that includes the regions with zero depth.*
+
+# 2025 April (1) – Camera Support, Depth Edges, FitLine, LineTrack, Gravity/Horizon, TreeView.
+
+-   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
+-   Camera support for color and left aligned images is still under development.
+    -   StereoLabs ZED – working – camera aligns color and left view.
+    -   Orbbec Gemini 335L – working – camera aligns color and left view.
+    -   Intel RealSense – not working – camera does not align left and color views.
+        -   Manual alternative is not working either.
+        -   Translation and rotation parameters from the camera look incorrect.
+    -   Oak-D Pro 4 – new camera coming – status is TBD.
+-   Depth data is filtered with HighVis_Basics to produce higher quality values.
+    -   Grid cells can’t be neighbors if disparities are significantly different.
+    -   Disparity differences can define coarse edges in depth data.
+    -   Grid cells with a large range of depth values also define depth edges.
+    -   GIF below demonstrates that poor depth data is trimmed carefully.
+-   Disparity differences can also be too close – left and right can’t be the same.
+    -   If the change is less than 1 pixel, the depth data is not reliable.
+    -   Left and right images are unlikely to have identical locations.
+-   FitLine_Basics was redone and is now more accurate.
+    -   Fit the points with an ellipse and use the ellipse center line.
+    -   The result is better than either FitLine or Eigen functions.
+-   Line tracking algorithms were reworked and simplified.
+    -   RedColor is used to identify the lines and track their movement.
+-   Gravity and Horizon were incorrect at the highest resolution.
+    -   FindNonZero found plenty of pixels but all in row zero. Problem fixed.
+-   The TreeView output was updated to show detail of algorithms \< 1% utilization.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of people and objects AI-generated content may be incorrect.](media/ef742dde619d31abd091b68a09c09191.gif)
+
+**GridCell_Info :** *This algorithm displays the contents of the grid cell under the mouse cursor but the goal here is to show the impact of removing cells that have a high difference from the disparity in the cell’s neighbor. Essentially, this is edge detection in depth and removes the cells with unreliable depth data – visible in the upper right image..*
