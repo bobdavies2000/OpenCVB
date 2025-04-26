@@ -419,11 +419,11 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Dim lastImage As cv.Mat
     Dim dotSlider As TrackBar
     Dim options As New Options_KNN
-    Dim optionsEx As New Options_Features
+    Dim feat As New Feature_Basics
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 200
         dotSlider = optiBase.FindSlider("Average distance multiplier")
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"
     End Sub
@@ -456,7 +456,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        optionsEx.Run()
+        feat.Run(task.grayStable)
 
         If task.firstPass Then lastImage = src.Clone
         Dim multiplier = dotSlider.Value
@@ -472,7 +472,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
         For Each mps In knn.matches
             Dim currRect = ValidateRect(New cv.Rect(mps.p1.X - sz, mps.p1.Y - sz, sz * 2, sz * 2))
             Dim prevRect = ValidateRect(New cv.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))
-            cv.Cv2.MatchTemplate(lastImage(prevRect), src(currRect), correlationMat, task.feat.options.matchOption)
+            cv.Cv2.MatchTemplate(lastImage(prevRect), src(currRect), correlationMat, feat.options.matchOption)
             Dim corrNext = correlationMat.Get(Of Single)(0, 0)
             DrawCircle(dst2, mps.p1, task.DotSize, task.highlight)
             diffX.Add(mps.p1.X - mps.p2.X)

@@ -8,6 +8,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public options As New Options_Swarm
     Public optionsEx As New Options_Features
     Dim cornerHistory As New List(Of List(Of cv.Point2f))
+    Dim feat As New Feature_Basics
     Public Sub New()
         optiBase.FindSlider("Feature Sample Size").Value = 1000
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -35,9 +36,9 @@ Public Class Swarm_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        optionsEx.Run()
+        feat.Run(task.grayStable)
 
-        dst3 = task.feat.dst2
+        dst3 = feat.dst2
 
         If task.optionsChanged Then cornerHistory.Clear()
 

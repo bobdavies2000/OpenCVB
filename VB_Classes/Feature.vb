@@ -168,11 +168,14 @@ End Class
 Public Class Feature_KNN : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public featurePoints As New List(Of cv.Point2f)
+    Dim feat As New Feature_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.grayStable)
+
         knn.queries = New List(Of cv.Point2f)(task.features)
         If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
@@ -192,8 +195,8 @@ Public Class Feature_KNN : Inherits TaskParent
             DrawCircle(dst3, pt, task.DotSize + 2, white)
         Next
 
-        labels(2) = task.feat.labels(2)
-        labels(3) = task.feat.labels(2)
+        labels(2) = feat.labels(2)
+        labels(3) = feat.labels(2)
     End Sub
 End Class
 
@@ -326,18 +329,21 @@ End Class
 
 
 Public Class Feature_Points : Inherits TaskParent
+    Dim feat As New Feature_Basics
     Public Sub New()
         labels(3) = "Features found in the image"
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.grayStable)
+
         If task.heartBeat Then dst3.SetTo(0)
 
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
             DrawCircle(dst3, pt, task.DotSize, task.highlight)
         Next
-        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(task.feat.options.featurePoints) + " requested."
+        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(feat.options.featurePoints) + " requested."
     End Sub
 End Class
 
@@ -527,13 +533,15 @@ End Class
 
 
 Public Class Feature_GridPopulation : Inherits TaskParent
+    Dim feat As New Feature_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
         desc = "Find the feature population for each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = task.feat.labels(2)
+        feat.Run(task.grayStable)
+        labels(2) = feat.labels(2)
 
         dst3.SetTo(0)
         For Each pt In task.featurePoints
@@ -719,12 +727,12 @@ End Class
 
 Public Class Feature_FacetPoints : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Assign each delaunay point to a RedCell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.feat Is Nothing Then task.feat = New Feature_Basics
-        task.feat.Run(src)
+        feat.Run(src)
 
         If standalone Then runRedC(src)
 
@@ -825,7 +833,7 @@ End Class
 
 
 Public Class Feature_NoMotion : Inherits TaskParent
-    Public options As New Options_Features
+    Dim feat As New Feature_Basics
     Public Sub New()
         UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         task.gOptions.UseMotionMask.Checked = False
@@ -833,7 +841,7 @@ Public Class Feature_NoMotion : Inherits TaskParent
         desc = "Find good features to track in a BGR image using the motion mask+"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+        feat.Run(task.grayStable)
         dst2 = src.Clone
 
         dst3.SetTo(0)

@@ -1,3 +1,4 @@
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
@@ -12,7 +13,9 @@ Public Class Structured_Basics : Inherits TaskParent
         dst1 = dst0.Clone
         desc = "Find the lines in the X- and Y-direction of the Structured_Core output"
     End Sub
-    Private Function inventoryLines(dst As cv.Mat, lpList As List(Of lpData), structureMap As cv.Mat) As List(Of lpData)
+    Private Function inventoryLines(input As cv.Mat, dst As cv.Mat, lpList As List(Of lpData), structureMap As cv.Mat) As List(Of lpData)
+        lines.Run(input)
+
         dst.SetTo(0)
         lpList.Clear()
         lpList.Add(New lpData)
@@ -47,8 +50,7 @@ Public Class Structured_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         struct.Run(src)
 
-        lines.Run(struct.dst2)
-        lpListX = inventoryLines(dst0, lpListX, task.structureMapX)
+        lpListX = inventoryLines(struct.dst2, dst0, lpListX, task.structureMapX)
         labels(2) = CStr(lpListX.Count) + " depth lines found in X-direction slices"
         dst2 = ShowPalette(task.structureMapX).Clone
         If task.toggleOn Then
@@ -56,8 +58,7 @@ Public Class Structured_Basics : Inherits TaskParent
             dst2.SetTo(white, tmpX)
         End If
 
-        lines.Run(struct.dst3)
-        lpListY = inventoryLines(dst1, lpListY, task.structureMapY)
+        lpListY = inventoryLines(struct.dst3, dst1, lpListY, task.structureMapY)
         labels(3) = CStr(lpListY.Count) + " depth lines found in Y-direction slices"
         dst3 = ShowPalette(task.structureMapY)
         If task.toggleOn Then
@@ -67,6 +68,84 @@ Public Class Structured_Basics : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Structured_LinesX : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Dim lines As New Line_Basics
+    Dim struct As New Structured_Core
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the lines in the X-direction of the Structured_Core output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        'struct.Run(src)
+        'lines.Run(struct.dst2)
+
+        'dst.SetTo(0)
+        'lpList.Clear()
+        'lpList.Add(New lpData)
+        'For Each lp In lines.lpList
+        '    lp.index = lpList.Count
+        '    lp.cellList.Clear()
+        '    dst.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+        '    lpList.Add(lp)
+        '    If lpList.Count >= task.numberOfLines Then Exit For
+        'Next
+
+        'For Each gc In task.gcList
+        '    If dst(gc.rect).CountNonZero = 0 Then Continue For
+        '    hist.Run(dst(gc.rect))
+        '    For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
+        '        If hist.histarray(i) > 0 Then
+        '            lpList(i).cellList.Add(gc.index)
+        '        End If
+        '    Next
+        'Next
+
+        'structureMap.SetTo(0)
+        'For Each lp In lpList
+        '    For Each index In lp.cellList
+        '        Dim gc = task.gcList(index)
+        '        structureMap(gc.rect).SetTo(lp.index)
+        '    Next
+        'Next
+    End Sub
+End Class
+
+
+
+
+Public Class Structured_LinesY : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Dim lines As New Line_RawSorted
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the lines in the Y-direction of the Structured_Core output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static struct As New Structured_Core
+            struct.Run(src)
+            src = struct.dst3
+        End If
+
+        lines.Run(src)
+        lpList = New List(Of lpData)(lines.lpList)
+
+        dst2.SetTo(0)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+
+        labels(2) = CStr(lpList.Count) + " lines found in Y-direction slices"
+    End Sub
+End Class
 
 
 
@@ -1189,66 +1268,6 @@ Public Class Structured_MultiSliceV : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Structured_LinesX : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Dim lines As New Line_RawSorted
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the lines in the X-direction of the Structured_Core output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static struct As New Structured_Core
-            struct.Run(src)
-            src = struct.dst2
-        End If
-
-        lines.Run(src)
-        lpList = New List(Of lpData)(lines.lpList)
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(2) = CStr(lpList.Count) + " lines found in X-direction slices"
-    End Sub
-End Class
-
-
-
-
-Public Class Structured_LinesY : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Dim lines As New Line_RawSorted
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the lines in the Y-direction of the Structured_Core output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static struct As New Structured_Core
-            struct.Run(src)
-            src = struct.dst3
-        End If
-
-        lines.Run(src)
-        lpList = New List(Of lpData)(lines.lpList)
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-
-        labels(2) = CStr(lpList.Count) + " lines found in Y-direction slices"
-    End Sub
-End Class
 
 
 

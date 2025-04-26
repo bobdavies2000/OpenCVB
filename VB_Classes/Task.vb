@@ -128,12 +128,10 @@ Public Class VBtask : Implements IDisposable
     Public lines As Line_Basics
     Public gCell As GridCell_Basics
     Public buildCorr As GridCell_CorrelationMap
-    Public fcs As FCS_Basics
     Public gridPoint As GridPoint_Basics
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
-    Public paletteRandom As Palette_RandomColors
     Public feat As Feature_Basics
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Object
@@ -142,8 +140,10 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
-    Public kalman As Kalman_Basics
     Public mouseD As GridCell_MouseDepth
+
+    Public paletteRandom As Palette_RandomColors
+    Public kalman As Kalman_Basics
 
     ' end of task algorithms
 
@@ -567,9 +567,7 @@ Public Class VBtask : Implements IDisposable
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
         buildCorr = New GridCell_CorrelationMap
-        fcs = New FCS_Basics
         gridPoint = New GridPoint_Basics
-        feat = New Feature_Basics
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
@@ -895,6 +893,8 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon.Run(src)
 
         lines.Run(src.Clone)
+        task.lpList = New List(Of lpData)(lines.lpList)
+        task.lpMap = lines.lpMap.Clone
 
         Dim saveOptionsChanged = optionsChanged
         mouseD.Run(src)

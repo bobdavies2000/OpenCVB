@@ -3,11 +3,14 @@ Public Class Mesh_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public ptList As New List(Of cv.Point2f)
     Dim options As New Options_Mesh
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Build triangles from the ptList input of points."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
+
+        feat.Run(task.grayStable)
 
         dst2 = src
         If task.heartBeat And standaloneTest() Then ptList = task.features
@@ -43,20 +46,23 @@ End Class
 
 Public Class Mesh_Features : Inherits TaskParent
     Dim mesh As New Mesh_Basics
+    Dim feat As New Feature_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
         UpdateAdvice(traceName + ": Use 'Options_Features' to update results.")
         desc = "Build triangles from feature points"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.grayStable)
+
         If task.features.Count < 3 Then Exit Sub
         mesh.ptList = task.features
         mesh.Run(src)
         dst2 = mesh.dst2
         dst3 = mesh.dst3
 
-        Dim pad = task.feat.options.templatePad
-        Dim size = task.feat.options.templateSize
+        Dim pad = feat.options.templatePad
+        Dim size = feat.options.templateSize
         Dim depthMiss As Integer
         For Each pt In task.features
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)

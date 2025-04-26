@@ -10,7 +10,7 @@ Public Class GridCell_Basics : Inherits TaskParent
         desc = "Create the grid of grid cells that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
+        If task.algorithmPrep = False Then Exit Sub ' when standalone or called from another algorithm is unnecessary - already been run...
         options.Run()
 
         If task.optionsChanged Then task.gcList.Clear()
@@ -609,17 +609,15 @@ End Class
 
 
 Public Class GridCell_Features : Inherits TaskParent
-    Dim options As New Options_Features
+    Dim feat As New Feature_Basics
     Public Sub New()
         task.featureOptions.DistanceSlider.Value = 3
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Featureless areas"
-        task.feat = New Feature_Basics
         desc = "Identify the cells with features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        task.feat.Run(src)
+        feat.Run(src)
 
         dst2 = task.gCell.dst2
 

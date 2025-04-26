@@ -3,9 +3,9 @@ Imports cv = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public mpCorrelation As New List(Of Single)
+    Dim feat As New Feature_Basics
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
-        If standalone Then task.gOptions.displaydst1.checked = true
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
@@ -13,7 +13,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Dim correlationmat As New cv.Mat
         lpList.Clear()
         mpCorrelation.Clear()
-        Dim pad = task.feat.options.templatePad, size = task.feat.options.templateSize
+        Dim pad = feat.options.templatePad, size = feat.options.templateSize
         For Each p1 In prevFeatures
             Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, size, size))
             Dim correlations As New List(Of Single)
@@ -30,8 +30,9 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
             End If
         Next
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        labels = task.feat.labels
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.grayStable)
+        labels = feat.labels
 
         dst3 = If(task.firstPass, src.Clone, dst2.Clone)
         Static prevFeatures As New List(Of cv.Point)(task.featurePoints)

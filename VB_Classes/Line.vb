@@ -1,75 +1,75 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Public rawLines As New Line_Raw
+    Public lpList As New List(Of lpData)
+    Public lpMap As New cv.Mat
+    Dim rawLines As New Line_Raw
     Public Sub New()
-        task.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 255)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 255)
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
-        If task.optionsChanged Then task.lpList.Clear()
-        Static lastList As New List(Of lpData)(task.lpList)
-        If task.optionsChanged Then lastList = rawLines.lpList
+        If task.algorithmPrep = False Then Exit Sub
+        If task.optionsChanged Then lpList.Clear()
 
-        Dim newList As New List(Of lpData)
+        cv.Cv2.ImShow("Motion", task.motionMask)
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingle)
+        Static lastList As New List(Of lpData)
         For Each lp In lastList
-            Dim noMotion As Boolean = True
+            Dim noMotionTest As Boolean = True
             For Each index In lp.cellList
                 Dim gc = task.gcList(index)
                 If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
-                    noMotion = False
+                    noMotionTest = False
                     Exit For
                 End If
             Next
-            If noMotion Then newList.Add(lp)
+            If noMotionTest Then
+                lp.age += 1
+                sortlines.Add(lp.length, lp)
+            End If
         Next
 
-        If src.Channels = 1 Then rawLines.Run(src) Else rawLines.Run(task.grayStable.Clone)
+        rawLines.Run(src)
 
         For Each lp In rawLines.lpList
-            Dim motion As Boolean = False
+            Dim motionTest As Boolean = False
             For Each index In lp.cellList
                 Dim gc = task.gcList(index)
                 If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
-                    motion = True
+                    motionTest = True
                     Exit For
                 End If
             Next
-            If motion Then newList.Add(lp)
+            If motionTest Then sortlines.Add(lp.length, lp)
         Next
 
-        ' sort again because some lines came from the previous generation.
-        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingle)
-        For Each lp In newList
-            If lp.length > 0 Then sortlines.Add(lp.length, lp)
-        Next
-
-        task.lpList.Clear()
+        lpList.Clear()
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-        task.lpList.Add(New lpData(New cv.Point, New cv.Point))
+        lpList.Add(New lpData(New cv.Point, New cv.Point))
 
-        ' update lpMap from smallest to largest so the largest lines own the grid cell.
-        task.lpMap.SetTo(0)
+        ' update lpMap from smallest to largest so the largest lines own any grid cell.
+        lpMap.SetTo(0)
         For Each lp In sortlines.Values
-            lp.index = task.lpList.Count
+            lp.index = lpList.Count
             For Each index In lp.cellList
-                task.lpMap(task.gcList(index).rect).SetTo(lp.index)
+                Dim gc = task.gcList(index)
+                Dim val = lpMap.Get(Of Single)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X)
+                If val <> 0 Then lpList(val).cellList.RemoveAt(lpList(val).cellList.IndexOf(gc.index))
+                lpMap(gc.rect).SetTo(lp.index)
             Next
-            task.lpList.Add(lp)
+            lpList.Add(lp)
         Next
 
-        dst2 = src.Clone
-        dst3.SetTo(0)
-        For Each lp In task.lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-        Next
+        If standaloneTest() Then
+            dst2 = src.Clone
+            For Each lp In lpList
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+        End If
 
-        lastList = New List(Of lpData)(task.lpList)
-
-        labels(2) = CStr(task.lpList.Count) + " lines were identified from the " + CStr(rawLines.lpList.Count) + " raw lines found."
+        lastList = New List(Of lpData)(lpList)
+        labels(2) = CStr(lpList.Count) + " lines were identified from the " + CStr(rawLines.lpList.Count) + " raw lines found."
     End Sub
 End Class
 
