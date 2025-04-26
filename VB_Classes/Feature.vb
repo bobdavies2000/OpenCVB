@@ -261,15 +261,15 @@ End Class
 
 Public Class Feature_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Contours
-    Dim options As New Options_Features
+    Dim feat As New Feature_Basics
     Public Sub New()
         task.featureOptions.DistanceSlider.Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+        feat.Run(task.grayStable)
 
-        labels(2) = task.feat.labels(2)
+        labels(2) = feat.labels(2)
 
         delaunay.Run(src)
         dst3 = delaunay.dst2
@@ -850,7 +850,7 @@ Public Class Feature_NoMotion : Inherits TaskParent
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
-        labels(2) = task.feat.labels(2)
+        labels(2) = feat.labels(2)
     End Sub
 End Class
 

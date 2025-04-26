@@ -132,7 +132,6 @@ Public Class VBtask : Implements IDisposable
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
-    Public feat As Feature_Basics
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Object
     Public ogl As OpenGL_Basics

@@ -138,7 +138,6 @@ Line
 Line3D
 Linear
 LinearRegression
-LineCoin
 LineRect
 LineTrack
 LogicalDepth

@@ -53,10 +53,7 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In sortlines.Values
             lp.index = lpList.Count
             For Each index In lp.cellList
-                Dim gc = task.gcList(index)
-                Dim val = lpMap.Get(Of Single)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X)
-                If val <> 0 Then lpList(val).cellList.RemoveAt(lpList(val).cellList.IndexOf(gc.index))
-                lpMap(gc.rect).SetTo(lp.index)
+                lpMap(task.gcList(index).rect).SetTo(lp.index)
             Next
             lpList.Add(lp)
         Next
