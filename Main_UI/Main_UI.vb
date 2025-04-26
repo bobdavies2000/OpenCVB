@@ -165,7 +165,6 @@ Public Class Main_UI
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
-                If searchname.Contains("Orbbec") Then searchname = "Orbbec Gemini"
                 If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
