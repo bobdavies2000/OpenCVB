@@ -28,9 +28,6 @@ Partial Class OptionsFeatures
         Me.MaskGroup = New System.Windows.Forms.GroupBox()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.EdgeMethods = New System.Windows.Forms.ComboBox()
-        Me.numLinesLabel = New System.Windows.Forms.Label()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.NumberLinesSlider = New System.Windows.Forms.TrackBar()
         Me.DistanceLabel = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.DistanceSlider = New System.Windows.Forms.TrackBar()
@@ -46,7 +43,6 @@ Partial Class OptionsFeatures
         Me.Label8 = New System.Windows.Forms.Label()
         Me.SelectedFeature = New System.Windows.Forms.TrackBar()
         Me.LineGroup.SuspendLayout()
-        CType(Me.NumberLinesSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -111,34 +107,6 @@ Partial Class OptionsFeatures
         Me.EdgeMethods.Name = "EdgeMethods"
         Me.EdgeMethods.Size = New System.Drawing.Size(246, 28)
         Me.EdgeMethods.TabIndex = 22
-        '
-        'numLinesLabel
-        '
-        Me.numLinesLabel.AutoSize = True
-        Me.numLinesLabel.Location = New System.Drawing.Point(499, 187)
-        Me.numLinesLabel.Name = "numLinesLabel"
-        Me.numLinesLabel.Size = New System.Drawing.Size(125, 20)
-        Me.numLinesLabel.TabIndex = 21
-        Me.numLinesLabel.Text = "Number of Lines"
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(32, 154)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(125, 20)
-        Me.Label4.TabIndex = 20
-        Me.Label4.Text = "Number of Lines"
-        '
-        'NumberLinesSlider
-        '
-        Me.NumberLinesSlider.Location = New System.Drawing.Point(28, 177)
-        Me.NumberLinesSlider.Maximum = 200
-        Me.NumberLinesSlider.Minimum = 1
-        Me.NumberLinesSlider.Name = "NumberLinesSlider"
-        Me.NumberLinesSlider.Size = New System.Drawing.Size(476, 69)
-        Me.NumberLinesSlider.TabIndex = 19
-        Me.NumberLinesSlider.Value = 50
         '
         'DistanceLabel
         '
@@ -284,9 +252,6 @@ Partial Class OptionsFeatures
         Me.Controls.Add(Me.FCorrSlider)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.EdgeMethods)
-        Me.Controls.Add(Me.numLinesLabel)
-        Me.Controls.Add(Me.Label4)
-        Me.Controls.Add(Me.NumberLinesSlider)
         Me.Controls.Add(Me.DistanceLabel)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.DistanceSlider)
@@ -298,7 +263,6 @@ Partial Class OptionsFeatures
         Me.Text = "Important Options for Features, Edges, Lines, and Masks"
         Me.LineGroup.ResumeLayout(False)
         Me.LineGroup.PerformLayout()
-        CType(Me.NumberLinesSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -313,9 +277,6 @@ Partial Class OptionsFeatures
     Friend WithEvents verticalRadio As Windows.Forms.RadioButton
     Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents EdgeMethods As Windows.Forms.ComboBox
-    Friend WithEvents numLinesLabel As Windows.Forms.Label
-    Friend WithEvents Label4 As Windows.Forms.Label
-    Friend WithEvents NumberLinesSlider As Windows.Forms.TrackBar
     Friend WithEvents DistanceLabel As Windows.Forms.Label
     Friend WithEvents Label2 As Windows.Forms.Label
     Friend WithEvents DistanceSlider As Windows.Forms.TrackBar

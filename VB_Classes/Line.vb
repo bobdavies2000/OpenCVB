@@ -3,16 +3,16 @@ Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpMap As New cv.Mat
+    Public nonTaskRequest As Boolean
     Dim rawLines As New Line_Raw
     Public Sub New()
         lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 255)
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub
+        If task.algorithmPrep = False And nonTaskRequest = False Then Exit Sub
         If task.optionsChanged Then lpList.Clear()
 
-        cv.Cv2.ImShow("Motion", task.motionMask)
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingle)
         Static lastList As New List(Of lpData)
         For Each lp In lastList
@@ -24,7 +24,7 @@ Public Class Line_Basics : Inherits TaskParent
                     Exit For
                 End If
             Next
-            If noMotionTest Then
+            If noMotionTest And lp.cellList.Count > 1 Then
                 lp.age += 1
                 sortlines.Add(lp.length, lp)
             End If
@@ -95,7 +95,8 @@ Public Class Line_Raw : Inherits TaskParent
 
         Dim lines = ld.Detect(src)
 
-        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+
+        lpList.Clear()
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
                v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
@@ -103,18 +104,13 @@ Public Class Line_Raw : Inherits TaskParent
                 Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
                    p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
+                    p1 = validatePoint(p1)
+                    p2 = validatePoint(p2)
                     Dim lp = New lpData(p1, p2)
-                    sortlines.Add(lp.length, lp)
+                    lp.index = lpList.Count
+                    lpList.Add(lp)
                 End If
             End If
-        Next
-
-        lpList.Clear()
-        For Each lp In sortlines.Values
-            lp.index = lpList.Count
-            lp.p1 = validatePoint(lp.p1)
-            lp.p2 = validatePoint(lp.p2)
-            lpList.Add(lp)
         Next
 
         If standaloneTest() Then
