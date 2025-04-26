@@ -918,7 +918,7 @@ Public Class VBtask : Implements IDisposable
             If gOptions.displayDst0.Checked Then
                 dst0 = Check8uC3(displayObject.dst0)
             Else
-                dst0 = color
+                dst0 = color.Clone
             End If
             If gOptions.displayDst1.Checked Then
                 dst1 = Check8uC3(displayObject.dst1)
