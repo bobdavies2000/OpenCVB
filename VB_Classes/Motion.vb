@@ -3,16 +3,16 @@ Imports System.Threading
 Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
-    Public lastColor() As cv.Vec3f
-    Public cellAge() As Integer
-    Public motionFlags() As Boolean
+    Public lastColor(0) As cv.Vec3f
+    Public cellAge(0) As Integer
+    Public motionFlags(0) As Boolean
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Below is the difference between the current image and the dst2 at left which is composed using the motion mask."
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Or task.firstPass Then
+        If lastColor.Count <> task.gridRects.Count Then
             ReDim lastColor(task.gridRects.Count - 1)
             ReDim cellAge(task.gridRects.Count - 1)
         End If

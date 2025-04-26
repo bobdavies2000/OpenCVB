@@ -46,17 +46,18 @@ Public Class Structured_Core : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Build structured slices through the point cloud."
+        desc = "Build structured slices through the point cloud.  Use the global option 'Grid Square Size' to adjust pattern."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         Dim depthMask As New cv.Mat
-        Dim minVal As Double, maxVal As Double
         For yCoordinate = 0 To src.Height - 1 Step task.cellSize
-            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-            minVal = planeY - task.metersPerPixel
-            maxVal = planeY + task.metersPerPixel
+            Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then
+                sliceY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+            End If
+            Dim minVal = sliceY - task.metersPerPixel
+            Dim maxVal = sliceY + task.metersPerPixel
             depthMask = task.pcSplit(1).InRange(minVal, maxVal)
             dst2.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then dst2.SetTo(0, task.noDepthMask)
@@ -64,100 +65,20 @@ Public Class Structured_Core : Inherits TaskParent
 
         dst3.SetTo(0)
         For xCoordinate = 0 To src.Width - 1 Step task.cellSize
-            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-            minVal = planeX - task.metersPerPixel
-            maxVal = planeX + task.metersPerPixel
+            Dim sliceX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then
+                sliceX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+            End If
+            Dim minVal = sliceX - task.metersPerPixel
+            Dim maxVal = sliceX + task.metersPerPixel
             depthMask = task.pcSplit(0).InRange(minVal, maxVal)
             dst3.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
         Next
+        labels = {"", "", "Horizontal depth lines with cell size = " + CStr(task.cellSize), "Vertical depth lines with cell size = " + CStr(task.cellSize)}
     End Sub
 End Class
 
-
-
-
-
-Public Class Structured_LinearizeFloor : Inherits TaskParent
-    Public floor As New Structured_FloorCeiling
-    Dim kalman As New Kalman_VB_Basics
-    Public sliceMask As cv.Mat
-    Public floorYPlane As Single
-    Dim options As New Options_StructuredFloor
-    Public Sub New()
-        desc = "Using the mask for the floor create a better representation of the floor plane"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        floor.Run(src)
-        dst2 = floor.dst2
-        dst3 = floor.dst3
-        sliceMask = floor.slice.sliceMask
-
-        Dim imuPC = task.pointCloud.Clone
-        imuPC.SetTo(0, Not sliceMask)
-
-        If sliceMask.CountNonZero > 0 Then
-            Dim split = imuPC.Split()
-            If options.xCheck Then
-                Dim mm As mmData = GetMinMax(split(0), sliceMask)
-
-                Dim firstCol As Integer, lastCol As Integer
-                For firstCol = 0 To sliceMask.Width - 1
-                    If sliceMask.Col(firstCol).CountNonZero > 0 Then Exit For
-                Next
-                For lastCol = sliceMask.Width - 1 To 0 Step -1
-                    If sliceMask.Col(lastCol).CountNonZero Then Exit For
-                Next
-
-                Dim xIncr = (mm.maxVal - mm.minVal) / (lastCol - firstCol)
-                For i = firstCol To lastCol
-                    Dim maskCol = sliceMask.Col(i)
-                    If maskCol.CountNonZero > 0 Then split(0).Col(i).SetTo(mm.minVal + xIncr * i, maskCol)
-                Next
-            End If
-
-            If options.yCheck Then
-                Dim mm As mmData = GetMinMax(split(1), sliceMask)
-                kalman.kInput = (mm.minVal + mm.maxVal) / 2
-                kalman.Run(src)
-                floorYPlane = kalman.kAverage
-                split(1).SetTo(floorYPlane, sliceMask)
-            End If
-
-            If options.zCheck Then
-                Dim firstRow As Integer, lastRow As Integer
-                For firstRow = 0 To sliceMask.Height - 1
-                    If sliceMask.Row(firstRow).CountNonZero > 20 Then Exit For
-                Next
-                For lastRow = sliceMask.Height - 1 To 0 Step -1
-                    If sliceMask.Row(lastRow).CountNonZero > 20 Then Exit For
-                Next
-
-                If lastRow >= 0 And firstRow < sliceMask.Height Then
-                    Dim meanMin = split(2).Row(lastRow).Mean(sliceMask.Row(lastRow))
-                    Dim meanMax = split(2).Row(firstRow).Mean(sliceMask.Row(firstRow))
-                    Dim zIncr = (meanMax(0) - meanMin(0)) / Math.Abs(lastRow - firstRow)
-                    For i = firstRow To lastRow
-                        Dim maskRow = sliceMask.Row(i)
-                        Dim mean = split(2).Row(i).Mean(maskRow)
-                        If maskRow.CountNonZero > 0 Then
-                            split(2).Row(i).SetTo(mean(0))
-                        End If
-                    Next
-                    dst2.Line(New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), cv.Scalar.Yellow, task.lineWidth + 1)
-                    dst2.Line(New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), cv.Scalar.Yellow, task.lineWidth + 1)
-                End If
-            End If
-
-            cv.Cv2.Merge(split, imuPC)
-
-            imuPC.CopyTo(task.pointCloud, sliceMask)
-        End If
-    End Sub
-End Class
 
 
 
@@ -177,40 +98,6 @@ Public Class Structured_MultiSliceLines : Inherits TaskParent
         lines.Run(dst3)
         dst2 = lines.dst2
         labels(2) = lines.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Structured_Depth : Inherits TaskParent
-    Dim sliceH As New Structured_SliceH
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)"}
-        desc = "Use the structured depth to enhance the depth away from the centerline."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        sliceH.Run(src)
-        dst0 = sliceH.dst3
-        dst2 = sliceH.dst2
-
-        Dim mask = sliceH.sliceMask
-        Dim perMeter = dst3.Height / task.MaxZmeters
-        dst3.SetTo(0)
-        Dim white As New cv.Vec3b(255, 255, 255)
-        For y = 0 To mask.Height - 1
-            For x = 0 To mask.Width - 1
-                Dim val = mask.Get(Of Byte)(y, x)
-                If val > 0 Then
-                    Dim depth = task.pcSplit(2).Get(Of Single)(y, x)
-                    Dim row = dst1.Height - depth * perMeter
-                    dst3.Set(Of cv.Vec3b)(If(row < 0, 0, row), x, white)
-                End If
-            Next
-        Next
     End Sub
 End Class
 
@@ -347,71 +234,6 @@ Public Class Structured_CountTop : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Structured_FloorCeiling : Inherits TaskParent
-    Public slice As New Structured_SliceEither
-    Public Sub New()
-        ReDim task.kalman.kInput(2 - 1)
-        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
-        desc = "Find the floor or ceiling plane"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        slice.Run(src)
-        dst2 = slice.heat.dst3
-
-        Dim floorMax As Single
-        Dim floorY As Integer
-        Dim floorBuffer = dst2.Height / 4
-        For i = dst2.Height - 1 To 0 Step -1
-            Dim nextSum = slice.heat.dst3.Row(i).Sum()(0)
-            If nextSum > 0 Then floorBuffer -= 1
-            If floorBuffer = 0 Then Exit For
-            If nextSum > floorMax Then
-                floorMax = nextSum
-                floorY = i
-            End If
-        Next
-
-        Dim ceilingMax As Single
-        Dim ceilingY As Integer
-        Dim ceilingBuffer = dst2.Height / 4
-        For i = 0 To dst3.Height - 1
-            Dim nextSum = slice.heat.dst3.Row(i).Sum()(0)
-            If nextSum > 0 Then ceilingBuffer -= 1
-            If ceilingBuffer = 0 Then Exit For
-            If nextSum > ceilingMax Then
-                ceilingMax = nextSum
-                ceilingY = i
-            End If
-        Next
-
-        task.kalman.kInput(0) = floorY
-        task.kalman.kInput(1) = ceilingY
-        task.kalman.Run(src)
-
-        labels(2) = "Current slice is at row =" + CStr(task.mouseMovePoint.Y)
-        labels(3) = "Ceiling is at row =" + CStr(CInt(task.kalman.kOutput(1))) + " floor at y=" + CStr(CInt(task.kalman.kOutput(0)))
-
-        DrawLine(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow)
-        SetTrueText("floor", New cv.Point(10, floorY + task.DotSize), 3)
-
-        Dim rect = New cv.Rect(0, Math.Max(ceilingY - 5, 0), dst2.Width, 10)
-        Dim mask = slice.heat.dst3(rect)
-        Dim mean As cv.Scalar, stdev As cv.Scalar
-        cv.Cv2.MeanStdDev(mask, mean, stdev)
-        If mean(0) < mean(2) Then
-            DrawLine(dst2, New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Yellow)
-            SetTrueText("ceiling", New cv.Point(10, ceilingY + task.DotSize), 3)
-        Else
-            SetTrueText("Ceiling does not appear to be present", 3)
-        End If
-    End Sub
-End Class
 
 
 

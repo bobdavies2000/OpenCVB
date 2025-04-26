@@ -11,14 +11,17 @@ Public Class Line_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False And nonTaskRequest = False Then Exit Sub
-        If task.optionsChanged Then lpList.Clear()
+        Static lastList As New List(Of lpData)
+        If task.optionsChanged Then
+            lastList.Clear()
+            lpList.Clear()
+        End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingle)
-        Static lastList As New List(Of lpData)
         For Each lp In lastList
             Dim noMotionTest As Boolean = True
             For Each index In lp.cellList
-                Dim gc = task.gcList(index)
+                Dim gc = If(index < task.gcList.Count, task.gcList(index), task.gcList(0))
                 If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
                     noMotionTest = False
                     Exit For

@@ -13,13 +13,14 @@ Public Class GridCell_Basics : Inherits TaskParent
         If task.algorithmPrep = False Then Exit Sub ' when standalone or called from another algorithm is unnecessary - already been run...
         options.Run()
 
-        If task.optionsChanged Then task.gcList.Clear()
+        If task.gcList.Count <> task.gridRects.Count Then task.gcList.Clear()
 
         Dim correlationMat As New cv.Mat
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
-        Dim gcLast As New List(Of gcData)(task.gcList), unchangedCount As Integer
+        Dim gcLast As New List(Of gcData)(task.gcList)
+        Dim unchangedCount As Integer
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.gcList.Clear()
@@ -28,7 +29,7 @@ Public Class GridCell_Basics : Inherits TaskParent
             Dim gc As New gcData
             If gc.depth > 0 Then
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute gc.
-                Dim lastCorrelation = If(task.optionsChanged, 0, gcLast(i).correlation)
+                Dim lastCorrelation = If(i < gcLast.Count, gcLast(i).correlation, 0)
                 If gc.age > 1 And lastCorrelation > task.fCorrThreshold And instantUpdate = False Then
                     ' no need to recompute everything when there is no motion in the cell.
                     gc = gcLast(i)
