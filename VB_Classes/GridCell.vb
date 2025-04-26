@@ -134,7 +134,7 @@ Public Class GridCell_MouseDepth : Inherits TaskParent
                                   Format(task.gcD.mm.maxVal, fmt1) + "m" + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
         ptCursor = validatePoint(task.mouseMovePoint)
         ptTextLoc = pt
-        ptTopLeft = task.gcD.rect.TopLeft
+        ptTopLeft = ptCursor ' task.gcD.rect.TopLeft ' in case it needs to switch back...
         If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptCursor, 2)
     End Sub
 End Class
@@ -967,26 +967,18 @@ Public Class GridCell_Lines : Inherits TaskParent
         desc = "Lines can mean cells are connected - click on any highlighted grid cell to see info on that line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.ClickPoint = newPoint Then
-            If task.gcList.Count > 1 Then task.ClickPoint = task.gcList(1).rect.TopLeft
-        End If
         dst2 = task.lines.dst2
 
         dst3.SetTo(0)
-        Dim lineRect As cv.Rect
-        Dim index = task.lpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        If index = 0 Then Exit Sub
-        labels(2) = CStr(index)
-        task.lpD = task.lpList(index)
+        If task.heartBeat Then info.Run(emptyMat)
         For Each index In task.lpD.cellList
             Dim gc = task.gcList(index)
-            If lineRect.Width = 0 Then lineRect = gc.rect Else lineRect = lineRect.Union(gc.rect)
             dst2.Rectangle(gc.rect, task.highlight, 1, task.lineType)
         Next
 
-        info.Run(emptyMat)
         SetTrueText(info.strOut, 3)
 
         dst1 = ShowPalette(task.lpMap.ConvertScaleAbs())
+        labels(2) = task.lines.labels(2) + " - Click on any line in the upper right to get details on that line."
     End Sub
 End Class

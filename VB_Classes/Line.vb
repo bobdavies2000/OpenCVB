@@ -479,31 +479,40 @@ Public Class Line_Info : Inherits TaskParent
         labels(2) = task.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
         If task.lpList.Count <= 1 Then Exit Sub
-        Dim lp As lpData
-        dst2.SetTo(0)
-        For Each lp In task.lpList
-            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
-            DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
-        Next
-
-        If task.firstPass Then task.ClickPoint = task.lpList(0).p1
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            For Each lp In task.lpList
+                dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+                DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
+            Next
+        End If
+        If task.firstPass Then
+            task.lpD = task.lpList(1)
+        Else
+            Dim index = task.lpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.lpD = task.lpList(index)
+        End If
 
         strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
         strOut += CStr(task.lpList.Count) + " lines found " + vbCrLf + vbCrLf
 
-        Dim clickIndex As Integer = Math.Abs(task.gOptions.DebugSlider.Value)
-        lp = task.lpList(clickIndex)
+        dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
+        strOut += "Line ID = " + CStr(task.lpD.index) + vbCrLf + vbCrLf
+        strOut += "gcMap element = " + CStr(task.lpD.index) + vbCrLf
+        strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
 
-        strOut += "Line ID = " + CStr(lp.index) + vbCrLf + vbCrLf
-        strOut += "gcMap element = " + CStr(clickIndex) + vbCrLf
-        strOut += "Age = " + CStr(lp.age) + vbCrLf
+        strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf + vbCrLf
+        strOut += "Slope = " + Format(task.lpD.m, fmt3) + vbCrLf
+        strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
 
-        strOut += "p1 = " + lp.p1.ToString + ", p2 = " + lp.p2.ToString + vbCrLf + vbCrLf
-        strOut += "Slope = " + Format(lp.m, fmt3) + vbCrLf
-        strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted."
-
+        For Each index In task.lpD.cellList
+            If index = task.lpD.cellList.Last Then
+                strOut += CStr(index)
+            Else
+                strOut += CStr(index) + ", "
+            End If
+        Next
         SetTrueText(strOut, 3)
     End Sub
 End Class
