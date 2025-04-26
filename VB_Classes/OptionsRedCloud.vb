@@ -69,7 +69,7 @@ Public Class OptionsRedCloud
                 Case "MYNT-EYE-D1000"
                     task.xRange = 3.5
                     task.yRange = 1.5
-                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L"
+                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                     task.xRange = 3.5
                     task.yRange = 1.5
             End Select

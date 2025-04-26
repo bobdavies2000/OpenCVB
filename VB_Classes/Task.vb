@@ -517,10 +517,10 @@ Public Class VBtask : Implements IDisposable
         ' set options for specific cameras here.
         Select Case task.cameraName
             Case "StereoLabs ZED 2/2i"
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
             Case "Intel(R) RealSense(TM) Depth Camera 455"
             Case "Oak-D camera"
-            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L"
             Case "MYNT-EYE-D1000"
 #If AZURE_SUPPORT Then
             Case "Azure Kinect 4K"
