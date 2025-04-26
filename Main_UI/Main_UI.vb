@@ -139,14 +139,11 @@ Public Class Main_UI
         settings = jsonfs.Load()(0)
         ' The camera names are defined in VBtask.algParms.cameraNames
         ' the 3 lists below must have an entry for each camera - supported/640x480/1920...
-        cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)
+        cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)  ' <<<<<<<<<<<< here is the list of supported cameras.
         With settings
-            .cameraSupported = New List(Of Boolean)({True, True, True, True, True,
-                                                     False, True}) ' Mynt support updated below
-            .camera640x480Support = New List(Of Boolean)({False, True, True, False,
-                                                          False, False, True})
-            .camera1920x1080Support = New List(Of Boolean)({True, False, False, False,
-                                                            True, False, False})
+            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True}) ' Mynt support updated below
+            .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
+            .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim sr = New StreamReader(defines.FullName)
             If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then
@@ -177,9 +174,16 @@ Public Class Main_UI
             Next
 
             For i = 0 To cameraNames.Count - 1
-                If cameraNames(i).Contains(.cameraName) Then
-                    .cameraIndex = i
-                    Exit For
+                If cameraNames(i).StartsWith("Orbbec") Then
+                    If cameraNames(i) = .cameraName Then
+                        .cameraIndex = i
+                        Exit For
+                    End If
+                Else
+                    If cameraNames(i).Contains(.cameraName) Then
+                        .cameraIndex = i
+                        Exit For
+                    End If
                 End If
             Next
 
