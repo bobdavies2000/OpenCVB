@@ -1736,7 +1736,7 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Dim corrText = task.mouseD.depthAndCorrelationText
+                Dim corrText = task.gCell.depthAndCorrelationText
                 SyncLock trueTextLock
                     Static saveObjectName = task.displayObjectName
                     If saveObjectName <> task.displayObjectName Then
@@ -1747,7 +1747,7 @@ Public Class Main_UI
                     If task.trueData.Count Then
                         trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                     End If
-                    trueData.Add(New TrueText(corrText, task.mouseD.ptTextLoc, 1))
+                    trueData.Add(New TrueText(corrText, task.gCell.ptTextLoc, 1))
                     task.trueData.Clear()
                 End SyncLock
 
@@ -1765,10 +1765,10 @@ Public Class Main_UI
                     algorithmRefresh = True
                 End If
 
-                dst(0).Circle(task.mouseD.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(1).Circle(task.mouseD.ptTopLeft, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(2).Circle(task.mouseD.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(3).Circle(task.mouseD.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(0).Circle(task.gCell.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(1).Circle(task.gCell.ptTopLeft, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(2).Circle(task.gCell.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(3).Circle(task.gCell.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
 
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 

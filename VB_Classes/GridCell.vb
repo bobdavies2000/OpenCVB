@@ -2,6 +2,10 @@
 Public Class GridCell_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Dim intrinsics As New Intrinsics_Basics
+    Public ptCursor As New cv.Point
+    Public ptTextLoc As New cv.Point
+    Public ptTopLeft As New cv.Point
+    Public depthAndCorrelationText As String
     Public Sub New()
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
         If task.cameraName.StartsWith("StereoLabs") Then task.rgbLeftAligned = True
@@ -88,6 +92,26 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.gcList.Count) + " grid cells, " + CStr(depthCount) +
                                            " have useful depth data and " + CStr(unchangedCount) + " were unchanged and "
+
+        If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
+        If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
+        Dim index As Integer = task.gcMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        task.gcD = task.gcList(index)
+
+        Dim pt = task.gcD.rect.TopLeft
+        If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
+            pt.X -= dst2.Width * 0.15
+        Else
+            pt.Y -= task.gcD.rect.Height * 3
+        End If
+
+        depthAndCorrelationText = Format(task.gcD.depth, fmt3) +
+                                  "m stdev " + Format(task.gcD.depthStdev, fmt1) + " ID=" +
+                                  CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
+                                  Format(task.gcD.mm.maxVal, fmt1) + "m" + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
+        ptCursor = validatePoint(task.mouseMovePoint)
+        ptTextLoc = pt
+        ptTopLeft = ptCursor ' task.gcD.rect.TopLeft ' in case it needs to switch back...
     End Sub
 End Class
 
@@ -803,7 +827,7 @@ Public Class GridCell_Correlation : Inherits TaskParent
         If index < 0 Or index > task.gcList.Count Then Exit Sub
 
         Dim gc = task.gcList(index)
-        Dim pt = task.mouseD.ptCursor
+        Dim pt = task.gCell.ptCursor
         Dim corr = gc.correlation
         dst2.Circle(gc.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
