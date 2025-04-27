@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class GridCell_Basics : Inherits TaskParent
-    Public options As New Options_GridCells
     Public instantUpdate As Boolean
     Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
@@ -10,7 +9,6 @@ Public Class GridCell_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' when standalone or called from another algorithm is unnecessary - already been run...
-        options.Run()
 
         If task.gcList.Count <> task.gridRects.Count Then task.gcList.Clear()
 
@@ -23,7 +21,7 @@ Public Class GridCell_Basics : Inherits TaskParent
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.gcList.Clear()
-        Dim depthCount As Integer, prevDisparity As Single
+        Dim depthCount As Integer
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
             If gc.depth > 0 Then
@@ -77,14 +75,6 @@ Public Class GridCell_Basics : Inherits TaskParent
                 gc.corrHistory.Add(gc.correlation)
             End If
 
-            If gc.rect.X > 0 Then
-                If Math.Abs(prevDisparity - gc.disparity) > options.disparityThreshold Then
-                    task.depthMask(gc.rect).SetTo(0)
-                    task.noDepthMask(gc.rect).SetTo(255)
-                    gc.depth = 0
-                    gc.correlation = 0
-                End If
-            End If
             dst2(gc.rect).SetTo(gc.color)
 
             If gc.depth > 0 Then depthCount += 1
@@ -94,7 +84,6 @@ Public Class GridCell_Basics : Inherits TaskParent
             End If
 
             task.gcList.Add(gc)
-            prevDisparity = gc.disparity
         Next
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.gcList.Count) + " grid cells, " + CStr(depthCount) +
