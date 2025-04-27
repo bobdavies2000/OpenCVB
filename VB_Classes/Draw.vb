@@ -243,6 +243,7 @@ Public Class Draw_Arc : Inherits TaskParent
     Dim thickness As Integer
     Dim options As New Options_DrawArc
     Public Sub New()
+        task.kalman = New Kalman_Basics
         desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -259,7 +260,7 @@ Public Class Draw_Arc : Inherits TaskParent
         End If
 
         task.kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         Dim r = New cv.Rect(task.kalman.kOutput(0), task.kalman.kOutput(1), task.kalman.kOutput(2), task.kalman.kOutput(3))
         If r.Width <= 5 Then r.Width = 5
         If r.Height <= 5 Then r.Height = 5
@@ -303,14 +304,15 @@ Public Class Draw_ClipLine : Inherits TaskParent
         If task.gOptions.UseKalman.Checked Then flow.flowText.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
+        task.kalman = New Kalman_Basics
         flow.parentData = Me
         setup()
         desc = "Demonstrate the use of the ClipLine function in Opencvb. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = src
         task.kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         Dim p1 = New cv.Point(CInt(task.kalman.kOutput(0)), CInt(task.kalman.kOutput(1)))
         Dim p2 = New cv.Point(CInt(task.kalman.kOutput(2)), CInt(task.kalman.kOutput(3)))
 

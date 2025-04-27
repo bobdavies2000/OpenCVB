@@ -415,3 +415,20 @@ Public Class GridPoint_KNN : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class GridPoint_BackProjection : Inherits TaskParent
+    Dim fLess As New GridPoint_FeatureLess
+    Dim backP As New BackProject_Basics
+    Public Sub New()
+        desc = "Backproject the featureless gridpoint regions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+    End Sub
+End Class

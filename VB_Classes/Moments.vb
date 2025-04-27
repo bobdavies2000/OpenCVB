@@ -5,6 +5,7 @@ Public Class Moments_Basics : Inherits TaskParent
     Public scaleFactor As Integer = 1
     Public offsetPt As cv.Point
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(2 - 1) ' 2 elements - cv.point
         labels(2) = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the provided mask file."
@@ -20,7 +21,7 @@ Public Class Moments_Basics : Inherits TaskParent
         If task.gOptions.UseKalman.Checked Then
             task.kalman.kInput(0) = m.M10 / m.M00
             task.kalman.kInput(1) = m.M01 / m.M00
-            task.kalman.Run(src)
+            task.kalman.Run(emptyMat)
             center = New cv.Point2f(task.kalman.kOutput(0), task.kalman.kOutput(1))
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
@@ -37,18 +38,19 @@ End Class
 Public Class Moments_CentroidKalman : Inherits TaskParent
     Dim fore As New Foreground_KMeans
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(2 - 1) ' 2 elements - cv.point
         labels(2) = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fore.Run(src)
         dst2 = fore.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim m = cv.Cv2.Moments(fore.dst2, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             task.kalman.kInput(0) = m.M10 / m.M00
             task.kalman.kInput(1) = m.M01 / m.M00
-            task.kalman.Run(src)
+            task.kalman.Run(emptyMat)
             DrawCircle(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), task.DotSize + 5, cv.Scalar.Red)
         End If
     End Sub

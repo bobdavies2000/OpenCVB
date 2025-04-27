@@ -49,6 +49,7 @@ Public Class Interpolate_Kalman : Inherits TaskParent
     Dim myFrameCount As Integer
     Dim heartCount As Integer
     Public Sub New()
+        task.kalman = New Kalman_Basics
         desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -64,7 +65,7 @@ Public Class Interpolate_Kalman : Inherits TaskParent
         Dim tmp32f As New cv.Mat
         dst2.ConvertTo(tmp32f, cv.MatType.CV_32F)
         Marshal.Copy(tmp32f.Data, task.kalman.kInput, 0, task.kalman.kInput.Length)
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
 
         Dim results(task.kalman.kInput.Length - 1) As Byte
         For i = 0 To task.kalman.kOutput.Length - 1

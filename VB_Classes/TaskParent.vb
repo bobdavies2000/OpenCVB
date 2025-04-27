@@ -519,12 +519,8 @@ Public Class TaskParent : Implements IDisposable
         DrawContour(dst, ptlist, color, 1)
     End Sub
     Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
-        If task.palette Is Nothing Then
-            task.palette = New Palette_LoadColorMap
-            task.palette.Run(input)
-        Else
-            task.palette.Run(input)
-        End If
+        If task.palette Is Nothing Then task.palette = New Palette_LoadColorMap
+        task.palette.Run(input)
         Return task.palette.dst2
     End Function
     Public Function ShowPalette(input As cv.Mat) As cv.Mat

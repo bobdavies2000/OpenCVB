@@ -580,10 +580,6 @@ Public Class Palette_LoadColorMap : Inherits TaskParent
             colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
         End If
 
-        If src.Type = cv.MatType.CV_32F Then
-            src = Convert32f_To_8UC3(src)
-            src.ConvertTo(src, cv.MatType.CV_8U)
-        End If
         cv.Cv2.ApplyColorMap(src, dst2, colorMap)
         If standalone Then dst3 = colorMap.Resize(dst3.Size)
     End Sub

@@ -70,6 +70,7 @@ End Class
 Public Class IMU_BasicsKalman : Inherits TaskParent
     Dim lastTimeStamp As Double
     Public Sub New()
+        task.kalman = New Kalman_Basics
         desc = "Read and display the IMU coordinates"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -245,6 +246,7 @@ End Class
 
 Public Class IMU_Stabilize : Inherits TaskParent
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(3 - 1)
         desc = "Stabilize IMU acceleration data."
         labels = {"", "", "IMU Stabilize (move camera around)", "Difference from Color Image"}
@@ -259,7 +261,7 @@ Public Class IMU_Stabilize : Inherits TaskParent
         Dim sy = 1 ' assume no scaling is taking place.
 
         task.kalman.kInput = {dx, dy, dz}
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         dx = task.kalman.kOutput(0)
         dy = task.kalman.kOutput(1)
         dz = task.kalman.kOutput(2)
@@ -539,6 +541,7 @@ Public Class IMU_Lines : Inherits TaskParent
     Dim vert As New Line_GCloud
     Dim lastGcell As gravityLine
     Public Sub New()
+        task.kalman = New Kalman_Basics
         labels(2) = "Vertical lines in Blue and horizontal lines in Yellow"
         desc = "Find the vertical and horizontal lines"
     End Sub
@@ -557,7 +560,7 @@ Public Class IMU_Lines : Inherits TaskParent
             Dim lastp2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
 
             task.kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
-            task.kalman.Run(src)
+            task.kalman.Run(emptyMat)
 
             p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
             p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))

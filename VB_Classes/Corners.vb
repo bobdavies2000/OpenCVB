@@ -180,6 +180,7 @@ End Class
 Public Class Corners_BasicsCentroid : Inherits TaskParent
     Dim fast As New Corners_Basics
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(1) ' 2 elements - cv.point
         desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub

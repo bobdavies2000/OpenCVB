@@ -417,6 +417,7 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
     Public fPlot As New FPoly_Plot
     Dim plot As New Plot_Histogram
     Public Sub New()
+        task.kalman = New Kalman_Basics
         plot.minRange = 0
         plot.removeZeroEntry = False
         labels = {"", "Distance change from previous frame", "", "anchor and companions - input to distance difference"}
@@ -430,7 +431,7 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         If task.optionsChanged Then ReDim task.kalman.kInput(fPlot.hist.Length - 1)
 
         task.kalman.kInput = fPlot.hist
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         fPlot.hist = task.kalman.kOutput
 
         Dim hlist = fPlot.hist.ToList
@@ -456,7 +457,7 @@ End Class
 Public Class FPoly_Stablizer : Inherits TaskParent
     Public fGrid As New FPoly_Core
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Movement amount - dot is current anchor point", "SyncImage aligned to current image - slide camera left or right",
                   "current image with distance map"}
         desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)"
@@ -503,7 +504,7 @@ Public Class FPoly_StartPoints : Inherits TaskParent
     Dim fGrid As New FPoly_Core
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 255)
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the feature grid points back to the last sync point"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -704,7 +705,7 @@ Public Class FPoly_WarpAffineImage : Inherits TaskParent
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -754,6 +755,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
     Public rotatePoints As New FPoly_RotatePoints
     Dim near As New XO_Line_Nearest
     Public Sub New()
+        task.kalman = New Kalman_Basics
         labels = {"", "", "Output of FPoly_Basics", "Center of rotation is where the extended lines intersect"}
         desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FPoly_Basics"
     End Sub
@@ -802,7 +804,7 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
                                         fPD.currPoly(fPD.polyPrevSideIndex).Y - fPD.prevPoly(fPD.polyPrevSideIndex).Y)
 
         task.kalman.kInput = {fPD.rotateAngle}
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         fPD.rotateAngle = task.kalman.kOutput(0)
 
         rotatePoints.poly = fPD.currPoly

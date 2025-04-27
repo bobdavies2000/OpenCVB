@@ -417,6 +417,7 @@ Public Class HistValley_Simple : Inherits TaskParent
     Dim trends As New SLR_Trends
     Public depthRegions As New List(Of Integer)
     Public Sub New()
+        task.kalman = New Kalman_Basics
         desc = "Identify ranges by marking the depth histogram entries from valley to valley"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -424,7 +425,7 @@ Public Class HistValley_Simple : Inherits TaskParent
 
         If task.kalman.kInput.Length <> task.histogramBins Then ReDim task.kalman.kInput(task.histogramBins - 1)
         task.kalman.kInput = trends.resultingValues.ToArray
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
 
         dst2.SetTo(cv.Scalar.Black)
         Dim barWidth As Single = dst2.Width / trends.resultingValues.Count
@@ -533,6 +534,7 @@ Public Class HistValley_GrayKalman : Inherits TaskParent
     Dim hist As New Hist_Kalman
     Dim auto As New OpAuto_Valley
     Public Sub New()
+        task.kalman = New Kalman_Basics
         If standalone Then task.gOptions.setHistogramBins(256)
         If standalone Then optiBase.FindSlider("Desired boundary count").Value = 4
         desc = "Find the histogram valleys for a grayscale image."
@@ -549,7 +551,7 @@ Public Class HistValley_GrayKalman : Inherits TaskParent
         For i = 0 To auto.valleyOrder.Count - 1
             task.kalman.kInput(i) = auto.valleyOrder.ElementAt(i).Value
         Next
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
 
         Dim lastEntry As Integer
         For i = 0 To task.kalman.kOutput.Count - 1

@@ -582,6 +582,7 @@ Public Class Random_KalmanPoints : Inherits TaskParent
     Dim currSet As New List(Of cv.Point2f)
     Dim refreshPoints As Boolean = True
     Public Sub New()
+        task.kalman = New Kalman_Basics
         Dim offset = dst2.Width / 5
         random.range = New cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2))
         optiBase.FindSlider("Random Pixel Count").Value = 10
@@ -604,7 +605,7 @@ Public Class Random_KalmanPoints : Inherits TaskParent
             task.kalman.kInput(i * 2 + 1) = pt.Y
         Next
 
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         For i = 0 To task.kalman.kOutput.Count - 1 Step 2
             currSet(i / 2) = New cv.Point(task.kalman.kOutput(i), task.kalman.kOutput(i + 1))
         Next

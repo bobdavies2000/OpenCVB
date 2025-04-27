@@ -686,6 +686,7 @@ End Class
 
 Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
 
         labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
@@ -705,7 +706,7 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
                 task.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
             End Sub)
 
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
 
         Static minList(task.gridRects.Count - 1) As cv.Point2f
         Static maxList(task.gridRects.Count - 1) As cv.Point2f
@@ -1466,6 +1467,7 @@ Public Class XO_Line_Movement : Inherits TaskParent
     Dim gradientColors(100) As cv.Scalar
     Dim frameCount As Integer
     Public Sub New()
+        task.kalman = New Kalman_Basics
         task.kalman.kOutput = {0, 0, 0, 0}
 
         Dim color1 = cv.Scalar.Yellow, color2 = cv.Scalar.Blue
@@ -1488,7 +1490,7 @@ Public Class XO_Line_Movement : Inherits TaskParent
                 dst2.SetTo(0)
             End If
             task.kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
-            task.kalman.Run(src)
+            task.kalman.Run(emptyMat)
             p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
             p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
         End If
@@ -4625,6 +4627,7 @@ End Class
 Public Class XO_Structured_FloorCeiling : Inherits TaskParent
     Public slice As New Structured_SliceEither
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(2 - 1)
         optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Find the floor or ceiling plane"
@@ -4661,7 +4664,7 @@ Public Class XO_Structured_FloorCeiling : Inherits TaskParent
 
         task.kalman.kInput(0) = floorY
         task.kalman.kInput(1) = ceilingY
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
 
         labels(2) = "Current slice is at row =" + CStr(task.mouseMovePoint.Y)
         labels(3) = "Ceiling is at row =" + CStr(CInt(task.kalman.kOutput(1))) + " floor at y=" + CStr(CInt(task.kalman.kOutput(0)))

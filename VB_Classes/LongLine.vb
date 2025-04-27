@@ -159,6 +159,7 @@ End Class
 Public Class LongLine_Point : Inherits TaskParent
     Public longPt As cv.Point
     Public Sub New()
+        task.kalman = New Kalman_Basics
         desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -166,7 +167,7 @@ Public Class LongLine_Point : Inherits TaskParent
         If task.lpList.Count = 0 Then Exit Sub
         Dim lp = task.lpList(1)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         lp.p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
         lp.p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
 

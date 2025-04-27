@@ -37,9 +37,8 @@ Public Class Kalman_Basics : Inherits TaskParent
         End If
 
         If standalone Then
-            dst2 = src
             SetTrueText("Kalman_Basics doesn't produce output when run standalone..." + vbCrLf +
-                        "It is used a lot. No need for standalone", 3)
+                        "It is used a lot. No need for standalone", 2)
         End If
     End Sub
 End Class
@@ -166,6 +165,7 @@ End Class
 ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
 Public Class Kalman_MousePredict : Inherits TaskParent
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(2 - 1)
         ReDim task.kalman.kOutput(2 - 1)
 
@@ -178,7 +178,7 @@ Public Class Kalman_MousePredict : Inherits TaskParent
         Dim lastStateResult = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
         Static lastRealMouse = task.mouseMovePoint
         task.kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         DrawLine(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), lastStateResult, white)
         dst2.Line(task.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
         lastRealMouse = task.mouseMovePoint

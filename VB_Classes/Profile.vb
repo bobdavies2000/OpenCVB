@@ -331,6 +331,7 @@ End Class
 Public Class Profile_Kalman : Inherits TaskParent
     Dim sides As New Profile_Basics
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(12 - 1)
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
@@ -348,7 +349,7 @@ Public Class Profile_Kalman : Inherits TaskParent
             task.kalman.kInput(i * 2 + 1) = sides.corners(i).Y
         Next
 
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
 
         If rc.index > 0 Then
             dst3.SetTo(0)

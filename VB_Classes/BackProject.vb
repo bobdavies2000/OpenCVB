@@ -459,6 +459,7 @@ Public Class BackProject_Image : Inherits TaskParent
     Public mask As New cv.Mat
     Public useInrange As Boolean
     Public Sub New()
+        task.kalman = New Kalman_Basics
         labels(2) = "Move mouse to backproject each histogram column"
         desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
@@ -473,7 +474,7 @@ Public Class BackProject_Image : Inherits TaskParent
         If task.kalman.kInput.Length <> 2 Then ReDim task.kalman.kInput(2 - 1)
         task.kalman.kInput(0) = hist.mm.minVal
         task.kalman.kInput(1) = hist.mm.maxVal
-        task.kalman.Run(src)
+        task.kalman.Run(emptyMat)
         hist.mm.minVal = Math.Min(task.kalman.kOutput(0), task.kalman.kOutput(1))
         hist.mm.maxVal = Math.Max(task.kalman.kOutput(0), task.kalman.kOutput(1))
 

@@ -505,6 +505,7 @@ Public Class Depth_ForegroundHead : Inherits TaskParent
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Public Sub New()
+        task.kalman = New Kalman_Basics
         labels(2) = "Blue is current, red is kalman, green is trusted"
         desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera."
     End Sub
@@ -522,7 +523,7 @@ Public Class Depth_ForegroundHead : Inherits TaskParent
             dst2 = fgnd.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             task.kalman.kInput = {xx, yy, rectSize, rectSize}
-            task.kalman.Run(src)
+            task.kalman.Run(emptyMat)
             Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
             Dim kRect = New cv.Rect(task.kalman.kOutput(0), task.kalman.kOutput(1), task.kalman.kOutput(2), task.kalman.kOutput(3))
             dst2.Rectangle(kRect, cv.Scalar.Red, 2)
