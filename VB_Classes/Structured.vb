@@ -107,87 +107,6 @@ End Class
 
 
 
-Public Class Structured_Rebuild : Inherits TaskParent
-    Dim heat As New HeatMap_Basics
-    Dim options As New Options_Structured
-    Dim thickness As Single
-    Public pointcloud As New cv.Mat
-    Public Sub New()
-        labels = {"", "", "X values in point cloud", "Y values in point cloud"}
-        desc = "Rebuild the point cloud using inrange - not useful yet"
-    End Sub
-    Private Function rebuildX(viewX As cv.Mat) As cv.Mat
-        Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        Dim firstCol As Integer
-        For firstCol = 0 To viewX.Width - 1
-            If viewX.Col(firstCol).CountNonZero > 0 Then Exit For
-        Next
-
-        Dim lastCol As Integer
-        For lastCol = viewX.Height - 1 To 0 Step -1
-            If viewX.Row(lastCol).CountNonZero > 0 Then Exit For
-        Next
-
-        Dim sliceMask As New cv.Mat
-        For i = firstCol To lastCol
-            Dim planeX = -task.xRange * (task.topCameraPoint.X - i) / task.topCameraPoint.X
-            If i > task.topCameraPoint.X Then planeX = task.xRange * (i - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-
-            cv.Cv2.InRange(task.pcSplit(0), planeX - thickness, planeX + thickness, sliceMask)
-            output.SetTo(planeX, sliceMask)
-        Next
-        Return output
-    End Function
-    Private Function rebuildY(viewY As cv.Mat) As cv.Mat
-        Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        Dim firstLine As Integer
-        For firstLine = 0 To viewY.Height - 1
-            If viewY.Row(firstLine).CountNonZero > 0 Then Exit For
-        Next
-
-        Dim lastLine As Integer
-        For lastLine = viewY.Height - 1 To 0 Step -1
-            If viewY.Row(lastLine).CountNonZero > 0 Then Exit For
-        Next
-
-        Dim sliceMask As New cv.Mat
-        For i = firstLine To lastLine
-            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - i) / task.sideCameraPoint.Y
-            If i > task.sideCameraPoint.Y Then planeY = task.yRange * (i - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-
-            cv.Cv2.InRange(task.pcSplit(1), planeY - thickness, planeY + thickness, sliceMask)
-            output.SetTo(planeY, sliceMask)
-        Next
-        Return output
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim metersPerPixel = task.MaxZmeters / dst3.Height
-        thickness = options.sliceSize * metersPerPixel
-        heat.Run(src)
-
-        If options.rebuilt Then
-            task.pcSplit(0) = rebuildX(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            task.pcSplit(1) = rebuildY(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            cv.Cv2.Merge(task.pcSplit, pointcloud)
-        Else
-            task.pcSplit = task.pointCloud.Split()
-            pointcloud = task.pointCloud
-        End If
-
-        dst2 = Convert32f_To_8UC3(task.pcSplit(0))
-        dst3 = Convert32f_To_8UC3(task.pcSplit(1))
-        dst2.SetTo(0, task.noDepthMask)
-        dst3.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Structured_CountTop : Inherits TaskParent
     Dim slice As New Structured_SliceV
@@ -348,53 +267,6 @@ Public Class Structured_SliceYPlot : Inherits TaskParent
             labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / pixelsPerMeter, fmt2) + " m"
         End If
         SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Structured_MouseSlice : Inherits TaskParent
-    Dim slice As New Structured_SliceEither
-    Dim lines As New Line_RawSorted
-    Public Sub New()
-        labels(2) = "Center Slice in yellow"
-        labels(3) = "White = SliceV output, Red Dot is avgPt"
-        desc = "Find the vertical center line with accurate depth data.."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
-        slice.Run(src)
-
-        lines.Run(slice.sliceMask)
-        Dim tops As New List(Of Integer)
-        Dim bots As New List(Of Integer)
-        Dim topsList As New List(Of cv.Point)
-        Dim botsList As New List(Of cv.Point)
-        If task.lpList.Count > 0 Then
-            dst3 = lines.dst2
-            For Each lp In task.lpList
-                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 3, task.lineType)
-                tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
-                bots.Add(If(lp.p1.Y > lp.p2.Y, lp.p1.Y, lp.p2.Y))
-                topsList.Add(lp.p1)
-                botsList.Add(lp.p2)
-            Next
-
-            'Dim topPt = topsList(tops.IndexOf(tops.Min))
-            'Dim botPt = botsList(bots.IndexOf(bots.Max))
-            'DrawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.DotSize + 5, cv.Scalar.Red)
-            'dst3.Line(topPt, botPt, cv.Scalar.Red, task.lineWidth, task.lineType)
-            'DrawLine(dst2,topPt, botPt, task.highlight, task.lineWidth + 2, task.lineType)
-        End If
-        If standaloneTest() Then
-            dst2 = src
-            dst2.SetTo(white, dst3)
-        End If
     End Sub
 End Class
 
@@ -986,20 +858,83 @@ End Class
 
 
 
-Public Class XO_OpenGL_Tiles : Inherits TaskParent
-    Dim sCloud As New XO_Structured_Tiles
+
+Public Class Structured_LinearizeFloor : Inherits TaskParent
+    Public floor As New XO_Structured_FloorCeiling
+    Dim kalman As New Kalman_VB_Basics
+    Public sliceMask As cv.Mat
+    Public floorYPlane As Single
+    Dim options As New Options_StructuredFloor
     Public Sub New()
-        task.ogl.oglFunction = oCase.drawTiles
-        labels = {"", "", "Input from Structured_Tiles", ""}
-        desc = "Display the quads built by Structured_Tiles in OpenGL - uses OpenGL's point size"
+        desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        sCloud.Run(src)
-        dst2 = sCloud.dst2
-        dst3 = sCloud.dst3
+        options.Run()
 
-        task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
-        task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        floor.Run(src)
+        dst2 = floor.dst2
+        dst3 = floor.dst3
+        sliceMask = floor.slice.sliceMask
+
+        Dim imuPC = task.pointCloud.Clone
+        imuPC.SetTo(0, Not sliceMask)
+
+        If sliceMask.CountNonZero > 0 Then
+            Dim split = imuPC.Split()
+            If options.xCheck Then
+                Dim mm As mmData = GetMinMax(split(0), sliceMask)
+
+                Dim firstCol As Integer, lastCol As Integer
+                For firstCol = 0 To sliceMask.Width - 1
+                    If sliceMask.Col(firstCol).CountNonZero > 0 Then Exit For
+                Next
+                For lastCol = sliceMask.Width - 1 To 0 Step -1
+                    If sliceMask.Col(lastCol).CountNonZero Then Exit For
+                Next
+
+                Dim xIncr = (mm.maxVal - mm.minVal) / (lastCol - firstCol)
+                For i = firstCol To lastCol
+                    Dim maskCol = sliceMask.Col(i)
+                    If maskCol.CountNonZero > 0 Then split(0).Col(i).SetTo(mm.minVal + xIncr * i, maskCol)
+                Next
+            End If
+
+            If options.yCheck Then
+                Dim mm As mmData = GetMinMax(split(1), sliceMask)
+                kalman.kInput = (mm.minVal + mm.maxVal) / 2
+                kalman.Run(src)
+                floorYPlane = kalman.kAverage
+                split(1).SetTo(floorYPlane, sliceMask)
+            End If
+
+            If options.zCheck Then
+                Dim firstRow As Integer, lastRow As Integer
+                For firstRow = 0 To sliceMask.Height - 1
+                    If sliceMask.Row(firstRow).CountNonZero > 20 Then Exit For
+                Next
+                For lastRow = sliceMask.Height - 1 To 0 Step -1
+                    If sliceMask.Row(lastRow).CountNonZero > 20 Then Exit For
+                Next
+
+                If lastRow >= 0 And firstRow < sliceMask.Height Then
+                    Dim meanMin = split(2).Row(lastRow).Mean(sliceMask.Row(lastRow))
+                    Dim meanMax = split(2).Row(firstRow).Mean(sliceMask.Row(firstRow))
+                    Dim zIncr = (meanMax(0) - meanMin(0)) / Math.Abs(lastRow - firstRow)
+                    For i = firstRow To lastRow
+                        Dim maskRow = sliceMask.Row(i)
+                        Dim mean = split(2).Row(i).Mean(maskRow)
+                        If maskRow.CountNonZero > 0 Then
+                            split(2).Row(i).SetTo(mean(0))
+                        End If
+                    Next
+                    dst2.Line(New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), cv.Scalar.Yellow, task.lineWidth + 1)
+                    dst2.Line(New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), cv.Scalar.Yellow, task.lineWidth + 1)
+                End If
+            End If
+
+            cv.Cv2.Merge(split, imuPC)
+
+            imuPC.CopyTo(task.pointCloud, sliceMask)
+        End If
     End Sub
 End Class

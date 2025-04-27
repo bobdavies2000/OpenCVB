@@ -109,6 +109,7 @@ Public Class CameraORB : Inherits GenericCamera
         SyncLock orbMutex
             IMU_AngularVelocity = angularVelocity
             IMU_Acceleration = acceleration
+            IMU_Acceleration.Z *= -1
             Static initialTime As Int64 = timeStamp
             IMU_FrameTime = timeStamp - initialTime
         End SyncLock

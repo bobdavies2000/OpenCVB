@@ -236,26 +236,6 @@ End Class
 
 
 
-
-Public Class OpenGL_Rebuilt : Inherits TaskParent
-    Dim rebuild As New Structured_Rebuild
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
-        desc = "Review the rebuilt point cloud from Structured_Rebuild"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        rebuild.Run(src)
-        dst2 = rebuild.dst2
-        task.ogl.pointCloudInput = rebuild.pointcloud
-        task.ogl.Run(task.color)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
 ' https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_Pyramid : Inherits TaskParent
     Public Sub New()
