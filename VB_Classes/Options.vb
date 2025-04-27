@@ -7992,21 +7992,6 @@ End Class
 
 
 
-Public Class Options_GridPoint : Inherits OptionParent
-    Public sobelThreshhold As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Sobel Threshold", 0, 255, 100)
-    End Sub
-    Public Sub Run()
-        Static minSlider = FindSlider("Sobel Threshold")
-        sobelThreshhold = minSlider.value
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Options_MinArea : Inherits OptionParent
     Public srcPoints As New List(Of cv.Point2f)

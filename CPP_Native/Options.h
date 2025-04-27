@@ -2184,12 +2184,6 @@ public:
 	Options_FAST() {
 	}
 };
-class Options_GridPoint {
-public:
-	void Run() {}
-	Options_GridPoint() {
-	}
-};
 class Options_MinArea {
 public:
 vector<cv::Point2f> srcPoints;

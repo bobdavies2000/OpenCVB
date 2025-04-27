@@ -54,8 +54,6 @@ Public Class VBtask : Implements IDisposable
     Public fpLastList As New List(Of fpData)
     Public featurePoints As New List(Of cv.Point)
 
-    'Public gridPoints As New List(Of cv.Point2f)
-
     Public featureMask As New cv.Mat
     Public fLessMask As New cv.Mat
     Public featureRects As New List(Of cv.Rect)
@@ -128,7 +126,6 @@ Public Class VBtask : Implements IDisposable
     Public lines As Line_Basics
     Public gCell As GridCell_Basics
     Public buildCorr As GridCell_CorrelationMap
-    Public gridPoint As GridPoint_Basics
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
@@ -566,7 +563,6 @@ Public Class VBtask : Implements IDisposable
         motionBasics = New Motion_Basics
         gCell = New GridCell_Basics
         buildCorr = New GridCell_CorrelationMap
-        gridPoint = New GridPoint_Basics
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
@@ -852,7 +848,6 @@ Public Class VBtask : Implements IDisposable
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
-        gridPoint.Run(src.Clone)
 
         task.colorizer.Run(src)
 

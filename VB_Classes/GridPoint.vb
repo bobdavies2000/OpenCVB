@@ -3,17 +3,12 @@ Imports cv = OpenCvSharp
 Public Class GridPoint_Basics : Inherits TaskParent
     Dim sobel As New Edge_SobelQT
     Public sortedPoints As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
-    Public options As New Options_GridPoint
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         desc = "Find the max Sobel point in each grid cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' we have already been run as part of the algorithm setup.
-
-        options.Run()
-
-        dst2 = src
+        dst2 = src.Clone
 
         sobel.Run(task.grayStable.Clone)
         dst3 = sobel.dst2
@@ -43,36 +38,9 @@ Public Class GridPoint_Basics : Inherits TaskParent
 
         labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(task.gcFeatures.Count) +
                     " were retained from the previous image. "
-        labels(3) = If(task.toggleOn, "Toggle On", "Toggle Off")
     End Sub
 End Class
 
-
-
-
-
-
-Public Class GridPoint_PeakThreshold : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "All the points found by GridPoint_Basics"
-        desc = "Thresold the Sobel max values from GridPoint_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static peakSlider = optiBase.FindSlider("Sobel Threshold")
-        Dim peak = peakSlider.value
-        dst3 = task.gridPoint.dst2
-
-        dst2 = src
-        Dim hitCount As Integer
-        For Each ele In task.gridPoint.sortedPoints
-            If ele.Key >= peak Then
-                dst2.Circle(ele.Value, task.DotSize, task.highlight, -1)
-                hitCount += 1
-            End If
-        Next
-        labels(2) = traceName + " found " + CStr(hitCount) + " points with peak  value greater than " + CStr(peak)
-    End Sub
-End Class
 
 
 
@@ -82,6 +50,7 @@ End Class
 
 Public Class GridPoint_Plot : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
+    Dim gridPoint As New GridPoint_Basics
     Public Sub New()
         task.gOptions.HistBinBar.Value = 3
         plotHist.maxRange = 255
@@ -91,6 +60,8 @@ Public Class GridPoint_Plot : Inherits TaskParent
         desc = "Plot the distribution of Sobel values for each gridPoint cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        gridPoint.Run(task.grayStable)
+
         Dim sobelValues As New List(Of Byte)
         For Each gc In task.gcList
             sobelValues.Add(gc.intensity)
@@ -105,7 +76,7 @@ Public Class GridPoint_Plot : Inherits TaskParent
         labels(3) = "Sobel peak values from " + CStr(minVal) + " to " + CStr(maxVal)
 
         dst3 = src
-        For Each ele In task.gridPoint.sortedPoints
+        For Each ele In gridPoint.sortedPoints
             If ele.Key <= maxVal And ele.Key >= minVal Then dst3.Circle(ele.Value, task.DotSize, task.highlight, -1)
         Next
         labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
@@ -254,6 +225,7 @@ End Class
 
 
 Public Class GridPoint_PopulationSurvey : Inherits TaskParent
+    Dim gridPoint As New GridPoint_Basics
     Public results(,) As Single
     Public Sub New()
         labels(2) = "Cursor over each brick to see where the grid points are."
@@ -261,7 +233,9 @@ Public Class GridPoint_PopulationSurvey : Inherits TaskParent
         desc = "Monitor the location of each grid point in the grid cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.gridPoint.dst2
+        gridPoint.Run(task.grayStable)
+
+        dst1 = gridPoint.dst2
         dst3 = src
 
         ReDim results(task.cellSize - 1, task.cellSize - 1)
@@ -369,6 +343,36 @@ Public Class GridPoint_DistanceAbove : Inherits TaskParent
             Dim lp = lpList(gc.index)
             If lp.length < min Or lp.length > max Then Continue For
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GridPoint_Best : Inherits TaskParent
+    Dim gridPoint As New GridPoint_Basics
+    Public bestGridPoints As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Display the grid points that have the highest possible max val - indicating the quality of the point."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gridPoint.Run(task.grayStable)
+        dst2 = gridPoint.dst2
+        labels(2) = gridPoint.labels(2)
+
+        dst3 = src.Clone
+        bestGridPoints.Clear()
+        For Each ele In gridPoint.sortedPoints
+            If ele.Key = 255 Then
+                bestGridPoints.Add(ele.Value)
+                dst3.Circle(ele.Value, task.DotSize, task.highlight, -1)
+            Else
+                Exit For
+            End If
         Next
     End Sub
 End Class

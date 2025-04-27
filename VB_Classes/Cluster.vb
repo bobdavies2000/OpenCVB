@@ -78,10 +78,13 @@ End Class
 Public Class Cluster_Hulls : Inherits TaskParent
     Dim cluster As New Cluster_Basics
     Public hulls As New List(Of List(Of cv.Point))
+    Dim gridPoint As New GridPoint_Basics
     Public Sub New()
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gridPoint.Run(task.grayStable)
+
         cluster.ptInput = task.featurePoints
         cluster.Run(src)
         dst2 = cluster.dst2
@@ -104,6 +107,6 @@ Public Class Cluster_Hulls : Inherits TaskParent
             hulls.Add(hull)
             If (hull.Count > 0) Then DrawContour(dst3, hull, white, task.lineWidth)
         Next
-        labels(3) = task.gridPoint.labels(2)
+        labels(3) = gridPoint.labels(2)
     End Sub
 End Class
