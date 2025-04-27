@@ -17,7 +17,7 @@ Public Class TextureFlow_Basics : Inherits TaskParent
                 Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * options.TFdelta
                 Dim p1 = New cv.Point(CInt(x - delta.X), CInt(y - delta.Y))
                 Dim p2 = New cv.Point(CInt(x + delta.X), CInt(y + delta.Y))
-                DrawLine(dst2, p1, p2, task.highlight)
+                DrawLine(dst2, p1, p2, white)
             Next
         Next
     End Sub
@@ -72,10 +72,43 @@ Public Class TextureFlow_DepthSegments : Inherits TaskParent
         labels = {"", "", "TextureFlow output", "TextureFlow Input"}
         desc = "Find the texture flow for the depth segments output"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         segments.Run(src)
         diffx.Run(segments.dst1)
         dst3 = segments.dst3
+        flow.Run(dst3)
+        dst2 = flow.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class TextureFlow_GridPoints : Inherits TaskParent
+    Dim gridPoint As New GridPoint_Best
+    Dim flow As New TextureFlow_Basics
+    Dim knn As New KNN_Basics
+    Public Sub New()
+        desc = "Use the grid points as input to the texture flow algorithm"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gridPoint.Run(task.grayStable)
+        dst3 = gridPoint.dst3
+
+        knn.trainInput.Clear()
+        For Each pt In gridPoint.bestGridPoints
+            knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
+        Next
+        knn.queries = New List(Of cv.Point2f)(knn.trainInput)
+        knn.Run(emptyMat)
+
+        For i = 0 To knn.neighbors.Count - 1
+            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255, task.lineWidth, task.lineType)
+            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, task.lineWidth, task.lineType)
+        Next
+
         flow.Run(dst3)
         dst2 = flow.dst2
     End Sub

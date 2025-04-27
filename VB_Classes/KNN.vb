@@ -65,8 +65,6 @@ Public Class KNN_N2Basics : Inherits TaskParent
         Dim KNNdimension = 2
 
         If standalone Then
-
-
             If task.heartBeat Then
                 random.Run(src)
                 trainInput = New List(Of cv.Point2f)(random.PointList)
@@ -103,7 +101,7 @@ Public Class KNN_N2Basics : Inherits TaskParent
         Next
 
         ReDim result(queryMat.Rows - 1, dm - 1)
-        neighbors = New List(Of List(Of Integer))
+        neighbors.Clear()
         For i = 0 To queryMat.Rows - 1
             Dim pt = queries(i)
             Dim res = New List(Of Integer)

@@ -357,22 +357,61 @@ Public Class GridPoint_Best : Inherits TaskParent
     Dim gridPoint As New GridPoint_Basics
     Public bestGridPoints As New List(Of cv.Point)
     Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Display the grid points that have the highest possible max val - indicating the quality of the point."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         gridPoint.Run(task.grayStable)
-        dst2 = gridPoint.dst2
         labels(2) = gridPoint.labels(2)
 
-        dst3 = src.Clone
+        dst2 = src.Clone
+        dst3.SetTo(0)
         bestGridPoints.Clear()
         For Each ele In gridPoint.sortedPoints
             If ele.Key = 255 Then
                 bestGridPoints.Add(ele.Value)
-                dst3.Circle(ele.Value, task.DotSize, task.highlight, -1)
+                dst2.Circle(ele.Value, task.DotSize, task.highlight, -1)
+                dst3.Circle(ele.Value, task.DotSize, 255, -1)
             Else
                 Exit For
             End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GridPoint_KNN : Inherits TaskParent
+    Dim gridPoint As New GridPoint_Best
+    Dim knn As New KNN_Basics
+    Dim lines As New Line_Basics
+    Public Sub New()
+        lines.nonTaskRequest = True
+        desc = "Join the 2 nearest points to each grid point to help find lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gridPoint.Run(task.grayStable)
+        dst3 = gridPoint.dst3
+
+        knn.trainInput.Clear()
+        For Each pt In gridPoint.bestGridPoints
+            knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
+        Next
+        knn.queries = New List(Of cv.Point2f)(knn.trainInput)
+        knn.Run(emptyMat)
+
+        For i = 0 To knn.neighbors.Count - 1
+            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255, task.lineWidth, task.lineType)
+            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, task.lineWidth, task.lineType)
+        Next
+
+        lines.Run(dst3)
+        dst2 = src.Clone
+        For Each lp In lines.lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
