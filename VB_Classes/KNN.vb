@@ -728,101 +728,6 @@ End Class
 
 
 
-Public Class KNN_MaxDistance : Inherits TaskParent
-    Dim knn As New KNN_Basics
-    Public inputPoints As New List(Of cv.Point2f)
-    Public inputIDs As New List(Of Single)
-    Public outputPoints As New List(Of (cv.Point2f, cv.Point2f))
-    Public options As New Options_KNN
-    Public Sub New()
-        desc = "Use the feature points on the periphery and find the point farthest from each."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static pairList As New List(Of (cv.Point2f, cv.Point2f))
-        options.Run()
-
-        If standalone Or inputPoints.Count = 0 Or task.optionsChanged Then
-            Static perif As New FCS_Periphery
-            perif.Run(src)
-            If task.heartBeat Or task.optionsChanged Then
-                If options.useOutSide Then
-                    inputPoints = perif.ptOutside
-                    inputIDs = perif.ptOutID
-                Else
-                    inputPoints = perif.ptInside
-                    inputIDs = perif.ptInID
-                End If
-
-                knn.queries = New List(Of cv.Point2f)(If(standalone, task.gcFeatures, inputPoints))
-                knn.trainInput = knn.queries
-                knn.Run(src)
-
-                Dim distances As New SortedList(Of Single, (cv.Point2f, cv.Point2f))(
-                                                New compareAllowIdenticalSingleInverted)
-
-                For i = 0 To knn.result.GetUpperBound(0)
-                    Dim ptLast = knn.result.GetUpperBound(0)
-                    Dim p1 = knn.queries(knn.result(i, ptLast))
-                    Dim p2 = knn.queries(knn.result(i, 0))
-                    distances.Add(p1.DistanceTo(p2), (p1, p2))
-                Next
-
-                For i = 0 To Math.Min(options.topXDistances, distances.Count) - 1
-                    Dim pair = distances.ElementAt(i).Value
-                    If pairList.Contains(pair) = False Then
-                        pairList.Add(pair)
-                    End If
-                Next
-            Else
-                Dim nextPairs As New List(Of (cv.Point2f, cv.Point2f))
-                Dim nextIDs As New List(Of Single)
-                For Each pair In pairList
-                    Dim p1 = pair.Item1
-                    Dim p2 = pair.Item2
-                    Dim gcIndex = task.gcMap.Get(Of Single)(p1.Y, p1.X)
-                    Dim fpIndex = task.fpFromGridCell.IndexOf(gcIndex)
-                    If fpIndex >= 0 Then
-                        Dim fp = task.fpList(fpIndex)
-                        Dim index = inputIDs.IndexOf(fp.ID)
-                        If index >= 0 Then
-                            nextPairs.Add((p1, p2))
-                            nextIDs.Add(inputIDs(index))
-                        Else
-                            nextIDs.Add(-1)
-                        End If
-                    End If
-                Next
-
-                pairList.Clear()
-                For i = 0 To nextPairs.Count - 1
-                    If nextIDs(i) >= 0 Then
-                        pairList.Add(nextPairs(i))
-                    End If
-                Next
-            End If
-        End If
-
-        If task.heartBeat Or task.optionsChanged Then
-            dst2 = src
-            outputPoints.Clear()
-            For Each pair In pairList
-                Dim p1 = New cv.Point(pair.Item1.X, pair.Item1.Y)
-                Dim p2 = New cv.Point(pair.Item2.X, pair.Item2.Y)
-                DrawCircle(dst2, p1, task.DotSize, cv.Scalar.White)
-                DrawCircle(dst2, p2, task.DotSize, cv.Scalar.White)
-                dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
-                outputPoints.Add(pair)
-            Next
-        End If
-        labels(2) = "There were " + CStr(inputPoints.Count) + " input points and " +
-                    CStr(outputPoints.Count) + " pairs output."
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class KNN_NNBasicsTest : Inherits TaskParent
@@ -1075,20 +980,61 @@ End Class
 
 
 
+
+Public Class KNN_MaxDistance : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Public outputPoints As New List(Of (cv.Point2f, cv.Point2f))
+    Public options As New Options_KNN
+    Dim perif As New FCS_Periphery
+    Public Sub New()
+        desc = "Use the feature points on the periphery and find the points farthest from each."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If task.heartBeat = False Then Exit Sub
+
+        Static pairList As New List(Of (cv.Point2f, cv.Point2f))
+
+        perif.Run(src)
+        dst3 = perif.dst3
+        If task.features.Count = 0 Then Exit Sub
+
+        knn.queries = perif.ptOutside
+        knn.trainInput = knn.queries
+        knn.Run(emptyMat)
+
+        dst2 = src
+        For i = 0 To knn.result.GetUpperBound(0)
+            Dim lp = New lpData(knn.queries(knn.result(i, knn.queries.Count - 1)), knn.queries(knn.result(i, 0)))
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+        Next
+
+        labels(2) = "There were " + CStr(task.features.Count) + " features and " + CStr(knn.queries.Count) + " were on the periphery."
+    End Sub
+End Class
+
+
+
+
 Public Class KNN_MinDistance : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public inputPoints As New List(Of cv.Point2f)
     Public outputPoints2f As New List(Of cv.Point2f)
     Public outputPoints As New List(Of cv.Point)
     Dim options As New Options_Features
+    Dim feat As New Feature_Basics
     Public Sub New()
         If standalone Then task.featureOptions.FeatureMethod.SelectedItem = "AGAST"
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        feat.Run(task.grayStable)
+        labels = feat.labels
 
-        If standalone Then inputPoints = task.gcFeatures
+        If task.features.Count = 0 Then Exit Sub
+        If standalone Then inputPoints = task.features
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)
         knn.trainInput = knn.queries

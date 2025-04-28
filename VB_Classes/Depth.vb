@@ -1566,8 +1566,8 @@ End Class
 
 Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
     Public Sub New()
+        task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
-
         labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
         desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
     End Sub
@@ -1576,7 +1576,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
 
         dst1 = src.Clone()
         dst1.SetTo(white, task.gridMask)
-        for each gc in task.gcList
+        For Each gc In task.gcList
             Dim pt = gc.mm.minLoc
             subdiv.Insert(New cv.Point(pt.X + gc.rect.X, pt.Y + gc.rect.Y))
             DrawCircle(dst1(gc.rect), gc.mm.minLoc, task.DotSize, cv.Scalar.Red)

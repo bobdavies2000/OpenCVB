@@ -689,6 +689,7 @@ Public Class IMU_Kalman : Inherits TaskParent
         desc = "Use Kalman Filter to stabilize the IMU acceleration and velocity"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        task.kalman = New Kalman_Basics
         With task.kalman
             .kInput = {task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z,
                               task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z}

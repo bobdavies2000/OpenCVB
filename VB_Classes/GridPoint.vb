@@ -18,9 +18,8 @@ Public Class GridPoint_Basics : Inherits TaskParent
             Dim mm = GetMinMax(dst3(gc.rect))
             gc.pt = New cv.Point(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y)
             gc.feature = mm.maxLoc
-            Dim val = dst3.Get(Of Byte)(gc.pt.Y, gc.pt.X)
-            gc.intensity = val
-            sortedPoints.Add(val, gc.pt)
+            gc.intensity = mm.maxVal
+            sortedPoints.Add(mm.maxVal, gc.pt)
         Next
 
         dst1.SetTo(255, task.motionMask)
@@ -80,38 +79,6 @@ Public Class GridPoint_Plot : Inherits TaskParent
             If ele.Key <= maxVal And ele.Key >= minVal Then dst3.Circle(ele.Value, task.DotSize, task.highlight, -1)
         Next
         labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class GridPoint_Lines : Inherits TaskParent
-    Public Sub New()
-        desc = "Find lines in the grid points."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static peakSlider = optiBase.FindSlider("Sobel Threshold")
-        Dim peak = peakSlider.value
-
-        dst2 = src
-        dst3.SetTo(0)
-        For Each gc In task.gcList
-            If gc.intensity <= peak Then Continue For
-            For Each index In task.gridNeighbors(gc.index)
-                Dim gcNabe = task.gcList(index)
-                If gcNabe.intensity <= peak Then Continue For
-                If gcNabe.feature.X = gc.feature.X And gcNabe.feature.Y = gc.feature.Y Then
-                    If gc.pt <> task.gcList(index).pt Then
-                        dst2.Line(gc.pt, task.gcList(index).pt, task.highlight, task.lineWidth)
-                        dst3.Line(gc.pt, task.gcList(index).pt, task.highlight, task.lineWidth)
-                    End If
-                End If
-            Next
-        Next
     End Sub
 End Class
 

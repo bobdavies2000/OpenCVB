@@ -4540,10 +4540,8 @@ Public Class Options_KNN : Inherits OptionParent
         If check.Setup(traceName) Then
             check.addCheckBox("Display queries")
             check.addCheckBox("Display training input and connecting line")
-            check.addCheckBox("Use 'Outside' feature points (unchecked use 'Inside'")
             check.Box(0).Checked = True
             check.Box(1).Checked = True
-            check.Box(2).Checked = True
         End If
     End Sub
     Public Sub Run()
@@ -4556,7 +4554,6 @@ Public Class Options_KNN : Inherits OptionParent
         numPoints = randomSlider.Value
         multiplier = distSlider.value
         topXDistances = topXSlider.value
-        useOutSide = inOutCheck.checked
     End Sub
 End Class
 

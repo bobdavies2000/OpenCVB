@@ -177,47 +177,6 @@ End Class
 
 
 
-Public Class FCS_Periphery : Inherits TaskParent
-    Public ptOutside As New List(Of cv.Point2f)
-    Public ptOutID As New List(Of Single)
-
-    Public ptInside As New List(Of cv.Point2f)
-    Public ptInID As New List(Of Single)
-    Dim fcs As New FCS_Basics
-    Public Sub New()
-        desc = "Display the cells which are on the periphery of the image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(task.grayStable)
-        dst2 = fcs.dst2
-
-        dst3 = dst2.Clone
-        ptOutside.Clear()
-        ptOutID.Clear()
-        ptInside.Clear()
-        ptInID.Clear()
-
-        For Each fp In task.fpList
-            If fp.periph Then
-                dst3.FillConvexPoly(fp.facets, cv.Scalar.Gray, task.lineType)
-                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
-                ptOutside.Add(fp.pt)
-                ptOutID.Add(fp.ID)
-            Else
-                ptInside.Add(fp.pt)
-                ptInID.Add(fp.ID)
-            End If
-        Next
-        fpDSet()
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class FCS_Edges : Inherits TaskParent
     Dim fcs As New FCS_Basics
@@ -718,5 +677,63 @@ Public Class FCS_ByDepth : Inherits TaskParent
         Next
 
         labels(3) = "Cells with depth between " + Format(depthStart, fmt1) + "m to " + Format(depthEnd, fmt1) + "m"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_Periphery : Inherits TaskParent
+    Public ptOutside As New List(Of cv.Point2f)
+    Public ptInside As New List(Of cv.Point2f)
+    Dim fcs As New FCS_Basics
+    Public Sub New()
+        desc = "Display the cells which are on the periphery of the image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fcs.Run(task.grayStable)
+        dst2 = fcs.dst2
+
+        dst3 = dst2.Clone
+        ptOutside.Clear()
+        ptInside.Clear()
+        For Each fp In task.fpList
+            If fp.periph Then
+                dst3.FillConvexPoly(fp.facets, cv.Scalar.Gray, task.lineType)
+                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+                ptOutside.Add(fp.pt)
+            Else
+                ptInside.Add(fp.pt)
+            End If
+        Next
+        fpDSet()
+        labels(2) = "There are " + CStr(ptOutside.Count) + " features on the periphery of the image."
+        labels(3) = "There are " + CStr(task.fpList.Count - ptOutside.Count) + " features in the interior region of the image."
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_PeripheryNot : Inherits TaskParent
+    Dim perif As New FCS_Periphery
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Create a mask for the cells which are not on the periphery of the image - the interior region that is fully visible and connected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        perif.Run(task.grayStable)
+        dst2 = perif.dst3
+
+        dst3.SetTo(0)
+        For Each fp In task.fpList
+            If fp.periph = False Then dst3.FillConvexPoly(fp.facets, 255, task.lineType)
+        Next
+        fpDSet()
+        labels = perif.labels
     End Sub
 End Class

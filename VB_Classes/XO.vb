@@ -3832,36 +3832,6 @@ End Class
 
 
 
-Public Class XO_GridPoint_FeatureLess1 : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "Mask for the featureless regions"
-        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Isolate the featureless regions using the sobel intensity."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static peakSlider = optiBase.FindSlider("Sobel Threshold")
-        Dim peak = peakSlider.value
-
-        dst3.SetTo(0)
-        Dim gcPrev As gcData = task.gcList(0), gcAbove = task.gcList(0)
-        For Each gc In task.gcList
-            If gc.intensity <= peak And Math.Abs(gc.depth - gcPrev.depth) < task.depthDiffMeters And
-                Math.Abs(gc.depth - gcAbove.depth) < task.depthDiffMeters Then
-                dst3(gc.rect).SetTo(255)
-            End If
-            gcPrev = gc
-            gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
-        Next
-
-        If standaloneTest() Then dst2 = ShowAddweighted(src, dst3, labels(2))
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class XO_GridPoint_FeatureLess2 : Inherits TaskParent
     Public edges As New EdgeLine_Basics
