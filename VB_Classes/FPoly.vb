@@ -1269,11 +1269,13 @@ End Class
 Public Class FPoly_TopFeatures : Inherits TaskParent
     Public stable As New Stable_BasicsCount
     Public options As New Options_FPoly
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Get the top features and validate them using Delaunay regions."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
+        feat.Run(task.grayStable)
 
         stable.Run(src)
         dst2 = stable.dst2
@@ -1315,10 +1317,12 @@ Public Class FPoly_Line : Inherits TaskParent
             distances.Add(pts(i).DistanceTo(pts(i + 1)))
         Next
 
-        Dim index = distances.IndexOf(distances.Max)
-        lp = New lpData(pts(index), pts(index + 1))
-        dst3 = src
-        DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+        If distances.Count Then
+            Dim index = distances.IndexOf(distances.Max)
+            lp = New lpData(pts(index), pts(index + 1))
+            dst3 = src
+            DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+        End If
     End Sub
 End Class
 
