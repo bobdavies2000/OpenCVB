@@ -408,8 +408,8 @@ Public Class PointCloud_GridInspector : Inherits TaskParent
         SetTrueText("Values show gc.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
         For i = 0 To dst2.Height - 1 Step task.cellSize
             Dim pt = New cv.Point2f(cLine, i)
-            Dim index = task.gcMap.Get(Of Single)(pt.Y, pt.X)
-            Dim xyz = task.gcList(index).pt3D
+            Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim xyz = task.brickList(index).pt3D
             SetTrueText("Row " + Format(i, "00") + vbTab + vbTab + Format(xyz(0), fmt2) + vbTab + Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
         Next
         labels(2) = "Values displayed are the point cloud X, Y, and Z values for column " + CStr(cLine)
@@ -697,8 +697,8 @@ Public Class PointCloud_Continuous_GridX : Inherits TaskParent
 
         dst2.SetTo(0)
         dst3.SetTo(0)
-        Dim gcPrev = task.gcList(0)
-        For Each gc In task.gcList
+        Dim gcPrev = task.brickList(0)
+        For Each gc In task.brickList
             If gc.rect.X > 0 Then
                 If Math.Abs(gc.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(gc.rect).SetTo(255) Else dst3(gc.rect).SetTo(255)
             End If
@@ -725,10 +725,10 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
         dst2.SetTo(0)
-        Dim gcPrev = task.gcList(0)
+        Dim gcPrev = task.brickList(0)
         Dim cellMat As New cv.Mat(task.cellSize, task.cellSize, cv.MatType.CV_8U, cv.Scalar.All(127))
-        For Each gc In task.gcList
-            Dim gcAbove = task.gcList(CInt(gc.index Mod task.grid.tilesPerRow))
+        For Each gc In task.brickList
+            Dim gcAbove = task.brickList(CInt(gc.index Mod task.grid.tilesPerRow))
             If gc.correlation > task.fCorrThreshold Then
                 If gc.rect.Y = 0 Or gc.rect.X = 0 Then Continue For
                 If Math.Abs(gc.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(gc.rect).SetTo(128)

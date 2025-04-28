@@ -1742,7 +1742,7 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Dim corrText = task.gCell.depthAndCorrelationText
+                Dim corrText = task.gbricks.depthAndCorrelationText
                 SyncLock trueTextLock
                     Static saveObjectName = task.displayObjectName
                     If saveObjectName <> task.displayObjectName Then
@@ -1753,12 +1753,12 @@ Public Class Main_UI
                     If task.trueData.Count Then
                         trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                     End If
-                    trueData.Add(New TrueText(corrText, task.gCell.ptTextLoc, 1))
+                    trueData.Add(New TrueText(corrText, task.gbricks.ptTextLoc, 1))
                     task.trueData.Clear()
                 End SyncLock
 
                 corrText = corrText.Replace(vbCrLf, ", ")
-                picLabels(1) = "Quad grid cells - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
+                picLabels(1) = "Correlation bricks - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
                                    "  " + corrText
                 If task.dst0 IsNot Nothing Then
                     SyncLock cameraLock
@@ -1771,10 +1771,10 @@ Public Class Main_UI
                     algorithmRefresh = True
                 End If
 
-                dst(0).Circle(task.gCell.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(1).Circle(task.gCell.ptTopLeft, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(2).Circle(task.gCell.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(3).Circle(task.gCell.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(0).Circle(task.gbricks.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(1).Circle(task.gbricks.ptTopLeft, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(2).Circle(task.gbricks.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(3).Circle(task.gbricks.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
 
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 

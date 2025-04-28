@@ -118,7 +118,7 @@
     <Compile Include="FindCells.vb" />
     <Compile Include="FindContours.vb" />
     <Compile Include="FindNonZero.vb" />
-    <Compile Include="GridPoint.vb" />
+    <Compile Include="BrickPoint.vb" />
     <Compile Include="Intrinsics.vb" />
     <Compile Include="FindTriangle.vb" />
     <Compile Include="LogicalDepth.vb" />
@@ -139,7 +139,7 @@
     <Compile Include="Deterministic.vb" />
     <Compile Include="FCS.vb" />
     <Compile Include="Grid.vb" />
-    <Compile Include="GridCell.vb" />
+    <Compile Include="Brick.vb" />
     <Compile Include="ImageOffset.vb" />
     <Compile Include="KNN.vb" />
     <Compile Include="KNNorm.vb" />

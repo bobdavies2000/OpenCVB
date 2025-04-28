@@ -22,8 +22,8 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             Dim halfCount As Integer = Math.Floor(If(lp.cellList.Count Mod 2 = 0, lp.cellList.Count, lp.cellList.Count - 1) / 2)
             Dim depthValues As New List(Of Single)
             For i = 0 To halfCount - 1
-                Dim gc1 = task.gcList(lp.cellList(i))
-                Dim gc2 = task.gcList(lp.cellList(lp.cellList.Count - i - 1))
+                Dim gc1 = task.brickList(lp.cellList(i))
+                Dim gc2 = task.brickList(lp.cellList(lp.cellList.Count - i - 1))
 
                 Dim d1 = gc1.depth
                 Dim d2 = gc2.depth
@@ -52,7 +52,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             If avg1 < avg2 Then offset = lp.cellList.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
                 For Each index In lp.cellList
-                    Dim gc = task.gcList(index)
+                    Dim gc = task.brickList(index)
                     dst1(gc.rect).SetTo(1)
                     If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
                     gcUpdates.Add(New Tuple(Of Integer, Single)(index, (avg1 + avg2) / 2))
@@ -63,7 +63,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                 Dim depthIncr = (max - min) / lp.cellList.Count
                 For i = 0 To lp.cellList.Count - 1
                     Dim index = lp.cellList(i)
-                    Dim gc = task.gcList(index)
+                    Dim gc = task.brickList(index)
                     If offset > 0 Then
                         dst1(gc.rect).SetTo((offset - i + 1) * incr)
                         gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
@@ -82,7 +82,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         If debugmode Then
             If task.heartBeat Then
                 labels(3) = "Average depth for first half = " + Format(avg1) + ", average depth for second half = " + Format(avg2, fmt1) + ", " +
-                            "'All yellow' grid cells indicate the line is likely a 3D vertical line."
+                            "'All yellow' bricks indicate the line is likely a 3D vertical line."
             End If
         Else
             labels(3) = "Yellow is closer than blue but 'all yellow' is a likely vertical line in 3D where depths are within " +
@@ -108,8 +108,8 @@ Public Class LongLine_Depth : Inherits TaskParent
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-        Dim gcMin = task.gcList(task.gcMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-        Dim gcMax = task.gcList(task.gcMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+        Dim gcMin = task.brickList(task.brickMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+        Dim gcMax = task.brickList(task.brickMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
 
         dst0.SetTo(0)
         dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
@@ -314,7 +314,7 @@ End Class
 Public Class LongLine_DepthUpdate : Inherits TaskParent
     Dim direction As New LongLine_DepthDirection
     Public Sub New()
-        desc = "Update the line grid cells with a better estimate of the distance."
+        desc = "Update the line bricks with a better estimate of the distance."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         direction.Run(src)

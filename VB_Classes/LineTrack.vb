@@ -32,7 +32,7 @@ Public Class LineTrack_Map : Inherits TaskParent
     Dim lTrack As New LineTrack_Basics
     Public Sub New()
         task.gOptions.CrossHairs.Checked = False
-        desc = "Show the gcmap (grid cells) and fpMap (features points) "
+        desc = "Show the brickMap (bricks) and fpMap (features points) "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lTrack.Run(src)
@@ -44,7 +44,7 @@ Public Class LineTrack_Map : Inherits TaskParent
         dst3.SetTo(0)
         Dim histarray(task.rcList.Count - 1) As Single
         Dim histogram As New cv.Mat
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             cv.Cv2.CalcHist({task.rcMap(gc.rect)}, {0}, emptyMat, histogram, 1, {task.rcList.Count},
                              New cv.Rangef() {New cv.Rangef(1, task.rcList.Count)})
 
@@ -62,6 +62,6 @@ Public Class LineTrack_Map : Inherits TaskParent
             Next
         Next
 
-        labels(3) = "The redCloud cells are completely covered by " + CStr(count) + " grid cells"
+        labels(3) = "The redCloud cells are completely covered by " + CStr(count) + " bricks"
     End Sub
 End Class

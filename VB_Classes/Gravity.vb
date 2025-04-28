@@ -109,7 +109,7 @@ End Class
 
 
 Public Class Gravity_RGB : Inherits TaskParent
-    Dim survey As New GridPoint_PopulationSurvey
+    Dim survey As New BrickPoint_PopulationSurvey
     Public Sub New()
         desc = "Rotate the RGB image using the offset from gravity."
     End Sub
@@ -142,7 +142,7 @@ End Class
 
 
 Public Class Gravity_GridPoints : Inherits TaskParent
-    Dim survey As New GridPoint_PopulationSurvey
+    Dim survey As New BrickPoint_PopulationSurvey
     Public Sub New()
         desc = "Rotate the gric point using the offset from gravity."
     End Sub
@@ -155,7 +155,7 @@ Public Class Gravity_GridPoints : Inherits TaskParent
         If rotateAngle >= angle Then rotateAngle = -angle
 
         dst1 = src
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If gc.pt.Y = gc.rect.Y Then dst1.Circle(gc.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 

@@ -1561,7 +1561,7 @@ End Class
 
 
 Public Class OpenGL_Grid : Inherits TaskParent
-    Dim lowRes As New GridCell_Edges
+    Dim lowRes As New Brick_Edges
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the grid depth and color for each cell"
@@ -1755,9 +1755,9 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.depthRGB
-        labels = task.gCell.labels
+        labels = task.gbricks.labels
         Dim quadData As New List(Of cv.Point3f)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             quadData.Add(gc.color)
             For Each pt In gc.corners
                 quadData.Add(pt)
@@ -1782,13 +1782,13 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
     Public Sub New()
         optiBase.FindSlider("OpenCVB OpenGL buffer count").Value = 1
         task.ogl.oglFunction = oCase.quadBasics
-        desc = "Create a simple plane in each of grid cells."
+        desc = "Create a simple plane in each of bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.gCell.dst2
-        dst3 = task.gCell.dst3
+        dst2 = task.gbricks.dst2
+        dst3 = task.gbricks.dst3
         Dim quadData As New List(Of cv.Point3f)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If gc.depth = 0 Then Continue For
             If gc.corners.Count Then quadData.Add(gc.color)
             For Each pt In gc.corners
@@ -1798,7 +1798,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels(2) = task.gCell.labels(2)
+        labels(2) = task.gbricks.labels(2)
         labels(3) = "There were " + CStr(quadData.Count / 5) + " quads found."
     End Sub
 End Class
@@ -1864,7 +1864,7 @@ Public Class OpenGL_Lines3D : Inherits TaskParent
     Dim lines As New Line3D_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
-        desc = "Draw the 3D lines found using the task.lpList and the accompanying grid cells."
+        desc = "Draw the 3D lines found using the task.lpList and the accompanying bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
@@ -1889,7 +1889,7 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
     Dim connect As New Region_Core
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
-        desc = "Build connected grid cells and remove cells that are not connected."
+        desc = "Build connected bricks and remove cells that are not connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src)
@@ -1899,11 +1899,11 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         Dim quadData As New List(Of cv.Point3f)
         Dim gc1 As gcData, gc2 As gcData
         For Each tup In connect.hTuples
-            gc1 = task.gcList(tup.Item1)
-            gc2 = task.gcList(tup.Item2)
+            gc1 = task.brickList(tup.Item1)
+            gc2 = task.brickList(tup.Item2)
             For i = tup.Item1 + 1 To tup.Item2 - 1
-                gc1 = task.gcList(i - 1)
-                gc2 = task.gcList(i)
+                gc1 = task.brickList(i - 1)
+                gc2 = task.brickList(i)
                 If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
                 If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
 
@@ -1925,8 +1925,8 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         Dim width = dst2.Width / task.cellSize
         For Each tup In connect.vTuples
             For i = tup.Item1 To tup.Item2 - width Step width
-                gc1 = task.gcList(i)
-                gc2 = task.gcList(i + width)
+                gc1 = task.brickList(i)
+                gc2 = task.brickList(i + width)
                 If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
                 If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
 
@@ -1948,7 +1948,7 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels = task.gCell.labels
+        labels = task.gbricks.labels
     End Sub
 End Class
 
@@ -2011,18 +2011,18 @@ End Class
 
 
 Public Class OpenGL_GridPointRegions : Inherits TaskParent
-    Dim gridPoint As New GridPoint_FLessRegions
+    Dim ptBrick As New BrickPoint_FLessRegions
     Public Sub New()
         desc = "Display the grid point featureless region in OpenGL."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        gridPoint.Run(task.grayStable)
-        dst2 = gridPoint.dst2
-        dst3 = gridPoint.dst3
-        labels = gridPoint.labels
+        ptBrick.Run(task.grayStable)
+        dst2 = ptBrick.dst2
+        dst3 = ptBrick.dst3
+        labels = ptBrick.labels
 
         task.ogl.oglFunction = oCase.drawPointCloudRGB
-        task.pointCloud.CopyTo(task.ogl.pointCloudInput, gridPoint.hist.dst1)
+        task.pointCloud.CopyTo(task.ogl.pointCloudInput, ptBrick.hist.dst1)
         task.ogl.Run(dst2)
     End Sub
 End Class

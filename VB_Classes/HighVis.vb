@@ -1,13 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 Public Class HighVis_Basics : Inherits TaskParent
-    Dim info As New GridCell_Info
+    Dim info As New Brick_Info
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display all the grid cells that have good visibility"
+        desc = "Display all the bricks that have good visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If gc.correlation > task.fCorrThreshold Then
                 If gc.correlation > 0 And gc.corrHistory.Count = task.historyCount Then
                     dst1(gc.rect).SetTo((gc.correlation + 1) * 127)
@@ -20,7 +20,7 @@ Public Class HighVis_Basics : Inherits TaskParent
         dst0 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         Dim mm = GetMinMax(dst1, dst0)
         dst2 = ShowPaletteDepth((dst1 - mm.minVal) * mm.maxVal / (mm.maxVal - mm.minVal))
-        labels(2) = task.gCell.labels(2)
+        labels(2) = task.gbricks.labels(2)
 
         info.Run(src)
         SetTrueText(info.strOut, 3)

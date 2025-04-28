@@ -18,6 +18,8 @@ BlockMatching
 Blur
 BlurMotion
 Boundary
+Brick
+BrickPoint
 Brightness
 BRISK
 CamShift
@@ -98,8 +100,6 @@ GrabCut
 Gradient
 Gravity
 Grid
-GridCell
-GridPoint
 GridROI
 Guess
 GuidedBP

@@ -21,7 +21,7 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In lastList
             Dim noMotionTest As Boolean = True
             For Each index In lp.cellList
-                Dim gc = If(index < task.gcList.Count, task.gcList(index), task.gcList(0))
+                Dim gc = If(index < task.brickList.Count, task.brickList(index), task.brickList(0))
                 If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
                     noMotionTest = False
                     Exit For
@@ -38,7 +38,7 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In rawLines.lpList
             Dim motionTest As Boolean = False
             For Each index In lp.cellList
-                Dim gc = task.gcList(index)
+                Dim gc = task.brickList(index)
                 If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
                     motionTest = True
                     Exit For
@@ -56,7 +56,7 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In sortlines.Values
             lp.index = lpList.Count
             For Each index In lp.cellList
-                lpMap(task.gcList(index).rect).SetTo(lp.index)
+                lpMap(task.brickList(index).rect).SetTo(lp.index)
             Next
             lpList.Add(lp)
         Next
@@ -495,7 +495,7 @@ Public Class Line_Info : Inherits TaskParent
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
         strOut += "Line ID = " + CStr(task.lpD.index) + vbCrLf + vbCrLf
-        strOut += "gcMap element = " + CStr(task.lpD.index) + vbCrLf
+        strOut += "brickMap element = " + CStr(task.lpD.index) + vbCrLf
         strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf + vbCrLf
@@ -754,19 +754,19 @@ Public Class Line_CellList : Inherits TaskParent
             ' handle the special case of slope 0
             Dim x = lp.p1.X
             For y = Math.Min(lp.p1.Y, lp.p2.Y) To Math.Max(lp.p1.Y, lp.p2.Y) Step task.cellSize
-                Dim index = task.gcMap.Get(Of Single)(y, x)
+                Dim index = task.brickMap.Get(Of Single)(y, x)
                 lp.cellList.Add(index)
-                dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+                dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
             Next
         Else
             For x = Math.Min(lp.p1.X, lp.p2.X) To Math.Max(lp.p1.X, lp.p2.X)
                 Dim y = lp.m * x + lp.b
-                Dim index = task.gcMap.Get(Of Single)(y, x)
-                dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+                Dim index = task.brickMap.Get(Of Single)(y, x)
+                dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
                 If lp.cellList.Contains(index) = False Then lp.cellList.Add(index)
             Next
         End If
-        labels(2) = CStr(lp.cellList.Count) + " grid cells will cover the line."
+        labels(2) = CStr(lp.cellList.Count) + " bricks will cover the line."
     End Sub
 End Class
 
@@ -790,8 +790,8 @@ Public Class Line_CellListValidate : Inherits TaskParent
             End If
         End If
         For Each index In lp.cellList
-            dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+            dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
         Next
-        labels(2) = CStr(lp.cellList.Count) + " grid cells will cover the line."
+        labels(2) = CStr(lp.cellList.Count) + " bricks will cover the line."
     End Sub
 End Class

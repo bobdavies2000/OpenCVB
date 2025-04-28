@@ -11,7 +11,7 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Sub statsString()
         Dim rc = task.rcD
 
-        Dim gridID As Integer = task.gcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+        Dim gridID As Integer = task.brickMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
         strOut += "rc.age = " + CStr(rc.age) + vbCrLf
         strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
@@ -303,7 +303,7 @@ Public Class RedCell_Generate : Inherits TaskParent
                 rc.age = 1
             End If
 
-            Dim gcIndex = task.gcMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
+            Dim gcIndex = task.brickMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
             rc.color = task.scalarColors(gcIndex Mod 255)
             initialList.Add(rc)
         Next

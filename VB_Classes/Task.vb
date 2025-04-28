@@ -13,15 +13,15 @@ Public Class VBtask : Implements IDisposable
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
     Public lpList As New List(Of lpData) ' line pair list
-    Public gcList As New List(Of gcData)
+    Public brickList As New List(Of gcData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of rcData)
     Public featList As New List(Of List(Of Integer))
     Public fLess As New List(Of List(Of Integer))
 
-    Public gcMap As New cv.Mat ' grid cell map
-    Public lpMap As New cv.Mat ' map of each line's grid cells...
+    Public brickMap As New cv.Mat ' grid cell map
+    Public lpMap As New cv.Mat ' map of each line's bricks...
     Public fpMap As New cv.Mat ' feature map
     Public rcMap As cv.Mat ' redColor map
     Public structureMapX As New cv.Mat
@@ -40,7 +40,7 @@ Public Class VBtask : Implements IDisposable
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
-    Public depthDiffMeters As Single ' grid cells > than this value are depth edges - in meters
+    Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean
 
     Public gcFeatures As New List(Of cv.Point2f)
@@ -125,8 +125,8 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public gCell As GridCell_Basics
-    Public buildCorr As GridCell_CorrelationMap
+    Public gbricks As Brick_Basics
+    Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
@@ -561,8 +561,8 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        gCell = New GridCell_Basics
-        buildCorr = New GridCell_CorrelationMap
+        gbricks = New Brick_Basics
+        buildCorr = New Brick_CorrelationMap
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
@@ -840,7 +840,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         motionBasics.Run(src)
-        gCell.Run(src)
+        gbricks.Run(src)
         buildCorr.Run(src)
 
         If task.optionsChanged Then task.motionMask.SetTo(255)

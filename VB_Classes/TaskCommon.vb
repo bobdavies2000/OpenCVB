@@ -585,7 +585,7 @@ Public Class gcData
     Public rHoodRect As cv.Rect ' a rect describing the neighborhood of the center cell for the right image.
     Sub New()
         Dim stdev As cv.Scalar
-        index = task.gcList.Count
+        index = task.brickList.Count
         rect = task.gridRects(index)
         lRect = rect
         rRect = lRect
@@ -637,8 +637,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         p2 = validatePoint(_p2)
 
         ' convention: p1 has closer depth than p2.  Switch if not...
-        Dim gc1 = task.gcList(task.gcMap.Get(Of Single)(p1.Y, p1.X))
-        Dim gc2 = task.gcList(task.gcMap.Get(Of Single)(p2.Y, p2.X))
+        Dim gc1 = task.brickList(task.brickMap.Get(Of Single)(p1.Y, p1.X))
+        Dim gc2 = task.brickList(task.brickMap.Get(Of Single)(p2.Y, p2.X))
         If gc1.depth > gc2.depth Then
             Dim ptTemp = p1
             p1 = p2
@@ -661,20 +661,20 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             ' handle the special case of slope 0
             Dim x = p1.X
             For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y) Step task.cellSize
-                Dim index = task.gcMap.Get(Of Single)(y, x)
+                Dim index = task.brickMap.Get(Of Single)(y, x)
                 If cellList.Contains(index) = False Then cellList.Add(index)
             Next
         Else
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
                 For x = Math.Min(p1.X, p2.X) To Math.Max(p1.X, p2.X)
                     Dim y = m * x + b
-                    Dim index = task.gcMap.Get(Of Single)(y, x)
+                    Dim index = task.brickMap.Get(Of Single)(y, x)
                     If cellList.Contains(index) = False Then cellList.Add(index)
                 Next
             Else
                 For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y)
                     Dim x = (y - b) / m
-                    Dim index = task.gcMap.Get(Of Single)(y, x)
+                    Dim index = task.brickMap.Get(Of Single)(y, x)
                     If cellList.Contains(index) = False Then cellList.Add(index)
                 Next
             End If

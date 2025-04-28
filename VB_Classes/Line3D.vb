@@ -6,7 +6,7 @@ Public Class Line3D_Basics : Inherits TaskParent
     Public lines3DMat As New cv.Mat
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find all the lines in 3D using the structured slices through the grid cells."
+        desc = "Find all the lines in 3D using the structured slices through the bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
@@ -15,21 +15,21 @@ Public Class Line3D_Basics : Inherits TaskParent
         dst2 = lines.dst2
         labels(2) = lines.labels(2)
 
-        Static gcList As New List(Of gcData)(task.gcList)
+        Static brickList As New List(Of gcData)(task.brickList)
 
         For i = 0 To task.gridRects.Count - 1
-            Dim gc = task.gcList(i)
+            Dim gc = task.brickList(i)
             Dim val = task.motionMask.Get(Of Byte)(gc.center.Y, gc.center.X)
-            If val Then gcList(i) = gc
+            If val Then brickList(i) = gc
         Next
 
         lines3D.Clear()
 
         For Each lp In task.lpList
-            Dim gc1 = gcList(task.gcMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            Dim gc1 = brickList(task.brickMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
             If gc1.depth = 0 Then Continue For
 
-            Dim gc2 = gcList(task.gcMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+            Dim gc2 = brickList(task.brickMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
             If gc2.depth = 0 Then Continue For
 
             lines3D.Add(New cv.Point3f(0, 0.9, 0.9))

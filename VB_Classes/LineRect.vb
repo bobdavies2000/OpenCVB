@@ -45,7 +45,7 @@ End Class
 Public Class LineRect_CenterNeighbor : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
-        desc = "Remove lines which have similar depth in grid cells on either side of a line."
+        desc = "Remove lines which have similar depth in bricks on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -57,14 +57,14 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
         Dim depthLines As Integer, colorLines As Integer
         For Each lp In task.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim index As Integer = task.gcMap.Get(Of Single)(center.Y, center.X)
+            Dim index As Integer = task.brickMap.Get(Of Single)(center.Y, center.X)
             Dim nabeList = task.gridNeighbors(index)
             Dim foundObjectLine As Boolean = False
             For i = 1 To nabeList.Count - 1
-                Dim gc1 = task.gcList(nabeList(i))
+                Dim gc1 = task.brickList(nabeList(i))
                 If gc1.depth = 0 Then Continue For
                 For j = i + 1 To nabeList.Count - 1
-                    Dim gc2 = task.gcList(nabeList(j))
+                    Dim gc2 = task.brickList(nabeList(j))
                     If gc2.depth = 0 Then Continue For
                     If Math.Abs(gc1.depth - gc2.depth) > depthThreshold Then
                         foundObjectLine = True
@@ -99,7 +99,7 @@ End Class
 Public Class LineRect_CenterRange : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
-        desc = "Remove lines which have similar depth in grid cells on either side of a line."
+        desc = "Remove lines which have similar depth in bricks on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -111,8 +111,8 @@ Public Class LineRect_CenterRange : Inherits TaskParent
         Dim depthLines As Integer, colorLines As Integer
         For Each lp In task.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim index As Integer = task.gcMap.Get(Of Single)(center.Y, center.X)
-            Dim gc = task.gcList(index)
+            Dim index As Integer = task.brickMap.Get(Of Single)(center.Y, center.X)
+            Dim gc = task.brickList(index)
             If gc.mm.maxVal - gc.mm.minVal > depthThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1

@@ -8,7 +8,7 @@ Public Class Region_Basics : Inherits TaskParent
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
         labels(2) = "Move mouse over a line to see the depth values.  Results will be in Labels(3)"
-        desc = "Display grid cells that are connected by depth vertically and horizontally."
+        desc = "Display bricks that are connected by depth vertically and horizontally."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim tilesPerRow = task.grid.tilesPerRow
@@ -19,13 +19,13 @@ Public Class Region_Basics : Inherits TaskParent
         dst0.SetTo(0)
         dst2.SetTo(0)
         For Each tuple In regions.hTuples
-            Dim gc1 = task.gcList(tuple.Item1)
-            Dim gc2 = task.gcList(tuple.Item2)
+            Dim gc1 = task.brickList(tuple.Item1)
+            Dim gc2 = task.brickList(tuple.Item2)
             If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
             If gc1.center.DistanceTo(gc2.center) > task.cellSize Then
                 Dim r = gc1.rect
                 For i = gc1.index + 1 To gc2.index - 1
-                    r = r.Union(task.gcList(i).rect)
+                    r = r.Union(task.brickList(i).rect)
                 Next
                 hRects.Add(r)
                 dst0(r).SetTo(hRects.Count)
@@ -39,13 +39,13 @@ Public Class Region_Basics : Inherits TaskParent
         dst1.SetTo(0)
         dst3.SetTo(0)
         For Each tuple In regions.vTuples
-            Dim gc1 = task.gcList(tuple.Item1)
-            Dim gc2 = task.gcList(tuple.Item2)
+            Dim gc1 = task.brickList(tuple.Item1)
+            Dim gc2 = task.brickList(tuple.Item2)
             If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
             If gc1.center.DistanceTo(gc2.center) > task.cellSize Then
                 Dim r = gc1.rect
                 For i = gc1.index + tilesPerRow To gc2.index - 1 Step tilesPerRow
-                    r = r.Union(task.gcList(i).rect)
+                    r = r.Union(task.brickList(i).rect)
                 Next
                 vRects.Add(r)
                 dst1(r).SetTo(vRects.Count)
@@ -66,11 +66,11 @@ Public Class Region_Basics : Inherits TaskParent
             rect = vRects(index - 1)
         End If
 
-        Dim gcIndex = task.gcMap.Get(Of Single)(rect.Y, rect.X)
+        Dim gcIndex = task.brickMap.Get(Of Single)(rect.Y, rect.X)
         If gcIndex > 0 Then
-            labels(3) = "Depth = " + Format(task.gcList(gcIndex).depth, fmt1) + "m"
-            gcIndex = task.gcMap.Get(Of Single)(rect.BottomRight.Y, rect.BottomRight.X)
-            labels(3) += " to " + Format(task.gcList(gcIndex).depth, fmt1) + "m"
+            labels(3) = "Depth = " + Format(task.brickList(gcIndex).depth, fmt1) + "m"
+            gcIndex = task.brickMap.Get(Of Single)(rect.BottomRight.Y, rect.BottomRight.X)
+            labels(3) += " to " + Format(task.brickList(gcIndex).depth, fmt1) + "m"
         Else
             labels(3) = "No depth region present..."
         End If
@@ -99,12 +99,12 @@ Public Class Region_Quads : Inherits TaskParent
 
         Dim quadData As New List(Of cv.Point3f)
         For Each rect In inputRects
-            Dim index1 = task.gcMap.Get(Of Single)(rect.Y, rect.X)
-            Dim index2 = task.gcMap.Get(Of Single)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
+            Dim index1 = task.brickMap.Get(Of Single)(rect.Y, rect.X)
+            Dim index2 = task.brickMap.Get(Of Single)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
             If index1 = 0 Or index2 = 0 Then Continue For
 
-            Dim gc1 = task.gcList(index1)
-            Dim gc2 = task.gcList(index2)
+            Dim gc1 = task.brickList(index1)
+            Dim gc2 = task.brickList(index2)
 
             quadData.Add(gc1.color)
 
@@ -138,8 +138,8 @@ Public Class Region_Core : Inherits TaskParent
     End Sub
     Private Sub hTestRect(gc1 As gcData, gc2 As gcData, nextStart As Integer)
         If Math.Abs(gc1.depth - gc2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            Dim p1 = task.gcList(colStart).rect.TopLeft
-            Dim p2 = task.gcList(colEnd).rect.BottomRight
+            Dim p1 = task.brickList(colStart).rect.TopLeft
+            Dim p2 = task.brickList(colEnd).rect.BottomRight
             dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
             colorIndex += 1
             hTuples.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
@@ -151,12 +151,12 @@ Public Class Region_Core : Inherits TaskParent
     End Sub
     Private Sub vTestRect(gc1 As gcData, gc2 As gcData, gcNext As Integer, nextStart As Integer)
         If Math.Abs(gc1.depth - gc2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            bottomRight = task.gcList(gcNext).rect.BottomRight
+            bottomRight = task.brickList(gcNext).rect.BottomRight
             dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
             colorIndex += 1
             vTuples.Add(New Tuple(Of Integer, Integer)(rowStart, gcNext))
             rowStart = nextStart
-            If nextStart >= 0 Then topLeft = task.gcList(rowStart).rect.TopLeft
+            If nextStart >= 0 Then topLeft = task.brickList(rowStart).rect.TopLeft
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -173,9 +173,9 @@ Public Class Region_Core : Inherits TaskParent
             colStart = i * width
             colEnd = colStart
             For j = 0 To width - 2
-                hTestRect(task.gcList(i * width + j), task.gcList(i * width + j + 1), i * width + j + 1)
+                hTestRect(task.brickList(i * width + j), task.brickList(i * width + j + 1), i * width + j + 1)
             Next
-            hTestRect(task.gcList(i * width + height - 1), task.gcList(i * width + height - 1), -1)
+            hTestRect(task.brickList(i * width + height - 1), task.brickList(i * width + height - 1), -1)
         Next
         labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
                     CStr(task.depthDiffMeters) + " meters"
@@ -185,16 +185,16 @@ Public Class Region_Core : Inherits TaskParent
         colorIndex = 0
         For i = 0 To width - 1
             rowStart = i
-            topLeft = task.gcList(i).rect.TopLeft
-            bottomRight = task.gcList(i + width).rect.TopLeft
+            topLeft = task.brickList(i).rect.TopLeft
+            bottomRight = task.brickList(i + width).rect.TopLeft
             For j = 0 To height - 2
                 index = i + (j + 1) * width
-                If index >= task.gcList.Count Then index = task.gcList.Count - 1
-                vTestRect(task.gcList(i + j * width), task.gcList(index), i + j * width, index)
+                If index >= task.brickList.Count Then index = task.brickList.Count - 1
+                vTestRect(task.brickList(i + j * width), task.brickList(index), i + j * width, index)
             Next
             Dim gcNext = i + (height - 1) * width
-            If gcNext >= task.gcList.Count Then gcNext = task.gcList.Count - 1
-            vTestRect(task.gcList(gcNext), task.gcList(index), gcNext, -1)
+            If gcNext >= task.brickList.Count Then gcNext = task.brickList.Count - 1
+            vTestRect(task.brickList(gcNext), task.brickList(index), gcNext, -1)
         Next
 
         labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
@@ -263,7 +263,7 @@ Public Class Region_Depth : Inherits TaskParent
         Dim minSize As Integer = src.Total / 25
         dst2.SetTo(0)
         mdLargest.Clear()
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             Dim index = dst1.Get(Of Byte)(gc.center.Y, gc.center.X)
             Dim md = redM.mdList(index)
             If index = 0 Then
@@ -292,14 +292,14 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
     Public Sub New()
         dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "The matching grid cells in the right view that were used in the correlation computation"
+        labels(3) = "The matching bricks in the right view that were used in the correlation computation"
         desc = "Create depth region markers using a correlation threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0.SetTo(0)
         dst1.SetTo(0)
         Dim count As Integer
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If gc.correlation > task.fCorrThreshold Then
                 dst0.Rectangle(gc.rRect, 255, -1)
                 dst1.Rectangle(gc.rect, 255, -1)
@@ -313,7 +313,7 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
         dst3.SetTo(0)
         task.rightView.CopyTo(dst3, dst0)
 
-        labels(2) = Format(count / task.gcList.Count, "0%") + " of grid cells had color correlation of " +
+        labels(2) = Format(count / task.brickList.Count, "0%") + " of bricks had color correlation of " +
                     Format(task.fCorrThreshold, "0.0%") + " or better"
     End Sub
 End Class

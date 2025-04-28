@@ -25,7 +25,7 @@ Public Class FindCells_Basics : Inherits TaskParent
             featList.Add(New List(Of Integer))
         Next
 
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             hist.Run(src(gc.rect))
             For i = 1 To hist.histarray.Count - 1
                 If hist.histarray(i) > 0 Then
@@ -47,7 +47,7 @@ Public Class FindCells_Basics : Inherits TaskParent
         Dim edgeIndex = task.selectedFeature
         If edgeIndex <> 0 And edgeIndex < task.featList.Count Then
             For Each index In task.featList(edgeIndex)
-                Dim gc = task.gcList(index)
+                Dim gc = task.brickList(index)
                 dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
             Next
         End If
@@ -57,14 +57,14 @@ Public Class FindCells_Basics : Inherits TaskParent
                 If debugMode Then If i <> task.selectedFeature Then Continue For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
-                    Dim gc = task.gcList(index)
+                    Dim gc = task.brickList(index)
                     depthSorted.Add(gc.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
                 For Each ele In depthSorted
                     If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then
-                        Dim gc = task.gcList(ele.Value)
+                        Dim gc = task.brickList(ele.Value)
                         dst2.Rectangle(gc.rect, red, task.lineWidth + 1)
                     End If
                     lastDepth = ele.Key
@@ -150,13 +150,13 @@ Public Class FindCells_Gaps : Inherits TaskParent
             If task.featList(i).Count = 0 Then Exit For
             Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
             For Each index In task.featList(i)
-                Dim gc = task.gcList(index)
+                Dim gc = task.brickList(index)
                 depthSorted.Add(gc.depth, index)
             Next
 
             Dim lastDepth = depthSorted.ElementAt(0).Key
             For Each ele In depthSorted
-                If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then gapCells.Add(task.gcList(ele.Value).index)
+                If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then gapCells.Add(task.brickList(ele.Value).index)
                 lastDepth = ele.Key
             Next
         Next
@@ -166,7 +166,7 @@ Public Class FindCells_Gaps : Inherits TaskParent
             Dim debugMode = task.selectedFeature <> 0
             For i = 0 To gapCells.Count - 1
                 If debugMode Then If i <> task.selectedFeature Then Continue For
-                Dim gc = task.gcList(gapCells(i))
+                Dim gc = task.brickList(gapCells(i))
                 dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
                 If i = task.selectedFeature Then
                     SetTrueText(Format(gc.depth, fmt1), gc.rect.BottomRight)
@@ -226,13 +226,13 @@ Public Class FindCells_FeatureLess : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To task.featList.Count - 1
             For Each index In task.featList(i)
-                Dim gc = task.gcList(index)
+                Dim gc = task.brickList(index)
                 dst3.Rectangle(gc.rect, 255, -1)
             Next
         Next
 
         Dim regionCount As Integer = 1
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If dst3.Get(Of Byte)(gc.pt.Y, gc.pt.X) = 0 Then
                 dst3.FloodFill(New cv.Point(gc.pt.X, gc.pt.Y), regionCount)
                 regionCount += 1
@@ -245,7 +245,7 @@ Public Class FindCells_FeatureLess : Inherits TaskParent
         Next
 
         dst1.SetTo(0)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             Dim val = dst3.Get(Of Byte)(gc.pt.Y, gc.pt.X)
             If val = 255 Then Continue For
             If val Then
@@ -257,7 +257,7 @@ Public Class FindCells_FeatureLess : Inherits TaskParent
         Dim regionSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To fless.Count - 1
             If fless(i).Count = 1 Then
-                Dim gc = task.gcList(fless(i)(0))
+                Dim gc = task.brickList(fless(i)(0))
                 dst1(gc.rect).SetTo(0)
             Else
                 regionSorted.Add(fless(i).Count, i)
@@ -272,7 +272,7 @@ Public Class FindCells_FeatureLess : Inherits TaskParent
         dst1.SetTo(0)
         For i = 0 To task.fLess.Count - 1
             For Each index In task.fLess(i)
-                Dim gc = task.gcList(index)
+                Dim gc = task.brickList(index)
                 dst1(gc.rect).SetTo(i + 1)
             Next
         Next
@@ -280,7 +280,7 @@ Public Class FindCells_FeatureLess : Inherits TaskParent
         dst2 = ShowPalette(dst1)
 
         For i = 0 To task.fLess.Count - 2
-            Dim gc = task.gcList(task.fLess(i)(0))
+            Dim gc = task.brickList(task.fLess(i)(0))
             SetTrueText(CStr(task.fLess(i).Count), gc.pt)
         Next
     End Sub

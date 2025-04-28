@@ -12,7 +12,7 @@ Public Class Disparity_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.leftView
 
-        Dim index As Integer = task.gcMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Static saveIndex As Integer = index
         Static saveCorrelations As New List(Of Single)
         Static bestRect As cv.Rect
@@ -59,7 +59,7 @@ Public Class Disparity_Edges : Inherits TaskParent
     Dim edges As New EdgeLine_Basics
     Dim disparity As New Disparity_Basics
     Public Sub New()
-        desc = "Use features in grid cells to confirm depth."
+        desc = "Use features in bricks to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.leftView)
@@ -190,7 +190,7 @@ Public Class Disparity_Color8u : Inherits TaskParent
     Dim disparity As New Disparity_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Measure the impact of the color8u transforms on the grid cells."
+        desc = "Measure the impact of the color8u transforms on the bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = task.rightView.Clone
@@ -205,7 +205,7 @@ Public Class Disparity_Color8u : Inherits TaskParent
         task.color.Rectangle(disparity.rect, 255, task.lineWidth)
         dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
 
-        Dim index As Integer = task.gcMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim index As Integer = task.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         Dim rect = task.gridRects(index)
         dst2.Rectangle(rect, 255, task.lineWidth + 1)
     End Sub

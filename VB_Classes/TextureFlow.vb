@@ -87,18 +87,18 @@ End Class
 
 
 Public Class TextureFlow_GridPoints : Inherits TaskParent
-    Dim gridPoint As New GridPoint_Best
+    Dim ptBrick As New BrickPoint_Best
     Dim flow As New TextureFlow_Basics
     Dim knn As New KNN_Basics
     Public Sub New()
         desc = "Use the grid points as input to the texture flow algorithm"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        gridPoint.Run(task.grayStable)
-        dst3 = gridPoint.dst3
+        ptBrick.Run(task.grayStable)
+        dst3 = ptBrick.dst3
 
         knn.trainInput.Clear()
-        For Each pt In gridPoint.bestGridPoints
+        For Each pt In ptBrick.bestBricks
             knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
         Next
         knn.queries = New List(Of cv.Point2f)(knn.trainInput)

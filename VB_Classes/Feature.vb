@@ -100,7 +100,7 @@ Public Class Feature_Basics : Inherits TaskParent
 
         Dim sortByGrid As New SortedList(Of Single, cv.Point2f)(New compareAllowIdenticalSingle)
         For Each pt In ptNew
-            Dim index = task.gcMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.brickMap.Get(Of Integer)(pt.Y, pt.X)
             sortByGrid.Add(index, pt)
         Next
 
@@ -113,7 +113,7 @@ Public Class Feature_Basics : Inherits TaskParent
             task.features.Add(pt)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
 
-            Dim nextIndex = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            Dim nextIndex = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             task.fpFromGridCell.Add(nextIndex)
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
@@ -645,7 +645,7 @@ Public Class Feature_Matching : Inherits TaskParent
         For Each pt In features
             Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
             If val = 0 Then
-                Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+                Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
                 Dim r = task.gridRects(index)
                 match.template = fpLastSrc(r)
                 match.Run(src(r))
@@ -701,7 +701,7 @@ Public Class Feature_SteadyCam : Inherits TaskParent
         Dim mode = cv.TemplateMatchModes.CCoeffNormed
         features.Clear()
         For Each pt In ptList
-            Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             Dim r = task.gridRects(index)
             cv.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
             If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then

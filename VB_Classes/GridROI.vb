@@ -375,7 +375,7 @@ Public Class GridROI_LRClick : Inherits TaskParent
         If gather.rects.Count = 0 Then Exit Sub
         If task.mouseClickFlag Then setClickPoint(task.ClickPoint, task.mousePicTag)
         If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
-        Dim gridIndex As Integer = task.gcMap.Get(Of Single)(ClickPoint.Y, ClickPoint.X)
+        Dim gridIndex As Integer = task.brickMap.Get(Of Single)(ClickPoint.Y, ClickPoint.X)
         Dim roi = task.gridRects(gridIndex)
         dst2.Rectangle(roi, white, task.lineWidth)
 
@@ -478,7 +478,7 @@ Public Class GridROI_Canny : Inherits TaskParent
         dst3 = edges.dst2
 
         dst2.SetTo(0)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If dst3(gc.rect).CountNonZero Then src(gc.rect).CopyTo(dst2(gc.rect))
         Next
     End Sub

@@ -1544,7 +1544,7 @@ Public Class Depth_ErrorEstimate : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        for each gc in task.gcList
+        For Each gc In task.brickList
             Dim testError = ErrorEstimate(gc.depth)
             dst1(gc.rect).SetTo(testError)
         Next
@@ -1576,7 +1576,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
 
         dst1 = src.Clone()
         dst1.SetTo(white, task.gridMask)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             Dim pt = gc.mm.minLoc
             subdiv.Insert(New cv.Point(pt.X + gc.rect.X, pt.Y + gc.rect.Y))
             DrawCircle(dst1(gc.rect), gc.mm.minLoc, task.DotSize, cv.Scalar.Red)

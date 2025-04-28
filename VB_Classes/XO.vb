@@ -761,17 +761,17 @@ End Class
 
 
 
-Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
+Public Class XO_Brick_GrayScaleTest : Inherits TaskParent
     Dim options As New Options_Stdev
     Public Sub New()
-        labels(3) = "grid cells where grayscale stdev and average of the 3 color stdev's"
+        labels(3) = "bricks where grayscale stdev and average of the 3 color stdev's"
         desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim threshold = options.stdevThreshold
 
-        Dim pt = task.gCell.ptCursor
+        Dim pt = task.gbricks.ptCursor
         Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
         Dim ColorMean As cv.Scalar, colorStdev As cv.Scalar
         Static saveTrueData As New List(Of TrueText)
@@ -779,7 +779,7 @@ Public Class XO_GridCell_GrayScaleTest : Inherits TaskParent
             dst3.SetTo(0)
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim count As Integer
-            For Each gc In task.gcList
+            For Each gc In task.brickList
                 cv.Cv2.MeanStdDev(dst2(gc.rect), grayMean, grayStdev)
                 cv.Cv2.MeanStdDev(task.color(gc.rect), ColorMean, colorStdev)
                 Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
@@ -1943,7 +1943,7 @@ End Class
 
 
 
-Public Class XO_GridCell_Basics : Inherits TaskParent
+Public Class XO_Brick_Basics : Inherits TaskParent
     Public options As New Options_GridCells
     Public thresholdRangeZ As Single
     Public instantUpdate As Boolean = True
@@ -1952,7 +1952,7 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
     Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
-        desc = "Create the grid of grid cells that reduce depth volatility"
+        desc = "Create the grid of bricks that reduce depth volatility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -1965,7 +1965,7 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
-        task.gcList.Clear()
+        task.brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim gc As New gcData
             gc.rect = task.gridRects(i)
@@ -2015,14 +2015,14 @@ Public Class XO_GridCell_Basics : Inherits TaskParent
             End If
 
             lastCorrelation(i) = gc.correlation
-            gc.index = task.gcList.Count
-            task.gcMap(gc.rect).SetTo(i)
-            task.gcList.Add(gc)
+            gc.index = task.brickList.Count
+            task.brickMap(gc.rect).SetTo(i)
+            task.brickList.Add(gc)
         Next
 
         quad.Run(src)
 
-        If task.heartBeat Then labels(2) = CStr(task.gcList.Count) + " grid cells have the useful depth values."
+        If task.heartBeat Then labels(2) = CStr(task.brickList.Count) + " bricks have the useful depth values."
     End Sub
 End Class
 
@@ -2041,11 +2041,11 @@ Public Class XO_Quad_Basics : Inherits TaskParent
             shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
         End If
 
-        task.gcMap.SetTo(0)
+        task.brickMap.SetTo(0)
         dst2.SetTo(0)
-        For i = 0 To task.gcList.Count - 1
-            Dim gc = task.gcList(i)
-            task.gcMap(gc.rect).SetTo(i)
+        For i = 0 To task.brickList.Count - 1
+            Dim gc = task.brickList(i)
+            task.brickMap(gc.rect).SetTo(i)
             If gc.depth > 0 Then
                 gc.corners.Clear()
 
@@ -2735,7 +2735,7 @@ Public Class XO_Region_RectsH : Inherits TaskParent
     Dim connect As New Region_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Connect grid cells with similar depth - horizontally scanning."
+        desc = "Connect bricks with similar depth - horizontally scanning."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src)
@@ -2746,8 +2746,8 @@ Public Class XO_Region_RectsH : Inherits TaskParent
         Dim index As Integer
         For Each tup In connect.hTuples
             If tup.Item1 = tup.Item2 Then Continue For
-            Dim gc1 = task.gcList(tup.Item1)
-            Dim gc2 = task.gcList(tup.Item2)
+            Dim gc1 = task.brickList(tup.Item1)
+            Dim gc2 = task.brickList(tup.Item2)
 
             Dim w = gc2.rect.BottomRight.X - gc1.rect.X
             Dim h = gc1.rect.Height
@@ -2773,7 +2773,7 @@ Public Class XO_Region_RectsV : Inherits TaskParent
     Dim connect As New Region_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Connect grid cells with similar depth - vertically scanning."
+        desc = "Connect bricks with similar depth - vertically scanning."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src)
@@ -2784,8 +2784,8 @@ Public Class XO_Region_RectsV : Inherits TaskParent
         Dim index As Integer
         For Each tup In connect.vTuples
             If tup.Item1 = tup.Item2 Then Continue For
-            Dim gc1 = task.gcList(tup.Item1)
-            Dim gc2 = task.gcList(tup.Item2)
+            Dim gc1 = task.brickList(tup.Item1)
+            Dim gc2 = task.brickList(tup.Item2)
 
             Dim w = gc1.rect.Width
             Dim h = gc2.rect.BottomRight.Y - gc1.rect.Y
@@ -2809,7 +2809,7 @@ Public Class XO_Region_Rects : Inherits TaskParent
     Dim hConn As New XO_Region_RectsH
     Dim vConn As New XO_Region_RectsV
     Public Sub New()
-        desc = "Isolate the connected depth grid cells both vertically and horizontally."
+        desc = "Isolate the connected depth bricks both vertically and horizontally."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hConn.Run(src)
@@ -2850,7 +2850,7 @@ End Class
 Public Class XO_Region_Gaps : Inherits TaskParent
     Dim connect As New Region_Core
     Public Sub New()
-        labels(2) = "Grid cells with single cells removed for both vertical and horizontal connected cells."
+        labels(2) = "bricks with single cells removed for both vertical and horizontal connected cells."
         labels(3) = "Vertical cells with single cells removed."
         desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
     End Sub
@@ -2861,14 +2861,14 @@ Public Class XO_Region_Gaps : Inherits TaskParent
 
         For Each tup In connect.hTuples
             If tup.Item2 - tup.Item1 = 0 Then
-                Dim gc = task.gcList(tup.Item1)
+                Dim gc = task.brickList(tup.Item1)
                 dst2(gc.rect).SetTo(0)
             End If
         Next
 
         For Each tup In connect.vTuples
-            Dim gc1 = task.gcList(tup.Item1)
-            Dim gc2 = task.gcList(tup.Item2)
+            Dim gc1 = task.brickList(tup.Item1)
+            Dim gc2 = task.brickList(tup.Item2)
             If gc2.rect.Y - gc1.rect.Y = 0 Then
                 dst2(gc1.rect).SetTo(0)
                 dst3(gc1.rect).SetTo(0)
@@ -2882,11 +2882,11 @@ End Class
 
 
 
-Public Class XO_GridCell_FeatureGaps : Inherits TaskParent
-    Dim feat As New GridCell_Features
+Public Class XO_Brick_FeatureGaps : Inherits TaskParent
+    Dim feat As New Brick_Features
     Dim gaps As New XO_Region_Gaps
     Public Sub New()
-        labels(2) = "The output of GridCell_Gaps overlaid with the output of the GridCell_Features"
+        labels(2) = "The output of Brick_Gaps overlaid with the output of the Brick_Features"
         desc = "Overlay the features on the image of the gaps"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2929,7 +2929,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
             DrawContour(dst1, facets, 255, task.lineWidth)
             DrawContour(task.fpMap, facets, lp.index)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim gc = task.gcList(task.gcMap.Get(Of Single)(center.Y, center.X))
+            Dim gc = task.brickList(task.brickMap.Get(Of Single)(center.Y, center.X))
             DrawContour(dst3, facets, gc.color)
             task.lpList(i) = lp
         Next
@@ -3833,7 +3833,7 @@ End Class
 
 
 
-Public Class XO_GridPoint_FeatureLess2 : Inherits TaskParent
+Public Class XO_BrickPoint_FeatureLess2 : Inherits TaskParent
     Public edges As New EdgeLine_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -3845,12 +3845,12 @@ Public Class XO_GridPoint_FeatureLess2 : Inherits TaskParent
         edges.Run(task.grayStable.Clone)
 
         dst0.SetTo(0)
-        Dim gcPrev = task.gcList(0)
+        Dim gcPrev = task.brickList(0)
         Dim fLessCount As Integer = 1
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
 
-            Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
+            Dim gcAbove = task.brickList(gc.index - task.grid.tilesPerRow)
             Dim val = gcAbove.fLessIndex
             If val = 0 Then val = dst0.Get(Of Byte)(gcPrev.rect.Y, gcPrev.rect.X)
             Dim count = edges.dst2(gc.rect).CountNonZero
@@ -3865,14 +3865,14 @@ Public Class XO_GridPoint_FeatureLess2 : Inherits TaskParent
             gcPrev = gc
         Next
 
-        For i = task.gcList.Count - 1 To 1 Step -1
-            Dim gc = task.gcList(i)
+        For i = task.brickList.Count - 1 To 1 Step -1
+            Dim gc = task.brickList(i)
             If gc.fLessIndex > 0 Then
-                gcPrev = task.gcList(i - 1)
+                gcPrev = task.brickList(i - 1)
                 If gcPrev.fLessIndex > 0 And gcPrev.fLessIndex <> 0 And gcPrev.fLessIndex <> gc.fLessIndex And gcPrev.fLessIndex <> 0 Then
                     gcPrev.fLessIndex = gc.fLessIndex
                     dst0(gcPrev.rect).SetTo(gc.fLessIndex)
-                    task.gcList(i - 1) = gcPrev
+                    task.brickList(i - 1) = gcPrev
                 End If
             End If
         Next
@@ -3888,7 +3888,7 @@ End Class
 
 
 
-Public Class XO_GridPoint_FeatureLess : Inherits TaskParent
+Public Class XO_BrickPoint_FeatureLess : Inherits TaskParent
     Public edges As New EdgeLine_Basics
     Public classCount As Integer
     Public fLessMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
@@ -3900,7 +3900,7 @@ Public Class XO_GridPoint_FeatureLess : Inherits TaskParent
         edges.Run(task.grayStable.Clone)
 
         fLessMask.SetTo(0)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
 
             If edges.dst2(gc.rect).CountNonZero = 0 Then
@@ -3909,12 +3909,12 @@ Public Class XO_GridPoint_FeatureLess : Inherits TaskParent
             End If
         Next
 
-        Dim gcPrev = task.gcList(0)
+        Dim gcPrev = task.brickList(0)
         classCount = 0
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
             If gc.fLessIndex = 255 Then
-                Dim gcAbove = task.gcList(gc.index - task.grid.tilesPerRow)
+                Dim gcAbove = task.brickList(gc.index - task.grid.tilesPerRow)
                 Dim val = gcAbove.fLessIndex
                 If val = 0 Then val = gcPrev.fLessIndex
                 If val = 0 And gc.fLessIndex <> 0 Then
@@ -4216,7 +4216,7 @@ End Class
 Public Class XO_LineRect_CenterDepth : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
-        desc = "Remove lines which have similar depth in grid cells on either side of a line."
+        desc = "Remove lines which have similar depth in bricks on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -4230,10 +4230,10 @@ Public Class XO_LineRect_CenterDepth : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim lpPerp = lp.perpendicularPoints(center, task.cellSize)
-            Dim index1 As Integer = task.gcMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
-            Dim index2 As Integer = task.gcMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
-            Dim gc1 = task.gcList(index1)
-            Dim gc2 = task.gcList(index2)
+            Dim index1 As Integer = task.brickMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
+            Dim index2 As Integer = task.brickMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
+            Dim gc1 = task.brickList(index1)
+            Dim gc2 = task.brickList(index2)
             If Math.Abs(gc1.depth - gc2.depth) > depthThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
@@ -4291,7 +4291,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
     Public Sub New()
         task.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        desc = "Isolate the longest X lines and update the list of grid cells containing each line."
+        desc = "Isolate the longest X lines and update the list of bricks containing each line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
@@ -4321,13 +4321,13 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
         Next
 
         task.lpMap.SetTo(0)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If dst1(gc.rect).CountNonZero = 0 Then Continue For
             hist.Run(dst1(gc.rect))
             For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
                 If hist.histarray(i) > 0 Then
                     lpList(i).cellList.Add(gc.index)
-                    task.lpMap(task.gcList(gc.index).rect).SetTo(gc.index)
+                    task.lpMap(task.brickList(gc.index).rect).SetTo(gc.index)
                 End If
             Next
         Next
@@ -4338,7 +4338,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             For Each index In lp.cellList
-                dst2.Rectangle(task.gcList(index).rect, task.highlight, task.lineWidth)
+                dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
             Next
         Next
 
@@ -4387,7 +4387,7 @@ Public Class XO_Structured_Basics : Inherits TaskParent
             lpList.Add(lp)
         Next
 
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If dst(gc.rect).CountNonZero = 0 Then Continue For
             hist.Run(dst(gc.rect))
             For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
@@ -4400,7 +4400,7 @@ Public Class XO_Structured_Basics : Inherits TaskParent
         structureMap.SetTo(0)
         For Each lp In lpList
             For Each index In lp.cellList
-                Dim gc = task.gcList(index)
+                Dim gc = task.brickList(index)
                 structureMap(gc.rect).SetTo(lp.index)
             Next
         Next

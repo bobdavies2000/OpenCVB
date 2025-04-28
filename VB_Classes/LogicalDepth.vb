@@ -4,7 +4,7 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
     Dim gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        desc = "Use the lp.cellList of grid cells to build logical depth values for each cell."
+        desc = "Use the lp.cellList of bricks to build logical depth values for each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         structured.Run(src)
@@ -20,8 +20,8 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
             Dim halfCount As Integer = Math.Floor(If(lp.cellList.Count Mod 2 = 0, lp.cellList.Count, lp.cellList.Count - 1) / 2)
             Dim depthValues As New List(Of Single)
             For i = 0 To halfCount - 1
-                Dim gc1 = task.gcList(lp.cellList(i))
-                Dim gc2 = task.gcList(lp.cellList(lp.cellList.Count - i - 1))
+                Dim gc1 = task.brickList(lp.cellList(i))
+                Dim gc2 = task.brickList(lp.cellList(lp.cellList.Count - i - 1))
 
                 Dim d1 = gc1.depth
                 Dim d2 = gc2.depth
@@ -50,7 +50,7 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
             If avg1 < avg2 Then offset = lp.cellList.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
                 For Each index In lp.cellList
-                    Dim gc = task.gcList(index)
+                    Dim gc = task.brickList(index)
                     dst1(gc.rect).SetTo(1)
                     If debugMode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
                     gcUpdates.Add(New Tuple(Of Integer, Single)(index, (avg1 + avg2) / 2))
@@ -61,7 +61,7 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
                 Dim depthIncr = (max - min) / lp.cellList.Count
                 For i = 0 To lp.cellList.Count - 1
                     Dim index = lp.cellList(i)
-                    Dim gc = task.gcList(index)
+                    Dim gc = task.brickList(index)
                     If offset > 0 Then
                         dst1(gc.rect).SetTo((offset - i + 1) * incr)
                         gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
@@ -77,12 +77,12 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
         Next
 
         For Each tuple In gcUpdates
-            task.gcList(tuple.Item1).depth = tuple.Item2
+            task.brickList(tuple.Item1).depth = tuple.Item2
         Next
 
 
         dst1.SetTo(0)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             dst1(gc.rect).SetTo(gc.depth * 255 / task.MaxZmeters)
         Next
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)

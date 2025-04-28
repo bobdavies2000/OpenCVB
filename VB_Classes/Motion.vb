@@ -47,7 +47,7 @@ Public Class Motion_Basics : Inherits TaskParent
         Next
 
         task.fullImageStable = motionList.Count = 0
-        labels(2) = "There were " + CStr(motionList.Count) + " grid cells with motion."
+        labels(2) = "There were " + CStr(motionList.Count) + " bricks with motion."
 
         ' some cameras have low light images for the first few frames.
         If task.gOptions.UseMotionMask.Checked = False Or task.frameCount < 3 Then dst1.SetTo(255)
@@ -630,7 +630,7 @@ End Class
 
 
 Public Class Motion_EdgeStability : Inherits TaskParent
-    Dim gEdges As New GridCell_Edges
+    Dim gEdges As New Brick_Edges
     Public Sub New()
         labels(3) = "High population cells"
         desc = "Measure the stability of edges in each grid Rect"
@@ -967,7 +967,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             featureRects.Clear()
             saveMat = src.Clone
             For Each pt In task.topFeatures
-                Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+                Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
                 Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
                 roi = ValidateRect(roi)
                 featureRects.Add(roi)
@@ -976,7 +976,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
 
             dst2 = saveMat.Clone
             For Each pt In task.topFeatures
-                Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+                Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
                 Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
                 roi = ValidateRect(roi)
                 dst2.Rectangle(roi, task.highlight, task.lineWidth)
@@ -1000,7 +1000,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         featureRects.Clear()
         For Each roi In matchRects
             Dim pt = New cv.Point(roi.X + half, roi.Y + half)
-            Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
         Next
@@ -1025,7 +1025,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         searchRects.Clear()
         featureRects.Clear()
         For Each pt In task.topFeatures
-            Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
             roi = ValidateRect(roi)
             featureRects.Add(roi)
@@ -1034,7 +1034,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
 
         dst2 = dst1.Clone
         For Each pt In task.topFeatures
-            Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
             roi = ValidateRect(roi)
             dst2.Rectangle(roi, task.highlight, task.lineWidth)
@@ -1066,7 +1066,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         featureRects.Clear()
         For Each roi In matchRects
             Dim pt = New cv.Point(roi.X + half, roi.Y + half)
-            Dim index As Integer = task.gcMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
         Next

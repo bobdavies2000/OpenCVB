@@ -1466,7 +1466,7 @@ End Class
 
 
 Public Class Hist_GridPointRegions : Inherits TaskParent
-    Dim fLess As New GridPoint_FeatureLess
+    Dim fLess As New BrickPoint_FeatureLess
     Dim ranges() As cv.Rangef
     Public Sub New()
         ranges = {New cv.Rangef(0, 256)}
@@ -1478,11 +1478,11 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
 
         Dim histList = New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim predictedList As New List(Of Integer)
-        For Each gc In task.gcList
+        For Each gc In task.brickList
             If gc.fLessIndex Then
                 Dim nabes = task.gridNeighbors(gc.index)
                 For i = 1 To nabes.Count - 1 ' the first entry is for the gc...
-                    If task.gcList(nabes(i)).fLessIndex = 0 Then
+                    If task.brickList(nabes(i)).fLessIndex = 0 Then
                         If predictedList.Contains(nabes(i)) = False Then
                             histList.Add(gc.index, nabes(i))
                             predictedList.Add(nabes(i))
@@ -1497,7 +1497,7 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
         For Each ele In histList
             If gcIndex <> ele.Key Then
                 gcIndex = ele.Key
-                gc1 = task.gcList(gcIndex)
+                gc1 = task.brickList(gcIndex)
 
                 cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, Not fLess.edges.dst2(gc1.rect), histogram, 1, {task.histogramBins}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -1521,7 +1521,7 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
                 Next
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If
-            Dim gc2 = task.gcList(ele.Value)
+            Dim gc2 = task.brickList(ele.Value)
             cv.Cv2.CalcBackProject({task.grayStable(gc2.rect)}, {0}, histogram, dst1(gc2.rect), ranges)
         Next
         dst2 = ShowPalette(dst1)
@@ -1539,7 +1539,7 @@ End Class
 
 
 Public Class Hist_ToggleFeatureLess : Inherits TaskParent
-    Dim fLess As New GridPoint_FeatureLess
+    Dim fLess As New BrickPoint_FeatureLess
     Dim plotHist As New Plot_Histogram
     Public Sub New()
         plotHist.maxRange = 255

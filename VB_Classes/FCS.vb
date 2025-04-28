@@ -28,8 +28,8 @@ Public Class FCS_Basics : Inherits TaskParent
             fp.ptHistory.Add(fp.pt)
             fp.index = i
 
-            Dim gcIndex = task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
-            Dim gc = task.gcList(gcIndex)
+            Dim gcIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+            Dim gc = task.brickList(gcIndex)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(gcIndex)
             If fpIndex >= 0 Then
                 Dim fpLast = task.fpLastList(fpIndex)
@@ -65,7 +65,7 @@ Public Class FCS_Basics : Inherits TaskParent
         If task.features.Count <> facets.Length Then
             task.fpFromGridCell.Clear()
             For Each fp In task.fpList
-                Dim nextIndex = task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+                Dim nextIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
                 task.fpFromGridCell.Add(nextIndex)
             Next
         End If
@@ -413,7 +413,7 @@ Public Class FCS_Motion : Inherits TaskParent
         yDist.Add(0)
         dst3.SetTo(0)
         For Each fp In task.fpList
-            Dim gcIndex = task.gcMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+            Dim gcIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(gcIndex)
             If fpIndex >= 0 Then
                 linkedCount += 1
@@ -524,7 +524,7 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
 
         strOut += "gcIndex = " + CStr(fp.gcIndex) + vbCrLf
-        Dim gc = task.gcList(fp.gcIndex)
+        Dim gc = task.brickList(fp.gcIndex)
         strOut += CStr(gc.age) + vbTab + "Age" + vbTab + vbCrLf
         strOut += Format(gc.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
         strOut += Format(gc.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf

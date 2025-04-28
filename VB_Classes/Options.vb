@@ -7563,8 +7563,8 @@ Public Class Options_Regions : Inherits OptionParent
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Raw Pointcloud")
-            radio.addRadio("Flat grid cells")
-            radio.addRadio("Connected grid cells")
+            radio.addRadio("Flat bricks")
+            radio.addRadio("Connected bricks")
             radio.addRadio("Vertical Cells")
             radio.addRadio("Horizontal Cells")
             radio.check(3).Checked = True
