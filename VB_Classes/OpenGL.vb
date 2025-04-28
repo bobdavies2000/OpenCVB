@@ -2005,3 +2005,24 @@ Public Class OpenGL_Regions : Inherits TaskParent
         End Select
     End Sub
 End Class
+
+
+
+
+
+Public Class OpenGL_GridPointRegions : Inherits TaskParent
+    Dim gridPoint As New GridPoint_FLessRegions
+    Public Sub New()
+        desc = "Display the grid point featureless region in OpenGL."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gridPoint.Run(task.grayStable)
+        dst2 = gridPoint.dst2
+        dst3 = gridPoint.dst3
+        labels = gridPoint.labels
+
+        task.ogl.oglFunction = oCase.drawPointCloudRGB
+        task.pointCloud.CopyTo(task.ogl.pointCloudInput, gridPoint.hist.dst1)
+        task.ogl.Run(dst2)
+    End Sub
+End Class

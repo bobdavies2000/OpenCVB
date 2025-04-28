@@ -16,6 +16,7 @@ Public Class VBtask : Implements IDisposable
     Public gcList As New List(Of gcData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
+    Public regionList As New List(Of rcData)
     Public featList As New List(Of List(Of Integer))
     Public fLess As New List(Of List(Of Integer))
 

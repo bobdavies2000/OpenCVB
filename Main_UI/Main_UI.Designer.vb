@@ -62,9 +62,10 @@ Partial Class Main_UI
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.PixelViewerButton, Me.Magnify, Me.TranslateButton, Me.BluePlusButton, Me.ComplexityButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1055, 31)
+        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1582, 34)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -74,7 +75,7 @@ Partial Class Main_UI
         Me.PausePlayButton.Image = CType(resources.GetObject("PausePlayButton.Image"), System.Drawing.Image)
         Me.PausePlayButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.PausePlayButton.Name = "PausePlayButton"
-        Me.PausePlayButton.Size = New System.Drawing.Size(28, 28)
+        Me.PausePlayButton.Size = New System.Drawing.Size(34, 29)
         Me.PausePlayButton.Text = "Run Pause Button"
         '
         'OptionsButton
@@ -83,7 +84,7 @@ Partial Class Main_UI
         Me.OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), System.Drawing.Image)
         Me.OptionsButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.OptionsButton.Name = "OptionsButton"
-        Me.OptionsButton.Size = New System.Drawing.Size(28, 28)
+        Me.OptionsButton.Size = New System.Drawing.Size(34, 29)
         Me.OptionsButton.Text = "OpenCVB Settings"
         '
         'TestAllButton
@@ -92,7 +93,7 @@ Partial Class Main_UI
         Me.TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), System.Drawing.Image)
         Me.TestAllButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.TestAllButton.Name = "TestAllButton"
-        Me.TestAllButton.Size = New System.Drawing.Size(28, 28)
+        Me.TestAllButton.Size = New System.Drawing.Size(34, 29)
         Me.TestAllButton.Text = "Test All Algorithms"
         '
         'PixelViewerButton
@@ -101,7 +102,7 @@ Partial Class Main_UI
         Me.PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), System.Drawing.Image)
         Me.PixelViewerButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.PixelViewerButton.Name = "PixelViewerButton"
-        Me.PixelViewerButton.Size = New System.Drawing.Size(28, 28)
+        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
         Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
         '
         'Magnify
@@ -110,7 +111,7 @@ Partial Class Main_UI
         Me.Magnify.Image = CType(resources.GetObject("Magnify.Image"), System.Drawing.Image)
         Me.Magnify.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.Magnify.Name = "Magnify"
-        Me.Magnify.Size = New System.Drawing.Size(28, 28)
+        Me.Magnify.Size = New System.Drawing.Size(34, 29)
         Me.Magnify.Text = "Magnify - click then draw a rectangle"
         Me.Magnify.ToolTipText = "Magnify - draw a rectangle then click"
         '
@@ -120,7 +121,7 @@ Partial Class Main_UI
         Me.TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), System.Drawing.Image)
         Me.TranslateButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.TranslateButton.Name = "TranslateButton"
-        Me.TranslateButton.Size = New System.Drawing.Size(28, 28)
+        Me.TranslateButton.Size = New System.Drawing.Size(34, 29)
         Me.TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
         '
         'BluePlusButton
@@ -129,7 +130,7 @@ Partial Class Main_UI
         Me.BluePlusButton.Image = CType(resources.GetObject("BluePlusButton.Image"), System.Drawing.Image)
         Me.BluePlusButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.BluePlusButton.Name = "BluePlusButton"
-        Me.BluePlusButton.Size = New System.Drawing.Size(28, 28)
+        Me.BluePlusButton.Size = New System.Drawing.Size(34, 29)
         Me.BluePlusButton.Text = "Add new OpenGL, Python, C#, C++, or VB.Net algorithms"
         '
         'ComplexityButton
@@ -138,7 +139,7 @@ Partial Class Main_UI
         Me.ComplexityButton.Image = CType(resources.GetObject("ComplexityButton.Image"), System.Drawing.Image)
         Me.ComplexityButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ComplexityButton.Name = "ComplexityButton"
-        Me.ComplexityButton.Size = New System.Drawing.Size(28, 28)
+        Me.ComplexityButton.Size = New System.Drawing.Size(34, 29)
         Me.ComplexityButton.Text = "Measure an algorithm's complexity"
         Me.ComplexityButton.Visible = False
         '
@@ -148,7 +149,7 @@ Partial Class Main_UI
         Me.Advice.Image = CType(resources.GetObject("Advice.Image"), System.Drawing.Image)
         Me.Advice.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.Advice.Name = "Advice"
-        Me.Advice.Size = New System.Drawing.Size(28, 28)
+        Me.Advice.Size = New System.Drawing.Size(34, 29)
         Me.Advice.Text = "Show any advice on options for the current algorithm"
         Me.Advice.Visible = False
         '
@@ -160,7 +161,7 @@ Partial Class Main_UI
         Me.RecentList.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.RecentList.Name = "RecentList"
         Me.RecentList.ShowDropDownArrow = False
-        Me.RecentList.Size = New System.Drawing.Size(47, 28)
+        Me.RecentList.Size = New System.Drawing.Size(68, 29)
         Me.RecentList.Text = "Recent"
         '
         'AvailableAlgorithms
@@ -172,7 +173,7 @@ Partial Class Main_UI
         Me.AvailableAlgorithms.IntegralHeight = False
         Me.AvailableAlgorithms.MaxDropDownItems = 100
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
-        Me.AvailableAlgorithms.Size = New System.Drawing.Size(268, 23)
+        Me.AvailableAlgorithms.Size = New System.Drawing.Size(400, 33)
         '
         'GroupButtonList
         '
@@ -180,7 +181,7 @@ Partial Class Main_UI
         Me.GroupButtonList.Image = CType(resources.GetObject("GroupButtonList.Image"), System.Drawing.Image)
         Me.GroupButtonList.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.GroupButtonList.Name = "GroupButtonList"
-        Me.GroupButtonList.Size = New System.Drawing.Size(31, 28)
+        Me.GroupButtonList.Size = New System.Drawing.Size(45, 29)
         Me.GroupButtonList.Text = "A-Z"
         Me.GroupButtonList.ToolTipText = "Jump to Algorithm Group"
         '
@@ -189,16 +190,16 @@ Partial Class Main_UI
         Me.GroupCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
         Me.GroupCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
         Me.GroupCombo.Name = "GroupCombo"
-        Me.GroupCombo.Size = New System.Drawing.Size(181, 31)
+        Me.GroupCombo.Size = New System.Drawing.Size(270, 34)
         '
         'AlgorithmDesc
         '
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(803, 21)
-        Me.AlgorithmDesc.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1204, 32)
+        Me.AlgorithmDesc.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.AlgorithmDesc.Multiline = True
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
         Me.AlgorithmDesc.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.AlgorithmDesc.Size = New System.Drawing.Size(246, 24)
+        Me.AlgorithmDesc.Size = New System.Drawing.Size(367, 35)
         Me.AlgorithmDesc.TabIndex = 2
         '
         'fpsTimer
@@ -213,22 +214,22 @@ Partial Class Main_UI
         'XYLoc
         '
         Me.XYLoc.AutoSize = True
-        Me.XYLoc.Location = New System.Drawing.Point(7, 471)
-        Me.XYLoc.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.XYLoc.Location = New System.Drawing.Point(10, 725)
         Me.XYLoc.Name = "XYLoc"
-        Me.XYLoc.Size = New System.Drawing.Size(39, 13)
+        Me.XYLoc.Size = New System.Drawing.Size(57, 20)
         Me.XYLoc.TabIndex = 3
         Me.XYLoc.Text = "XYLoc"
         Me.XYLoc.Visible = False
         '
         'MenuStrip1
         '
+        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(3, 1, 0, 1)
-        Me.MenuStrip1.Size = New System.Drawing.Size(1055, 24)
+        Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(4, 2, 0, 2)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1582, 33)
         Me.MenuStrip1.TabIndex = 4
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -236,19 +237,19 @@ Partial Class Main_UI
         '
         Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 22)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(54, 29)
         Me.FileToolStripMenuItem.Text = "&File"
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(93, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(141, 34)
         Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(52, 22)
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 29)
         Me.AboutToolStripMenuItem.Text = "About"
         '
         'RefreshTimer
@@ -264,20 +265,18 @@ Partial Class Main_UI
         '
         Me.CameraSwitching.AutoSize = True
         Me.CameraSwitching.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CameraSwitching.Location = New System.Drawing.Point(17, 84)
-        Me.CameraSwitching.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.CameraSwitching.Location = New System.Drawing.Point(26, 129)
         Me.CameraSwitching.Name = "CameraSwitching"
-        Me.CameraSwitching.Size = New System.Drawing.Size(145, 20)
+        Me.CameraSwitching.Size = New System.Drawing.Size(216, 29)
         Me.CameraSwitching.TabIndex = 5
         Me.CameraSwitching.Text = "Setting Up Camera"
         '
         'CamSwitchProgress
         '
         Me.CamSwitchProgress.BackColor = System.Drawing.SystemColors.MenuHighlight
-        Me.CamSwitchProgress.Location = New System.Drawing.Point(20, 105)
-        Me.CamSwitchProgress.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.CamSwitchProgress.Location = New System.Drawing.Point(30, 162)
         Me.CamSwitchProgress.Name = "CamSwitchProgress"
-        Me.CamSwitchProgress.Size = New System.Drawing.Size(24, 23)
+        Me.CamSwitchProgress.Size = New System.Drawing.Size(36, 35)
         Me.CamSwitchProgress.TabIndex = 6
         Me.CamSwitchProgress.TabStop = False
         '
@@ -287,9 +286,9 @@ Partial Class Main_UI
         '
         'Main_UI
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1055, 486)
+        Me.ClientSize = New System.Drawing.Size(1582, 748)
         Me.Controls.Add(Me.CamSwitchProgress)
         Me.Controls.Add(Me.CameraSwitching)
         Me.Controls.Add(Me.XYLoc)
@@ -299,7 +298,7 @@ Partial Class Main_UI
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.MainMenuStrip = Me.MenuStrip1
-        Me.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
+        Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.Name = "Main_UI"
         Me.Text = "OpenCVB Main Form"
         Me.ToolStrip1.ResumeLayout(False)

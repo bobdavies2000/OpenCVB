@@ -205,24 +205,6 @@ End Class
 
 
 
-Public Class GridPoint_FLessContours : Inherits TaskParent
-    Dim hist As New Hist_GridPointRegions
-    Dim contour As New Contour_Basics
-    Public Sub New()
-        desc = "Build contours for the featureless regions fleshed out by Hist_GridPointRegions"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(src)
-        dst3 = hist.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class GridPoint_PopulationSurvey : Inherits TaskParent
     Dim gridPoint As New GridPoint_Basics
@@ -422,13 +404,15 @@ End Class
 
 
 
-Public Class GridPoint_BackProjection : Inherits TaskParent
-    Dim fLess As New GridPoint_FeatureLess
-    Dim backP As New BackProject_Basics
+Public Class GridPoint_FLessRegions : Inherits TaskParent
+    Public hist As New Hist_GridPointRegions
     Public Sub New()
-        desc = "Backproject the featureless gridpoint regions."
+        desc = "Build a mask for the featureless regions fleshed out by Hist_GridPointRegions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(src)
+        hist.Run(src)
+        dst2 = ShowPalette(hist.dst1)
+        dst3 = hist.dst3
+        labels = hist.labels
     End Sub
 End Class

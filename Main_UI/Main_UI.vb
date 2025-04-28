@@ -471,7 +471,13 @@ Public Class Main_UI
         If settings.snap320 Then Me.Width = 720 ' expose the list of available algorithms.
     End Sub
     Private Sub BluePlusButton_Click(sender As Object, e As EventArgs) Handles BluePlusButton.Click
-        Dim OKcancel = InsertAlgorithm.ShowDialog()
+        ' Dim OKcancel = InsertAlgorithm.ShowDialog()
+        MsgBox("Only VB.Net is now under active development.  AI has made it" + vbCrLf +
+               "convenient to translate algorithms to any language.  Use the snippets" + vbCrLf +
+               "in OpenCVB.snippets to add new code." + vbCrLf + vbCrLf +
+               "Uncomment 'InsertAlgorithm' if you are adventurous and " + vbCrLf +
+               "would like to add C++, C#, or Python algorithms." + vbCrLf +
+               "Just cut and paste from an existing algorithm for new OpenGL examples.")
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If Trim(AvailableAlgorithms.Text) = "" Then

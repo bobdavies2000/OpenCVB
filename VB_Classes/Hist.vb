@@ -1524,9 +1524,9 @@ Public Class Hist_GridPointRegions : Inherits TaskParent
             Dim gc2 = task.gcList(ele.Value)
             cv.Cv2.CalcBackProject({task.grayStable(gc2.rect)}, {0}, histogram, dst1(gc2.rect), ranges)
         Next
-        dst3 = ShowPalette(dst1)
-        dst0 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = ShowAddweighted(dst0, src, labels(2))
+        dst2 = ShowPalette(dst1)
+        dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = ShowAddweighted(dst0, src, labels(3))
         dst2.SetTo(0, fLess.edges.dst2)
     End Sub
 End Class

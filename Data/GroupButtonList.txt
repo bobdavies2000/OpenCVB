@@ -97,7 +97,6 @@ Gif
 GrabCut
 Gradient
 Gravity
-GrdiPoint
 Grid
 GridCell
 GridPoint
