@@ -1465,7 +1465,7 @@ End Class
 
 
 
-Public Class Hist_GridPointRegions : Inherits TaskParent
+Public Class Hist_BrickRegions : Inherits TaskParent
     Dim fLess As New BrickPoint_FeatureLess
     Dim ranges() As cv.Rangef
     Public Sub New()

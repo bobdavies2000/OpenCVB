@@ -172,55 +172,6 @@ End Class
 
 
 
-
-Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Basics
-    Public results(,) As Single
-    Public Sub New()
-        labels(2) = "Cursor over each brick to see where the grid points are."
-        task.mouseMovePoint = New cv.Point(0, 0) ' this brick is often the most populated.
-        desc = "Monitor the location of each grid point in the grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.grayStable)
-
-        dst1 = ptBrick.dst2
-        dst3 = src
-
-        ReDim results(task.cellSize - 1, task.cellSize - 1)
-
-        For Each gc In task.brickList
-            results(gc.feature.X, gc.feature.Y) += 1
-        Next
-
-        Dim incrX = dst1.Width / task.cellSize
-        Dim incrY = dst1.Height / task.cellSize
-        Dim row = Math.Floor(task.mouseMovePoint.Y / incrY)
-        Dim col = Math.Floor(task.mouseMovePoint.X / incrX)
-
-        dst2 = cv.Mat.FromPixelData(task.cellSize, task.cellSize, cv.MatType.CV_32F, results)
-
-        For Each gc In task.brickList
-            If gc.feature.X = col And gc.feature.Y = row Then dst3.Circle(gc.pt, task.DotSize, task.highlight, -1)
-        Next
-
-        For y = 0 To task.cellSize - 1
-            For x = 0 To task.cellSize - 1
-                SetTrueText(CStr(results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
-            Next
-        Next
-
-        dst2 = dst2.Resize(dst0.Size, 0, 0, cv.InterpolationFlags.Nearest).ConvertScaleAbs
-        Dim mm = GetMinMax(dst2)
-        dst2 *= 255 / mm.maxVal
-        labels(3) = "There were " + CStr(results(col, row)) + " features at row/col " + CStr(row) + "/" + CStr(col)
-    End Sub
-End Class
-
-
-
-
-
 Public Class BrickPoint_TopRow : Inherits TaskParent
     Public results(,) As Single
     Public Sub New()
@@ -341,7 +292,7 @@ End Class
 
 
 Public Class BrickPoint_FLessRegions : Inherits TaskParent
-    Public hist As New Hist_GridPointRegions
+    Public hist As New Hist_BrickRegions
     Public Sub New()
         desc = "Build a mask for the featureless regions fleshed out by Hist_GridPointRegions"
     End Sub
@@ -420,5 +371,107 @@ Public Class BrickPoint_Busiest : Inherits TaskParent
             dst3.Rectangle(ele.Value, 255, task.lineWidth)
         Next
         labels(2) = CStr(sortedBricks.Count) + " bricks had max Sobel values with high left/right correlation and depth < " + CStr(CInt(task.MaxZmeters)) + "m"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
+    Dim ptBrick As New BrickPoint_Basics
+    Public results(,) As Single
+    Public Sub New()
+        labels(2) = "Cursor over each brick to see where the grid points are."
+        task.mouseMovePoint = New cv.Point(0, 0) ' this brick is often the most populated.
+        desc = "Monitor the location of each brick point in a brick."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        ptBrick.Run(task.grayStable)
+
+        dst1 = ptBrick.dst2
+        dst3 = src
+
+        ReDim results(task.cellSize - 1, task.cellSize - 1)
+        For Each ele In ptBrick.sortedPoints
+            If ele.Key = 255 Then
+                Dim pt = ele.Value
+                Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+                Dim gc = task.brickList(index)
+                results(gc.feature.X, gc.feature.Y) += 1
+            End If
+        Next
+
+        Dim incrX = dst1.Width / task.cellSize
+        Dim incrY = dst1.Height / task.cellSize
+        Dim row = Math.Floor(task.mouseMovePoint.Y / incrY)
+        Dim col = Math.Floor(task.mouseMovePoint.X / incrX)
+
+        dst2 = cv.Mat.FromPixelData(task.cellSize, task.cellSize, cv.MatType.CV_32F, results)
+
+        For Each gc In task.brickList
+            If gc.feature.X = col And gc.feature.Y = row Then dst3.Circle(gc.pt, task.DotSize, task.highlight, -1)
+        Next
+
+        For y = 0 To task.cellSize - 1
+            For x = 0 To task.cellSize - 1
+                SetTrueText(CStr(results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
+            Next
+        Next
+
+        dst2 = dst2.Resize(dst0.Size, 0, 0, cv.InterpolationFlags.Nearest).ConvertScaleAbs
+        Dim mm = GetMinMax(dst2)
+        dst2 *= 255 / mm.maxVal
+        labels(3) = "There were " + CStr(results(col, row)) + " features at row/col " + CStr(row) + "/" + CStr(col)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BrickPoint_RedCloud : Inherits TaskParent
+    Dim fLess As New BrickPoint_FeatureLess
+    Public histTop As New Projection_HistTop
+    Public Sub New()
+        desc = "Use RedCloud to identify the featureLess regions found in BrickPoint_FeatureLess"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.grayStable)
+
+        dst1 = fLess.dst2.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        dst2 = runRedC(fLess.dst2, labels(2), dst1)
+
+        dst0.SetTo(0)
+        task.pointCloud.CopyTo(dst0, fLess.dst2)
+        histTop.Run(fLess.dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BrickPoint_Test : Inherits TaskParent
+    Dim fLess As New BrickPoint_FLessRegions
+    Public histTop As New Projection_HistTop
+    Public Sub New()
+        desc = "Use RedCloud to identify the featureLess regions found in BrickPoint_FeatureLess"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.grayStable)
+
+        'dst1 = fLess.dst2.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        'dst2 = runRedC(fLess.dst2, labels(2), dst1)
+
+        'dst0.SetTo(0)
+        'task.pointCloud.CopyTo(dst0, fLess.dst2)
+        'histTop.Run(fLess.dst2)
     End Sub
 End Class

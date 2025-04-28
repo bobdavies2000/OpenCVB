@@ -141,10 +141,10 @@ End Class
 
 
 
-Public Class Gravity_GridPoints : Inherits TaskParent
+Public Class Gravity_BrickRotate : Inherits TaskParent
     Dim survey As New BrickPoint_PopulationSurvey
     Public Sub New()
-        desc = "Rotate the gric point using the offset from gravity."
+        desc = "Rotate the grid point using the offset from gravity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim angle = Math.Abs(task.verticalizeAngle)

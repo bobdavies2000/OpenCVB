@@ -2010,7 +2010,7 @@ End Class
 
 
 
-Public Class OpenGL_GridPointRegions : Inherits TaskParent
+Public Class OpenGL_BrickRegions : Inherits TaskParent
     Dim ptBrick As New BrickPoint_FLessRegions
     Public Sub New()
         desc = "Display the grid point featureless region in OpenGL."

@@ -86,7 +86,7 @@ End Class
 
 
 
-Public Class TextureFlow_GridPoints : Inherits TaskParent
+Public Class TextureFlow_Bricks : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Best
     Dim flow As New TextureFlow_Basics
     Dim knn As New KNN_Basics
