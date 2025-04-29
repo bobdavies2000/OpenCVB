@@ -739,6 +739,7 @@ Public Class tourData
     Public maxDist As cv.Point
     Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
     Public index As Integer
+    Public colorIndex As Integer
     Public indexLast As Integer
     Public contour As New List(Of cv.Point)
     Public Sub New()
