@@ -415,6 +415,13 @@ Public Class TaskParent : Implements IDisposable
 
         Return mm.maxLoc
     End Function
+    Public Function GetMaxDist(ByRef maskInput As cv.Mat) As cv.Point
+        Dim mask = maskInput.Clone
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        Return mm.maxLoc
+    End Function
     Public Function GetMaxDist(ByRef rc As rcData) As cv.Point
         Dim mask = rc.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)

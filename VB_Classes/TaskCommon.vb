@@ -736,6 +736,7 @@ Public Class tourData
     Public mask As cv.Mat
     Public pixels As Integer
     Public age As Integer
+    Public ptMax As cv.Point
     Public maxDist As cv.Point
     Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
     Public index As Integer
