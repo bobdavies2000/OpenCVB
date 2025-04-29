@@ -26,7 +26,6 @@ Public Class Tour_Core : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
-        dst2 = contours.dst2
         dst3 = contours.dst3
         labels = contours.labels
 
@@ -46,14 +45,20 @@ Public Class Tour_Core : Inherits TaskParent
 
             td.rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
             If td.rect.Width = 0 Or td.rect.Height = 0 Then Continue For
+
             td.mask = contours.dst0(td.rect).Clone
             td.mask = td.mask.InRange(td.index, td.index)
-            tourMap(td.rect).SetTo(tourList.Count, td.mask)
+
+            tourMap(td.rect).SetTo(td.index, td.mask)
+            DrawContour(tourMap, td.contour.ToList, td.index, task.lineWidth + 2) ' Why +2?  To fill in interior lines - change to see the impact.
+            td.mask = tourMap(td.rect).InRange(td.index, td.index) ' why do this again?  To fill in the gaps in the mask as well as in tourMap.
+
             td.maxDist = GetMaxDist(td.mask, td.rect)
             td.maxDStable = td.maxDist
             tourList.Add(td)
         Next
 
+        dst2 = ShowPalette((tourMap * 255 / tourList.Count).tomat)
         Dim index = tourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.color(tourList(index).rect).SetTo(white, tourList(index).mask)
         task.color.Circle(tourList(index).maxDist, task.DotSize, black, -1)
