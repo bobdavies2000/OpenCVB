@@ -92,7 +92,7 @@ End Class
 
 Public Class Foreground_Contours : Inherits TaskParent
     Public fore As New Foreground_Hist3D
-    Dim contours As New Contour_General
+    Dim contours As New Contour_Basics
     Public Sub New()
         desc = "Create contours for the foreground mask"
     End Sub

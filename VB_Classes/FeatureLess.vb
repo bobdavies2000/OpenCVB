@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
-    Public edges As New EdgeLine_Basics
+    Public contours As New Contour_Basics
     Public classCount As Integer = 2
     Public Sub New()
         labels = {"", "", "EdgeLine_Basics output", ""}
@@ -9,9 +9,10 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         desc = "Access the EdgeLine_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.grayStable.Clone)
-        dst2 = src.Clone
-        dst2.SetTo(1, edges.dst2)
+        contours.Run(src)
+        dst2 = contours.dst2
+        dst3 = contours.dst3
+        labels = contours.labels
     End Sub
 End Class
 
@@ -268,5 +269,24 @@ Public Class FeatureLess_RedColor : Inherits TaskParent
         fLess.Run(src)
         dst3 = fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = runRedC(dst3, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_BasicsNew : Inherits TaskParent
+    Public edges As New EdgeLine_Basics
+    Public classCount As Integer = 2
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "lines produced with EdgeLines"
+        desc = "Access the EdgeLine_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.grayStable.Clone)
+        dst2 = src.Clone
+        dst2.SetTo(1, edges.dst2)
     End Sub
 End Class

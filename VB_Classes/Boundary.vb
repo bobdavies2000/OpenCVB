@@ -31,7 +31,7 @@ End Class
 
 Public Class Boundary_Tiers : Inherits TaskParent
     Dim cells As New Boundary_Basics
-    Dim contours As New Contour_DepthTiers
+    Dim contours As New Contour_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Add the depth tiers to the cell boundaries"

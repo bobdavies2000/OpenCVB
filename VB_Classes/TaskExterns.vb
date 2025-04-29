@@ -226,8 +226,6 @@ Module TaskExterns
 
 
 
-    Public minLengthContour = 4 ' use any contour with enough points to make a contour!
-
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Depth_Colorizer_Open() As IntPtr
     End Function
