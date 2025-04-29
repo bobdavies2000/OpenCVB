@@ -21,7 +21,6 @@ Public Class Tour_Core : Inherits TaskParent
     Public contours As New Contour_Basics
     Public tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public tourList As New List(Of tourData)
-    'Public colorMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         labels(3) = "ColorMap - similar to tourMap."
         desc = "Create the tourList and tourMap from FeatureLess_Basics"
@@ -33,7 +32,6 @@ Public Class Tour_Core : Inherits TaskParent
         tourList.Clear()
         tourList.Add(New tourData) ' placeholder for zero which is the background
         tourMap.SetTo(0)
-        'colorMap.SetTo(0)
         For Each tour In contours.tourlist
             Dim td = New tourData
             td.index = tourList.Count
@@ -51,19 +49,13 @@ Public Class Tour_Core : Inherits TaskParent
             td.mask = contours.dst0(td.rect).Clone
             td.mask = td.mask.InRange(td.index, td.index)
             tourMap(td.rect).SetTo(td.index, td.mask)
-            'tourMap(td.rect).copyto(colorMap(td.rect), td.mask)
-            'DrawContour(colorMap, td.contour.ToList, td.index, task.lineWidth + 2) ' Why +2?  To fill in interior lines - change to see the impact.
-            'td.mask = colorMap(td.rect).InRange(td.index, td.index) ' why do this again?  To fill in the gaps in the mask as well as in tourMap.
 
             td.maxDist = GetMaxDist(td.mask, td.rect)
-            'td.colorIndex = task.brickMap.Get(Of Single)(td.maxDist.Y, td.maxDist.X) Mod 256
-            'colorMap(td.rect).SetTo(td.colorIndex, td.mask)
             td.maxDStable = td.maxDist
             tourList.Add(td)
         Next
 
         dst2 = ShowPalette((tourMap * 255 / tourList.Count).ToMat)
-        '  dst3 = ShowPalette((colorMap * 255 / tourList.Count).ToMat)
         Dim tIndex = tourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.color(tourList(tIndex).rect).SetTo(white, tourList(tIndex).mask)
         task.color.Circle(tourList(tIndex).maxDist, task.DotSize, black, -1)
