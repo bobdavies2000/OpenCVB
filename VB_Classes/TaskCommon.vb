@@ -449,54 +449,6 @@ End Class
 
 
 
-
-Public Class rcData
-    Public rect As cv.Rect
-    Public mask As cv.Mat
-    Public pixels As Integer
-    Public age As Integer
-
-    Public color As cv.Scalar
-
-    Public mdList As New List(Of maskData)
-
-    Public depthPixels As Integer
-    Public depthMask As cv.Mat
-    Public depth As Single
-
-    Public mmX As mmData
-    Public mmY As mmData
-    Public mmZ As mmData
-
-    Public maxDist As cv.Point
-    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
-
-    Public index As Integer
-    Public indexLast As Integer
-
-    Public container As Integer
-
-    Public contour As New List(Of cv.Point)
-
-    Public ptFacets As New List(Of cv.Point)
-    Public ptList As New List(Of cv.Point)
-
-    ' transition these...
-    Public nabs As New List(Of Integer)
-    Public hull As New List(Of cv.Point)
-    Public eq As cv.Vec4f ' plane equation
-    Public contour3D As New List(Of cv.Point3f)
-    Public Sub New()
-        index = 0
-        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-        depthMask = mask
-        rect = New cv.Rect(0, 0, 1, 1)
-    End Sub
-End Class
-
-
-
-
 Public Class rangeData
     Public index As Integer
     Public pixels As Integer
@@ -727,4 +679,71 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function
+End Class
+
+
+
+
+Public Class rcData
+    Public rect As cv.Rect
+    Public mask As cv.Mat
+    Public pixels As Integer
+    Public age As Integer
+
+    Public color As cv.Scalar
+
+    Public mdList As New List(Of maskData)
+
+    Public depthPixels As Integer
+    Public depthMask As cv.Mat
+    Public depth As Single
+
+    Public mmX As mmData
+    Public mmY As mmData
+    Public mmZ As mmData
+
+    Public maxDist As cv.Point
+    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
+
+    Public index As Integer
+    Public indexLast As Integer
+
+    Public container As Integer
+
+    Public contour As New List(Of cv.Point)
+
+    Public ptFacets As New List(Of cv.Point)
+    Public ptList As New List(Of cv.Point)
+
+    ' transition these...
+    Public nabs As New List(Of Integer)
+    Public hull As New List(Of cv.Point)
+    Public eq As cv.Vec4f ' plane equation
+    Public contour3D As New List(Of cv.Point3f)
+    Public Sub New()
+        index = 0
+        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+        depthMask = mask
+        rect = New cv.Rect(0, 0, 1, 1)
+    End Sub
+End Class
+
+
+
+
+Public Class tourData
+    Public rect As cv.Rect
+    Public mask As cv.Mat
+    Public pixels As Integer
+    Public age As Integer
+    Public maxDist As cv.Point
+    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
+    Public index As Integer
+    Public indexLast As Integer
+    Public contour As New List(Of cv.Point)
+    Public Sub New()
+        index = 0
+        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+        rect = New cv.Rect(0, 0, 1, 1)
+    End Sub
 End Class

@@ -42,10 +42,10 @@ Public Class Boundary_Tiers : Inherits TaskParent
 
         contours.Run(src)
         dst2.SetTo(0)
-        For Each tour In contours.contourlist
+        For Each tour In contours.tourlist
             DrawContour(dst2, tour.ToList, 255, 2)
         Next
-        labels(2) = $"{contours.contourlist.Count} depth tiers were found."
+        labels(2) = $"{contours.tourlist.Count} depth tiers were found."
         labels(3) = cells.labels(2)
     End Sub
 End Class

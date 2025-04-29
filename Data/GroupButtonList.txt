@@ -234,6 +234,7 @@ Texture
 TextureFlow
 Thickness
 Threshold
+Tour
 Tracker
 Transform
 TransformationMatrix

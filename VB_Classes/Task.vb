@@ -14,13 +14,15 @@ Public Class VBtask : Implements IDisposable
 
     Public lpList As New List(Of lpData) ' line pair list
     Public brickList As New List(Of gcData)
+    Public tourList As New List(Of tourData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of rcData)
     Public featList As New List(Of List(Of Integer))
     Public fLess As New List(Of List(Of Integer))
 
-    Public brickMap As New cv.Mat ' grid cell map
+    Public brickMap As New cv.Mat ' map of bricks to index in bricklist
+    Public tourMap As New cv.Mat ' map of contours to index in tourList
     Public lpMap As New cv.Mat ' map of each line's bricks...
     Public fpMap As New cv.Mat ' feature map
     Public rcMap As cv.Mat ' redColor map

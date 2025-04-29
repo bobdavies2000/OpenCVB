@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
-    Public contourlist As New List(Of cv.Point())
+    Public tourlist As New List(Of cv.Point())
+    Public areaList As New List(Of Integer) ' point counts for each contour in contourList above.
     Public options As New Options_Contours
-    Public sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Dim color8U As New Color8U_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -30,7 +30,7 @@ Public Class Contour_Basics : Inherits TaskParent
         End If
         If allContours.Count <= 1 Then Exit Sub
 
-        sortedList.Clear()
+        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To allContours.Count - 1
             If allContours(i).Length < 4 Then Continue For
             Dim count = cv.Cv2.ContourArea(allContours(i))
@@ -39,14 +39,16 @@ Public Class Contour_Basics : Inherits TaskParent
         Next
 
         dst0.SetTo(0)
-        contourlist.Clear()
+        tourlist.Clear()
+        areaList.Clear()
         For i = 0 To Math.Min(sortedList.Count, options.maxContours) - 1
-            Dim tour = allContours(sortedList.ElementAt(i).Value)
-            contourlist.Add(tour)
-            DrawContour(dst0, tour.ToList, contourlist.Count, -1)
+            Dim ele = sortedList.ElementAt(i)
+            tourlist.Add(allContours(ele.Value))
+            areaList.Add(ele.Key)
+            DrawContour(dst0, allContours(ele.Value).ToList, tourlist.Count, -1)
         Next
-        dst2 = ShowPalette(dst0 * 255 / contourlist.Count)
-        labels(2) = $"Top {contourlist.Count} contours in contourList from the " + CStr(sortedList.Count) + " found."
+        dst2 = ShowPalette(dst0 * 255 / tourlist.Count)
+        labels(2) = $"Top {tourlist.Count} contours in tourlist from the " + CStr(sortedList.Count) + " found."
     End Sub
 End Class
 
@@ -216,7 +218,7 @@ Public Class Contour_Foreground : Inherits TaskParent
 
         contour.Run(dst2)
         dst3.SetTo(0)
-        For Each ctr In contour.contourlist
+        For Each ctr In contour.tourlist
             DrawContour(dst3, New List(Of cv.Point)(ctr), 255, -1)
         Next
     End Sub
@@ -610,7 +612,7 @@ Public Class Contour_WholeImage : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         contour.Run(src)
         Dim sortedContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
-        For Each tour In contour.contourlist
+        For Each tour In contour.tourlist
             sortedContours.Add(tour.Length, tour.ToList)
         Next
 

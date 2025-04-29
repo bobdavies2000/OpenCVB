@@ -139,7 +139,7 @@ Public Class Options_Contours : Inherits OptionParent
     Public retrievalMode As cv.RetrievalModes = cv.RetrievalModes.External
     Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Double = 0.03
-    Public maxContours As Integer = 20
+    Public maxContours As Integer = 200
     Public options2 As New Options_Contours2
     Public Sub New()
         If radio.Setup(traceName) Then
