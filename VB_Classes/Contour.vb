@@ -1,46 +1,47 @@
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
-    Dim color8U As New Color8U_Basics
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours
     Public sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         optibase.findRadio("FloodFill").Checked = True
-        UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        color8U.Run(src)
-        dst2 = color8U.dst2
+        If src.Type <> cv.MatType.CV_8U Then
+            Static color8U As New Color8U_Basics
+            color8U.Run(src)
+            dst2 = color8U.dst2
+        Else
+            dst2 = src.Clone
+        End If
 
+        Dim mode = options.options2.ApproximationMode
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             dst2.ConvertTo(dst1, cv.MatType.CV_32SC1)
-            cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
+            cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
         Else
-            cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
+            cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, mode)
         End If
         If allContours.Count <= 1 Then Exit Sub
 
         sortedList.Clear()
+        Dim maxCount = src.Total / 100
         For i = 0 To allContours.Count - 1
             If allContours(i).Length < 4 Then Continue For
             Dim count = cv.Cv2.ContourArea(allContours(i))
-            If count > 2 Then sortedList.Add(count, i)
+            If count >= maxCount Then sortedList.Add(count, i)
         Next
 
         dst3.SetTo(0)
         contourlist.Clear()
-        dst2 = color8U.dst2
         For i = 0 To sortedList.Count - 1
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             contourlist.Add(tour)
-            'Dim test = validatePoint(tour(0))
-            'Dim vec = dst2.Get(Of cv.Vec3b)(test.Y, test.X)
-            'Dim color = New cv.Scalar(vec.Item0, vec.Item1, vec.Item2)
             DrawContour(dst3, tour.ToList, cv.Scalar.White, -1)
         Next
         labels(3) = $"Top {sortedList.Count} contours found"
@@ -73,12 +74,10 @@ Public Class Contour_General : Inherits TaskParent
         End If
 
         If dst2.Type = cv.MatType.CV_8U Then
-            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External,
-                            cv.ContourApproximationModes.ApproxTC89KCOS)
+            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxTC89KCOS)
         Else
             If dst2.Type <> cv.MatType.CV_32S Then dst2.ConvertTo(dst2, cv.MatType.CV_32S)
-            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill,
-                            cv.ContourApproximationModes.ApproxTC89KCOS)
+            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxTC89KCOS)
         End If
 
         contourlist.Clear()
@@ -391,8 +390,7 @@ Public Class Contour_Sorted : Inherits TaskParent
             Dim area = cv.Cv2.ContourArea(contours.contourlist(i))
             If area > options.minPixels And contours.contourlist(i).Length > minLengthContour Then
                 sortedByArea.Add(area, i)
-                sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours.contourlist(i),
-                                                             contours.options.epsilon, True))
+                sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours.contourlist(i), contours.options.epsilon, True))
                 DrawContour(dst3, contours.contourlist(i).ToList, white, -1)
             End If
         Next

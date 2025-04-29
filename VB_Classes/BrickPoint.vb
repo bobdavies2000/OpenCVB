@@ -291,24 +291,6 @@ End Class
 
 
 
-Public Class BrickPoint_FLessRegions : Inherits TaskParent
-    Public hist As New Hist_BrickRegions
-    Public Sub New()
-        desc = "Build a mask for the featureless regions fleshed out by Hist_GridPointRegions"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(src)
-        dst2 = ShowPalette(hist.dst1)
-        dst3 = hist.dst3
-        labels = hist.labels
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class BrickPoint_Best : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Basics
@@ -458,6 +440,24 @@ End Class
 
 
 
+
+Public Class BrickPoint_FLessRegions : Inherits TaskParent
+    Public hist As New Hist_BrickRegions
+    Public Sub New()
+        desc = "Build a mask for the featureless regions fleshed out by Hist_GridPointRegions"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hist.Run(src)
+        dst2 = ShowPalette(hist.dst1)
+        dst3 = hist.dst3
+        labels = hist.labels
+    End Sub
+End Class
+
+
+
+
+
 Public Class BrickPoint_Test : Inherits TaskParent
     Dim fLess As New BrickPoint_FLessRegions
     Public histTop As New Projection_HistTop
@@ -466,12 +466,46 @@ Public Class BrickPoint_Test : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayStable)
+        labels = fLess.labels
 
-        'dst1 = fLess.dst2.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        'dst2 = runRedC(fLess.dst2, labels(2), dst1)
+        dst1 = fLess.hist.dst1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        'dst2 = fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = dst1.Clone
+        ' If task.firstPass Then dst2 = runRedC(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY), labels(2), dst1)
 
         'dst0.SetTo(0)
         'task.pointCloud.CopyTo(dst0, fLess.dst2)
         'histTop.Run(fLess.dst2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class BrickPoint_Contours : Inherits TaskParent
+    Dim fLess As New BrickPoint_FLessRegions
+    Dim contours As New Contour_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Create contours for the featureless regions "
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.grayStable)
+
+        contours.Run(fLess.hist.dst1)
+
+        dst3.SetTo(0)
+        For Each tour In contours.contourlist.ToArray
+            DrawContour(dst3, tour.ToList, 255, -1)
+            DrawContour(dst3, tour.ToList, 0, task.lineWidth)
+        Next
+
+        dst2.SetTo(0)
+        src.CopyTo(dst2, dst3)
+
+        labels(2) = contours.labels(3)
+    End Sub
+End Class
+

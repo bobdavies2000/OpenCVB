@@ -30,7 +30,7 @@ Public Class RedMask_Basics : Inherits TaskParent
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
         classCount = RedMask_Count(cPtr)
-        If classCount = 0 Then Exit Sub ' no data to process.
+        If classCount <= 1 Then Exit Sub ' no data to process.
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
         Dim rects(classCount * 4) As Integer

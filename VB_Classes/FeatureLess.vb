@@ -254,3 +254,19 @@ Public Class FeatureLess_LeftRight : Inherits TaskParent
         dst3 = fLess.dst2.Clone
     End Sub
 End Class
+
+
+
+
+
+Public Class FeatureLess_RedColor : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Public Sub New()
+        desc = "Use the featureLess_Basics output as input to RedColor_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+        dst3 = fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = runRedC(dst3, labels(2))
+    End Sub
+End Class

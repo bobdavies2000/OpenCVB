@@ -140,9 +140,8 @@ Public Class Options_Contours : Inherits OptionParent
     Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Double = 0.03
     Public minPixels As Integer = 30
-    Public trueTextOffset As Integer = 80
     Dim maxContourCount As Integer = 50
-    Dim options2 As New Options_Contours2
+    Public options2 As New Options_Contours2
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("CComp")
@@ -156,17 +155,13 @@ Public Class Options_Contours : Inherits OptionParent
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Min Pixels", 1, 2000, minPixels)
             sliders.setupTrackBar("Max contours", 1, 200, maxContourCount)
-            sliders.setupTrackBar("TrueText offset", 1, task.cols / 3, trueTextOffset)
         End If
     End Sub
     Public Sub Run()
         options2.Run()
         Static minSlider = FindSlider("Min Pixels")
         Static countSlider = FindSlider("Max contours")
-        Static offsetSlider = FindSlider("TrueText offset")
         maxContourCount = countSlider.value
-
-        ' epsilon = epsilonSlider.Value / 100
 
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
@@ -179,7 +174,6 @@ Public Class Options_Contours : Inherits OptionParent
         Next
         ApproximationMode = options2.ApproximationMode
         minPixels = minSlider.value
-        trueTextOffset = offsetSlider.value
     End Sub
 End Class
 

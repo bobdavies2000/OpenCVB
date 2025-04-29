@@ -44,7 +44,6 @@ public:
 	cv::ContourApproximationModes ApproximationMode =  cv::ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
 	double epsilon =  0.03;
 	int minPixels =  30;
-	int trueTextOffset =  80;
 	int maxContourCount =  50;
 	void Run() {}
 	Options_Contours() {
