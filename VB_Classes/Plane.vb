@@ -221,14 +221,17 @@ Public Class Plane_EqCorrelation : Inherits TaskParent
         Dim s2 = If(pt(2) < 0, " - ", " + ")
 
         If count(index) > plane.equations.Count / 4 Then
-            With task.kalman
-                .kInput = {pt(0), pt(1), pt(2), pt(3)}
-                .Run(src)
+            If task.kalman Is Nothing Then task.kalman = New Kalman_Basics
+            If task.heartBeat Then
+                With task.kalman
+                    .kInput = {pt(0), pt(1), pt(2), pt(3)}
+                    .Run(src)
 
-                strOut = "Normalized Plane equation: " + Format(.kOutput(0), fmt3) + "x" + s1 + Format(Math.Abs(.kOutput(1)), fmt3) + "y" + s2 +
+                    strOut = "Normalized Plane equation: " + Format(.kOutput(0), fmt3) + "x" + s1 + Format(Math.Abs(.kOutput(1)), fmt3) + "y" + s2 +
                          Format(Math.Abs(.kOutput(2)), fmt3) + "z = " + Format(- .kOutput(3), fmt3) + " with " + CStr(count(index)) +
                          " closely matching plane equations." + vbCrLf
-            End With
+                End With
+            End If
         End If
         SetTrueText(strOut, 3)
     End Sub
