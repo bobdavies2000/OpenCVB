@@ -31,8 +31,7 @@ Public Class Tour_Basics : Inherits TaskParent
             td.mask = td.mask.InRange(td.index, td.index)
             task.tourMap(td.rect).SetTo(td.index, td.mask)
 
-            td.ptMax = GetMaxDist(td.mask)
-            td.maxDist = New cv.Point(td.rect.X + td.ptMax.X, td.rect.Y + td.ptMax.Y)
+            td.maxDist = GetMaxDist(td.mask, td.rect)
             td.maxDStable = td.maxDist
             task.tourList.Add(td)
         Next
@@ -50,34 +49,49 @@ End Class
 
 
 
+Public Class Tour_Features : Inherits TaskParent
+    Dim feat As New Feature_Basics
+    Dim core As New Tour_Basics
+    Public Sub New()
+        desc = "Show contours and features"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(src)
 
-'Public Class Tour_BasicsNot : Inherits TaskParent
-'    Public core As New Tour_Core
-'    Public Sub New()
-'        task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-'        desc = "Track each contour using tourMap and tourList."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        core.Run(src)
-'        Dim lastMap = task.tourMap.Clone
+        core.Run(src)
+        dst2 = core.dst2
+        labels(2) = core.labels(2)
 
-'        task.tourList.Clear()
-'        task.tourList.Add(New tourData)
-'        task.tourMap.SetTo(0)
-'        Dim usedColors As New List(Of Byte)
-'        For Each td In core.tourList
-'            task.tourList.Add(td)
-'            Dim index = lastMap.Get(Of Byte)(td.maxDist.Y, td.maxDist.X)
-'            If usedColors.Contains(index) Or index = 0 Then index = core.tourMap.Get(Of Byte)(td.maxDist.Y, td.maxDist.X)
-'            usedColors.Add(index)
-'            task.tourMap(td.rect).SetTo(index, td.mask)
-'        Next
+        For Each pt In task.features
+            dst2.Circle(pt, task.DotSize, task.highlight, -1)
+        Next
+    End Sub
+End Class
 
-'        dst2 = ShowPalette(task.tourMap * 255 / core.tourList.Count)
-'        If task.heartBeat Then labels(2) = "Originally detected " + CStr(core.tourList.Count) + " contours.  " + CStr(task.tourList.Count) + " after filtering out overlaps."
-'    End Sub
-'End Class
 
+
+
+
+
+
+Public Class Tour_Bricks : Inherits TaskParent
+    Dim ptBrick As New BrickPoint_Basics
+    Dim core As New Tour_Basics
+    Public Sub New()
+        desc = "Show contours and Brick points"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        ptBrick.Run(task.grayStable)
+
+        core.Run(src)
+        dst2 = core.dst2
+        labels(2) = core.labels(2)
+
+        For Each gc In task.brickList
+            If gc.intensity = 255 Then dst2.Circle(gc.pt, task.DotSize, task.highlight, -1)
+        Next
+    End Sub
+End Class
 
 
 
@@ -111,5 +125,62 @@ Public Class Tour_Info : Inherits TaskParent
         dst2.Circle(td.maxDist, task.DotSize, black, -1)
 
         SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Tour_Lines : Inherits TaskParent
+    Dim core As New Tour_Basics
+    Public Sub New()
+        desc = "Identify contour by its Lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        core.Run(src)
+        dst2 = core.dst2
+        labels(2) = core.labels(2)
+
+        For Each lp In task.lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Tour_Delaunay : Inherits TaskParent
+    Dim core As New Tour_Basics
+    Dim delaunay As New Delaunay_Basics
+    Public Sub New()
+        desc = "Use Delaunay to track maxDist point."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        core.Run(src)
+        labels(2) = core.labels(2)
+
+        Dim ptSorted As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalInteger)
+        ptSorted.Add(0, task.tourList(0).maxDist)
+        For Each td In task.tourList
+            ptSorted.Add(td.index, td.maxDist)
+        Next
+
+        delaunay.inputPoints = New List(Of cv.Point2f)(ptSorted.Values)
+        delaunay.Run(emptyMat)
+        dst2 = delaunay.dst2.Clone
+
+        For Each td In task.tourList
+            dst2.Circle(td.maxDist, task.DotSize, task.highlight, -1)
+        Next
+
+        dst3 = ShowPalette(task.tourMap * 255 / task.tourList.Count)
     End Sub
 End Class

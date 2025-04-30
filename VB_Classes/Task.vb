@@ -45,8 +45,6 @@ Public Class VBtask : Implements IDisposable
     Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean
 
-    Public gcFeatures As New List(Of cv.Point2f)
-
     Public fpOutline As New cv.Mat
     Public fpMotion As cv.Point2f
 

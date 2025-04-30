@@ -3,6 +3,7 @@ Imports cv = OpenCvSharp
 Public Class BrickPoint_Basics : Inherits TaskParent
     Public sobel As New Edge_SobelQT
     Public sortedPoints As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
+    Public intensityFeatures As New List(Of cv.Point2f)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         desc = "Find the max Sobel point in each grid cell"
@@ -23,19 +24,19 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         Next
 
         dst1.SetTo(255, task.motionMask)
-        task.gcFeatures.Clear()
+        intensityFeatures.Clear()
         For Each ele In sortedPoints
             Dim pt = ele.Value
-            If dst1.Get(Of Byte)(pt.Y, pt.X) Then task.gcFeatures.Add(pt)
+            If dst3.Get(Of Byte)(pt.Y, pt.X) = 255 Then intensityFeatures.Add(pt)
         Next
 
         dst1.SetTo(0)
-        For Each pt In task.gcFeatures
+        For Each pt In intensityFeatures
             dst1.Circle(pt, task.DotSize, 255, -1, cv.LineTypes.Link8)
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
         Next
 
-        labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(task.gcFeatures.Count) +
+        labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(intensityFeatures.Count) +
                     " were retained from the previous image. "
     End Sub
 End Class

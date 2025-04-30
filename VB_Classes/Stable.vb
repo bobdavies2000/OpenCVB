@@ -67,7 +67,9 @@ Public Class Stable_BasicsCount : Inherits TaskParent
         If task.features.Count > 0 Then
             basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         Else
-            basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.gcFeatures)
+            Static ptBest As New BrickPoint_Basics
+            ptBest.Run(src)
+            basics.facetGen.inputPoints = ptBest.intensityFeatures
         End If
         basics.Run(src)
         dst2 = basics.dst2

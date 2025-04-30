@@ -42,7 +42,6 @@ End Class
 
 
 Public Class Delaunay_Contours : Inherits TaskParent
-    Dim randEnum As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -50,7 +49,11 @@ Public Class Delaunay_Contours : Inherits TaskParent
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then task.features = task.gcFeatures
+        If standalone Then
+            Static ptBest As New BrickPoint_Basics
+            ptBest.Run(src)
+            task.features = ptBest.intensityFeatures
+        End If
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(task.features)
 
@@ -246,7 +249,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            If task.heartBeat Then Random.Run(src)
+            If task.heartBeatLT Then random.Run(src)
             inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
 
@@ -355,7 +358,11 @@ Public Class Delaunay_Points : Inherits TaskParent
         desc = "This algorithm explores what happens when Delaunay is used on 2 points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then task.features = task.gcFeatures
+        If standalone Then
+            Static ptBest As New BrickPoint_Basics
+            ptBest.Run(src)
+            task.features = ptBest.intensityFeatures
+        End If
         Static ptSlider = optiBase.FindSlider("Points to use in Feature Poly")
 
         fPoly.Run(src)

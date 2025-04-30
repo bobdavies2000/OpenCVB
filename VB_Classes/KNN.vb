@@ -12,7 +12,12 @@ Public Class KNN_Basics : Inherits TaskParent
         desc = "Default unnormalized KNN with dimension 2"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then trainInput = task.gcFeatures
+        If standalone Then
+            Static ptBest As New BrickPoint_Basics
+            ptBest.Run(src)
+            trainInput = ptBest.intensityFeatures
+            queries = trainInput
+        End If
         knn2.trainInput = trainInput
         knn2.queries = queries
         knn2.desiredMatches = desiredMatches
@@ -24,6 +29,7 @@ Public Class KNN_Basics : Inherits TaskParent
             dst2 = src
             For Each pt In trainInput
                 DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Red)
+                dst2.Circle(pt, task.DotSize, task.highlight)
             Next
         End If
     End Sub

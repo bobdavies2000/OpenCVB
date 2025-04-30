@@ -1302,12 +1302,15 @@ End Class
 Public Class FPoly_Line : Inherits TaskParent
     Dim topFeatures As New FPoly_TopFeatures
     Public lp As New lpData
+    Dim ptBest As New BrickPoint_Basics
     Public Sub New()
         labels = {"", "", "Points found with FPoly_TopFeatures", "Longest line in task.topFeatures"}
         desc = "Identify the longest line in task.topFeatures"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.features = task.gcFeatures
+        ptBest.Run(src)
+        task.features = ptBest.intensityFeatures
+
         topFeatures.Run(src)
         dst2.SetTo(0)
         Dim pts = task.topFeatures

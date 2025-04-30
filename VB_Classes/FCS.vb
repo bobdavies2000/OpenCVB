@@ -620,7 +620,11 @@ Public Class FCS_ByDepth : Inherits TaskParent
         desc = "Use cell depth to break down the layers in an image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then task.features = task.gcFeatures ' use the gridpoints when standalone
+        If standalone Then
+            Static ptBest As New BrickPoint_Basics
+            ptBest.Run(src)
+            task.features = ptBest.intensityFeatures
+        End If
         fcs.Run(src)
         dst2 = fcs.dst2
         labels(2) = fcs.labels(2)
