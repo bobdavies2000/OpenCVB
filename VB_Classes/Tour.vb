@@ -2,30 +2,27 @@
 Public Class Tour_Basics : Inherits TaskParent
     Public core As New Tour_Core
     Public Sub New()
-        task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        optiBase.FindSlider("Max contours").Value = 10
         desc = "Track each contour using tourMap and tourList."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         core.Run(src)
-        dst2 = core.dst2
+        Dim lastMap = task.tourMap.Clone
 
         task.tourList.Clear()
         task.tourList.Add(New tourData)
-        Dim colorMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.tourMap.SetTo(0)
+        Dim usedColors As New List(Of Byte)
         For Each td In core.tourList
-            Dim index = colorMap.Get(Of Byte)(td.maxDist.Y, td.maxDist.X)
-            If index <> 0 Then Continue For
-            colorMap(td.rect).SetTo(td.index, td.mask)
-            core.tourMap(td.rect).copyto(colorMap(td.rect), td.mask)
-            DrawContour(colorMap, td.contour.ToList, td.index, task.lineWidth + 5) ' Why +2?  To fill in interior lines - change to see the impact.
-            td.index = task.tourList.Count
             task.tourList.Add(td)
-            task.tourMap(td.rect).SetTo(td.index, td.mask)
+            Dim index = lastMap.Get(Of Byte)(td.maxDist.Y, td.maxDist.X)
+            If usedColors.Contains(index) Or index = 0 Then index = core.tourMap.Get(Of Byte)(td.maxDist.Y, td.maxDist.X)
+            usedColors.Add(index)
+            task.tourMap(td.rect).SetTo(index, td.mask)
         Next
 
-        dst2 = ShowPalette(colorMap * 255 / core.tourList.Count)
-
-        dst3 = ShowPalette(colorMap * 255 / task.tourList.Count)
+        dst2 = ShowPalette(task.tourMap * 255 / core.tourList.Count)
         If task.heartBeat Then labels(2) = "Originally detected " + CStr(core.tourList.Count) + " contours.  " + CStr(task.tourList.Count) + " after filtering out overlaps."
     End Sub
 End Class
@@ -37,7 +34,7 @@ End Class
 
 Public Class Tour_Core : Inherits TaskParent
     Public contours As New Contour_Basics
-    Public tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public tourMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public tourList As New List(Of tourData)
     Public Sub New()
         desc = "Create the tourList and tourMap from FeatureLess_Basics"
@@ -73,7 +70,7 @@ Public Class Tour_Core : Inherits TaskParent
             tourList.Add(td)
         Next
 
-        dst2 = ShowPalette((tourMap * 255 / tourList.Count).ToMat)
+        dst2 = ShowPalette(tourMap * 255 / tourList.Count)
         Dim tIndex = tourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.color(tourList(tIndex).rect).SetTo(white, tourList(tIndex).mask)
         task.color.Circle(tourList(tIndex).maxDist, task.DotSize, black, -1)

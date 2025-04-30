@@ -139,7 +139,7 @@ Public Class Options_Contours : Inherits OptionParent
     Public retrievalMode As cv.RetrievalModes = cv.RetrievalModes.External
     Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Double = 0.03
-    Public maxContours As Integer = 200
+    Public maxContours As Integer = 50
     Public options2 As New Options_Contours2
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -151,7 +151,7 @@ Public Class Options_Contours : Inherits OptionParent
             radio.check(1).Checked = True
         End If
 
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max contours", 1, 200, maxContours)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max contours", 1, 255, maxContours)
     End Sub
     Public Sub Run()
         options2.Run()
