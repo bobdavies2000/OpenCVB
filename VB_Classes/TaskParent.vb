@@ -535,13 +535,7 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Function ShowPalette(input As cv.Mat) As cv.Mat
         If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
-        If input.Type = cv.MatType.CV_8UC3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If input.Type <> cv.MatType.CV_8U Then
-            Dim mm = GetMinMax(input)
-            Dim tmp = input.ConvertScaleAbs(255 / (mm.maxVal - mm.minVal), mm.minVal)
-            input = tmp
-        End If
-
+        If input.Type <> cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_8U)
         Return task.paletteRandom.useColorMapWithBlack(input)
     End Function
     Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat

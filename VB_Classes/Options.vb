@@ -7873,6 +7873,37 @@ End Class
 
 
 
+
+
+Public Class Options_MinArea : Inherits OptionParent
+    Public srcPoints As New List(Of cv.Point2f)
+    Public minSize As Integer = 10
+    Public numPoints As Integer = 5
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
+            sliders.setupTrackBar("Minimum width and height", 10, 300, minSize)
+        End If
+    End Sub
+    Public Sub Run()
+        Static numSlider = FindSlider("Area Number of Points")
+        Static sizeSlider = FindSlider("Area size")
+        srcPoints.Clear()
+
+        Dim pt As cv.Point2f
+        numPoints = numSlider.Value
+        For i = 0 To numPoints - 1
+            pt.X = msRNG.Next(task.cols / 2 - minSize, task.cols / 2 + minSize)
+            pt.Y = msRNG.Next(task.rows / 2 - minSize, task.rows / 2 + minSize)
+            srcPoints.Add(pt)
+        Next
+    End Sub
+End Class
+
+
+
+
+
 Public Class Options_FeaturesEx : Inherits OptionParent
     Public templatePad As Integer = 10
     Public templateSize As Integer = 0
@@ -7885,7 +7916,6 @@ Public Class Options_FeaturesEx : Inherits OptionParent
             sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
             sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
             sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
-            sliders.setupTrackBar("FAST Threshold", 0, 200, 100)
         End If
         Application.DoEvents()
     End Sub
@@ -7893,8 +7923,6 @@ Public Class Options_FeaturesEx : Inherits OptionParent
         Static cellSlider = FindSlider("MatchTemplate Cell Size")
         Static resyncSlider = FindSlider("Threshold Percent for Resync")
         Static agastslider = FindSlider("Agast Threshold")
-        Static FASTslider = FindSlider("FAST Threshold")
-        task.FASTthreshold = FASTslider.value
 
         templatePad = CInt(cellSlider.value / 2)
         templateSize = cellSlider.value Or 1
@@ -7954,6 +7982,7 @@ End Class
 
 
 
+
 Public Class Options_FAST : Inherits OptionParent
     Public useNonMax As Boolean = True
     Public Sub New()
@@ -7970,35 +7999,5 @@ Public Class Options_FAST : Inherits OptionParent
         Static rangeSlider = FindSlider("Random motion introduced (in pixels)")
         task.FASTthreshold = rangeSlider.Value
         useNonMax = nonMaxCheck.checked
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Options_MinArea : Inherits OptionParent
-    Public srcPoints As New List(Of cv.Point2f)
-    Public minSize As Integer = 10
-    Public numPoints As Integer = 5
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
-            sliders.setupTrackBar("Minimum width and height", 10, 300, minSize)
-        End If
-    End Sub
-    Public Sub Run()
-        Static numSlider = FindSlider("Area Number of Points")
-        Static sizeSlider = FindSlider("Area size")
-        srcPoints.Clear()
-
-        Dim pt As cv.Point2f
-        numPoints = numSlider.Value
-        For i = 0 To numPoints - 1
-            pt.X = msRNG.Next(task.cols / 2 - minSize, task.cols / 2 + minSize)
-            pt.Y = msRNG.Next(task.rows / 2 - minSize, task.rows / 2 + minSize)
-            srcPoints.Add(pt)
-        Next
     End Sub
 End Class

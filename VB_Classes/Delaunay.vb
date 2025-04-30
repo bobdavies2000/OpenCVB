@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class Delaunay_Basics : Inherits TaskParent
     Public inputPoints As New List(Of cv.Point2f)
     Public facetList As New List(Of List(Of cv.Point))
-    Dim random As New Random_Basics
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
@@ -10,6 +9,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
+            Static random As New Random_Basics
             random.Run(src)
             inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
@@ -354,7 +354,7 @@ Public Class Delaunay_Points : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Dim fPoly As New FPoly_TopFeatures
     Public Sub New()
-       optiBase.findslider("Points to use in Feature Poly").Value = 2
+        optiBase.FindSlider("Points to use in Feature Poly").Value = 2
         desc = "This algorithm explores what happens when Delaunay is used on 2 points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

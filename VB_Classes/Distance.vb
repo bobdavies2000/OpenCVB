@@ -209,7 +209,7 @@ Public Class Distance_Peaks : Inherits TaskParent
             If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
             countList.Add(distance32f(rect).CountNonZero)
         Next
-        dst2 = ShowPalette(dst1 * 255 / maxList.Max)
+        dst2 = ShowPalette(dst1)
 
         If standalone Then
             dst0.SetTo(0)

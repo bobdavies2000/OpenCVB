@@ -3879,7 +3879,7 @@ Public Class XO_BrickPoint_FeatureLess2 : Inherits TaskParent
 
         labels(3) = "Mask for the " + CStr(fLessCount) + " featureless regions."
         If standaloneTest() Then
-            dst1 = ShowPalette(dst0 * 255 / fLessCount)
+            dst1 = ShowPalette(dst0)
             dst2 = ShowAddweighted(src, dst1, labels(2))
         End If
     End Sub
@@ -3930,7 +3930,7 @@ Public Class XO_BrickPoint_FeatureLess : Inherits TaskParent
         Next
 
         labels(3) = "Mask for the " + CStr(classCount) + " featureless regions."
-        dst3 = ShowPalette(fLessMask * 255 / classCount)
+        dst3 = ShowPalette(fLessMask)
         If standaloneTest() Then dst2 = ShowAddweighted(src, dst3, labels(2))
     End Sub
 End Class

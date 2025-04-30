@@ -1550,7 +1550,7 @@ Public Class Depth_ErrorEstimate : Inherits TaskParent
         Next
 
         Dim mm = GetMinMax(dst1)
-        dst2 = ShowPalette(dst1 * 255 / mm.maxVal)
+        dst2 = ShowPalette(dst1)
         ' dst2.SetTo(0, task.noDepthMask)
         labels(3) = "Error estimates vary from " + Format(mm.minVal, fmt3) + " to " + Format(mm.maxVal, fmt3)
         SetTrueText(Format(ErrorEstimate(task.gcD.depth), fmt3) + " estimated error" + vbCrLf + Format(task.gcD.depth, fmt3) + "m",

@@ -47,7 +47,7 @@ Public Class Contour_Basics : Inherits TaskParent
             areaList.Add(ele.Key)
             DrawContour(dst0, allContours(ele.Value).ToList, tourlist.Count, -1)
         Next
-        dst2 = ShowPalette(dst0 * 255 / tourlist.Count)
+        dst2 = ShowPalette(dst0)
         labels(2) = $"Top {tourlist.Count} contours in tourlist from the " + CStr(sortedList.Count) + " found."
     End Sub
 End Class

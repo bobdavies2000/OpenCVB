@@ -168,7 +168,6 @@ Public Class Tour_Delaunay : Inherits TaskParent
         labels(2) = core.labels(2)
 
         Dim ptSorted As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalInteger)
-        ptSorted.Add(0, task.tourList(0).maxDist)
         For Each td In task.tourList
             ptSorted.Add(td.index, td.maxDist)
         Next
@@ -181,6 +180,6 @@ Public Class Tour_Delaunay : Inherits TaskParent
             dst2.Circle(td.maxDist, task.DotSize, task.highlight, -1)
         Next
 
-        dst3 = ShowPalette(task.tourMap * 255 / task.tourList.Count)
+        dst3 = ShowPalette(task.tourMap)
     End Sub
 End Class
