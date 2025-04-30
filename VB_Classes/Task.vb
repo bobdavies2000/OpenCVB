@@ -25,7 +25,7 @@ Public Class VBtask : Implements IDisposable
     Public tourMap As New cv.Mat ' map of contours to index in tourList
     Public lpMap As New cv.Mat ' map of each line's bricks...
     Public fpMap As New cv.Mat ' feature map
-    Public referenceMap As New cv.Mat ' FCS reference map - updated on heartBeat. 
+    Public fcsMap As New cv.Mat ' FCS reference map - updated on heartBeat. 
     Public rcMap As cv.Mat ' redColor map
     Public structureMapX As New cv.Mat
     Public structureMapY As New cv.Mat
@@ -126,7 +126,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gbricks As Brick_Basics
-    Public fcsMap As FCS_Basics
+    Public fcs As FCS_Basics
     Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
@@ -564,7 +564,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gbricks = New Brick_Basics
-        fcsMap = New FCS_Basics
+        fcs = New FCS_Basics
         buildCorr = New Brick_CorrelationMap
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
@@ -842,7 +842,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         motionBasics.Run(src)
-        fcsMap.Run(src)
+        fcs.Run(src)
         gbricks.Run(src)
         buildCorr.Run(src)
 

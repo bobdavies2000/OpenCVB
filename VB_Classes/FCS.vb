@@ -4,25 +4,29 @@ Public Class FCS_Basics : Inherits TaskParent
     Dim tour As New Tour_Basics
     Public desiredMapCount As Integer = 10
     Public Sub New()
-        labels(3) = "Note that the task.referenceMap uses the same colors as the task.tourMap - same index for both."
+        task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Note that the task.fcsMap uses the same colors as the task.tourMap - same index for both."
         desc = "Create the reference map for FCS - updated on the heartbeat. "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeatLT Or task.optionsChanged Then
-            task.motionMask.SetTo(255)
+        Static restartRequest As Boolean
+        If task.heartBeatLT Or task.optionsChanged Or restartRequest Or task.mouseClickFlag Then
             tour.Run(src)
             fcs.inputFeatures.Clear()
-            task.referenceMap.SetTo(0)
             For i = 0 To task.tourList.Count - 1
                 fcs.inputFeatures.Add(task.tourList(i).maxDist)
             Next
+            If task.tourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
+                restartRequest = True
+                Exit Sub
+            End If
+            restartRequest = False
+
             fcs.Run(emptyMat)
 
-            task.referenceMap = fcs.dst1.Clone
-            If standaloneTest() Then
-                dst3 = tour.dst2.Clone
-                dst2 = ShowPalette(task.referenceMap)
-            End If
+            task.fcsMap = fcs.dst1.Clone
+            dst2 = ShowPalette(task.fcsMap)
+            dst3 = ShowAddweighted(tour.dst2, dst2, labels(0))
             labels(2) = fcs.labels(2)
         End If
     End Sub
@@ -47,7 +51,6 @@ Public Class FCS_Core : Inherits TaskParent
         Dim facets = New cv.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
-        dst1.SetTo(0)
         For i = 0 To Math.Min(inputFeatures.Count, facets.Count) - 1
             Dim facetList = New List(Of cv.Point)
             For Each pt In facets(i)
@@ -58,7 +61,7 @@ Public Class FCS_Core : Inherits TaskParent
 
         If standaloneTest() Then dst2 = ShowPalette(dst1)
 
-        If task.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
+        If task.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count - 1) + " cells found." ' don't count tourList(0)
     End Sub
 End Class
 
@@ -150,8 +153,6 @@ Public Class FCS_CreateList : Inherits TaskParent
             labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells found.  Matched = " +
                         CStr(matchCount) + " of " + CStr(task.features.Count)
         End If
-
-        cv.Cv2.ImShow("fcsMap", task.referenceMap)
     End Sub
 End Class
 

@@ -107,12 +107,11 @@ Public Class Tour_Info : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static core As New Tour_Basics
-            core.Run(src)
-            dst2 = core.dst2
-            labels(2) = core.labels(2)
+            dst2 = task.fcs.dst3
+            labels(2) = task.fcs.labels(2)
         End If
-        index = task.tourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+
+        index = task.fcsMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         td = task.tourList(index)
 
         strOut = vbCrLf + vbCrLf
@@ -120,7 +119,6 @@ Public Class Tour_Info : Inherits TaskParent
         strOut += "Number of pixels in the mask: " + CStr(td.pixels) + vbCrLf
         strOut += "Number of points in the contour: " + CStr(td.contour.Count) + vbCrLf
         strOut += td.maxDist.ToString + vbCrLf
-        strOut += "Age " + CStr(td.age) + vbCrLf
         dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
         dst2.Circle(td.maxDist, task.DotSize, black, -1)
 

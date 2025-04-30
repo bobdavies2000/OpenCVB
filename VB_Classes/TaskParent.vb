@@ -427,7 +427,7 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Sub fpDisplayAge()
         For Each fp In task.fpList
-            SetTrueText(CStr(fp.age), fp.pt, 3)
+            SetTrueText(CStr(fp.age), fp.pt, 2)
         Next
     End Sub
     Public Sub fpDSet()
@@ -535,7 +535,7 @@ Public Class TaskParent : Implements IDisposable
     Public Function ShowPalette(input As cv.Mat) As cv.Mat
         If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
         If input.Type <> cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_8U)
-        Return task.paletteRandom.useColorMapWithBlack(input)
+        Return task.paletteRandom.useColorMapWithBlack(input).Clone
     End Function
     Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat
         If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
