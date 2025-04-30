@@ -2147,13 +2147,21 @@ public:
 	Options_GridCells() {
 	}
 };
+class Options_MinArea {
+public:
+vector<cv::Point2f> srcPoints;
+	int minSize =  10;
+	int numPoints =  5;
+	void Run() {}
+	Options_MinArea() {
+	}
+};
 class Options_FeaturesEx {
 public:
 	int templatePad =  10;
 	int templateSize =  0;
 	double resyncThreshold =  0.95;
 	int agastThreshold =  20;
-	bool useBRISK = false;
 	void Run() {}
 	Options_FeaturesEx() {
 	}
@@ -2165,12 +2173,10 @@ public:
 	string matchText =  "";
 	double k =  0.04;
 	int blockSize =  3;
-	int featurePoints =  400;
 	int templatePad =  10;
 	int templateSize =  0;
 	double resyncThreshold =  0.95;
 	int agastThreshold =  20;
-	bool useBRISK = false;
 	void Run() {}
 	Options_Features() {
 	}
@@ -2180,14 +2186,5 @@ public:
 	bool useNonMax = true;
 	void Run() {}
 	Options_FAST() {
-	}
-};
-class Options_MinArea {
-public:
-vector<cv::Point2f> srcPoints;
-	int minSize =  10;
-	int numPoints =  5;
-	void Run() {}
-	Options_MinArea() {
 	}
 };

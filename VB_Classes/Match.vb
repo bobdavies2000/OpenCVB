@@ -108,14 +108,14 @@ Public Class Match_RandomTest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If standaloneTest() Then
-            Static saveSampleCount = options.featurePoints
-            If saveSampleCount <> options.featurePoints Then
-                saveSampleCount = options.featurePoints
+            Static saveSampleCount = task.FeatureSampleSize
+            If saveSampleCount <> task.FeatureSampleSize Then
+                saveSampleCount = task.FeatureSampleSize
                 maxCorrelation = Single.MinValue
                 minCorrelation = Single.MaxValue
             End If
-            template = New cv.Mat(New cv.Size(options.featurePoints, 1), cv.MatType.CV_32FC1)
-            src = New cv.Mat(New cv.Size(options.featurePoints, 1), cv.MatType.CV_32FC1)
+            template = New cv.Mat(New cv.Size(task.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
+            src = New cv.Mat(New cv.Size(task.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(template, 100, 25)
             cv.Cv2.Randn(src, 0, 25)
         End If
@@ -134,7 +134,8 @@ Public Class Match_RandomTest : Inherits TaskParent
             flow.Run(src)
             SetTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
                         " a correlation coefficient near zero" + vbCrLf +
-                        "The larger the sample size, the closer to zero the correlation will be - See 'Sample Size' slider nearby." + vbCrLf +
+                        "The larger the sample size, the closer to zero the correlation will be. " + vbCrLf +
+                        "See the Feature option 'Feature Sample Size' slider." + vbCrLf +
                         "There should also be symmetry in the min and max around zero." + vbCrLf + vbCrLf +
                         "Min Correlation = " + Format(minCorrelation, fmt3) + vbCrLf +
                         "Max Correlation = " + Format(maxCorrelation, fmt3), 3)

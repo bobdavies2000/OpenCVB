@@ -36,7 +36,7 @@ Public Class Tour_Basics : Inherits TaskParent
             task.tourList.Add(td)
         Next
 
-        dst2 = ShowPalette(task.tourMap * 255 / task.tourList.Count)
+        dst2 = ShowPalette(task.tourMap)
         Dim tIndex = task.tourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.color(task.tourList(tIndex).rect).SetTo(white, task.tourList(tIndex).mask)
         task.color.Circle(task.tourList(tIndex).maxDist, task.DotSize, black, -1)

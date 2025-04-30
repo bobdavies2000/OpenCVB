@@ -42,11 +42,15 @@ Partial Class OptionsFeatures
         Me.SelectedLabel = New System.Windows.Forms.Label()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.SelectedFeature = New System.Windows.Forms.TrackBar()
+        Me.FeatureSampleSizeLabel = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.FeatureSampleSize = New System.Windows.Forms.TrackBar()
         Me.LineGroup.SuspendLayout()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'LineGroup
@@ -236,11 +240,42 @@ Partial Class OptionsFeatures
         Me.SelectedFeature.TabIndex = 30
         Me.SelectedFeature.Value = 1
         '
+        'FeatureSampleSizeLabel
+        '
+        Me.FeatureSampleSizeLabel.AutoSize = True
+        Me.FeatureSampleSizeLabel.Location = New System.Drawing.Point(507, 160)
+        Me.FeatureSampleSizeLabel.Name = "FeatureSampleSizeLabel"
+        Me.FeatureSampleSizeLabel.Size = New System.Drawing.Size(175, 20)
+        Me.FeatureSampleSizeLabel.TabIndex = 35
+        Me.FeatureSampleSizeLabel.Text = "Selected Feature Index"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(32, 127)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(158, 20)
+        Me.Label5.TabIndex = 34
+        Me.Label5.Text = "Feature Sample Size"
+        '
+        'FeatureSampleSize
+        '
+        Me.FeatureSampleSize.Location = New System.Drawing.Point(28, 150)
+        Me.FeatureSampleSize.Maximum = 400
+        Me.FeatureSampleSize.Minimum = 1
+        Me.FeatureSampleSize.Name = "FeatureSampleSize"
+        Me.FeatureSampleSize.Size = New System.Drawing.Size(476, 69)
+        Me.FeatureSampleSize.TabIndex = 33
+        Me.FeatureSampleSize.Value = 25
+        '
         'OptionsFeatures
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1419, 615)
+        Me.Controls.Add(Me.FeatureSampleSizeLabel)
+        Me.Controls.Add(Me.Label5)
+        Me.Controls.Add(Me.FeatureSampleSize)
         Me.Controls.Add(Me.SelectedLabel)
         Me.Controls.Add(Me.Label8)
         Me.Controls.Add(Me.SelectedFeature)
@@ -267,6 +302,7 @@ Partial Class OptionsFeatures
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -291,4 +327,7 @@ Partial Class OptionsFeatures
     Friend WithEvents SelectedLabel As Windows.Forms.Label
     Friend WithEvents Label8 As Windows.Forms.Label
     Friend WithEvents SelectedFeature As Windows.Forms.TrackBar
+    Friend WithEvents FeatureSampleSizeLabel As Windows.Forms.Label
+    Friend WithEvents Label5 As Windows.Forms.Label
+    Friend WithEvents FeatureSampleSize As Windows.Forms.TrackBar
 End Class

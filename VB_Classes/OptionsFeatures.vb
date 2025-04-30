@@ -72,4 +72,9 @@
         task.optionsChanged = True
         SelectedLabel.Text = CStr(task.selectedFeature)
     End Sub
+    Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSampleSize.ValueChanged
+        task.FeatureSampleSize = FeatureSampleSize.Value
+        task.optionsChanged = True
+        FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
+    End Sub
 End Class

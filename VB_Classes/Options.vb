@@ -7909,7 +7909,6 @@ Public Class Options_FeaturesEx : Inherits OptionParent
     Public templateSize As Integer = 0
     Public resyncThreshold As Double = 0.95
     Public agastThreshold As Integer = 20
-    Public useBRISK As Boolean = False
     Public Sub New()
         templatePad = If(task.cols > 336, 20, 10)
         If sliders.Setup(traceName) Then
@@ -7941,7 +7940,6 @@ Public Class Options_Features : Inherits OptionParent
     Public matchText As String = ""
     Public k As Double = 0.04
     Public blockSize As Integer = 3
-    Public featurePoints As Integer = 400
 
     Dim options As New Options_FeaturesEx
 
@@ -7949,10 +7947,8 @@ Public Class Options_Features : Inherits OptionParent
     Public templateSize As Integer = 0
     Public resyncThreshold As Double = 0.95
     Public agastThreshold As Integer = 20
-    Public useBRISK As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
         End If
@@ -7964,15 +7960,12 @@ Public Class Options_Features : Inherits OptionParent
         templateSize = options.templateSize
         resyncThreshold = options.resyncThreshold
         agastThreshold = options.agastThreshold
-        useBRISK = options.useBRISK
 
         Static qualitySlider = FindSlider("Quality Level")
         Static kSlider = FindSlider("k X1000")
-        Static featureSlider = FindSlider("Feature Sample Size")
         Static vertRadio = findRadio("Vertical lines")
         k = kSlider.value / 1000
 
-        featurePoints = featureSlider.value
         quality = qualitySlider.Value / 100
     End Sub
 End Class

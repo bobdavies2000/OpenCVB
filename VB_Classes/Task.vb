@@ -25,6 +25,7 @@ Public Class VBtask : Implements IDisposable
     Public tourMap As New cv.Mat ' map of contours to index in tourList
     Public lpMap As New cv.Mat ' map of each line's bricks...
     Public fpMap As New cv.Mat ' feature map
+    Public referenceMap As New cv.Mat ' FCS reference map - updated on heartBeat. 
     Public rcMap As cv.Mat ' redColor map
     Public structureMapX As New cv.Mat
     Public structureMapY As New cv.Mat
@@ -274,6 +275,7 @@ Public Class VBtask : Implements IDisposable
     Public FASTthreshold As Integer
 
     Public minDistance As Integer ' minimum distance between features
+    Public FeatureSampleSize As Integer ' how many features do you want...
     Public featureSource As Integer ' which Feature_Basics method...
     Public fCorrThreshold As Single ' feature correlation threshold
     Public colorDiffThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.

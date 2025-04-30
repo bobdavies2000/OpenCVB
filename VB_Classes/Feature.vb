@@ -11,7 +11,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = src
+        dst2 = task.color.Clone
 
         Dim features As New List(Of cv.Point2f)
         Dim ptNew As New List(Of cv.Point2f)
@@ -22,16 +22,16 @@ Public Class Feature_Basics : Inherits TaskParent
 
         Select Case task.featureSource
             Case FeatureSrc.GoodFeaturesFull
-                features = cv.Cv2.GoodFeaturesToTrack(task.gray, options.featurePoints, options.quality,
+                features = cv.Cv2.GoodFeaturesToTrack(task.gray, task.FeatureSampleSize, options.quality,
                                                       task.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.GoodFeaturesGrid
-                options.featurePoints = 4
+                task.FeatureSampleSize = 4
                 features.Clear()
                 For i = 0 To task.gridRects.Count - 1
                     Dim roi = task.gridRects(i)
-                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(task.gray(roi), options.featurePoints, options.quality,
+                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(task.gray(roi), task.FeatureSampleSize, options.quality,
                                                                  task.minDistance, New cv.Mat, options.blockSize,
                                                                  True, options.k).ToList
                     For j = 0 To tmpFeatures.Count - 1
@@ -119,12 +119,9 @@ Public Class Feature_Basics : Inherits TaskParent
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
-        If standaloneTest() Then
-            dst2 = src
-            For Each pt In task.features
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            Next
-        End If
+        For Each pt In task.features
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        Next
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
@@ -268,7 +265,7 @@ Public Class Feature_Delaunay : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(task.grayStable)
-
+        dst2 = feat.dst2
         labels(2) = feat.labels(2)
 
         delaunay.Run(src)
@@ -343,7 +340,7 @@ Public Class Feature_Points : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
             DrawCircle(dst3, pt, task.DotSize, task.highlight)
         Next
-        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(feat.options.featurePoints) + " requested."
+        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
     End Sub
 End Class
 
@@ -658,7 +655,7 @@ Public Class Feature_Matching : Inherits TaskParent
         labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
                     " were matched to the previous frame"
 
-        If matched.Count < match.options.featurePoints / 2 Then
+        If matched.Count < task.FeatureSampleSize / 2 Then
             feat.Run(src)
             features = task.featurePoints
         Else
