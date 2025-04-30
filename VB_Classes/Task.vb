@@ -46,7 +46,6 @@ Public Class VBtask : Implements IDisposable
     Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean
 
-    Public fpOutline As New cv.Mat
     Public fpMotion As cv.Point2f
 
     Public topFeatures As New List(Of cv.Point2f)
@@ -127,6 +126,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gbricks As Brick_Basics
+    Public fcsMap As FCS_Basics
     Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
@@ -564,6 +564,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gbricks = New Brick_Basics
+        fcsMap = New FCS_Basics
         buildCorr = New Brick_CorrelationMap
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
@@ -591,7 +592,6 @@ Public Class VBtask : Implements IDisposable
         End If
 
         fpList.Clear()
-        fpOutline = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
 
@@ -842,6 +842,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         motionBasics.Run(src)
+        fcsMap.Run(src)
         gbricks.Run(src)
         buildCorr.Run(src)
 

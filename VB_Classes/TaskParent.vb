@@ -426,7 +426,6 @@ Public Class TaskParent : Implements IDisposable
         Return mm.maxLoc
     End Function
     Public Sub fpDisplayAge()
-        dst3 = task.fpOutline
         For Each fp In task.fpList
             SetTrueText(CStr(fp.age), fp.pt, 3)
         Next

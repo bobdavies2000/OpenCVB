@@ -1,6 +1,73 @@
-﻿Imports OpenCvSharp.Flann
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
+    Dim fcs As New FCS_Core
+    Dim tour As New Tour_Basics
+    Public desiredMapCount As Integer = 10
+    Public Sub New()
+        labels(3) = "Note that the task.referenceMap uses the same colors as the task.tourMap - same index for both."
+        desc = "Create the reference map for FCS - updated on the heartbeat. "
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Or task.optionsChanged Then
+            task.motionMask.SetTo(255)
+            tour.Run(src)
+            fcs.inputFeatures.Clear()
+            task.referenceMap.SetTo(0)
+            For i = 0 To task.tourList.Count - 1
+                fcs.inputFeatures.Add(task.tourList(i).maxDist)
+            Next
+            fcs.Run(emptyMat)
+
+            task.referenceMap = fcs.dst1.Clone
+            If standaloneTest() Then
+                dst3 = tour.dst2.Clone
+                dst2 = ShowPalette(task.referenceMap)
+            End If
+            labels(2) = fcs.labels(2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_Core : Inherits TaskParent
+    Dim subdiv As New cv.Subdiv2D
+    Public inputFeatures As New List(Of cv.Point2f)
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Subdivide an image based on the points provided."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
+        subdiv.Insert(inputFeatures)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        dst1.SetTo(0)
+        For i = 0 To Math.Min(inputFeatures.Count, facets.Count) - 1
+            Dim facetList = New List(Of cv.Point)
+            For Each pt In facets(i)
+                facetList.Add(New cv.Point(pt.X, pt.Y))
+            Next
+            dst1.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
+        Next
+
+        If standaloneTest() Then dst2 = ShowPalette(dst1)
+
+        If task.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_CreateList : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -19,7 +86,6 @@ Public Class FCS_Basics : Inherits TaskParent
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         task.fpList.Clear()
-        task.fpOutline.SetTo(0)
         Dim matchCount As Integer
         dst1.SetTo(0)
         For i = 0 To Math.Min(task.features.Count, facets.Count) - 1
@@ -59,7 +125,6 @@ Public Class FCS_Basics : Inherits TaskParent
 
             task.fpMap.FillConvexPoly(fp.facets, CSng(gcIndex), task.lineType)
             dst1.FillConvexPoly(fp.facets, i, task.lineType)
-            DrawContour(task.fpOutline, fp.facets, 255, 1)
         Next
 
         If task.features.Count <> facets.Length Then
@@ -74,9 +139,7 @@ Public Class FCS_Basics : Inherits TaskParent
         For Each fp In task.fpList
             If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
         Next
-        dst3 = task.fpOutline
 
-        dst2.SetTo(black, task.fpOutline)
         If standalone Then
             fpDisplayAge()
             fpCellContour(task.fpD, task.color)
@@ -87,42 +150,11 @@ Public Class FCS_Basics : Inherits TaskParent
             labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells found.  Matched = " +
                         CStr(matchCount) + " of " + CStr(task.features.Count)
         End If
+
+        cv.Cv2.ImShow("fcsMap", task.referenceMap)
     End Sub
 End Class
 
-
-
-
-
-
-Public Class FCS_Core : Inherits TaskParent
-    Dim subdiv As New cv.Subdiv2D
-    Public features As New List(Of cv.Point2f)
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Subdivide an image based on the points provided."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
-        subdiv.Insert(features)
-
-        Dim facets = New cv.Point2f()() {Nothing}
-        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-        dst1.SetTo(0)
-        For i = 0 To Math.Min(features.Count, facets.Count) - 1
-            Dim facetList = New List(Of cv.Point)
-            For Each pt In facets(i)
-                facetList.Add(New cv.Point(pt.X, pt.Y))
-            Next
-            dst1.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
-        Next
-
-        If standaloneTest() Then dst2 = ShowPalette(dst1)
-
-        If task.heartBeat Then labels(2) = traceName + ": " + CStr(features.Count) + " cells found."
-    End Sub
-End Class
 
 
 
@@ -131,7 +163,7 @@ End Class
 
 
 Public Class FCS_ViewLeft : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Public Sub New()
         desc = "Build an FCS for left view."
     End Sub
@@ -153,7 +185,7 @@ End Class
 
 
 Public Class FCS_ViewRight : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Public Sub New()
         desc = "Build an FCS for right view."
     End Sub
@@ -198,7 +230,6 @@ Public Class FCS_FloodFill : Inherits TaskParent
             task.fpList(i) = fp
             DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
         Next
-        dst3.SetTo(cv.Scalar.White, task.fpOutline)
     End Sub
 End Class
 
@@ -211,7 +242,7 @@ End Class
 
 
 Public Class FCS_Edges : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Dim edges As New Edge_Canny
     Public Sub New()
         desc = "Use edges to connect feature points to their neighbors."
@@ -228,7 +259,6 @@ Public Class FCS_Edges : Inherits TaskParent
                 DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
             End If
         Next
-        dst3.SetTo(cv.Scalar.White, task.fpOutline)
         fpDSet()
     End Sub
 End Class
@@ -239,7 +269,7 @@ End Class
 
 
 'Public Class FCS_KNNfeatures : Inherits TaskParent
-'    Dim fcs As New FCS_Basics
+'    Dim fcs As New FCS_CreateList
 '    Dim knn As New KNNorm_Basics
 '    Dim info As New FCS_Info
 '    Dim dimension As Integer
@@ -309,7 +339,7 @@ End Class
 
 
 Public Class FCS_WithAge : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Public Sub New()
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the age of each cell."
@@ -333,7 +363,7 @@ End Class
 
 
 Public Class FCS_BestAge : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Public Sub New()
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the top X oldest (best) cells."
@@ -367,10 +397,10 @@ End Class
 
 
 Public Class FCS_RedCloud1 : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(1) = "Output of FCS_Basics."
+        labels(1) = "Output of FCS_CreateList."
         desc = "Isolate FCS cells for each redCell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -394,10 +424,10 @@ End Class
 
 
 Public Class FCS_InfoTest : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Dim info As New FCS_Info
     Public Sub New()
-        desc = "Invoke FCS_Basics and display the contents of the selected feature point cell"
+        desc = "Invoke FCS_CreateList and display the contents of the selected feature point cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
@@ -418,7 +448,7 @@ End Class
 
 
 Public Class FCS_Motion : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Dim plot As New Plot_OverTime
     Public xDist As New List(Of Single), yDist As New List(Of Single)
     Public motionPercent As Single
@@ -543,7 +573,7 @@ Public Class FCS_Info : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static fcs As New FCS_Basics
+            Static fcs As New FCS_CreateList
             fcs.Run(task.grayStable)
             dst2 = fcs.dst2
         End If
@@ -581,7 +611,7 @@ End Class
 
 'Public Class FCS_RedCloud : Inherits TaskParent
 '    Dim redCombo As New RedColor_Basics
-'    Dim fcs As New FCS_Basics
+'    Dim fcs As New FCS_CreateList
 '    Dim knnMin As New KNN_MinDistance
 '    Public Sub New()
 '        desc = "Use the RedCloud maxDist points as feature points in an FCS display."
@@ -613,7 +643,7 @@ End Class
 
 
 Public Class FCS_Lines : Inherits TaskParent
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Public Sub New()
         task.featureOptions.DistanceSlider.Value = 60
         task.featureOptions.FeatureMethod.SelectedItem() = "LineInput"
@@ -641,7 +671,7 @@ End Class
 
 Public Class FCS_ByDepth : Inherits TaskParent
     Dim plot As New Plot_Histogram
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         plot.addLabels = False
@@ -725,7 +755,7 @@ End Class
 Public Class FCS_Periphery : Inherits TaskParent
     Public ptOutside As New List(Of cv.Point2f)
     Public ptInside As New List(Of cv.Point2f)
-    Dim fcs As New FCS_Basics
+    Dim fcs As New FCS_CreateList
     Public Sub New()
         desc = "Display the cells which are on the periphery of the image"
     End Sub
@@ -771,38 +801,5 @@ Public Class FCS_PeripheryNot : Inherits TaskParent
         Next
         fpDSet()
         labels = perif.labels
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class FCS_ReferenceMap : Inherits TaskParent
-    Dim fcs As New FCS_Core
-    Dim tour As New Tour_Basics
-    Public desiredMapCount As Integer = 10
-    Public Sub New()
-        labels(3) = "Note that the task.referenceMap uses the same colors as the task.tourMap - same index for both."
-        desc = "Create the reference map for FCS - updated on the heartbeat. "
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeatLT Then
-            tour.Run(src)
-            fcs.features.Clear()
-            For Each td In task.tourList
-                fcs.features.Add(td.maxDist)
-            Next
-            fcs.Run(emptyMat)
-
-            task.referenceMap = fcs.dst1.Clone
-            If standaloneTest() Then
-                dst3 = tour.dst2.Clone
-                dst2 = ShowPalette(task.referenceMap)
-            End If
-            labels(2) = fcs.labels(2)
-        End If
     End Sub
 End Class
