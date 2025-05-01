@@ -27,6 +27,8 @@ Public Class Stable_Basics : Inherits TaskParent
             SetTrueText(CStr(g), pt)
         Next
 
+        If generations.Count = 0 Then Exit Sub
+
         Dim maxGens = generations.Max()
         Dim index = generations.IndexOf(maxGens)
         anchorPoint = ptList(index)
@@ -135,7 +137,6 @@ Public Class Stable_FAST : Inherits TaskParent
     Public basics As New Stable_Basics
     Dim fast As New Corners_Basics
     Public Sub New()
-        optiBase.FindSlider("FAST Threshold").Value = 100
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

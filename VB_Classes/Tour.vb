@@ -1,23 +1,56 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Tour_Basics : Inherits TaskParent
     Public contours As New Contour_Basics
+    Dim tour As New Tour_Core
     Public Sub New()
         task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         optiBase.FindSlider("Max contours").Value = 10
-        desc = "Create the tourList and tourMap from Contour_Basics"
+        desc = "Create the task.tourList and task.tourMap from Contour_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        tour.Run(src)
+        labels = tour.labels
+
+        task.tourList.Clear()
+        task.tourList.Add(New tourData)
+        task.tourMap.SetTo(0)
+        For Each td In tour.tourList
+            td.index = task.tourList.Count
+            task.tourList.Add(td)
+            task.tourMap(td.rect).SetTo(td.index, td.mask)
+        Next
+
+        dst2 = ShowPalette(task.tourMap)
+        Dim tIndex = task.tourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        task.color(task.tourList(tIndex).rect).SetTo(white, task.tourList(tIndex).mask)
+        task.color.Circle(task.tourList(tIndex).maxDist, task.DotSize, black, -1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Tour_Core : Inherits TaskParent
+    Public contours As New Contour_Basics
+    Public tourList As New List(Of tourData)
+    Public Sub New()
+        optiBase.FindSlider("Max contours").Value = 10
+        desc = "Create only the tourList from Contour_Basics but without a placeholder for zero."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
+        dst2 = contours.dst2
         labels(2) = contours.labels(2)
 
-        task.tourList.Clear()
-        task.tourList.Add(New tourData) ' placeholder for zero which is the background
-        task.tourMap.SetTo(0)
-        For Each tour In contours.tourlist
+        tourList.Clear()
+        For Each tour In contours.contourList
             Dim td = New tourData
-            td.index = task.tourList.Count
+            td.index = tourList.Count
             td.contour = New List(Of cv.Point)(tour)
-            td.pixels = contours.areaList(td.index - 1)
+            td.pixels = contours.areaList(td.index)
 
             Dim minX As Single = td.contour.Min(Function(p) p.X)
             Dim maxX As Single = td.contour.Max(Function(p) p.X)
@@ -28,18 +61,17 @@ Public Class Tour_Basics : Inherits TaskParent
             If td.rect.Width = 0 Or td.rect.Height = 0 Then Continue For
 
             td.mask = contours.dst0(td.rect).Clone
-            td.mask = td.mask.InRange(td.index, td.index)
-            task.tourMap(td.rect).SetTo(td.index, td.mask)
+            td.mask = td.mask.InRange(td.index + 1, td.index + 1)
 
             td.maxDist = GetMaxDist(td.mask, td.rect)
-            td.maxDStable = td.maxDist
-            task.tourList.Add(td)
-        Next
 
-        dst2 = ShowPalette(task.tourMap)
-        Dim tIndex = task.tourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        task.color(task.tourList(tIndex).rect).SetTo(white, task.tourList(tIndex).mask)
-        task.color.Circle(task.tourList(tIndex).maxDist, task.DotSize, black, -1)
+            tourList.Add(td)
+
+            If standalone Then
+                dst2.Circle(td.maxDist, task.DotSize + 3, task.highlight, -1)
+                dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
+            End If
+        Next
     End Sub
 End Class
 
@@ -107,8 +139,10 @@ Public Class Tour_Info : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            dst2 = task.fcs.dst3
-            labels(2) = task.fcs.labels(2)
+            Static tour As New Tour_Basics
+            tour.Run(src)
+            dst2 = ShowAddweighted(tour.dst2, task.fcsBasics.dst2, labels(0))
+            labels(2) = task.fcsBasics.labels(2)
         End If
 
         index = task.fcsMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)

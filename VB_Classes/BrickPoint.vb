@@ -498,7 +498,7 @@ Public Class BrickPoint_Contours : Inherits TaskParent
         contours.Run(fLess.hist.dst1)
 
         dst3.SetTo(0)
-        For Each tour In contours.tourlist.ToArray
+        For Each tour In contours.contourList.ToArray
             DrawContour(dst3, tour.ToList, 255, -1)
             DrawContour(dst3, tour.ToList, 0, task.lineWidth)
         Next

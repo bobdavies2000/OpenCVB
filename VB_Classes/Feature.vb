@@ -631,7 +631,7 @@ Public Class Feature_Matching : Inherits TaskParent
     Dim match As New Match_Basics
     Dim feat As New Feature_Basics
     Public Sub New()
-        optiBase.FindSlider("Feature Sample Size").Value = 150
+        task.featureOptions.FeatureSampleSize.Value = 150
         desc = "Use correlation coefficient to keep features from frame to frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

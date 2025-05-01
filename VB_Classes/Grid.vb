@@ -394,16 +394,3 @@ Public Class Grid_TrackCenter : Inherits TaskParent
         End If
     End Sub
 End Class
-
-
-
-
-
-Public Class Grid_ShowMap : Inherits TaskParent
-    Public Sub New()
-        desc = "Verify that task.brickMap is laid out correctly"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.brickMap)
-    End Sub
-End Class

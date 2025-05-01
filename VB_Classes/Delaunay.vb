@@ -27,7 +27,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
                 nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            dst3.FillConvexPoly(nextFacet, i, task.lineType)
+            dst3.FillConvexPoly(nextFacet, i, cv.LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
@@ -118,8 +118,8 @@ Public Class Delaunay_SubDiv : Inherits TaskParent
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
             ifacets(0) = ifacet
-            dst3.FillConvexPoly(ifacet, task.scalarColors(i Mod task.scalarColors.Length), task.lineType)
-            cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, task.lineType, 0)
+            dst3.FillConvexPoly(ifacet, task.scalarColors(i Mod task.scalarColors.Length), cv.LineTypes.Link4)
+            cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, cv.LineTypes.Link4, 0)
         Next
     End Sub
 End Class
@@ -219,7 +219,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits TaskParent
                     g += 1
                 End While
             End If
-            dst3.FillConvexPoly(nextFacet, g, task.lineType)
+            dst3.FillConvexPoly(nextFacet, g, cv.LineTypes.Link4)
             usedG.Add(g)
             SetTrueText(CStr(g), pt, 2)
         Next
@@ -264,7 +264,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
         dst0.SetTo(0)
         Dim usedG As New List(Of Integer), g As Integer
         For Each lp In knn.matches
-            Dim index = facet.dst3.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            Dim index = facet.dst3.Get(Of Byte)(lp.p2.Y, lp.p2.X)
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
@@ -276,7 +276,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
                     g += 1
                 End While
             End If
-            dst0.FillConvexPoly(nextFacet, g, task.lineType)
+            dst0.FillConvexPoly(nextFacet, g, cv.LineTypes.Link4)
             usedG.Add(g)
             SetTrueText(CStr(g), lp.p2, 2)
         Next
@@ -329,13 +329,13 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
             usedColors.Add(nextColor)
 
             dst2.FillConvexPoly(nextFacet, nextColor)
-            facet32s.FillConvexPoly(nextFacet, i, task.lineType)
+            facet32s.FillConvexPoly(nextFacet, i, cv.LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
         dst1.SetTo(0)
         For Each pt In inputPoints
-            dst1.Circle(New cv.Point(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
+            dst1.Circle(New cv.Point(pt.X, pt.Y), task.DotSize, task.highlight, -1, cv.LineTypes.Link4)
         Next
         lastColor = dst2.Clone
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."

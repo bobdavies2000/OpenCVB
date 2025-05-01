@@ -8,7 +8,7 @@ Public Class FPoly_Basics : Inherits TaskParent
     Public sides As New FPoly_Sides
     Dim options As New Options_Features
     Public Sub New()
-        optiBase.FindSlider("Feature Sample Size").Value = 30
+        task.featureOptions.FeatureSampleSize.Value = 30
         If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
         If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
@@ -244,7 +244,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Dim optionsEx As New Options_Features
     Public Sub New()
         center = New FPoly_Center
-        optiBase.FindSlider("Feature Sample Size").Value = 30
+        task.featureOptions.FeatureSampleSize.Value = 30
         If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
         If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
@@ -1216,7 +1216,7 @@ Public Class FPoly_Core : Inherits TaskParent
     Dim optionsEx As New Options_Features
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        optiBase.FindSlider("Feature Sample Size").Value = 20
+        task.featureOptions.FeatureSampleSize.Value = 20
         labels(3) = "Feature points with anchor"
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub

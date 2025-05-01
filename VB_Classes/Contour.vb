@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
-    Public tourlist As New List(Of cv.Point())
+    Public contourList As New List(Of cv.Point())
     Public areaList As New List(Of Integer) ' point counts for each contour in contourList above.
     Public options As New Options_Contours
     Dim color8U As New Color8U_Basics
@@ -39,16 +39,16 @@ Public Class Contour_Basics : Inherits TaskParent
         Next
 
         dst0.SetTo(0)
-        tourlist.Clear()
+        contourList.Clear()
         areaList.Clear()
         For i = 0 To Math.Min(sortedList.Count, options.maxContours) - 1
             Dim ele = sortedList.ElementAt(i)
-            tourlist.Add(allContours(ele.Value))
+            contourList.Add(allContours(ele.Value))
             areaList.Add(ele.Key)
-            DrawContour(dst0, allContours(ele.Value).ToList, tourlist.Count, -1)
+            DrawContour(dst0, allContours(ele.Value).ToList, contourList.Count, -1, cv.LineTypes.Link8)
         Next
         dst2 = ShowPalette(dst0)
-        labels(2) = $"Top {tourlist.Count} contours in tourlist from the " + CStr(sortedList.Count) + " found."
+        labels(2) = $"Top {contourList.Count} contours in contourList from the " + CStr(sortedList.Count) + " found."
     End Sub
 End Class
 
@@ -218,7 +218,7 @@ Public Class Contour_Foreground : Inherits TaskParent
 
         contour.Run(dst2)
         dst3.SetTo(0)
-        For Each ctr In contour.tourlist
+        For Each ctr In contour.contourList
             DrawContour(dst3, New List(Of cv.Point)(ctr), 255, -1)
         Next
     End Sub
@@ -372,7 +372,7 @@ Public Class Contour_Compare : Inherits TaskParent
 
         Dim allContours As cv.Point()()
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, cv.MatType.CV_32SC1)
-        cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
+        cv.Cv2.FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
         dst3.SetTo(0)
         cv.Cv2.DrawContours(dst3(task.rcD.rect), allContours, -1, cv.Scalar.Yellow)
@@ -612,7 +612,7 @@ Public Class Contour_WholeImage : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         contour.Run(src)
         Dim sortedContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
-        For Each tour In contour.tourlist
+        For Each tour In contour.contourList
             sortedContours.Add(tour.Length, tour.ToList)
         Next
 
@@ -919,3 +919,47 @@ End Class
 '        labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."
 '    End Sub
 'End Class
+
+
+
+
+
+
+
+
+Public Class Contour_FCS : Inherits TaskParent
+    Dim tour As New Tour_Core
+    Dim knn As New KNN_Basics
+    Public desiredNodes As Integer = 5
+    Public Sub New()
+        desc = "Use the contours of the featureless regions to split the image into an FCS map."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        tour.Run(src)
+        If tour.tourList.Count < desiredNodes Then Exit Sub
+
+        dst2 = tour.dst2
+
+        knn.queries.Clear()
+        For Each td In tour.tourList
+            knn.queries.Add(td.maxDist)
+            If td.index < desiredNodes Then
+                dst2.Circle(td.maxDist, task.DotSize + 3, task.highlight, -1)
+                dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
+            End If
+        Next
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+
+        knn.Run(emptyMat)
+
+        ' input maxdist points were sorted by the size of the contour.
+        Dim ptMagnets As New List(Of cv.Point2f)
+        For i = 0 To desirednodes - 1
+            ptMagnets.Add(knn.queries(i))
+        Next
+
+        For Each nabe In knn.neighbors
+            Dim k = 0
+        Next
+    End Sub
+End Class

@@ -7983,14 +7983,13 @@ Public Class Options_FAST : Inherits OptionParent
             check.addCheckBox("Use Non-Max = True")
             check.Box(0).Checked = True
         End If
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Random motion introduced (in pixels)", 0, 30, 20)
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Fast Threshold", 0, 100, 50)
     End Sub
     Public Sub Run()
         Static nonMaxCheck = FindCheckBox("Use Non-Max = True")
-        Static rangeSlider = FindSlider("Random motion introduced (in pixels)")
-        task.FASTthreshold = rangeSlider.Value
         useNonMax = nonMaxCheck.checked
+
+        Static thresholdSlider = FindSlider("Fast Threshold")
+        task.FASTthreshold = thresholdSlider.Value
     End Sub
 End Class

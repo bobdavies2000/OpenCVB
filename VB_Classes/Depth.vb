@@ -597,7 +597,7 @@ Public Class Depth_MaxMask : Inherits TaskParent
         dst2.SetTo(white, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)
-        For Each c In contour.tourlist
+        For Each c In contour.contourList
             Dim hull = cv.Cv2.ConvexHull(c, True).ToList
             DrawContour(dst3, hull, white, -1)
         Next
@@ -950,10 +950,10 @@ Public Class Depth_PunchBlob : Inherits TaskParent
         contours.Run(dst1)
         dst3 = contours.dst3
 
-        If contours.tourlist.Count > 0 Then showMessage = 30
+        If contours.contourList.Count > 0 Then showMessage = 30
 
         If showMessage = 30 And lastContoursCount = 0 Then punchCount += 1
-        lastContoursCount = contours.tourlist.Count
+        lastContoursCount = contours.contourList.Count
         labels(3) = CStr(punchCount) + " Punches Thrown"
 
         If showMessage > 0 Then
@@ -961,7 +961,7 @@ Public Class Depth_PunchBlob : Inherits TaskParent
             showMessage -= 1
         End If
 
-        If contours.tourlist.Count > 3 Then showWarningInfo = 100
+        If contours.contourList.Count > 3 Then showWarningInfo = 100
 
         If showWarningInfo Then
             showWarningInfo -= 1
@@ -1019,7 +1019,7 @@ Public Class Depth_Contour : Inherits TaskParent
         contour.Run(task.depthMask)
 
         dst2.SetTo(0)
-        For Each tour In contour.tourlist
+        For Each tour In contour.contourList
             DrawContour(dst2, tour.ToList, 255, -1)
         Next
     End Sub
@@ -1046,7 +1046,7 @@ Public Class Depth_Outline : Inherits TaskParent
         contour.Run(src)
 
         dst2.SetTo(0)
-        For Each tour In contour.tourlist
+        For Each tour In contour.contourList
             DrawContour(dst2, tour.ToList, 255, task.lineWidth)
         Next
 

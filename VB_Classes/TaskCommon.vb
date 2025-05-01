@@ -735,15 +735,12 @@ Public Class tourData
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public pixels As Integer
-    Public ptMax As cv.Point
     Public maxDist As cv.Point
-    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
     Public index As Integer
-    Public indexLast As Integer
     Public contour As New List(Of cv.Point)
     Public Sub New()
-        index = 0
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
+        maxDist = New cv.point
     End Sub
 End Class

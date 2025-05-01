@@ -337,8 +337,7 @@ Public Class Stabilizer_CornerPoints : Inherits TaskParent
         desc = "Track the FAST feature points found in the corners of the BGR image."
     End Sub
     Private Sub getKeyPoints(src As cv.Mat, r As cv.Rect)
-        Static thresholdSlider =optiBase.findslider("FAST Threshold")
-        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src(r), thresholdSlider.value, True)
+        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src(r), task.FASTthreshold, True)
         For Each kp In kpoints
             features.Add(New cv.Point2f(kp.Pt.X + r.X, kp.Pt.Y + r.Y))
         Next

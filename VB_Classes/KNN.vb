@@ -46,7 +46,6 @@ Public Class KNN_N2Basics : Inherits TaskParent
     Public neighbors As New List(Of List(Of Integer))
     Public result(,) As Integer ' Get results here...
     Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
-    Dim random As New Random_Basics
     Public Sub New()
         knn = cv.ML.KNearest.Create()
         labels(2) = "Red=TrainingData, yellow = queries"
@@ -71,6 +70,7 @@ Public Class KNN_N2Basics : Inherits TaskParent
         Dim KNNdimension = 2
 
         If standalone Then
+            Static random As New Random_Basics
             If task.heartBeat Then
                 random.Run(src)
                 trainInput = New List(Of cv.Point2f)(random.PointList)
@@ -425,7 +425,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Dim options As New Options_KNN
     Dim feat As New Feature_Basics
     Public Sub New()
-        optiBase.FindSlider("Feature Sample Size").Value = 200
+        task.featureOptions.FeatureSampleSize.Value = 200
         dotSlider = optiBase.FindSlider("Average distance multiplier")
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}

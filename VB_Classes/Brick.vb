@@ -7,6 +7,7 @@ Public Class Brick_Basics : Inherits TaskParent
     Public ptTopLeft As New cv.Point
     Public depthAndCorrelationText As String
     Public Sub New()
+        task.brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
         If task.cameraName.StartsWith("StereoLabs") Then task.rgbLeftAligned = True
         desc = "Create the grid of bricks that reduce depth volatility"
@@ -325,6 +326,12 @@ Public Class Brick_LeftRightSize : Inherits TaskParent
         Dim maxX As Integer = Integer.MinValue, maxY As Integer = Integer.MinValue
         For Each gc In task.brickList
             If gc.depth > 0 Then
+
+                'minX = gc.rect.Min(Function(gc.rect) gc.rect.X)
+                'minY = gc.rect.Min(Function(gc.rect) gc.rect.Y)
+                'maxX = gc.Max(Function(p) gc.rect.BottomRight.X)
+                'maxY = gc.Max(Function(p) gc.rect.BottomRight.Y)
+
                 If gc.rect.X < minX Then minX = gc.rect.X
                 If gc.rect.Y < minY Then minY = gc.rect.Y
                 If gc.rect.BottomRight.X > maxX Then maxX = gc.rect.BottomRight.X

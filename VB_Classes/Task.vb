@@ -126,7 +126,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public gbricks As Brick_Basics
-    Public fcs As FCS_Basics
+    Public fcsBasics As FCS_Basics
     Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
@@ -564,7 +564,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         gbricks = New Brick_Basics
-        fcs = New FCS_Basics
+        fcsBasics = New FCS_Basics
         buildCorr = New Brick_CorrelationMap
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
@@ -840,13 +840,13 @@ Public Class VBtask : Implements IDisposable
             If task.optionsChanged Then task.motionMask.SetTo(255) ' force the change over...
             LRMeanSub.Run(src)
         End If
+        If task.optionsChanged Then task.motionMask.SetTo(255)
 
         motionBasics.Run(src)
-        fcs.Run(src)
+        fcsBasics.Run(src)
         gbricks.Run(src)
         buildCorr.Run(src)
 
-        If task.optionsChanged Then task.motionMask.SetTo(255)
 
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 

@@ -2,7 +2,7 @@
 Public Class FCS_Basics : Inherits TaskParent
     Dim fcs As New FCS_Core
     Dim tour As New Tour_Basics
-    Public desiredMapCount As Integer = 10
+    Public desiredMapCount As Integer = 5
     Public Sub New()
         task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Note that the task.fcsMap uses the same colors as the task.tourMap - same index for both."
@@ -10,10 +10,11 @@ Public Class FCS_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static restartRequest As Boolean
-        If task.heartBeatLT Or task.optionsChanged Or restartRequest Or task.mouseClickFlag Then
+        Dim count = task.motionMask.CountNonZero
+        If task.heartBeat Or task.optionsChanged Or restartRequest Or task.mouseClickFlag Or count = dst2.Total Then
             tour.Run(src)
             fcs.inputFeatures.Clear()
-            For i = 0 To task.tourList.Count - 1
+            For i = 1 To Math.Min(task.tourList.Count - 1, desiredMapCount)
                 fcs.inputFeatures.Add(task.tourList(i).maxDist)
             Next
             If task.tourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
@@ -25,8 +26,8 @@ Public Class FCS_Basics : Inherits TaskParent
             fcs.Run(emptyMat)
 
             task.fcsMap = fcs.dst1.Clone
-            dst2 = ShowPalette(task.fcsMap)
-            dst3 = ShowAddweighted(tour.dst2, dst2, labels(0))
+            dst2 = ShowPaletteFullColor(task.fcsMap)
+            dst3 = tour.dst2
             labels(2) = fcs.labels(2)
         End If
     End Sub
