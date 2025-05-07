@@ -631,6 +631,22 @@ Module TaskExterns
 
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function ML_RemoveDups_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function ML_RemoveDups_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function ML_RemoveDups_GetCount(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function ML_RemoveDups_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, type As Integer) As IntPtr
+    End Function
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MSER_Open(delta As Integer, minArea As Integer, maxArea As Integer, maxVariation As Single, minDiversity As Single,
                           maxEvolution As Integer, areaThreshold As Single, minMargin As Single, edgeBlurSize As Integer,
                           pass2Setting As Integer) As IntPtr

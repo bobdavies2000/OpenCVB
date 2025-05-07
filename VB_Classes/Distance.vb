@@ -16,27 +16,6 @@ End Class
 
 
 
-Public Class Distance_Instant : Inherits TaskParent
-    Dim options As New Options_Distance
-    Public Sub New()
-        labels = {"", "", "Distance transform - create a mask with threshold", ""}
-        UpdateAdvice(traceName + ": use local options to control which method is used.")
-        desc = "Distance algorithm basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        If standaloneTest() Then src = task.depthRGB
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        dst0 = src.DistanceTransform(options.distanceType, 0)
-        dst1 = Convert32f_To_8UC3(dst0)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
-    End Sub
-End Class
-
-
-
 
 
 
@@ -416,5 +395,114 @@ Public Class Distance_RedColor : Inherits TaskParent
         Next
 
         lastrcList = New List(Of rcData)(task.rcList)
+    End Sub
+End Class
+
+
+
+
+Public Class Distance_Instant : Inherits TaskParent
+    Dim options As New Options_Distance
+    Public Sub New()
+        labels = {"", "", "Distance transform - create a mask with threshold", ""}
+        UpdateAdvice(traceName + ": use local options to control which method is used.")
+        desc = "Distance algorithm basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If standaloneTest() Then src = task.depthRGB
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        dst0 = src.DistanceTransform(options.distanceType, 0)
+        dst1 = Convert32f_To_8UC3(dst0)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Distance_Depth : Inherits TaskParent
+    Dim options As New Options_Distance
+    Public Sub New()
+        task.gOptions.DebugSlider.Value = 3
+        desc = "Apply the distance transform to the depth data and clip values below specified threshold."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        Dim mm = GetMinMax(src)
+        dst1 = src * 255 / mm.maxVal
+        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst2 = dst1.DistanceTransform(options.distanceType, 0)
+        dst3 = dst2.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
+        mm = GetMinMax(dst2)
+        labels(2) = "Distance results of 32F input data (usually Depth data).  Min = " + CStr(CInt(mm.minVal)) + " and max = " + CStr(CInt(mm.maxVal))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Distance_DepthPeaks : Inherits TaskParent
+    Dim dist As New Distance_Depth
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        desc = "Find the peaks in the depth data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dist.Run(src)
+        dst2 = dist.dst2
+
+        Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
+        Dim mask = dst2.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        dst3.SetTo(0)
+        dst2.CopyTo(dst3, mask)
+
+        Dim mm = GetMinMax(dst2)
+        labels(2) = "Distance results of 32F input data (usually Depth data).  Min = " + CStr(CInt(mm.minVal)) + " and max = " + CStr(CInt(mm.maxVal))
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Distance_ClickPoint : Inherits TaskParent
+    Dim options As New Options_Distance
+    Public Sub New()
+        desc = "Click anywhere to visualize the distance to the each pixel."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src.InRange(0, 0)
+
+        src.SetTo(255, dst1)
+        src.Set(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X, 0)
+        dst2 = src.DistanceTransform(options.distanceType, 0)
+        dst3 = 255 - dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Distance_Bricks : Inherits TaskParent
+    Public Sub New()
+        desc = "description"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

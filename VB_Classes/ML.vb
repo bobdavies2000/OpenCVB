@@ -619,7 +619,7 @@ Public Class ML_LearnRegions : Inherits TaskParent
         labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
         desc = "Learn region from X, Y, and grayscale for the RedCloud cells."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         regions.Run(src)
 
         color8U.Run(src)
@@ -666,5 +666,36 @@ Public Class ML_LearnRegions : Inherits TaskParent
                 dst3.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
             End If
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class ML_RemoveDups_CPP : Inherits TaskParent
+    Public Sub New()
+        cPtr = ML_RemoveDups_Open()
+        labels = {"", "", "BGR input below is converted to BGRA and sorted as integers", ""}
+        desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type = cv.MatType.CV_8U Then dst2 = src.Clone Else dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim dataSrc(dst2.Total * dst2.ElemSize) As Byte
+        Marshal.Copy(dst2.Data, dataSrc, 0, dataSrc.Length)
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim imagePtr = ML_RemoveDups_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols, dst2.Type)
+        handleSrc.Free()
+
+        Dim compressedCount = ML_RemoveDups_GetCount(cPtr)
+        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        labels(3) = "The BGR data in dst2 after removing duplicate BGR entries.  Input count = " + CStr(dst2.Total) + " output = " + CStr(compressedCount)
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = ML_RemoveDups_Close(cPtr)
     End Sub
 End Class
