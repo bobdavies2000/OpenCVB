@@ -5,7 +5,7 @@ Public Class Color8U_Basics : Inherits TaskParent
     Dim colorMethods(10) As Object
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        labels(3) = "vbPalette output of dst2 at left"
+        labels(3) = "ShowPalette output of dst2 at left"
         UpdateAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
@@ -40,14 +40,13 @@ Public Class Color8U_Basics : Inherits TaskParent
         If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
             classifier.Run(src)
         Else
-            dst1 = task.gray
-            classifier.Run(task.gray)
+            classifier.Run(task.grayStable)
         End If
 
         If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)
         classCount = classifier.classCount
 
-        If standaloneTest() Then dst3 = ShowPalette(dst2)
+        dst3 = ShowPalette(dst2)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                     " pixel classifications"
     End Sub

@@ -454,7 +454,7 @@ Public Class Distance_DepthPeaks : Inherits TaskParent
     Dim dist As New Distance_Depth
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
-        desc = "Find the peaks in the depth data."
+        desc = "Find the peaks in the depth data.  NOTE: use global option 'DebugSlider' to provide the threshold value."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dist.Run(src)
@@ -498,11 +498,24 @@ End Class
 
 
 
-Public Class Distance_Bricks : Inherits TaskParent
+Public Class Distance_DepthBricks : Inherits TaskParent
+    Dim dist As New Distance_Depth
     Public Sub New()
-        desc = "description"
+        task.gOptions.DebugSlider.Value = 20
+        desc = "Threshold the maxDist in each brick to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dist.Run(src)
+        dst2 = dist.dst2
+        dst3 = src.Clone
+
+        Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
+        For Each brick In task.brickList
+            Dim mm = GetMinMax(dst2(brick.rect))
+            If mm.maxVal >= threshold Then
+                Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
+                dst3.Circle(pt, task.DotSize, task.highlight, -1)
+            End If
+        Next
     End Sub
 End Class

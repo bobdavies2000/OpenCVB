@@ -430,7 +430,7 @@ Public Class KMeans_Valleys : Inherits TaskParent
     Dim km As New KMeans_Basics
     Dim tiers As New KMeans_TierCount
     Public Sub New()
-        labels(2) = "8-Bit input to vbPalette output in dst3"
+        labels(2) = "8-Bit input to ShowPalette output in dst3"
         desc = "Cluster depth using kMeans - use KMeans_TierCount to determine 'K'"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

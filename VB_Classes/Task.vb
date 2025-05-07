@@ -843,12 +843,12 @@ Public Class VBtask : Implements IDisposable
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         motionBasics.Run(src)
+        If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
         fcsBasics.Run(src)
         gbricks.Run(src)
         buildCorr.Run(src)
 
-
-        If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
+        cv.Cv2.ImShow("grayStable", grayStable)
 
         task.colorizer.Run(src)
 
