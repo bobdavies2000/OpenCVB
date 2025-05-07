@@ -119,8 +119,8 @@ Public Class Tour_Bricks : Inherits TaskParent
         dst2 = core.dst2
         labels(2) = core.labels(2)
 
-        For Each gc In task.brickList
-            If gc.intensity = 255 Then dst2.Circle(gc.pt, task.DotSize, task.highlight, -1)
+        For Each brick In task.brickList
+            If brick.intensity = 255 Then dst2.Circle(brick.pt, task.DotSize, task.highlight, -1)
         Next
     End Sub
 End Class

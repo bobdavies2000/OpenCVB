@@ -99,7 +99,7 @@ Public Class FCS_CreateList : Inherits TaskParent
             fp.index = i
 
             Dim gcIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
-            Dim gc = task.brickList(gcIndex)
+            Dim brick = task.brickList(gcIndex)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(gcIndex)
             If fpIndex >= 0 Then
                 Dim fpLast = task.fpLastList(fpIndex)
@@ -123,7 +123,7 @@ Public Class FCS_CreateList : Inherits TaskParent
 
             If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
 
-            fp.depth = gc.depth
+            fp.depth = brick.depth
 
             task.fpList.Add(fp)
 
@@ -588,10 +588,10 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
 
         strOut += "gcIndex = " + CStr(fp.gcIndex) + vbCrLf
-        Dim gc = task.brickList(fp.gcIndex)
-        strOut += CStr(gc.age) + vbTab + "Age" + vbTab + vbCrLf
-        strOut += Format(gc.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
-        strOut += Format(gc.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
+        Dim brick = task.brickList(fp.gcIndex)
+        strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
+        strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
+        strOut += Format(brick.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
 
         strOut += "Depth = " + Format(fp.depth, fmt1)
         strOut += vbCrLf

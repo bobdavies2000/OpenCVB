@@ -136,7 +136,7 @@ Public Class Region_Core : Inherits TaskParent
     Public Sub New()
         desc = "Connect cells that are close in depth"
     End Sub
-    Private Sub hTestRect(gc1 As gcData, gc2 As gcData, nextStart As Integer)
+    Private Sub hTestRect(gc1 As brickData, gc2 As brickData, nextStart As Integer)
         If Math.Abs(gc1.depth - gc2.depth) > task.depthDiffMeters Or nextStart = -1 Then
             Dim p1 = task.brickList(colStart).rect.TopLeft
             Dim p2 = task.brickList(colEnd).rect.BottomRight
@@ -149,7 +149,7 @@ Public Class Region_Core : Inherits TaskParent
             colEnd += 1
         End If
     End Sub
-    Private Sub vTestRect(gc1 As gcData, gc2 As gcData, gcNext As Integer, nextStart As Integer)
+    Private Sub vTestRect(gc1 As brickData, gc2 As brickData, gcNext As Integer, nextStart As Integer)
         If Math.Abs(gc1.depth - gc2.depth) > task.depthDiffMeters Or nextStart = -1 Then
             bottomRight = task.brickList(gcNext).rect.BottomRight
             dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
@@ -263,14 +263,14 @@ Public Class Region_Depth : Inherits TaskParent
         Dim minSize As Integer = src.Total / 25
         dst2.SetTo(0)
         mdLargest.Clear()
-        For Each gc In task.brickList
-            Dim index = dst1.Get(Of Byte)(gc.center.Y, gc.center.X)
+        For Each brick In task.brickList
+            Dim index = dst1.Get(Of Byte)(brick.center.Y, brick.center.X)
             Dim md = redM.mdList(index)
             If index = 0 Then
-                dst2(gc.rect).SetTo(black)
+                dst2(brick.rect).SetTo(black)
             Else
                 If md.pixels > minSize Then
-                    dst2(gc.rect).SetTo(task.scalarColors(index))
+                    dst2(brick.rect).SetTo(task.scalarColors(index))
                     mdLargest.Add(md)
                 End If
             End If
@@ -299,10 +299,10 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
         dst0.SetTo(0)
         dst1.SetTo(0)
         Dim count As Integer
-        For Each gc In task.brickList
-            If gc.correlation > task.fCorrThreshold Then
-                dst0.Rectangle(gc.rRect, 255, -1)
-                dst1.Rectangle(gc.rect, 255, -1)
+        For Each brick In task.brickList
+            If brick.correlation > task.fCorrThreshold Then
+                dst0.Rectangle(brick.rRect, 255, -1)
+                dst1.Rectangle(brick.rect, 255, -1)
                 count += 1
             End If
         Next

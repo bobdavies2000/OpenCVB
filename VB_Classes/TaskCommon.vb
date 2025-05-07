@@ -507,7 +507,7 @@ End Class
 
 
 
-Public Class gcData
+Public Class brickData
     Public age As Integer
     Public color As cv.Vec3f
     Public correlation As Single

@@ -463,14 +463,14 @@ Public Class IMU_VerticalAngles : Inherits TaskParent
         strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc X" + vbTab + "Arc Y" + vbTab + "Arc Z" + vbTab + "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
         dst3.SetTo(0)
         For i = 0 To cells.Count - 1
-            Dim gc = cells.ElementAt(i).Value
-            strOut += CStr(i) + vbTab + Format(gc.len3D, fmt1) + "m" + vbTab + Format(gc.tc1.depth, fmt1) + "m" + vbTab +
-                      Format(gc.arcX, fmt1) + vbTab + Format(gc.arcY, fmt1) + vbTab + Format(gc.arcZ, fmt1) + vbTab
+            Dim brick = cells.ElementAt(i).Value
+            strOut += CStr(i) + vbTab + Format(brick.len3D, fmt1) + "m" + vbTab + Format(brick.tc1.depth, fmt1) + "m" + vbTab +
+                      Format(brick.arcX, fmt1) + vbTab + Format(brick.arcY, fmt1) + vbTab + Format(brick.arcZ, fmt1) + vbTab
             strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbTab + vbCrLf
-            SetTrueText(CStr(i), gc.tc1.center, 2)
-            SetTrueText(CStr(i), gc.tc1.center, 3)
-            DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.highlight)
-            DrawLine(dst3, gc.tc1.center, gc.tc2.center, white)
+            SetTrueText(CStr(i), brick.tc1.center, 2)
+            SetTrueText(CStr(i), brick.tc1.center, 3)
+            DrawLine(dst2, brick.tc1.center, brick.tc2.center, task.highlight)
+            DrawLine(dst3, brick.tc1.center, brick.tc2.center, white)
         Next
         SetTrueText(strOut, 3)
     End Sub
@@ -1054,27 +1054,27 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
         dst3.SetTo(0)
         Dim index As Integer
         For i = gCells.Count - 1 To 0 Step -1
-            Dim gc = gCells(i)
-            If gc.arcY > options.angleThreshold Then
+            Dim brick = gCells(i)
+            If brick.arcY > options.angleThreshold Then
                 index = gCells.Count - i
-                Dim p1 = gc.tc1.center
-                Dim p2 = gc.tc2.center
+                Dim p1 = brick.tc1.center
+                Dim p2 = brick.tc2.center
                 Dim xOffset = p1.X - p2.X
                 If p1.Y < p2.Y Then xOffset = p2.X - p1.X
                 Dim hypot = p1.DistanceTo(p2)
-                gc.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
+                brick.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
 
-                strOut += CStr(index) + vbTab + Format(gc.len3D, fmt1) + "m" + vbTab +
-                                                Format(gc.tc1.depth, fmt1) + "m" + vbTab +
-                                                Format(gc.arcY, fmt1) + vbTab +
-                                                Format(gc.imageAngle, fmt1) + vbTab
+                strOut += CStr(index) + vbTab + Format(brick.len3D, fmt1) + "m" + vbTab +
+                                                Format(brick.tc1.depth, fmt1) + "m" + vbTab +
+                                                Format(brick.arcY, fmt1) + vbTab +
+                                                Format(brick.imageAngle, fmt1) + vbTab
                 strOut += Format(task.accRadians.Y * 57.2958, fmt1) + vbCrLf
 
-                SetTrueText(CStr(index), gc.tc1.center, 2)
-                SetTrueText(CStr(index), gc.tc1.center, 3)
-                DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.highlight)
-                DrawLine(dst3, gc.tc1.center, gc.tc2.center, white)
-                gCells(i) = gc
+                SetTrueText(CStr(index), brick.tc1.center, 2)
+                SetTrueText(CStr(index), brick.tc1.center, 3)
+                DrawLine(dst2, brick.tc1.center, brick.tc2.center, task.highlight)
+                DrawLine(dst3, brick.tc1.center, brick.tc2.center, white)
+                gCells(i) = brick
             Else
                 gCells.RemoveAt(i)
             End If

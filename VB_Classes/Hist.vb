@@ -1478,13 +1478,13 @@ Public Class Hist_BrickRegions : Inherits TaskParent
 
         Dim histList = New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim predictedList As New List(Of Integer)
-        For Each gc In task.brickList
-            If gc.fLessIndex Then
-                Dim nabes = task.gridNeighbors(gc.index)
-                For i = 1 To nabes.Count - 1 ' the first entry is for the gc...
+        For Each brick In task.brickList
+            If brick.fLessIndex Then
+                Dim nabes = task.gridNeighbors(brick.index)
+                For i = 1 To nabes.Count - 1 ' the first entry is for the brick...
                     If task.brickList(nabes(i)).fLessIndex = 0 Then
                         If predictedList.Contains(nabes(i)) = False Then
-                            histList.Add(gc.index, nabes(i))
+                            histList.Add(brick.index, nabes(i))
                             predictedList.Add(nabes(i))
                         End If
                     End If
@@ -1492,7 +1492,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
             End If
         Next
 
-        Dim gcIndex = -1, gc1 As gcData, histogram As New cv.Mat, histArray(256 - 1) As Single
+        Dim gcIndex = -1, gc1 As brickData, histogram As New cv.Mat, histArray(256 - 1) As Single
         dst1 = fLess.dst2.Clone
         For Each ele In histList
             If gcIndex <> ele.Key Then

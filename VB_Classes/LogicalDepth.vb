@@ -50,9 +50,9 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
             If avg1 < avg2 Then offset = lp.cellList.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
                 For Each index In lp.cellList
-                    Dim gc = task.brickList(index)
-                    dst1(gc.rect).SetTo(1)
-                    If debugMode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
+                    Dim brick = task.brickList(index)
+                    dst1(brick.rect).SetTo(1)
+                    If debugMode Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                     gcUpdates.Add(New Tuple(Of Integer, Single)(index, (avg1 + avg2) / 2))
                 Next
             Else
@@ -61,15 +61,15 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
                 Dim depthIncr = (max - min) / lp.cellList.Count
                 For i = 0 To lp.cellList.Count - 1
                     Dim index = lp.cellList(i)
-                    Dim gc = task.brickList(index)
+                    Dim brick = task.brickList(index)
                     If offset > 0 Then
-                        dst1(gc.rect).SetTo((offset - i + 1) * incr)
+                        dst1(brick.rect).SetTo((offset - i + 1) * incr)
                         gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
                     Else
-                        dst1(gc.rect).SetTo(i * incr + 1)
+                        dst1(brick.rect).SetTo(i * incr + 1)
                         gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + i * depthIncr))
                     End If
-                    If debugMode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
+                    If debugMode Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                 Next
             End If
 
@@ -82,8 +82,8 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
 
 
         dst1.SetTo(0)
-        For Each gc In task.brickList
-            dst1(gc.rect).SetTo(gc.depth * 255 / task.MaxZmeters)
+        For Each brick In task.brickList
+            dst1(brick.rect).SetTo(brick.depth * 255 / task.MaxZmeters)
         Next
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
         cv.Cv2.ApplyColorMap(dst0, dst2, task.depthColorMap)

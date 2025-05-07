@@ -478,8 +478,8 @@ Public Class GridROI_Canny : Inherits TaskParent
         dst3 = edges.dst2
 
         dst2.SetTo(0)
-        For Each gc In task.brickList
-            If dst3(gc.rect).CountNonZero Then src(gc.rect).CopyTo(dst2(gc.rect))
+        For Each brick In task.brickList
+            If dst3(brick.rect).CountNonZero Then src(brick.rect).CopyTo(dst2(brick.rect))
         Next
     End Sub
 End Class

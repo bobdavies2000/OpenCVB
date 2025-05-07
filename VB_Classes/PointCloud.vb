@@ -405,7 +405,7 @@ Public Class PointCloud_GridInspector : Inherits TaskParent
         dst2 = task.depthRGB
         DrawLine(dst2, topPt, botPt, 255)
 
-        SetTrueText("Values show gc.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
+        SetTrueText("Values show brick.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
         For i = 0 To dst2.Height - 1 Step task.cellSize
             Dim pt = New cv.Point2f(cLine, i)
             Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
@@ -698,11 +698,11 @@ Public Class PointCloud_Continuous_GridX : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
         Dim gcPrev = task.brickList(0)
-        For Each gc In task.brickList
-            If gc.rect.X > 0 Then
-                If Math.Abs(gc.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(gc.rect).SetTo(255) Else dst3(gc.rect).SetTo(255)
+        For Each brick In task.brickList
+            If brick.rect.X > 0 Then
+                If Math.Abs(brick.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(255) Else dst3(brick.rect).SetTo(255)
             End If
-            gcPrev = gc
+            gcPrev = brick
         Next
 
         labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
@@ -727,17 +727,17 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
         dst2.SetTo(0)
         Dim gcPrev = task.brickList(0)
         Dim cellMat As New cv.Mat(task.cellSize, task.cellSize, cv.MatType.CV_8U, cv.Scalar.All(127))
-        For Each gc In task.brickList
-            Dim gcAbove = task.brickList(CInt(gc.index Mod task.grid.tilesPerRow))
-            If gc.correlation > task.fCorrThreshold Then
-                If gc.rect.Y = 0 Or gc.rect.X = 0 Then Continue For
-                If Math.Abs(gc.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(gc.rect).SetTo(128)
-                If Math.Abs(gc.pt3D(2) - gcAbove.pt3D(2)) <= task.depthDiffMeters And
-                gc.rect.Width = cellMat.Width And gc.rect.Height = cellMat.Height Then
-                    cv.Cv2.Add(dst2(gc.rect), cellMat, dst2(gc.rect))
+        For Each brick In task.brickList
+            Dim gcAbove = task.brickList(CInt(brick.index Mod task.grid.tilesPerRow))
+            If brick.correlation > task.fCorrThreshold Then
+                If brick.rect.Y = 0 Or brick.rect.X = 0 Then Continue For
+                If Math.Abs(brick.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(128)
+                If Math.Abs(brick.pt3D(2) - gcAbove.pt3D(2)) <= task.depthDiffMeters And
+                brick.rect.Width = cellMat.Width And brick.rect.Height = cellMat.Height Then
+                    cv.Cv2.Add(dst2(brick.rect), cellMat, dst2(brick.rect))
                 End If
             End If
-            gcPrev = gc
+            gcPrev = brick
         Next
 
         labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"

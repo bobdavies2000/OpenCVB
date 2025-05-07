@@ -15,12 +15,12 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         dst3 = sobel.dst2
 
         sortedPoints.Clear()
-        For Each gc In task.brickList
-            Dim mm = GetMinMax(dst3(gc.rect))
-            gc.pt = New cv.Point(mm.maxLoc.X + gc.rect.X, mm.maxLoc.Y + gc.rect.Y)
-            gc.feature = mm.maxLoc
-            gc.intensity = mm.maxVal
-            sortedPoints.Add(mm.maxVal, gc.pt)
+        For Each brick In task.brickList
+            Dim mm = GetMinMax(dst3(brick.rect))
+            brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
+            brick.feature = mm.maxLoc
+            brick.intensity = mm.maxVal
+            sortedPoints.Add(mm.maxVal, brick.pt)
         Next
 
         dst1.SetTo(255, task.motionMask)
@@ -63,8 +63,8 @@ Public Class BrickPoint_Plot : Inherits TaskParent
         ptBrick.Run(task.grayStable)
 
         Dim sobelValues As New List(Of Byte)
-        For Each gc In task.brickList
-            sobelValues.Add(gc.intensity)
+        For Each brick In task.brickList
+            sobelValues.Add(brick.intensity)
         Next
         plotHist.Run(cv.Mat.FromPixelData(sobelValues.Count, 1, cv.MatType.CV_8U, sobelValues.ToArray))
         dst2 = plotHist.dst2
@@ -137,34 +137,34 @@ Public Class BrickPoint_FeatureLess : Inherits TaskParent
         edges.Run(task.grayStable.Clone)
 
         dst2.SetTo(0)
-        For Each gc In task.brickList
-            If gc.rect.X = 0 Or gc.rect.Y = 0 Then Continue For
-            If edges.dst2(gc.rect).CountNonZero = 0 Then
-                gc.fLessIndex = 255
-                dst2(gc.rect).SetTo(255)
+        For Each brick In task.brickList
+            If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
+            If edges.dst2(brick.rect).CountNonZero = 0 Then
+                brick.fLessIndex = 255
+                dst2(brick.rect).SetTo(255)
             End If
         Next
 
         classCount = 1
         dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For Each gc In task.brickList
-            Dim pt = gc.rect.TopLeft
+        For Each brick In task.brickList
+            Dim pt = brick.rect.TopLeft
             If dst2.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
             Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
             If val <> 255 Then
-                gc.fLessIndex = val
+                brick.fLessIndex = val
                 Continue For
             End If
 
-            dst2.FloodFill(pt, gc.index Mod 255)
-            gc.fLessIndex = gc.index Mod 255
+            dst2.FloodFill(pt, brick.index Mod 255)
+            brick.fLessIndex = brick.index Mod 255
             classCount += 1
         Next
 
         If standaloneTest() Then dst3 = ShowPalette(dst2)
 
         labels(2) = "CV_8U Mask for the " + CStr(classCount) + " featureless regions enumerated."
-        labels(3) = CStr(classCount) + " featureless regions colored using the gc.index of the first grid cell member."
+        labels(3) = CStr(classCount) + " featureless regions colored using the brick.index of the first grid cell member."
     End Sub
 End Class
 
@@ -183,13 +183,13 @@ Public Class BrickPoint_TopRow : Inherits TaskParent
 
         ReDim results(task.cellSize - 1, task.cellSize - 1)
 
-        For Each gc In task.brickList
-            results(gc.feature.X, gc.feature.Y) += 1
+        For Each brick In task.brickList
+            results(brick.feature.X, brick.feature.Y) += 1
         Next
 
-        For Each gc In task.brickList
-            If gc.rect.Height <> task.cellSize Or gc.rect.Width <> task.cellSize Then Continue For
-            If gc.feature.Y = 0 Then dst2(gc.rect).Circle(gc.feature, task.DotSize, task.highlight, -1, task.lineType)
+        For Each brick In task.brickList
+            If brick.rect.Height <> task.cellSize Or brick.rect.Width <> task.cellSize Then Continue For
+            If brick.feature.Y = 0 Then dst2(brick.rect).Circle(brick.feature, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -210,12 +210,12 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
         Dim lpList As New List(Of lpData)
 
         Dim lpZero As New lpData(New cv.Point, New cv.Point)
-        For Each gc In task.brickList
-            If gc.rect.Y = 0 Then
+        For Each brick In task.brickList
+            If brick.rect.Y = 0 Then
                 lpList.Add(lpZero)
             Else
-                Dim gc1 = task.brickList(gc.index - task.grid.tilesPerRow)
-                Dim lp = New lpData(gc.pt, gc1.pt)
+                Dim gc1 = task.brickList(brick.index - task.grid.tilesPerRow)
+                Dim lp = New lpData(brick.pt, gc1.pt)
                 lpList.Add(lp)
             End If
         Next
@@ -240,8 +240,8 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
         Dim max = Math.Max(CInt((histindex + 1) * brickRange), CInt((histindex1 + 1) * brickRange))
 
         dst3 = src
-        For Each gc In task.brickList
-            Dim lp = lpList(gc.index)
+        For Each brick In task.brickList
+            Dim lp = lpList(brick.index)
             If lp.length < min Or lp.length > max Then Continue For
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
@@ -342,8 +342,8 @@ Public Class BrickPoint_Busiest : Inherits TaskParent
             If ele.Key = 255 Then
                 Dim pt = ele.Value
                 Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-                Dim gc = task.brickList(index)
-                If gc.correlation > 0.9 And gc.depth < task.MaxZmeters Then sortedBricks.Add(ptBrick.sobel.dst2(gc.rect).CountNonZero, gc.rect)
+                Dim brick = task.brickList(index)
+                If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(ptBrick.sobel.dst2(brick.rect).CountNonZero, brick.rect)
             End If
         Next
 
@@ -383,8 +383,8 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
             If ele.Key = 255 Then
                 Dim pt = ele.Value
                 Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-                Dim gc = task.brickList(index)
-                results(gc.feature.X, gc.feature.Y) += 1
+                Dim brick = task.brickList(index)
+                results(brick.feature.X, brick.feature.Y) += 1
             End If
         Next
 
@@ -395,8 +395,8 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(task.cellSize, task.cellSize, cv.MatType.CV_32F, results)
 
-        For Each gc In task.brickList
-            If gc.feature.X = col And gc.feature.Y = row Then dst3.Circle(gc.pt, task.DotSize, task.highlight, -1)
+        For Each brick In task.brickList
+            If brick.feature.X = col And brick.feature.Y = row Then dst3.Circle(brick.pt, task.DotSize, task.highlight, -1)
         Next
 
         For y = 0 To task.cellSize - 1

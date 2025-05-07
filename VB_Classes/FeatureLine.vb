@@ -53,28 +53,28 @@ Public Class FeatureLine_VH : Inherits TaskParent
             Exit Sub
         End If
 
-        Dim gc As gravityLine
+        Dim brick As gravityLine
         gCells.Clear()
         match.tCells.Clear()
         For i = 0 To sortedLines.Count - 1
-            gc = sortedLines.ElementAt(i).Value
+            brick = sortedLines.ElementAt(i).Value
 
             If i = 0 Then
                 dst1.SetTo(0)
-                gc.tc1.template.CopyTo(dst1(gc.tc1.rect))
-                gc.tc2.template.CopyTo(dst1(gc.tc2.rect))
+                brick.tc1.template.CopyTo(dst1(brick.tc1.rect))
+                brick.tc2.template.CopyTo(dst1(brick.tc2.rect))
             End If
 
             match.tCells.Clear()
-            match.tCells.Add(gc.tc1)
-            match.tCells.Add(gc.tc2)
+            match.tCells.Add(brick.tc1)
+            match.tCells.Add(brick.tc2)
 
             match.Run(src)
             If match.tCells(0).correlation >= task.fCorrThreshold And match.tCells(1).correlation >= task.fCorrThreshold Then
-                gc.tc1 = match.tCells(0)
-                gc.tc2 = match.tCells(1)
-                gc = gLines.updateGLine(src, gc, gc.tc1.center, gc.tc2.center)
-                If gc.len3D > 0 Then gCells.Add(gc)
+                brick.tc1 = match.tCells(0)
+                brick.tc2 = match.tCells(1)
+                brick = gLines.updateGLine(src, brick, brick.tc1.center, brick.tc2.center)
+                If brick.len3D > 0 Then gCells.Add(brick)
             End If
         Next
 
@@ -82,14 +82,14 @@ Public Class FeatureLine_VH : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To gCells.Count - 1
             Dim tc As tCell
-            gc = gCells(i)
+            brick = gCells(i)
             Dim p1 As cv.Point2f, p2 As cv.Point2f
             For j = 0 To 2 - 1
-                tc = Choose(j + 1, gc.tc1, gc.tc2)
+                tc = Choose(j + 1, brick.tc1, brick.tc2)
                 If j = 0 Then p1 = tc.center Else p2 = tc.center
             Next
-            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 2)
-            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 3)
+            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(brick.arcY, fmt1), brick.tc1.center, 2)
+            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(brick.arcY, fmt1), brick.tc1.center, 3)
 
             DrawLine(dst2, p1, p2, task.highlight)
             DrawLine(dst3, p1, p2, task.highlight)

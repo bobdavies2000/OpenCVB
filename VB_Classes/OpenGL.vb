@@ -1757,12 +1757,12 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
         dst2 = task.depthRGB
         labels = task.gbricks.labels
         Dim quadData As New List(Of cv.Point3f)
-        For Each gc In task.brickList
-            quadData.Add(gc.color)
-            For Each pt In gc.corners
+        For Each brick In task.brickList
+            quadData.Add(brick.color)
+            For Each pt In brick.corners
                 quadData.Add(pt)
             Next
-            dst2(gc.rect).SetTo(gc.color)
+            dst2(brick.rect).SetTo(brick.color)
         Next
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
 
@@ -1788,10 +1788,10 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         dst2 = task.gbricks.dst2
         dst3 = task.gbricks.dst3
         Dim quadData As New List(Of cv.Point3f)
-        For Each gc In task.brickList
-            If gc.depth = 0 Then Continue For
-            If gc.corners.Count Then quadData.Add(gc.color)
-            For Each pt In gc.corners
+        For Each brick In task.brickList
+            If brick.depth = 0 Then Continue For
+            If brick.corners.Count Then quadData.Add(brick.color)
+            For Each pt In brick.corners
                 quadData.Add(pt)
             Next
         Next
@@ -1897,7 +1897,7 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         dst3 = connect.dst3
 
         Dim quadData As New List(Of cv.Point3f)
-        Dim gc1 As gcData, gc2 As gcData
+        Dim gc1 As brickData, gc2 As brickData
         For Each tup In connect.hTuples
             gc1 = task.brickList(tup.Item1)
             gc2 = task.brickList(tup.Item2)

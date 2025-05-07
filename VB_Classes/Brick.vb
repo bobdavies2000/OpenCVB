@@ -21,74 +21,74 @@ Public Class Brick_Basics : Inherits TaskParent
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
-        Dim gcLast As New List(Of gcData)(task.brickList)
+        Dim brickLast As New List(Of brickData)(task.brickList)
         Dim unchangedCount As Integer
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.brickList.Clear()
         Dim depthCount As Integer
         For i = 0 To task.gridRects.Count - 1
-            Dim gc As New gcData
-            If gc.depth > 0 Then
-                ' motion mask does not include depth shadow so if there is depth shadow, we must recompute gc.
-                Dim lastCorrelation = If(i < gcLast.Count, gcLast(i).correlation, 0)
-                If gc.age > 1 And lastCorrelation > task.fCorrThreshold And instantUpdate = False Then
+            Dim brick As New brickData
+            If brick.depth > 0 Then
+                ' motion mask does not include depth shadow so if there is depth shadow, we must recompute brick.
+                Dim lastCorrelation = If(i < brickLast.Count, brickLast(i).correlation, 0)
+                If brick.age > 1 And lastCorrelation > task.fCorrThreshold And instantUpdate = False Then
                     ' no need to recompute everything when there is no motion in the cell.
-                    gc = gcLast(i)
-                    gc.age = task.motionBasics.cellAge(i)
+                    brick = brickLast(i)
+                    brick.age = task.motionBasics.cellAge(i)
                     unchangedCount += 1
                 Else
                     ' everything is recomputed when there is motion in the cell.
                     If task.rgbLeftAligned Then
-                        gc.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / gc.depth
+                        brick.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
                     Else
-                        Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.Y, gc.rect.X))
+                        Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
-                            gc.depth = 0 ' off the grid.
-                            gc.lRect = emptyRect
-                            gc.rRect = emptyRect
+                            brick.depth = 0 ' off the grid.
+                            brick.lRect = emptyRect
+                            brick.rRect = emptyRect
                         Else
-                            gc.lRect = New cv.Rect(irPt.X, irPt.Y, gc.rect.Width, gc.rect.Height)
-                            gc.lRect = ValidateRect(gc.lRect)
+                            brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
+                            brick.lRect = ValidateRect(brick.lRect)
 
-                            gc.disparity = task.calibData.baseline * task.calibData.leftIntrinsics.fx / gc.depth
+                            brick.disparity = task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
                         End If
                     End If
 
-                    If gc.depth > 0 Then ' depth can be zero if the translation of the irPt fails.
-                        gc.rRect.X -= gc.disparity
-                        gc.rRect = ValidateRect(gc.rRect)
-                        gc.rHoodRect.X -= gc.disparity
-                        gc.rHoodRect = ValidateRect(gc.rHoodRect)
-                        If gc.lRect.Width <> gc.rRect.Width Then gc.lRect.Width = Math.Min(gc.lRect.Width, gc.rRect.Width)
-                        If gc.lRect.Height <> gc.rRect.Height Then gc.lRect.Height = Math.Min(gc.lRect.Height, gc.rRect.Height)
+                    If brick.depth > 0 Then ' depth can be zero if the translation of the irPt fails.
+                        brick.rRect.X -= brick.disparity
+                        brick.rRect = ValidateRect(brick.rRect)
+                        brick.rHoodRect.X -= brick.disparity
+                        brick.rHoodRect = ValidateRect(brick.rHoodRect)
+                        If brick.lRect.Width <> brick.rRect.Width Then brick.lRect.Width = Math.Min(brick.lRect.Width, brick.rRect.Width)
+                        If brick.lRect.Height <> brick.rRect.Height Then brick.lRect.Height = Math.Min(brick.lRect.Height, brick.rRect.Height)
 
-                        cv.Cv2.MatchTemplate(leftview(gc.lRect), rightView(gc.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                        gc.correlation = correlationMat.Get(Of Single)(0, 0)
+                        cv.Cv2.MatchTemplate(leftview(brick.lRect), rightView(brick.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                        brick.correlation = correlationMat.Get(Of Single)(0, 0)
 
-                        Dim p0 = getWorldCoordinates(gc.rect.TopLeft, gc.depth)
-                        Dim p1 = getWorldCoordinates(gc.rect.BottomRight, gc.depth)
+                        Dim p0 = getWorldCoordinates(brick.rect.TopLeft, brick.depth)
+                        Dim p1 = getWorldCoordinates(brick.rect.BottomRight, brick.depth)
 
                         ' clockwise around starting in upper left.
-                        gc.corners.Add(New cv.Point3f(p0.X, p0.Y, gc.depth))
-                        gc.corners.Add(New cv.Point3f(p1.X, p0.Y, gc.depth))
-                        gc.corners.Add(New cv.Point3f(p1.X, p1.Y, gc.depth))
-                        gc.corners.Add(New cv.Point3f(p0.X, p1.Y, gc.depth))
+                        brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
+                        brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
+                        brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
+                        brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
                     End If
                 End If
-                gc.depthRanges.Add(gc.mm.range)
-                gc.corrHistory.Add(gc.correlation)
+                brick.depthRanges.Add(brick.mm.range)
+                brick.corrHistory.Add(brick.correlation)
             End If
 
-            dst2(gc.rect).SetTo(gc.color)
+            dst2(brick.rect).SetTo(brick.color)
 
-            If gc.depth > 0 Then depthCount += 1
-            If gc.depthRanges.Count > task.historyCount Then
-                gc.depthRanges.RemoveAt(0)
-                gc.corrHistory.RemoveAt(0)
+            If brick.depth > 0 Then depthCount += 1
+            If brick.depthRanges.Count > task.historyCount Then
+                brick.depthRanges.RemoveAt(0)
+                brick.corrHistory.RemoveAt(0)
             End If
 
-            task.brickList.Add(gc)
+            task.brickList.Add(brick)
         Next
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) +
@@ -173,15 +173,15 @@ Public Class Brick_Plot : Inherits TaskParent
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
 
-        Dim gc As gcData
+        Dim brick As brickData
         If index < 0 Or index >= task.brickList.Count Then
-            gc = task.brickList(task.brickList.Count / 2)
-            task.mouseMovePoint = New cv.Point(gc.rect.X + gc.rect.Width / 2, gc.rect.Y + gc.rect.Height / 2)
+            brick = task.brickList(task.brickList.Count / 2)
+            task.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
         Else
-            gc = task.brickList(index)
+            brick = task.brickList(index)
         End If
 
-        Dim split() = task.pointCloud(gc.rect).Split()
+        Dim split() = task.pointCloud(brick.rect).Split()
         Dim mm = GetMinMax(split(2))
         If Single.IsInfinity(mm.maxVal) Then Exit Sub
 
@@ -220,11 +220,11 @@ Public Class Brick_FullDepth : Inherits TaskParent
         If task.mouseClickFlag Then
             whiteCol = Math.Round(tilesPerRow * (task.ClickPoint.X - task.cellSize / 2) / dst2.Width)
         End If
-        For Each gc In task.brickList
-            If gc.depth > 0 Then
+        For Each brick In task.brickList
+            If brick.depth > 0 Then
                 Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / tilesPerRow)))
-                dst2.Rectangle(gc.rect, color, task.lineWidth)
-                dst3.Rectangle(gc.rRect, color, task.lineWidth)
+                dst2.Rectangle(brick.rect, color, task.lineWidth)
+                dst3.Rectangle(brick.rRect, color, task.lineWidth)
             End If
             col += 1
             If col >= tilesPerRow Then col = 0
@@ -268,15 +268,15 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim gc As gcData
+        Dim brick As brickData
         If index > 0 And index < task.brickList.Count Then
-            gc = task.brickList(index)
+            brick = task.brickList(index)
         Else
-            gc = task.brickList(task.brickList.Count / 2)
+            brick = task.brickList(task.brickList.Count / 2)
         End If
 
         Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        Dim rgbTop = gc.rect.TopLeft, ir3D As cv.Point3f
+        Dim rgbTop = brick.rect.TopLeft, ir3D As cv.Point3f
         ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
         ' can be found.  For Intel and the Oak-D, the left image and RGB need to be aligned to get accurate depth.
         ' With depth the correlation between the left and right for that grid cell will be accurate (if there is depth.)
@@ -297,17 +297,17 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
                 irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
             End If
         Else
-            irPt = gc.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
+            irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
         End If
         labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
 
         dst2 = task.leftView
         dst3 = task.rightView
-        Dim r = New cv.Rect(irPt.X, irPt.Y, gc.rect.Width, gc.rect.Height)
+        Dim r = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
         dst2.Rectangle(r, 255, task.lineWidth)
 
         dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
-        ' SetTrueText("Correlation " + Format(gc.correlation, fmt3), task.gbricks.mouseD.pt, 2)
+        ' SetTrueText("Correlation " + Format(brick.correlation, fmt3), task.gbricks.mouseD.pt, 2)
     End Sub
 End Class
 
@@ -324,18 +324,18 @@ Public Class Brick_LeftRightSize : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim minX As Integer = Integer.MaxValue, minY As Integer = Integer.MaxValue
         Dim maxX As Integer = Integer.MinValue, maxY As Integer = Integer.MinValue
-        For Each gc In task.brickList
-            If gc.depth > 0 Then
+        For Each brick In task.brickList
+            If brick.depth > 0 Then
 
-                'minX = gc.rect.Min(Function(gc.rect) gc.rect.X)
-                'minY = gc.rect.Min(Function(gc.rect) gc.rect.Y)
-                'maxX = gc.Max(Function(p) gc.rect.BottomRight.X)
-                'maxY = gc.Max(Function(p) gc.rect.BottomRight.Y)
+                'minX = brick.rect.Min(Function(brick.rect) brick.rect.X)
+                'minY = brick.rect.Min(Function(brick.rect) brick.rect.Y)
+                'maxX = brick.Max(Function(p) brick.rect.BottomRight.X)
+                'maxY = brick.Max(Function(p) brick.rect.BottomRight.Y)
 
-                If gc.rect.X < minX Then minX = gc.rect.X
-                If gc.rect.Y < minY Then minY = gc.rect.Y
-                If gc.rect.BottomRight.X > maxX Then maxX = gc.rect.BottomRight.X
-                If gc.rect.BottomRight.Y > maxY Then maxY = gc.rect.BottomRight.Y
+                If brick.rect.X < minX Then minX = brick.rect.X
+                If brick.rect.Y < minY Then minY = brick.rect.Y
+                If brick.rect.BottomRight.X > maxX Then maxX = brick.rect.BottomRight.X
+                If brick.rect.BottomRight.Y > maxY Then maxY = brick.rect.BottomRight.Y
             End If
         Next
 
@@ -642,27 +642,27 @@ Public Class Brick_Features : Inherits TaskParent
         dst2 = task.gbricks.dst2
 
         For i = 0 To task.brickList.Count - 1
-            Dim gc = task.brickList(i)
-            gc.features.Clear()
-            task.brickList(i) = gc
+            Dim brick = task.brickList(i)
+            brick.features.Clear()
+            task.brickList(i) = brick
         Next
 
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
             Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-            Dim gc = task.brickList(index)
-            gc.features.Add(pt)
-            DrawCircle(dst2, gc.rect.TopLeft, task.DotSize, task.highlight)
+            Dim brick = task.brickList(index)
+            brick.features.Add(pt)
+            DrawCircle(dst2, brick.rect.TopLeft, task.DotSize, task.highlight)
 
-            rects.Add(gc.rect)
-            task.brickList(index) = gc
+            rects.Add(brick.rect)
+            task.brickList(index) = brick
         Next
 
         task.featureRects.Clear()
         task.fLessRects.Clear()
-        For Each gc In task.brickList
-            If gc.features.Count > 0 Then task.featureRects.Add(gc.rect) Else task.fLessRects.Add(gc.rect)
+        For Each brick In task.brickList
+            If brick.features.Count > 0 Then task.featureRects.Add(brick.rect) Else task.fLessRects.Add(brick.rect)
         Next
 
         If task.gOptions.DebugCheckBox.Checked Then
@@ -833,19 +833,19 @@ Public Class Brick_Correlation : Inherits TaskParent
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.brickList.Count Then Exit Sub
 
-        Dim gc = task.brickList(index)
+        Dim brick = task.brickList(index)
         Dim pt = task.gbricks.ptCursor
-        Dim corr = gc.correlation
-        dst2.Circle(gc.lRect.TopLeft, task.DotSize, 255, -1)
+        Dim corr = brick.correlation
+        dst2.Circle(brick.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
         labels(3) = "Correlation of the left grid cell to the right is " + Format(corr, fmt3)
 
         Dim grayScale As Integer = If(task.gOptions.LRMeanSubtraction.Checked, 128, 255)
-        dst2.Rectangle(gc.lRect, grayScale, task.lineWidth)
-        dst3.Rectangle(gc.rRect, grayScale, task.lineWidth)
+        dst2.Rectangle(brick.lRect, grayScale, task.lineWidth)
+        dst3.Rectangle(brick.rRect, grayScale, task.lineWidth)
 
-        dst2.Rectangle(gc.hoodRect, grayScale, task.lineWidth)
-        dst3.Rectangle(gc.rHoodRect, grayScale, task.lineWidth)
+        dst2.Rectangle(brick.hoodRect, grayScale, task.lineWidth)
+        dst3.Rectangle(brick.rHoodRect, grayScale, task.lineWidth)
 
         labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
     End Sub
@@ -864,31 +864,31 @@ Public Class Brick_Info : Inherits TaskParent
 
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
-        Dim gc As gcData = task.brickList(index)
+        Dim brick As brickData = task.brickList(index)
         dst2 = task.gbricks.dst2
 
         strOut = labels(2) + vbCrLf + vbCrLf
 
-        dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
-        dst2.Rectangle(gc.hoodRect, task.highlight, task.lineWidth)
+        dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
+        dst2.Rectangle(brick.hoodRect, task.highlight, task.lineWidth)
 
         strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
-        strOut += CStr(gc.age) + vbTab + "Age" + vbTab + vbCrLf
-        strOut += Format(gc.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
-        strOut += Format(gc.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
-        strOut += Format(gc.depthStdev, fmt3) + vbTab + "Depth stdev" + vbCrLf
-        strOut += Format(gc.depth, fmt3) + vbTab + "Depth" + vbCrLf
-        strOut += Format(gc.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
-        strOut += Format(gc.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
-        strOut += Format(gc.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
+        strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
+        strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
+        strOut += Format(brick.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
+        strOut += Format(brick.depthStdev, fmt3) + vbTab + "Depth stdev" + vbCrLf
+        strOut += Format(brick.depth, fmt3) + vbTab + "Depth" + vbCrLf
+        strOut += Format(brick.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
+        strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
+        strOut += Format(brick.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
 
         strOut += "Depth range history: " + vbTab
-        For Each ele In gc.depthRanges
+        For Each ele In brick.depthRanges
             strOut += Format(ele, fmt3) + vbTab
         Next
 
         strOut += vbCrLf + vbCrLf + "Correlation history: " + vbTab
-        For Each ele In gc.corrHistory
+        For Each ele In brick.corrHistory
             strOut += Format(ele, fmt3) + vbTab
         Next
 
@@ -912,8 +912,8 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         dst1.SetTo(0)
-        For Each gc In task.brickList
-            If gc.depth > 0 Then dst1(gc.rect).SetTo((gc.correlation + 1) * 255 / 2)
+        For Each brick In task.brickList
+            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
         Next
 
         dst2 = ShowPaletteDepth(dst1)
@@ -935,12 +935,12 @@ Public Class Brick_LeftToColor : Inherits TaskParent
         dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3.SetTo(0)
         Dim count As Integer
-        For Each gc In task.brickList
-            If gc.depth > 0 Then
+        For Each brick In task.brickList
+            If brick.depth > 0 Then
                 count += 1
-                task.color.Circle(gc.rect.TopLeft, task.DotSize, task.highlight, -1)
-                dst2.Circle(gc.lRect.TopLeft, task.DotSize, task.highlight, -1)
-                dst3.Circle(gc.lRect.TopLeft, task.DotSize, task.highlight, -1)
+                task.color.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1)
+                dst2.Circle(brick.lRect.TopLeft, task.DotSize, task.highlight, -1)
+                dst3.Circle(brick.lRect.TopLeft, task.DotSize, task.highlight, -1)
             End If
         Next
         labels(2) = CStr(count) + " bricks have depth and therefore an equivalent in the left and right views."
@@ -990,8 +990,8 @@ Public Class Brick_Lines : Inherits TaskParent
         dst3.SetTo(0)
         If task.heartBeat Then info.Run(emptyMat)
         For Each index In task.lpD.cellList
-            Dim gc = task.brickList(index)
-            dst2.Rectangle(gc.rect, task.highlight, 1, task.lineType)
+            Dim brick = task.brickList(index)
+            dst2.Rectangle(brick.rect, task.highlight, 1, task.lineType)
         Next
 
         SetTrueText(info.strOut, 3)

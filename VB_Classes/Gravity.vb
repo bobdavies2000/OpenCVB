@@ -155,8 +155,8 @@ Public Class Gravity_BrickRotate : Inherits TaskParent
         If rotateAngle >= angle Then rotateAngle = -angle
 
         dst1 = src
-        For Each gc In task.brickList
-            If gc.pt.Y = gc.rect.Y Then dst1.Circle(gc.pt, task.DotSize, task.highlight, -1, task.lineType)
+        For Each brick In task.brickList
+            If brick.pt.Y = brick.rect.Y Then dst1.Circle(brick.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)

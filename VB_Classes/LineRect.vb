@@ -112,8 +112,8 @@ Public Class LineRect_CenterRange : Inherits TaskParent
         For Each lp In task.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim index As Integer = task.brickMap.Get(Of Single)(center.Y, center.X)
-            Dim gc = task.brickList(index)
-            If gc.mm.maxVal - gc.mm.minVal > depthThreshold Then
+            Dim brick = task.brickList(index)
+            If brick.mm.maxVal - brick.mm.minVal > depthThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else

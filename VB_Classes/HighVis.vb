@@ -7,12 +7,12 @@ Public Class HighVis_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        For Each gc In task.brickList
-            If gc.correlation > task.fCorrThreshold Then
-                If gc.correlation > 0 And gc.corrHistory.Count = task.historyCount Then
-                    dst1(gc.rect).SetTo((gc.correlation + 1) * 127)
+        For Each brick In task.brickList
+            If brick.correlation > task.fCorrThreshold Then
+                If brick.correlation > 0 And brick.corrHistory.Count = task.historyCount Then
+                    dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
                 Else
-                    dst1(gc.rect).SetTo(0)
+                    dst1(brick.rect).SetTo(0)
                 End If
             End If
         Next

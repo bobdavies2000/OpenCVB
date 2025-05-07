@@ -52,9 +52,9 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             If avg1 < avg2 Then offset = lp.cellList.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
                 For Each index In lp.cellList
-                    Dim gc = task.brickList(index)
-                    dst1(gc.rect).SetTo(1)
-                    If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
+                    Dim brick = task.brickList(index)
+                    dst1(brick.rect).SetTo(1)
+                    If debugmode Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                     gcUpdates.Add(New Tuple(Of Integer, Single)(index, (avg1 + avg2) / 2))
                 Next
             Else
@@ -63,15 +63,15 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                 Dim depthIncr = (max - min) / lp.cellList.Count
                 For i = 0 To lp.cellList.Count - 1
                     Dim index = lp.cellList(i)
-                    Dim gc = task.brickList(index)
+                    Dim brick = task.brickList(index)
                     If offset > 0 Then
-                        dst1(gc.rect).SetTo((offset - i + 1) * incr)
+                        dst1(brick.rect).SetTo((offset - i + 1) * incr)
                         gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
                     Else
-                        dst1(gc.rect).SetTo(i * incr + 1)
+                        dst1(brick.rect).SetTo(i * incr + 1)
                         gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + i * depthIncr))
                     End If
-                    If debugmode Then dst2.Rectangle(gc.rect, task.highlight, task.lineWidth)
+                    If debugmode Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                 Next
             End If
         Next

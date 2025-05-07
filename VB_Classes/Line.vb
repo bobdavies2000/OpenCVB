@@ -21,8 +21,8 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In lastList
             Dim noMotionTest As Boolean = True
             For Each index In lp.cellList
-                Dim gc = If(index < task.brickList.Count, task.brickList(index), task.brickList(0))
-                If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
+                Dim brick = If(index < task.brickList.Count, task.brickList(index), task.brickList(0))
+                If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
                     noMotionTest = False
                     Exit For
                 End If
@@ -38,8 +38,8 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In rawLines.lpList
             Dim motionTest As Boolean = False
             For Each index In lp.cellList
-                Dim gc = task.brickList(index)
-                If task.motionMask.Get(Of Byte)(gc.rect.TopLeft.Y, gc.rect.TopLeft.X) Then
+                Dim brick = task.brickList(index)
+                If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
                     motionTest = True
                     Exit For
                 End If
@@ -631,32 +631,32 @@ Public Class Line_GCloud : Inherits TaskParent
         labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
         desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
     End Sub
-    Public Function updateGLine(src As cv.Mat, gc As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
-        gc.tc1.center = p1
-        gc.tc2.center = p2
-        gc.tc1 = match.createCell(src, gc.tc1.correlation, p1)
-        gc.tc2 = match.createCell(src, gc.tc2.correlation, p2)
-        gc.tc1.strOut = Format(gc.tc1.correlation, fmt2) + vbCrLf + Format(gc.tc1.depth, fmt2) + "m"
-        gc.tc2.strOut = Format(gc.tc2.correlation, fmt2) + vbCrLf + Format(gc.tc2.depth, fmt2) + "m"
+    Public Function updateGLine(src As cv.Mat, brick As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
+        brick.tc1.center = p1
+        brick.tc2.center = p2
+        brick.tc1 = match.createCell(src, brick.tc1.correlation, p1)
+        brick.tc2 = match.createCell(src, brick.tc2.correlation, p2)
+        brick.tc1.strOut = Format(brick.tc1.correlation, fmt2) + vbCrLf + Format(brick.tc1.depth, fmt2) + "m"
+        brick.tc2.strOut = Format(brick.tc2.correlation, fmt2) + vbCrLf + Format(brick.tc2.depth, fmt2) + "m"
 
-        Dim mean = task.pointCloud(gc.tc1.rect).Mean(task.depthMask(gc.tc1.rect))
-        gc.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
-        gc.tc1.depth = gc.pt1.Z
-        mean = task.pointCloud(gc.tc2.rect).Mean(task.depthMask(gc.tc2.rect))
-        gc.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
-        gc.tc2.depth = gc.pt2.Z
+        Dim mean = task.pointCloud(brick.tc1.rect).Mean(task.depthMask(brick.tc1.rect))
+        brick.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
+        brick.tc1.depth = brick.pt1.Z
+        mean = task.pointCloud(brick.tc2.rect).Mean(task.depthMask(brick.tc2.rect))
+        brick.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
+        brick.tc2.depth = brick.pt2.Z
 
-        gc.len3D = distance3D(gc.pt1, gc.pt2)
-        If gc.pt1 = New cv.Point3f Or gc.pt2 = New cv.Point3f Then
-            gc.len3D = 0
+        brick.len3D = distance3D(brick.pt1, brick.pt2)
+        If brick.pt1 = New cv.Point3f Or brick.pt2 = New cv.Point3f Then
+            brick.len3D = 0
         Else
-            gc.arcX = Math.Asin((gc.pt1.X - gc.pt2.X) / gc.len3D) * 57.2958
-            gc.arcY = Math.Abs(Math.Asin((gc.pt1.Y - gc.pt2.Y) / gc.len3D) * 57.2958)
-            If gc.arcY > 90 Then gc.arcY -= 90
-            gc.arcZ = Math.Asin((gc.pt1.Z - gc.pt2.Z) / gc.len3D) * 57.2958
+            brick.arcX = Math.Asin((brick.pt1.X - brick.pt2.X) / brick.len3D) * 57.2958
+            brick.arcY = Math.Abs(Math.Asin((brick.pt1.Y - brick.pt2.Y) / brick.len3D) * 57.2958)
+            If brick.arcY > 90 Then brick.arcY -= 90
+            brick.arcZ = Math.Asin((brick.pt1.Z - brick.pt2.Z) / brick.len3D) * 57.2958
         End If
 
-        Return gc
+        Return brick
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -669,15 +669,15 @@ Public Class Line_GCloud : Inherits TaskParent
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
         For Each lp In task.lpList
-            Dim gc As gravityLine
-            gc = updateGLine(src, gc, lp.p1, lp.p2)
-            allLines.Add(lp.p1.DistanceTo(lp.p2), gc)
-            If Math.Abs(90 - gc.arcY) < maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
-                sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gc)
+            Dim brick As gravityLine
+            brick = updateGLine(src, brick, lp.p1, lp.p2)
+            allLines.Add(lp.p1.DistanceTo(lp.p2), brick)
+            If Math.Abs(90 - brick.arcY) < maxAngle And brick.tc1.depth > 0 And brick.tc2.depth > 0 Then
+                sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), brick)
                 DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
             End If
-            If Math.Abs(gc.arcY) <= maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
-                sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gc)
+            If Math.Abs(brick.arcY) <= maxAngle And brick.tc1.depth > 0 And brick.tc2.depth > 0 Then
+                sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), brick)
                 DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
             End If
         Next

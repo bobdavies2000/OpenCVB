@@ -229,17 +229,17 @@ Public Class FitLine_Grid : Inherits TaskParent
         dst2 = edges.dst2
 
         dst3.SetTo(0)
-        For Each gc In task.brickList
-            If dst2(gc.rect).CountNonZero >= 5 Then
-                nZero.Run(dst2(gc.rect))
+        For Each brick In task.brickList
+            If dst2(brick.rect).CountNonZero >= 5 Then
+                nZero.Run(dst2(brick.rect))
 
                 fitline.ptList.Clear()
                 For i = 0 To nZero.ptMat.Rows - 1
                     fitline.ptList.Add(nZero.ptMat.Get(Of cv.Point)(i, 0))
                 Next
 
-                fitline.Run(dst2(gc.rect))
-                dst3(gc.rect).Line(fitline.lp.p1, fitline.lp.p2, 255, task.lineWidth, task.lineType)
+                fitline.Run(dst2(brick.rect))
+                dst3(brick.rect).Line(fitline.lp.p1, fitline.lp.p2, 255, task.lineWidth, task.lineType)
             End If
         Next
     End Sub

@@ -13,7 +13,7 @@ Public Class VBtask : Implements IDisposable
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
     Public lpList As New List(Of lpData) ' line pair list
-    Public brickList As New List(Of gcData)
+    Public brickList As New List(Of brickData)
     Public tourList As New List(Of tourData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
@@ -30,7 +30,7 @@ Public Class VBtask : Implements IDisposable
     Public structureMapX As New cv.Mat
     Public structureMapY As New cv.Mat
 
-    Public gcD As gcData ' the currently selected grid cell
+    Public gcD As brickData ' the currently selected grid cell
     Public rcD As New rcData ' the currently selected red Cell
     Public lpD As New lpData ' the currently seleccted line pair
     Public fpD As New fpData ' the currently seleccted feature point.

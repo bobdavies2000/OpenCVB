@@ -27,8 +27,8 @@ Public Class Intrinsics_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             dst2 = task.leftView.Clone
-            For Each gc In task.brickList
-                Dim pt = translatePixel(task.pointCloud.Get(Of cv.Point3f)(gc.rect.Y, gc.rect.X))
+            For Each brick In task.brickList
+                Dim pt = translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                 If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
                 If Single.IsInfinity(pt.X) Or Single.Isinfinity(pt.Y) Then Continue For
                 pt = validatePoint(pt)
