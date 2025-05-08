@@ -7,7 +7,8 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         desc = "Retain the existing edge/lines and add the edge/lines where motion occurred."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.algorithmPrep = False Then Exit Sub
+        Dim input = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         Dim edgeLineWidth = 1, imageEdgeWidth = 2
         If dst2.Width >= 1280 Then
@@ -15,14 +16,15 @@ Public Class EdgeLine_Basics : Inherits TaskParent
             imageEdgeWidth = 4
         End If
 
-        Dim cppData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+        Dim cppData(input.Total - 1) As Byte
+        Marshal.Copy(input.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, edgeLineWidth)
+        Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, edgeLineWidth)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
+        cv.Cv2.ImShow("dst2", dst2)
     End Sub
     Public Sub Close()
         EdgeLineSimple_Close(cPtr)
@@ -183,22 +185,22 @@ Public Class EdgeLine_BasicsMotion : Inherits TaskParent
         desc = "Native C++ version to find edges/lines using motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = task.grayStable
+        Dim input = If(src.Channels() = 1, src.Clone, task.grayStable.Clone)
 
-        Dim cppData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+        Dim cppData(input.Total - 1) As Byte
+        Marshal.Copy(input.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
 
         Dim maskData(task.motionMask.Total - 1) As Byte
         Marshal.Copy(task.motionMask.Data, maskData, 0, maskData.Length)
         Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
-        Dim imagePtr = EdgeLine_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
+        Dim imagePtr = EdgeLine_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), input.Rows, input.Cols,
                                         task.lineWidth)
         handleSrc.Free()
         handleMask.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
+        dst2 = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8U, imagePtr)
         If task.heartBeat Then
             labels(2) = "There were " + CStr(EdgeLine_GetEdgeLength(cPtr)) + " edge/lines found while " +
                                         CStr(EdgeLine_GetSegCount(cPtr)) + " edge/lines were found on the current image."

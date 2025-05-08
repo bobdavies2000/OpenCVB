@@ -1742,7 +1742,7 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Dim corrText = task.gbricks.depthAndCorrelationText
+                Dim corrText = task.brickBasics.depthAndCorrelationText
                 SyncLock trueTextLock
                     Static saveObjectName = task.displayObjectName
                     If saveObjectName <> task.displayObjectName Then
@@ -1753,7 +1753,7 @@ Public Class Main_UI
                     If task.trueData.Count Then
                         trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                     End If
-                    trueData.Add(New TrueText(corrText, task.gbricks.ptTextLoc, 1))
+                    trueData.Add(New TrueText(corrText, task.brickBasics.ptTextLoc, 1))
                     task.trueData.Clear()
                 End SyncLock
 
@@ -1771,10 +1771,10 @@ Public Class Main_UI
                     algorithmRefresh = True
                 End If
 
-                dst(0).Circle(task.gbricks.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(1).Circle(task.gbricks.ptTopLeft, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(2).Circle(task.gbricks.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(3).Circle(task.gbricks.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(0).Circle(task.brickBasics.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(1).Circle(task.brickBasics.ptTopLeft, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(2).Circle(task.brickBasics.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(3).Circle(task.brickBasics.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
 
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 

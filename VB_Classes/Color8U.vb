@@ -38,9 +38,9 @@ Public Class Color8U_Basics : Inherits TaskParent
         End If
 
         If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
-            classifier.Run(src)
+            classifier.Run(src.Clone)
         Else
-            classifier.Run(task.grayStable)
+            classifier.Run(task.grayStable.Clone)
         End If
 
         If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)

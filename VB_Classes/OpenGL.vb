@@ -1755,7 +1755,7 @@ Public Class OpenGL_QuadSimple : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.depthRGB
-        labels = task.gbricks.labels
+        labels = task.brickBasics.labels
         Dim quadData As New List(Of cv.Point3f)
         For Each brick In task.brickList
             quadData.Add(brick.color)
@@ -1785,8 +1785,8 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         desc = "Create a simple plane in each of bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.gbricks.dst2
-        dst3 = task.gbricks.dst3
+        dst2 = task.brickBasics.dst2
+        dst3 = task.brickBasics.dst3
         Dim quadData As New List(Of cv.Point3f)
         For Each brick In task.brickList
             If brick.depth = 0 Then Continue For
@@ -1798,7 +1798,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels(2) = task.gbricks.labels(2)
+        labels(2) = task.brickBasics.labels(2)
         labels(3) = "There were " + CStr(quadData.Count / 5) + " quads found."
     End Sub
 End Class
@@ -1948,7 +1948,7 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels = task.gbricks.labels
+        labels = task.brickBasics.labels
     End Sub
 End Class
 

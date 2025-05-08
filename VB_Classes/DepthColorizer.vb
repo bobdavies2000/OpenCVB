@@ -7,7 +7,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.gOptions.GridDepth.Checked Then
-            task.depthRGB = task.gbricks.dst2
+            task.depthRGB = task.brickBasics.dst2
         ElseIf task.gOptions.ColorizedDepth.Checked Then
             src = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
             Dim depthNorm As cv.Mat = src * 255 / task.MaxZmeters

@@ -125,7 +125,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public gbricks As Brick_Basics
+    Public brickBasics As Brick_Basics
     Public fcsBasics As FCS_Basics
     Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
@@ -563,7 +563,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        gbricks = New Brick_Basics
+        brickBasics = New Brick_Basics
         fcsBasics = New FCS_Basics
         buildCorr = New Brick_CorrelationMap
         task.colorizer = New DepthColorizer_Basics
@@ -845,10 +845,8 @@ Public Class VBtask : Implements IDisposable
         motionBasics.Run(src)
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
         fcsBasics.Run(src)
-        gbricks.Run(src)
+        brickBasics.Run(src)
         buildCorr.Run(src)
-
-        cv.Cv2.ImShow("grayStable", grayStable)
 
         task.colorizer.Run(src)
 

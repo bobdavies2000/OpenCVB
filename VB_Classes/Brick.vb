@@ -133,7 +133,7 @@ Public Class Brick_MouseDepth : Inherits TaskParent
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         task.gcD = task.brickList(index)
-        If standaloneTest() Then dst2 = task.gbricks.dst3
+        If standaloneTest() Then dst2 = task.brickBasics.dst3
 
         Dim pt = task.gcD.rect.TopLeft
         If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
@@ -168,7 +168,7 @@ Public Class Brick_Plot : Inherits TaskParent
         desc = "Select any cell To plot a histogram Of that cell's depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.gbricks.dst2
+        dst2 = task.brickBasics.dst2
 
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
@@ -241,17 +241,17 @@ End Class
 
 Public Class Brick_InstantUpdate : Inherits TaskParent
     Public Sub New()
-        task.gbricks.instantUpdate = True
+        task.brickBasics.instantUpdate = True
         labels(3) = "Pointcloud image for cells with good visibility"
         desc = "Create the grid of bricks with good visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then labels(2) = CStr(task.brickList.Count) + " bricks have reasonable depth."
 
-        dst2 = task.gbricks.dst2
-        dst3 = task.gbricks.dst3
+        dst2 = task.brickBasics.dst2
+        dst3 = task.brickBasics.dst3
 
-        labels(2) = task.gbricks.labels(2)
+        labels(2) = task.brickBasics.labels(2)
     End Sub
 End Class
 
@@ -307,7 +307,7 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
         dst2.Rectangle(r, 255, task.lineWidth)
 
         dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
-        ' SetTrueText("Correlation " + Format(brick.correlation, fmt3), task.gbricks.mouseD.pt, 2)
+        ' SetTrueText("Correlation " + Format(brick.correlation, fmt3), task.brickBasics.mouseD.pt, 2)
     End Sub
 End Class
 
@@ -639,7 +639,7 @@ Public Class Brick_Features : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
 
-        dst2 = task.gbricks.dst2
+        dst2 = task.brickBasics.dst2
 
         For i = 0 To task.brickList.Count - 1
             Dim brick = task.brickList(i)
@@ -714,25 +714,25 @@ End Class
 Public Class Brick_MeanSubtraction : Inherits TaskParent
     Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
-        task.gbricks.instantUpdate = True
+        task.brickBasics.instantUpdate = True
         ' labels = {"", "", "This is the grid cell map using mean subtraction on the left and right images", ""}
         desc = "Use the mean subtraction output of the left and right images as input to the Brick_Basics.  NOTE: instant update!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.LRMeanSubtraction.Checked Then
-            dst2 = task.gbricks.dst3
+            dst2 = task.brickBasics.dst3
         Else
-            Static gbricks As New Brick_Basics
+            Static brickBasics As New Brick_Basics
             LRMeanSub.Run(src.Clone)
 
             task.leftView = LRMeanSub.dst2
             task.rightView = LRMeanSub.dst3
 
-            gbricks.Run(src)
-            dst2 = gbricks.dst3
+            brickBasics.Run(src)
+            dst2 = brickBasics.dst3
         End If
 
-        labels(2) = task.gbricks.labels(2)
+        labels(2) = task.brickBasics.labels(2)
         SetTrueText("dst2 is the grid cell correlations when using mean subtraction output of the left and right images.", 3)
     End Sub
 End Class
@@ -834,7 +834,7 @@ Public Class Brick_Correlation : Inherits TaskParent
         If index < 0 Or index > task.brickList.Count Then Exit Sub
 
         Dim brick = task.brickList(index)
-        Dim pt = task.gbricks.ptCursor
+        Dim pt = task.brickBasics.ptCursor
         Dim corr = brick.correlation
         dst2.Circle(brick.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
@@ -860,12 +860,12 @@ Public Class Brick_Info : Inherits TaskParent
         desc = "Display the info about the select grid cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = task.gbricks.labels(2)
+        labels(2) = task.brickBasics.labels(2)
 
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim brick As brickData = task.brickList(index)
-        dst2 = task.gbricks.dst2
+        dst2 = task.brickBasics.dst2
 
         strOut = labels(2) + vbCrLf + vbCrLf
 
@@ -917,7 +917,7 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
         Next
 
         dst2 = ShowPaletteDepth(dst1)
-        labels(2) = task.gbricks.labels(2)
+        labels(2) = task.brickBasics.labels(2)
     End Sub
 End Class
 

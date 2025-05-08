@@ -604,14 +604,16 @@ Public Class TaskParent : Implements IDisposable
             task.algorithmTimes.Add(nextTime)
         End If
 
-        Dim index = task.algorithmStack.Peek
-        Dim elapsedTicks = nextTime.Ticks - task.algorithmTimes(index).Ticks
-        Dim span = New TimeSpan(elapsedTicks)
-        task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+        If task.algorithmStack.Count > 0 Then
+            Dim index = task.algorithmStack.Peek
+            Dim elapsedTicks = nextTime.Ticks - task.algorithmTimes(index).Ticks
+            Dim span = New TimeSpan(elapsedTicks)
+            task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
 
-        index = task.algorithmNames.IndexOf(name)
-        task.algorithmTimes(index) = nextTime
-        task.algorithmStack.Push(index)
+            index = task.algorithmNames.IndexOf(name)
+            task.algorithmTimes(index) = nextTime
+            task.algorithmStack.Push(index)
+        End If
     End Sub
     Public Sub measureEndRun(name As String)
         Try
