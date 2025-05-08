@@ -11,25 +11,23 @@ Public Class FCS_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static restartRequest As Boolean
         Dim count = task.motionMask.CountNonZero
-        If task.heartBeat Or task.optionsChanged Or restartRequest Or task.mouseClickFlag Or count = dst2.Total Then
-            tour.Run(src)
-            fcs.inputFeatures.Clear()
-            For i = 1 To Math.Min(task.tourList.Count - 1, desiredMapCount)
-                fcs.inputFeatures.Add(task.tourList(i).maxDist)
-            Next
-            If task.tourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
-                restartRequest = True
-                Exit Sub
-            End If
-            restartRequest = False
-
-            fcs.Run(emptyMat)
-
-            task.fcsMap = fcs.dst1.Clone
-            dst2 = ShowPaletteFullColor(task.fcsMap)
-            dst3 = tour.dst2
-            labels(2) = fcs.labels(2)
+        tour.Run(src)
+        fcs.inputFeatures.Clear()
+        For i = 1 To Math.Min(task.tourList.Count - 1, desiredMapCount)
+            fcs.inputFeatures.Add(task.tourList(i).maxDist)
+        Next
+        If task.tourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
+            restartRequest = True
+            Exit Sub
         End If
+        restartRequest = False
+
+        fcs.Run(emptyMat)
+
+        task.fcsMap = fcs.dst1.Clone
+        dst2 = ShowPaletteFullColor(task.fcsMap)
+        dst3 = tour.dst2
+        labels(2) = fcs.labels(2)
     End Sub
 End Class
 

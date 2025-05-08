@@ -7,7 +7,6 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         desc = "Retain the existing edge/lines and add the edge/lines where motion occurred."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub
         Dim input = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         Dim edgeLineWidth = 1, imageEdgeWidth = 2
@@ -24,7 +23,6 @@ Public Class EdgeLine_Basics : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
-        cv.Cv2.ImShow("dst2", dst2)
     End Sub
     Public Sub Close()
         EdgeLineSimple_Close(cPtr)
@@ -112,7 +110,7 @@ End Class
 
 Public Class EdgeLine_SplitMean : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
-    Dim edges As New EdgeLine_Basics
+    Dim edges As New EdgeLine_Raw
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "find the edges in a 4-way color split of the image."
@@ -236,5 +234,26 @@ Public Class EdgeLine_Construct : Inherits TaskParent
         dst3 = edges.dst2
 
         dst2 = dst2 Or dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class EdgeLine_LeftRight : Inherits TaskParent
+    Dim edges As New EdgeLine_Raw
+    Public Sub New()
+        labels(3) = "Right View: Note it is updated on every frame - it does not use the motion mask."
+        desc = "Build the left and right edge lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.leftView)
+        dst2 = task.edges.dst2.Clone
+
+        edges.Run(task.rightView)
+        dst3 = edges.dst2.Clone
     End Sub
 End Class

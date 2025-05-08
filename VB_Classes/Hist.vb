@@ -1499,7 +1499,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
                 gcIndex = ele.Key
                 gc1 = task.brickList(gcIndex)
 
-                cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, Not fLess.edges.dst2(gc1.rect), histogram, 1, {task.histogramBins}, ranges)
+                cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, Not task.edges.dst2(gc1.rect), histogram, 1, {task.histogramBins}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
                 Dim arrayStart = -1
                 Dim arrayEnd = 0
@@ -1527,7 +1527,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
         dst2 = ShowPalette(dst1)
         dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst3 = ShowAddweighted(dst0, src, labels(3))
-        dst2.SetTo(0, fLess.edges.dst2)
+        dst2.SetTo(0, task.edges.dst2)
     End Sub
 End Class
 

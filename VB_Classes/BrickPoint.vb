@@ -127,19 +127,16 @@ End Class
 
 
 Public Class BrickPoint_FeatureLess : Inherits TaskParent
-    Public edges As New EdgeLine_Basics
     Public classCount As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
         desc = "Isolate the featureless regions using the sobel intensity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.grayStable.Clone)
-
         dst2.SetTo(0)
         For Each brick In task.brickList
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
-            If edges.dst2(brick.rect).CountNonZero = 0 Then
+            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
                 brick.fLessIndex = 255
                 dst2(brick.rect).SetTo(255)
             End If

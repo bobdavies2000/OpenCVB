@@ -391,18 +391,17 @@ End Class
 
 Public Class HistValley_EdgeDraw : Inherits TaskParent
     Dim valley As New HistValley_FromPeaks
-    Dim edges As New EdgeLine_Basics
     Public Sub New()
+        labels(3) = "Color image overlaid with edge lines."
         desc = "Remove edge color in RGB before HistValley_FromPeaks"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-
         dst3 = src
-        dst3.SetTo(cv.Scalar.Black, edges.dst2)
+        dst3.SetTo(cv.Scalar.Black, task.edges.dst2)
 
         valley.Run(dst3)
         dst2 = valley.dst2
+        labels(2) = valley.labels(2)
     End Sub
 End Class
 

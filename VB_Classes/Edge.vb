@@ -1030,7 +1030,7 @@ Public Class Edge_Color8U : Inherits TaskParent
                         Case 2
                             colorMethods(i) = New Binarize_DepthTiers
                         Case 3
-                            colorMethods(i) = New EdgeLine_Basics
+                            colorMethods(i) = task.edges ' New EdgeLine_Basics
                         Case 4
                             colorMethods(i) = New Hist3Dcolor_Basics
                         Case 5

@@ -692,16 +692,15 @@ End Class
 
 Public Class Brick_EdgeDraw : Inherits TaskParent
     Dim regions As New Region_Contours
-    Public edges As New EdgeLine_Basics
     Public Sub New()
         desc = "Lines can mean cells are connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         regions.Run(src)
         dst2 = regions.dst3
+        labels(2) = regions.labels(2)
 
-        edges.Run(src)
-        dst2.SetTo(cv.Scalar.White, edges.dst2)
+        dst2.SetTo(cv.Scalar.White, task.edges.dst2) ' edgeLine_Basics has already been run as part of fcsBasics.
     End Sub
 End Class
 

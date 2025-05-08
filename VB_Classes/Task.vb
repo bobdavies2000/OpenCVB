@@ -127,6 +127,7 @@ Public Class VBtask : Implements IDisposable
     Public lines As Line_Basics
     Public brickBasics As Brick_Basics
     Public fcsBasics As FCS_Basics
+    Public edges As EdgeLine_Basics
     Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
@@ -564,6 +565,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         brickBasics = New Brick_Basics
+        edges = New EdgeLine_Basics
         fcsBasics = New FCS_Basics
         buildCorr = New Brick_CorrelationMap
         task.colorizer = New DepthColorizer_Basics

@@ -15,21 +15,6 @@ End Class
 
 
 
-Public Class FeatureLess_WithoutMotion : Inherits TaskParent
-    Dim edges As New EdgeLine_Basics
-    Public classCount As Integer = 2
-    Public Sub New()
-        labels = {"", "", "EdgeLine_Basics output", ""}
-        desc = "Access the EdgeLine_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-        dst2 = edges.dst2
-    End Sub
-End Class
-
-
-
 
 
 
