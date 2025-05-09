@@ -117,7 +117,7 @@ Public Class Depth_MeanStdev_MT : Inherits TaskParent
     Dim meanSeries As New cv.Mat
     Dim maxMeanVal As Single, maxStdevVal As Single
     Public Sub New()
-        If standalone Then task.gOptions.GridSlider.Value *= 3
+        If standalone Then task.gOptions.GridSlider.Value = task.gOptions.GridSlider.Maximum
         dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."

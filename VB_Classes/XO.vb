@@ -1407,7 +1407,7 @@ End Class
 
 Public Class XO_Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim contours As New Contour_Gray
+    Dim contours As New XO_Contour_Gray
     Dim lines As New Line_RawSorted
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
@@ -4828,5 +4828,107 @@ Public Class XO_OpenGL_Tiles : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
         task.ogl.Run(src)
         If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Contour_Gray : Inherits TaskParent
+    Public contour As New List(Of cv.Point)
+    Public options As New Options_Contours
+    Dim myFrameCount As Integer = task.frameCount
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        desc = "Find the contour for the src."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If myFrameCount <> task.frameCount Then
+            options.Run() ' avoid running options more than once per frame.
+            myFrameCount = task.frameCount
+        End If
+
+        If standalone Then
+            task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
+            reduction.Run(src)
+            src = reduction.dst2
+        End If
+
+        Dim allContours As cv.Point()()
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
+        If allContours.Count = 0 Then Exit Sub
+
+        dst2 = src
+        For Each tour In allContours
+            DrawContour(dst2, tour.ToList, white, task.lineWidth)
+        Next
+        labels(2) = $"There were {allContours.Count} contours found."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Contour_RC_AddContour : Inherits TaskParent
+    Public contour As New List(Of cv.Point)
+    Public options As New Options_Contours
+    Dim myFrameCount As Integer = task.frameCount
+    Dim reduction As New Reduction_Basics
+    Dim contours As New Contour_Basics
+    Public Sub New()
+        desc = "Find the contour for the src."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If myFrameCount <> task.frameCount Then
+            options.Run() ' avoid running options more than once per frame.
+            myFrameCount = task.frameCount
+        End If
+
+        If standalone Then
+            reduction.Run(src)
+            src = reduction.dst2
+        End If
+        dst2 = src.Clone
+        dst3 = ShowPalette(dst2)
+
+        contours.Run(dst2)
+
+        Dim maxCount As Integer, maxIndex As Integer
+        For i = 0 To contours.contourList.Count - 1
+            Dim len = CInt(contours.contourList(i).Count)
+            If len > maxCount Then
+                maxCount = len
+                maxIndex = i
+            End If
+        Next
+        If contours.contourList.Count = 0 Then Exit Sub
+        Dim contour = New List(Of cv.Point)(contours.contourList(maxIndex).ToList)
+        DrawContour(dst2, contour, task.highlight, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Contour_RedCloud : Inherits TaskParent
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Show all the contours found in the RedCloud output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        dst3.SetTo(0)
+        For Each rc In task.rcList
+            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+        Next
     End Sub
 End Class

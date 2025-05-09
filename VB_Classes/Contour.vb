@@ -472,7 +472,7 @@ Public Class Contour_CompareToFeatureless : Inherits TaskParent
         dst2 = contour.dst2
 
         fLess.Run(src)
-        dst3 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3 = fLess.dst3 ' .Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -508,86 +508,6 @@ Public Class Contour_Smoothing : Inherits TaskParent
 End Class
 
 
-
-
-
-
-
-Public Class Contour_RC_AddContour : Inherits TaskParent
-    Public contour As New List(Of cv.Point)
-    Public options As New Options_Contours
-    Dim myFrameCount As Integer = task.frameCount
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Find the contour for the src."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If myFrameCount <> task.frameCount Then
-            options.Run() ' avoid running options more than once per frame.
-            myFrameCount = task.frameCount
-        End If
-
-        If standalone Then
-            reduction.Run(src)
-            src = reduction.dst2
-        End If
-
-        Dim allContours As cv.Point()()
-        cv.Cv2.FindContours(task.gray, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
-
-        Dim maxCount As Integer, maxIndex As Integer
-        For i = 0 To allContours.Count - 1
-            Dim len = CInt(allContours(i).Count)
-            If len > maxCount Then
-                maxCount = len
-                maxIndex = i
-            End If
-        Next
-        dst2 = src
-        If allContours.Count = 0 Then Exit Sub
-        Dim contour = New List(Of cv.Point)(allContours(maxIndex).ToList)
-        DrawContour(dst2, contour, 255, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Contour_Gray : Inherits TaskParent
-    Public contour As New List(Of cv.Point)
-    Public options As New Options_Contours
-    Dim myFrameCount As Integer = task.frameCount
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Find the contour for the src."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If myFrameCount <> task.frameCount Then
-            options.Run() ' avoid running options more than once per frame.
-            myFrameCount = task.frameCount
-        End If
-
-        If standalone Then
-            task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
-            reduction.Run(src)
-            src = reduction.dst2
-        End If
-
-        Dim allContours As cv.Point()()
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
-        If allContours.Count = 0 Then Exit Sub
-
-        dst2 = src
-        For Each tour In allContours
-            DrawContour(dst2, tour.ToList, white, task.lineWidth)
-        Next
-        labels(2) = $"There were {allContours.Count} contours found."
-    End Sub
-End Class
 
 
 
@@ -653,25 +573,6 @@ Public Class Contour_FromPoints : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class Contour_RedCloud : Inherits TaskParent
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Show all the contours found in the RedCloud output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-
-        dst3.SetTo(0)
-        For Each rc In task.rcList
-            If rc.index > 1 Then Exit For
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
-        Next
-    End Sub
-End Class
 
 
 
@@ -925,7 +826,8 @@ End Class
 Public Class Contour_FCS : Inherits TaskParent
     Dim tour As New Tour_Core
     Dim knn As New KNN_Basics
-    Public desiredNodes As Integer = 5
+    Dim delaunay As New Delaunay_Basics
+    Public desiredNodes As Integer = 10
     Public Sub New()
         desc = "Use the contours of the featureless regions to split the image into an FCS map."
     End Sub
@@ -953,8 +855,8 @@ Public Class Contour_FCS : Inherits TaskParent
             ptMagnets.Add(knn.queries(i))
         Next
 
-        For Each nabe In knn.neighbors
-            Dim k = 0
-        Next
+        delaunay.inputPoints = New List(Of cv.Point2f)(ptMagnets)
+        delaunay.Run(src)
+        dst3 = delaunay.dst2
     End Sub
 End Class
