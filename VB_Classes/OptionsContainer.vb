@@ -84,10 +84,27 @@ Public Class OptionsContainer
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         layoutOptions(normalRequest:=False)
     End Sub
+    Private Sub CheckIfOffScreen()
+        Dim formRect As Rectangle = Me.Bounds
+        Dim screenBounds As Rectangle = Screen.PrimaryScreen.WorkingArea ' Use WorkingArea to exclude taskbar
+
+        ' Check if any part of the form is visible on the screen
+        If Not screenBounds.IntersectsWith(formRect) Then
+            ' The entire form is off the screen
+            MessageBox.Show("Form is completely off-screen!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+            ' Optionally, you might want to move the form back onto the screen
+            ' For example, move it to the center of the primary screen
+            Me.StartPosition = FormStartPosition.Manual
+            Me.Location = New Point(screenBounds.Left + (screenBounds.Width - Me.Width) \ 2,
+                                    screenBounds.Top + (screenBounds.Height - Me.Height) \ 2)
+        End If
+    End Sub
     Private Sub OptionsContainer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         SaveSetting("Opencv", "gOptionsLeft", "gOptionsLeft", Math.Abs(Me.Left))
         SaveSetting("Opencv", "gOptionsTop", "gOptionsTop", Me.Top)
         SaveSetting("Opencv", "gOptionsWidth", "gOptionsWidth", Me.Width)
         SaveSetting("Opencv", "gOptionsHeight", "gOptionsHeight", Me.Height)
+        CheckIfOffScreen()
     End Sub
 End Class

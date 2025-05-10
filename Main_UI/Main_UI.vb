@@ -1534,6 +1534,8 @@ Public Class Main_UI
             If camera IsNot Nothing Then
                 parms.calibData = camera.calibData
                 Exit While
+            ElseIf saveAlgorithmName = "" Then
+                Exit Sub
             End If
         End While
 

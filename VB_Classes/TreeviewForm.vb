@@ -159,6 +159,22 @@ Public Class TreeviewForm
 
         PercentTime.Text += If(percentStr Is Nothing, "Inactive algorithm selected", percentStr)
     End Sub
+    Private Sub CheckIfOffScreen()
+        Dim formRect As Rectangle = Me.Bounds
+        Dim screenBounds As Rectangle = Screen.PrimaryScreen.WorkingArea ' Use WorkingArea to exclude taskbar
+
+        ' Check if any part of the form is visible on the screen
+        If Not screenBounds.IntersectsWith(formRect) Then
+            ' The entire form is off the screen
+            MessageBox.Show("Form is completely off-screen!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+            ' Optionally, you might want to move the form back onto the screen
+            ' For example, move it to the center of the primary screen
+            Me.StartPosition = FormStartPosition.Manual
+            Me.Location = New Point(screenBounds.Left + (screenBounds.Width - Me.Width) \ 2,
+                                    screenBounds.Top + (screenBounds.Height - Me.Height) \ 2)
+        End If
+    End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
@@ -168,6 +184,8 @@ Public Class TreeviewForm
         Me.Height = GetSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
         PercentTime.Width = 250
         PercentTime.Left = 250
+
+        CheckIfOffScreen()
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", Me.Left)
