@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Tour_Basics : Inherits TaskParent
     Public contours As New Contour_Basics
     Dim tour As New Tour_Core
@@ -119,8 +118,8 @@ Public Class Tour_Bricks : Inherits TaskParent
         dst2 = core.dst2
         labels(2) = core.labels(2)
 
-        For Each brick In task.brickList
-            If brick.intensity = 255 Then dst2.Circle(brick.pt, task.DotSize, task.highlight, -1)
+        For Each pt In ptBrick.intensityFeatures
+            dst2.Circle(pt, task.DotSize, task.highlight, -1)
         Next
     End Sub
 End Class

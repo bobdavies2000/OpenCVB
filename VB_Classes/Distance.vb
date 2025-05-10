@@ -477,17 +477,17 @@ End Class
 Public Class Distance_ClickPoint : Inherits TaskParent
     Dim options As New Options_Distance
     Public Sub New()
+        labels(3) = "Inverse of dst2"
         desc = "Click anywhere to visualize the distance to the each pixel."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = src.InRange(0, 0)
+        dst1 = task.grayStable.InRange(0, 0)
 
-        src.SetTo(255, dst1)
-        src.Set(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X, 0)
-        dst2 = src.DistanceTransform(options.distanceType, 0)
+        task.grayStable.SetTo(255, dst1)
+        task.grayStable.Set(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X, 0)
+        dst2 = task.grayStable.DistanceTransform(options.distanceType, 0)
         dst3 = 255 - dst2
     End Sub
 End Class

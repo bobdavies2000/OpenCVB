@@ -1,11 +1,9 @@
-﻿Imports NAudio.Utils
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class BrickPoint_Basics : Inherits TaskParent
     Public sobel As New Edge_SobelQT
-    Public sortedPoints As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
     Public intensityFeatures As New List(Of cv.Point2f)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
+        labels(3) = "Sobel input to BrickPoint_Basics"
         desc = "Find the max Sobel point in each grid cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -14,30 +12,21 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         sobel.Run(task.grayStable.Clone)
         dst3 = sobel.dst2
 
-        sortedPoints.Clear()
+        intensityFeatures.Clear()
         For Each brick In task.brickList
             Dim mm = GetMinMax(dst3(brick.rect))
             brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
-            brick.feature = mm.maxLoc
+            brick.feature = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.intensity = mm.maxVal
-            sortedPoints.Add(mm.maxVal, brick.pt)
+            If brick.intensity = 255 Then intensityFeatures.Add(brick.feature)
         Next
 
-        dst1.SetTo(255, task.motionMask)
-        intensityFeatures.Clear()
-        For Each ele In sortedPoints
-            Dim pt = ele.Value
-            If dst3.Get(Of Byte)(pt.Y, pt.X) = 255 Then intensityFeatures.Add(pt)
-        Next
-
-        dst1.SetTo(0)
         For Each pt In intensityFeatures
-            dst1.Circle(pt, task.DotSize, 255, -1, cv.LineTypes.Link8)
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
         Next
 
-        labels(2) = "Of the " + CStr(sortedPoints.Count) + " candidates, " + CStr(intensityFeatures.Count) +
-                    " were retained from the previous image. "
+        labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(intensityFeatures.Count) +
+                    " had the maximum intensity (255). "
     End Sub
 End Class
 
@@ -76,8 +65,8 @@ Public Class BrickPoint_Plot : Inherits TaskParent
         labels(3) = "Sobel peak values from " + CStr(minVal) + " to " + CStr(maxVal)
 
         dst3 = src
-        For Each ele In ptBrick.sortedPoints
-            If ele.Key <= maxVal And ele.Key >= minVal Then dst3.Circle(ele.Value, task.DotSize, task.highlight, -1)
+        For Each brick In task.brickList
+            If brick.intensity <= maxVal And brick.intensity >= minVal Then dst3.Circle(brick.feature, task.DotSize, task.highlight, -1)
         Next
         labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
     End Sub
@@ -171,23 +160,28 @@ End Class
 
 
 Public Class BrickPoint_TopRow : Inherits TaskParent
-    Public results(,) As Single
+    Dim ptBrick As New BrickPoint_Basics
     Public Sub New()
-        desc = "BackProject the top row of the survey results into the RGB image."
+        labels(3) = "BrickPoint_Basics output of intensity = 255 - not necessarily in the top row of the brick."
+        desc = "BackProject the top row of the survey results into the RGB image - might help identify vertical lines (see dst3)."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
+        ptBrick.Run(src)
+        dst3 = src.Clone
+        dst2 = src.Clone
 
-        ReDim results(task.cellSize - 1, task.cellSize - 1)
-
+        Dim count As Integer
         For Each brick In task.brickList
-            results(brick.feature.X, brick.feature.Y) += 1
+            If brick.feature = newPoint Then Continue For
+            If brick.intensity <> 255 Then Continue For
+            If brick.feature.Y = brick.rect.Y Then
+                dst2.Circle(brick.feature, task.DotSize, task.highlight, -1, task.lineType)
+                dst3.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
+                count += 1
+            End If
         Next
 
-        For Each brick In task.brickList
-            If brick.rect.Height <> task.cellSize Or brick.rect.Width <> task.cellSize Then Continue For
-            If brick.feature.Y = 0 Then dst2(brick.rect).Circle(brick.feature, task.DotSize, task.highlight, -1, task.lineType)
-        Next
+        labels(2) = "Of the " + CStr(ptBrick.intensityFeatures.Count) + " max intensity bricks " + CStr(count) + " had max intensity in the top row of the brick."
     End Sub
 End Class
 
@@ -304,14 +298,10 @@ Public Class BrickPoint_Best : Inherits TaskParent
         dst2 = src.Clone
         dst3.SetTo(0)
         bestBricks.Clear()
-        For Each ele In ptBrick.sortedPoints
-            If ele.Key = 255 Then
-                bestBricks.Add(ele.Value)
-                dst2.Circle(ele.Value, task.DotSize, task.highlight, -1)
-                dst3.Circle(ele.Value, task.DotSize, 255, -1)
-            Else
-                Exit For
-            End If
+        For Each pt In ptBrick.intensityFeatures
+            bestBricks.Add(pt)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1)
+            dst3.Circle(pt, task.DotSize, 255, -1)
         Next
     End Sub
 End Class
@@ -335,13 +325,10 @@ Public Class BrickPoint_Busiest : Inherits TaskParent
         dst3.SetTo(0)
         bestBricks.Clear()
         sortedBricks.Clear()
-        For Each ele In ptBrick.sortedPoints
-            If ele.Key = 255 Then
-                Dim pt = ele.Value
-                Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-                Dim brick = task.brickList(index)
-                If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(ptBrick.sobel.dst2(brick.rect).CountNonZero, brick.rect)
-            End If
+        For Each pt In ptBrick.intensityFeatures
+            Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim brick = task.brickList(index)
+            If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(ptBrick.sobel.dst2(brick.rect).CountNonZero, brick.rect)
         Next
 
         dst3 = ptBrick.sobel.dst2
@@ -376,13 +363,10 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
         dst3 = src
 
         ReDim results(task.cellSize - 1, task.cellSize - 1)
-        For Each ele In ptBrick.sortedPoints
-            If ele.Key = 255 Then
-                Dim pt = ele.Value
-                Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-                Dim brick = task.brickList(index)
-                results(brick.feature.X, brick.feature.Y) += 1
-            End If
+        For Each pt In ptBrick.intensityFeatures
+            Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim brick = task.brickList(index)
+            results(brick.feature.X - brick.rect.X, brick.feature.Y - brick.rect.Y) += 1
         Next
 
         Dim incrX = dst1.Width / task.cellSize
@@ -452,30 +436,6 @@ Public Class BrickPoint_FLessRegions : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class BrickPoint_Test : Inherits TaskParent
-    Dim fLess As New BrickPoint_FLessRegions
-    Public histTop As New Projection_HistTop
-    Public Sub New()
-        desc = "Use RedCloud to identify the featureLess regions found in BrickPoint_FeatureLess"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.grayStable)
-        labels = fLess.labels
-
-        dst1 = fLess.hist.dst1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        'dst2 = fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst3 = dst1.Clone
-        ' If task.firstPass Then dst2 = runRedC(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY), labels(2), dst1)
-
-        'dst0.SetTo(0)
-        'task.pointCloud.CopyTo(dst0, fLess.dst2)
-        'histTop.Run(fLess.dst2)
-    End Sub
-End Class
 
 
 
