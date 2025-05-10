@@ -524,3 +524,28 @@ End Class
 
 
 
+
+Public Class Distance_Contour : Inherits TaskParent
+    Dim tour As New Tour_Basics
+    Dim options As New Options_Distance
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Compute the distance of each point from the top contour (or a selected contour.)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        tour.Run(src)
+        dst2 = tour.dst2
+
+        dst3 = src.Clone
+        dst3(task.tourD.rect).SetTo(white, task.tourD.mask)
+
+        dst1.SetTo(255)
+        dst1(task.tourD.rect).SetTo(0, task.tourD.mask)
+
+        dst0 = dst1.DistanceTransform(options.distanceType, 0)
+    End Sub
+End Class

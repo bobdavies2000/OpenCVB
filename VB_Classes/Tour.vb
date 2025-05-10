@@ -16,14 +16,19 @@ Public Class Tour_Basics : Inherits TaskParent
         task.tourMap.SetTo(0)
         For Each td In tour.tourList
             td.index = task.tourList.Count
+            td.maxDist = GetMaxDist(td.mask, td.rect)
             task.tourList.Add(td)
             task.tourMap(td.rect).SetTo(td.index, td.mask)
         Next
 
         dst2 = ShowPalette(task.tourMap)
-        Dim tIndex = task.tourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        task.color(task.tourList(tIndex).rect).SetTo(white, task.tourList(tIndex).mask)
-        task.color.Circle(task.tourList(tIndex).maxDist, task.DotSize, black, -1)
+
+        Static ptTour = task.ClickPoint
+        If task.mouseClickFlag Then ptTour = task.ClickPoint
+        Dim index = task.tourMap.Get(Of Byte)(ptTour.Y, ptTour.X)
+        task.tourD = task.tourList(index)
+
+        task.color(task.tourD.rect).SetTo(white, task.tourD.mask)
     End Sub
 End Class
 

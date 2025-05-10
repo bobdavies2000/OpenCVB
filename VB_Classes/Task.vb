@@ -32,8 +32,9 @@ Public Class VBtask : Implements IDisposable
 
     Public gcD As brickData ' the currently selected grid cell
     Public rcD As New rcData ' the currently selected red Cell
-    Public lpD As New lpData ' the currently seleccted line pair
-    Public fpD As New fpData ' the currently seleccted feature point.
+    Public lpD As New lpData ' the currently selected line pair
+    Public fpD As New fpData ' the currently selected feature point.
+    Public tourD As New tourData ' the currently selected contour
 
     Public cellSize As Integer
     Public tilesPerCol As Integer
