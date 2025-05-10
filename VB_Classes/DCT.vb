@@ -3,7 +3,6 @@ Public Class DCT_Basics : Inherits TaskParent
     Public options As New Options_DCT
     Public Sub New()
         labels(3) = "Difference from original"
-        UpdateAdvice(traceName + ": local options control the Discrete Cosine Transform'")
         desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

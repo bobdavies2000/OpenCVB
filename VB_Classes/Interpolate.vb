@@ -5,9 +5,6 @@ Public Class Interpolate_Basics : Inherits TaskParent
     Public iOptions As New Options_Interpolate
     Dim direction = 1
     Public Sub New()
-        UpdateAdvice(traceName + ": 'Interpolation threshold' is the primary control" + vbCrLf +
-                    "Local option 'Resize %' has a secondary effect." + vbCrLf +
-                    "Local option 'Line length' affects the lines found.")
         desc = "Resize image using all available interpolation methods in OpenCV"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

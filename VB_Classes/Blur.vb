@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Blur_Basics : Inherits TaskParent
     Public Options As New Options_Blur
     Public Sub New()
-        UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.")
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

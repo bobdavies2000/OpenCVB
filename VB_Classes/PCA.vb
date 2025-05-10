@@ -875,7 +875,6 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
     Public Sub New()
         cPtr = PCA_NColor_Open()
         optiBase.FindSlider("Desired number of colors").Value = 8
-        UpdateAdvice(traceName + ": Adjust the 'Desired number of colors' between 1 and 256")
         labels = {"", "", "Palettized (CV_8U) version of color image.", ""}
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub

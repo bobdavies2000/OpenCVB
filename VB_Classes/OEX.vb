@@ -7,7 +7,6 @@ Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         labels = {"", "", "BackProjection of Hue channel", "Plot of Hue histogram"}
-        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "OpenCV Sample CalcBackProject_Demo1"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

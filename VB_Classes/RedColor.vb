@@ -8,8 +8,6 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public Sub New()
         task.gOptions.setHistogramBins(40)
         inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        UpdateAdvice(traceName + ": there are dedicated options for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (options which affect most algorithms.)")
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

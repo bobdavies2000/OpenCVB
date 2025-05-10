@@ -250,7 +250,6 @@ Public Class VBtask : Implements IDisposable
 
     Public labels(4 - 1) As String
     Public desc As String
-    Public advice As String = ""
     Public displayObjectName As String
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
@@ -587,11 +586,6 @@ Public Class VBtask : Implements IDisposable
 
         If testAllRunning = False Then treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
-
-        If advice = "" Then
-            advice = "No advice for " + algName + " yet." + vbCrLf +
-                               "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
-        End If
 
         fpList.Clear()
 

@@ -488,7 +488,6 @@ End Class
 Public Class PointCloud_ReduceSplit2 : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        UpdateAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.")
         desc = "Reduce the task.pcSplit(2) for use in several algorithms."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -517,7 +516,6 @@ End Class
 Public Class PointCloud_ReducedTopView : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
-        UpdateAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
         desc = "Create a stable side view of the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -586,7 +584,6 @@ End Class
 Public Class PointCloud_XRangeTest : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
-        UpdateAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.")
         desc = "Test adjusting the X-Range value to squeeze a histogram into dst2."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -610,7 +607,6 @@ End Class
 Public Class PointCloud_YRangeTest : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
-        UpdateAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.")
         desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

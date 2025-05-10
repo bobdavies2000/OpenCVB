@@ -638,7 +638,6 @@ End Class
 Public Class Structured_SurveyH : Inherits TaskParent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 300
-        UpdateAdvice(traceName + ": use Y-Range slider in RedCloud options.")
         labels(2) = "Each slice represents point cloud pixels with the same Y-Range"
         labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
         desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is."
@@ -685,7 +684,6 @@ End Class
 Public Class Structured_SurveyV : Inherits TaskParent
     Public Sub New()
         task.redOptions.setXRangeSlider(250)
-        UpdateAdvice(traceName + ": use X-Range slider in RedCloud options.")
         labels(2) = "Each slice represents point cloud pixels with the same X-Range"
         labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
         desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is."

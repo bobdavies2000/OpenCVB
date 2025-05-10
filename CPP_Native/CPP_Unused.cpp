@@ -352,7 +352,6 @@ public:
     Options_AddWeighted* options = new Options_AddWeighted();
     AddWeighted_Basics_CC() : CPP_Parent()
     {
-        task->UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'");
         desc = "Add 2 images with specified weights.";
     }
     void Run(cv::Mat src)
@@ -2467,7 +2466,6 @@ public:
     vector<Point> points;
 
     Bezier_Basics_CC() : CPP_Parent() {
-        advice = "Update the public points array and then Run.";
         points = { Point(100, 100),
                     Point(150, 50),
                     Point(250, 150),
@@ -2595,7 +2593,6 @@ public:
         vbPalette(dst2);
         fLess = new FeatureLess_Basics_CC();
         cPtr = new RedCloud();
-        advice = "In redOptions the 'Desired RedCloud Cells' slider has a big impact.";
         inputRemoved = Mat(dst2.size(), CV_8U);
         inputRemoved.setTo(0);
         desc = "Another minimalist approach to building RedCloud color-based cells.";
@@ -2674,7 +2671,6 @@ public:
     Mat lastMap = dst2.clone();
     RedColor_FeatureLess_CC() : CPP_Parent() {
         minCore = new RedColor_FeatureLessCore_CC();
-        advice = minCore->advice;
         dst2 = Mat::zeros(dst2.size(), CV_8U);
         labels = { "", "Mask of active RedCloud cells", "CV_8U representation of redCells", "" };
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
@@ -2736,7 +2732,6 @@ public:
         random = new Random_Basics_CC();
         knn = new KNN_Basics_CC();
         labels[2] = "Triangles built with each random point and its 2 nearest neighbors.";
-        advice = "Adjust the number of points with the options_random";
         desc = "Build triangles from random points";
     }
     Mat showMesh(const vector<Point2f>& pointList) {
@@ -2779,7 +2774,6 @@ public:
         feat = new Feature_Stable_CC();
         mesh = new Mesh_Basics_CC();
         labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
-        advice = "Use options_Features to update results.";
         desc = "Build triangles from feature points";
     }
     void Run(Mat src) {
@@ -3089,7 +3083,6 @@ public:
     std::vector<cv::Range> ranges;
     std::vector<cv::Range> rangesCloud;
     Hist_RedOptions_CC() : CPP_Parent() {
-        advice = "See redOption 'Histogram Channels' to control the settings here.";
         desc = "Build the channels, channel count, and ranges based on the PointCloud Reduction setting.";
     }
     void Run(Mat src) {

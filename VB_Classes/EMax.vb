@@ -17,7 +17,6 @@ Public Class EMax_Basics : Inherits TaskParent
         cPtr = EMax_Open()
         optiBase.FindSlider("EMax Number of Samples per region").Value = 1
         labels(3) = "Emax regions as integers"
-        UpdateAdvice(traceName + ": use local options to control EMax.")
         desc = "Use EMax - Expectation Maximization - to classify the regions around a series of labeled points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

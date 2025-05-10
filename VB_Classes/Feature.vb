@@ -137,7 +137,6 @@ Public Class Feature_NoMotionTest : Inherits TaskParent
     Public options As New Options_Features
     Dim method As New Feature_Basics
     Public Sub New()
-        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -438,7 +437,6 @@ Public Class Feature_Generations : Inherits TaskParent
     Dim features As New List(Of cv.Point)
     Dim gens As New List(Of Integer)
     Public Sub New()
-        UpdateAdvice(traceName + ": Local options will determine how many features are present.")
         desc = "Find feature age maximum and average."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -832,7 +830,6 @@ End Class
 Public Class Feature_NoMotion : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
-        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         task.gOptions.UseMotionMask.Checked = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find good features to track in a BGR image using the motion mask+"

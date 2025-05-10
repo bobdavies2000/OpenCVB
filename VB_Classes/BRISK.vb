@@ -5,7 +5,6 @@ Public Class BRISK_Basics : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
         brisk = cv.BRISK.Create()
-        UpdateAdvice(traceName + ": only the 'Min Distance' option affects the BRISK results.")
         desc = "Detect features with BRISK"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

@@ -3,7 +3,6 @@ Public Class Convex_Basics : Inherits TaskParent
     Public hull() As cv.Point
     Dim options As New Options_Convex
     Public Sub New()
-        UpdateAdvice(traceName + ": use the local options to control the number of points.")
         desc = "Surround a set of random points with a convex hull"
         labels = {"", "", "Convex Hull - red dot is center and the black dots are the input points", ""}
     End Sub

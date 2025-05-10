@@ -4,7 +4,6 @@ Public Class Covariance_Basics : Inherits TaskParent
     Public mean As New cv.Mat
     Public covariance As New cv.Mat
     Public Sub New()
-        UpdateAdvice(traceName + ": use the local options to control the number of points.")
         desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

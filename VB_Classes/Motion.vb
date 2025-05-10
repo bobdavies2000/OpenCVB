@@ -103,7 +103,6 @@ Public Class Motion_BGSub : Inherits TaskParent
     Public bgSub As New BGSubtract_MOG2
     Dim motion As New Motion_BGSub_QT
     Public Sub New()
-        UpdateAdvice(traceName + ": redOptions are used as well as BGSubtract options.")
         desc = "Use floodfill to find all the real motion in an image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -261,7 +260,6 @@ End Class
 Public Class Motion_Grid_MP : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
-        UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect Motion in the color image using multi-threading - slower than single-threaded!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -296,7 +294,6 @@ End Class
 Public Class Motion_Grid : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
-        UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect Motion in the color image.  Rectangles outlines didn't have high correlation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -434,7 +431,6 @@ Public Class Motion_RectTest : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim lastRects As New List(Of cv.Rect)
     Public Sub New()
-        UpdateAdvice(traceName + ": gOptions frame history slider will impact results.")
         labels(3) = "The white spots show the difference of the constructed image from the current image."
         desc = "Track the RGB image using Motion_Enclosing to isolate the motion"
     End Sub

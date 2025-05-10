@@ -4,7 +4,6 @@ Public Class Density_Basics : Inherits TaskParent
     Dim options = New Options_Density
     Public Sub New()
         cPtr = Density_2D_Open()
-        UpdateAdvice(traceName + ": use local options to control separation of points in 3D.")
         desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

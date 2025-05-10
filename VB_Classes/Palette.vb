@@ -89,7 +89,6 @@ End Class
 Public Class Palette_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        UpdateAdvice(traceName + ": redOptions 'Reduction' to control results.")
         desc = "Map colors To different palette"
         labels(2) = "Reduced Colors"
     End Sub
@@ -155,7 +154,6 @@ Public Class Palette_DepthColorMap : Inherits TaskParent
     Public gradientColorMap As New cv.Mat
     Dim gColor As New Gradient_ForDepth
     Public Sub New()
-        UpdateAdvice(traceName + ": adjust color with 'Convert and Scale' slider")
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Convert And Scale", 0, 100, 45)
         labels(3) = "Palette used To color left image"
         desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
@@ -542,7 +540,6 @@ End Class
 Public Class Palette_Random : Inherits TaskParent
     Public colorMap As cv.Mat
     Public Sub New()
-        UpdateAdvice(traceName + ": There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
         colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         For i = 0 To 255
             Dim vec = randomCellColor()

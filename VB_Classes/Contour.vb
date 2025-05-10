@@ -95,7 +95,6 @@ Public Class Contour_RemoveLines : Inherits TaskParent
     Dim options As New Options_Morphology
     Dim image As cv.Mat
     Public Sub New()
-        UpdateAdvice(traceName + ": use the local options in 'Morphology width/height to show impact'")
         labels = {"", "", "Identified horizontal lines - why is scale factor necessary?", "Identified vertical lines"}
         image = cv.Cv2.ImRead(task.HomeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(dst2.Height * dst2.Width / image.Height, dst2.Height)
@@ -309,7 +308,6 @@ Public Class Contour_Largest : Inherits TaskParent
     Public options As New Options_Contours
     Dim rotatedRect As New Rectangle_Rotated
     Public Sub New()
-        UpdateAdvice(traceName + ": use the local options in 'Options_Contours'")
         labels = {"", "", "Input to FindContours", "Largest single contour in the input image."}
         desc = "Create a mask from the largest contour of the input."
     End Sub
@@ -775,7 +773,6 @@ End Class
 '    Public Sub New()
 '        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
 '        optiBase.findRadio("FloodFill").Checked = True
-'        UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
 '        labels = {"", "", "FindContour input", "Draw contour output"}
 '        desc = "General purpose contour finder"
 '    End Sub

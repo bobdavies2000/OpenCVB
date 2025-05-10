@@ -8,7 +8,6 @@ Public Class CComp_Basics : Inherits TaskParent
     Dim options As New Options_CComp
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        UpdateAdvice(traceName + ": only the local options for threshold is used in CComp_Basics.")
         labels(2) = "Input to ConnectedComponenetsEx"
         desc = "Draw bounding boxes around BGR binarized connected Components"
     End Sub

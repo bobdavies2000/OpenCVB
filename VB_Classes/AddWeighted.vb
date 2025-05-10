@@ -5,7 +5,6 @@ Public Class AddWeighted_Basics : Inherits TaskParent
     Public weight As Double
     Public Sub New()
         If standalone Then task.gOptions.ColorizedDepth.Checked = True
-        UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'")
         desc = "Add 2 images with specified weights."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

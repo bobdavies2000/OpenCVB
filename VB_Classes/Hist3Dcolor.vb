@@ -302,7 +302,6 @@ Public Class Hist3Dcolor_Vector : Inherits TaskParent
     Public Sub New()
         Dim bins = task.redOptions.HistBinBar3D.Value
         binArray = {bins, bins, bins}
-        UpdateAdvice(traceName + ": redOptions '3D Histogram Bins'")
         desc = "Capture a 3D color histogram for input src - likely to be src(rect)."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

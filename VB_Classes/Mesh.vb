@@ -49,7 +49,6 @@ Public Class Mesh_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
-        UpdateAdvice(traceName + ": Use 'Options_Features' to update results.")
         desc = "Build triangles from feature points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

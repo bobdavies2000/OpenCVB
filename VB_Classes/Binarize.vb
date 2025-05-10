@@ -6,8 +6,6 @@ Imports cv = OpenCvSharp
 ' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
 Public Class Binarize_Basics : Inherits TaskParent
     Public thresholdType = cv.ThresholdTypes.Otsu
-    Dim minRange = 0
-    Dim maxRange = 255
     Public histogram As New cv.Mat
     Public meanScalar As cv.Scalar
     Public mask As New cv.Mat
@@ -15,7 +13,6 @@ Public Class Binarize_Basics : Inherits TaskParent
     Public useBlur As Boolean
     Public Sub New()
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
-        UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.")
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

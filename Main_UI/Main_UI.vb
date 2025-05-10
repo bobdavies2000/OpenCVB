@@ -87,7 +87,6 @@ Public Class Main_UI
     Dim picLabels() = {"", "", "", ""}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Dim textDesc As String = ""
-    Dim textAdvice As String = ""
     Dim totalBytesOfMemoryUsed As Integer
     Dim trueData As New List(Of TrueText)
 
@@ -722,10 +721,6 @@ Public Class Main_UI
                 settings.WorkingRes = New cv.Size(168, 94)
                 settings.captureRes = New cv.Size(672, 376)
         End Select
-    End Sub
-
-    Private Sub Advice_Click(sender As Object, e As EventArgs) Handles Advice.Click
-        MsgBox(textAdvice)
     End Sub
     Public Sub jumpToAlgorithm(algName As String)
         If AvailableAlgorithms.Items.Contains(algName) = False Then
@@ -1657,7 +1652,6 @@ Public Class Main_UI
                             BothFirstAndLastReady = False
                         End If
 
-                        textAdvice = task.advice
                         Exit While
                     End If
                 End While

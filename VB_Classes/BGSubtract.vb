@@ -6,7 +6,6 @@ Public Class BGSubtract_Basics : Inherits TaskParent
     Public options As New Options_BGSubtract
     Public Sub New()
         cPtr = BGSubtract_BGFG_Open(options.currMethod)
-        UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

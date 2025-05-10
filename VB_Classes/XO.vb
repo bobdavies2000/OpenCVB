@@ -1412,7 +1412,6 @@ Public Class XO_Line_FromContours : Inherits TaskParent
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         task.gOptions.highlight.SelectedIndex = 3
-        UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
         desc = "Find the lines in the contours."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

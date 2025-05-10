@@ -5,7 +5,6 @@ Public Class Dither_Basics : Inherits TaskParent
     Dim options As New Options_Dither
     Public Sub New()
         labels = {"", "", "Dither applied to the BGR image", "Dither applied to the Depth image"}
-        UpdateAdvice(traceName + ": use local options to control which method is used.")
         desc = "Explore all the varieties of dithering"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

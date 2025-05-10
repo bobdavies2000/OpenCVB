@@ -4,7 +4,6 @@ Public Class Correlation_Basics : Inherits TaskParent
     Dim options As New Options_FeatureMatch
     Public Sub New()
         labels(3) = "Plot of z (vertical scale) to x with ranges shown on the plot."
-        UpdateAdvice(traceName + ": there are several local options panels.")
         desc = "Compute a correlation for src rows (See also: Match.vb"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

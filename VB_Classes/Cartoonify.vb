@@ -5,7 +5,6 @@ Public Class Cartoonify_Basics : Inherits TaskParent
     Public Sub New()
         labels(2) = "Mask for Cartoon"
         labels(3) = "Cartoonify Result"
-        UpdateAdvice(traceName + ": click 'Show All' to control cartoonify options.")
         desc = "Create a cartoon from a color image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

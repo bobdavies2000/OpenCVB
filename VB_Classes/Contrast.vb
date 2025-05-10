@@ -3,7 +3,6 @@ Public Class Contrast_Basics : Inherits TaskParent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         labels(2) = "Brightness/Contrast"
-        UpdateAdvice(traceName + ": use the local options to control brightness and contrast.")
         desc = "Show image with varying contrast and brightness."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

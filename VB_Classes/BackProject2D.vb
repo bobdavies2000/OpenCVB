@@ -9,7 +9,6 @@ Public Class BackProject2D_Basics : Inherits TaskParent
     Public backProjectByGrid As Boolean = True
     Public classCount As Integer
     Public Sub New()
-        UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
         desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -67,7 +66,6 @@ End Class
 '    Public bpCol As Integer, bpRow As Integer
 '    Public Sub New()
 '        If standalone Then task.gOptions.setGridSize(5)
-'        UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
 '        desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)

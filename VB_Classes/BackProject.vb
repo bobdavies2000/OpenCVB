@@ -5,7 +5,6 @@ Public Class BackProject_Basics : Inherits TaskParent
     Public minRange As cv.Scalar, maxRange As cv.Scalar
     Public Sub New()
         labels(2) = "Move mouse to backproject a histogram column"
-        UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
         desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

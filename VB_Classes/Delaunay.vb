@@ -296,7 +296,6 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         facet32s = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
-        UpdateAdvice(traceName + ": use local options to control the number of points")
         labels(1) = "Input points to subdiv"
         labels(3) = "Inconsistent colors in dst2 are duplicate randomCellColor output."
         desc = "Subdivide an image based on the points provided."

@@ -4,7 +4,6 @@ Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_Basics : Inherits TaskParent
     Public Sub New()
-        UpdateAdvice(traceName + ": use global option to control 'Max Depth'.")
         desc = "Colorize the depth data into task.depthRGB"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1273,7 +1272,6 @@ Public Class Depth_Tiers : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_DepthTiers
     Public Sub New()
-        UpdateAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
         desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

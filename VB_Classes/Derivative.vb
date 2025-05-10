@@ -100,7 +100,6 @@ Public Class Derivative_Sobel : Inherits TaskParent
     Public options As New Options_Derivative
     Public plot As New Plot_Histogram
     Public Sub New()
-        UpdateAdvice(traceName + ": gOptions histogram Bins and several local options are important.")
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

@@ -378,7 +378,6 @@ Public Class Projection_HistSide : Inherits TaskParent
     Public histogram As New cv.Mat
     Public Sub New()
         labels = {"", "", "Top view with histogram counts", "ZY (Side View) - mask"}
-        UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
         desc = "Create a 2D side view for ZY histogram of depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -400,7 +399,6 @@ Public Class Projection_HistTop : Inherits TaskParent
     Public histogram As New cv.Mat
     Public Sub New()
         labels = {"", "", "Top view with histogram counts", "XZ (Top View) - mask"}
-        UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
         desc = "Create a 2D top view for XZ histogram of depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

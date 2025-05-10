@@ -326,7 +326,6 @@ Public Class Grid_MinMaxDepth : Inherits TaskParent
     Public minMaxVals(0) As cv.Vec2f
     Public Sub New()
         task.gOptions.GridSlider.Value = 8
-        UpdateAdvice(traceName + ": goptions 'grid Square Size' has direct impact.")
         desc = "Find the min and max depth within each grid roi."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

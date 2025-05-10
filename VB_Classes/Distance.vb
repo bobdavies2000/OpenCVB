@@ -405,7 +405,6 @@ Public Class Distance_Instant : Inherits TaskParent
     Dim options As New Options_Distance
     Public Sub New()
         labels = {"", "", "Distance transform - create a mask with threshold", ""}
-        UpdateAdvice(traceName + ": use local options to control which method is used.")
         desc = "Distance algorithm basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

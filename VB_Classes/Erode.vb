@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class Erode_Basics : Inherits TaskParent
     Public options As New Options_Erode
     Public Sub New()
-        UpdateAdvice(traceName + ": use local options to control erosion.")
         desc = "Erode the image provided."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

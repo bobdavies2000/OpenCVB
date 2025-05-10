@@ -6,7 +6,6 @@ Public Class Blob_Basics : Inherits TaskParent
     Public Sub New()
         options = New Options_Blob
         input = New Blob_Input
-        UpdateAdvice(traceName & ": click 'Show All' to see all the available options.")
         desc = "Isolate and list blobs with specified options"
     End Sub
 

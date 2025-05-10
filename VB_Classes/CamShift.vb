@@ -7,10 +7,8 @@ Public Class CamShift_Basics : Inherits TaskParent
     Dim roi As New cv.Rect
     Dim histogram As New cv.Mat
     Public Sub New()
-        UpdateAdvice(traceName + ": Draw on any available red hue area.")
         labels(2) = "Draw anywhere to create histogram and start camshift"
         labels(3) = "Histogram of targeted region (hue only)"
-        UpdateAdvice(traceName + ": click 'Show All' to control camShift options.")
         desc = "CamShift Demo - draw on the images to define the object to track. "
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
