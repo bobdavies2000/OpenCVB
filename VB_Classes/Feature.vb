@@ -15,10 +15,12 @@ Public Class Feature_Basics : Inherits TaskParent
 
         Dim features As New List(Of cv.Point2f)
         Dim ptNew As New List(Of cv.Point2f)
-        For Each pt In task.features
-            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val = 0 Then ptNew.Add(pt)
-        Next
+        If task.optionsChanged = False Then
+            For Each pt In task.features
+                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val = 0 Then ptNew.Add(pt)
+            Next
+        End If
 
         Select Case task.featureSource
             Case FeatureSrc.GoodFeaturesFull
@@ -75,9 +77,9 @@ Public Class Feature_Basics : Inherits TaskParent
                 features = task.features
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
             Case FeatureSrc.LineInput
-                task.lines.Run(task.gray)
+                Dim minDistance = task.featureOptions.DistanceSlider.Value
                 For Each lp In task.lpList
-                    If lp.p1 <> lp.p2 Then
+                    If lp.length > minDistance Then
                         features.Add(lp.p1)
                         features.Add(lp.p2)
                     End If
@@ -122,6 +124,8 @@ Public Class Feature_Basics : Inherits TaskParent
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
+
+        labels(2) = CStr(task.features.Count) + " features were found using '" + task.featureOptions.FeatureMethod.Text + "' method."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
@@ -180,7 +184,7 @@ Public Class Feature_KNN : Inherits TaskParent
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.trainInput(trainIndex)
             Dim qPt = task.features(i)
-            If pt.DistanceTo(qPt) > task.minDistance Then knn.trainInput(trainIndex) = task.features(i)
+            If pt.DistanceTo(qPt) > 2 Then knn.trainInput(trainIndex) = task.features(i)
         Next
         featurePoints = New List(Of cv.Point2f)(knn.trainInput)
 
@@ -215,6 +219,7 @@ Public Class Feature_PointTracker : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+
         Dim templatePad = options.templatePad
         Dim templateSize = options.templateSize
 
@@ -286,13 +291,12 @@ Public Class Feature_LucasKanade : Inherits TaskParent
     Dim pyr As New FeatureFlow_LucasKanade
     Public ptList As New List(Of cv.Point)
     Public ptLast As New List(Of cv.Point)
-    Dim ptHist As New List(Of List(Of cv.Point))
     Public Sub New()
         desc = "Provide a trace of the tracked features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         pyr.Run(src)
-        dst2 = src
+        dst2 = pyr.dst2
         labels(2) = pyr.labels(2)
 
         If task.heartBeat Then dst3.SetTo(0)
@@ -333,32 +337,15 @@ Public Class Feature_Points : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(task.grayStable)
 
-        If task.heartBeat Then dst3.SetTo(0)
+        If task.heartBeat Then dst2.SetTo(0)
 
         For Each pt In task.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            DrawCircle(dst3, pt, task.DotSize, task.highlight)
         Next
         labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Feature_Trace : Inherits TaskParent
-    Dim track As New RedTrack_Features
-    Public Sub New()
-        desc = "Placeholder to help find RedTrack_Features"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        track.Run(src)
-        dst2 = track.dst2
-        labels = track.labels
-    End Sub
-End Class
 
 
 
@@ -373,7 +360,7 @@ Public Class Feature_TraceDelaunay : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         features.Run(src)
-        dst3 = features.dst2
+        dst3 = features.dst3
 
         If task.optionsChanged Then goodList.Clear()
 
@@ -436,10 +423,13 @@ End Class
 Public Class Feature_Generations : Inherits TaskParent
     Dim features As New List(Of cv.Point)
     Dim gens As New List(Of Integer)
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Find feature age maximum and average."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.grayStable)
+
         Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         For Each pt In task.featurePoints
             Dim index = features.IndexOf(pt)
@@ -475,10 +465,13 @@ Public Class Feature_History : Inherits TaskParent
     Public features As New List(Of cv.Point)
     Dim featureHistory As New List(Of List(Of cv.Point))
     Dim gens As New List(Of Integer)
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Find good features across multiple frames."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.grayStable)
+
         dst2 = src.Clone
 
         featureHistory.Add(New List(Of cv.Point)(task.featurePoints))
@@ -583,10 +576,13 @@ End Class
 
 
 Public Class Feature_RedCloud : Inherits TaskParent
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Show the feature points in the RedCloud output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(src)
+
         dst2 = runRedC(src, labels(2))
 
         For Each pt In task.featurePoints
@@ -601,21 +597,23 @@ End Class
 
 
 Public Class Feature_WithDepth : Inherits TaskParent
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Show the feature points that have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = src
+        feat.Run(task.grayStable)
+
+        dst2 = src
         Dim depthCount As Integer
         For Each pt In task.featurePoints
-            Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
-            If val > 0 Then
-                DrawCircle(dst3, pt, task.DotSize, task.highlight)
+            Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            If task.brickList(index).depth > 0 Then
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 depthCount += 1
             End If
         Next
-        labels(3) = CStr(depthCount) + " features had depth or " +
-                    Format(depthCount / task.features.Count, "0%")
+        labels(2) = CStr(depthCount) + " features had depth or " + Format(depthCount / task.features.Count, "0%")
     End Sub
 End Class
 
@@ -676,12 +674,15 @@ End Class
 
 Public Class Feature_SteadyCam : Inherits TaskParent
     Public options As New Options_Features
+    Dim feat As New Feature_Basics
     Public Sub New()
         optiBase.FindSlider("Threshold Percent for Resync").Value = 50
         desc = "Track features using correlation without the motion mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+
+        feat.Run(task.grayStable)
 
         Static features As New List(Of cv.Point)(task.featurePoints)
         Static lastSrc As cv.Mat = src.Clone
@@ -853,7 +854,7 @@ End Class
 
 
 Public Class Feature_StableVisual : Inherits TaskParent
-    Dim noMotion As New Feature_NoMotion
+    Dim noMotion As New Feature_Basics
     Public fpStable As New List(Of fpData)
     Public ptStable As New List(Of cv.Point)
     Public Sub New()

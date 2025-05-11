@@ -84,17 +84,20 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
     Public features As New List(Of cv.Point2f)
     Public lastFeatures As New List(Of cv.Point2f)
     Dim options As New Options_OpticalFlowSparse
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Show the optical flow of a sparse matrix."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+
+        feat.Run(task.grayStable)
 
         dst2 = src.Clone()
         dst3 = src.Clone()
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static lastGray As cv.Mat = src.Clone
+        If src.Channels() = 3 Then src = task.grayStable
+        Static lastGray As cv.Mat = task.grayStable.Clone
         features = task.features
         Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat

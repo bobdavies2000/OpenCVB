@@ -15,9 +15,10 @@ Public Class Line_Basics : Inherits TaskParent
         If task.optionsChanged Then
             lastList.Clear()
             lpList.Clear()
+            task.motionMask.SetTo(255)
         End If
 
-        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingle)
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each lp In lastList
             Dim noMotionTest As Boolean = True
             For Each index In lp.cellList
@@ -59,6 +60,7 @@ Public Class Line_Basics : Inherits TaskParent
                 lpMap(task.brickList(index).rect).SetTo(lp.index)
             Next
             lpList.Add(lp)
+            If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
         If standaloneTest() Then
@@ -69,7 +71,7 @@ Public Class Line_Basics : Inherits TaskParent
         End If
 
         lastList = New List(Of lpData)(lpList)
-        labels(2) = CStr(lpList.Count) + " lines were identified from the " + CStr(rawLines.lpList.Count) + " raw lines found."
+        labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
     End Sub
 End Class
 

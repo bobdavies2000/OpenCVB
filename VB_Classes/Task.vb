@@ -840,7 +840,12 @@ Public Class VBtask : Implements IDisposable
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         motionBasics.Run(src)
-        If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
+        If task.optionsChanged Then
+            gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            grayStable = gray.Clone
+        Else
+            gray.CopyTo(grayStable, motionMask)
+        End If
         fcsBasics.Run(src)
         brickBasics.Run(src)
         buildCorr.Run(src)

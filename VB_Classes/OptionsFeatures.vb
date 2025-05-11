@@ -11,7 +11,7 @@
         FeatureMethod.Items.Add("Harris")
         FeatureMethod.Items.Add("FAST")
         FeatureMethod.Items.Add("LineInput")
-        FeatureMethod.SelectedItem() = "GoodFeatures Full Image"
+        FeatureMethod.SelectedItem() = "LineInput"
 
         EdgeMethods.Items.Add("Canny")
         EdgeMethods.Items.Add("Scharr")
