@@ -733,7 +733,7 @@ End Class
 
 
 
-Public Class Line_CellList : Inherits TaskParent
+Public Class Line_Bricks : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
         desc = "Create the bricks for a given line."
@@ -777,7 +777,7 @@ End Class
 
 
 
-Public Class Line_CellListValidate : Inherits TaskParent
+Public Class Line_BricksValidate : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
         desc = "Validate the bricks for a given line."

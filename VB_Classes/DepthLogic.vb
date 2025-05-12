@@ -2,13 +2,14 @@
 Public Class DepthLogic_Basics : Inherits TaskParent
     Dim structured As New Structured_Basics
     Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Collect all the depth lines to make them accessible to all algorithms."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         structured.Run(src)
         dst2 = src.Clone
-        dst1.SetTo(0)
+
         task.logicalLines.Clear()
         For Each lp In task.lpList
             lp.index = task.logicalLines.Count + 1
@@ -26,13 +27,23 @@ Public Class DepthLogic_Basics : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
+        dst0.SetTo(0)
+        dst1.SetTo(0)
+        Dim brickCount As Integer
         For Each lp In task.logicalLines
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+            For Each index In lp.bricks
+                Dim brick = task.brickList(index)
+                dst0(brick.rect).SetTo(lp.index)
+                brickCount += 1
+            Next
         Next
 
-
-        If standaloneTest() Then dst3 = ShowPalette(dst1)
+        If standaloneTest() Then
+            If task.toggleOn Then dst3 = ShowPalette(dst1) Else dst3 = ShowPalette(dst0)
+        End If
         labels(2) = "Found " + CStr(task.logicalLines.Count) + " lines in the depth data."
+        labels(3) = CStr(brickCount) + " bricks were updated with logical depth (" + Format(brickCount / task.gridRects.Count, "0%") + ")"
     End Sub
 End Class
 
