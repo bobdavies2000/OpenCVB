@@ -691,14 +691,14 @@ Public Class FCS_ByDepth : Inherits TaskParent
         dst2 = fcs.dst2
         labels(2) = fcs.labels(2)
 
-        Dim cellList As New List(Of Single)
+        Dim bricks As New List(Of Single)
         For Each fp In task.fpList
-            cellList.Add(fp.depth)
+            bricks.Add(fp.depth)
         Next
 
         plot.minRange = 0
         plot.maxRange = task.MaxZmeters
-        plot.Run(cv.Mat.FromPixelData(cellList.Count, 1, cv.MatType.CV_32F, cellList.ToArray))
+        plot.Run(cv.Mat.FromPixelData(bricks.Count, 1, cv.MatType.CV_32F, bricks.ToArray))
         dst1 = plot.dst2
 
         Dim incr = dst1.Width / task.histogramBins

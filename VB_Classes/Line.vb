@@ -21,14 +21,14 @@ Public Class Line_Basics : Inherits TaskParent
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each lp In lastList
             Dim noMotionTest As Boolean = True
-            For Each index In lp.cellList
+            For Each index In lp.bricks
                 Dim brick = If(index < task.brickList.Count, task.brickList(index), task.brickList(0))
                 If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
                     noMotionTest = False
                     Exit For
                 End If
             Next
-            If noMotionTest And lp.cellList.Count > 1 Then
+            If noMotionTest And lp.bricks.Count > 1 Then
                 lp.age += 1
                 sortlines.Add(lp.length, lp)
             End If
@@ -38,7 +38,7 @@ Public Class Line_Basics : Inherits TaskParent
 
         For Each lp In rawLines.lpList
             Dim motionTest As Boolean = False
-            For Each index In lp.cellList
+            For Each index In lp.bricks
                 Dim brick = task.brickList(index)
                 If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
                     motionTest = True
@@ -56,7 +56,7 @@ Public Class Line_Basics : Inherits TaskParent
         lpMap.SetTo(0)
         For Each lp In sortlines.Values
             lp.index = lpList.Count
-            For Each index In lp.cellList
+            For Each index In lp.bricks
                 lpMap(task.brickList(index).rect).SetTo(lp.index)
             Next
             lpList.Add(lp)
@@ -504,8 +504,8 @@ Public Class Line_Info : Inherits TaskParent
         strOut += "Slope = " + Format(task.lpD.m, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
 
-        For Each index In task.lpD.cellList
-            If index = task.lpD.cellList.Last Then
+        For Each index In task.lpD.bricks
+            If index = task.lpD.bricks.Last Then
                 strOut += CStr(index)
             Else
                 strOut += CStr(index) + ", "
@@ -736,7 +736,7 @@ End Class
 Public Class Line_CellList : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
-        desc = "Create the cellList for a given line."
+        desc = "Create the bricks for a given line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
@@ -751,13 +751,13 @@ Public Class Line_CellList : Inherits TaskParent
         End If
 
 
-        lp.cellList.Clear()
+        lp.bricks.Clear()
         If lp.p1.X = lp.p2.X Then
             ' handle the special case of slope 0
             Dim x = lp.p1.X
             For y = Math.Min(lp.p1.Y, lp.p2.Y) To Math.Max(lp.p1.Y, lp.p2.Y) Step task.cellSize
                 Dim index = task.brickMap.Get(Of Single)(y, x)
-                lp.cellList.Add(index)
+                lp.bricks.Add(index)
                 dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
             Next
         Else
@@ -765,10 +765,10 @@ Public Class Line_CellList : Inherits TaskParent
                 Dim y = lp.m * x + lp.b
                 Dim index = task.brickMap.Get(Of Single)(y, x)
                 dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
-                If lp.cellList.Contains(index) = False Then lp.cellList.Add(index)
+                If lp.bricks.Contains(index) = False Then lp.bricks.Add(index)
             Next
         End If
-        labels(2) = CStr(lp.cellList.Count) + " bricks will cover the line."
+        labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
     End Sub
 End Class
 
@@ -780,7 +780,7 @@ End Class
 Public Class Line_CellListValidate : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
-        desc = "Validate the cellList for a given line."
+        desc = "Validate the bricks for a given line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
@@ -791,9 +791,9 @@ Public Class Line_CellListValidate : Inherits TaskParent
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
             End If
         End If
-        For Each index In lp.cellList
+        For Each index In lp.bricks
             dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
         Next
-        labels(2) = CStr(lp.cellList.Count) + " bricks will cover the line."
+        labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
     End Sub
 End Class

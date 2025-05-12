@@ -988,7 +988,7 @@ Public Class Brick_Lines : Inherits TaskParent
 
         dst3.SetTo(0)
         If task.heartBeat Then info.Run(emptyMat)
-        For Each index In task.lpD.cellList
+        For Each index In task.lpD.bricks
             Dim brick = task.brickList(index)
             dst2.Rectangle(brick.rect, task.highlight, 1, task.lineType)
         Next

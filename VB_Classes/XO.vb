@@ -4315,7 +4315,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
             lp.index = lpList.Count
 
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-            lp.cellList.Clear()
+            lp.bricks.Clear()
             lpList.Add(lp)
         Next
 
@@ -4325,7 +4325,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
             hist.Run(dst1(brick.rect))
             For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
                 If hist.histarray(i) > 0 Then
-                    lpList(i).cellList.Add(brick.index)
+                    lpList(i).bricks.Add(brick.index)
                     task.lpMap(task.brickList(brick.index).rect).SetTo(brick.index)
                 End If
             Next
@@ -4336,7 +4336,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
         For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            For Each index In lp.cellList
+            For Each index In lp.bricks
                 dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
             Next
         Next
@@ -4381,7 +4381,7 @@ Public Class XO_Structured_Basics : Inherits TaskParent
         lpList.Add(New lpData)
         For Each lp In lines.lpList
             lp.index = lpList.Count
-            lp.cellList.Clear()
+            lp.bricks.Clear()
             dst.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
             lpList.Add(lp)
         Next
@@ -4391,14 +4391,14 @@ Public Class XO_Structured_Basics : Inherits TaskParent
             hist.Run(dst(brick.rect))
             For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
                 If hist.histarray(i) > 0 Then
-                    lpList(i).cellList.Add(brick.index)
+                    lpList(i).bricks.Add(brick.index)
                 End If
             Next
         Next
 
         structureMap.SetTo(0)
         For Each lp In lpList
-            For Each index In lp.cellList
+            For Each index In lp.bricks
                 Dim brick = task.brickList(index)
                 structureMap(brick.rect).SetTo(lp.index)
             Next

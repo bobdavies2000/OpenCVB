@@ -15,15 +15,15 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         Dim debugmode = If(task.selectedFeature = 0, False, True)
 
         For Each lp In task.lpList
-            If lp.cellList.Count = 0 Then Continue For
+            If lp.bricks.Count = 0 Then Continue For
             If debugmode Then If task.selectedFeature <> lp.index Then Continue For
 
             Dim halfSum1 As New List(Of Single), halfsum2 As New List(Of Single)
-            Dim halfCount As Integer = Math.Floor(If(lp.cellList.Count Mod 2 = 0, lp.cellList.Count, lp.cellList.Count - 1) / 2)
+            Dim halfCount As Integer = Math.Floor(If(lp.bricks.Count Mod 2 = 0, lp.bricks.Count, lp.bricks.Count - 1) / 2)
             Dim depthValues As New List(Of Single)
             For i = 0 To halfCount - 1
-                Dim gc1 = task.brickList(lp.cellList(i))
-                Dim gc2 = task.brickList(lp.cellList(lp.cellList.Count - i - 1))
+                Dim gc1 = task.brickList(lp.bricks(i))
+                Dim gc2 = task.brickList(lp.bricks(lp.bricks.Count - i - 1))
 
                 Dim d1 = gc1.depth
                 Dim d2 = gc2.depth
@@ -44,14 +44,14 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                 End If
             Next
 
-            Dim incr = 255 / lp.cellList.Count
+            Dim incr = 255 / lp.bricks.Count
             Dim offset As Integer
             avg1 = If(halfSum1.Count > 0, halfSum1.Average, 0)
             avg2 = If(halfsum2.Count > 0, halfsum2.Average, 0)
 
-            If avg1 < avg2 Then offset = lp.cellList.Count
+            If avg1 < avg2 Then offset = lp.bricks.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
-                For Each index In lp.cellList
+                For Each index In lp.bricks
                     Dim brick = task.brickList(index)
                     dst1(brick.rect).SetTo(1)
                     If debugmode Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
@@ -60,9 +60,9 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             Else
                 Dim min = If(depthValues.Count, depthValues.Min, 0)
                 Dim max = If(depthValues.Count, depthValues.Max, 0)
-                Dim depthIncr = (max - min) / lp.cellList.Count
-                For i = 0 To lp.cellList.Count - 1
-                    Dim index = lp.cellList(i)
+                Dim depthIncr = (max - min) / lp.bricks.Count
+                For i = 0 To lp.bricks.Count - 1
+                    Dim index = lp.bricks(i)
                     Dim brick = task.brickList(index)
                     If offset > 0 Then
                         dst1(brick.rect).SetTo((offset - i + 1) * incr)

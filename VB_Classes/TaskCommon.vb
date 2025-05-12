@@ -574,8 +574,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p2 As cv.Point2f
     Public length As Single
     Public index As Integer
-    Public bricks As List(Of Index)
-    Public cellList As New List(Of Integer)  ' index of each brick containing the line.
+    Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
     Public b As Single
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
@@ -615,20 +614,20 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             Dim x = p1.X
             For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y) Step task.cellSize
                 Dim index = task.brickMap.Get(Of Single)(y, x)
-                If cellList.Contains(index) = False Then cellList.Add(index)
+                If bricks.Contains(index) = False Then bricks.Add(index)
             Next
         Else
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
                 For x = Math.Min(p1.X, p2.X) To Math.Max(p1.X, p2.X)
                     Dim y = m * x + b
                     Dim index = task.brickMap.Get(Of Single)(y, x)
-                    If cellList.Contains(index) = False Then cellList.Add(index)
+                    If bricks.Contains(index) = False Then bricks.Add(index)
                 Next
             Else
                 For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y)
                     Dim x = (y - b) / m
                     Dim index = task.brickMap.Get(Of Single)(y, x)
-                    If cellList.Contains(index) = False Then cellList.Add(index)
+                    If bricks.Contains(index) = False Then bricks.Add(index)
                 Next
             End If
         End If

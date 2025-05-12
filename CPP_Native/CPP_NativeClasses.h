@@ -1707,18 +1707,18 @@ class RedColor_FindCells
 {
 private:
 public:
-    vector <int> cellList;
+    vector <int> bricks;
     RedColor_FindCells() {}
     void RunCPP(Mat src)
     {
-        cellList.clear();
+        bricks.clear();
         for (int y = 0; y < src.rows; y++)
         {
             for (int x = 0; x < src.cols; x++)
             {
                 auto val = src.at<unsigned char>(y, x);
-                if (count(cellList.begin(), cellList.end(), val) == 0)
-                    cellList.push_back(val);
+                if (count(bricks.begin(), bricks.end(), val) == 0)
+                    bricks.push_back(val);
             }
         }
     }
@@ -1733,13 +1733,13 @@ void RedColor_FindCells_Close(RedColor_FindCells* cPtr)
 {
     delete cPtr;
 }
-extern "C" __declspec(dllexport) int RedColor_FindCells_TotalCount(RedColor_FindCells* cPtr) { return int(cPtr->cellList.size()); }
+extern "C" __declspec(dllexport) int RedColor_FindCells_TotalCount(RedColor_FindCells* cPtr) { return int(cPtr->bricks.size()); }
 extern "C" __declspec(dllexport)
 int* RedColor_FindCells_RunCPP(RedColor_FindCells* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->RunCPP(Mat(rows, cols, CV_8UC1, dataPtr));
-    if (cPtr->cellList.size() == 0) return 0;
-    return (int*)&cPtr->cellList[0];
+    if (cPtr->bricks.size() == 0) return 0;
+    return (int*)&cPtr->bricks[0];
 }
 
 

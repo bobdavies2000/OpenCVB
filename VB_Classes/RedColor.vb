@@ -112,14 +112,14 @@ End Class
 
 
 Public Class RedColor_FindCells : Inherits TaskParent
-    Public cellList As New List(Of Integer)
+    Public bricks As New List(Of Integer)
     Public Sub New()
         task.gOptions.pixelDiffThreshold = 25
         cPtr = RedColor_FindCells_Open()
         desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cellList = New List(Of Integer)
+        bricks = New List(Of Integer)
 
         dst2 = runRedC(src, labels(2))
 
@@ -135,11 +135,11 @@ Public Class RedColor_FindCells : Inherits TaskParent
         Dim cellsFound(count - 1) As Integer
         Marshal.Copy(imagePtr, cellsFound, 0, cellsFound.Length)
 
-        cellList = cellsFound.ToList
+        bricks = cellsFound.ToList
         dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         dst3.SetTo(0)
-        For Each index In cellList
+        For Each index In bricks
             If task.rcList.Count <= index Then Continue For
             Dim rc = task.rcList(index)
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
