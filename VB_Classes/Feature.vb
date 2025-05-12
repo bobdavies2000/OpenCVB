@@ -77,11 +77,14 @@ Public Class Feature_Basics : Inherits TaskParent
                 features = task.features
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
             Case FeatureSrc.LineInput
+                task.logicalLines.Clear()
                 Dim minDistance = task.featureOptions.DistanceSlider.Value
                 For Each lp In task.lpList
                     If lp.length > minDistance Then
                         features.Add(lp.p1)
                         features.Add(lp.p2)
+                        lp.index = task.logicalLines.Count
+                        task.logicalLines.Add(lp)
                     End If
                 Next
         End Select
@@ -109,7 +112,6 @@ Public Class Feature_Basics : Inherits TaskParent
         task.features.Clear()
         task.featurePoints.Clear()
         task.fpFromGridCell.Clear()
-        dst3.SetTo(0)
         For i = 0 To sortByGrid.Count - 1
             Dim pt = sortByGrid.ElementAt(i).Value
             task.features.Add(pt)
@@ -117,13 +119,17 @@ Public Class Feature_Basics : Inherits TaskParent
 
             Dim nextIndex = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             task.fpFromGridCell.Add(nextIndex)
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
-        For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-        Next
+        If task.featureSource = FeatureSrc.LineInput Then
+            For Each lp In task.logicalLines
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+        Else
+            For Each pt In task.features
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            Next
+        End If
 
         labels(2) = CStr(task.features.Count) + " features were found using '" + task.featureOptions.FeatureMethod.Text + "' method."
     End Sub

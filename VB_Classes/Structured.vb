@@ -32,6 +32,7 @@ Public Class Structured_Basics : Inherits TaskParent
             dst3.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
         Next
         task.structureMapY = linesY.lpMap.Clone
+
     End Sub
 End Class
 

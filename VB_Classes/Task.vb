@@ -20,6 +20,7 @@ Public Class VBtask : Implements IDisposable
     Public regionList As New List(Of rcData)
     Public featList As New List(Of List(Of Integer))
     Public fLess As New List(Of List(Of Integer))
+    Public logicalLines As New List(Of lpData)
 
     Public brickMap As New cv.Mat ' map of bricks to index in bricklist
     Public tourMap As New cv.Mat ' map of contours to index in tourList
@@ -140,6 +141,7 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
+    Public depthLogic As DepthLogic_Basics
 
     Public paletteRandom As Palette_RandomColors
     Public kalman As Kalman_Basics
@@ -571,6 +573,7 @@ Public Class VBtask : Implements IDisposable
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New Line_Basics
+        depthLogic = New DepthLogic_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -890,6 +893,8 @@ Public Class VBtask : Implements IDisposable
         lines.Run(src.Clone)
         task.lpList = New List(Of lpData)(lines.lpList)
         task.lpMap = lines.lpMap.Clone
+
+        depthLogic.Run(src)
 
         Dim saveOptionsChanged = optionsChanged
         If paused = False Then

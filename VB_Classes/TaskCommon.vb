@@ -574,7 +574,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p2 As cv.Point2f
     Public length As Single
     Public index As Integer
-    Public cellList As New List(Of Integer)
+    Public bricks As List(Of Index)
+    Public cellList As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
     Public b As Single
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f

@@ -61,7 +61,7 @@ Public Class Tour_Core : Inherits TaskParent
             Dim minY As Single = td.contour.Min(Function(p) p.Y)
             Dim maxY As Single = td.contour.Max(Function(p) p.Y)
 
-            td.rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
+            td.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
             If td.rect.Width = 0 Or td.rect.Height = 0 Then Continue For
 
             td.mask = contours.dst0(td.rect).Clone

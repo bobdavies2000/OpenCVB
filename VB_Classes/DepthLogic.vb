@@ -1,5 +1,45 @@
 ﻿Imports cv = OpenCvSharp
-Public Class LogicalDepth_Basics : Inherits TaskParent
+Public Class DepthLogic_Basics : Inherits TaskParent
+    Dim structured As New Structured_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect all the depth lines to make them accessible to all algorithms."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        structured.Run(src)
+        dst2 = src.Clone
+        dst1.SetTo(0)
+        task.logicalLines.Clear()
+        For Each lp In task.lpList
+            lp.index = task.logicalLines.Count + 1
+            task.logicalLines.Add(lp)
+        Next
+
+        For Each lp In structured.lpListX
+            lp.index = task.logicalLines.Count + 1
+            task.logicalLines.Add(lp)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+        For Each lp In structured.lpListY
+            lp.index = task.logicalLines.Count + 1
+            task.logicalLines.Add(lp)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+
+        For Each lp In task.logicalLines
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+        Next
+        If standaloneTest() Then dst3 = ShowPalette(dst1)
+        labels(2) = "Found " + CStr(task.logicalLines.Count) + " lines in the depth data."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class DepthLogic_Bricks : Inherits TaskParent
     Dim structured As New Structured_Basics
     Dim gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
@@ -80,7 +120,6 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
             task.brickList(tuple.Item1).depth = tuple.Item2
         Next
 
-
         dst1.SetTo(0)
         For Each brick In task.brickList
             dst1(brick.rect).SetTo(brick.depth * 255 / task.MaxZmeters)
@@ -93,3 +132,18 @@ Public Class LogicalDepth_Basics : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class DepthLogic_Correlations : Inherits TaskParent
+    Public Sub New()
+        desc = "Reconstruct depth data using depth lines with high correlation (typically indicating featureless.)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        For Each lp In task.logicalLines
+
+        Next
+    End Sub
+End Class
