@@ -652,7 +652,11 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Dim minY As Single = brickptList.Min(Function(p) p.Y)
         Dim maxY As Single = brickptList.Max(Function(p) p.Y)
 
-        rect = New cv.Rect(minX, minY, maxX + task.cellSize - minX, maxY + task.cellSize - minY)
+        Dim w = maxX + task.cellSize - minX
+        Dim h = maxY + task.cellSize - minY
+        If minX + w >= task.workingRes.Width Then w = task.workingRes.Width - minX
+        If minY + h >= task.workingRes.Height Then h = task.workingRes.Height - minY
+        rect = New cv.Rect(minX, minY, w, h)
     End Sub
     Sub New()
         p1 = New cv.Point2f()
