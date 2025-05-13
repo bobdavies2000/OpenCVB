@@ -3365,7 +3365,7 @@ Public Class Options_Threshold : Inherits OptionParent
     Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
     Public thresholdName As String = ""
     Public threshold As Integer = 128
-    Public gradient As New Gradient_ForDepth
+    Public gradient As New Gradient_Color
     Public inputGray As Boolean = False
     Public otsuOption As Boolean = False
     Public dst2 As cv.Mat
@@ -3510,7 +3510,7 @@ Public Class Options_ThresholdAll : Inherits OptionParent
     Public constantVal As Integer = 0
     Public maxVal As Integer = 255
     Public threshold As Integer = 100
-    Public gradient As New Gradient_ForDepth
+    Public gradient As New Gradient_Color
     Public inputGray As Boolean = False
     Public otsuOption As Boolean = False
     Public adaptiveMethod As cv.AdaptiveThresholdTypes = cv.AdaptiveThresholdTypes.GaussianC

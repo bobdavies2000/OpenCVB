@@ -573,7 +573,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public length As Single
+    Public rect As cv.Rect
     Public index As Integer
+    Public depthLine As Boolean ' false means it is an RGB line.
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
     Public b As Single
@@ -608,33 +610,54 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         age = 1
 
         If length > 180 Then Dim k = 0
+        Dim brickptList As New List(Of cv.Point2f)
         If Math.Abs(p1.X - p2.X) <= 2 Then ' 
             m = 100000 ' a big number for slope 
             ' handle the special case of slope 0
             Dim x = p1.X
             For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y) Step task.cellSize
                 Dim index = task.brickMap.Get(Of Single)(y, x)
-                If bricks.Contains(index) = False Then bricks.Add(index)
+                If bricks.Contains(index) = False Then
+                    bricks.Add(index)
+                    Dim brick = task.brickList(index)
+                    brickptList.Add(brick.rect.TopLeft)
+                End If
             Next
         Else
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
                 For x = Math.Min(p1.X, p2.X) To Math.Max(p1.X, p2.X)
                     Dim y = m * x + b
                     Dim index = task.brickMap.Get(Of Single)(y, x)
-                    If bricks.Contains(index) = False Then bricks.Add(index)
+                    If bricks.Contains(index) = False Then
+                        bricks.Add(index)
+                        Dim brick = task.brickList(index)
+                        brickptList.Add(brick.rect.TopLeft)
+                    End If
                 Next
             Else
                 For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y)
                     Dim x = (y - b) / m
                     Dim index = task.brickMap.Get(Of Single)(y, x)
-                    If bricks.Contains(index) = False Then bricks.Add(index)
+                    If bricks.Contains(index) = False Then
+                        bricks.Add(index)
+                        Dim brick = task.brickList(index)
+                        brickptList.Add(brick.rect.TopLeft)
+                    End If
                 Next
             End If
         End If
+
+        Dim minX As Single = brickptList.Min(Function(p) p.X)
+        Dim maxX As Single = brickptList.Max(Function(p) p.X)
+        Dim minY As Single = brickptList.Min(Function(p) p.Y)
+        Dim maxY As Single = brickptList.Max(Function(p) p.Y)
+
+        rect = New cv.Rect(minX, minY, maxX + task.cellSize - minX, maxY + task.cellSize - minY)
     End Sub
     Sub New()
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
+        rect = New cv.Rect(0, 0, 8, 8) ' dummy rect for first pass through Gradient_Depth
     End Sub
     Public Function BuildLongLine(lp As lpData) As lpData
         If lp.p1.X <> lp.p2.X Then

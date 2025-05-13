@@ -16,7 +16,7 @@ End Class
 
 
 
-Public Class Gradient_Depth : Inherits TaskParent
+Public Class Gradient_PhaseDepth : Inherits TaskParent
     Dim sobel As New Edge_Sobel
     Public Sub New()
         labels(3) = "Phase Output"
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class Gradient_ForDepth : Inherits TaskParent
+Public Class Gradient_Color : Inherits TaskParent
     Public color1 = cv.Scalar.Blue
     Public color2 = cv.Scalar.Yellow
     Public gradientWidth As Integer
@@ -95,5 +95,58 @@ Public Class Gradient_ForDepth : Inherits TaskParent
             gradient.Col(i).SetTo(gradientColors.Get(Of cv.Scalar)(0, i))
         Next
         dst2 = gradient.Resize(dst2.Size)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Gradient_Depth : Inherits TaskParent
+    Dim options As New Options_Distance
+    Public lp As lpData
+    Public Sub New()
+        If standalone Then lp = New lpData
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Test using the distance transform to create a gradient in depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Static depthRange As Single, brickNear As brickData, brickFar As brickData
+        dst0(lp.rect).SetTo(0)
+        dst1(lp.rect).SetTo(0)
+        dst2(lp.rect).SetTo(0)
+        dst3(lp.rect).SetTo(0)
+        If standalone Then lp = task.logicalLines(0)
+        For Each brick In lp.bricks
+            dst3.Rectangle(task.brickList(brick).rect, 255, -1)
+        Next
+
+        If task.brickList(lp.bricks.First).depth < task.brickList(lp.bricks.Last).depth Then
+            brickNear = task.brickList(lp.bricks.First)
+            brickFar = task.brickList(lp.bricks.Last)
+        Else
+            brickNear = task.brickList(lp.bricks.First)
+            brickFar = task.brickList(lp.bricks.Last)
+        End If
+
+        dst1(lp.rect).SetTo(255)
+        dst1.Set(Of Byte)(brickNear.rect.TopLeft.Y, brickNear.rect.TopLeft.X, 0)
+        depthRange = brickFar.depth - brickNear.depth
+        dst0(lp.rect) = dst1(lp.rect).DistanceTransform(options.distanceType, 0)
+
+        Dim mm = GetMinMax(dst0(lp.rect))
+        Dim normVal = 1 / mm.maxVal
+        dst2(lp.rect) = dst0(lp.rect) * normVal
+
+        dst2(lp.rect) = dst2(lp.rect).SetTo(0, Not dst3(lp.rect))
+
+        Dim tmp As New cv.Mat
+        cv.Cv2.Multiply(task.pcSplit(2)(lp.rect), dst2(lp.rect), tmp)
+        cv.Cv2.ImShow("tmp", tmp)
     End Sub
 End Class

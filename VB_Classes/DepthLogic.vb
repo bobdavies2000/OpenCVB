@@ -2,7 +2,6 @@
 Public Class DepthLogic_Basics : Inherits TaskParent
     Dim structured As New Structured_Basics
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Collect all the depth lines to make them accessible to all algorithms."
     End Sub
@@ -10,38 +9,44 @@ Public Class DepthLogic_Basics : Inherits TaskParent
         structured.Run(src)
         dst2 = src.Clone
 
-        task.logicalLines.Clear()
+        Dim lines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each lp In task.lpList
-            lp.index = task.logicalLines.Count + 1
-            task.logicalLines.Add(lp)
+            lp.depthLine = False
+            lines.Add(lp.length, lp)
         Next
 
         For Each lp In structured.lpListX
-            lp.index = task.logicalLines.Count + 1
-            task.logicalLines.Add(lp)
+            lp.depthLine = True
+            lines.Add(lp.length, lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         For Each lp In structured.lpListY
-            lp.index = task.logicalLines.Count + 1
-            task.logicalLines.Add(lp)
+            lp.depthLine = True
+            lines.Add(lp.length, lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
-        dst0.SetTo(0)
         dst1.SetTo(0)
         Dim brickCount As Integer
-        For Each lp In task.logicalLines
-            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+        task.logicalLines.Clear()
+        For Each lp In lines.Values
+            lp.index = task.logicalLines.Count + 1
+            task.logicalLines.Add(lp)
             For Each index In lp.bricks
                 Dim brick = task.brickList(index)
-                dst0(brick.rect).SetTo(lp.index)
-                brickCount += 1
+                Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
+                If val = 0 Then
+                    dst1(brick.rect).SetTo(lp.index)
+                    brickCount += 1
+                End If
             Next
         Next
 
-        If standaloneTest() Then
-            If task.toggleOn Then dst3 = ShowPalette(dst1) Else dst3 = ShowPalette(dst0)
-        End If
+        dst3 = ShowPalette(dst1)
+        For Each lp In task.logicalLines
+            dst3.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+        Next
+
         labels(2) = "Found " + CStr(task.logicalLines.Count) + " lines in the depth data."
         labels(3) = CStr(brickCount) + " bricks were updated with logical depth (" + Format(brickCount / task.gridRects.Count, "0%") + ")"
     End Sub
@@ -150,13 +155,59 @@ End Class
 
 
 
-Public Class DepthLogic_Correlations : Inherits TaskParent
+Public Class DepthLogic_Lines : Inherits TaskParent
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Reconstruct depth data using depth lines with high correlation (typically indicating featureless.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        For Each lp In task.logicalLines
+        dst3 = task.depthLogic.dst3
+        labels = task.depthLogic.labels
 
+        dst1.SetTo(0)
+        For Each lp In task.logicalLines
+            Dim brick1 = task.brickList(lp.bricks(0))
+            Dim brick2 = task.brickList(lp.bricks.Last)
+            If brick1.correlation > task.fCorrThreshold Then
+                For Each index In lp.bricks
+                    Dim brick = task.brickList(index)
+                    Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
+                    If val = 0 Then
+                        dst1(brick.rect).SetTo(lp.index)
+                    End If
+                Next
+            End If
         Next
+
+        dst2 = ShowPalette(dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class DepthLogic_LinesRGB : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Reconstruct depth data using depth lines with high correlation (typically indicating featureless.)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        Dim brickCount As Integer
+        For Each lp In task.logicalLines
+            For Each index In lp.bricks
+                Dim brick = task.brickList(index)
+                Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
+                If val = 0 Then
+                    dst1(brick.rect).SetTo(lp.index)
+                    brickCount += 1
+                End If
+            Next
+        Next
+
+        dst2 = ShowPalette(dst1)
     End Sub
 End Class

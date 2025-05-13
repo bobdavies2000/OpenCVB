@@ -1444,12 +1444,12 @@ End Class
 
 Public Class Depth_ColorizerOld : Inherits TaskParent
     Dim customColorMap As cv.Mat
-    Dim gColor As New Gradient_ForDepth
+    Dim gColor As New Gradient_Color
     Public Sub New()
         desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ' couldn't do this in the constructor because it uses Gradient_ForDepth and is called in task.
+        ' couldn't do this in the constructor because it uses Gradient_Color and is called in task.
         If customColorMap Is Nothing Then
             gColor.gradientWidth = 255
             gColor.Run(src)

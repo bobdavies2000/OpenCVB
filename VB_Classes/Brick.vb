@@ -903,6 +903,7 @@ End Class
 
 
 Public Class Brick_CorrelationMap : Inherits TaskParent
+    Dim ptBrick As New BrickPoint_Basics
     Public Sub New()
         labels(3) = "The map to identify each grid cell."
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -917,6 +918,8 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
 
         dst2 = ShowPaletteDepth(dst1)
         labels(2) = task.brickBasics.labels(2)
+
+        ptBrick.Run(src)
     End Sub
 End Class
 

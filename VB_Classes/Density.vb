@@ -30,7 +30,7 @@ End Class
 
 Public Class Density_Phase : Inherits TaskParent
     Dim dense As New Density_Basics
-    Dim gradient As New Gradient_Depth
+    Dim gradient As New Gradient_PhaseDepth
     Public Sub New()
         desc = "Display gradient phase and 2D density side by side."
     End Sub
