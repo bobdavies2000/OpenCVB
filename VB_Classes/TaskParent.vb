@@ -432,8 +432,8 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Sub fpDSet()
         If task.fpList.Count = 0 Then Exit Sub
-        Dim gcIndex = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        Dim fpIndex = task.fpFromGridCell.IndexOf(gcIndex)
+        Dim brickIndex = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim fpIndex = task.fpFromGridCell.IndexOf(brickIndex)
         If fpIndex >= 0 Then task.fpD = task.fpList(fpIndex)
     End Sub
     Public Sub fpDisplayMotion()

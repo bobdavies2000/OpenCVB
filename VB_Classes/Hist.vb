@@ -1492,12 +1492,12 @@ Public Class Hist_BrickRegions : Inherits TaskParent
             End If
         Next
 
-        Dim gcIndex = -1, gc1 As brickData, histogram As New cv.Mat, histArray(256 - 1) As Single
+        Dim brickIndex = -1, gc1 As brickData, histogram As New cv.Mat, histArray(256 - 1) As Single
         dst1 = fLess.dst2.Clone
         For Each ele In histList
-            If gcIndex <> ele.Key Then
-                gcIndex = ele.Key
-                gc1 = task.brickList(gcIndex)
+            If brickIndex <> ele.Key Then
+                brickIndex = ele.Key
+                gc1 = task.brickList(brickIndex)
 
                 cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, Not task.edges.dst2(gc1.rect), histogram, 1, {task.histogramBins}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)

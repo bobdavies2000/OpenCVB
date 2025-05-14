@@ -96,9 +96,9 @@ Public Class FCS_CreateList : Inherits TaskParent
             fp.ptHistory.Add(fp.pt)
             fp.index = i
 
-            Dim gcIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
-            Dim brick = task.brickList(gcIndex)
-            Dim fpIndex = task.fpFromGridCellLast.IndexOf(gcIndex)
+            Dim brickIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+            Dim brick = task.brickList(brickIndex)
+            Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
                 Dim fpLast = task.fpLastList(fpIndex)
                 fp.ptLast = fpLast.pt
@@ -106,7 +106,7 @@ Public Class FCS_CreateList : Inherits TaskParent
                 matchCount += 1
             End If
 
-            fp.gcIndex = gcIndex
+            fp.brickIndex = brickIndex
 
             fp.facets = New List(Of cv.Point)
             Dim xlist As New List(Of Integer), ylist As New List(Of Integer)
@@ -125,7 +125,7 @@ Public Class FCS_CreateList : Inherits TaskParent
 
             task.fpList.Add(fp)
 
-            task.fpMap.FillConvexPoly(fp.facets, CSng(gcIndex), task.lineType)
+            task.fpMap.FillConvexPoly(fp.facets, CSng(brickIndex), task.lineType)
             dst1.FillConvexPoly(fp.facets, i, task.lineType)
         Next
 
@@ -475,8 +475,8 @@ Public Class FCS_Motion : Inherits TaskParent
         yDist.Add(0)
         dst3.SetTo(0)
         For Each fp In task.fpList
-            Dim gcIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
-            Dim fpIndex = task.fpFromGridCellLast.IndexOf(gcIndex)
+            Dim brickIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+            Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
                 linkedCount += 1
                 dst3.Line(fp.pt, fp.ptLast, task.highlight, task.lineWidth, task.lineType)
@@ -585,8 +585,8 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
 
-        strOut += "gcIndex = " + CStr(fp.gcIndex) + vbCrLf
-        Dim brick = task.brickList(fp.gcIndex)
+        strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
+        Dim brick = task.brickList(fp.brickIndex)
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
         strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
         strOut += Format(brick.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
@@ -721,7 +721,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
             If fp.depth > depthStart And fp.depth < depthEnd Then
                 Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
                 If val = 0 Then
-                    palInput.FillConvexPoly(fp.facets, fp.gcIndex Mod 255)
+                    palInput.FillConvexPoly(fp.facets, fp.brickIndex Mod 255)
                     fpCells.Add((fp, task.frameCount))
                 End If
             End If

@@ -10,18 +10,11 @@ Public Class DepthLogic_Basics : Inherits TaskParent
         dst2 = src.Clone
 
         Dim lines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-        For Each lp In task.lpList
-            lp.depthLine = False
-            lines.Add(lp.length, lp)
-        Next
-
         For Each lp In structured.lpListX
-            lp.depthLine = True
             lines.Add(lp.length, lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         For Each lp In structured.lpListY
-            lp.depthLine = True
             lines.Add(lp.length, lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
@@ -189,25 +182,24 @@ End Class
 
 
 
-Public Class DepthLogic_LinesRGB : Inherits TaskParent
+Public Class DepthLogic_Cloud : Inherits TaskParent
+    Dim gradient As New Gradient_Depth
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Reconstruct depth data using depth lines with high correlation (typically indicating featureless.)"
+        desc = "Reconstruct pointcloud using depth lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
         Dim brickCount As Integer
+        dst3 = task.pcSplit(2)
         For Each lp In task.logicalLines
-            For Each index In lp.bricks
-                Dim brick = task.brickList(index)
-                Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
-                If val = 0 Then
-                    dst1(brick.rect).SetTo(lp.index)
-                    brickCount += 1
-                End If
-            Next
+            gradient.lp = lp
+            gradient.Run(emptyMat)
+            gradient.dst2(lp.rect).CopyTo(dst3(lp.rect), gradient.dst3(lp.rect))
+            brickCount += lp.bricks.Count
         Next
 
         dst2 = ShowPalette(dst1)
+
+        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst3}, dst2)
+        labels(2) = "Of the " + CStr(task.gridRects.Count) + " bricks, " + CStr(brickCount) + " bricks had their depth updated."
     End Sub
 End Class

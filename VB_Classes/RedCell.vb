@@ -303,8 +303,8 @@ Public Class RedCell_Generate : Inherits TaskParent
                 rc.age = 1
             End If
 
-            Dim gcIndex = task.brickMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
-            rc.color = task.scalarColors(gcIndex Mod 255)
+            Dim brickIndex = task.brickMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
+            rc.color = task.scalarColors(brickIndex Mod 255)
             initialList.Add(rc)
         Next
 

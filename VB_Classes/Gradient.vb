@@ -126,27 +126,20 @@ Public Class Gradient_Depth : Inherits TaskParent
             dst3.Rectangle(task.brickList(brick).rect, 255, -1)
         Next
 
-        If task.brickList(lp.bricks.First).depth < task.brickList(lp.bricks.Last).depth Then
-            brickNear = task.brickList(lp.bricks.First)
-            brickFar = task.brickList(lp.bricks.Last)
-        Else
-            brickNear = task.brickList(lp.bricks.First)
-            brickFar = task.brickList(lp.bricks.Last)
-        End If
+        brickNear = task.brickList(lp.bricks.First) ' p1 is always closest to the camera.
+        brickFar = task.brickList(lp.bricks.Last)
 
         dst1(lp.rect).SetTo(255)
         dst1.Set(Of Byte)(brickNear.rect.TopLeft.Y, brickNear.rect.TopLeft.X, 0)
-        depthRange = brickFar.depth - brickNear.depth
+        depthRange = Math.Abs(brickFar.depth - brickNear.depth)
         dst0(lp.rect) = dst1(lp.rect).DistanceTransform(options.distanceType, 0)
 
         Dim mm = GetMinMax(dst0(lp.rect))
         Dim normVal = 1 / mm.maxVal
         dst2(lp.rect) = dst0(lp.rect) * normVal
 
+        dst2(lp.rect) *= depthRange
+        dst2(lp.rect) += brickNear.depth
         dst2(lp.rect) = dst2(lp.rect).SetTo(0, Not dst3(lp.rect))
-
-        Dim tmp As New cv.Mat
-        cv.Cv2.Multiply(task.pcSplit(2)(lp.rect), dst2(lp.rect), tmp)
-        cv.Cv2.ImShow("tmp", tmp)
     End Sub
 End Class

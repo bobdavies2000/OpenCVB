@@ -495,7 +495,7 @@ Public Class fpData ' feature point -  excessive - trim this to fcsData...
     Public ptLast As cv.Point
     Public ptHistory As List(Of cv.Point)
     Public depth As Single
-    Public gcIndex As Integer
+    Public brickIndex As Integer
     Sub New()
         facets = New List(Of cv.Point)
         ptHistory = New List(Of cv.Point)
@@ -575,7 +575,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public rect As cv.Rect
     Public index As Integer
-    Public depthLine As Boolean ' false means it is an RGB line.
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
     Public b As Single
@@ -591,9 +590,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         p2 = validatePoint(_p2)
 
         ' convention: p1 has closer depth than p2.  Switch if not...
-        Dim gc1 = task.brickList(task.brickMap.Get(Of Single)(p1.Y, p1.X))
-        Dim gc2 = task.brickList(task.brickMap.Get(Of Single)(p2.Y, p2.X))
-        If gc1.depth > gc2.depth Then
+        Dim brick1 = task.brickList(task.brickMap.Get(Of Single)(p1.Y, p1.X))
+        Dim brick2 = task.brickList(task.brickMap.Get(Of Single)(p2.Y, p2.X))
+        If brick1.depth > brick2.depth Then
             Dim ptTemp = p1
             p1 = p2
             p2 = ptTemp
@@ -611,37 +610,34 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
 
         If length > 180 Then Dim k = 0
         Dim brickptList As New List(Of cv.Point2f)
-        If Math.Abs(p1.X - p2.X) <= 2 Then ' 
+        If Math.Abs(p1.X - p2.X) <= 2 Then
             m = 100000 ' a big number for slope 
             ' handle the special case of slope 0
-            Dim x = p1.X
-            For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y) Step task.cellSize
-                Dim index = task.brickMap.Get(Of Single)(y, x)
-                If bricks.Contains(index) = False Then
-                    bricks.Add(index)
-                    Dim brick = task.brickList(index)
-                    brickptList.Add(brick.rect.TopLeft)
-                End If
+            Dim stepSize = If(p1.Y > p2.Y, -task.cellSize, task.cellSize)
+            For y = p1.Y To p2.Y Step stepSize
+                Dim index = task.brickMap.Get(Of Single)(y, p1.X)
+                bricks.Add(index)
+                brickptList.Add(task.brickList(index).rect.TopLeft)
             Next
         Else
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
-                For x = Math.Min(p1.X, p2.X) To Math.Max(p1.X, p2.X)
+                Dim stepSize = If(p1.X > p2.X, -1, 1)
+                For x = p1.X To p2.X Step stepSize
                     Dim y = m * x + b
                     Dim index = task.brickMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
-                        Dim brick = task.brickList(index)
-                        brickptList.Add(brick.rect.TopLeft)
+                        brickptList.Add(task.brickList(index).rect.TopLeft)
                     End If
                 Next
             Else
-                For y = Math.Min(p1.Y, p2.Y) To Math.Max(p1.Y, p2.Y)
+                Dim stepSize = If(p1.Y > p2.Y, -1, 1)
+                For y = p1.Y To p2.Y Step stepSize
                     Dim x = (y - b) / m
                     Dim index = task.brickMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
-                        Dim brick = task.brickList(index)
-                        brickptList.Add(brick.rect.TopLeft)
+                        brickptList.Add(task.brickList(index).rect.TopLeft)
                     End If
                 Next
             End If

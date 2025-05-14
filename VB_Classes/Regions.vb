@@ -66,11 +66,11 @@ Public Class Region_Basics : Inherits TaskParent
             rect = vRects(index - 1)
         End If
 
-        Dim gcIndex = task.brickMap.Get(Of Single)(rect.Y, rect.X)
-        If gcIndex > 0 Then
-            labels(3) = "Depth = " + Format(task.brickList(gcIndex).depth, fmt1) + "m"
-            gcIndex = task.brickMap.Get(Of Single)(rect.BottomRight.Y, rect.BottomRight.X)
-            labels(3) += " to " + Format(task.brickList(gcIndex).depth, fmt1) + "m"
+        Dim brickIndex = task.brickMap.Get(Of Single)(rect.Y, rect.X)
+        If brickIndex > 0 Then
+            labels(3) = "Depth = " + Format(task.brickList(brickIndex).depth, fmt1) + "m"
+            brickIndex = task.brickMap.Get(Of Single)(rect.BottomRight.Y, rect.BottomRight.X)
+            labels(3) += " to " + Format(task.brickList(brickIndex).depth, fmt1) + "m"
         Else
             labels(3) = "No depth region present..."
         End If
