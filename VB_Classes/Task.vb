@@ -126,7 +126,7 @@ Public Class VBtask : Implements IDisposable
 
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
-    Public lines As Line_Basics
+    Public lines As LineRGB_Basics
     Public brickBasics As Brick_Basics
     Public fcsBasics As FCS_Basics
     Public edges As EdgeLine_Basics
@@ -141,7 +141,7 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
-    Public depthLogic As DepthLogic_Basics
+    Public depthLogic As LineDepth_Basics
 
     Public paletteRandom As Palette_RandomColors
     Public kalman As Kalman_Basics
@@ -572,8 +572,8 @@ Public Class VBtask : Implements IDisposable
         buildCorr = New Brick_CorrelationMap
         task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
-        lines = New Line_Basics
-        depthLogic = New DepthLogic_Basics
+        lines = New LineRGB_Basics
+        depthLogic = New LineDepth_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics

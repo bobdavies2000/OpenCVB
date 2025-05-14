@@ -663,7 +663,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Sub New()
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
-        rect = New cv.Rect(0, 0, 8, 8) ' dummy rect for first pass through Gradient_Depth
+        rect = New cv.Rect(0, 0, 8, 8) ' dummy rect for first pass through Gradient_DepthLines
     End Sub
     Public Function BuildLongLine(lp As lpData) As lpData
         If lp.p1.X <> lp.p2.X Then

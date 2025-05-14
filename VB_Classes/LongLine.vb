@@ -213,7 +213,7 @@ End Class
 Public Class LongLine_ExtendAll : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public Sub New()
-        labels = {"", "", "Image output from Line_Core", "The extended line for each line found in Line_Core"}
+        labels = {"", "", "Image output from LineRGB_Core", "The extended line for each line found in LineRGB_Core"}
         desc = "Create a list of all the extended lines in an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -238,7 +238,7 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public parList As New List(Of coinPoints)
     Public Sub New()
-        labels = {"", "", "Image output from Line_Core", "Parallel extended lines"}
+        labels = {"", "", "Image output from LineRGB_Core", "Parallel extended lines"}
         desc = "Use KNN to find which lines are near each other and parallel"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

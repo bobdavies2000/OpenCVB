@@ -981,7 +981,7 @@ End Class
 
 
 Public Class Brick_Lines : Inherits TaskParent
-    Dim info As New Line_Info
+    Dim info As New LineRGB_Info
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Lines can mean cells are connected - click on any highlighted grid cell to see info on that line."

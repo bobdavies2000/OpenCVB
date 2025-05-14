@@ -166,7 +166,7 @@ End Class
 
 
 Public Class XO_Horizon_Perpendicular : Inherits TaskParent
-    Dim perp As New Line_Perpendicular
+    Dim perp As New LineRGB_Perpendicular
     Public Sub New()
         labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
         desc = "Find the gravity vector using the perpendicular to the horizon."
@@ -940,7 +940,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
     Dim lineMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim lpList As New List(Of lpData)
     Public Sub New()
-        labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
+        labels(2) = "Highlighted lines were combined from 2 lines.  Click on LineRGB_Core in Treeview to see."
         desc = "Combine lines that are approximately the same line."
     End Sub
     Private Function combine2Lines(lp1 As lpData, lp2 As lpData) As lpData
@@ -1104,7 +1104,7 @@ End Class
 
 Public Class XO_Line_Cells : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
@@ -1128,9 +1128,9 @@ End Class
 Public Class XO_Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
-        labels(3) = "Input to Line_Basics"
+        labels(3) = "Input to LineRGB_Basics"
         optiBase.FindSlider("Canny Aperture").Value = 7
         optiBase.FindSlider("Min Line Length").Value = 30
         desc = "Find lines in the Canny output"
@@ -1382,7 +1382,7 @@ End Class
 
 Public Class XO_Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Lines for the current color class", "Color Class input"}
@@ -1396,7 +1396,7 @@ Public Class XO_Line_ColorClass : Inherits TaskParent
         dst2 = lines.dst2
         dst3 = lines.dst2
 
-        labels(1) = "Input to Line_Basics"
+        labels(1) = "Input to LineRGB_Basics"
         labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
     End Sub
 End Class
@@ -1408,7 +1408,7 @@ End Class
 Public Class XO_Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim contours As New XO_Contour_Gray
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         task.gOptions.highlight.SelectedIndex = 3
@@ -1437,7 +1437,7 @@ End Class
 Public Class XO_Line_ViewSide : Inherits TaskParent
     Public autoY As New OpAuto_YRange
     Dim histSide As New Projection_HistSide
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
         desc = "Find lines in the hotspots for the side view."
@@ -1612,7 +1612,7 @@ Public Class XO_Line_Core : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_RawSorted in the current image with " +
+            labels(2) = CStr(lines.lpList.Count) + " lines found in LineRGB_RawSorted in the current image with " +
                             CStr(lpList.Count) + " after filtering with the motion mask."
         End If
     End Sub
@@ -1745,7 +1745,7 @@ End Class
 
 
 Public Class XO_Hough_Sudoku1 : Inherits TaskParent
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
@@ -1765,7 +1765,7 @@ End Class
 
 
 Public Class XO_Line_InterceptsUI : Inherits TaskParent
-    Dim lines As New Line_Intercepts
+    Dim lines As New LineRGB_Intercepts
     Dim p2 As cv.Point
     Dim redRadio As System.Windows.Forms.RadioButton
     Dim greenRadio As System.Windows.Forms.RadioButton
@@ -2950,7 +2950,7 @@ End Class
 
 
 Public Class XO_FCSLine_Vertical : Inherits TaskParent
-    Dim verts As New Line_Vertical
+    Dim verts As New LineRGB_Vertical
     Dim minRect As New LineRect_Basics
     Dim options As New Options_FCSLine
     Public Sub New()
@@ -3180,7 +3180,7 @@ End Class
 
 
 Public Class XO_FeatureLine_LongestVerticalKNN : Inherits TaskParent
-    Dim gLines As New Line_GCloud
+    Dim gLines As New LineRGB_GCloud
     Dim longest As New XO_FeatureLine_Longest
     Public Sub New()
         labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
@@ -3553,7 +3553,7 @@ End Class
 
 
 Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
-    Dim lines As New Line_RawSubset
+    Dim lines As New LineRGB_RawSubset
     Dim lineDisp As New XO_Line_DisplayInfoOld
     Dim options As New Options_Features
     Dim match As New Match_tCell
@@ -3684,7 +3684,7 @@ End Class
 
 
 Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
-    Dim glines As New Line_GCloud
+    Dim glines As New LineRGB_GCloud
     Public knn As New KNN_ClosestTracker
     Public options As New Options_Features
     Public gline As gravityLine
@@ -3726,7 +3726,7 @@ End Class
 
 
 Public Class XO_FeatureLine_Longest : Inherits TaskParent
-    Dim glines As New Line_GCloud
+    Dim glines As New LineRGB_GCloud
     Public knn As New KNN_ClosestTracker
     Public options As New Options_Features
     Public gline As gravityLine
@@ -4363,7 +4363,7 @@ End Class
 Public Class XO_Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
     Public lpListY As New List(Of lpData)
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Dim struct As New Structured_Core
     Dim hist As New Hist_GridCell
     Public Sub New()
@@ -4767,7 +4767,7 @@ End Class
 
 Public Class XO_tructured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"

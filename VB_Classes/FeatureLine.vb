@@ -34,7 +34,7 @@ End Class
 Public Class FeatureLine_VH : Inherits TaskParent
     Public gCells As New List(Of gravityLine)
     Dim match As New Match_tCell
-    Dim gLines As New Line_GCloud
+    Dim gLines As New LineRGB_GCloud
     Dim options As New Options_Features
     Public Sub New()
         labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"

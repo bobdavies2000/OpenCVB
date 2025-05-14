@@ -1,10 +1,10 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Line_Basics : Inherits TaskParent
+Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpMap As New cv.Mat
     Public nonTaskRequest As Boolean
-    Dim rawLines As New Line_Raw
+    Dim rawLines As New LineRGB_Raw
     Public Sub New()
         lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 255)
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Line_Raw : Inherits TaskParent
+Public Class LineRGB_Raw : Inherits TaskParent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of lpData)
     Public Sub New()
@@ -133,7 +133,7 @@ End Class
 
 
 
-Public Class Line_RawSorted : Inherits TaskParent
+Public Class LineRGB_RawSorted : Inherits TaskParent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of lpData)
     Public Sub New()
@@ -185,8 +185,8 @@ End Class
 
 
 
-Public Class Line_BasicsAlternative : Inherits TaskParent
-    Public lines As New Line_RawSorted
+Public Class LineRGB_BasicsAlternative : Inherits TaskParent
+    Public lines As New LineRGB_RawSorted
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -263,7 +263,7 @@ End Class
 
 
 
-Public Class Line_RawSubset : Inherits TaskParent
+Public Class LineRGB_RawSubset : Inherits TaskParent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of lpData)
     Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
@@ -320,7 +320,7 @@ End Class
 
 
 
-Public Class Line_Intercepts : Inherits TaskParent
+Public Class LineRGB_Intercepts : Inherits TaskParent
     Public extended As New LongLine_ExtendTest
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
@@ -395,9 +395,9 @@ End Class
 
 
 
-Public Class Line_VerticalHorizontal : Inherits TaskParent
-    Dim verts As New Line_Vertical
-    Dim horiz As New Line_Horizontal
+Public Class LineRGB_VerticalHorizontal : Inherits TaskParent
+    Dim verts As New LineRGB_Vertical
+    Dim horiz As New LineRGB_Horizontal
     Public vertList As New List(Of lpData)
     Public horizList As New List(Of lpData)
     Public Sub New()
@@ -441,7 +441,7 @@ End Class
 
 
 
-Public Class Line_Perpendicular : Inherits TaskParent
+Public Class LineRGB_Perpendicular : Inherits TaskParent
     Public input As lpData
     Public output As lpData
     Dim midPoint As cv.Point2f
@@ -466,7 +466,7 @@ End Class
 
 
 
-Public Class Line_Info : Inherits TaskParent
+Public Class LineRGB_Info : Inherits TaskParent
     Public Sub New()
         task.gOptions.DebugSlider.Value = 1 ' because the 0th element is a placeholder at 0,0
         labels(3) = "The selected line with details."
@@ -520,7 +520,7 @@ End Class
 
 
 
-Public Class Line_Horizontal : Inherits TaskParent
+Public Class LineRGB_Horizontal : Inherits TaskParent
     Public horizList As New List(Of lpData)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -558,9 +558,9 @@ End Class
 
 
 
-Public Class Line_ViewLeftRight : Inherits TaskParent
-    Dim lines As New Line_Basics
-    Dim linesRaw As New Line_RawSorted
+Public Class LineRGB_ViewLeftRight : Inherits TaskParent
+    Dim lines As New LineRGB_Basics
+    Dim linesRaw As New LineRGB_RawSorted
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Find lines in the left and right images."
@@ -584,7 +584,7 @@ End Class
 
 
 
-Public Class Line_Vertical : Inherits TaskParent
+Public Class LineRGB_Vertical : Inherits TaskParent
     Public vertList As New List(Of lpData)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
@@ -620,14 +620,14 @@ End Class
 
 
 
-Public Class Line_GCloud : Inherits TaskParent
+Public Class LineRGB_GCloud : Inherits TaskParent
     Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public options As New Options_LineFinder
     Dim match As New Match_tCell
     Dim angleSlider As System.Windows.Forms.TrackBar
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         angleSlider = optiBase.FindSlider("Angle tolerance in degrees")
         labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
@@ -696,7 +696,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-Public Class Line_Intersection : Inherits TaskParent
+Public Class LineRGB_Intersection : Inherits TaskParent
     Public p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
     Public intersectionPoint As cv.Point2f
     Public Sub New()
@@ -733,7 +733,7 @@ End Class
 
 
 
-Public Class Line_Bricks : Inherits TaskParent
+Public Class LineRGB_Bricks : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
         desc = "Create the bricks for a given line."
@@ -777,7 +777,7 @@ End Class
 
 
 
-Public Class Line_BricksValidate : Inherits TaskParent
+Public Class LineRGB_BricksValidate : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
         desc = "Validate the bricks for a given line."

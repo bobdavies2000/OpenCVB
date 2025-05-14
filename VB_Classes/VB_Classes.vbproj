@@ -122,6 +122,7 @@
     <Compile Include="Intrinsics.vb" />
     <Compile Include="FindTriangle.vb" />
     <Compile Include="DepthLogic.vb" />
+    <Compile Include="LineDepth.vb" />
     <Compile Include="OptionFeatures.Designer.vb">
       <DependentUpon>OptionFeatures.vb</DependentUpon>
     </Compile>
@@ -366,7 +367,7 @@
     <Compile Include="GrabCut.vb" />
     <Compile Include="HMM.vb" />
     <Compile Include="Keyboard.vb" />
-    <Compile Include="Line.vb" />
+    <Compile Include="LineRGB.vb" />
     <Compile Include="Gradient.vb" />
     <Compile Include="Hist.vb" />
     <Compile Include="HOG.vb" />

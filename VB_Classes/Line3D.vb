@@ -1,7 +1,7 @@
 ﻿Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New LineRGB_Basics
     Public lines3D As New List(Of cv.Point3f)
     Public lines3DMat As New cv.Mat
     Public Sub New()

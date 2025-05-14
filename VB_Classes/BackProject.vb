@@ -175,7 +175,7 @@ End Class
 
 Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         task.gOptions.RGBFilterActive.Checked = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -606,7 +606,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

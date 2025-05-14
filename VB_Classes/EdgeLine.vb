@@ -217,11 +217,11 @@ End Class
 
 Public Class EdgeLine_Construct : Inherits TaskParent
     Dim edges As New Edge_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New LineRGB_Basics
     Public classCount = 2
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Construct a combination of lines and edges using Line_Basics and Edge_Basics."
+        desc = "Construct a combination of lines and edges using LineRGB_Basics and Edge_Basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)

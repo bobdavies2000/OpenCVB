@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim fcs As New FCS_Core
-    Dim tour As New Tour_Basics
+    Public tour As New Tour_Basics
     Public desiredMapCount As Integer = 5
     Public Sub New()
         task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

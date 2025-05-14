@@ -172,30 +172,6 @@ End Class
 
 
 
-
-Public Class Tour_Lines : Inherits TaskParent
-    Dim core As New Tour_Basics
-    Public Sub New()
-        desc = "Identify contour by its Lines"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        core.Run(src)
-        dst2 = core.dst2
-        labels(2) = core.labels(2)
-
-        For Each lp In task.lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Tour_Delaunay : Inherits TaskParent
     Dim core As New Tour_Basics
     Dim delaunay As New Delaunay_Basics
@@ -220,5 +196,25 @@ Public Class Tour_Delaunay : Inherits TaskParent
         Next
 
         dst3 = ShowPalette(task.tourMap)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Tour_Lines : Inherits TaskParent
+    Public Sub New()
+        desc = "Identify contour by its Lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.fcsBasics.tour.dst2
+        labels(2) = task.fcsBasics.tour.labels(2)
+
+        For Each lp In task.lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
     End Sub
 End Class

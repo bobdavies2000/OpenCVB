@@ -393,7 +393,7 @@ End Class
 Public Class LeftRight_Lines : Inherits TaskParent
     Public leftLines As New List(Of lpData)
     Public rightLines As New List(Of lpData)
-    Dim lines As New Line_RawSorted
+    Dim lines As New LineRGB_RawSorted
     Public Sub New()
         labels = {"", "", "Left image lines", "Right image lines"}
         desc = "Find the lines in the Left and Right images."
