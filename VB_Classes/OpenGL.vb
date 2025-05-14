@@ -2043,12 +2043,11 @@ Public Class OpenGL_DepthLogicCloud : Inherits TaskParent
         dst2 = logic.dst2
         labels(2) = logic.labels(2)
 
-        If task.toggleOn Then
-            task.ogl.pointCloudInput = dst2
-            task.ogl.Run(dst3)
-        Else
-            task.ogl.pointCloudInput = dst2
-            task.ogl.Run(task.depthLogic.dst3)
-        End If
+        task.depthLogic.dst3.CopyTo(dst3, logic.gradient.dst3)
+        task.ogl.pointCloudInput = If(task.toggleOn, task.pointCloud, dst2)
+        task.ogl.pointCloudInput = dst2
+        task.ogl.Run(dst3)
+
+        labels(3) = logic.labels(3)
     End Sub
 End Class

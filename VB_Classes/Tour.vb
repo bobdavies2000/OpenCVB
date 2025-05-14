@@ -10,7 +10,6 @@ Public Class Tour_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = src.Clone
-        cv.Cv2.ImShow("dst0", dst0)
         tour.Run(src)
         labels = tour.labels
 

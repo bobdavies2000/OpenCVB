@@ -575,6 +575,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public rect As cv.Rect
     Public index As Integer
+    Public vertical As Boolean ' false is horizontal
+    Public inverted As Boolean ' true is p2 to p1, false is p1 to p2
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
     Public b As Single
@@ -610,6 +612,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
 
         If length > 180 Then Dim k = 0
         Dim brickptList As New List(Of cv.Point2f)
+        vertical = True
+        inverted = If(p1.Y > p2.Y, True, False)
         If Math.Abs(p1.X - p2.X) <= 2 Then
             m = 100000 ' a big number for slope 
             ' handle the special case of slope 0
@@ -621,6 +625,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             Next
         Else
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
+                vertical = False
+                inverted = If(p1.X > p2.X, True, False)
                 Dim stepSize = If(p1.X > p2.X, -1, 1)
                 For x = p1.X To p2.X Step stepSize
                     Dim y = m * x + b

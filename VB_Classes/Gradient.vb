@@ -129,8 +129,17 @@ Public Class Gradient_Depth : Inherits TaskParent
         brickNear = task.brickList(lp.bricks.First) ' p1 is always closest to the camera.
         brickFar = task.brickList(lp.bricks.Last)
 
+        ' the end points of the bricks may have depth contaminated by a line extending into a brick that is on a depth edge.
+        ' here we use the next brick in toward the center's depth as a purer depth estimate.
+        brickNear.depth = task.brickList(lp.bricks(1)).depth
+        brickFar.depth = task.brickList(lp.bricks(lp.bricks.Count - 2)).depth
+
         dst1(lp.rect).SetTo(255)
-        dst1.Set(Of Byte)(brickNear.rect.TopLeft.Y, brickNear.rect.TopLeft.X, 0)
+        If lp.vertical Then
+            dst1(brickNear.rect).Row(If(lp.inverted, brickNear.rect.Height - 1, 0)).SetTo(0)
+        Else
+            dst1(brickNear.rect).Col(If(lp.inverted, brickNear.rect.Width - 1, 0)).SetTo(0)
+        End If
         depthRange = Math.Abs(brickFar.depth - brickNear.depth)
         dst0(lp.rect) = dst1(lp.rect).DistanceTransform(options.distanceType, 0)
 
@@ -141,5 +150,7 @@ Public Class Gradient_Depth : Inherits TaskParent
         dst2(lp.rect) *= depthRange
         dst2(lp.rect) += brickNear.depth
         dst2(lp.rect) = dst2(lp.rect).SetTo(0, Not dst3(lp.rect))
+
+        labels(2) = task.lines.labels(2)
     End Sub
 End Class

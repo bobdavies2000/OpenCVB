@@ -23,6 +23,7 @@ Public Class DepthLogic_Basics : Inherits TaskParent
         Dim brickCount As Integer
         task.logicalLines.Clear()
         For Each lp In lines.Values
+            If lp.bricks.Count < 3 Then Continue For ' must have 3 bricks in the list or the line is not big enough...
             lp.index = task.logicalLines.Count + 1
             task.logicalLines.Add(lp)
             For Each index In lp.bricks
@@ -185,7 +186,7 @@ End Class
 
 
 Public Class DepthLogic_Cloud : Inherits TaskParent
-    Dim gradient As New Gradient_Depth
+    Public gradient As New Gradient_Depth
     Public Sub New()
         desc = "Reconstruct pointcloud using depth lines."
     End Sub
@@ -203,5 +204,6 @@ Public Class DepthLogic_Cloud : Inherits TaskParent
 
         cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst3}, dst2)
         labels(2) = "Of the " + CStr(task.gridRects.Count) + " bricks, " + CStr(brickCount) + " bricks had their depth updated."
+        labels(3) = gradient.labels(2)
     End Sub
 End Class
