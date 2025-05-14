@@ -36,9 +36,11 @@ Public Class DepthLogic_Basics : Inherits TaskParent
         Next
 
         dst3 = ShowPalette(dst1)
-        For Each lp In task.logicalLines
-            dst3.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
-        Next
+        If standaloneTest() Then
+            For Each lp In task.logicalLines
+                dst3.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+            Next
+        End If
 
         labels(2) = "Found " + CStr(task.logicalLines.Count) + " lines in the depth data."
         labels(3) = CStr(brickCount) + " bricks were updated with logical depth (" + Format(brickCount / task.gridRects.Count, "0%") + ")"

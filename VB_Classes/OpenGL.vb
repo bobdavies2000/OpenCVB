@@ -2012,6 +2012,7 @@ End Class
 Public Class OpenGL_BrickRegions : Inherits TaskParent
     Dim ptBrick As New BrickPoint_FLessRegions
     Public Sub New()
+        task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the grid point featureless region in OpenGL."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2020,9 +2021,34 @@ Public Class OpenGL_BrickRegions : Inherits TaskParent
         dst3 = ptBrick.dst3
         labels = ptBrick.labels
 
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
         task.pointCloud.CopyTo(task.ogl.pointCloudInput, ptBrick.hist.dst1)
         task.ogl.Run(dst2)
     End Sub
 End Class
 
+
+
+
+
+
+Public Class OpenGL_DepthLogicCloud : Inherits TaskParent
+    Dim logic As New DepthLogic_Cloud
+    Public Sub New()
+        task.ogl.oglFunction = oCase.drawPointCloudRGB
+        desc = "Display the reconstructed point cloud."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = src.Clone
+        logic.Run(src)
+        dst2 = logic.dst2
+        labels(2) = logic.labels(2)
+
+        If task.toggleOn Then
+            task.ogl.pointCloudInput = dst2
+            task.ogl.Run(dst3)
+        Else
+            task.ogl.pointCloudInput = dst2
+            task.ogl.Run(task.depthLogic.dst3)
+        End If
+    End Sub
+End Class

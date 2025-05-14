@@ -3,11 +3,14 @@ Public Class Tour_Basics : Inherits TaskParent
     Public contours As New Contour_Basics
     Dim tour As New Tour_Core
     Public Sub New()
+        If standalone Then task.gOptions.displayDst0.Checked = True
         task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         optiBase.FindSlider("Max contours").Value = 10
         desc = "Create the task.tourList and task.tourMap from Contour_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0 = src.Clone
+        cv.Cv2.ImShow("dst0", dst0)
         tour.Run(src)
         labels = tour.labels
 
@@ -26,9 +29,10 @@ Public Class Tour_Basics : Inherits TaskParent
         Static ptTour = task.ClickPoint
         If task.mouseClickFlag Then ptTour = task.ClickPoint
         Dim index = task.tourMap.Get(Of Byte)(ptTour.Y, ptTour.X)
+        If index = 0 Then index = 1 ' make sure a contour was selected and the biggest is likely to be there...
         task.tourD = task.tourList(index)
 
-        task.color(task.tourD.rect).SetTo(white, task.tourD.mask)
+        If standaloneTest() Then dst0(task.tourD.rect).SetTo(white, task.tourD.mask)
     End Sub
 End Class
 
