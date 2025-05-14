@@ -1,5 +1,46 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineDepth_Basics : Inherits TaskParent
+    Public lpListX As New List(Of lpData)
+    Public lpListY As New List(Of lpData)
+    Dim linesX As New LineRGB_Basics
+    Dim linesY As New LineRGB_Basics
+    Dim struct As New Structured_Core
+    Public Sub New()
+        linesX.nonTaskRequest = True
+        linesY.nonTaskRequest = True
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the lines in the X-direction of the Structured_Core output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        struct.Run(src)
+        linesX.Run(struct.dst2)
+        labels(2) = linesX.labels(2)
+
+        dst2 = src.Clone
+        lpListX = New List(Of lpData)(linesX.lpList)
+        For Each lp In linesX.lpList
+            dst2.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+        Next
+        task.structureMapX = linesX.lpMap.Clone
+
+        linesY.Run(struct.dst3)
+        labels(3) = linesY.labels(2)
+
+        dst3 = src.Clone
+        lpListY = New List(Of lpData)(linesY.lpList)
+        For Each lp In linesY.lpList
+            dst3.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+        Next
+        task.structureMapY = linesY.lpMap.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineDepth_Logical : Inherits TaskParent
     Dim structured As New Structured_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
