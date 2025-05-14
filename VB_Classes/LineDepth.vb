@@ -1,7 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineDepth_Basics : Inherits TaskParent
-    Public lpListX As New List(Of lpData)
-    Public lpListY As New List(Of lpData)
     Dim linesX As New LineRGB_Basics
     Dim linesY As New LineRGB_Basics
     Dim struct As New Structured_Core
@@ -12,26 +10,50 @@ Public Class LineDepth_Basics : Inherits TaskParent
         desc = "Find the lines in the X-direction of the Structured_Core output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
         struct.Run(src)
         linesX.Run(struct.dst2)
         labels(2) = linesX.labels(2)
 
-        dst2 = src.Clone
-        lpListX = New List(Of lpData)(linesX.lpList)
-        For Each lp In linesX.lpList
-            dst2.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
-        Next
-        task.structureMapX = linesX.lpMap.Clone
-
         linesY.Run(struct.dst3)
         labels(3) = linesY.labels(2)
 
-        dst3 = src.Clone
-        lpListY = New List(Of lpData)(linesY.lpList)
-        For Each lp In linesY.lpList
-            dst3.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each lp In linesX.lpList
+            sortlines.Add(lp.length, lp)
         Next
-        task.structureMapY = linesY.lpMap.Clone
+        For Each lp In linesY.lpList
+            sortlines.Add(lp.length, lp)
+        Next
+
+        dst1.SetTo(0)
+        Dim brickCount As Integer
+        task.logicalLines.Clear()
+        For Each lp In sortlines.Values
+            If lp.bricks.Count < 3 Then Continue For ' must have 3 bricks so Gradient_DepthLine can use interior bricks.
+            lp.index = task.logicalLines.Count + 1
+            task.logicalLines.Add(lp)
+            For Each index In lp.bricks
+                Dim brick = task.brickList(index)
+                Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
+                If val = 0 Then
+                    dst1(brick.rect).SetTo(lp.index)
+                    brickCount += 1
+                End If
+            Next
+        Next
+
+        dst3 = ShowPalette(dst1)
+        If standaloneTest() Then
+            For Each lp In task.logicalLines
+                dst3.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+        End If
+
+        labels(2) = "Found " + CStr(task.logicalLines.Count) + " lines in the depth data."
+        labels(3) = CStr(brickCount) + " bricks were updated with logical depth (" + Format(brickCount / task.gridRects.Count, "0%") + ")"
     End Sub
 End Class
 
