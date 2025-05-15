@@ -1,11 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineDepth_Basics : Inherits TaskParent
-    Dim linesX As New LineRGB_Basics
-    Dim linesY As New LineRGB_Basics
+    Dim linesX As New LineRGB_Raw
+    Dim linesY As New LineRGB_Raw
     Dim struct As New Structured_Core
     Public Sub New()
-        linesX.nonTaskRequest = True
-        linesY.nonTaskRequest = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the X-direction of the Structured_Core output"
     End Sub

@@ -523,7 +523,6 @@ End Class
 Public Class LineRGB_Horizontal : Inherits TaskParent
     Public horizList As New List(Of lpData)
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         desc = "Find all the Horizontal lines with horizon vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -535,7 +534,6 @@ Public Class LineRGB_Horizontal : Inherits TaskParent
         Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
 
         horizList.Clear()
-        dst3.SetTo(0)
         For Each lp In task.lpList
             If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
 
@@ -545,7 +543,6 @@ Public Class LineRGB_Horizontal : Inherits TaskParent
 
             If Math.Abs(angle - hAngle) < 2 Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
                 horizList.Add(lp)
             End If
         Next

@@ -2161,7 +2161,7 @@ int* ExPhoto_Inpaint_Run(ExPhoto_Inpaint* cPtr, int* imagePtr, int* maskPtr, int
 
 
 
-cppTask* task;
+cppTask* ctask;
 
 class Random_Basics_CC : public CPP_Parent {
 public:
@@ -2176,14 +2176,14 @@ public:
 
     void Run(Mat src) {
         pointList.clear();
-        if (!task->paused) {
+        if (!ctask->paused) {
             while (pointList.size() < sizeRequest) {
                 pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
             }
 
             dst2.setTo(0);
             for (Point2f pt : pointList) {
-                circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
+                circle(dst2, pt, ctask->DotSize, Scalar(0, 255, 255), -1, ctask->lineType, 0);
             }
         }
     }
@@ -2217,7 +2217,7 @@ public:
 
         dst2 = Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
         for (const Point2f& pt : pointList) {
-            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
+            //circle(dst2, pt, ctask->DotSize, Scalar(0, 255, 255), -1, ctask->lineType, 0);
         }
     }
 };
@@ -2261,8 +2261,8 @@ public:
 
         random->range = Rect(0, 0, cols * 3 / 4, rows * 3 / 4);
         random->dst2 = Mat(rows, cols, CV_8UC3);
-        task = new cppTask(rows, cols);
-        task->DotSize = 1;
+        ctask = new cppTask(rows, cols);
+        ctask->DotSize = 1;
         random->Run(Mat());
 
         trainedPoints = random->pointList;

@@ -1631,6 +1631,10 @@ Public Class Main_UI
                             task.CPU_FrameTime = camera.CPU_FrameTime
                         End SyncLock
 
+                        Dim tmp = task.brickMap.Clone
+
+                        If task.color.Size <> tmp.Size Then Dim k = 0
+
                         Dim endCopyTime = Now
                         Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
                         Dim spanCopy = New TimeSpan(elapsedCopyTicks)

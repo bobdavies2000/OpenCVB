@@ -498,6 +498,8 @@ Public Class Plot_Histogram : Inherits TaskParent
                     End If
                 End If
             End If
+            If Single.IsNaN(min) Or Single.IsInfinity(min) Then min = Single.MinValue
+            If Single.IsNaN(max) Or Single.IsInfinity(max) Then max = Single.MaxValue
             ranges = {New cv.Rangef(min, max)}
             cv.Cv2.CalcHist({src}, {0}, histMask, histogram, 1, {task.histogramBins}, ranges)
         Else
