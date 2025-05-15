@@ -4,10 +4,6 @@ Public Class OptionsGlobal
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public heartBeatSeconds = 1
-    Public RGBfilters As String() = {"Blur_Basics", "Brightness_Basics", "Contrast_Basics",
-                                     "Dilate_Basics", "Erode_Basics", "Filter_Laplacian",
-                                     "MeanSubtraction_Basics", "PhotoShop_SharpenDetail",
-                                     "PhotoShop_WhiteBalance"}
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 
@@ -44,11 +40,6 @@ Public Class OptionsGlobal
         LineType.Items.Add("Link4")
         LineType.Items.Add("Link8")
         LineType.SelectedIndex = 0
-
-        For Each filt In RGBfilters
-            RGBFilterList.Items.Add(filt)
-        Next
-        RGBFilterList.SelectedIndex = 0
 
         highlight.Items.Add("Yellow")
         highlight.Items.Add("Black")

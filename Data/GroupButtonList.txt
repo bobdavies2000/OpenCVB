@@ -68,7 +68,6 @@ Entropy
 Erode
 Etch
 ExPhoto
-Extrinsics
 Face
 FCS
 Feature

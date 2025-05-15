@@ -1,4 +1,12 @@
-﻿Public Class OptionsFeatures
+﻿Imports System.Windows.Forms
+Imports System.Drawing
+Public Class OptionsFeatures
+    Public checkBoxes() As RadioButton
+    Public rgbFilterSelected As Boolean
+    Public RGBfilters As String() = {"Original", "Blur_Basics", "Brightness_Basics", "Contrast_Basics",
+                                     "Dilate_Basics", "Erode_Basics", "Filter_Equalize", "Filter_Laplacian",
+                                     "MeanSubtraction_Basics", "PhotoShop_SharpenDetail",
+                                     "PhotoShop_WhiteBalance"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Left = 0
@@ -29,19 +37,34 @@
         FCorrSlider.Value = 50
         SelectedFeature.Value = 0
 
-        verticalRadio.Checked = True
+        ReDim checkBoxes(RGBfilters.Count - 1)
+        For i = 0 To RGBfilters.Count - 1
+            Dim cb As New RadioButton
+            cb.Text = RGBfilters(i)
+            cb.Location = New Point(20, 20 + i * 20)
+            cb.AutoSize = True
+            cb.Tag = i
+            AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
+            FilterGroup.Controls.Add(cb)
+            checkBoxes(i) = cb
+        Next
+        checkBoxes(0).Checked = True
     End Sub
 
 
 
+    Private Sub CheckBox_CheckedChanged(sender As Object, e As EventArgs)
+        rgbFilterSelected = True
+        task.optionsChanged = True
+    End Sub
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
         task.featureSource = FeatureMethod.SelectedIndex
         task.optionsChanged = True
     End Sub
-    Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs) Handles verticalRadio.CheckedChanged
+    Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs)
         task.verticalLines = True
     End Sub
-    Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs) Handles HorizRadio.CheckedChanged
+    Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs)
         task.verticalLines = False
     End Sub
     Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged

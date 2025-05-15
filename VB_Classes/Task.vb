@@ -135,7 +135,7 @@ Public Class VBtask : Implements IDisposable
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
-    Public rgbFilter As Object
+    Public rgbFilter As Filter_Basics
     Public ogl As OpenGL_Basics
     Public gravityHorizon As Gravity_Basics
     Public imuBasics As IMU_Basics
@@ -705,7 +705,6 @@ Public Class VBtask : Implements IDisposable
         redOptions.Sync() ' update the task with redCloud variables
 
         Dim src = color
-        gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If src.Size <> New cv.Size(dst2.Cols, dst2.Rows) Then dst2 = dst2.Resize(src.Size)
         If src.Size <> New cv.Size(dst3.Cols, dst3.Rows) Then dst3 = dst3.Resize(src.Size)
@@ -727,46 +726,8 @@ Public Class VBtask : Implements IDisposable
         imuBasics.Run(src)
         gmat.Run(src)
 
-        If gOptions.RGBFilterActive.Checked Then
-            Static saveFilterName As String
-            Dim filterName = gOptions.RGBFilterList.Text
-            If saveFilterName <> filterName Then
-                saveFilterName = filterName
-                Select Case filterName
-                    Case "Blur_Basics"
-                        rgbFilter = New Blur_Basics
-                    Case "Brightness_Basics"
-                        rgbFilter = New Brightness_Basics
-                    Case "Contrast_Basics"
-                        rgbFilter = New Contrast_Basics
-                    Case "Dilate_Basics"
-                        rgbFilter = New Dilate_Basics
-                    Case "Erode_Basics"
-                        rgbFilter = New Erode_Basics
-                    Case "Filter_Laplacian"
-                        rgbFilter = New Filter_Laplacian
-                    Case "PhotoShop_SharpenDetail"
-                        rgbFilter = New PhotoShop_SharpenDetail
-                    Case "PhotoShop_WhiteBalance"
-                        rgbFilter = New PhotoShop_WhiteBalance
-                    Case "MeanSubtraction_Basics"
-                        rgbFilter = New MeanSubtraction_Basics
-                End Select
-                For i = 0 To callTrace.Count - 1
-                    If callTrace(i).StartsWith(algName) = False Then
-                        callTrace(i) = algName + "\" + callTrace(i)
-                    End If
-                Next
-            End If
-            rgbFilter.Run(src)
-            src = rgbFilter.dst2
-            ' src is always color and leftview is grayscale (because some are only gray - StereoLabs is color.)
-            leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            task.color = rgbFilter.dst2
-
-            rgbFilter.Run(rightView) ' apply the rgb filter to the right view as well.
-            rightView = rgbFilter.dst2
-        End If
+        ' src is always color and leftview is grayscale (because some are only gray - StereoLabs is color.)
+        leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If gOptions.CreateGif.Checked Then
             heartBeat = False
@@ -843,12 +804,16 @@ Public Class VBtask : Implements IDisposable
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         motionBasics.Run(src)
-        If task.optionsChanged Then
-            gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            grayStable = gray.Clone
-        Else
-            gray.CopyTo(grayStable, motionMask)
+        gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
+
+        If featureOptions.rgbFilterSelected Then
+            If rgbFilter Is Nothing Then rgbFilter = New Filter_Basics
+
+            rgbFilter.Run(task.grayStable)
+            src = rgbFilter.dst2
         End If
+
         fcsBasics.Run(src)
         brickBasics.Run(src)
         buildCorr.Run(src)

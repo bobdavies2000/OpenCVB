@@ -22,10 +22,6 @@ Partial Class OptionsFeatures
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.LineGroup = New System.Windows.Forms.GroupBox()
-        Me.HorizRadio = New System.Windows.Forms.RadioButton()
-        Me.verticalRadio = New System.Windows.Forms.RadioButton()
-        Me.MaskGroup = New System.Windows.Forms.GroupBox()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.EdgeMethods = New System.Windows.Forms.ComboBox()
         Me.DistanceLabel = New System.Windows.Forms.Label()
@@ -45,55 +41,13 @@ Partial Class OptionsFeatures
         Me.FeatureSampleSizeLabel = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.FeatureSampleSize = New System.Windows.Forms.TrackBar()
-        Me.LineGroup.SuspendLayout()
+        Me.FilterGroup = New System.Windows.Forms.GroupBox()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
-        '
-        'LineGroup
-        '
-        Me.LineGroup.Controls.Add(Me.HorizRadio)
-        Me.LineGroup.Controls.Add(Me.verticalRadio)
-        Me.LineGroup.Location = New System.Drawing.Point(796, 12)
-        Me.LineGroup.Name = "LineGroup"
-        Me.LineGroup.Size = New System.Drawing.Size(328, 568)
-        Me.LineGroup.TabIndex = 1
-        Me.LineGroup.TabStop = False
-        Me.LineGroup.Text = "Lines"
-        '
-        'HorizRadio
-        '
-        Me.HorizRadio.AutoSize = True
-        Me.HorizRadio.Location = New System.Drawing.Point(27, 80)
-        Me.HorizRadio.Name = "HorizRadio"
-        Me.HorizRadio.Size = New System.Drawing.Size(148, 24)
-        Me.HorizRadio.TabIndex = 1
-        Me.HorizRadio.TabStop = True
-        Me.HorizRadio.Text = "Horizontal Lines"
-        Me.HorizRadio.UseVisualStyleBackColor = True
-        '
-        'verticalRadio
-        '
-        Me.verticalRadio.AutoSize = True
-        Me.verticalRadio.Location = New System.Drawing.Point(27, 49)
-        Me.verticalRadio.Name = "verticalRadio"
-        Me.verticalRadio.Size = New System.Drawing.Size(129, 24)
-        Me.verticalRadio.TabIndex = 0
-        Me.verticalRadio.TabStop = True
-        Me.verticalRadio.Text = "Vertical Lines"
-        Me.verticalRadio.UseVisualStyleBackColor = True
-        '
-        'MaskGroup
-        '
-        Me.MaskGroup.Location = New System.Drawing.Point(1038, 12)
-        Me.MaskGroup.Name = "MaskGroup"
-        Me.MaskGroup.Size = New System.Drawing.Size(328, 568)
-        Me.MaskGroup.TabIndex = 2
-        Me.MaskGroup.TabStop = False
-        Me.MaskGroup.Text = "Masks"
         '
         'Label3
         '
@@ -268,6 +222,15 @@ Partial Class OptionsFeatures
         Me.FeatureSampleSize.TabIndex = 33
         Me.FeatureSampleSize.Value = 25
         '
+        'FilterGroup
+        '
+        Me.FilterGroup.Location = New System.Drawing.Point(749, 12)
+        Me.FilterGroup.Name = "FilterGroup"
+        Me.FilterGroup.Size = New System.Drawing.Size(392, 393)
+        Me.FilterGroup.TabIndex = 2
+        Me.FilterGroup.TabStop = False
+        Me.FilterGroup.Text = "Filter input with selected algorithms"
+        '
         'OptionsFeatures
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -292,12 +255,9 @@ Partial Class OptionsFeatures
         Me.Controls.Add(Me.DistanceSlider)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.FeatureMethod)
-        Me.Controls.Add(Me.MaskGroup)
-        Me.Controls.Add(Me.LineGroup)
+        Me.Controls.Add(Me.FilterGroup)
         Me.Name = "OptionsFeatures"
         Me.Text = "Important Options for Features, Edges, Lines, and Masks"
-        Me.LineGroup.ResumeLayout(False)
-        Me.LineGroup.PerformLayout()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -307,10 +267,6 @@ Partial Class OptionsFeatures
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents LineGroup As Windows.Forms.GroupBox
-    Friend WithEvents MaskGroup As Windows.Forms.GroupBox
-    Friend WithEvents HorizRadio As Windows.Forms.RadioButton
-    Friend WithEvents verticalRadio As Windows.Forms.RadioButton
     Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents EdgeMethods As Windows.Forms.ComboBox
     Friend WithEvents DistanceLabel As Windows.Forms.Label
@@ -330,4 +286,5 @@ Partial Class OptionsFeatures
     Friend WithEvents FeatureSampleSizeLabel As Windows.Forms.Label
     Friend WithEvents Label5 As Windows.Forms.Label
     Friend WithEvents FeatureSampleSize As Windows.Forms.TrackBar
+    Friend WithEvents FilterGroup As Windows.Forms.GroupBox
 End Class

@@ -170,38 +170,6 @@ End Class
 
 
 
-
-'https://docs.opencvb.org/master/d1/db7/tutorial_py_Hist_begins.html
-Public Class Hist_EqualizeGray : Inherits TaskParent
-    Public histogramEQ As New Hist_Basics
-    Public histogram As New Hist_Basics
-    Dim mats As New Mat_4to1
-    Public Sub New()
-        histogramEQ.plot.addLabels = False
-        histogram.plot.addLabels = False
-        labels(2) = "Equalized image"
-        labels(3) = "Orig. Hist, Eq. Hist, Orig. Image, Eq. Image"
-        desc = "Create an equalized histogram of the grayscale image."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        histogram.Run(src)
-        cv.Cv2.EqualizeHist(src, dst2)
-        histogramEQ.Run(dst2)
-        mats.mat(0) = histogram.dst2.Clone
-        mats.mat(1) = histogramEQ.dst2
-        mats.mat(2) = src
-        mats.mat(3) = dst2
-        mats.Run(src)
-        dst3 = mats.dst2
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Hist_Simple : Inherits TaskParent
     Public plot As New Plot_Histogram
     Public Sub New()
@@ -1556,5 +1524,38 @@ Public Class Hist_ToggleFeatureLess : Inherits TaskParent
         If task.toggleOn Then plotHist.histMask = New cv.Mat Else plotHist.histMask = fLess.dst2.Clone
         plotHist.Run(task.grayStable.Clone)
         dst2 = plotHist.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+'https://docs.opencvb.org/master/d1/db7/tutorial_py_Hist_begins.html
+Public Class Hist_EqualizeGray : Inherits TaskParent
+    Public histogramEQ As New Hist_Basics
+    Public histogram As New Hist_Basics
+    Dim mats As New Mat_4to1
+    Public Sub New()
+        histogramEQ.plot.addLabels = False
+        histogram.plot.addLabels = False
+        labels(2) = "Equalized image"
+        labels(3) = "Orig. Hist, Eq. Hist, Orig. Image, Eq. Image"
+        desc = "Create an equalized histogram of the grayscale image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else src = task.grayStable
+        histogram.Run(src)
+        cv.Cv2.EqualizeHist(task.grayStable, dst2)
+        histogramEQ.Run(dst2)
+        mats.mat(0) = histogram.dst2.Clone
+        mats.mat(1) = histogramEQ.dst2
+        mats.mat(2) = src
+        mats.mat(3) = dst2
+        mats.Run(emptyMat)
+        dst3 = mats.dst2
     End Sub
 End Class

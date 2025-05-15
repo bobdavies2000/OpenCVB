@@ -2347,7 +2347,7 @@ Public Class Options_Blur : Inherits OptionParent
     Public sigmaY As Double = 1.5
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Blur Kernel Size", 0, 32, kernelSize)
+            sliders.setupTrackBar("Blur Kernel Size", 0, 31, kernelSize)
             sliders.setupTrackBar("Blur SigmaX", 1, 10, sigmaX * 2)
             sliders.setupTrackBar("Blur SigmaY", 1, 10, sigmaY * 2)
         End If

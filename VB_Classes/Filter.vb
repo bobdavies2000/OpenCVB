@@ -1,4 +1,54 @@
 Imports cv = OpenCvSharp
+Public Class Filter_Basics : Inherits TaskParent
+    Dim RGBfilters(task.featureOptions.checkBoxes.Count - 1) As Object
+    Public Sub New()
+        desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = If(src.Channels = 1, src, task.grayStable)
+        Static filterIndex As Integer = -1
+        If task.optionsChanged Then
+            For Each cb In task.featureOptions.checkBoxes
+                If cb.Checked Then
+                    Select Case cb.Text
+                        Case "Original"
+                        Case "Blur_Basics"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Blur_Basics
+                        Case "Brightness_Basics"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Brightness_Basics
+                        Case "Contrast_Basics"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Contrast_Basics
+                        Case "Dilate_Basics"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Dilate_Basics
+                        Case "Erode_Basics"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Erode_Basics
+                        Case "Filter_Equalize"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Filter_Equalize
+                        Case "Filter_Laplacian"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Filter_Laplacian
+                        Case "PhotoShop_SharpenDetail"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_SharpenDetail
+                        Case "PhotoShop_WhiteBalance"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_WhiteBalance
+                        Case "MeanSubtraction_Basics"
+                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New MeanSubtraction_Basics
+                    End Select
+                    filterIndex = cb.Tag
+                End If
+            Next
+        End If
+
+        If filterIndex > 0 Then
+            RGBfilters(filterIndex).run(dst2)
+            dst2 = RGBfilters(filterIndex).dst2
+        End If
+    End Sub
+End Class
+
+
+
+
+
 ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Filter_Laplacian : Inherits TaskParent
     Public Sub New()
@@ -164,5 +214,28 @@ Public Class Filter_Median : Inherits TaskParent
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         dst2 = src.MedianBlur(kernelSize)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
+
+'https://docs.opencvb.org/master/d1/db7/tutorial_py_Hist_begins.html
+Public Class Filter_Equalize : Inherits TaskParent
+    Public Sub New()
+        labels(2) = "Equalized image"
+        desc = "Create an equalized image of the grayscale input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        cv.Cv2.EqualizeHist(src, dst2)
     End Sub
 End Class

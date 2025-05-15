@@ -95,41 +95,6 @@ End Class
 
 
 
-' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class PhotoShop_WhiteBalance : Inherits TaskParent
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("White balance threshold X100", 1, 100, 50)
-        cPtr = WhiteBalance_Open()
-        labels = {"", "", "Image with white balance applied", "White pixels were altered from the original"}
-        desc = "Automate getting the right white balance"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static thresholdSlider =optiBase.findslider("White balance threshold X100")
-        Dim thresholdVal As Single = thresholdSlider.Value / 100
-
-        Dim rgbData(src.Total * src.ElemSize - 1) As Byte
-        Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
-        Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
-
-        Dim imagePtr = WhiteBalance_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
-        handleSrc.Free()
-
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
-        If standaloneTest() Then
-            Dim diff = dst2 - src
-            diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst3 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
-        End If
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = WhiteBalance_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class PhotoShop_WhiteBalancePlot : Inherits TaskParent
@@ -466,26 +431,6 @@ End Class
 
 
 
-' https://www.learnopencvb.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class PhotoShop_SharpenDetail : Inherits TaskParent
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("DetailEnhance Sigma_s", 0, 200, 60)
-            sliders.setupTrackBar("DetailEnhance Sigma_r X100", 1, 100, 7)
-        End If
-        desc = "Enhance detail on an image"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static sSigmaSlider =optiBase.findslider("DetailEnhance Sigma_s")
-        Static rSigmaSlider =optiBase.findslider("DetailEnhance Sigma_r X100")
-        cv.Cv2.DetailEnhance(src, dst2, sSigmaSlider.Value, rSigmaSlider.Value / rSigmaSlider.Maximum)
-    End Sub
-End Class
-
-
-
-
-
 
 
 ' https://www.learnopencvb.com/non-photorealistic-rendering-using-opencv-python-c/
@@ -580,8 +525,71 @@ Public Class PhotoShop_Vignetting : Inherits TaskParent
         labels(2) = "Vignetted image.  Click anywhere to establish a different center."
         desc = "Inject vignetting into an image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         vignet.Run(src)
         dst2 = vignet.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+' https://www.learnopencvb.com/non-photorealistic-rendering-using-opencv-python-c/
+Public Class PhotoShop_SharpenDetail : Inherits TaskParent
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("DetailEnhance Sigma_s", 0, 200, 60)
+            sliders.setupTrackBar("DetailEnhance Sigma_r X100", 1, 100, 7)
+        End If
+        desc = "Enhance detail on an image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static sSigmaSlider = optiBase.FindSlider("DetailEnhance Sigma_s")
+        Static rSigmaSlider = optiBase.FindSlider("DetailEnhance Sigma_r X100")
+
+        If src.Channels <> 3 Then src = task.color.Clone
+        cv.Cv2.DetailEnhance(src, dst2, sSigmaSlider.Value, rSigmaSlider.Value / rSigmaSlider.Maximum)
+
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    End Sub
+End Class
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class PhotoShop_WhiteBalance : Inherits TaskParent
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("White balance threshold X100", 1, 100, 50)
+        cPtr = WhiteBalance_Open()
+        labels = {"", "", "Image with white balance applied", "White pixels were altered from the original"}
+        desc = "Automate getting the right white balance"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = optiBase.FindSlider("White balance threshold X100")
+        Dim thresholdVal As Single = thresholdSlider.Value / 100
+
+        If src.Channels <> 3 Then src = task.color.Clone
+        Dim rgbData(src.Total * src.ElemSize - 1) As Byte
+        Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
+        Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
+
+        Dim imagePtr = WhiteBalance_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
+        handleSrc.Free()
+
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        If standaloneTest() Then
+            Dim diff = dst2 - src
+            diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst3 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+        End If
+
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = WhiteBalance_Close(cPtr)
     End Sub
 End Class

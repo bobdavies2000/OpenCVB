@@ -355,7 +355,6 @@
     <Compile Include="Edge.vb" />
     <Compile Include="Eigen.vb" />
     <Compile Include="Encode.vb" />
-    <Compile Include="Extrinsics.vb" />
     <Compile Include="Face.vb" />
     <Compile Include="Feature.vb" />
     <Compile Include="Filter.vb" />
