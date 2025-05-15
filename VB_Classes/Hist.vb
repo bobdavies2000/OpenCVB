@@ -561,14 +561,14 @@ Public Class Hist_EqualizeColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
-        rgbEq = src.Split()
+        rgbEq = task.color.Split()
 
         For i = 0 To rgb.Count - 1
             cv.Cv2.EqualizeHist(rgbEq(i), rgbEq(i))
         Next
 
         If standaloneTest() Or displayHist Then
-            cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
+            cv.Cv2.Split(task.color, rgb) ' equalizehist alters the input...
             kalman.plot.backColor = cv.Scalar.Red
             kalman.Run(rgb(channel).Clone())
             mats.mat(0) = kalman.dst2.Clone()

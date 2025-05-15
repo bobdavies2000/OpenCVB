@@ -425,9 +425,9 @@ Public Class Mat_4Click : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         mat = mats.mat
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2.Clone
-        If standalone Then mats.defaultMats(src)
+        If standalone Then mats.defaultMats(emptyMat)
         If task.firstPass Then
             task.ClickPoint = New cv.Point(0, 0)
             task.mousePicTag = 2
@@ -440,7 +440,7 @@ Public Class Mat_4Click : Inherits TaskParent
                 quadrant = If(task.ClickPoint.X < task.dst2.Width / 2, 2, 3)
             End If
         End If
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2.Clone
         dst3 = mats.mat(quadrant).Clone
     End Sub

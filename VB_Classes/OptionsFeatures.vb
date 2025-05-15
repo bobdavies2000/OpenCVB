@@ -48,7 +48,7 @@ Public Class OptionsFeatures
             FilterGroup.Controls.Add(cb)
             checkBoxes(i) = cb
         Next
-        checkBoxes(0).Checked = True
+        checkBoxes(6).Checked = True ' equalize is the default.
     End Sub
 
 

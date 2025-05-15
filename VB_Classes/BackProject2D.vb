@@ -15,7 +15,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim roi = task.gridRects(index)
 
-        colorFmt.Run(src)
+        colorFmt.Run(task.color)
         hist2d.Run(colorFmt.dst2)
         dst2 = hist2d.dst2
 
@@ -113,15 +113,15 @@ Public Class BackProject2D_Compare : Inherits TaskParent
         desc = "Compare the hue and brightness images and the results of the Hist_backprojection2d"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        hueSat.Run(src.Clone)
+        hueSat.Run(task.color.Clone)
         mats.mat(0) = hueSat.dst2
         mats.mat(1) = hueSat.dst3
 
-        backP.Run(src)
+        backP.Run(task.color)
         mats.mat(2) = backP.dst3
 
         If task.firstPass Then mats.quadrant = 3
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
 
