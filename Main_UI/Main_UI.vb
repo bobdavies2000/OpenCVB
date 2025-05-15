@@ -1631,10 +1631,6 @@ Public Class Main_UI
                             task.CPU_FrameTime = camera.CPU_FrameTime
                         End SyncLock
 
-                        Dim tmp = task.brickMap.Clone
-
-                        If task.color.Size <> tmp.Size Then Dim k = 0
-
                         Dim endCopyTime = Now
                         Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
                         Dim spanCopy = New TimeSpan(elapsedCopyTicks)
@@ -1659,6 +1655,14 @@ Public Class Main_UI
                         Exit While
                     End If
                 End While
+
+                ' when "testAll" is running and switching resolutions, the camera task may have switched to the new
+                ' resolution but the task has not.  This catches that and will rebuild the task structure and start fresh.
+                ' BTW: if you are ever stuck debugging this code, there is a conflict deep in the compiler with using the
+                ' word "task" for the main OpenCVB variable. It only shows up here.  If you carefully change "task" to "aTask"
+                ' throughout VB_Classes, it will make it easier to debug this while loop.  "task" is not a reserved work in VB.Net
+                ' but is seems to act like it in main_UI.vb.  Using "task" instead of "aTask" is to be preferred - just simpler to type.
+                If task.color.Size <> saveWorkingRes Then Exit While
 
                 ' camera has exited or resolution is changed.
                 If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or

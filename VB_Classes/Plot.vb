@@ -77,7 +77,7 @@ Public Class Plot_Histogram2D : Inherits TaskParent
         labels = {"", "", "2D Histogram", ""}
         desc = "Plot a 2D histgram from the input Mat"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histogram = src.Clone
         If standaloneTest() Then
             colorFmt.Run(src)
@@ -109,7 +109,7 @@ Public Class Plot_OverTimeSingle : Inherits TaskParent
         labels(2) = "Plot_OverTime "
         desc = "Plot an input variable over time"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then plotData = task.color.Mean(task.depthMask)(0)
 
         If inputList.Count >= dst2.Width Then inputList.RemoveAt(0)
@@ -123,7 +123,7 @@ Public Class Plot_OverTimeSingle : Inherits TaskParent
             y *= dst2.Height - 1
             Dim c As New cv.Point(i, y)
             If c.X < 1 Then c.X = 1
-            DrawCircle(dst2,c, 1, plotColor)
+            DrawCircle(dst2, c, 1, plotColor)
         Next
 
         If inputList.Count > dst2.Width / 8 Then
@@ -162,7 +162,7 @@ Public Class Plot_OverTimeScalar : Inherits TaskParent
         Next
         desc = "Plot the requested number of entries in the cv.scalar input"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then plotData = task.color.Mean()
 
         For i = 0 To Math.Min(plotCount, 4) - 1
@@ -210,7 +210,7 @@ Public Class Plot_OverTime : Inherits TaskParent
         End Select
         task.gOptions.DotSizeSlider.Value = task.gOptions.LineWidth.Value
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
@@ -253,7 +253,7 @@ Public Class Plot_OverTime : Inherits TaskParent
             y *= dst2.Height - 1
             Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
             If c.X < 1 Then c.X = 1
-            DrawCircle(dst2,c, task.DotSize, plotColors(i))
+            DrawCircle(dst2, c, task.DotSize, plotColors(i))
         Next
 
 
@@ -296,7 +296,7 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
         task.gOptions.LineWidth.Value = 1
         task.gOptions.DotSizeSlider.Value = 2
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
@@ -379,7 +379,7 @@ Public Class Plot_Beats : Inherits TaskParent
         plot.maxScale = 5
         desc = "Plot the beats to validate things are working."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         plot.plotData(0) = If(task.heartBeat, 1, -1)
         plot.plotData(1) = If(task.midHeartBeat, 2, -1)
         plot.plotData(2) = If(task.quarterBeat, 3, -1)
@@ -411,7 +411,7 @@ Public Class Plot_Basics_CPP : Inherits TaskParent
         cPtr = PlotOpenCV_Open()
         desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim handleX = GCHandle.Alloc(srcX.ToArray, GCHandleType.Pinned)
         Dim handleY = GCHandle.Alloc(srcY.ToArray, GCHandleType.Pinned)
 
@@ -448,7 +448,7 @@ Public Class Plot_Dots : Inherits TaskParent
         Next
         desc = "Plot the requested points..."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim maxX = srcX.Max, minX = srcX.Min, maxY = srcY.Max, minY = srcY.Min
         If wipeSlate Then dst2.SetTo(0)
         For i = 0 To srcX.Count - 1
