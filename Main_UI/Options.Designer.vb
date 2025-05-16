@@ -77,9 +77,9 @@ Partial Class Options
         Me.FixedPalette.CheckState = System.Windows.Forms.CheckState.Checked
         Me.FixedPalette.Location = New System.Drawing.Point(422, 86)
         Me.FixedPalette.Name = "FixedPalette"
-        Me.FixedPalette.Size = New System.Drawing.Size(351, 24)
+        Me.FixedPalette.Size = New System.Drawing.Size(397, 24)
         Me.FixedPalette.TabIndex = 16
-        Me.FixedPalette.Text = "On = fixed palette.  Off - random after restart."
+        Me.FixedPalette.Text = "On = random colors.  Off - fixed palette after restart."
         Me.FixedPalette.UseVisualStyleBackColor = True
         '
         'Label7
