@@ -240,8 +240,7 @@ Public Class BGSubtract_DepthOrColorMotion : Inherits TaskParent
         motion.Run(src)
         dst2 = motion.dst2
         dst3 = motion.dst3
-        Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs()
-        src.CopyTo(dst3, Not mask)
+        src.CopyTo(dst3, Not dst2)
         labels(3) = "Image with instability filled with color data"
     End Sub
 End Class

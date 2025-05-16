@@ -747,24 +747,9 @@ Public Class LineRGB_Bricks : Inherits TaskParent
             End If
         End If
 
-
-        lp.bricks.Clear()
-        If lp.p1.X = lp.p2.X Then
-            ' handle the special case of slope 0
-            Dim x = lp.p1.X
-            For y = Math.Min(lp.p1.Y, lp.p2.Y) To Math.Max(lp.p1.Y, lp.p2.Y) Step task.cellSize
-                Dim index = task.brickMap.Get(Of Single)(y, x)
-                lp.bricks.Add(index)
-                dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
-            Next
-        Else
-            For x = Math.Min(lp.p1.X, lp.p2.X) To Math.Max(lp.p1.X, lp.p2.X)
-                Dim y = lp.m * x + lp.b
-                Dim index = task.brickMap.Get(Of Single)(y, x)
-                dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
-                If lp.bricks.Contains(index) = False Then lp.bricks.Add(index)
-            Next
-        End If
+        For Each index In lp.bricks
+            dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
+        Next
         labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
     End Sub
 End Class

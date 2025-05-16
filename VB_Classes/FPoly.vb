@@ -606,7 +606,8 @@ Public Class FPoly_WarpAffinePoly : Inherits TaskParent
         rotatePoly.poly = New List(Of cv.Point2f)(poly)
         rotatePoly.Run(src)
 
-        If fPoly.fPD.polyPrevSideIndex >= rotatePoly.poly.Count Then fPoly.fPD.polyPrevSideIndex = 0
+        If rotatePoly.poly.Count = 0 Then Exit Sub
+        If fPoly.fPD.polyPrevSideIndex > rotatePoly.poly.Count Then fPoly.fPD.polyPrevSideIndex = 0
 
         Dim offset = New cv.Point2f(rotatePoly.poly(fPoly.fPD.polyPrevSideIndex).X - polyPrev(fPoly.fPD.polyPrevSideIndex).X,
                                     rotatePoly.poly(fPoly.fPD.polyPrevSideIndex).Y - polyPrev(fPoly.fPD.polyPrevSideIndex).Y)

@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class Filter_Basics : Inherits TaskParent
     Dim RGBfilters(task.featureOptions.checkBoxes.Count - 1) As Object
+    Public filterIndex As Integer = -1
     Public Sub New()
         desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = If(src.Channels = 1, src, task.grayStable)
-        Static filterIndex As Integer = -1
         If task.optionsChanged Then
             For Each cb In task.featureOptions.checkBoxes
                 If cb.Checked Then
@@ -236,6 +236,6 @@ Public Class Filter_Equalize : Inherits TaskParent
         desc = "Create an equalized image of the grayscale input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.EqualizeHist(src, dst2)
+        cv.Cv2.EqualizeHist(task.grayStable, dst2)
     End Sub
 End Class

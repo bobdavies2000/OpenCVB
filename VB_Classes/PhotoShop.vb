@@ -551,8 +551,6 @@ Public Class PhotoShop_SharpenDetail : Inherits TaskParent
 
         If src.Channels <> 3 Then src = task.color.Clone
         cv.Cv2.DetailEnhance(src, dst2, sSigmaSlider.Value, rSigmaSlider.Value / rSigmaSlider.Maximum)
-
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
 
@@ -586,8 +584,6 @@ Public Class PhotoShop_WhiteBalance : Inherits TaskParent
             diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst3 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
         End If
-
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = WhiteBalance_Close(cPtr)

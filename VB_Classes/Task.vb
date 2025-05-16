@@ -587,6 +587,7 @@ Public Class VBtask : Implements IDisposable
         featureOptions.Show() ' behind redOptions
         redOptions.Show()     ' behind gOptions
         gOptions.Show()       ' In front of both...
+        rgbFilter = New Filter_Basics
 
         If testAllRunning = False Then treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
@@ -807,9 +808,7 @@ Public Class VBtask : Implements IDisposable
         gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
-        If featureOptions.rgbFilterSelected Then
-            If rgbFilter Is Nothing Then rgbFilter = New Filter_Basics
-
+        If rgbFilter.filterIndex > 0 Then
             rgbFilter.Run(task.grayStable)
             src = rgbFilter.dst2
         End If
