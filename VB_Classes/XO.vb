@@ -2688,7 +2688,7 @@ Public Class XO_Region_Palette : Inherits TaskParent
         mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
         If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

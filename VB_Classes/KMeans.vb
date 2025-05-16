@@ -94,7 +94,7 @@ Public Class KMeans_k2_to_k8 : Inherits TaskParent
         km.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Mats.mat(kmIndex) = km.dst2 * 255 / km.classCount
 
-        Mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub

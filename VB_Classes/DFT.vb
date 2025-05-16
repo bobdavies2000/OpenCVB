@@ -62,7 +62,7 @@ Public Class DFT_Basics : Inherits TaskParent
         mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
         mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
         mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst3 = mats.dst2
 
         dst2 = inverseDFT(complexImage)
@@ -94,7 +94,7 @@ Public Class DFT_Inverse : Inherits TaskParent
         cv.Cv2.Absdiff(task.gray, dst2, diff)
         mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
-        mats.Run(task.gray)
+        mats.Run(emptyMat)
         If mats.mat(0).CountNonZero > 0 Then
             dst3 = mats.dst2
             labels(3) = "Mask of difference (top) and relative diff (bot)"

@@ -422,7 +422,7 @@ Public Class GuidedBP_Regions : Inherits TaskParent
             rcListY.Add(rc)
         Next
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
 

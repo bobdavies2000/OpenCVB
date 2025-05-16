@@ -74,7 +74,7 @@ Public Class Threshold_Definitions : Inherits TaskParent
         mats.mat(1) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Trunc)
         mats.mat(2) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Tozero)
         mats.mat(3) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.TozeroInv)
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
         SetTrueText("Input Gradient Image", 0)

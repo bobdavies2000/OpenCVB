@@ -104,7 +104,7 @@ Public Class ImageOffset_SliceH : Inherits TaskParent
             mats.mat(i) = plot.dst2.Clone
         Next
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
 
         Dim p1 = New cv.Point(0, pt.Y), p2 = New cv.Point(dst2.Width, pt.Y)
@@ -165,7 +165,7 @@ Public Class ImageOffset_SliceV : Inherits TaskParent
             mats.mat(i) = plot.dst2.Clone
         Next
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
 
         Dim p1 = New cv.Point(pt.X, 0), p2 = New cv.Point(pt.X, dst2.Height)

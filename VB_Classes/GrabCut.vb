@@ -80,7 +80,7 @@ Public Class GrabCut_FineTune : Inherits TaskParent
         mats.mat(0) = basics.dst2
         mats.mat(1) = basics.fgFineTune
         mats.mat(2) = basics.bgFineTune
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
 
         dst3 = basics.dst3

@@ -541,7 +541,7 @@ Public Class FCS_MotionDirection : Inherits TaskParent
         task.fpMotion.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
         mats.mat(1) = plothist.dst2.Clone
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
 

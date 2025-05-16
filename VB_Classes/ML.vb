@@ -341,7 +341,7 @@ Public Class ML_DepthFromColor : Inherits TaskParent
         colorPal.Run(predictedDepth.ConvertScaleAbs())
         mats.mat(0) = colorPal.dst2.Clone()
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         labels(2) = "prediction, shadow, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
         dst3 = mats.dst3
@@ -419,7 +419,7 @@ Public Class ML_DepthFromXYColor : Inherits TaskParent
         colorizer.Run(predictedDepth.ConvertScaleAbs)
         dst2 = colorizer.dst2.Clone()
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst3 = mats.dst2
         labels(3) = "shadow, empty, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
     End Sub

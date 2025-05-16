@@ -529,7 +529,7 @@ Public Class Random_StaticTVFaster : Inherits TaskParent
 
         cv.Cv2.Add(dst2, valMat, dst2, plusMask)
         cv.Cv2.Subtract(dst2, valMat, dst2, minusMask)
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst3 = mats.dst2
     End Sub
 End Class

@@ -171,7 +171,7 @@ Public Class Plot_OverTimeScalar : Inherits TaskParent
             mats.mat(i) = plotList(i).dst2
         Next
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

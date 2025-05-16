@@ -67,7 +67,7 @@ Public Class Blob_Input : Inherits TaskParent
 
         poly.Run(src)
         Mats.mat(3) = poly.dst3
-        Mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub

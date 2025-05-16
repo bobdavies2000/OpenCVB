@@ -220,7 +220,7 @@ Public Class Hist_ColorsAndGray : Inherits TaskParent
             mats.mat(i) = histogram.plot.dst2.Clone
         Next
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -236,11 +236,11 @@ End Class
 Public Class Hist_Frustrum : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         task.gOptions.setGravityUsage(False)
         desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst2
         dst3 = heat.dst3
@@ -268,7 +268,7 @@ Public Class Hist_PeakMax : Inherits TaskParent
         desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         labels(3) = "Grayscale Histogram"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         task.gOptions.UseKalman.Checked = False
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
@@ -313,7 +313,7 @@ Public Class Hist_PeakFinder : Inherits TaskParent
     Public Sub New()
         desc = "Find the peaks - columns taller that both neighbors - in the histogram"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.pcSplit(2)
 
         hist.Run(src)
@@ -402,7 +402,7 @@ Public Class Hist_PeaksDepth : Inherits TaskParent
     Public Sub New()
         desc = "Find the peaks - columns taller that both neighbors - in the histogram"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         peaks.Run(task.pcSplit(2))
         dst2 = peaks.dst2
         labels(2) = peaks.labels(2)
@@ -429,7 +429,7 @@ Public Class Hist_PeaksRGB : Inherits TaskParent
         labels(2) = "Upper left is Blue, upper right is Green, bottom left is Red"
         desc = "Find the peaks and valleys for each of the BGR channels."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim split = src.Split()
         For i = 0 To 3 - 1
             peaks(i).hist.plot.backColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
@@ -443,7 +443,7 @@ Public Class Hist_PeaksRGB : Inherits TaskParent
             task.mousePicTag = 2
         End If
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -463,7 +463,7 @@ Public Class Hist_Color : Inherits TaskParent
     Public Sub New()
         desc = "Create a histogram of green and red."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         ranges = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(0, 255)}
         cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat, histogram, 1, {task.histogramBins, task.histogramBins}, ranges)
 
@@ -499,7 +499,7 @@ Public Class Hist_KalmanAuto : Inherits TaskParent
         task.kalman = New Kalman_Basics
         desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
@@ -576,7 +576,7 @@ Public Class Hist_EqualizeColor : Inherits TaskParent
             kalmanEq.Run(rgbEq(channel).Clone())
             mats.mat(1) = kalmanEq.dst2.Clone()
 
-            mats.Run(src)
+            mats.Run(emptyMat)
             dst3 = mats.dst2
             labels(3) = "Before (top) and After Red Histogram"
         End If

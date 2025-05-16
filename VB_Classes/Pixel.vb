@@ -233,7 +233,7 @@ Public Class Pixel_GetSet : Inherits TaskParent
 
         SetTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

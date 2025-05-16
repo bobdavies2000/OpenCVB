@@ -32,7 +32,7 @@ Public Class Bin2Way_Basics : Inherits TaskParent
         mats.mat(1) = task.gray.InRange(halfSplit, 255)            ' lightest
 
         If standaloneTest() Then
-            mats.Run(task.gray)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
         End If
     End Sub
@@ -52,7 +52,7 @@ Public Class Bin2Way_KMeans : Inherits TaskParent
         labels = {"", "", "Darkest (upper left),lightest (upper right)", "Selected image from dst2"}
         desc = "Use kmeans with each of the 2-way split images"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bin2.Run(task.gray)
 
         kmeans.Run(task.gray)
@@ -61,7 +61,7 @@ Public Class Bin2Way_KMeans : Inherits TaskParent
             kmeans.dst3.CopyTo(mats.mat(i), bin2.mats.mat(i))
         Next
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -79,7 +79,7 @@ Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
     Public Sub New()
         desc = "Use RedCloud with the darkest regions"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then bin2.Run(src)
 
         flood.inputRemoved = Not bin2.mats.mat(0)
@@ -140,7 +140,7 @@ Public Class Bin2Way_RecurseOnce : Inherits TaskParent
         mats.mat(2) = bin2.mats.mat(0) And Not darkestMask
         mats.mat(3) = bin2.mats.mat(1)
 
-        mats.Run(task.gray)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

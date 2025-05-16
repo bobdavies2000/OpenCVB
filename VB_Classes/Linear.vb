@@ -124,7 +124,7 @@ Public Class Linear_Visualize : Inherits TaskParent
             mats.mat(i) = mats.mat(i).Normalize(0, 255, cv.NormTypes.MinMax).ConvertScaleAbs
         Next
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
 
         matPlots.Run(src)

@@ -119,7 +119,7 @@ Public Class MiniCloud_RotateAngle : Inherits TaskParent
 
         mats.mat(0) = peak.dst2(peak.mini.rect)
         mats.mat(1) = peak.dst3(peak.mini.rect)
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
     End Sub
 End Class

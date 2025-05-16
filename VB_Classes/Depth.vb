@@ -402,7 +402,7 @@ Public Class Depth_Smoothing : Inherits TaskParent
         reduction.dst2.ConvertTo(reducedDepth, cv.MatType.CV_32F)
         colorize.Run(reducedDepth)
         dst2 = colorize.dst2
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst3 = mats.dst2
         labels(2) = smooth.labels(2)
     End Sub

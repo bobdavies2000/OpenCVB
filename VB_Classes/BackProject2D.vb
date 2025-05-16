@@ -323,12 +323,12 @@ Public Class BackProject2D_RowCol : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst0 = src.Clone
+        dst0 = task.color.Clone
 
         Dim selection = If(options.backProjectRow, "Row", "Col")
         labels(2) = "Histogram 2D with Backprojection by " + selection
 
-        backp.Run(src)
+        backp.Run(task.color)
         dst2 = Convert32f_To_8UC3(backp.dst2) * 255
 
         Dim roi = task.gridRects(task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X))
@@ -343,7 +343,7 @@ Public Class BackProject2D_RowCol : Inherits TaskParent
         backp.hist2d.histogram(rect).CopyTo(histData(rect))
 
         Dim ranges() = backp.hist2d.ranges
-        cv.Cv2.CalcBackProject({src}, backp.hist2d.channels, histData, dst1, ranges)
+        cv.Cv2.CalcBackProject({task.color}, backp.hist2d.channels, histData, dst1, ranges)
 
         dst3.SetTo(0)
         dst3.SetTo(cv.Scalar.Yellow, dst1)

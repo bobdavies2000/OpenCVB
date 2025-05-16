@@ -990,7 +990,7 @@ Public Class Edge_RedCloud : Inherits TaskParent
 
         mats.mat(3) = mats.mat(2).SetTo(0, Not mats.mat(0))
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -1224,7 +1224,7 @@ Public Class Edge_DiffXYZ : Inherits TaskParent
 
         mats.mat(3) = diffX.dst2 Or diffY.dst2 ' diffz is too much...
 
-        mats.Run(src)
+        mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
