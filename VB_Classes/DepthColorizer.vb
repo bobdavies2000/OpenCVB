@@ -4,6 +4,44 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Create a traditional depth color scheme."
     End Sub
+    Public Sub buildColors(FixedPalette As Boolean)
+        If saveVecColors.Count = 1 Or FixedPalette <> saveFixedPalette Then
+            saveFixedPalette = FixedPalette
+            Dim initVal = msRNG.Next()
+            If FixedPalette Then initVal = 43
+            Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
+            Dim bgr(3) As Byte
+            For i = 0 To task.vecColors.Length - 1
+                rand.NextBytes(bgr)
+                task.vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
+                task.scalarColors(i) = New cv.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+            Next
+
+            Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow, gradientWidth = Math.Min(dst2.Width, 256), f As Double = 1.0
+            task.depthColorList = New List(Of cv.Vec3b)
+            For i = 0 To gradientWidth - 1
+                task.depthColorList.Add(New cv.Vec3b(f * color2(0) + (1 - f) * color1(0),
+                                           f * color2(1) + (1 - f) * color1(1),
+                                           f * color2(2) + (1 - f) * color1(2)))
+                f -= 1 / gradientWidth
+            Next
+            task.depthColorList(0) = New cv.Vec3b ' black for the first color...
+            task.depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.depthColorList.ToArray)
+
+            saveVecColors = task.vecColors
+            saveScalarColors = task.scalarColors
+            saveDepthColorMap = task.depthColorMap
+            saveDepthColorList = New List(Of cv.Vec3b)(task.depthColorList)
+        Else
+            ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
+            ' Colors will be different when OpenCVB is restarted.  Don't like the colors?  Restart.
+            task.vecColors = saveVecColors
+            task.scalarColors = saveScalarColors
+            task.depthColorMap = saveDepthColorMap
+            task.depthColorList = saveDepthColorList
+        End If
+    End Sub
+
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.gOptions.GridDepth.Checked Then

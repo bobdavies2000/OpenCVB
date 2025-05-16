@@ -1499,7 +1499,7 @@ Public Class Main_UI
         parms.displayRes = settings.displayRes
         parms.algName = AvailableAlgorithms.Text
 
-        parms.FixedPalette = settings.FixedPalette
+        parms.fixedPalette = settings.FixedPalette
 
         PausePlayButton.Image = PausePlay
 

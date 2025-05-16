@@ -382,47 +382,12 @@ Public Class VBtask : Implements IDisposable
         Public displayRes As cv.Size
 
         Public algName As String
-        Public FixedPalette As Boolean ' on = random colors after each restart.  Off = fixed colors.  See buildColors below.
+        ' on = random colors for each task, off = fixed colors - See DepthColorizer_Basics BuildColors
+        Public fixedPalette As Boolean
 
         Public calibData As cameraInfo
     End Structure
-    Private Sub buildColors(FixedPalette As Boolean)
-        If saveVecColors.Count = 1 Or FixedPalette <> saveFixedPalette Then
-            saveFixedPalette = FixedPalette
-            Dim initVal = msRNG.Next()
-            If FixedPalette Then initVal = 43
-            Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
-            Dim bgr(3) As Byte
-            For i = 0 To vecColors.Length - 1
-                rand.NextBytes(bgr)
-                vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
-                scalarColors(i) = New cv.Scalar(vecColors(i)(0), vecColors(i)(1), vecColors(i)(2))
-            Next
 
-            Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow, gradientWidth = Math.Min(dst2.Width, 256), f As Double = 1.0
-            depthColorList = New List(Of cv.Vec3b)
-            For i = 0 To gradientWidth - 1
-                depthColorList.Add(New cv.Vec3b(f * color2(0) + (1 - f) * color1(0),
-                                           f * color2(1) + (1 - f) * color1(1),
-                                           f * color2(2) + (1 - f) * color1(2)))
-                f -= 1 / gradientWidth
-            Next
-            depthColorList(0) = New cv.Vec3b ' black for the first color...
-            depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, depthColorList.ToArray)
-
-            saveVecColors = vecColors
-            saveScalarColors = scalarColors
-            saveDepthColorMap = depthColorMap
-            saveDepthColorList = New List(Of cv.Vec3b)(depthColorList)
-        Else
-            ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
-            ' Colors will be different when OpenCVB is restarted.  Don't like the colors?  Restart.
-            vecColors = saveVecColors
-            scalarColors = saveScalarColors
-            depthColorMap = saveDepthColorMap
-            depthColorList = saveDepthColorList
-        End If
-    End Sub
 #End Region
     Private Function findDisplayObject(lookupName As String) As TaskParent
         Dim saveObject As Object
@@ -544,7 +509,6 @@ Public Class VBtask : Implements IDisposable
         OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", mainFormLocation.Y))
 
-        buildColors(parms.FixedPalette)
         pythonTaskName = HomeDir + "Python\" + algName
 
         allOptions = New OptionsContainer
@@ -561,6 +525,8 @@ Public Class VBtask : Implements IDisposable
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
 
+        colorizer = New DepthColorizer_Basics
+        colorizer.buildColors(parms.fixedPalette)
         gmat = New IMU_GMatrix
         grid = New Grid_Basics
         gravityHorizon = New Gravity_Basics
@@ -570,7 +536,6 @@ Public Class VBtask : Implements IDisposable
         edges = New EdgeLine_Basics
         fcsBasics = New FCS_Basics
         buildCorr = New Brick_CorrelationMap
-        task.colorizer = New DepthColorizer_Basics
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New LineRGB_Basics
         depthLogic = New LineDepth_Basics

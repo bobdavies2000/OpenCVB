@@ -243,7 +243,7 @@ Partial Class Main_UI
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(141, 34)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(270, 34)
         Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'AboutToolStripMenuItem

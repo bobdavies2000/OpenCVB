@@ -1,5 +1,6 @@
 ﻿Imports System.Windows.Forms
 Imports System.Drawing
+Imports System.ComponentModel
 Public Class OptionsFeatures
     Public checkBoxes() As RadioButton
     Public RGBfilters As String() = {"Original", "Blur_Basics", "Brightness_Basics", "Contrast_Basics",
@@ -97,5 +98,8 @@ Public Class OptionsFeatures
         task.FeatureSampleSize = FeatureSampleSize.Value
         task.optionsChanged = True
         FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
+    End Sub
+    Private Sub OptionsFeatures_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+
     End Sub
 End Class
