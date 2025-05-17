@@ -25,6 +25,10 @@ Public Class Tour_Basics : Inherits TaskParent
 
         dst2 = ShowPalette(task.tourMap)
 
+        If task.tourList.Count <= 1 Then
+            labels(2) = "There were no contours found!"
+            Exit Sub
+        End If
         Static ptTour = task.ClickPoint
         If task.mouseClickFlag Then ptTour = task.ClickPoint
         Dim index = task.tourMap.Get(Of Byte)(ptTour.Y, ptTour.X)
@@ -148,11 +152,11 @@ Public Class Tour_Info : Inherits TaskParent
         If standalone Then
             Static tour As New Tour_Basics
             tour.Run(src)
-            dst2 = ShowAddweighted(tour.dst2, task.fcsBasics.dst2, labels(0))
-            labels(2) = task.fcsBasics.labels(2)
+            dst2 = tour.dst2
+            labels(2) = tour.labels(2)
         End If
 
-        index = task.fcsMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        index = task.fcsMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) + 1
         td = task.tourList(index)
 
         strOut = vbCrLf + vbCrLf
@@ -161,7 +165,7 @@ Public Class Tour_Info : Inherits TaskParent
         strOut += "Number of points in the contour: " + CStr(td.contour.Count) + vbCrLf
         strOut += td.maxDist.ToString + vbCrLf
         dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
-        dst2.Circle(td.maxDist, task.DotSize, black, -1)
+        dst2.Circle(td.maxDist, task.DotSize, task.highlight, -1)
 
         SetTrueText(strOut, 3)
     End Sub
@@ -205,7 +209,7 @@ End Class
 
 
 
-Public Class Tour_Lines : Inherits TaskParent
+Public Class Tour_LineRGB : Inherits TaskParent
     Public Sub New()
         desc = "Identify contour by its Lines"
     End Sub
