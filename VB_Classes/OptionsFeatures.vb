@@ -3,11 +3,7 @@ Imports System.Drawing
 Imports System.ComponentModel
 Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
-    Public grayfilters As String() = {"Original", "Blur_Basics", "Brightness_Basics", "Contrast_Basics",
-                                     "Dilate_Basics", "Erode_Basics", "Filter_Equalize", "Filter_Laplacian",
-                                     "MeanSubtraction_Basics", "PhotoShop_Gamma"}
     Public colorCheckbox() As RadioButton
-    Public colorfilters As String() = {"Original", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance", "PhotoShop_HSV"}
 
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
@@ -39,10 +35,10 @@ Public Class OptionsFeatures
         FCorrSlider.Value = 50
         SelectedFeature.Value = 0
 
-        ReDim grayCheckbox(grayfilters.Count - 1)
-        For i = 0 To grayfilters.Count - 1
+        ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
+        For i = 0 To task.rgbFilter.grayFilter.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = grayfilters(i)
+            cb.Text = task.rgbFilter.grayFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
@@ -52,10 +48,10 @@ Public Class OptionsFeatures
         Next
         grayCheckbox(0).Checked = True
 
-        ReDim colorCheckbox(colorfilters.Count - 1)
-        For i = 0 To colorfilters.Count - 1
+        ReDim colorCheckbox(task.rgbFilter.filterList.Count - 1)
+        For i = 0 To task.rgbFilter.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = colorfilters(i)
+            cb.Text = task.rgbFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i

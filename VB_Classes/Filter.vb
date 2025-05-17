@@ -1,6 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class Filter_Basics : Inherits TaskParent
-    Dim RGBfilters(task.featureOptions.colorCheckbox.Count - 1) As Object
+    Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"
+                                     }
+    Dim filters(filterList.Count - 1) As Object
     Public grayFilter As New Filter_BasicsGray
     Public filterIndex As Integer = -1
     Public Sub New()
@@ -13,19 +15,19 @@ Public Class Filter_Basics : Inherits TaskParent
                 Select Case cb.Text
                     Case "Original"
                     Case "PhotoShop_WhiteBalance"
-                        If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_WhiteBalance
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_WhiteBalance
                     Case "PhotoShop_SharpenDetail"
-                        If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_SharpenDetail
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_SharpenDetail
                     Case "PhotoShop_HSV"
-                        If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_HSV
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_HSV
                 End Select
                 filterIndex = cb.Tag
             End If
         Next
 
         If filterIndex > 0 Then
-            RGBfilters(filterIndex).run(dst2)
-            dst2 = RGBfilters(filterIndex).dst2
+            filters(filterIndex).run(dst2)
+            dst2 = filters(filterIndex).dst2
         End If
         grayFilter.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst3 = grayFilter.dst2
@@ -37,45 +39,51 @@ End Class
 
 
 Public Class Filter_BasicsGray : Inherits TaskParent
-    Dim grayfilters(task.featureOptions.grayCheckbox.Count - 1) As Object
     Public filterIndex As Integer = -1
+    Public filterList As String() = {"Original", "Blur_Basics", "Brightness_Basics", "Contrast_Basics",
+                                     "Dilate_Basics", "Erode_Basics", "Filter_Equalize", "Filter_Laplacian",
+                                     "MeanSubtraction_Gray", "PhotoShop_Gamma"}
+    Dim filters(filterList.Count - 1) As Object
     Public Sub New()
         desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
-        If task.optionsChanged Then
-            For Each cb In task.featureOptions.grayCheckbox
-                If cb.Checked Then
-                    Select Case cb.Text
-                        Case "Original"
-                        Case "Blur_Basics"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Blur_Basics
-                        Case "Brightness_Basics"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Brightness_Basics
-                        Case "Contrast_Basics"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Contrast_Basics
-                        Case "Dilate_Basics"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Dilate_Basics
-                        Case "Erode_Basics"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Erode_Basics
-                        Case "Filter_Equalize"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Filter_Equalize
-                        Case "Filter_Laplacian"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Filter_Laplacian
-                        Case "MeanSubtraction_Basics"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New MeanSubtraction_Basics
-                        Case "PhotoShop_Gamma"
-                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New PhotoShop_Gamma
-                    End Select
-                    filterIndex = cb.Tag
-                End If
-            Next
-        End If
+        For Each cb In task.featureOptions.grayCheckbox
+            If cb.Checked Then
+                Select Case cb.Text
+                    Case "Original"
+                    Case "Blur_Basics"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Blur_Basics
+                    Case "Brightness_Basics"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Brightness_Basics
+                    Case "Contrast_Basics"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Contrast_Basics
+                    Case "Dilate_Basics"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Dilate_Basics
+                    Case "Erode_Basics"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Erode_Basics
+                    Case "Filter_Equalize"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Equalize
+                    Case "Filter_Laplacian"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Laplacian
+                    Case "MeanSubtraction_Gray"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New MeanSubtraction_Gray
+                    Case "PhotoShop_Gamma"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_Gamma
+                End Select
+                filterIndex = cb.Tag
+            End If
+        Next
 
         If filterIndex > 0 Then
-            grayfilters(filterIndex).run(dst2)
-            dst2 = grayfilters(filterIndex).dst2
+            filters(filterIndex).run(dst2)
+            dst2 = filters(filterIndex).dst2
+            If dst2.Channels <> 1 Then
+                MsgBox("Filter_BasicsGray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
+                       "an 8UC1 image, not 8UC3.  Reevaluate any new filters added above!")
+                Dim k = 0 ' if you set a breakpoint here when you get this message, you can debug it more easily.
+            End If
         End If
     End Sub
 End Class
@@ -271,6 +279,6 @@ Public Class Filter_Equalize : Inherits TaskParent
         desc = "Create an equalized image of the grayscale input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.EqualizeHist(task.grayStable, dst2)
+        cv.Cv2.EqualizeHist(src, dst2)
     End Sub
 End Class

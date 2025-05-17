@@ -536,6 +536,7 @@ Public Class VBtask : Implements IDisposable
         LRMeanSub = New MeanSubtraction_LeftRight
         lines = New LineRGB_Basics
         depthLogic = New LineDepth_Basics
+        rgbFilter = New Filter_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -549,7 +550,6 @@ Public Class VBtask : Implements IDisposable
         featureOptions.Show() ' behind redOptions
         redOptions.Show()     ' behind gOptions
         gOptions.Show()       ' In front of both...
-        rgbFilter = New Filter_Basics
 
         If testAllRunning = False Then treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
@@ -774,8 +774,9 @@ Public Class VBtask : Implements IDisposable
             src = rgbFilter.dst2
             gray = rgbFilter.dst3
         ElseIf rgbFilter.grayFilter.filterIndex > 0 Then
-            rgbFilter.grayFilter.Run(src)
-            gray = rgbFilter.grayFilter.dst2.Clone
+            rgbFilter.grayFilter.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            gray = rgbFilter.grayFilter.dst2
+            src = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Else
             src = task.color
             gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -796,8 +797,6 @@ Public Class VBtask : Implements IDisposable
             If pixelViewerOn = False Then PixelViewer = Nothing
         End If
 
-        cv.Cv2.ImShow("task.color", task.color)
-        cv.Cv2.ImShow("src", src)
         If gOptions.CreateGif.Checked Then
             If gifCreator Is Nothing Then gifCreator = New Gif_OpenCVB
             gifCreator.Run(src)

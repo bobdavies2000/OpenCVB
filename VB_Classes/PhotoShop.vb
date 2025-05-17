@@ -75,7 +75,7 @@ Public Class PhotoShop_Gamma : Inherits TaskParent
     Dim lastGamma As Integer = -1
     Public Sub New()
         desc = "Use gamma correction."
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Gamma correction", 0, 200, 100)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Gamma correction", 0, 200, 50)
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Static gammaSlider =optiBase.findslider("Brightness Gamma correction")
