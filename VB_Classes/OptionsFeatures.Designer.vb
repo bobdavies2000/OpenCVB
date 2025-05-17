@@ -41,7 +41,8 @@ Partial Class OptionsFeatures
         Me.FeatureSampleSizeLabel = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.FeatureSampleSize = New System.Windows.Forms.TrackBar()
-        Me.FilterGroup = New System.Windows.Forms.GroupBox()
+        Me.GrayGroup = New System.Windows.Forms.GroupBox()
+        Me.ColorGroup = New System.Windows.Forms.GroupBox()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -222,20 +223,30 @@ Partial Class OptionsFeatures
         Me.FeatureSampleSize.TabIndex = 33
         Me.FeatureSampleSize.Value = 25
         '
-        'FilterGroup
+        'GrayGroup
         '
-        Me.FilterGroup.Location = New System.Drawing.Point(749, 12)
-        Me.FilterGroup.Name = "FilterGroup"
-        Me.FilterGroup.Size = New System.Drawing.Size(392, 393)
-        Me.FilterGroup.TabIndex = 2
-        Me.FilterGroup.TabStop = False
-        Me.FilterGroup.Text = "Filter input with selected algorithms"
+        Me.GrayGroup.Location = New System.Drawing.Point(749, 12)
+        Me.GrayGroup.Name = "GrayGroup"
+        Me.GrayGroup.Size = New System.Drawing.Size(284, 393)
+        Me.GrayGroup.TabIndex = 2
+        Me.GrayGroup.TabStop = False
+        Me.GrayGroup.Text = "Grayscale source inputs"
+        '
+        'ColorGroup
+        '
+        Me.ColorGroup.Location = New System.Drawing.Point(1049, 11)
+        Me.ColorGroup.Name = "ColorGroup"
+        Me.ColorGroup.Size = New System.Drawing.Size(284, 393)
+        Me.ColorGroup.TabIndex = 3
+        Me.ColorGroup.TabStop = False
+        Me.ColorGroup.Text = "Color source inputs"
         '
         'OptionsFeatures
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1419, 615)
+        Me.Controls.Add(Me.ColorGroup)
         Me.Controls.Add(Me.FeatureSampleSizeLabel)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.FeatureSampleSize)
@@ -255,7 +266,7 @@ Partial Class OptionsFeatures
         Me.Controls.Add(Me.DistanceSlider)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.FeatureMethod)
-        Me.Controls.Add(Me.FilterGroup)
+        Me.Controls.Add(Me.GrayGroup)
         Me.Name = "OptionsFeatures"
         Me.Text = "Important Options for Features, Edges, Lines, and Masks"
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -286,5 +297,6 @@ Partial Class OptionsFeatures
     Friend WithEvents FeatureSampleSizeLabel As Windows.Forms.Label
     Friend WithEvents Label5 As Windows.Forms.Label
     Friend WithEvents FeatureSampleSize As Windows.Forms.TrackBar
-    Friend WithEvents FilterGroup As Windows.Forms.GroupBox
+    Friend WithEvents GrayGroup As Windows.Forms.GroupBox
+    Friend WithEvents ColorGroup As Windows.Forms.GroupBox
 End Class

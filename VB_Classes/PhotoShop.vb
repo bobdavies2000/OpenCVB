@@ -27,20 +27,19 @@ End Class
 
 
 
-Public Class PhotoShop_Hue : Inherits TaskParent
+Public Class PhotoShop_HSV : Inherits TaskParent
     Public hsv_planes(2) As cv.Mat
     Public Sub New()
-        labels(2) = "Hue"
-        labels(3) = "Saturation"
-        desc = "Show hue (Result1) and Saturation (Result2)."
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels = {"", "", "HSV (8UC3)", "Hue (8uC1)"}
+        desc = "HSV 8UC3 is in dst2, dst3 is Hue in 8UC1, and dst1 is Saturation 8UC1."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
-        Dim hsv_planes = imghsv.Split()
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.RGB2HSV)
+        Dim hsv_planes = dst2.Split()
 
-        cv.Cv2.CvtColor(hsv_planes(0), dst2, cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.CvtColor(hsv_planes(1), dst3, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(hsv_planes(0), dst3, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(hsv_planes(1), dst1, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -75,7 +74,7 @@ Public Class PhotoShop_Gamma : Inherits TaskParent
     Dim lookupTable(255) As Byte
     Dim lastGamma As Integer = -1
     Public Sub New()
-        desc = "Use gamma with ConvertScaleAbs."
+        desc = "Use gamma correction."
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

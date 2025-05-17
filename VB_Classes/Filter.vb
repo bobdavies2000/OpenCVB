@@ -1,37 +1,72 @@
 Imports cv = OpenCvSharp
 Public Class Filter_Basics : Inherits TaskParent
-    Dim RGBfilters(task.featureOptions.checkBoxes.Count - 1) As Object
+    Dim RGBfilters(task.featureOptions.colorCheckbox.Count - 1) As Object
+    Public grayFilter As New Filter_BasicsGray
     Public filterIndex As Integer = -1
     Public Sub New()
         desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = If(src.Channels = 1, src, task.grayStable)
+        dst2 = src.Clone
+        For Each cb In task.featureOptions.colorCheckbox
+            If cb.Checked Then
+                Select Case cb.Text
+                    Case "Original"
+                    Case "PhotoShop_WhiteBalance"
+                        If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_WhiteBalance
+                    Case "PhotoShop_SharpenDetail"
+                        If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_SharpenDetail
+                    Case "PhotoShop_HSV"
+                        If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_HSV
+                End Select
+                filterIndex = cb.Tag
+            End If
+        Next
+
+        If filterIndex > 0 Then
+            RGBfilters(filterIndex).run(dst2)
+            dst2 = RGBfilters(filterIndex).dst2
+        End If
+        grayFilter.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst3 = grayFilter.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Filter_BasicsGray : Inherits TaskParent
+    Dim grayfilters(task.featureOptions.grayCheckbox.Count - 1) As Object
+    Public filterIndex As Integer = -1
+    Public Sub New()
+        desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
         If task.optionsChanged Then
-            For Each cb In task.featureOptions.checkBoxes
+            For Each cb In task.featureOptions.grayCheckbox
                 If cb.Checked Then
                     Select Case cb.Text
                         Case "Original"
                         Case "Blur_Basics"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Blur_Basics
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Blur_Basics
                         Case "Brightness_Basics"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Brightness_Basics
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Brightness_Basics
                         Case "Contrast_Basics"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Contrast_Basics
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Contrast_Basics
                         Case "Dilate_Basics"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Dilate_Basics
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Dilate_Basics
                         Case "Erode_Basics"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Erode_Basics
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Erode_Basics
                         Case "Filter_Equalize"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Filter_Equalize
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Filter_Equalize
                         Case "Filter_Laplacian"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New Filter_Laplacian
-                        Case "PhotoShop_SharpenDetail"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_SharpenDetail
-                        Case "PhotoShop_WhiteBalance"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New PhotoShop_WhiteBalance
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New Filter_Laplacian
                         Case "MeanSubtraction_Basics"
-                            If RGBfilters(cb.Tag) Is Nothing Then RGBfilters(cb.Tag) = New MeanSubtraction_Basics
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New MeanSubtraction_Basics
+                        Case "PhotoShop_Gamma"
+                            If grayfilters(cb.Tag) Is Nothing Then grayfilters(cb.Tag) = New PhotoShop_Gamma
                     End Select
                     filterIndex = cb.Tag
                 End If
@@ -39,8 +74,8 @@ Public Class Filter_Basics : Inherits TaskParent
         End If
 
         If filterIndex > 0 Then
-            RGBfilters(filterIndex).run(dst2)
-            dst2 = RGBfilters(filterIndex).dst2
+            grayfilters(filterIndex).run(dst2)
+            dst2 = grayfilters(filterIndex).dst2
         End If
     End Sub
 End Class

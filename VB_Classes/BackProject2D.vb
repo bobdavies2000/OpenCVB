@@ -104,7 +104,7 @@ End Class
 
 
 Public Class BackProject2D_Compare : Inherits TaskParent
-    Dim hueSat As New PhotoShop_Hue
+    Dim hueSat As New PhotoShop_HSV
     Dim backP As New BackProject2D_Basics
     Dim mats As New Mat_4Click
     Public Sub New()

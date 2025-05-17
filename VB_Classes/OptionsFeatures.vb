@@ -2,11 +2,13 @@
 Imports System.Drawing
 Imports System.ComponentModel
 Public Class OptionsFeatures
-    Public checkBoxes() As RadioButton
-    Public RGBfilters As String() = {"Original", "Blur_Basics", "Brightness_Basics", "Contrast_Basics",
+    Public grayCheckbox() As RadioButton
+    Public grayfilters As String() = {"Original", "Blur_Basics", "Brightness_Basics", "Contrast_Basics",
                                      "Dilate_Basics", "Erode_Basics", "Filter_Equalize", "Filter_Laplacian",
-                                     "MeanSubtraction_Basics", "PhotoShop_SharpenDetail",
-                                     "PhotoShop_WhiteBalance"}
+                                     "MeanSubtraction_Basics", "PhotoShop_Gamma"}
+    Public colorCheckbox() As RadioButton
+    Public colorfilters As String() = {"Original", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance", "PhotoShop_HSV"}
+
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Left = 0
@@ -37,18 +39,31 @@ Public Class OptionsFeatures
         FCorrSlider.Value = 50
         SelectedFeature.Value = 0
 
-        ReDim checkBoxes(RGBfilters.Count - 1)
-        For i = 0 To RGBfilters.Count - 1
+        ReDim grayCheckbox(grayfilters.Count - 1)
+        For i = 0 To grayfilters.Count - 1
             Dim cb As New RadioButton
-            cb.Text = RGBfilters(i)
+            cb.Text = grayfilters(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
             AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
-            FilterGroup.Controls.Add(cb)
-            checkBoxes(i) = cb
+            GrayGroup.Controls.Add(cb)
+            grayCheckbox(i) = cb
         Next
-        checkBoxes(0).Checked = True ' equalize is the default.
+        grayCheckbox(0).Checked = True
+
+        ReDim colorCheckbox(colorfilters.Count - 1)
+        For i = 0 To colorfilters.Count - 1
+            Dim cb As New RadioButton
+            cb.Text = colorfilters(i)
+            cb.Location = New Point(20, 20 + i * 20)
+            cb.AutoSize = True
+            cb.Tag = i
+            AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
+            ColorGroup.Controls.Add(cb)
+            colorCheckbox(i) = cb
+        Next
+        colorCheckbox(0).Checked = True
     End Sub
 
 

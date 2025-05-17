@@ -663,18 +663,18 @@ Public Class VBtask : Implements IDisposable
             algorithm_ms(2) += returnCopyTime
             algorithmTimes(3) = Now  ' starting the main algorithm
         End If
-        If useRecordedData Then recordedData.Run(color.Clone)
+        If useRecordedData Then recordedData.Run(task.color.Clone)
 
         redOptions.Sync() ' update the task with redCloud variables
 
-        Dim src = color
+        Dim src = task.color
 
         If src.Size <> New cv.Size(dst2.Cols, dst2.Rows) Then dst2 = dst2.Resize(src.Size)
         If src.Size <> New cv.Size(dst3.Cols, dst3.Rows) Then dst3 = dst3.Resize(src.Size)
         bins2D = {dst2.Height, dst2.Width}
 
         ' If the WorkingRes changes, the previous generation of images needs to be reset.
-        If pointCloud.Size <> New cv.Size(cols, rows) Or color.Size <> dst2.Size Then
+        If pointCloud.Size <> New cv.Size(cols, rows) Or task.color.Size <> dst2.Size Then
             pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
             noDepthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
             depthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -685,11 +685,11 @@ Public Class VBtask : Implements IDisposable
         IMU_RawAngularVelocity = IMU_AngularVelocity
         IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
 
-        grid.Run(color)
-        imuBasics.Run(src)
-        gmat.Run(src)
+        grid.Run(task.color)
+        imuBasics.Run(emptyMat)
+        gmat.Run(emptyMat)
 
-        ' src is always color and leftview is grayscale (because some are only gray - StereoLabs is color.)
+        ' src is color and leftview is grayscale (because some cameras are only gray - RealSense is always grayscale.)
         leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If gOptions.CreateGif.Checked Then
@@ -767,13 +767,20 @@ Public Class VBtask : Implements IDisposable
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         motionBasics.Run(src)
-        gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
+        rgbFilter.Run(task.color)
         If rgbFilter.filterIndex > 0 Then
-            rgbFilter.Run(task.grayStable)
+            task.color = rgbFilter.dst2
             src = rgbFilter.dst2
+            gray = rgbFilter.dst3
+        ElseIf rgbFilter.grayFilter.filterIndex > 0 Then
+            rgbFilter.grayFilter.Run(src)
+            gray = rgbFilter.grayFilter.dst2.Clone
+        Else
+            src = task.color
+            gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
+        If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
         fcsBasics.Run(src)
         brickBasics.Run(src)
@@ -789,6 +796,8 @@ Public Class VBtask : Implements IDisposable
             If pixelViewerOn = False Then PixelViewer = Nothing
         End If
 
+        cv.Cv2.ImShow("task.color", task.color)
+        cv.Cv2.ImShow("src", src)
         If gOptions.CreateGif.Checked Then
             If gifCreator Is Nothing Then gifCreator = New Gif_OpenCVB
             gifCreator.Run(src)
@@ -845,7 +854,7 @@ Public Class VBtask : Implements IDisposable
             If gOptions.displayDst0.Checked Then
                 dst0 = Check8uC3(displayObject.dst0)
             Else
-                dst0 = color.Clone
+                dst0 = task.color.Clone
             End If
             If gOptions.displayDst1.Checked Then
                 dst1 = Check8uC3(displayObject.dst1)

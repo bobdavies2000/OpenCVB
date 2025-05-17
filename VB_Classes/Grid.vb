@@ -12,19 +12,17 @@ Public Class Grid_Basics : Inherits TaskParent
             task.gridROIclicked = task.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
 
-        Dim cellSize As Integer
+        Dim cellSize = task.gOptions.GridSlider.Value
         If task.optionsChanged Then
             tilesPerCol = 0
             tilesPerRow = 0
             task.gridNabeRects.Clear()
             task.gridNeighbors.Clear()
 
-            cellSize = task.gOptions.GridSlider.Value
-
             task.gridRects.Clear()
             Dim index As Integer
-            For y = 0 To src.Height - 1 Step cellSize
-                For x = 0 To src.Width - 1 Step cellSize
+            For y = 0 To dst2.Height - 1 Step cellSize
+                For x = 0 To dst2.Width - 1 Step cellSize
                     Dim roi = ValidateRect(New cv.Rect(x, y, cellSize, cellSize))
 
                     If roi.Bottom = dst2.Height - 1 Then roi.Height += 1
@@ -40,12 +38,12 @@ Public Class Grid_Basics : Inherits TaskParent
             Next
 
             task.gridMask.SetTo(0)
-            For x = cellSize To src.Width - 1 Step cellSize
-                Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, src.Height)
+            For x = cellSize To dst2.Width - 1 Step cellSize
+                Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
                 task.gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
-            For y = cellSize To src.Height - 1 Step cellSize
-                Dim p1 = New cv.Point(0, y), p2 = New cv.Point(src.Width, y)
+            For y = cellSize To dst2.Height - 1 Step cellSize
+                Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
                 task.gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
 
@@ -64,7 +62,7 @@ Public Class Grid_Basics : Inherits TaskParent
                                               roi.X - 1, roi.X, roi.X + roi.Width + 1)
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                               roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
-                    If x >= 0 And x < src.Width And y >= 0 And y < src.Height Then
+                    If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
                         Dim nextIndex As Integer = task.brickMap.Get(Of Single)(y, x)
                         If nextList.Contains(nextIndex) = False Then nextList.Add(nextIndex)
                     End If
@@ -90,7 +88,7 @@ Public Class Grid_Basics : Inherits TaskParent
             task.tilesPerRow = tilesPerRow
         End If
         If standaloneTest() Then
-            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U)
+            dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.tilesPerCol) + "X" + CStr(task.tilesPerRow) + ") " +
