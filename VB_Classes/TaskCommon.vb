@@ -26,7 +26,6 @@ Public Module vbc
     Public emptyMat As New cv.Mat
     Public saveVecColors(0) As cv.Vec3b
     Public saveScalarColors(0) As cv.Scalar
-    Public saveFixedPalette As Boolean
     Public saveDepthColorMap As cv.Mat
     Public saveDepthColorList As New List(Of cv.Vec3b)
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)

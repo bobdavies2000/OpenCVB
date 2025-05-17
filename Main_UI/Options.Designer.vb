@@ -23,7 +23,6 @@ Partial Class Options
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.FixedPalette = New System.Windows.Forms.CheckBox()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.UpdateXRef = New System.Windows.Forms.Button()
@@ -54,7 +53,6 @@ Partial Class Options
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.FixedPalette)
         Me.GroupBox2.Controls.Add(Me.Label7)
         Me.GroupBox2.Controls.Add(Me.Label6)
         Me.GroupBox2.Controls.Add(Me.UpdateXRef)
@@ -69,18 +67,6 @@ Partial Class Options
         Me.GroupBox2.TabIndex = 5
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Other Global Settings"
-        '
-        'FixedPalette
-        '
-        Me.FixedPalette.AutoSize = True
-        Me.FixedPalette.Checked = True
-        Me.FixedPalette.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.FixedPalette.Location = New System.Drawing.Point(422, 86)
-        Me.FixedPalette.Name = "FixedPalette"
-        Me.FixedPalette.Size = New System.Drawing.Size(397, 24)
-        Me.FixedPalette.TabIndex = 16
-        Me.FixedPalette.Text = "On = random colors.  Off - fixed palette after restart."
-        Me.FixedPalette.UseVisualStyleBackColor = True
         '
         'Label7
         '
@@ -345,5 +331,4 @@ Partial Class Options
     Friend WithEvents UpdateXRef As Button
     Friend WithEvents Label7 As Label
     Friend WithEvents Label5 As Label
-    Friend WithEvents FixedPalette As CheckBox
 End Class

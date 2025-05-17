@@ -1170,7 +1170,6 @@ Public Class Main_UI
             settings.cameraName = optionsForm.cameraName
             settings.cameraIndex = optionsForm.cameraIndex
             settings.testAllDuration = optionsForm.testDuration
-            settings.FixedPalette = optionsForm.FixedPalette.Checked
 
             frameCount = 0
             setupCamPics()
@@ -1498,8 +1497,6 @@ Public Class Main_UI
         parms.captureRes = settings.captureRes
         parms.displayRes = settings.displayRes
         parms.algName = AvailableAlgorithms.Text
-
-        parms.fixedPalette = settings.FixedPalette
 
         PausePlayButton.Image = PausePlay
 

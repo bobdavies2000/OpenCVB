@@ -2,13 +2,8 @@
 Imports cv = OpenCvSharp
 Public Class DepthColorizer_Basics : Inherits TaskParent
     Public Sub New()
-        desc = "Create a traditional depth color scheme."
-    End Sub
-    Public Sub buildColors(FixedPalette As Boolean)
-        If saveVecColors.Count = 1 Or FixedPalette <> saveFixedPalette Then
-            saveFixedPalette = FixedPalette
-            Dim initVal = msRNG.Next()
-            If FixedPalette Then initVal = 43
+        If saveVecColors.Count = 1 Then
+            Dim initVal = 43
             Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
             Dim bgr(3) As Byte
             For i = 0 To task.vecColors.Length - 1
@@ -40,8 +35,8 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             task.depthColorMap = saveDepthColorMap
             task.depthColorList = saveDepthColorList
         End If
+        desc = "Create a traditional depth color scheme."
     End Sub
-
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.gOptions.GridDepth.Checked Then

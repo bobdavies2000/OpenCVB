@@ -382,8 +382,6 @@ Public Class VBtask : Implements IDisposable
         Public displayRes As cv.Size
 
         Public algName As String
-        ' on = random colors for each task, off = fixed colors - See DepthColorizer_Basics BuildColors
-        Public fixedPalette As Boolean
 
         Public calibData As cameraInfo
     End Structure
@@ -526,7 +524,6 @@ Public Class VBtask : Implements IDisposable
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
 
         colorizer = New DepthColorizer_Basics
-        colorizer.buildColors(parms.fixedPalette)
         gmat = New IMU_GMatrix
         grid = New Grid_Basics
         gravityHorizon = New Gravity_Basics

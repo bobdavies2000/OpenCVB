@@ -156,7 +156,6 @@ Public Class Options
         TestAllDuration.Value = Main_UI.settings.testAllDuration
         cameraDisplayRes = Main_UI.settings.displayRes
         showConsoleLog.Checked = Main_UI.settings.showConsoleLog
-        FixedPalette.Checked = Main_UI.settings.FixedPalette
     End Sub
     Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
