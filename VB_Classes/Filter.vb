@@ -279,6 +279,6 @@ Public Class Filter_Equalize : Inherits TaskParent
         desc = "Create an equalized image of the grayscale input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.EqualizeHist(src, dst2)
+        If src.Channels = 1 Then cv.Cv2.EqualizeHist(src, dst2) Else cv.Cv2.EqualizeHist(task.grayStable, dst2)
     End Sub
 End Class

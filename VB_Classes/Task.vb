@@ -831,6 +831,7 @@ Public Class VBtask : Implements IDisposable
         depthLogic.Run(src)
 
         Dim saveOptionsChanged = optionsChanged
+        If optionsChanged Then treeView.optionsChanged = True
         If paused = False Then
 
 
