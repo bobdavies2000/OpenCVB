@@ -417,21 +417,15 @@ Public Class VBtask : Implements IDisposable
             ' MSER mistakenly can have 1 cell - just ignore it.
             If rcList.Count > 1 Then setSelectedCell()
 
-            'If redOptions.IdentifyCells.Checked Then
-            '    ' cannot use rc as it means rc here!  Be careful...
-            '    For Each rcX In rcList
-            '        Dim str As New TrueText(CStr(rcX.index), rcX.maxDist, 2)
-            '        trueData.Add(str)
-            '        If rcX.index = 20 Then Exit For
-            '    Next
-
-            '    color.Rectangle(rc.rect, cv.Scalar.Yellow, lineWidth)
-            '    color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-            'End If
-
+            If optionsChanged = True Then
+                treeView.optionsChanged = True
+                Dim sender As Object, e As EventArgs
+                treeView.Timer2_Tick(sender, e)
+                treeView.optionsChanged = False
+            End If
             optionsChanged = False
             TaskTimer.Enabled = False
-            frameCount += 1
+                frameCount += 1
         Catch ex As Exception
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
@@ -830,8 +824,8 @@ Public Class VBtask : Implements IDisposable
 
         depthLogic.Run(src)
 
-        Dim saveOptionsChanged = optionsChanged
-        If optionsChanged Then treeView.optionsChanged = True
+        Dim saveOptionsChanged = task.optionsChanged
+        If task.optionsChanged Then treeView.optionsChanged = True
         If paused = False Then
 
 
