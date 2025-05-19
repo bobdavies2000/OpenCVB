@@ -37,7 +37,7 @@ End Class
 Public Class FindMinRect_Motion : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
-        optiBase.FindSlider("MOG Learn Rate X1000").Value = 100 ' low threshold to maximize motion
+        OptionParent.FindSlider("MOG Learn Rate X1000").Value = 100 ' low threshold to maximize motion
         desc = "Use minRectArea to encompass detected motion"
         labels(2) = "MinRectArea of MOG motion"
     End Sub

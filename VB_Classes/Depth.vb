@@ -462,8 +462,8 @@ Public Class Depth_Holes : Inherits TaskParent
         desc = "Identify holes in the depth image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static borderSlider = optiBase.FindSlider("Amount of dilation of borderMask")
-        Static holeSlider = optiBase.FindSlider("Amount of dilation of holeMask")
+        Static borderSlider = OptionParent.FindSlider("Amount of dilation of borderMask")
+        Static holeSlider = OptionParent.FindSlider("Amount of dilation of holeMask")
         dst2 = task.pcSplit(2).Threshold(0.01, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         dst2 = dst2.Dilate(element, Nothing, holeSlider.Value)
         dst3 = dst2.Dilate(element, Nothing, borderSlider.Value)
@@ -912,7 +912,7 @@ Public Class Depth_PunchDecreasing : Inherits TaskParent
         task.pcSplit(2).CopyTo(dst1, fore.dst2)
 
         Static lastDepth = dst1
-        Static mmSlider = optiBase.FindSlider("Threshold in millimeters")
+        Static mmSlider = OptionParent.FindSlider("Threshold in millimeters")
         Dim mmThreshold = mmSlider.Value / 1000
         If Increasing Then
             cv.Cv2.Subtract(dst1, lastDepth, dst2)
@@ -985,7 +985,7 @@ Public Class Depth_PunchBlobNew : Inherits TaskParent
         desc = "Identify a punch using both depth and color"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider = optiBase.FindSlider("Threshold for punch")
+        Static thresholdSlider = OptionParent.FindSlider("Threshold for punch")
         Dim threshold = thresholdSlider.value
 
         Static lastColor As cv.Mat = task.color.Clone
@@ -1065,11 +1065,11 @@ Public Class Depth_StableAverage : Inherits TaskParent
     Dim dAvg As New DepthColorizer_Mean
     Dim extrema As New Depth_StableMinMax
     Public Sub New()
-        optiBase.findRadio("Use farthest distance").Checked = True
+        OptionParent.findRadio("Use farthest distance").Checked = True
         desc = "Use Depth_StableMax to remove the artifacts from the depth averaging"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static unchangedRadio = optiBase.findRadio("Use unchanged depth input")
+        Static unchangedRadio = OptionParent.findRadio("Use unchanged depth input")
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         extrema.Run(src)
 

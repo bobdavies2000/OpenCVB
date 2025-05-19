@@ -68,7 +68,7 @@ Public Class Random_Enumerable : Inherits TaskParent
     Public options As New Options_Random
     Public points() As cv.Point2f
     Public Sub New()
-        optiBase.FindSlider("Random Pixel Count").Value = 100
+        OptionParent.FindSlider("Random Pixel Count").Value = 100
         desc = "Create an enumerable list of points using a lambda function"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -95,8 +95,8 @@ Public Class Random_Basics3D : Inherits TaskParent
     Public PointList As New List(Of cv.Point3f)
     Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters}
     Public Sub New()
-        optiBase.FindSlider("Random Pixel Count").Value = 20
-        optiBase.FindSlider("Random Pixel Count").Maximum = dst2.Cols * dst2.Rows
+        OptionParent.FindSlider("Random Pixel Count").Value = 20
+        OptionParent.FindSlider("Random Pixel Count").Maximum = dst2.Cols * dst2.Rows
         desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -131,7 +131,7 @@ Public Class Random_Basics4D : Inherits TaskParent
     Dim countSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         desc = "Create a uniform random mask with a specificied number of pixels."
-        countSlider = optiBase.FindSlider("Random Pixel Count")
+        countSlider = OptionParent.FindSlider("Random Pixel Count")
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         PointList.Clear()
@@ -506,8 +506,8 @@ Public Class Random_StaticTVFaster : Inherits TaskParent
         desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static valSlider = optiBase.FindSlider("Range of noise to apply (from 0 to this value)")
-        Static percentSlider = optiBase.FindSlider("Percentage of pixels to include noise")
+        Static valSlider = OptionParent.FindSlider("Range of noise to apply (from 0 to this value)")
+        Static percentSlider = OptionParent.FindSlider("Percentage of pixels to include noise")
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -548,8 +548,8 @@ Public Class Random_StaticTVFastSimple : Inherits TaskParent
         desc = "Remove diagnostics from the faster algorithm to simplify code."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static valSlider = optiBase.FindSlider("Range of noise to apply (from 0 to this value)")
-        Static percentSlider = optiBase.FindSlider("Percentage of pixels to include noise")
+        Static valSlider = OptionParent.FindSlider("Range of noise to apply (from 0 to this value)")
+        Static percentSlider = OptionParent.FindSlider("Percentage of pixels to include noise")
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -585,7 +585,7 @@ Public Class Random_KalmanPoints : Inherits TaskParent
         task.kalman = New Kalman_Basics
         Dim offset = dst2.Width / 5
         random.range = New cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2))
-        optiBase.FindSlider("Random Pixel Count").Value = 10
+        OptionParent.FindSlider("Random Pixel Count").Value = 10
         desc = "Smoothly transition a random point from location to location."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

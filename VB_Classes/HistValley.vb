@@ -67,7 +67,7 @@ Public Class HistValley_FromPeaks : Inherits TaskParent
     Public avgValley() As Single
     Public histList As New List(Of Single)
     Public Sub New()
-        optiBase.FindSlider("Desired boundary count").Value = 10
+        OptionParent.FindSlider("Desired boundary count").Value = 10
         desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks."
     End Sub
     Public Sub updatePlot(dst As cv.Mat, bins As Integer)
@@ -122,7 +122,7 @@ Public Class HistValley_Peaks : Inherits TaskParent
     Public histArray() As Single
     Public Sub New()
         task.gOptions.setHistogramBins(100)
-        optiBase.FindSlider("Desired boundary count").Value = 5
+        OptionParent.FindSlider("Desired boundary count").Value = 5
         labels(2) = "Histogram - white lines are peaks"
         desc = "Find the requested number of peaks in the histogram "
     End Sub
@@ -498,7 +498,7 @@ Public Class HistValley_Colors : Inherits TaskParent
     Dim splitIndex As Integer
     Public Sub New()
         If standalone Then task.gOptions.setHistogramBins(256)
-        If standalone Then optiBase.FindSlider("Desired boundary count").Value = 10
+        If standalone Then OptionParent.FindSlider("Desired boundary count").Value = 10
         desc = "Find the histogram valleys for each of the colors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -535,7 +535,7 @@ Public Class HistValley_GrayKalman : Inherits TaskParent
     Public Sub New()
         task.kalman = New Kalman_Basics
         If standalone Then task.gOptions.setHistogramBins(256)
-        If standalone Then optiBase.FindSlider("Desired boundary count").Value = 4
+        If standalone Then OptionParent.FindSlider("Desired boundary count").Value = 4
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

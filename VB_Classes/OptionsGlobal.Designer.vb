@@ -73,9 +73,6 @@ Partial Class OptionsGlobal
         Me.CreateGif = New System.Windows.Forms.CheckBox()
         Me.Palettes = New System.Windows.Forms.ComboBox()
         Me.gravityPointCloud = New System.Windows.Forms.CheckBox()
-        Me.Label10 = New System.Windows.Forms.Label()
-        Me.RGBFilterList = New System.Windows.Forms.ComboBox()
-        Me.RGBFilterActive = New System.Windows.Forms.CheckBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.LineType = New System.Windows.Forms.ComboBox()
         Me.displayDst1 = New System.Windows.Forms.CheckBox()
@@ -368,9 +365,6 @@ Partial Class OptionsGlobal
         Me.GroupBox2.Controls.Add(Me.CreateGif)
         Me.GroupBox2.Controls.Add(Me.Palettes)
         Me.GroupBox2.Controls.Add(Me.gravityPointCloud)
-        Me.GroupBox2.Controls.Add(Me.Label10)
-        Me.GroupBox2.Controls.Add(Me.RGBFilterList)
-        Me.GroupBox2.Controls.Add(Me.RGBFilterActive)
         Me.GroupBox2.Controls.Add(Me.Label5)
         Me.GroupBox2.Controls.Add(Me.LineType)
         Me.GroupBox2.Controls.Add(Me.displayDst1)
@@ -673,33 +667,6 @@ Partial Class OptionsGlobal
         Me.gravityPointCloud.Text = "Apply gravity transform to point cloud"
         Me.gravityPointCloud.UseVisualStyleBackColor = True
         '
-        'Label10
-        '
-        Me.Label10.AutoSize = True
-        Me.Label10.Location = New System.Drawing.Point(540, 28)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(92, 20)
-        Me.Label10.TabIndex = 20
-        Me.Label10.Text = "RGB Filters"
-        '
-        'RGBFilterList
-        '
-        Me.RGBFilterList.FormattingEnabled = True
-        Me.RGBFilterList.Location = New System.Drawing.Point(528, 52)
-        Me.RGBFilterList.Name = "RGBFilterList"
-        Me.RGBFilterList.Size = New System.Drawing.Size(288, 28)
-        Me.RGBFilterList.TabIndex = 19
-        '
-        'RGBFilterActive
-        '
-        Me.RGBFilterActive.AutoSize = True
-        Me.RGBFilterActive.Location = New System.Drawing.Point(381, 55)
-        Me.RGBFilterActive.Name = "RGBFilterActive"
-        Me.RGBFilterActive.Size = New System.Drawing.Size(138, 24)
-        Me.RGBFilterActive.TabIndex = 16
-        Me.RGBFilterActive.Text = "Use RGB filter"
-        Me.RGBFilterActive.UseVisualStyleBackColor = True
-        '
         'Label5
         '
         Me.Label5.AutoSize = True
@@ -890,9 +857,6 @@ Partial Class OptionsGlobal
     Friend WithEvents GridSlider As System.Windows.Forms.TrackBar
     Friend WithEvents Label9 As System.Windows.Forms.Label
     Friend WithEvents Label8 As System.Windows.Forms.Label
-    Friend WithEvents RGBFilterActive As System.Windows.Forms.CheckBox
-    Friend WithEvents Label10 As System.Windows.Forms.Label
-    Friend WithEvents RGBFilterList As System.Windows.Forms.ComboBox
     Friend WithEvents gravityPointCloud As System.Windows.Forms.CheckBox
     Friend WithEvents CreateGif As System.Windows.Forms.CheckBox
     Friend WithEvents PixelDiff As System.Windows.Forms.Label

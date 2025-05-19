@@ -263,7 +263,7 @@ Public Class OptionsGlobal
     Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-    Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles RGBFilterActive.CheckedChanged
+    Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
     Private Sub highlight_SelectedIndexChanged(sender As Object, e As EventArgs) Handles highlight.SelectedIndexChanged
@@ -357,12 +357,6 @@ Public Class OptionsGlobal
     Public Function getMultiThreading() As Boolean
         Return UseMultiThreading.Checked
     End Function
-    Public Sub setRGBFilterActive(val As Boolean)
-        RGBFilterActive.Checked = val
-    End Sub
-    Public Sub setRGBFilterSelection(val As String)
-        RGBFilterList.SelectedIndex = task.gOptions.RGBFilterList.Items.IndexOf(val)
-    End Sub
     Public Sub SetDotSize(val As Integer)
         DotSizeSlider.Value = val
     End Sub

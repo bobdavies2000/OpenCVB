@@ -38,11 +38,11 @@ End Class
 Public Class Hough_Sudoku : Inherits TaskParent
     Dim hough As New Hough_Basics
     Public Sub New()
-       optiBase.findslider("Canny threshold1").Value = 50
-       optiBase.findslider("Canny threshold2").Value = 200
-       optiBase.findslider("Hough rho").Value = 1
-       optiBase.findslider("Hough theta").Value = 1000 * cv.Cv2.PI / 180
-       optiBase.findslider("Hough threshold").Value = 150
+       OptionParent.FindSlider("Canny threshold1").Value = 50
+       OptionParent.FindSlider("Canny threshold2").Value = 200
+       OptionParent.FindSlider("Hough rho").Value = 1
+       OptionParent.FindSlider("Hough theta").Value = 1000 * cv.Cv2.PI / 180
+       OptionParent.FindSlider("Hough threshold").Value = 150
         desc = "Successful use of Hough to find lines in Sudoku grid."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -64,7 +64,7 @@ Public Class Hough_Circles : Inherits TaskParent
     Dim circles As New Draw_Circles
     Dim method As Integer = 3
     Public Sub New()
-       optiBase.findslider("DrawCount").Value = 3
+       OptionParent.FindSlider("DrawCount").Value = 3
         labels(2) = "Input circles to Hough"
         labels(3) = "Hough Circles found"
         desc = "Find circles using HoughCircles."
@@ -192,7 +192,7 @@ Public Class Hough_FeatureLessTopX : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Static segSlider =optiBase.findslider("Minimum feature pixels")
+        Static segSlider =OptionParent.FindSlider("Minimum feature pixels")
         Dim minSegments = segSlider.Value
         edges.Run(src)
 

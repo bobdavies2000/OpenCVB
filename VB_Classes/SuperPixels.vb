@@ -68,7 +68,7 @@ Public Class SuperPixel_BinarizedImage : Inherits TaskParent
     Public Sub New()
         binarize = New Binarize_Basics()
         pixels.gridColor = cv.Scalar.Red
-       optiBase.findslider("Number of SuperPixels").Value = 20 ' find the top 20 super pixels.
+       OptionParent.FindSlider("Number of SuperPixels").Value = 20 ' find the top 20 super pixels.
         desc = "Create SuperPixels from a binary image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

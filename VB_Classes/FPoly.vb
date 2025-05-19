@@ -9,7 +9,7 @@ Public Class FPoly_Basics : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
         task.featureOptions.FeatureSampleSize.Value = 30
-        If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
+        If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
         If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
@@ -245,7 +245,7 @@ Public Class FPoly_BasicsOriginal : Inherits TaskParent
     Public Sub New()
         center = New FPoly_Center
         task.featureOptions.FeatureSampleSize.Value = 30
-        If dst2.Width >= 640 Then optiBase.FindSlider("Resync if feature moves > X pixels").Value = 15
+        If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
         If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
                       "Feature polygon created by highest generation counts",
@@ -508,7 +508,7 @@ Public Class FPoly_StartPoints : Inherits TaskParent
         desc = "Track the feature grid points back to the last sync point"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider = optiBase.FindSlider("Resync if feature moves > X pixels")
+        Static thresholdSlider = OptionParent.FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
         Dim maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold
 
@@ -1005,7 +1005,7 @@ Public Class FPoly_Center : Inherits TaskParent
             Exit Sub
         End If
 
-        Static thresholdSlider = optiBase.FindSlider("Resync if feature moves > X pixels")
+        Static thresholdSlider = OptionParent.FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
 
         Dim sindex1 = fPD.polyPrevSideIndex

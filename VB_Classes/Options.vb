@@ -20,15 +20,15 @@ Public Class Options_Quaternion : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static axSlider = optiBase.FindSlider("quaternion A.x X100")
-        Static aySlider = optiBase.FindSlider("quaternion A.y X100")
-        Static azSlider = optiBase.FindSlider("quaternion A.z X100")
-        Static athetaSlider = optiBase.FindSlider("quaternion A Theta X100")
+        Static axSlider = OptionParent.FindSlider("quaternion A.x X100")
+        Static aySlider = OptionParent.FindSlider("quaternion A.y X100")
+        Static azSlider = OptionParent.FindSlider("quaternion A.z X100")
+        Static athetaSlider = OptionParent.FindSlider("quaternion A Theta X100")
 
-        Static bxSlider = optiBase.FindSlider("quaternion B.x X100")
-        Static bySlider = optiBase.FindSlider("quaternion B.y X100")
-        Static bzSlider = optiBase.FindSlider("quaternion B.z X100")
-        Static bthetaSlider = optiBase.FindSlider("quaternion B Theta X100")
+        Static bxSlider = OptionParent.FindSlider("quaternion B.x X100")
+        Static bySlider = OptionParent.FindSlider("quaternion B.y X100")
+        Static bzSlider = OptionParent.FindSlider("quaternion B.z X100")
+        Static bthetaSlider = OptionParent.FindSlider("quaternion B Theta X100")
 
         q1 = New Quaternion(CSng(axSlider.Value / 100), CSng(aySlider.Value / 100),
                                 CSng(azSlider.Value / 100), CSng(athetaSlider.Value / 100))
@@ -64,8 +64,8 @@ Public Class Options_Annealing : Inherits OptionParent
         Static circleCheck = FindCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
         Static copyBestCheck = FindCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half")
         Static circularCheck = FindCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
-        Static citySlider = FindSlider("Anneal Number of Cities")
-        Static successSlider = FindSlider("Success = top X threads agree on energy level.")
+        Static citySlider = OptionParent.FindSlider("Anneal Number of Cities")
+        Static successSlider = OptionParent.FindSlider("Success = top X threads agree on energy level.")
 
         copyBestFlag = copyBestCheck.checked
         circularFlag = circularCheck.checked
@@ -91,9 +91,9 @@ Public Class Options_CamShift : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static vMinSlider = FindSlider("CamShift vMin")
-        Static vMaxSlider = FindSlider("CamShift vMax")
-        Static sMinSlider = FindSlider("CamShift Smin")
+        Static vMinSlider = OptionParent.FindSlider("CamShift vMin")
+        Static vMaxSlider = OptionParent.FindSlider("CamShift vMax")
+        Static sMinSlider = OptionParent.FindSlider("CamShift Smin")
 
         Dim vMin = vMinSlider.Value
         Dim vMax = vMaxSlider.Value
@@ -155,7 +155,7 @@ Public Class Options_Contours : Inherits OptionParent
     End Sub
     Public Sub Run()
         options2.Run()
-        Static countSlider = FindSlider("Max contours")
+        Static countSlider = OptionParent.FindSlider("Max contours")
         maxContours = countSlider.value
 
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -188,7 +188,7 @@ Public Class Options_DepthTiers : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("cm's per tier", 10, 200, cmPerTier)
     End Sub
     Public Sub Run()
-        Static cmSlider = FindSlider("cm's per tier")
+        Static cmSlider = OptionParent.FindSlider("cm's per tier")
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
@@ -226,8 +226,8 @@ Public Class Options_Encode : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static qualitySlider = FindSlider("Encode Quality Level")
-        Static scalingSlider = FindSlider("Encode Output Scaling")
+        Static qualitySlider = OptionParent.FindSlider("Encode Quality Level")
+        Static scalingSlider = OptionParent.FindSlider("Encode Output Scaling")
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
@@ -255,7 +255,7 @@ Public Class Options_Filter : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter kernel size", 1, 21, kernelSize)
     End Sub
     Public Sub Run()
-        Static kernelSlider = FindSlider("Filter kernel size")
+        Static kernelSlider = OptionParent.FindSlider("Filter kernel size")
         kernelSize = kernelSlider.value Or 1
     End Sub
 End Class
@@ -285,11 +285,11 @@ Public Class Options_GeneticDrawing : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static genSlider = FindSlider("Number of Generations")
-        Static stageSlider = FindSlider("Number of Stages")
-        Static brushSlider = FindSlider("Brush size Percentage")
+        Static genSlider = OptionParent.FindSlider("Number of Generations")
+        Static stageSlider = OptionParent.FindSlider("Number of Stages")
+        Static brushSlider = OptionParent.FindSlider("Brush size Percentage")
         Static snapCheckbox = FindCheckBox("Snapshot Video input to initialize genetic drawing")
-        Static strokeSlider = FindSlider("Brushstroke count per generation")
+        Static strokeSlider = OptionParent.FindSlider("Brushstroke count per generation")
 
         If snapCheckbox.checked Then snapCheckbox.checked = False
         snapCheck = snapCheckbox.checked
@@ -327,9 +327,9 @@ Public Class Options_MatchShapes : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Match Threshold %")
-        Static ySlider = FindSlider("Max Y Delta % (of height)")
-        Static minSlider = FindSlider("Min Size % of image size")
+        Static thresholdSlider = OptionParent.FindSlider("Match Threshold %")
+        Static ySlider = OptionParent.FindSlider("Max Y Delta % (of height)")
+        Static minSlider = OptionParent.FindSlider("Min Size % of image size")
         matchThreshold = thresholdSlider.Value / 100
         maxYdelta = ySlider.Value * task.rows / 100
         minSize = minSlider.value * task.cols * task.rows / 100
@@ -373,7 +373,7 @@ Public Class Options_Plane : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static rmsSlider = FindSlider("RMS error threshold for flat X100")
+        Static rmsSlider = OptionParent.FindSlider("RMS error threshold for flat X100")
         rmsThreshold = rmsSlider.Value / 100
 
         Static maskRadio = findRadio("Use all points in the rc mask")
@@ -409,9 +409,9 @@ Public Class Options_Interpolate : Inherits OptionParent
         findRadio("WarpInverseMap").Enabled = False
     End Sub
     Public Sub Run()
-        Static resizeSlider = FindSlider("Interpolation Resize %")
-        Static interpolationSlider = FindSlider("Interpolation Resize %")
-        Static pixelSlider = FindSlider("Number of interplation pixels that changed")
+        Static resizeSlider = OptionParent.FindSlider("Interpolation Resize %")
+        Static interpolationSlider = OptionParent.FindSlider("Interpolation Resize %")
+        Static pixelSlider = OptionParent.FindSlider("Number of interplation pixels that changed")
         resizePercent = resizeSlider.value
         interpolationThreshold = interpolationSlider.value
         pixelCountThreshold = pixelSlider.value
@@ -472,9 +472,9 @@ Public Class Options_Smoothing : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static iterSlider = FindSlider("Smoothing iterations")
-        Static tensionSlider = FindSlider("Smoothing tension X100 (Interior Only)")
-        Static stepSlider = FindSlider("Step size when adding points (1 is identity)")
+        Static iterSlider = OptionParent.FindSlider("Smoothing iterations")
+        Static tensionSlider = OptionParent.FindSlider("Smoothing tension X100 (Interior Only)")
+        Static stepSlider = OptionParent.FindSlider("Step size when adding points (1 is identity)")
         iterations = iterSlider.Value
         interiorTension = tensionSlider.Value / 100
         stepSize = stepSlider.Value
@@ -508,7 +508,7 @@ Public Class Options_SuperRes : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static radioChoices = {"farneback", "tvl1", "brox", "pyrlk"}
-        Static iterSlider = FindSlider("SuperRes Iterations")
+        Static iterSlider = OptionParent.FindSlider("SuperRes Iterations")
         Static frm = FindFrm(traceName + " Radio Buttons")
         method = radioChoices(findRadioIndex(frm.check))
         Static lastMethod = method
@@ -612,14 +612,14 @@ Public Class Options_SVM : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         kernelType = radioChoices(findRadioIndex(frm.check))
 
-        Static granSlider = FindSlider("Granularity")
-        Static degreeSlider = FindSlider("SVM Degree")
-        Static gammaSlider = FindSlider("SVM Gamma")
-        Static coef0Slider = FindSlider("SVM Coef0 X100")
-        Static svmCSlider = FindSlider("SVM C X100")
-        Static svmNuSlider = FindSlider("SVM Nu X100")
-        Static svmPSlider = FindSlider("SVM P X100")
-        Static sampleSlider = FindSlider("SVM Sample Count")
+        Static granSlider = OptionParent.FindSlider("Granularity")
+        Static degreeSlider = OptionParent.FindSlider("SVM Degree")
+        Static gammaSlider = OptionParent.FindSlider("SVM Gamma")
+        Static coef0Slider = OptionParent.FindSlider("SVM Coef0 X100")
+        Static svmCSlider = OptionParent.FindSlider("SVM C X100")
+        Static svmNuSlider = OptionParent.FindSlider("SVM Nu X100")
+        Static svmPSlider = OptionParent.FindSlider("SVM P X100")
+        Static sampleSlider = OptionParent.FindSlider("SVM Sample Count")
 
         granularity = granSlider.Value
         svmDegree = degreeSlider.Value / 100
@@ -739,8 +739,8 @@ Public Class Options_DCT : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static removeSlider = FindSlider("Remove Frequencies < x")
-        Static runLenSlider = FindSlider("Run Length Minimum")
+        Static removeSlider = OptionParent.FindSlider("Remove Frequencies < x")
+        Static runLenSlider = OptionParent.FindSlider("Run Length Minimum")
 
         runLengthMin = runLenSlider.Value
         removeFrequency = removeSlider.Value
@@ -768,8 +768,8 @@ Public Class Options_Eigen : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static linePairSlider = FindSlider("Line Point Count")
-        Static noiseSlider = FindSlider("Line Noise")
+        Static linePairSlider = OptionParent.FindSlider("Line Point Count")
+        Static noiseSlider = OptionParent.FindSlider("Line Noise")
         noisyPointCount = linePairSlider.Value
         noiseOffset = noiseSlider.Value
     End Sub
@@ -791,8 +791,8 @@ Public Class Options_FitLine : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static radiusSlider = FindSlider("Accuracy for the radius X100")
-        Static angleSlider = FindSlider("Accuracy for the angle X100")
+        Static radiusSlider = OptionParent.FindSlider("Accuracy for the radius X100")
+        Static angleSlider = OptionParent.FindSlider("Accuracy for the angle X100")
         radiusAccuracy = radiusSlider.Value
         angleAccuracy = angleSlider.Value
     End Sub
@@ -813,7 +813,7 @@ Public Class Options_Fractal : Inherits OptionParent
         resetCheck = FindCheckBox("Reset to original Mandelbrot")
     End Sub
     Public Sub Run()
-        Static iterSlider = FindSlider("Mandelbrot iterations")
+        Static iterSlider = OptionParent.FindSlider("Mandelbrot iterations")
         iterations = iterSlider.Value
     End Sub
 End Class
@@ -838,9 +838,9 @@ Public Class Options_ProCon : Inherits OptionParent
         buffer = Enumerable.Repeat(-1, buffer.Length).ToArray
     End Sub
     Public Sub Run()
-        Static sizeSlider = FindSlider("Buffer Size")
-        Static proSlider = FindSlider("Producer Workload Duration (ms)")
-        Static conSlider = FindSlider("Consumer Workload Duration (ms)")
+        Static sizeSlider = OptionParent.FindSlider("Buffer Size")
+        Static proSlider = OptionParent.FindSlider("Producer Workload Duration (ms)")
+        Static conSlider = OptionParent.FindSlider("Consumer Workload Duration (ms)")
         If task.optionsChanged Then
             bufferSize = sizeSlider.Value
             pduration = proSlider.Value
@@ -868,10 +868,10 @@ Public Class Options_OilPaint : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static kernelSlider = FindSlider("Kernel Size")
-        Static intensitySlider = FindSlider("Intensity")
-        Static filterSlider = FindSlider("Filter Size")
-        Static thresholdSlider = FindSlider("OilPaint Threshold")
+        Static kernelSlider = OptionParent.FindSlider("Kernel Size")
+        Static intensitySlider = OptionParent.FindSlider("Intensity")
+        Static filterSlider = OptionParent.FindSlider("Filter Size")
+        Static thresholdSlider = OptionParent.FindSlider("OilPaint Threshold")
         kernelSize = kernelSlider.Value Or 1
 
         intensity = intensitySlider.Value
@@ -906,8 +906,8 @@ Public Class Options_Pointilism : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static radiusSlider = FindSlider("Smoothing Radius")
-        Static strokeSlider = FindSlider("Stroke Scale")
+        Static radiusSlider = OptionParent.FindSlider("Smoothing Radius")
+        Static strokeSlider = OptionParent.FindSlider("Stroke Scale")
         Static ellipStroke = findRadio("Use Elliptical stroke")
         smoothingRadius = radiusSlider.Value * 2 + 1
         strokeSize = strokeSlider.Value
@@ -946,12 +946,12 @@ Public Class Options_MotionBlur : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static deblurSlider = FindSlider("Deblur Restore Vector")
-        Static angleSlider = FindSlider("Deblur Angle of Restore Vector")
-        Static blurSlider = FindSlider("Motion Blur Length")
-        Static blurAngleSlider = FindSlider("Motion Blur Angle")
-        Static SNRSlider = FindSlider("Deblur Signal to Noise Ratio")
-        Static gammaSlider = FindSlider("Deblur Gamma")
+        Static deblurSlider = OptionParent.FindSlider("Deblur Restore Vector")
+        Static angleSlider = OptionParent.FindSlider("Deblur Angle of Restore Vector")
+        Static blurSlider = OptionParent.FindSlider("Motion Blur Length")
+        Static blurAngleSlider = OptionParent.FindSlider("Motion Blur Angle")
+        Static SNRSlider = OptionParent.FindSlider("Deblur Signal to Noise Ratio")
+        Static gammaSlider = OptionParent.FindSlider("Deblur Gamma")
         If redoCheckBox.Checked Then
             deblurSlider.Value = msRNG.Next(deblurSlider.Minimum, deblurSlider.Maximum)
             angleSlider.Value = msRNG.Next(angleSlider.Minimum, angleSlider.Maximum)
@@ -986,11 +986,11 @@ Public Class Options_BinarizeNiBlack : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static kernelSlider = FindSlider("Kernel Size")
-        Static NiBlackSlider = FindSlider("Niblack k")
-        Static kSlider = FindSlider("Nick k")
-        Static skSlider = FindSlider("Sauvola k")
-        Static rSlider = FindSlider("Sauvola r")
+        Static kernelSlider = OptionParent.FindSlider("Kernel Size")
+        Static NiBlackSlider = OptionParent.FindSlider("Niblack k")
+        Static kSlider = OptionParent.FindSlider("Nick k")
+        Static skSlider = OptionParent.FindSlider("Sauvola k")
+        Static rSlider = OptionParent.FindSlider("Sauvola r")
         kernelSize = kernelSlider.Value Or 1
         niBlackK = NiBlackSlider.Value / 1000
         nickK = kSlider.Value / 1000
@@ -1016,9 +1016,9 @@ Public Class Options_Bernson : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static kernelSlider = FindSlider("Kernel Size")
-        Static contrastSlider = FindSlider("Contrast min")
-        Static bgSlider = FindSlider("bg Threshold")
+        Static kernelSlider = OptionParent.FindSlider("Kernel Size")
+        Static contrastSlider = OptionParent.FindSlider("Contrast min")
+        Static bgSlider = OptionParent.FindSlider("bg Threshold")
         kernelSize = kernelSlider.Value Or 1
 
         bgThreshold = bgSlider.Value
@@ -1044,9 +1044,9 @@ Public Class Options_BlockMatching : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static matchSlider = FindSlider("Blockmatch max disparity")
-        Static sizeSlider = FindSlider("Blockmatch block size")
-        Static distSlider = FindSlider("Blockmatch distance in meters")
+        Static matchSlider = OptionParent.FindSlider("Blockmatch max disparity")
+        Static sizeSlider = OptionParent.FindSlider("Blockmatch block size")
+        Static distSlider = OptionParent.FindSlider("Blockmatch distance in meters")
         numDisparity = matchSlider.Value * 16 ' must be a multiple of 16
         blockSize = sizeSlider.Value Or 1
         distance = distSlider.Value
@@ -1072,10 +1072,10 @@ Public Class Options_Cartoonify : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static kernelSlider = FindSlider("Cartoon Median Blur kernel")
-        Static kernel2Slider = FindSlider("Cartoon Median Blur kernel 2")
-        Static thresholdSlider = FindSlider("Cartoon threshold")
-        Static laplaceSlider = FindSlider("Cartoon Laplacian kernel")
+        Static kernelSlider = OptionParent.FindSlider("Cartoon Median Blur kernel")
+        Static kernel2Slider = OptionParent.FindSlider("Cartoon Median Blur kernel 2")
+        Static thresholdSlider = OptionParent.FindSlider("Cartoon threshold")
+        Static laplaceSlider = OptionParent.FindSlider("Cartoon Laplacian kernel")
         medianBlur = kernelSlider.Value Or 1
         medianBlur2 = kernel2Slider.Value Or 1
         kernelSize = laplaceSlider.Value Or 1
@@ -1107,7 +1107,7 @@ Public Class Options_Dither : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static bppSlider = FindSlider("Bits per color plane (Nbpp only)")
+        Static bppSlider = OptionParent.FindSlider("Bits per color plane (Nbpp only)")
         bppIndex = bppSlider.Value
 
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -1160,10 +1160,10 @@ Public Class Options_SymmetricalShapes : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static countSlider = FindSlider("Sample Size")
-        Static r1Slider = FindSlider("Radius 1")
-        Static r2Slider = FindSlider("Radius 2")
-        Static nGenPerSlider = FindSlider("nGenPer")
+        Static countSlider = OptionParent.FindSlider("Sample Size")
+        Static r1Slider = OptionParent.FindSlider("Radius 1")
+        Static r2Slider = OptionParent.FindSlider("Radius 2")
+        Static nGenPerSlider = OptionParent.FindSlider("nGenPer")
         Static symCheck = FindCheckBox("Symmetric Ripple")
         Static fillCheck = FindCheckBox("Filled Shapes")
         Static regularCheck = FindCheckBox("Only Regular Shapes")
@@ -1219,7 +1219,7 @@ Public Class Options_DrawArc : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static marginSlider = FindSlider("Clearance from image edge (margin size)")
+        Static marginSlider = OptionParent.FindSlider("Clearance from image edge (margin size)")
         Static fillCheck = findRadio("Draw Filled Arc")
         Static fullCheck = findRadio("Draw Full Ellipse")
         saveMargin = marginSlider.Value / 16
@@ -1249,7 +1249,7 @@ Public Class Options_FilterNorm : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static alphaSlider = FindSlider("Normalize alpha X10")
+        Static alphaSlider = OptionParent.FindSlider("Normalize alpha X10")
 
         Dim normType = cv.NormTypes.L1
         kernel = cv.Mat.FromPixelData(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
@@ -1287,9 +1287,9 @@ Public Class Options_SepFilter2D : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static xSlider = FindSlider("Kernel X size")
-        Static ySlider = FindSlider("Kernel Y size")
-        Static sigmaSlider = FindSlider("SepFilter2D Sigma X10")
+        Static xSlider = OptionParent.FindSlider("Kernel X size")
+        Static ySlider = OptionParent.FindSlider("Kernel Y size")
+        Static sigmaSlider = OptionParent.FindSlider("SepFilter2D Sigma X10")
         Static diffCheckBox = FindCheckBox("Show Difference SepFilter2D and Gaussian")
         xDim = xSlider.Value Or 1
         yDim = ySlider.Value Or 1
@@ -1315,9 +1315,9 @@ Public Class Options_IMUFrameTime : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static minSliderHost = FindSlider("Minimum Host interrupt delay (ms)")
-        Static minSliderIMU = FindSlider("Minimum IMU to Capture time (ms)")
-        Static plotSlider = FindSlider("Number of Plot Values")
+        Static minSliderHost = OptionParent.FindSlider("Minimum Host interrupt delay (ms)")
+        Static minSliderIMU = OptionParent.FindSlider("Minimum IMU to Capture time (ms)")
+        Static plotSlider = OptionParent.FindSlider("Number of Plot Values")
         minDelayIMU = minSliderIMU.Value
         minDelayHost = minSliderHost.Value
         plotLastX = plotSlider.Value
@@ -1352,10 +1352,10 @@ Public Class Options_KLT : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static maxSlider = FindSlider("KLT - MaxCorners")
-        Static qualitySlider = FindSlider("KLT - qualityLevel")
-        Static minSlider = FindSlider("KLT - minDistance")
-        Static blockSlider = FindSlider("KLT - BlockSize")
+        Static maxSlider = OptionParent.FindSlider("KLT - MaxCorners")
+        Static qualitySlider = OptionParent.FindSlider("KLT - qualityLevel")
+        Static minSlider = OptionParent.FindSlider("KLT - minDistance")
+        Static blockSlider = OptionParent.FindSlider("KLT - BlockSize")
         Static nightCheck = FindCheckBox("KLT - Night Mode")
         Static deleteCheck = FindCheckBox("KLT - delete all Points")
 
@@ -1401,10 +1401,10 @@ Public Class Options_Laplacian : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static kernelSlider = FindSlider("Laplacian Kernel size")
-        Static scaleSlider = FindSlider("Laplacian Scale")
-        Static deltaSlider = FindSlider("Laplacian Delta")
-        Static thresholdSlider = FindSlider("Laplacian Threshold")
+        Static kernelSlider = OptionParent.FindSlider("Laplacian Kernel size")
+        Static scaleSlider = OptionParent.FindSlider("Laplacian Scale")
+        Static deltaSlider = OptionParent.FindSlider("Laplacian Delta")
+        Static thresholdSlider = OptionParent.FindSlider("Laplacian Threshold")
         Static blurCheck = findRadio("Add Gaussian Blur")
         Static boxCheck = findRadio("Add boxfilter Blur")
         Dim kernelSize As Integer = kernelSlider.Value Or 1
@@ -1453,12 +1453,12 @@ Public Class Options_OpticalFlow : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static scaleSlider = FindSlider("Optical Flow pyrScale")
-        Static levelSlider = FindSlider("Optical Flow Levels")
-        Static sizeSlider = FindSlider("Optical Flow winSize")
-        Static iterSlider = FindSlider("Optical Flow Iterations")
-        Static polySlider = FindSlider("Optical Flow PolyN")
-        Static flowSlider = FindSlider("Optical Flow Scaling Out")
+        Static scaleSlider = OptionParent.FindSlider("Optical Flow pyrScale")
+        Static levelSlider = OptionParent.FindSlider("Optical Flow Levels")
+        Static sizeSlider = OptionParent.FindSlider("Optical Flow winSize")
+        Static iterSlider = OptionParent.FindSlider("Optical Flow Iterations")
+        Static polySlider = OptionParent.FindSlider("Optical Flow PolyN")
+        Static flowSlider = OptionParent.FindSlider("Optical Flow Scaling Out")
 
         pyrScale = scaleSlider.Value / scaleSlider.Maximum
         levels = levelSlider.Value
@@ -1536,8 +1536,8 @@ Public Class Options_XPhoto : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static ratioSlider = FindSlider("XPhoto Dynamic Ratio")
-        Static sizeSlider = FindSlider("XPhoto Block Size")
+        Static ratioSlider = OptionParent.FindSlider("XPhoto Dynamic Ratio")
+        Static sizeSlider = OptionParent.FindSlider("XPhoto Block Size")
         dynamicRatio = ratioSlider.Value
         blockSize = sizeSlider.Value
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -1592,7 +1592,7 @@ Public Class Options_RotatePoly : Inherits OptionParent
             check.addCheckBox("Change center of rotation and triangle")
         End If
 
-        angleSlider = FindSlider("Amount to rotate triangle")
+        angleSlider = OptionParent.FindSlider("Amount to rotate triangle")
         changeCheck = FindCheckBox("Change center of rotation and triangle")
     End Sub
     Public Sub Run()
@@ -1621,9 +1621,9 @@ Public Class Options_FPoly : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
-        Static pointSlider = FindSlider("Points to use in Feature Poly")
-        Static resyncSlider = FindSlider("Automatically resync after X frames")
+        Static thresholdSlider = OptionParent.FindSlider("Resync if feature moves > X pixels")
+        Static pointSlider = OptionParent.FindSlider("Points to use in Feature Poly")
+        Static resyncSlider = OptionParent.FindSlider("Automatically resync after X frames")
         removeThreshold = thresholdSlider.Value
         task.polyCount = pointSlider.Value
         autoResyncAfterX = resyncSlider.Value
@@ -1695,7 +1695,7 @@ Public Class Options_Random : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static countSlider = FindSlider("Random Pixel Count")
+        Static countSlider = OptionParent.FindSlider("Random Pixel Count")
         count = countSlider.value
     End Sub
 End Class
@@ -1724,11 +1724,11 @@ Public Class Options_Hough : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static rhoslider = FindSlider("Hough rho")
-        Static thetaSlider = FindSlider("Hough theta")
-        Static thresholdSlider = FindSlider("Hough threshold")
-        Static lineSlider = FindSlider("Lines to Plot")
-        Static relativeSlider = FindSlider("Relative Intensity (Accord)")
+        Static rhoslider = OptionParent.FindSlider("Hough rho")
+        Static thetaSlider = OptionParent.FindSlider("Hough theta")
+        Static thresholdSlider = OptionParent.FindSlider("Hough threshold")
+        Static lineSlider = OptionParent.FindSlider("Lines to Plot")
+        Static relativeSlider = OptionParent.FindSlider("Relative Intensity (Accord)")
 
         rho = rhoslider.Value
         theta = thetaSlider.Value / 1000
@@ -1756,9 +1756,9 @@ Public Class Options_Canny : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static t1Slider = FindSlider("Canny threshold1")
-        Static t2Slider = FindSlider("Canny threshold2")
-        Static apertureSlider = FindSlider("Canny Aperture")
+        Static t1Slider = OptionParent.FindSlider("Canny threshold1")
+        Static t2Slider = OptionParent.FindSlider("Canny threshold2")
+        Static apertureSlider = OptionParent.FindSlider("Canny Aperture")
 
         threshold1 = t1Slider.Value
         threshold2 = t2Slider.Value
@@ -1826,7 +1826,7 @@ Public Class Options_Sort : Inherits OptionParent
         radio5 = findRadio("Sort all pixels descending")
     End Sub
     Public Sub Run()
-        Static sortSlider = FindSlider("Threshold for sort input")
+        Static sortSlider = OptionParent.FindSlider("Threshold for sort input")
         If radio1.Checked Then sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Descending
         If radio2.Checked Then sortOption = cv.SortFlags.EveryRow + cv.SortFlags.Ascending
         If radio3.Checked Then sortOption = cv.SortFlags.EveryRow + cv.SortFlags.Descending
@@ -1885,11 +1885,11 @@ Public Class Options_Warp : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static alphaSlider = FindSlider("Alpha")
-        Static betaSlider = FindSlider("Beta")
-        Static gammaSlider = FindSlider("Gamma")
-        Static fSlider = FindSlider("f")
-        Static distanceSlider = FindSlider("distance")
+        Static alphaSlider = OptionParent.FindSlider("Alpha")
+        Static betaSlider = OptionParent.FindSlider("Beta")
+        Static gammaSlider = OptionParent.FindSlider("Gamma")
+        Static fSlider = OptionParent.FindSlider("f")
+        Static distanceSlider = OptionParent.FindSlider("distance")
 
         alpha = CDbl(alphaSlider.value - 90) * cv.Cv2.PI / 180
         beta = CDbl(betaSlider.value - 90) * cv.Cv2.PI / 180
@@ -2006,7 +2006,7 @@ Public Class Options_MatchCell : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent overlap", 0, 100, overlapPercent * 100)
     End Sub
     Public Sub Run()
-        Static overlapSlider = FindSlider("Percent overlap")
+        Static overlapSlider = OptionParent.FindSlider("Percent overlap")
         overlapPercent = overlapSlider.value / 100
     End Sub
 End Class
@@ -2043,9 +2043,9 @@ Public Class Options_Extrinsics : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static leftSlider = FindSlider("Left image percent")
-        Static rightSlider = FindSlider("Right image percent")
-        Static heightSlider = FindSlider("Height percent")
+        Static leftSlider = OptionParent.FindSlider("Left image percent")
+        Static rightSlider = OptionParent.FindSlider("Right image percent")
+        Static heightSlider = OptionParent.FindSlider("Height percent")
         leftCorner = task.cols * leftSlider.value / 100
         rightCorner = task.cols * rightSlider.value / 100
         topCorner = task.rows * heightSlider.value / 100
@@ -2074,8 +2074,8 @@ Public Class Options_Translation : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static leftSlider = FindSlider("Left translation percent")
-        Static rightSlider = FindSlider("Right translation percent")
+        Static leftSlider = OptionParent.FindSlider("Left translation percent")
+        Static rightSlider = OptionParent.FindSlider("Right translation percent")
         leftTrans = task.cols * leftSlider.value / 100
         rightTrans = task.cols * rightSlider.value / 100
     End Sub
@@ -2107,7 +2107,7 @@ Public Class Options_OpenGL_Contours : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter threshold in meters X100", 0, 100, filterThreshold * 100)
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Filter threshold in meters X100")
+        Static thresholdSlider = OptionParent.FindSlider("Filter threshold in meters X100")
         Static unFilteredRadio = findRadio("Unfiltered depth points")
         Static filteredRadio = findRadio("Filtered depth points")
         Static flattenRadio = findRadio("Flatten depth points")
@@ -2145,8 +2145,8 @@ Public Class Options_Motion : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Single frame motion threshold")
-        Static percentSlider = FindSlider("Cumulative motion threshold percent of image")
+        Static thresholdSlider = OptionParent.FindSlider("Single frame motion threshold")
+        Static percentSlider = OptionParent.FindSlider("Cumulative motion threshold percent of image")
         motionThreshold = thresholdSlider.value
         cumulativePercentThreshold = percentSlider.value / 100
     End Sub
@@ -2173,7 +2173,7 @@ Public Class Options_Emax : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static stepSlider = FindSlider("EMax Prediction Step Size")
+        Static stepSlider = OptionParent.FindSlider("EMax Prediction Step Size")
         predictionStepSize = stepSlider.value
         covarianceType = cv.EMTypes.CovMatDefault
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -2210,7 +2210,7 @@ Public Class Options_Intercepts : Inherits OptionParent
     Public Sub showIntercepts(mousePoint As cv.Point, dst As cv.Mat)
     End Sub
     Public Sub Run()
-        Static interceptSlider = FindSlider("Intercept width range in pixels")
+        Static interceptSlider = OptionParent.FindSlider("Intercept width range in pixels")
         interceptRange = interceptSlider.Value
 
         Static topRadio = findRadio("Show Top intercepts")
@@ -2269,9 +2269,9 @@ Public Class Options_ForeGround : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static depthSlider = FindSlider("Max foreground depth in mm's")
-        Static minSizeSlider = FindSlider("Min length contour")
-        Static regionSlider = FindSlider("Number of depth ranges")
+        Static depthSlider = OptionParent.FindSlider("Max foreground depth in mm's")
+        Static minSizeSlider = OptionParent.FindSlider("Min length contour")
+        Static regionSlider = OptionParent.FindSlider("Number of depth ranges")
         maxForegroundDepthInMeters = depthSlider.value / 1000
         minSizeContour = minSizeSlider.value
         numberOfRegions = regionSlider.value
@@ -2302,8 +2302,8 @@ Public Class Options_Flood : Inherits OptionParent
     Public Sub Run()
         Static floatingCheck = FindCheckBox("Use floating range")
         Static connectCheck = FindCheckBox("Use connectivity 8 (unchecked in connectivity 4)")
-        Static stepSlider = FindSlider("Step Size")
-        Static minSlider = FindSlider("Min Pixels")
+        Static stepSlider = OptionParent.FindSlider("Step Size")
+        Static minSlider = OptionParent.FindSlider("Min Pixels")
 
         stepSize = stepSlider.Value
         floodFlag = If(connectCheck.checked, 8, 4) Or If(floatingCheck.checked, cv.FloodFillFlags.FixedRange, 0)
@@ -2353,9 +2353,9 @@ Public Class Options_Blur : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static kernelSlider = FindSlider("Blur Kernel Size")
-        Static sigmaXSlider = FindSlider("Blur SigmaX")
-        Static sigmaYSlider = FindSlider("Blur SigmaY")
+        Static kernelSlider = OptionParent.FindSlider("Blur Kernel Size")
+        Static sigmaXSlider = OptionParent.FindSlider("Blur SigmaX")
+        Static sigmaYSlider = OptionParent.FindSlider("Blur SigmaY")
         kernelSize = kernelSlider.Value Or 1
         sigmaX = sigmaXSlider.value * 0.5
         sigmaY = sigmaYSlider.value * 0.5
@@ -2384,7 +2384,7 @@ Public Class Options_Wavelet : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static iterSlider = FindSlider("Wavelet Iterations")
+        Static iterSlider = OptionParent.FindSlider("Wavelet Iterations")
         Static haarRadio = findRadio("Haar")
         useHaar = haarRadio.checked
         iterations = iterSlider.value
@@ -2411,9 +2411,9 @@ Public Class Options_SOM : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static iterSlider = FindSlider("Iterations (000's)")
-        Static learnSlider = FindSlider("Initial Learning Rate %")
-        Static radiusSlider = FindSlider("Radius in Pixels")
+        Static iterSlider = OptionParent.FindSlider("Iterations (000's)")
+        Static learnSlider = OptionParent.FindSlider("Initial Learning Rate %")
+        Static radiusSlider = OptionParent.FindSlider("Radius in Pixels")
         iterations = iterSlider.value * 1000
         learningRate = learnSlider.value / 100
         radius = radiusSlider.value
@@ -2447,10 +2447,10 @@ Public Class Options_SURF : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Hessian threshold")
+        Static thresholdSlider = OptionParent.FindSlider("Hessian threshold")
         Static BFRadio = findRadio("Use BF Matcher")
-        Static rangeSlider = FindSlider("Surf Vertical Range to Search")
-        Static countSlider = FindSlider("Points to Match")
+        Static rangeSlider = OptionParent.FindSlider("Surf Vertical Range to Search")
+        Static countSlider = OptionParent.FindSlider("Points to Match")
 
         useBFMatcher = BFRadio.checked
         hessianThreshold = thresholdSlider.value
@@ -2484,8 +2484,8 @@ Public Class Options_Sift : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static bfRadio = findRadio("Use BF Matcher")
-        Static countSlider = FindSlider("Points to Match")
-        Static stepSlider = FindSlider("Sift StepSize")
+        Static countSlider = OptionParent.FindSlider("Points to Match")
+        Static stepSlider = OptionParent.FindSlider("Sift StepSize")
 
         useBFMatcher = bfRadio.checked
         pointCount = countSlider.value
@@ -2522,8 +2522,8 @@ Public Class Options_Dilate : Inherits OptionParent
     Public Sub Run()
         Static ellipseRadio = findRadio("Dilate shape: Ellipse")
         Static rectRadio = findRadio("Dilate shape: Rect")
-        Static iterSlider = FindSlider("Dilate Iterations")
-        Static kernelSlider = FindSlider("Dilate Kernel Size")
+        Static iterSlider = OptionParent.FindSlider("Dilate Iterations")
+        Static kernelSlider = OptionParent.FindSlider("Dilate Kernel Size")
         Static noShapeRadio = findRadio("Dilate shape: None")
         iterations = iterSlider.Value
         kernelSize = kernelSlider.Value Or 1
@@ -2562,11 +2562,11 @@ Public Class Options_KMeans : Inherits OptionParent
         End If
     End Sub
     Public Sub setK(k As Integer)
-        FindSlider("KMeans k").Value = k
+        OptionParent.FindSlider("KMeans k").Value = k
     End Sub
     Public Sub Run()
         Static frm = FindFrm(traceName + " Radio Buttons")
-        Static kSlider = FindSlider("KMeans k")
+        Static kSlider = OptionParent.FindSlider("KMeans k")
         Select Case findRadioText(frm.check)
             Case "Use PpCenters"
                 kMeansFlag = cv.KMeansFlags.PpCenters
@@ -2600,11 +2600,11 @@ Public Class Options_LUT : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static lutSlider = FindSlider("Number of LUT Segments")
-        Static zeroSlider = FindSlider("LUT zero through xxx")
-        Static xSlider = FindSlider("LUT xxx through yyy")
-        Static ySlider = FindSlider("LUT yyy through zzz")
-        Static zSlider = FindSlider("LUT zzz through 255")
+        Static lutSlider = OptionParent.FindSlider("Number of LUT Segments")
+        Static zeroSlider = OptionParent.FindSlider("LUT zero through xxx")
+        Static xSlider = OptionParent.FindSlider("LUT xxx through yyy")
+        Static ySlider = OptionParent.FindSlider("LUT yyy through zzz")
+        Static zSlider = OptionParent.FindSlider("LUT zzz through 255")
 
         splits = {zeroSlider.Value, xSlider.Value, ySlider.Value, zSlider.Value, 255}
         vals = {1, zeroSlider.Value, xSlider.Value, ySlider.Value, 255}
@@ -2762,11 +2762,11 @@ Public Class Options_IMU : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static xRotateSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
-        Static yRotateSlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
-        Static alphaSlider = FindSlider("IMU_Basics: Alpha X100")
-        Static stabilitySlider = FindSlider("IMU Stability Threshold (radians) X100")
+        Static xRotateSlider = OptionParent.FindSlider("Rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static alphaSlider = OptionParent.FindSlider("IMU_Basics: Alpha X100")
+        Static stabilitySlider = OptionParent.FindSlider("IMU Stability Threshold (radians) X100")
         rotateX = xRotateSlider.value
         rotateY = yRotateSlider.value
         rotateZ = zRotateSlider.value
@@ -2829,7 +2829,7 @@ Public Class Options_HeatMap : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static topCheck = FindCheckBox("Top View (Unchecked Side View)")
-        Static redSlider = FindSlider("Threshold for Red channel")
+        Static redSlider = OptionParent.FindSlider("Threshold for Red channel")
 
         redThreshold = redSlider.value
 
@@ -2854,8 +2854,8 @@ Public Class Options_Boundary : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static boundarySlider = FindSlider("Desired boundary count")
-        Static distSlider = FindSlider("Distance to next Peak (pixels)")
+        Static boundarySlider = OptionParent.FindSlider("Desired boundary count")
+        Static distSlider = OptionParent.FindSlider("Distance to next Peak (pixels)")
         desiredBoundaries = boundarySlider.value
         peakDistance = distSlider.value
     End Sub
@@ -2953,15 +2953,15 @@ Public Class Options_MSER : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static deltaSlider = FindSlider("MSER Delta")
-        Static minAreaSlider = FindSlider("MSER Min Area")
-        Static maxAreaSlider = FindSlider("MSER Max Area")
-        Static variationSlider = FindSlider("MSER Max Variation")
-        Static diversitySlider = FindSlider("MSER Diversity")
-        Static evolutionSlider = FindSlider("MSER Max Evolution")
-        Static thresholdSlider = FindSlider("MSER Area Threshold")
-        Static marginSlider = FindSlider("MSER Min Margin")
-        Static blurSlider = FindSlider("MSER Edge BlurSize")
+        Static deltaSlider = OptionParent.FindSlider("MSER Delta")
+        Static minAreaSlider = OptionParent.FindSlider("MSER Min Area")
+        Static maxAreaSlider = OptionParent.FindSlider("MSER Max Area")
+        Static variationSlider = OptionParent.FindSlider("MSER Max Variation")
+        Static diversitySlider = OptionParent.FindSlider("MSER Diversity")
+        Static evolutionSlider = OptionParent.FindSlider("MSER Max Evolution")
+        Static thresholdSlider = OptionParent.FindSlider("MSER Area Threshold")
+        Static marginSlider = OptionParent.FindSlider("MSER Min Margin")
+        Static blurSlider = OptionParent.FindSlider("MSER Edge BlurSize")
 
         delta = deltaSlider.Value
         minArea = minAreaSlider.Value
@@ -3149,9 +3149,9 @@ Public Class Options_Spectrum : Inherits OptionParent
             task.redC.Run(task.color)
         End If
         Static frmSliders = FindFrm("Options_Spectrum Sliders")
-        Static gapDSlider = FindSlider("Gap in depth spectrum (cm's)")
-        Static gapGSlider = FindSlider("Gap in gray spectrum")
-        Static countSlider = FindSlider("Sample count threshold")
+        Static gapDSlider = OptionParent.FindSlider("Gap in depth spectrum (cm's)")
+        Static gapGSlider = OptionParent.FindSlider("Gap in gray spectrum")
+        Static countSlider = OptionParent.FindSlider("Sample count threshold")
         gapDepth = gapDSlider.value
         gapGray = gapGSlider.value
         sampleThreshold = countSlider.value
@@ -3180,9 +3180,9 @@ Public Class Options_HistXD : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static topSlider = FindSlider("Min top bin samples")
-        Static sideSlider = FindSlider("Min side bin samples")
-        Static bothSlider = FindSlider("Min samples per bin")
+        Static topSlider = OptionParent.FindSlider("Min top bin samples")
+        Static sideSlider = OptionParent.FindSlider("Min side bin samples")
+        Static bothSlider = OptionParent.FindSlider("Min samples per bin")
         topThreshold = topSlider.value
         sideThreshold = sideSlider.value
         threshold3D = bothSlider.value
@@ -3259,10 +3259,10 @@ Public Class Options_BGSubtractSynthetic : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static amplitudeSlider = FindSlider("Synthetic Amplitude x100")
-        Static MagSlider = FindSlider("Synthetic Magnitude")
-        Static speedSlider = FindSlider("Synthetic Wavespeed x100")
-        Static objectSlider = FindSlider("Synthetic ObjectSpeed")
+        Static amplitudeSlider = OptionParent.FindSlider("Synthetic Amplitude x100")
+        Static MagSlider = OptionParent.FindSlider("Synthetic Magnitude")
+        Static speedSlider = OptionParent.FindSlider("Synthetic Wavespeed x100")
+        Static objectSlider = OptionParent.FindSlider("Synthetic ObjectSpeed")
 
         amplitude = amplitudeSlider.Value
         magnitude = MagSlider.Value
@@ -3294,7 +3294,7 @@ Public Class Options_BGSubtract : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, learnRate * 1000)
     End Sub
     Public Sub Run()
-        Static learnRateSlider = FindSlider("MOG Learn Rate X1000")
+        Static learnRateSlider = OptionParent.FindSlider("MOG Learn Rate X1000")
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
@@ -3337,7 +3337,7 @@ Public Class Options_Classifier : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static inputSlider = FindSlider("Random Samples")
+        Static inputSlider = OptionParent.FindSlider("Random Samples")
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
@@ -3404,7 +3404,7 @@ Public Class Options_Threshold : Inherits OptionParent
 
         Static inputGrayCheck = FindCheckBox("GrayScale Input")
         Static otsuCheck = FindCheckBox("Add OTSU Option - a 50/50 split")
-        Static threshSlider = FindSlider("Threshold value")
+        Static threshSlider = OptionParent.FindSlider("Threshold value")
 
         inputGray = inputGrayCheck.checked
         otsuOption = otsuCheck.checked
@@ -3440,8 +3440,8 @@ Public Class Options_AdaptiveThreshold : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static gaussRadio = findRadio("GaussianC")
-        Static constantSlider = FindSlider("Constant subtracted from mean Or weighted mean")
-        Static blockSlider = FindSlider("AdaptiveThreshold block size")
+        Static constantSlider = OptionParent.FindSlider("Constant subtracted from mean Or weighted mean")
+        Static blockSlider = OptionParent.FindSlider("AdaptiveThreshold block size")
 
         method = If(gaussRadio.checked, cv.AdaptiveThresholdTypes.GaussianC, cv.AdaptiveThresholdTypes.MeanC)
         blockSize = blockSlider.Value Or 1
@@ -3468,9 +3468,9 @@ Public Class Options_Colors : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static redSlider = FindSlider("Red")
-        Static greenSlider = FindSlider("Green")
-        Static blueSlider = FindSlider("Blue")
+        Static redSlider = OptionParent.FindSlider("Red")
+        Static greenSlider = OptionParent.FindSlider("Green")
+        Static blueSlider = OptionParent.FindSlider("Blue")
         redS = redSlider.Value
         greenS = greenSlider.Value
         blueS = blueSlider.Value
@@ -3557,10 +3557,10 @@ Public Class Options_ThresholdAll : Inherits OptionParent
         Static inputGrayCheck = FindCheckBox("GrayScale Input")
         Static otsuCheck = FindCheckBox("Add OTSU Option - a 50/50 split")
 
-        Static threshSlider = FindSlider("Threshold value")
-        Static maxSlider = FindSlider("MaxVal setting")
-        Static constantSlider = FindSlider("Constant subtracted from mean Or weighted mean")
-        Static blockSlider = FindSlider("AdaptiveThreshold block size")
+        Static threshSlider = OptionParent.FindSlider("Threshold value")
+        Static maxSlider = OptionParent.FindSlider("MaxVal setting")
+        Static constantSlider = OptionParent.FindSlider("Constant subtracted from mean Or weighted mean")
+        Static blockSlider = OptionParent.FindSlider("AdaptiveThreshold block size")
 
         inputGray = inputGrayCheck.checked
         otsuOption = otsuCheck.checked
@@ -3587,9 +3587,9 @@ Public Class Options_StdevGrid : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static minSlider = FindSlider("Min color threshold")
-        Static maxSlider = FindSlider("Max color threshold")
-        Static diffSlider = FindSlider("Equal diff threshold")
+        Static minSlider = OptionParent.FindSlider("Min color threshold")
+        Static maxSlider = OptionParent.FindSlider("Max color threshold")
+        Static diffSlider = OptionParent.FindSlider("Equal diff threshold")
         minThreshold = minSlider.value
         maxThreshold = maxSlider.value
         diffThreshold = diffSlider.value
@@ -3622,8 +3622,8 @@ Public Class Options_DFT : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static radiusSlider = FindSlider("DFT B Filter - Radius")
-        Static orderSlider = FindSlider("DFT B Filter - Order")
+        Static radiusSlider = OptionParent.FindSlider("DFT B Filter - Radius")
+        Static orderSlider = OptionParent.FindSlider("DFT B Filter - Order")
         radius = radiusSlider.Value
         order = orderSlider.Value
 
@@ -3682,7 +3682,7 @@ Public Class Options_FitEllipse : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("FitEllipse threshold")
+        Static thresholdSlider = OptionParent.FindSlider("FitEllipse threshold")
         Static qRadio = findRadio("fitEllipseQ")
         Static amsRadio = findRadio("fitEllipseAMS")
         Static directRadio = findRadio("fitEllipseDirect")
@@ -3706,7 +3706,7 @@ Public Class Options_TopX : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Show the top X cells", 1, 255, topX)
     End Sub
     Public Sub Run()
-        Static topXSlider = FindSlider("Show the top X cells")
+        Static topXSlider = OptionParent.FindSlider("Show the top X cells")
         topX = topXSlider.value
     End Sub
 End Class
@@ -3726,8 +3726,8 @@ Public Class Options_EdgeOverlay : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static xSlider = FindSlider("Displacement in the X direction (in pixels)")
-        Static ySlider = FindSlider("Displacement in the Y direction (in pixels)")
+        Static xSlider = OptionParent.FindSlider("Displacement in the X direction (in pixels)")
+        Static ySlider = OptionParent.FindSlider("Displacement in the Y direction (in pixels)")
         xDisp = xSlider.Value
         yDisp = ySlider.Value
     End Sub
@@ -3749,8 +3749,8 @@ Public Class Options_AddWeighted : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static weightSlider = FindSlider("Add Weighted %")
-        Static accumSlider = FindSlider("Accumulation weight of each image X100")
+        Static weightSlider = OptionParent.FindSlider("Add Weighted %")
+        Static accumSlider = OptionParent.FindSlider("Accumulation weight of each image X100")
         addWeighted = weightSlider.value / 100
         accumWeighted = accumSlider.value / 100
     End Sub
@@ -3777,7 +3777,7 @@ Public Class Options_ApproxPoly : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static epsilonSlider = FindSlider("epsilon - max distance from original curve")
+        Static epsilonSlider = OptionParent.FindSlider("epsilon - max distance from original curve")
         Static closedPolyCheck = FindCheckBox("Closed polygon - connect first and last vertices.")
         epsilon = epsilonSlider.value
         closedPoly = closedPolyCheck.checked
@@ -3880,8 +3880,8 @@ Public Class Options_GuidedBPDepth : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static binSlider = FindSlider("Histogram Bins for depth data")
-        Static clusterSlider = FindSlider("Maximum number of clusters")
+        Static binSlider = OptionParent.FindSlider("Histogram Bins for depth data")
+        Static clusterSlider = OptionParent.FindSlider("Maximum number of clusters")
         bins = binSlider.value
         maxClusters = clusterSlider.value
     End Sub
@@ -3928,8 +3928,8 @@ Public Class Options_AsciiArt : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static hSlider = FindSlider("Character height in pixels")
-        Static wSlider = FindSlider("Character width in pixels")
+        Static hSlider = OptionParent.FindSlider("Character height in pixels")
+        Static wSlider = OptionParent.FindSlider("Character width in pixels")
 
         hStep = CInt(task.rows / hSlider.value)
         wStep = CInt(task.cols / wSlider.value)
@@ -3969,10 +3969,10 @@ Public Class Options_MotionDetect : Inherits OptionParent
                     New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
                     New cv.Vec3i(32, w / 8, h / 8)}
 
-        Static correlationSlider = FindSlider("Correlation Threshold")
+        Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
         Static frm = FindFrm(traceName + " Radio Buttons")
-        Static padSlider = FindSlider("Pad size in pixels for the search area")
-        Static stdevSlider = FindSlider("Stdev threshold for using correlation")
+        Static padSlider = OptionParent.FindSlider("Pad size in pixels for the search area")
+        Static stdevSlider = OptionParent.FindSlider("Stdev threshold for using correlation")
         CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         threadData = radioChoices(findRadioIndex(frm.check))
         pad = padSlider.Value
@@ -3990,7 +3990,7 @@ Public Class Options_JpegQuality : Inherits OptionParent
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("JPEG Quality", 1, 100, quality)
     End Sub
     Public Sub Run()
-        Static qualitySlider = FindSlider("JPEG Quality")
+        Static qualitySlider = OptionParent.FindSlider("JPEG Quality")
         quality = qualitySlider.value
     End Sub
 End Class
@@ -4004,7 +4004,7 @@ Public Class Options_PNGCompression : Inherits OptionParent
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("PNG Compression", 1, 100, compression)
     End Sub
     Public Sub Run()
-        Static compressionSlider = FindSlider("PNG Compression")
+        Static compressionSlider = OptionParent.FindSlider("PNG Compression")
         compression = compressionSlider.value
     End Sub
 End Class
@@ -4051,9 +4051,9 @@ Public Class Options_BlurTopo : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static reductionSlider = FindSlider("Blur Color Reduction")
-        Static frameSlider = FindSlider("Frame Count Cycle")
-        Static percentSlider = FindSlider("Percent of Blurring")
+        Static reductionSlider = OptionParent.FindSlider("Blur Color Reduction")
+        Static frameSlider = OptionParent.FindSlider("Frame Count Cycle")
+        Static percentSlider = OptionParent.FindSlider("Percent of Blurring")
 
         If task.optionsChanged Then
             savePercent = percentSlider.Value
@@ -4077,7 +4077,7 @@ Public Class Options_BoundaryRect : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired percent of rectangles", 0, 100, percentRect)
     End Sub
     Public Sub Run()
-        Static percentSlider = FindSlider("Desired percent of rectangles")
+        Static percentSlider = OptionParent.FindSlider("Desired percent of rectangles")
         percentRect = percentSlider.value / 100
     End Sub
 End Class
@@ -4116,13 +4116,13 @@ Public Class Options_BrightnessContrast : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static betaSlider = FindSlider("Beta (brightness)")
-        Static alphaSlider = FindSlider("Alpha (contrast)")
+        Static betaSlider = OptionParent.FindSlider("Beta (brightness)")
+        Static alphaSlider = OptionParent.FindSlider("Alpha (contrast)")
         brightness = alphaSlider.value / 500
         contrast = betaSlider.value
-        Static brightnessSlider = FindSlider("HSV Brightness Value")
+        Static brightnessSlider = OptionParent.FindSlider("HSV Brightness Value")
         hsvBrightness = brightnessSlider.Value / 100
-        Static exponentSlider = FindSlider("Contrast exponent to use X100")
+        Static exponentSlider = OptionParent.FindSlider("Contrast exponent to use X100")
         exponent = exponentSlider.value / 100
     End Sub
 End Class
@@ -4147,18 +4147,18 @@ Public Class Options_HistPointCloud : Inherits OptionParent
 
         Select Case task.cols
             Case 640
-                FindSlider("Histogram threshold").Value = 200
+                OptionParent.FindSlider("Histogram threshold").Value = 200
             Case 320
-                FindSlider("Histogram threshold").Value = threshold
+                OptionParent.FindSlider("Histogram threshold").Value = threshold
             Case 160
-                FindSlider("Histogram threshold").Value = 25
+                OptionParent.FindSlider("Histogram threshold").Value = 25
         End Select
     End Sub
     Public Sub Run()
-        Static xSlider = FindSlider("Histogram X bins")
-        Static ySlider = FindSlider("Histogram Y bins")
-        Static zSlider = FindSlider("Histogram Z bins")
-        Static tSlider = FindSlider("Histogram threshold")
+        Static xSlider = OptionParent.FindSlider("Histogram X bins")
+        Static ySlider = OptionParent.FindSlider("Histogram Y bins")
+        Static zSlider = OptionParent.FindSlider("Histogram Z bins")
+        Static tSlider = OptionParent.FindSlider("Histogram threshold")
         xBins = xSlider.Value
         yBins = ySlider.Value
         zBins = zSlider.Value
@@ -4186,10 +4186,10 @@ Public Class Options_Harris : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdslider = FindSlider("Harris Threshold")
-        Static neighborSlider = FindSlider("Harris Neighborhood")
-        Static apertureSlider = FindSlider("Harris aperture")
-        Static parmSlider = FindSlider("Harris Parameter")
+        Static thresholdslider = OptionParent.FindSlider("Harris Threshold")
+        Static neighborSlider = OptionParent.FindSlider("Harris Neighborhood")
+        Static apertureSlider = OptionParent.FindSlider("Harris aperture")
+        Static parmSlider = OptionParent.FindSlider("Harris Parameter")
 
         threshold = thresholdslider.Value / 10000
         neighborhood = neighborSlider.Value Or 1
@@ -4216,9 +4216,9 @@ Public Class Options_HarrisCorners : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static blockSlider = FindSlider("Corner block size")
-        Static apertureSlider = FindSlider("Corner aperture size")
-        Static qualitySlider = FindSlider("Corner quality level")
+        Static blockSlider = OptionParent.FindSlider("Corner block size")
+        Static apertureSlider = OptionParent.FindSlider("Corner aperture size")
+        Static qualitySlider = OptionParent.FindSlider("Corner quality level")
         quality = qualitySlider.Value
         aperture = apertureSlider.value Or 1
         blockSize = blockSlider.value Or 1
@@ -4313,8 +4313,8 @@ Public Class Options_EdgeMatching : Inherits OptionParent '
         Static overlayCheck = FindCheckBox("Overlay thread grid")
         Static highlightCheck = FindCheckBox("Highlight all grid entries above threshold")
         Static clearCheck = FindCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
-        Static thresholdSlider = FindSlider("Edge Correlation threshold X100")
-        Static searchSlider = FindSlider("Search depth in pixels")
+        Static thresholdSlider = OptionParent.FindSlider("Edge Correlation threshold X100")
+        Static searchSlider = OptionParent.FindSlider("Search depth in pixels")
         threshold = thresholdSlider.Value / 100
         searchDepth = searchSlider.Value
         overlayChecked = overlayCheck.checked
@@ -4340,9 +4340,9 @@ Public Class Options_EmaxInputClusters : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static sampleSlider = FindSlider("EMax Number of Samples per region")
-        Static sigmaSlider = FindSlider("EMax Sigma (spread)")
-        Static sizeSlider = FindSlider("EMax Cell Size")
+        Static sampleSlider = OptionParent.FindSlider("EMax Number of Samples per region")
+        Static sigmaSlider = OptionParent.FindSlider("EMax Sigma (spread)")
+        Static sizeSlider = OptionParent.FindSlider("EMax Cell Size")
         samplesPerRegion = sampleSlider.value
         sigma = sigmaSlider.value
         emaxCellSize = sizeSlider.value
@@ -4365,9 +4365,9 @@ Public Class Options_CComp : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static lightSlider = FindSlider("Threshold for lighter input")
-        Static darkSlider = FindSlider("Threshold for darker input")
-        Static thresholdSlider = FindSlider("CComp threshold")
+        Static lightSlider = OptionParent.FindSlider("Threshold for lighter input")
+        Static darkSlider = OptionParent.FindSlider("Threshold for darker input")
+        Static thresholdSlider = OptionParent.FindSlider("CComp threshold")
         threshold = thresholdSlider.value
         light = lightSlider.value
         dark = darkSlider.value
@@ -4385,7 +4385,7 @@ Public Class Options_CellAutomata : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Current Rule", 0, 255, currentRule)
     End Sub
     Public Sub Run()
-        Static ruleSlider = FindSlider("Current Rule")
+        Static ruleSlider = OptionParent.FindSlider("Current Rule")
         currentRule = ruleSlider.value
     End Sub
 End Class
@@ -4426,8 +4426,8 @@ Public Class Options_Kaze : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static maxSlider = FindSlider("Max number of points to match")
-        Static distSlider = FindSlider("When matching, max possible distance")
+        Static maxSlider = OptionParent.FindSlider("Max number of points to match")
+        Static distSlider = OptionParent.FindSlider("When matching, max possible distance")
         pointsToMatch = maxSlider.value
         maxDistance = distSlider.value
     End Sub
@@ -4459,9 +4459,9 @@ Public Class Options_Blob : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static minSlider = FindSlider("min Threshold")
-        Static maxSlider = FindSlider("max Threshold")
-        Static stepSlider = FindSlider("Threshold Step")
+        Static minSlider = OptionParent.FindSlider("min Threshold")
+        Static maxSlider = OptionParent.FindSlider("max Threshold")
+        Static stepSlider = OptionParent.FindSlider("Threshold Step")
         Static areaRadio = findRadio("FilterByArea")
         Static circRadio = findRadio("FilterByCircularity")
         Static convexRadio = findRadio("FilterByConvexity")
@@ -4502,8 +4502,8 @@ Public Class Options_SLR : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static toleranceSlider = FindSlider("Approximate accuracy (tolerance) X100")
-        Static movingAvgSlider = FindSlider("Simple moving average window size")
+        Static toleranceSlider = OptionParent.FindSlider("Approximate accuracy (tolerance) X100")
+        Static movingAvgSlider = OptionParent.FindSlider("Simple moving average window size")
         tolerance = toleranceSlider.Value / 100
         halfLength = movingAvgSlider.Value
     End Sub
@@ -4533,10 +4533,10 @@ Public Class Options_KNN : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static dimSlider = FindSlider("KNN Dimension")
-        Static randomSlider = FindSlider("Random input points")
-        Static distSlider = FindSlider("Random input points")
-        Static topXSlider = FindSlider("Top X distances")
+        Static dimSlider = OptionParent.FindSlider("KNN Dimension")
+        Static randomSlider = OptionParent.FindSlider("Random input points")
+        Static distSlider = OptionParent.FindSlider("Random input points")
+        Static topXSlider = OptionParent.FindSlider("Top X distances")
         Static inOutCheck = FindCheckBox("Use 'Outside' feature points (unchecked use 'Inside'")
         knnDimension = dimSlider.Value
         numPoints = randomSlider.Value
@@ -4578,13 +4578,13 @@ Public Class Options_Clone : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static alphaSlider = FindSlider("Alpha")
-        Static betaSlider = FindSlider("Beta")
-        Static lowSlider = FindSlider("Low Threshold")
-        Static highSlider = FindSlider("High Threshold")
-        Static redSlider = FindSlider("Color Change - Red")
-        Static greenSlider = FindSlider("Color Change - Green")
-        Static blueSlider = FindSlider("Color Change - Blue")
+        Static alphaSlider = OptionParent.FindSlider("Alpha")
+        Static betaSlider = OptionParent.FindSlider("Beta")
+        Static lowSlider = OptionParent.FindSlider("Low Threshold")
+        Static highSlider = OptionParent.FindSlider("High Threshold")
+        Static redSlider = OptionParent.FindSlider("Color Change - Red")
+        Static greenSlider = OptionParent.FindSlider("Color Change - Green")
+        Static blueSlider = OptionParent.FindSlider("Color Change - Blue")
         alpha = alphaSlider.value / 10
         beta = betaSlider.value / 10
         lowThreshold = lowSlider.value
@@ -4622,10 +4622,10 @@ Public Class Options_Coherence : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static sigmaSlider = FindSlider("Coherence Sigma")
-        Static blendSlider = FindSlider("Coherence Blend")
-        Static strSlider = FindSlider("Coherence str_sigma")
-        Static eigenSlider = FindSlider("Coherence eigen kernel")
+        Static sigmaSlider = OptionParent.FindSlider("Coherence Sigma")
+        Static blendSlider = OptionParent.FindSlider("Coherence Blend")
+        Static strSlider = OptionParent.FindSlider("Coherence str_sigma")
+        Static eigenSlider = OptionParent.FindSlider("Coherence eigen kernel")
 
         sigma = sigmaSlider.Value * 2 + 1
         blend = blendSlider.Value / 10
@@ -4692,7 +4692,7 @@ Public Class Options_Color8UTopX : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Top X pixels", 2, 32, topXcount)
     End Sub
     Public Sub Run()
-        Static topXSlider = FindSlider("Top X pixels")
+        Static topXSlider = OptionParent.FindSlider("Top X pixels")
         topXcount = topXSlider.value
     End Sub
 End Class
@@ -4715,9 +4715,9 @@ Public Class Options_Morphology : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static morphSlider = FindSlider("Morphology width/height")
-        Static morphExSlider = FindSlider("MorphologyEx iterations")
-        Static scaleSlider = FindSlider("MorphologyEx Scale factor X1000")
+        Static morphSlider = OptionParent.FindSlider("Morphology width/height")
+        Static morphExSlider = OptionParent.FindSlider("MorphologyEx iterations")
+        Static scaleSlider = OptionParent.FindSlider("MorphologyEx Scale factor X1000")
         widthHeight = morphSlider.value
         iterations = morphExSlider.value
         scaleFactor = 1 + scaleSlider.value / 1000
@@ -4734,7 +4734,7 @@ Public Class Options_Convex : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Hull random points", 4, 20, hullCount)
     End Sub
     Public Sub Run()
-        Static hullSlider = FindSlider("Hull random points")
+        Static hullSlider = OptionParent.FindSlider("Hull random points")
         hullCount = hullSlider.Value
     End Sub
 End Class
@@ -4751,8 +4751,8 @@ Public Class Options_PreCorners : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static kernelSlider = FindSlider("kernel Size")
-        Static subpixSlider = FindSlider("SubPix kernel Size")
+        Static kernelSlider = OptionParent.FindSlider("kernel Size")
+        Static subpixSlider = OptionParent.FindSlider("SubPix kernel Size")
         kernelSize = kernelSlider.value Or 1
         subpixSize = subpixSlider.value Or 1
     End Sub
@@ -4783,9 +4783,9 @@ Public Class Options_ShiTomasi : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static typeRadio = findRadio("Shi-Tomasi features")
-        Static blockSlider = FindSlider("Corner block size")
-        Static apertureSlider = FindSlider("Corner aperture size")
-        Static thresholdSlider = FindSlider("Corner normalize threshold")
+        Static blockSlider = OptionParent.FindSlider("Corner block size")
+        Static apertureSlider = OptionParent.FindSlider("Corner aperture size")
+        Static thresholdSlider = OptionParent.FindSlider("Corner normalize threshold")
         threshold = thresholdSlider.Value
         useShiTomasi = typeRadio.checked
         aperture = apertureSlider.value Or 1
@@ -4802,7 +4802,7 @@ Public Class Options_FlatLand : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Region Count", 1, 250, reductionFactor)
     End Sub
     Public Sub Run()
-        Static regionSlider = FindSlider("Region Count")
+        Static regionSlider = OptionParent.FindSlider("Region Count")
         reductionFactor = regionSlider.Maximum - regionSlider.Value
     End Sub
 End Class
@@ -4823,8 +4823,8 @@ Public Class Options_Depth : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static mmSlider = FindSlider("Threshold in millimeters")
-        Static thresholdSlider = FindSlider("Threshold for punch")
+        Static mmSlider = OptionParent.FindSlider("Threshold in millimeters")
+        Static thresholdSlider = OptionParent.FindSlider("Threshold for punch")
         millimeters = mmSlider.value
         mmThreshold = mmSlider.Value / 1000.0
         threshold = thresholdSlider.value
@@ -4846,8 +4846,8 @@ Public Class Options_DepthHoles : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static borderSlider = FindSlider("Amount of dilation of borderMask")
-        Static holeSlider = FindSlider("Amount of dilation of holeMask")
+        Static borderSlider = OptionParent.FindSlider("Amount of dilation of borderMask")
+        Static holeSlider = OptionParent.FindSlider("Amount of dilation of holeMask")
         borderDilation = borderSlider.value
         holeDilation = holeSlider.value
     End Sub
@@ -4866,7 +4866,7 @@ Public Class Options_Uncertainty : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Uncertainty threshold")
+        Static thresholdSlider = OptionParent.FindSlider("Uncertainty threshold")
         uncertaintyThreshold = thresholdSlider.value
     End Sub
 End Class
@@ -4887,8 +4887,8 @@ Public Class Options_DepthColor : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static alphaSlider = FindSlider("Depth ColorMap Alpha X100")
-        Static betaSlider = FindSlider("Depth ColorMap Beta")
+        Static alphaSlider = OptionParent.FindSlider("Depth ColorMap Alpha X100")
+        Static betaSlider = OptionParent.FindSlider("Depth ColorMap Beta")
         alpha = alphaSlider.value / 100
         beta = betaSlider.value
     End Sub
@@ -4931,9 +4931,9 @@ Public Class Options_DNN : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static scaleSlider = FindSlider("DNN Scale Factor")
-        Static meanSlider = FindSlider("DNN MeanVal")
-        Static confidenceSlider = FindSlider("DNN Confidence Threshold")
+        Static scaleSlider = OptionParent.FindSlider("DNN Scale Factor")
+        Static meanSlider = OptionParent.FindSlider("DNN MeanVal")
+        Static confidenceSlider = OptionParent.FindSlider("DNN Confidence Threshold")
         confidenceThreshold = confidenceSlider.Value / 100
         ScaleFactor = scaleSlider.value
         scaleMax = scaleSlider.maximum
@@ -4970,8 +4970,8 @@ Public Class Options_DrawNoise : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static widthSlider = FindSlider("Noise Width")
-        Static CountSlider = FindSlider("Noise Count")
+        Static widthSlider = OptionParent.FindSlider("Noise Width")
+        Static CountSlider = OptionParent.FindSlider("Noise Count")
         noiseCount = CountSlider.Value
         noiseWidth = widthSlider.Value
     End Sub
@@ -5001,8 +5001,8 @@ Public Class Options_Edges : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static sigmaSSlider = FindSlider("Edge-preserving Sigma_s")
-        Static sigmaRSlider = FindSlider("Edge-preserving Sigma_r")
+        Static sigmaSSlider = OptionParent.FindSlider("Edge-preserving Sigma_s")
+        Static sigmaRSlider = OptionParent.FindSlider("Edge-preserving Sigma_r")
         Static recurseRadio = findRadio("Edge-preserving RecurseFilter")
         EP_Sigma_s = sigmaSSlider.Value
         EP_Sigma_r = sigmaRSlider.Value / sigmaRSlider.Maximum
@@ -5027,9 +5027,9 @@ Public Class Options_Edges2 : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static freqSlider = FindSlider("Remove Frequencies < x")
-        Static thresholdSlider = FindSlider("Threshold after Removal")
-        Static rfSlider = FindSlider("Edges RF Threshold")
+        Static freqSlider = OptionParent.FindSlider("Remove Frequencies < x")
+        Static thresholdSlider = OptionParent.FindSlider("Threshold after Removal")
+        Static rfSlider = OptionParent.FindSlider("Edges RF Threshold")
 
         edgeRFthreshold = rfSlider.value
         removeFrequencies = freqSlider.value
@@ -5058,15 +5058,15 @@ Public Class Options_Edges3 : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static alphaSlider = FindSlider("Deriche Alpha X100")
-        Static omegaSlider = FindSlider("Deriche Omega X1000")
-        Static thresholdSlider = FindSlider("Output filter threshold")
+        Static alphaSlider = OptionParent.FindSlider("Deriche Alpha X100")
+        Static omegaSlider = OptionParent.FindSlider("Deriche Omega X1000")
+        Static thresholdSlider = OptionParent.FindSlider("Output filter threshold")
         alpha = alphaSlider.value / 100
         omega = omegaSlider.value / 100
         threshold = thresholdSlider.value
 
-        Static distanceSlider = FindSlider("Input pixel distance")
-        Static diffSlider = FindSlider("Input pixel difference")
+        Static distanceSlider = OptionParent.FindSlider("Input pixel distance")
+        Static diffSlider = OptionParent.FindSlider("Input pixel difference")
         gapDistance = distanceSlider.Value And 254
         gapdiff = diffSlider.Value
     End Sub
@@ -5100,8 +5100,8 @@ Public Class Options_Edges4 : Inherits OptionParent
     Public Sub Run()
         Static hCheck = FindCheckBox("Horizontal Edges")
         Static vCheck = FindCheckBox("Vertical Edges")
-        Static vertSlider = FindSlider("Border Vertical in Pixels")
-        Static horizSlider = FindSlider("Border Horizontal in Pixels")
+        Static vertSlider = OptionParent.FindSlider("Border Vertical in Pixels")
+        Static horizSlider = OptionParent.FindSlider("Border Horizontal in Pixels")
         vertPixels = vertSlider.value
         horizPixels = horizSlider.value
         horizonCheck = hCheck.checked
@@ -5141,10 +5141,10 @@ Public Class Options_Erode : Inherits OptionParent
     Public Sub Run()
         Static ellipseRadio = findRadio("Erode shape: Ellipse")
         Static rectRadio = findRadio("Erode shape: Rect")
-        Static iterSlider = FindSlider("Erode Iterations")
-        Static kernelSlider = FindSlider("Erode Kernel Size")
+        Static iterSlider = OptionParent.FindSlider("Erode Iterations")
+        Static kernelSlider = OptionParent.FindSlider("Erode Kernel Size")
         Static noShapeRadio = findRadio("Erode shape: None")
-        Static depthSlider = FindSlider("DepthSeed flat depth X1000")
+        Static depthSlider = OptionParent.FindSlider("DepthSeed flat depth X1000")
         iterations = iterSlider.Value
         kernelSize = kernelSlider.Value Or 1
 
@@ -5196,8 +5196,8 @@ Public Class Options_LineFinder : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static angleSlider = FindSlider("Angle tolerance in degrees")
-        Static kernelSlider = FindSlider("Area kernel size for depth")
+        Static angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
+        Static kernelSlider = OptionParent.FindSlider("Area kernel size for depth")
         kernelSize = kernelSlider.value * 2 - 1
         tolerance = angleSlider.value
         kSize = kernelSlider.Value - 1
@@ -5215,7 +5215,7 @@ Public Class Options_PCA_NColor : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired number of colors", 1, 256, desiredNcolors)
     End Sub
     Public Sub Run()
-        Static nSlider = FindSlider("Desired number of colors")
+        Static nSlider = OptionParent.FindSlider("Desired number of colors")
         desiredNcolors = nSlider.value
     End Sub
 End Class
@@ -5235,9 +5235,9 @@ Public Class Options_FPolyCore : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
-        Static shiftSlider = FindSlider("Maximum shift to trigger resync")
-        Static anchorSlider = FindSlider("Anchor point max movement")
+        Static thresholdSlider = OptionParent.FindSlider("Resync if feature moves > X pixels")
+        Static shiftSlider = OptionParent.FindSlider("Maximum shift to trigger resync")
+        Static anchorSlider = OptionParent.FindSlider("Anchor point max movement")
         maxShift = shiftSlider.Value
         resyncThreshold = thresholdSlider.Value
         anchorMovement = anchorSlider.value
@@ -5271,10 +5271,10 @@ Public Class Options_FLANN : Inherits OptionParent
     Public Sub Run()
         Static reuseCheck = FindCheckBox("Reuse the same feature list (test different search parameters)")
         Static sortedCheck = FindCheckBox("Search params sorted")
-        Static matchSlider = FindSlider("Match count")
-        Static querySlider = FindSlider("Query count")
-        Static searchSlider = FindSlider("Search check count")
-        Static epsSlider = FindSlider("EPS X100")
+        Static matchSlider = OptionParent.FindSlider("Match count")
+        Static querySlider = OptionParent.FindSlider("Query count")
+        Static searchSlider = OptionParent.FindSlider("Search check count")
+        Static epsSlider = OptionParent.FindSlider("EPS X100")
         reuseData = reuseCheck.checked
         matchCount = matchSlider.value
         queryCount = querySlider.Value
@@ -5303,7 +5303,7 @@ Public Class Options_TrackerDepth : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static displayCheck = FindCheckBox("Display centroid and rectangle for each region")
-        Static minRectSizeSlider = FindSlider("Threshold for rectangle size")
+        Static minRectSizeSlider = OptionParent.FindSlider("Threshold for rectangle size")
 
         displayRect = displayCheck.checked
         minRectSize = minRectSizeSlider.value
@@ -5332,12 +5332,12 @@ Public Class Options_Gabor : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static ksizeSlider = FindSlider("Gabor Kernel Size")
-        Static sigmaSlider = FindSlider("Gabor Sigma")
-        Static lambdaSlider = FindSlider("Gabor lambda")
-        Static gammaSlider = FindSlider("Gabor gamma X10")
-        Static phaseSlider = FindSlider("Gabor Phase offset X100")
-        Static thetaSlider = FindSlider("Gabor Theta (degrees)")
+        Static ksizeSlider = OptionParent.FindSlider("Gabor Kernel Size")
+        Static sigmaSlider = OptionParent.FindSlider("Gabor Sigma")
+        Static lambdaSlider = OptionParent.FindSlider("Gabor lambda")
+        Static gammaSlider = OptionParent.FindSlider("Gabor gamma X10")
+        Static phaseSlider = OptionParent.FindSlider("Gabor Phase offset X100")
+        Static thetaSlider = OptionParent.FindSlider("Gabor Theta (degrees)")
         ksize = ksizeSlider.Value * 2 + 1
         Sigma = sigmaSlider.Value
         lambda = lambdaSlider.Value
@@ -5386,7 +5386,7 @@ Public Class Options_Gradient : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static contrastSlider = FindSlider("Contrast exponent to use X100")
+        Static contrastSlider = OptionParent.FindSlider("Contrast exponent to use X100")
         exponent = contrastSlider.Value / 100
     End Sub
 End Class
@@ -5407,8 +5407,8 @@ Public Class Options_Histogram : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static minSlider = FindSlider("Min Gray")
-        Static maxSlider = FindSlider("Max Gray")
+        Static minSlider = OptionParent.FindSlider("Min Gray")
+        Static maxSlider = OptionParent.FindSlider("Max Gray")
         If minSlider.Value >= maxSlider.Value Then minSlider.Value = maxSlider.Value - Math.Min(10, maxSlider.Value - 1)
         If minSlider.Value = maxSlider.Value Then maxSlider.Value += 1
         minGray = minSlider.value
@@ -5429,7 +5429,7 @@ Public Class Options_Guess : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static distSlider = FindSlider("Max Distance from edge (pixels)")
+        Static distSlider = OptionParent.FindSlider("Max Distance from edge (pixels)")
         MaxDistance = distSlider.value
     End Sub
 End Class
@@ -5470,9 +5470,9 @@ Public Class Options_HOG : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("HOG Threshold")
-        Static strideSlider = FindSlider("HOG Stride")
-        Static scaleSlider = FindSlider("HOG Scale X1000")
+        Static thresholdSlider = OptionParent.FindSlider("HOG Threshold")
+        Static strideSlider = OptionParent.FindSlider("HOG Stride")
+        Static scaleSlider = OptionParent.FindSlider("HOG Scale X1000")
 
         thresholdHOG = thresholdSlider.Value
         strideHOG = CInt(strideSlider.Value)
@@ -5546,7 +5546,7 @@ Public Class Options_VerticalVerify : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static arcYslider = FindSlider("Minimum Arc-Y threshold angle (degrees)")
+        Static arcYslider = OptionParent.FindSlider("Minimum Arc-Y threshold angle (degrees)")
         angleThreshold = arcYslider.Value
     End Sub
 End Class
@@ -5607,15 +5607,15 @@ Public Class Options_Kalman_VB : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static matrix As New List(Of Double)
-        Static inputSlider = FindSlider("Move this to see results")
-        Static noisyInputSlider = FindSlider("Input with Noise")
-        Static pointSlider = FindSlider("20 point average of output")
-        Static avgSlider = FindSlider("20 Point average difference")
-        Static noiseSlider = FindSlider("Simulated Noise")
-        Static biasSlider = FindSlider("Simulated Bias")
-        Static scaleSlider = FindSlider("Simulated Scale")
-        Static outputSlider = FindSlider("Kalman Output")
-        Static kDiffSlider = FindSlider("Kalman difference")
+        Static inputSlider = OptionParent.FindSlider("Move this to see results")
+        Static noisyInputSlider = OptionParent.FindSlider("Input with Noise")
+        Static pointSlider = OptionParent.FindSlider("20 point average of output")
+        Static avgSlider = OptionParent.FindSlider("20 Point average difference")
+        Static noiseSlider = OptionParent.FindSlider("Simulated Noise")
+        Static biasSlider = OptionParent.FindSlider("Simulated Bias")
+        Static scaleSlider = OptionParent.FindSlider("Simulated Scale")
+        Static outputSlider = OptionParent.FindSlider("Kalman Output")
+        Static kDiffSlider = OptionParent.FindSlider("Kalman difference")
 
         kalmanInput = inputSlider.Value
 
@@ -5672,10 +5672,10 @@ Public Class Options_Kalman : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static deltaSlider = FindSlider("Delta Time X100")
-        Static covarSlider = FindSlider("Process Covariance X10000")
-        Static pDotSlider = FindSlider("pDot entry X1000")
-        Static avgSlider = FindSlider("Average input count")
+        Static deltaSlider = OptionParent.FindSlider("Delta Time X100")
+        Static covarSlider = OptionParent.FindSlider("Process Covariance X10000")
+        Static pDotSlider = OptionParent.FindSlider("pDot entry X1000")
+        Static avgSlider = OptionParent.FindSlider("Average input count")
         delta = deltaSlider.Value / 100
         pdotEntry = pDotSlider.Value / 1000
         processCovar = covarSlider.Value / 10000
@@ -5759,8 +5759,8 @@ Public Class Options_LeftRight : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static startYSlider = FindSlider("Slice Starting Y")
-        Static hSlider = FindSlider("Slice Height")
+        Static startYSlider = OptionParent.FindSlider("Slice Starting Y")
+        Static hSlider = OptionParent.FindSlider("Slice Height")
         sliceY = startYSlider.Value
         sliceHeight = hSlider.Value
     End Sub
@@ -5777,7 +5777,7 @@ Public Class Options_LUT_Create : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("LUT entry diff threshold", 1, 100, lutThreshold)
     End Sub
     Public Sub Run()
-        Static diffSlider = FindSlider("LUT entry diff threshold")
+        Static diffSlider = OptionParent.FindSlider("LUT entry diff threshold")
         lutThreshold = diffSlider.value
     End Sub
 End Class
@@ -5828,8 +5828,8 @@ Public Class Options_Match : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static distSlider = FindSlider("Maximum travel distance per frame")
-        Static stdevSlider = FindSlider("Stdev Threshold")
+        Static distSlider = OptionParent.FindSlider("Maximum travel distance per frame")
+        Static stdevSlider = OptionParent.FindSlider("Stdev Threshold")
         stdevThreshold = CSng(stdevSlider.Value)
         maxDistance = distSlider.Value
     End Sub
@@ -5869,7 +5869,7 @@ Public Class Options_MeanSubtraction : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Scaling Factor X100", 1, 255, scaleVal)
     End Sub
     Public Sub Run()
-        Static scaleSlider = FindSlider("Scaling Factor X100")
+        Static scaleSlider = OptionParent.FindSlider("Scaling Factor X100")
         scaleVal = scaleSlider.Value
     End Sub
 End Class
@@ -5885,7 +5885,7 @@ Public Class Options_Mesh : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of nearest neighbors", 1, 10, nabeCount)
     End Sub
     Public Sub Run()
-        Static nabeSlider = FindSlider("Number of nearest neighbors")
+        Static nabeSlider = OptionParent.FindSlider("Number of nearest neighbors")
         nabeCount = nabeSlider.value
     End Sub
 End Class
@@ -5909,12 +5909,12 @@ Public Class Options_OEX : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static hueLowSlider = FindSlider("Hue low")
-        Static hueHighSlider = FindSlider("Hue high")
-        Static satLowSlider = FindSlider("Saturation low")
-        Static satHighSlider = FindSlider("Saturation high")
-        Static valLowSlider = FindSlider("Value low")
-        Static valHighSlider = FindSlider("Value high")
+        Static hueLowSlider = OptionParent.FindSlider("Hue low")
+        Static hueHighSlider = OptionParent.FindSlider("Hue high")
+        Static satLowSlider = OptionParent.FindSlider("Saturation low")
+        Static satHighSlider = OptionParent.FindSlider("Saturation high")
+        Static valLowSlider = OptionParent.FindSlider("Value low")
+        Static valHighSlider = OptionParent.FindSlider("Value high")
         lows = New cv.Scalar(hueLowSlider.value, satLowSlider.value, valLowSlider.value)
         highs = New cv.Scalar(hueHighSlider.value, satHighSlider.value, valHighSlider.value)
     End Sub
@@ -5930,7 +5930,7 @@ Public Class Options_ORB : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("ORB - desired point count", 10, 2000, desiredCount)
     End Sub
     Public Sub Run()
-        Static countSlider = FindSlider("ORB - desired point count")
+        Static countSlider = OptionParent.FindSlider("ORB - desired point count")
         desiredCount = countSlider.value
     End Sub
 End Class
@@ -5964,9 +5964,9 @@ Public Class Options_Palette : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static paletteSlider = FindSlider("Color transitions")
-        Static cvtScaleSlider = FindSlider("Convert And Scale")
-        Static radiusSlider = FindSlider("LinearPolar radius")
+        Static paletteSlider = OptionParent.FindSlider("Color transitions")
+        Static cvtScaleSlider = OptionParent.FindSlider("Convert And Scale")
+        Static radiusSlider = OptionParent.FindSlider("LinearPolar radius")
         transitions = paletteSlider.value
         Static frm = FindFrm(traceName + " Radio Buttons")
         schemeName = schemes(findRadioIndex(frm.check)).FullName
@@ -5986,7 +5986,7 @@ Public Class Options_PCA : Inherits OptionParent
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Retained Variance X100", 1, 100, retainedVariance * 100)
     End Sub
     Public Sub Run()
-        Static retainSlider = FindSlider("Retained Variance X100")
+        Static retainSlider = OptionParent.FindSlider("Retained Variance X100")
         retainedVariance = retainSlider.value / 100
     End Sub
 End Class
@@ -6008,7 +6008,7 @@ Public Class Options_Pendulum : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static initCheck = FindCheckBox("Reset initial conditions")
-        Static timeSlider = FindSlider("Pendulum FPS")
+        Static timeSlider = OptionParent.FindSlider("Pendulum FPS")
         If initCheck.checked Then initCheck.checked = False
         If task.firstPass Then check.Box(0).Checked = True
         fps = timeSlider.value
@@ -6028,7 +6028,7 @@ Public Class Options_PhaseCorrelate : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Threshold shift to cause reset of lastFrame")
+        Static thresholdSlider = OptionParent.FindSlider("Threshold shift to cause reset of lastFrame")
         shiftThreshold = thresholdSlider.value
     End Sub
 End Class
@@ -6045,7 +6045,7 @@ Public Class Options_PlaneFloor : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Pixel Count threshold that indicates floor")
+        Static thresholdSlider = OptionParent.FindSlider("Pixel Count threshold that indicates floor")
         countThreshold = thresholdSlider.value
     End Sub
 End Class
@@ -6107,7 +6107,7 @@ Public Class Options_PointCloud : Inherits OptionParent
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Delta Z threshold (cm)", 0, 100, deltaThreshold)
     End Sub
     Public Sub Run()
-        Static deltaSlider = FindSlider("Delta Z threshold (cm)")
+        Static deltaSlider = OptionParent.FindSlider("Delta Z threshold (cm)")
         deltaThreshold = deltaSlider.value / 100
     End Sub
 End Class
@@ -6127,7 +6127,7 @@ Public Class Options_PolyLines : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Polyline Count", 2, 500, polyCount)
     End Sub
     Public Sub Run()
-        Static countSlider = FindSlider("Polyline Count")
+        Static countSlider = OptionParent.FindSlider("Polyline Count")
         Static closeCheck = FindCheckBox("Polyline closed if checked")
         polyCount = countSlider.value
         polyClosed = closeCheck.checked
@@ -6150,9 +6150,9 @@ Public Class Options_Projection : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Concentration threshold")
+        Static thresholdSlider = OptionParent.FindSlider("Concentration threshold")
         Static topCheckBox = FindCheckBox("Top View (Unchecked Side View)")
-        Static objSlider = FindSlider("Index of object")
+        Static objSlider = OptionParent.FindSlider("Index of object")
         index = objSlider.value
         If topCheckBox IsNot Nothing Then topCheck = topCheckBox.checked
         projectionThreshold = thresholdSlider.value
@@ -6191,7 +6191,7 @@ Public Class Options_Pyramid : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in and out", -1, 1, zoom)
     End Sub
     Public Sub Run()
-        Static zoomSlider = FindSlider("Zoom in and out")
+        Static zoomSlider = OptionParent.FindSlider("Zoom in and out")
         zoom = zoomSlider.Value
     End Sub
 End Class
@@ -6213,9 +6213,9 @@ Public Class Options_PyrFilter : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static radiusSlider = FindSlider("MeanShift Spatial Radius")
-        Static colorSlider = FindSlider("MeanShift color Radius")
-        Static maxSlider = FindSlider("MeanShift Max Pyramid level")
+        Static radiusSlider = OptionParent.FindSlider("MeanShift Spatial Radius")
+        Static colorSlider = OptionParent.FindSlider("MeanShift color Radius")
+        Static maxSlider = OptionParent.FindSlider("MeanShift Max Pyramid level")
         spatialRadius = radiusSlider.value
         colorRadius = colorSlider.value
         maxPyramid = maxSlider.value
@@ -6243,10 +6243,10 @@ Public Class Options_NormalDist : Inherits OptionParent
         If check.Setup(traceName) Then check.addCheckBox("Use Grayscale image")
     End Sub
     Public Sub Run()
-        Static blueSlider = FindSlider("Random_NormalDist Blue Mean")
-        Static greenSlider = FindSlider("Random_NormalDist Green Mean")
-        Static redSlider = FindSlider("Random_NormalDist Red Mean")
-        Static stdevSlider = FindSlider("Random_NormalDist Stdev")
+        Static blueSlider = OptionParent.FindSlider("Random_NormalDist Blue Mean")
+        Static greenSlider = OptionParent.FindSlider("Random_NormalDist Green Mean")
+        Static redSlider = OptionParent.FindSlider("Random_NormalDist Red Mean")
+        Static stdevSlider = OptionParent.FindSlider("Random_NormalDist Stdev")
         redVal = redSlider.value
         greenVal = greenSlider.value
         blueVal = blueSlider.value
@@ -6268,7 +6268,7 @@ Public Class Options_MonteCarlo : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of bins", 1, 255, dimension)
     End Sub
     Public Sub Run()
-        Static binSlider = FindSlider("Number of bins")
+        Static binSlider = OptionParent.FindSlider("Number of bins")
         dimension = binSlider.value
     End Sub
 End Class
@@ -6287,8 +6287,8 @@ Public Class Options_StaticTV : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static valSlider = FindSlider("Range of noise to apply (from 0 to this value)")
-        Static threshSlider = FindSlider("Percentage of pixels to include noise")
+        Static valSlider = OptionParent.FindSlider("Range of noise to apply (from 0 to this value)")
+        Static threshSlider = OptionParent.FindSlider("Percentage of pixels to include noise")
         rangeVal = valSlider.Value
         threshPercent = threshSlider.Value
     End Sub
@@ -6312,9 +6312,9 @@ Public Class Options_Clusters : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static clustSlider = FindSlider("Number of Clusters")
-        Static numSlider = FindSlider("Number of points per cluster")
-        Static stdevSlider = FindSlider("Cluster stdev")
+        Static clustSlider = OptionParent.FindSlider("Number of Clusters")
+        Static numSlider = OptionParent.FindSlider("Number of points per cluster")
+        Static stdevSlider = OptionParent.FindSlider("Cluster stdev")
         numClusters = clustSlider.Value
         numPoints = numSlider.Value
         stdev = stdevSlider.Value
@@ -6344,8 +6344,8 @@ Public Class Options_Draw : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static mergeSlider = FindSlider("Merge rectangles within X pixels")
-        Static countSlider = FindSlider("DrawCount")
+        Static mergeSlider = OptionParent.FindSlider("Merge rectangles within X pixels")
+        Static countSlider = OptionParent.FindSlider("DrawCount")
         Static fillCheck = FindCheckBox("Draw filled (unchecked draw an outline)")
         Static rotateCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         drawCount = countSlider.Value
@@ -6366,7 +6366,7 @@ Public Class Options_RBF : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("RBF Recursion count", 1, 20, RBFCount)
     End Sub
     Public Sub Run()
-        Static countSlider = FindSlider("RBF Recursion count")
+        Static countSlider = OptionParent.FindSlider("RBF Recursion count")
         RBFCount = countSlider.value
     End Sub
 End Class
@@ -6416,7 +6416,7 @@ Public Class Options_RedTrack : Inherits OptionParent
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, maxDistance)
     End Sub
     Public Sub Run()
-        Static distSlider = FindSlider("Max feature travel distance")
+        Static distSlider = OptionParent.FindSlider("Max feature travel distance")
         maxDistance = distSlider.Value
     End Sub
 End Class
@@ -6462,7 +6462,7 @@ Public Class Options_Retina : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static sampleSlider = FindSlider("Retina Sample Factor")
+        Static sampleSlider = OptionParent.FindSlider("Retina Sample Factor")
         Static logCheckbox = FindCheckBox("Use log sampling")
         Static xmlCheckbox = FindCheckBox("Open resulting xml file")
         useLogSampling = logCheckbox.Checked
@@ -6483,7 +6483,7 @@ Public Class Options_ROI : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, roiPercent * 100)
     End Sub
     Public Sub Run()
-        Static roiSlider = FindSlider("Max size area of interest %")
+        Static roiSlider = OptionParent.FindSlider("Max size area of interest %")
         roiPercent = roiSlider.value / 100
     End Sub
 End Class
@@ -6499,7 +6499,7 @@ Public Class Options_Rotate : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees X100", -18000, 18000, rotateAngle * 100)
     End Sub
     Public Sub Run()
-        Static angleSlider = FindSlider("Rotation Angle in degrees X100")
+        Static angleSlider = OptionParent.FindSlider("Rotation Angle in degrees X100")
         rotateAngle = angleSlider.Value / 100
     End Sub
 End Class
@@ -6514,7 +6514,7 @@ Public Class Options_Salience : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Salience numScales", 1, 6, numScales)
     End Sub
     Public Sub Run()
-        Static scaleSlider = FindSlider("Salience numScales")
+        Static scaleSlider = OptionParent.FindSlider("Salience numScales")
         numScales = scaleSlider.Value
     End Sub
 End Class
@@ -6568,11 +6568,11 @@ Public Class Options_Stabilizer : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static widthSlider = FindSlider("Width of input to matchtemplate")
-        Static heightSlider = FindSlider("Height of input to matchtemplate")
-        Static netSlider = FindSlider("Max % of lost pixels before reseting image")
-        Static stdevSlider = FindSlider("Min stdev in correlation rect")
-        Static thresholdSlider = FindSlider("Stabilizer Correlation Threshold X1000")
+        Static widthSlider = OptionParent.FindSlider("Width of input to matchtemplate")
+        Static heightSlider = OptionParent.FindSlider("Height of input to matchtemplate")
+        Static netSlider = OptionParent.FindSlider("Max % of lost pixels before reseting image")
+        Static stdevSlider = OptionParent.FindSlider("Min stdev in correlation rect")
+        Static thresholdSlider = OptionParent.FindSlider("Stabilizer Correlation Threshold X1000")
         lostMax = netSlider.value / 100
         minStdev = stdevSlider.value
         corrThreshold = thresholdSlider.value / 1000
@@ -6601,9 +6601,9 @@ Public Class Options_Stitch : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static countSlider = FindSlider("Number of random images")
-        Static widthSlider = FindSlider("Rectangle width")
-        Static heightSlider = FindSlider("Rectangle height")
+        Static countSlider = OptionParent.FindSlider("Number of random images")
+        Static widthSlider = OptionParent.FindSlider("Rectangle width")
+        Static heightSlider = OptionParent.FindSlider("Rectangle height")
         imageCount = countSlider.Value
         width = widthSlider.Value
         height = heightSlider.Value
@@ -6668,11 +6668,11 @@ Public Class Options_StructuredCloud : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static xLineSlider = FindSlider("Lines in X-Direction")
-        Static yLineSlider = FindSlider("Lines in Y-Direction")
-        Static thresholdSlider = FindSlider("Continuity threshold in mm")
-        Static xSlider = FindSlider("Slice index X")
-        Static ySlider = FindSlider("Slice index Y")
+        Static xLineSlider = OptionParent.FindSlider("Lines in X-Direction")
+        Static yLineSlider = OptionParent.FindSlider("Lines in Y-Direction")
+        Static thresholdSlider = OptionParent.FindSlider("Continuity threshold in mm")
+        Static xSlider = OptionParent.FindSlider("Slice index X")
+        Static ySlider = OptionParent.FindSlider("Slice index Y")
 
         Static xCheck = FindCheckBox("Impose constraints on X")
         Static yCheck = FindCheckBox("Impose constraints on Y")
@@ -6702,7 +6702,7 @@ Public Class Options_StructuredMulti : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static sidesSlider = FindSlider("Max number of sides in the identified polygons")
+        Static sidesSlider = OptionParent.FindSlider("Max number of sides in the identified polygons")
         maxSides = sidesSlider.Value
     End Sub
 End Class
@@ -6728,8 +6728,8 @@ Public Class Options_Structured : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static sliceSlider = FindSlider("Structured Depth slice thickness in pixels")
-        Static stepSlider = FindSlider("Slice step size in pixels (multi-slice option only)")
+        Static sliceSlider = OptionParent.FindSlider("Structured Depth slice thickness in pixels")
+        Static stepSlider = OptionParent.FindSlider("Slice step size in pixels (multi-slice option only)")
         Static rebuiltRadio = findRadio("Show rebuilt data")
         rebuilt = rebuiltRadio.checked
         sliceSize = sliceSlider.Value
@@ -6754,9 +6754,9 @@ Public Class Options_SuperPixels : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static countSlider = FindSlider("Number of SuperPixels")
-        Static iterSlider = FindSlider("SuperPixel Iterations")
-        Static priorSlider = FindSlider("Prior")
+        Static countSlider = OptionParent.FindSlider("Number of SuperPixels")
+        Static iterSlider = OptionParent.FindSlider("SuperPixel Iterations")
+        Static priorSlider = OptionParent.FindSlider("Prior")
         numSuperPixels = countSlider.value
         numIterations = iterSlider.value
         prior = priorSlider.value
@@ -6777,8 +6777,8 @@ Public Class Options_Swarm : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static ptSlider = FindSlider("Connect X KNN points")
-        Static borderSlider = FindSlider("Distance to image border")
+        Static ptSlider = OptionParent.FindSlider("Connect X KNN points")
+        Static borderSlider = OptionParent.FindSlider("Distance to image border")
         ptCount = ptSlider.value
         border = borderSlider.value
     End Sub
@@ -6794,7 +6794,7 @@ Public Class Options_SwarmPercent : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, percent * 100)
     End Sub
     Public Sub Run()
-        Static percentSlider = FindSlider("Cells map X percent")
+        Static percentSlider = OptionParent.FindSlider("Cells map X percent")
         percent = percentSlider.value / 100
     End Sub
 End Class
@@ -6816,9 +6816,9 @@ Public Class Options_Texture : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static deltaSlider = FindSlider("Texture Flow Delta")
-        Static blockSlider = FindSlider("Texture Eigen BlockSize")
-        Static ksizeSlider = FindSlider("Texture Eigen Ksize")
+        Static deltaSlider = OptionParent.FindSlider("Texture Flow Delta")
+        Static blockSlider = OptionParent.FindSlider("Texture Eigen BlockSize")
+        Static ksizeSlider = OptionParent.FindSlider("Texture Eigen Ksize")
 
         TFdelta = deltaSlider.Value
         TFblockSize = blockSlider.Value * 2 + 1
@@ -6838,7 +6838,7 @@ Public Class Options_ThresholdDef : Inherits OptionParent
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Defined Threshold", 0, 255, threshold)
     End Sub
     Public Sub Run()
-        Static truncateSlider = FindSlider("Defined Threshold")
+        Static truncateSlider = OptionParent.FindSlider("Defined Threshold")
         threshold = truncateSlider.value
     End Sub
 End Class
@@ -6904,13 +6904,13 @@ Public Class Options_Transform : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static angleSlider = FindSlider("Angle")
-        Static scaleSlider = FindSlider("Scale Factor% (100% means no scaling)")
-        Static centerXSlider = FindSlider("Rotation center X")
-        Static centerYSlider = FindSlider("Rotation center Y")
+        Static angleSlider = OptionParent.FindSlider("Angle")
+        Static scaleSlider = OptionParent.FindSlider("Scale Factor% (100% means no scaling)")
+        Static centerXSlider = OptionParent.FindSlider("Rotation center X")
+        Static centerYSlider = OptionParent.FindSlider("Rotation center Y")
         Static firstCheckBox = FindCheckBox("Check to snap the first point cloud")
         Static secondCheckBox = FindCheckBox("Check to snap the second point cloud")
-        Static percentSlider = FindSlider("Resize Percent")
+        Static percentSlider = OptionParent.FindSlider("Resize Percent")
         resizeFactor = percentSlider.Value / 100
         firstCheck = firstCheckBox.checked
         secondCheck = secondCheckBox.checked
@@ -6933,7 +6933,7 @@ Public Class Options_TransformationMatrix : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("TMatrix Top View multiplier", 1, 1000, mul)
     End Sub
     Public Sub Run()
-        Static multSlider = FindSlider("TMatrix Top View multiplier")
+        Static multSlider = OptionParent.FindSlider("TMatrix Top View multiplier")
         mul = multSlider.value
     End Sub
 End Class
@@ -6948,7 +6948,7 @@ Public Class Options_Vignetting : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, radius)
     End Sub
     Public Sub Run()
-        Static radiusSlider = FindSlider("Vignette radius X100")
+        Static radiusSlider = OptionParent.FindSlider("Vignette radius X100")
         radius = radiusSlider.value / 100
     End Sub
 End Class
@@ -7005,7 +7005,7 @@ Public Class Options_WarpAffine : Inherits OptionParent
         If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Angle", 0, 360, angle)
     End Sub
     Public Sub Run()
-        Static angleSlider = FindSlider("Angle")
+        Static angleSlider = OptionParent.FindSlider("Angle")
         angle = angleSlider.value
     End Sub
 End Class
@@ -7030,9 +7030,9 @@ Public Class Options_WarpPerspective : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static wSlider = FindSlider("Warped Width")
-        Static hSlider = FindSlider("Warped Height")
-        Static angleSlider = FindSlider("Warped Angle")
+        Static wSlider = OptionParent.FindSlider("Warped Width")
+        Static hSlider = OptionParent.FindSlider("Warped Height")
+        Static angleSlider = OptionParent.FindSlider("Warped Angle")
         width = wSlider.value
         height = hSlider.value
         angle = angleSlider.value
@@ -7079,8 +7079,8 @@ Public Class Options_Density : Inherits OptionParent
         distance = task.densityMetric
     End Sub
     Public Sub Run()
-        Static distSlider = FindSlider("Distance in meters X10000")
-        Static neighborSlider = FindSlider("Neighboring Z count")
+        Static distSlider = OptionParent.FindSlider("Distance in meters X10000")
+        Static neighborSlider = OptionParent.FindSlider("Neighboring Z count")
         zCount = neighborSlider.value
         distance = distSlider.value / 10000
     End Sub
@@ -7117,7 +7117,7 @@ Public Class Options_DiffDepth : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 2000, 1000)
     End Sub
     Public Sub Run()
-        Static mmSlider = FindSlider("Depth varies more than X mm's")
+        Static mmSlider = OptionParent.FindSlider("Depth varies more than X mm's")
         millimeters = mmSlider.value
         meters = millimeters / 1000
     End Sub
@@ -7137,7 +7137,7 @@ Public Class Options_Outliers : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static percentSlider = FindSlider("Cutoff bins with less than %")
+        Static percentSlider = OptionParent.FindSlider("Cutoff bins with less than %")
         cutoffPercent = percentSlider.value / 100
     End Sub
 End Class
@@ -7153,7 +7153,7 @@ Public Class Options_BP_Regions : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of cells to identify", 1, 100, 50)
     End Sub
     Public Sub Run()
-        Static countSlider = FindSlider("Number of cells to identify")
+        Static countSlider = OptionParent.FindSlider("Number of cells to identify")
         cellCount = countSlider.value
     End Sub
 End Class
@@ -7196,7 +7196,7 @@ Public Class Options_GridFromResize : Inherits OptionParent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("LowRes %", 1, 100, 10)
     End Sub
     Public Sub Run()
-        Static percentSlider = FindSlider("LowRes %")
+        Static percentSlider = OptionParent.FindSlider("LowRes %")
         lowResPercent = percentSlider.value / 100
     End Sub
 End Class
@@ -7218,9 +7218,9 @@ Public Class Options_LaplacianKernels : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static gaussSlider = FindSlider("Gaussian Kernel")
-        Static LaplacianSlider = FindSlider("Laplacian Kernel")
-        Static thresholdSlider = FindSlider("Laplacian Threshold")
+        Static gaussSlider = OptionParent.FindSlider("Gaussian Kernel")
+        Static LaplacianSlider = OptionParent.FindSlider("Laplacian Kernel")
+        Static thresholdSlider = OptionParent.FindSlider("Laplacian Threshold")
         gaussiankernelSize = gaussSlider.Value Or 1
         LaplaciankernelSize = LaplacianSlider.Value Or 1
         threshold = thresholdSlider.Value
@@ -7251,7 +7251,7 @@ Public Class Options_LinearInput : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static deltaSlider = FindSlider("Delta (mm)")
+        Static deltaSlider = OptionParent.FindSlider("Delta (mm)")
         delta = deltaSlider.value / 1000
 
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -7331,12 +7331,12 @@ Public Class Options_Line : Inherits OptionParent
         Application.DoEvents()
     End Sub
     Public Sub Run()
-        Static lenSlider = FindSlider("Min Line Length")
-        Static interSlider = FindSlider("Intersection Maximum Pixel Count")
-        Static correlSlider = FindSlider("Min Correlation")
-        Static topXSlider = FindSlider("Top X count")
-        Static overlapSlider = FindSlider("Same line overlap %")
-        Static distanceSlider = FindSlider("Distance to next center")
+        Static lenSlider = OptionParent.FindSlider("Min Line Length")
+        Static interSlider = OptionParent.FindSlider("Intersection Maximum Pixel Count")
+        Static correlSlider = OptionParent.FindSlider("Min Correlation")
+        Static topXSlider = OptionParent.FindSlider("Top X count")
+        Static overlapSlider = OptionParent.FindSlider("Same line overlap %")
+        Static distanceSlider = OptionParent.FindSlider("Distance to next center")
         If lenSlider Is Nothing Then Exit Sub ' diagnostic...
         minLength = lenSlider.value
         maxIntersection = interSlider.value
@@ -7376,10 +7376,10 @@ Public Class Options_OpenGLFunctions : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static XmoveSlider = FindSlider("OpenGL shift left/right (X-axis) X100")
-        Static YmoveSlider = FindSlider("OpenGL shift up/down (Y-axis) X100")
-        Static ZmoveSlider = FindSlider("OpenGL shift fwd/back (Z-axis) X100")
-        Static PointSizeSlider = FindSlider("OpenGL Point Size")
+        Static XmoveSlider = OptionParent.FindSlider("OpenGL shift left/right (X-axis) X100")
+        Static YmoveSlider = OptionParent.FindSlider("OpenGL shift up/down (Y-axis) X100")
+        Static ZmoveSlider = OptionParent.FindSlider("OpenGL shift fwd/back (Z-axis) X100")
+        Static PointSizeSlider = OptionParent.FindSlider("OpenGL Point Size")
 
         pointSize = PointSizeSlider.value
         moveAmount = New cv.Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
@@ -7419,10 +7419,10 @@ Public Class Options_Sobel : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Threshold to zero pixels below this value")
-        Static ksizeSlider = FindSlider("Sobel kernel Size")
-        Static rangeSlider = FindSlider("Range around zero X100")
-        Static distanceSlider = FindSlider("Threshold distance")
+        Static thresholdSlider = OptionParent.FindSlider("Threshold to zero pixels below this value")
+        Static ksizeSlider = OptionParent.FindSlider("Sobel kernel Size")
+        Static rangeSlider = OptionParent.FindSlider("Range around zero X100")
+        Static distanceSlider = OptionParent.FindSlider("Threshold distance")
         kernelSize = ksizeSlider.Value Or 1
         threshold = thresholdSlider.value
         Static vDeriv = FindCheckBox("Vertical Derivative")
@@ -7492,8 +7492,8 @@ Public Class Options_DerivativeBasics : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("mm Threshold")
-        Static barSlider = FindSlider("Plus/Minus bars around center")
+        Static thresholdSlider = OptionParent.FindSlider("mm Threshold")
+        Static barSlider = OptionParent.FindSlider("Plus/Minus bars around center")
         mmThreshold = thresholdSlider.value / 1000
         histBars = barSlider.value
 
@@ -7533,8 +7533,8 @@ Public Class Options_Grid : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static widthSlider = FindSlider("Grid Cell Width")
-        Static heightSlider = FindSlider("Grid Cell Height")
+        Static widthSlider = OptionParent.FindSlider("Grid Cell Width")
+        Static heightSlider = OptionParent.FindSlider("Grid Cell Height")
         width = widthSlider.value
         height = heightSlider.value
     End Sub
@@ -7584,10 +7584,10 @@ Public Class Options_RGBAlign : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static XSlider = FindSlider("X Displacement")
-        Static YSlider = FindSlider("Y Displacement")
-        Static xShiftSlider = FindSlider("X Shift")
-        Static yShiftSlider = FindSlider("Y Shift")
+        Static XSlider = OptionParent.FindSlider("X Displacement")
+        Static YSlider = OptionParent.FindSlider("Y Displacement")
+        Static xShiftSlider = OptionParent.FindSlider("X Shift")
+        Static yShiftSlider = OptionParent.FindSlider("Y Shift")
         xDisp = XSlider.value
         yDisp = YSlider.value
         xShift = xShiftSlider.value
@@ -7614,15 +7614,15 @@ Public Class Options_OpenGL1 : Inherits OptionParent
             sliders.setupTrackBar("OpenGL pitch (degrees)", -180, 180, pitch)
             sliders.setupTrackBar("OpenGL roll (degrees)", -180, 180, roll)
             If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
-                FindSlider("OpenGL yaw (degrees)").Value = 135
+                OptionParent.FindSlider("OpenGL yaw (degrees)").Value = 135
             End If
         End If
     End Sub
     Public Sub Run()
-        Static pcBufferSlider = FindSlider("OpenCVB OpenGL buffer count")
-        Static yawSlider = FindSlider("OpenGL yaw (degrees)")
-        Static pitchSlider = FindSlider("OpenGL pitch (degrees)")
-        Static rollSlider = FindSlider("OpenGL roll (degrees)")
+        Static pcBufferSlider = OptionParent.FindSlider("OpenCVB OpenGL buffer count")
+        Static yawSlider = OptionParent.FindSlider("OpenGL yaw (degrees)")
+        Static pitchSlider = OptionParent.FindSlider("OpenGL pitch (degrees)")
+        Static rollSlider = OptionParent.FindSlider("OpenGL roll (degrees)")
 
         yaw = yawSlider.Value
         pitch = pitchSlider.Value
@@ -7650,10 +7650,10 @@ Public Class Options_OpenGL2 : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static eyeXSlider = FindSlider("OpenGL Eye X X100")
-        Static eyeYSlider = FindSlider("OpenGL Eye Y X100")
-        Static eyeZSlider = FindSlider("OpenGL Eye Z X100")
-        Static fovSlider = FindSlider("OpenGL FOV")
+        Static eyeXSlider = OptionParent.FindSlider("OpenGL Eye X X100")
+        Static eyeYSlider = OptionParent.FindSlider("OpenGL Eye Y X100")
+        Static eyeZSlider = OptionParent.FindSlider("OpenGL Eye Z X100")
+        Static fovSlider = OptionParent.FindSlider("OpenGL FOV")
 
         FOV = fovSlider.Value
         eye = New cv.Vec3f(eyeXSlider.Value, eyeYSlider.Value, eyeZSlider.Value)
@@ -7678,10 +7678,10 @@ Public Class Options_OpenGL3 : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static zNearSlider = FindSlider("OpenGL zNear")
-        Static zFarSlider = FindSlider("OpenGL zFar")
-        Static zTransSlider = FindSlider("zTrans (X100)")
-        Static PointSizeSlider = FindSlider("OpenGL Point Size")
+        Static zNearSlider = OptionParent.FindSlider("OpenGL zNear")
+        Static zFarSlider = OptionParent.FindSlider("OpenGL zFar")
+        Static zTransSlider = OptionParent.FindSlider("zTrans (X100)")
+        Static PointSizeSlider = OptionParent.FindSlider("OpenGL Point Size")
 
         zNear = zNearSlider.Value
         zFar = zFarSlider.Value
@@ -7708,12 +7708,12 @@ Public Class Options_OpenGL4 : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static XmoveSlider = FindSlider("OpenGL shift left/right (X-axis) X100")
-        Static YmoveSlider = FindSlider("OpenGL shift up/down (Y-axis) X100")
-        Static ZmoveSlider = FindSlider("OpenGL shift fwd/back (Z-axis) X100")
-        Static scaleXSlider = FindSlider("OpenGL Scale X X10")
-        Static scaleYSlider = FindSlider("OpenGL Scale Y X10")
-        Static scaleZSlider = FindSlider("OpenGL Scale Z X10")
+        Static XmoveSlider = OptionParent.FindSlider("OpenGL shift left/right (X-axis) X100")
+        Static YmoveSlider = OptionParent.FindSlider("OpenGL shift up/down (Y-axis) X100")
+        Static ZmoveSlider = OptionParent.FindSlider("OpenGL shift fwd/back (Z-axis) X100")
+        Static scaleXSlider = OptionParent.FindSlider("OpenGL Scale X X10")
+        Static scaleYSlider = OptionParent.FindSlider("OpenGL Scale Y X10")
+        Static scaleZSlider = OptionParent.FindSlider("OpenGL Scale Z X10")
 
         moveAmount = New cv.Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
         scaleXYZ = New cv.Vec3f(scaleXSlider.Value, scaleYSlider.Value, scaleZSlider.Value)
@@ -7731,7 +7731,7 @@ Public Class Options_Stdev : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static stdevSlider = FindSlider("Stdev Threshold")
+        Static stdevSlider = OptionParent.FindSlider("Stdev Threshold")
         stdevThreshold = stdevSlider.value
     End Sub
 End Class
@@ -7751,8 +7751,8 @@ Public Class Options_GridStdev : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static depthSlider = FindSlider("Stdev Depth Threshold X100")
-        Static colorSlider = FindSlider("Stdev Color Threshold")
+        Static depthSlider = OptionParent.FindSlider("Stdev Depth Threshold X100")
+        Static colorSlider = OptionParent.FindSlider("Stdev Color Threshold")
         depthThreshold = depthSlider.value / 100
         colorThreshold = colorSlider.value
     End Sub
@@ -7772,8 +7772,8 @@ Public Class Options_LineRect : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static depthSlider = FindSlider("LineRect Depth Threshold X100")
-        Static colorSlider = FindSlider("LineRect Color Threshold")
+        Static depthSlider = OptionParent.FindSlider("LineRect Depth Threshold X100")
+        Static colorSlider = OptionParent.FindSlider("LineRect Color Threshold")
         depthThreshold = depthSlider.value / 100
         colorThreshold = colorSlider.value
     End Sub
@@ -7797,7 +7797,7 @@ Public Class Options_Agast : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Agast Threshold")
+        Static thresholdSlider = OptionParent.FindSlider("Agast Threshold")
         Static nonMaxCheck = FindCheckBox("Use non-max suppression in Agast")
         useNonMaxSuppression = nonMaxCheck.checked
         agastThreshold = thresholdSlider.value
@@ -7816,7 +7816,7 @@ Public Class Options_FCSLine : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static proximitySlider = FindSlider("Proximity in pixels")
+        Static proximitySlider = OptionParent.FindSlider("Proximity in pixels")
         proximity = proximitySlider.value
     End Sub
 End Class
@@ -7842,10 +7842,10 @@ Public Class Options_Neighbors : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static thresholdSlider = FindSlider("Difference from neighbor in mm's")
-        Static pixelSlider = FindSlider("Minimum offset to neighbor pixel")
-        Static patchSlider = FindSlider("Patch z-values")
-        Static topXSlider = FindSlider("X neighbors")
+        Static thresholdSlider = OptionParent.FindSlider("Difference from neighbor in mm's")
+        Static pixelSlider = OptionParent.FindSlider("Minimum offset to neighbor pixel")
+        Static patchSlider = OptionParent.FindSlider("Patch z-values")
+        Static topXSlider = OptionParent.FindSlider("X neighbors")
         neighbors = topXSlider.value
         threshold = thresholdSlider.value / 1000
         pixels = pixelSlider.value
@@ -7864,7 +7864,7 @@ Public Class Options_GridCells : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static shiftSlider = FindSlider("Disparity Threshold")
+        Static shiftSlider = OptionParent.FindSlider("Disparity Threshold")
         disparityThreshold = shiftSlider.value
     End Sub
 End Class
@@ -7886,8 +7886,8 @@ Public Class Options_MinArea : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static numSlider = FindSlider("Area Number of Points")
-        Static sizeSlider = FindSlider("Area size")
+        Static numSlider = OptionParent.FindSlider("Area Number of Points")
+        Static sizeSlider = OptionParent.FindSlider("Area size")
         srcPoints.Clear()
 
         Dim pt As cv.Point2f
@@ -7919,9 +7919,9 @@ Public Class Options_FeaturesEx : Inherits OptionParent
         Application.DoEvents()
     End Sub
     Public Sub Run()
-        Static cellSlider = FindSlider("MatchTemplate Cell Size")
-        Static resyncSlider = FindSlider("Threshold Percent for Resync")
-        Static agastslider = FindSlider("Agast Threshold")
+        Static cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
+        Static resyncSlider = OptionParent.FindSlider("Threshold Percent for Resync")
+        Static agastslider = OptionParent.FindSlider("Agast Threshold")
 
         templatePad = CInt(cellSlider.value / 2)
         templateSize = cellSlider.value Or 1
@@ -7961,8 +7961,8 @@ Public Class Options_Features : Inherits OptionParent
         resyncThreshold = options.resyncThreshold
         agastThreshold = options.agastThreshold
 
-        Static qualitySlider = FindSlider("Quality Level")
-        Static kSlider = FindSlider("k X1000")
+        Static qualitySlider = OptionParent.FindSlider("Quality Level")
+        Static kSlider = OptionParent.FindSlider("k X1000")
         Static vertRadio = findRadio("Vertical lines")
         k = kSlider.value / 1000
 
@@ -7989,7 +7989,7 @@ Public Class Options_FAST : Inherits OptionParent
         Static nonMaxCheck = FindCheckBox("Use Non-Max = True")
         useNonMax = nonMaxCheck.checked
 
-        Static thresholdSlider = FindSlider("Fast Threshold")
+        Static thresholdSlider = OptionParent.FindSlider("Fast Threshold")
         task.FASTthreshold = thresholdSlider.Value
     End Sub
 End Class

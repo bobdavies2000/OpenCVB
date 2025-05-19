@@ -118,7 +118,7 @@ Public Class Smoothing_Interior : Inherits TaskParent
         Return nl
     End Function
     Public Sub New()
-        If standalone Then optiBase.FindSlider("Hull random points").Value = 16
+        If standalone Then OptionParent.FindSlider("Hull random points").Value = 16
 
         labels(2) = "Original Points (white) Smoothed (yellow)"
         labels(3) = ""

@@ -159,13 +159,6 @@ End Class
 
 
 
-Module pipeData
-    Public pipeCount As Integer
-    Public optiBase As New OptionParent
-End Module
-
-
-
 
 
 
@@ -177,7 +170,7 @@ Public Class OpenGL_BasicsMouse : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' seems to not like it when running overnight but it runs fine.
 
-        Static MotionCheck = optiBase.FindCheckBox("Use Motion Mask on the pointcloud")
+        Static MotionCheck = OptionParent.findCheckBox("Use Motion Mask on the pointcloud")
         task.ogl.pointCloudInput = task.pointCloud
 
         task.ogl.Run(src)
@@ -436,7 +429,7 @@ Public Class OpenGL_FlatStudy3 : Inherits TaskParent
         desc = "Create an OpenGL display where the floor is built as a quad"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static cushionSlider = optiBase.FindSlider("Structured Depth slice thickness in pixels")
+        Static cushionSlider = OptionParent.FindSlider("Structured Depth slice thickness in pixels")
 
         plane.Run(src)
         dst2 = plane.dst2
@@ -566,7 +559,7 @@ End Class
 Public Class OpenGL_Sierpinski : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.sierpinski
-        optiBase.FindSlider("OpenGL Point Size").Value = 3
+        OptionParent.FindSlider("OpenGL Point Size").Value = 3
         desc = "Draw the Sierpinski triangle pattern in OpenGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -645,7 +638,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
     Public options As New Options_OpenGLFunctions
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCells
-        optiBase.FindSlider("OpenGL shift fwd/back (Z-axis)").Value = -150
+        OptionParent.FindSlider("OpenGL shift fwd/back (Z-axis)").Value = -150
         labels = {"", "", "Output of RedCloud", "OpenGL snapshot"}
         desc = "Draw all the RedCloud contours in OpenGL with various settings."
     End Sub
@@ -731,7 +724,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
     Dim eq As New Plane_Equation
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         labels(3) = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis"
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
@@ -837,9 +830,9 @@ Public Class OpenGL_ProfileSweep : Inherits TaskParent
         End If
 
         Dim bump = 1
-        Static xRotateSlider = optiBase.FindSlider("Rotate pointcloud around X-axis (degrees)")
-        Static yRotateSlider = optiBase.FindSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static zRotateSlider = optiBase.FindSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static xRotateSlider = OptionParent.FindSlider("Rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
         ' NOTE: the z and x sliders are switched on purpose.
         Select Case testCase
             Case 0
@@ -1316,7 +1309,7 @@ Public Class OpenGL_HistDepth3D : Inherits TaskParent
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.Histogram3D
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the 3D histogram of the depth in OpenGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1413,7 +1406,7 @@ Public Class OpenGL_Color3D : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         desc = "Plot the results of a 3D histogram of the BGR data "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1442,7 +1435,7 @@ Public Class OpenGL_ColorReduced3D : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         task.redOptions.ColorSource.SelectedItem = "LUT_Basics"
-        optiBase.FindSlider("OpenGL Point Size").Value = 20
+        OptionParent.FindSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1469,7 +1462,7 @@ End Class
 Public Class OpenGL_ColorRaw : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         desc = "Plot the results of a 3D histogram of the BGR data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1496,7 +1489,7 @@ End Class
 Public Class OpenGL_ColorBin4Way : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8UC3, white)
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub
@@ -1528,7 +1521,7 @@ Public Class OpenGL_World : Inherits TaskParent
     Dim world As New Depth_World
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
-        If optiBase.FindFrm(traceName + " Radio Buttons") Is Nothing Then
+        If OptionParent.findFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use Generated Pointcloud")
             radio.addRadio("Use Pointcloud from camera")
@@ -1539,7 +1532,7 @@ Public Class OpenGL_World : Inherits TaskParent
         desc = "Display the generated point cloud in OpenGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static generatedRadio = optiBase.findRadio("Use Generated Pointcloud")
+        Static generatedRadio = OptionParent.findRadio("Use Generated Pointcloud")
 
         If generatedRadio.checked Then
             world.Run(src)
@@ -1779,7 +1772,7 @@ End Class
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadDepth : Inherits TaskParent
     Public Sub New()
-        optiBase.FindSlider("OpenCVB OpenGL buffer count").Value = 1
+        OptionParent.FindSlider("OpenCVB OpenGL buffer count").Value = 1
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Create a simple plane in each of bricks."
     End Sub

@@ -69,7 +69,7 @@ Public Class FitLine_Lines : Inherits TaskParent
     Public draw As New Draw_Lines
     Public lines As New List(Of cv.Point)
     Public Sub New()
-        optiBase.FindSlider("DrawCount").Value = 2
+        OptionParent.FindSlider("DrawCount").Value = 2
         labels(2) = "If the contours overlap, then one line the trendline for both is found.  Otherwise, 2 lines are found."
         labels(3) = "FitLine_Basics contour input - if they overlap, a trendline will be found."
         desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
@@ -124,7 +124,7 @@ Public Class FitLine_Simple3D : Inherits TaskParent
 
         If standalone Then
             Static random As New Random_Basics3D
-            If task.firstPass Then optiBase.FindSlider("Random Pixel Count").Value = 200
+            If task.firstPass Then OptionParent.FindSlider("Random Pixel Count").Value = 200
             random.Run(src)
             dst2.SetTo(0)
             ptList.Clear()

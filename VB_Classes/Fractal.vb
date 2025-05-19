@@ -127,7 +127,7 @@ Public Class Fractal_Julia : Inherits TaskParent
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static resetCheck = optiBase.FindCheckBox("Reset to original Mandelbrot")
+        Static resetCheck = OptionParent.findCheckBox("Reset to original Mandelbrot")
         If savedMouse <> task.mouseMovePoint Or resetCheck.Checked Then
             savedMouse = task.mouseMovePoint
             mandel.Run(src)

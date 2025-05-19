@@ -172,9 +172,9 @@ Public Class Motion_ThruCorrelation : Inherits TaskParent
         desc = "Detect motion through the correlation coefficient"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static ccSlider = optiBase.FindSlider("Correlation threshold X1000")
-        Static padSlider = optiBase.FindSlider("Pad size in pixels for the search area")
-        Static stdevSlider = optiBase.FindSlider("Stdev threshold for using correlation")
+        Static ccSlider = OptionParent.FindSlider("Correlation threshold X1000")
+        Static padSlider = OptionParent.FindSlider("Pad size in pixels for the search area")
+        Static stdevSlider = OptionParent.FindSlider("Stdev threshold for using correlation")
         Dim pad = padSlider.Value
         Dim ccThreshold = ccSlider.Value
         Dim stdevThreshold = stdevSlider.Value
@@ -263,7 +263,7 @@ Public Class Motion_Grid_MP : Inherits TaskParent
         desc = "Detect Motion in the color image using multi-threading - slower than single-threaded!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static correlationSlider = optiBase.FindSlider("Correlation Threshold")
+        Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then dst3 = src.Clone
@@ -297,7 +297,7 @@ Public Class Motion_Grid : Inherits TaskParent
         desc = "Detect Motion in the color image.  Rectangles outlines didn't have high correlation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static correlationSlider = optiBase.FindSlider("Correlation Threshold")
+        Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then dst3 = src.Clone
@@ -887,7 +887,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         vertRect = New cv.Rect(w / 2 - w / 4, 0, w / 2, dst2.Height)
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        optiBase.FindSlider("Threshold value").Value = 200
+        OptionParent.FindSlider("Threshold value").Value = 200
         desc = "Find the approximate rotation angle using the diamond shape " +
                "from the thresholded MatchTemplate output."
     End Sub
@@ -895,7 +895,7 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         options.Run()
 
         Dim dCount = dst2.CountNonZero
-        Static tSlider = optiBase.FindSlider("Threshold value")
+        Static tSlider = OptionParent.FindSlider("Threshold value")
         If dCount > dst2.Total / 100 Then
             Dim nextval = tSlider.value + 1
             If nextval < tSlider.maximum Then tSlider.value = nextval

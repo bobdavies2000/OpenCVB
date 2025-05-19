@@ -99,14 +99,14 @@ Public Class Sort_1Channel : Inherits TaskParent
     Public rangeEnd As New List(Of Integer)
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
-        optiBase.findRadio("Sort all pixels descending").Checked = True
+        OptionParent.findRadio("Sort all pixels descending").Checked = True
         If standalone Then task.gOptions.GridSlider.Value = 10
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static thresholdSlider =optiBase.findslider("Threshold for sort input")
+        Static thresholdSlider =OptionParent.FindSlider("Threshold for sort input")
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -159,12 +159,12 @@ Public Class Sort_3Channel : Inherits TaskParent
     Dim bgra As cv.Mat
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
-        optiBase.findRadio("Sort all pixels descending").Checked = True
+        OptionParent.findRadio("Sort all pixels descending").Checked = True
         labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
         desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static thresholdSlider =optiBase.findslider("Threshold for sort input")
+        Static thresholdSlider =OptionParent.FindSlider("Threshold for sort input")
         Dim inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
@@ -198,7 +198,7 @@ Public Class Sort_Integer : Inherits TaskParent
     Public data(dst2.Total - 1) As Integer
     Public vecList As New List(Of Integer)
     Public Sub New()
-        optibase.findRadio("Sort all pixels ascending").Checked = True
+        OptionParent.findRadio("Sort all pixels ascending").Checked = True
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub

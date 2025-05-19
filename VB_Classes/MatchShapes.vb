@@ -10,9 +10,9 @@ Public Class MatchShapes_Basics : Inherits TaskParent
     Dim match As New Options_MatchShapes
     Dim options As New Options_Contours
     Public Sub New()
-        optibase.findRadio("CComp").Checked = True
-        optibase.findRadio("FloodFill").Enabled = False
-        optibase.findRadio("ApproxNone").Checked = True
+        OptionParent.findRadio("CComp").Checked = True
+        OptionParent.findRadio("FloodFill").Enabled = False
+        OptionParent.findRadio("ApproxNone").Checked = True
 
         dst0 = cv.Cv2.ImRead(task.HomeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2Gray)
         dst1 = cv.Cv2.ImRead(task.HomeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2Gray)
@@ -184,7 +184,7 @@ Public Class MatchShapes_Hulls : Inherits TaskParent
     Dim options As New Options_MatchShapes
     Dim hulls As New RedColor_Hulls
     Public Sub New()
-       optiBase.findslider("Match Threshold %").Value = 3
+       OptionParent.FindSlider("Match Threshold %").Value = 3
         labels = {"", "", "Output of RedColor_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
@@ -218,7 +218,7 @@ End Class
 Public Class MatchShapes_Contours : Inherits TaskParent
     Dim options As New Options_MatchShapes
     Public Sub New()
-       optiBase.findslider("Match Threshold %").Value = 3
+       OptionParent.FindSlider("Match Threshold %").Value = 3
         labels = {"", "", "Output of RedColor_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub

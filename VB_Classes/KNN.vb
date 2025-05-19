@@ -133,7 +133,7 @@ Public Class KNN_N2BasicsTest : Inherits TaskParent
     Public knn As New KNN_Basics
     Dim random As New Random_Basics
     Public Sub New()
-       optiBase.findslider("Random Pixel Count").Value = 10
+       OptionParent.FindSlider("Random Pixel Count").Value = 10
         desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub accumulateDisplay()
@@ -279,7 +279,7 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
     Dim random As New Random_Basics3D
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
-       optiBase.findslider("Random Pixel Count").Value = 100
+       OptionParent.FindSlider("Random Pixel Count").Value = 100
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -339,7 +339,7 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
     Dim random As New Random_Basics4D
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
-       optiBase.findslider("Random Pixel Count").Value = 5
+       OptionParent.FindSlider("Random Pixel Count").Value = 5
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -426,7 +426,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
         task.featureOptions.FeatureSampleSize.Value = 200
-        dotSlider = optiBase.FindSlider("Average distance multiplier")
+        dotSlider = OptionParent.FindSlider("Average distance multiplier")
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"

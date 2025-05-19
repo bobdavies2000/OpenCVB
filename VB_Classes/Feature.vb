@@ -397,7 +397,7 @@ Public Class Feature_ShiTomasi : Inherits TaskParent
     Dim shiTomasi As New Corners_ShiTomasi_CPP
     Dim options As New Options_ShiTomasi
     Public Sub New()
-        optiBase.FindSlider("Corner normalize threshold").Value = 15
+        OptionParent.FindSlider("Corner normalize threshold").Value = 15
         labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
         desc = "Identify feature points in the left And right views"
     End Sub
@@ -682,7 +682,7 @@ Public Class Feature_SteadyCam : Inherits TaskParent
     Public options As New Options_Features
     Dim feat As New Feature_Basics
     Public Sub New()
-        optiBase.FindSlider("Threshold Percent for Resync").Value = 50
+        OptionParent.FindSlider("Threshold Percent for Resync").Value = 50
         desc = "Track features using correlation without the motion mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -147,7 +147,7 @@ Public Class Math_StdevBoundary : Inherits TaskParent
         dst2 = stdev.dst2
         stdev.saveFrame.CopyTo(dst3)
 
-        Static stdevSlider =optiBase.findslider("Stdev Threshold")
+        Static stdevSlider =OptionParent.FindSlider("Stdev Threshold")
         Dim stdevThreshold = CSng(stdevSlider.Value)
 
         For Each roi In task.gridRects
@@ -329,7 +329,7 @@ Public Class Math_Stdev : Inherits TaskParent
     Dim optionsMatch As New Options_Match
     Dim stdevSlider As New System.Windows.Forms.TrackBar
     Public Sub New()
-        stdevSlider =optiBase.findslider("Stdev Threshold")
+        stdevSlider =OptionParent.FindSlider("Stdev Threshold")
         task.gOptions.GridSlider.Value = 16
 
         highStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)

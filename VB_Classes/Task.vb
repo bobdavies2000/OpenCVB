@@ -683,8 +683,9 @@ Public Class VBtask : Implements IDisposable
         imuBasics.Run(emptyMat)
         gmat.Run(emptyMat)
 
-        ' src is color and leftview is grayscale (because some cameras are only gray - RealSense is always grayscale.)
-        leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") = False Then
+            leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        End If
 
         If gOptions.CreateGif.Checked Then
             heartBeat = False

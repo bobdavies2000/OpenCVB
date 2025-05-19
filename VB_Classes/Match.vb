@@ -381,7 +381,7 @@ Public Class Match_tCell : Inherits TaskParent
     Public Sub New()
         Dim tc As tCell
         tCells.Add(tc)
-        cellSlider = optiBase.FindSlider("MatchTemplate Cell Size")
+        cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
     Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
@@ -443,7 +443,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static cellSlider = optiBase.FindSlider("MatchTemplate Cell Size")
+        Static cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
         Dim rSize = cellSlider.Value
         Dim radius = rSize / 2
 
@@ -512,7 +512,7 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
         desc = "Track the GoodFeatures with KNN"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static distSlider = optiBase.FindSlider("Maximum travel distance per frame")
+        Static distSlider = OptionParent.FindSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
 
         knn.queries = New List(Of cv.Point2f)(task.features)
@@ -565,7 +565,7 @@ Public Class Match_Point : Inherits TaskParent
             Exit Sub
         End If
 
-        Static cellSlider = optiBase.FindSlider("MatchTemplate Cell Size")
+        Static cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
         Dim rSize = cellSlider.Value
         Dim radius = rSize / 2
 

@@ -83,7 +83,7 @@ Public Class KMeans_k2_to_k8 : Inherits TaskParent
         desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static kSlider = optiBase.FindSlider("KMeans k")
+        Static kSlider = OptionParent.FindSlider("KMeans k")
 
         If task.frameCount Mod 100 = 0 Then
             kmIndex += 1
@@ -159,7 +159,7 @@ Public Class KMeans_CustomData : Inherits TaskParent
         If src.Rows < k Then k = src.Rows
 
         If standaloneTest() Then
-            Static randslider = optiBase.FindSlider("Random Pixel Count")
+            Static randslider = OptionParent.FindSlider("Random Pixel Count")
             If task.firstPass Then randslider.Value = 50
             If randslider.Value < k Then randslider.Value = k
             If task.heartBeat Then random.Run(src)
@@ -279,7 +279,7 @@ Public Class KMeans_TierCount : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         tiers.Run(src)
-        Static kSlider = optiBase.FindSlider("KMeans k")
+        Static kSlider = OptionParent.FindSlider("KMeans k")
         If kSlider.value <> tiers.classCount Then
             kSlider.value = Math.Max(tiers.classCount, kSlider.minimum)
         End If
@@ -379,7 +379,7 @@ Public Class KMeans_Dimensions : Inherits TaskParent
         desc = "Demonstrate how to use KMeans for a variety of dimensions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static dimSlider = optiBase.FindSlider("Dimension")
+        Static dimSlider = OptionParent.FindSlider("Dimension")
 
         Dim merge As New cv.Mat
         Select Case dimSlider.value
@@ -436,7 +436,7 @@ Public Class KMeans_Valleys : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         tiers.Run(src)
 
-        Static kSlider = optiBase.FindSlider("KMeans k")
+        Static kSlider = OptionParent.FindSlider("KMeans k")
         kSlider.value = tiers.classCount
         Dim kMeansK = kSlider.Value
 
@@ -459,7 +459,7 @@ Public Class KMeans_Depth : Inherits TaskParent
     Public km As New KMeans_Basics
     Public classCount As Integer
     Public Sub New()
-        optiBase.FindSlider("KMeans k").Value = 10
+        OptionParent.FindSlider("KMeans k").Value = 10
         desc = "Cluster depth using kMeans - useful to split foreground and background"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

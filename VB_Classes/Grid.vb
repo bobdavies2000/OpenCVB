@@ -188,7 +188,7 @@ Public Class Grid_FPS : Inherits TaskParent
         desc = "Provide a service that lets any algorithm control its frame rate"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static fpsSlider = optiBase.FindSlider("Desired FPS rate")
+        Static fpsSlider = OptionParent.FindSlider("Desired FPS rate")
         desiredFPS = fpsSlider.value
 
         Dim fps = CInt(task.fpsAlgorithm / desiredFPS)

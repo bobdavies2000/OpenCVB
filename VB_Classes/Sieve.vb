@@ -20,11 +20,11 @@ Public Class Sieve_BasicsVB : Inherits TaskParent
         Return completeList + Mid(nextList, 1, If(nextList.Length > 2, Len(nextList) - 2, ""))
     End Function
     Public Sub setMaxPrimes()
-        Static countSlider =optiBase.findslider("Count of desired primes")
+        Static countSlider =OptionParent.FindSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static countSlider =optiBase.findslider("Count of desired primes")
+        Static countSlider =OptionParent.FindSlider("Count of desired primes")
 
         Dim count = countSlider.Value
         Dim nextEntry As Integer = 2

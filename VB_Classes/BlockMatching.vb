@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class BlockMatching_Basics : Inherits TaskParent
     Dim colorizer As New DepthColorizer_CPP
     Dim options As New Options_BlockMatching
-    Public useDefaultLeftRight As Boolean = True
     Public leftView As cv.Mat, rightView As cv.Mat
     Public Sub New()
         labels(2) = "Block matching disparity colorized like depth"
@@ -32,10 +31,8 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         blockMatch.SpeckleRange = 32
         blockMatch.Disp12MaxDiff = 1
 
-        If useDefaultLeftRight Then
-            leftView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
-            rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
-        End If
+        leftView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
+        rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
         Dim disparity As New cv.Mat
         blockMatch.compute(leftView, rightView, disparity)
@@ -50,29 +47,3 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         dst3 = task.rightview.Resize(src.Size())
     End Sub
 End Class
-
-
-
-
-
-
-
-'Public Class BlockMatching_Grid : Inherits TaskParent
-'    Dim quadR As New Quad_RightView
-'    Dim block As New BlockMatching_Basics
-'    Public Sub New()
-'        task.gOptions.displayDst1.Checked = True
-'        block.useDefaultLeftRight = False
-'        task.gOptions.GridSlider.Value = 2
-'        desc = "Match the low resolution left and right images."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        block.leftView = task.leftview
-'        dst1 = block.leftView
-'        quadR.Run(task.rightView)
-'        block.rightView = quadR.dst2
-'        dst3 = block.rightView
-'        block.Run(src)
-'        dst2 = block.dst2
-'    End Sub
-'End Class

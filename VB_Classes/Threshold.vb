@@ -110,7 +110,7 @@ Public Class Threshold_ByChannels : Inherits TaskParent
     Dim options As New Options_Threshold
     Public Sub New()
         labels(3) = "Threshold Inverse"
-        optibase.findRadio("Trunc").Checked = True
+        OptionParent.findRadio("Trunc").Checked = True
         desc = "Threshold by channel - use red threshold slider to impact grayscale results."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

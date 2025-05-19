@@ -10,7 +10,7 @@ Imports System.IO
 '        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)
-'        Static distanceSlider =optiBase.findslider("Distance threshold (pixels)")
+'        Static distanceSlider =OptionParent.FindSlider("Distance threshold (pixels)")
 '        Dim matSize = 21 ' must be odd
 '        Dim halfsize = 10
 '        If histogram.Rows <> matSize Then

@@ -54,7 +54,7 @@ End Class
 Public Class Foreground_KMeans : Inherits TaskParent
     Dim km As New KMeans_Image
     Public Sub New()
-        optiBase.FindSlider("KMeans k").Value = 2
+        OptionParent.FindSlider("KMeans k").Value = 2
         labels = {"", "", "Foreground Mask", "Background Mask"}
         dst2 = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))

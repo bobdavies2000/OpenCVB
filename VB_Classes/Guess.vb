@@ -44,7 +44,7 @@ Public Class Guess_ImageEdges_CPP : Inherits TaskParent
             Exit Sub
         End If
 #End If
-        Static distSlider =optiBase.findslider("Max Distance from edge")
+        Static distSlider =OptionParent.FindSlider("Max Distance from edge")
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 

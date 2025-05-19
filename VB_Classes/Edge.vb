@@ -60,10 +60,10 @@ Public Class Edge_DepthAndColor : Inherits TaskParent
     Dim canny As New Edge_Basics
     Dim dilate As New Dilate_Basics
     Public Sub New()
-        optiBase.FindRadio("Dilate shape: Rect").Checked = True
+        OptionParent.findRadio("Dilate shape: Rect").Checked = True
 
-        optiBase.FindSlider("Canny threshold1").Value = 100
-        optiBase.FindSlider("Canny threshold2").Value = 100
+        OptionParent.FindSlider("Canny threshold1").Value = 100
+        OptionParent.FindSlider("Canny threshold2").Value = 100
 
         desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         labels(2) = "Edges in color and depth after dilate"
@@ -468,7 +468,7 @@ End Class
 Public Class Edge_SobelLR : Inherits TaskParent
     Dim sobel As New Edge_Sobel
     Public Sub New()
-        optiBase.FindSlider("Sobel kernel Size").Value = 3
+        OptionParent.FindSlider("Sobel kernel Size").Value = 3
         desc = "Find the edges in the LeftViewimages."
         labels = {"", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)"}
     End Sub
@@ -494,8 +494,8 @@ Public Class Edge_ColorGap_CPP : Inherits TaskParent
         desc = "Using grayscale image to identify color gaps which imply an edge - C++ version"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static distanceSlider = optiBase.FindSlider("Input pixel distance")
-        Static diffSlider = optiBase.FindSlider("Input pixel difference")
+        Static distanceSlider = OptionParent.FindSlider("Input pixel distance")
+        Static diffSlider = OptionParent.FindSlider("Input pixel difference")
         Dim diff = diffSlider.Value
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -571,8 +571,8 @@ End Class
 Public Class Edge_CannyMin : Inherits TaskParent
     Dim canny As New Edge_Canny
     Public Sub New()
-        optiBase.FindSlider("Canny threshold1").Value = 200
-        optiBase.FindSlider("Canny threshold2").Value = 200
+        OptionParent.FindSlider("Canny threshold1").Value = 200
+        OptionParent.FindSlider("Canny threshold2").Value = 200
         desc = "Set the max thresholds for Canny to get the minimum number of edge pixels"
         labels(2) = "Essential lines in the image - minimum number of pixels in Canny output"
     End Sub
@@ -595,8 +595,8 @@ End Class
 Public Class Edge_CannyLeftRight : Inherits TaskParent
     Dim canny As New Edge_Canny
     Public Sub New()
-        optiBase.FindSlider("Canny threshold1").Value = 200
-        optiBase.FindSlider("Canny threshold2").Value = 200
+        OptionParent.FindSlider("Canny threshold1").Value = 200
+        OptionParent.FindSlider("Canny threshold2").Value = 200
         labels = {"", "", "Essential lines in the left image", "Essential lines in the right image"}
         desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images."
     End Sub
@@ -643,7 +643,7 @@ Public Class Edge_Regions : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim edge As New Edge_Basics
     Public Sub New()
-        optiBase.FindSlider("Canny threshold2").Value = 30
+        OptionParent.FindSlider("Canny threshold2").Value = 30
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
         desc = "Find the edges for the depth tiers."
     End Sub
@@ -902,12 +902,12 @@ End Class
 Public Class Edge_SobelHorizontal : Inherits TaskParent
     Dim edges As New Edge_Sobel
     Public Sub New()
-        optiBase.FindCheckBox("Vertical Derivative").Checked = False
-        optiBase.FindCheckBox("Horizontal Derivative").Checked = True
+        OptionParent.findCheckBox("Vertical Derivative").Checked = False
+        OptionParent.findCheckBox("Horizontal Derivative").Checked = True
         desc = "Find edges with Sobel only in the horizontal direction"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider = optiBase.FindSlider("Threshold to zero pixels below this value")
+        Static thresholdSlider = OptionParent.FindSlider("Threshold to zero pixels below this value")
         edges.Run(src)
 
         dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -924,8 +924,8 @@ Public Class Edge_MotionFrames : Inherits TaskParent
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
-        optiBase.FindSlider("Canny threshold1").Value = 50
-        optiBase.FindSlider("Canny threshold2").Value = 50
+        OptionParent.FindSlider("Canny threshold1").Value = 50
+        OptionParent.FindSlider("Canny threshold2").Value = 50
         desc = "Collect edges over several frames controlled with global frame history"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1014,7 +1014,7 @@ Public Class Edge_Color8U : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.firstPass Then
-            Dim frmCheck = optiBase.FindFrm("Options_ColorMethod CheckBoxes")
+            Dim frmCheck = OptionParent.findFrm("Options_ColorMethod CheckBoxes")
             frmCheck.Left = task.gOptions.Width / 2
         End If
         options.Run()
@@ -1285,7 +1285,7 @@ Public Class Edge_Sweep : Inherits TaskParent
         desc = "Sweep through the various edge algorithms"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static frm = optiBase.FindFrm("Options_Edge_Basics Radio Buttons")
+        Static frm = OptionParent.findFrm("Options_Edge_Basics Radio Buttons")
 
         If task.heartBeatLT Then
             Dim index = task.featureOptions.EdgeMethods.SelectedIndex + 1

@@ -276,7 +276,7 @@ End Class
 '    Public Sub New()
 '        task.gOptions.debugSyncUI.Checked = True
 '        If standalone Then task.gOptions.displayDst1.Checked = True
-'        optiBase.FindSlider("KNN Dimension").Value = 3
+'        OptionParent.FindSlider("KNN Dimension").Value = 3
 '        desc = "Can we distinguish each feature point cell with color, depth, and grid."
 '    End Sub
 '    Private Function buildEntry(fp As fpData) As List(Of Single)
@@ -287,7 +287,7 @@ End Class
 '        Return dataList
 '    End Function
 '    Public Overrides Sub RunAlg(src As cv.Mat)
-'        Static dimensionSlider = optiBase.FindSlider("KNN Dimension")
+'        Static dimensionSlider = OptionParent.FindSlider("KNN Dimension")
 '        dimension = dimensionSlider.value
 
 '        fcs.Run(src)

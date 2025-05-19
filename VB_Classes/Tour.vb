@@ -5,7 +5,7 @@ Public Class Tour_Basics : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
         task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        optiBase.FindSlider("Max contours").Value = 10
+        OptionParent.FindSlider("Max contours").Value = 10
         desc = "Create the task.tourList and task.tourMap from Contour_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -48,7 +48,7 @@ Public Class Tour_Core : Inherits TaskParent
     Public contours As New Contour_Basics
     Public tourList As New List(Of tourData)
     Public Sub New()
-        optiBase.FindSlider("Max contours").Value = 10
+        OptionParent.FindSlider("Max contours").Value = 10
         desc = "Create only the tourList from Contour_Basics but without a placeholder for zero."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

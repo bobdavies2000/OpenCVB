@@ -177,7 +177,6 @@ Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_Full
     Dim lines As New LineRGB_RawSorted
     Public Sub New()
-        task.gOptions.RGBFilterActive.Checked = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
         desc = "Find lines in the back projection"

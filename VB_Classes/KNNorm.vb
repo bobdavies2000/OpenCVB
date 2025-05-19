@@ -47,8 +47,8 @@ Public Class KNNorm_TestDim2 : Inherits TaskParent
     Public trainInput As New List(Of cv.Point2f)
     Public queryInput As New List(Of cv.Point2f)
     Public Sub New()
-       optiBase.findslider("Random Pixel Count").Value = 20
-       optiBase.findslider("KNN Dimension").Value = 2
+       OptionParent.FindSlider("Random Pixel Count").Value = 20
+       OptionParent.FindSlider("KNN Dimension").Value = 2
         desc = "Test KNNorm_Basics with random 2D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub displayResults()
@@ -110,8 +110,8 @@ Public Class KNNorm_TestDim3 : Inherits TaskParent
     Public trainInput As New List(Of cv.Point3f)
     Public queryInput As New List(Of cv.Point3f)
     Public Sub New()
-       optiBase.findslider("Random Pixel Count").Value = 20
-       optiBase.findslider("KNN Dimension").Value = 3
+       OptionParent.FindSlider("Random Pixel Count").Value = 20
+       OptionParent.FindSlider("KNN Dimension").Value = 3
         desc = "Test KNNorm_Basics with random 3D points.  Find the nearest neighbors."
     End Sub
     Public Sub displayResults()
@@ -176,8 +176,8 @@ Public Class KNNorm_TestDim4 : Inherits TaskParent
     Public trainInput As New List(Of cv.Vec4f)
     Public queryInput As New List(Of cv.Vec4f)
     Public Sub New()
-       optiBase.findslider("Random Pixel Count").Value = 20
-       optiBase.findslider("KNN Dimension").Value = 4
+       OptionParent.FindSlider("Random Pixel Count").Value = 20
+       OptionParent.FindSlider("KNN Dimension").Value = 4
         desc = "Test KNNorm_Basics with random 4D points.  Find the nearest neighbors."
     End Sub
     Public Sub displayResults()

@@ -204,7 +204,7 @@ Public Class GeneticDrawing_Color : Inherits TaskParent
         desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static restartCheck = optiBase.FindCheckBox("Restart the algorithm with the current settings")
+        Static restartCheck = OptionParent.findCheckBox("Restart the algorithm with the current settings")
         Dim split() As cv.Mat
         split = src.Split()
 

@@ -214,7 +214,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
         desc = "Find the peaks in a 2D histogram"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static boundarySlider =optiBase.findslider("Desired boundary count")
+        Static boundarySlider =OptionParent.FindSlider("Desired boundary count")
         Dim desiredBoundaries = boundarySlider.value
 
         ' input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...

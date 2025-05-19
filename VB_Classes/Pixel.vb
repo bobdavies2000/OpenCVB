@@ -257,7 +257,7 @@ Public Class Pixel_Measure : Inherits TaskParent
         Return halfLineInMeters * 2 / dst2.Width
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static distanceSlider = optiBase.FindSlider("Distance in mm")
+        Static distanceSlider = OptionParent.FindSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.Value)
         SetTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
                     Format(mmPP * src.Width / 1000, fmt2) + " meters wide" + vbCrLf +
@@ -337,7 +337,7 @@ Public Class Pixel_Unstable : Inherits TaskParent
     Dim unstable As New List(Of cv.Mat)
     Dim lastImage As cv.Mat
     Public unstablePixels As New cv.Mat
-    Dim kSlider = optiBase.FindSlider("KMeans k")
+    Dim kSlider = OptionParent.FindSlider("KMeans k")
     Public Sub New()
         task.gOptions.setPixelDifference(2)
         labels(2) = "KMeans_Basics output"
@@ -387,7 +387,7 @@ Public Class Pixel_Zoom : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom Factor", 2, 16, 4)
         labels(2) = "To zoom move the mouse over the image"
-        zoomSlider = optiBase.FindSlider("Zoom Factor")
+        zoomSlider = OptionParent.FindSlider("Zoom Factor")
         desc = "Zoom into the pixels under the mouse in dst2"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -600,7 +600,7 @@ End Class
 Public Class Pixel_NeighborsPatchNeighbors : Inherits TaskParent
     Public options As New Options_Neighbors
     Public Sub New()
-        optiBase.FindSlider("Minimum offset to neighbor pixel").Value = 1
+        OptionParent.FindSlider("Minimum offset to neighbor pixel").Value = 1
         desc = "Update depth values for neighbors where they are within X mm's"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

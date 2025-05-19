@@ -583,7 +583,7 @@ Public Class XO_Rotate_Horizon : Inherits TaskParent
     Dim rotate As New Rotate_Basics
     Dim edges As New XO_CameraMotion_WithRotation
     Public Sub New()
-        optiBase.FindSlider("Rotation Angle in degrees X100").Value = 3
+        OptionParent.FindSlider("Rotation Angle in degrees X100").Value = 3
         labels(2) = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector."
         desc = "Rotate the horizon independently from the rotation of the image to validate the Edge_CameraMotion algorithm."
     End Sub
@@ -962,7 +962,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
         options.Run()
         dst2 = src.Clone
 
-        If task.firstPass Then optiBase.FindSlider("Min Line Length").Value = 30
+        If task.firstPass Then OptionParent.FindSlider("Min Line Length").Value = 30
 
         Dim tolerance = 0.1
         Dim newSet As New List(Of lpData)
@@ -1131,8 +1131,8 @@ Public Class XO_Line_Canny : Inherits TaskParent
     Dim lines As New LineRGB_RawSorted
     Public Sub New()
         labels(3) = "Input to LineRGB_Basics"
-        optiBase.FindSlider("Canny Aperture").Value = 7
-        optiBase.FindSlider("Min Line Length").Value = 30
+        OptionParent.FindSlider("Canny Aperture").Value = 7
+        OptionParent.FindSlider("Min Line Length").Value = 30
         desc = "Find lines in the Canny output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1192,7 +1192,7 @@ Public Class XO_Line_RegionsVB : Inherits TaskParent
         task.redOptions.BitwiseReduction.Checked = True
         task.redOptions.setBitReductionBar(6)
 
-        If optiBase.FindFrm(traceName + " CheckBoxes") Is Nothing Then
+        If OptionParent.findFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Show intermediate vertical step results.")
             check.addCheckBox("Run horizontal without vertical step")
@@ -1201,8 +1201,8 @@ Public Class XO_Line_RegionsVB : Inherits TaskParent
         desc = "Use the reduction values between lines to identify regions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static noVertCheck = optiBase.FindCheckBox("Run horizontal without vertical step")
-        Static verticalCheck = optiBase.FindCheckBox("Show intermediate vertical step results.")
+        Static noVertCheck = OptionParent.findCheckBox("Run horizontal without vertical step")
+        Static verticalCheck = OptionParent.findCheckBox("Show intermediate vertical step results.")
         reduction.Run(src)
         dst2 = reduction.dst2
         dst3 = dst2.Clone
@@ -1772,10 +1772,10 @@ Public Class XO_Line_InterceptsUI : Inherits TaskParent
     Dim yellowRadio As System.Windows.Forms.RadioButton
     Dim blueRadio As System.Windows.Forms.RadioButton
     Public Sub New()
-        redRadio = optiBase.findRadio("Show Top intercepts")
-        greenRadio = optiBase.findRadio("Show Bottom intercepts")
-        yellowRadio = optiBase.findRadio("Show Right intercepts")
-        blueRadio = optiBase.findRadio("Show Left intercepts")
+        redRadio = OptionParent.findRadio("Show Top intercepts")
+        greenRadio = OptionParent.findRadio("Show Bottom intercepts")
+        yellowRadio = OptionParent.findRadio("Show Right intercepts")
+        blueRadio = OptionParent.findRadio("Show Left intercepts")
         labels(2) = "Use mouse in right image to highlight lines"
         desc = "An alternative way to highlight line segments with common slope"
     End Sub
@@ -2357,7 +2357,7 @@ Public Class XO_OpenGL_PClinesFirstLast : Inherits TaskParent
     Dim lines As New XO_Line3D_CandidatesFirstLast
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         desc = "Draw the 3D lines found from the PCpoints"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2382,7 +2382,7 @@ Public Class XO_OpenGL_PCLineCandidates : Inherits TaskParent
     Dim pts As New XO_PointCloud_VerticalHorizontal
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPointsAlone
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the output of the PointCloud_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2604,7 +2604,7 @@ Public Class OpenGL_PCpoints : Inherits TaskParent
     Dim pts As New XO_PointCloud_PCPoints
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the output of the PointCloud_Points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -3515,7 +3515,7 @@ End Class
 Public Class XO_OpenGL_VerticalOrHorizontal : Inherits TaskParent
     Dim vLine As New XO_FeatureLine_Finder3D
     Public Sub New()
-        If optiBase.FindFrm(traceName + " Radio Buttons") Is Nothing Then
+        If OptionParent.findFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Show Vertical Lines")
             radio.addRadio("Show Horizontal Lines")
@@ -3526,7 +3526,7 @@ Public Class XO_OpenGL_VerticalOrHorizontal : Inherits TaskParent
         desc = "Visualize all the vertical lines found in FeatureLine_Finder"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static verticalRadio = optiBase.findRadio("Show Vertical Lines")
+        Static verticalRadio = OptionParent.findRadio("Show Vertical Lines")
         Dim showVerticals = verticalRadio.checked
 
         vLine.Run(src)
@@ -4056,7 +4056,7 @@ Public Class XO_OpenGL_PCpointsPlane : Inherits TaskParent
     Dim pts As New XO_PointCloud_PCPointsPlane
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the points that are likely to be in a plane - found by both the vertical and horizontal searches"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -4598,7 +4598,7 @@ Public Class XO_Structured_FloorCeiling : Inherits TaskParent
     Public Sub New()
         task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(2 - 1)
-        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Find the floor or ceiling plane"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

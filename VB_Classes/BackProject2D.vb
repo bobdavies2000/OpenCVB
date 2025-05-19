@@ -315,7 +315,7 @@ Public Class BackProject2D_RowCol : Inherits TaskParent
     Dim backp As New BackProject2D_Basics
     Dim options As New Options_BackProject2D
     Public Sub New()
-        optiBase.findRadio("HSV").Checked = True
+        OptionParent.findRadio("HSV").Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         task.gOptions.GridSlider.Value = 10
         desc = "Backproject the whole row or column of the 2D histogram"

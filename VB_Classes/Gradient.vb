@@ -42,7 +42,7 @@ Public Class Gradient_CartToPolar : Inherits TaskParent
     Public angle As New cv.Mat
     Dim options As New Options_Gradient
     Public Sub New()
-        optiBase.FindSlider("Sobel kernel Size").Value = 1
+        OptionParent.FindSlider("Sobel kernel Size").Value = 1
         labels(2) = "CartToPolar Magnitude Output Normalized"
         labels(3) = "CartToPolar Angle Output"
         desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"

@@ -152,7 +152,7 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
         desc = "Use KNN to find good features to track"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static distSlider = optiBase.FindSlider("Max feature travel distance")
+        Static distSlider = OptionParent.FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
         knn.queries = New List(Of cv.Point2f)(task.features)

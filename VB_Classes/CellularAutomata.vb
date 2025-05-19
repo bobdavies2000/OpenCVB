@@ -97,7 +97,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
         grid = New cv.Mat(dst2.Height / factor, dst2.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
         random.range = New cv.Rect(0, 0, grid.Width, grid.Height)
-       optiBase.findslider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
+       OptionParent.FindSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -242,7 +242,7 @@ Public Class CellularAutomata_All256 : Inherits TaskParent
     Dim options As New Options_CellAutomata
     Dim ruleSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        ruleSlider =optiBase.findslider("Current Rule")
+        ruleSlider =OptionParent.FindSlider("Current Rule")
         desc = "Run through all 256 combinations of outcomes"
     End Sub
     Private Function createOutcome(val As Integer) As String

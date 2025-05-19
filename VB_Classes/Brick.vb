@@ -29,6 +29,7 @@ Public Class Brick_Basics : Inherits TaskParent
         Dim depthCount As Integer
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
+            If brick.index = 70 Then Dim k = 0
             If brick.depth > 0 Then
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute brick.
                 Dim lastCorrelation = If(i < brickLast.Count, brickLast(i).correlation, 0)
@@ -92,7 +93,7 @@ Public Class Brick_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) +
-                                           " have useful depth data and " + CStr(unchangedCount) + " were unchanged and "
+                                           " have useful depth data and " + CStr(unchangedCount) + " were unchanged"
 
         If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
@@ -106,10 +107,10 @@ Public Class Brick_Basics : Inherits TaskParent
             pt.Y -= task.gcD.rect.Height * 3
         End If
 
-        depthAndCorrelationText = Format(task.gcD.depth, fmt3) +
-                                  "m stdev " + Format(task.gcD.depthStdev, fmt1) + " ID=" +
+        depthAndCorrelationText = Format(task.gcD.depth, fmt3) + " ID=" +
                                   CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
-                                  Format(task.gcD.mm.maxVal, fmt1) + "m" + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
+                                  Format(task.gcD.mm.maxVal, fmt1) + "m, age = " + CStr(task.gcD.age) + vbCrLf +
+                                  "correlation = " + Format(task.gcD.correlation, fmt3)
         ptCursor = validatePoint(task.mouseMovePoint)
         ptTextLoc = pt
         ptTopLeft = ptCursor ' task.gcD.rect.TopLeft ' in case it needs to switch back...
@@ -120,38 +121,38 @@ End Class
 
 
 
-Public Class Brick_MouseDepth : Inherits TaskParent
-    Public ptCursor As New cv.Point
-    Public ptTextLoc As New cv.Point
-    Public ptTopLeft As New cv.Point
-    Public depthAndCorrelationText As String
-    Public Sub New()
-        desc = "Provide the mouse depth at the mouse movement location."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
-        If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
-        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        task.gcD = task.brickList(index)
-        If standaloneTest() Then dst2 = task.brickBasics.dst3
+'Public Class Brick_MouseDepth : Inherits TaskParent
+'    Public ptCursor As New cv.Point
+'    Public ptTextLoc As New cv.Point
+'    Public ptTopLeft As New cv.Point
+'    Public depthAndCorrelationText As String
+'    Public Sub New()
+'        desc = "Provide the mouse depth at the mouse movement location."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
+'        If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
+'        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+'        task.gcD = task.brickList(index)
+'        If standaloneTest() Then dst2 = task.brickBasics.dst3
 
-        Dim pt = task.gcD.rect.TopLeft
-        If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
-            pt.X -= dst2.Width * 0.15
-        Else
-            pt.Y -= task.gcD.rect.Height * 3
-        End If
+'        Dim pt = task.gcD.rect.TopLeft
+'        If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
+'            pt.X -= dst2.Width * 0.15
+'        Else
+'            pt.Y -= task.gcD.rect.Height * 3
+'        End If
 
-        depthAndCorrelationText = Format(task.gcD.depth, fmt3) +
-                                  "m stdev " + Format(task.gcD.depthStdev, fmt1) + " ID=" +
-                                  CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
-                                  Format(task.gcD.mm.maxVal, fmt1) + "m" + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
-        ptCursor = validatePoint(task.mouseMovePoint)
-        ptTextLoc = pt
-        ptTopLeft = ptCursor ' task.gcD.rect.TopLeft ' in case it needs to switch back...
-        If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptCursor, 2)
-    End Sub
-End Class
+'        depthAndCorrelationText = Format(task.gcD.depth, fmt3) +
+'                                  "m stdev " + Format(task.gcD.depthStdev, fmt1) + " ID=" +
+'                                  CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
+'                                  Format(task.gcD.mm.maxVal, fmt1) + "m, age = " + CStr(task.gcD.age) + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
+'        ptCursor = validatePoint(task.mouseMovePoint)
+'        ptTextLoc = pt
+'        ptTopLeft = ptCursor ' task.gcD.rect.TopLeft ' in case it needs to switch back...
+'        If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptCursor, 2)
+'    End Sub
+'End Class
 
 
 
@@ -710,37 +711,6 @@ End Class
 
 
 
-Public Class Brick_MeanSubtraction : Inherits TaskParent
-    Dim LRMeanSub As New MeanSubtraction_LeftRight
-    Public Sub New()
-        task.brickBasics.instantUpdate = True
-        ' labels = {"", "", "This is the grid cell map using mean subtraction on the left and right images", ""}
-        desc = "Use the mean subtraction output of the left and right images as input to the Brick_Basics.  NOTE: instant update!"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.LRMeanSubtraction.Checked Then
-            dst2 = task.brickBasics.dst3
-        Else
-            Static brickBasics As New Brick_Basics
-            LRMeanSub.Run(src.Clone)
-
-            task.leftView = LRMeanSub.dst2
-            task.rightView = LRMeanSub.dst3
-
-            brickBasics.Run(src)
-            dst2 = brickBasics.dst3
-        End If
-
-        labels(2) = task.brickBasics.labels(2)
-        SetTrueText("dst2 is the grid cell correlations when using mean subtraction output of the left and right images.", 3)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Brick_LeftRight : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()
@@ -875,7 +845,6 @@ Public Class Brick_Info : Inherits TaskParent
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
         strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
         strOut += Format(brick.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
-        strOut += Format(brick.depthStdev, fmt3) + vbTab + "Depth stdev" + vbCrLf
         strOut += Format(brick.depth, fmt3) + vbTab + "Depth" + vbCrLf
         strOut += Format(brick.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
         strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
@@ -892,34 +861,6 @@ Public Class Brick_Info : Inherits TaskParent
         Next
 
         SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Brick_CorrelationMap : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Basics
-    Public Sub New()
-        labels(3) = "The map to identify each grid cell."
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
-        dst1.SetTo(0)
-        For Each brick In task.brickList
-            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
-        Next
-
-        dst2 = ShowPaletteDepth(dst1)
-        labels(2) = task.brickBasics.labels(2)
-
-        ptBrick.Run(src)
     End Sub
 End Class
 
@@ -1000,5 +941,33 @@ Public Class Brick_Lines : Inherits TaskParent
 
         dst1 = ShowPalette(task.lpMap.ConvertScaleAbs())
         labels(2) = task.lines.labels(2) + " - Click on any line in the upper right to get details on that line."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Brick_CorrelationMap : Inherits TaskParent
+    Dim ptBrick As New BrickPoint_Basics
+    Public Sub New()
+        labels(3) = "The map to identify each grid cell."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        For Each brick In task.brickList
+            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
+        Next
+
+        dst2 = ShowPaletteDepth(dst1)
+        labels(2) = task.brickBasics.labels(2)
+
+        ptBrick.Run(src)
     End Sub
 End Class

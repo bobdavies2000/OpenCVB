@@ -29,14 +29,14 @@ Public Class Erode_CloudXY : Inherits TaskParent
     Dim dilate As New Dilate_Basics
     Dim erodeMask As New Erode_Basics
     Public Sub New()
-       optiBase.findslider("Dilate Iterations").Value = 2
-        optibase.findRadio("Erode shape: Ellipse").Checked = True
+       OptionParent.FindSlider("Dilate Iterations").Value = 2
+        OptionParent.findRadio("Erode shape: Ellipse").Checked = True
         labels = {"", "", "Eroded point cloud X", "Erode point cloud Y"}
         desc = "Erode depth and then find edges"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static dilateSlider =optiBase.findslider("Dilate Iterations")
-        Static erodeSlider =optiBase.findslider("Erode Iterations")
+        Static dilateSlider =OptionParent.FindSlider("Dilate Iterations")
+        Static erodeSlider =OptionParent.FindSlider("Erode Iterations")
         erodeMask.Run(task.depthMask)
         dst1 = Not erodeMask.dst2
 

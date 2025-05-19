@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits TaskParent
     Public Sub New()
-        If task.cameraName = "MYNT-EYE-D1000" Then optiBase.findslider("Alpha (contrast)").Value = 1100
+        If task.cameraName = "MYNT-EYE-D1000" Then OptionParent.FindSlider("Alpha (contrast)").Value = 1100
 #If AZURE_SUPPORT Then
         labels = {"", "", "Left camera image", If(task.cameraName = "Azure Kinect 4K", "No right image", "Right camera image")}
 #Else

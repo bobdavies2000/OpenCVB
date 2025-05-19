@@ -626,7 +626,7 @@ Public Class LineRGB_GCloud : Inherits TaskParent
     Dim angleSlider As System.Windows.Forms.TrackBar
     Dim lines As New LineRGB_RawSorted
     Public Sub New()
-        angleSlider = optiBase.FindSlider("Angle tolerance in degrees")
+        angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
         labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
         desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
     End Sub

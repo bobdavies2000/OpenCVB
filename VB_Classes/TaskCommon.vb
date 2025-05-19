@@ -24,6 +24,7 @@ Public Module vbc
     Public zero3f As New cv.Point3f
     Public newVec4f As New cv.Vec4f
     Public emptyMat As New cv.Mat
+    Public pipeCount As Integer
     Public saveVecColors(0) As cv.Vec3b
     Public saveScalarColors(0) As cv.Scalar
     Public saveDepthColorMap As cv.Mat
@@ -515,14 +516,13 @@ Public Class brickData
     Public fLessIndex As Integer
 
     Public rect As cv.Rect ' rectange under the cursor in the color image.
-    Public lRect As New cv.Rect ' when the left camera is not automatically aligned with the color image - some cameras don't do this.
+    Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
     Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
 
     Public center As cv.Point ' center of the rectangle
     Public depth As Single
     Public depthRanges As New List(Of Single)
     Public disparity As Single
-    Public depthStdev As Single
     Public pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this grid cell.
 
     Public mm As mmData ' min and max values of the depth data.
@@ -530,7 +530,7 @@ Public Class brickData
     Public features As New List(Of cv.Point)
     Public prevFeature As cv.Point ' the max grid output from the previous image
     Public feature As cv.Point ' the max grid output from the current image
-    Public intensity As Byte ' sobel intensity
+    Public intensity As Byte ' sobel maximum intensity in this grid cell.
     Public pt As cv.Point ' feature absolute coordinates.
     Public hoodRect As cv.Rect ' a rect describing the neighborhood of the center cell...
     Public rHoodRect As cv.Rect ' a rect describing the neighborhood of the center cell for the right image.
@@ -547,11 +547,8 @@ Public Class brickData
         color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
         lRect = rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
-        If task.depthMask(rect).CountNonZero Then
-            cv.Cv2.MeanStdDev(task.pointCloud(rect), pt3D, stdev, task.depthMask(rect))
-            depth = pt3D(2)
-            depthStdev = stdev(2)
-        End If
+        cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), pt3D, stdev, task.depthMask(rect))
+        depth = pt3D(0)
 
         For Each rectIndex In task.gridNeighbors(index)
             hoodRect = hoodRect.Union(task.gridRects(rectIndex))

@@ -82,7 +82,7 @@ End Class
 Public Class Delaunay_SubDiv : Inherits TaskParent
     Dim random As New Random_Basics
     Public Sub New()
-       optiBase.findslider("Random Pixel Count").Value = 100
+       OptionParent.FindSlider("Random Pixel Count").Value = 100
         desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -188,7 +188,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits TaskParent
     Public facet As New Delaunay_Basics
     Dim random As New Random_Basics
     Public Sub New()
-       optiBase.findslider("Random Pixel Count").Value = 10
+       OptionParent.FindSlider("Random Pixel Count").Value = 10
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region."}
         desc = "Create a region in an image for each point provided without using KNN."
@@ -244,7 +244,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",
                   "Generation counts in CV_32SC1 format"}
-       optiBase.findslider("Random Pixel Count").Value = 10
+       OptionParent.FindSlider("Random Pixel Count").Value = 10
         desc = "Create a region in an image for each point provided"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -353,7 +353,7 @@ Public Class Delaunay_Points : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Dim fPoly As New FPoly_TopFeatures
     Public Sub New()
-        optiBase.FindSlider("Points to use in Feature Poly").Value = 2
+        OptionParent.FindSlider("Points to use in Feature Poly").Value = 2
         desc = "This algorithm explores what happens when Delaunay is used on 2 points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -362,7 +362,7 @@ Public Class Delaunay_Points : Inherits TaskParent
             ptBest.Run(src)
             task.features = ptBest.intensityFeatures
         End If
-        Static ptSlider = optiBase.FindSlider("Points to use in Feature Poly")
+        Static ptSlider = OptionParent.FindSlider("Points to use in Feature Poly")
 
         fPoly.Run(src)
         dst3 = fPoly.dst3

@@ -211,9 +211,9 @@ Public Class Rotate_Verticalize : Inherits TaskParent
     Dim rotate As New Rotate_Basics
     Public angleSlider As New System.Windows.Forms.TrackBar
     Public Sub New()
-        angleSlider = optiBase.FindSlider("Rotation Angle in degrees X100")
+        angleSlider = OptionParent.FindSlider("Rotation Angle in degrees X100")
         angleSlider.Value = task.verticalizeAngle / 100
-        optiBase.findRadio("Nearest (preserves pixel values best)").Checked = True
+        OptionParent.findRadio("Nearest (preserves pixel values best)").Checked = True
         desc = "Use gravity vector to rotate the image to be vertical"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

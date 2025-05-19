@@ -46,8 +46,8 @@ Public Class Blob_Input : Inherits TaskParent
     Public Mats As New Mat_4Click
     Public updateFrequency = 30
     Public Sub New()
-       optiBase.findslider("DrawCount").Value = 5
-        optiBase.FindCheckBox("Draw filled (unchecked draw an outline)").Checked = True
+       OptionParent.FindSlider("DrawCount").Value = 5
+        OptionParent.FindCheckBox("Draw filled (unchecked draw an outline)").Checked = True
 
         Mats.mats.lineSeparators = False
 

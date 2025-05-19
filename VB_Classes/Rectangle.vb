@@ -40,7 +40,7 @@ End Class
 Public Class Rectangle_Rotated : Inherits TaskParent
     Public rectangle As New Rectangle_Basics
     Public Sub New()
-        optiBase.FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
+        OptionParent.findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
         desc = "Draw the requested number of rectangles."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -62,11 +62,11 @@ Public Class Rectangle_Overlap : Inherits TaskParent
     Public enclosingRect As New cv.Rect
     Dim draw As New Rectangle_Basics
     Public Sub New()
-       optiBase.findslider("DrawCount").Value = 2
+       OptionParent.FindSlider("DrawCount").Value = 2
         desc = "Test if 2 rectangles overlap"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static typeCheckBox = optiBase.FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        Static typeCheckBox = OptionParent.findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If task.heartBeatLT = False Then Exit Sub
         If standaloneTest() Then
             draw.Run(src)
@@ -114,8 +114,8 @@ Public Class Rectangle_Intersection : Inherits TaskParent
     Dim rotatedCheck As System.Windows.Forms.CheckBox
     Dim countSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        rotatedCheck = optiBase.FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        countSlider =optiBase.findslider("DrawCount")
+        rotatedCheck = OptionParent.findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        countSlider =OptionParent.FindSlider("DrawCount")
         desc = "Test if any number of rectangles intersect."
     End Sub
     Private Function findEnclosingRect(rects As List(Of cv.Rect), proximity As Integer) As cv.Rect
@@ -188,8 +188,8 @@ Public Class Rectangle_Union : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            Static countSlider =optiBase.findslider("DrawCount")
-            Static rotatedCheck = optiBase.FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+            Static countSlider =OptionParent.FindSlider("DrawCount")
+            Static rotatedCheck = OptionParent.findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
             labels(2) = "Input rectangles = " + CStr(draw.rectangles.Count)
@@ -239,8 +239,8 @@ Public Class Rectangle_MultiOverlap : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            Static rotatedCheck = optiBase.FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-            Static countSlider =optiBase.findslider("DrawCount")
+            Static rotatedCheck = OptionParent.findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+            Static countSlider =OptionParent.FindSlider("DrawCount")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
 

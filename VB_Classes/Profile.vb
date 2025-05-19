@@ -105,7 +105,7 @@ Public Class Profile_Rotation : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            Static ySlider = optiBase.FindSlider("Rotate pointcloud around Y-axis")
+            Static ySlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis")
             ySlider.value += 1
             If ySlider.value = ySlider.maximum Then ySlider.value = ySlider.minimum
             SetTrueText("When running standaloneTest(), the Y-axis slider is rotating from -90 to 90.", 3)
@@ -202,7 +202,7 @@ End Class
 Public Class Profile_ConcentrationSide : Inherits TaskParent
     Dim profile As New Profile_ConcentrationTop
     Public Sub New()
-        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
         labels = {"", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", ""}
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
@@ -238,7 +238,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Static ySlider = optiBase.FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static ySlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
 
         sides.Run(src)
         dst2 = sides.dst2
@@ -295,7 +295,7 @@ Public Class Profile_OpenGL : Inherits TaskParent
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
         If standalone Then task.gOptions.setGravityUsage(False)
         task.ogl = New OpenGL_Basics
-        optiBase.FindSlider("OpenGL Point Size").Value = 10
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
         task.ogl.oglFunction = oCase.pcPointsAlone
         desc = "Visualize just the RedCloud cell contour in OpenGL"
     End Sub

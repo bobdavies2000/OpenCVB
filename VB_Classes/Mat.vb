@@ -539,7 +539,7 @@ Public Class Mat_FindNearZero : Inherits TaskParent
         desc = "Find samples near zero using FindNonZero"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider = optiBase.FindSlider("FindNearZero threshold X1000")
+        Static thresholdSlider = OptionParent.FindSlider("FindNearZero threshold X1000")
         Dim threshold = thresholdSlider.value / 1000
 
         dst3 = task.pcSplit(1).InRange(-threshold, threshold)

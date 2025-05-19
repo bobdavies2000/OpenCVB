@@ -101,7 +101,7 @@ Public Class Projection_Lines : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Dim options As New Options_Projection
     Public Sub New()
-        optiBase.FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells"}
         desc = "Search for surfaces among the FeatureLess regions"
@@ -209,7 +209,7 @@ Public Class Projection_Floor : Inherits TaskParent
     Dim isolate As New Projection_ObjectIsolate
     Dim objSlider As TrackBar
     Public Sub New()
-        objSlider = optiBase.FindSlider("Index of object")
+        objSlider = OptionParent.FindSlider("Index of object")
         desc = "Isolate just the floor."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
