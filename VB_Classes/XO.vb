@@ -1948,7 +1948,6 @@ Public Class XO_Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean = True
     Dim lastCorrelation() As Single
     Public quad As New XO_Quad_Basics
-    Dim intrinsics As New Intrinsics_Basics
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of bricks that reduce depth volatility"
@@ -1993,7 +1992,7 @@ Public Class XO_Brick_Basics : Inherits TaskParent
 
                     brick.correlation = correlationMat.Get(Of Single)(0, 0)
                 Else
-                    Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
+                    Dim irPt = Intrinsics_Basics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                     If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                         brick.depth = 0 ' off the grid.
                         brick.lRect = emptyRect

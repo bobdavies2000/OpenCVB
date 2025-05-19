@@ -12,27 +12,34 @@ Public Class Intrinsics_Basics : Inherits TaskParent
                                task.calibData.rotation(1) * pt.Y +
                                task.calibData.rotation(2) * pt.Z + task.calibData.translation(0)
             ptTranslated3D.Y = task.calibData.rotation(3) * pt.X +
-                           task.calibData.rotation(4) * pt.Y +
-                           task.calibData.rotation(5) * pt.Z + task.calibData.translation(1)
+                               task.calibData.rotation(4) * pt.Y +
+                               task.calibData.rotation(5) * pt.Z + task.calibData.translation(1)
             ptTranslated3D.Z = task.calibData.rotation(6) * pt.X +
                                task.calibData.rotation(7) * pt.Y +
                                task.calibData.rotation(8) * pt.Z + task.calibData.translation(2)
-            ptTranslated.X = task.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppx
-            ptTranslated.Y = task.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppy
+            ptTranslated.X = task.calibData.rgbIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.rgbIntrinsics.ppx
+            ptTranslated.Y = task.calibData.rgbIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.rgbIntrinsics.ppy
         End If
 
         Return ptTranslated
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            dst2 = task.leftView.Clone
-            For Each brick In task.brickList
-                Dim pt = translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
-                If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
-                If Single.IsInfinity(pt.X) Or Single.Isinfinity(pt.Y) Then Continue For
-                pt = validatePoint(pt)
-                dst2.Set(Of Byte)(pt.Y, pt.X, 128)
-            Next
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
+            If task.rgbLeftAligned Then
+                For Each brick In task.brickList
+                    dst2.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1)
+                Next
+            Else
+                For Each brick In task.brickList
+                    Dim pt = translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
+                    If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
+                    If Single.IsInfinity(pt.X) Or Single.IsInfinity(pt.Y) Then Continue For
+                    pt = validatePoint(pt)
+                    dst2.Circle(pt, task.DotSize, task.highlight, -1)
+                Next
+            End If
         End If
     End Sub
 End Class
@@ -44,7 +51,6 @@ End Class
 
 
 Public Class Intrinsics_PixelByPixel : Inherits TaskParent
-    Dim intrinsics As New Intrinsics_Basics
     Public rect As cv.Rect
     Public Sub New()
         desc = "Translate each pixel location from the color image to the left image."
@@ -63,7 +69,7 @@ Public Class Intrinsics_PixelByPixel : Inherits TaskParent
             For y = 0 To dst2.Height - 1
                 Dim pc = task.pointCloud.Col(0).Get(Of cv.Point3f)(y, x)
                 If pc.Z > 0 Then
-                    Dim pt As cv.Point2f = intrinsics.translatePixel(pc)
+                    Dim pt As cv.Point2f = Intrinsics_Basics.translatePixel(pc)
                     If minX > pt.X Then
                         minX = pt.X
                         cMinX = x

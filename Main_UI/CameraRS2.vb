@@ -15,13 +15,9 @@ Public Class CameraRS2 : Inherits GenericCamera
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""
         Dim ctx As New Context()
-        Dim searchName As String = devName
-
+        Dim searchName As String = If(devName.EndsWith("455"), "D455", "D435i")
         For Each dev In ctx.QueryDevices()
-            Dim deviceName As String = dev.Info.Item(0)
-            If String.Compare(deviceName, searchName) = 0 Then
-                serialNumber = dev.Info.Item(1)
-            End If
+            If dev.Info.Item(0).Contains(searchName) Then serialNumber = dev.Info.Item(1)
         Next
 
         Dim cfg As New Config()
@@ -52,11 +48,18 @@ Public Class CameraRS2 : Inherits GenericCamera
         ReDim calibData.translation(3 - 1)
         ReDim calibData.rotation(9 - 1)
 
+        'For i = 0 To 3 - 1
+        '    calibData.translation(i) = leftExtrinsics.translation(i)
+        'Next
+        'For i = 0 To 9 - 1
+        '    calibData.rotation(i) = leftExtrinsics.rotation(i)
+        'Next
+
         For i = 0 To 3 - 1
-            calibData.translation(i) = leftExtrinsics.translation(i)
+            calibData.translation(i) = rgbExtrinsics.translation(i)
         Next
         For i = 0 To 9 - 1
-            calibData.rotation(i) = leftExtrinsics.rotation(i)
+            calibData.rotation(i) = rgbExtrinsics.rotation(i)
         Next
 
         calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +

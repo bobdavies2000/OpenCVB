@@ -51,8 +51,7 @@ Public Class Brick_Basics : Inherits TaskParent
                         Else
                             brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
                             brick.lRect = ValidateRect(brick.lRect)
-
-                            brick.disparity = task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
+                            brick.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
                         End If
                     End If
 
@@ -737,6 +736,7 @@ End Class
 
 Public Class Brick_LeftToColor : Inherits TaskParent
     Public Sub New()
+        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Align grid cell left rectangles in color with the left image.  StereoLabs and Orbbec already match."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -842,16 +842,17 @@ End Class
 
 
 
-Public Class Brick_LeftRightGrid : Inherits TaskParent
+Public Class Brick_LeftRightMouse : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()
-        labels(2) = "Move the mouse in the color image to see the matches in left and right images"
+        labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
         labels(3) = "Right view with the translated trace of bricks under the mouse."
+        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Map the grid cells from the color image into the left view and the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView
-        dst3 = task.rightView
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Static myBricks As New List(Of Integer)
         If standalone And task.testAllRunning Then
@@ -869,7 +870,7 @@ Public Class Brick_LeftRightGrid : Inherits TaskParent
             dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
             dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
         Next
-        If task.heartBeatLT Then myBricks.Clear()
+        If task.mouseClickFlag Then myBricks.Clear()
     End Sub
 End Class
 
@@ -881,6 +882,7 @@ End Class
 Public Class Brick_RGBtoLeft : Inherits TaskParent
     Public Sub New()
         labels(3) = "Right camera image..."
+        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Translate the RGB to left view - only needed for the Intel RealSense cameras."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -941,6 +943,7 @@ Public Class Brick_LeftRight : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()
         labels(3) = "Right view with the translated bricks shown at left."
+        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Map the column of bricks in the color image into the left view and then to the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
