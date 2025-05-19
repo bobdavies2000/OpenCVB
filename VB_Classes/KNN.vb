@@ -527,7 +527,7 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
 
         Dim p1 As cv.Point2f, p2 As cv.Point2f
         If trainInput.Count = 0 Then
-            dst3 = task.lines.dst2
+            dst3 = task.lineRGB.dst2
         Else
             p1 = lastPair.p1
             p2 = lastPair.p2

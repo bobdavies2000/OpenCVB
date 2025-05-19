@@ -7,7 +7,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         desc = "Display the direction of each line in depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst3
+        dst2 = task.lineRGB.dst3
 
         dst1.SetTo(0)
         gcUpdates.Clear()
@@ -217,7 +217,7 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
         desc = "Create a list of all the extended lines in an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
+        dst2 = task.lineRGB.dst2
 
         dst3 = src.Clone
         lpList.Clear()

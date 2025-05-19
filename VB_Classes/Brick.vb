@@ -318,40 +318,6 @@ End Class
 
 
 
-Public Class Brick_LeftRightSize : Inherits TaskParent
-    Public Sub New()
-        desc = "Resize the left image so it is about the same size as the color image.  This is just an approximation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim minX As Integer = Integer.MaxValue, minY As Integer = Integer.MaxValue
-        Dim maxX As Integer = Integer.MinValue, maxY As Integer = Integer.MinValue
-        For Each brick In task.brickList
-            If brick.depth > 0 Then
-
-                'minX = brick.rect.Min(Function(brick.rect) brick.rect.X)
-                'minY = brick.rect.Min(Function(brick.rect) brick.rect.Y)
-                'maxX = brick.Max(Function(p) brick.rect.BottomRight.X)
-                'maxY = brick.Max(Function(p) brick.rect.BottomRight.Y)
-
-                If brick.rect.X < minX Then minX = brick.rect.X
-                If brick.rect.Y < minY Then minY = brick.rect.Y
-                If brick.rect.BottomRight.X > maxX Then maxX = brick.rect.BottomRight.X
-                If brick.rect.BottomRight.Y > maxY Then maxY = brick.rect.BottomRight.Y
-            End If
-        Next
-
-        If minX >= 0 And minX < dst2.Width And minY >= 0 And minY < dst2.Height And maxX < dst2.Width And maxY < dst2.Height Then
-            Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
-            dst2 = task.leftView(rect).Resize(task.color.Size)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 
@@ -436,7 +402,7 @@ Public Class Brick_MLColor : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
+        desc = "Train an ML tree to predict each pixel of the boundary cells using only color from boundary neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bounds.Run(src)
@@ -924,23 +890,23 @@ End Class
 Public Class Brick_Lines : Inherits TaskParent
     Dim info As New LineRGB_Info
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Lines can mean cells are connected - click on any highlighted grid cell to see info on that line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
+        dst2 = task.lineRGB.dst2
 
         dst3.SetTo(0)
         If task.heartBeat Then info.Run(emptyMat)
         For Each index In task.lpD.bricks
             Dim brick = task.brickList(index)
-            dst2.Rectangle(brick.rect, task.highlight, 1, task.lineType)
+            If brick.index <> 0 Then dst3.Rectangle(brick.rect, task.highlight, 1, task.lineType)
         Next
+        dst3.Line(task.lpD.p1, task.lpD.p2, white, task.lineWidth, task.lineType)
 
         SetTrueText(info.strOut, 3)
 
-        dst1 = ShowPalette(task.lpMap.ConvertScaleAbs())
-        labels(2) = task.lines.labels(2) + " - Click on any line in the upper right to get details on that line."
+        dst2 = ShowPalette(task.lpMap.ConvertScaleAbs())
+        labels(2) = task.lineRGB.labels(2) + " - Click on any line in below to get details on that line."
     End Sub
 End Class
 

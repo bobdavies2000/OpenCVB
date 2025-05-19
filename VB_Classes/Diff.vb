@@ -112,8 +112,8 @@ Public Class Diff_Lines : Inherits TaskParent
         diff.Run(src)
         dst2 = diff.dst2
 
-        dst3 = task.lines.dst2
-        labels(2) = task.lines.labels(2)
+        dst3 = task.lineRGB.dst2
+        labels(2) = task.lineRGB.labels(2)
     End Sub
 End Class
 

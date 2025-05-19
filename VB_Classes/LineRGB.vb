@@ -63,12 +63,10 @@ Public Class LineRGB_Basics : Inherits TaskParent
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
-        If standaloneTest() Then
-            dst2 = src.Clone
-            For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            Next
-        End If
+        dst2 = src
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
 
         lastList = New List(Of lpData)(lpList)
         labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
@@ -474,7 +472,7 @@ Public Class LineRGB_Info : Inherits TaskParent
         desc = "Display details about the line selected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = task.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
+        labels(2) = task.lineRGB.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
         If task.lpList.Count <= 1 Then Exit Sub
         If standaloneTest() Then
@@ -588,7 +586,7 @@ Public Class LineRGB_Vertical : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        dst3 = task.lines.dst2
+        dst3 = task.lineRGB.dst2
 
         Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
         Dim sideOpposite = p2.X - p1.X

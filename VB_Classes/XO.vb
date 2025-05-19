@@ -910,8 +910,8 @@ Public Class XO_Line_LeftRight : Inherits TaskParent
         desc = "Show lines in both the right and left images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2.Clone
-        labels(2) = "Left view" + task.lines.labels(2)
+        dst2 = task.lineRGB.dst2.Clone
+        labels(2) = "Left view" + task.lineRGB.labels(2)
 
         dst1 = task.rightView
         lineCore.Run(task.rightView)
@@ -1026,8 +1026,8 @@ Public Class XO_Line_TopX : Inherits TaskParent
         desc = "Isolate the top X lines by length - lines are already sorted by length."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
-        labels(2) = task.lines.labels(2)
+        dst2 = task.lineRGB.dst2
+        labels(2) = task.lineRGB.labels(2)
 
         dst3.SetTo(0)
         For i = 0 To 9
@@ -1161,7 +1161,7 @@ Public Class XO_Line_KNN : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         swarm.options.Run()
-        dst2 = task.lines.dst2
+        dst2 = task.lineRGB.dst2
 
         dst3.SetTo(0)
         swarm.knn.queries.Clear()
@@ -1174,7 +1174,7 @@ Public Class XO_Line_KNN : Inherits TaskParent
         swarm.knn.Run(src)
 
         dst3 = swarm.DrawLines().Clone
-        labels(2) = task.lines.labels(2)
+        labels(2) = task.lineRGB.labels(2)
     End Sub
 End Class
 
@@ -1515,7 +1515,7 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
         desc = "Find the BGR lines and confirm they are present in the cloud data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
+        dst2 = task.lineRGB.dst2
         If task.lpList.Count = 0 Then Exit Sub
 
         Dim lineList = New List(Of cv.Rect)
@@ -2908,7 +2908,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
         Dim lastMap = task.fpMap.Clone
         Dim lastCount = task.lpList.Count
 
-        dst2 = task.lines.dst2
+        dst2 = task.lineRGB.dst2
 
         delaunay.inputPoints.Clear()
 
@@ -2938,7 +2938,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
         Dim facetsD = delaunay.facetList(task.lpD.index)
         DrawContour(dst2, facetsD, white, task.lineWidth)
 
-        labels(2) = task.lines.labels(2)
+        labels(2) = task.lineRGB.labels(2)
         labels(3) = delaunay.labels(2)
     End Sub
 End Class
@@ -3035,7 +3035,7 @@ Public Class XO_FeatureLine_Finder3D : Inherits TaskParent
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
 
-        dst2 = task.lines.dst2
+        dst2 = task.lineRGB.dst2
 
         Dim raw2D As New List(Of lpData)
         Dim raw3D As New List(Of cv.Point3f)
@@ -3143,7 +3143,7 @@ Public Class XO_FeatureLine_Tutorial2 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = task.lines.dst2
+        dst2 = task.lineRGB.dst2
 
         Dim raw3D As New List(Of cv.Point3f)
         For Each lp In task.lpList
@@ -3459,7 +3459,7 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
         Dim pixelDiff = task.gOptions.pixelDiffThreshold
 
         dst2 = src.Clone
-        If standaloneTest() Then dst3 = task.lines.dst2
+        If standaloneTest() Then dst3 = task.lineRGB.dst2
 
         nearest.lp = task.gravityVec
         DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)

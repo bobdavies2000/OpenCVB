@@ -133,9 +133,9 @@ Public Class SuperPixel_WithLineDetector : Inherits TaskParent
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst3 = task.lines.dst2
+        dst3 = task.lineRGB.dst2
         pixels.Run(dst3)
         dst2 = pixels.dst2
-        labels(3) = task.lines.labels(2)
+        labels(3) = task.lineRGB.labels(2)
     End Sub
 End Class

@@ -25,11 +25,13 @@ Public Class Filter_Basics : Inherits TaskParent
             End If
         Next
 
+        labels(2) = "Color input to all algorithms - " + task.featureOptions.colorCheckbox(filterIndex).Text
         If filterIndex > 0 Then
             filters(filterIndex).run(dst2)
             dst2 = filters(filterIndex).dst2
         End If
         grayFilter.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        labels(3) = grayFilter.labels(2)
         dst3 = grayFilter.dst2
     End Sub
 End Class
@@ -76,6 +78,7 @@ Public Class Filter_BasicsGray : Inherits TaskParent
             End If
         Next
 
+        labels(2) = "Grayscale input to all algorithms - " + task.featureOptions.grayCheckbox(filterIndex).Text
         If filterIndex > 0 Then
             filters(filterIndex).run(dst2)
             dst2 = filters(filterIndex).dst2

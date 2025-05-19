@@ -252,7 +252,7 @@ Public Class Match_Lines : Inherits TaskParent
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
+        dst2 = task.lineRGB.dst2
         Static lastPt As New List(Of lpData)(task.lpList)
 
         knn.queries.Clear()

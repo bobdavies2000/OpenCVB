@@ -126,7 +126,7 @@ Public Class VBtask : Implements IDisposable
 
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
-    Public lines As LineRGB_Basics
+    Public lineRGB As LineRGB_Basics
     Public brickBasics As Brick_Basics
     Public fcsBasics As FCS_Basics
     Public edges As EdgeLine_Basics
@@ -528,7 +528,7 @@ Public Class VBtask : Implements IDisposable
         fcsBasics = New FCS_Basics
         buildCorr = New Brick_CorrelationMap
         LRMeanSub = New MeanSubtraction_LeftRight
-        lines = New LineRGB_Basics
+        lineRGB = New LineRGB_Basics
         depthLogic = New LineDepth_Basics
         rgbFilter = New Filter_Basics
 
@@ -819,9 +819,9 @@ Public Class VBtask : Implements IDisposable
 
         gravityHorizon.Run(src)
 
-        lines.Run(src.Clone)
-        task.lpList = New List(Of lpData)(lines.lpList)
-        task.lpMap = lines.lpMap.Clone
+        lineRGB.Run(src.Clone)
+        task.lpList = New List(Of lpData)(lineRGB.lpList)
+        task.lpMap = lineRGB.lpMap.Clone
 
         depthLogic.Run(src)
 

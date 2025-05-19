@@ -151,7 +151,7 @@ Public Class Gradient_DepthLines : Inherits TaskParent
         dst2(lp.rect) += brickNear.depth
         dst2(lp.rect) = dst2(lp.rect).SetTo(0, Not dst3(lp.rect))
 
-        labels(2) = task.lines.labels(2)
+        labels(2) = task.lineRGB.labels(2)
     End Sub
 End Class
 
