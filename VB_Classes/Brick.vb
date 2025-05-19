@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp.Flann
+Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Dim intrinsics As New Intrinsics_Basics
@@ -255,66 +256,6 @@ Public Class Brick_InstantUpdate : Inherits TaskParent
         labels(2) = task.brickBasics.labels(2)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Brick_RGBtoLeft : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "Right camera image..."
-        desc = "Translate the RGB to left view for all cameras except Stereolabs where left is RGB."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim brick As brickData
-        If index > 0 And index < task.brickList.Count Then
-            brick = task.brickList(index)
-        Else
-            brick = task.brickList(task.brickList.Count / 2)
-        End If
-
-        Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        Dim rgbTop = brick.rect.TopLeft, ir3D As cv.Point3f
-        ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
-        ' can be found.  For Intel and the Oak-D, the left image and RGB need to be aligned to get accurate depth.
-        ' With depth the correlation between the left and right for that grid cell will be accurate (if there is depth.)
-        ' NOTE: the Intel camera is accurate in X but way off in Y.  Probably my problem...
-        If task.cameraName.StartsWith("Intel") Or task.cameraName.StartsWith("Oak-D") Then
-            Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
-            If pcTop.Z > 0 Then
-                ir3D.X = camInfo.rotation(0) * pcTop.X +
-                         camInfo.rotation(1) * pcTop.Y +
-                         camInfo.rotation(2) * pcTop.Z + camInfo.translation(0)
-                ir3D.Y = camInfo.rotation(3) * pcTop.X +
-                         camInfo.rotation(4) * pcTop.Y +
-                         camInfo.rotation(5) * pcTop.Z + camInfo.translation(1)
-                ir3D.Z = camInfo.rotation(6) * pcTop.X +
-                         camInfo.rotation(7) * pcTop.Y +
-                         camInfo.rotation(8) * pcTop.Z + camInfo.translation(2)
-                irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
-                irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
-            End If
-        Else
-            irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
-        End If
-        labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
-
-        dst2 = task.leftView
-        dst3 = task.rightView
-        Dim r = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
-        dst2.Rectangle(r, 255, task.lineWidth)
-
-        dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
-        ' SetTrueText("Correlation " + Format(brick.correlation, fmt3), task.brickBasics.mouseD.pt, 2)
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -677,47 +618,6 @@ End Class
 
 
 
-Public Class Brick_LeftRight : Inherits TaskParent
-    Public means As New List(Of Single)
-    Public Sub New()
-        labels(2) = "Draw above in the color image to see the matches in left and right images"
-        labels(3) = "Right view with the translated drawrect."
-        task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
-        desc = "Map Each grid cell into the right view."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView
-        dst3 = task.rightView
-
-        Dim indexTop As Integer = task.brickMap.Get(Of Single)(task.drawRect.Y, task.drawRect.X)
-        If indexTop < 0 Or indexTop >= task.brickList.Count Then Exit Sub
-        Dim indexBot As Integer = task.brickMap.Get(Of Single)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
-        If indexBot < 0 Or indexBot >= task.brickList.Count Then Exit Sub
-
-        Dim gc1 = task.brickList(indexTop)
-        Dim gc2 = task.brickList(indexBot)
-
-        Dim w = gc2.lRect.BottomRight.X - gc1.lRect.X
-        Dim h = gc2.lRect.BottomRight.Y - gc1.lRect.Y
-        Dim rectLeft = New cv.Rect(gc1.lRect.X, gc1.lRect.Y, w, h)
-
-        w = gc2.rRect.BottomRight.X - gc1.rRect.X
-        h = gc2.rRect.BottomRight.Y - gc1.rRect.Y
-        Dim rectRight = New cv.Rect(gc1.rRect.X, gc1.rRect.Y, w, h)
-
-        dst2.Rectangle(rectLeft, 0, task.lineWidth)
-        dst3.Rectangle(rectRight, 0, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Brick_RegionLines : Inherits TaskParent
     Dim regions As New Region_Contours
     Public Sub New()
@@ -935,5 +835,135 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
         labels(2) = task.brickBasics.labels(2)
 
         ptBrick.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Brick_LeftRight : Inherits TaskParent
+    Public means As New List(Of Single)
+    Public Sub New()
+        labels(2) = "Draw above in the color image to see the matches in left and right images"
+        labels(3) = "Right view with the translated drawrect."
+        task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
+        desc = "Map the drawrect in the color image into the left view and the right view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView
+        dst3 = task.rightView
+
+        Dim indexTop As Integer = task.brickMap.Get(Of Single)(task.drawRect.Y, task.drawRect.X)
+        Dim indexBot As Integer = task.brickMap.Get(Of Single)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
+
+        Dim brick1 = task.brickList(indexTop)
+        Dim brick2 = task.brickList(indexBot)
+
+        Dim w = brick2.lRect.BottomRight.X - brick1.lRect.X
+        Dim h = brick2.lRect.BottomRight.Y - brick1.lRect.Y
+        Dim rectLeft = New cv.Rect(brick1.lRect.X, brick1.lRect.Y, w, h)
+
+        w = brick2.rRect.BottomRight.X - brick1.rRect.X
+        h = brick2.rRect.BottomRight.Y - brick1.rRect.Y
+        Dim rectRight = New cv.Rect(brick1.rRect.X, brick1.rRect.Y, w, h)
+
+        dst2.Rectangle(rectLeft, 0, task.lineWidth)
+        dst3.Rectangle(rectRight, 0, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Brick_LeftRightGrid : Inherits TaskParent
+    Public means As New List(Of Single)
+    Public Sub New()
+        labels(2) = "Move the mouse in the color image to see the matches in left and right images"
+        labels(3) = "Right view with the translated trace of bricks under the mouse."
+        desc = "Map the grid cells from the color image into the left view and the right view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView
+        dst3 = task.rightView
+
+        Static myBricks As New List(Of Integer)
+        If standalone And task.testAllRunning Then
+            Dim index As Integer = task.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            For i = index To index + 10
+                If myBricks.Contains(i) = False Then myBricks.Add(i)
+            Next
+        Else
+            Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            If myBricks.Contains(index) = False Then myBricks.Add(index)
+        End If
+
+        For Each index In myBricks
+            Dim brick = task.brickList(index)
+            dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
+            dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
+        Next
+        If task.heartBeatLT Then myBricks.Clear()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Brick_RGBtoLeft : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "Right camera image..."
+        desc = "Translate the RGB to left view for all cameras except Stereolabs where left is RGB."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim camInfo = task.calibData, correlationMat As New cv.Mat
+        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim brick As brickData
+        If index > 0 And index < task.brickList.Count Then
+            brick = task.brickList(index)
+        Else
+            brick = task.brickList(task.brickList.Count / 2)
+        End If
+
+        Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        Dim rgbTop = brick.rect.TopLeft, ir3D As cv.Point3f
+        ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
+        ' can be found.  For Intel and the Oak-D, the left image and RGB need to be aligned to get accurate depth.
+        ' With depth the correlation between the left and right for that grid cell will be accurate (if there is depth.)
+        ' NOTE: the Intel camera is accurate in X but way off in Y.  Probably my problem...
+        If task.cameraName.StartsWith("Intel") Or task.cameraName.StartsWith("Oak-D") Then
+            Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
+            If pcTop.Z > 0 Then
+                ir3D.X = camInfo.rotation(0) * pcTop.X +
+                         camInfo.rotation(1) * pcTop.Y +
+                         camInfo.rotation(2) * pcTop.Z + camInfo.translation(0)
+                ir3D.Y = camInfo.rotation(3) * pcTop.X +
+                         camInfo.rotation(4) * pcTop.Y +
+                         camInfo.rotation(5) * pcTop.Z + camInfo.translation(1)
+                ir3D.Z = camInfo.rotation(6) * pcTop.X +
+                         camInfo.rotation(7) * pcTop.Y +
+                         camInfo.rotation(8) * pcTop.Z + camInfo.translation(2)
+                irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
+                irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
+            End If
+        Else
+            irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
+        End If
+        labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
+
+        dst2 = task.leftView
+        dst3 = task.rightView
+        Dim r = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
+        dst2.Rectangle(r, 255, task.lineWidth)
+
+        dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
+        ' SetTrueText("Correlation " + Format(brick.correlation, fmt3), task.brickBasics.mouseD.pt, 2)
     End Sub
 End Class

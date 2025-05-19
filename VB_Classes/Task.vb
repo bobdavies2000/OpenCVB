@@ -417,7 +417,7 @@ Public Class VBtask : Implements IDisposable
             ' MSER mistakenly can have 1 cell - just ignore it.
             If rcList.Count > 1 Then setSelectedCell()
 
-            If optionsChanged = True Then
+            If optionsChanged = True And treeView IsNot Nothing Then ' treeview is not active during 'TestAll'.
                 treeView.optionsChanged = True
                 Dim sender As Object, e As EventArgs
                 treeView.Timer2_Tick(sender, e)
@@ -826,8 +826,8 @@ Public Class VBtask : Implements IDisposable
         depthLogic.Run(src)
 
         Dim saveOptionsChanged = task.optionsChanged
-        If task.optionsChanged Then treeView.optionsChanged = True
-        If paused = False Then
+        If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
+        If task.paused = False Then
 
 
 
