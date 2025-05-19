@@ -69,8 +69,8 @@ End Class
 '        desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)
-'        bpCol = Math.Floor(task.mouseMovePoint.X / task.tilesPerRow)
-'        bpRow = Math.Floor(task.mouseMovePoint.Y / task.tilesPerCol)
+'        bpCol = Math.Floor(task.mouseMovePoint.X / task.cellsPerRow)
+'        bpRow = Math.Floor(task.mouseMovePoint.Y / task.cellsPerCol)
 
 '        colorFmt.Run(src)
 '        hist2d.Run(colorFmt.dst2)

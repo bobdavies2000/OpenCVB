@@ -2532,14 +2532,14 @@ Public Class XO_PointCloud_PCpointsMask : Inherits TaskParent
         desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then pcPoints = New cv.Mat(task.tilesPerCol, task.tilesPerRow, cv.MatType.CV_32FC3, cv.Scalar.All(0))
+        If task.optionsChanged Then pcPoints = New cv.Mat(task.cellsPerCol, task.cellsPerRow, cv.MatType.CV_32FC3, cv.Scalar.All(0))
 
         dst2.SetTo(0)
         actualCount = 0
         Dim lastMeanZ As Single
-        For y = 0 To task.tilesPerCol - 1
-            For x = 0 To task.tilesPerRow - 1
-                Dim roi = task.gridRects(y * task.tilesPerRow + x)
+        For y = 0 To task.cellsPerCol - 1
+            For x = 0 To task.cellsPerRow - 1
+                Dim roi = task.gridRects(y * task.cellsPerRow + x)
                 Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
                 If Single.IsNaN(mean(0)) Then Continue For
                 If Single.IsNaN(mean(1)) Then Continue For
@@ -3849,7 +3849,7 @@ Public Class XO_BrickPoint_FeatureLess2 : Inherits TaskParent
         For Each brick In task.brickList
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
 
-            Dim gcAbove = task.brickList(brick.index - task.grid.tilesPerRow)
+            Dim gcAbove = task.brickList(brick.index - task.cellsPerRow)
             Dim val = gcAbove.fLessIndex
             If val = 0 Then val = dst0.Get(Of Byte)(gcPrev.rect.Y, gcPrev.rect.X)
             Dim count = edges.dst2(brick.rect).CountNonZero
@@ -3913,7 +3913,7 @@ Public Class XO_BrickPoint_FeatureLess : Inherits TaskParent
         For Each brick In task.brickList
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
             If brick.fLessIndex = 255 Then
-                Dim gcAbove = task.brickList(brick.index - task.grid.tilesPerRow)
+                Dim gcAbove = task.brickList(brick.index - task.cellsPerRow)
                 Dim val = gcAbove.fLessIndex
                 If val = 0 Then val = gcPrev.fLessIndex
                 If val = 0 And brick.fLessIndex <> 0 Then

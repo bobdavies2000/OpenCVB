@@ -194,15 +194,15 @@ Public Class Motion_ThruCorrelation : Inherits TaskParent
                 cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 Dim mm As mmData = GetMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
-                    If (i Mod task.tilesPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
-                    If (i Mod task.tilesPerCol) < task.tilesPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
-                    If i > task.tilesPerCol Then
-                        dst3(task.gridRects(i - task.tilesPerCol)).SetTo(255)
-                        dst3(task.gridRects(i - task.tilesPerCol + 1)).SetTo(255)
+                    If (i Mod task.cellsPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
+                    If (i Mod task.cellsPerCol) < task.cellsPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
+                    If i > task.cellsPerCol Then
+                        dst3(task.gridRects(i - task.cellsPerCol)).SetTo(255)
+                        dst3(task.gridRects(i - task.cellsPerCol + 1)).SetTo(255)
                     End If
-                    If i < (task.gridRects.Count - task.tilesPerCol - 1) Then
-                        dst3(task.gridRects(i + task.tilesPerCol)).SetTo(255)
-                        dst3(task.gridRects(i + task.tilesPerCol + 1)).SetTo(255)
+                    If i < (task.gridRects.Count - task.cellsPerCol - 1) Then
+                        dst3(task.gridRects(i + task.cellsPerCol)).SetTo(255)
+                        dst3(task.gridRects(i + task.cellsPerCol + 1)).SetTo(255)
                     End If
                     dst3(roi).SetTo(255)
                 End If

@@ -1,11 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Intrinsics_Basics : Inherits TaskParent
-    Public ptTranslated As cv.Point2f
-    Public ptTranslated3D As cv.Point3f
     Public Sub New()
         desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
     End Sub
-    Public Function translatePixel(pt As cv.Point3f) As cv.Point2f
+    Public Shared Function translatePixel(pt As cv.Point3f) As cv.Point2f
+        Dim ptTranslated As cv.Point2f, ptTranslated3D As cv.Point3f
         If task.calibData.translation Is Nothing Then
             ptTranslated3D = pt ' no translation or rotation - they are likely the same camera...
         Else

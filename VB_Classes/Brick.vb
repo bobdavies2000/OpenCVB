@@ -2,7 +2,6 @@
 Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
-    Dim intrinsics As New Intrinsics_Basics
     Public ptCursor As New cv.Point
     Public ptTextLoc As New cv.Point
     Public ptTopLeft As New cv.Point
@@ -44,7 +43,7 @@ Public Class Brick_Basics : Inherits TaskParent
                     If task.rgbLeftAligned Then
                         brick.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
                     Else
-                        Dim irPt = intrinsics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
+                        Dim irPt = Intrinsics_Basics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                             brick.depth = 0 ' off the grid.
                             brick.lRect = emptyRect
@@ -217,19 +216,19 @@ Public Class Brick_FullDepth : Inherits TaskParent
         End If
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim col As Integer, tilesPerRow = task.grid.tilesPerRow
-        Static whiteCol As Integer = tilesPerRow / 2
+        Dim col As Integer, cellsPerRow = task.cellsPerRow
+        Static whiteCol As Integer = cellsPerRow / 2
         If task.mouseClickFlag Then
-            whiteCol = Math.Round(tilesPerRow * (task.ClickPoint.X - task.cellSize / 2) / dst2.Width)
+            whiteCol = Math.Round(cellsPerRow * (task.ClickPoint.X - task.cellSize / 2) / dst2.Width)
         End If
         For Each brick In task.brickList
             If brick.depth > 0 Then
-                Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / tilesPerRow)))
+                Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / cellsPerRow)))
                 dst2.Rectangle(brick.rect, color, task.lineWidth)
                 dst3.Rectangle(brick.rRect, color, task.lineWidth)
             End If
             col += 1
-            If col >= tilesPerRow Then col = 0
+            If col >= cellsPerRow Then col = 0
         Next
     End Sub
 End Class
@@ -368,8 +367,8 @@ Public Class Brick_MLColor : Inherits TaskParent
 
             For j = 1 To nList.Count - 1
                 Dim roiA = task.gridRects(nList(j))
-                Dim x As Integer = Math.Floor(roiA.X * task.tilesPerRow / task.cols)
-                Dim y As Integer = Math.Floor(roiA.Y * task.tilesPerCol / task.rows)
+                Dim x As Integer = Math.Floor(roiA.X * task.cellsPerRow / task.cols)
+                Dim y As Integer = Math.Floor(roiA.Y * task.cellsPerCol / task.rows)
                 Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
                 trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
                 ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
@@ -442,8 +441,8 @@ Public Class Brick_MLColorDepth : Inherits TaskParent
 
             For j = 1 To nList.Count - 1
                 Dim roiA = task.gridRects(nList(j))
-                Dim x As Integer = Math.Floor(roiA.X * task.tilesPerRow / task.cols)
-                Dim y As Integer = Math.Floor(roiA.Y * task.tilesPerCol / task.rows)
+                Dim x As Integer = Math.Floor(roiA.X * task.cellsPerRow / task.cols)
+                Dim y As Integer = Math.Floor(roiA.Y * task.cellsPerCol / task.rows)
                 Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
                 trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
                 trainDepth.Set(Of Single)(j - 1, 0, task.lowResDepth.Get(Of Single)(y, x))
@@ -843,44 +842,6 @@ End Class
 
 
 
-
-
-Public Class Brick_LeftRight : Inherits TaskParent
-    Public means As New List(Of Single)
-    Public Sub New()
-        labels(2) = "Draw above in the color image to see the matches in left and right images"
-        labels(3) = "Right view with the translated drawrect."
-        task.drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40)
-        desc = "Map the drawrect in the color image into the left view and the right view."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView
-        dst3 = task.rightView
-
-        Dim indexTop As Integer = task.brickMap.Get(Of Single)(task.drawRect.Y, task.drawRect.X)
-        Dim indexBot As Integer = task.brickMap.Get(Of Single)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
-
-        Dim brick1 = task.brickList(indexTop)
-        Dim brick2 = task.brickList(indexBot)
-
-        Dim w = brick2.lRect.BottomRight.X - brick1.lRect.X
-        Dim h = brick2.lRect.BottomRight.Y - brick1.lRect.Y
-        Dim rectLeft = New cv.Rect(brick1.lRect.X, brick1.lRect.Y, w, h)
-
-        w = brick2.rRect.BottomRight.X - brick1.rRect.X
-        h = brick2.rRect.BottomRight.Y - brick1.rRect.Y
-        Dim rectRight = New cv.Rect(brick1.rRect.X, brick1.rRect.Y, w, h)
-
-        dst2.Rectangle(rectLeft, 0, task.lineWidth)
-        dst3.Rectangle(rectRight, 0, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Brick_LeftRightGrid : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()
@@ -920,7 +881,7 @@ End Class
 Public Class Brick_RGBtoLeft : Inherits TaskParent
     Public Sub New()
         labels(3) = "Right camera image..."
-        desc = "Translate the RGB to left view for all cameras except Stereolabs where left is RGB."
+        desc = "Translate the RGB to left view - only needed for the Intel RealSense cameras."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
@@ -938,7 +899,7 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
         ' can be found.  For Intel and the Oak-D, the left image and RGB need to be aligned to get accurate depth.
         ' With depth the correlation between the left and right for that grid cell will be accurate (if there is depth.)
         ' NOTE: the Intel camera is accurate in X but way off in Y.  Probably my problem...
-        If task.cameraName.StartsWith("Intel") Or task.cameraName.StartsWith("Oak-D") Then
+        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then
             Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
             If pcTop.Z > 0 Then
                 ir3D.X = camInfo.rotation(0) * pcTop.X +
@@ -965,5 +926,50 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
 
         dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
         ' SetTrueText("Correlation " + Format(brick.correlation, fmt3), task.brickBasics.mouseD.pt, 2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Brick_LeftRight : Inherits TaskParent
+    Public means As New List(Of Single)
+    Public Sub New()
+        labels(3) = "Right view with the translated bricks shown at left."
+        desc = "Map the column of bricks in the color image into the left view and then to the right view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        For i = 0 To task.cellsPerRow - 1 Step 2
+            For j = i To task.gridRects.Count - task.cellsPerRow - 1 Step task.cellsPerRow
+                Dim brick = task.brickList(j)
+                dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
+                dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
+            Next
+        Next
+
+        'Dim indexTop As Integer = task.brickMap.Get(Of Single)(task.drawRect.Y, task.drawRect.X)
+        'Dim indexBot As Integer = task.brickMap.Get(Of Single)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
+
+        'Dim brick1 = task.brickList(indexTop)
+        'Dim brick2 = task.brickList(indexBot)
+
+        'Dim w = brick2.lRect.BottomRight.X - brick1.lRect.X
+        'Dim h = brick2.lRect.BottomRight.Y - brick1.lRect.Y
+        'Dim rectLeft = New cv.Rect(brick1.lRect.X, brick1.lRect.Y, w, h)
+
+        'w = brick2.rRect.BottomRight.X - brick1.rRect.X
+        'h = brick2.rRect.BottomRight.Y - brick1.rRect.Y
+        'Dim rectRight = New cv.Rect(brick1.rRect.X, brick1.rRect.Y, w, h)
+
+        'dst2.Rectangle(rectLeft, 0, task.lineWidth)
+        'dst3.Rectangle(rectRight, 0, task.lineWidth)
     End Sub
 End Class

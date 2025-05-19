@@ -205,7 +205,7 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
             If brick.rect.Y = 0 Then
                 lpList.Add(lpZero)
             Else
-                Dim gc1 = task.brickList(brick.index - task.grid.tilesPerRow)
+                Dim gc1 = task.brickList(brick.index - task.cellsPerRow)
                 Dim lp = New lpData(brick.pt, gc1.pt)
                 lpList.Add(lp)
             End If

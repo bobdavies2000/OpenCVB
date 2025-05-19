@@ -11,8 +11,6 @@ Public Class Region_Basics : Inherits TaskParent
         desc = "Display bricks that are connected by depth vertically and horizontally."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim tilesPerRow = task.grid.tilesPerRow
-        Dim tilesPerCol = task.grid.tilesPerCol
         regions.Run(src)
 
         hRects.Clear()
@@ -30,7 +28,7 @@ Public Class Region_Basics : Inherits TaskParent
                 hRects.Add(r)
                 dst0(r).SetTo(hRects.Count)
 
-                Dim color = task.scalarColors(CInt(tilesPerCol * r.Y / dst2.Height) Mod 255)
+                Dim color = task.scalarColors(CInt(task.cellsPerCol * r.Y / dst2.Height) Mod 255)
                 dst2(r).SetTo(color)
             End If
         Next
@@ -44,13 +42,13 @@ Public Class Region_Basics : Inherits TaskParent
             If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
             If gc1.center.DistanceTo(gc2.center) > task.cellSize Then
                 Dim r = gc1.rect
-                For i = gc1.index + tilesPerRow To gc2.index - 1 Step tilesPerRow
+                For i = gc1.index + task.cellsPerRow To gc2.index - 1 Step task.cellsPerRow
                     r = r.Union(task.brickList(i).rect)
                 Next
                 vRects.Add(r)
                 dst1(r).SetTo(vRects.Count)
 
-                Dim color = task.scalarColors(CInt(tilesPerRow * r.X / dst2.Width) Mod 255)
+                Dim color = task.scalarColors(CInt(task.cellsPerRow * r.X / dst2.Width) Mod 255)
                 dst3(r).SetTo(color)
             End If
         Next

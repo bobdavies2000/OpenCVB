@@ -38,8 +38,8 @@ Public Class VBtask : Implements IDisposable
     Public tourD As New tourData ' the currently selected contour
 
     Public cellSize As Integer
-    Public tilesPerCol As Integer
-    Public tilesPerRow As Integer
+    Public cellsPerCol As Integer
+    Public cellsPerRow As Integer
     Public gridRects As List(Of cv.Rect)
     Public gridMask As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))

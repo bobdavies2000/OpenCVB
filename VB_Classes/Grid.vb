@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class Grid_Basics : Inherits TaskParent
-    Public tilesPerCol As Integer, tilesPerRow As Integer
     Public Sub New()
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         task.brickMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
@@ -14,8 +13,7 @@ Public Class Grid_Basics : Inherits TaskParent
 
         Dim cellSize = task.gOptions.GridSlider.Value
         If task.optionsChanged Then
-            tilesPerCol = 0
-            tilesPerRow = 0
+            Dim cellsPerCol As Integer, cellsPerRow As Integer
             task.gridNabeRects.Clear()
             task.gridNeighbors.Clear()
 
@@ -29,8 +27,8 @@ Public Class Grid_Basics : Inherits TaskParent
                     If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
 
                     If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then tilesPerCol += 1
-                        If y = 0 Then tilesPerRow += 1
+                        If x = 0 Then cellsPerCol += 1
+                        If y = 0 Then cellsPerRow += 1
                         task.gridRects.Add(roi)
                         index += 1
                     End If
@@ -84,14 +82,14 @@ Public Class Grid_Basics : Inherits TaskParent
             Next
 
             task.cellSize = cellSize
-            task.tilesPerCol = tilesPerCol
-            task.tilesPerRow = tilesPerRow
+            task.cellsPerCol = cellsPerCol
+            task.cellsPerRow = cellsPerRow
         End If
         If standaloneTest() Then
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
-            labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.tilesPerCol) + "X" + CStr(task.tilesPerRow) + ") " +
+            labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.cellsPerCol) + "X" + CStr(task.cellsPerRow) + ") " +
                                          CStr(cellSize) + "X" + CStr(cellSize) + " regions"
         End If
     End Sub
@@ -245,8 +243,8 @@ Public Class Grid_Emax : Inherits TaskParent
     Public gridWidth As Integer = 10
     Public gridHeight As Integer = 10
     Public gridRects As New List(Of cv.Rect)
-    Public tilesPerCol As Integer
-    Public tilesPerRow As Integer
+    Public cellsPerCol As Integer
+    Public cellsPerRow As Integer
     Public gridMask As cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public brickMap As cv.Mat
@@ -259,16 +257,16 @@ Public Class Grid_Emax : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
             gridRects.Clear()
-            tilesPerCol = 0
-            tilesPerRow = 0
+            cellsPerCol = 0
+            cellsPerRow = 0
             For y = 0 To dst2.Height - 1 Step gridHeight
                 For x = 0 To dst2.Width - 1 Step gridWidth
                     Dim roi = New cv.Rect(x, y, gridWidth, gridHeight)
                     If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
                     If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then tilesPerCol += 1
-                        If y = 0 Then tilesPerRow += 1
+                        If x = 0 Then cellsPerCol += 1
+                        If y = 0 Then cellsPerRow += 1
                         gridRects.Add(roi)
                     End If
                 Next
@@ -307,7 +305,7 @@ Public Class Grid_Emax : Inherits TaskParent
         If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(white, gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(tilesPerCol) + "X" + CStr(tilesPerRow) + ") " +
+            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(cellsPerCol) + "X" + CStr(cellsPerRow) + ") " +
                           CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
         End If
     End Sub
