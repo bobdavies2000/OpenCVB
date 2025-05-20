@@ -340,9 +340,13 @@ Public Class VBtask : Implements IDisposable
 
         Public rgbIntrinsics As intrinsicData
         Public leftIntrinsics As intrinsicData
+        Public rightIntrinsics As intrinsicData
 
-        Public translation() As Single
-        Public rotation() As Single
+        Public ColorToLeft_translation() As Single
+        Public ColorToLeft_rotation() As Single
+
+        Public LtoR_translation() As Single
+        Public LtoR_rotation() As Single
 
         Public v_fov As Single ' vertical field of view in degrees.
         Public h_fov As Single ' horizontal field of view in degrees.

@@ -1419,7 +1419,7 @@ Public Class Main_UI
                 Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 ' Return New CameraORB_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
         End Select
-        Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
+        Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
     End Function
     Private Sub CameraTask()
         restartCameraRequest = True

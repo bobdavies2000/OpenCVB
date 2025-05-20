@@ -41,28 +41,39 @@ Public Class Brick_Basics : Inherits TaskParent
                 Else
                     ' everything is recomputed when there is motion in the cell.
                     If task.rgbLeftAligned Then
-                        brick.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
+                        brick.rRect = brick.lRect
+                        brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
+                        If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
+                            brick.depth = 0 ' off the image
+                            brick.lRect = emptyRect
+                            brick.rRect = emptyRect
+                        End If
                     Else
-                        Dim irPt = Intrinsics_Basics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
+                        Dim irPt = Intrinsics_Basics.translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
-                            brick.depth = 0 ' off the grid.
+                            brick.depth = 0 ' off the image
                             brick.lRect = emptyRect
                             brick.rRect = emptyRect
                         Else
                             brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
                             brick.lRect = ValidateRect(brick.lRect)
-                            brick.disparity = task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
+
+                            Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y,
+                                                                                                                     brick.lRect.X))
+                            If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0 And i > 0) Or
+                                (LtoR_Pt.X >= dst2.Width Or LtoR_Pt.Y >= dst2.Height) Then
+
+                                brick.depth = 0 ' off the image
+                                brick.lRect = emptyRect
+                                brick.rRect = emptyRect
+                            Else
+                                brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
+                                brick.rRect = ValidateRect(brick.rRect)
+                            End If
                         End If
                     End If
 
-                    If brick.depth > 0 Then ' depth can be zero if the translation of the irPt fails.
-                        brick.rRect.X -= brick.disparity
-                        brick.rRect = ValidateRect(brick.rRect)
-                        brick.rHoodRect.X -= brick.disparity
-                        brick.rHoodRect = ValidateRect(brick.rHoodRect)
-                        If brick.lRect.Width <> brick.rRect.Width Then brick.lRect.Width = Math.Min(brick.lRect.Width, brick.rRect.Width)
-                        If brick.lRect.Height <> brick.rRect.Height Then brick.lRect.Height = Math.Min(brick.lRect.Height, brick.rRect.Height)
-
+                    If brick.depth > 0 Then ' depth can be zero if the translation of color to left fails or left to right fails.
                         cv.Cv2.MatchTemplate(leftview(brick.lRect), rightView(brick.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                         brick.correlation = correlationMat.Get(Of Single)(0, 0)
 
@@ -708,7 +719,6 @@ Public Class Brick_Info : Inherits TaskParent
         strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
         strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
-        strOut += Format(brick.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
         strOut += Format(brick.depth, fmt3) + vbTab + "Depth" + vbCrLf
         strOut += Format(brick.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
         strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
@@ -848,9 +858,11 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
         labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
         labels(3) = "Right view with the translated trace of bricks under the mouse."
         If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
+        If standalone Then task.gOptions.displayDst0.Checked = True
         desc = "Map the grid cells from the color image into the left view and the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0 = src
         dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -867,6 +879,7 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
 
         For Each index In myBricks
             Dim brick = task.brickList(index)
+            dst0.Rectangle(brick.rect, task.highlight, task.lineWidth)
             dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
             dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
         Next
@@ -898,36 +911,33 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
         Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         Dim rgbTop = brick.rect.TopLeft, ir3D As cv.Point3f
         ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
-        ' can be found.  For Intel and the Oak-D, the left image and RGB need to be aligned to get accurate depth.
+        ' can be found.  For Intel, the left image and RGB need to be aligned first.
         ' With depth the correlation between the left and right for that grid cell will be accurate (if there is depth.)
-        ' NOTE: the Intel camera is accurate in X but way off in Y.  Probably my problem...
-        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then
+        If task.rgbLeftAligned Then
+            irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
+        Else
             Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
             If pcTop.Z > 0 Then
-                ir3D.X = camInfo.rotation(0) * pcTop.X +
-                         camInfo.rotation(1) * pcTop.Y +
-                         camInfo.rotation(2) * pcTop.Z + camInfo.translation(0)
-                ir3D.Y = camInfo.rotation(3) * pcTop.X +
-                         camInfo.rotation(4) * pcTop.Y +
-                         camInfo.rotation(5) * pcTop.Z + camInfo.translation(1)
-                ir3D.Z = camInfo.rotation(6) * pcTop.X +
-                         camInfo.rotation(7) * pcTop.Y +
-                         camInfo.rotation(8) * pcTop.Z + camInfo.translation(2)
+                ir3D.X = camInfo.ColorToLeft_rotation(0) * pcTop.X +
+                         camInfo.ColorToLeft_rotation(1) * pcTop.Y +
+                         camInfo.ColorToLeft_rotation(2) * pcTop.Z + camInfo.ColorToLeft_translation(0)
+                ir3D.Y = camInfo.ColorToLeft_rotation(3) * pcTop.X +
+                         camInfo.ColorToLeft_rotation(4) * pcTop.Y +
+                         camInfo.ColorToLeft_rotation(5) * pcTop.Z + camInfo.ColorToLeft_translation(1)
+                ir3D.Z = camInfo.ColorToLeft_rotation(6) * pcTop.X +
+                         camInfo.ColorToLeft_rotation(7) * pcTop.Y +
+                         camInfo.ColorToLeft_rotation(8) * pcTop.Z + camInfo.ColorToLeft_translation(2)
                 irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
                 irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
             End If
-        Else
-            irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
         End If
         labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
 
-        dst2 = task.leftView
-        dst3 = task.rightView
-        Dim r = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
-        dst2.Rectangle(r, 255, task.lineWidth)
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        dst2.Circle(r.TopLeft, task.DotSize, 255, -1)
-        ' SetTrueText("Correlation " + Format(brick.correlation, fmt3), task.brickBasics.mouseD.pt, 2)
+        dst2.Rectangle(New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height), task.highlight, task.lineWidth)
+        dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -942,6 +952,7 @@ End Class
 Public Class Brick_LeftRight : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()
+        labels(2) = "Only every other colum is shown to make it clear which bricks are being translated (can get crowded otherwise.)"
         labels(3) = "Right view with the translated bricks shown at left."
         If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Map the column of bricks in the color image into the left view and then to the right view."
@@ -957,22 +968,5 @@ Public Class Brick_LeftRight : Inherits TaskParent
                 dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
             Next
         Next
-
-        'Dim indexTop As Integer = task.brickMap.Get(Of Single)(task.drawRect.Y, task.drawRect.X)
-        'Dim indexBot As Integer = task.brickMap.Get(Of Single)(task.drawRect.BottomRight.Y, task.drawRect.BottomRight.X)
-
-        'Dim brick1 = task.brickList(indexTop)
-        'Dim brick2 = task.brickList(indexBot)
-
-        'Dim w = brick2.lRect.BottomRight.X - brick1.lRect.X
-        'Dim h = brick2.lRect.BottomRight.Y - brick1.lRect.Y
-        'Dim rectLeft = New cv.Rect(brick1.lRect.X, brick1.lRect.Y, w, h)
-
-        'w = brick2.rRect.BottomRight.X - brick1.rRect.X
-        'h = brick2.rRect.BottomRight.Y - brick1.rRect.Y
-        'Dim rectRight = New cv.Rect(brick1.rRect.X, brick1.rRect.Y, w, h)
-
-        'dst2.Rectangle(rectLeft, 0, task.lineWidth)
-        'dst3.Rectangle(rectRight, 0, task.lineWidth)
     End Sub
 End Class

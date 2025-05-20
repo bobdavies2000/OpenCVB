@@ -383,12 +383,13 @@ Partial Class OptionsGlobal
         Me.LRMeanSubtraction.AutoSize = True
         Me.LRMeanSubtraction.Checked = True
         Me.LRMeanSubtraction.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.LRMeanSubtraction.Location = New System.Drawing.Point(24, 322)
+        Me.LRMeanSubtraction.Location = New System.Drawing.Point(426, 25)
         Me.LRMeanSubtraction.Name = "LRMeanSubtraction"
         Me.LRMeanSubtraction.Size = New System.Drawing.Size(308, 24)
         Me.LRMeanSubtraction.TabIndex = 79
         Me.LRMeanSubtraction.Text = "MeanSubtraction on Left/Right images"
         Me.LRMeanSubtraction.UseVisualStyleBackColor = True
+        Me.LRMeanSubtraction.Visible = False
         '
         'DepthGroupBox
         '

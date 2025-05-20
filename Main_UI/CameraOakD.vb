@@ -81,17 +81,20 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
         Dim leftExtrinsicsArray(12 - 1) As Single
         Marshal.Copy(leftExtrin, leftExtrinsicsArray, 0, leftExtrinsicsArray.Length)
 
-        ReDim calibData.translation(3 - 1)
-        ReDim calibData.rotation(9 - 1)
+        ReDim calibData.LtoR_translation(3 - 1)
+        ReDim calibData.LtoR_rotation(9 - 1)
+
+        ReDim calibData.ColorToLeft_translation(3 - 1)
+        ReDim calibData.ColorToLeft_rotation(9 - 1)
 
         For i = 0 To 3 - 1
-            calibData.translation(i) = rgbExtrinsicsArray(i)
+            calibData.LtoR_translation(i) = rgbExtrinsicsArray(i)
         Next
         For i = 0 To 9 - 1
-            calibData.rotation(i) = rgbExtrinsicsArray(i + 3)
+            calibData.LtoR_rotation(i) = rgbExtrinsicsArray(i + 3)
         Next
 
-        fxTemplate = calibData.rgbIntrinsics.fx * ratio ' these are used below on the full size image before resize.
+        fxTemplate = calibData.rgbIntrinsics.fx * ratio
         fyTemplate = calibData.rgbIntrinsics.fy * ratio
         ppxTemplate = calibData.rgbIntrinsics.ppx * ratio
         ppyTemplate = calibData.rgbIntrinsics.ppy * ratio

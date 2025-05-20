@@ -23,7 +23,9 @@ Public Class CameraZED2 : Inherits GenericCamera
         Dim camInfo As sl.CameraInformation = zed.GetCameraInformation
 
         ' stereolabs left camera is the RGB camera so alignment to depth and left camera is already done.
+        ' all we need to translate from left to right image is the baseline
         calibData.baseline = camInfo.cameraConfiguration.calibrationParameters.Trans.X
+        Dim translation = camInfo.cameraConfiguration.calibrationParameters.Trans
         calibData.rgbIntrinsics.fx = camInfo.cameraConfiguration.calibrationParameters.leftCam.fx
         calibData.rgbIntrinsics.fy = camInfo.cameraConfiguration.calibrationParameters.leftCam.fy
         calibData.rgbIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx

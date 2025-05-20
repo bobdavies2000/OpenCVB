@@ -1,6 +1,6 @@
-﻿Imports System.Runtime.InteropServices
+﻿#If AZURE_SUPPORT Then
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Imports Microsoft.Kinect.KinectSensor
 Public Class CameraK4A : Inherits GenericCamera
     Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
@@ -31,18 +31,21 @@ Public Class CameraK4A : Inherits GenericCamera
             Dim leftExtrinsics(12) As Single
             Marshal.Copy(ptr, leftExtrinsics, 0, leftExtrinsics.Length)
 
-            ReDim calibData.translation(3 - 1)
-            ReDim calibData.rotation(9 - 1)
+            ReDim calibData.LtoR_translation(3 - 1)
+            ReDim calibData.LtoR_rotation(9 - 1)
+
+            ReDim calibData.ColorToLeft_translation(3 - 1)
+            ReDim calibData.ColorToLeft_rotation(9 - 1)
 
             For i = 0 To 9 - 1
-                calibData.rotation(i) = leftExtrinsics(i)
+                calibData.LtoR_rotation(i) = leftExtrinsics(i)
             Next
             For i = 0 To 3 - 1
-                calibData.translation(i) = leftExtrinsics(i + 9)
+                calibData.LtoR_translation(i) = leftExtrinsics(i + 9)
             Next
-            calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
-                                                  System.Math.Pow(calibData.translation(1), 2) +
-                                                  System.Math.Pow(calibData.translation(2), 2))
+            calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.LtoR_translation(0), 2) +
+                                                  System.Math.Pow(calibData.LtoR_translation(1), 2) +
+                                                  System.Math.Pow(calibData.LtoR_translation(2), 2))
             calibData.baseline = 0.068
         End If
     End Sub
@@ -138,32 +141,31 @@ Public Class CameraK4A : Inherits GenericCamera
     End Sub
 End Class
 
+#End If
 
 
 
-
-Module A4K_Interface
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KOpen(width As Integer, height As Integer) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceCount(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceName(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KWaitFrame(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KRGBIntrinsics(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftIntrinsics(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftExtrinsics(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KPointCloud(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KColor(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftView(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub A4KClose(cPtr As IntPtr)
-    End Sub
-End Module
-
+'Module A4K_Interface
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KOpen(width As Integer, height As Integer) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceCount(cPtr As IntPtr) As Integer
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KDeviceName(cPtr As IntPtr) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KWaitFrame(cPtr As IntPtr) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KRGBIntrinsics(cPtr As IntPtr) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftIntrinsics(cPtr As IntPtr) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftExtrinsics(cPtr As IntPtr) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KPointCloud(cPtr As IntPtr) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KColor(cPtr As IntPtr) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function A4KLeftView(cPtr As IntPtr) As IntPtr
+'    End Function
+'    <DllImport(("Cam_K4A.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub A4KClose(cPtr As IntPtr)
+'    End Sub
+'End Module

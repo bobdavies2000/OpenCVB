@@ -1992,7 +1992,7 @@ Public Class XO_Brick_Basics : Inherits TaskParent
 
                     brick.correlation = correlationMat.Get(Of Single)(0, 0)
                 Else
-                    Dim irPt = Intrinsics_Basics.translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
+                    Dim irPt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                     If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                         brick.depth = 0 ' off the grid.
                         brick.lRect = emptyRect

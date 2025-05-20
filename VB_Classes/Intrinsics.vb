@@ -3,22 +3,39 @@ Public Class Intrinsics_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
     End Sub
-    Public Shared Function translatePixel(pt As cv.Point3f) As cv.Point2f
+    Public Shared Function translate_LeftToRight(pt As cv.Point3f) As cv.Point2f
         Dim ptTranslated As cv.Point2f, ptTranslated3D As cv.Point3f
-        If task.calibData.translation Is Nothing Then
+        ptTranslated3D.X = task.calibData.LtoR_rotation(0) * pt.X +
+                           task.calibData.LtoR_rotation(1) * pt.Y +
+                           task.calibData.LtoR_rotation(2) * pt.Z + task.calibData.LtoR_translation(0)
+        ptTranslated3D.Y = task.calibData.LtoR_rotation(3) * pt.X +
+                           task.calibData.LtoR_rotation(4) * pt.Y +
+                           task.calibData.LtoR_rotation(5) * pt.Z + task.calibData.LtoR_translation(1)
+        ptTranslated3D.Z = task.calibData.LtoR_rotation(6) * pt.X +
+                           task.calibData.LtoR_rotation(7) * pt.Y +
+                           task.calibData.LtoR_rotation(8) * pt.Z + task.calibData.LtoR_translation(2)
+        If ptTranslated3D.Z = 0 Then ptTranslated3D.Z = 1
+        ptTranslated.X = task.calibData.rgbIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.rgbIntrinsics.ppx
+        ptTranslated.Y = task.calibData.rgbIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.rgbIntrinsics.ppy
+
+        Return ptTranslated
+    End Function
+    Public Shared Function translate_ColorToLeft(pt As cv.Point3f) As cv.Point2f
+        Dim ptTranslated As cv.Point2f, ptTranslated3D As cv.Point3f
+        If task.calibData.ColorToLeft_translation Is Nothing Then
             ptTranslated3D = pt ' no translation or rotation - they are likely the same camera...
         Else
-            ptTranslated3D.X = task.calibData.rotation(0) * pt.X +
-                               task.calibData.rotation(1) * pt.Y +
-                               task.calibData.rotation(2) * pt.Z + task.calibData.translation(0)
-            ptTranslated3D.Y = task.calibData.rotation(3) * pt.X +
-                               task.calibData.rotation(4) * pt.Y +
-                               task.calibData.rotation(5) * pt.Z + task.calibData.translation(1)
-            ptTranslated3D.Z = task.calibData.rotation(6) * pt.X +
-                               task.calibData.rotation(7) * pt.Y +
-                               task.calibData.rotation(8) * pt.Z + task.calibData.translation(2)
-            ptTranslated.X = task.calibData.rgbIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.rgbIntrinsics.ppx
-            ptTranslated.Y = task.calibData.rgbIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.rgbIntrinsics.ppy
+            ptTranslated3D.X = task.calibData.ColorToLeft_rotation(0) * pt.X +
+                               task.calibData.ColorToLeft_rotation(1) * pt.Y +
+                               task.calibData.ColorToLeft_rotation(2) * pt.Z + task.calibData.ColorToLeft_translation(0)
+            ptTranslated3D.Y = task.calibData.ColorToLeft_rotation(3) * pt.X +
+                               task.calibData.ColorToLeft_rotation(4) * pt.Y +
+                               task.calibData.ColorToLeft_rotation(5) * pt.Z + task.calibData.ColorToLeft_translation(1)
+            ptTranslated3D.Z = task.calibData.ColorToLeft_rotation(6) * pt.X +
+                               task.calibData.ColorToLeft_rotation(7) * pt.Y +
+                               task.calibData.ColorToLeft_rotation(8) * pt.Z + task.calibData.ColorToLeft_translation(2)
+            ptTranslated.X = task.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppx
+            ptTranslated.Y = task.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppy
         End If
 
         Return ptTranslated
@@ -33,7 +50,7 @@ Public Class Intrinsics_Basics : Inherits TaskParent
                 Next
             Else
                 For Each brick In task.brickList
-                    Dim pt = translatePixel(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
+                    Dim pt = translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                     If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
                     If Single.IsInfinity(pt.X) Or Single.IsInfinity(pt.Y) Then Continue For
                     pt = validatePoint(pt)
@@ -69,7 +86,7 @@ Public Class Intrinsics_PixelByPixel : Inherits TaskParent
             For y = 0 To dst2.Height - 1
                 Dim pc = task.pointCloud.Col(0).Get(Of cv.Point3f)(y, x)
                 If pc.Z > 0 Then
-                    Dim pt As cv.Point2f = Intrinsics_Basics.translatePixel(pc)
+                    Dim pt As cv.Point2f = Intrinsics_Basics.translate_LeftToRight(pc)
                     If minX > pt.X Then
                         minX = pt.X
                         cMinX = x

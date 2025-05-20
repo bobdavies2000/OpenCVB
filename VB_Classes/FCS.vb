@@ -589,7 +589,6 @@ Public Class FCS_Info : Inherits TaskParent
         Dim brick = task.brickList(fp.brickIndex)
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
         strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
-        strOut += Format(brick.disparity, fmt1) + vbTab + "Disparity to right image" + vbCrLf
 
         strOut += "Depth = " + Format(fp.depth, fmt1)
         strOut += vbCrLf

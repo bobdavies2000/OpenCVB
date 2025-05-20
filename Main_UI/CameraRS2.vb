@@ -45,26 +45,29 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim leftExtrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
         calibData.leftIntrinsics = copyIntrinsics(leftIntrinsics, ratio)
 
-        ReDim calibData.translation(3 - 1)
-        ReDim calibData.rotation(9 - 1)
+        ReDim calibData.LtoR_translation(3 - 1)
+        ReDim calibData.LtoR_rotation(9 - 1)
 
-        'For i = 0 To 3 - 1
-        '    calibData.translation(i) = leftExtrinsics.translation(i)
-        'Next
-        'For i = 0 To 9 - 1
-        '    calibData.rotation(i) = leftExtrinsics.rotation(i)
-        'Next
+        ReDim calibData.ColorToLeft_translation(3 - 1)
+        ReDim calibData.ColorToLeft_rotation(9 - 1)
 
         For i = 0 To 3 - 1
-            calibData.translation(i) = rgbExtrinsics.translation(i)
+            calibData.LtoR_translation(i) = leftExtrinsics.translation(i)
         Next
         For i = 0 To 9 - 1
-            calibData.rotation(i) = rgbExtrinsics.rotation(i)
+            calibData.LtoR_rotation(i) = leftExtrinsics.rotation(i)
         Next
 
-        calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.translation(0), 2) +
-                                              System.Math.Pow(calibData.translation(1), 2) +
-                                              System.Math.Pow(calibData.translation(2), 2))
+        For i = 0 To 3 - 1
+            calibData.ColorToLeft_translation(i) = rgbExtrinsics.translation(i)
+        Next
+        For i = 0 To 9 - 1
+            calibData.ColorToLeft_rotation(i) = rgbExtrinsics.rotation(i)
+        Next
+
+        calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.ColorToLeft_translation(0), 2) +
+                                              System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
+                                              System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
