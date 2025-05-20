@@ -522,7 +522,6 @@ Public Class brickData
     Public center As cv.Point ' center of the rectangle
     Public depth As Single
     Public depthRanges As New List(Of Single)
-    Public disparity As Single
     Public pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this grid cell.
 
     Public mm As mmData ' min and max values of the depth data.

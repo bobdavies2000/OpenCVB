@@ -1,44 +1,54 @@
-# 2025 April (2) – Camera Support, Feature Options, FCS, Logical Depth, and RGB Lines.
+# 2025 May (1) – Experimental Inputs, Logical Depth in OpenGL, Bricks, Periphery, and RealSense Support.
 
 -   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
--   Support added for some new cameras: Orbbec Gemini 335, Orbbec Gemini 336L
--   UPDATE: Camera support for color and left aligned images:
-    -   StereoLabs ZED – working – camera aligns color and left view.
-    -   Orbbec Gemini 335L – working – camera aligns color and left view.
-    -   Orbbec Gemini 336L – working – camera aligns color and left view.
-    -   Orbbec Gemini 335 – working - camera aligns color and left view.
-    -   Intel RealSense – not working – camera does not align left and color views.
-        -   Manual alternative is not working either.
-        -   Translation and rotation parameters from the camera look incorrect.
-    -   Oak-D Pro 4 – new camera coming – status is TBD.
--   Important feature options are presented the same way as Global and RedCloud.
-    -   Feature options also include some options for edges and lines.
--   Feature coordinate system (FCS) interface was reworked with better colors and aging.
--   Included in this version of OpenCVB is the notion of “LogicalDepth”.
-    -   LogicalDepth.vb code shows how lines in depth can enhance depth data.
-    -   Lines in depth indicate depth that is logically connected and linear.
-    -   How to get lines in depth? Structured.vb algorithms have long provided it.
-    -   Similar to structured light, structured.vb finds lines in X and Y directions.
-    -   Below is an example of showing how lines are found in structured depth.
--   RGB lines can be used in a similar manner to depth lines but with a difference.
-    -   RGB lines will not have consistent depth on both sides of the line.
-    -   However, an edge in RGB suggests a disparity in depth.
-        -   Lines on a wall and painting frame will have similar depth values.
-    -   Lines in depth should have coherent depth for the length of the line.
-    -   Optical illusions are examples of when lines are not coherent, hopefully rare.
+-   A variety of alternative inputs were added for grayscale and color.
+    -   Any algorithm can be tested with different input using one click.
+    -   Working on edge detection? Prep the input as a sharpened image.
+    -   Working on RGB images? Test the algorithm again with HSV data.
+    -   Successful experiments would implement the alternative by default.
+    -   “Feature Options” (behind the global options) has the complete list.
+-   The option for a random palette for all OpenCVB algorithms was removed.
+    -   The fixed palette is always preferred and simplifies that user interface.
+-   Logical depth is now visualized in OpenGL for comparison with raw data.
+    -   Currently, the logical depth is not as good as the original data.
+    -   But the potential is there for improvement.
+    -   Gradient_Line smoothly applies a linear function to depth data.
+-   Overnight testing could fail when image jumped in size – now corrected.
+-   Removed the ‘Advice’ scheme – not needed when source is available.
+    -   Also, it was too much work to keep up to date.
+-   OpenCVB’s matrix of squares (bricks) covers the entire image.
+    -   Depth, left/right correlation, features can categorize bricks into groups.
+    -   Any problem can be made more manageable when working with bricks.
+-   Features of Delaunay polygons that extend beyond the image define a periphery.
+    -   The complementary interior defines a fully connected and visible region.
+    -   The Feature Coordinate System (FCS) also labels undefined regions.
+-   Intel RealSense support now handles the mapping of RGB to left/right images.
+    -   Support for multiple Intel cameras broke (name change?). Now fixed.
+        -   Multiple cameras can be attached but only one camera will be used.
+    -   The Oak-D camera support is still TBD – Oak-D Pro 4 camera not here yet.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/8ecc1cc1682ce29ec4ba0dd0fdd6d9db.gif)
+![A screenshot of a computer AI-generated content may be incorrect.](media/79f6e36c9e119263741e7b3774c34c3e.png)
 
-**Structured_Core:** *The Structured_Core algorithm is similar in concept to structured light without additional hardware. All RGBD cameras can produce depth lines. By slicing through the point cloud with various increments, this example produces edges which line detection can use to find lines.  Note how lines change from one depth image to the next.  Depth data is fairly chaotic pixel by pixel. Depth lines should be coherent and will form the basis of ‘Logical Depth’.*
+**Brick_LeftRightMouse:** *This algorithm translates path of the mouse movement in the color image to the left camera image (below left.) The bricks in the lower left are then translated to the right image (below right.) The reason this was difficult is that the RealSense cameras don’t align the left image with the color image automatically. Only the RealSense cameras require this 2-step translation.*
+
+![A collage of images of hands typing on a computer AI-generated content may be incorrect.](media/136a1ba998770c8ce43cb4b2fd8c0080.png)
+
+**Brick_LeftRightMouse:** *This algorithm is the same as the one above but uses the StereoLabs ZED 2 camera. Here the color image is aligned with the left image while the RealSense example shows that the left camera is not aligned with the color image. For both sample outputs, the lower right image shows the selected cells that match those in the lower left confirming that the translation between left and right cameras is working properly. There are other considerations though but that is TBD.*
+
+\------------------------------------------------------------------------------------------------------------------
+
+NOTE: OpenCVB has evolved away from implementing algorithms in multiple languages because AI has made it convenient to translate the algorithms into any language. While C\#, C++, and Python are often discussed below, the algorithms are now exclusively written in VB.Net because it is the most convenient to type in and the simplest to read. Translate to any language using CodeConvert.ai.
+
+\------------------------------------------------------------------------------------------------------------------
 
 # Introduction
 
-There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having 1000’s of OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. Moreover, each algorithm is free from any baggage from a user interface or environment.
+There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having 1000’s of OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. Moreover, each algorithm is free of any baggage from a user interface or environment.
 
-A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBZ cameras listed below.
+A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBD cameras listed below.
 
-However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized. The output is often self-documenting or a natural representation of the algorithm’s in tent.
+However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized. The output is often self-documenting or a natural representation of the algorithm’s intent.
 
 The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<All but Python\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
 
@@ -64,13 +74,9 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 **Pixel Viewer:** *The ![](media/b5c54b9b31c1c9e4aabb65640ba92463.png) button will display a separate form showing the pixel values for any of the 4 images. The pixel viewer is aware of the image type so if the image is 32 bit, it will show the floating point values.*
 
-**Create Algorithm:** *The ![](media/850a870af3b7ca340674f12fb84dd90e.png) button will open a dialog box that guides the user to create a new algorithm. The different types of algorithms that may be created are VB.Net, C++, OpenGL, C\#, or Python.*
-
-**Complexity Evaluation:** *The ![](media/a5052fbe863b1a080812ce60d9b4644f.png) button will run the current algorithm across a variety of resolutions to evaluate the complexity of the algorithm. Complexity if often designated as O(n), hence the ![](media/a5052fbe863b1a080812ce60d9b4644f.png) icon.*
-
 **Algorithm Translation:** *The ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button invokes the Touchup.exe application that guides the translation of VB.Net algorithms to C\#.*
 
-**Advice/Info Button:** *The ![](media/e895e394551ce117375db85115ea6cd5.png) button will display any advice about how to use the algorithm. With so many global and local options, this advice will highlight which sliders or check boxes are most relevant to impacting the current algorithm.*
+**Create Algorithm:** *The ![](media/850a870af3b7ca340674f12fb84dd90e.png) button will open a dialog box that guides the user to create a new algorithm. The different types of algorithms that may be created are VB.Net, C++, OpenGL, C\#, or Python.*
 
 **OpenCVB Main Form Caption:** *The caption at the top requires some further explanation. The number of lines of code in OpenCVB and algorithms are shown. Using these, the average number of lines per algorithm is computed. Also, the name of the current camera is shown next to the frame rate for the camera and the frame rate for the algorithm. The camera is in its own thread so its frame rate may be higher than the rate at which the frames are processed in the algorithm thread.*
 
@@ -78,7 +84,7 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 The objective is to solve many small computer vision problems and do so in a way that enables any of the solutions to be reused. The result is a toolkit for solving incrementally bigger problems. The hypothesis behind this approach is that human vision is not computationally intensive but is built on many, usually trivial algorithms working together. Computer vision problems are not huge; there are just an unmanageable number of them. A single app that allows algorithms to be easily created and combined is the primary motivation for the OpenCVB application.
 
-OpenCVB is targeting only RGBZ cameras that produce depth and color and have an IMU to detect gravity and motion. These newer cameras have prompted a review of existing vision algorithms to see how they can be improved if depth and gravity are known. To enable revisiting existing algorithms, this software provides a single application that can run OpenCV algorithms on any of the cameras listed below.
+OpenCVB is targeting only RGBD cameras that produce depth and color and have an IMU to detect gravity and motion. These newer cameras have prompted a review of existing vision algorithms to see how they can be improved if depth and gravity are known. To enable revisiting existing algorithms, this software provides a single application that can run OpenCV algorithms on any of the cameras listed below.
 
 Supporting multiple cameras with the same application adds a further level of generalization. Plus, adding more cameras is a multiplier. If there are over 2000 algorithms and 6 supported cameras, testing all of them requires 12,000 tests which is the reason for the integrated regression testing. If the different resolutions are added, the multiplier and the need for regression testing is even greater.
 
@@ -104,7 +110,7 @@ Here are the pre-install requirements:
 -   Visual Studio Community Edition (free)
 -   Install Python from <https://www.python.org/downloads/>
     -   Be sure to click the option to add Python to the path.
--   Any one of the following RGBZ cameras:
+-   Any one of the following RGBD cameras:
     -   Microsoft Kinect for Azure
     -   Intel RealSense D435i
     -   StereoLabs ZED2
@@ -175,7 +181,6 @@ Some typical problems with new installations:
         -   Review the output of the “Update_All.bat” run. Which component didn’t complete?
     -   Post any problems encountered. Install problems have the highest priority.
 -   Camera Failure: check the camera installation by testing the examples provided by the camera vendor. Did the Kinect4Azure support get upgraded recently? Post if some configuration problems prevent the camera from working in OpenCVB.
--   Python Scripts Fail: if any Python scripts fail, open a command line window and run the script. The error messages will indicate which package is missing from your Python installation. Any Python script problem is likely to be a missing package. But the challenge is identifying which package.
 -   Link problems: the C++ code in OpenCVB relies on PragmaLibs.h which is automatically created as part of the build process. “PragmaLibs.h” defines the names of the OpenCV libraries. It should be updated automatically with the current OpenCV version that is in use. If not, run the “VersionUpdates” application included in the OpenCVB tree. “VersionUpdates” will update the names of the files from OpenCV to be linked into the OpenCVB interfaces. Open the “PragmaLibs.h” file to see the current version of OpenCV that is expected to be present.
 
 # Building New Experiments with Snippets
@@ -222,77 +227,29 @@ One side benefit of the “Test All” feature is that it provides a way to visu
 
 # Why VB.Net?
 
-VB.Net is not a language typically associated with computer vision algorithms. But the abundance of examples in OpenCVB suggests this may be an oversight. Even the seasoned developer should recognize what is obvious to the beginner: VB.Net can keep the code simple to read and write. Papers and articles on software often use pseudo-code to present an algorithm. In many respects, VB.Net code resembles pseudo-code except it is an actual working implementation of the algorithm.
+VB.Net is not a language typically associated with computer vision algorithms. But the abundance of examples in OpenCVB suggests this may be an oversight. Even the seasoned developer should recognize what is obvious to the beginner: VB.Net is convenient to write and simple to read. Papers and articles on software often use pseudo-code to present an algorithm. In many respects, VB.Net code resembles pseudo-code except it is an actual working implementation of the algorithm.
 
-VB.Net provides a full-featured language just like C\# with lambda functions and multi-threading except VB.Net uses only a subset of the special keys available on the keyboard. Contrasted with Python or C++, VB.Net need make no apologies for using real words instead of the keyboard hieroglyphics defined in Python or C++. VB.Net syntax is easier to recall and much easier to type in – the Intellisense is better than any other language. VB.Net includes user interface tools that are flexible and complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI library. (All existing HighGUI interfaces are still supported in OpenCVB.)
+VB.Net provides a full-featured language just like C\# with lambda functions and multi-threading except VB.Net uses only a subset of the special keys available on the keyboard. Contrasted with Python or C++, VB.Net need make no apologies for using real words instead of the keyboard hieroglyphics defined in Python or C++. VB.Net syntax is easier to recall and much easier to type in – the IntelliSense is better than any other language. VB.Net includes user interface tools that are flexible and complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI library. (All existing HighGUI interfaces are still supported in OpenCVB.)
 
-The main caution in using VB.Net is to treat it as a scripting language like Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be detailed but it will be slower than optimized C++. Usually, the VB.Net algorithm is doing most of the real work in optimized C++ through the OpenCVSharp interface. Most algorithms run reasonably fast even in Debug mode because the release version of OpenCVSharp is active when OpenCVB is in Debug mode. Review the OpenCVB setup using Visual Studio’s “Build/Configuration Manager”.
+The main caution in using VB.Net is to treat it as a scripting language like Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be detailed but it will be slower than optimized C++ and the VB.Net code in OpenCVB is in debug mode and not optimized. Usually, the VB.Net algorithm is doing most of the real work in optimized C++ through the OpenCVSharp interface. Most algorithms run reasonably fast even in Debug mode because the release version of OpenCVSharp is active when OpenCVB is in Debug mode.
 
-Critics will point out that a Windows 10/11 app using VB.Net is not easily portable to other platforms. The entire OpenCVB application does not need to be ported to other platforms. Only individual algorithms are likely to be ported after they are debugged and polished. Most OpenCVB algorithms consist almost entirely of OpenCV APIs which are available everywhere. OpenCVB’s value lies in the ability to experiment and test an OpenCV algorithm. After the prototype is complete the algorithm can be transferred to a different platform.
+Review Visual Studio’s “Build/Configuration Manager” see what portions of OpenCVB are optimized and which are in Debug mode. OpenCVB’s Debug version is the only version that is really used but the Release version is there as well.
 
-OpenCVB also includes the ability to translate VB.Net algorithms to C\#. A new icon is present in the OpenCVB user interface. The translation is a 98% translation where the user must manually replace some VB.Net names. The small app “Touchup.exe” provides almost all that is needed after translation with AI.
+Critics will point out that a Windows 10/11 app using VB.Net is not easily portable to other platforms. The entire OpenCVB application does not need to be ported to other platforms. Only individual algorithms are likely to be ported after they are debugged and polished. Most OpenCVB algorithms consist almost entirely of OpenCV APIs which are available everywhere. OpenCVB’s value lies in the ability to experiment and test an OpenCV algorithm. After the prototype is complete the algorithm can be transferred to a different platform or a different language using any of the AI translators.
 
 # Camera Interface
 
-All the camera code is organized with the “camera” class – see cameraRS2.vb, cameraKinect.vb, cameraMynt.vb, cameraOakD.vb, or cameraZed2.vb. There are no references to camera interfaces anywhere in the code except for the main user interface form – OpenCVB.vb. Isolating the camera support from the algorithms strips the algorithm code to just the essential OpenCV API’s needed.
-
-For example, the Kinect for Azure camera support is in the cameraKinect.vb class. The C++ interface to the Kinect for Azure camera is in a supporting Kinect4Azure DLL. Since there is likely to be little interest in debugging the Kinect4Azure DLL, the Release version is used even in the Debug configuration. If it is necessary to debug the camera interface, open the Build/Configuration Manager menu and modify the desired camera entry to use the Debug version. Using Release versions naturally enables a higher framerate and as a result, the VB.Net code – which is usually in Debug mode - is almost as fast as the Release configuration.
+All the camera code is organized with the “camera” class – see any of the Camera\<type\>.vb modules. There are no references to camera interfaces anywhere in the code except for the main user interface form –MainUI.vb. Isolating the camera support from the algorithms strips the algorithm code to just the essential OpenCV API’s needed.
 
 # OpenGL Interface
 
 There have been several attempts to provide OpenGL interfaces into managed code, but none is used here. OpenGL is simply run in a separate process. To accommodate running separately, a named-pipe moves the image data to the separate process and a memory-mapped file provides a control interface. The result is both robust and economical while making the OpenGL code independent of camera hardware specifics. The VB.Net code for the OpenGL interface is less than a page and does not require much memory or CPU usage.
 
-To accommodate building new OpenGL experiments, OpenCVB includes an interface shown below in the section on creating new algorithms. The interface is triggered with one of the ![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png) button in the OpenCVB toolbar. The interface can add a variety of algorithms as indicated below.
-
-# Python Interface
-
-OpenCV has numerous examples of Python scripts and Python is often used for computer vision experiments. To add a new Python script for use with OpenCVB, add the Python script to the Python_Classes project so any changes to a Python script will automatically show the new or renamed Python files in the user interface. Python scripts don’t require a VB.Net wrapper – just add a new script to the VB_Classes Project – and it will appear in the user interface.
-
-Python scripts can get a stream of images from the camera and return resulting images. There are numerous examples of how to do this: see AddWeighted_PS.py or Camshift_PS.py for the simplest examples. The “_PS” suffix is an OpenCVB convention that indicates it is a Python Streaming script that expects a stream of RGB and Depth images and will return images. NOTE: The Python Streaming scripts MUST end with “_PS.py” to stream images to and from Python code. Other Python scripts don’t require anything from OpenCVB and can use any name. To see the list of all the Python Streaming scripts, select the pre-defined subset group called “\<PyStream\>”.
-
-Some care is required when first using an OpenCVB “PyStream” script. The algorithm thread is writing to a pipe received by the Python script. However, if the right version of Python is not set in OpenCVB or some of the packages are missing, it will appear to hang the algorithm thread in OpenCVB. The problem is almost always a missing Python package.
-
-# Python Installation
-
-If any of the Python scripts fail, open a command line window and run the script. The error messages will indicate what is wrong. The most likely problem is a missing package. Use Visual Studio’s “Tools/Python” menu to manage your Python packages.
-
-Python scripts are run in a separate address space when invoked by OpenCVB just like OpenGL. Visual Studio’s Python debugging environment is not available directly when running OpenCVB. When a Python script fails in OpenCVB, it will disappear, but it may be tested in a command line window to reveal the error messages.
-
-# Creating C++ “AI_Generated” Algorithms
-
-There are some tools included with OpenCVB which make it a lot easier to add C++ algorithms. The toolbar includes 2 icons for this purpose:
-
-![](media/6ea4526065a1fa32388a4a5305706527.png)
-
-**Toolbar additions:** *The ![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png) button is used to add new algorithms. The ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button is an interface to Microsoft’s ChatGPT or Google’s Bard to move the current algorithm from VB.Net to C++.*
-
-Adding a new algorithms to OpenCVB can take one of the several forms outlined in the figure below.
-
-![A screenshot of a computer Description automatically generated](media/2e5935027deb91c182c989b526074bf1.png)
-
-**Building New OpenCVB algorithms:** *The form above is accessed by clicking on the ![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png) button in the main toolbar for OpenCVB. Once a name is decided on, clicking on one of the buttons will add the new algorithm to OpenCVB.*
-
-# The quickest way to add a new C++ algorithm is to use the “VB_to_CPP” project included in the “OpenCVB.sln” file.
-
--   Set the “Startup Project” in OpenCVB’s Visual Studio solution to “VB_to_CPP”.
-    -   The output of “VB_to_CPP” includes the VB.Net version on one side and the C++ equivalent on the other side.
--   Following the step-by-step instructions for the translator will automatically insert the new C++ algorithm into the “CPP_AI_Generated.h” file – an ‘Include Only’ style .h file which can be included into a C++ project. No library or link update is required.
--   The algorithm is translated into C++ but there are usually errors. To fix these errors, there are 2 methods:
-    -   Tweak the VB_to_CPP.vb code to update this and all future VB.Net translations.
-    -   Or: tweak the C++ code in “CPP_AI_Generated.h” to update only the current algorithm.
--   Rerun the “VB_to_CPP” application until the C++ code compiles and works.
--   Currently, there is no support for options for C++ IncludeOnly algorithms.
-    -   Options are dependent on the user interface.
-    -   Variables that are typically options will be marked with “options_” at the start of the variable name.
-    -   All of the currently available Options.vb entries are already translated into the C++ interface.
-
-There are nearly 2000 VB.Net algorithms included in OpenCVB and there are currently hundreds of C++ translated algorithms. It is expected that future releases of OpenCVB will include more C++ editions of VB.Net algorithms. Translating any of the VB.Net algorithms to C++ provides an excellent code review of both the VB.Net and C++ code.
-
 # Visual Studio C++ Debugging
 
 The Visual Studio projects can be configured to simultaneously debug both managed and unmanaged code seamlessly. The property “Enable Native Code Debugging” for the managed projects controls whether C\# or VB.Net code will step into C++ code while debugging.
 
-However, leaving that property enabled all the time means that the OpenCVB will take longer to start – approximately 5 seconds vs. 3 seconds on a higher-end system. The default is to leave the “Enable Native Code Debugging” property off so OpenCVB will load faster. Of course, if there is a problem in the C++ code that is best handled with a debug session, turn on the “Enable Native Code Debugging” property in the OpenCVB VB.Net project and invoke the algorithm requiring C++ debugging.
+However, leaving that property enabled all the time means that the OpenCVB will take a few seconds longer to start. The default is to leave the “Enable Native Code Debugging” property uncheckedso OpenCVB will load faster. Of course, if there is a problem in the C++ code that is best handled with a debug session, turn on the “Enable Native Code Debugging” property in the OpenCVB VB.Net project and invoke the algorithm requiring C++ debugging.
 
 # StereoLabs Zed 2 and 2i Support
 
@@ -319,9 +276,9 @@ The Mynt D SDK creates a system environmental variable MYNTEYED_SDK_ROOT that al
 
 The TreeView shows the different layers of the algorithm and how it was built from other OpenCVB algorithms. Here is a simple algorithm tree view that shows how the “KNN_TrackEach” algorithm was built:
 
-![A screenshot of a computer program Description automatically generated](media/c844902ab4d892dcf51d5a2d24c676f0.png)
+![A screenshot of a computer AI-generated content may be incorrect.](media/64308265bbf494cf5be99e354777c061.png)
 
-**KNN_TrackEach:** *The tree above describes how the algorithm calls KNN_Basics and how KNN_Basics calls KNN_Core. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
+**Brick_FeatureLess:** *The tree above describes what algorithms are used by Brick_Featureless. Many of the existing entries are for “Task Algorithms” which are always run on every frame. Clicking on any of the entries will show the output of the selected algorithm in OpenCVB’s output window. This is extremely useful for understanding the various steps needed to build the output.*
 
 *Play with this when running OpenCVB. It is a fun feature and helps increase understanding of the composition of increasingly complex algorithms.*
 
@@ -2009,3 +1966,37 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of people and objects AI-generated content may be incorrect.](media/ef742dde619d31abd091b68a09c09191.gif)
 
 **GridCell_Info :** *This algorithm displays the contents of the grid cell under the mouse cursor but the goal here is to show the impact of removing cells that have a high difference from the disparity in the cell’s neighbor. Essentially, this is edge detection in depth and removes the cells with unreliable depth data – visible in the upper right image..*
+
+# 2025 April (2) – Camera Support, Feature Options, FCS, Logical Depth, and RGB Lines.
+
+-   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
+-   Support added for some new cameras: Orbbec Gemini 335, Orbbec Gemini 336L
+-   UPDATE: Camera support for color and left aligned images:
+    -   StereoLabs ZED – working – camera aligns color and left view.
+    -   Orbbec Gemini 335L – working – camera aligns color and left view.
+    -   Orbbec Gemini 336L – working – camera aligns color and left view.
+    -   Orbbec Gemini 335 – working - camera aligns color and left view.
+    -   Intel RealSense – not working – camera does not align left and color views.
+        -   Manual alternative is not working either.
+        -   Translation and rotation parameters from the camera look incorrect.
+    -   Oak-D Pro 4 – new camera coming – status is TBD.
+-   Important feature options are presented the same way as Global and RedCloud.
+    -   Feature options also include some options for edges and lines.
+-   Feature coordinate system (FCS) interface was reworked with better colors and aging.
+-   Included in this version of OpenCVB is the notion of “LogicalDepth”.
+    -   LogicalDepth.vb code shows how lines in depth can enhance depth data.
+    -   Lines in depth indicate depth that is logically connected and linear.
+    -   How to get lines in depth? Structured.vb algorithms have long provided it.
+    -   Similar to structured light, structured.vb finds lines in X and Y directions.
+    -   Below is an example of showing how lines are found in structured depth.
+-   RGB lines can be used in a similar manner to depth lines but with a difference.
+    -   RGB lines will not have consistent depth on both sides of the line.
+    -   However, an edge in RGB suggests a disparity in depth.
+        -   Lines on a wall and painting frame will have similar depth values.
+    -   Lines in depth should have coherent depth for the length of the line.
+    -   Optical illusions are examples of when lines are not coherent, hopefully rare.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of different colors AI-generated content may be incorrect.](media/8ecc1cc1682ce29ec4ba0dd0fdd6d9db.gif)
+
+**Structured_Core:** *The Structured_Core algorithm is similar in concept to structured light without additional hardware. All RGBD cameras can produce depth lines. By slicing through the point cloud with various increments, this example produces edges which line detection can use to find lines. Note how lines change from one depth image to the next. Depth data is fairly chaotic pixel by pixel. Depth lines should be coherent and will form the basis of ‘Logical Depth’.*

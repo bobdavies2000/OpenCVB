@@ -94,8 +94,6 @@ Public Class LineRGB_Raw : Inherits TaskParent
         If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
         Dim lines = ld.Detect(src)
-
-
         lpList.Clear()
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
