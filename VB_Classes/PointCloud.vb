@@ -409,7 +409,7 @@ Public Class PointCloud_GridInspector : Inherits TaskParent
         For i = 0 To dst2.Height - 1 Step task.cellSize
             Dim pt = New cv.Point2f(cLine, i)
             Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-            Dim xyz = task.brickList(index).pt3D
+            Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(task.brickList(index).pt.Y, task.brickList(index).pt.X)
             SetTrueText("Row " + Format(i, "00") + vbTab + vbTab + Format(xyz(0), fmt2) + vbTab + Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
         Next
         labels(2) = "Values displayed are the point cloud X, Y, and Z values for column " + CStr(cLine)
@@ -696,7 +696,11 @@ Public Class PointCloud_Continuous_GridX : Inherits TaskParent
         Dim gcPrev = task.brickList(0)
         For Each brick In task.brickList
             If brick.rect.X > 0 Then
-                If Math.Abs(brick.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(255) Else dst3(brick.rect).SetTo(255)
+                If Math.Abs(brick.depth - gcPrev.depth) <= task.depthDiffMeters Then
+                    dst2(brick.rect).SetTo(255)
+                Else
+                    dst3(brick.rect).SetTo(255)
+                End If
             End If
             gcPrev = brick
         Next
@@ -727,8 +731,8 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
             Dim gcAbove = task.brickList(CInt(brick.index Mod task.cellsPerRow))
             If brick.correlation > task.fCorrThreshold Then
                 If brick.rect.Y = 0 Or brick.rect.X = 0 Then Continue For
-                If Math.Abs(brick.pt3D(2) - gcPrev.pt3D(2)) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(128)
-                If Math.Abs(brick.pt3D(2) - gcAbove.pt3D(2)) <= task.depthDiffMeters And
+                If Math.Abs(brick.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(128)
+                If Math.Abs(brick.depth - gcAbove.depth) <= task.depthDiffMeters And
                 brick.rect.Width = cellMat.Width And brick.rect.Height = cellMat.Height Then
                     cv.Cv2.Add(dst2(brick.rect), cellMat, dst2(brick.rect))
                 End If

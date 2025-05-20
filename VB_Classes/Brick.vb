@@ -510,6 +510,7 @@ End Class
 
 Public Class Brick_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
+    Public features() As List(Of cv.Point)
     Public Sub New()
         task.featureOptions.DistanceSlider.Value = 3
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -521,18 +522,15 @@ Public Class Brick_Features : Inherits TaskParent
 
         dst2 = task.brickBasics.dst2
 
-        For i = 0 To task.brickList.Count - 1
-            Dim brick = task.brickList(i)
-            brick.features.Clear()
-            task.brickList(i) = brick
-        Next
+        ReDim features(task.gridRects.Count - 1)
 
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
             Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.brickList(index)
-            brick.features.Add(pt)
+            If features(index) Is Nothing Then features(index) = New List(Of cv.Point)
+            features(index).Add(pt)
             DrawCircle(dst2, brick.rect.TopLeft, task.DotSize, task.highlight)
 
             rects.Add(brick.rect)
@@ -541,8 +539,13 @@ Public Class Brick_Features : Inherits TaskParent
 
         task.featureRects.Clear()
         task.fLessRects.Clear()
-        For Each brick In task.brickList
-            If brick.features.Count > 0 Then task.featureRects.Add(brick.rect) Else task.fLessRects.Add(brick.rect)
+        For i = 0 To features.Count - 1
+            Dim ptlist = features(i)
+            If ptlist Is Nothing Then
+                task.fLessRects.Add(task.brickList(i).rect)
+            Else
+                task.featureRects.Add(task.brickList(i).rect)
+            End If
         Next
 
         If task.gOptions.DebugCheckBox.Checked Then
@@ -651,8 +654,8 @@ Public Class Brick_Correlation : Inherits TaskParent
         dst2.Rectangle(brick.lRect, grayScale, task.lineWidth)
         dst3.Rectangle(brick.rRect, grayScale, task.lineWidth)
 
-        dst2.Rectangle(brick.hoodRect, grayScale, task.lineWidth)
-        dst3.Rectangle(brick.rHoodRect, grayScale, task.lineWidth)
+        'dst2.Rectangle(brick.hoodRect, grayScale, task.lineWidth)
+        'dst3.Rectangle(brick.rHoodRect, grayScale, task.lineWidth)
 
         labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
     End Sub
@@ -677,7 +680,6 @@ Public Class Brick_Info : Inherits TaskParent
         strOut = labels(2) + vbCrLf + vbCrLf
 
         dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
-        dst2.Rectangle(brick.hoodRect, task.highlight, task.lineWidth)
 
         strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf

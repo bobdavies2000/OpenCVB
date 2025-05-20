@@ -426,7 +426,7 @@ End Class
 Public Class BrickPoint_FLessRegions : Inherits TaskParent
     Public hist As New Hist_BrickRegions
     Public Sub New()
-        desc = "Build a mask for the featureless regions fleshed out by Hist_GridPointRegions"
+        desc = "Build a mask for the featureless regions fleshed out by Hist_BrickRegions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hist.Run(src)

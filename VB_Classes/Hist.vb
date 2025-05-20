@@ -1446,6 +1446,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
 
         Dim histList = New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim predictedList As New List(Of Integer)
+        Dim brick As brickData
         For Each brick In task.brickList
             If brick.fLessIndex Then
                 Dim nabes = task.gridNeighbors(brick.index)
@@ -1460,21 +1461,21 @@ Public Class Hist_BrickRegions : Inherits TaskParent
             End If
         Next
 
-        Dim brickIndex = -1, gc1 As brickData, histogram As New cv.Mat, histArray(256 - 1) As Single
+        Dim brickIndex = -1, histogram As New cv.Mat, histArray(256 - 1) As Single
         dst1 = fLess.dst2.Clone
         For Each ele In histList
             If brickIndex <> ele.Key Then
                 brickIndex = ele.Key
-                gc1 = task.brickList(brickIndex)
+                brick = task.brickList(brickIndex)
 
-                cv.Cv2.CalcHist({task.grayStable(gc1.rect)}, {0}, Not task.edges.dst2(gc1.rect), histogram, 1, {task.histogramBins}, ranges)
+                cv.Cv2.CalcHist({task.grayStable(brick.rect)}, {0}, Not task.edges.dst2(brick.rect), histogram, 1, {task.histogramBins}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
                 Dim arrayStart = -1
                 Dim arrayEnd = 0
                 For i = 0 To histArray.Count - 1 ' there is often garbage in histarray(255) but why?  Eliminate it here.
                     If histArray(i) >= 1 Then
                         If arrayStart = -1 Then arrayStart = i
-                        histArray(i) = gc1.fLessIndex
+                        histArray(i) = brick.fLessIndex
                         If arrayStart < 255 Then
                             If i <> 255 Then arrayEnd = i
                         Else
@@ -1485,7 +1486,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
 
                 ' fill in any gaps in the series!
                 For i = arrayStart To arrayEnd
-                    histArray(i) = gc1.fLessIndex
+                    histArray(i) = brick.fLessIndex
                 Next
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If

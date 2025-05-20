@@ -522,35 +522,29 @@ Public Class brickData
     Public center As cv.Point ' center of the rectangle
     Public depth As Single
     Public depthRanges As New List(Of Single)
-    Public pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this grid cell.
 
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
-    Public features As New List(Of cv.Point)
-    Public prevFeature As cv.Point ' the max grid output from the previous image
     Public feature As cv.Point ' the max grid output from the current image
     Public intensity As Byte ' sobel maximum intensity in this grid cell.
     Public pt As cv.Point ' feature absolute coordinates.
-    Public hoodRect As cv.Rect ' a rect describing the neighborhood of the center cell...
-    Public rHoodRect As cv.Rect ' a rect describing the neighborhood of the center cell for the right image.
     Sub New()
         Dim stdev As cv.Scalar
         index = task.brickList.Count
         rect = task.gridRects(index)
         lRect = rect
-        hoodRect = rect
-        rHoodRect = hoodRect
 
         age = task.motionBasics.cellAge(index)
         color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
         lRect = rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
+        Dim pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this grid cell.
         cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), pt3D, stdev, task.depthMask(rect))
         depth = pt3D(0)
 
-        For Each rectIndex In task.gridNeighbors(index)
-            hoodRect = hoodRect.Union(task.gridRects(rectIndex))
-        Next
+        'For Each rectIndex In task.gridNeighbors(index)
+        '    hoodRect = hoodRect.Union(task.gridRects(rectIndex))
+        'Next
 
         If depth > 0 Then
             task.pcSplit(2)(rect).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(rect))
