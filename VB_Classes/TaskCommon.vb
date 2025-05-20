@@ -539,7 +539,6 @@ Public Class brickData
         index = task.brickList.Count
         rect = task.gridRects(index)
         lRect = rect
-        rRect = lRect
         hoodRect = rect
         rHoodRect = hoodRect
 

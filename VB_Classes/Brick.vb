@@ -39,7 +39,6 @@ Public Class Brick_Basics : Inherits TaskParent
                     brick.age = task.motionBasics.cellAge(i)
                     unchangedCount += 1
                 Else
-                    ' everything is recomputed when there is motion in the cell.
                     If task.rgbLeftAligned Then
                         brick.rRect = brick.lRect
                         brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
@@ -89,6 +88,8 @@ Public Class Brick_Basics : Inherits TaskParent
                 End If
                 brick.depthRanges.Add(brick.mm.range)
                 brick.corrHistory.Add(brick.correlation)
+            Else
+                Dim k = 0
             End If
 
             dst2(brick.rect).SetTo(brick.color)
@@ -126,44 +127,6 @@ Public Class Brick_Basics : Inherits TaskParent
         ptTopLeft = ptCursor ' task.gcD.rect.TopLeft ' in case it needs to switch back...
     End Sub
 End Class
-
-
-
-
-
-'Public Class Brick_MouseDepth : Inherits TaskParent
-'    Public ptCursor As New cv.Point
-'    Public ptTextLoc As New cv.Point
-'    Public ptTopLeft As New cv.Point
-'    Public depthAndCorrelationText As String
-'    Public Sub New()
-'        desc = "Provide the mouse depth at the mouse movement location."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
-'        If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
-'        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-'        task.gcD = task.brickList(index)
-'        If standaloneTest() Then dst2 = task.brickBasics.dst3
-
-'        Dim pt = task.gcD.rect.TopLeft
-'        If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
-'            pt.X -= dst2.Width * 0.15
-'        Else
-'            pt.Y -= task.gcD.rect.Height * 3
-'        End If
-
-'        depthAndCorrelationText = Format(task.gcD.depth, fmt3) +
-'                                  "m stdev " + Format(task.gcD.depthStdev, fmt1) + " ID=" +
-'                                  CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
-'                                  Format(task.gcD.mm.maxVal, fmt1) + "m, age = " + CStr(task.gcD.age) + vbCrLf + "correlation = " + Format(task.gcD.correlation, fmt3)
-'        ptCursor = validatePoint(task.mouseMovePoint)
-'        ptTextLoc = pt
-'        ptTopLeft = ptCursor ' task.gcD.rect.TopLeft ' in case it needs to switch back...
-'        If standaloneTest() Then SetTrueText(depthAndCorrelationText, ptCursor, 2)
-'    End Sub
-'End Class
-
 
 
 
@@ -964,8 +927,10 @@ Public Class Brick_LeftRight : Inherits TaskParent
         For i = 0 To task.cellsPerRow - 1 Step 2
             For j = i To task.gridRects.Count - task.cellsPerRow - 1 Step task.cellsPerRow
                 Dim brick = task.brickList(j)
-                dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
-                dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
+                If brick.depth > 0 Then
+                    dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
+                    dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
+                End If
             Next
         Next
     End Sub
