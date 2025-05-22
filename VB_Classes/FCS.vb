@@ -1,19 +1,14 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
     Dim fcs As New FCS_Core
-    Public tour As New Contour_List
     Public desiredMapCount As Integer = 5
     Public Sub New()
-        task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Note that the task.fcsMap uses the same colors as the task.tourMap - same index for both."
-        desc = "Create the reference map for FCS - updated on the heartbeat. "
+        desc = "Create the reference map for FCS. "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static restartRequest As Boolean
-        Dim count = task.motionMask.CountNonZero
-        tour.Run(src)
         fcs.inputFeatures.Clear()
-        For i = 1 To Math.Min(task.tourList.Count - 1, desiredMapCount)
+        For i = 0 To task.tourList.Count - 1
             fcs.inputFeatures.Add(task.tourList(i).maxDist)
         Next
         If task.tourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
@@ -24,10 +19,10 @@ Public Class FCS_Basics : Inherits TaskParent
 
         fcs.Run(emptyMat)
 
-        task.fcsMap = fcs.dst1.Clone
         dst2 = ShowPaletteFullColor(task.fcsMap)
-        dst3 = tour.dst2
+        dst3 = task.contours.dst2
         labels(2) = fcs.labels(2)
+        labels(3) = task.contours.labels(2)
     End Sub
 End Class
 
@@ -40,11 +35,11 @@ Public Class FCS_Core : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Public inputFeatures As New List(Of cv.Point2f)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
+        subdiv.InitDelaunay(New cv.Rect(0, 0, task.fcsMap.Width, task.fcsMap.Height))
         subdiv.Insert(inputFeatures)
 
         Dim facets = New cv.Point2f()() {Nothing}
@@ -55,12 +50,12 @@ Public Class FCS_Core : Inherits TaskParent
             For Each pt In facets(i)
                 facetList.Add(New cv.Point(pt.X, pt.Y))
             Next
-            dst1.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
+            task.fcsMap.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
         Next
 
         If standaloneTest() Then dst2 = ShowPalette(dst1)
 
-        If task.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count - 1) + " cells found." ' don't count tourList(0)
+        If task.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
     End Sub
 End Class
 

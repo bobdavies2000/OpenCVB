@@ -526,7 +526,6 @@ End Class
 
 
 Public Class Distance_Contour : Inherits TaskParent
-    Dim tour As New Contour_List
     Dim options As New Options_Distance
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
@@ -537,8 +536,8 @@ Public Class Distance_Contour : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        tour.Run(src)
-        dst2 = tour.dst2
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
 
         dst3 = src.Clone
         dst3(task.tourD.rect).SetTo(white, task.tourD.mask)

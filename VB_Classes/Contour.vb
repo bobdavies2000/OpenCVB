@@ -81,95 +81,6 @@ End Class
 
 
 
-
-
-Public Class Contour_List : Inherits TaskParent
-    Dim core As New Contour_Core
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        OptionParent.FindSlider("Max contours").Value = 10
-        desc = "Create the task.tourList and task.tourMap from Contour_BasicsOld"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = src.Clone
-        core.Run(task.color)
-        labels = core.labels
-
-        task.tourList.Clear()
-        task.tourList.Add(New tourData)
-        task.tourMap.SetTo(0)
-        For Each td In core.tourList
-            td.index = task.tourList.Count
-            td.maxDist = GetMaxDist(td.mask, td.rect)
-            task.tourList.Add(td)
-            task.tourMap(td.rect).SetTo(td.index, td.mask)
-        Next
-
-        dst2 = ShowPalette(task.tourMap)
-
-        If task.tourList.Count <= 1 Then
-            labels(2) = "There were no contours found!"
-            Exit Sub
-        End If
-
-        If standaloneTest() Then dst0(task.tourD.rect).SetTo(white, task.tourD.mask)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Contour_Core : Inherits TaskParent
-    Public contours As New Contour_BasicsOld
-    Public tourList As New List(Of tourData)
-    Public Sub New()
-        OptionParent.FindSlider("Max contours").Value = 10
-        desc = "Create only the tourList from Contour_BasicsOld but without a placeholder for zero."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        dst2 = contours.dst2
-        labels(2) = contours.labels(2)
-
-        tourList.Clear()
-        For Each tour In contours.contourList
-            Dim td = New tourData
-            td.index = tourList.Count
-            td.contour = New List(Of cv.Point)(tour)
-            td.pixels = contours.areaList(td.index)
-
-            Dim minX As Single = td.contour.Min(Function(p) p.X)
-            Dim maxX As Single = td.contour.Max(Function(p) p.X)
-            Dim minY As Single = td.contour.Min(Function(p) p.Y)
-            Dim maxY As Single = td.contour.Max(Function(p) p.Y)
-
-            td.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-            If td.rect.Width = 0 Or td.rect.Height = 0 Then Continue For
-
-            td.mask = contours.dst0(td.rect).Clone
-            td.mask = td.mask.InRange(td.index + 1, td.index + 1)
-
-            td.maxDist = GetMaxDist(td.mask, td.rect)
-
-            tourList.Add(td)
-
-            If standalone Then
-                dst2.Circle(td.maxDist, task.DotSize + 3, task.highlight, -1)
-                dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Contour_BasicsOld : Inherits TaskParent
     Public contourList As New List(Of cv.Point())
     Public areaList As New List(Of Integer) ' point counts for each contour in contourList above.
@@ -300,29 +211,25 @@ End Class
 
 
 Public Class Contour_Delaunay : Inherits TaskParent
-    Dim core As New Contour_List
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
         desc = "Use Delaunay to track maxDist point."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        core.Run(src)
-        labels(2) = core.labels(2)
+        dst3 = task.contours.dst2
+        labels(3) = task.contours.labels(2)
 
-        Dim ptSorted As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalInteger)
+        delaunay.inputPoints.Clear()
         For Each td In task.tourList
-            ptSorted.Add(td.index, td.maxDist)
+            delaunay.inputPoints.Add(td.maxDist)
         Next
 
-        delaunay.inputPoints = New List(Of cv.Point2f)(ptSorted.Values)
         delaunay.Run(emptyMat)
         dst2 = delaunay.dst2.Clone
 
         For Each td In task.tourList
             dst2.Circle(td.maxDist, task.DotSize, task.highlight, -1)
         Next
-
-        dst3 = ShowPalette(task.tourMap)
     End Sub
 End Class
 
@@ -1100,45 +1007,3 @@ End Class
 '    End Sub
 'End Class
 
-
-
-
-
-
-Public Class Contour_FCS : Inherits TaskParent
-    Dim core As New Contour_Core
-    Dim knn As New KNN_Basics
-    Dim delaunay As New Delaunay_Basics
-    Public desiredNodes As Integer = 10
-    Public Sub New()
-        desc = "Use the contours of the featureless regions to split the image into an FCS map."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        core.Run(src)
-        If core.tourList.Count < desiredNodes Then Exit Sub
-
-        dst2 = core.dst2
-
-        knn.queries.Clear()
-        For Each td In core.tourList
-            knn.queries.Add(td.maxDist)
-            If td.index < desiredNodes Then
-                dst2.Circle(td.maxDist, task.DotSize + 3, task.highlight, -1)
-                dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
-            End If
-        Next
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-
-        knn.Run(emptyMat)
-
-        ' input maxdist points were sorted by the size of the contour.
-        Dim ptMagnets As New List(Of cv.Point2f)
-        For i = 0 To desiredNodes - 1
-            ptMagnets.Add(knn.queries(i))
-        Next
-
-        delaunay.inputPoints = New List(Of cv.Point2f)(ptMagnets)
-        delaunay.Run(src)
-        dst3 = delaunay.dst2
-    End Sub
-End Class
