@@ -503,10 +503,13 @@ Public Structure mlColorInTier
     Dim x As Single
     Dim y As Single
 End Structure
+
+
+
+
+
 Public Class ML_ColorInTier2Depth : Inherits TaskParent
-    Dim minMax As New Grid_MinMaxDepth
     Dim color8U As New Color8U_Basics
-    Dim tiers As New Contour_BasicsOld
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."

@@ -90,25 +90,6 @@ End Class
 
 
 
-Public Class Foreground_Contours : Inherits TaskParent
-    Public fore As New Foreground_Hist3D
-    Dim contours As New Contour_BasicsOld
-    Public Sub New()
-        desc = "Create contours for the foreground mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fore.Run(src)
-
-        contours.Run(fore.dst2)
-        dst2 = contours.dst2
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Foreground_Hist3D : Inherits TaskParent
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()

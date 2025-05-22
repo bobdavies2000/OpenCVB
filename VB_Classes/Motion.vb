@@ -61,9 +61,7 @@ Public Class Motion_Basics : Inherits TaskParent
             diff.Run(src)
             dst3 = diff.dst2
             SetTrueText("NOTE: the differences should be small - no blobs or artifacts should be present." + vbCrLf +
-                        "Any differences that persist should not be visible in the RGB image at left." + vbCrLf +
-                        "Some differences will occur when the displayed size is not the working resolution size." + vbCrLf +
-                        "The anti-aliasing in the resize may produce some differences.", 3)
+                        "Any differences that persist should not be visible in the RGB image at left." + vbCrLf, 3)
         End If
         If task.heartBeatLT Then dst2 = src.Clone
     End Sub
@@ -1066,5 +1064,51 @@ Public Class Motion_TopFeatures : Inherits TaskParent
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_Blob : Inherits TaskParent
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for punch", 0, 255, 250)
+        desc = "Identify the difference in pixels from one image to the next"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = OptionParent.FindSlider("Threshold for punch")
+        Dim threshold = thresholdSlider.value
+
+        Static lastColor As cv.Mat = src.Clone
+
+        dst2 = src.Clone
+        dst2 -= lastColor
+        dst3 = dst2.Threshold(0, New cv.Scalar(threshold, threshold, threshold), cv.ThresholdTypes.Binary).ConvertScaleAbs
+
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        lastColor = src.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_BlobGray : Inherits TaskParent
+    Public Sub New()
+        desc = "Identify the difference in pixels from one image to the next"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lastGray As cv.Mat = task.gray.Clone
+
+        dst2 = task.gray.Clone
+        dst2 -= lastGray
+        dst3 = dst2.Threshold(task.featureOptions.ColorDiffSlider.Value, 255, cv.ThresholdTypes.Binary)
+
+        lastGray = task.gray.Clone
     End Sub
 End Class

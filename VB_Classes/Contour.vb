@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class Contour_BasicsOld : Inherits TaskParent
+Public Class Contour_Regions : Inherits TaskParent
     Public contourList As New List(Of cv.Point())
     Public areaList As New List(Of Integer) ' point counts for each contour in contourList above.
     Public options As New Options_Contours
@@ -252,9 +252,16 @@ Public Class Contour_LineRGB : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
 Public Class Contour_RotatedRects : Inherits TaskParent
     Public rotatedRect As New Rectangle_Rotated
-    Dim basics As New Contour_BasicsOld
+    Dim basics As New Contour_Regions
     Public Sub New()
         labels(3) = "Find contours of several rotated rects"
         desc = "Demo options on FindContours."
@@ -398,7 +405,7 @@ End Class
 
 Public Class Contour_Foreground : Inherits TaskParent
     Dim km As New Foreground_KMeans
-    Dim contour As New Contour_BasicsOld
+    Dim contour As New Contour_Regions
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Kmeans foreground output", "Contour of foreground"}
@@ -650,29 +657,6 @@ End Class
 
 
 
-
-Public Class Contour_CompareToFeatureless : Inherits TaskParent
-    Dim contour As New Contour_WholeImage
-    Dim fLess As New FeatureLess_Basics
-    Public Sub New()
-        labels = {"", "", "Contour_WholeImage output", "FeatureLess_Basics output"}
-        desc = "Compare Contour_WholeImage and FeatureLess_Basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contour.Run(src)
-        dst2 = contour.dst2
-
-        fLess.Run(src)
-        dst3 = fLess.dst3 ' .Threshold(0, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Contour_Smoothing : Inherits TaskParent
     Dim options As New Options_Contours2
     Public Sub New()
@@ -698,38 +682,6 @@ Public Class Contour_Smoothing : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-
-
-Public Class Contour_WholeImage : Inherits TaskParent
-    Dim contour As New Contour_BasicsOld
-    Public Sub New()
-        OptionParent.FindSlider("Max contours").Value = 20
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        desc = "Outline all the color contours found in the whole image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contour.Run(src)
-        Dim sortedContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
-        For Each tour In contour.contourList
-            sortedContours.Add(tour.Length, tour.ToList)
-        Next
-
-        dst2.SetTo(0)
-        For i = 0 To sortedContours.Count - 1
-            Dim tour = sortedContours.ElementAt(i).Value
-            DrawContour(dst2, tour, 255, task.lineWidth)
-        Next
-        labels(2) = CStr(sortedContours.Count) + " contours are shown below."
-    End Sub
-End Class
 
 
 

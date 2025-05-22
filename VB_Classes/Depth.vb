@@ -584,7 +584,7 @@ End Class
 
 
 Public Class Depth_MaxMask : Inherits TaskParent
-    Dim contour As New Contour_BasicsOld
+    Dim contour As New Contour_Regions
     Public Sub New()
         labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
         desc = "Display the task.maxDepthMask and its contour containing depth that is greater than maxdepth (global setting)"
@@ -592,7 +592,7 @@ Public Class Depth_MaxMask : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
 
-        task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+        task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, 30).ConvertScaleAbs()
         dst2.SetTo(white, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)
@@ -929,86 +929,11 @@ End Class
 
 
 
-Public Class Depth_PunchBlob : Inherits TaskParent
-    Dim depthDec As New Depth_PunchDecreasing
-    Dim depthInc As New Depth_PunchDecreasing
-    Dim contours As New Contour_BasicsOld
-    Dim lastContoursCount As Integer
-    Dim punchCount As Integer
-    Dim showMessage As Integer
-    Dim showWarningInfo As Integer
-    Public Sub New()
-        desc = "Identify the punch with a rectangle around the largest blob"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        depthInc.Run(src)
-        dst2 = depthInc.dst2
-
-        Dim mm As mmData = GetMinMax(dst2)
-        dst2.ConvertTo(dst1, cv.MatType.CV_8U)
-        contours.Run(dst1)
-        dst3 = contours.dst3
-
-        If contours.contourList.Count > 0 Then showMessage = 30
-
-        If showMessage = 30 And lastContoursCount = 0 Then punchCount += 1
-        lastContoursCount = contours.contourList.Count
-        labels(3) = CStr(punchCount) + " Punches Thrown"
-
-        If showMessage > 0 Then
-            SetTrueText("Punched!!!", New cv.Point(10, 100), 3)
-            showMessage -= 1
-        End If
-
-        If contours.contourList.Count > 3 Then showWarningInfo = 100
-
-        If showWarningInfo Then
-            showWarningInfo -= 1
-            SetTrueText("Too many contours!  Reduce the Max Depth.", New cv.Point(10, 130), 3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Depth_PunchBlobNew : Inherits TaskParent
-    Dim depthDec As New Depth_PunchDecreasing
-    Dim depthInc As New Depth_PunchDecreasing
-    Dim contours As New Contour_BasicsOld
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for punch", 0, 255, 250)
-        desc = "Identify a punch using both depth and color"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider = OptionParent.FindSlider("Threshold for punch")
-        Dim threshold = thresholdSlider.value
-
-        Static lastColor As cv.Mat = task.color.Clone
-
-        dst2 = task.color.Clone
-        dst2 -= lastColor
-        dst3 = dst2.Threshold(0, New cv.Scalar(threshold, threshold, threshold), cv.ThresholdTypes.Binary).ConvertScaleAbs
-
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        lastColor = task.color.Clone
-    End Sub
-End Class
-
-
-
-
-
 
 
 
 Public Class Depth_Contour : Inherits TaskParent
-    Dim contour As New Contour_BasicsOld
+    Dim contour As New Contour_Regions
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "task.depthMask contour"
@@ -1033,7 +958,7 @@ End Class
 
 
 Public Class Depth_Outline : Inherits TaskParent
-    Dim contour As New Contour_BasicsOld
+    Dim contour As New Contour_Regions
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

@@ -1,14 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
-    Public contours As New Contour_BasicsOld
     Public Sub New()
-        desc = "Use Contour_BasicsOld to get the contour data for the top X contours."
+        desc = "Use Contour_Basics to get the contour data for the top X contours."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        dst2 = contours.dst2
-        dst3 = contours.dst3
-        labels = contours.labels
+        dst2 = task.contours.dst2
+        dst3 = task.contours.dst3
+        labels = task.contours.labels
     End Sub
 End Class
 

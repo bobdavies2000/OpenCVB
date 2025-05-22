@@ -4879,7 +4879,7 @@ Public Class XO_Contour_RC_AddContour : Inherits TaskParent
     Public options As New Options_Contours
     Dim myFrameCount As Integer = task.frameCount
     Dim reduction As New Reduction_Basics
-    Dim contours As New Contour_BasicsOld
+    Dim contours As New Contour_Regions
     Public Sub New()
         desc = "Find the contour for the src."
     End Sub
