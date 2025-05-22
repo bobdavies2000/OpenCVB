@@ -526,7 +526,7 @@ End Class
 
 
 Public Class Distance_Contour : Inherits TaskParent
-    Dim tour As New Tour_Basics
+    Dim tour As New Contour_List
     Dim options As New Options_Distance
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
