@@ -1740,7 +1740,6 @@ End Class
 Public Class RedColor_Largest : Inherits TaskParent
     Public Sub New()
         task.gOptions.FrameHistory.Value = 1
-        task.redC = New RedColor_Basics
         desc = "Identify the largest redCloud cells and accumulate them by size - largest to smallest"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

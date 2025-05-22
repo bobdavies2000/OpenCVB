@@ -29,33 +29,6 @@ End Class
 
 
 
-Public Class Boundary_Tiers : Inherits TaskParent
-    Dim cells As New Boundary_Basics
-    Dim contours As New Contour_BasicsOld
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Add the depth tiers to the cell boundaries"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        cells.Run(src)
-        dst3 = cells.dst2
-
-        contours.Run(src)
-        dst2.SetTo(0)
-        For Each tour In contours.contourList
-            DrawContour(dst2, tour.ToList, 255, 2)
-        Next
-        labels(2) = $"{contours.contourList.Count} depth tiers were found."
-        labels(3) = cells.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Boundary_Rectangles : Inherits TaskParent
     Public bounds As New Boundary_Basics

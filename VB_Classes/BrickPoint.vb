@@ -77,26 +77,6 @@ End Class
 
 
 
-
-Public Class BrickPoint_FeatureLessCompare : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
-    Dim gpLess As New BrickPoint_FeatureLess
-    Public Sub New()
-        desc = "Compare the grid point featureless output to the earlier version - FeatureLess_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(src)
-        gpLess.Run(src)
-
-        dst2 = ShowAddweighted(fLess.dst2, gpLess.dst3, labels(2)).Clone
-        dst3 = ShowAddweighted(src, gpLess.dst3, labels(2))
-    End Sub
-End Class
-
-
-
-
-
 Public Class BrickPoint_MaskRedColor : Inherits TaskParent
     Dim fLess As New BrickPoint_FeatureLess
     Public Sub New()
@@ -106,53 +86,11 @@ Public Class BrickPoint_MaskRedColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(src)
 
-        task.redC.inputRemoved = fLess.dst3
+        task.redC.inputRemoved = fLess.dst2
         dst2 = runRedC(src, labels(2))
     End Sub
 End Class
 
-
-
-
-
-Public Class BrickPoint_FeatureLess : Inherits TaskParent
-    Public classCount As Integer
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
-        desc = "Isolate the featureless regions using the sobel intensity."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2.SetTo(0)
-        For Each brick In task.brickList
-            If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
-            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
-                brick.fLessIndex = 255
-                dst2(brick.rect).SetTo(255)
-            End If
-        Next
-
-        classCount = 1
-        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For Each brick In task.brickList
-            Dim pt = brick.rect.TopLeft
-            If dst2.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
-            Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
-            If val <> 255 Then
-                brick.fLessIndex = val
-                Continue For
-            End If
-
-            dst2.FloodFill(pt, brick.index Mod 255)
-            brick.fLessIndex = brick.index Mod 255
-            classCount += 1
-        Next
-
-        If standaloneTest() Then dst3 = ShowPalette(dst2)
-
-        labels(2) = "CV_8U Mask for the " + CStr(classCount) + " featureless regions enumerated."
-        labels(3) = CStr(classCount) + " featureless regions colored using the brick.index of the first grid cell member."
-    End Sub
-End Class
 
 
 
@@ -400,20 +338,111 @@ End Class
 
 
 Public Class BrickPoint_RedCloud : Inherits TaskParent
-    Dim fLess As New BrickPoint_FeatureLess
-    Public histTop As New Projection_HistTop
+    Dim histTop As New Projection_HistTop
     Public Sub New()
-        desc = "Use RedCloud to identify the featureLess regions found in BrickPoint_FeatureLess"
+        desc = "Run RedCloud to find the cells not already identified as contours."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.grayStable)
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
 
-        dst1 = fLess.dst2.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        dst2 = runRedC(fLess.dst2, labels(2), dst1)
+        dst3 = runRedC(src, labels(3), task.contourMap)
+    End Sub
+End Class
 
-        dst0.SetTo(0)
-        task.pointCloud.CopyTo(dst0, fLess.dst2)
-        histTop.Run(fLess.dst2)
+
+
+
+
+
+
+
+
+Public Class BrickPoint_ContourCompare : Inherits TaskParent
+    Dim gpLess As New BrickPoint_FeatureLessOld
+    Public Sub New()
+        desc = "Compare Contour_Basics to BrickPoint_FeatureLessOld"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gpLess.Run(src)
+
+        dst2 = ShowAddweighted(task.contours.dst2, gpLess.dst3, labels(2)).Clone
+        dst3 = ShowAddweighted(src, gpLess.dst3, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BrickPoint_FeatureLessOld : Inherits TaskParent
+    Public classCount As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
+        desc = "Isolate the featureless regions using sobel."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2.SetTo(0)
+        For Each brick In task.brickList
+            If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
+            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
+                brick.fLessIndex = 255
+                dst2(brick.rect).SetTo(255)
+            End If
+        Next
+
+        classCount = 1
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For Each brick In task.brickList
+            Dim pt = brick.rect.TopLeft
+            If dst2.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
+            Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
+            If val <> 255 Then
+                brick.fLessIndex = val
+                Continue For
+            End If
+
+            dst2.FloodFill(pt, brick.index Mod 255)
+            brick.fLessIndex = brick.index Mod 255
+            classCount += 1
+        Next
+
+        If standaloneTest() Then dst3 = ShowPalette(dst2)
+
+        labels(2) = "CV_8U Mask for the " + CStr(classCount) + " featureless regions found."
+        labels(3) = CStr(classCount) + " featureless regions colored using the brick.index of the first grid cell member."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BrickPoint_FeatureLess : Inherits TaskParent
+    Public classCount As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
+        desc = "Identify each brick as part of a contour or not."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2.SetTo(0)
+        Dim contourCount As New List(Of Integer)
+        For Each brick In task.brickList
+            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
+                brick.fLessIndex = task.contourMap.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X)
+                If contourCount.Contains(brick.fLessIndex) = False Then contourCount.Add(brick.fLessIndex)
+                dst2(brick.rect).SetTo(255)
+            End If
+        Next
+
+        dst3 = ShowAddweighted(dst2, task.contours.dst2, labels(3))
+        classCount = contourCount.Count
+        labels(2) = task.contours.labels(2)
+        labels(3) = "Of the " + CStr(task.contourList.Count) + " contours " + CStr(classCount) + " have complete bricks inside them."
     End Sub
 End Class
 
@@ -466,4 +495,3 @@ Public Class BrickPoint_Contours : Inherits TaskParent
         labels(2) = contours.labels(3)
     End Sub
 End Class
-

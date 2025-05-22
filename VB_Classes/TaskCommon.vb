@@ -748,7 +748,7 @@ End Class
 
 
 
-Public Class tourData
+Public Class contourData
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public pixels As Integer
@@ -758,6 +758,6 @@ Public Class tourData
     Public Sub New()
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
-        maxDist = New cv.point
+        maxDist = New cv.Point
     End Sub
 End Class

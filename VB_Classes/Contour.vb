@@ -3,7 +3,7 @@ Public Class Contour_Basics : Inherits TaskParent
     Public options As New Options_Contours
     Public Sub New()
         dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.contourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         OptionParent.findRadio("FloodFill").Checked = True
         labels(3) = "Input to OpenCV's FindContours"
         desc = "General purpose contour finder"
@@ -29,9 +29,9 @@ Public Class Contour_Basics : Inherits TaskParent
         End If
         If allContours.Count <= 1 Then Exit Sub
 
-        Dim sortedList As New SortedList(Of Integer, tourData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
         For Each tour In allContours
-            Dim td = New tourData
+            Dim td = New contourData
             ' tour = New List(Of cv.Point)(tour)
             td.pixels = cv.Cv2.ContourArea(tour)
             If td.pixels > src.Total * 3 / 4 Then Continue For
@@ -54,24 +54,24 @@ Public Class Contour_Basics : Inherits TaskParent
             sortedList.Add(td.pixels, td)
         Next
 
-        task.tourList.Clear()
-        task.tourList.Add(New tourData)
-        task.tourMap.SetTo(0)
+        task.contourList.Clear()
+        task.contourList.Add(New contourData)
+        task.contourMap.SetTo(0)
         For Each td In sortedList.Values
-            td.index = task.tourList.Count
-            task.tourMap(td.rect).SetTo(td.index, td.mask)
-            task.tourList.Add(td)
-            If task.tourList.Count >= options.maxContours Then Exit For
+            td.index = task.contourList.Count
+            task.contourMap(td.rect).SetTo(td.index, td.mask)
+            task.contourList.Add(td)
+            If task.contourList.Count >= options.maxContours Then Exit For
         Next
 
-        dst2 = ShowPalette(task.tourMap)
+        dst2 = ShowPalette(task.contourMap)
 
         Static pt = task.ClickPoint
         If task.mouseClickFlag Then pt = task.ClickPoint
-        Dim index = task.tourMap.Get(Of Byte)(pt.Y, pt.X)
-        task.tourD = task.tourList(index)
+        Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
+        task.contourD = task.contourList(index)
 
-        labels(2) = CStr(task.tourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found."
+        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found."
     End Sub
 End Class
 
@@ -184,7 +184,7 @@ End Class
 
 Public Class Contour_Info : Inherits TaskParent
     Public Sub New()
-        desc = "Provide details about the selected contour's tourList entry."
+        desc = "Provide details about the selected contour's contourList entry."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
@@ -192,7 +192,7 @@ Public Class Contour_Info : Inherits TaskParent
             labels(2) = task.contours.labels(2)
         End If
 
-        Dim td = task.tourD
+        Dim td = task.contourD
 
         strOut = vbCrLf + vbCrLf
         strOut += "Index = " + CStr(td.index) + vbCrLf
@@ -220,14 +220,14 @@ Public Class Contour_Delaunay : Inherits TaskParent
         labels(3) = task.contours.labels(2)
 
         delaunay.inputPoints.Clear()
-        For Each td In task.tourList
+        For Each td In task.contourList
             delaunay.inputPoints.Add(td.maxDist)
         Next
 
         delaunay.Run(emptyMat)
         dst2 = delaunay.dst2.Clone
 
-        For Each td In task.tourList
+        For Each td In task.contourList
             dst2.Circle(td.maxDist, task.DotSize, task.highlight, -1)
         Next
     End Sub

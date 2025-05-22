@@ -14,7 +14,7 @@ Public Class VBtask : Implements IDisposable
 
     Public lpList As New List(Of lpData) ' line pair list
     Public brickList As New List(Of brickData)
-    Public tourList As New List(Of tourData)
+    Public contourList As New List(Of contourData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of rcData)
@@ -23,7 +23,7 @@ Public Class VBtask : Implements IDisposable
     Public logicalLines As New List(Of lpData)
 
     Public brickMap As New cv.Mat ' map of bricks to index in bricklist
-    Public tourMap As New cv.Mat ' map of contours to index in tourList
+    Public contourMap As New cv.Mat ' map of contours to index in contourList
     Public lpMap As New cv.Mat ' map of each line's bricks...
     Public fpMap As New cv.Mat ' feature map
     Public fcsMap As New cv.Mat ' FCS reference map - updated on heartBeat. 
@@ -35,7 +35,7 @@ Public Class VBtask : Implements IDisposable
     Public rcD As New rcData ' the currently selected red Cell
     Public lpD As New lpData ' the currently selected line pair
     Public fpD As New fpData ' the currently selected feature point.
-    Public tourD As New tourData ' the currently selected contour
+    Public contourD As New contourData ' the currently selected contour
 
     Public cellSize As Integer
     Public cellsPerCol As Integer

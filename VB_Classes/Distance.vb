@@ -540,10 +540,10 @@ Public Class Distance_Contour : Inherits TaskParent
         labels(2) = task.contours.labels(2)
 
         dst3 = src.Clone
-        dst3(task.tourD.rect).SetTo(white, task.tourD.mask)
+        dst3(task.contourD.rect).SetTo(white, task.contourD.mask)
 
         dst1.SetTo(255)
-        dst1(task.tourD.rect).SetTo(0, task.tourD.mask)
+        dst1(task.contourD.rect).SetTo(0, task.contourD.mask)
 
         dst0 = dst1.DistanceTransform(options.distanceType, 0)
     End Sub

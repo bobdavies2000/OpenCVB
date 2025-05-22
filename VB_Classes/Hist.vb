@@ -1434,7 +1434,7 @@ End Class
 
 
 Public Class Hist_BrickRegions : Inherits TaskParent
-    Dim fLess As New BrickPoint_FeatureLess
+    Dim fLess As New BrickPoint_FeatureLessOld
     Dim ranges() As cv.Rangef
     Public Sub New()
         ranges = {New cv.Rangef(0, 256)}
@@ -1508,7 +1508,7 @@ End Class
 
 
 Public Class Hist_ToggleFeatureLess : Inherits TaskParent
-    Dim fLess As New BrickPoint_FeatureLess
+    Dim fLess As New BrickPoint_FeatureLessOld
     Dim plotHist As New Plot_Histogram
     Public Sub New()
         plotHist.maxRange = 255

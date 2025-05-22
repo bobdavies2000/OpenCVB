@@ -3831,7 +3831,7 @@ End Class
 
 
 
-Public Class XO_BrickPoint_FeatureLess2 : Inherits TaskParent
+Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
     Public edges As New EdgeLine_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -3886,7 +3886,7 @@ End Class
 
 
 
-Public Class XO_BrickPoint_FeatureLess : Inherits TaskParent
+Public Class XO_BrickPoint_FeatureLessOld : Inherits TaskParent
     Public edges As New EdgeLine_Basics
     Public classCount As Integer
     Public fLessMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
