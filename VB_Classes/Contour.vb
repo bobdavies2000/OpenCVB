@@ -1,11 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
-    Public contourList As New List(Of cv.Point())
-    Public areaList As New List(Of Integer) ' point counts for each contour in contourList above.
     Public options As New Options_Contours
-    Dim color8U As New Color8U_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         OptionParent.findRadio("FloodFill").Checked = True
         labels(3) = "Input to OpenCV's FindContours"
         desc = "General purpose contour finder"
@@ -14,6 +12,7 @@ Public Class Contour_Basics : Inherits TaskParent
         options.Run()
 
         If src.Type <> cv.MatType.CV_8U Then
+            Static color8U As New Color8U_Basics
             color8U.Run(src)
             dst3 = color8U.dst2
         Else
@@ -30,25 +29,49 @@ Public Class Contour_Basics : Inherits TaskParent
         End If
         If allContours.Count <= 1 Then Exit Sub
 
-        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To allContours.Count - 1
-            If allContours(i).Length < 4 Then Continue For
-            Dim count = cv.Cv2.ContourArea(allContours(i))
-            If count > src.Total * 3 / 4 Then Continue For
-            sortedList.Add(count, i)
+        Dim sortedList As New SortedList(Of Integer, tourData)(New compareAllowIdenticalIntegerInverted)
+        For Each tour In allContours
+            Dim td = New tourData
+            ' tour = New List(Of cv.Point)(tour)
+            td.pixels = cv.Cv2.ContourArea(tour)
+            If td.pixels > src.Total * 3 / 4 Then Continue For
+            If tour.Count < 4 Then Continue For
+
+            Dim minX As Single = tour.Min(Function(p) p.X)
+            Dim maxX As Single = tour.Max(Function(p) p.X)
+            Dim minY As Single = tour.Min(Function(p) p.Y)
+            Dim maxY As Single = tour.Max(Function(p) p.Y)
+
+            td.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+            If td.rect.Width = 0 Or td.rect.Height = 0 Then Continue For
+
+            td.maxDist = GetMaxDist(td.mask, td.rect)
+
+            dst0(td.rect).SetTo(0)
+            DrawContour(dst0, tour.ToList, sortedList.Count, -1, cv.LineTypes.Link8)
+            td.mask = dst0(td.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            sortedList.Add(td.pixels, td)
         Next
 
-        dst0.SetTo(0)
-        contourList.Clear()
-        areaList.Clear()
-        For i = 0 To Math.Min(sortedList.Count, options.maxContours) - 1
-            Dim ele = sortedList.ElementAt(i)
-            contourList.Add(allContours(ele.Value))
-            areaList.Add(ele.Key)
-            DrawContour(dst0, allContours(ele.Value).ToList, contourList.Count, -1, cv.LineTypes.Link8)
+        task.tourList.Clear()
+        task.tourList.Add(New tourData)
+        task.tourMap.SetTo(0)
+        For Each td In sortedList.Values
+            td.index = task.tourList.Count
+            task.tourMap(td.rect).SetTo(td.index, td.mask)
+            task.tourList.Add(td)
+            If task.tourList.Count >= options.maxContours Then Exit For
         Next
-        dst2 = ShowPalette(dst0)
-        labels(2) = $"Top {contourList.Count} contours in contourList from the " + CStr(sortedList.Count) + " found."
+
+        dst2 = ShowPalette(task.tourMap)
+
+        Static pt = task.ClickPoint
+        If task.mouseClickFlag Then pt = task.ClickPoint
+        Dim index = task.tourMap.Get(Of Byte)(pt.Y, pt.X)
+        task.tourD = task.tourList(index)
+
+        labels(2) = CStr(task.tourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found."
     End Sub
 End Class
 
@@ -89,13 +112,55 @@ Public Class Contour_List : Inherits TaskParent
             labels(2) = "There were no contours found!"
             Exit Sub
         End If
-        Static ptTour = task.ClickPoint
-        If task.mouseClickFlag Then ptTour = task.ClickPoint
-        Dim index = task.tourMap.Get(Of Byte)(ptTour.Y, ptTour.X)
-        If index = 0 Then index = 1 ' make sure a contour was selected and the biggest is likely to be there...
-        task.tourD = task.tourList(index)
 
         If standaloneTest() Then dst0(task.tourD.rect).SetTo(white, task.tourD.mask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contour_Core : Inherits TaskParent
+    Public contours As New Contour_BasicsOld
+    Public tourList As New List(Of tourData)
+    Public Sub New()
+        OptionParent.FindSlider("Max contours").Value = 10
+        desc = "Create only the tourList from Contour_BasicsOld but without a placeholder for zero."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        contours.Run(src)
+        dst2 = contours.dst2
+        labels(2) = contours.labels(2)
+
+        tourList.Clear()
+        For Each tour In contours.contourList
+            Dim td = New tourData
+            td.index = tourList.Count
+            td.contour = New List(Of cv.Point)(tour)
+            td.pixels = contours.areaList(td.index)
+
+            Dim minX As Single = td.contour.Min(Function(p) p.X)
+            Dim maxX As Single = td.contour.Max(Function(p) p.X)
+            Dim minY As Single = td.contour.Min(Function(p) p.Y)
+            Dim maxY As Single = td.contour.Max(Function(p) p.Y)
+
+            td.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+            If td.rect.Width = 0 Or td.rect.Height = 0 Then Continue For
+
+            td.mask = contours.dst0(td.rect).Clone
+            td.mask = td.mask.InRange(td.index + 1, td.index + 1)
+
+            td.maxDist = GetMaxDist(td.mask, td.rect)
+
+            tourList.Add(td)
+
+            If standalone Then
+                dst2.Circle(td.maxDist, task.DotSize + 3, task.highlight, -1)
+                dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
+            End If
+        Next
     End Sub
 End Class
 
@@ -163,66 +228,15 @@ End Class
 
 
 
-Public Class Contour_Core : Inherits TaskParent
-    Public contours As New Contour_BasicsOld
-    Public tourList As New List(Of tourData)
-    Public Sub New()
-        OptionParent.FindSlider("Max contours").Value = 10
-        desc = "Create only the tourList from Contour_BasicsOld but without a placeholder for zero."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        dst2 = contours.dst2
-        labels(2) = contours.labels(2)
-
-        tourList.Clear()
-        For Each tour In contours.contourList
-            Dim td = New tourData
-            td.index = tourList.Count
-            td.contour = New List(Of cv.Point)(tour)
-            td.pixels = contours.areaList(td.index)
-
-            Dim minX As Single = td.contour.Min(Function(p) p.X)
-            Dim maxX As Single = td.contour.Max(Function(p) p.X)
-            Dim minY As Single = td.contour.Min(Function(p) p.Y)
-            Dim maxY As Single = td.contour.Max(Function(p) p.Y)
-
-            td.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-            If td.rect.Width = 0 Or td.rect.Height = 0 Then Continue For
-
-            td.mask = contours.dst0(td.rect).Clone
-            td.mask = td.mask.InRange(td.index + 1, td.index + 1)
-
-            td.maxDist = GetMaxDist(td.mask, td.rect)
-
-            tourList.Add(td)
-
-            If standalone Then
-                dst2.Circle(td.maxDist, task.DotSize + 3, task.highlight, -1)
-                dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Contour_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
-    Dim core As New Contour_List
     Public Sub New()
         desc = "Show contours and features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.contours.dst2.Clone
         feat.Run(src)
-
-        core.Run(src)
-        dst2 = core.dst2
-        labels(2) = core.labels(2)
 
         For Each pt In task.features
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
@@ -238,16 +252,12 @@ End Class
 
 Public Class Contour_Bricks : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Basics
-    Dim core As New Contour_List
     Public Sub New()
         desc = "Show contours and Brick points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.contours.dst2.Clone
         ptBrick.Run(task.grayStable)
-
-        core.Run(src)
-        dst2 = core.dst2
-        labels(2) = core.labels(2)
 
         For Each pt In ptBrick.intensityFeatures
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
@@ -262,27 +272,21 @@ End Class
 
 
 Public Class Contour_Info : Inherits TaskParent
-    Public index As Integer
-    Public td As tourData
     Public Sub New()
         desc = "Provide details about the selected contour's tourList entry."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static tour As New Contour_List
-            tour.Run(src)
-            dst2 = tour.dst2
-            labels(2) = tour.labels(2)
+            dst2 = task.contours.dst2
+            labels(2) = task.contours.labels(2)
         End If
 
-        index = task.fcsMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) + 1
-        td = task.tourList(index)
+        Dim td = task.tourD
 
         strOut = vbCrLf + vbCrLf
         strOut += "Index = " + CStr(td.index) + vbCrLf
         strOut += "Number of pixels in the mask: " + CStr(td.pixels) + vbCrLf
-        strOut += "Number of points in the contour: " + CStr(td.contour.Count) + vbCrLf
-        strOut += td.maxDist.ToString + vbCrLf
+        strOut += "maxDist = " + td.maxDist.ToString + vbCrLf
         dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
         dst2.Circle(td.maxDist, task.DotSize, task.highlight, -1)
 
@@ -333,8 +337,8 @@ Public Class Contour_LineRGB : Inherits TaskParent
         desc = "Identify contour by its Lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.fcsBasics.tour.dst2
-        labels(2) = task.fcsBasics.tour.labels(2)
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
 
         For Each lp In task.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)

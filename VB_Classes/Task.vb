@@ -128,7 +128,8 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lineRGB As LineRGB_Basics
     Public brickBasics As Brick_Basics
-    Public fcsBasics As FCS_Basics
+    ' Public fcsBasics As FCS_Basics
+    Public contours As Contour_Basics
     Public edges As EdgeLine_Basics
     Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
@@ -529,7 +530,7 @@ Public Class VBtask : Implements IDisposable
         motionBasics = New Motion_Basics
         brickBasics = New Brick_Basics
         edges = New EdgeLine_Basics
-        fcsBasics = New FCS_Basics
+        contours = New Contour_Basics
         buildCorr = New Brick_CorrelationMap
         LRMeanSub = New MeanSubtraction_LeftRight
         lineRGB = New LineRGB_Basics
@@ -782,7 +783,7 @@ Public Class VBtask : Implements IDisposable
         End If
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
-        fcsBasics.Run(src)
+        contours.Run(src)
         brickBasics.Run(src)
         buildCorr.Run(src)
 
