@@ -444,7 +444,7 @@ End Class
 
 Public Class BrickPoint_Contours : Inherits TaskParent
     Dim fLess As New BrickPoint_FLessRegions
-    Dim contours As New Contour_Basics
+    Dim contours As New Contour_BasicsOld
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Create contours for the featureless regions "

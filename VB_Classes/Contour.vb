@@ -59,24 +59,24 @@ End Class
 
 
 
+
 Public Class Contour_List : Inherits TaskParent
-    Public contours As New Contour_Basics
-    Dim tour As New Contour_Core
+    Dim core As New Contour_Core
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
         task.tourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         OptionParent.FindSlider("Max contours").Value = 10
-        desc = "Create the task.tourList and task.tourMap from Contour_Basics"
+        desc = "Create the task.tourList and task.tourMap from Contour_BasicsOld"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = src.Clone
-        tour.Run(task.color)
-        labels = tour.labels
+        core.Run(task.color)
+        labels = core.labels
 
         task.tourList.Clear()
         task.tourList.Add(New tourData)
         task.tourMap.SetTo(0)
-        For Each td In tour.tourList
+        For Each td In core.tourList
             td.index = task.tourList.Count
             td.maxDist = GetMaxDist(td.mask, td.rect)
             task.tourList.Add(td)
@@ -104,12 +104,71 @@ End Class
 
 
 
+
+Public Class Contour_BasicsOld : Inherits TaskParent
+    Public contourList As New List(Of cv.Point())
+    Public areaList As New List(Of Integer) ' point counts for each contour in contourList above.
+    Public options As New Options_Contours
+    Dim color8U As New Color8U_Basics
+    Public Sub New()
+        dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        OptionParent.findRadio("FloodFill").Checked = True
+        labels(3) = "Input to OpenCV's FindContours"
+        desc = "General purpose contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If src.Type <> cv.MatType.CV_8U Then
+            color8U.Run(src)
+            dst3 = color8U.dst2
+        Else
+            dst3 = src
+        End If
+
+        Dim allContours As cv.Point()()
+        Dim mode = options.options2.ApproximationMode
+        If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+            dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
+            cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+        Else
+            cv.Cv2.FindContours(dst3, allContours, Nothing, options.retrievalMode, mode)
+        End If
+        If allContours.Count <= 1 Then Exit Sub
+
+        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To allContours.Count - 1
+            If allContours(i).Length < 4 Then Continue For
+            Dim count = cv.Cv2.ContourArea(allContours(i))
+            If count > src.Total * 3 / 4 Then Continue For
+            sortedList.Add(count, i)
+        Next
+
+        dst0.SetTo(0)
+        contourList.Clear()
+        areaList.Clear()
+        For i = 0 To Math.Min(sortedList.Count, options.maxContours) - 1
+            Dim ele = sortedList.ElementAt(i)
+            contourList.Add(allContours(ele.Value))
+            areaList.Add(ele.Key)
+            DrawContour(dst0, allContours(ele.Value).ToList, contourList.Count, -1, cv.LineTypes.Link8)
+        Next
+        dst2 = ShowPalette(dst0)
+        labels(2) = $"Top {contourList.Count} contours in contourList from the " + CStr(sortedList.Count) + " found."
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Contour_Core : Inherits TaskParent
-    Public contours As New Contour_Basics
+    Public contours As New Contour_BasicsOld
     Public tourList As New List(Of tourData)
     Public Sub New()
         OptionParent.FindSlider("Max contours").Value = 10
-        desc = "Create only the tourList from Contour_Basics but without a placeholder for zero."
+        desc = "Create only the tourList from Contour_BasicsOld but without a placeholder for zero."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
@@ -284,7 +343,7 @@ Public Class Contour_LineRGB : Inherits TaskParent
 End Class
 Public Class Contour_RotatedRects : Inherits TaskParent
     Public rotatedRect As New Rectangle_Rotated
-    Dim basics As New Contour_Basics
+    Dim basics As New Contour_BasicsOld
     Public Sub New()
         labels(3) = "Find contours of several rotated rects"
         desc = "Demo options on FindContours."
@@ -428,7 +487,7 @@ End Class
 
 Public Class Contour_Foreground : Inherits TaskParent
     Dim km As New Foreground_KMeans
-    Dim contour As New Contour_Basics
+    Dim contour As New Contour_BasicsOld
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Kmeans foreground output", "Contour of foreground"}
@@ -739,7 +798,7 @@ End Class
 
 
 Public Class Contour_WholeImage : Inherits TaskParent
-    Dim contour As New Contour_Basics
+    Dim contour As New Contour_BasicsOld
     Public Sub New()
         OptionParent.FindSlider("Max contours").Value = 20
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
@@ -1042,10 +1101,8 @@ End Class
 
 
 
-
-
 Public Class Contour_FCS : Inherits TaskParent
-    Dim tour As New Contour_Core
+    Dim core As New Contour_Core
     Dim knn As New KNN_Basics
     Dim delaunay As New Delaunay_Basics
     Public desiredNodes As Integer = 10
@@ -1053,13 +1110,13 @@ Public Class Contour_FCS : Inherits TaskParent
         desc = "Use the contours of the featureless regions to split the image into an FCS map."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        tour.Run(src)
-        If tour.tourList.Count < desiredNodes Then Exit Sub
+        core.Run(src)
+        If core.tourList.Count < desiredNodes Then Exit Sub
 
-        dst2 = tour.dst2
+        dst2 = core.dst2
 
         knn.queries.Clear()
-        For Each td In tour.tourList
+        For Each td In core.tourList
             knn.queries.Add(td.maxDist)
             If td.index < desiredNodes Then
                 dst2.Circle(td.maxDist, task.DotSize + 3, task.highlight, -1)
