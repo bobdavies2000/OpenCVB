@@ -121,7 +121,11 @@ Public Class Gradient_DepthLines : Inherits TaskParent
         dst1(lp.rect).SetTo(0)
         dst2(lp.rect).SetTo(0)
         dst3(lp.rect).SetTo(0)
-        If standalone Then lp = task.logicalLines(0)
+        If standalone Then
+            Static lines As New LineDepth_Basics
+            lines.Run(src)
+            lp = task.logicalLines(0)
+        End If
         For Each brick In lp.bricks
             dst3.Rectangle(task.brickList(brick).rect, 255, -1)
         Next
