@@ -71,17 +71,15 @@ Public Class Contour_Basics : Inherits TaskParent
         Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
         task.contourD = task.contourList(index)
 
-        Dim brickCount As Integer
         For Each brick In task.brickList
             If brick.contourIndex Then
                 If drawBricks Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
-                brickCount += 1
             End If
         Next
 
         labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found.  " +
-                    "Contours had " + CStr(brickCount) + " complete interior bricks (" +
-                    Format(brickCount / task.gridRects.Count, "00%") + ")"
+                    "Contours had " + CStr(task.brickBasics.brickCount) + " complete interior bricks (" +
+                    Format(task.brickBasics.brickCount / task.gridRects.Count, "00%") + ")"
     End Sub
 End Class
 

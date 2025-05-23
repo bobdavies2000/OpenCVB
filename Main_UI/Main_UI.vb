@@ -1705,24 +1705,42 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Dim corrText = task.brickBasics.depthAndCorrelationText
-                SyncLock trueTextLock
-                    Static saveObjectName = task.displayObjectName
-                    If saveObjectName <> task.displayObjectName Then
-                        trueData.Clear()
-                        saveObjectName = task.displayObjectName
-                    End If
-                    If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
-                    If task.trueData.Count Then
-                        trueData = New List(Of VB_Classes.TrueText)(task.trueData)
-                    End If
-                    trueData.Add(New TrueText(corrText, task.brickBasics.ptTextLoc, 1))
-                    task.trueData.Clear()
-                End SyncLock
+                Dim depthAndCorrelationText As String = ""
+                Dim ptCursor As New cv.Point
+                Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
+                If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
+                    Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                    task.gcD = task.brickList(index)
+                    depthAndCorrelationText = Format(task.gcD.depth, fmt3) + " ID=" +
+                                              CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
+                                              Format(task.gcD.mm.maxVal, fmt1) + "m, age = " + CStr(task.gcD.age) + vbCrLf +
+                                              "correlation = " + Format(task.gcD.correlation, fmt3)
 
-                corrText = corrText.Replace(vbCrLf, ", ")
+                    Dim ptTextLoc = task.gcD.rect.TopLeft
+                    If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
+                        ptTextLoc.X -= w * 0.15
+                    Else
+                        ptTextLoc.Y -= task.gcD.rect.Height * 3
+                    End If
+                    ptCursor = validatePoint(task.mouseMovePoint)
+                    SyncLock trueTextLock
+                        Static saveObjectName = task.displayObjectName
+                        If saveObjectName <> task.displayObjectName Then
+                            trueData.Clear()
+                            saveObjectName = task.displayObjectName
+                        End If
+                        If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
+                        If task.trueData.Count Then
+                            trueData = New List(Of VB_Classes.TrueText)(task.trueData)
+                        End If
+                        trueData.Add(New TrueText(depthAndCorrelationText, ptCursor, 1))
+                        task.trueData.Clear()
+                    End SyncLock
+                End If
+
+                depthAndCorrelationText = depthAndCorrelationText.Replace(vbCrLf, ", ")
                 picLabels(1) = "Correlation bricks - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
-                                   "  " + corrText
+                                   "  " + depthAndCorrelationText
                 If task.dst0 IsNot Nothing Then
                     SyncLock cameraLock
                         dst(0) = task.dst0.Clone
@@ -1734,10 +1752,10 @@ Public Class Main_UI
                     algorithmRefresh = True
                 End If
 
-                dst(0).Circle(task.brickBasics.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(1).Circle(task.brickBasics.ptTopLeft, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(2).Circle(task.brickBasics.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(3).Circle(task.brickBasics.ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(0).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(1).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(2).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                dst(3).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
 
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 

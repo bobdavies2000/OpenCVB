@@ -155,7 +155,8 @@ Public Class Gradient_DepthLines : Inherits TaskParent
         dst2(lp.rect) += brickNear.depth
         dst2(lp.rect) = dst2(lp.rect).SetTo(0, Not dst3(lp.rect))
 
-        labels(2) = task.lineRGB.labels(2)
+        mm = GetMinMax(dst2, dst3)
+        labels(2) = "Depth values below vary from " + Format(mm.minVal, fmt1) + " to " + Format(mm.maxVal, fmt1)
     End Sub
 End Class
 
@@ -166,8 +167,13 @@ End Class
 
 Public Class Gradient_Contour : Inherits TaskParent
     Public Sub New()
-        desc = "Use contours in color to create linear depth covering the entire contour."
+        desc = "Use contours in color to create linear depth covering each contour."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
     End Sub
 End Class
+
+
+
+
+

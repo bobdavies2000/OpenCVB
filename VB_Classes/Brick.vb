@@ -1,11 +1,7 @@
 ﻿Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
-    Public instantUpdate As Boolean
-    Public ptCursor As New cv.Point
-    Public ptTextLoc As New cv.Point
-    Public ptTopLeft As New cv.Point
-    Public depthAndCorrelationText As String
+    Public instantUpdate As Boolean, brickCount As Integer
     Public Sub New()
         task.brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
@@ -22,23 +18,22 @@ Public Class Brick_Basics : Inherits TaskParent
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
         Dim brickLast As New List(Of brickData)(task.brickList)
-        Dim unchangedCount As Integer
 
         Dim maxPixels = task.cellSize * task.cellSize
         task.brickList.Clear()
         Dim depthCount As Integer
-        Dim contourCount As New List(Of Integer), brickCount As Integer
+        Dim contourCount As New List(Of Integer)
+        brickCount = 0
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             If brick.index = 70 Then Dim k = 0
             If brick.depth > 0 Then
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute brick.
                 Dim lastCorrelation = If(i < brickLast.Count, brickLast(i).correlation, 0)
-                If brick.age > 1 And lastCorrelation > task.fCorrThreshold And instantUpdate = False Then
+                If brick.age > 1 And instantUpdate = False Then
                     ' no need to recompute everything when there is no motion in the cell.
                     brick = brickLast(i)
                     brick.age = task.motionBasics.cellAge(i)
-                    unchangedCount += 1
                 Else
                     If task.rgbLeftAligned Then
                         brick.rRect = brick.lRect
@@ -108,35 +103,14 @@ Public Class Brick_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) +
-                                           " have useful depth data and " + CStr(unchangedCount) + " were unchanged and " +
-                                           CStr(contourCount.Count) + " had fully interior bricks (" +
-                                           Format(brickCount / task.gridRects.Count, "00%") + ")"
-
+                                           " have useful depth data.  " + Format(brickCount / task.gridRects.Count, "00%") +
+                                           " of all bricks were fully interior bricks in the " +
+                                           CStr(contourCount.Count) + " contours."
         If standaloneTest() Then
             For Each brick In task.brickList
                 If brick.contourIndex <> 0 Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
             Next
         End If
-
-        If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
-        If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
-        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        task.gcD = task.brickList(index)
-
-        Dim pt = task.gcD.rect.TopLeft
-        If pt.X > dst2.Width * 0.85 Or (pt.Y < dst2.Height * 0.15 And pt.X > dst2.Width * 0.15) Then
-            pt.X -= dst2.Width * 0.15
-        Else
-            pt.Y -= task.gcD.rect.Height * 3
-        End If
-
-        depthAndCorrelationText = Format(task.gcD.depth, fmt3) + " ID=" +
-                                  CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
-                                  Format(task.gcD.mm.maxVal, fmt1) + "m, age = " + CStr(task.gcD.age) + vbCrLf +
-                                  "correlation = " + Format(task.gcD.correlation, fmt3)
-        ptCursor = validatePoint(task.mouseMovePoint)
-        ptTextLoc = pt
-        ptTopLeft = ptCursor ' task.gcD.rect.TopLeft ' in case it needs to switch back...
     End Sub
 End Class
 
@@ -656,7 +630,7 @@ Public Class Brick_Correlation : Inherits TaskParent
         If index < 0 Or index > task.brickList.Count Then Exit Sub
 
         Dim brick = task.brickList(index)
-        Dim pt = task.brickBasics.ptCursor
+        Dim pt = task.gcD.rect.TopLeft
         Dim corr = brick.correlation
         dst2.Circle(brick.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
@@ -665,10 +639,6 @@ Public Class Brick_Correlation : Inherits TaskParent
         Dim grayScale As Integer = If(task.gOptions.LRMeanSubtraction.Checked, 128, 255)
         dst2.Rectangle(brick.lRect, grayScale, task.lineWidth)
         dst3.Rectangle(brick.rRect, grayScale, task.lineWidth)
-
-        'dst2.Rectangle(brick.hoodRect, grayScale, task.lineWidth)
-        'dst3.Rectangle(brick.rHoodRect, grayScale, task.lineWidth)
-
         labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
     End Sub
 End Class
