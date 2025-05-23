@@ -60,7 +60,7 @@ Public Class Motion_Basics : Inherits TaskParent
             diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)
             dst3 = diff.dst2
-            SetTrueText("NOTE: the differences should be small - no blobs or artifacts should be present." + vbCrLf +
+            SetTrueText("NOTE: the differences below should be small - no artifacts should be present." + vbCrLf +
                         "Any differences that persist should not be visible in the RGB image at left." + vbCrLf, 3)
         End If
         If task.heartBeatLT Then dst2 = src.Clone

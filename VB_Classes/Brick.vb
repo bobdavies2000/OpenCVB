@@ -26,7 +26,6 @@ Public Class Brick_Basics : Inherits TaskParent
         brickCount = 0
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
-            If brick.index = 70 Then Dim k = 0
             If brick.depth > 0 Then
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute brick.
                 Dim lastCorrelation = If(i < brickLast.Count, brickLast(i).correlation, 0)
@@ -36,19 +35,15 @@ Public Class Brick_Basics : Inherits TaskParent
                     brick.age = task.motionBasics.cellAge(i)
                 Else
                     If task.rgbLeftAligned Then
-                        brick.rRect = brick.lRect
+                        brick.rRect = brick.rect
                         brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
                         If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
                             brick.depth = 0 ' off the image
-                            brick.lRect = emptyRect
-                            brick.rRect = emptyRect
                         End If
                     Else
                         Dim irPt = Intrinsics_Basics.translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                             brick.depth = 0 ' off the image
-                            brick.lRect = emptyRect
-                            brick.rRect = emptyRect
                         Else
                             brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
                             brick.lRect = ValidateRect(brick.lRect)
@@ -59,8 +54,6 @@ Public Class Brick_Basics : Inherits TaskParent
                                 (LtoR_Pt.X >= dst2.Width Or LtoR_Pt.Y >= dst2.Height) Then
 
                                 brick.depth = 0 ' off the image
-                                brick.lRect = emptyRect
-                                brick.rRect = emptyRect
                             Else
                                 brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
                                 brick.rRect = ValidateRect(brick.rRect)

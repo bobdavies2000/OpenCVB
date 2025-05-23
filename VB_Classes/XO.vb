@@ -1959,7 +1959,7 @@ Public Class XO_Brick_Basics : Inherits TaskParent
         End If
 
         Dim stdev As cv.Scalar, mean As cv.Scalar
-        Dim emptyRect As New cv.Rect, correlationMat As New cv.Mat
+        Dim correlationMat As New cv.Mat
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 

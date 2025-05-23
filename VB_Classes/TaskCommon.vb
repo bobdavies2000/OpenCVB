@@ -533,18 +533,14 @@ Public Class brickData
         index = task.brickList.Count
         rect = task.gridRects(index)
         lRect = rect
+        rRect = New cv.Rect
 
         age = task.motionBasics.cellAge(index)
         color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
-        lRect = rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
         Dim pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this grid cell.
         cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), pt3D, stdev, task.depthMask(rect))
         depth = pt3D(0)
-
-        'For Each rectIndex In task.gridNeighbors(index)
-        '    hoodRect = hoodRect.Union(task.gridRects(rectIndex))
-        'Next
 
         If depth > 0 Then
             task.pcSplit(2)(rect).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(rect))
@@ -598,7 +594,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         length = p1.DistanceTo(p2)
         age = 1
 
-        If length > 180 Then Dim k = 0
         Dim brickptList As New List(Of cv.Point2f)
         vertical = True
         inverted = If(p1.Y > p2.Y, True, False)
