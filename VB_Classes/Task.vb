@@ -142,7 +142,6 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
-    Public depthLogic As LineDepth_Basics
 
     Public paletteRandom As Palette_RandomColors
     Public kalman As Kalman_Basics
@@ -534,7 +533,6 @@ Public Class VBtask : Implements IDisposable
         buildCorr = New Brick_CorrelationMap
         LRMeanSub = New MeanSubtraction_LeftRight
         lineRGB = New LineRGB_Basics
-        depthLogic = New LineDepth_Basics
         rgbFilter = New Filter_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
@@ -827,8 +825,6 @@ Public Class VBtask : Implements IDisposable
         lineRGB.Run(src.Clone)
         task.lpList = New List(Of lpData)(lineRGB.lpList)
         task.lpMap = lineRGB.lpMap.Clone
-
-        depthLogic.Run(src)
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True

@@ -32,7 +32,6 @@ Public Class Contour_Basics : Inherits TaskParent
         Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
         For Each tour In allContours
             Dim td = New contourData
-            ' tour = New List(Of cv.Point)(tour)
             td.pixels = cv.Cv2.ContourArea(tour)
             If td.pixels > src.Total * 3 / 4 Then Continue For
             If tour.Count < 4 Then Continue For
@@ -71,7 +70,20 @@ Public Class Contour_Basics : Inherits TaskParent
         Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
         task.contourD = task.contourList(index)
 
-        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found."
+        Dim contourCount As New List(Of Integer)
+        Dim brickCount As Integer
+        For Each brick In task.brickList
+            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
+                brick.contourIndex = task.contourMap.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X)
+                If contourCount.Contains(brick.contourIndex) = False Then contourCount.Add(brick.contourIndex)
+                If standalone Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
+                brickCount += 1
+            End If
+        Next
+
+        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found.  " +
+                    CStr(contourCount.Count) + " contours had " + CStr(brickCount) + " complete interior bricks (" +
+                    Format(brickCount / task.gridRects.Count, "00%") + ")"
     End Sub
 End Class
 
@@ -161,7 +173,7 @@ End Class
 
 
 
-Public Class Contour_Bricks : Inherits TaskParent
+Public Class Contour_BrickPoints : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Basics
     Public Sub New()
         desc = "Show contours and Brick points"

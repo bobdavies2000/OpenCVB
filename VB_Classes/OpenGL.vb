@@ -2026,17 +2026,20 @@ End Class
 
 Public Class OpenGL_DepthLogicCloud : Inherits TaskParent
     Dim logic As New DepthLogic_Cloud
+    Dim depthLogic As LineDepth_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the reconstructed point cloud."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        depthLogic.Run(src)
+
         dst3 = src.Clone
         logic.Run(src)
         dst2 = logic.dst2
         labels(2) = logic.labels(2)
 
-        task.depthLogic.dst3.CopyTo(dst3, logic.gradient.dst3)
+        depthLogic.dst3.CopyTo(dst3, logic.gradient.dst3)
         task.ogl.pointCloudInput = If(task.toggleOn, task.pointCloud, dst2)
         task.ogl.pointCloudInput = dst2
         task.ogl.Run(dst3)

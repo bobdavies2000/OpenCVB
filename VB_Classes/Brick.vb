@@ -27,6 +27,7 @@ Public Class Brick_Basics : Inherits TaskParent
         Dim maxPixels = task.cellSize * task.cellSize
         task.brickList.Clear()
         Dim depthCount As Integer
+        Dim contourCount As New List(Of Integer), brickCount As Integer
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             If brick.index = 70 Then Dim k = 0
@@ -88,8 +89,6 @@ Public Class Brick_Basics : Inherits TaskParent
                 End If
                 brick.depthRanges.Add(brick.mm.range)
                 brick.corrHistory.Add(brick.correlation)
-            Else
-                Dim k = 0
             End If
 
             dst2(brick.rect).SetTo(brick.color)
@@ -100,11 +99,18 @@ Public Class Brick_Basics : Inherits TaskParent
                 brick.corrHistory.RemoveAt(0)
             End If
 
+            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
+                brick.contourIndex = task.contourMap.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X)
+                If contourCount.Contains(brick.contourIndex) = False Then contourCount.Add(brick.contourIndex)
+                brickCount += 1
+            End If
             task.brickList.Add(brick)
         Next
 
         If task.heartBeat Then labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) +
-                                           " have useful depth data and " + CStr(unchangedCount) + " were unchanged"
+                                           " have useful depth data and " + CStr(unchangedCount) + " were unchanged and " +
+                                           CStr(contourCount.Count) + " had fully interior bricks (" +
+                                           Format(brickCount / task.gridRects.Count, "00%") + ")"
 
         If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub

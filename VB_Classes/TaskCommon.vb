@@ -513,7 +513,7 @@ Public Class brickData
     Public correlation As Single
     Public corrHistory As New List(Of Single)
     Public index As Integer
-    Public fLessIndex As Integer
+    Public contourIndex As Integer
 
     Public rect As cv.Rect ' rectange under the cursor in the color image.
     Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
@@ -754,7 +754,6 @@ Public Class contourData
     Public pixels As Integer
     Public maxDist As cv.Point
     Public index As Integer
-    Public contour As New List(Of cv.Point)
     Public Sub New()
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)

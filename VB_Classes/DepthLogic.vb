@@ -98,13 +98,15 @@ End Class
 
 
 Public Class DepthLogic_Lines : Inherits TaskParent
+    Dim depthLogic As New LineDepth_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Reconstruct depth data using depth lines with high correlation (typically indicating featureless.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.depthLogic.dst3
-        labels = task.depthLogic.labels
+        depthLogic.Run(src)
+        dst3 = depthLogic.dst3
+        labels = depthLogic.labels
 
         dst1.SetTo(0)
         For Each lp In task.logicalLines

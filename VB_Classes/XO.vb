@@ -3849,7 +3849,7 @@ Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
 
             Dim gcAbove = task.brickList(brick.index - task.cellsPerRow)
-            Dim val = gcAbove.fLessIndex
+            Dim val = gcAbove.contourIndex
             If val = 0 Then val = dst0.Get(Of Byte)(gcPrev.rect.Y, gcPrev.rect.X)
             Dim count = edges.dst2(brick.rect).CountNonZero
             If val = 0 And count = 0 Then
@@ -3857,7 +3857,7 @@ Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
                 fLessCount += 1
             End If
             If count = 0 Then
-                brick.fLessIndex = val
+                brick.contourIndex = val
                 dst0(brick.rect).SetTo(val Mod 255)
             End If
             gcPrev = brick
@@ -3865,11 +3865,11 @@ Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
 
         For i = task.brickList.Count - 1 To 1 Step -1
             Dim brick = task.brickList(i)
-            If brick.fLessIndex > 0 Then
+            If brick.contourIndex > 0 Then
                 gcPrev = task.brickList(i - 1)
-                If gcPrev.fLessIndex > 0 And gcPrev.fLessIndex <> 0 And gcPrev.fLessIndex <> brick.fLessIndex And gcPrev.fLessIndex <> 0 Then
-                    gcPrev.fLessIndex = brick.fLessIndex
-                    dst0(gcPrev.rect).SetTo(brick.fLessIndex)
+                If gcPrev.contourIndex > 0 And gcPrev.contourIndex <> 0 And gcPrev.contourIndex <> brick.contourIndex And gcPrev.contourIndex <> 0 Then
+                    gcPrev.contourIndex = brick.contourIndex
+                    dst0(gcPrev.rect).SetTo(brick.contourIndex)
                     task.brickList(i - 1) = gcPrev
                 End If
             End If
@@ -3902,7 +3902,7 @@ Public Class XO_BrickPoint_FeatureLessOld : Inherits TaskParent
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
 
             If edges.dst2(brick.rect).CountNonZero = 0 Then
-                brick.fLessIndex = 255
+                brick.contourIndex = 255
                 fLessMask(brick.rect).SetTo(255)
             End If
         Next
@@ -3911,17 +3911,17 @@ Public Class XO_BrickPoint_FeatureLessOld : Inherits TaskParent
         classCount = 0
         For Each brick In task.brickList
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
-            If brick.fLessIndex = 255 Then
+            If brick.contourIndex = 255 Then
                 Dim gcAbove = task.brickList(brick.index - task.cellsPerRow)
-                Dim val = gcAbove.fLessIndex
-                If val = 0 Then val = gcPrev.fLessIndex
-                If val = 0 And brick.fLessIndex <> 0 Then
+                Dim val = gcAbove.contourIndex
+                If val = 0 Then val = gcPrev.contourIndex
+                If val = 0 And brick.contourIndex <> 0 Then
                     classCount += 1
                     val = classCount
                 End If
                 If val <> 0 Then
-                    brick.fLessIndex = val
-                    fLessMask(brick.rect).SetTo(brick.fLessIndex)
+                    brick.contourIndex = val
+                    fLessMask(brick.rect).SetTo(brick.contourIndex)
                 End If
             End If
             gcPrev = brick

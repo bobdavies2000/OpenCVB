@@ -1434,12 +1434,12 @@ End Class
 
 
 Public Class Hist_BrickRegions : Inherits TaskParent
-    Dim fLess As New BrickPoint_FeatureLessOld
+    Dim fLess As New BrickPoint_FeatureLess
     Dim ranges() As cv.Rangef
     Public Sub New()
         ranges = {New cv.Rangef(0, 256)}
         task.gOptions.HistBinBar.Value = 255
-        desc = "Build a histogram of one cell and predict any neighbors with an fLessIndex"
+        desc = "Build a histogram of one cell and predict any neighbors with an contourIndex"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayStable.Clone)
@@ -1448,10 +1448,10 @@ Public Class Hist_BrickRegions : Inherits TaskParent
         Dim predictedList As New List(Of Integer)
         Dim brick As brickData
         For Each brick In task.brickList
-            If brick.fLessIndex Then
+            If brick.contourIndex Then
                 Dim nabes = task.gridNeighbors(brick.index)
                 For i = 1 To nabes.Count - 1 ' the first entry is for the brick...
-                    If task.brickList(nabes(i)).fLessIndex = 0 Then
+                    If task.brickList(nabes(i)).contourIndex = 0 Then
                         If predictedList.Contains(nabes(i)) = False Then
                             histList.Add(brick.index, nabes(i))
                             predictedList.Add(nabes(i))
@@ -1475,7 +1475,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
                 For i = 0 To histArray.Count - 1 ' there is often garbage in histarray(255) but why?  Eliminate it here.
                     If histArray(i) >= 1 Then
                         If arrayStart = -1 Then arrayStart = i
-                        histArray(i) = brick.fLessIndex
+                        histArray(i) = brick.contourIndex
                         If arrayStart < 255 Then
                             If i <> 255 Then arrayEnd = i
                         Else
@@ -1486,7 +1486,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
 
                 ' fill in any gaps in the series!
                 For i = arrayStart To arrayEnd
-                    histArray(i) = brick.fLessIndex
+                    histArray(i) = brick.contourIndex
                 Next
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If
@@ -1508,7 +1508,7 @@ End Class
 
 
 Public Class Hist_ToggleFeatureLess : Inherits TaskParent
-    Dim fLess As New BrickPoint_FeatureLessOld
+    Dim fLess As New BrickPoint_FeatureLess
     Dim plotHist As New Plot_Histogram
     Public Sub New()
         plotHist.maxRange = 255
@@ -1521,8 +1521,15 @@ Public Class Hist_ToggleFeatureLess : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayStable.Clone)
         dst3 = fLess.dst2
+        labels(3) = fLess.labels(2)
 
-        If task.toggleOn Then plotHist.histMask = New cv.Mat Else plotHist.histMask = fLess.dst2.Clone
+        If task.toggleOn Then
+            plotHist.histMask = New cv.Mat
+            labels(2) = "Histogram of the whole image."
+        Else
+            plotHist.histMask = fLess.dst2.Clone
+            labels(2) = "Histogram of just the featureless regions."
+        End If
         plotHist.Run(task.grayStable.Clone)
         dst2 = plotHist.dst2
     End Sub
