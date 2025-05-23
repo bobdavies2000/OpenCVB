@@ -228,6 +228,7 @@ Public Class VBtask : Implements IDisposable
     Public paletteIndex As Integer
 
     Public mouseClickFlag As Boolean
+    Public activateTaskForms As Boolean
     Public ClickPoint As cv.Point
     Public mousePicTag As Integer ' which image was the mouse in?
     Public mouseMovePoint As cv.Point ' trace any mouse movements using this.
@@ -781,6 +782,7 @@ Public Class VBtask : Implements IDisposable
         End If
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
+        edges.Run(task.grayStable)
         contours.Run(src)
         brickBasics.Run(src)
         buildCorr.Run(src)
@@ -828,6 +830,11 @@ Public Class VBtask : Implements IDisposable
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
+        If activateTaskForms Then
+            treeView.Activate()
+            allOptions.Activate()
+            activateTaskForms = False
+        End If
         If task.paused = False Then
 
 

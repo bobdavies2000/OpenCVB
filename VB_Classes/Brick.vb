@@ -112,6 +112,12 @@ Public Class Brick_Basics : Inherits TaskParent
                                            CStr(contourCount.Count) + " had fully interior bricks (" +
                                            Format(brickCount / task.gridRects.Count, "00%") + ")"
 
+        If standaloneTest() Then
+            For Each brick In task.brickList
+                If brick.contourIndex <> 0 Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
+            Next
+        End If
+
         If task.mouseMovePoint.X < 0 Or task.mouseMovePoint.X >= dst2.Width Then Exit Sub
         If task.mouseMovePoint.Y < 0 Or task.mouseMovePoint.Y >= dst2.Height Then Exit Sub
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)

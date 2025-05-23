@@ -71,6 +71,7 @@ Public Class Main_UI
     Dim LastX As Integer
     Dim LastY As Integer
     Dim mouseClickFlag As Boolean
+    Dim activateTaskForms As Boolean
     Dim ClickPoint As New cv.Point ' last place where mouse was clicked.
     Dim mousePicTag As Integer
     Dim mouseDownPoint As New cv.Point
@@ -469,15 +470,6 @@ Public Class Main_UI
         GroupCombo.Visible = settings.snap640
         If settings.snap320 Then Me.Width = 720 ' expose the list of available algorithms.
     End Sub
-    Private Sub BluePlusButton_Click(sender As Object, e As EventArgs) Handles BluePlusButton.Click
-        ' Dim OKcancel = InsertAlgorithm.ShowDialog()
-        MsgBox("Only VB.Net is now under active development.  AI has made it" + vbCrLf +
-               "convenient to translate algorithms to any language.  Use the snippets" + vbCrLf +
-               "in OpenCVB.snippets to add new code." + vbCrLf + vbCrLf +
-               "Uncomment 'InsertAlgorithm' if you are adventurous and " + vbCrLf +
-               "would like to add C++, C#, or Python algorithms." + vbCrLf +
-               "Just cut and paste from an existing algorithm for new OpenGL examples.")
-    End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If Trim(AvailableAlgorithms.Text) = "" Then
             Dim incr = 1
@@ -853,40 +845,14 @@ Public Class Main_UI
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
         MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
-                   "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
-                   "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
-                   "problems.  The hypothesis behind this approach is that human vision" + vbCrLf +
-                   "is not computationally intensive but is built on many almost trivial" + vbCrLf +
-                   "algorithms working together." + vbCrLf)
+               "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
+               "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
+               "problems.  The hypothesis behind this approach is that human vision" + vbCrLf +
+               "is not computationally intensive but is built on many almost trivial" + vbCrLf +
+               "algorithms working together." + vbCrLf)
     End Sub
     Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
         Me.Close()
-    End Sub
-    Private Sub ComplexityButton_Click(sender As Object, e As EventArgs) Handles ComplexityButton.Click
-        If ComplexityTimer.Enabled = False Then
-            Dim ret = MsgBox("Do you want to test the complexity of the current algorithm?" + vbCrLf +
-                                 "Algorithm will run at all available resolutions until you stop it.", MsgBoxStyle.OkCancel,
-                             "Test algorithm at all resolutions.")
-            If ret = MsgBoxResult.Ok Then
-                complexityResults.Clear()
-                ComplexityTimer.Interval = 30000
-                complexityStartTime = Now
-                ComplexityTimer.Enabled = True
-                settings.WorkingResIndex = Main_UI.settings.resolutionsSupported.Count - 1 ' start smallest resolution
-                ComplexityButton.Image = stopTest
-                ComplexityTimer_Tick(sender, e)
-            End If
-        Else
-            Dim sw = New StreamWriter(HomeDir.FullName + "Complexity/" + saveAlgorithmName + ".txt")
-            For Each line In complexityResults
-                sw.WriteLine(line)
-            Next
-            sw.Close()
-
-            ComplexityButton.Image = complexityTest
-            ComplexityTimer.Enabled = False
-            complexityResults.Clear()
-        End If
     End Sub
 #End Region
     Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
@@ -1019,8 +985,8 @@ Public Class Main_UI
         pythonPresent = InStr(systemPath.ToLower, "python")
         If pythonPresent = False Then
             MsgBox("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
-                       "That is how you control which version of python is active for OpenCVB." + vbCrLf +
-                       "All Python algorithms will be disabled for now...")
+                   "That is how you control which version of python is active for OpenCVB." + vbCrLf +
+                   "All Python algorithms will be disabled for now...")
         End If
 
         Me.Show()
@@ -1507,13 +1473,6 @@ Public Class Main_UI
 
         Debug.WriteLine("Main_UI.StartTask completed.")
     End Sub
-    Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
-        ' Translator.Show()
-        MsgBox("To translate any VB.Net algorithm to C# or C++ or Python, use" + vbCrLf +
-                "Codeconvert.ai.  There are touchups expected to be " + vbCrLf +
-                "needed and a future version will include the touchups here." + vbCrLf +
-                "There is touchup code in Translator.vb if you want to get started.")
-    End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
         If parms.algName = "" Then Exit Sub
         algorithmQueueCount += 1
@@ -1688,6 +1647,11 @@ Public Class Main_UI
                     End SyncLock
                 End If
 
+                If activateTaskForms Then
+                    task.activateTaskForms = True
+                    activateTaskForms = False
+                End If
+
                 Dim endWaitTime = Now
                 Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
                 Dim spanWait = New TimeSpan(elapsedWaitTicks)
@@ -1703,7 +1667,7 @@ Public Class Main_UI
 
 
 
-                Dim optionsChange = task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
+                task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
 
 
 
@@ -1796,5 +1760,8 @@ Public Class Main_UI
 
         If parms.algName.EndsWith(".py") Then killThread("python")
         frameCount = 0
+    End Sub
+    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        activateTaskForms = True
     End Sub
 End Class

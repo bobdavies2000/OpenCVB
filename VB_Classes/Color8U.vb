@@ -36,10 +36,12 @@ Public Class Color8U_Basics : Inherits TaskParent
             classifier = colorMethods(index)
         End If
 
-        If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
-            classifier.Run(src.Clone)
-        Else
-            classifier.Run(task.grayStable.Clone)
+        If task.redOptions.colorInputName <> "EdgeLine_Basics" Then ' edgeLine_Basics is already running on each frame.
+            If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
+                classifier.Run(src.Clone)
+            Else
+                classifier.Run(task.grayStable.Clone)
+            End If
         End If
 
         If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)

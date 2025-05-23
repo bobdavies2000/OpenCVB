@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
     Public options As New Options_Contours
+    Public drawBricks As Boolean = True
     Public Sub New()
         dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         task.contourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -70,19 +71,16 @@ Public Class Contour_Basics : Inherits TaskParent
         Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
         task.contourD = task.contourList(index)
 
-        Dim contourCount As New List(Of Integer)
         Dim brickCount As Integer
         For Each brick In task.brickList
-            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
-                brick.contourIndex = task.contourMap.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X)
-                If contourCount.Contains(brick.contourIndex) = False Then contourCount.Add(brick.contourIndex)
-                If standalone Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
+            If brick.contourIndex Then
+                If drawBricks Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                 brickCount += 1
             End If
         Next
 
         labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found.  " +
-                    CStr(contourCount.Count) + " contours had " + CStr(brickCount) + " complete interior bricks (" +
+                    "Contours had " + CStr(brickCount) + " complete interior bricks (" +
                     Format(brickCount / task.gridRects.Count, "00%") + ")"
     End Sub
 End Class
@@ -155,6 +153,7 @@ End Class
 Public Class Contour_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
+        task.contours.drawBricks = False
         desc = "Show contours and features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -164,6 +163,7 @@ Public Class Contour_Features : Inherits TaskParent
         For Each pt In task.features
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
         Next
+        labels(2) = "There are " + CStr(task.contourList.Count) + " contours and " + CStr(task.features.Count) + " features."
     End Sub
 End Class
 
@@ -733,87 +733,45 @@ End Class
 
 
 
+Public Class Contour_GeneralWithOptions : Inherits TaskParent
+    Public contourlist As New List(Of cv.Point())
+    Public allContours As cv.Point()()
+    Public options As New Options_Contours
+    Dim rotatedRect As New Rectangle_Rotated
+    Public Sub New()
+        labels = {"", "", "FindContour input", "Draw contour output"}
+        desc = "General purpose contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
 
+        If standaloneTest() Then
+            If Not task.heartBeat Then Exit Sub
+            rotatedRect.Run(src)
+            dst2 = rotatedRect.dst2
+            If dst2.Channels() = 3 Then
+                dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+            Else
+                dst2 = dst2.ConvertScaleAbs(255)
+            End If
+        Else
+            dst2 = task.gray
+        End If
 
+        If options.retrievalMode = cv.RetrievalModes.FloodFill Then dst2.ConvertTo(dst2, cv.MatType.CV_32SC1)
+        cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
+        contourlist.Clear()
+        For Each c In allContours
+            contourlist.Add(c)
+        Next
 
-
-
-'Public Class Contour_Edges : Inherits TaskParent
-'    Dim edges As New Edge_ResizeAdd
-'    Dim contour As New Contour_General
-'    Dim lastImage = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-'    Public Sub New()
-'        desc = "Create contours for Edge_MotionAccum"
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        edges.Run(src)
-'        dst2 = edges.dst2
-
-'        contour.Run(dst2)
-
-'        dst3.SetTo(0)
-'        Dim colors As New List(Of cv.Vec3b)
-'        Dim color As cv.Scalar
-'        For Each c In contour.allContours
-'            If c.Count > minLengthContour Then
-'                Dim vec = lastImage.Get(Of cv.Vec3b)(c(0).Y, c(0).X)
-'                If vec = black.ToVec3b Or colors.Contains(vec) Then
-'                    color = New cv.Scalar(msRNG.Next(10, 240), msRNG.Next(10, 240), msRNG.Next(10, 240)) ' trying to avoid extreme colors... 
-'                Else
-'                    color = New cv.Scalar(vec(0), vec(1), vec(2))
-'                End If
-'                colors.Add(vec)
-'                DrawContour(dst3, c.ToList, color, -1)
-'            End If
-'        Next
-'        lastImage = dst3.Clone
-'    End Sub
-'End Class
-
-
-
-
-
-'Public Class Contour_GeneralWithOptions : Inherits TaskParent
-'    Public contourlist As New List(Of cv.Point())
-'    Public allContours As cv.Point()()
-'    Public options As New Options_Contours
-'    Dim rotatedRect As New Rectangle_Rotated
-'    Public Sub New()
-'        labels = {"", "", "FindContour input", "Draw contour output"}
-'        desc = "General purpose contour finder"
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        options.Run()
-
-'        If standaloneTest() Then
-'            If Not task.heartBeat Then Exit Sub
-'            rotatedRect.Run(src)
-'            dst2 = rotatedRect.dst2
-'            If dst2.Channels() = 3 Then
-'                dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
-'            Else
-'                dst2 = dst2.ConvertScaleAbs(255)
-'            End If
-'        Else
-'            dst2 = task.gray
-'        End If
-
-'        If options.retrievalMode = cv.RetrievalModes.FloodFill Then dst2.ConvertTo(dst2, cv.MatType.CV_32SC1)
-'        cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
-
-'        contourlist.Clear()
-'        For Each c In allContours
-'            contourlist.Add(c)
-'        Next
-
-'        dst3.SetTo(0)
-'        For Each ctr In allContours.ToArray
-'            DrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
-'        Next
-'    End Sub
-'End Class
+        dst3.SetTo(0)
+        For Each ctr In allContours.ToArray
+            DrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
+        Next
+    End Sub
+End Class
 
 
 
@@ -821,153 +779,43 @@ End Class
 
 
 
-'Public Class Contour_General : Inherits TaskParent
-'    Public contourlist As New List(Of cv.Point())
-'    Public allContours As cv.Point()()
-'    Public options As New Options_Contours
-'    Dim rotatedRect As New Rectangle_Rotated
-'    Public Sub New()
-'        labels = {"", "", "FindContour input", "Draw contour output"}
-'        desc = "General purpose contour finder"
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        If standalone Then
-'            If Not task.heartBeat Then Exit Sub
-'            rotatedRect.Run(src)
-'            dst2 = rotatedRect.dst2
-'            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-'        Else
-'            dst2 = task.gray
-'        End If
+Public Class Contour_General : Inherits TaskParent
+    Public contourlist As New List(Of cv.Point())
+    Public allContours As cv.Point()()
+    Public options As New Options_Contours
+    Dim rotatedRect As New Rectangle_Rotated
+    Public Sub New()
+        labels = {"", "", "FindContour input", "Draw contour output"}
+        desc = "General purpose contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            If Not task.heartBeat Then Exit Sub
+            rotatedRect.Run(src)
+            dst2 = rotatedRect.dst2
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Else
+            dst2 = task.gray
+        End If
 
-'        If dst2.Type = cv.MatType.CV_8U Then
-'            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxTC89KCOS)
-'        Else
-'            If dst2.Type <> cv.MatType.CV_32S Then dst2.ConvertTo(dst2, cv.MatType.CV_32S)
-'            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxTC89KCOS)
-'        End If
+        If dst2.Type = cv.MatType.CV_8U Then
+            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxTC89KCOS)
+        Else
+            If dst2.Type <> cv.MatType.CV_32S Then dst2.ConvertTo(dst2, cv.MatType.CV_32S)
+            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxTC89KCOS)
+        End If
 
-'        contourlist.Clear()
-'        For Each c In allContours
-'            Dim area = cv.Cv2.ContourArea(c)
-'            contourlist.Add(c)
-'            If contourlist.Count >= options.maxContours Then Exit For
-'        Next
+        contourlist.Clear()
+        For Each c In allContours
+            Dim area = cv.Cv2.ContourArea(c)
+            contourlist.Add(c)
+            If contourlist.Count >= options.maxContours Then Exit For
+        Next
 
-'        dst3.SetTo(0)
-'        For Each ctr In allContours.ToArray
-'            DrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
-'        Next
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-
-
-
-
-'Public Class Contour_Sorted : Inherits TaskParent
-'    Dim contours As New Contour_GeneralWithOptions
-'    Dim sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
-'    Dim sortedByArea As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-'    Dim diff As New Diff_Basics
-'    Dim erode As New Erode_Basics
-'    Dim dilate As New Dilate_Basics
-'    Dim options As New Options_Contours
-'    Public Sub New()
-'        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-'        If standalone Then task.gOptions.displaydst1.checked = True
-'        labels = {"", "", "Contours in the detected motion", "Diff output - detected motion"}
-'        task.gOptions.pixelDiffThreshold = 25
-'        desc = "Display the contours from largest to smallest in the motion output"
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        diff.Run(src)
-'        erode.Run(diff.dst2) ' remove solo points.
-
-'        contours.Run(diff.dst2)
-'        dst2 = contours.dst2
-'        dst1 = contours.dst2.Clone
-
-'        sortedByArea.Clear()
-'        sortedContours.Clear()
-'        dst3.SetTo(0)
-'        For i = 0 To contours.contourlist.Count - 1
-'            If area > options.minPixels And contours.contourlist(i).Length > minLengthContour Then
-'                sortedByArea.Add(area, i)
-'                sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours.contourlist(i), contours.options.epsilon, True))
-'                DrawContour(dst3, contours.contourlist(i).ToList, white, -1)
-'            End If
-'        Next
-
-'        dilate.Run(dst3)
-'        dst3 = dilate.dst2
-
-'        Dim beforeCount = dst1.CountNonZero
-'        dst1.SetTo(0, dst3)
-'        Dim afterCount = dst1.CountNonZero
-'        SetTrueText("Before dilate: " + CStr(beforeCount) + vbCrLf + "After dilate " + CStr(afterCount) + vbCrLf + "Removed = " + CStr(beforeCount - afterCount), 1)
-
-'        SetTrueText("The motion detected produced " + CStr(sortedContours.Count) + " contours after filtering for length and area.", 3)
-'    End Sub
-'End Class
-
-
-
-
-
-
-'Public Class Contour_DepthTiers : Inherits TaskParent
-'    Public options As New Options_Contours
-'    Public optionsTiers As New Options_DepthTiers
-'    Public classCount As Integer
-'    Public contourlist As New List(Of cv.Point())
-'    Public Sub New()
-'        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-'        OptionParent.findRadio("FloodFill").Checked = True
-'        labels = {"", "", "FindContour input", "Draw contour output"}
-'        desc = "General purpose contour finder"
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        options.Run()
-
-'        task.pcSplit(2).ConvertTo(dst1, cv.MatType.CV_32S, 100 / optionsTiers.cmPerTier, 1)
-
-'        Dim allContours As cv.Point()()
-'        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
-'        If allContours.Count <= 1 Then Exit Sub
-
-'        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-'        For i = 0 To allContours.Count - 1
-'            If allContours(i).Length < 4 Then Continue For
-'            Dim count = cv.Cv2.ContourArea(allContours(i))
-'            If count < options.minPixels Then Continue For
-'            If count > 2 Then sortedList.Add(count, i)
-'        Next
-
-'        dst2.SetTo(0)
-'        contourlist.Clear()
-'        For i = 0 To sortedList.Count - 1
-'            Dim tour = allContours(sortedList.ElementAt(i).Value)
-'            Dim val = dst2.Get(Of Byte)(tour(0).Y, tour(0).X)
-'            If val = 0 Then
-'                Dim index = dst1.Get(Of Integer)(tour(0).Y, tour(0).X)
-'                contourlist.Add(tour)
-'                DrawContour(dst2, tour.ToList, index, -1)
-'            End If
-'        Next
-
-'        dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
-'        classCount = task.MaxZmeters * 100 / optionsTiers.cmPerTier
-
-'        If standaloneTest() Then dst3 = ShowPalette(dst2)
-'        labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."
-'    End Sub
-'End Class
+        dst3.SetTo(0)
+        For Each ctr In allContours.ToArray
+            DrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
+        Next
+    End Sub
+End Class
 

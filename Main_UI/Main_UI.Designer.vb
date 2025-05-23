@@ -28,12 +28,9 @@ Partial Class Main_UI
         Me.PausePlayButton = New System.Windows.Forms.ToolStripButton()
         Me.OptionsButton = New System.Windows.Forms.ToolStripButton()
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
-        Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
         Me.Magnify = New System.Windows.Forms.ToolStripButton()
-        Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
-        Me.BluePlusButton = New System.Windows.Forms.ToolStripButton()
-        Me.ComplexityButton = New System.Windows.Forms.ToolStripButton()
-        Me.Advice = New System.Windows.Forms.ToolStripButton()
+        Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
         Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
         Me.GroupButtonList = New System.Windows.Forms.ToolStripButton()
@@ -61,7 +58,7 @@ Partial Class Main_UI
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.PixelViewerButton, Me.Magnify, Me.TranslateButton, Me.BluePlusButton, Me.ComplexityButton, Me.Advice, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.Magnify, Me.PixelViewerButton, Me.ToolStripButton1, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
@@ -96,6 +93,16 @@ Partial Class Main_UI
         Me.TestAllButton.Size = New System.Drawing.Size(34, 29)
         Me.TestAllButton.Text = "Test All Algorithms"
         '
+        'Magnify
+        '
+        Me.Magnify.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.Magnify.Image = CType(resources.GetObject("Magnify.Image"), System.Drawing.Image)
+        Me.Magnify.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.Magnify.Name = "Magnify"
+        Me.Magnify.Size = New System.Drawing.Size(34, 29)
+        Me.Magnify.Text = "Magnify - click then draw a rectangle"
+        Me.Magnify.ToolTipText = "Magnify - draw a rectangle then click here."
+        '
         'PixelViewerButton
         '
         Me.PixelViewerButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
@@ -105,53 +112,15 @@ Partial Class Main_UI
         Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
         Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
         '
-        'Magnify
+        'ToolStripButton1
         '
-        Me.Magnify.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.Magnify.Image = CType(resources.GetObject("Magnify.Image"), System.Drawing.Image)
-        Me.Magnify.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.Magnify.Name = "Magnify"
-        Me.Magnify.Size = New System.Drawing.Size(34, 29)
-        Me.Magnify.Text = "Magnify - click then draw a rectangle"
-        Me.Magnify.ToolTipText = "Magnify - draw a rectangle then click"
-        '
-        'TranslateButton
-        '
-        Me.TranslateButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), System.Drawing.Image)
-        Me.TranslateButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TranslateButton.Name = "TranslateButton"
-        Me.TranslateButton.Size = New System.Drawing.Size(34, 29)
-        Me.TranslateButton.Text = "Translate algorithms to C#, C++, or VB.Net"
-        '
-        'BluePlusButton
-        '
-        Me.BluePlusButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.BluePlusButton.Image = CType(resources.GetObject("BluePlusButton.Image"), System.Drawing.Image)
-        Me.BluePlusButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.BluePlusButton.Name = "BluePlusButton"
-        Me.BluePlusButton.Size = New System.Drawing.Size(34, 29)
-        Me.BluePlusButton.Text = "Add new OpenGL, Python, C#, C++, or VB.Net algorithms"
-        '
-        'ComplexityButton
-        '
-        Me.ComplexityButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ComplexityButton.Image = CType(resources.GetObject("ComplexityButton.Image"), System.Drawing.Image)
-        Me.ComplexityButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ComplexityButton.Name = "ComplexityButton"
-        Me.ComplexityButton.Size = New System.Drawing.Size(34, 29)
-        Me.ComplexityButton.Text = "Measure an algorithm's complexity"
-        Me.ComplexityButton.Visible = False
-        '
-        'Advice
-        '
-        Me.Advice.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.Advice.Image = CType(resources.GetObject("Advice.Image"), System.Drawing.Image)
-        Me.Advice.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.Advice.Name = "Advice"
-        Me.Advice.Size = New System.Drawing.Size(34, 29)
-        Me.Advice.Text = "Show any advice on options for the current algorithm"
-        Me.Advice.Visible = False
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 29)
+        Me.ToolStripButton1.Text = "ToolStripButton1"
+        Me.ToolStripButton1.ToolTipText = "Bring Task forms to the front."
         '
         'RecentList
         '
@@ -243,7 +212,7 @@ Partial Class Main_UI
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(270, 34)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(141, 34)
         Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'AboutToolStripMenuItem
@@ -316,9 +285,6 @@ Partial Class Main_UI
     Friend WithEvents OptionsButton As ToolStripButton
     Friend WithEvents TestAllButton As ToolStripButton
     Friend WithEvents PixelViewerButton As ToolStripButton
-    Friend WithEvents BluePlusButton As ToolStripButton
-    Friend WithEvents ComplexityButton As ToolStripButton
-    Friend WithEvents Advice As ToolStripButton
     Friend WithEvents AvailableAlgorithms As ToolStripComboBox
     Friend WithEvents GroupCombo As ToolStripComboBox
     Friend WithEvents AlgorithmDesc As TextBox
@@ -339,5 +305,5 @@ Partial Class Main_UI
     Friend WithEvents CamSwitchProgress As PictureBox
     Friend WithEvents CamSwitchTimer As Timer
     Friend WithEvents GroupButtonList As ToolStripButton
-    Friend WithEvents TranslateButton As ToolStripButton
+    Friend WithEvents ToolStripButton1 As ToolStripButton
 End Class
