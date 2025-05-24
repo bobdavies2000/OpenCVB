@@ -7528,13 +7528,13 @@ Public Class Options_Grid : Inherits OptionParent
     Public height As Integer = 8
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Grid Cell Width", 1, task.cols, width)
-            sliders.setupTrackBar("Grid Cell Height", 1, task.rows, height)
+            sliders.setupTrackBar("brick Width", 1, task.cols, width)
+            sliders.setupTrackBar("brick Height", 1, task.rows, height)
         End If
     End Sub
     Public Sub Run()
-        Static widthSlider = OptionParent.FindSlider("Grid Cell Width")
-        Static heightSlider = OptionParent.FindSlider("Grid Cell Height")
+        Static widthSlider = OptionParent.FindSlider("brick Width")
+        Static heightSlider = OptionParent.FindSlider("brick Height")
         width = widthSlider.value
         height = heightSlider.value
     End Sub

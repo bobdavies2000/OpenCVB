@@ -7,7 +7,7 @@ Public Class Disparity_Basics : Inherits TaskParent
     Public rect As cv.Rect
     Public matchRect As cv.Rect
     Public Sub New()
-        desc = "Given a grid cell, find the match in the right view image."
+        desc = "Given a brick, find the match in the right view image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.leftView

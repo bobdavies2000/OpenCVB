@@ -392,7 +392,7 @@ Public Class PointCloud_GridInspector : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.mouseMovePoint.X = dst2.Width / 2
-        desc = "Inspect x, y, and z values by grid cell"
+        desc = "Inspect x, y, and z values by brick"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim cLine = task.mouseMovePoint.X
@@ -685,7 +685,7 @@ Public Class PointCloud_Continuous_GridX : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Show where the pointcloud is continuous at the grid cell resolution"
+        desc = "Show where the pointcloud is continuous at the brick resolution"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim input = src
@@ -718,7 +718,7 @@ End Class
 Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Show where the pointcloud is continuous at the grid cell resolution"
+        desc = "Show where the pointcloud is continuous at the brick resolution"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim input = src

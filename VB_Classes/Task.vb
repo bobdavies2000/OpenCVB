@@ -31,7 +31,7 @@ Public Class VBtask : Implements IDisposable
     Public structureMapX As New cv.Mat
     Public structureMapY As New cv.Mat
 
-    Public gcD As brickData ' the currently selected grid cell
+    Public gcD As brickData ' the currently selected brick
     Public rcD As New rcData ' the currently selected red Cell
     Public lpD As New lpData ' the currently selected line pair
     Public fpD As New fpData ' the currently selected feature point.
@@ -831,7 +831,7 @@ Public Class VBtask : Implements IDisposable
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
         If activateTaskForms Then
-            treeView.Activate()
+            If task.testAllRunning = False Then treeView.Activate()
             allOptions.Activate()
             activateTaskForms = False
         End If

@@ -526,7 +526,7 @@ Public Class brickData
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
     Public feature As cv.Point ' the max grid output from the current image
-    Public intensity As Byte ' sobel maximum intensity in this grid cell.
+    Public intensity As Byte ' sobel maximum intensity in this brick.
     Public pt As cv.Point ' feature absolute coordinates.
     Sub New()
         Dim stdev As cv.Scalar
@@ -538,7 +538,7 @@ Public Class brickData
         age = task.motionBasics.cellAge(index)
         color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
-        Dim pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this grid cell.
+        Dim pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this brick.
         cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), pt3D, stdev, task.depthMask(rect))
         depth = pt3D(0)
 

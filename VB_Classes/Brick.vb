@@ -627,7 +627,7 @@ Public Class Brick_Correlation : Inherits TaskParent
         Dim corr = brick.correlation
         dst2.Circle(brick.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
-        labels(3) = "Correlation of the left grid cell to the right is " + Format(corr, fmt3)
+        labels(3) = "Correlation of the left brick to the right is " + Format(corr, fmt3)
 
         Dim grayScale As Integer = If(task.gOptions.LRMeanSubtraction.Checked, 128, 255)
         dst2.Rectangle(brick.lRect, grayScale, task.lineWidth)
@@ -642,7 +642,7 @@ End Class
 Public Class Brick_Info : Inherits TaskParent
     Public Sub New()
         task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        desc = "Display the info about the select grid cell."
+        desc = "Display the info about the select brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.brickBasics.labels(2)
@@ -687,7 +687,7 @@ End Class
 Public Class Brick_LeftToColor : Inherits TaskParent
     Public Sub New()
         If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
-        desc = "Align grid cell left rectangles in color with the left image.  StereoLabs and Orbbec already match."
+        desc = "Align brick left rectangles in color with the left image.  StereoLabs and Orbbec already match."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -739,7 +739,7 @@ End Class
 Public Class Brick_Lines : Inherits TaskParent
     Dim info As New LineRGB_Info
     Public Sub New()
-        desc = "Lines can mean cells are connected - click on any highlighted grid cell to see info on that line."
+        desc = "Lines can mean cells are connected - click on any highlighted brick to see info on that line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lineRGB.dst2
@@ -770,9 +770,9 @@ End Class
 Public Class Brick_CorrelationMap : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Basics
     Public Sub New()
-        labels(3) = "The map to identify each grid cell."
+        labels(3) = "The map to identify each brick."
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each grid cell."
+        desc = "Display a heatmap of the correlation of the left and right images for each brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
@@ -799,7 +799,7 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
         labels(3) = "Right view with the translated trace of bricks under the mouse."
         If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         If standalone Then task.gOptions.displayDst0.Checked = True
-        desc = "Map the grid cells from the color image into the left view and the right view."
+        desc = "Map the bricks from the color image into the left view and the right view."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = src
@@ -852,7 +852,7 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
         Dim rgbTop = brick.rect.TopLeft, ir3D As cv.Point3f
         ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
         ' can be found.  For Intel, the left image and RGB need to be aligned first.
-        ' With depth the correlation between the left and right for that grid cell will be accurate (if there is depth.)
+        ' With depth the correlation between the left and right for that brick will be accurate (if there is depth.)
         If task.rgbLeftAligned Then
             irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
         Else

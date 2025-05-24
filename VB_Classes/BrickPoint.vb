@@ -4,7 +4,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
     Public intensityFeatures As New List(Of cv.Point2f)
     Public Sub New()
         labels(3) = "Sobel input to BrickPoint_Basics"
-        desc = "Find the max Sobel point in each grid cell"
+        desc = "Find the max Sobel point in each brick"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone

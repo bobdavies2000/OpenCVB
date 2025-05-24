@@ -2828,7 +2828,7 @@ End Class
 Public Class XO_Region_RedColor : Inherits TaskParent
     Dim connect As New Region_Contours
     Public Sub New()
-        desc = "Color each redCell with the color of the nearest grid cell region."
+        desc = "Color each redCell with the color of the nearest brick region."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src)
@@ -4322,7 +4322,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
         For Each brick In task.brickList
             If dst1(brick.rect).CountNonZero = 0 Then Continue For
             hist.Run(dst1(brick.rect))
-            For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
+            For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the brick last.
                 If hist.histarray(i) > 0 Then
                     lpList(i).bricks.Add(brick.index)
                     task.lpMap(task.brickList(brick.index).rect).SetTo(brick.index)
@@ -4388,7 +4388,7 @@ Public Class XO_Structured_Basics : Inherits TaskParent
         For Each brick In task.brickList
             If dst(brick.rect).CountNonZero = 0 Then Continue For
             hist.Run(dst(brick.rect))
-            For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the grid cell last.
+            For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the brick last.
                 If hist.histarray(i) > 0 Then
                     lpList(i).bricks.Add(brick.index)
                 End If

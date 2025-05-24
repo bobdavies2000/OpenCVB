@@ -1215,25 +1215,27 @@ Public Class Main_UI
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' don't start another algorithm until the current one has finished 
         If algorithmQueueCount <> 0 Then
-            Debug.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
-            While 1
-                If algorithmQueueCount <> 0 Or task.TaskTimer.Enabled Then
-                    Exit Sub
-                Else
-                    algorithmQueueCount = 0
-                    Exit While
+            ' Give the algorithm a reasonable time to finish, then crash.
+            Dim crash As Boolean = True
+            For i = 0 To 10
+                Thread.Sleep(2000)
+                If algorithmQueueCount = 0 Then
+                    crash = False
+                    Exit For
                 End If
-            End While
+            Next
+            If crash Then
+                Throw New InvalidOperationException("Can't start the next algorithm because previous algorithm has not completed.")
+            End If
         End If
 
         If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
             AvailableAlgorithms.SelectedIndex = 0
+        End If
+        If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
+            AvailableAlgorithms.SelectedIndex += 2
         Else
-            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
-                AvailableAlgorithms.SelectedIndex += 2
-            Else
-                AvailableAlgorithms.SelectedIndex += 1
-            End If
+            AvailableAlgorithms.SelectedIndex += 1
         End If
 
         ' skip testing the XO_ algorithms.  They are obsolete.

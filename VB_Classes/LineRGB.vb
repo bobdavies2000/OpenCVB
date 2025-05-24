@@ -52,7 +52,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
         lpList.Add(New lpData(New cv.Point, New cv.Point))
 
-        ' update lpMap from smallest to largest so the largest lines own any grid cell.
+        ' update lpMap from smallest to largest so the largest lines own any brick.
         lpMap.SetTo(0)
         For Each lp In sortlines.Values
             lp.index = lpList.Count
