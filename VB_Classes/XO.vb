@@ -3849,7 +3849,7 @@ Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
 
             Dim gcAbove = task.brickList(brick.index - task.cellsPerRow)
-            Dim val = gcAbove.contourIndex
+            Dim val = gcAbove.contourFull
             If val = 0 Then val = dst0.Get(Of Byte)(gcPrev.rect.Y, gcPrev.rect.X)
             Dim count = edges.dst2(brick.rect).CountNonZero
             If val = 0 And count = 0 Then
@@ -3857,7 +3857,7 @@ Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
                 fLessCount += 1
             End If
             If count = 0 Then
-                brick.contourIndex = val
+                brick.contourFull = val
                 dst0(brick.rect).SetTo(val Mod 255)
             End If
             gcPrev = brick
@@ -3865,11 +3865,12 @@ Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
 
         For i = task.brickList.Count - 1 To 1 Step -1
             Dim brick = task.brickList(i)
-            If brick.contourIndex > 0 Then
+            If brick.contourFull > 0 Then
                 gcPrev = task.brickList(i - 1)
-                If gcPrev.contourIndex > 0 And gcPrev.contourIndex <> 0 And gcPrev.contourIndex <> brick.contourIndex And gcPrev.contourIndex <> 0 Then
-                    gcPrev.contourIndex = brick.contourIndex
-                    dst0(gcPrev.rect).SetTo(brick.contourIndex)
+                If gcPrev.contourFull > 0 And gcPrev.contourFull <> 0 And gcPrev.contourFull <> brick.contourFull And
+                    gcPrev.contourFull <> 0 Then
+                    gcPrev.contourFull = brick.contourFull
+                    dst0(gcPrev.rect).SetTo(brick.contourFull)
                     task.brickList(i - 1) = gcPrev
                 End If
             End If
@@ -3902,7 +3903,7 @@ Public Class XO_BrickPoint_FeatureLessOld : Inherits TaskParent
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
 
             If edges.dst2(brick.rect).CountNonZero = 0 Then
-                brick.contourIndex = 255
+                brick.contourFull = 255
                 fLessMask(brick.rect).SetTo(255)
             End If
         Next
@@ -3911,17 +3912,17 @@ Public Class XO_BrickPoint_FeatureLessOld : Inherits TaskParent
         classCount = 0
         For Each brick In task.brickList
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
-            If brick.contourIndex = 255 Then
+            If brick.contourFull = 255 Then
                 Dim gcAbove = task.brickList(brick.index - task.cellsPerRow)
-                Dim val = gcAbove.contourIndex
-                If val = 0 Then val = gcPrev.contourIndex
-                If val = 0 And brick.contourIndex <> 0 Then
+                Dim val = gcAbove.contourFull
+                If val = 0 Then val = gcPrev.contourFull
+                If val = 0 And brick.contourFull <> 0 Then
                     classCount += 1
                     val = classCount
                 End If
                 If val <> 0 Then
-                    brick.contourIndex = val
-                    fLessMask(brick.rect).SetTo(brick.contourIndex)
+                    brick.contourFull = val
+                    fLessMask(brick.rect).SetTo(brick.contourFull)
                 End If
             End If
             gcPrev = brick
@@ -4928,5 +4929,72 @@ Public Class XO_Contour_RedCloud : Inherits TaskParent
         For Each rc In task.rcList
             DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_OpenGL_PlaneClusters3D : Inherits TaskParent
+    Dim eq As New Plane_Equation
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pcPoints
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
+        labels(3) = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis"
+        desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+        dst3 = task.redC.dst3
+
+        Dim pcPoints As New List(Of cv.Point3f)
+        Dim blue As New cv.Point3f(0, 0, 1), red As New cv.Point3f(1, 0, 0), green As New cv.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
+        For Each rc In task.rcList
+            If rc.mmZ.maxVal > 0 Then
+                eq.rc = rc
+                eq.Run(src)
+                rc = eq.rc
+            End If
+            If rc.eq = New cv.Vec4f Then Continue For
+
+            If rc.eq.Item0 > rc.eq.Item1 And rc.eq.Item0 > rc.eq.Item2 Then pcPoints.Add(red)
+            If rc.eq.Item1 > rc.eq.Item0 And rc.eq.Item1 > rc.eq.Item2 Then pcPoints.Add(green)
+            If rc.eq.Item2 > rc.eq.Item0 And rc.eq.Item2 > rc.eq.Item1 Then pcPoints.Add(blue)
+
+            pcPoints.Add(New cv.Point3f(rc.eq.Item0 * 0.5, rc.eq.Item1 * 0.5, rc.eq.Item2 * 0.5))
+        Next
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(pcPoints.Count, 1, cv.MatType.CV_32FC3, pcPoints.ToArray)
+        task.ogl.Run(New cv.Mat)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Pixel_Unique_CPP : Inherits TaskParent
+    Public Sub New()
+        cPtr = Pixels_Vector_Open()
+        desc = "Create the list of pixels in a RedCloud Cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
+        Dim cppData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim classCount = Pixels_Vector_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        handleSrc.Free()
+
+        If classCount = 0 Then Exit Sub
+        Dim pixelData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
+        SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
+                    "Or " + Format(classCount / src.Total, "0%") + " of the input were unique pixels.")
+    End Sub
+    Public Sub Close()
+        Pixels_Vector_Close(cPtr)
     End Sub
 End Class

@@ -385,19 +385,13 @@ Public Class BrickPoint_FeatureLess : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
-        Dim contourCount As New List(Of Integer)
-        For Each brick In task.brickList
-            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
-                brick.contourIndex = task.contourMap.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X)
-                If contourCount.Contains(brick.contourIndex) = False Then contourCount.Add(brick.contourIndex)
-                dst2(brick.rect).SetTo(255)
-            End If
-        Next
+        DrawContourBricks()
 
         dst3 = ShowAddweighted(dst2, task.contours.dst2, labels(3))
-        classCount = contourCount.Count
+        classCount = task.brickBasics.contourFull.Count
         labels(2) = task.contours.labels(2)
-        labels(3) = "Of the " + CStr(task.contourList.Count) + " contours " + CStr(classCount) + " have complete bricks inside them."
+        labels(3) = "Of the " + CStr(task.contourList.Count) + " contours " + CStr(classCount) +
+                    " have complete bricks inside them."
     End Sub
 End Class
 

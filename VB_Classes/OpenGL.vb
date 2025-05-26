@@ -720,45 +720,6 @@ End Class
 
 
 
-Public Class OpenGL_PlaneClusters3D : Inherits TaskParent
-    Dim eq As New Plane_Equation
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pcPoints
-        OptionParent.FindSlider("OpenGL Point Size").Value = 10
-        labels(3) = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis"
-        desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-        dst3 = task.redC.dst3
-
-        Dim pcPoints As New List(Of cv.Point3f)
-        Dim blue As New cv.Point3f(0, 0, 1), red As New cv.Point3f(1, 0, 0), green As New cv.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
-        For Each rc In task.rcList
-            If rc.mmZ.maxVal > 0 Then
-                eq.rc = rc
-                eq.Run(src)
-                rc = eq.rc
-            End If
-            If rc.eq = New cv.Vec4f Then Continue For
-
-            If rc.eq.Item0 > rc.eq.Item1 And rc.eq.Item0 > rc.eq.Item2 Then pcPoints.Add(red)
-            If rc.eq.Item1 > rc.eq.Item0 And rc.eq.Item1 > rc.eq.Item2 Then pcPoints.Add(green)
-            If rc.eq.Item2 > rc.eq.Item0 And rc.eq.Item2 > rc.eq.Item1 Then pcPoints.Add(blue)
-
-            pcPoints.Add(New cv.Point3f(rc.eq.Item0 * 0.5, rc.eq.Item1 * 0.5, rc.eq.Item2 * 0.5))
-        Next
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(pcPoints.Count, 1, cv.MatType.CV_32FC3, pcPoints.ToArray)
-        task.ogl.Run(New cv.Mat)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class OpenGL_Profile : Inherits TaskParent
     Public sides As New Profile_Basics
     Public rotate As New Profile_Rotation

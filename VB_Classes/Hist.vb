@@ -1448,10 +1448,10 @@ Public Class Hist_BrickRegions : Inherits TaskParent
         Dim predictedList As New List(Of Integer)
         Dim brick As brickData
         For Each brick In task.brickList
-            If brick.contourIndex Then
+            If brick.contourFull Then
                 Dim nabes = task.gridNeighbors(brick.index)
                 For i = 1 To nabes.Count - 1 ' the first entry is for the brick...
-                    If task.brickList(nabes(i)).contourIndex = 0 Then
+                    If task.brickList(nabes(i)).contourFull = 0 Then
                         If predictedList.Contains(nabes(i)) = False Then
                             histList.Add(brick.index, nabes(i))
                             predictedList.Add(nabes(i))
@@ -1475,7 +1475,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
                 For i = 0 To histArray.Count - 1 ' there is often garbage in histarray(255) but why?  Eliminate it here.
                     If histArray(i) >= 1 Then
                         If arrayStart = -1 Then arrayStart = i
-                        histArray(i) = brick.contourIndex
+                        histArray(i) = brick.contourFull
                         If arrayStart < 255 Then
                             If i <> 255 Then arrayEnd = i
                         Else
@@ -1486,7 +1486,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
 
                 ' fill in any gaps in the series!
                 For i = arrayStart To arrayEnd
-                    histArray(i) = brick.contourIndex
+                    histArray(i) = brick.contourFull
                 Next
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If

@@ -65,21 +65,19 @@ Public Class Contour_Basics : Inherits TaskParent
         Next
 
         dst2 = ShowPalette(task.contourMap)
+        dst2.SetTo(white, task.contourMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
 
         Static pt = task.ClickPoint
         If task.mouseClickFlag Then pt = task.ClickPoint
         Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
         task.contourD = task.contourList(index)
 
-        For Each brick In task.brickList
-            If brick.contourIndex Then
-                If drawBricks Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
-            End If
-        Next
+        DrawContourBricks()
 
         labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found.  " +
-                    "Contours had " + CStr(task.brickBasics.brickCount) + " complete interior bricks (" +
-                    Format(task.brickBasics.brickCount / task.gridRects.Count, "00%") + ")"
+                    "Contours had " + CStr(task.brickBasics.brickFull) + " interior bricks (" +
+                    Format(task.brickBasics.brickFull / task.gridRects.Count, "00%") + ") and " +
+                    CStr(task.brickBasics.brickPartial) + " partially contained (blue)"
     End Sub
 End Class
 

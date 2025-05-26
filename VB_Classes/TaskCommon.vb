@@ -506,52 +506,6 @@ End Class
 
 
 
-
-Public Class brickData
-    Public age As Integer
-    Public color As cv.Vec3f
-    Public correlation As Single
-    Public corrHistory As New List(Of Single)
-    Public index As Integer
-    Public contourIndex As Integer
-
-    Public rect As cv.Rect ' rectange under the cursor in the color image.
-    Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
-    Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
-
-    Public center As cv.Point ' center of the rectangle
-    Public depth As Single
-    Public depthRanges As New List(Of Single)
-
-    Public mm As mmData ' min and max values of the depth data.
-    Public corners As New List(Of cv.Point3f)
-    Public feature As cv.Point ' the max grid output from the current image
-    Public intensity As Byte ' sobel maximum intensity in this brick.
-    Public pt As cv.Point ' feature absolute coordinates.
-    Sub New()
-        Dim stdev As cv.Scalar
-        index = task.brickList.Count
-        rect = task.gridRects(index)
-        lRect = rect
-        rRect = New cv.Rect
-
-        age = task.motionBasics.cellAge(index)
-        color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
-        center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
-        Dim pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this brick.
-        cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), pt3D, stdev, task.depthMask(rect))
-        depth = pt3D(0)
-
-        If depth > 0 Then
-            task.pcSplit(2)(rect).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(rect))
-            mm.range = mm.maxVal - mm.minVal
-        End If
-    End Sub
-End Class
-
-
-
-
 Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
     Public age As Integer
     Public p1 As cv.Point2f
@@ -743,12 +697,61 @@ End Class
 
 
 
+
+
+Public Class brickData
+    Public age As Integer
+    Public color As cv.Vec3f
+    Public correlation As Single
+    Public corrHistory As New List(Of Single)
+    Public index As Integer
+    Public contourFull As Integer
+    Public contourPartial As Integer
+
+    Public rect As cv.Rect ' rectange under the cursor in the color image.
+    Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
+    Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
+
+    Public center As cv.Point ' center of the rectangle
+    Public depth As Single
+    Public depthRanges As New List(Of Single)
+
+    Public mm As mmData ' min and max values of the depth data.
+    Public corners As New List(Of cv.Point3f)
+    Public feature As cv.Point ' the max grid output from the current image
+    Public intensity As Byte ' sobel maximum intensity in this brick.
+    Public pt As cv.Point ' feature absolute coordinates.
+    Sub New()
+        Dim stdev As cv.Scalar
+        index = task.brickList.Count
+        rect = task.gridRects(index)
+        lRect = rect
+        rRect = New cv.Rect
+
+        age = task.motionBasics.cellAge(index)
+        color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
+        center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
+        Dim pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this brick.
+        cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), pt3D, stdev, task.depthMask(rect))
+        depth = pt3D(0)
+
+        If depth > 0 Then
+            task.pcSplit(2)(rect).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(rect))
+            mm.range = mm.maxVal - mm.minVal
+        End If
+    End Sub
+End Class
+
+
+
 Public Class contourData
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public pixels As Integer
     Public maxDist As cv.Point
     Public index As Integer
+    Public bricks As New List(Of Integer)
+    Public brickPartial As New List(Of Integer)
     Public Sub New()
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)

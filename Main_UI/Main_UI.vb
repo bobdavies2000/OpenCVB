@@ -1713,8 +1713,8 @@ Public Class Main_UI
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
                     Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
                     task.gcD = task.brickList(index)
-                    depthAndCorrelationText = Format(task.gcD.depth, fmt3) + " ID=" +
-                                              CStr(task.gcD.index) + vbCrLf + "depth " + Format(task.gcD.mm.minVal, fmt1) + "-" +
+                    depthAndCorrelationText = "depth = " + Format(task.gcD.depth, fmt3) + "m ID=" +
+                                              CStr(task.gcD.index) + vbCrLf + "range " + Format(task.gcD.mm.minVal, fmt1) + "-" +
                                               Format(task.gcD.mm.maxVal, fmt1) + "m, age = " + CStr(task.gcD.age) + vbCrLf +
                                               "correlation = " + Format(task.gcD.correlation, fmt3)
 

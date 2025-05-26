@@ -1,7 +1,9 @@
 ﻿Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
-    Public instantUpdate As Boolean, brickCount As Integer
+    Public instantUpdate As Boolean, brickFull As Integer, brickPartial As Integer
+    Public contourFull As New List(Of Integer)
+    Public contourPartial As New List(Of Integer)
     Public Sub New()
         task.brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
@@ -22,8 +24,10 @@ Public Class Brick_Basics : Inherits TaskParent
         Dim maxPixels = task.cellSize * task.cellSize
         task.brickList.Clear()
         Dim depthCount As Integer
-        Dim contourCount As New List(Of Integer)
-        brickCount = 0
+        contourFull.Clear()
+        contourPartial.Clear()
+        brickFull = 0
+        brickPartial = 0
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             If brick.depth > 0 Then
@@ -87,23 +91,30 @@ Public Class Brick_Basics : Inherits TaskParent
                 brick.corrHistory.RemoveAt(0)
             End If
 
+            Dim contourIndex = task.contourMap.Get(Of Byte)(brick.center.Y, brick.center.X)
             If task.edges.dst2(brick.rect).CountNonZero = 0 Then
-                brick.contourIndex = task.contourMap.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X)
-                If contourCount.Contains(brick.contourIndex) = False Then contourCount.Add(brick.contourIndex)
-                brickCount += 1
+                If contourFull.Contains(contourIndex) = False Then contourFull.Add(contourIndex)
+                task.contourList(contourIndex).bricks.Add(brick.index)
+                brick.contourFull = contourIndex
+                brickFull += 1
+            Else
+                If contourIndex > 0 Then
+                    If contourPartial.Contains(contourIndex) = False Then contourPartial.Add(contourIndex)
+                    task.contourList(contourIndex).brickPartial.Add(brick.index)
+                    brick.contourPartial = contourIndex
+                    brickPartial += 1
+                End If
             End If
             task.brickList.Add(brick)
         Next
 
-        If task.heartBeat Then labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) +
-                                           " have useful depth data.  " + Format(brickCount / task.gridRects.Count, "00%") +
-                                           " of all bricks were fully interior bricks in the " +
-                                           CStr(contourCount.Count) + " contours."
-        If standaloneTest() Then
-            For Each brick In task.brickList
-                If brick.contourIndex <> 0 Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
-            Next
-        End If
+        If task.heartBeat Then labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " +
+            CStr(depthCount) + " have no edge data (aka featureless) - " +
+            Format(brickFull / task.gridRects.Count, "00%") +
+            " of all bricks were fully interior bricks in the " + CStr(task.contourList.Count) + " contours." +
+            "  There were also " + CStr(brickPartial) + " partial contour bricks (blue)"
+
+        DrawContourBricks()
     End Sub
 End Class
 

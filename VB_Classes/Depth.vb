@@ -740,30 +740,6 @@ End Class
 
 
 
-Public Class Depth_Grid : Inherits TaskParent
-    Public Sub New()
-        task.gOptions.GridSlider.Value = 4
-        labels = {"", "", "White regions below are likely depth edges where depth changes rapidly", "Depth 32f display"}
-        desc = "Find boundaries in depth to separate featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.pcSplit(2)
-        dst2 = task.gridMask.Clone
-        For Each roi In task.gridRects
-            Dim mm As mmData = GetMinMax(dst3(roi))
-            If Math.Abs(mm.minVal - mm.maxVal) > 0.1 Then dst2(roi).SetTo(cv.Scalar.White)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Depth_InRange : Inherits TaskParent
     Dim options As New Options_ForeGround
     Dim contours As New Contour_Largest
