@@ -703,7 +703,6 @@ Public Class brickData
     Public age As Integer
     Public color As cv.Vec3f
     Public correlation As Single
-    Public corrHistory As New List(Of Single)
     Public index As Integer
     Public contourFull As Integer
     Public contourPartial As Integer
@@ -712,7 +711,7 @@ Public Class brickData
     Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
     Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
 
-    Public center As cv.Point ' center of the rectangle
+    Public center As cv.Point ' center of the brick
     Public depth As Single
     Public depthRanges As New List(Of Single)
 
@@ -720,7 +719,7 @@ Public Class brickData
     Public corners As New List(Of cv.Point3f)
     Public feature As cv.Point ' the max grid output from the current image
     Public intensity As Byte ' sobel maximum intensity in this brick.
-    Public pt As cv.Point ' feature absolute coordinates.
+    Public pt As cv.Point ' Brick's Sobel maximum in absolute coordinates.
     Sub New()
         Dim stdev As cv.Scalar
         index = task.brickList.Count

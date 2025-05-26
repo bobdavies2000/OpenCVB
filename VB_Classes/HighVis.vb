@@ -9,7 +9,7 @@ Public Class HighVis_Basics : Inherits TaskParent
         dst1.SetTo(0)
         For Each brick In task.brickList
             If brick.correlation > task.fCorrThreshold Then
-                If brick.correlation > 0 And brick.corrHistory.Count = task.historyCount Then
+                If brick.correlation > 0 Then
                     dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
                 Else
                     dst1(brick.rect).SetTo(0)

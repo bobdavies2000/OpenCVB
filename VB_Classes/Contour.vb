@@ -72,7 +72,7 @@ Public Class Contour_Basics : Inherits TaskParent
         Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
         task.contourD = task.contourList(index)
 
-        DrawContourBricks()
+        Dim totalBricks = DrawContourBricks()
 
         labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found.  " +
                     "Contours had " + CStr(task.brickBasics.brickFull) + " interior bricks (" +

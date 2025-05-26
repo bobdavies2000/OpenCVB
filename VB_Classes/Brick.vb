@@ -2,8 +2,6 @@
 Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean, brickFull As Integer, brickPartial As Integer
-    Public contourFull As New List(Of Integer)
-    Public contourPartial As New List(Of Integer)
     Public Sub New()
         task.brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
@@ -24,8 +22,6 @@ Public Class Brick_Basics : Inherits TaskParent
         Dim maxPixels = task.cellSize * task.cellSize
         task.brickList.Clear()
         Dim depthCount As Integer
-        contourFull.Clear()
-        contourPartial.Clear()
         brickFull = 0
         brickPartial = 0
         For i = 0 To task.gridRects.Count - 1
@@ -33,10 +29,12 @@ Public Class Brick_Basics : Inherits TaskParent
             If brick.depth > 0 Then
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute brick.
                 Dim lastCorrelation = If(i < brickLast.Count, brickLast(i).correlation, 0)
-                If brick.age > 1 And instantUpdate = False Then
+                If brick.age > 1 And instantUpdate = False And lastCorrelation > 0 Then
                     ' no need to recompute everything when there is no motion in the cell.
                     brick = brickLast(i)
                     brick.age = task.motionBasics.cellAge(i)
+                    brick.contourFull = 0
+                    brick.contourPartial = 0
                 Else
                     If task.rgbLeftAligned Then
                         brick.rRect = brick.rect
@@ -80,7 +78,6 @@ Public Class Brick_Basics : Inherits TaskParent
                     End If
                 End If
                 brick.depthRanges.Add(brick.mm.range)
-                brick.corrHistory.Add(brick.correlation)
             End If
 
             dst2(brick.rect).SetTo(brick.color)
@@ -88,21 +85,20 @@ Public Class Brick_Basics : Inherits TaskParent
             If brick.depth > 0 Then depthCount += 1
             If brick.depthRanges.Count > task.historyCount Then
                 brick.depthRanges.RemoveAt(0)
-                brick.corrHistory.RemoveAt(0)
             End If
 
             Dim contourIndex = task.contourMap.Get(Of Byte)(brick.center.Y, brick.center.X)
-            If task.edges.dst2(brick.rect).CountNonZero = 0 Then
-                If contourFull.Contains(contourIndex) = False Then contourFull.Add(contourIndex)
-                task.contourList(contourIndex).bricks.Add(brick.index)
-                brick.contourFull = contourIndex
-                brickFull += 1
-            Else
-                If contourIndex > 0 Then
-                    If contourPartial.Contains(contourIndex) = False Then contourPartial.Add(contourIndex)
-                    task.contourList(contourIndex).brickPartial.Add(brick.index)
-                    brick.contourPartial = contourIndex
-                    brickPartial += 1
+            If contourIndex > 0 Then
+                If task.edges.dst2(brick.rect).CountNonZero = 0 Then
+                    task.contourList(contourIndex).bricks.Add(brick.index)
+                    brick.contourFull = contourIndex
+                    brickFull += 1
+                Else
+                    If contourIndex > 0 Then
+                        task.contourList(contourIndex).brickPartial.Add(brick.index)
+                        brick.contourPartial = contourIndex
+                        brickPartial += 1
+                    End If
                 End If
             End If
             task.brickList.Add(brick)
@@ -114,7 +110,13 @@ Public Class Brick_Basics : Inherits TaskParent
             " of all bricks were fully interior bricks in the " + CStr(task.contourList.Count) + " contours." +
             "  There were also " + CStr(brickPartial) + " partial contour bricks (blue)"
 
-        DrawContourBricks()
+        Dim brickTotal = DrawContourBricks()
+
+        Dim c1 As Integer, c2 As Integer
+        For Each brick In task.brickList
+            If brick.contourFull Then c1 += 1
+            If brick.contourPartial Then c2 += 1
+        Next
     End Sub
 End Class
 
@@ -677,11 +679,6 @@ Public Class Brick_Info : Inherits TaskParent
 
         strOut += "Depth range history: " + vbTab
         For Each ele In brick.depthRanges
-            strOut += Format(ele, fmt3) + vbTab
-        Next
-
-        strOut += vbCrLf + vbCrLf + "Correlation history: " + vbTab
-        For Each ele In brick.corrHistory
             strOut += Format(ele, fmt3) + vbTab
         Next
 

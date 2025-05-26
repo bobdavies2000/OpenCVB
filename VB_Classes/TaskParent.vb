@@ -503,12 +503,20 @@ Public Class TaskParent : Implements IDisposable
     Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar, Optional fillFlag As Integer = -1)
         dst.Circle(pt, radius, color, fillFlag, task.lineType)
     End Sub
-    Public Sub DrawContourBricks()
+    Public Function DrawContourBricks() As Integer
+        Dim count As Integer
         For Each brick In task.brickList
-            If brick.contourFull <> 0 Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
-            If brick.contourPartial <> 0 Then dst2.Rectangle(brick.rect, blue, task.lineWidth)
+            If brick.contourFull <> 0 Then
+                dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
+                count += 1
+            End If
+            If brick.contourPartial <> 0 Then
+                dst2.Rectangle(brick.rect, blue, task.lineWidth)
+                count += 1
+            End If
         Next
-    End Sub
+        Return count
+    End Function
     Public Sub DrawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
         dst.Circle(pt, task.DotSize + 2, white, -1, task.lineType)
         DrawCircle(dst, pt, task.DotSize, cv.Scalar.Black)

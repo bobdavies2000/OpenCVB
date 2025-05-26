@@ -388,7 +388,7 @@ Public Class BrickPoint_FeatureLess : Inherits TaskParent
         DrawContourBricks()
 
         dst3 = ShowAddweighted(dst2, task.contours.dst2, labels(3))
-        classCount = task.brickBasics.contourFull.Count
+        classCount = task.contourList.Count
         labels(2) = task.contours.labels(2)
         labels(3) = "Of the " + CStr(task.contourList.Count) + " contours " + CStr(classCount) +
                     " have complete bricks inside them."
