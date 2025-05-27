@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp.Flann
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean, brickFull As Integer, brickPartial As Integer
     Public Sub New()
@@ -104,18 +103,23 @@ Public Class Brick_Basics : Inherits TaskParent
             task.brickList.Add(brick)
         Next
 
-        If task.heartBeat Then labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " +
-            CStr(depthCount) + " have no edge data (aka featureless) - " +
-            Format(brickFull / task.gridRects.Count, "00%") +
-            " of all bricks were fully interior bricks in the " + CStr(task.contourList.Count) + " contours." +
-            "  There were also " + CStr(brickPartial) + " partial contour bricks (blue)"
+        If task.heartBeat Then
+            labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " +
+                        CStr(depthCount) + " have no edge data (aka featureless) - " +
+                        Format(brickFull / task.gridRects.Count, "00%") +
+                        " of all bricks were fully interior bricks in the " + CStr(task.contourList.Count) + " contours." +
+                        "  There were also " + CStr(brickPartial) + " partial contour bricks (blue)"
+        End If
 
-        Dim brickTotal = DrawContourBricks()
+        DrawContourBricks()
 
-        Dim c1 As Integer, c2 As Integer
-        For Each brick In task.brickList
-            If brick.contourFull Then c1 += 1
-            If brick.contourPartial Then c2 += 1
+        Dim depth As Single
+        For Each contour In task.contourList
+            depth = 0
+            For Each index In contour.bricks
+                depth += task.brickList(index).depth
+            Next
+            contour.depth = depth / contour.bricks.Count
         Next
     End Sub
 End Class

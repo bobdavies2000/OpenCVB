@@ -6,6 +6,7 @@ Imports System.Drawing
 Imports System.Threading
 Imports cvext = OpenCvSharp.Extensions
 Imports System.Security.Cryptography
+Imports OpenCvSharp
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim startInfo As New ProcessStartInfo
@@ -1837,77 +1838,6 @@ End Class
 
 
 
-
-Public Class OpenGL_QuadConnected : Inherits TaskParent
-    Dim connect As New Region_Core
-    Public Sub New()
-        task.ogl.oglFunction = oCase.quadBasics
-        desc = "Build connected bricks and remove cells that are not connected."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        connect.Run(src)
-        dst2 = connect.dst2
-        dst3 = connect.dst3
-
-        Dim quadData As New List(Of cv.Point3f)
-        Dim gc1 As brickData, gc2 As brickData
-        For Each tup In connect.hTuples
-            gc1 = task.brickList(tup.Item1)
-            gc2 = task.brickList(tup.Item2)
-            For i = tup.Item1 + 1 To tup.Item2 - 1
-                gc1 = task.brickList(i - 1)
-                gc2 = task.brickList(i)
-                If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
-                If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
-
-                quadData.Add(gc1.color)
-                quadData.Add(gc1.corners(0))
-                quadData.Add(gc2.corners(0))
-                quadData.Add(gc2.corners(3))
-                quadData.Add(gc1.corners(3))
-            Next
-            If gc1.corners.Count > 0 And gc2.corners.Count > 0 Then
-                quadData.Add(gc2.color)
-                quadData.Add(gc2.corners(0))
-                quadData.Add(gc2.corners(1))
-                quadData.Add(gc2.corners(2))
-                quadData.Add(gc2.corners(3))
-            End If
-        Next
-
-        Dim width = dst2.Width / task.cellSize
-        For Each tup In connect.vTuples
-            For i = tup.Item1 To tup.Item2 - width Step width
-                gc1 = task.brickList(i)
-                gc2 = task.brickList(i + width)
-                If gc1.depth = 0 Or gc2.depth = 0 Then Continue For
-                If gc1.corners.Count = 0 Or gc2.corners.Count = 0 Then Continue For
-
-                quadData.Add(gc1.color)
-                quadData.Add(gc1.corners(0))
-                quadData.Add(gc1.corners(1))
-                quadData.Add(gc2.corners(1))
-                quadData.Add(gc2.corners(0))
-            Next
-            If gc1.corners.Count > 0 And gc2.corners.Count > 0 Then
-                quadData.Add(gc2.color)
-                quadData.Add(gc2.corners(0))
-                quadData.Add(gc2.corners(1))
-                quadData.Add(gc2.corners(2))
-                quadData.Add(gc2.corners(3))
-            End If
-        Next
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
-        task.ogl.pointCloudInput = New cv.Mat()
-        task.ogl.Run(src)
-        labels = task.brickBasics.labels
-    End Sub
-End Class
-
-
-
-
 Public Class OpenGL_Regions : Inherits TaskParent
     Dim options As New Options_Regions
     Dim qDepth As New OpenGL_QuadDepth
@@ -2002,9 +1932,151 @@ Public Class OpenGL_DepthLogicCloud : Inherits TaskParent
 
         depthLogic.dst3.CopyTo(dst3, logic.gradient.dst3)
         task.ogl.pointCloudInput = If(task.toggleOn, task.pointCloud, dst2)
-        task.ogl.pointCloudInput = dst2
         task.ogl.Run(dst3)
 
         labels(3) = logic.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_ContourPlaneSimple : Inherits TaskParent
+    Dim contours As New ContourPlane_Basics
+    Public Sub New()
+        task.ogl.oglFunction = oCase.drawPointCloudRGB
+        desc = "Display the contour planes in 3D"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        contours.Run(src)
+        dst2 = contours.dst2
+        dst3 = contours.dst3
+        labels(2) = contours.labels(2)
+
+        task.ogl.pointCloudInput = contours.dst3
+        task.ogl.Run(contours.dst2)
+    End Sub
+End Class
+
+
+
+
+Public Class OpenGL_ContourPlaneOnly : Inherits TaskParent
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        desc = "Display the rectangles of the contour planes in 3D"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim quadData As New List(Of cv.Point3f)
+        For Each contour In task.contourList
+            Dim c = task.scalarColors(contour.index)
+            Dim color As cv.Point3f = New cv.Point3f(c(0), c(1), c(2))
+
+            Dim p0 = getWorldCoordinates(contour.rect.TopLeft, contour.depth)
+            Dim p1 = getWorldCoordinates(contour.rect.BottomRight, contour.depth)
+
+            Dim corners As New List(Of cv.Point3f) From {New cv.Point3f(p0.X, p0.Y, contour.depth),
+                                                         New cv.Point3f(p1.X, p0.Y, contour.depth),
+                                                         New cv.Point3f(p1.X, p1.Y, contour.depth),
+                                                         New cv.Point3f(p0.X, p1.Y, contour.depth)}
+            Dim noNaNs = True
+            For Each pt In corners
+                If Single.IsNaN(pt.Z) Then
+                    noNaNs = False
+                    Exit For
+                End If
+            Next
+            If noNaNs Then
+                quadData.Add(color)
+                quadData.Add(corners(0))
+                quadData.Add(corners(0))
+                quadData.Add(corners(3))
+                quadData.Add(corners(3))
+                quadData.Add(color)
+                quadData.Add(corners(0))
+                quadData.Add(corners(1))
+                quadData.Add(corners(2))
+                quadData.Add(corners(3))
+            End If
+        Next
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+        task.ogl.pointCloudInput = New cv.Mat()
+        task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_QuadConnected : Inherits TaskParent
+    Dim connect As New Region_Core
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        desc = "Build connected bricks and remove cells that are not connected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        connect.Run(src)
+        dst2 = connect.dst2
+        dst3 = connect.dst3
+
+        Dim quadData As New List(Of cv.Point3f)
+        Dim brick1 As brickData, brick2 As brickData
+        For Each tup In connect.hTuples
+            brick1 = task.brickList(tup.Item1)
+            brick2 = task.brickList(tup.Item2)
+            For i = tup.Item1 + 1 To tup.Item2 - 1
+                brick1 = task.brickList(i - 1)
+                brick2 = task.brickList(i)
+                If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
+                If brick1.corners.Count = 0 Or brick2.corners.Count = 0 Then Continue For
+
+                quadData.Add(brick1.color)
+                quadData.Add(brick1.corners(0))
+                quadData.Add(brick2.corners(0))
+                quadData.Add(brick2.corners(3))
+                quadData.Add(brick1.corners(3))
+            Next
+            If brick1.corners.Count > 0 And brick2.corners.Count > 0 Then
+                quadData.Add(brick2.color)
+                quadData.Add(brick2.corners(0))
+                quadData.Add(brick2.corners(1))
+                quadData.Add(brick2.corners(2))
+                quadData.Add(brick2.corners(3))
+            End If
+        Next
+
+        Dim width = dst2.Width / task.cellSize
+        For Each tup In connect.vTuples
+            For i = tup.Item1 To tup.Item2 - width Step width
+                brick1 = task.brickList(i)
+                brick2 = task.brickList(i + width)
+                If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
+                If brick1.corners.Count = 0 Or brick2.corners.Count = 0 Then Continue For
+
+                quadData.Add(brick1.color)
+                quadData.Add(brick1.corners(0))
+                quadData.Add(brick1.corners(1))
+                quadData.Add(brick2.corners(1))
+                quadData.Add(brick2.corners(0))
+            Next
+            If brick1.corners.Count > 0 And brick2.corners.Count > 0 Then
+                quadData.Add(brick2.color)
+                quadData.Add(brick2.corners(0))
+                quadData.Add(brick2.corners(1))
+                quadData.Add(brick2.corners(2))
+                quadData.Add(brick2.corners(3))
+            End If
+        Next
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+        task.ogl.pointCloudInput = New cv.Mat()
+        task.ogl.Run(src)
+        labels = task.brickBasics.labels
     End Sub
 End Class

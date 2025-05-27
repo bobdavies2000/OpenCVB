@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
 			case 6: // oCase.quadBasics - OpenGL_QuadSimple
 			{
 				GLfloat* quadData = (GLfloat*)dataBuffer;
-				int quadCount = (int)(dataBufferSize / 4);
+				int quadCount = (int)(dataBufferSize / 5);
 				glDisable(GL_TEXTURE_2D);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				glBegin(GL_QUADS);

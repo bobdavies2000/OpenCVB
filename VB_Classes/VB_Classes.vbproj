@@ -115,6 +115,7 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
+    <Compile Include="ContourPlane.vb" />
     <Compile Include="FindCells.vb" />
     <Compile Include="FindContours.vb" />
     <Compile Include="FindNonZero.vb" />

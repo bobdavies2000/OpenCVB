@@ -35,6 +35,7 @@ Color8U
 Complexity
 Concat
 Contour
+ContourPlane
 Contrast
 Convex
 Corners

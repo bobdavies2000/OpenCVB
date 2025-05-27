@@ -749,6 +749,7 @@ Public Class contourData
     Public pixels As Integer
     Public maxDist As cv.Point
     Public index As Integer
+    Public depth As Single
     Public bricks As New List(Of Integer)
     Public brickPartial As New List(Of Integer)
     Public Sub New()

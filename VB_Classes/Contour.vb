@@ -1,7 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
     Public options As New Options_Contours
-    Public drawBricks As Boolean = True
+    Public classCount As Integer
+    Dim contourBricks As New Contour_Bricks
     Public Sub New()
         dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         task.contourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -32,9 +33,9 @@ Public Class Contour_Basics : Inherits TaskParent
 
         Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
         For Each tour In allContours
-            Dim td = New contourData
-            td.pixels = cv.Cv2.ContourArea(tour)
-            If td.pixels > src.Total * 3 / 4 Then Continue For
+            Dim contour = New contourData
+            contour.pixels = cv.Cv2.ContourArea(tour)
+            If contour.pixels > src.Total * 3 / 4 Then Continue For
             If tour.Count < 4 Then Continue For
 
             Dim minX As Single = tour.Min(Function(p) p.X)
@@ -42,28 +43,46 @@ Public Class Contour_Basics : Inherits TaskParent
             Dim minY As Single = tour.Min(Function(p) p.Y)
             Dim maxY As Single = tour.Max(Function(p) p.Y)
 
-            td.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-            If td.rect.Width = 0 Or td.rect.Height = 0 Then Continue For
+            contour.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+            If contour.rect.Width = 0 Or contour.rect.Height = 0 Then Continue For
 
-            td.maxDist = GetMaxDist(td.mask, td.rect)
+            contour.maxDist = GetMaxDist(contour.mask, contour.rect)
 
-            dst0(td.rect).SetTo(0)
+            dst0(contour.rect).SetTo(0)
             DrawContour(dst0, tour.ToList, sortedList.Count, -1, cv.LineTypes.Link8)
-            td.mask = dst0(td.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            contour.mask = dst0(contour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-            sortedList.Add(td.pixels, td)
+            sortedList.Add(contour.pixels, contour)
         Next
+
+        classCount = sortedList.Count
 
         task.contourList.Clear()
         task.contourList.Add(New contourData)
         task.contourMap.SetTo(0)
-        For Each td In sortedList.Values
-            td.index = task.contourList.Count
-            task.contourMap(td.rect).SetTo(td.index, td.mask)
-            task.contourList.Add(td)
+        For Each contour In sortedList.Values
+            contour.index = task.contourList.Count
+            task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
+            task.contourList.Add(contour)
             If task.contourList.Count >= options.maxContours Then Exit For
         Next
 
+        contourBricks.Run(src)
+        dst2 = contourBricks.dst2
+        labels(2) = contourBricks.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contour_Bricks : Inherits TaskParent
+    Public Sub New()
+        desc = "Display the full and partial bricks in each contour"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = ShowPalette(task.contourMap)
         dst2.SetTo(white, task.contourMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
 
@@ -72,9 +91,10 @@ Public Class Contour_Basics : Inherits TaskParent
         Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
         task.contourD = task.contourList(index)
 
-        Dim totalBricks = DrawContourBricks()
+        DrawContourBricks()
 
-        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(sortedList.Count) + " found.  " +
+        Dim classCount = task.contours.classCount
+        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(classCount) + " found.  " +
                     "Contours had " + CStr(task.brickBasics.brickFull) + " interior bricks (" +
                     Format(task.brickBasics.brickFull / task.gridRects.Count, "00%") + ") and " +
                     CStr(task.brickBasics.brickPartial) + " partially contained (blue)"
@@ -149,15 +169,20 @@ End Class
 Public Class Contour_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
-        task.contours.drawBricks = False
+        labels(3) = "Each of the feature points with their correlation coefficien"
         desc = "Show contours and features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.contours.dst2.Clone
+        dst2 = ShowPalette(task.contourMap)
         feat.Run(src)
 
+        dst3.SetTo(0)
         For Each pt In task.features
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
+            dst3.Circle(pt, task.DotSize, task.highlight, -1)
+            Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim brick = task.brickList(index)
+            SetTrueText(Format(brick.correlation, fmt1), pt, 3)
         Next
         labels(2) = "There are " + CStr(task.contourList.Count) + " contours and " + CStr(task.features.Count) + " features."
     End Sub
