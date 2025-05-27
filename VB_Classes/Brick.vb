@@ -43,39 +43,42 @@ Public Class Brick_Basics : Inherits TaskParent
                         End If
                     Else
                         Dim irPt = Intrinsics_Basics.translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
-                        If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
+                        Dim badTranslation As Boolean = False
+                        If Single.IsNaN(irPt.X) Or Single.IsNaN(irPt.Y) Then badTranslation = True
+                        If irPt.X = 0 And irPt.Y = 0 And i > 0 Then badTranslation = True
+                        If irPt.X < 0 Or irPt.X >= dst2.Width Or irPt.Y >= dst2.Height Or badTranslation Then
                             brick.depth = 0 ' off the image
                         Else
                             brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
-                            brick.lRect = ValidateRect(brick.lRect)
+                                brick.lRect = ValidateRect(brick.lRect)
 
-                            Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y,
-                                                                                                                     brick.lRect.X))
-                            If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0 And i > 0) Or
-                                (LtoR_Pt.X >= dst2.Width Or LtoR_Pt.Y >= dst2.Height) Then
+                                Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y,
+                                                                                                                             brick.lRect.X))
+                                If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0 And i > 0) Or
+                                        (LtoR_Pt.X >= dst2.Width Or LtoR_Pt.Y >= dst2.Height) Then
 
-                                brick.depth = 0 ' off the image
-                            Else
-                                brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
-                                brick.rRect = ValidateRect(brick.rRect)
+                                    brick.depth = 0 ' off the image
+                                Else
+                                    brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
+                                    brick.rRect = ValidateRect(brick.rRect)
+                                End If
                             End If
                         End If
+
+                        If brick.depth > 0 Then ' depth can be zero if the translation of color to left fails or left to right fails.
+                            cv.Cv2.MatchTemplate(leftview(brick.lRect), rightView(brick.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                            brick.correlation = correlationMat.Get(Of Single)(0, 0)
+
+                            Dim p0 = getWorldCoordinates(brick.rect.TopLeft, brick.depth)
+                            Dim p1 = getWorldCoordinates(brick.rect.BottomRight, brick.depth)
+
+                            ' clockwise around starting in upper left.
+                            brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
+                            brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
+                            brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
+                            brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
+                        End If
                     End If
-
-                    If brick.depth > 0 Then ' depth can be zero if the translation of color to left fails or left to right fails.
-                        cv.Cv2.MatchTemplate(leftview(brick.lRect), rightView(brick.rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                        brick.correlation = correlationMat.Get(Of Single)(0, 0)
-
-                        Dim p0 = getWorldCoordinates(brick.rect.TopLeft, brick.depth)
-                        Dim p1 = getWorldCoordinates(brick.rect.BottomRight, brick.depth)
-
-                        ' clockwise around starting in upper left.
-                        brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
-                        brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
-                        brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
-                        brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
-                    End If
-                End If
                 brick.depthRanges.Add(brick.mm.range)
             End If
 

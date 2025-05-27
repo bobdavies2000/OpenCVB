@@ -1,6 +1,9 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
+Imports System.Web.UI
+Imports System.Windows
+Imports NAudio.Wave
 Public Class PointCloud_Basics : Inherits TaskParent
     Dim pcHistory As New List(Of cv.Mat)
     Public Sub New()
@@ -28,7 +31,7 @@ Public Class PointCloud_Spin : Inherits TaskParent
     Dim gMat As New IMU_GMatrixWithOptions
     Dim xBump = 1, yBump = 1, zBump = 1
     Public Sub New()
-        If OptionParent.findFrm(traceName + " CheckBoxes") Is Nothing Then
+        If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Spin pointcloud on X-axis")
             check.addCheckBox("Spin pointcloud on Y-axis")
@@ -40,9 +43,9 @@ Public Class PointCloud_Spin : Inherits TaskParent
         desc = "Spin the point cloud exercise"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static xCheck = OptionParent.findCheckBox("Spin pointcloud on X-axis")
-        Static yCheck = OptionParent.findCheckBox("Spin pointcloud on Y-axis")
-        Static zCheck = OptionParent.findCheckBox("Spin pointcloud on Z-axis")
+        Static xCheck = OptionParent.FindCheckBox("Spin pointcloud on X-axis")
+        Static yCheck = OptionParent.FindCheckBox("Spin pointcloud on Y-axis")
+        Static zCheck = OptionParent.FindCheckBox("Spin pointcloud on Z-axis")
         Static xRotateSlider = OptionParent.FindSlider("Rotate pointcloud around X-axis (degrees)")
         Static yRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
         Static zRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
@@ -242,7 +245,7 @@ End Class
 Public Class PointCloud_Solo : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public Sub New()
-        OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = True
+        OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(2) = "Top down view after inrange sampling"
         labels(3) = "Histogram after filtering For Single-only histogram bins"
         desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample"
@@ -327,7 +330,7 @@ Public Class PointCloud_SurfaceH : Inherits TaskParent
     Public botRow As Integer
     Public peakRow As Integer
     Public Sub New()
-        OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = True
+        OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(3) = "Histogram Of Each Of " + CStr(task.histogramBins) + " bins aligned With the sideview"
         desc = "Find the horizontal surfaces With a projects Of the SideView histogram."
     End Sub
@@ -409,7 +412,7 @@ Public Class PointCloud_FrustrumTop : Inherits TaskParent
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
         task.gOptions.setGravityUsage(False)
-        OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = True
+        OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(3) = "Draw the frustrum from the top view"
         desc = "Draw the top view of the frustrum"
     End Sub
@@ -695,3 +698,54 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
         labels(3) = "Mask showing discontinuities > " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
     End Sub
 End Class
+
+
+
+
+
+
+Public Class PointCloud_Templates : Inherits TaskParent
+    Dim templateX As New cv.Mat, templateY As New cv.Mat
+    Public Sub New()
+        templateX = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
+        templateY = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
+        For i = 0 To templateX.Width - 1
+            templateX.Set(Of Single)(0, i, i)
+        Next
+
+        For i = 1 To templateX.Height - 1
+            templateX.Row(0).CopyTo(templateX.Row(i))
+            templateY.Set(Of Single)(i, 0, i)
+        Next
+
+        For i = 1 To templateY.Width - 1
+            templateY.Col(0).CopyTo(templateY.Col(i))
+        Next
+        templateX -= task.calibData.rgbIntrinsics.ppx
+        templateY -= task.calibData.rgbIntrinsics.ppy
+
+        desc = "Prepare for injecting depth into the point cloud."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            src = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+            For Each contour In task.contourList
+                If contour.bricks.Count = 0 Then Continue For
+                contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
+                src(contour.rect).SetTo(contour.depth, contour.mask)
+            Next
+        End If
+        Dim fxTemplate = task.calibData.rgbIntrinsics.fx
+        Dim fyTemplate = task.calibData.rgbIntrinsics.fy
+        Dim worldX As New cv.Mat, worldY As New cv.Mat
+
+        cv.Cv2.Multiply(templateX, src, worldX)
+        worldX *= 1 / fxTemplate
+
+        cv.Cv2.Multiply(templateY, src, worldY)
+        worldY *= 1 / fyTemplate
+
+        cv.Cv2.Merge({worldX, worldY, src}, dst2)
+    End Sub
+End Class
+

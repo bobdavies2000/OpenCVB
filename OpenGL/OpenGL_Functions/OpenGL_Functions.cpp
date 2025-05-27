@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 
 		glLoadIdentity();
 
-		//glClearColor(0.7f, 0.7f, 0.7f, 1);
+		glClearColor(0.0f, 0.0f, 0.0f, 1);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		glMatrixMode(GL_PROJECTION);
@@ -215,7 +215,8 @@ int main(int argc, char* argv[])
 				glBegin(GL_QUADS);
 				for (int i = 0; i < quadCount - 15; i += 15)
 				{
-					glColor3f(quadData[i + 2] / 255, quadData[i + 1] / 255, quadData[i] / 255); // BGR to RGB tossed in...
+					// BGR to RGB tossed in...
+					glColor3f(quadData[i + 2] / 255, quadData[i + 1] / 255, quadData[i] / 255);
 					glVertex3f(quadData[i + 3], quadData[i + 4], quadData[i + 5]);
 					glVertex3f(quadData[i + 6], quadData[i + 7], quadData[i + 8]);
 					glVertex3f(quadData[i + 9], quadData[i + 10], quadData[i + 11]);

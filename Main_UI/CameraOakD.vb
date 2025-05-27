@@ -46,8 +46,6 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
     Dim templateY As cv.Mat
     Dim fxTemplate As Single
     Dim fyTemplate As Single
-    Dim ppxTemplate As Single
-    Dim ppyTemplate As Single
     Private Function copyOakIntrinsics(input() As Single, ratio As Single) As VB_Classes.VBtask.intrinsicData
         Dim output As New VB_Classes.VBtask.intrinsicData
         output.ppx = input(2) / ratio
@@ -94,11 +92,6 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
             calibData.LtoR_rotation(i) = rgbExtrinsicsArray(i + 3)
         Next
 
-        fxTemplate = calibData.rgbIntrinsics.fx * ratio
-        fyTemplate = calibData.rgbIntrinsics.fy * ratio
-        ppxTemplate = calibData.rgbIntrinsics.ppx * ratio
-        ppyTemplate = calibData.rgbIntrinsics.ppy * ratio
-
         Dim translation(3 - 1) As Single
         For i = 0 To 3 - 1
             translation(i) = rgbExtrinsicsArray(i)
@@ -121,8 +114,10 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
         For i = 1 To templateY.Width - 1
             templateY.Col(0).CopyTo(templateY.Col(i))
         Next
-        templateX -= ppxTemplate
-        templateY -= ppyTemplate
+        templateX -= calibData.rgbIntrinsics.ppx * ratio
+        templateY -= calibData.rgbIntrinsics.ppy * ratio
+        fxTemplate = calibData.rgbIntrinsics.fx * ratio
+        fyTemplate = calibData.rgbIntrinsics.fy * ratio
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
         If cPtr = 0 Then Exit Sub

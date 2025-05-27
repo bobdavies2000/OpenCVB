@@ -1943,7 +1943,7 @@ End Class
 
 
 Public Class OpenGL_ContourPlaneSimple : Inherits TaskParent
-    Dim contours As New ContourPlane_BasicsNew
+    Dim contours As New ContourPlane_Templates
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the contour planes in 3D"
