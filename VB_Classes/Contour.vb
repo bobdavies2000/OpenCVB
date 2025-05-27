@@ -97,7 +97,7 @@ Public Class Contour_Bricks : Inherits TaskParent
         labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(classCount) + " found.  " +
                     "Contours had " + CStr(task.brickBasics.brickFull) + " interior bricks (" +
                     Format(task.brickBasics.brickFull / task.gridRects.Count, "00%") + ") and " +
-                    CStr(task.brickBasics.brickPartial) + " partially contained (blue)"
+                    CStr(task.brickBasics.brickPartial) + " partially contained"
     End Sub
 End Class
 

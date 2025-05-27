@@ -1943,7 +1943,7 @@ End Class
 
 
 Public Class OpenGL_ContourPlaneSimple : Inherits TaskParent
-    Dim contours As New ContourPlane_Basics
+    Dim contours As New ContourPlane_BasicsNew
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPointCloudRGB
         desc = "Display the contour planes in 3D"
@@ -1959,55 +1959,6 @@ Public Class OpenGL_ContourPlaneSimple : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-Public Class OpenGL_ContourPlaneOnly : Inherits TaskParent
-    Public Sub New()
-        task.ogl.oglFunction = oCase.quadBasics
-        desc = "Display the rectangles of the contour planes in 3D"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim quadData As New List(Of cv.Point3f)
-        For Each contour In task.contourList
-            Dim c = task.scalarColors(contour.index)
-            Dim color As cv.Point3f = New cv.Point3f(c(0), c(1), c(2))
-
-            Dim p0 = getWorldCoordinates(contour.rect.TopLeft, contour.depth)
-            Dim p1 = getWorldCoordinates(contour.rect.BottomRight, contour.depth)
-
-            Dim corners As New List(Of cv.Point3f) From {New cv.Point3f(p0.X, p0.Y, contour.depth),
-                                                         New cv.Point3f(p1.X, p0.Y, contour.depth),
-                                                         New cv.Point3f(p1.X, p1.Y, contour.depth),
-                                                         New cv.Point3f(p0.X, p1.Y, contour.depth)}
-            Dim noNaNs = True
-            For Each pt In corners
-                If Single.IsNaN(pt.Z) Then
-                    noNaNs = False
-                    Exit For
-                End If
-            Next
-            If noNaNs Then
-                quadData.Add(color)
-                quadData.Add(corners(0))
-                quadData.Add(corners(0))
-                quadData.Add(corners(3))
-                quadData.Add(corners(3))
-                quadData.Add(color)
-                quadData.Add(corners(0))
-                quadData.Add(corners(1))
-                quadData.Add(corners(2))
-                quadData.Add(corners(3))
-            End If
-        Next
-        dst2 = task.contours.dst2
-        labels(2) = task.contours.labels(2)
-
-        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
-        task.ogl.pointCloudInput = New cv.Mat()
-        task.ogl.Run(src)
-    End Sub
-End Class
 
 
 
@@ -2078,5 +2029,55 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
         labels = task.brickBasics.labels
+    End Sub
+End Class
+
+
+
+
+Public Class OpenGL_ContourPlaneOnly : Inherits TaskParent
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        desc = "Display the rectangles of the contour planes in 3D"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim quadData As New List(Of cv.Point3f)
+        For Each contour In task.contourList
+            Dim c = task.scalarColors(contour.index)
+            Dim color As cv.Point3f = New cv.Point3f(c(0), c(1), c(2))
+
+            Dim p0 = getWorldCoordinates(contour.rect.TopLeft, contour.depth)
+            Dim p1 = getWorldCoordinates(contour.rect.BottomRight, contour.depth)
+
+            Dim corners As New List(Of cv.Point3f) From {New cv.Point3f(p0.X, p0.Y, contour.depth),
+                                                         New cv.Point3f(p1.X, p0.Y, contour.depth),
+                                                         New cv.Point3f(p1.X, p1.Y, contour.depth),
+                                                         New cv.Point3f(p0.X, p1.Y, contour.depth)}
+            Dim noNaNs = True
+            For Each pt In corners
+                If Single.IsNaN(pt.Z) Then
+                    noNaNs = False
+                    Exit For
+                End If
+            Next
+            If noNaNs Then
+                quadData.Add(color)
+                quadData.Add(corners(0))
+                quadData.Add(corners(0))
+                quadData.Add(corners(3))
+                quadData.Add(corners(3))
+                quadData.Add(color)
+                quadData.Add(corners(0))
+                quadData.Add(corners(1))
+                quadData.Add(corners(2))
+                quadData.Add(corners(3))
+            End If
+        Next
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+        task.ogl.pointCloudInput = New cv.Mat()
+        task.ogl.Run(src)
     End Sub
 End Class

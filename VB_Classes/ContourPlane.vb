@@ -48,3 +48,27 @@ Public Class ContourPlane_Simple : Inherits TaskParent
         cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst1}, dst3)
     End Sub
 End Class
+
+
+
+
+
+Public Class ContourPlane_BasicsNew : Inherits TaskParent
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        desc = "Use a gradient to build a contour with a single depth value."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = ShowPalette(task.contourMap)
+        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(task.contours.classCount) + " found."
+
+        dst3.SetTo(0)
+        For Each contour In task.contourList
+            If contour.bricks.Count = 0 Then Continue For
+            Dim pcAvg = task.pointCloud(contour.rect).Mean(contour.mask)
+            Dim mmX = GetMinMax(task.pcSplit(0), contour.mask)
+            Dim mmY = GetMinMax(task.pcSplit(1), contour.mask)
+            dst3(contour.rect).SetTo(pcAvg, contour.mask)
+        Next
+    End Sub
+End Class

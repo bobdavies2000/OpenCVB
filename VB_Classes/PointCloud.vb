@@ -76,9 +76,6 @@ End Class
 
 
 
-
-
-
 Public Class PointCloud_Spin2 : Inherits TaskParent
     Dim spin As New PointCloud_Spin
     Dim redCSpin As New RedColor_Basics
@@ -242,9 +239,6 @@ End Class
 
 
 
-
-
-
 Public Class PointCloud_Solo : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public Sub New()
@@ -286,9 +280,6 @@ End Class
 
 
 
-
-
-
 Public Class PointCloud_SurfaceH_CPP : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public plot As New Plot_Basics_CPP
@@ -325,9 +316,6 @@ Public Class PointCloud_SurfaceH_CPP : Inherits TaskParent
         labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
     End Sub
 End Class
-
-
-
 
 
 
@@ -382,12 +370,6 @@ End Class
 
 
 
-
-
-
-
-
-
 Public Class PointCloud_GridInspector : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -421,17 +403,6 @@ End Class
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 Public Class PointCloud_FrustrumTop : Inherits TaskParent
     Dim frustrum As New Draw_Frustrum
     Dim heat As New HeatMap_Basics
@@ -456,16 +427,13 @@ End Class
 
 
 
-
-
-
 Public Class PointCloud_FrustrumSide : Inherits TaskParent
     Dim frustrum As New Draw_Frustrum
     Dim heat As New HeatMap_Basics
     Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
         task.gOptions.setGravityUsage(False)
-        OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
+        OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         labels(2) = "Draw the frustrum from the side view"
         desc = "Draw the side view of the frustrum"
     End Sub
@@ -477,9 +445,6 @@ Public Class PointCloud_FrustrumSide : Inherits TaskParent
         dst2 = setupSide.dst2
     End Sub
 End Class
-
-
-
 
 
 
@@ -509,10 +474,6 @@ End Class
 
 
 
-
-
-
-
 Public Class PointCloud_ReducedTopView : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
@@ -528,7 +489,6 @@ Public Class PointCloud_ReducedTopView : Inherits TaskParent
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
-
 
 
 
@@ -579,8 +539,6 @@ End Class
 
 
 
-
-
 Public Class PointCloud_XRangeTest : Inherits TaskParent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
@@ -596,10 +554,6 @@ Public Class PointCloud_XRangeTest : Inherits TaskParent
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
-
-
-
-
 
 
 
@@ -641,9 +595,6 @@ Public Class PointCloud_Split : Inherits TaskParent
         labels(3) = "Min/Max for Z " + Format(mmz.minVal, fmt1) + " / " + Format(mmz.maxVal, fmt1)
     End Sub
 End Class
-
-
-
 
 
 
