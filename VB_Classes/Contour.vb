@@ -29,7 +29,6 @@ Public Class Contour_Basics : Inherits TaskParent
             sortedList.Add(contour.pixels, contour)
         Next
 
-
         task.contourList.Clear()
         task.contourList.Add(New contourData)
         task.contourMap.SetTo(0)
