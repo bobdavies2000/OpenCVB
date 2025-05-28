@@ -10,11 +10,8 @@ Public Class RedMask_Basics : Inherits TaskParent
         desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static color As New Color8U_Basics
-            color.Run(src)
-            src = color.dst2
-        End If
+        src = srcMustBe8U(src)
+
         Dim inputData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)

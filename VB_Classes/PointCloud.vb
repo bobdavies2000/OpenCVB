@@ -1,9 +1,4 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports System.Web.UI
-Imports System.Windows
-Imports NAudio.Wave
 Public Class PointCloud_Basics : Inherits TaskParent
     Dim pcHistory As New List(Of cv.Mat)
     Public Sub New()
@@ -705,7 +700,7 @@ End Class
 
 
 Public Class PointCloud_Templates : Inherits TaskParent
-    Dim templateX As New cv.Mat, templateY As New cv.Mat
+    Public templateX As New cv.Mat, templateY As New cv.Mat
     Public Sub New()
         templateX = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
         templateY = New cv.Mat(task.workingRes, cv.MatType.CV_32F)

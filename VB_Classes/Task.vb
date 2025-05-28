@@ -129,7 +129,7 @@ Public Class VBtask : Implements IDisposable
     Public lineRGB As LineRGB_Basics
     Public brickBasics As Brick_Basics
     ' Public fcsBasics As FCS_Basics
-    Public contours As Contour_Basics
+    Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
     Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
@@ -516,6 +516,8 @@ Public Class VBtask : Implements IDisposable
         featureOptions = New OptionsFeatures
         If testAllRunning = False Then treeView = New TreeviewForm
 
+        task.contourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.rcList = New List(Of rcData)
 
@@ -530,7 +532,7 @@ Public Class VBtask : Implements IDisposable
         motionBasics = New Motion_Basics
         brickBasics = New Brick_Basics
         edges = New EdgeLine_Basics
-        contours = New Contour_Basics
+        contours = New Contour_Basics_List
         buildCorr = New Brick_CorrelationMap
         LRMeanSub = New MeanSubtraction_LeftRight
         lineRGB = New LineRGB_Basics

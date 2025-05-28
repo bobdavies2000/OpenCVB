@@ -6,7 +6,7 @@ Public Class ContourPlane_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = ShowPalette(task.contourMap)
-        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(task.contours.classCount) + " found."
+        labels(2) = task.contours.labels(2)
 
         dst1.SetTo(0)
         Dim depth As Single
@@ -36,8 +36,7 @@ Public Class ContourPlane_Simple : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = ShowPalette(task.contourMap)
-        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(task.contours.classCount) +
-                    " found."
+        labels(2) = task.contours.labels(2)
 
         dst1.SetTo(0)
         For Each contour In task.contourList
@@ -61,16 +60,14 @@ Public Class ContourPlane_Templates : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = ShowPalette(task.contourMap)
-        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(task.contours.classCount) + " found."
+        labels(2) = task.contours.labels(2)
 
-        If task.heartBeat Then
-            dst1.SetTo(0)
-            For Each contour In task.contourList
-                If contour.bricks.Count = 0 Then Continue For
-                contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
-                dst1(contour.rect).SetTo(contour.depth, contour.mask)
-            Next
-        End If
+        dst1.SetTo(0)
+        For Each contour In task.contourList
+            If contour.bricks.Count = 0 Then Continue For
+            contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
+            dst1(contour.rect).SetTo(contour.depth, contour.mask)
+        Next
 
         cloud.Run(dst1)
         dst3 = cloud.dst2

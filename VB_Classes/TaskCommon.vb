@@ -747,14 +747,19 @@ Public Class contourData
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public pixels As Integer
-    Public maxDist As cv.Point
     Public index As Integer
     Public depth As Single
     Public bricks As New List(Of Integer)
     Public brickPartial As New List(Of Integer)
+    Public Function buildRect(tour As cv.Point()) As cv.Rect
+        Dim minX As Single = tour.Min(Function(p) p.X)
+        Dim maxX As Single = tour.Max(Function(p) p.X)
+        Dim minY As Single = tour.Min(Function(p) p.Y)
+        Dim maxY As Single = tour.Max(Function(p) p.Y)
+        Return TaskParent.ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+    End Function
     Public Sub New()
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
-        maxDist = New cv.Point
     End Sub
 End Class

@@ -5,21 +5,45 @@ Public Class Contour_Basics : Inherits TaskParent
     Dim contourBricks As New Contour_Bricks
     Public Sub New()
         dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        task.contourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        OptionParent.findRadio("FloodFill").Checked = True
+        OptionParent.findRadio("List").Checked = True
         labels(3) = "Input to OpenCV's FindContours"
         desc = "General purpose contour finder"
+    End Sub
+    Public Shared Sub sortContours(allContours As cv.Point()(), maxContours As Integer)
+        Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
+        Dim tourMat As New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
+        For Each tour In allContours
+            Dim contour = New contourData
+            contour.pixels = cv.Cv2.ContourArea(tour)
+            If contour.pixels > task.color.Total * 3 / 4 Then Continue For
+            If tour.Count < 4 Then Continue For
+
+            contour.rect = contour.buildRect(tour)
+            If contour.rect.Width = 0 Or contour.rect.Height = 0 Then Continue For
+
+            tourMat(contour.rect).SetTo(0)
+            Dim listOfPoints = New List(Of List(Of cv.Point))({tour.ToList})
+            cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
+            contour.mask = tourMat(contour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            sortedList.Add(contour.pixels, contour)
+        Next
+
+
+        task.contourList.Clear()
+        task.contourList.Add(New contourData)
+        task.contourMap.SetTo(0)
+        For Each contour In sortedList.Values
+            contour.index = task.contourList.Count
+            task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
+            task.contourList.Add(contour)
+            If task.contourList.Count >= maxContours Then Exit For
+        Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_8U Then
-            Static color8U As New Color8U_Basics
-            color8U.Run(src)
-            dst3 = color8U.dst2
-        Else
-            dst3 = src
-        End If
+        dst3 = srcMustBe8U(src)
 
         Dim allContours As cv.Point()()
         Dim mode = options.options2.ApproximationMode
@@ -31,47 +55,25 @@ Public Class Contour_Basics : Inherits TaskParent
         End If
         If allContours.Count <= 1 Then Exit Sub
 
-        Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
-        For Each tour In allContours
-            Dim contour = New contourData
-            contour.pixels = cv.Cv2.ContourArea(tour)
-            If contour.pixels > src.Total * 3 / 4 Then Continue For
-            If tour.Count < 4 Then Continue For
+        sortContours(allContours, options.maxContours)
 
-            Dim minX As Single = tour.Min(Function(p) p.X)
-            Dim maxX As Single = tour.Max(Function(p) p.X)
-            Dim minY As Single = tour.Min(Function(p) p.Y)
-            Dim maxY As Single = tour.Max(Function(p) p.Y)
+        classCount = task.contourList.Count
 
-            contour.rect = ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-            If contour.rect.Width = 0 Or contour.rect.Height = 0 Then Continue For
+        If task.toggleOn Or task.gOptions.DebugCheckBox.Checked Then
+            dst2 = ShowPalette(task.contourMap)
+            For Each contour In task.contourList
+                dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
+            Next
+            ' dst2.SetTo(white, task.contourMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
+        Else
+            contourBricks.Run(emptyMat)
+            dst2 = contourBricks.dst2
+        End If
 
-            contour.maxDist = GetMaxDist(contour.mask, contour.rect)
-
-            dst0(contour.rect).SetTo(0)
-            DrawContour(dst0, tour.ToList, sortedList.Count, -1, cv.LineTypes.Link8)
-            contour.mask = dst0(contour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-            sortedList.Add(contour.pixels, contour)
-        Next
-
-        classCount = sortedList.Count
-
-        task.contourList.Clear()
-        task.contourList.Add(New contourData)
-        task.contourMap.SetTo(0)
-        For Each contour In sortedList.Values
-            contour.index = task.contourList.Count
-            task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
-            task.contourList.Add(contour)
-            If task.contourList.Count >= options.maxContours Then Exit For
-        Next
-
-        contourBricks.Run(src)
-        dst2 = contourBricks.dst2
         labels(2) = contourBricks.labels(2)
     End Sub
 End Class
+
 
 
 
@@ -93,11 +95,7 @@ Public Class Contour_Bricks : Inherits TaskParent
 
         DrawContourBricks()
 
-        Dim classCount = task.contours.classCount
-        labels(2) = CStr(task.contourList.Count) + " largest contours of the " + CStr(classCount) + " found.  " +
-                    "Contours had " + CStr(task.brickBasics.brickFull) + " interior bricks (" +
-                    Format(task.brickBasics.brickFull / task.gridRects.Count, "00%") + ") and " +
-                    CStr(task.brickBasics.brickPartial) + " partially contained"
+        labels(2) = task.contours.labels(2)
     End Sub
 End Class
 
@@ -121,12 +119,7 @@ Public Class Contour_Regions : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_8U Then
-            color8U.Run(src)
-            dst3 = color8U.dst2
-        Else
-            dst3 = src
-        End If
+        dst3 = srcMustBe8U(src)
 
         Dim allContours As cv.Point()()
         Dim mode = options.options2.ApproximationMode
@@ -221,18 +214,29 @@ Public Class Contour_Info : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            dst2 = task.contours.dst2
+            dst2 = ShowPalette(task.contourMap)
             labels(2) = task.contours.labels(2)
         End If
+
+        Static pt = task.ClickPoint
+        If task.mouseClickFlag Then pt = task.ClickPoint
+        Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
+        task.contourD = task.contourList(index)
 
         Dim td = task.contourD
 
         strOut = vbCrLf + vbCrLf
         strOut += "Index = " + CStr(td.index) + vbCrLf
+        strOut += "Depth = " + Format(td.depth, fmt1) + vbCrLf
         strOut += "Number of pixels in the mask: " + CStr(td.pixels) + vbCrLf
-        strOut += "maxDist = " + td.maxDist.ToString + vbCrLf
+        Dim maxDist = GetMaxDist(td.mask, td.rect)
+        strOut += "maxDist = " + maxDist.ToString + vbCrLf + vbCrLf
+        strOut += "There are " + CStr(td.bricks.Count) + " fully interior bricks" + vbCrLf
+        strOut += "There are " + CStr(td.brickPartial.Count) + " partial bricks" + vbCrLf
+
+
         dst2.Rectangle(td.rect, task.highlight, task.lineWidth)
-        dst2.Circle(td.maxDist, task.DotSize, task.highlight, -1)
+        dst2.Circle(maxDist, task.DotSize, task.highlight, -1)
 
         SetTrueText(strOut, 3)
     End Sub
@@ -253,15 +257,17 @@ Public Class Contour_Delaunay : Inherits TaskParent
         labels(3) = task.contours.labels(2)
 
         delaunay.inputPoints.Clear()
-        For Each td In task.contourList
-            delaunay.inputPoints.Add(td.maxDist)
+        Dim maxList As New List(Of cv.Point2f)
+        For Each contour In task.contourList
+            maxList.Add(GetMaxDist(contour.mask, contour.rect))
+            delaunay.inputPoints.Add(GetMaxDist(contour.mask, contour.rect))
         Next
 
         delaunay.Run(emptyMat)
         dst2 = delaunay.dst2.Clone
 
-        For Each td In task.contourList
-            dst2.Circle(td.maxDist, task.DotSize, task.highlight, -1)
+        For Each pt In maxList
+            dst2.Circle(pt, task.DotSize, task.highlight, -1)
         Next
     End Sub
 End Class
@@ -840,3 +846,148 @@ Public Class Contour_General : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class Contour_Basics_FloodFill : Inherits TaskParent
+    Public options As New Options_Contours
+    Public Sub New()
+        desc = "FloodFill retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst3 = srcMustBe8U(src)
+
+        Dim allContours As cv.Point()()
+        Dim mode = options.options2.ApproximationMode
+        dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
+        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+        If allContours.Count <= 1 Then Exit Sub
+
+        Contour_Basics.sortContours(allContours, options.maxContours)
+
+        dst2 = ShowPalette(task.contourMap)
+
+        labels(2) = "FloodFill found the " + CStr(task.contourList.Count) + " largest contours of the " +
+                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
+                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contour_Basics_CComp : Inherits TaskParent
+    Public options As New Options_Contours
+    Public Sub New()
+        desc = "CComp retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst1 = srcMustBe8U(src)
+
+        Dim allContours As cv.Point()()
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.CComp, mode)
+        If allContours.Count <= 1 Then Exit Sub
+
+        Contour_Basics.sortContours(allContours, options.maxContours)
+
+        dst2 = ShowPalette(task.contourMap)
+
+        labels(2) = "CComp found the " + CStr(task.contourList.Count) + " largest contours of the " +
+                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
+                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contour_Basics_Tree : Inherits TaskParent
+    Public options As New Options_Contours
+    Public Sub New()
+        desc = "Tree retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst1 = srcMustBe8U(src)
+
+        Dim allContours As cv.Point()()
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.Tree, mode)
+        If allContours.Count <= 1 Then Exit Sub
+
+        Contour_Basics.sortContours(allContours, options.maxContours)
+
+        dst2 = ShowPalette(task.contourMap)
+
+        labels(2) = "Tree found the " + CStr(task.contourList.Count) + " largest contours of the " +
+                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
+                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contour_Basics_List : Inherits TaskParent
+    Public options As New Options_Contours
+    Public Sub New()
+        desc = "List retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst1 = srcMustBe8U(src)
+
+        Dim allContours As cv.Point()()
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.List, mode)
+        If allContours.Count <= 1 Then Exit Sub
+
+        Contour_Basics.sortContours(allContours, options.maxContours)
+
+        dst2 = ShowPalette(task.contourMap)
+
+        labels(2) = "List found the " + CStr(task.contourList.Count) + " largest contours of the " +
+                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
+                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contour_Basics_External : Inherits TaskParent
+    Public options As New Options_Contours
+    Public Sub New()
+        desc = "External retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst1 = srcMustBe8U(src)
+
+        Dim allContours As cv.Point()()
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.List, mode)
+        If allContours.Count <= 1 Then Exit Sub
+
+        Contour_Basics.sortContours(allContours, options.maxContours)
+
+        dst2 = ShowPalette(task.contourMap)
+
+        labels(2) = "External found the " + CStr(task.contourList.Count) + " largest contours of the " +
+                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
+                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+    End Sub
+End Class

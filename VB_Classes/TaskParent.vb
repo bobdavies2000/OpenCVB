@@ -346,16 +346,24 @@ Public Class TaskParent : Implements IDisposable
         If pt.Y > dst2.Height Then pt.Y = dst2.Height
         Return pt
     End Function
-    Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
+    Public Shared Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X + r.Width >= task.dst2.Width * ratio Then r.Width = task.dst2.Width * ratio - r.X - 1
-        If r.Y + r.Height >= task.dst2.Height * ratio Then r.Height = task.dst2.Height * ratio - r.Y - 1
-        If r.X >= task.dst2.Width * ratio Then r.X = dst2.Width - 1
-        If r.Y >= task.dst2.Height * ratio Then r.Y = dst2.Height - 1
+        If r.X + r.Width >= task.workingRes.Width * ratio Then r.Width = task.workingRes.Width * ratio - r.X - 1
+        If r.Y + r.Height >= task.workingRes.Height * ratio Then r.Height = task.workingRes.Height * ratio - r.Y - 1
+        If r.X >= task.workingRes.Width * ratio Then r.X = task.workingRes.Width - 1
+        If r.Y >= task.workingRes.Height * ratio Then r.Y = task.workingRes.Height - 1
         If r.Width <= 0 Then r.Width = 1
         If r.Height <= 0 Then r.Height = 1
         Return r
+    End Function
+    Public Function srcMustBe8U(src As cv.Mat) As cv.Mat
+        If src.Type <> cv.MatType.CV_8U Then
+            Static color8U As New Color8U_Basics
+            color8U.Run(src)
+            Return color8U.dst2
+        End If
+        Return src
     End Function
     Public Enum trackColor
         meanColor = 0
@@ -532,7 +540,7 @@ Public Class TaskParent : Implements IDisposable
         task.palette.Run(input)
         Return task.palette.dst2
     End Function
-    Public Function ShowPalette(input As cv.Mat) As cv.Mat
+    Public Shared Function ShowPalette(input As cv.Mat) As cv.Mat
         If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
         If input.Type <> cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_8U)
         Return task.paletteRandom.useColorMapWithBlack(input).Clone
@@ -631,9 +639,8 @@ Public Class TaskParent : Implements IDisposable
     Public Sub DrawContour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
                            Optional lineType As cv.LineTypes = cv.LineTypes.AntiAlias)
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
-        Dim listOfPoints = New List(Of List(Of cv.Point))
-        listOfPoints.Add(contour)
-        cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, lineType)
+        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+        cv.Cv2.DrawContours(dst, listOfPoints, 0, color, lineWidth, lineType)
     End Sub
     Public Sub DrawPoly(result As cv.Mat, polyPoints As List(Of cv.Point), color As cv.Scalar)
         If polyPoints.Count < 3 Then Exit Sub

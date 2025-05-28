@@ -165,18 +165,25 @@ End Class
 
 
 
-Public Class Gradient_Contour : Inherits TaskParent
-    Dim options As New Options_Distance
-    Public Sub New()
-        desc = "Use contours in color to create linear depth covering each contour."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+'Public Class Gradient_Contour : Inherits TaskParent
+'    Dim options As New Options_Distance
+'    Public Sub New()
+'        desc = "Use contours in color to create linear depth covering each contour."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        options.Run()
 
-        dst2 = ShowPalette(task.contourMap)
-        labels(2) = task.contours.labels(2)
-    End Sub
-End Class
+'        dst2 = ShowPalette(task.contourMap)
+
+'        src = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+'        For Each contour In task.contourList
+'            contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
+'            src(contour.rect).SetTo(contour.depth, contour.mask)
+'        Next
+
+'        labels(2) = task.contours.labels(2)
+'    End Sub
+'End Class
 
 
 

@@ -11,11 +11,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static color As New Color8U_Basics
-            color.Run(src)
-            src = color.dst2
-        End If
+        src = srcMustBe8U(src)
 
         redMask.inputRemoved = inputRemoved
         redMask.Run(src)
@@ -1299,10 +1295,7 @@ Public Class RedColor_MaxDist_CPP : Inherits TaskParent
         desc = "Run the C++ RedCloudMaxDist interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            color8U.Run(src)
-            src = color8U.dst2
-        End If
+        src = srcMustBe8U(src)
 
         If task.heartBeat Then maxList.Clear() ' reevaluate all cells.
         Dim maxArray = maxList.ToArray
@@ -1925,11 +1918,8 @@ Public Class RedColor_CPP : Inherits TaskParent
         desc = "Run the C++ RedCloud Interface With Or without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static color As New Color8U_Basics
-            color.Run(src)
-            src = color.dst2
-        End If
+        src = srcMustBe8U(src)
+
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
@@ -1982,11 +1972,8 @@ Public Class RedColor_BasicsNoMask : Inherits TaskParent
         desc = "Run the C++ RedCloud Interface With Or without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static color As New Color8U_Basics
-            color.Run(src)
-            src = color.dst2
-        End If
+        src = srcMustBe8U(src)
+
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)

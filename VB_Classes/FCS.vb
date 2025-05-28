@@ -8,8 +8,8 @@ Public Class FCS_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static restartRequest As Boolean
         fcs.inputFeatures.Clear()
-        For i = 0 To task.contourList.Count - 1
-            fcs.inputFeatures.Add(task.contourList(i).maxDist)
+        For Each contour In task.contourList
+            fcs.inputFeatures.Add(GetMaxDist(contour.mask, contour.rect))
         Next
         If task.contourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
             restartRequest = True
