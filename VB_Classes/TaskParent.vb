@@ -423,7 +423,7 @@ Public Class TaskParent : Implements IDisposable
 
         Return mm.maxLoc
     End Function
-    Public Function GetMaxDistDepth(ByRef maskInput As cv.Mat, rect As cv.Rect) As cv.Point
+    Public Shared Function GetMaxDistDepth(ByRef maskInput As cv.Mat, rect As cv.Rect) As cv.Point
         Dim depth As New cv.Mat
         task.depthMask(rect).CopyTo(depth, maskInput)
         depth.Rectangle(New cv.Rect(0, 0, depth.Width, depth.Height), 0, 1)
@@ -471,7 +471,7 @@ Public Class TaskParent : Implements IDisposable
             dst.Line(p1, p2, color, task.lineWidth, task.lineType)
         Next
     End Sub
-    Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
+    Public Shared Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
             mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
@@ -480,7 +480,7 @@ Public Class TaskParent : Implements IDisposable
         End If
 
         If Double.IsInfinity(mm.maxVal) Then
-            Console.WriteLine("Infinity encountered in " + traceName + " algorithm")
+            Throw New InvalidOperationException("IsInfinity encounterd in getMinMax.")
             If mat.Type = cv.MatType.CV_32F Then
                 mm.maxVal = Single.MaxValue
             Else
