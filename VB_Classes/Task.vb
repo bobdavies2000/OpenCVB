@@ -761,6 +761,8 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
+        task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, 1000).ConvertScaleAbs()
+
         If task.gOptions.LRMeanSubtraction.Checked Then
             If task.optionsChanged Then task.motionMask.SetTo(255) ' force the change over...
             LRMeanSub.Run(src)

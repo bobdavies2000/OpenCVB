@@ -10,10 +10,7 @@ Public Class Depth_Basics : Inherits TaskParent
         dst2 = task.pcSplit(2)
 
         task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
-        If task.firstPass Then
-            task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.MaxZmeters, task.MaxZmeters)
-            task.maxDepthMask.SetTo(0)
-        End If
+        task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.MaxZmeters, 1000)
         If standalone Then dst3 = task.maxDepthMask
         SetTrueText(task.gmat.strOut, 3)
     End Sub
@@ -592,7 +589,6 @@ Public Class Depth_MaxMask : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
 
-        task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, 30).ConvertScaleAbs()
         dst2.SetTo(white, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)
