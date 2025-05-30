@@ -4,7 +4,6 @@ Public Class Contour_Basics : Inherits TaskParent
     Public classCount As Integer
     Dim contourBricks As New Contour_Bricks
     Public Sub New()
-        dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         OptionParent.findRadio("List").Checked = True
         labels(3) = "Input to OpenCV's FindContours"
         desc = "General purpose contour finder"
