@@ -133,10 +133,10 @@ End Class
 
 
 Public Class Brick_Plot : Inherits TaskParent
-    Dim plot As New Plot_Histogram
+    Dim plotHist As New Plot_Histogram
     Public Sub New()
-        plot.createHistogram = True
-        plot.addLabels = False
+        plotHist.createHistogram = True
+        plotHist.addLabels = False
         labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
         desc = "Select any cell To plot a histogram Of that cell's depth"
     End Sub
@@ -159,12 +159,12 @@ Public Class Brick_Plot : Inherits TaskParent
         If Single.IsInfinity(mm.maxVal) Then Exit Sub
 
         If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
-            plot.minRange = mm.minVal
-            plot.maxRange = mm.maxVal
-            plot.Run(split(2))
-            dst3 = plot.dst2
-            labels(3) = "Depth values vary from " + Format(plot.minRange, fmt3) +
-                            " to " + Format(plot.maxRange, fmt3)
+            plotHist.minRange = mm.minVal
+            plotHist.maxRange = mm.maxVal
+            plotHist.Run(split(2))
+            dst3 = plotHist.dst2
+            labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
+                            " to " + Format(plotHist.maxRange, fmt3)
         End If
     End Sub
 End Class

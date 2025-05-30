@@ -23,7 +23,7 @@ Public Class HistValley_Basics : Inherits TaskParent
         dst2 = hist.dst2
 
         Dim avg = hist.histogram.Mean()
-        scaleList.Add(dst2.Height - dst2.Height * avg(0) / hist.plot.mm.maxVal)
+        scaleList.Add(dst2.Height - dst2.Height * avg(0) / hist.plotHist.mm.maxVal)
         Dim scale = scaleList.Average()
         SetTrueText("Mean", New cv.Point(5, scale), 3)
         dst2.Line(New cv.Point(0, scale), New cv.Point(dst2.Width, scale), cv.Scalar.Yellow, task.lineWidth + 1)
@@ -504,7 +504,7 @@ Public Class HistValley_Colors : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
         src = src.ExtractChannel(splitIndex)
-        hist.hist.plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue,
+        hist.hist.plotHist.backColor = Choose(splitIndex + 1, cv.Scalar.Blue,
                                           cv.Scalar.Green, cv.Scalar.Red)
         hist.Run(src)
         dst2 = hist.dst2

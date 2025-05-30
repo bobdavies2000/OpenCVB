@@ -1,4 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
+Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Public Class BackProject_Basics : Inherits TaskParent
@@ -9,7 +10,7 @@ Public Class BackProject_Basics : Inherits TaskParent
         desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(task.grayStable.Clone)
+        hist.Run(task.grayStable)
         If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
             Exit Sub
@@ -432,7 +433,7 @@ Public Class BackProject_Image : Inherits TaskParent
         desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(task.gray)
+        hist.Run(task.grayStable)
         If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
             Exit Sub ' the input image is empty...
@@ -447,7 +448,7 @@ Public Class BackProject_Image : Inherits TaskParent
         hist.mm.maxVal = Math.Max(task.kalman.kOutput(0), task.kalman.kOutput(1))
 
         Dim totalPixels = dst2.Total ' assume we are including zeros.
-        If hist.plot.removeZeroEntry Then totalPixels = task.gray.CountNonZero
+        If hist.plotHist.removeZeroEntry Then totalPixels = task.gray.CountNonZero
 
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
@@ -460,7 +461,7 @@ Public Class BackProject_Image : Inherits TaskParent
             maxRange = New cv.Scalar(255)
         End If
         If useInrange Then
-            If histIndex = 0 And hist.plot.removeZeroEntry Then
+            If histIndex = 0 And hist.plotHist.removeZeroEntry Then
                 mask = New cv.Mat(task.grayStable.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Else
                 mask = task.grayStable.InRange(minRange, maxRange)
@@ -482,7 +483,6 @@ Public Class BackProject_Image : Inherits TaskParent
         dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
-
 
 
 
@@ -617,7 +617,7 @@ Public Class BackProject_Masks : Inherits TaskParent
         cv.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
         Return mask
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hist.Run(src)
         dst2 = hist.dst2
 
@@ -679,27 +679,6 @@ Public Class BackProject_MaskList : Inherits TaskParent
         dst3 = inputMatList(index)
     End Sub
 End Class
-
-
-
-
-
-Public Class BackProject_Depth : Inherits TaskParent
-    Dim backp As New BackProject_Image
-    Public Sub New()
-        desc = "Allow review of the depth backprojection"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim depth = task.pcSplit(2).Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.TozeroInv)
-        backp.Run(depth * 1000)
-        dst2 = backp.dst2
-        dst3 = src
-        dst3.SetTo(white, backp.mask)
-    End Sub
-End Class
-
-
-
 
 
 
@@ -819,11 +798,11 @@ End Class
 
 
 
-Public Class BackProject_DepthInRange : Inherits TaskParent
+Public Class BackProject_InRangeDepthTest : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         task.gOptions.HistBinBar.Value = 4
-        desc = "Create histogram bin count images for the different ranges of depth."
+        desc = "Create images for the different ranges of depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         classCount = task.histogramBins
@@ -850,5 +829,45 @@ Public Class BackProject_DepthInRange : Inherits TaskParent
                     Format(maxRange, fmt1) + " m had " + CStr(dst2.CountNonZero)
         If task.heartBeatLT And task.frameCount > 1 Then index += 1
         If maxRange > task.MaxZmeters Then index = 0
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class BackProject_InRangeDepth : Inherits TaskParent
+    Public classCount As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Create images for the different ranges of depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        classCount = task.histogramBins
+
+        Dim binSize = task.MaxZmeters / task.histogramBins
+        Dim binCounts As New List(Of Integer)
+        For i = 1 To classCount
+            Dim maxRange = i * binSize
+            Dim minRange = (i - 1) * binSize
+            If i = 1 Then minRange = 0.01
+            dst1 = task.pcSplit(2).InRange(minRange, maxRange).ConvertScaleAbs * i
+            If maxRange >= task.MaxZmeters Then dst1 = dst1 Or task.maxDepthMask
+            binCounts.Add(dst1.CountNonZero)
+            dst2.SetTo(i, dst1)
+        Next
+        dst2.SetTo(0, task.noDepthMask)
+
+        strOut = ""
+        For i = 0 To binCounts.Count - 1
+            strOut += "Class " + CStr(i) + " had " + CStr(binCounts(i)) + " pixels." + vbCrLf
+        Next
+        SetTrueText(strOut)
+
+        dst3 = ShowPalette(dst2)
+        labels(3) = "Below are the " + CStr(task.histogramBins) + " classes of depth data."
     End Sub
 End Class

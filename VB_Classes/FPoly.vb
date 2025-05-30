@@ -359,12 +359,12 @@ End Class
 
 Public Class FPoly_Plot : Inherits TaskParent
     Public fGrid As New FPoly_Core
-    Dim plot As New Plot_Histogram
+    Dim plotHist As New Plot_Histogram
     Public hist() As Single
     Public distDiff As New List(Of Single)
     Public Sub New()
-        plot.minRange = 0
-        plot.removeZeroEntry = False
+        plotHist.minRange = 0
+        plotHist.removeZeroEntry = False
         labels = {"", "", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot the distribution"
     End Sub
@@ -397,9 +397,9 @@ Public Class FPoly_Plot : Inherits TaskParent
         Dim peakIndex = hlist.IndexOf(peak)
 
         Dim histMat = cv.Mat.FromPixelData(hist.Length, 1, cv.MatType.CV_32F, hist.ToArray)
-        plot.maxRange = fGrid.stable.basics.ptList.Count
-        plot.Run(histMat)
-        dst2 = plot.dst2
+        plotHist.maxRange = fGrid.stable.basics.ptList.Count
+        plotHist.Run(histMat)
+        dst2 = plotHist.dst2
         Dim avg = If(distDiff.Count > 0, distDiff.Average, 0)
         labels(2) = "Average distance change (after threshholding) = " + Format(avg, fmt3) + ", peak at " + CStr(peakIndex) +
                         " with " + Format(peak, fmt1) + " occurances"
@@ -415,11 +415,11 @@ End Class
 
 Public Class FPoly_PlotWeighted : Inherits TaskParent
     Public fPlot As New FPoly_Plot
-    Dim plot As New Plot_Histogram
+    Dim plotHist As New Plot_Histogram
     Public Sub New()
         task.kalman = New Kalman_Basics
-        plot.minRange = 0
-        plot.removeZeroEntry = False
+        plotHist.minRange = 0
+        plotHist.removeZeroEntry = False
         labels = {"", "Distance change from previous frame", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot with weighting and Kalman to smooth results"
     End Sub
@@ -427,7 +427,7 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         fPlot.Run(src)
         dst3 = fPlot.dst3
 
-        Dim lastPlot As cv.Mat = plot.dst2.Clone
+        Dim lastPlot As cv.Mat = plotHist.dst2.Clone
         If task.optionsChanged Then ReDim task.kalman.kInput(fPlot.hist.Length - 1)
 
         task.kalman.kInput = fPlot.hist
@@ -438,9 +438,9 @@ Public Class FPoly_PlotWeighted : Inherits TaskParent
         Dim peak = hlist.Max
         Dim peakIndex = hlist.IndexOf(peak)
         Dim histMat = cv.Mat.FromPixelData(fPlot.hist.Length, 1, cv.MatType.CV_32F, fPlot.hist)
-        plot.maxRange = fPlot.fGrid.stable.basics.ptList.Count
-        plot.Run(histMat)
-        dst2 = ShowAddweighted(plot.dst2, lastPlot, labels(2))
+        plotHist.maxRange = fPlot.fGrid.stable.basics.ptList.Count
+        plotHist.Run(histMat)
+        dst2 = ShowAddweighted(plotHist.dst2, lastPlot, labels(2))
         If task.heartBeat Then
             Dim avg = If(fPlot.distDiff.Count > 0, fPlot.distDiff.Average, 0)
             labels(2) = "Average distance change (after threshholding) = " + Format(avg, fmt3) + ", peak at " +

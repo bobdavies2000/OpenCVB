@@ -165,22 +165,18 @@ End Class
 
 Public Class Hist2D_PlotHistogram1D : Inherits TaskParent
     Dim histogram As New cv.Mat
-    Dim plot As New Plot_Histogram
-    Public histArray() As Single
+    Dim plotHist As New Plot_Histogram
     Public Sub New()
-        plot.removeZeroEntry = False
+        plotHist.removeZeroEntry = False
         labels(2) = "Hist2D_PlotHistogram1D output shown with plot_histogram"
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         cv.Cv2.CalcHist({src}, task.redOptions.channels, task.depthMask, histogram, 2, {task.histogramBins, task.histogramBins},
                         task.redOptions.rangesBGR)
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        plot.Run(histogram)
-        dst3 = plot.dst2
-
-        'ReDim histArray(histogram.Total - 1)
-        'Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+        plotHist.Run(histogram)
+        dst3 = plotHist.dst2
     End Sub
 End Class

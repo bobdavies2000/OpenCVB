@@ -664,13 +664,13 @@ End Class
 
 
 Public Class FCS_ByDepth : Inherits TaskParent
-    Dim plot As New Plot_Histogram
+    Dim plotHist As New Plot_Histogram
     Dim fcs As New FCS_CreateList
     Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
-        plot.addLabels = False
-        plot.removeZeroEntry = True
-        plot.createHistogram = True
+        plotHist.addLabels = False
+        plotHist.removeZeroEntry = True
+        plotHist.createHistogram = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         task.gOptions.setHistogramBins(20)
         desc = "Use cell depth to break down the layers in an image."
@@ -690,15 +690,15 @@ Public Class FCS_ByDepth : Inherits TaskParent
             bricks.Add(fp.depth)
         Next
 
-        plot.minRange = 0
-        plot.maxRange = task.MaxZmeters
-        plot.Run(cv.Mat.FromPixelData(bricks.Count, 1, cv.MatType.CV_32F, bricks.ToArray))
-        dst1 = plot.dst2
+        plotHist.minRange = 0
+        plotHist.maxRange = task.MaxZmeters
+        plotHist.Run(cv.Mat.FromPixelData(bricks.Count, 1, cv.MatType.CV_32F, bricks.ToArray))
+        dst1 = plotHist.dst2
 
         Dim incr = dst1.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / incr)
         dst1.Rectangle(New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-        Dim depthIncr = (plot.maxRange - plot.minRange) / task.histogramBins
+        Dim depthIncr = (plotHist.maxRange - plotHist.minRange) / task.histogramBins
         Dim depthStart = histIndex * depthIncr
         Dim depthEnd = (histIndex + 1) * depthIncr
 

@@ -176,8 +176,8 @@ Public Class PhotoShop_PlotHist : Inherits TaskParent
     Public hist2 As New Hist_Basics
     Dim mat2to1 As New Mat_2to1
     Public Sub New()
-        hist1.plot.addLabels = False
-        hist2.plot.addLabels = False
+        hist1.plotHist.addLabels = False
+        hist2.plotHist.addLabels = False
         desc = "Plot the histogram of the before and after white balancing"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

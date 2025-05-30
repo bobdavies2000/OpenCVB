@@ -166,14 +166,14 @@ Public Class SLR_TrendImages : Inherits TaskParent
         options.Run()
 
         Dim split = src.Split()
-        trends.hist.plot.maxRange = 255
-        trends.hist.plot.removeZeroEntry = False ' default is to look at element 0....
+        trends.hist.plotHist.maxRange = 255
+        trends.hist.plotHist.removeZeroEntry = False ' default is to look at element 0....
 
         Dim splitIndex = 0
         Select Case options.radioText
             Case "pcSplit(2) input"
-                trends.hist.plot.maxRange = task.MaxZmeters
-                trends.hist.plot.removeZeroEntry = True ' not interested in the undefined depth areas...
+                trends.hist.plotHist.maxRange = task.MaxZmeters
+                trends.hist.plotHist.removeZeroEntry = True ' not interested in the undefined depth areas...
                 trends.Run(task.pcSplit(2))
                 labels(2) = "SLR_TrendImages - pcSplit(2)"
             Case "Grayscale input"
@@ -234,7 +234,7 @@ Public Class SLR_Trends : Inherits TaskParent
     End Sub
     Public Sub connectLine(i As Integer, dst As cv.Mat)
         Dim x = barMidPoint + dst.Width * i / valList.Count
-        Dim y = dst.Height - dst.Height * valList(i) / hist.plot.maxRange
+        Dim y = dst.Height - dst.Height * valList(i) / hist.plotHist.maxRange
         Dim p1 = New cv.Point2f(x, y)
         resultingPoints.Add(p1)
         resultingValues.Add(p1.Y)
@@ -243,7 +243,7 @@ Public Class SLR_Trends : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         labels(2) = "Grayscale histogram - yellow line shows trend"
-        hist.plot.backColor = cv.Scalar.Red
+        hist.plotHist.backColor = cv.Scalar.Red
         hist.Run(src)
         dst2 = hist.dst2
 
@@ -255,8 +255,8 @@ Public Class SLR_Trends : Inherits TaskParent
         barMidPoint = dst2.Width / valList.Count / 2
 
         If valList.Count < 2 Then Exit Sub
-        hist.plot.maxRange = valList.Max
-        lastPoint = New cv.Point2f(barMidPoint, dst2.Height - dst2.Height * valList(0) / hist.plot.maxRange)
+        hist.plotHist.maxRange = valList.Max
+        lastPoint = New cv.Point2f(barMidPoint, dst2.Height - dst2.Height * valList(0) / hist.plotHist.maxRange)
         resultingPoints.Clear()
         resultingValues.Clear()
         resultingPoints.Add(lastPoint)

@@ -15,7 +15,7 @@ Imports System.Text.RegularExpressions
 Public Class Benford_Basics : Inherits TaskParent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
-    Dim plot As New Plot_Histogram
+    Dim plotHist As New Plot_Histogram
     Dim use99 As Boolean
     Public Sub New()
         For i = 1 To expectedDistribution.Count - 1
@@ -63,18 +63,18 @@ Public Class Benford_Basics : Inherits TaskParent
         End If
 
         Dim hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plot.backColor = cv.Scalar.Blue
-        plot.Run(hist)
-        dst3 = plot.dst2.Clone
+        plotHist.backColor = cv.Scalar.Blue
+        plotHist.Run(hist)
+        dst3 = plotHist.dst2.Clone
         For i = 0 To counts.Count - 1
             counts(i) = src.Rows * expectedDistribution(i)
         Next
 
         hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plot.backColor = cv.Scalar.Gray
-        plot.Run(hist)
+        plotHist.backColor = cv.Scalar.Gray
+        plotHist.Run(hist)
 
-        dst2 = ShowAddweighted(Not plot.dst2, dst3, labels(2))
+        dst2 = ShowAddweighted(Not plotHist.dst2, dst3, labels(2))
     End Sub
 End Class
 

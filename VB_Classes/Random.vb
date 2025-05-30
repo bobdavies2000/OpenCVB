@@ -248,7 +248,7 @@ Public Class Random_CheckUniformSmoothed : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         rUniform.Run(src)
         dst2 = rUniform.dst2
-        histogram.plot.maxRange = 255
+        histogram.plotHist.maxRange = 255
         histogram.Run(dst2)
         dst3 = histogram.dst2
     End Sub
@@ -302,7 +302,7 @@ Public Class Random_CheckNormalDistSmoothed : Inherits TaskParent
     Dim histogram As New Hist_Basics
     Dim normalDist As New Random_NormalDist
     Public Sub New()
-        histogram.plot.minRange = 1
+        histogram.plotHist.minRange = 1
         desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -439,10 +439,10 @@ Public Class Random_CustomHistogram : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        hist.plot.maxRange = 0 ' we are sharing the plot with the code below...
+        hist.plotHist.maxRange = 0 ' we are sharing the plot with the code below...
         hist.Run(src)
         dst2 = hist.dst2.Clone()
-        saveHist = hist.plot.histogram.Clone()
+        saveHist = hist.plotHist.histogram.Clone()
 
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
         random.Run(src)
@@ -452,9 +452,9 @@ Public Class Random_CustomHistogram : Inherits TaskParent
             Exit Sub
         End If
         If standaloneTest() And random.outputHistogram IsNot Nothing Then
-            hist.plot.maxRange = 100
-            hist.plot.Run(random.outputHistogram)
-            dst3 = hist.plot.dst2
+            hist.plotHist.maxRange = 100
+            hist.plotHist.Run(random.outputHistogram)
+            dst3 = hist.plotHist.dst2
         End If
     End Sub
 End Class

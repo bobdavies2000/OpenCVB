@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Derivative_Basics : Inherits TaskParent
     Dim subD As New Derivative_Subtract
-    Dim plot As New Plot_Histogram
+    Dim plotHist As New Plot_Histogram
     Public Sub New()
-        plot.removeZeroEntry = False
+        plotHist.removeZeroEntry = False
         If standalone Then task.gOptions.displaydst1.checked = true
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Compute the gradient in the Z depth and maintain the units for depth."
@@ -15,10 +15,10 @@ Public Class Derivative_Basics : Inherits TaskParent
         Dim histogram As New cv.Mat
         cv.Cv2.CalcHist({subD.dst2}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
 
-        plot.Run(histogram)
-        dst2 = plot.dst2
+        plotHist.Run(histogram)
+        dst2 = plotHist.dst2
 
-        Dim proximityCount As Integer = plot.histogram.Sum
+        Dim proximityCount As Integer = plotHist.histogram.Sum
         Dim proximityPercent = proximityCount / dst2.Total
 
         Dim brickWidth = dst2.Width / task.histogramBins
@@ -29,15 +29,15 @@ Public Class Derivative_Basics : Inherits TaskParent
         Dim center As Integer = task.histogramBins / 2
         Dim centerAdjust As Integer = If(task.histogramBins Mod 2 = 0, 1, 0)
         ' this is a variation of guided backprojection.
-        For i = 0 To plot.histArray.Count - 1
+        For i = 0 To plotHist.histArray.Count - 1
             If i >= center - bars And i <= center + bars + centerAdjust Then
-                plot.histArray(i) = 0
+                plotHist.histArray(i) = 0
             Else
-                plot.histArray(i) = 1
+                plotHist.histArray(i) = 1
             End If
         Next
 
-        histogram = cv.Mat.FromPixelData(plot.histArray.Count, 1, cv.MatType.CV_32F, plot.histArray)
+        histogram = cv.Mat.FromPixelData(plotHist.histArray.Count, 1, cv.MatType.CV_32F, plotHist.histArray)
 
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({subD.dst2(subD.options.rect1)}, {0}, histogram, mask, ranges)
@@ -98,7 +98,7 @@ End Class
 
 Public Class Derivative_Sobel : Inherits TaskParent
     Public options As New Options_Derivative
-    Public plot As New Plot_Histogram
+    Public plotHist As New Plot_Histogram
     Public Sub New()
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
@@ -112,18 +112,18 @@ Public Class Derivative_Sobel : Inherits TaskParent
         Dim histogram As New cv.Mat
         cv.Cv2.CalcHist({src}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
-        plot.Run(histogram)
-        histogram = plot.histogram ' reflect any updates to the 0 entry...
-        dst2 = plot.dst2
+        plotHist.Run(histogram)
+        histogram = plotHist.histogram ' reflect any updates to the 0 entry...
+        dst2 = plotHist.dst2
 
         Dim index As Integer = 1
-        For i = 0 To plot.histArray.Count - 1
-            If plot.histArray(i) <> 0 Then
-                plot.histArray(i) = index
+        For i = 0 To plotHist.histArray.Count - 1
+            If plotHist.histArray(i) <> 0 Then
+                plotHist.histArray(i) = index
                 index += 1
             End If
         Next
-        dst1 = cv.Mat.FromPixelData(plot.histArray.Count, 1, cv.MatType.CV_32F, plot.histArray)
+        dst1 = cv.Mat.FromPixelData(plotHist.histArray.Count, 1, cv.MatType.CV_32F, plotHist.histArray)
 
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
@@ -221,8 +221,8 @@ Public Class Derivative_Classes : Inherits TaskParent
         desc = "Display the X and Y derivatives for the whole image."
     End Sub
     Private Function derivClassCount(ByRef dst As cv.Mat) As Integer
-        For i = 0 To deriv.plot.histArray.Count - 1
-            If deriv.plot.histArray(i) > 0 Then derivClassCount += 1
+        For i = 0 To deriv.plotHist.histArray.Count - 1
+            If deriv.plotHist.histArray(i) > 0 Then derivClassCount += 1
         Next
         dst = ShowPalette(deriv.dst0)
         dst.SetTo(0, task.noDepthMask)
