@@ -269,7 +269,10 @@ Public Class BackProject_Top : Inherits TaskParent
         histTop.Run(src)
         dst2 = histTop.dst2
 
-        Dim histogram = histTop.histogram.SetTo(0, Not dst2)
+        Dim histogram = histTop.histogram
+        If Not standalone Then
+            histogram = histTop.histogram.SetTo(0, Not dst2) ' use this to isolate the non-vertical areas.
+        End If
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst3, task.rangesTop)
         dst3 = ShowPalette(dst3.ConvertScaleAbs)
@@ -297,29 +300,6 @@ Public Class BackProject_Horizontal : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-
-Public Class BackProject_Vertical : Inherits TaskParent
-    Dim bpTop As New BackProject_Top
-    Dim bpSide As New BackProject_Side
-    Public Sub New()
-        desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bpSide.Run(src)
-        task.pointCloud.SetTo(0, bpSide.dst3)
-
-        bpTop.Run(src)
-        dst2 = bpTop.dst3
-    End Sub
-End Class
 
 
 
@@ -840,7 +820,7 @@ End Class
 
 
 Public Class BackProject_Basics_Depth : Inherits TaskParent
-    Dim bpDepth As New BackProject_FullDepth
+    Public bpDepth As New BackProject_FullDepth
     Public Sub New()
         task.gOptions.HistBinBar.Value = 20
         desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."

@@ -107,7 +107,6 @@ Public Class Contour_Regions : Inherits TaskParent
     Public contourList As New List(Of cv.Point())
     Public areaList As New List(Of Integer) ' point counts for each contour in contourList above.
     Public options As New Options_Contours
-    Dim color8U As New Color8U_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         OptionParent.findRadio("FloodFill").Checked = True
@@ -987,5 +986,56 @@ Public Class Contour_Basics_External : Inherits TaskParent
         labels(2) = "External found the " + CStr(task.contourList.Count) + " largest contours of the " +
                     CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
                     " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contour_Depth : Inherits TaskParent
+    Dim backP As New BackProject_Basics_Depth
+    Public options As New Options_Contours
+    Public allContourList As New List(Of Integer)
+    Public allcontours As cv.Point()()
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "ShowPalette output of the depth contours (below left)"
+        desc = "Isolate the contours in the output of BackProject_Basics_Depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        backP.Run(src)
+
+        ReDim allcontours(0)
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(backP.bpDepth.dst2, allContours, Nothing, cv.RetrievalModes.List, mode)
+        If allContours.Count <= 1 Then Exit Sub
+
+        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To allContours.Count - 1
+            Dim tour = allContours(i)
+            Dim pixels = cv.Cv2.ContourArea(tour)
+            If pixels > task.color.Total * 3 / 4 Then Continue For
+            If tour.Count < 4 Then Continue For
+
+            sortedList.Add(pixels, i)
+        Next
+
+        allContourList.Clear
+        dst2.SetTo(0)
+        For Each index In sortedList.Values
+            Dim listOfPoints = New List(Of List(Of cv.Point))({allcontours(index).ToList})
+            cv.Cv2.DrawContours(dst2, listOfPoints, 0, cv.Scalar.All(allContourList.Count + 1), -1, cv.LineTypes.Link8)
+
+            allContourList.Add(index)
+            If allContourList.Count >= options.maxContours Then Exit For
+        Next
+
+        dst3 = ShowPalette(dst2)
+        dst1 = ShowPalette(task.contourMap)
+        labels(2) = "CV_8U format of the " + CStr(options.maxContours) + " depth contours"
     End Sub
 End Class
