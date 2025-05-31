@@ -107,11 +107,10 @@ Public Class Brick_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = "Of " + CStr(task.brickList.Count) + " bricks, " +
-                        CStr(depthCount) + " have no edge data (aka featureless) - " +
+            labels(2) = CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) + " are featureless - " +
                         Format(brickFull / task.gridRects.Count, "00%") +
-                        " of all bricks were fully interior bricks in the " + CStr(task.contourList.Count) + " contours." +
-                        "  There were also " + CStr(brickPartial) + " partial contour bricks (blue)"
+                        " of bricks were fully interior in the " + CStr(task.contourList.Count) + " contours." +
+                        CStr(brickPartial) + " partial contour bricks (blue)"
         End If
 
         DrawContourBricks()
@@ -124,6 +123,7 @@ Public Class Brick_Basics : Inherits TaskParent
             Next
             contour.depth = depth / contour.bricks.Count
         Next
+        dst3 = ShowPalette(task.contourMap)
     End Sub
 End Class
 
