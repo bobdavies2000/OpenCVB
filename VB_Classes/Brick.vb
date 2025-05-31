@@ -795,7 +795,7 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
             If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
         Next
 
-        dst2 = ShowPaletteDepth(dst1)
+        dst2 = ShowPaletteCorrelation(dst1)
         labels(2) = task.brickBasics.labels(2)
 
         ptBrick.Run(src)

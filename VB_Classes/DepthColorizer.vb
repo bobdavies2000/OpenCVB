@@ -2,6 +2,8 @@
 Imports cv = OpenCvSharp
 Public Class DepthColorizer_Basics : Inherits TaskParent
     Public Sub New()
+        Dim gradientWidth = Math.Min(dst2.Width, 256)
+        Dim f As Double = 1.0
         If saveVecColors.Count = 1 Then
             Dim initVal = 43
             Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
@@ -12,12 +14,13 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
                 task.scalarColors(i) = New cv.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
             Next
 
-            Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow, gradientWidth = Math.Min(dst2.Width, 256), f As Double = 1.0
+            Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow
             task.depthColorList = New List(Of cv.Vec3b)
             For i = 0 To gradientWidth - 1
-                task.depthColorList.Add(New cv.Vec3b(f * color2(0) + (1 - f) * color1(0),
-                                           f * color2(1) + (1 - f) * color1(1),
-                                           f * color2(2) + (1 - f) * color1(2)))
+                Dim v1 = f * color2(0) + (1 - f) * color1(0)
+                Dim v2 = f * color2(1) + (1 - f) * color1(1)
+                Dim v3 = f * color2(2) + (1 - f) * color1(2)
+                task.depthColorList.Add(New cv.Vec3b(v1, v2, v3))
                 f -= 1 / gradientWidth
             Next
             task.depthColorList(0) = New cv.Vec3b ' black for the first color...
@@ -35,6 +38,19 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             task.depthColorMap = saveDepthColorMap
             task.depthColorList = saveDepthColorList
         End If
+
+        Dim color4 = cv.Scalar.Red, color3 = New cv.Scalar
+        Dim corrColors = New List(Of cv.Vec3b)
+        f = 1.0
+        For i = 0 To gradientWidth - 1
+            Dim v1 = f * color3(0) + (1 - f) * color4(0)
+            Dim v2 = f * color3(1) + (1 - f) * color4(1)
+            Dim v3 = f * color3(2) + (1 - f) * color4(2)
+            corrColors.Add(New cv.Vec3b(v1, v2, v3))
+            f -= 1 / gradientWidth
+        Next
+        task.correlationColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
+
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

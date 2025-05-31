@@ -261,6 +261,7 @@ Public Class VBtask : Implements IDisposable
     Public scalarColors(255) As cv.Scalar
     Public vecColors(255) As cv.Vec3b
     Public depthColorMap As cv.Mat
+    Public correlationColorMap As cv.Mat
     Public depthColorList As New List(Of cv.Vec3b)
 
     Public topCameraPoint As cv.Point

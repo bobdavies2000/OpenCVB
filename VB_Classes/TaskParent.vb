@@ -547,11 +547,32 @@ Public Class TaskParent : Implements IDisposable
         DrawContour(dst, ptlist, color, 1)
     End Sub
     Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
+        Dim output As New cv.Mat
+        cv.Cv2.ApplyColorMap(input, output, task.depthColorMap)
+        Return output
+    End Function
+    Public Function ShowPaletteCorrelation(input As cv.Mat) As cv.Mat
+        Dim output As New cv.Mat
+        cv.Cv2.ApplyColorMap(input, output, task.correlationColorMap)
+        Return output
+    End Function
+    Public Function ShowPaletteDepthOriginal(input As cv.Mat) As cv.Mat
         If task.palette Is Nothing Then task.palette = New Palette_LoadColorMap
         task.palette.Run(input)
         Return task.palette.dst2
     End Function
     Public Shared Function ShowPalette(input As cv.Mat) As cv.Mat
+        Dim output As New cv.Mat
+        Static colorMap As cv.Mat
+        If colorMap Is Nothing Then
+            colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors)
+            colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b)
+        End If
+        cv.Cv2.ApplyColorMap(input, output, colorMap)
+
+        Return output
+    End Function
+    Public Shared Function ShowPaletteOriginal(input As cv.Mat) As cv.Mat
         If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
         If input.Type <> cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_8U)
         Return task.paletteRandom.useColorMapWithBlack(input).Clone
