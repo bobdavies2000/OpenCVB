@@ -180,7 +180,7 @@ Public Class GuidedBP_Depth : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         task.gOptions.setHistogramBins(16)
-        desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
+        desc = "Backproject the 2D histogram of depth for selected channels to categorize the depth data."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud

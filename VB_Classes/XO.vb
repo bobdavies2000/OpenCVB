@@ -2130,6 +2130,7 @@ Public Class XO_PointCloud_Histograms : Inherits TaskParent
                 labels(2) = "2D plot of the resulting 3D histogram."
         End Select
 
+        If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         dst3 = ShowPalette(dst2)
     End Sub
 End Class

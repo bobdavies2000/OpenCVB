@@ -568,7 +568,13 @@ Public Class TaskParent : Implements IDisposable
             colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors)
             colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b)
         End If
-        cv.Cv2.ApplyColorMap(input, output, colorMap)
+        If input.Type <> cv.MatType.CV_8U Then
+            Dim input8u As New cv.Mat
+            input.ConvertTo(input8u, cv.MatType.CV_8U)
+            cv.Cv2.ApplyColorMap(input8u, output, colorMap)
+        Else
+            cv.Cv2.ApplyColorMap(input, output, colorMap)
+        End If
 
         Return output
     End Function
