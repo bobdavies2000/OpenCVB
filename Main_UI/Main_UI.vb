@@ -572,6 +572,7 @@ Public Class Main_UI
         SyncLock mouseLock
             mouseClickFlag = True
         End SyncLock
+        activateTaskForms = True
     End Sub
     Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
         DrawingRectangle = False
@@ -1475,6 +1476,9 @@ Public Class Main_UI
 
         Debug.WriteLine("Main_UI.StartTask completed.")
     End Sub
+    Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
+        activateTaskForms = True
+    End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
         If parms.algName = "" Then Exit Sub
         algorithmQueueCount += 1
@@ -1780,8 +1784,5 @@ Public Class Main_UI
 
         If parms.algName.EndsWith(".py") Then killThread("python")
         frameCount = 0
-    End Sub
-    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-        activateTaskForms = True
     End Sub
 End Class

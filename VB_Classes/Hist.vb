@@ -1216,38 +1216,6 @@ End Class
 
 
 
-
-
-
-Public Class Hist_PointCloud : Inherits TaskParent
-    Public rangesX() As cv.Rangef
-    Public rangesY() As cv.Rangef
-    Public options As New Options_HistPointCloud
-    Public Sub New()
-        labels = {"", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis"}
-        desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        rangesX = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.MaxZmeters)}
-        rangesY = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
-
-        Dim sizesX() As Integer = {options.xBins, options.zBins}
-        cv.Cv2.CalcHist({src}, {0, 2}, New cv.Mat(), dst2, 2, sizesX, rangesX)
-        dst2.Set(Of cv.Point3f)(dst2.Height / 2, 0, New cv.Point3f)
-
-        Dim sizesY() As Integer = {options.yBins, options.zBins}
-        cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat(), dst3, 2, sizesY, rangesY)
-        dst3.Set(Of cv.Point3f)(dst3.Height / 2, 0, New cv.Point3f)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Hist_Kalman : Inherits TaskParent
     Public hist As New Hist_Basics
     Public Sub New()
@@ -1562,5 +1530,112 @@ Public Class Hist_EqualizeGray : Inherits TaskParent
         mats.mat(3) = dst2
         mats.Run(emptyMat)
         dst3 = mats.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Hist_PointCloud_XZ_YZ : Inherits TaskParent
+    Public rangesX() As cv.Rangef
+    Public rangesY() As cv.Rangef
+    Public options As New Options_HistPointCloud
+    Public Sub New()
+        labels = {"", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis"}
+        desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        rangesX = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.MaxZmeters)}
+        rangesY = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
+
+        Dim sizesX() As Integer = {options.xBins, options.zBins}
+        cv.Cv2.CalcHist({src}, {0, 2}, New cv.Mat(), dst2, 2, sizesX, rangesX)
+        dst2.Set(Of cv.Point3f)(dst2.Height / 2, 0, New cv.Point3f)
+
+        Dim sizesY() As Integer = {options.yBins, options.zBins}
+        cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat(), dst3, 2, sizesY, rangesY)
+        dst3.Set(Of cv.Point3f)(dst3.Height / 2, 0, New cv.Point3f)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Hist_PointCloud : Inherits TaskParent
+    Dim grid As New Grid_Basics
+    Public histogram As New cv.Mat
+    Public histArray() As Single
+    Public Sub New()
+        task.gOptions.setHistogramBins(9)
+        task.redOptions.XYReduction.Checked = True
+        labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
+        desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.redOptions.Sync() ' make sure settings are consistent
+
+        cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
+                        task.redOptions.histBinList, task.redOptions.ranges)
+
+        Select Case task.redOptions.PointCloudReduction
+            Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
+                Static plot As New Plot_Histogram
+                plot.Run(histogram)
+                dst2 = plot.histogram
+                labels(2) = "2D plot of 1D histogram."
+            Case 3, 4, 5 ' "XY Reduction", "XZ Reduction", "YZ Reduction"
+                Static plot2D As New Plot_Histogram2D
+                plot2D.Run(histogram)
+                dst2 = plot2D.dst2
+                labels(2) = "2D plot of 2D histogram."
+                If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+            Case 6 ' "XYZ Reduction"
+                Static hcloud As New Hist3Dcloud_Basics
+                dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+
+                hcloud.Run(task.pointCloud)
+
+                histogram = hcloud.histogram
+                Dim histData(histogram.Total - 1) As Single
+                Marshal.Copy(histogram.Data, histData, 0, histData.Length)
+
+                If histData.Count > 255 And task.histogramBins > 3 Then
+                    task.histogramBins -= 1
+                End If
+                If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
+                    task.histogramBins += 1
+                End If
+                If task.gridRects.Count < histData.Length And task.cellSize > 2 Then
+                    task.cellSize -= 1
+                    grid.Run(src)
+                    dst2.SetTo(0)
+                End If
+                histData(0) = 0 ' count of zero pixels - distorts results..
+
+                Dim maxVal = histData.ToList.Max
+                For i = 0 To task.gridRects.Count - 1
+                    Dim roi = task.gridRects(i)
+                    If i >= histData.Length Then
+                        dst2(roi).SetTo(0)
+                    Else
+                        dst2(roi).SetTo(255 * histData(i) / maxVal)
+                    End If
+                Next
+                labels(2) = "2D plot of the resulting 3D histogram."
+        End Select
+
+        dst3 = ShowPalette(dst2)
+
+        Dim histArray(histogram.Total - 1) As Single
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
     End Sub
 End Class

@@ -175,8 +175,7 @@ End Class
 
 
 Public Class GuidedBP_Depth : Inherits TaskParent
-    Public hist As New XO_PointCloud_Histograms
-    Dim myPalette As New Palette_Random
+    Public hist As New Hist_PointCloud
     Public classCount As Integer
     Public Sub New()
         task.gOptions.setHistogramBins(16)
@@ -199,31 +198,36 @@ Public Class GuidedBP_Depth : Inherits TaskParent
             sortedHist.Add(histArray(i), i)
         Next
 
-        classCount = 0
-        Dim count As Integer
+        classCount = sortedHist.Values.Max
         Dim newSamples(histArray.Count - 1) As Single
         For i = 0 To sortedHist.Count - 1
             Dim index = sortedHist.ElementAt(i).Value
-            count += sortedHist.ElementAt(i).Key
-            newSamples(index) = classCount
-            classCount += 1
-            If classCount >= 255 Then Exit For
+            newSamples(index) = i + 1
+            If index >= 255 Then Exit For
         Next
+
+        'classCount = 0
+        'Dim count As Integer
+        'Dim newSamples(histArray.Count - 1) As Single
+        'For i = 0 To sortedHist.Count - 1
+        '    Dim index = sortedHist.ElementAt(i).Value
+        '    count += sortedHist.ElementAt(i).Key
+        '    newSamples(index) = classCount
+        '    classCount += 1
+        '    If classCount >= 255 Then Exit For
+        'Next
 
         Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
 
         cv.Cv2.CalcBackProject({src}, task.redOptions.channels, hist.histogram, dst2, task.redOptions.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        If standaloneTest() Then
-            labels(3) = "Note that colors are shifting because this is before any matching."
-            dst2 += 1
-            dst2.SetTo(0, task.noDepthMask)
-            myPalette.Run(dst2)
-            dst3 = myPalette.dst2
-        End If
+        labels(3) = "Use task.redOptions.PointCloudReduction to select different cloud combinations."
+        If standaloneTest() Then dst3 = ShowPalette(dst2 + 1)
 
         Dim depthCount = task.depthMask.CountNonZero
+        dst3.SetTo(0, task.noDepthMask)
+        Dim count = dst2.CountNonZero
         labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / depthCount, "0%") + " of depth data"
     End Sub
 End Class

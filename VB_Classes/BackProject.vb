@@ -126,7 +126,7 @@ End Class
 
 
 Public Class BackProject_PointCloud : Inherits TaskParent
-    Public hist As New Hist_PointCloud
+    Public hist As New Hist_PointCloud_XZ_YZ
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         labels = {"", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values"}

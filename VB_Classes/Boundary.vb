@@ -185,7 +185,6 @@ End Class
 
 
 Public Class Boundary_GuidedBP : Inherits TaskParent
-    Public redCPP As New RedColor_CPP
     Dim guided As New GuidedBP_Depth
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100

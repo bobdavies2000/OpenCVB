@@ -1,5 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Windows
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class XO_Gravity_HorizonRawOld : Inherits TaskParent
     Public yLeft As Integer, yRight As Integer, xTop As Integer, xBot As Integer
@@ -1192,7 +1193,7 @@ Public Class XO_Line_RegionsVB : Inherits TaskParent
         task.redOptions.BitwiseReduction.Checked = True
         task.redOptions.setBitReductionBar(6)
 
-        If OptionParent.findFrm(traceName + " CheckBoxes") Is Nothing Then
+        If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Show intermediate vertical step results.")
             check.addCheckBox("Run horizontal without vertical step")
@@ -1201,8 +1202,8 @@ Public Class XO_Line_RegionsVB : Inherits TaskParent
         desc = "Use the reduction values between lines to identify regions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static noVertCheck = OptionParent.findCheckBox("Run horizontal without vertical step")
-        Static verticalCheck = OptionParent.findCheckBox("Show intermediate vertical step results.")
+        Static noVertCheck = OptionParent.FindCheckBox("Run horizontal without vertical step")
+        Static verticalCheck = OptionParent.FindCheckBox("Show intermediate vertical step results.")
         reduction.Run(src)
         dst2 = reduction.dst2
         dst3 = dst2.Clone
@@ -2061,79 +2062,6 @@ Public Class XO_Quad_Basics : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class XO_PointCloud_Histograms : Inherits TaskParent
-    Dim plot2D As New Plot_Histogram2D
-    Dim plot As New Plot_Histogram
-    Dim hcloud As New Hist3Dcloud_Basics
-    Dim grid As New Grid_Basics
-    Public histogram As New cv.Mat
-    Public Sub New()
-        task.gOptions.setHistogramBins(9)
-        task.redOptions.XYReduction.Checked = True
-        labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
-        desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        task.redOptions.Sync() ' make sure settings are consistent
-
-        cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
-                        task.redOptions.histBinList, task.redOptions.ranges)
-
-        Select Case task.redOptions.PointCloudReduction
-            Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
-                plot.Run(histogram)
-                dst2 = plot.histogram
-                labels(2) = "2D plot of 1D histogram."
-            Case 3, 4, 5 ' "XY Reduction", "XZ Reduction", "YZ Reduction"
-                plot2D.Run(histogram)
-                dst2 = plot2D.dst2
-                labels(2) = "2D plot of 2D histogram."
-            Case 6 ' "XYZ Reduction"
-                If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-
-                hcloud.Run(task.pointCloud)
-
-                histogram = hcloud.histogram
-                Dim histData(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histData, 0, histData.Length)
-
-                If histData.Count > 255 And task.histogramBins > 3 Then
-                    task.histogramBins -= 1
-                End If
-                If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
-                    task.histogramBins += 1
-                End If
-                If task.gridRects.Count < histData.Length And task.cellSize > 2 Then
-                    task.cellSize -= 1
-                    grid.Run(src)
-                    dst2.SetTo(0)
-                End If
-                histData(0) = 0 ' count of zero pixels - distorts results..
-
-                Dim maxVal = histData.ToList.Max
-                For i = 0 To task.gridRects.Count - 1
-                    Dim roi = task.gridRects(i)
-                    If i >= histData.Length Then
-                        dst2(roi).SetTo(0)
-                    Else
-                        dst2(roi).SetTo(255 * histData(i) / maxVal)
-                    End If
-                Next
-                labels(2) = "2D plot of the resulting 3D histogram."
-        End Select
-
-        If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst2)
-    End Sub
-End Class
 
 
 
@@ -3515,7 +3443,7 @@ End Class
 Public Class XO_OpenGL_VerticalOrHorizontal : Inherits TaskParent
     Dim vLine As New XO_FeatureLine_Finder3D
     Public Sub New()
-        If OptionParent.findFrm(traceName + " Radio Buttons") Is Nothing Then
+        If OptionParent.FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Show Vertical Lines")
             radio.addRadio("Show Horizontal Lines")
