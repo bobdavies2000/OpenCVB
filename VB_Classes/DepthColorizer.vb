@@ -15,28 +15,26 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             Next
 
             Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow
-            task.depthColorList = New List(Of cv.Vec3b)
+            Dim colorList As New List(Of cv.Vec3b)
             For i = 0 To gradientWidth - 1
                 Dim v1 = f * color2(0) + (1 - f) * color1(0)
                 Dim v2 = f * color2(1) + (1 - f) * color1(1)
                 Dim v3 = f * color2(2) + (1 - f) * color1(2)
-                task.depthColorList.Add(New cv.Vec3b(v1, v2, v3))
+                colorList.Add(New cv.Vec3b(v1, v2, v3))
                 f -= 1 / gradientWidth
             Next
-            task.depthColorList(0) = New cv.Vec3b ' black for the first color...
-            task.depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.depthColorList.ToArray)
+            colorList(0) = New cv.Vec3b ' black for the first color...
+            task.depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
 
             saveVecColors = task.vecColors
             saveScalarColors = task.scalarColors
             saveDepthColorMap = task.depthColorMap
-            saveDepthColorList = New List(Of cv.Vec3b)(task.depthColorList)
         Else
             ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
             ' Colors will be different when OpenCVB is restarted.  
             task.vecColors = saveVecColors
             task.scalarColors = saveScalarColors
             task.depthColorMap = saveDepthColorMap
-            task.depthColorList = saveDepthColorList
         End If
 
         Dim color3 = cv.Scalar.Black, color4 = cv.Scalar.Red
@@ -51,21 +49,34 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         Next
         task.correlationColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
 
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
         If task.gOptions.GridDepth.Checked Then
             task.depthRGB = task.brickBasics.dst2
-        ElseIf task.gOptions.ColorizedDepth.Checked Then
-            Dim depthNorm As cv.Mat = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
-            depthNorm = depthNorm * 255 / task.MaxZmeters
-            depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-            task.depthRGB = ShowPaletteCorrelation(depthNorm)
         Else
-            task.depthRGB = task.buildCorr.dst2.Clone
+            dst1.SetTo(0)
+            If task.gOptions.DepthCorrelations.Checked Then
+                For Each brick In task.brickList
+                    If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
+                Next
+            Else
+                For Each brick In task.brickList
+                    If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
+                Next
+            End If
+
+            If task.gOptions.DepthCorrelations.Checked Then
+                task.depthRGB = ShowPaletteCorrelation(dst1)
+            Else
+                task.depthRGB = ShowPaletteDepth(dst1)
+            End If
+            task.depthRGB.SetTo(0, task.noDepthMask)
         End If
-        If standaloneTest() Then dst2 = task.depthRGB.Clone
+        labels(2) = task.brickBasics.labels(2)
+
+        If standaloneTest() Then dst2 = task.depthRGB
     End Sub
 End Class
 

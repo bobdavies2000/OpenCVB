@@ -1711,8 +1711,8 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.brickBasics.dst2
-        dst3 = task.buildCorr.dst2
-        labels(3) = task.buildCorr.labels(2)
+        dst3 = task.colorizer.dst2
+        labels(3) = task.colorizer.labels(2)
         Dim quadData As New List(Of cv.Point3f)
         For Each brick In task.brickList
             If brick.depth = 0 Then Continue For

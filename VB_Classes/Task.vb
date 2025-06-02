@@ -131,7 +131,6 @@ Public Class VBtask : Implements IDisposable
     ' Public fcsBasics As FCS_Basics
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
-    Public buildCorr As Brick_CorrelationMap
     Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
@@ -262,7 +261,6 @@ Public Class VBtask : Implements IDisposable
     Public vecColors(255) As cv.Vec3b
     Public depthColorMap As cv.Mat
     Public correlationColorMap As cv.Mat
-    Public depthColorList As New List(Of cv.Vec3b)
 
     Public topCameraPoint As cv.Point
     Public sideCameraPoint As cv.Point
@@ -534,7 +532,6 @@ Public Class VBtask : Implements IDisposable
         brickBasics = New Brick_Basics
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
-        buildCorr = New Brick_CorrelationMap
         LRMeanSub = New MeanSubtraction_LeftRight
         lineRGB = New LineRGB_Basics
         rgbFilter = New Filter_Basics
@@ -790,7 +787,6 @@ Public Class VBtask : Implements IDisposable
         edges.Run(task.grayStable)
         contours.Run(src)
         brickBasics.Run(src)
-        buildCorr.Run(src)
 
         task.colorizer.Run(src)
 

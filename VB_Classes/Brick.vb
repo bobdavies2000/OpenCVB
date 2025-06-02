@@ -112,7 +112,7 @@ Public Class Brick_Basics : Inherits TaskParent
             labels(2) = CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) + " are featureless - " +
                         Format(brickFull / task.gridRects.Count, "00%") +
                         " of bricks were fully interior in the " + CStr(task.contourList.Count) + " contours." +
-                        CStr(brickPartial) + " partial contour bricks (blue)"
+                        CStr(brickPartial) + " partial contour bricks"
         End If
 
         DrawFullPartialBricks()
@@ -126,7 +126,6 @@ Public Class Brick_Basics : Inherits TaskParent
             contour.depth = depth / contour.bricks.Count
         Next
         dst3 = ShowPaletteCorrelation(task.contourMap)
-        cv.Cv2.ImShow("dst3", dst3)
     End Sub
 End Class
 
@@ -782,34 +781,6 @@ End Class
 
 
 
-
-
-
-Public Class Brick_CorrelationMap : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Basics
-    Public Sub New()
-        labels(3) = "The map to identify each brick."
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        For Each brick In task.brickList
-            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
-        Next
-
-        dst2 = ShowPaletteDepth(dst1)
-        labels(2) = task.brickBasics.labels(2)
-
-        ptBrick.Run(src)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Brick_LeftRightMouse : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()
@@ -928,5 +899,42 @@ Public Class Brick_LeftRight : Inherits TaskParent
                 End If
             Next
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Brick_Map : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "The map to identify each brick's depth."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each brick."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        If task.gOptions.DepthCorrelations.Checked Then
+            For Each brick In task.brickList
+                If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
+            Next
+        Else
+            For Each brick In task.brickList
+                If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
+            Next
+        End If
+
+        If task.gOptions.DepthCorrelations.Checked Then
+            dst2 = ShowPaletteCorrelation(dst1)
+        Else
+            dst2 = ShowPaletteDepth(dst1)
+        End If
+        dst2.SetTo(0, task.noDepthMask)
+        labels(2) = task.brickBasics.labels(2)
     End Sub
 End Class
