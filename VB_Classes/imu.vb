@@ -1033,7 +1033,7 @@ End Class
 
 
 Public Class IMU_VerticalVerify : Inherits TaskParent
-    Public gCells As New List(Of gravityLine)
+    Public brickCells As New List(Of gravityLine)
     Dim linesVH As New FeatureLine_VH
     Dim options As New Options_VerticalVerify
     Public Sub New()
@@ -1047,16 +1047,16 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
 
         If standaloneTest() Then
             linesVH.Run(src)
-            gCells = linesVH.gCells
+            brickCells = linesVH.brickCells
         End If
 
         strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
         dst3.SetTo(0)
         Dim index As Integer
-        For i = gCells.Count - 1 To 0 Step -1
-            Dim brick = gCells(i)
+        For i = brickCells.Count - 1 To 0 Step -1
+            Dim brick = brickCells(i)
             If brick.arcY > options.angleThreshold Then
-                index = gCells.Count - i
+                index = brickCells.Count - i
                 Dim p1 = brick.tc1.center
                 Dim p2 = brick.tc2.center
                 Dim xOffset = p1.X - p2.X
@@ -1074,9 +1074,9 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
                 SetTrueText(CStr(index), brick.tc1.center, 3)
                 DrawLine(dst2, brick.tc1.center, brick.tc2.center, task.highlight)
                 DrawLine(dst3, brick.tc1.center, brick.tc2.center, white)
-                gCells(i) = brick
+                brickCells(i) = brick
             Else
-                gCells.RemoveAt(i)
+                brickCells.RemoveAt(i)
             End If
         Next
         SetTrueText(strOut, 3)

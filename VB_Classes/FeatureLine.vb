@@ -32,7 +32,7 @@ End Class
 
 
 Public Class FeatureLine_VH : Inherits TaskParent
-    Public gCells As New List(Of gravityLine)
+    Public brickCells As New List(Of gravityLine)
     Dim match As New Match_tCell
     Dim gLines As New LineRGB_GCloud
     Dim options As New Options_Features
@@ -54,7 +54,7 @@ Public Class FeatureLine_VH : Inherits TaskParent
         End If
 
         Dim brick As gravityLine
-        gCells.Clear()
+        brickCells.Clear()
         match.tCells.Clear()
         For i = 0 To sortedLines.Count - 1
             brick = sortedLines.ElementAt(i).Value
@@ -74,15 +74,15 @@ Public Class FeatureLine_VH : Inherits TaskParent
                 brick.tc1 = match.tCells(0)
                 brick.tc2 = match.tCells(1)
                 brick = gLines.updateGLine(src, brick, brick.tc1.center, brick.tc2.center)
-                If brick.len3D > 0 Then gCells.Add(brick)
+                If brick.len3D > 0 Then brickCells.Add(brick)
             End If
         Next
 
         dst2 = src
         dst3.SetTo(0)
-        For i = 0 To gCells.Count - 1
+        For i = 0 To brickCells.Count - 1
             Dim tc As tCell
-            brick = gCells(i)
+            brick = brickCells(i)
             Dim p1 As cv.Point2f, p2 As cv.Point2f
             For j = 0 To 2 - 1
                 tc = Choose(j + 1, brick.tc1, brick.tc2)

@@ -1701,35 +1701,6 @@ End Class
 
 
 
-'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
-Public Class OpenGL_QuadSimple : Inherits TaskParent
-    Public Sub New()
-        task.ogl.oglFunction = oCase.quadBasics
-        desc = "Create a simple plane in each roi of the RedCloud data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.depthRGB
-        labels = task.brickBasics.labels
-        Dim quadData As New List(Of cv.Point3f)
-        For Each brick In task.brickList
-            quadData.Add(brick.color)
-            For Each pt In brick.corners
-                quadData.Add(pt)
-            Next
-            dst2(brick.rect).SetTo(brick.color)
-        Next
-        task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
-
-        task.ogl.pointCloudInput = New cv.Mat()
-        task.ogl.Run(dst3)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadDepth : Inherits TaskParent
@@ -1740,7 +1711,8 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.brickBasics.dst2
-        dst3 = task.brickBasics.dst3
+        dst3 = task.buildCorr.dst2
+        labels(3) = task.buildCorr.labels(2)
         Dim quadData As New List(Of cv.Point3f)
         For Each brick In task.brickList
             If brick.depth = 0 Then Continue For

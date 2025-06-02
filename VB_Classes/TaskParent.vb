@@ -522,7 +522,7 @@ Public Class TaskParent : Implements IDisposable
     Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar, Optional fillFlag As Integer = -1)
         dst.Circle(pt, radius, color, fillFlag, task.lineType)
     End Sub
-    Public Sub DrawContourBricks()
+    Public Sub DrawFullPartialBricks()
         For Each brick In task.brickList
             If brick.contourFull <> 0 Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
             If brick.contourPartial <> 0 Then dst2.Rectangle(brick.rect, blue, task.lineWidth)
@@ -549,6 +549,7 @@ Public Class TaskParent : Implements IDisposable
     Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
         cv.Cv2.ApplyColorMap(input, output, task.depthColorMap)
+        output.SetTo(0, task.noDepthMask)
         Return output
     End Function
     Public Function ShowPaletteCorrelation(input As cv.Mat) As cv.Mat

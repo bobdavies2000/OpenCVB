@@ -84,7 +84,7 @@ Public Class Brick_Basics : Inherits TaskParent
                 brick.depthRanges.Add(brick.mm.range)
             End If
 
-            dst2(brick.rect).SetTo(brick.color)
+            'dst2(brick.rect).SetTo(brick.color)
 
             If brick.depth > 0 Then depthCount += 1
             If brick.depthRanges.Count > task.historyCount Then
@@ -115,7 +115,7 @@ Public Class Brick_Basics : Inherits TaskParent
                         CStr(brickPartial) + " partial contour bricks (blue)"
         End If
 
-        DrawContourBricks()
+        DrawFullPartialBricks()
 
         Dim depth As Single
         For Each contour In task.contourList
@@ -125,7 +125,8 @@ Public Class Brick_Basics : Inherits TaskParent
             Next
             contour.depth = depth / contour.bricks.Count
         Next
-        dst3 = ShowPalette(task.contourMap)
+        dst3 = ShowPaletteCorrelation(task.contourMap)
+        cv.Cv2.ImShow("dst3", dst3)
     End Sub
 End Class
 
@@ -797,7 +798,7 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
             If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
         Next
 
-        dst2 = ShowPaletteCorrelation(dst1)
+        dst2 = ShowPaletteDepth(dst1)
         labels(2) = task.brickBasics.labels(2)
 
         ptBrick.Run(src)

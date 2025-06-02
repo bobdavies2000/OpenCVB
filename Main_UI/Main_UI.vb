@@ -1476,9 +1476,6 @@ Public Class Main_UI
 
         Debug.WriteLine("Main_UI.StartTask completed.")
     End Sub
-    Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
-        activateTaskForms = True
-    End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
         If parms.algName = "" Then Exit Sub
         algorithmQueueCount += 1

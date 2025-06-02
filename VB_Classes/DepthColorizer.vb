@@ -32,14 +32,14 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             saveDepthColorList = New List(Of cv.Vec3b)(task.depthColorList)
         Else
             ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
-            ' Colors will be different when OpenCVB is restarted.  Don't like the colors?  Restart.
+            ' Colors will be different when OpenCVB is restarted.  
             task.vecColors = saveVecColors
             task.scalarColors = saveScalarColors
             task.depthColorMap = saveDepthColorMap
             task.depthColorList = saveDepthColorList
         End If
 
-        Dim color4 = cv.Scalar.Red, color3 = New cv.Scalar
+        Dim color3 = cv.Scalar.Black, color4 = cv.Scalar.Red
         Dim corrColors = New List(Of cv.Vec3b)
         f = 1.0
         For i = 0 To gradientWidth - 1
@@ -58,10 +58,10 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         If task.gOptions.GridDepth.Checked Then
             task.depthRGB = task.brickBasics.dst2
         ElseIf task.gOptions.ColorizedDepth.Checked Then
-            src = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
-            Dim depthNorm As cv.Mat = src * 255 / task.MaxZmeters
+            Dim depthNorm As cv.Mat = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
+            depthNorm = depthNorm * 255 / task.MaxZmeters
             depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-            cv.Cv2.ApplyColorMap(depthNorm, task.depthRGB, task.depthColorMap)
+            task.depthRGB = ShowPaletteCorrelation(depthNorm)
         Else
             task.depthRGB = task.buildCorr.dst2.Clone
         End If

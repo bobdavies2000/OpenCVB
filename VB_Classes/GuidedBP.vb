@@ -206,17 +206,6 @@ Public Class GuidedBP_Depth : Inherits TaskParent
             If index >= 255 Then Exit For
         Next
 
-        'classCount = 0
-        'Dim count As Integer
-        'Dim newSamples(histArray.Count - 1) As Single
-        'For i = 0 To sortedHist.Count - 1
-        '    Dim index = sortedHist.ElementAt(i).Value
-        '    count += sortedHist.ElementAt(i).Key
-        '    newSamples(index) = classCount
-        '    classCount += 1
-        '    If classCount >= 255 Then Exit For
-        'Next
-
         Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
 
         cv.Cv2.CalcBackProject({src}, task.redOptions.channels, hist.histogram, dst2, task.redOptions.ranges)

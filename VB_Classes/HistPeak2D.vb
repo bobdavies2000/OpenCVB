@@ -28,6 +28,8 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
         histogram.SetTo(0, Not mask)
 
         If ranges Is Nothing Or task.optionsChanged Then
+            ' the pcsplit arrays have been patched for inf and nan's already in task.vb.
+            If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.Merge(task.pcSplit, src)
             ranges = GetHist2Dminmax(src, task.redOptions.channels(0), task.redOptions.channels(1))
         End If
 

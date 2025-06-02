@@ -30,7 +30,6 @@ Partial Class Main_UI
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
         Me.Magnify = New System.Windows.Forms.ToolStripButton()
         Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
         Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
         Me.GroupButtonList = New System.Windows.Forms.ToolStripButton()
@@ -50,6 +49,7 @@ Partial Class Main_UI
         Me.CameraSwitching = New System.Windows.Forms.Label()
         Me.CamSwitchProgress = New System.Windows.Forms.PictureBox()
         Me.CamSwitchTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.CamSwitchProgress, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -111,16 +111,6 @@ Partial Class Main_UI
         Me.PixelViewerButton.Name = "PixelViewerButton"
         Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
         Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
-        '
-        'ToolStripButton1
-        '
-        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 29)
-        Me.ToolStripButton1.Text = "ToolStripButton1"
-        Me.ToolStripButton1.ToolTipText = "Bring Task forms to the front."
         '
         'RecentList
         '
@@ -252,6 +242,17 @@ Partial Class Main_UI
         'CamSwitchTimer
         '
         Me.CamSwitchTimer.Enabled = True
+        '
+        'ToolStripButton1
+        '
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 29)
+        Me.ToolStripButton1.Text = "ToolStripButton1"
+        Me.ToolStripButton1.ToolTipText = "Bring Task forms to the front."
+        Me.ToolStripButton1.Visible = False
         '
         'Main_UI
         '

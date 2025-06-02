@@ -91,7 +91,7 @@ Public Class Contour_Bricks : Inherits TaskParent
         Dim index = task.contourMap.Get(Of Byte)(pt.Y, pt.X)
         task.contourD = task.contourList(index)
 
-        DrawContourBricks()
+        DrawFullPartialBricks()
 
         labels(2) = task.contours.labels(2)
     End Sub
