@@ -49,73 +49,6 @@ End Class
 
 
 
-Public Class RedCloud_PrepData : Inherits TaskParent
-    Dim plot As New Plot_Histogram
-    Public Sub New()
-        desc = "Reduction transform for the point cloud"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split() As cv.Mat = {New cv.Mat, New cv.Mat, New cv.Mat}
-        Dim input() As cv.Mat = task.pcSplit
-        If src.Type = cv.MatType.CV_32FC3 Then input = src.Split
-        Dim reduceAmt = task.redOptions.rcReductionSlider.Value
-        input(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
-        input(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
-        input(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
-
-        Select Case task.redOptions.PointCloudReduction
-            Case 0 ' X Reduction
-                dst0 = (split(0) * reduceAmt).ToMat
-            Case 1 ' Y Reduction
-                dst0 = (split(1) * reduceAmt).ToMat
-            Case 2 ' Z Reduction
-                dst0 = (split(2) * reduceAmt).ToMat
-            Case 3 ' XY Reduction
-                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).ToMat
-            Case 4 ' XZ Reduction
-                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).ToMat
-            Case 5 ' YZ Reduction
-                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).ToMat
-            Case 6 ' XYZ Reduction
-                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).ToMat
-        End Select
-
-        Dim mm As mmData = GetMinMax(dst0)
-        dst2 = (dst0 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        dst2.SetTo(0, task.noDepthMask)
-
-        If standaloneTest() Then
-            If task.heartBeat Then
-                mm = GetMinMax(dst2)
-                plot.createHistogram = True
-                plot.removeZeroEntry = False
-                plot.maxRange = mm.maxVal
-                plot.Run(dst2)
-                dst3 = plot.dst2
-
-                For i = 0 To plot.histArray.Count - 1
-                    plot.histArray(i) = i
-                Next
-
-                Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
-                cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
-                dst3 = ShowPalette(dst1)
-                labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
-            End If
-        End If
-
-        labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " +
-                    CStr(reduceAmt)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class RedCloud_BasicsHist : Inherits TaskParent
     Dim plot As New Plot_Histogram
@@ -283,3 +216,141 @@ Public Class RedCloud_World : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class RedCloud_PrepData : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim split() As cv.Mat = {New cv.Mat, New cv.Mat, New cv.Mat}
+        Dim input() As cv.Mat = task.pcSplit
+        If src.Type = cv.MatType.CV_32FC3 Then input = src.Split
+        Dim reduceAmt = task.redOptions.rcReductionSlider.Value
+        input(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
+        input(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
+        input(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
+
+        Select Case task.redOptions.PointCloudReduction
+            Case 0 ' X Reduction
+                dst0 = (split(0) * reduceAmt).ToMat
+            Case 1 ' Y Reduction
+                dst0 = (split(1) * reduceAmt).ToMat
+            Case 2 ' Z Reduction
+                dst0 = (split(2) * reduceAmt).ToMat
+            Case 3 ' XY Reduction
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).ToMat
+            Case 4 ' XZ Reduction
+                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).ToMat
+            Case 5 ' YZ Reduction
+                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).ToMat
+            Case 6 ' XYZ Reduction
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).ToMat
+        End Select
+
+        Dim mm As mmData = GetMinMax(dst0)
+        Dim dst32f As New cv.Mat
+        If Math.Abs(mm.minVal) > mm.maxVal Then
+            mm.minVal = -mm.maxVal
+            dst0.ConvertTo(dst32f, cv.MatType.CV_32F)
+            Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
+            mask.ConvertTo(mask, cv.MatType.CV_8U)
+            dst32f.SetTo(mm.minVal, mask)
+        End If
+        dst2 = (dst0 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        dst2.SetTo(0, task.noDepthMask)
+
+        If standaloneTest() Then
+            If task.heartBeat Then
+                mm = GetMinMax(dst2)
+                plot.createHistogram = True
+                plot.removeZeroEntry = False
+                plot.maxRange = mm.maxVal
+                plot.Run(dst2)
+                dst3 = plot.dst2
+
+                For i = 0 To plot.histArray.Count - 1
+                    plot.histArray(i) = i
+                Next
+
+                Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
+                cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
+                dst3 = ShowPalette(dst1)
+                labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
+            End If
+        End If
+
+        labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " + CStr(reduceAmt)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_PrepDataNew : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+
+        Dim ranges As cv.Rangef()
+        Select Case task.redOptions.PointCloudReduction
+            Case 0 ' X Reduction
+                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Case 1 ' Y Reduction
+                ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
+                cv.Cv2.CalcHist({task.pcSplit(1)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Case 2 ' Z Reduction
+                ranges = New cv.Rangef() {New cv.Rangef(0, task.MaxZmeters)}
+                cv.Cv2.CalcHist({task.pcSplit(2)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Case 3 ' XY Reduction
+                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Case 4 ' XZ Reduction
+                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Case 5 ' YZ Reduction
+                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Case 6 ' XYZ Reduction
+                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+        End Select
+
+        Dim histArray(histogram.Total - 1) As Single
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+        For i = 0 To histArray.Count - 1
+            histArray(i) = i
+        Next
+
+        histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
+        cv.Cv2.CalcBackProject({task.pcSplit(0)}, {0}, histogram, dst3, ranges)
+        dst3.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst2 = ShowPalette(dst1)
+        dst2.SetTo(0, task.noDepthMask)
+
+        labels(2) = "Pointcloud data backprojection to " + CStr(task.histogramBins) + " classes."
+    End Sub
+End Class

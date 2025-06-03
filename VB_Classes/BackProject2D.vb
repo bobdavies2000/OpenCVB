@@ -194,7 +194,7 @@ Public Class BackProject2D_Filter : Inherits TaskParent
         If standaloneTest() Then
             cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
         End If
-        histogram.Col(0).SetTo(0)
+        'histogram.Col(0).SetTo(0)
         dst2 = histogram.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
