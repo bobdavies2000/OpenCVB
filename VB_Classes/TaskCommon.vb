@@ -720,7 +720,6 @@ Public Class brickData
     Public intensity As Byte ' sobel maximum intensity in this brick.
     Public pt As cv.Point ' Brick's Sobel maximum in absolute coordinates.
     Sub New()
-        Dim stdev As cv.Scalar
         index = task.brickList.Count
         rect = task.gridRects(index)
         lRect = rect
@@ -729,9 +728,8 @@ Public Class brickData
         age = task.motionBasics.cellAge(index)
         color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
-        Dim pt3D As cv.Scalar ' average of the X, Y, and Z values of the point cloud for this brick.
-        cv.Cv2.MeanStdDev(task.pcSplit(2)(rect), pt3D, stdev, task.depthMask(rect))
-        depth = pt3D(0)
+
+        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))
 
         If depth > 0 Then
             task.pcSplit(2)(rect).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(rect))
@@ -745,9 +743,11 @@ End Class
 Public Class contourData
     Public rect As cv.Rect
     Public mask As cv.Mat
+    Public center As cv.Point
     Public pixels As Integer
     Public index As Integer
     Public depth As Single
+    Public mm As mmData
     Public bricks As New List(Of Integer)
     Public brickPartial As New List(Of Integer)
     Public Function buildRect(tour As cv.Point()) As cv.Rect

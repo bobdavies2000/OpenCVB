@@ -132,7 +132,7 @@ Public Class RedCloud_BasicsHist : Inherits TaskParent
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)
-            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + "meters - verticals every meter"
+            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + "meters - vertical lines every meter"
 
             Dim incr = dst2.Width / task.MaxZmeters
             For i = 1 To CInt(task.MaxZmeters - 1)

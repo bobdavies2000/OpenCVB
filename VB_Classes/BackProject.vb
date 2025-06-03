@@ -788,15 +788,16 @@ Public Class BackProject_FullDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
-        classCount = task.histogramBins
+        classCount = task.histogramBins + 1
 
         src.SetTo(task.MaxZmeters, task.maxDepthMask)
         plotHist.Run(src)
         dst1 = plotHist.dst2
 
         For i = 0 To classCount - 1
-            plotHist.histogram.Set(Of Single)(i, 0, i)
+            plotHist.histogram.Set(Of Single)(i, 0, i + 1)
         Next
+
         Dim histArray(plotHist.histogram.Rows - 1) As Single
         Marshal.Copy(plotHist.histogram.Data, histArray, 0, histArray.Length)
 
@@ -828,6 +829,33 @@ Public Class BackProject_Basics_Depth : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bpDepth.Run(src)
         dst2 = ShowPalette(bpDepth.dst2)
+        dst2.SetTo(0, task.noDepthMask)
         labels(2) = bpDepth.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BackProject_DepthSlider : Inherits TaskParent
+    Public bpDepth As New BackProject_FullDepth
+    Public Sub New()
+        task.gOptions.HistBinBar.Value = 20
+        desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bpDepth.Run(src)
+        dst2 = ShowPalette(bpDepth.dst2)
+        dst2.SetTo(0, task.noDepthMask)
+        labels(2) = bpDepth.labels(2)
+
+        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+        If index >= bpDepth.classCount Then index = bpDepth.classCount - 1
+        dst3 = bpDepth.dst2.InRange(index, index)
+        Dim count = dst3.CountNonZero
+        labels(3) = "Class " + CStr(index) + " had " + CStr(count) + " pixels after backprojection."
     End Sub
 End Class

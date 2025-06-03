@@ -672,7 +672,7 @@ Public Class Brick_Info : Inherits TaskParent
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim brick As brickData = task.brickList(index)
-        dst2 = task.brickBasics.dst2
+        dst2 = src
 
         strOut = labels(2) + vbCrLf + vbCrLf
 
@@ -680,7 +680,7 @@ Public Class Brick_Info : Inherits TaskParent
 
         strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
-        strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
+        strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation of the left image to right image" + vbCrLf
         strOut += Format(brick.depth, fmt3) + vbTab + "Depth" + vbCrLf
         strOut += Format(brick.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
         strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
