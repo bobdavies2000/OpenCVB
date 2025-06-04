@@ -55,9 +55,6 @@ Partial Class OptionsRedCloud
         Me.YReduction = New System.Windows.Forms.RadioButton()
         Me.XReduction = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.rcReductionSlider = New System.Windows.Forms.TrackBar()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.Label3 = New System.Windows.Forms.Label()
         Me.LabelIdentify = New System.Windows.Forms.Label()
         Me.IdentifyCountBar = New System.Windows.Forms.TrackBar()
         Me.IdentifyCountLabel = New System.Windows.Forms.Label()
@@ -79,7 +76,6 @@ Partial Class OptionsRedCloud
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
-        CType(Me.rcReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
@@ -433,9 +429,6 @@ Partial Class OptionsRedCloud
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.rcReductionSlider)
-        Me.GroupBox2.Controls.Add(Me.Label1)
-        Me.GroupBox2.Controls.Add(Me.Label3)
         Me.GroupBox2.Controls.Add(Me.LabelIdentify)
         Me.GroupBox2.Controls.Add(Me.IdentifyCountBar)
         Me.GroupBox2.Controls.Add(Me.IdentifyCountLabel)
@@ -448,35 +441,6 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.TabIndex = 9
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "RedCloud Options"
-        '
-        'rcReductionSlider
-        '
-        Me.rcReductionSlider.Location = New System.Drawing.Point(180, 171)
-        Me.rcReductionSlider.Maximum = 2500
-        Me.rcReductionSlider.Minimum = 1
-        Me.rcReductionSlider.Name = "rcReductionSlider"
-        Me.rcReductionSlider.Size = New System.Drawing.Size(482, 69)
-        Me.rcReductionSlider.TabIndex = 34
-        Me.rcReductionSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.rcReductionSlider.Value = 250
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(21, 171)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(157, 20)
-        Me.Label1.TabIndex = 33
-        Me.Label1.Text = "RedCloud Reduction"
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(668, 177)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(57, 20)
-        Me.Label3.TabIndex = 35
-        Me.Label3.Text = "Label7"
         '
         'LabelIdentify
         '
@@ -611,7 +575,6 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
-        CType(Me.rcReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
@@ -661,8 +624,5 @@ Partial Class OptionsRedCloud
     Friend WithEvents TrackingDepthColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
-    Friend WithEvents rcReductionSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label1 As Windows.Forms.Label
-    Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents DisplayCellStats As Windows.Forms.CheckBox
 End Class

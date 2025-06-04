@@ -3,7 +3,6 @@ Public Class Boundary_Basics : Inherits TaskParent
     Public redCPP As New RedColor_CPP
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.redOptions.IdentifyCountBar.Value = 100
         task.redOptions.ColorSource.SelectedItem = "Bin4Way_Regions"
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries"
@@ -160,7 +159,6 @@ End Class
 Public Class Boundary_RedCloud : Inherits TaskParent
     Dim rCloud As New RedCloud_PrepData
     Public Sub New()
-        task.redOptions.IdentifyCountBar.Value = 100
         task.gOptions.MaxDepthBar.Value = 20
         task.redOptions.TrackingColor.Checked = True
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -187,7 +185,6 @@ End Class
 Public Class Boundary_GuidedBP : Inherits TaskParent
     Dim guided As New GuidedBP_Depth
     Public Sub New()
-        task.redOptions.IdentifyCountBar.Value = 100
         task.gOptions.HistBinBar.Value = 100
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"

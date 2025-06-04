@@ -109,9 +109,6 @@ Public Class OptionsRedCloud
         task.redOptions.setBitReductionBar(5)
         TrackingColor.Checked = True
 
-        rcReductionSlider.Value = 50
-        Label3.Text = CStr(rcReductionSlider.Value)
-
         Me.Left = 0
         Me.Top = 30
     End Sub
@@ -333,10 +330,6 @@ Public Class OptionsRedCloud
 
 
 
-    Private Sub rcReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles rcReductionSlider.ValueChanged
-        task.optionsChanged = True
-        Label3.Text = CStr(rcReductionSlider.Value)
-    End Sub
     Private Sub TrackingMeanColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingMeanColor.CheckedChanged
         trackingLabel = TrackingMeanColor.Text
         trackingIndex = TaskParent.trackColor.meanColor

@@ -683,7 +683,6 @@ Public Class MSER_CPP : Inherits TaskParent
             dst3 = src
             For i = 0 To boxes.Count - 1
                 dst3.Rectangle(boxes(i), task.highlight, task.lineWidth)
-                If i < task.redOptions.IdentifyCountBar.Value Then SetTrueText(CStr(i + 1), boxes(i).TopLeft, 3)
             Next
         End If
         labels(2) = CStr(classcount) + " regions identified"

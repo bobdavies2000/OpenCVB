@@ -37,7 +37,6 @@ Public Class Projection_Basics : Inherits TaskParent
             rcList.Add(rc)
         Next
 
-        Dim otherCount As Integer
         Dim meterDesc = "tall"
         Dim ranges = task.rangesSide
         If viewType = "Top" Then
@@ -49,39 +48,34 @@ Public Class Projection_Basics : Inherits TaskParent
         If task.heartBeat Then strOut = ""
         For Each rc In rcList
             If rc.index = 0 Then Continue For
-            If rc.index <= task.redOptions.IdentifyCountBar.Value Then
-                If viewType = "Side" Then
-                    xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
-                    xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
-                    z1 = (ranges(1).End - ranges(1).Start) * rc.rect.X / dst2.Width
-                    z2 = (ranges(1).End - ranges(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width
-                Else
-                    xy1 = (ranges(1).End - ranges(1).Start) * rc.rect.X / dst2.Width + ranges(1).Start
-                    xy2 = (ranges(1).End - ranges(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width + ranges(1).Start
-                    z1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height
-                    z2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height
-                End If
-                objectList.Add(New cv.Vec4f(xy1, xy2, z1, z2))
-                If task.heartBeat Then
-                    strOut += "Object " + vbTab + CStr(rc.index) + vbTab + Format(xy2 - xy1, fmt3) + " m " + meterDesc + vbTab +
-                               Format(z1, fmt1) + "m " + " to " + Format(z2, fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
-                End If
+            If viewType = "Side" Then
+                xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
+                xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
+                z1 = (ranges(1).End - ranges(1).Start) * rc.rect.X / dst2.Width
+                z2 = (ranges(1).End - ranges(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width
             Else
-                otherCount += rc.pixels
+                xy1 = (ranges(1).End - ranges(1).Start) * rc.rect.X / dst2.Width + ranges(1).Start
+                xy2 = (ranges(1).End - ranges(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width + ranges(1).Start
+                z1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height
+                z2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height
+            End If
+            objectList.Add(New cv.Vec4f(xy1, xy2, z1, z2))
+            If task.heartBeat Then
+                strOut += "Object " + vbTab + CStr(rc.index) + vbTab + Format(xy2 - xy1, fmt3) + " m " + meterDesc + vbTab +
+                                   Format(z1, fmt1) + "m " + " to " + Format(z2, fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
             End If
         Next
 
         If task.heartBeat Then
             Dim check1 = src.Sum()(0)
             Dim depthCount = task.pcSplit(2).CountNonZero
-            strOut += CStr(rcList.Count - task.redOptions.IdentifyCountBar.Value - 1) + " other objects " + vbTab + CStr(otherCount) + " pixels" + vbCrLf
             strOut += "Sum above   " + vbTab + CStr(check2) + " pixels" + " (losses from histogram ranges?)" + vbCrLf
             strOut += "Sum of src  " + vbTab + CStr(check1) + " pixels" + " (losses from RedCloud.)" + vbCrLf
             strOut += "Actual count" + vbTab + CStr(depthCount) + " pixels" + vbCrLf
         End If
         SetTrueText(strOut, 3)
         If showRectangles Then
-            For i = 0 To Math.Min(rcList.Count, task.redOptions.IdentifyCountBar.Value) - 1
+            For i = 0 To rcList.Count - 1
                 dst2.Rectangle(rcList(i).rect, task.highlight, task.lineWidth)
             Next
         End If

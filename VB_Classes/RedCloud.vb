@@ -6,7 +6,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Dim rcMask As cv.Mat
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        task.redOptions.rcReductionSlider.Value = 100
         rcMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
@@ -202,7 +201,6 @@ Public Class RedCloud_World : Inherits TaskParent
     Dim prep As New RedCloud_PrepData
     Public Sub New()
         task.redOptions.IdentifyCountBar.Value = 100
-        task.redOptions.rcReductionSlider.Value = 1000
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "Generated pointcloud"
         desc = "Display the output of a generated pointcloud as RedCloud cells"
@@ -232,7 +230,7 @@ Public Class RedCloud_PrepData : Inherits TaskParent
         Dim split() As cv.Mat = {New cv.Mat, New cv.Mat, New cv.Mat}
         Dim input() As cv.Mat = task.pcSplit
         If src.Type = cv.MatType.CV_32FC3 Then input = src.Split
-        Dim reduceAmt = task.redOptions.rcReductionSlider.Value
+        Dim reduceAmt = 50
         input(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
         input(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
         input(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
@@ -435,6 +433,7 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
 
             histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
             cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
+
             If i = 0 Then dst1 = dst0.Clone Else dst1 += dst0
         Next
 
@@ -442,6 +441,11 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
         mm = GetMinMax(dst1)
         dst3 = (dst1 * 255 / mm.maxVal).ToMat
         dst2 = ShowPalette(dst3)
+
+        'Static canny As New Edge_Canny
+        'canny.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        'dst2.SetTo(0, canny.dst2)
+
         labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
     End Sub
 End Class
