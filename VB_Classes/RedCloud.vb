@@ -298,7 +298,7 @@ End Class
 
 
 
-Public Class RedCloud_PrepDataNew : Inherits TaskParent
+Public Class RedCloud_PrepDataOld : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
@@ -360,5 +360,107 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
         dst2.SetTo(0, task.noDepthMask)
 
         labels(2) = "Pointcloud data backprojection to " + CStr(task.histogramBins) + " classes."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_PrepDataNew : Inherits TaskParent
+    Dim mats As New Mat_4Click
+    Public Sub New()
+        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+
+        For i = 0 To 2
+            Select Case i
+                Case 0 ' X Reduction
+                    dst0 = task.pcSplit(0)
+                Case 1 ' Y Reduction
+                    dst0 = task.pcSplit(1)
+                Case 2 ' Z Reduction
+                    dst0 = task.pcSplit(2)
+                Case 3 ' XY Reduction
+                    dst0 = task.pcSplit(0) + task.pcSplit(1)
+                Case 4 ' XZ Reduction
+                    dst0 = task.pcSplit(0) + task.pcSplit(2)
+                Case 5 ' YZ Reduction
+                    dst0 = task.pcSplit(1) + task.pcSplit(2)
+                Case 6 ' XYZ Reduction
+                    dst0 = task.pcSplit(0) + task.pcSplit(1) + task.pcSplit(2)
+            End Select
+
+            Dim mm = GetMinMax(dst0)
+            Dim ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
+            cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Dim histArray(histogram.Total - 1) As Single
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+            For j = 0 To histArray.Count - 1
+                histArray(j) = j
+            Next
+
+            histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
+            cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
+            dst0.ConvertTo(dst1, cv.MatType.CV_8U)
+            mats.mat(i) = ShowPalette(dst1)
+            mats.mat(i).SetTo(0, task.noDepthMask)
+        Next
+
+        mats.Run(emptyMat)
+        dst2 = mats.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Mats : Inherits TaskParent
+    Dim mats As New Mat_4Click
+    Public Sub New()
+        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+
+        For i = 0 To 2
+            Select Case i
+                Case 0 ' X Reduction
+                    dst0 = task.pcSplit(0)
+                Case 1 ' Y Reduction
+                    dst0 = task.pcSplit(1)
+                Case 2 ' Z Reduction
+                    dst0 = task.pcSplit(2)
+            End Select
+
+            Dim mm = GetMinMax(dst0)
+            Dim ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
+            cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Dim histArray(histogram.Total - 1) As Single
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+            For j = 0 To histArray.Count - 1
+                histArray(j) = j
+            Next
+
+            histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
+            cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
+            dst0.ConvertTo(dst1, cv.MatType.CV_8U)
+            mats.mat(i) = ShowPalette(dst1)
+            mats.mat(i).SetTo(0, task.noDepthMask)
+        Next
+
+        mats.Run(emptyMat)
+        dst2 = mats.dst2
     End Sub
 End Class
