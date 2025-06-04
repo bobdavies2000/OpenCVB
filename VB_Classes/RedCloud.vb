@@ -310,35 +310,32 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
         Dim channels() As Integer = {0, 1}
         Select Case task.redOptions.PointCloudReduction
             Case 0 ' X Reduction
-                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
+                If task.optionsChanged Then task.gOptions.setHistogramBins(8)
                 ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
                 dst0 = task.pcSplit(0)
                 cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 1 ' Y Reduction
-                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
+                If task.optionsChanged Then task.gOptions.setHistogramBins(8)
                 ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
                 dst0 = task.pcSplit(1)
                 cv.Cv2.CalcHist({task.pcSplit(1)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 2 ' Z Reduction
-                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
+                If task.optionsChanged Then task.gOptions.setHistogramBins(8)
                 ranges = New cv.Rangef() {New cv.Rangef(-0.01, task.MaxZmeters + 0.01)}
                 dst0 = task.pcSplit(2)
                 cv.Cv2.CalcHist({task.pcSplit(2)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 3 ' XY Reduction
-                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
-                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(-task.yRange, task.yRange)}
                 dst0 = task.pcSplit(0) + task.pcSplit(1)
-                cv.Cv2.CalcHist({task.pointCloud}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 4 ' XZ Reduction
                 If task.optionsChanged Then task.gOptions.setHistogramBins(16)
                 channels = {0, 2}
                 ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.MaxZmeters)}
                 dst0 = task.pcSplit(0) + task.pcSplit(2)
-                cv.Cv2.CalcHist({task.pointCloud}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+                cv.Cv2.CalcHist({dst0}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 5 ' YZ Reduction
                 If task.optionsChanged Then task.gOptions.setHistogramBins(16)
@@ -353,10 +350,29 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
                 ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange),
                                           New cv.Rangef(-task.yRange, task.yRange),
                                           New cv.Rangef(0, task.MaxZmeters)}
-                dst0 = task.pcSplit(1) + task.pcSplit(2)
+                dst0 = task.pcSplit(0) + task.pcSplit(1) + task.pcSplit(2)
                 cv.Cv2.CalcHist({task.pointCloud}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
-
         End Select
+
+        Dim mm = GetMinMax(dst0)
+        Dim minVal = Math.Abs(mm.minVal)
+        Dim maxVal = Math.Abs(mm.maxVal)
+        If minVal > maxVal Then
+            ranges = New cv.Rangef() {New cv.Rangef(-maxVal, maxVal)}
+            Dim mask = dst0.Threshold(-maxVal, -maxVal, cv.ThresholdTypes.BinaryInv)
+            mask.ConvertTo(mask, cv.MatType.CV_8U)
+            dst0.SetTo(-maxVal, mask)
+        Else
+            If minVal <> 0 Then
+                maxVal = minVal
+                minVal = -minVal
+            End If
+            ranges = New cv.Rangef() {New cv.Rangef(minVal, maxVal)}
+            Dim mask = dst0.Threshold(minVal, minVal, cv.ThresholdTypes.BinaryInv)
+            mask.ConvertTo(mask, cv.MatType.CV_8U)
+            dst0.SetTo(minVal, mask)
+        End If
+        cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
         Dim histArray(histogram.Total - 1) As Single
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -366,7 +382,7 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
         Next
 
         histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
-        cv.Cv2.CalcBackProject({task.pcSplit(0)}, {0}, histogram, dst3, ranges)
+        cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst3, ranges)
         dst3.ConvertTo(dst1, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst1)
         dst2.SetTo(0, task.noDepthMask)
