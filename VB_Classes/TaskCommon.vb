@@ -166,7 +166,7 @@ Public Module vbc
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
         task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 1000
 
-        task.rcPixelThreshold = 0 ' task.gOptions.DebugSlider.Value / 1000
+        task.rcPixelThreshold = CInt(task.dst2.Total * 0.002)
         task.historyCount = task.gOptions.FrameHistory.Value
     End Sub
 
@@ -427,23 +427,6 @@ Public Class triangleData
     Public facets(3) As cv.Point3f
 End Class
 
-
-
-
-Public Class maskData
-    Public rect As cv.Rect
-    Public mask As cv.Mat
-    Public contour As New List(Of cv.Point)
-    Public index As Integer
-    Public maxDist As cv.Point
-    Public pixels As Integer
-    Public depthMean As Single
-    Public mm As mmData ' min/max/loc
-    Public Sub New()
-        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-        rect = New cv.Rect(0, 0, 1, 1)
-    End Sub
-End Class
 
 
 
@@ -737,6 +720,25 @@ Public Class brickData
         End If
     End Sub
 End Class
+
+
+
+
+Public Class maskData
+    Public rect As cv.Rect
+    Public mask As cv.Mat
+    Public contour As New List(Of cv.Point)
+    Public index As Integer
+    Public maxDist As cv.Point
+    Public pixels As Integer
+    Public depthMean As Single
+    Public mm As mmData
+    Public Sub New()
+        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+        rect = New cv.Rect(0, 0, 1, 1)
+    End Sub
+End Class
+
 
 
 

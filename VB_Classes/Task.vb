@@ -600,6 +600,7 @@ Public Class VBtask : Implements IDisposable
             ClickPoint = rcList(1).maxDist
         End If
         Dim index = rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
+        If index = 0 Then Exit Sub
         If index > 0 And index < rcList.Count Then
             ' ClickPoint = rcList(index).maxDist
             task.rcD = rcList(index)
