@@ -301,40 +301,60 @@ End Class
 Public Class RedCloud_PrepDataNew : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
-        desc = "Reduction transform for the point cloud"
+        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histogram As New cv.Mat
 
         Dim ranges As cv.Rangef()
+        Dim channels() As Integer = {0, 1}
         Select Case task.redOptions.PointCloudReduction
             Case 0 ' X Reduction
+                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
                 ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                dst0 = task.pcSplit(0)
                 cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 1 ' Y Reduction
+                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
                 ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
+                dst0 = task.pcSplit(1)
                 cv.Cv2.CalcHist({task.pcSplit(1)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 2 ' Z Reduction
-                ranges = New cv.Rangef() {New cv.Rangef(0, task.MaxZmeters)}
+                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
+                ranges = New cv.Rangef() {New cv.Rangef(-0.01, task.MaxZmeters + 0.01)}
+                dst0 = task.pcSplit(2)
                 cv.Cv2.CalcHist({task.pcSplit(2)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 3 ' XY Reduction
-                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
-                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
+                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(-task.yRange, task.yRange)}
+                dst0 = task.pcSplit(0) + task.pcSplit(1)
+                cv.Cv2.CalcHist({task.pointCloud}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 4 ' XZ Reduction
-                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
-                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
+                channels = {0, 2}
+                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.MaxZmeters)}
+                dst0 = task.pcSplit(0) + task.pcSplit(2)
+                cv.Cv2.CalcHist({task.pointCloud}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 5 ' YZ Reduction
-                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
-                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+                If task.optionsChanged Then task.gOptions.setHistogramBins(16)
+                channels = {1, 2}
+                ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
+                dst0 = task.pcSplit(1) + task.pcSplit(2)
+                cv.Cv2.CalcHist({task.pointCloud}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Case 6 ' XYZ Reduction
-                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
-                cv.Cv2.CalcHist({task.pcSplit(0)}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+                If task.optionsChanged Then task.gOptions.setHistogramBins(32)
+                channels = {0, 1, 2}
+                ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange),
+                                          New cv.Rangef(-task.yRange, task.yRange),
+                                          New cv.Rangef(0, task.MaxZmeters)}
+                dst0 = task.pcSplit(1) + task.pcSplit(2)
+                cv.Cv2.CalcHist({task.pointCloud}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
         End Select
 
