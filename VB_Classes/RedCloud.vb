@@ -200,7 +200,6 @@ Public Class RedCloud_World : Inherits TaskParent
     Dim world As New Depth_World
     Dim prep As New RedCloud_PrepData
     Public Sub New()
-        task.redOptions.IdentifyCountBar.Value = 100
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "Generated pointcloud"
         desc = "Display the output of a generated pointcloud as RedCloud cells"
@@ -398,64 +397,6 @@ End Class
 
 
 
-Public Class RedCloud_PrepDataNew : Inherits TaskParent
-    Public Sub New()
-        task.gOptions.HistBinBar.Value = 64
-        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim histogram As New cv.Mat
-
-        Dim mm As mmData
-        Dim ranges As cv.Rangef()
-        For i = 0 To 1
-            Select Case i
-                Case 0 ' X Reduction
-                    dst0 = task.pcSplit(0)
-                    ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
-                Case 1 ' Y Reduction
-                    dst0 = task.pcSplit(1)
-                    ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
-                Case 2 ' Z Reduction
-                    dst0 = task.pcSplit(2)
-                    ranges = New cv.Rangef() {New cv.Rangef(-0.01, task.MaxZmeters + 0.01)}
-            End Select
-
-            mm = GetMinMax(dst0)
-            cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
-
-            Dim histArray(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-            For j = 0 To histArray.Count - 1
-                histArray(j) = j
-            Next
-
-            histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
-            cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
-
-            If i = 0 Then dst1 = dst0.Clone Else dst1 += dst0
-        Next
-
-        dst1.SetTo(0, task.noDepthMask)
-        mm = GetMinMax(dst1)
-        dst3 = (dst1 * 255 / mm.maxVal).ToMat
-        dst2 = ShowPalette(dst3)
-
-        'Static canny As New Edge_Canny
-        'canny.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        'dst2.SetTo(0, canny.dst2)
-
-        labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class RedCloud_BasicsNew : Inherits TaskParent
     Dim prep As New RedCloud_PrepDataNew
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -503,5 +444,72 @@ Public Class RedCloud_Contours : Inherits TaskParent
         For Each rc In task.rcList
             dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_PrepDataNew : Inherits TaskParent
+    Public Sub New()
+        task.gOptions.HistBinBar.Value = 64
+        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+
+        Dim ranges As cv.Rangef()
+        For i = 0 To 1
+            Select Case i
+                Case 0 ' X Reduction
+                    dst0 = task.pcSplit(0)
+                    ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                Case 1 ' Y Reduction
+                    dst0 = task.pcSplit(1)
+                    ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
+            End Select
+
+            cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Dim histArray(histogram.Total - 1) As Single
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+            For j = 0 To histArray.Count - 1
+                histArray(j) = j
+            Next
+
+            histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
+            cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
+
+            If i = 0 Then dst2 = dst0.Clone Else dst2 += dst0
+        Next
+
+        labels(2) = CStr(task.histogramBins * 2) + " (max) possible depth regions mapped."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_PrepDataShow : Inherits TaskParent
+    Dim prep As New RedCloud_PrepDataNew
+    Public Sub New()
+        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2
+
+        dst2.SetTo(0, task.noDepthMask)
+        Dim mm = GetMinMax(dst2)
+        dst2 = ShowPalette((dst2 * 255 / mm.maxVal).ToMat)
+
+        labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
     End Sub
 End Class

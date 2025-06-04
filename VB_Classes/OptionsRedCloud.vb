@@ -77,7 +77,6 @@ Public Class OptionsRedCloud
 
         XRangeBar.Value = task.xRange * 100
         YRangeSlider.Value = task.yRange * 100
-        IdentifyCountBar.Value = 5
 
         task.xRangeDefault = task.xRange
         task.yRangeDefault = task.yRange
@@ -189,10 +188,7 @@ Public Class OptionsRedCloud
         task.optionsChanged = True
         SideLabel.Text = CStr(ProjectionThresholdBar.Value)
     End Sub
-    Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountBar.ValueChanged
-        task.optionsChanged = True
-        LabelIdentify.Text = CStr(IdentifyCountBar.Value)
-    End Sub
+
 
 
 

@@ -55,9 +55,6 @@ Partial Class OptionsRedCloud
         Me.YReduction = New System.Windows.Forms.RadioButton()
         Me.XReduction = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.LabelIdentify = New System.Windows.Forms.Label()
-        Me.IdentifyCountBar = New System.Windows.Forms.TrackBar()
-        Me.IdentifyCountLabel = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
@@ -76,7 +73,6 @@ Partial Class OptionsRedCloud
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
-        CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -429,9 +425,6 @@ Partial Class OptionsRedCloud
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.LabelIdentify)
-        Me.GroupBox2.Controls.Add(Me.IdentifyCountBar)
-        Me.GroupBox2.Controls.Add(Me.IdentifyCountLabel)
         Me.GroupBox2.Controls.Add(Me.ProjectionThresholdBar)
         Me.GroupBox2.Controls.Add(Me.Label8)
         Me.GroupBox2.Controls.Add(Me.SideLabel)
@@ -441,35 +434,6 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.TabIndex = 9
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "RedCloud Options"
-        '
-        'LabelIdentify
-        '
-        Me.LabelIdentify.AutoSize = True
-        Me.LabelIdentify.Location = New System.Drawing.Point(668, 30)
-        Me.LabelIdentify.Name = "LabelIdentify"
-        Me.LabelIdentify.Size = New System.Drawing.Size(57, 20)
-        Me.LabelIdentify.TabIndex = 32
-        Me.LabelIdentify.Text = "Label1"
-        '
-        'IdentifyCountBar
-        '
-        Me.IdentifyCountBar.Location = New System.Drawing.Point(180, 30)
-        Me.IdentifyCountBar.Maximum = 255
-        Me.IdentifyCountBar.Minimum = 1
-        Me.IdentifyCountBar.Name = "IdentifyCountBar"
-        Me.IdentifyCountBar.Size = New System.Drawing.Size(482, 69)
-        Me.IdentifyCountBar.TabIndex = 31
-        Me.IdentifyCountBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.IdentifyCountBar.Value = 10
-        '
-        'IdentifyCountLabel
-        '
-        Me.IdentifyCountLabel.AutoSize = True
-        Me.IdentifyCountLabel.Location = New System.Drawing.Point(70, 39)
-        Me.IdentifyCountLabel.Name = "IdentifyCountLabel"
-        Me.IdentifyCountLabel.Size = New System.Drawing.Size(104, 20)
-        Me.IdentifyCountLabel.TabIndex = 30
-        Me.IdentifyCountLabel.Text = "IdentifyCount"
         '
         'ColorSourceLabel
         '
@@ -575,7 +539,6 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
-        CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
         Me.ResumeLayout(False)
@@ -617,9 +580,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents Label7 As System.Windows.Forms.Label
     Friend WithEvents ColorSourceLabel As System.Windows.Forms.Label
     Friend WithEvents ColorSource As System.Windows.Forms.ComboBox
-    Friend WithEvents LabelIdentify As System.Windows.Forms.Label
-    Friend WithEvents IdentifyCountBar As System.Windows.Forms.TrackBar
-    Friend WithEvents IdentifyCountLabel As System.Windows.Forms.Label
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
     Friend WithEvents TrackingDepthColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingColor As Windows.Forms.RadioButton
