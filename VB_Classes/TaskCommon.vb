@@ -74,6 +74,7 @@ Public Module vbc
             If rc.index >= 255 Then Exit For
         Next
         saveColorSetting = task.redOptions.trackingIndex
+        task.rcMap.SetTo(0, task.noDepthMask)
         Return DisplayCells()
     End Function
     Public Function RebuildRCMap(rcList As List(Of rcData)) As cv.Mat

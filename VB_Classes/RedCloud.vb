@@ -425,34 +425,6 @@ End Class
 
 
 
-Public Class RedCloud_Contours : Inherits TaskParent
-    Dim prep As New RedCloud_PrepDataNew
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public contourList As New List(Of contourData)
-    Public Sub New()
-        task.gOptions.HistBinBar.Value = 64
-        desc = "Identify the contours in the RedCloud_PrepDataNew output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-        dst2 = prep.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        labels(2) = prep.labels(2)
-
-        dst3 = runRedC(dst2, labels(3))
-        dst3.SetTo(0, task.noDepthMask)
-
-        For Each rc In task.rcList
-            dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class RedCloud_PrepDataNew : Inherits TaskParent
     Public Sub New()
         task.gOptions.HistBinBar.Value = 64
@@ -465,14 +437,14 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
         For i = 0 To 1
             Select Case i
                 Case 0 ' X Reduction
-                    dst0 = task.pcSplit(0)
+                    dst1 = task.pcSplit(0)
                     ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
                 Case 1 ' Y Reduction
-                    dst0 = task.pcSplit(1)
+                    dst1 = task.pcSplit(1)
                     ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
             End Select
 
-            cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+            cv.Cv2.CalcHist({dst1}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -482,11 +454,12 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
             Next
 
             histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
-            cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
+            cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst1, ranges)
 
-            If i = 0 Then dst2 = dst0.Clone Else dst2 += dst0
+            If i = 0 Then dst2 = dst1.Clone Else dst2 += dst1
         Next
 
+        dst2.SetTo(0, task.noDepthMask)
         labels(2) = CStr(task.histogramBins * 2) + " (max) possible depth regions mapped."
     End Sub
 End Class
@@ -498,7 +471,7 @@ End Class
 
 
 Public Class RedCloud_PrepDataShow : Inherits TaskParent
-    Dim prep As New RedCloud_PrepDataNew
+    Public prep As New RedCloud_RedMaskNew
     Public Sub New()
         desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
     End Sub
@@ -511,5 +484,74 @@ Public Class RedCloud_PrepDataShow : Inherits TaskParent
         dst2 = ShowPalette((dst2 * 255 / mm.maxVal).ToMat)
 
         labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_RedMaskNew : Inherits TaskParent
+    Dim prep As New RedCloud_PrepDataNew
+    Public Sub New()
+        desc = "Remove corners of RedCloud cells in the prep data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2
+
+        Dim val1 As Single, val2 As Single
+        For y = 0 To dst2.Height - 2
+            For x = 0 To dst2.Width - 2
+                val1 = dst2.Get(Of Single)(y, x)
+                val2 = dst2.Get(Of Single)(y, x + 1)
+                If val1 <> 0 And val2 <> 0 Then
+                    If val1 <> val2 Then
+                        dst2.Set(Of Single)(y, x, 0)
+                        dst2.Set(Of Single)(y, x + 1, 0)
+                    End If
+                End If
+                val1 = dst2.Get(Of Single)(y, x)
+                val2 = dst2.Get(Of Single)(y + 1, x)
+                If val1 <> 0 And val2 <> 0 Then
+                    If val1 <> val2 Then
+                        dst2.Set(Of Single)(y + 1, x, 0)
+                    End If
+                End If
+            Next
+        Next
+
+        dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Contours : Inherits TaskParent
+    Dim prep As New RedCloud_PrepDataShow
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public contourList As New List(Of contourData)
+    Public Sub New()
+        task.redC = New RedColor_Basics
+        task.gOptions.HistBinBar.Value = 64
+        desc = "Identify the contours in the RedCloud_PrepDataNew output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        labels(2) = prep.labels(2)
+
+        task.redC.inputRemoved = prep.prep.dst3 ' mask of zeros to avoid using...
+        dst3 = runRedC(dst2, labels(3))
+        dst3.SetTo(0, task.noDepthMask)
+
+        For Each rc In task.rcList
+            dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+        Next
     End Sub
 End Class

@@ -588,6 +588,7 @@ Public Class VBtask : Implements IDisposable
         If rcList.Count = 0 Then Exit Sub
         If ClickPoint = newPoint And rcList.Count > 1 Then ClickPoint = rcList(1).maxDist
         Dim index = cellMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
+        If index = 0 Then Exit Sub
         task.rcD = rcList(index)
         If index > 0 And index < rcList.Count Then
             ' ClickPoint = rcList(index).maxDist
@@ -725,9 +726,10 @@ Public Class VBtask : Implements IDisposable
         pcSplit = pointCloud.Split
         If useGravityPointcloud Then gravitySplit = pcSplit Else gravitySplit = gravityCloud.Split()
 
-        If optionsChanged Then maxDepthMask.SetTo(0)
+        If optionsChanged Then maxDepthMask = New cv.Mat(pcSplit(2).Size, cv.MatType.CV_8U, 0)
         If gOptions.TruncateDepth.Checked Then
             pcSplit(2) = pcSplit(2).Threshold(MaxZmeters, MaxZmeters, cv.ThresholdTypes.Trunc)
+            task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
@@ -759,8 +761,6 @@ Public Class VBtask : Implements IDisposable
 
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
-
-        task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, 1000).ConvertScaleAbs()
 
         If task.gOptions.LRMeanSubtraction.Checked Then
             If task.optionsChanged Then task.motionMask.SetTo(255) ' force the change over...

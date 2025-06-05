@@ -954,7 +954,6 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim half As Integer = CInt(task.cellSize / 2)
-
         Dim pt As cv.Point
         If task.heartBeatLT Then
             fPoly.Run(src)
@@ -964,7 +963,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             For Each pt In task.topFeatures
                 Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
                 Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
-                roi = ValidateRect(roi)
+                roi = ValidateRect(roi) ' stub bricks are fixed here 
                 featureRects.Add(roi)
                 searchRects.Add(task.gridNabeRects(index))
             Next
@@ -973,7 +972,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             For Each pt In task.topFeatures
                 Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
                 Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
-                roi = ValidateRect(roi)
+                roi = ValidateRect(roi) ' stub bricks are fixed here 
                 dst2.Rectangle(roi, task.highlight, task.lineWidth)
                 dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
             Next
@@ -994,11 +993,8 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         searchRects.Clear()
         featureRects.Clear()
         For Each roi In matchRects
-            If roi.Width = task.cellSize And roi.Height = task.cellSize Then
-                pt = New cv.Point(roi.X + half, roi.Y + half)
-            Else
-                pt = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-            End If
+            half = CInt(roi.Width / 2) ' stubby bricks are those at the bottom or right side of the image.
+            pt = New cv.Point(roi.X + half, roi.Y + half)
             Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
@@ -1064,7 +1060,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         searchRects.Clear()
         featureRects.Clear()
         For Each roi In matchRects
-            Dim pt = New cv.Point(roi.X + half, roi.Y + half)
+            Dim pt = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
             Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
