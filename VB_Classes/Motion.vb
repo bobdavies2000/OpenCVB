@@ -955,6 +955,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim half As Integer = CInt(task.cellSize / 2)
 
+        Dim pt As cv.Point
         If task.heartBeatLT Then
             fPoly.Run(src)
             searchRects.Clear()
@@ -993,7 +994,11 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         searchRects.Clear()
         featureRects.Clear()
         For Each roi In matchRects
-            Dim pt = New cv.Point(roi.X + half, roi.Y + half)
+            If roi.Width = task.cellSize And roi.Height = task.cellSize Then
+                pt = New cv.Point(roi.X + half, roi.Y + half)
+            Else
+                pt = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
+            End If
             Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
