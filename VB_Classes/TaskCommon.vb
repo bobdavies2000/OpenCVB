@@ -167,7 +167,7 @@ Public Module vbc
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
         task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 1000
 
-        task.rcPixelThreshold = CInt(task.dst2.Total * 0.001)
+        task.rcPixelThreshold = CInt(task.dst2.Total * 0.0)
         task.historyCount = task.gOptions.FrameHistory.Value
     End Sub
 
