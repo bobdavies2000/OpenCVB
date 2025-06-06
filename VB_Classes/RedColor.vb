@@ -1898,13 +1898,11 @@ End Class
 
 
 Public Class RedColor_CPP : Inherits TaskParent
-    Public inputRemoved As cv.Mat
     Public classCount As Integer
     Public rectList As New List(Of cv.Rect)
     Public identifyCount As Integer = 255
     Public Sub New()
         cPtr = RedMask_Open()
-        inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Run the C++ RedCloud Interface With Or without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1914,15 +1912,10 @@ Public Class RedColor_CPP : Inherits TaskParent
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim maskData(src.Total - 1) As Byte
-        Marshal.Copy(inputRemoved.Data, maskData, 0, maskData.Length)
-        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
-
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(),
-                                    handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
-        handleMask.Free()
+        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
         handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone - 1
+        dst2 = cv.Mat.FromPixelData(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
 
         classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
         If classCount = 0 Then Exit Sub ' no data to process.

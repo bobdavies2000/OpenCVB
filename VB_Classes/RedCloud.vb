@@ -471,7 +471,7 @@ End Class
 
 
 Public Class RedCloud_PrepDataShow : Inherits TaskParent
-    Public prep As New RedCloud_RedMaskNew
+    Public prep As New RedCloud_EdgeEnhanced
     Public Sub New()
         desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
     End Sub
@@ -492,7 +492,7 @@ End Class
 
 
 
-Public Class RedCloud_RedMaskNew : Inherits TaskParent
+Public Class RedCloud_EdgeEnhanced : Inherits TaskParent
     Dim prep As New RedCloud_PrepDataNew
     Public Sub New()
         desc = "Remove corners of RedCloud cells in the prep data."
@@ -537,7 +537,8 @@ End Class
 
 
 
-Public Class RedCloud_Contours1 : Inherits TaskParent
+
+Public Class RedCloud_Contours : Inherits TaskParent
     Dim prep As New RedCloud_PrepDataShow
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public contourList As New List(Of contourData)
@@ -565,9 +566,7 @@ End Class
 
 
 
-
-
-Public Class RedCloud_Contours : Inherits TaskParent
+Public Class RedCloud_Contours1 : Inherits TaskParent
     Dim prep As New RedCloud_PrepDataShow
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public contourList As New List(Of contourData)
