@@ -173,7 +173,7 @@ Public Class Quad_Hulls : Inherits TaskParent
     Dim hulls As New RedColor_Hulls
     Const depthListMaxCount As Integer = 10
     Public Sub New()
-        task.gOptions.GridSlider.Value = 20
+        If standalone Then task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Create a triangle representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

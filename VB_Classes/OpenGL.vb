@@ -270,6 +270,7 @@ Public Class OpenGL_QuadHulls : Inherits TaskParent
     Dim quad As New Quad_Hulls
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
+        If standalone Then task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
