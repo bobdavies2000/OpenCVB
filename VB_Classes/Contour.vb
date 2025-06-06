@@ -8,7 +8,7 @@ Public Class Contour_Basics : Inherits TaskParent
         labels(3) = "Input to OpenCV's FindContours"
         desc = "General purpose contour finder"
     End Sub
-    Public Shared Function sortContours(allContours As cv.Point()()) As List(Of contourData)
+    Public Shared Function sortContours(allContours As cv.Point()(), maxContours As Integer) As List(Of contourData)
         Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
         Dim tourMat As New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
         For Each tour In allContours
@@ -32,12 +32,11 @@ Public Class Contour_Basics : Inherits TaskParent
             sortedList.Add(contour.pixels, contour)
         Next
 
-        Dim contourList As New List(Of contourData)
-        contourList.Add(New contourData)
+        Dim contourList As New List(Of contourData)({New contourData})
         For Each contour In sortedList.Values
             contour.index = contourList.Count
             contourList.Add(contour)
-            If contourList.Count >= 255 Then Exit For
+            If contourList.Count >= maxContours Then Exit For
         Next
         Return contourList
     End Function
@@ -56,7 +55,7 @@ Public Class Contour_Basics : Inherits TaskParent
         End If
         If allContours.Count <= 1 Then Exit Sub
 
-        task.contourList = sortContours(allContours)
+        task.contourList = sortContours(allContours, 255)
         task.contourMap.SetTo(0)
         For Each contour In task.contourList
             task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
@@ -754,7 +753,7 @@ Public Class Contour_Basics_FloodFill : Inherits TaskParent
         cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
         If allContours.Count <= 1 Then Exit Sub
 
-        task.contourList = Contour_Basics.sortContours(allContours)
+        task.contourList = Contour_Basics.sortContours(allContours, 255)
         task.contourMap.SetTo(0)
         For Each contour In task.contourList
             task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
@@ -787,7 +786,7 @@ Public Class Contour_Basics_CComp : Inherits TaskParent
         cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.CComp, mode)
         If allContours.Count <= 1 Then Exit Sub
 
-        task.contourList = Contour_Basics.sortContours(allContours)
+        task.contourList = Contour_Basics.sortContours(allContours, 255)
         task.contourMap.SetTo(0)
         For Each contour In task.contourList
             task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
@@ -820,7 +819,7 @@ Public Class Contour_Basics_Tree : Inherits TaskParent
         cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.Tree, mode)
         If allContours.Count <= 1 Then Exit Sub
 
-        task.contourList = Contour_Basics.sortContours(allContours)
+        task.contourList = Contour_Basics.sortContours(allContours, 255)
         task.contourMap.SetTo(0)
         For Each contour In task.contourList
             task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
@@ -853,7 +852,7 @@ Public Class Contour_Basics_List : Inherits TaskParent
         cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.List, mode)
         If allContours.Count <= 1 Then Exit Sub
 
-        task.contourList = Contour_Basics.sortContours(allContours)
+        task.contourList = Contour_Basics.sortContours(allContours, 255)
         task.contourMap.SetTo(0)
         For Each contour In task.contourList
             task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
@@ -886,7 +885,7 @@ Public Class Contour_Basics_External : Inherits TaskParent
         cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.List, mode)
         If allContours.Count <= 1 Then Exit Sub
 
-        task.contourList = Contour_Basics.sortContours(allContours)
+        task.contourList = Contour_Basics.sortContours(allContours, 255)
         task.contourMap.SetTo(0)
         For Each contour In task.contourList
             task.contourMap(contour.rect).SetTo(contour.index, contour.mask)
@@ -967,7 +966,7 @@ Public Class Contour_Depth : Inherits TaskParent
         cv.Cv2.FindContours(dst0, allcontours, Nothing, cv.RetrievalModes.List, mode)
         If allContours.Count <= 1 Then Exit Sub
 
-        depthContourList = Contour_Basics.sortContours(allcontours)
+        depthContourList = Contour_Basics.sortContours(allcontours, 255)
         dst2.SetTo(0)
         For Each contour In depthContourList
             dst2(contour.rect).SetTo(contour.index, contour.mask)
@@ -1037,10 +1036,31 @@ End Class
 
 
 Public Class Contour_RedCloud : Inherits TaskParent
+    Dim prep As New RedCloud_PrepOutline
+    Public options As New Options_Contours
     Public Sub New()
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use the RedCloud_PrepData as input to contours_basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        options.Run()
+
+        prep.Run(src)
+        prep.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        labels(2) = prep.labels(2)
+
+        Dim allContours As cv.Point()()
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.List, mode)
+        If allContours.Count <= 1 Then Exit Sub
+
+        Dim contourList = Contour_Basics.sortContours(allContours, 255 - task.histogramBins * 2)
+        dst1.SetTo(0)
+        For Each contour In contourList
+            dst1(contour.rect).SetTo(contour.index, contour.mask)
+        Next
+
+        dst3 = ShowPalette(dst1)
+        labels(3) = CStr(contourList.Count) + " contours found"
     End Sub
 End Class

@@ -460,7 +460,7 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
         Next
 
         dst2.SetTo(0, task.noDepthMask)
-        labels(2) = CStr(task.histogramBins * 2) + " (max) possible depth regions mapped."
+        labels(2) = CStr(task.histogramBins * 2) + " possible depth regions mapped (control with histogram bins.)"
     End Sub
 End Class
 
@@ -471,7 +471,7 @@ End Class
 
 
 Public Class RedCloud_PrepDataShow : Inherits TaskParent
-    Public prep As New RedCloud_EdgeEnhanced
+    Public prep As New RedCloud_PrepOutline
     Public Sub New()
         desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
     End Sub
@@ -492,7 +492,7 @@ End Class
 
 
 
-Public Class RedCloud_EdgeEnhanced : Inherits TaskParent
+Public Class RedCloud_PrepOutline : Inherits TaskParent
     Dim prep As New RedCloud_PrepDataNew
     Public Sub New()
         desc = "Remove corners of RedCloud cells in the prep data."
@@ -587,5 +587,27 @@ Public Class RedCloud_Contours1 : Inherits TaskParent
         For Each rc In task.rcList
             dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_Outline : Inherits TaskParent
+    Dim prep As New RedCloud_PrepOutline
+    Public Sub New()
+        desc = "Apply the outline of the prepared depth data to the color contours."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst3 = prep.dst3
+        dst3.SetTo(0, task.noDepthMask)
+        dst3.ConvertTo(dst3, cv.MatType.CV_8U)
+
+        dst1 = task.contourMap
+        dst1.SetTo(0, dst3)
+
+        dst2 = runRedC(dst1, labels(2))
     End Sub
 End Class
