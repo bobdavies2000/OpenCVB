@@ -213,7 +213,6 @@ Rotate
 Salience
 ScatterMatrix
 SemiGlobalMatching
-Sides
 Sieve
 SLR
 Smoothing

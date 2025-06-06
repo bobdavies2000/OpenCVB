@@ -237,7 +237,6 @@
     <Compile Include="Model.vb" />
     <Compile Include="Options.vb" />
     <Compile Include="Profile.vb" />
-    <Compile Include="Sides.vb" />
     <Compile Include="Spectrum.vb" />
     <Compile Include="Thickness.vb" />
     <Compile Include="TreeviewForm.Designer.vb">

@@ -43,7 +43,6 @@ public:
 	cv::RetrievalModes retrievalMode =  cv::RetrievalModes::RETR_EXTERNAL;
 	cv::ContourApproximationModes ApproximationMode =  cv::ContourApproximationModes::CHAIN_APPROX_TC89_KCOS;
 	double epsilon =  0.03;
-	int maxContours =  50;
 	void Run() {}
 	Options_Contours() {
 	}

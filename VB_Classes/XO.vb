@@ -4924,3 +4924,165 @@ Public Class XO_Pixel_Unique_CPP : Inherits TaskParent
         Pixels_Vector_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+Public Class XO_Sides_Corner : Inherits TaskParent
+    Dim sides As New XO_Contour_RedCloudCorners
+    Public Sub New()
+        labels = {"", "", "RedColor_Basics output", ""}
+        desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        sides.Run(src)
+        dst3 = sides.dst3
+        SetTrueText("Center point is rcSelect.maxDist", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_Sides_Basics : Inherits TaskParent
+    Public sides As New Profile_Basics
+    Public corners As New XO_Contour_RedCloudCorners
+    Public Sub New()
+        labels = {"", "", "RedCloud output", "Selected Cell showing the various extrema."}
+        desc = "Find the 6 extrema and the 4 farthest points in each quadrant for the selected RedCloud cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        sides.Run(src)
+        dst2 = sides.dst2
+        dst3 = sides.dst3
+
+        Dim corners = sides.corners.ToList
+        For i = 0 To corners.Count - 1
+            Dim nextColor = sides.cornerColors(i)
+            Dim nextLabel = sides.cornerNames(i)
+            DrawLine(dst3, task.rcD.maxDist, corners(i), white)
+            SetTrueText(nextLabel, New cv.Point(corners(i).X, corners(i).Y), 3)
+        Next
+
+        If corners.Count Then SetTrueText(sides.strOut, 3) Else SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Contour_RedCloudCorners : Inherits TaskParent
+    Public corners(4 - 1) As cv.Point
+    Public rc As New rcData
+    Public Sub New()
+        labels(2) = "The RedCloud Output with the highlighted contour to smooth"
+        desc = "Find the point farthest from the center in each cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standaloneTest() Then
+            dst2 = runRedC(src, labels(2))
+            rc = task.rcD
+        End If
+
+        dst3.SetTo(0)
+        DrawCircle(dst3, rc.maxDist, task.DotSize, white)
+        Dim center As New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
+        Dim maxDistance(4 - 1) As Single
+        For i = 0 To corners.Length - 1
+            corners(i) = center ' default is the center - a triangle shape can omit a corner
+        Next
+        If rc.contour Is Nothing Then Exit Sub
+        For Each pt In rc.contour
+            Dim quad As Integer
+            If pt.X - center.X >= 0 And pt.Y - center.Y <= 0 Then quad = 0 ' upper right quadrant
+            If pt.X - center.X >= 0 And pt.Y - center.Y >= 0 Then quad = 1 ' lower right quadrant
+            If pt.X - center.X <= 0 And pt.Y - center.Y >= 0 Then quad = 2 ' lower left quadrant
+            If pt.X - center.X <= 0 And pt.Y - center.Y <= 0 Then quad = 3 ' upper left quadrant
+            Dim dist = center.DistanceTo(pt)
+            If dist > maxDistance(quad) Then
+                maxDistance(quad) = dist
+                corners(quad) = pt
+            End If
+        Next
+
+        DrawContour(dst3(rc.rect), rc.contour, white)
+        For i = 0 To corners.Count - 1
+            DrawLine(dst3(rc.rect), center, corners(i), white)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Sides_Profile : Inherits TaskParent
+    Dim sides As New Contour_SidePoints
+    Public Sub New()
+        labels = {"", "", "RedColor_Basics Output", "Selected Cell"}
+        desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        sides.Run(src)
+        dst3 = sides.dst3
+        SetTrueText(sides.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_Sides_ColorC : Inherits TaskParent
+    Dim sides As New XO_Sides_Basics
+    Public Sub New()
+        labels = {"", "", "RedColor Output", "Cell Extrema"}
+        desc = "Find the extrema - top/bottom, left/right, near/far - points for a RedColor Cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        sides.Run(src)
+        dst3 = sides.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        labels = {"", "EdgeLine_Basics output", "", "Pixels below are both cell boundaries and edges."}
+        desc = "Intersect the cell contours and the edges in the image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        runRedC(src)
+        labels(2) = task.redC.labels(2) + " - Contours only.  Click anywhere to select a cell"
+
+        dst2.SetTo(0)
+        For Each rc In task.rcList
+            DrawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
+        Next
+
+        dst3 = task.edges.dst2 And dst2
+    End Sub
+End Class

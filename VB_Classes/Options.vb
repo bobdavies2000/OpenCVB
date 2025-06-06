@@ -139,7 +139,6 @@ Public Class Options_Contours : Inherits OptionParent
     Public retrievalMode As cv.RetrievalModes = cv.RetrievalModes.External
     Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Double = 0.03
-    Public maxContours As Integer = 50
     Public options2 As New Options_Contours2
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -150,14 +149,9 @@ Public Class Options_Contours : Inherits OptionParent
             radio.addRadio("Tree")
             radio.check(1).Checked = True
         End If
-
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max contours", 1, 255, maxContours)
     End Sub
     Public Sub Run()
         options2.Run()
-        Static countSlider = OptionParent.FindSlider("Max contours")
-        maxContours = countSlider.value
-
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
