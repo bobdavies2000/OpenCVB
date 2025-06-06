@@ -14,7 +14,6 @@ Public Class Structured_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         struct.Run(src)
         linesX.Run(struct.dst2)
-        labels(2) = linesX.labels(2)
 
         dst2 = src.Clone
         lpListX = New List(Of lpData)(linesX.lpList)
@@ -24,7 +23,10 @@ Public Class Structured_Basics : Inherits TaskParent
         task.structureMapX = linesX.lpMap.Clone
 
         linesY.Run(struct.dst3)
-        labels(3) = linesY.labels(2)
+        If task.heartBeat Then
+            labels(2) = linesX.labels(2)
+            labels(3) = linesY.labels(2)
+        End If
 
         dst3 = src.Clone
         lpListY = New List(Of lpData)(linesY.lpList)
