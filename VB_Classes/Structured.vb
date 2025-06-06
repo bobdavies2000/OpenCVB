@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
     Public lpListY As New List(Of lpData)
-    Dim linesX As New LineRGB_Basics
-    Dim linesY As New LineRGB_Basics
+    Public linesX As New LineRGB_Basics
+    Public linesY As New LineRGB_Basics
     Dim struct As New Structured_Core
     Public Sub New()
         linesX.nonTaskRequest = True
@@ -20,7 +20,6 @@ Public Class Structured_Basics : Inherits TaskParent
         For Each lp In linesX.lpList
             dst2.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
         Next
-        task.structureMapX = linesX.lpMap.Clone
 
         linesY.Run(struct.dst3)
         If task.heartBeat Then
@@ -33,7 +32,6 @@ Public Class Structured_Basics : Inherits TaskParent
         For Each lp In linesY.lpList
             dst3.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
         Next
-        task.structureMapY = linesY.lpMap.Clone
     End Sub
 End Class
 
