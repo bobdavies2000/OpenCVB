@@ -128,9 +128,9 @@ public:
     vector<Point> floodPoints;
 
     RedMaskNew() {}
-    void RunCPP(Mat inputRemoved, int minSize) {
-        Mat maskCopy = inputRemoved.clone();
-        Rect rect;
+    void RunCPP(int minSize) {
+        result = Mat(src.rows + 2, src.cols + 2, CV_8U);
+        result.setTo(0);
 
         multimap<int, Point, greater<int>> sizeSorted;
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
@@ -139,11 +139,11 @@ public:
         {
             for (int x = 0; x < src.cols; x++)
             {
-                if (inputRemoved.at<unsigned char>(y, x) == 0)
+                if (src.at<unsigned char>(y, x) != 0)
                 {
                     pt = Point(x, y);
-                    int count = floodFill(src, inputRemoved, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
-                    if (rect.width * rect.height > minSize) sizeSorted.insert(make_pair(count, pt));
+                    int count = floodFill(src, result, pt, 255, nullptr, 0, 0, 4 | floodFlag | (255 << 8));
+                    if (count > minSize) sizeSorted.insert(make_pair(count, pt));
                 }
             }
         }
@@ -151,20 +151,19 @@ public:
         cellRects.clear();
         floodPoints.clear();
         int fill = 1;
+        result.setTo(0);
+        Rect rect;
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
-            if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
+            if (floodFill(src, result, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
             {
                 cellRects.push_back(rect);
                 floodPoints.push_back(it->second);
 
-                if (fill >= 255)
-                    break; // just taking up to the top X largest objects found.
+                if (fill >= 255) break; // just taking up to the top X largest objects found.
                 fill++;
             }
         }
-        Rect r = Rect(1, 1, inputRemoved.cols - 2, inputRemoved.rows - 2);
-        maskCopy(r).copyTo(result);
     }
 };
 
@@ -185,14 +184,11 @@ extern "C" __declspec(dllexport) int* RedMaskNew_Rects(RedMaskNew* cPtr)
 
 extern "C" __declspec(dllexport) int* RedMaskNew_Close(RedMaskNew* cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
-RedMaskNew_Run(RedMaskNew* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int minSize)
+RedMaskNew_Run(RedMaskNew* cPtr, int* dataPtr, int rows, int cols, int minSize)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
 
-    Mat inputRemoved = Mat(rows, cols, CV_8U, maskPtr);
-
-    copyMakeBorder(inputRemoved, inputRemoved, 1, 1, 1, 1, BORDER_CONSTANT, 0);
-    cPtr->RunCPP(inputRemoved, minSize);
+    cPtr->RunCPP(minSize);
 
     return (int*)cPtr->result.data;
 }

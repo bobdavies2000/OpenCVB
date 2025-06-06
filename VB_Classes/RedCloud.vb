@@ -510,19 +510,54 @@ Public Class RedCloud_RedMaskNew : Inherits TaskParent
                     If val1 <> val2 Then
                         dst2.Set(Of Single)(y, x, 0)
                         dst2.Set(Of Single)(y, x + 1, 0)
+                        dst2.Set(Of Single)(y + 1, x, 0)
+                        dst2.Set(Of Single)(y + 1, x + 1, 0)
                     End If
                 End If
                 val1 = dst2.Get(Of Single)(y, x)
                 val2 = dst2.Get(Of Single)(y + 1, x)
                 If val1 <> 0 And val2 <> 0 Then
                     If val1 <> val2 Then
+                        dst2.Set(Of Single)(y, x, 0)
+                        dst2.Set(Of Single)(y, x + 1, 0)
                         dst2.Set(Of Single)(y + 1, x, 0)
+                        dst2.Set(Of Single)(y + 1, x + 1, 0)
                     End If
                 End If
             Next
         Next
 
         dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Contours1 : Inherits TaskParent
+    Dim prep As New RedCloud_PrepDataShow
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public contourList As New List(Of contourData)
+    Public Sub New()
+        task.redC = New RedColor_Basics
+        task.gOptions.HistBinBar.Value = 64
+        desc = "Identify the contours in the RedCloud_PrepDataNew output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        labels(2) = prep.labels(2)
+
+        dst2.SetTo(0, prep.prep.dst3.ConvertScaleAbs)
+        dst3 = runRedC(dst2, labels(3))
+        dst3.SetTo(0, task.noDepthMask)
+
+        For Each rc In task.rcList
+            dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+        Next
     End Sub
 End Class
 
@@ -546,7 +581,7 @@ Public Class RedCloud_Contours : Inherits TaskParent
         dst2 = prep.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         labels(2) = prep.labels(2)
 
-        task.redC.inputRemoved = prep.prep.dst3 ' mask of zeros to avoid using...
+        dst2.SetTo(0, prep.prep.dst3.ConvertScaleAbs)
         dst3 = runRedC(dst2, labels(3))
         dst3.SetTo(0, task.noDepthMask)
 
