@@ -26,7 +26,6 @@ Public Class VBtask : Implements IDisposable
     Public contourMap As New cv.Mat ' map of contours to index in contourList
     Public lpMap As New cv.Mat ' map of each line's bricks...
     Public fpMap As New cv.Mat ' feature map
-    Public fcsMap As New cv.Mat ' FCS reference map - updated on heartBeat. 
     Public rcMap As cv.Mat ' redColor map
     Public structureMapX As New cv.Mat
     Public structureMapY As New cv.Mat

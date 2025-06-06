@@ -19,7 +19,7 @@ Public Class FCS_Basics : Inherits TaskParent
 
         fcs.Run(emptyMat)
 
-        dst2 = ShowPaletteFullColor(task.fcsMap)
+        dst2 = ShowPaletteFullColor(fcs.fcsMap)
         dst3 = task.contours.dst2
         labels(2) = fcs.labels(2)
         labels(3) = task.contours.labels(2)
@@ -34,12 +34,12 @@ End Class
 Public Class FCS_Core : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Public inputFeatures As New List(Of cv.Point2f)
+    Public fcsMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
-        task.fcsMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        subdiv.InitDelaunay(New cv.Rect(0, 0, task.fcsMap.Width, task.fcsMap.Height))
+        subdiv.InitDelaunay(New cv.Rect(0, 0, fcsMap.Width, fcsMap.Height))
         subdiv.Insert(inputFeatures)
 
         Dim facets = New cv.Point2f()() {Nothing}
@@ -50,10 +50,10 @@ Public Class FCS_Core : Inherits TaskParent
             For Each pt In facets(i)
                 facetList.Add(New cv.Point(pt.X, pt.Y))
             Next
-            task.fcsMap.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
+            fcsMap.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
         Next
 
-        If standaloneTest() Then dst2 = ShowPalette(dst1)
+        If standaloneTest() Then dst2 = ShowPalette(fcsMap)
 
         If task.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
     End Sub
