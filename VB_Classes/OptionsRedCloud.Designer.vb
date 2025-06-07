@@ -61,7 +61,6 @@ Partial Class OptionsRedCloud
         Me.TrackingDepthColor = New System.Windows.Forms.RadioButton()
         Me.TrackingColor = New System.Windows.Forms.RadioButton()
         Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
-        Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -497,22 +496,11 @@ Partial Class OptionsRedCloud
         Me.TrackingMeanColor.Text = "Mean color"
         Me.TrackingMeanColor.UseVisualStyleBackColor = True
         '
-        'DisplayCellStats
-        '
-        Me.DisplayCellStats.AutoSize = True
-        Me.DisplayCellStats.Location = New System.Drawing.Point(1061, 272)
-        Me.DisplayCellStats.Name = "DisplayCellStats"
-        Me.DisplayCellStats.Size = New System.Drawing.Size(158, 24)
-        Me.DisplayCellStats.TabIndex = 80
-        Me.DisplayCellStats.Text = "Display Cell Stats"
-        Me.DisplayCellStats.UseVisualStyleBackColor = True
-        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1585, 604)
-        Me.Controls.Add(Me.DisplayCellStats)
         Me.Controls.Add(Me.ColoringGroup)
         Me.Controls.Add(Me.ColorSource)
         Me.Controls.Add(Me.ColorSourceLabel)
@@ -584,5 +572,4 @@ Partial Class OptionsRedCloud
     Friend WithEvents TrackingDepthColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
-    Friend WithEvents DisplayCellStats As Windows.Forms.CheckBox
 End Class

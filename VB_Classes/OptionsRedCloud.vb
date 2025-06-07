@@ -286,10 +286,6 @@ Public Class OptionsRedCloud
     End Sub
 
 
-    Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs)
-        task.gOptions.displayDst1.Checked = DisplayCellStats.Checked
-        task.optionsChanged = True
-    End Sub
     Public Sub checkSimpleReduction(newVal As Boolean)
         UseSimpleReduction.Checked = newVal
     End Sub

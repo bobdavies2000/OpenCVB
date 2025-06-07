@@ -735,6 +735,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
+        cv.Cv2.ImShow("src", src)
 
         If standalone Then runRedC(src)
 
@@ -770,7 +771,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
             Next
         Next
 
-        If standalone Then
+        If standalone And task.rcList.Count > 0 Then
             Dim rc = task.rcList(task.rcD.index)
             task.color.Rectangle(rc.rect, task.highlight, task.lineWidth)
             For Each pt In rc.ptFacets

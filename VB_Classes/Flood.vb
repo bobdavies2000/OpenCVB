@@ -20,7 +20,6 @@ End Class
 
 Public Class Flood_CellStatsPlot : Inherits TaskParent
     Public Sub New()
-        task.redOptions.DisplayCellStats.Checked = True
         task.gOptions.setHistogramBins(1000)
         desc = "Provide cell stats on the flood_basics cells.  Identical to RedCell_FloodFill"
     End Sub

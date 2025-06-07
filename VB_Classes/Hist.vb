@@ -1345,7 +1345,6 @@ End Class
 Public Class Hist_RedCell : Inherits TaskParent
     Dim hist As New Hist_Depth
     Public Sub New()
-        If standalone Then task.redOptions.DisplayCellStats.Checked = True
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
         desc = "Review depth data for a RedCloud Cell"
