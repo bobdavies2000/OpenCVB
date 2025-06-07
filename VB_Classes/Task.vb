@@ -125,7 +125,6 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lineRGB As LineRGB_Basics
     Public brickBasics As Brick_Basics
-    ' Public fcsBasics As FCS_Basics
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
     Public LRMeanSub As MeanSubtraction_LeftRight

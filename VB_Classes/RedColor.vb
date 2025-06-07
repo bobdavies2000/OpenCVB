@@ -11,7 +11,11 @@ Public Class RedColor_Basics : Inherits TaskParent
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src = srcMustBe8U(src)
+        If standalone Then
+            src = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Else
+            src = srcMustBe8U(src)
+        End If
 
         redMask.inputRemoved = inputRemoved
         redMask.Run(src)

@@ -43,7 +43,7 @@ Public Class Contour_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst3 = srcMustBe8U(src)
+        dst3 = task.edges.dst2
 
         Dim allContours As cv.Point()()
         Dim mode = options.options2.ApproximationMode

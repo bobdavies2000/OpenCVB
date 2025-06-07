@@ -41,7 +41,7 @@ Public Class BrickPoint_Plot : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
     Dim ptBrick As New BrickPoint_Basics
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 3
+        task.gOptions.setHistogramBins(3)
         plotHist.maxRange = 255
         plotHist.minRange = 0
         plotHist.removeZeroEntry = False

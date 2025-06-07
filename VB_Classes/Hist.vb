@@ -1403,7 +1403,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
     Dim ranges() As cv.Rangef
     Public Sub New()
         ranges = {New cv.Rangef(0, 256)}
-        task.gOptions.HistBinBar.Value = 255
+        task.gOptions.setHistogramBins(255)
         desc = "Build a histogram of one cell and predict any neighbors with an contourIndex"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1480,7 +1480,7 @@ Public Class Hist_ToggleFeatureLess : Inherits TaskParent
         plotHist.minRange = 0
         plotHist.removeZeroEntry = False
         plotHist.createHistogram = True
-        task.gOptions.HistBinBar.Value = 255
+        task.gOptions.setHistogramBins(255)
         desc = "Toggle between a histogram of the entire image and one of the featureless regions found with grid points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

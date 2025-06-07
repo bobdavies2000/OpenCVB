@@ -76,7 +76,7 @@ Public Class Deterministic_Histogram : Inherits TaskParent
         plothist.minRange = 0
         plothist.maxRange = 255
         plothist.createHistogram = True
-        task.gOptions.HistBinBar.Value = 255
+        task.gOptions.setHistogramBins(255)
         labels(2) = "Histogram bins range from 0 to 255."
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build a histogram from the differences in an attempt to answer why are the images different."

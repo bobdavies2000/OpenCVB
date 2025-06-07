@@ -58,6 +58,7 @@ End Class
 
 
 
+
 Public Class Color8U_Sweep : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public classCount As Integer

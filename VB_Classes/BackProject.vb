@@ -164,7 +164,7 @@ End Class
 Public Class BackProject_DisplayColor : Inherits TaskParent
     Dim backP As New BackProject_Full
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 10
+        task.gOptions.setHistogramBins(10)
         labels = {"", "", "Back projection", ""}
         desc = "Display the back projected color image"
     End Sub
@@ -631,7 +631,7 @@ Public Class BackProject_FullOld : Inherits TaskParent
     Public classCount As Integer
     Public ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 10
+        task.gOptions.setHistogramBins(10)
         labels = {"", "", "CV_8U format of the backprojection", "dst2 presented with a palette"}
         desc = "Create a color histogram, normalize it, and backproject it with a palette."
     End Sub
@@ -657,7 +657,7 @@ End Class
 Public Class BackProject_InRangeDepthTest : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 4
+        task.gOptions.setHistogramBins(4)
         desc = "An alternative way to get the depth histogram using InRange instead of CalcHist.."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -741,7 +741,7 @@ Public Class BackProject_Full : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
     Dim index As Integer
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 10
+        task.gOptions.setHistogramBins(10)
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = False
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -780,7 +780,7 @@ Public Class BackProject_FullDepth : Inherits TaskParent
     Public classCount As Integer
     Dim plotHist As New Plot_Histogram
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 20
+        task.gOptions.setHistogramBins(20)
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = False
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -823,7 +823,7 @@ End Class
 Public Class BackProject_Basics_Depth : Inherits TaskParent
     Public bpDepth As New BackProject_FullDepth
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 20
+        task.gOptions.setHistogramBins(20)
         desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -843,7 +843,7 @@ End Class
 Public Class BackProject_DepthSlider : Inherits TaskParent
     Public bpDepth As New BackProject_FullDepth
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 20
+        task.gOptions.setHistogramBins(20)
         desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

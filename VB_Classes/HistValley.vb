@@ -633,7 +633,7 @@ Public Class HistValley_Count : Inherits TaskParent
     Public Sub New()
         plot.addLabels = False
         plot.removeZeroEntry = False
-        task.gOptions.HistBinBar.Value = 10
+        task.gOptions.setHistogramBins(10)
         labels(2) = "Horizontal line in the plot is the valley threshold X% of the mean value"
         desc = "Count the number of peaks and valleys in the depth data provided."
     End Sub

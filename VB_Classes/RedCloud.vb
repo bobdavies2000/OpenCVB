@@ -10,7 +10,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedC(task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY), labels(2))
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         prep.Run(src)
@@ -266,23 +266,22 @@ Public Class RedCloud_PrepData : Inherits TaskParent
         dst2.SetTo(0, task.noDepthMask)
 
         If standaloneTest() Then
-            If task.heartBeat Then
-                mm = GetMinMax(dst2)
-                plot.createHistogram = True
-                plot.removeZeroEntry = False
-                plot.maxRange = mm.maxVal
-                plot.Run(dst2)
-                dst3 = plot.dst2
+            mm = GetMinMax(dst2)
+            plot.createHistogram = True
+            plot.removeZeroEntry = False
+            plot.maxRange = mm.maxVal
+            plot.Run(dst2)
+            dst3 = plot.dst2
 
-                For i = 0 To plot.histArray.Count - 1
-                    plot.histArray(i) = i
-                Next
+            For i = 0 To plot.histArray.Count - 1
+                plot.histArray(i) = i
+            Next
 
-                Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
-                cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
-                dst3 = ShowPalette(dst1)
-                labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
-            End If
+            Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
+            cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
+            dst3 = ShowPalette(dst1)
+            dst3.SetTo(0, task.noDepthMask)
+            labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
         End If
 
         labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " + CStr(reduceAmt)
@@ -295,7 +294,7 @@ End Class
 
 
 
-Public Class RedCloud_PrepDataOld : Inherits TaskParent
+Public Class RedCloud_PrepDataHist : Inherits TaskParent
     Public Sub New()
         desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
     End Sub
@@ -402,7 +401,7 @@ Public Class RedCloud_BasicsNew : Inherits TaskParent
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public contourList As New List(Of contourData)
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 64
+        task.gOptions.setHistogramBins(64)
         desc = "Identify the contours in the RedCloud_PrepDataNew output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -425,50 +424,6 @@ End Class
 
 
 
-Public Class RedCloud_PrepDataNew : Inherits TaskParent
-    Public Sub New()
-        task.gOptions.HistBinBar.Value = 64
-        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim histogram As New cv.Mat
-
-        Dim ranges As cv.Rangef()
-        For i = 0 To 1
-            Select Case i
-                Case 0 ' X Reduction
-                    dst1 = task.pcSplit(0)
-                    ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
-                Case 1 ' Y Reduction
-                    dst1 = task.pcSplit(1)
-                    ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
-            End Select
-
-            cv.Cv2.CalcHist({dst1}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
-
-            Dim histArray(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-            For j = 0 To histArray.Count - 1
-                histArray(j) = j
-            Next
-
-            histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
-            cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst1, ranges)
-
-            If i = 0 Then dst2 = dst1.Clone Else dst2 += dst1
-        Next
-
-        dst2.SetTo(0, task.noDepthMask)
-        labels(2) = CStr(task.histogramBins * 2) + " possible depth regions mapped (control with histogram bins.)"
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class RedCloud_PrepDataShow : Inherits TaskParent
     Public prep As New RedCloud_PrepOutline
@@ -479,9 +434,10 @@ Public Class RedCloud_PrepDataShow : Inherits TaskParent
         prep.Run(src)
         dst2 = prep.dst2
 
-        dst2.SetTo(0, task.noDepthMask)
+        ' dst2.SetTo(0, task.noDepthMask)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         Dim mm = GetMinMax(dst2)
-        dst2 = ShowPalette((dst2 * 255 / mm.maxVal).ToMat)
+        'dst2 = ShowPalette((dst2 * 255 / mm.maxVal).ToMat)
 
         labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
     End Sub
@@ -499,7 +455,7 @@ Public Class RedCloud_PrepOutline : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
-        dst2 = prep.dst2
+        dst2 = prep.dst2.Clone
 
         Dim val1 As Single, val2 As Single
         For y = 0 To dst2.Height - 2
@@ -544,7 +500,7 @@ Public Class RedCloud_Contours : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public Sub New()
         task.redC = New RedColor_Basics
-        task.gOptions.HistBinBar.Value = 64
+        task.gOptions.setHistogramBins(64)
         desc = "Identify the contours in the RedCloud_PrepDataNew output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -572,7 +528,7 @@ Public Class RedCloud_Contours1 : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public Sub New()
         task.redC = New RedColor_Basics
-        task.gOptions.HistBinBar.Value = 64
+        task.gOptions.setHistogramBins(64)
         desc = "Identify the contours in the RedCloud_PrepDataNew output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -609,5 +565,57 @@ Public Class RedCloud_Outline : Inherits TaskParent
         dst1.SetTo(0, dst3)
 
         dst2 = runRedC(dst1, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_PrepDataNew : Inherits TaskParent
+    Public Sub New()
+        task.gOptions.setHistogramBins(64)
+        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+
+        Dim ranges As cv.Rangef()
+        For i = 0 To 1
+            Select Case i
+                Case 0 ' X Reduction
+                    dst1 = task.pcSplit(0)
+                    ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                Case 1 ' Y Reduction
+                    dst1 = task.pcSplit(1)
+                    ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
+            End Select
+
+            cv.Cv2.CalcHist({dst1}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+            Dim histArray(histogram.Total - 1) As Single
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+            For j = 0 To histArray.Count - 1
+                histArray(j) = j
+            Next
+
+            histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
+            cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst1, ranges)
+
+            If i = 0 Then dst2 = dst1.Clone Else dst2 += dst1
+        Next
+
+        'dst2.SetTo(0, task.noDepthMask)
+
+        'dst3.SetTo(0)
+        'For Each brick In task.brickList
+        '    Dim mm = GetMinMax(dst2(brick.rect))
+        '    If mm.range > 2 Then dst3.Rectangle(brick.rect, task.highlight, task.lineWidth)
+        'Next
+        labels(2) = CStr(task.histogramBins * 2) + " possible depth regions mapped (control with histogram bins.)"
     End Sub
 End Class
