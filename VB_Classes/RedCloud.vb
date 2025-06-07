@@ -1,8 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
-    Dim prep As New RedCloud_PrepData
+    Dim prep As New RedCloud_PrepDataNew
     Public redMask As New RedMask_Basics
+    Public cellGen As New RedCell_Generate
     Dim rcMask As cv.Mat
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -10,35 +11,20 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY), labels(2))
-        dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        'dst2 = runRedC(task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY), labels(2))
+        'dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         prep.Run(src)
-        redMask.Run(prep.dst2 And dst1)
+        redMask.Run(prep.dst2)
         labels(1) = CStr(redMask.mdList.Count) + " maskData cells found in the point cloud."
 
-        If task.heartBeat Then strOut = ""
-        For i = 0 To task.rcList.Count - 1
-            Dim rc = task.rcList(i)
-            rcMask.SetTo(0)
-            rcMask(rc.rect).SetTo(255, rc.mask)
-            rc.mdList = New List(Of maskData)
-            For Each md In redMask.mdList
-                Dim index = rcMask.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
-                If index > 0 Then rc.mdList.Add(md)
-            Next
-            If rc.mdList.Count > 0 Then
-                For j = 0 To rc.mdList.Count - 1
-                    Dim md = rc.mdList(j)
-                    rcMask(md.rect) = rcMask(md.rect) And md.mask
-                    md.mask = rcMask(md.rect).Clone
-                    rc.mdList(j) = md
-                Next
-                task.rcList(i) = rc
-            End If
-        Next
+        If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+        cellGen.mdList = redMask.mdList
+        cellGen.Run(redMask.dst2)
 
-        SetTrueText(strOut, 3)
+        dst2 = cellGen.dst2
+
+        labels(2) = cellGen.labels(2)
     End Sub
 End Class
 
@@ -606,9 +592,11 @@ Public Class RedCloud_PrepDataNew : Inherits TaskParent
             histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
             cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst1, ranges)
 
-            If i = 0 Then dst2 = dst1.Clone Else dst2 += dst1
+            If i = 0 Then dst3 = dst1.Clone Else dst3 += dst1
         Next
 
+        dst3.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2.SetTo(0, task.noDepthMask)
         'dst2.SetTo(0, task.noDepthMask)
 
         'dst3.SetTo(0)
