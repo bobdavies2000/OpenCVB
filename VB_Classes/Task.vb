@@ -14,7 +14,6 @@ Public Class VBtask : Implements IDisposable
 
     Public lpList As New List(Of lpData) ' line pair list
     Public brickList As New List(Of brickData)
-    Public contourList As New List(Of contourData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of rcData)
@@ -23,7 +22,6 @@ Public Class VBtask : Implements IDisposable
     Public logicalLines As New List(Of lpData)
 
     Public brickMap As New cv.Mat ' map of bricks to index in bricklist
-    Public contourMap As New cv.Mat ' map of contours to index in contourList
     Public lpMap As New cv.Mat ' map of each line's bricks...
     Public fpMap As New cv.Mat ' feature map
     Public rcMap As cv.Mat ' redColor map
@@ -511,8 +509,6 @@ Public Class VBtask : Implements IDisposable
         featureOptions = New OptionsFeatures
         If testAllRunning = False Then treeView = New TreeviewForm
 
-        task.contourMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.rcList = New List(Of rcData)
 
@@ -579,17 +575,6 @@ Public Class VBtask : Implements IDisposable
     Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New TrueText(text, pt, picTag)
         trueData.Add(str)
-    End Sub
-    Public Sub setSelectedCell(ByRef rcList As List(Of rcData), ByRef cellMap As cv.Mat)
-        If rcList.Count = 0 Then Exit Sub
-        If ClickPoint = newPoint And rcList.Count > 1 Then ClickPoint = rcList(1).maxDist
-        Dim index = cellMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
-        If index = 0 Then Exit Sub
-        task.rcD = rcList(index)
-        If index > 0 And index < rcList.Count Then
-            ' ClickPoint = rcList(index).maxDist
-            task.rcD = rcList(index)
-        End If
     End Sub
     Public Sub setSelectedCell()
         If rcList.Count = 0 Then Exit Sub

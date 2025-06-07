@@ -78,31 +78,35 @@ public:
         result.convertTo(result, CV_8U);
 
         uchar* res = (uchar*)result.data;
-        for (int y = 0; y < dst.rows - 1; y++)
+        for (int y = 0; y < dst.rows - 2; y++)
         {
-            for (int x = 0; x < dst.cols - 1; x++)
+            for (int x = 0; x < dst.cols - 2; x++)
             {
-                int offset = dst.cols * y + x;
-                uchar val1 = res[offset];
-                uchar val2 = res[offset + 1];
+                int loc = dst.cols * y + x;
+                uchar val1 = res[loc];
+                uchar val2 = res[loc + 1];
                 bool zipData = false;
                 if (val1 != 0 && val2 != 0)
                     if (val1 != val2) zipData = true;
 
-                val2 = res[offset + dst.cols];
+                val2 = res[loc + dst.cols];
                 if (val1 != 0 && val2 != 0)
                     if (val1 != val2) zipData = true;
 
                 if (zipData) 
                 {
-                    res[offset] = 0;
-                    res[offset + 1] = 0;
-                    res[offset + dst.cols] = 0;
-                    res[offset + dst.cols + 1] = 0;
+                    res[loc] = 0;
+                    res[loc + 1] = 0;
+                    res[loc + dst.cols] = 0;
+                    res[loc + dst.cols + 1] = 0;
+                    //res[loc + 2] = 0;
+                    //res[loc + dst.cols * 2] = 0;
+                    //res[loc + dst.cols * 2 + 1] = 0;
                 }
             }
         }
         result.col(dst.cols - 1).setTo(0);
+        result.col(dst.cols - 2).setTo(0);
     }
 };
 

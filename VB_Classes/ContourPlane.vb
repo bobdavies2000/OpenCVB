@@ -5,12 +5,12 @@ Public Class ContourPlane_Basics : Inherits TaskParent
         desc = "Construct a simple plane from the interior bricks of the top contours"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.contourMap)
+        dst2 = ShowPalette(task.contours.contourMap)
         labels(2) = task.contours.labels(2)
 
         dst1.SetTo(0)
         Dim depth As Single
-        For Each contour In task.contourList
+        For Each contour In task.contours.contourList
             If contour.bricks.Count = 0 Then Continue For
             depth = 0
             For Each index In contour.bricks
@@ -35,11 +35,11 @@ Public Class ContourPlane_Simple : Inherits TaskParent
         desc = "Construct a simple plane at the average depth for each of the top contours"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.contourMap)
+        dst2 = ShowPalette(task.contours.contourMap)
         labels(2) = task.contours.labels(2)
 
         dst1.SetTo(0)
-        For Each contour In task.contourList
+        For Each contour In task.contours.contourList
             Dim depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
             dst1(contour.rect).SetTo(depth, contour.mask)
         Next
@@ -59,11 +59,11 @@ Public Class ContourPlane_Templates : Inherits TaskParent
         desc = "Use a gradient to build a contour with a single depth value."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.contourMap)
+        dst2 = ShowPalette(task.contours.contourMap)
         labels(2) = task.contours.labels(2)
 
         dst1.SetTo(0)
-        For Each contour In task.contourList
+        For Each contour In task.contours.contourList
             If contour.bricks.Count = 0 Then Continue For
             contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
             dst1(contour.rect).SetTo(contour.depth, contour.mask)
@@ -85,8 +85,8 @@ Public Class ContourPlane_MaxDist : Inherits TaskParent
         desc = "Show the maxDist value in color (yellow) and in depth (blue)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.contourMap)
-        For Each contour In task.contourList
+        dst2 = ShowPalette(task.contours.contourMap)
+        For Each contour In task.contours.contourList
             Dim maxDist = GetMaxDistDepth(contour.mask, contour.rect)
             dst2.Circle(maxDist, task.DotSize, task.highlight, -1, task.lineType)
             maxDist = GetMaxDist(contour.mask, contour.rect)
@@ -105,9 +105,9 @@ Public Class ContourPlane_RectX : Inherits TaskParent
         desc = "Assume the plane in a contour in X"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.contourMap)
+        dst2 = ShowPalette(task.contours.contourMap)
         labels(2) = task.contours.labels(2)
-        For Each contour In task.contourList
+        For Each contour In task.contours.contourList
             Dim maxDist = GetMaxDistDepth(contour.mask, contour.rect)
 
             Dim rleft = contour.rect, rRight = contour.rect
@@ -148,8 +148,8 @@ Public Class ContourPlane_X : Inherits TaskParent
         desc = "Assume the plane in a contour in X"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.contourMap)
-        For Each contour In task.contourList
+        dst2 = ShowPalette(task.contours.contourMap)
+        For Each contour In task.contours.contourList
             Dim maxDist = GetMaxDistDepth(contour.mask, contour.rect)
 
             Dim rleft = contour.rect, rRight = contour.rect

@@ -724,7 +724,7 @@ Public Class PointCloud_Templates : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             src = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-            For Each contour In task.contourList
+            For Each contour In task.contours.contourList
                 If contour.bricks.Count = 0 Then Continue For
                 contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
                 src(contour.rect).SetTo(contour.depth, contour.mask)

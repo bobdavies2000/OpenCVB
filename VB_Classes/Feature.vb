@@ -735,7 +735,6 @@ Public Class Feature_FacetPoints : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
-        cv.Cv2.ImShow("src", src)
 
         If standalone Then runRedC(src)
 

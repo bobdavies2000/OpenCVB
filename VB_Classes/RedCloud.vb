@@ -451,7 +451,7 @@ Public Class RedCloud_Outline : Inherits TaskParent
         dst3.SetTo(0, task.noDepthMask)
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
 
-        dst1 = task.contourMap
+        dst1 = task.contours.contourMap
         dst1.SetTo(0, dst3)
 
         dst2 = runRedC(dst1, labels(2))
@@ -512,6 +512,7 @@ Public Class RedCloud_Contours : Inherits TaskParent
     Dim prep As New RedCloud_PrepXY
     Dim options As New Options_Contours
     Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
@@ -528,13 +529,13 @@ Public Class RedCloud_Contours : Inherits TaskParent
         If allContours.Count <= 1 Then Exit Sub
 
         contourList = Contour_Basics.sortContours(allContours, 255)
-        dst1.SetTo(0)
+        contourMap.SetTo(0)
         For Each contour In contourList
-            dst1(contour.rect).SetTo(contour.index, contour.mask)
+            contourMap(contour.rect).SetTo(contour.index, contour.mask)
         Next
 
-        dst3 = ShowPalette(dst1)
-        labels(2) = CStr(contourList.Count) + " contours were found."
+        dst3 = ShowPalette(contourMap)
+        If task.heartBeat Then labels(2) = CStr(contourList.Count) + " depth contours were found."
     End Sub
 End Class
 
@@ -597,6 +598,8 @@ Public Class RedCloud_RedColor : Inherits TaskParent
         End If
 
         dst3 = task.contours.dst2
+        dst3(task.contourD.rect).SetTo(white, task.contourD.mask)
+        Contour_Info.setContourSelection(contours.contourList, contours.contourmap)
         labels(3) = task.contours.labels(2)
     End Sub
 End Class

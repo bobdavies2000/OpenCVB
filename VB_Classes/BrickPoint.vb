@@ -345,7 +345,7 @@ Public Class BrickPoint_RedCloud : Inherits TaskParent
         dst2 = task.contours.dst2
         labels(2) = task.contours.labels(2)
 
-        dst3 = runRedC(src, labels(3), task.contourMap)
+        dst3 = runRedC(src, labels(3), task.contours.contourMap)
     End Sub
 End Class
 
@@ -388,9 +388,9 @@ Public Class BrickPoint_FeatureLess : Inherits TaskParent
         DrawFullPartialBricks()
 
         dst3 = ShowAddweighted(dst2, task.contours.dst2, labels(3))
-        classCount = task.contourList.Count
+        classCount = task.contours.contourList.Count
         labels(2) = task.contours.labels(2)
-        labels(3) = "Of the " + CStr(task.contourList.Count) + " contours " + CStr(classCount) +
+        labels(3) = "Of the " + CStr(task.contours.contourList.Count) + " contours " + CStr(classCount) +
                     " have complete bricks inside them."
     End Sub
 End Class

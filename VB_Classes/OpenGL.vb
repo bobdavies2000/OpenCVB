@@ -2015,7 +2015,7 @@ Public Class OpenGL_ContourPlaneOnly : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim quadData As New List(Of cv.Point3f)
-        For Each contour In task.contourList
+        For Each contour In task.contours.contourList
             Dim c = task.scalarColors(contour.index)
             Dim color As cv.Point3f = New cv.Point3f(c(0), c(1), c(2))
 

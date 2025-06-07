@@ -39,26 +39,33 @@ End Class
 
 
 Public Class Hull_Contour : Inherits TaskParent
+    Dim contours As New Contour_General
     Public Sub New()
-        desc = "Compare the hull to the contour of a RedCloud cell"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Compare the hull to the contour of a contour cell"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Contour_Info.setContourSelection(task.contours.contourList, task.contours.contourMap)
+
+        dst2.SetTo(0)
+        dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
+        contours.Run(dst2)
+        'dst3.SetTo(0)
+        'Dim contour = task.contourD
+
+        'Dim jumpList As New List(Of cv.Point)
+        'For i = 1 To rc.contour.Count - 1
+        '    Dim p1 = rc.contour(i - 1)
+        '    Dim p2 = rc.contour(i)
+        '    If p1.DistanceTo(p2) > 1 Then
+        '        If jumpList.Contains(p2) = False Then jumpList.Add(p2)
+        '    End If
+        'Next
 
         dst3.SetTo(0)
-        Dim rc = task.rcD
-
-        Dim jumpList As New List(Of cv.Point)
-        For i = 1 To rc.contour.Count - 1
-            Dim p1 = rc.contour(i - 1)
-            Dim p2 = rc.contour(i)
-            If p1.DistanceTo(p2) > 1 Then
-                If jumpList.Contains(p2) = False Then jumpList.Add(p2)
-            End If
-        Next
-        rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
-        DrawContour(dst3, rc.contour, cv.Scalar.LightBlue, task.lineWidth)
-        If rc.hull.Count > 0 Then rc.hull.RemoveAt(rc.hull.Count - 1)
-        DrawContour(dst3, rc.hull, white, task.lineWidth)
+        Dim hull = cv.Cv2.ConvexHull(contours.allContours(0).ToArray, True).ToList
+        DrawContour(dst3, contours.allContours(0).ToList, white, -1)
+        ' If hull.Count > 0 Then hull.RemoveAt(hull.Count - 1)
+        DrawContour(dst3, hull, white, task.lineWidth)
     End Sub
 End Class

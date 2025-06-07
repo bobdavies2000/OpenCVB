@@ -91,15 +91,15 @@ Public Class Brick_Basics : Inherits TaskParent
                 brick.depthRanges.RemoveAt(0)
             End If
 
-            Dim contourIndex = task.contourMap.Get(Of Byte)(brick.center.Y, brick.center.X)
+            Dim contourIndex = task.contours.contourMap.Get(Of Byte)(brick.center.Y, brick.center.X)
             If contourIndex > 0 Then
                 If task.edges.dst2(brick.rect).CountNonZero = 0 Then
-                    task.contourList(contourIndex).bricks.Add(brick.index)
+                    task.contours.contourList(contourIndex).bricks.Add(brick.index)
                     brick.contourFull = contourIndex
                     brickFull += 1
                 Else
                     If contourIndex > 0 Then
-                        task.contourList(contourIndex).brickPartial.Add(brick.index)
+                        task.contours.contourList(contourIndex).brickPartial.Add(brick.index)
                         brick.contourPartial = contourIndex
                         brickPartial += 1
                     End If
@@ -111,21 +111,21 @@ Public Class Brick_Basics : Inherits TaskParent
         If task.heartBeat Then
             labels(2) = CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) + " are featureless - " +
                         Format(brickFull / task.gridRects.Count, "00%") +
-                        " of bricks were fully interior in the " + CStr(task.contourList.Count) + " contours." +
+                        " of bricks were fully interior in the " + CStr(task.contours.contourList.Count) + " contours." +
                         CStr(brickPartial) + " partial contour bricks"
         End If
 
         DrawFullPartialBricks()
 
         Dim depth As Single
-        For Each contour In task.contourList
+        For Each contour In task.contours.contourList
             depth = 0
             For Each index In contour.bricks
                 depth += task.brickList(index).depth
             Next
             contour.depth = depth / contour.bricks.Count
         Next
-        dst3 = ShowPaletteCorrelation(task.contourMap)
+        dst3 = ShowPaletteCorrelation(task.contours.contourMap)
     End Sub
 End Class
 
