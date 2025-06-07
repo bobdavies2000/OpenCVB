@@ -2,12 +2,10 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Flann
 Public Class RedColor_Basics : Inherits TaskParent
-    Public inputRemoved As New cv.Mat
+    Public inputRemoved As cv.Mat
     Public cellGen As New RedCell_Generate
     Dim redMask As New RedMask_Basics
     Public Sub New()
-        task.gOptions.setHistogramBins(40)
-        inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -17,7 +15,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             src = srcMustBe8U(src)
         End If
 
-        redMask.inputRemoved = inputRemoved
+        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
         redMask.Run(src)
 
         If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.

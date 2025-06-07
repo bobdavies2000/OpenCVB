@@ -95,7 +95,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
         End If
 
         dst3 = inputRemoved
-        redMask.inputRemoved = inputRemoved
+        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
         redMask.Run(src)
 
         cellGen.mdList = redMask.mdList

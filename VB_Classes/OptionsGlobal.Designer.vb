@@ -275,7 +275,7 @@ Partial Class OptionsGlobal
         Me.HistBinBar.Size = New System.Drawing.Size(506, 69)
         Me.HistBinBar.TabIndex = 43
         Me.HistBinBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.HistBinBar.Value = 40
+        Me.HistBinBar.Value = 16
         '
         'labelbins
         '

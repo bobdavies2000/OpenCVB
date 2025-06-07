@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
     Public options As New Options_Contours
     Public classCount As Integer
-    Dim contourBricks As New Contour_Bricks
     Public Sub New()
         OptionParent.findRadio("List").Checked = True
         labels(3) = "Input to OpenCV's FindContours"
@@ -62,18 +61,12 @@ Public Class Contour_Basics : Inherits TaskParent
         Next
         classCount = task.contourList.Count
 
-        If task.toggleOn Or task.gOptions.DebugCheckBox.Checked Then
-            dst2 = ShowPalette(task.contourMap)
-            For Each contour In task.contourList
-                dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
-            Next
-            ' dst2.SetTo(white, task.contourMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
-        Else
-            contourBricks.Run(emptyMat)
-            dst2 = contourBricks.dst2
-        End If
+        dst2 = ShowPalette(task.contourMap)
+        For Each contour In task.contourList
+            dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
+        Next
 
-        labels(2) = contourBricks.labels(2)
+        labels(2) = CStr(task.contourList.Count) + " contours were found"
     End Sub
 End Class
 

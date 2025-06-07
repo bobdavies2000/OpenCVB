@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedMask_Basics : Inherits TaskParent
-    Public inputRemoved As cv.Mat
     Public mdList As New List(Of maskData)
     Public classCount As Integer
     Public Sub New()

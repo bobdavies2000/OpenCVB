@@ -37,6 +37,106 @@ using namespace ximgproc;
 using namespace ml;
 
 #include "CPP_Parent.h"
+class PrepXY
+{
+private:
+public:
+    Mat dst, result;
+    vector<Rect>cellRects;
+    vector<Point> floodPoints;
+
+    PrepXY() {}
+    void RunCPP(Mat splitX, Mat splitY, float xRange, float yRange, int bins) {
+        float ranges[] = { -xRange, xRange };
+        Mat histogram; Mat input;
+        int hbins[] = { bins };
+        for (int i = 0; i < 2; i++)
+        {
+            if (i == 0)
+            {
+                ranges[0] = -xRange;
+                ranges[1] = xRange;
+                input = splitX;
+            }
+            else {
+                ranges[0] = -yRange;
+                ranges[1] = yRange;
+                input = splitY;
+            }
+
+            const float* range[] = { ranges };
+            calcHist(&input, 1, { 0 }, Mat(), histogram, 1, hbins, range);
+
+            float* histArray = (float*)histogram.data;
+            for (int j = 0; j < histogram.rows; j++) histArray[j] = j;
+
+            calcBackProject(&input, 1, 0, histogram, dst, range);
+
+            if (i == 0) result = dst.clone(); else result += dst;
+        }
+
+        result.convertTo(result, CV_8U);
+
+        uchar* res = (uchar*)result.data;
+        for (int y = 0; y < dst.rows - 1; y++)
+        {
+            for (int x = 0; x < dst.cols - 1; x++)
+            {
+                int offset = dst.cols * y + x;
+                uchar val1 = res[offset];
+                uchar val2 = res[offset + 1];
+                bool zipData = false;
+                if (val1 != 0 && val2 != 0)
+                    if (val1 != val2) zipData = true;
+
+                val2 = res[offset + dst.cols];
+                if (val1 != 0 && val2 != 0)
+                    if (val1 != val2) zipData = true;
+
+                if (zipData) 
+                {
+                    res[offset] = 0;
+                    res[offset + 1] = 0;
+                    res[offset + dst.cols] = 0;
+                    res[offset + dst.cols + 1] = 0;
+                }
+            }
+        }
+    }
+};
+
+extern "C" __declspec(dllexport) PrepXY* PrepXY_Open()
+{
+    return new PrepXY();
+}
+
+extern "C" __declspec(dllexport) int PrepXY_Count(PrepXY* cPtr)
+{
+    return (int)cPtr->cellRects.size();
+}
+
+extern "C" __declspec(dllexport) int* PrepXY_Rects(PrepXY* cPtr)
+{
+    return (int*)&cPtr->cellRects[0];
+}
+
+extern "C" __declspec(dllexport) int* PrepXY_Close(PrepXY* cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int*
+PrepXY_Run(PrepXY* cPtr, int* splitXPtr, int* splitYPtr, int rows, int cols, float xRange, float yRange, int bins)
+{
+    Mat splitX = Mat(rows, cols, CV_32F, splitXPtr);
+    Mat splitY = Mat(rows, cols, CV_32F, splitYPtr);
+
+    cPtr->RunCPP(splitX, splitY, xRange, yRange, bins);
+
+    return (int*)cPtr->result.data;
+}
+
+
+
+
+
+
 class RedMask
 {
 private:
@@ -110,7 +210,6 @@ RedMask_Run(RedMask* cPtr, int* dataPtr, int rows, int cols, int minSize)
 
     return (int*)cPtr->result.data;
 }
-
 
 
 
