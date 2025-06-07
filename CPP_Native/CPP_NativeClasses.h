@@ -102,6 +102,7 @@ public:
                 }
             }
         }
+        result.col(dst.cols - 1).setTo(0);
     }
 };
 

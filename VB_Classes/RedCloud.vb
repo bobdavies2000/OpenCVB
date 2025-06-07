@@ -511,6 +511,7 @@ End Class
 Public Class RedCloud_Contours : Inherits TaskParent
     Dim prep As New RedCloud_PrepXY
     Dim options As New Options_Contours
+    Public contourList As New List(Of contourData)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
@@ -526,7 +527,7 @@ Public Class RedCloud_Contours : Inherits TaskParent
         cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.List, mode)
         If allContours.Count <= 1 Then Exit Sub
 
-        Dim contourList = Contour_Basics.sortContours(allContours, 255)
+        contourList = Contour_Basics.sortContours(allContours, 255)
         dst1.SetTo(0)
         For Each contour In contourList
             dst1(contour.rect).SetTo(contour.index, contour.mask)
@@ -571,5 +572,31 @@ Public Class RedCloud_PrepXY : Inherits TaskParent
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_RedColor : Inherits TaskParent
+    Dim contours As New RedCloud_Contours
+    Public Sub New()
+        desc = "Show the output of the RedCloud and RedColor cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        contours.Run(src)
+        dst2 = contours.dst3
+        labels(2) = contours.labels(2)
+
+        If task.heartBeat Then
+            For Each contour In contours.contourList
+                SetTrueText(CStr(contour.index), contour.center, 2)
+            Next
+        End If
+
+        dst3 = task.contours.dst2
+        labels(3) = task.contours.labels(2)
     End Sub
 End Class
