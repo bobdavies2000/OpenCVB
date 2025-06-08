@@ -137,8 +137,9 @@ Public Class LeftRight_RedRight : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = task.rightView.Clone
         fLess.Run(task.rightView)
-        redMask.Run(fLess.dst2)
-        dst2 = ShowPalette(redMask.dst2 - 1)
+        dst2 = fLess.dst2
+        redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = ShowPalette(redMask.dst2)
         labels(2) = redMask.labels(2)
     End Sub
 End Class
@@ -158,8 +159,8 @@ Public Class LeftRight_RedLeft : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = task.leftView.Clone
         fLess.Run(task.leftView)
-        redMask.Run(fLess.dst2)
-        dst2 = ShowPalette(redMask.dst2 - 1)
+        redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = ShowPalette(redMask.dst2).Clone
         labels(2) = redMask.labels(2)
     End Sub
 End Class
@@ -178,23 +179,23 @@ Public Class LeftRight_RedMask : Inherits TaskParent
         desc = "Display the RedMask_Basics output for both the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        redLeft.Run(src)
+        redLeft.Run(task.leftView)
         dst2 = redLeft.dst2.Clone
         If standaloneTest() Then
             For Each md In redLeft.redMask.mdList
-                'DrawContour(dst2(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
                 DrawCircle(dst2, md.maxDist, task.DotSize, task.highlight)
             Next
         End If
 
-        redRight.Run(src)
-        dst3 = redRight.dst2
+        redRight.Run(task.rightView)
+        dst3 = redRight.dst2.Clone
         If standaloneTest() Then
             For Each md In redRight.redMask.mdList
-                'DrawContour(dst3(md.rect), md.contour, cv.Scalar.White, task.lineWidth)
                 DrawCircle(dst3, md.maxDist, task.DotSize, task.highlight)
             Next
         End If
+        labels(2) = redLeft.labels(2)
+        labels(3) = redRight.labels(2)
     End Sub
 End Class
 
@@ -299,3 +300,7 @@ Public Class LeftRight_Lines : Inherits TaskParent
         labels(3) = "There were " + CStr(rightLines.Count) + " lines found in the right view"
     End Sub
 End Class
+
+
+
+

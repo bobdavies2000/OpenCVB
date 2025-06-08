@@ -10,13 +10,13 @@ Public Class RedColor_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            src = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            src = srcMustBe8U(src)
+            dst1 = srcMustBe8U(src)
         End If
 
-        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
-        redMask.Run(src)
+        If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
+        redMask.Run(dst1)
 
         If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
         cellGen.mdList = redMask.mdList
@@ -27,7 +27,6 @@ Public Class RedColor_Basics : Inherits TaskParent
         labels(2) = cellGen.labels(2)
 
         dst3.SetTo(0)
-        task.gOptions.displayDst1.Checked = False
         labels(3) = ""
         SetTrueText("", newPoint, 1)
         task.setSelectedCell()
@@ -76,7 +75,7 @@ Public Class RedColor_Hulls : Inherits TaskParent
                 Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
                 Try
                     Dim defects = cv.Cv2.ConvexityDefects(rc.contour, hullIndices)
-                    rc.contour = convex.betterContour(rc.contour, defects)
+                    rc.contour = Convex_RedCloudDefects.betterContour(rc.contour, defects)
                 Catch ex As Exception
                     defectCount += 1
                 End Try
@@ -1278,7 +1277,7 @@ Public Class RedColor_MaxDist_CPP : Inherits TaskParent
         desc = "Run the C++ RedCloudMaxDist interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src = srcMustBe8U(src)
+        dst1 = srcMustBe8U(src)
 
         If task.heartBeat Then maxList.Clear() ' reevaluate all cells.
         Dim maxArray = maxList.ToArray
@@ -1287,13 +1286,13 @@ Public Class RedColor_MaxDist_CPP : Inherits TaskParent
         handleMaxList.Free()
 
         Dim imagePtr As IntPtr
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim inputData(dst1.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols)
+        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, dst1.Rows, dst1.Cols)
         handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst3 = ShowPalette(dst2)
 
         classCount = RedCloudMaxDist_Count(cPtr)
@@ -1897,15 +1896,15 @@ Public Class RedColor_CPP : Inherits TaskParent
         desc = "Run the C++ RedCloud Interface With Or without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src = srcMustBe8U(src)
+        dst1 = srcMustBe8U(src)
 
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim inputData(dst1.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
+        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
         handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
         dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
 
         classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
@@ -1946,15 +1945,15 @@ Public Class RedColor_BasicsNoMask : Inherits TaskParent
         desc = "Run the C++ RedCloud Interface With Or without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src = srcMustBe8U(src)
+        dst1 = srcMustBe8U(src)
 
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim inputData(dst1.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, 0)
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
         handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
         classCount = Math.Min(RedCloud_Count(cPtr), identifyCount * 2)
         If classCount = 0 Then Exit Sub ' no data to process.

@@ -848,11 +848,11 @@ Public Class Contour_Basics_List : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst1 = srcMustBe8U(src)
+        dst3 = srcMustBe8U(src)
 
         Dim allContours As cv.Point()()
         Dim mode = options.options2.ApproximationMode
-        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.List, mode)
+        cv.Cv2.FindContours(dst3, allContours, Nothing, cv.RetrievalModes.List, mode)
         If allContours.Count <= 1 Then Exit Sub
 
         contourList = Contour_Basics.sortContours(allContours, 255)

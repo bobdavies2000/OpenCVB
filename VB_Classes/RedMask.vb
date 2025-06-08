@@ -5,18 +5,19 @@ Public Class RedMask_Basics : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         cPtr = RedMask_Open()
+        If standalone Then task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src = srcMustBe8U(src)
+        dst1 = srcMustBe8U(src)
 
-        Dim inputData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim inputData(dst1.Total * dst1.ElemSize - 1) As Byte
+        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, task.rcPixelThreshold)
+        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, task.rcPixelThreshold)
         handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
         dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
 
         classCount = RedMask_Count(cPtr)

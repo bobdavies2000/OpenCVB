@@ -4,9 +4,15 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         desc = "Use Contour_Basics to get the contour data for the top X contours."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.contours.dst2
-        dst3 = task.contours.dst3
-        labels = task.contours.labels
+        If src.Type <> cv.MatType.CV_8U Then
+            dst2 = task.contours.dst2
+            labels = task.contours.labels
+        Else
+            Static contours As New Contour_Basics_List
+            contours.Run(src)
+            dst2 = contours.dst2.Clone
+            labels = contours.labels
+        End If
     End Sub
 End Class
 
