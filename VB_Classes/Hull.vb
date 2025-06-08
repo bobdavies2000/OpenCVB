@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Documents
+Imports cv = OpenCvSharp
 Public Class Hull_Basics : Inherits TaskParent
     Dim random As New Random_Basics
     Public inputPoints As New List(Of cv.Point2f)
@@ -16,7 +17,7 @@ Public Class Hull_Basics : Inherits TaskParent
         Next
         Return ptList
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
             random.Run(src)
             dst2.SetTo(0)
@@ -39,7 +40,8 @@ End Class
 
 
 Public Class Hull_Contour : Inherits TaskParent
-    Dim contours As New Contour_General
+    Public contours As New Contour_General
+    Public hull As New List(Of cv.Point)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Compare the hull to the contour of a contour cell"
@@ -50,22 +52,52 @@ Public Class Hull_Contour : Inherits TaskParent
         dst2.SetTo(0)
         dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
         contours.Run(dst2)
-        'dst3.SetTo(0)
-        'Dim contour = task.contourD
-
-        'Dim jumpList As New List(Of cv.Point)
-        'For i = 1 To rc.contour.Count - 1
-        '    Dim p1 = rc.contour(i - 1)
-        '    Dim p2 = rc.contour(i)
-        '    If p1.DistanceTo(p2) > 1 Then
-        '        If jumpList.Contains(p2) = False Then jumpList.Add(p2)
-        '    End If
-        'Next
 
         dst3.SetTo(0)
-        Dim hull = cv.Cv2.ConvexHull(contours.allContours(0).ToArray, True).ToList
+        hull = cv.Cv2.ConvexHull(contours.allContours(0).ToArray, True).ToList
         DrawContour(dst3, contours.allContours(0).ToList, white, -1)
-        ' If hull.Count > 0 Then hull.RemoveAt(hull.Count - 1)
         DrawContour(dst3, hull, white, task.lineWidth)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Hull_Defect : Inherits TaskParent
+    Public hull As New List(Of cv.Point)
+    Public contour As cv.Point()
+    Public Sub New()
+        desc = "Find defects in the hull provided."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static hContour = New Hull_Contour
+            hContour.run(src)
+            dst2 = hContour.dst2
+            hull = hContour.hull
+            contour = hContour.contours.allContours(0)
+        End If
+
+        Dim hullIndices = cv.Cv2.ConvexHullIndices(contour, False)
+        Dim defects = cv.Cv2.ConvexityDefects(contour, hullIndices.ToList)
+
+        Dim lastV As Integer = -1
+        Dim newC As New List(Of cv.Point)
+        For Each v In defects
+            If v(0) <> lastV And lastV >= 0 Then
+                For i = lastV To v(0) - 1
+                    newC.Add(contour(i))
+                Next
+            End If
+            newC.Add(contour(v(0)))
+            newC.Add(contour(v(2)))
+            newC.Add(contour(v(1)))
+            lastV = v(1)
+        Next
+        dst3.SetTo(0)
+        DrawContour(dst3, newC, white)
+    End Sub
+End Class
+

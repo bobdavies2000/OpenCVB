@@ -114,7 +114,7 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
         labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedColor_Basics"}
         desc = "Find the convexityDefects in the selected RedCloud cell"
     End Sub
-    Public Function betterContour(c As List(Of cv.Point), defects() As cv.Vec4i) As List(Of cv.Point)
+    Public Shared Function betterContour(c As List(Of cv.Point), defects() As cv.Vec4i) As List(Of cv.Point)
         Dim lastV As Integer = -1
         Dim newC As New List(Of cv.Point)
         For Each v In defects
