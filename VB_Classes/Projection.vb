@@ -112,7 +112,7 @@ Public Class Projection_Lines : Inherits TaskParent
         dst1 = dst2.Threshold(options.projectionThreshold, 255, cv.ThresholdTypes.Binary)
 
         dst3.SetTo(0)
-        dst3.SetTo(cv.Scalar.White, task.lpMap.ConvertScaleAbs)
+        dst3.SetTo(cv.Scalar.White, task.lineRGB.lpMap.ConvertScaleAbs)
     End Sub
 End Class
 

@@ -125,10 +125,10 @@ Public Class Interpolate_Lines : Inherits TaskParent
         dst2 = task.lineRGB.dst2
         dst3 = src
 
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
         Next
-        labels(3) = "There were " + CStr(task.lpList.Count) + " lines found"
+        labels(3) = "There were " + CStr(task.lineRGB.lpList.Count) + " lines found"
         labels(2) = inter.labels(2)
     End Sub
 End Class

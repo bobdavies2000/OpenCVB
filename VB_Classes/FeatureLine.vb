@@ -10,13 +10,13 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         options.Run()
 
         dst3.SetTo(0)
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
         dst2 = src
-        If task.lpList.Count > 1 Then
-            Dim lpt = task.lpList(1)
+        If task.lineRGB.lpList.Count > 1 Then
+            Dim lpt = task.lineRGB.lpList(1)
             dst2.Line(lpt.p1, lpt.p2, task.highlight, task.lineWidth + 1, task.lineType)
         End If
     End Sub

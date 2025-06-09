@@ -605,7 +605,7 @@ Public Class Brick_RegionLines : Inherits TaskParent
         dst3 = regions.dst3
         labels = regions.labels
 
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
             Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
             If c1 <> c2 Then
@@ -771,7 +771,7 @@ Public Class Brick_Lines : Inherits TaskParent
 
         SetTrueText(info.strOut, 3)
 
-        dst2 = ShowPalette(task.lpMap.ConvertScaleAbs())
+        dst2 = ShowPalette(task.lineRGB.lpMap.ConvertScaleAbs())
         labels(2) = task.lineRGB.labels(2) + " - Click on any line in below to get details on that line."
     End Sub
 End Class

@@ -186,7 +186,7 @@ Public Class LineRGB_BasicsAlternative : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines across frames using the motion mask.  Results are in task.lplist."
+        desc = "Collect lines across frames using the motion mask.  Results are in task.linergb.lpList."
     End Sub
     Private Function getLineCounts(lpList As List(Of lpData)) As Single()
         Dim histarray(lpList.Count - 1) As Single
@@ -205,7 +205,7 @@ Public Class LineRGB_BasicsAlternative : Inherits TaskParent
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then task.lpList.Clear()
+        If task.optionsChanged Then task.lineRGB.lpList.Clear()
 
         Dim histArray = getLineCounts(lines.lpList)
         Dim newList As New List(Of lpData)
@@ -219,10 +219,10 @@ Public Class LineRGB_BasicsAlternative : Inherits TaskParent
 
         If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable.Clone)
 
-        histArray = getLineCounts(task.lpList)
+        histArray = getLineCounts(task.lineRGB.lpList)
         For i = histArray.Count - 1 To 1 Step -1
             If histArray(i) Then
-                newList.Add(task.lpList(i)) ' Add the lines in the motion mask.
+                newList.Add(task.lineRGB.lpList(i)) ' Add the lines in the motion mask.
             End If
         Next
 
@@ -236,18 +236,18 @@ Public Class LineRGB_BasicsAlternative : Inherits TaskParent
             If lp.length > 0 Then sortlines.Add(lp.length, lp)
         Next
 
-        task.lpList.Clear()
+        task.lineRGB.lpList.Clear()
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-        task.lpList.Add(New lpData(New cv.Point, New cv.Point))
+        task.lineRGB.lpList.Add(New lpData(New cv.Point, New cv.Point))
 
         dst2 = src
         For Each lp In sortlines.Values
-            lp.index = task.lpList.Count
-            task.lpList.Add(lp)
+            lp.index = task.lineRGB.lpList.Count
+            task.lineRGB.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
-        labels(2) = CStr(task.lpList.Count) + " lines were found."
+        labels(2) = CStr(task.lineRGB.lpList.Count) + " lines were found."
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
     End Sub
 End Class
@@ -335,7 +335,7 @@ Public Class LineRGB_Intercepts : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.lpList.Count = 0 Then Exit Sub
+        If task.lineRGB.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
         p1List.Clear()
@@ -346,7 +346,7 @@ Public Class LineRGB_Intercepts : Inherits TaskParent
         leftIntercepts.Clear()
         rightIntercepts.Clear()
         Dim index As Integer
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             Dim minXX = Math.Min(lp.p1.X, lp.p2.X)
             If lp.p1.X <> minXX Then ' leftmost point is always in p1
                 Dim tmp = lp.p1
@@ -472,23 +472,23 @@ Public Class LineRGB_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.lineRGB.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
-        If task.lpList.Count <= 1 Then Exit Sub
+        If task.lineRGB.lpList.Count <= 1 Then Exit Sub
         If standaloneTest() Then
             dst2.SetTo(0)
-            For Each lp In task.lpList
+            For Each lp In task.lineRGB.lpList
                 dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
                 DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
             Next
         End If
         If task.firstPass Then
-            task.lpD = task.lpList(1)
+            task.lpD = task.lineRGB.lpList(1)
         Else
-            Dim index = task.lpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-            task.lpD = task.lpList(index)
+            Dim index = task.lineRGB.lpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.lpD = task.lineRGB.lpList(index)
         End If
 
         strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
-        strOut += CStr(task.lpList.Count) + " lines found " + vbCrLf + vbCrLf
+        strOut += CStr(task.lineRGB.lpList.Count) + " lines found " + vbCrLf + vbCrLf
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
@@ -530,7 +530,7 @@ Public Class LineRGB_Horizontal : Inherits TaskParent
         Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
 
         horizList.Clear()
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
 
             sideOpposite = lp.p2.Y - lp.p1.Y
@@ -561,7 +561,7 @@ Public Class LineRGB_ViewLeftRight : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(task.leftView)
         dst2.SetTo(0)
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth)
         Next
         labels(2) = lines.labels(2)
@@ -592,7 +592,7 @@ Public Class LineRGB_Vertical : Inherits TaskParent
         Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
 
         vertList.Clear()
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
 
             sideOpposite = lp.p2.X - lp.p1.X
@@ -663,7 +663,7 @@ Public Class LineRGB_GCloud : Inherits TaskParent
 
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             Dim brick As gravityLine
             brick = updateGLine(src, brick, lp.p1, lp.p2)
             allLines.Add(lp.p1.DistanceTo(lp.p2), brick)

@@ -79,7 +79,7 @@ Public Class Feature_Basics : Inherits TaskParent
             Case FeatureSrc.LineInput
                 task.logicalLines.Clear()
                 Dim minDistance = task.featureOptions.DistanceSlider.Value
-                For Each lp In task.lpList
+                For Each lp In task.lineRGB.lpList
                     If lp.length > minDistance Then
                         features.Add(lp.p1)
                         features.Add(lp.p2)

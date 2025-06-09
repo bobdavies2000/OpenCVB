@@ -12,7 +12,6 @@ Public Class VBtask : Implements IDisposable
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
-    Public lpList As New List(Of lpData) ' line pair list
     Public brickList As New List(Of brickData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
@@ -22,7 +21,6 @@ Public Class VBtask : Implements IDisposable
     Public logicalLines As New List(Of lpData)
 
     Public brickMap As New cv.Mat ' map of bricks to index in bricklist
-    Public lpMap As New cv.Mat ' map of each line's bricks...
     Public fpMap As New cv.Mat ' feature map
     Public rcMap As cv.Mat ' redColor map
 
@@ -808,8 +806,6 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon.Run(src)
 
         lineRGB.Run(src.Clone)
-        task.lpList = New List(Of lpData)(lineRGB.lpList)
-        task.lpMap = lineRGB.lpMap.Clone
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True

@@ -253,10 +253,10 @@ Public Class Match_Lines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lineRGB.dst2
-        Static lastPt As New List(Of lpData)(task.lpList)
+        Static lastPt As New List(Of lpData)(task.lineRGB.lpList)
 
         knn.queries.Clear()
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
         Next
         If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
@@ -265,8 +265,8 @@ Public Class Match_Lines : Inherits TaskParent
         If knn.queries.Count = 0 Then Exit Sub
 
         For Each i In knn.result
-            If i >= task.lpList.Count Then Continue For
-            Dim lp = task.lpList(i)
+            If i >= task.lineRGB.lpList.Count Then Continue For
+            Dim lp = task.lineRGB.lpList(i)
 
             Dim index = knn.result(i, 0)
             If index >= 0 And index < lastPt.Count Then
@@ -276,7 +276,7 @@ Public Class Match_Lines : Inherits TaskParent
         Next
 
         knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        lastPt = New List(Of lpData)(task.lpList)
+        lastPt = New List(Of lpData)(task.lineRGB.lpList)
     End Sub
 End Class
 

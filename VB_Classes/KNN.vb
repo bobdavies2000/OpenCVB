@@ -533,7 +533,7 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
             p2 = lastPair.p2
         End If
 
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             If trainInput.Count = 0 Then
                 p1 = lp.p1
                 p2 = lp.p2

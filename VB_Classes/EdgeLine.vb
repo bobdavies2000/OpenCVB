@@ -226,7 +226,7 @@ Public Class EdgeLine_Construct : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)
         dst2.SetTo(0)
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
         Next
 

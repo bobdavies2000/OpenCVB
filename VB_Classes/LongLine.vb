@@ -14,7 +14,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         Dim avg1 As Single, avg2 As Single
         Dim debugmode = If(task.selectedFeature = 0, False, True)
 
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             If lp.bricks.Count = 0 Then Continue For
             If debugmode Then If task.selectedFeature <> lp.index Then Continue For
 
@@ -102,8 +102,8 @@ Public Class LongLine_Depth : Inherits TaskParent
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lpList.Count <= 1 Then Exit Sub
-        Dim lp = task.lpList(1)
+        If task.lineRGB.lpList.Count <= 1 Then Exit Sub
+        Dim lp = task.lineRGB.lpList(1)
         dst2 = src
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
@@ -164,8 +164,8 @@ Public Class LongLine_Point : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then dst2 = src
-        If task.lpList.Count = 0 Then Exit Sub
-        Dim lp = task.lpList(1)
+        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        Dim lp = task.lineRGB.lpList(1)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         task.kalman.Run(emptyMat)
         lp.p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
@@ -221,7 +221,7 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
 
         dst3 = src.Clone
         lpList.Clear()
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             Dim elp = lp.BuildLongLine(lp)
             DrawLine(dst3, elp.p1, elp.p2, task.highlight)
             lpList.Add(elp)
@@ -275,11 +275,11 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
                 If distance1 < distanceMid * 2 And distance2 < distanceMid * 2 Then
                     Dim cp As coinPoints
 
-                    Dim mps = task.lpList(index)
+                    Dim mps = task.lineRGB.lpList(index)
                     cp.p1 = mps.p1
                     cp.p2 = mps.p2
 
-                    mps = task.lpList(i)
+                    mps = task.lineRGB.lpList(i)
                     cp.p3 = mps.p1
                     cp.p4 = mps.p2
 

@@ -55,7 +55,7 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
 
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim index As Integer = task.brickMap.Get(Of Single)(center.Y, center.X)
             Dim nabeList = task.gridNeighbors(index)
@@ -109,7 +109,7 @@ Public Class LineRect_CenterRange : Inherits TaskParent
 
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer
-        For Each lp In task.lpList
+        For Each lp In task.lineRGB.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim index As Integer = task.brickMap.Get(Of Single)(center.Y, center.X)
             Dim brick = task.brickList(index)
