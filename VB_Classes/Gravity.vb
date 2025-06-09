@@ -31,7 +31,7 @@ Public Class Gravity_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
-        task.gravityVec = New lpData(New cv.Point2f(gravity.xTop, 0), New cv.Point2f(gravity.xBot, dst2.Height))
+        task.gravityVec = gravity.gravityVec
         task.horizonVec = computePerp(task.gravityVec)
 
         If standaloneTest() Then
@@ -49,15 +49,16 @@ End Class
 
 
 Public Class Gravity_Raw : Inherits TaskParent
-    Public xTop As Integer, xBot As Integer
+    Public xTop As Single, xBot As Single
     Dim sampleSize As Integer = 25
     Dim ptList As New List(Of Integer)
+    Public gravityVec As lpData
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Horizon and Gravity Vectors"
         desc = "Improved method to find gravity and horizon vectors"
     End Sub
-    Private Function findFirst(points As cv.Mat) As Integer
+    Private Function findFirst(points As cv.Mat) As Single
         ptList.Clear()
 
         For i = 0 To Math.Min(sampleSize, points.Rows / 2)
@@ -70,7 +71,7 @@ Public Class Gravity_Raw : Inherits TaskParent
         If ptList.Count = 0 Then Return 0
         Return ptList.Average()
     End Function
-    Private Function findLast(points As cv.Mat) As Integer
+    Private Function findLast(points As cv.Mat) As Single
         ptList.Clear()
 
         For i = points.Rows To Math.Max(points.Rows - sampleSize, points.Rows / 2) Step -1
@@ -92,10 +93,9 @@ Public Class Gravity_Raw : Inherits TaskParent
         If gPoints.Rows = 0 Then Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
         xTop = findFirst(gPoints)
         xBot = findLast(gPoints)
+        gravityVec = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
 
         If standaloneTest() Then
-            Dim gravityVec = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
-
             dst2.SetTo(0)
             DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
         End If

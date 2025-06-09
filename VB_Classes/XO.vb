@@ -2875,7 +2875,7 @@ End Class
 
 
 Public Class XO_FCSLine_Vertical : Inherits TaskParent
-    Dim verts As New LineRGB_Vertical
+    Dim verts As New LineRGB_VerticalTrig
     Dim minRect As New LineRect_Basics
     Dim options As New Options_FCSLine
     Public Sub New()
@@ -4193,8 +4193,7 @@ Public Class XO_LongLine_BasicsEx : Inherits TaskParent
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
         lpList.Add(New lpData(New cv.Point, New cv.Point))
         For Each lp In task.lineRGB.lpList
-            lp = lp.BuildLongLine(lp)
-            DrawLine(dst2, lp.p1, lp.p2, white)
+            DrawLine(dst2, lp.ep1, lp.ep2, white)
             If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
             lp.index = lpList.Count
             lpList.Add(lp)
@@ -4303,7 +4302,7 @@ Public Class XO_LineCoin_Basics : Inherits TaskParent
                 If mp.m = 0 Then
                     lp = New lpData(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
                 Else
-                    lp = mp.BuildLongLine(mp)
+                    lp = New lpData(mp.ep1, mp.ep2)
                 End If
                 Dim index = p1List.IndexOf(lp.p1)
                 If index >= 0 Then

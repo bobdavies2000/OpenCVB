@@ -140,9 +140,9 @@ Public Class Gradient_DepthLines : Inherits TaskParent
 
         dst1(lp.rect).SetTo(255)
         If lp.vertical Then
-            dst1(brickNear.rect).Row(If(lp.inverted, brickNear.rect.Height - 1, 0)).SetTo(0)
+            dst1(brickNear.rect).Row(If(lp.p1.Y > lp.p2.Y, brickNear.rect.Height - 1, 0)).SetTo(0)
         Else
-            dst1(brickNear.rect).Col(If(lp.inverted, brickNear.rect.Width - 1, 0)).SetTo(0)
+            dst1(brickNear.rect).Col(If(lp.p1.X > lp.p2.X, brickNear.rect.Width - 1, 0)).SetTo(0)
         End If
         depthRange = Math.Abs(brickFar.depth - brickNear.depth)
         dst0(lp.rect) = dst1(lp.rect).DistanceTransform(options.distanceType, 0)

@@ -188,7 +188,6 @@ Public Class BrickPoint_KNN : Inherits TaskParent
     Dim knn As New KNN_Basics
     Dim lines As New LineRGB_Basics
     Public Sub New()
-        lines.nonTaskRequest = True
         desc = "Join the 2 nearest points to each grid point to help find lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

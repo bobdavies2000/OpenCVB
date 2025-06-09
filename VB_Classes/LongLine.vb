@@ -194,9 +194,8 @@ Public Class LongLine_ExtendTest : Inherits TaskParent
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
             Dim lp = New lpData(p1, p2)
-            Dim elp = lp.BuildLongLine(lp)
             dst2 = src
-            DrawLine(dst2, elp.p1, elp.p2, task.highlight)
+            DrawLine(dst2, lp.ep1, lp.ep2, task.highlight)
             DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
             DrawCircle(dst2, p2, task.DotSize + 2, cv.Scalar.Red)
         End If
@@ -222,9 +221,8 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
         dst3 = src.Clone
         lpList.Clear()
         For Each lp In task.lineRGB.lpList
-            Dim elp = lp.BuildLongLine(lp)
-            DrawLine(dst3, elp.p1, elp.p2, task.highlight)
-            lpList.Add(elp)
+            DrawLine(dst3, lp.ep1, lp.ep2, task.highlight)
+            lpList.Add(New lpData(lp.ep1, lp.ep2))
         Next
     End Sub
 End Class

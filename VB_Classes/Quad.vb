@@ -278,7 +278,7 @@ Public Class Quad_Bricks : Inherits TaskParent
             Dim center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
             Dim index = task.rcMap.Get(Of Byte)(center.Y, center.X)
             Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
-            If index >= 0 Then
+            If index >= 0 And task.rcList.Count > 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
                 Dim rc = task.rcList(index)
                 depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
@@ -330,9 +330,9 @@ Public Class Quad_Bricks : Inherits TaskParent
                     If depthMinList(i).Count >= myListMax Then depthMinList(i).RemoveAt(0)
                     If depthMaxList(i).Count >= myListMax Then depthMaxList(i).RemoveAt(0)
                 End If
+                depths.Add(depthMin)
+                depths.Add(depthMax)
             End If
-            depths.Add(depthMin)
-            depths.Add(depthMax)
         Next
         labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " ROI's produced " +
                                 Format(quadData.Count / 25, fmt0) + " six sided bricks with color"

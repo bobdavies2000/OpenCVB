@@ -490,17 +490,62 @@ End Class
 
 
 Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
-    Public age As Integer
+    Public age As Integer = 1
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
+    Public ep1 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
+    Public ep2 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
     Public length As Single
     Public rect As cv.Rect
     Public index As Integer
     Public vertical As Boolean ' false is horizontal
-    Public inverted As Boolean ' true is p2 to p1, false is p1 to p2
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
     Public b As Single
+    Public Sub BuildLongLine()
+        If p1.X <> p2.X Then
+            Dim b = p1.Y - p1.X * m
+            If p1.Y = p2.Y Then
+                ep1 = New cv.Point2f(0, p1.Y)
+                ep2 = New cv.Point2f(task.workingRes.Width, p1.Y)
+                Exit Sub
+            Else
+                Dim x1 = -b / m
+                Dim x2 = (task.workingRes.Height - b) / m
+                Dim y1 = b
+                Dim y2 = m * task.workingRes.Width + b
+
+                Dim pts As New List(Of cv.Point2f)
+                If x1 >= 0 And x1 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x1, 0))
+                If x2 >= 0 And x2 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x2, task.workingRes.Height))
+                If y1 >= 0 And y1 <= task.workingRes.Height Then pts.Add(New cv.Point2f(0, y1))
+                If y2 >= 0 And y2 <= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, y2))
+                ep1 = pts(0)
+                ep2 = pts(1)
+                Exit Sub
+            End If
+        End If
+        ep1 = New cv.Point2f(p1.X, 0)
+        ep2 = New cv.Point2f(p1.X, task.workingRes.Height)
+    End Sub
+    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
+        Dim perpSlope = -1 / m
+        Dim angleRadians As Double = Math.Atan(perpSlope)
+        Dim xShift = distance * Math.Cos(angleRadians)
+        Dim yShift = distance * Math.Sin(angleRadians)
+        Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
+        Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
+        If p1.X < 0 Then p1.X = 0
+        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
+        If p1.Y < 0 Then p1.Y = 0
+        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
+        If p2.X < 0 Then p2.X = 0
+        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
+        If p2.Y < 0 Then p2.Y = 0
+        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
+
+        Return New lpData(p1, p2)
+    End Function
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
         If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
@@ -529,11 +574,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         b = -p1.X * m + p1.Y
 
         length = p1.DistanceTo(p2)
-        age = 1
 
         Dim brickptList As New List(Of cv.Point2f)
         vertical = True
-        inverted = If(p1.Y > p2.Y, True, False)
         If Math.Abs(p1.X - p2.X) <= 2 Then
             m = 100000 ' a big number for slope 
             ' handle the special case of slope 0
@@ -546,7 +589,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Else
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
                 vertical = False
-                inverted = If(p1.X > p2.X, True, False)
                 Dim stepSize = If(p1.X > p2.X, -1, 1)
                 For x = p1.X To p2.X Step stepSize
                     Dim y = m * x + b
@@ -579,51 +621,14 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If minX + w >= task.workingRes.Width Then w = task.workingRes.Width - minX
         If minY + h >= task.workingRes.Height Then h = task.workingRes.Height - minY
         rect = New cv.Rect(minX, minY, w, h)
+        BuildLongLine()
     End Sub
     Sub New()
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
         rect = New cv.Rect(0, 0, 8, 8) ' dummy rect for first pass through Gradient_DepthLines
     End Sub
-    Public Function BuildLongLine(lp As lpData) As lpData
-        If lp.p1.X <> lp.p2.X Then
-            Dim b = lp.p1.Y - lp.p1.X * lp.m
-            If lp.p1.Y = lp.p2.Y Then
-                Return New lpData(New cv.Point(0, lp.p1.Y), New cv.Point(task.workingRes.Width, lp.p1.Y))
-            Else
-                Dim xint1 = CInt(-b / lp.m)
-                Dim xint2 = CInt((task.workingRes.Height - b) / lp.m)
-                Dim yint1 = CInt(b)
-                Dim yint2 = CInt(lp.m * task.workingRes.Width + b)
 
-                Dim points As New List(Of cv.Point)
-                If xint1 >= 0 And xint1 <= task.workingRes.Width Then points.Add(New cv.Point(xint1, 0))
-                If xint2 >= 0 And xint2 <= task.workingRes.Width Then points.Add(New cv.Point(xint2, task.workingRes.Height))
-                If yint1 >= 0 And yint1 <= task.workingRes.Height Then points.Add(New cv.Point(0, yint1))
-                If yint2 >= 0 And yint2 <= task.workingRes.Height Then points.Add(New cv.Point(task.workingRes.Width, yint2))
-                Return New lpData(points(0), points(1))
-            End If
-        End If
-        Return New lpData(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, task.workingRes.Height))
-    End Function
-    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
-        Dim perpSlope = -1 / m
-        Dim angleRadians As Double = Math.Atan(perpSlope)
-        Dim xShift = distance * Math.Cos(angleRadians)
-        Dim yShift = distance * Math.Sin(angleRadians)
-        Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
-        Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
-        If p1.X < 0 Then p1.X = 0
-        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
-        If p1.Y < 0 Then p1.Y = 0
-        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
-        If p2.X < 0 Then p2.X = 0
-        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
-        If p2.Y < 0 Then p2.Y = 0
-        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-
-        Return New lpData(p1, p2)
-    End Function
     Public Function compare(mp As lpData) As Boolean
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False

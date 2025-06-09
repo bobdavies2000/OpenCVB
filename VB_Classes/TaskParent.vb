@@ -480,12 +480,8 @@ Public Class TaskParent : Implements IDisposable
         End If
 
         If Double.IsInfinity(mm.maxVal) Then
-            Throw New InvalidOperationException("IsInfinity encounterd in getMinMax.")
-            If mat.Type = cv.MatType.CV_32F Then
-                mm.maxVal = Single.MaxValue
-            Else
-                mm.maxVal = Double.MaxValue
-            End If
+            Console.WriteLine("IsInfinity encountered in getMinMax.")
+            mm.maxVal = 0 ' skip ...
         End If
         mm.range = mm.maxVal - mm.minVal
         Return mm

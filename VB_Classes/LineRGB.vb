@@ -3,14 +3,12 @@ Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpMap As New cv.Mat
-    Public nonTaskRequest As Boolean
-    Dim rawLines As New LineRGB_Raw
+    Public rawLines As New LineRGB_Raw
     Public Sub New()
         lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 255)
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False And nonTaskRequest = False Then Exit Sub
         Static lastList As New List(Of lpData)
         If task.optionsChanged Then
             lastList.Clear()
@@ -360,16 +358,15 @@ Public Class LineRGB_Intercepts : Inherits TaskParent
 
             Dim saveP1 = lp.p1, saveP2 = lp.p2
 
-            Dim emps = lp.BuildLongLine(lp)
-            If emps.p1.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
-            If emps.p1.Y = 0 Then topIntercepts.Add(saveP1.X, index)
-            If emps.p1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)
-            If emps.p1.Y = dst2.Height Then botIntercepts.Add(saveP1.X, index)
+            If lp.ep1.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
+            If lp.ep1.Y = 0 Then topIntercepts.Add(saveP1.X, index)
+            If lp.ep1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)
+            If lp.ep1.Y = dst2.Height Then botIntercepts.Add(saveP1.X, index)
 
-            If emps.p2.X = 0 Then leftIntercepts.Add(saveP2.Y, index)
-            If emps.p2.Y = 0 Then topIntercepts.Add(saveP2.X, index)
-            If emps.p2.X = dst2.Width Then rightIntercepts.Add(saveP2.Y, index)
-            If emps.p2.Y = dst2.Height Then botIntercepts.Add(saveP2.X, index)
+            If lp.ep2.X = 0 Then leftIntercepts.Add(saveP2.Y, index)
+            If lp.ep2.Y = 0 Then topIntercepts.Add(saveP2.X, index)
+            If lp.ep2.X = dst2.Width Then rightIntercepts.Add(saveP2.Y, index)
+            If lp.ep2.Y = dst2.Height Then botIntercepts.Add(saveP2.X, index)
             index += 1
         Next
 
@@ -383,50 +380,6 @@ Public Class LineRGB_Intercepts : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class LineRGB_VerticalHorizontal : Inherits TaskParent
-    Dim verts As New LineRGB_Vertical
-    Dim horiz As New LineRGB_Horizontal
-    Public vertList As New List(Of lpData)
-    Public horizList As New List(Of lpData)
-    Public Sub New()
-        task.gOptions.LineWidth.Value = 2
-        labels(3) = "Vertical lines are in yellow and horizontal lines in red."
-        desc = "Highlight both vertical and horizontal lines"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        verts.Run(src)
-        horiz.Run(src)
-
-        Dim vList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
-        Dim hList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
-
-        dst3.SetTo(0)
-        For Each lp In verts.vertList
-            vList.Add(lp.length, lp)
-            DrawLine(dst2, lp.p1, lp.p2, task.highlight)
-            DrawLine(dst3, lp.p1, lp.p2, task.highlight)
-        Next
-
-        For Each lp In horiz.horizList
-            hList.Add(lp.length, lp)
-            DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
-            DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Red)
-        Next
-
-        vertList = New List(Of lpData)(vList.Values)
-        horizList = New List(Of lpData)(hList.Values)
-        labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vList.Count) + "/" + CStr(hList.Count)
-    End Sub
-End Class
 
 
 
@@ -516,40 +469,6 @@ End Class
 
 
 
-Public Class LineRGB_Horizontal : Inherits TaskParent
-    Public horizList As New List(Of lpData)
-    Public Sub New()
-        desc = "Find all the Horizontal lines with horizon vector"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-
-        Dim p1 = task.horizonVec.p1, p2 = task.horizonVec.p2
-        Dim sideOpposite = p2.Y - p1.Y
-        If p1.X = 0 Then sideOpposite = p1.Y - p2.Y
-        Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
-
-        horizList.Clear()
-        For Each lp In task.lineRGB.lpList
-            If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
-
-            sideOpposite = lp.p2.Y - lp.p1.Y
-            If lp.p1.X < lp.p2.X Then sideOpposite = lp.p1.Y - lp.p2.Y
-            Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.X - lp.p2.X)) * 57.2958
-
-            If Math.Abs(angle - hAngle) < 2 Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                horizList.Add(lp)
-            End If
-        Next
-        labels(2) = "There are " + CStr(horizList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class LineRGB_ViewLeftRight : Inherits TaskParent
     Dim lines As New LineRGB_Basics
@@ -572,41 +491,6 @@ Public Class LineRGB_ViewLeftRight : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class LineRGB_Vertical : Inherits TaskParent
-    Public vertList As New List(Of lpData)
-    Public Sub New()
-        desc = "Find all the vertical lines with gravity vector"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        dst3 = task.lineRGB.dst2
-
-        Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
-        Dim sideOpposite = p2.X - p1.X
-        If p1.Y = 0 Then sideOpposite = p1.X - p2.X
-        Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
-
-        vertList.Clear()
-        For Each lp In task.lineRGB.lpList
-            If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
-
-            sideOpposite = lp.p2.X - lp.p1.X
-            If lp.p1.Y < lp.p2.Y Then sideOpposite = lp.p1.X - lp.p2.X
-            Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
-
-            If Math.Abs(angle - gAngle) < 2 Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                vertList.Add(lp)
-            End If
-        Next
-        labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
-    End Sub
-End Class
 
 
 
@@ -663,7 +547,7 @@ Public Class LineRGB_GCloud : Inherits TaskParent
 
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
-        For Each lp In task.lineRGB.lpList
+        For Each lp In lines.lpList
             Dim brick As gravityLine
             brick = updateGLine(src, brick, lp.p1, lp.p2)
             allLines.Add(lp.p1.DistanceTo(lp.p2), brick)
@@ -773,5 +657,158 @@ Public Class LineRGB_BricksValidate : Inherits TaskParent
             dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
         Next
         labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class LineRGB_VerticalHorizontal : Inherits TaskParent
+    Public vertList As New List(Of lpData)
+    Public horizList As New List(Of lpData)
+    Public Sub New()
+        desc = "Highlight both vertical and horizontal lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
+        labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3)
+
+        dst2 = src
+        dst3.SetTo(0)
+        For Each lp In task.lineRGB.rawLines.lpList
+            If lp.vertical Then
+                Dim delta = lp.ep1.X - lp.ep2.X
+                If Math.Abs(gravityDelta - delta) < 3 Then
+                    vertList.Add(lp)
+                    DrawLine(dst2, lp.ep1, lp.ep2, task.highlight)
+                    DrawLine(dst3, lp.ep1, lp.ep2, task.highlight)
+                End If
+            End If
+        Next
+
+        'For Each lp In task.lineRGB.lpList
+        '    hList.Add(lp.length, lp)
+        '    DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+        '    DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Red)
+        'Next
+
+        labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vertList.Count) ' + "/" + CStr(hList.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class LineRGB_VerticalHorizontalRaw : Inherits TaskParent
+    Dim verts As New LineRGB_VerticalTrig
+    Dim horiz As New LineRGB_HorizontalTrig
+    Public vertList As New List(Of lpData)
+    Public horizList As New List(Of lpData)
+    Public Sub New()
+        task.gOptions.LineWidth.Value = 2
+        labels(3) = "Vertical lines are in yellow and horizontal lines in red."
+        desc = "Highlight both vertical and horizontal lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        verts.Run(src)
+        horiz.Run(src)
+
+        Dim vList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
+        Dim hList As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
+
+        dst3.SetTo(0)
+        For Each lp In verts.vertList
+            vList.Add(lp.length, lp)
+            DrawLine(dst2, lp.p1, lp.p2, task.highlight)
+            DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+        Next
+
+        For Each lp In horiz.horizList
+            hList.Add(lp.length, lp)
+            DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+            DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Red)
+        Next
+
+        vertList = New List(Of lpData)(vList.Values)
+        horizList = New List(Of lpData)(hList.Values)
+        labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vList.Count) + "/" + CStr(hList.Count)
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineRGB_HorizontalTrig : Inherits TaskParent
+    Public horizList As New List(Of lpData)
+    Public Sub New()
+        desc = "Find all the Horizontal lines with horizon vector"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
+
+        Dim p1 = task.horizonVec.p1, p2 = task.horizonVec.p2
+        Dim sideOpposite = p2.Y - p1.Y
+        If p1.X = 0 Then sideOpposite = p1.Y - p2.Y
+        Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
+
+        horizList.Clear()
+        For Each lp In task.lineRGB.rawLines.lpList
+            If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
+
+            sideOpposite = lp.p2.Y - lp.p1.Y
+            If lp.p1.X < lp.p2.X Then sideOpposite = lp.p1.Y - lp.p2.Y
+            Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.X - lp.p2.X)) * 57.2958
+
+            If Math.Abs(angle - hAngle) < 2 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                horizList.Add(lp)
+            End If
+        Next
+        labels(2) = "There are " + CStr(horizList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
+    End Sub
+End Class
+
+
+
+
+Public Class LineRGB_VerticalTrig : Inherits TaskParent
+    Public vertList As New List(Of lpData)
+    Public Sub New()
+        desc = "Find all the vertical lines with gravity vector"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
+
+        Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
+        Dim sideOpposite = p2.X - p1.X
+        If p1.Y = 0 Then sideOpposite = p1.X - p2.X
+        Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
+
+        vertList.Clear()
+        For Each lp In task.lineRGB.rawLines.lpList
+            If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
+
+            sideOpposite = lp.p2.X - lp.p1.X
+            If lp.p1.Y < lp.p2.Y Then sideOpposite = lp.p1.X - lp.p2.X
+            Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
+
+            If Math.Abs(angle - gAngle) < 2 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                vertList.Add(lp)
+            End If
+        Next
+        labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
     End Sub
 End Class
