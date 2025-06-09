@@ -1,16 +1,20 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
+    Dim contours As New Contour_Basics_List
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         desc = "Use Contour_Basics to get the contour data for the top X contours."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_8U Then
-            dst2 = task.contours.dst2
-            labels = task.contours.labels
+            contours.Run(edges.dst2)
+            dst2 = contours.dst2
+            labels = contours.labels
         Else
-            Static contours As New Contour_Basics_List
+            edges.Run(src)
             contours.Run(src)
-            dst2 = contours.dst2.Clone
+            cv.Cv2.ImShow("contours.dst2", contours.dst2)
+            dst2 = contours.dst2
             labels = contours.labels
         End If
     End Sub

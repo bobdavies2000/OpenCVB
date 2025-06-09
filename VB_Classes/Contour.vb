@@ -63,9 +63,11 @@ Public Class Contour_Basics : Inherits TaskParent
         classCount = contourList.Count
 
         dst2 = ShowPalette(task.contours.contourMap)
-        For Each contour In contourList
-            dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
-        Next
+        If task.toggleOn Then
+            For Each contour In contourList
+                dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
+            Next
+        End If
 
         labels(2) = CStr(contourList.Count) + " contours were found"
     End Sub

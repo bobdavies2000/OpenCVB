@@ -5,12 +5,12 @@ Public Class Color8U_Basics : Inherits TaskParent
     Dim colorMethods(10) As Object
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        labels(3) = "ShowPalette output of dst2 at left"
+        labels(3) = "Input to Color8U_Basics"
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim index = task.redOptions.colorInputIndex
         If task.optionsChanged Or classifier Is Nothing Then
+            Dim index = task.redOptions.colorInputIndex
             Select Case index
                 Case 0
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
@@ -33,21 +33,26 @@ Public Class Color8U_Basics : Inherits TaskParent
                 Case 9
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New MeanSubtraction_Gray
             End Select
-            classifier = colorMethods(index)
+            classifier = colorMethods(Index)
         End If
 
-        If task.redOptions.colorInputName <> "EdgeLine_Basics" Then ' edgeLine_Basics is already running on each frame.
+        ' edgeLine_Basics is already running on each frame so it may not need to be run...
+        If task.redOptions.colorInputName <> "EdgeLine_Basics" And src.Type <> cv.MatType.CV_8U Then
             If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
                 classifier.Run(src.Clone)
             Else
-                classifier.Run(task.grayStable.Clone)
+                If src.Type = cv.MatType.CV_8U Then
+                    classifier.run(src)
+                Else
+                    classifier.Run(task.grayStable)
+                End If
             End If
         End If
 
         If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)
         classCount = classifier.classCount
 
-        dst3 = ShowPalette(dst2)
+        dst3 = src
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                     " pixel classifications"
     End Sub
