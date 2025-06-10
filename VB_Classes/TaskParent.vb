@@ -370,6 +370,30 @@ Public Class TaskParent : Implements IDisposable
         tracking = 1
         colorWithDepth = 2
     End Enum
+    Public Shared Function GetMinMaxShared(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
+        Dim mm As mmData
+        If mask Is Nothing Then
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+        Else
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+        End If
+
+        If Double.IsInfinity(mm.maxVal) Then
+            Console.WriteLine("IsInfinity encountered in getMinMax.")
+            mm.maxVal = 0 ' skip ...
+        End If
+        mm.range = mm.maxVal - mm.minVal
+        Return mm
+    End Function
+    Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
+        Dim mm As mmData
+        If mask Is Nothing Then
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+        Else
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+        End If
+        Return mm
+    End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
         Dim img As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         Dim binCount = hist.Height
@@ -428,7 +452,7 @@ Public Class TaskParent : Implements IDisposable
         task.depthMask(rect).CopyTo(depth, maskInput)
         depth.Rectangle(New cv.Rect(0, 0, depth.Width, depth.Height), 0, 1)
         Dim distance32f = depth.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm As mmData = GetMinMax(distance32f)
+        Dim mm As mmData = GetMinMaxShared(distance32f)
         mm.maxLoc.X += rect.X
         mm.maxLoc.Y += rect.Y
 
@@ -471,21 +495,6 @@ Public Class TaskParent : Implements IDisposable
             dst.Line(p1, p2, color, task.lineWidth, task.lineType)
         Next
     End Sub
-    Public Shared Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
-        Dim mm As mmData
-        If mask Is Nothing Then
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
-        Else
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
-        End If
-
-        If Double.IsInfinity(mm.maxVal) Then
-            Console.WriteLine("IsInfinity encountered in getMinMax.")
-            mm.maxVal = 0 ' skip ...
-        End If
-        mm.range = mm.maxVal - mm.minVal
-        Return mm
-    End Function
     Public Sub SetTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         SetTrueTextBase(text, pt, picTag)
     End Sub

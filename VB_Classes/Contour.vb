@@ -28,7 +28,7 @@ Public Class Contour_Basics : Inherits TaskParent
             cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
             contour.mask = tourMat(contour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
             contour.depth = task.pcSplit(2)(contour.rect).Mean(task.depthMask(contour.rect))(0)
-            contour.mm = GetMinMax(task.pcSplit(2)(contour.rect), contour.mask)
+            contour.mm = GetMinMaxShared(task.pcSplit(2)(contour.rect), contour.mask)
             sortedList.Add(contour.pixels, contour)
         Next
 

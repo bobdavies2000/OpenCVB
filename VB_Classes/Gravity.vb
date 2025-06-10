@@ -1,7 +1,6 @@
-﻿Imports Microsoft.SqlServer
-Imports OpenCvSharp.Flann
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
+    Dim kalman As New Kalman_Basics
     Dim gravity As New Gravity_Raw
     Public Sub New()
         desc = "Use kalman to smooth gravity and horizon vectors."
@@ -31,7 +30,11 @@ Public Class Gravity_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
-        task.gravityVec = gravity.gravityVec
+        kalman.kInput = {gravity.gravityVec.ep1.X, gravity.gravityVec.ep1.Y, gravity.gravityVec.ep2.X, gravity.gravityVec.ep2.Y}
+        kalman.Run(emptyMat)
+        task.gravityVec = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
+                                     New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
+
         task.horizonVec = computePerp(task.gravityVec)
 
         If standaloneTest() Then

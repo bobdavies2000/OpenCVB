@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
@@ -109,12 +110,10 @@ Public Class LineRGB_Raw : Inherits TaskParent
             End If
         Next
 
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Next
-        End If
+        dst2.SetTo(0)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
 
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
@@ -668,46 +667,6 @@ End Class
 
 
 
-Public Class LineRGB_VerticalHorizontal : Inherits TaskParent
-    Public vertList As New List(Of lpData)
-    Public horizList As New List(Of lpData)
-    Public Sub New()
-        desc = "Highlight both vertical and horizontal lines"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
-        labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3)
-
-        dst2 = src
-        dst3.SetTo(0)
-        For Each lp In task.lineRGB.rawLines.lpList
-            If lp.vertical Then
-                Dim delta = lp.ep1.X - lp.ep2.X
-                If Math.Abs(gravityDelta - delta) < 3 Then
-                    vertList.Add(lp)
-                    DrawLine(dst2, lp.ep1, lp.ep2, task.highlight)
-                    DrawLine(dst3, lp.ep1, lp.ep2, task.highlight)
-                End If
-            End If
-        Next
-
-        'For Each lp In task.lineRGB.lpList
-        '    hList.Add(lp.length, lp)
-        '    DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
-        '    DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Red)
-        'Next
-
-        labels(2) = "Number of lines identified (vertical/horizontal): " + CStr(vertList.Count) ' + "/" + CStr(hList.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 Public Class LineRGB_VerticalHorizontalRaw : Inherits TaskParent
     Dim verts As New LineRGB_VerticalTrig
@@ -810,5 +769,110 @@ Public Class LineRGB_VerticalTrig : Inherits TaskParent
             End If
         Next
         labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class LineRGB_GravityToAverage : Inherits TaskParent
+    Public vertList As New List(Of lpData)
+    Dim kalman As New Kalman_Basics
+    Public Sub New()
+        desc = "Highlight both vertical and horizontal lines - not terribly good..."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
+
+        kalman.kInput = {gravityDelta}
+        kalman.Run(emptyMat)
+        gravityDelta = kalman.kOutput(0)
+
+        dst2 = src
+        If standalone Then dst3 = task.lineRGB.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim deltaList As New List(Of Single)
+        For Each lp In task.lineRGB.rawLines.lpList
+            If lp.vertical And Math.Sign(task.gravityVec.m) = Math.Sign(lp.m) Then
+                Dim delta = lp.ep1.X - lp.ep2.X
+                If Math.Abs(gravityDelta - delta) < 3 Then
+                    deltaList.Add(delta)
+                    vertList.Add(lp)
+                    DrawLine(dst2, lp.ep1, lp.ep2, task.highlight)
+                    If standalone Then DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+                End If
+            End If
+        Next
+
+        If task.heartBeat Then
+            labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3) + " and m = " + Format(task.gravityVec.m, fmt3)
+            If deltaList.Count > 0 Then
+                labels(2) = Format(gravityDelta, fmt3) + "/" + Format(deltaList.Average(), fmt3) + " gravity delta/line average delta"
+            Else
+                labels(2) = "No lines matched the gravity vector..."
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class LineRGB_GravityToLongest : Inherits TaskParent
+    Dim kalman As New Kalman_Basics
+    Dim matchLine As New MatchLine_Basics
+    Public Sub New()
+        desc = "Highlight both vertical and horizontal lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
+
+        kalman.kInput = {gravityDelta}
+        kalman.Run(emptyMat)
+        gravityDelta = kalman.kOutput(0)
+
+        matchLine.lpInput = Nothing
+        For Each lp In task.lineRGB.rawLines.lpList
+            If lp.vertical Then
+                matchLine.lpInput = lp
+                Exit For
+            End If
+        Next
+        If matchLine.lpInput Is Nothing Then Exit Sub
+        matchLine.Run(src)
+        dst2 = matchLine.dst2
+
+        'If standalone Then dst3 = task.lineRGB.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        'Dim deltaList As New List(Of Single)
+        'For Each lp In task.lineRGB.rawLines.lpList
+        '    If lp.vertical And Math.Sign(task.gravityVec.m) = Math.Sign(lp.m) Then
+        '        Dim delta = lp.ep1.X - lp.ep2.X
+        '        If Math.Abs(gravityDelta - delta) < 3 Then
+        '            deltaList.Add(delta)
+        '            DrawLine(dst2, lp.ep1, lp.ep2, task.highlight)
+        '            If standalone Then DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+        '        End If
+        '    End If
+        'Next
+
+        'If task.heartBeat Then
+        '    labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3) + " and m = " +
+        '                Format(task.gravityVec.m, fmt3)
+        '    If deltaList.Count > 0 Then
+        '        labels(2) = Format(gravityDelta, fmt3) + "/" + Format(deltaList.Average(), fmt3) +
+        '                    " gravity delta/line average delta"
+        '    Else
+        '        labels(2) = "No lines matched the gravity vector..."
+        '    End If
+        'End If
     End Sub
 End Class

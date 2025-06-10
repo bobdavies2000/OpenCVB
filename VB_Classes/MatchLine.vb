@@ -23,12 +23,10 @@ Public Class MatchLine_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
-        If task.quarterBeat Or match.correlation < task.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
+        If match.correlation < task.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
             lpSave = lpInput
-            If standalone Then
-                knn.Run(src.Clone)
-                lpInput = New lpData(knn.lastPair.p1, knn.lastPair.p2)
-            End If
+            ' default to longest line
+            If standalone Then lpInput = task.lineRGB.lpList(1)
 
             Dim r = ValidateRect(New cv.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
                                              Math.Abs(lpInput.p1.X - lpInput.p2.X), Math.Abs(lpInput.p1.Y - lpInput.p2.Y)))
@@ -114,7 +112,7 @@ Public Class MatchLine_Gravity : Inherits TaskParent
         desc = "Verify the gravity vector using MatchTemplate."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.quarterBeat Then matchLine.lpInput = task.gravityVec
+        matchLine.lpInput = task.gravityVec
         matchLine.Run(src)
         dst2 = matchLine.dst2
         DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.Red)

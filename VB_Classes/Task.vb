@@ -593,16 +593,6 @@ Public Class VBtask : Implements IDisposable
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         dst.Line(p1, p2, color, lineWidth, lineType)
     End Sub
-
-    Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
-        Dim mm As mmData
-        If mask Is Nothing Then
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
-        Else
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
-        End If
-        Return mm
-    End Function
     Public Function RunAlgorithm() As Boolean
         If allOptions.titlesAdded Then
             allOptions.titlesAdded = False

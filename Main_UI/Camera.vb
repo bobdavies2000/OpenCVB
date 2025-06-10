@@ -67,15 +67,6 @@ Public Class GenericCamera
     End Structure
     Public Sub New()
     End Sub
-    Public Function getMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
-        Dim mm As mmData
-        If mask Is Nothing Then
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
-        Else
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
-        End If
-        Return mm
-    End Function
     Public Sub GetNextFrameCounts(frameTime As Double)
         Static lastFrameTime = IMU_TimeStamp
         Static imuStartTime = IMU_TimeStamp
