@@ -3,10 +3,8 @@ Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public lpMap As New cv.Mat
     Public rawLines As New LineRGB_Raw
     Public Sub New()
-        lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 255)
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -48,16 +46,8 @@ Public Class LineRGB_Basics : Inherits TaskParent
         Next
 
         lpList.Clear()
-        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-        lpList.Add(New lpData(New cv.Point, New cv.Point))
-
-        ' update lpMap from smallest to largest so the largest lines own any brick.
-        lpMap.SetTo(0)
         For Each lp In sortlines.Values
             lp.index = lpList.Count
-            For Each index In lp.bricks
-                lpMap(task.brickList(index).rect).SetTo(lp.index)
-            Next
             lpList.Add(lp)
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
@@ -435,12 +425,7 @@ Public Class LineRGB_Info : Inherits TaskParent
                 DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
             Next
         End If
-        If task.firstPass Then
-            task.lpD = task.lineRGB.lpList(1)
-        Else
-            Dim index = task.lineRGB.lpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-            task.lpD = task.lineRGB.lpList(index)
-        End If
+        If task.firstPass Then task.lpD = task.lineRGB.lpList(1)
 
         strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
         strOut += CStr(task.lineRGB.lpList.Count) + " lines found " + vbCrLf + vbCrLf

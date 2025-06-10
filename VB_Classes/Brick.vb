@@ -773,7 +773,6 @@ Public Class Brick_Lines : Inherits TaskParent
 
         SetTrueText(info.strOut, 3)
 
-        dst2 = ShowPalette(task.lineRGB.lpMap.ConvertScaleAbs())
         labels(2) = task.lineRGB.labels(2) + " - Click on any line in below to get details on that line."
     End Sub
 End Class

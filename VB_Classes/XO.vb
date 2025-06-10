@@ -859,7 +859,6 @@ Public Class XO_Line_BasicsRawOld : Inherits TaskParent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of lpData)
     Public ptList As New List(Of cv.Point)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -875,7 +874,6 @@ Public Class XO_Line_BasicsRawOld : Inherits TaskParent
 
         lpList.Clear()
         ptList.Clear()
-        lpMap.SetTo(0)
         lpList.Add(New lpData) ' zero placeholder.
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
@@ -884,7 +882,6 @@ Public Class XO_Line_BasicsRawOld : Inherits TaskParent
                 Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
                 Dim lp = New lpData(p1, p2)
                 lp.index = lpList.Count
-                lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
                 lpList.Add(lp)
                 ptList.Add(New cv.Point(CInt(lp.p1.X), CInt(lp.p1.Y)))
             End If
@@ -1573,7 +1570,7 @@ End Class
 
 
 Public Class XO_Line_Core : Inherits TaskParent
-    Dim lines As New XO_Line_BasicsRawOld
+    Dim lines As New XO_Line_Core
     Public lpList As New List(Of lpData)
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public Sub New()
@@ -4226,7 +4223,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData) ' The top X longest lines
     Dim hist As New Hist_GridCell
     Public Sub New()
-        task.lineRGB.lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Isolate the longest X lines and update the list of bricks containing each line."
     End Sub
@@ -4257,14 +4254,12 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
             lpList.Add(lp)
         Next
 
-        task.lineRGB.lpMap.SetTo(0)
         For Each brick In task.brickList
             If dst1(brick.rect).CountNonZero = 0 Then Continue For
             hist.Run(dst1(brick.rect))
             For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the brick last.
                 If hist.histarray(i) > 0 Then
                     lpList(i).bricks.Add(brick.index)
-                    task.lineRGB.lpMap(task.brickList(brick.index).rect).SetTo(brick.index)
                 End If
             Next
         Next
