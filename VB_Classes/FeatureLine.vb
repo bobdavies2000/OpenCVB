@@ -1,24 +1,40 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FeatureLine_Basics : Inherits TaskParent
-    Dim options As New Options_Features
+    Dim match As New Match_Basics
+    Public correlation1 As Single
+    Public correlation2 As Single
     Public Sub New()
         If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
-        labels = {"", "", "Longest line present.", ""}
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find and track a line using the end points"
+        desc = "Find and track the longest line by matching endpoint bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        dst3.SetTo(0)
-        For Each lp In task.lineRGB.lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
+        If standalone Then
+            labels(3) = "Currently available lines."
+            dst3.SetTo(0)
+            For Each lp In task.lineRGB.lpList
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Next
+        End If
 
         dst2 = src
         If task.lineRGB.lpList.Count > 1 Then
-            Dim lpt = task.lineRGB.lpList(1)
-            dst2.Line(lpt.p1, lpt.p2, task.highlight, task.lineWidth + 1, task.lineType)
+            task.lpD = task.lineRGB.lpList(0)
+            dst2.Line(task.lpD.ep1, task.lpD.ep2, task.highlight, task.lineWidth + 1, task.lineType)
+            dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
+
+            Dim index = task.lpD.bricks(0)
+            match.template = src(task.gridRects(index))
+
+            Dim searchRect = task.gridNabeRects(index)
+            match.Run(src(searchRect))
+            correlation1 = match.correlation
+
+            searchRect = task.gridNabeRects(task.lpD.bricks.Last)
+            match.Run(src(searchRect))
+            correlation2 = match.correlation
+
+            labels(2) = "Line end point correlations: " + Format(correlation1, fmt3) + " / " + Format(correlation2, fmt3)
         End If
     End Sub
 End Class

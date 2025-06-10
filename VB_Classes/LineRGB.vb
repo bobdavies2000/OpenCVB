@@ -409,7 +409,6 @@ End Class
 Public Class LineRGB_Info : Inherits TaskParent
     Public Sub New()
         If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
-        task.gOptions.DebugSlider.Value = 1 ' because the 0th element is a placeholder at 0,0
         labels(3) = "The selected line with details."
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Display details about the line selected."
@@ -425,7 +424,9 @@ Public Class LineRGB_Info : Inherits TaskParent
                 DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
             Next
         End If
-        If task.firstPass Then task.lpD = task.lineRGB.lpList(1)
+
+        Dim lpIndex = Math.Abs(task.gOptions.DebugSlider.Value)
+        If lpIndex < task.lineRGB.lpList.Count Then task.lpD = task.lineRGB.lpList(lpIndex)
 
         strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
         strOut += CStr(task.lineRGB.lpList.Count) + " lines found " + vbCrLf + vbCrLf
@@ -440,12 +441,9 @@ Public Class LineRGB_Info : Inherits TaskParent
         strOut += "Slope = " + Format(task.lpD.m, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
 
+        strOut += "Below are the task.gridRects that the line intersects." + vbCrLf
         For Each index In task.lpD.bricks
-            If index = task.lpD.bricks.Last Then
-                strOut += CStr(index)
-            Else
-                strOut += CStr(index) + ", "
-            End If
+            If index = task.lpD.bricks.Last Then strOut += CStr(index) Else strOut += CStr(index) + ", "
         Next
         SetTrueText(strOut, 3)
     End Sub

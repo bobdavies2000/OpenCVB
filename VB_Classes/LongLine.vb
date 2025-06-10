@@ -105,7 +105,7 @@ Public Class LongLine_Depth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lineRGB.lpList.Count <= 1 Then Exit Sub
-        Dim lp = task.lineRGB.lpList(1)
+        Dim lp = task.lineRGB.lpList(0)
         dst2 = src
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
@@ -168,7 +168,7 @@ Public Class LongLine_Point : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then dst2 = src
         If task.lineRGB.lpList.Count = 0 Then Exit Sub
-        Dim lp = task.lineRGB.lpList(1)
+        Dim lp = task.lineRGB.lpList(0)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         task.kalman.Run(emptyMat)
         lp.p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
