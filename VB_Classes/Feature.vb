@@ -77,6 +77,7 @@ Public Class Feature_Basics : Inherits TaskParent
                 features = task.features
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
             Case FeatureSrc.LineInput
+                If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
                 task.logicalLines.Clear()
                 Dim minDistance = task.featureOptions.DistanceSlider.Value
                 For Each lp In task.lineRGB.lpList

@@ -523,7 +523,6 @@ Public Class VBtask : Implements IDisposable
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
         LRMeanSub = New MeanSubtraction_LeftRight
-        lineRGB = New LineRGB_Basics
         rgbFilter = New Filter_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
@@ -795,7 +794,7 @@ Public Class VBtask : Implements IDisposable
 
         gravityHorizon.Run(src)
 
-        lineRGB.Run(src.Clone)
+        If lineRGB IsNot Nothing Then lineRGB.Run(src.Clone)
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True

@@ -5,6 +5,7 @@ Public Class Line3D_Basics : Inherits TaskParent
     Public lines3D As New List(Of cv.Point3f)
     Public lines3DMat As New cv.Mat
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find all the lines in 3D using the structured slices through the bricks."
     End Sub

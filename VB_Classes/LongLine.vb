@@ -2,6 +2,7 @@
 Public Class LongLine_DepthDirection : Inherits TaskParent
     Public gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels(2) = "Use the 'Features' option slider to select different lines."
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the direction of each line in depth"
@@ -98,6 +99,7 @@ End Class
 
 Public Class LongLine_Depth : Inherits TaskParent
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
@@ -159,6 +161,7 @@ End Class
 Public Class LongLine_Point : Inherits TaskParent
     Public longPt As cv.Point
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         task.kalman = New Kalman_Basics
         desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point"
     End Sub
@@ -212,6 +215,7 @@ End Class
 Public Class LongLine_ExtendAll : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels = {"", "", "Image output from LineRGB_Core", "The extended line for each line found in LineRGB_Core"}
         desc = "Create a list of all the extended lines in an image"
     End Sub
@@ -236,6 +240,7 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public parList As New List(Of coinPoints)
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels = {"", "", "Image output from LineRGB_Core", "Parallel extended lines"}
         desc = "Use KNN to find which lines are near each other and parallel"
     End Sub

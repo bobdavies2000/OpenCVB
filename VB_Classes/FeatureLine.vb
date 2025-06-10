@@ -2,6 +2,7 @@
 Public Class FeatureLine_Basics : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels = {"", "", "Longest line present.", ""}
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and track a line using the end points"

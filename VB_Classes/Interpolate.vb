@@ -113,6 +113,7 @@ End Class
 Public Class Interpolate_Lines : Inherits TaskParent
     Dim inter As New Interpolate_Basics
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         OptionParent.FindSlider("Interpolation Resize %").Value = 80
         OptionParent.FindSlider("Interpolation threshold").Value = 100
         desc = "Detect lines in interpolation results."

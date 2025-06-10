@@ -105,6 +105,7 @@ End Class
 Public Class Diff_Lines : Inherits TaskParent
     Dim diff As New Diff_RGBAccum
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels = {"", "", "Add motion to see Diff output and lines input", "Wave at the camera to see results"}
         desc = "identify lines in the diff output"
     End Sub

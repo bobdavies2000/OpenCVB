@@ -7,6 +7,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
     Dim lpSave As New lpData
     Dim knn As New KNN_ClosestTracker
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Find and track a line in the BGR image."
     End Sub
     Private Function cornerToPoint(whichCorner As Integer, r As cv.Rect) As cv.Point2f

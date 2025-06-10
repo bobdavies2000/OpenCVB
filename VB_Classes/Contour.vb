@@ -239,6 +239,7 @@ End Class
 
 Public Class Contour_LineRGB : Inherits TaskParent
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Identify contour by its Lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

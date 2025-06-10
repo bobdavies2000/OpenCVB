@@ -519,6 +519,7 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
     Public trainInput As New List(Of cv.Point2f)
     Dim minDistances As New List(Of Single)
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels = {"", "", "Highlight the tracked line (move camera to see track results)", "Candidate lines - standaloneTest() only"}
         desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test."
     End Sub

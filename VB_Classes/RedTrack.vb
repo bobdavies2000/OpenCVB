@@ -23,6 +23,7 @@ End Class
 
 Public Class RedTrack_Lines : Inherits TaskParent
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
@@ -180,6 +181,7 @@ End Class
 Public Class RedTrack_Points : Inherits TaskParent
     Dim track As New RedTrack_Basics
     Public Sub New()
+        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
