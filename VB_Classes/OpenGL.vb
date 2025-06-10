@@ -1915,26 +1915,6 @@ End Class
 
 
 
-Public Class OpenGL_ContourPlaneSimple : Inherits TaskParent
-    Dim contours As New ContourPlane_Templates
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
-        desc = "Display the contour planes in 3D"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        dst2 = contours.dst2
-        dst3 = contours.dst3
-        labels(2) = contours.labels(2)
-
-        task.ogl.pointCloudInput = contours.dst3
-        task.ogl.Run(contours.dst2)
-    End Sub
-End Class
-
-
-
-
 
 
 

@@ -722,14 +722,14 @@ Public Class PointCloud_Templates : Inherits TaskParent
         desc = "Prepare for injecting depth into the point cloud."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            src = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-            For Each contour In task.contours.contourList
-                If contour.bricks.Count = 0 Then Continue For
-                contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
-                src(contour.rect).SetTo(contour.depth, contour.mask)
-            Next
-        End If
+        'If standalone Then
+        '    src = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        '    For Each contour In task.contours.contourList
+        '        If contour.bricks.Count = 0 Then Continue For
+        '        contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
+        '        src(contour.rect).SetTo(contour.depth, contour.mask)
+        '    Next
+        'End If
         Dim fxTemplate = task.calibData.rgbIntrinsics.fx
         Dim fyTemplate = task.calibData.rgbIntrinsics.fy
         Dim worldX As New cv.Mat, worldY As New cv.Mat

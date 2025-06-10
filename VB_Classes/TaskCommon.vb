@@ -756,8 +756,9 @@ Public Class contourData
     Public index As Integer
     Public depth As Single
     Public mm As mmData
-    Public bricks As New List(Of Integer)
-    Public brickPartial As New List(Of Integer)
+    Public points As New List(Of cv.Point)
+    Dim bricks As New List(Of Integer)
+    Dim brickPartial As New List(Of Integer)
     Public Function buildRect(tour As cv.Point()) As cv.Rect
         Dim minX As Single = tour.Min(Function(p) p.X)
         Dim maxX As Single = tour.Max(Function(p) p.X)

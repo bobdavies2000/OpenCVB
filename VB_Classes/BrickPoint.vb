@@ -384,7 +384,6 @@ Public Class BrickPoint_FeatureLess : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
-        DrawFullPartialBricks()
 
         dst3 = ShowAddweighted(dst2, task.contours.dst2, labels(3))
         classCount = task.contours.contourList.Count

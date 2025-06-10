@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
-    Public instantUpdate As Boolean, brickFull As Integer, brickPartial As Integer
+    Public instantUpdate As Boolean, brickDepthCount As Integer
     Public Sub New()
         task.brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
@@ -21,11 +21,12 @@ Public Class Brick_Basics : Inherits TaskParent
         Dim maxPixels = task.cellSize * task.cellSize
         task.brickList.Clear()
         Dim depthCount As Integer
-        brickFull = 0
-        brickPartial = 0
+        brickDepthCount = 0
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             If brick.depth > 0 Then
+                brickDepthCount += 1
+
                 ' motion mask does not include depth shadow so if there is depth shadow, we must recompute brick.
                 Dim lastCorrelation = If(i < brickLast.Count, brickLast(i).correlation, 0)
                 If brick.age > 1 And instantUpdate = False And lastCorrelation > 0 Then
@@ -84,48 +85,19 @@ Public Class Brick_Basics : Inherits TaskParent
                 brick.depthRanges.Add(brick.mm.range)
             End If
 
-            'dst2(brick.rect).SetTo(brick.color)
+            dst2(brick.rect).SetTo(brick.color)
 
             If brick.depth > 0 Then depthCount += 1
             If brick.depthRanges.Count > task.historyCount Then
                 brick.depthRanges.RemoveAt(0)
             End If
 
-            Dim contourIndex = task.contours.contourMap.Get(Of Byte)(brick.center.Y, brick.center.X)
-            If contourIndex > 0 Then
-                If task.edges.dst2(brick.rect).CountNonZero = 0 Then
-                    task.contours.contourList(contourIndex).bricks.Add(brick.index)
-                    brick.contourFull = contourIndex
-                    brickFull += 1
-                Else
-                    If contourIndex > 0 Then
-                        task.contours.contourList(contourIndex).brickPartial.Add(brick.index)
-                        brick.contourPartial = contourIndex
-                        brickPartial += 1
-                    End If
-                End If
-            End If
             task.brickList.Add(brick)
         Next
 
-        If task.heartBeat Then
-            labels(2) = CStr(task.brickList.Count) + " bricks, " + CStr(depthCount) + " are featureless - " +
-                        Format(brickFull / task.gridRects.Count, "00%") +
-                        " of bricks were fully interior in the " + CStr(task.contours.contourList.Count) + " contours." +
-                        CStr(brickPartial) + " partial contour bricks"
-        End If
-
-        DrawFullPartialBricks()
-
-        Dim depth As Single
-        For Each contour In task.contours.contourList
-            depth = 0
-            For Each index In contour.bricks
-                depth += task.brickList(index).depth
-            Next
-            contour.depth = depth / contour.bricks.Count
-        Next
-        dst3 = ShowPaletteCorrelation(task.contours.contourMap)
+        If task.heartBeat Then labels(2) = CStr(task.brickList.Count) + " bricks and " + CStr(brickDepthCount) + " had depth"
+        dst3 = ShowPalette(task.contours.contourMap)
+        labels(3) = task.contours.labels(2)
     End Sub
 End Class
 

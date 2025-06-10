@@ -14,6 +14,7 @@ Public Class Contour_Basics : Inherits TaskParent
         For Each tour In allContours
             Dim contour = New contourData
             contour.pixels = cv.Cv2.ContourArea(tour)
+            contour.points = New List(Of cv.Point)(tour)
             If contour.pixels > task.color.Total * 3 / 4 Then Continue For
             If tour.Count < 4 Then Continue For
 
@@ -91,8 +92,6 @@ Public Class Contour_Bricks : Inherits TaskParent
         If task.mouseClickFlag Then pt = task.ClickPoint
         Dim index = task.contours.contourMap.Get(Of Byte)(pt.Y, pt.X)
         task.contourD = task.contours.contourList(index)
-
-        DrawFullPartialBricks()
 
         labels(2) = task.contours.labels(2)
     End Sub
@@ -762,8 +761,7 @@ Public Class Contour_Basics_FloodFill : Inherits TaskParent
         dst2 = ShowPalette(contourMap)
 
         labels(2) = "FloodFill found the " + CStr(contourList.Count) + " largest contours of the " +
-                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
-                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+                    CStr(allContours.Count) + " found.  "
     End Sub
 End Class
 
@@ -797,8 +795,7 @@ Public Class Contour_Basics_CComp : Inherits TaskParent
         dst2 = ShowPalette(contourMap)
 
         labels(2) = "CComp found the " + CStr(contourList.Count) + " largest contours of the " +
-                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
-                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+                    CStr(allContours.Count) + " found.  "
     End Sub
 End Class
 
@@ -832,8 +829,7 @@ Public Class Contour_Basics_Tree : Inherits TaskParent
         dst2 = ShowPalette(contourMap)
 
         labels(2) = "Tree found the " + CStr(contourList.Count) + " largest contours of the " +
-                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
-                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+                    CStr(allContours.Count) + " found.  "
     End Sub
 End Class
 
@@ -868,8 +864,7 @@ Public Class Contour_Basics_List : Inherits TaskParent
 
         If task.heartBeat Then
             labels(2) = "List found the " + CStr(contourList.Count) + " largest color contours of the " +
-                        CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
-                        " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+                        CStr(allContours.Count) + " found.  "
         End If
     End Sub
 End Class
@@ -904,8 +899,7 @@ Public Class Contour_Basics_External : Inherits TaskParent
         dst2 = ShowPalette(contourMap)
 
         labels(2) = "External found the " + CStr(contourList.Count) + " largest contours of the " +
-                    CStr(allContours.Count) + " found.  " + "Contours had " + CStr(task.brickBasics.brickFull) +
-                    " interior bricks and " + CStr(task.brickBasics.brickPartial) + " partial bricks."
+                    CStr(allContours.Count) + " found.  "
     End Sub
 End Class
 
@@ -944,8 +938,6 @@ Public Class Contour_Info : Inherits TaskParent
         strOut += "Depth = " + Format(contour.depth, fmt1) + vbCrLf
         strOut += "Range (m) = " + Format(contour.mm.range, fmt1) + vbCrLf
         strOut += "Number of pixels in the mask: " + CStr(contour.pixels) + vbCrLf
-        strOut += "There are " + CStr(contour.bricks.Count) + " fully interior bricks" + vbCrLf
-        strOut += "There are " + CStr(contour.brickPartial.Count) + " partial bricks" + vbCrLf
 
         dst0 = src
         dst0(contour.rect).SetTo(white, contour.mask)
@@ -1034,8 +1026,6 @@ Public Class Contour_InfoDepth : Inherits TaskParent
         strOut += "Depth = " + Format(contour.depth, fmt1) + vbCrLf
         strOut += "Range (m) = " + Format(contour.mm.range, fmt1) + vbCrLf
         strOut += "Number of pixels in the mask: " + CStr(contour.pixels) + vbCrLf
-        strOut += "There are " + CStr(contour.bricks.Count) + " fully interior bricks" + vbCrLf
-        strOut += "There are " + CStr(contour.brickPartial.Count) + " partial bricks" + vbCrLf
 
         dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
         dst2.Circle(contour.center, task.DotSize, task.highlight, -1)
