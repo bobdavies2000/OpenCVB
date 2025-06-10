@@ -400,7 +400,7 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
             If standaloneTest() Then displayResults(p1, p2)
         End If
 
-        task.horizonVec = task.gravityHorizon.computePerp(task.gravityVec)
+        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
         SetTrueText(strOut, 3)
     End Sub
 End Class

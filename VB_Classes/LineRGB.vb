@@ -389,12 +389,34 @@ Public Class LineRGB_Perpendicular : Inherits TaskParent
         labels = {"", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", ""}
         desc = "Find the line perpendicular to the line created by the points provided."
     End Sub
+    Public Shared Function computePerp(lp As lpData) As lpData
+        Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
+        Dim m = If(lp.m = 0, 100000, -1 / lp.m)
+        Dim b = midPoint.Y - m * midPoint.X
+        Dim p1 = New cv.Point2f(-b / m, 0)
+        Dim p2 = New cv.Point2f((task.workingRes.Height - b) / m, task.workingRes.Height)
+
+        Dim w = task.workingRes.Width
+        Dim h = task.workingRes.Height
+
+        If p1.X < 0 Then p1 = New cv.Point2f(0, b)
+        If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)
+        If p1.Y < 0 Then p1 = New cv.Point2f(-b / m, 0)
+        If p1.Y > h Then p1 = New cv.Point2f(w, m * w + b)
+
+        If p2.X < 0 Then p2 = New cv.Point2f(0, b)
+        If p2.X > w Then p2 = New cv.Point2f(w, m * w + b)
+        If p2.Y < 0 Then p2 = New cv.Point2f(-b / m, 0)
+        If p2.Y > h Then p2 = New cv.Point2f(w, m * w + b)
+
+        Return New lpData(p1, p2)
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then input = task.gravityVec
         dst2.SetTo(0)
         DrawLine(dst2, input.p1, input.p2, white)
 
-        output = task.gravityHorizon.computePerp(input)
+        output = computePerp(input)
         DrawCircle(dst2, midPoint, task.DotSize + 2, cv.Scalar.Red)
         DrawLine(dst2, output.p1, output.p2, cv.Scalar.Yellow)
     End Sub

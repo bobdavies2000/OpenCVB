@@ -3,6 +3,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
     Dim match As New Match_Basics
     Public correlation1 As Single
     Public correlation2 As Single
+    Public doubleCheckLine As Boolean
     Public Sub New()
         If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -17,24 +18,27 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             Next
         End If
 
-        dst2 = src
+        dst2 = src.Clone
         If task.lineRGB.lpList.Count > 1 Then
             task.lpD = task.lineRGB.lpList(0)
             dst2.Line(task.lpD.ep1, task.lpD.ep2, task.highlight, task.lineWidth + 1, task.lineType)
             dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
 
-            Dim index = task.lpD.bricks(0)
-            match.template = src(task.gridRects(index))
+            If doubleCheckLine Then
+                Dim index = task.lpD.bricks(0)
+                match.template = src(task.gridRects(index))
 
-            Dim searchRect = task.gridNabeRects(index)
-            match.Run(src(searchRect))
-            correlation1 = match.correlation
+                Dim searchRect = task.gridNabeRects(index)
+                match.Run(src(searchRect))
+                correlation1 = match.correlation
 
-            searchRect = task.gridNabeRects(task.lpD.bricks.Last)
-            match.Run(src(searchRect))
-            correlation2 = match.correlation
-
-            labels(2) = "Line end point correlations: " + Format(correlation1, fmt3) + " / " + Format(correlation2, fmt3)
+                searchRect = task.gridNabeRects(task.lpD.bricks.Last)
+                match.Run(src(searchRect))
+                correlation2 = match.correlation
+                labels(2) = "Line end point correlations: " + Format(correlation1, fmt3) + " / " + Format(correlation2, fmt3)
+            Else
+                labels(2) = task.gravityHorizon.labels(2)
+            End If
         End If
     End Sub
 End Class

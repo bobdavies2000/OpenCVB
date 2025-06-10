@@ -1,32 +1,50 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
+    Dim gravity As New Gravity_BasicsRaw
+    Dim featLine As New FeatureLine_Basics
+    Dim imuGravityCount As Integer
+    Public Sub New()
+        desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.firstPass Then gravity.Run(emptyMat)
+        Static savedLine = task.gravityVec
+        featLine.Run(src)
+
+        If CInt(savedLine.ep1.X) <> CInt(task.lpD.ep1.X) Or
+           CInt(savedLine.ep1.Y) <> CInt(task.lpD.ep1.Y) Or
+           CInt(savedLine.ep2.X) <> CInt(task.lpD.ep2.X) Or
+           CInt(savedLine.ep2.Y) <> CInt(task.lpD.ep2.Y) Then
+
+            imuGravityCount += 1
+            gravity.Run(src)
+            savedLine = task.lpD
+            task.gravityVec = gravity.gravityVec
+        End If
+
+        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+        End If
+        labels(2) = "IMU gravity use " + CStr(imuGravityCount) + " times or " + Format(imuGravityCount / task.frameCount, "0%")
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Gravity_BasicsKalman : Inherits TaskParent
     Dim kalman As New Kalman_Basics
-    Dim gravity As New Gravity_Raw
+    Dim gravity As New Gravity_BasicsRaw
     Public Sub New()
         desc = "Use kalman to smooth gravity and horizon vectors."
     End Sub
-    Public Function computePerp(lp As lpData) As lpData
-        Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
-        Dim m = If(lp.m = 0, 100000, -1 / lp.m)
-        Dim b = midPoint.Y - m * midPoint.X
-        Dim p1 = New cv.Point2f(-b / m, 0)
-        Dim p2 = New cv.Point2f((dst2.Height - b) / m, dst2.Height)
-
-        Dim w = task.workingRes.Width
-        Dim h = task.workingRes.Height
-
-        If p1.X < 0 Then p1 = New cv.Point2f(0, b)
-        If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)
-        If p1.Y < 0 Then p1 = New cv.Point2f(-b / m, 0)
-        If p1.Y > h Then p1 = New cv.Point2f(w, m * w + b)
-
-        If p2.X < 0 Then p2 = New cv.Point2f(0, b)
-        If p2.X > w Then p2 = New cv.Point2f(w, m * w + b)
-        If p2.Y < 0 Then p2 = New cv.Point2f(-b / m, 0)
-        If p2.Y > h Then p2 = New cv.Point2f(w, m * w + b)
-
-        Return New lpData(p1, p2)
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
@@ -35,7 +53,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         task.gravityVec = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                      New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
 
-        task.horizonVec = computePerp(task.gravityVec)
+        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
 
         If standaloneTest() Then
             dst2.SetTo(0)
@@ -51,7 +69,7 @@ End Class
 
 
 
-Public Class Gravity_Raw : Inherits TaskParent
+Public Class Gravity_BasicsRaw : Inherits TaskParent
     Public xTop As Single, xBot As Single
     Dim sampleSize As Integer = 25
     Dim ptList As New List(Of Integer)
