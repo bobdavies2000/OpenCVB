@@ -124,6 +124,7 @@
     <Compile Include="FindTriangle.vb" />
     <Compile Include="DepthLogic.vb" />
     <Compile Include="LineDepth.vb" />
+    <Compile Include="MotionCam.vb" />
     <Compile Include="OptionFeatures.Designer.vb">
       <DependentUpon>OptionFeatures.vb</DependentUpon>
     </Compile>

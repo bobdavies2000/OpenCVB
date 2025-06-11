@@ -617,7 +617,7 @@ Public Class Brick_Correlation : Inherits TaskParent
         If index < 0 Or index > task.brickList.Count Then Exit Sub
 
         Dim brick = task.brickList(index)
-        Dim pt = task.gcD.rect.TopLeft
+        Dim pt = task.brickD.rect.TopLeft
         Dim corr = brick.correlation
         dst2.Circle(brick.lRect.TopLeft, task.DotSize, 255, -1)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)

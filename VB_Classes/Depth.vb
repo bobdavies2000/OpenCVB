@@ -1448,8 +1448,8 @@ Public Class Depth_ErrorEstimate : Inherits TaskParent
         dst2 = ShowPalette(dst1)
         ' dst2.SetTo(0, task.noDepthMask)
         labels(3) = "Error estimates vary from " + Format(mm.minVal, fmt3) + " to " + Format(mm.maxVal, fmt3)
-        If task.gcD Is Nothing Then Exit Sub
-        SetTrueText(Format(ErrorEstimate(task.gcD.depth), fmt3) + " estimated error" + vbCrLf + Format(task.gcD.depth, fmt3) + "m",
+        If task.brickD Is Nothing Then Exit Sub
+        SetTrueText(Format(ErrorEstimate(task.brickD.depth), fmt3) + " estimated error" + vbCrLf + Format(task.brickD.depth, fmt3) + "m",
                     task.mouseMovePoint, 3)
     End Sub
 End Class

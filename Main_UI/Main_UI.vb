@@ -1713,17 +1713,17 @@ Public Class Main_UI
                 Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
                     Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                    task.gcD = task.brickList(index)
-                    depthAndCorrelationText = "depth = " + Format(task.gcD.depth, fmt3) + "m ID=" +
-                                              CStr(task.gcD.index) + vbCrLf + "range " + Format(task.gcD.mm.minVal, fmt1) + "-" +
-                                              Format(task.gcD.mm.maxVal, fmt1) + "m, age = " + CStr(task.gcD.age) + vbCrLf +
-                                              "correlation = " + Format(task.gcD.correlation, fmt3)
+                    task.brickD = task.brickList(index)
+                    depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
+                                              CStr(task.brickD.index) + vbCrLf + "range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
+                                              Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
+                                              "correlation = " + Format(task.brickD.correlation, fmt3)
 
-                    Dim ptTextLoc = task.gcD.rect.TopLeft
+                    Dim ptTextLoc = task.brickD.rect.TopLeft
                     If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
                         ptTextLoc.X -= w * 0.15
                     Else
-                        ptTextLoc.Y -= task.gcD.rect.Height * 3
+                        ptTextLoc.Y -= task.brickD.rect.Height * 3
                     End If
                     ptCursor = validatePoint(task.mouseMovePoint)
                     SyncLock trueTextLock
@@ -1736,7 +1736,7 @@ Public Class Main_UI
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         End If
-                        trueData.Add(New TrueText(depthAndCorrelationText, ptCursor, 1))
+                        trueData.Add(New TrueText(depthAndCorrelationText, ptTextLoc, 1))
                         task.trueData.Clear()
                     End SyncLock
                 End If

@@ -159,6 +159,7 @@ ML
 Model
 Moments
 Motion
+MotionCam
 Mouse
 MSER
 MultiDimensionScaling
