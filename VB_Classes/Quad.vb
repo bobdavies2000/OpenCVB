@@ -23,10 +23,10 @@ End Class
 Public Class Quad_GridTiles : Inherits TaskParent
     Public quadData As New List(Of cv.Point3f)
     Public Sub New()
-        task.gOptions.GridSlider.Value = 10
+        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
-        labels = {"", "RedCloud cells", "", "Simplified depth map with RedCloud cell colors"}
+        labels = {"", "RedColor cells", "", "Simplified depth map with RedColor cell colors"}
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -80,7 +80,7 @@ Public Class Quad_MinMax : Inherits TaskParent
     Public oglOptions As New Options_OpenGLFunctions
     Const depthListMaxCount As Integer = 10
     Public Sub New()
-        task.gOptions.GridSlider.Value = 16
+        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Create a representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -251,10 +251,12 @@ Public Class Quad_Bricks : Inherits TaskParent
     Dim depthMaxList As New List(Of List(Of Single))
     Dim myListMax = 10
     Public Sub New()
-        task.gOptions.GridSlider.Value = 20
+        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Create triangles from each brick in point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
         If task.optionsChanged Then
             depthMinList.Clear()
             depthMaxList.Clear()
@@ -346,6 +348,7 @@ End Class
 
 Public Class Quad_Boundaries : Inherits TaskParent
     Public Sub New()
+        labels(2) = "Depth differences large enough to label them boundaries"
         desc = "Find large differences in depth between cells that could provide boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
