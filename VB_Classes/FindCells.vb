@@ -105,7 +105,6 @@ End Class
 Public Class FindCells_Lines : Inherits TaskParent
     Dim findCells As New FindCells_Basics
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.featureOptions.SelectedFeature.Value = 1
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
@@ -186,7 +185,6 @@ End Class
 Public Class FindCells_LineGaps : Inherits TaskParent
     Dim findCells As New FindCells_Gaps
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
         desc = "Find cells that have a gap in depth from their neighbors."

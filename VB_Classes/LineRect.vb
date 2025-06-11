@@ -45,7 +45,6 @@ End Class
 Public Class LineRect_CenterNeighbor : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Remove lines which have similar depth in bricks on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

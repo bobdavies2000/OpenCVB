@@ -520,6 +520,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         brickBasics = New Brick_Basics
+        lineRGB = New LineRGB_Basics
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
         LRMeanSub = New MeanSubtraction_LeftRight
@@ -794,7 +795,7 @@ Public Class VBtask : Implements IDisposable
 
         gravityHorizon.Run(src)
 
-        If lineRGB IsNot Nothing Then lineRGB.Run(src.Clone)
+        lineRGB.Run(src.Clone)
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True

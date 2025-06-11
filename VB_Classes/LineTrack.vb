@@ -2,7 +2,6 @@
 Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.redOptions.TrackingColor.Checked = True
         desc = "Track the line regions with RedCloud"

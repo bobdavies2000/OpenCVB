@@ -569,7 +569,6 @@ End Class
 Public Class Brick_RegionLines : Inherits TaskParent
     Dim regions As New Region_Contours
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Lines can mean cells are connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -729,7 +728,6 @@ End Class
 Public Class Brick_Lines : Inherits TaskParent
     Dim info As New LineRGB_Info
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Lines can mean cells are connected - click on any highlighted brick to see info on that line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

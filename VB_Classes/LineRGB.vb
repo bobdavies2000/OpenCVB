@@ -171,7 +171,6 @@ End Class
 Public Class LineRGB_BasicsAlternative : Inherits TaskParent
     Public lines As New LineRGB_RawSorted
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask.  Results are in task.linergb.lpList."
@@ -317,7 +316,6 @@ Public Class LineRGB_Intercepts : Inherits TaskParent
     Public rightIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public interceptArray = {topIntercepts, botIntercepts, leftIntercepts, rightIntercepts}
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels(2) = "Highlight line x- and y-intercepts.  Move mouse over the image."
         desc = "Show lines with similar y-intercepts"
     End Sub
@@ -430,7 +428,6 @@ End Class
 
 Public Class LineRGB_Info : Inherits TaskParent
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels(3) = "The selected line with details."
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Display details about the line selected."
@@ -481,7 +478,6 @@ Public Class LineRGB_ViewLeftRight : Inherits TaskParent
     Dim lines As New LineRGB_Basics
     Dim linesRaw As New LineRGB_RawSorted
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Find lines in the left and right images."
     End Sub
@@ -721,7 +717,6 @@ End Class
 Public Class LineRGB_HorizontalTrig : Inherits TaskParent
     Public horizList As New List(Of lpData)
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Find all the Horizontal lines with horizon vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -755,7 +750,6 @@ End Class
 Public Class LineRGB_VerticalTrig : Inherits TaskParent
     Public vertList As New List(Of lpData)
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Find all the vertical lines with gravity vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -795,7 +789,6 @@ Public Class LineRGB_GravityToAverage : Inherits TaskParent
     Public vertList As New List(Of lpData)
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Highlight both vertical and horizontal lines - not terribly good..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -843,7 +836,6 @@ Public Class LineRGB_GravityToLongest : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Dim matchLine As New MatchLine_Basics
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Highlight both vertical and horizontal lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -100,7 +100,6 @@ End Class
 Public Class Stable_Lines : Inherits TaskParent
     Public basics As New Stable_Basics
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the line end points found in the BGR image and keep those that are stable."
     End Sub

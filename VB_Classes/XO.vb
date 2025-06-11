@@ -904,7 +904,6 @@ End Class
 Public Class XO_Line_LeftRight : Inherits TaskParent
     Dim lineCore As New XO_Line_Core
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Show lines in both the right and left images."
     End Sub
@@ -939,7 +938,6 @@ Public Class XO_Line_Matching : Inherits TaskParent
     Dim lineMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim lpList As New List(Of lpData)
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels(2) = "Highlighted lines were combined from 2 lines.  Click on LineRGB_Core in Treeview to see."
         desc = "Combine lines that are approximately the same line."
     End Sub
@@ -1021,7 +1019,6 @@ End Class
 
 Public Class XO_Line_TopX : Inherits TaskParent
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         labels(3) = "The top X lines by length..."
         desc = "Isolate the top X lines by length - lines are already sorted by length."
@@ -1157,7 +1154,6 @@ End Class
 Public Class XO_Line_KNN : Inherits TaskParent
     Dim swarm As New Swarm_Basics
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Use KNN to find the nearest point to an endpoint and connect the 2 lines with a line."
     End Sub
@@ -1349,7 +1345,6 @@ Public Class XO_Line_TimeView : Inherits TaskParent
     Public pixelcount As Integer
     Public lpList As New List(Of lpData)
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Collect lines over time"
     End Sub
@@ -1513,7 +1508,6 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
     Public z1List As New List(Of cv.Point3f) ' the point cloud values corresponding to p1 and p2
     Public z2List As New List(Of cv.Point3f)
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels(2) = "Lines defined in BGR"
         labels(3) = "Lines in BGR confirmed in the point cloud"
         desc = "Find the BGR lines and confirm they are present in the cloud data."
@@ -1631,7 +1625,6 @@ Public Class XO_Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Dim lineCore As New XO_Line_Core
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines across frames using the motion mask."
     End Sub
@@ -2831,7 +2824,6 @@ End Class
 Public Class XO_FCSLine_Basics : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Build a feature coordinate system (FCS) based on lines, not features."
     End Sub
@@ -2952,7 +2944,6 @@ Public Class XO_FeatureLine_Finder3D : Inherits TaskParent
     Public sortedHorizontals As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
     Dim options As New Options_LineFinder()
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -3069,7 +3060,6 @@ End Class
 Public Class XO_FeatureLine_Tutorial2 : Inherits TaskParent
     Dim options As New Options_LineFinder()
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -3384,7 +3374,6 @@ End Class
 Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
     Dim nearest As New XO_Line_Nearest
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         task.gOptions.LineWidth.Value = 2
         desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
     End Sub
@@ -4149,7 +4138,6 @@ End Class
 Public Class XO_LineRect_CenterDepth : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Remove lines which have similar depth in bricks on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -4193,7 +4181,6 @@ Public Class XO_LongLine_BasicsEx : Inherits TaskParent
     Public lines As New XO_LongLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         desc = "Identify the longest lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -4223,7 +4210,6 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData) ' The top X longest lines
     Dim hist As New Hist_GridCell
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Isolate the longest X lines and update the list of bricks containing each line."
     End Sub
@@ -4629,7 +4615,6 @@ Public Class XO_tructured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
     Dim lines As New LineRGB_RawSorted
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"
         desc = "Find the vertical center line with accurate depth data.."

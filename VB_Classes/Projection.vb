@@ -95,7 +95,6 @@ Public Class Projection_Lines : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Dim options As New Options_Projection
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells"}

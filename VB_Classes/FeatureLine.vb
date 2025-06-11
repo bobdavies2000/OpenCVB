@@ -5,7 +5,6 @@ Public Class FeatureLine_Basics : Inherits TaskParent
     Public correlation2 As Single
     Public doubleCheckLine As Boolean
     Public Sub New()
-        If task.lineRGB Is Nothing Then task.lineRGB = New LineRGB_Basics
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and track the longest line by matching endpoint bricks."
     End Sub
