@@ -4,6 +4,7 @@ Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public rawLines As New LineRGB_Raw
+    Public minAge As Integer = 5 ' line has to be around for a little while before it is recorded as a line.
     Public Sub New()
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub

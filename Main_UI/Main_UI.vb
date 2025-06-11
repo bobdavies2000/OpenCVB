@@ -1719,7 +1719,7 @@ Public Class Main_UI
                                               Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
                                               "correlation = " + Format(task.brickD.correlation, fmt3)
 
-                    Dim ptTextLoc = task.brickD.rect.TopLeft
+                    Dim ptTextLoc = task.brickD.rect.topleft
                     If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
                         ptTextLoc.X -= w * 0.15
                     Else
@@ -1736,14 +1736,17 @@ Public Class Main_UI
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         End If
-                        trueData.Add(New TrueText(depthAndCorrelationText, ptTextLoc, 1))
+                        ' if dst1 is being overridden, then don't display the brick info.
+                        If task.displayDst1 = False Then trueData.Add(New TrueText(depthAndCorrelationText, ptTextLoc, 1))
                         task.trueData.Clear()
                     End SyncLock
                 End If
 
                 depthAndCorrelationText = depthAndCorrelationText.Replace(vbCrLf, ", ")
-                picLabels(1) = "Correlation bricks - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) +
-                                   "  " + depthAndCorrelationText
+                If task.displayDst1 = False Or task.labels(1) = "" Then
+                    picLabels(1) = "Correlation bricks - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) + "  " +
+                                   depthAndCorrelationText
+                End If
                 If task.dst0 IsNot Nothing Then
                     SyncLock cameraLock
                         dst(0) = task.dst0.Clone

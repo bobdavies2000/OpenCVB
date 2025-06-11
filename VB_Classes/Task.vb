@@ -315,6 +315,7 @@ Public Class VBtask : Implements IDisposable
     Public metersPerPixel As Single
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
+    Public displayDst1 As Boolean
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -830,8 +831,10 @@ Public Class VBtask : Implements IDisposable
             End If
             If gOptions.displayDst1.Checked Then
                 dst1 = Check8uC3(displayObject.dst1)
+                displayDst1 = True
             Else
                 dst1 = depthRGB
+                displayDst1 = False
             End If
 
             dst2 = Check8uC3(displayObject.dst2)
@@ -881,6 +884,7 @@ Public Class VBtask : Implements IDisposable
             trueData = New List(Of TrueText)(displayObject.trueData)
             displayObject.trueData.Clear()
             labels = displayObject.labels
+            If displayDst1 Then labels(1) = displayObject.labels(1)
         End If
         Return saveOptionsChanged
     End Function
