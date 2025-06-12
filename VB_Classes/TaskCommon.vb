@@ -521,6 +521,11 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                 If y1 >= 0 And y1 <= task.workingRes.Height Then pts.Add(New cv.Point2f(0, y1))
                 If y2 >= 0 And y2 <= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, y2))
                 ep1 = pts(0)
+                If pts.Count < 2 Then
+                    If CInt(x2) = task.workingRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workingRes.Height))
+                    If CInt(y2) = task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
+                End If
+                If pts.Count < 2 Then Dim k = 0
                 ep2 = pts(1)
                 Exit Sub
             End If
