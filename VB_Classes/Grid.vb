@@ -3,12 +3,11 @@ Imports System.Threading
 Public Class Grid_Basics : Inherits TaskParent
     Public Sub New()
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        task.brickMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.mouseClickFlag And Not task.firstPass Then
-            task.gridROIclicked = task.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.gridROIclicked = task.bbo.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
 
         Dim cellSize = task.gOptions.GridSlider.Value
@@ -47,7 +46,7 @@ Public Class Grid_Basics : Inherits TaskParent
 
             For i = 0 To task.gridRects.Count - 1
                 Dim roi = task.gridRects(i)
-                task.brickMap.Rectangle(roi, i, -1)
+                task.bbo.brickMap.Rectangle(roi, i, -1)
             Next
 
             For j = 0 To task.gridRects.Count - 1
@@ -61,7 +60,7 @@ Public Class Grid_Basics : Inherits TaskParent
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                               roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                     If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        Dim nextIndex As Integer = task.brickMap.Get(Of Single)(y, x)
+                        Dim nextIndex As Integer = task.bbo.brickMap.Get(Of Single)(y, x)
                         If nextList.Contains(nextIndex) = False Then nextList.Add(nextIndex)
                     End If
                 Next
@@ -222,7 +221,7 @@ Public Class Grid_Neighbors : Inherits TaskParent
         SetTrueText("Click any grid entry to see its neighbors", 3)
         dst2.SetTo(white, task.gridMask)
 
-        Dim roiIndex As Integer = task.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim roiIndex As Integer = task.bbo.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
 
         dst3.SetTo(0)
         For Each index In task.gridNeighbors(roiIndex)
@@ -364,7 +363,7 @@ Public Class Grid_TrackCenter : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
-            Dim index As Integer = task.brickMap.Get(Of Single)(dst2.Height / 2, dst2.Width / 2)
+            Dim index As Integer = task.bbo.brickMap.Get(Of Single)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridRects(index)
             match.template = src(roi).Clone
             center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)

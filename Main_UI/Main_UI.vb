@@ -1712,7 +1712,7 @@ Public Class Main_UI
                 Dim ptCursor As New cv.Point
                 Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-                    Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                    Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
                     task.brickD = task.bbo.brickList(index)
                     depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
                                               CStr(task.brickD.index) + vbCrLf + "range " + Format(task.brickD.mm.minVal, fmt1) + "-" +

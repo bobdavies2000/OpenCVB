@@ -2011,7 +2011,7 @@ Public Class XO_Brick_Basics : Inherits TaskParent
 
             lastCorrelation(i) = brick.correlation
             brick.index = task.bbo.brickList.Count
-            task.brickMap(brick.rect).SetTo(i)
+            task.bbo.brickMap(brick.rect).SetTo(i)
             task.bbo.brickList.Add(brick)
         Next
 
@@ -2036,11 +2036,11 @@ Public Class XO_Quad_Basics : Inherits TaskParent
             shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
         End If
 
-        task.brickMap.SetTo(0)
+        task.bbo.brickMap.SetTo(0)
         dst2.SetTo(0)
         For i = 0 To task.bbo.brickList.Count - 1
             Dim brick = task.bbo.brickList(i)
-            task.brickMap(brick.rect).SetTo(i)
+            task.bbo.brickMap(brick.rect).SetTo(i)
             If brick.depth > 0 Then
                 brick.corners.Clear()
 
@@ -2851,7 +2851,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
             DrawContour(dst1, facets, 255, task.lineWidth)
             DrawContour(task.fpMap, facets, lp.index)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim brick = task.bbo.brickList(task.brickMap.Get(Of Single)(center.Y, center.X))
+            Dim brick = task.bbo.brickList(task.bbo.brickMap.Get(Of Single)(center.Y, center.X))
             task.lineRGB.lpList(i) = lp
         Next
 
@@ -4152,8 +4152,8 @@ Public Class XO_LineRect_CenterDepth : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim lpPerp = lp.perpendicularPoints(center, task.cellSize)
-            Dim index1 As Integer = task.brickMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
-            Dim index2 As Integer = task.brickMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
+            Dim index1 As Integer = task.bbo.brickMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
+            Dim index2 As Integer = task.bbo.brickMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
             Dim brick1 = task.bbo.brickList(index1)
             Dim brick2 = task.bbo.brickList(index2)
             If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then

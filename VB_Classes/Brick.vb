@@ -2,8 +2,9 @@
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean, brickDepthCount As Integer
     Public brickList As New List(Of brickData)
+    Public brickMap As New cv.Mat ' map of bricks to index in bricklist
     Public Sub New()
-        task.brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
         If task.cameraName.StartsWith("StereoLabs") Then task.rgbLeftAligned = True
         desc = "Create the grid of bricks that reduce depth volatility"
@@ -118,7 +119,7 @@ Public Class Brick_Plot : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.bbo.dst2
 
-        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.bbo.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim brick As brickData
@@ -501,7 +502,7 @@ Public Class Brick_Features : Inherits TaskParent
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
-            Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index As Integer = task.bbo.brickMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.bbo.brickList(index)
             If features(index) Is Nothing Then features(index) = New List(Of cv.Point)
             features(index).Add(pt)
@@ -614,7 +615,7 @@ Public Class Brick_Correlation : Inherits TaskParent
             dst3 = task.rightView
         End If
 
-        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.bbo.brickList.Count Then Exit Sub
 
         Dim brick = task.bbo.brickList(index)
@@ -642,7 +643,7 @@ Public Class Brick_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.bbo.labels(2)
 
-        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim brick As brickData = task.bbo.brickList(index)
         dst2 = src
@@ -769,12 +770,12 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
 
         Static myBricks As New List(Of Integer)
         If standalone And task.testAllRunning Then
-            Dim index As Integer = task.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
             For i = index To index + 10
                 If myBricks.Contains(i) = False Then myBricks.Add(i)
             Next
         Else
-            Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             If myBricks.Contains(index) = False Then myBricks.Add(index)
         End If
 
@@ -801,7 +802,7 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim brick As brickData
         If index > 0 And index < task.bbo.brickList.Count Then
             brick = task.bbo.brickList(index)

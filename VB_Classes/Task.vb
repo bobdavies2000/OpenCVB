@@ -19,7 +19,6 @@ Public Class VBtask : Implements IDisposable
     Public fLess As New List(Of List(Of Integer))
     Public logicalLines As New List(Of lpData)
 
-    Public brickMap As New cv.Mat ' map of bricks to index in bricklist
     Public fpMap As New cv.Mat ' feature map
     Public rcMap As cv.Mat ' redColor map
 
@@ -515,11 +514,11 @@ Public Class VBtask : Implements IDisposable
 
         colorizer = New DepthColorizer_Basics
         gmat = New IMU_GMatrix
-        grid = New Grid_Basics
         gravityHorizon = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         bbo = New Brick_Basics
+        grid = New Grid_Basics
         lineRGB = New LineRGB_Basics
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List

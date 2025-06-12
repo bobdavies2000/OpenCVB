@@ -170,7 +170,7 @@ Public Class Contour_Features : Inherits TaskParent
         For Each pt In task.features
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
             dst3.Circle(pt, task.DotSize, task.highlight, -1)
-            Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index = task.bbo.brickMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.bbo.brickList(index)
             SetTrueText(Format(brick.correlation, fmt1), pt, 3)
         Next

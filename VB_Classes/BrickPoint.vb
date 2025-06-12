@@ -263,7 +263,7 @@ Public Class BrickPoint_Busiest : Inherits TaskParent
         bestBricks.Clear()
         sortedBricks.Clear()
         For Each pt In ptBrick.intensityFeatures
-            Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index = task.bbo.brickMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.bbo.brickList(index)
             If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(ptBrick.sobel.dst2(brick.rect).CountNonZero, brick.rect)
         Next
@@ -301,7 +301,7 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
 
         ReDim results(task.cellSize - 1, task.cellSize - 1)
         For Each pt In ptBrick.intensityFeatures
-            Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index = task.bbo.brickMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.bbo.brickList(index)
             results(brick.feature.X - brick.rect.X, brick.feature.Y - brick.rect.Y) += 1
         Next

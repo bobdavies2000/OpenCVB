@@ -563,8 +563,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         p2 = validatePoint(_p2)
 
         ' convention: p1 has closer depth than p2.  Switch if not...
-        Dim brick1 = task.bbo.brickList(task.brickMap.Get(Of Single)(p1.Y, p1.X))
-        Dim brick2 = task.bbo.brickList(task.brickMap.Get(Of Single)(p2.Y, p2.X))
+        Dim brick1 = task.bbo.brickList(task.bbo.brickMap.Get(Of Single)(p1.Y, p1.X))
+        Dim brick2 = task.bbo.brickList(task.bbo.brickMap.Get(Of Single)(p2.Y, p2.X))
         If brick1.depth > brick2.depth Then
             Dim ptTemp = p1
             p1 = p2
@@ -587,7 +587,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             ' handle the special case of slope 0
             Dim stepSize = If(p1.Y > p2.Y, -task.cellSize, task.cellSize)
             For y = p1.Y To p2.Y Step stepSize
-                Dim index = task.brickMap.Get(Of Single)(y, p1.X)
+                Dim index = task.bbo.brickMap.Get(Of Single)(y, p1.X)
                 bricks.Add(index)
                 brickptList.Add(task.bbo.brickList(index).rect.TopLeft)
             Next
@@ -597,7 +597,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                 Dim stepSize = If(p1.X > p2.X, -1, 1)
                 For x = p1.X To p2.X Step stepSize
                     Dim y = m * x + b
-                    Dim index = task.brickMap.Get(Of Single)(y, x)
+                    Dim index = task.bbo.brickMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
                         brickptList.Add(task.bbo.brickList(index).rect.TopLeft)
@@ -607,7 +607,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                 Dim stepSize = If(p1.Y > p2.Y, -1, 1)
                 For y = p1.Y To p2.Y Step stepSize
                     Dim x = (y - b) / m
-                    Dim index = task.brickMap.Get(Of Single)(y, x)
+                    Dim index = task.bbo.brickMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
                         brickptList.Add(task.bbo.brickList(index).rect.TopLeft)

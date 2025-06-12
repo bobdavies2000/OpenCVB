@@ -108,8 +108,8 @@ Public Class LongLine_Depth : Inherits TaskParent
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-        Dim gcMin = task.bbo.brickList(task.brickMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-        Dim gcMax = task.bbo.brickList(task.brickMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+        Dim gcMin = task.bbo.brickList(task.bbo.brickMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+        Dim gcMax = task.bbo.brickList(task.bbo.brickMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
 
         dst0.SetTo(0)
         dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)

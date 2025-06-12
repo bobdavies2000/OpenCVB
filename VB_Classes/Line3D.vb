@@ -25,10 +25,10 @@ Public Class Line3D_Basics : Inherits TaskParent
         lines3D.Clear()
 
         For Each lp In task.lineRGB.lpList
-            Dim gc1 = brickList(task.brickMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            Dim gc1 = brickList(task.bbo.brickMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
             If gc1.depth = 0 Then Continue For
 
-            Dim gc2 = brickList(task.brickMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+            Dim gc2 = brickList(task.bbo.brickMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
             If gc2.depth = 0 Then Continue For
 
             lines3D.Add(New cv.Point3f(0, 0.9, 0.9))
