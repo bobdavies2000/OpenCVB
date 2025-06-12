@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean, brickDepthCount As Integer
+    Public brickList As New List(Of brickData)
     Public Sub New()
         task.brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
@@ -10,16 +11,16 @@ Public Class Brick_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' when standalone or called from another algorithm is unnecessary - already been run...
 
-        If task.brickList.Count <> task.gridRects.Count Then task.brickList.Clear()
+        If task.bbo.brickList.Count <> task.gridRects.Count Then task.bbo.brickList.Clear()
 
         Dim correlationMat As New cv.Mat
         Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
         Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
-        Dim brickLast As New List(Of brickData)(task.brickList)
+        Dim brickLast As New List(Of brickData)(task.bbo.brickList)
 
         Dim maxPixels = task.cellSize * task.cellSize
-        task.brickList.Clear()
+        task.bbo.brickList.Clear()
         Dim depthCount As Integer
         brickDepthCount = 0
         For i = 0 To task.gridRects.Count - 1
@@ -92,10 +93,10 @@ Public Class Brick_Basics : Inherits TaskParent
                 brick.depthRanges.RemoveAt(0)
             End If
 
-            task.brickList.Add(brick)
+            task.bbo.brickList.Add(brick)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(task.brickList.Count) + " bricks and " + CStr(brickDepthCount) + " had depth"
+        If task.heartBeat Then labels(2) = CStr(task.bbo.brickList.Count) + " bricks and " + CStr(brickDepthCount) + " had depth"
         dst3 = ShowPalette(task.contours.contourMap)
         labels(3) = task.contours.labels(2)
     End Sub
@@ -115,17 +116,17 @@ Public Class Brick_Plot : Inherits TaskParent
         desc = "Select any cell To plot a histogram Of that cell's depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.brickBasics.dst2
+        dst2 = task.bbo.dst2
 
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        If task.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
+        If task.bbo.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim brick As brickData
-        If index < 0 Or index >= task.brickList.Count Then
-            brick = task.brickList(task.brickList.Count / 2)
+        If index < 0 Or index >= task.bbo.brickList.Count Then
+            brick = task.bbo.brickList(task.bbo.brickList.Count / 2)
             task.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
         Else
-            brick = task.brickList(index)
+            brick = task.bbo.brickList(index)
         End If
 
         Dim split() = task.pointCloud(brick.rect).Split()
@@ -167,7 +168,7 @@ Public Class Brick_FullDepth : Inherits TaskParent
         If task.mouseClickFlag Then
             whiteCol = Math.Round(cellsPerRow * (task.ClickPoint.X - task.cellSize / 2) / dst2.Width)
         End If
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If brick.depth > 0 Then
                 Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / cellsPerRow)))
                 dst2.Rectangle(brick.rect, color, task.lineWidth)
@@ -188,17 +189,17 @@ End Class
 
 Public Class Brick_InstantUpdate : Inherits TaskParent
     Public Sub New()
-        task.brickBasics.instantUpdate = True
+        task.bbo.instantUpdate = True
         labels(3) = "Pointcloud image for cells with good visibility"
         desc = "Create the grid of bricks with good visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then labels(2) = CStr(task.brickList.Count) + " bricks have reasonable depth."
+        If task.heartBeat Then labels(2) = CStr(task.bbo.brickList.Count) + " bricks have reasonable depth."
 
-        dst2 = task.brickBasics.dst2
-        dst3 = task.brickBasics.dst3
+        dst2 = task.bbo.dst2
+        dst3 = task.bbo.dst3
 
-        labels(2) = task.brickBasics.labels(2)
+        labels(2) = task.bbo.labels(2)
     End Sub
 End Class
 
@@ -493,7 +494,7 @@ Public Class Brick_Features : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
 
-        dst2 = task.brickBasics.dst2
+        dst2 = task.bbo.dst2
 
         ReDim features(task.gridRects.Count - 1)
 
@@ -501,13 +502,13 @@ Public Class Brick_Features : Inherits TaskParent
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
             Dim index As Integer = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-            Dim brick = task.brickList(index)
+            Dim brick = task.bbo.brickList(index)
             If features(index) Is Nothing Then features(index) = New List(Of cv.Point)
             features(index).Add(pt)
             DrawCircle(dst2, brick.rect.TopLeft, task.DotSize, task.highlight)
 
             rects.Add(brick.rect)
-            task.brickList(index) = brick
+            task.bbo.brickList(index) = brick
         Next
 
         task.featureRects.Clear()
@@ -515,9 +516,9 @@ Public Class Brick_Features : Inherits TaskParent
         For i = 0 To features.Count - 1
             Dim ptlist = features(i)
             If ptlist Is Nothing Then
-                task.fLessRects.Add(task.brickList(i).rect)
+                task.fLessRects.Add(task.bbo.brickList(i).rect)
             Else
-                task.featureRects.Add(task.brickList(i).rect)
+                task.featureRects.Add(task.bbo.brickList(i).rect)
             End If
         Next
 
@@ -614,9 +615,9 @@ Public Class Brick_Correlation : Inherits TaskParent
         End If
 
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        If index < 0 Or index > task.brickList.Count Then Exit Sub
+        If index < 0 Or index > task.bbo.brickList.Count Then Exit Sub
 
-        Dim brick = task.brickList(index)
+        Dim brick = task.bbo.brickList(index)
         Dim pt = task.brickD.rect.TopLeft
         Dim corr = brick.correlation
         dst2.Circle(brick.lRect.TopLeft, task.DotSize, 255, -1)
@@ -639,11 +640,11 @@ Public Class Brick_Info : Inherits TaskParent
         desc = "Display the info about the select brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = task.brickBasics.labels(2)
+        labels(2) = task.bbo.labels(2)
 
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
-        Dim brick As brickData = task.brickList(index)
+        Dim brick As brickData = task.bbo.brickList(index)
         dst2 = src
 
         strOut = labels(2) + vbCrLf + vbCrLf
@@ -682,7 +683,7 @@ Public Class Brick_LeftToColor : Inherits TaskParent
         dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3.SetTo(0)
         Dim count As Integer
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If brick.depth > 0 Then
                 count += 1
                 task.color.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1)
@@ -706,8 +707,8 @@ Public Class Brick_FitLeftInColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim correlationMat As New cv.Mat
 
-        Dim p1 = task.brickList(0).lRect.TopLeft
-        Dim p2 = task.brickList(task.brickList.Count - 1).lRect.BottomRight
+        Dim p1 = task.bbo.brickList(0).lRect.TopLeft
+        Dim p2 = task.bbo.brickList(task.bbo.brickList.Count - 1).lRect.BottomRight
 
         Dim rect = ValidateRect(New cv.Rect(p1.X - task.cellSize, p1.Y - task.cellSize, task.cellSize * 2, task.cellSize * 2))
         cv.Cv2.MatchTemplate(task.gray(New cv.Rect(0, 0, dst1.Width / 2, dst1.Height / 2)), task.leftView, dst2,
@@ -736,7 +737,7 @@ Public Class Brick_Lines : Inherits TaskParent
         dst3.SetTo(0)
         If task.heartBeat Then info.Run(emptyMat)
         For Each index In task.lpD.bricks
-            Dim brick = task.brickList(index)
+            Dim brick = task.bbo.brickList(index)
             If brick.index <> 0 Then dst3.Rectangle(brick.rect, task.highlight, 1, task.lineType)
         Next
         dst3.Line(task.lpD.p1, task.lpD.p2, white, task.lineWidth, task.lineType)
@@ -778,7 +779,7 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
         End If
 
         For Each index In myBricks
-            Dim brick = task.brickList(index)
+            Dim brick = task.bbo.brickList(index)
             dst0.Rectangle(brick.rect, task.highlight, task.lineWidth)
             dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
             dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
@@ -802,10 +803,10 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
         Dim index As Integer = task.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim brick As brickData
-        If index > 0 And index < task.brickList.Count Then
-            brick = task.brickList(index)
+        If index > 0 And index < task.bbo.brickList.Count Then
+            brick = task.bbo.brickList(index)
         Else
-            brick = task.brickList(task.brickList.Count / 2)
+            brick = task.bbo.brickList(task.bbo.brickList.Count / 2)
         End If
 
         Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
@@ -863,7 +864,7 @@ Public Class Brick_LeftRight : Inherits TaskParent
 
         For i = 0 To task.cellsPerRow - 1 Step 2
             For j = i To task.gridRects.Count - task.cellsPerRow - 1 Step task.cellsPerRow
-                Dim brick = task.brickList(j)
+                Dim brick = task.bbo.brickList(j)
                 If brick.depth > 0 Then
                     dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
                     dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
@@ -891,11 +892,11 @@ Public Class Brick_Map : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
         If task.gOptions.DepthCorrelations.Checked Then
-            For Each brick In task.brickList
+            For Each brick In task.bbo.brickList
                 If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
             Next
         Else
-            For Each brick In task.brickList
+            For Each brick In task.bbo.brickList
                 If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
             Next
         End If
@@ -906,6 +907,6 @@ Public Class Brick_Map : Inherits TaskParent
             dst2 = ShowPaletteDepth(dst1)
         End If
         dst2.SetTo(0, task.noDepthMask)
-        labels(2) = task.brickBasics.labels(2)
+        labels(2) = task.bbo.labels(2)
     End Sub
 End Class

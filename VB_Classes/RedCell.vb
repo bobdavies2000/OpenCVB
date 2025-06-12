@@ -110,6 +110,7 @@ Public Class RedCell_Distance : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
         desc = "Measure the color distance of each cell to the selected cell."
     End Sub
@@ -151,6 +152,7 @@ Public Class RedCell_Binarize : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         labels = {"", "Binarized image", "", "Relative gray image"}
         desc = "Separate the image into light and dark using RedCloud cells"
     End Sub
@@ -191,6 +193,7 @@ Public Class RedCell_FloodFill : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
+        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Provide cell stats on the flood_basics cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -254,6 +257,7 @@ End Class
 Public Class RedCell_Generate : Inherits TaskParent
     Public mdList As New List(Of maskData)
     Public Sub New()
+        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

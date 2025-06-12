@@ -92,7 +92,7 @@ Public Class FCS_CreateList : Inherits TaskParent
             fp.index = i
 
             Dim brickIndex = task.brickMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
-            Dim brick = task.brickList(brickIndex)
+            Dim brick = task.bbo.brickList(brickIndex)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
                 Dim fpLast = task.fpLastList(fpIndex)
@@ -581,7 +581,7 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
 
         strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
-        Dim brick = task.brickList(fp.brickIndex)
+        Dim brick = task.bbo.brickList(fp.brickIndex)
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
         strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
 

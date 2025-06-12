@@ -14,10 +14,10 @@ Public Class Line3D_Basics : Inherits TaskParent
         dst2 = lines.dst2
         labels(2) = lines.labels(2)
 
-        Static brickList As New List(Of brickData)(task.brickList)
+        Static brickList As New List(Of brickData)(task.bbo.brickList)
 
         For i = 0 To task.gridRects.Count - 1
-            Dim brick = task.brickList(i)
+            Dim brick = task.bbo.brickList(i)
             Dim val = task.motionMask.Get(Of Byte)(brick.center.Y, brick.center.X)
             If val Then brickList(i) = brick
         Next

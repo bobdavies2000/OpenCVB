@@ -614,7 +614,7 @@ Public Class Feature_WithDepth : Inherits TaskParent
         Dim depthCount As Integer
         For Each pt In task.featurePoints
             Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-            If task.brickList(index).depth > 0 Then
+            If task.bbo.brickList(index).depth > 0 Then
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 depthCount += 1
             End If

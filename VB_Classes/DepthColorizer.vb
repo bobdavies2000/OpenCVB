@@ -54,15 +54,15 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.GridDepth.Checked Then
-            task.depthRGB = task.brickBasics.dst2
+            task.depthRGB = task.bbo.dst2
         Else
             dst1.SetTo(0)
             If task.gOptions.DepthCorrelations.Checked Then
-                For Each brick In task.brickList
+                For Each brick In task.bbo.brickList
                     If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
                 Next
             Else
-                For Each brick In task.brickList
+                For Each brick In task.bbo.brickList
                     If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
                 Next
             End If
@@ -74,7 +74,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             End If
             task.depthRGB.SetTo(0, task.noDepthMask)
         End If
-        labels(2) = task.brickBasics.labels(2)
+        labels(2) = task.bbo.labels(2)
 
         If standaloneTest() Then dst2 = task.depthRGB
     End Sub

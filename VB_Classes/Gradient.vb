@@ -127,16 +127,16 @@ Public Class Gradient_DepthLines : Inherits TaskParent
             lp = task.logicalLines(0)
         End If
         For Each brick In lp.bricks
-            dst3.Rectangle(task.brickList(brick).rect, 255, -1)
+            dst3.Rectangle(task.bbo.brickList(brick).rect, 255, -1)
         Next
 
-        brickNear = task.brickList(lp.bricks.First) ' p1 is always closest to the camera.
-        brickFar = task.brickList(lp.bricks.Last)
+        brickNear = task.bbo.brickList(lp.bricks.First) ' p1 is always closest to the camera.
+        brickFar = task.bbo.brickList(lp.bricks.Last)
 
         ' the end points of the bricks may have depth contaminated by a line extending into a brick that is on a depth edge.
         ' here we use the next brick in toward the center's depth as a purer depth estimate.
-        brickNear.depth = task.brickList(lp.bricks(1)).depth
-        brickFar.depth = task.brickList(lp.bricks(lp.bricks.Count - 2)).depth
+        brickNear.depth = task.bbo.brickList(lp.bricks(1)).depth
+        brickFar.depth = task.bbo.brickList(lp.bricks(lp.bricks.Count - 2)).depth
 
         dst1(lp.rect).SetTo(255)
         If lp.vertical Then

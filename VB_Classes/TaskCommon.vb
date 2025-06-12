@@ -563,8 +563,8 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         p2 = validatePoint(_p2)
 
         ' convention: p1 has closer depth than p2.  Switch if not...
-        Dim brick1 = task.brickList(task.brickMap.Get(Of Single)(p1.Y, p1.X))
-        Dim brick2 = task.brickList(task.brickMap.Get(Of Single)(p2.Y, p2.X))
+        Dim brick1 = task.bbo.brickList(task.brickMap.Get(Of Single)(p1.Y, p1.X))
+        Dim brick2 = task.bbo.brickList(task.brickMap.Get(Of Single)(p2.Y, p2.X))
         If brick1.depth > brick2.depth Then
             Dim ptTemp = p1
             p1 = p2
@@ -589,7 +589,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             For y = p1.Y To p2.Y Step stepSize
                 Dim index = task.brickMap.Get(Of Single)(y, p1.X)
                 bricks.Add(index)
-                brickptList.Add(task.brickList(index).rect.TopLeft)
+                brickptList.Add(task.bbo.brickList(index).rect.TopLeft)
             Next
         Else
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
@@ -600,7 +600,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                     Dim index = task.brickMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
-                        brickptList.Add(task.brickList(index).rect.TopLeft)
+                        brickptList.Add(task.bbo.brickList(index).rect.TopLeft)
                     End If
                 Next
             Else
@@ -610,7 +610,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                     Dim index = task.brickMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
-                        brickptList.Add(task.brickList(index).rect.TopLeft)
+                        brickptList.Add(task.bbo.brickList(index).rect.TopLeft)
                     End If
                 Next
             End If
@@ -714,7 +714,7 @@ Public Class brickData
     Public intensity As Byte ' sobel maximum intensity in this brick.
     Public pt As cv.Point ' Brick's Sobel maximum in absolute coordinates.
     Sub New()
-        index = task.brickList.Count
+        index = task.bbo.brickList.Count
         rect = task.gridRects(index)
         lRect = rect
         rRect = New cv.Rect

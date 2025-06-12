@@ -17,13 +17,13 @@ Public Class Region_Basics : Inherits TaskParent
         dst0.SetTo(0)
         dst2.SetTo(0)
         For Each tuple In regions.hTuples
-            Dim brick1 = task.brickList(tuple.Item1)
-            Dim brick2 = task.brickList(tuple.Item2)
+            Dim brick1 = task.bbo.brickList(tuple.Item1)
+            Dim brick2 = task.bbo.brickList(tuple.Item2)
             If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
             If brick1.center.DistanceTo(brick2.center) > task.cellSize Then
                 Dim r = brick1.rect
                 For i = brick1.index + 1 To brick2.index - 1
-                    r = r.Union(task.brickList(i).rect)
+                    r = r.Union(task.bbo.brickList(i).rect)
                 Next
                 hRects.Add(r)
                 dst0(r).SetTo(hRects.Count)
@@ -37,13 +37,13 @@ Public Class Region_Basics : Inherits TaskParent
         dst1.SetTo(0)
         dst3.SetTo(0)
         For Each tuple In regions.vTuples
-            Dim brick1 = task.brickList(tuple.Item1)
-            Dim brick2 = task.brickList(tuple.Item2)
+            Dim brick1 = task.bbo.brickList(tuple.Item1)
+            Dim brick2 = task.bbo.brickList(tuple.Item2)
             If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
             If brick1.center.DistanceTo(brick2.center) > task.cellSize Then
                 Dim r = brick1.rect
                 For i = brick1.index + task.cellsPerRow To brick2.index - 1 Step task.cellsPerRow
-                    r = r.Union(task.brickList(i).rect)
+                    r = r.Union(task.bbo.brickList(i).rect)
                 Next
                 vRects.Add(r)
                 dst1(r).SetTo(vRects.Count)
@@ -66,9 +66,9 @@ Public Class Region_Basics : Inherits TaskParent
 
         Dim brickIndex = task.brickMap.Get(Of Single)(rect.Y, rect.X)
         If brickIndex > 0 Then
-            labels(3) = "Depth = " + Format(task.brickList(brickIndex).depth, fmt1) + "m"
+            labels(3) = "Depth = " + Format(task.bbo.brickList(brickIndex).depth, fmt1) + "m"
             brickIndex = task.brickMap.Get(Of Single)(rect.BottomRight.Y, rect.BottomRight.X)
-            labels(3) += " to " + Format(task.brickList(brickIndex).depth, fmt1) + "m"
+            labels(3) += " to " + Format(task.bbo.brickList(brickIndex).depth, fmt1) + "m"
         Else
             labels(3) = "No depth region present..."
         End If
@@ -101,8 +101,8 @@ Public Class Region_Quads : Inherits TaskParent
             Dim index2 = task.brickMap.Get(Of Single)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
             If index1 = 0 Or index2 = 0 Then Continue For
 
-            Dim brick1 = task.brickList(index1)
-            Dim brick2 = task.brickList(index2)
+            Dim brick1 = task.bbo.brickList(index1)
+            Dim brick2 = task.bbo.brickList(index2)
 
             quadData.Add(brick1.color)
 
@@ -136,8 +136,8 @@ Public Class Region_Core : Inherits TaskParent
     End Sub
     Private Sub hTestRect(brick1 As brickData, brick2 As brickData, nextStart As Integer)
         If Math.Abs(brick1.depth - brick2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            Dim p1 = task.brickList(colStart).rect.TopLeft
-            Dim p2 = task.brickList(colEnd).rect.BottomRight
+            Dim p1 = task.bbo.brickList(colStart).rect.TopLeft
+            Dim p2 = task.bbo.brickList(colEnd).rect.BottomRight
             dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
             colorIndex += 1
             hTuples.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
@@ -149,12 +149,12 @@ Public Class Region_Core : Inherits TaskParent
     End Sub
     Private Sub vTestRect(brick1 As brickData, brick2 As brickData, brickNext As Integer, nextStart As Integer)
         If Math.Abs(brick1.depth - brick2.depth) > task.depthDiffMeters Or nextStart = -1 Then
-            bottomRight = task.brickList(brickNext).rect.BottomRight
+            bottomRight = task.bbo.brickList(brickNext).rect.BottomRight
             dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
             colorIndex += 1
             vTuples.Add(New Tuple(Of Integer, Integer)(rowStart, brickNext))
             rowStart = nextStart
-            If nextStart >= 0 Then topLeft = task.brickList(rowStart).rect.TopLeft
+            If nextStart >= 0 Then topLeft = task.bbo.brickList(rowStart).rect.TopLeft
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -171,9 +171,9 @@ Public Class Region_Core : Inherits TaskParent
             colStart = i * width
             colEnd = colStart
             For j = 0 To width - 2
-                hTestRect(task.brickList(i * width + j), task.brickList(i * width + j + 1), i * width + j + 1)
+                hTestRect(task.bbo.brickList(i * width + j), task.bbo.brickList(i * width + j + 1), i * width + j + 1)
             Next
-            hTestRect(task.brickList(i * width + height - 1), task.brickList(i * width + height - 1), -1)
+            hTestRect(task.bbo.brickList(i * width + height - 1), task.bbo.brickList(i * width + height - 1), -1)
         Next
         labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
                     CStr(task.depthDiffMeters) + " meters"
@@ -183,16 +183,16 @@ Public Class Region_Core : Inherits TaskParent
         colorIndex = 0
         For i = 0 To width - 1
             rowStart = i
-            topLeft = task.brickList(i).rect.TopLeft
-            bottomRight = task.brickList(i + width).rect.TopLeft
+            topLeft = task.bbo.brickList(i).rect.TopLeft
+            bottomRight = task.bbo.brickList(i + width).rect.TopLeft
             For j = 0 To height - 2
                 index = i + (j + 1) * width
-                If index >= task.brickList.Count Then index = task.brickList.Count - 1
-                vTestRect(task.brickList(i + j * width), task.brickList(index), i + j * width, index)
+                If index >= task.bbo.brickList.Count Then index = task.bbo.brickList.Count - 1
+                vTestRect(task.bbo.brickList(i + j * width), task.bbo.brickList(index), i + j * width, index)
             Next
             Dim brickNext = i + (height - 1) * width
-            If brickNext >= task.brickList.Count Then brickNext = task.brickList.Count - 1
-            vTestRect(task.brickList(brickNext), task.brickList(index), brickNext, -1)
+            If brickNext >= task.bbo.brickList.Count Then brickNext = task.bbo.brickList.Count - 1
+            vTestRect(task.bbo.brickList(brickNext), task.bbo.brickList(index), brickNext, -1)
         Next
 
         labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
@@ -261,7 +261,7 @@ Public Class Region_Depth : Inherits TaskParent
         Dim minSize As Integer = src.Total / 25
         dst2.SetTo(0)
         mdLargest.Clear()
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             Dim index = dst1.Get(Of Byte)(brick.center.Y, brick.center.X)
             Dim md = redM.mdList(index)
             If index = 0 Then
@@ -297,7 +297,7 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
         dst0.SetTo(0)
         dst1.SetTo(0)
         Dim count As Integer
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If brick.correlation > task.fCorrThreshold Then
                 dst0.Rectangle(brick.rRect, 255, -1)
                 dst1.Rectangle(brick.rect, 255, -1)
@@ -311,7 +311,7 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
         dst3.SetTo(0)
         task.rightView.CopyTo(dst3, dst0)
 
-        labels(2) = Format(count / task.brickList.Count, "0%") + " of bricks had color correlation of " +
+        labels(2) = Format(count / task.bbo.brickList.Count, "0%") + " of bricks had color correlation of " +
                     Format(task.fCorrThreshold, "0.0%") + " or better"
     End Sub
 End Class

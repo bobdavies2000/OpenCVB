@@ -176,7 +176,7 @@ Public Class Gravity_BrickRotate : Inherits TaskParent
         If rotateAngle >= angle Then rotateAngle = -angle
 
         dst1 = src
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If brick.pt.Y = brick.rect.Y Then dst1.Circle(brick.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 

@@ -13,7 +13,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         dst3 = sobel.dst2
 
         intensityFeatures.Clear()
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             Dim mm = GetMinMax(dst3(brick.rect))
             brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.feature = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
@@ -52,7 +52,7 @@ Public Class BrickPoint_Plot : Inherits TaskParent
         ptBrick.Run(task.grayStable)
 
         Dim sobelValues As New List(Of Byte)
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             sobelValues.Add(brick.intensity)
         Next
         plotHist.Run(cv.Mat.FromPixelData(sobelValues.Count, 1, cv.MatType.CV_8U, sobelValues.ToArray))
@@ -65,7 +65,7 @@ Public Class BrickPoint_Plot : Inherits TaskParent
         labels(3) = "Sobel peak values from " + CStr(minVal) + " to " + CStr(maxVal)
 
         dst3 = src
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If brick.intensity <= maxVal And brick.intensity >= minVal Then dst3.Circle(brick.feature, task.DotSize, task.highlight, -1)
         Next
         labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
@@ -109,7 +109,7 @@ Public Class BrickPoint_TopRow : Inherits TaskParent
         dst2 = src.Clone
 
         Dim count As Integer
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If brick.feature = newPoint Then Continue For
             If brick.intensity <> 255 Then Continue For
             If brick.feature.Y = brick.rect.Y Then
@@ -139,11 +139,11 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
         Dim lpList As New List(Of lpData)
 
         Dim lpZero As New lpData(New cv.Point, New cv.Point)
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If brick.rect.Y = 0 Then
                 lpList.Add(lpZero)
             Else
-                Dim gc1 = task.brickList(brick.index - task.cellsPerRow)
+                Dim gc1 = task.bbo.brickList(brick.index - task.cellsPerRow)
                 Dim lp = New lpData(brick.pt, gc1.pt)
                 lpList.Add(lp)
             End If
@@ -169,7 +169,7 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
         Dim max = Math.Max(CInt((histindex + 1) * brickRange), CInt((histindex1 + 1) * brickRange))
 
         dst3 = src
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             Dim lp = lpList(brick.index)
             If lp.length < min Or lp.length > max Then Continue For
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
@@ -264,7 +264,7 @@ Public Class BrickPoint_Busiest : Inherits TaskParent
         sortedBricks.Clear()
         For Each pt In ptBrick.intensityFeatures
             Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-            Dim brick = task.brickList(index)
+            Dim brick = task.bbo.brickList(index)
             If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(ptBrick.sobel.dst2(brick.rect).CountNonZero, brick.rect)
         Next
 
@@ -302,7 +302,7 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
         ReDim results(task.cellSize - 1, task.cellSize - 1)
         For Each pt In ptBrick.intensityFeatures
             Dim index = task.brickMap.Get(Of Single)(pt.Y, pt.X)
-            Dim brick = task.brickList(index)
+            Dim brick = task.bbo.brickList(index)
             results(brick.feature.X - brick.rect.X, brick.feature.Y - brick.rect.Y) += 1
         Next
 
@@ -313,7 +313,7 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(task.cellSize, task.cellSize, cv.MatType.CV_32F, results)
 
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If brick.feature.X = col And brick.feature.Y = row Then dst3.Circle(brick.pt, task.DotSize, task.highlight, -1)
         Next
 

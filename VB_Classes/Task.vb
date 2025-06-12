@@ -12,7 +12,6 @@ Public Class VBtask : Implements IDisposable
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
-    Public brickList As New List(Of brickData)
     Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of rcData)
@@ -120,7 +119,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public lineRGB As LineRGB_Basics
-    Public brickBasics As Brick_Basics
+    Public bbo As Brick_Basics
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
     Public LRMeanSub As MeanSubtraction_LeftRight
@@ -422,7 +421,7 @@ Public Class VBtask : Implements IDisposable
             End If
             optionsChanged = False
             TaskTimer.Enabled = False
-                frameCount += 1
+            frameCount += 1
         Catch ex As Exception
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
@@ -506,7 +505,7 @@ Public Class VBtask : Implements IDisposable
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
         featureOptions = New OptionsFeatures
-        If testAllRunning = False Then treeView = New TreeviewForm
+        treeView = New TreeviewForm
 
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.rcList = New List(Of rcData)
@@ -520,7 +519,7 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        brickBasics = New Brick_Basics
+        bbo = New Brick_Basics
         lineRGB = New LineRGB_Basics
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
@@ -540,7 +539,7 @@ Public Class VBtask : Implements IDisposable
         redOptions.Show()     ' behind gOptions
         gOptions.Show()       ' In front of both...
 
-        If testAllRunning = False Then treeView.Show()
+        treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 
         fpList.Clear()
@@ -603,36 +602,34 @@ Public Class VBtask : Implements IDisposable
         Application.DoEvents()
         updateSettings()
 
-        If testAllRunning = False Then
-            If algorithm_ms.Count = 0 Then
-                algorithmNames.Add("waitingForInput")
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
+        If algorithm_ms.Count = 0 Then
+            algorithmNames.Add("waitingForInput")
+            algorithmTimes.Add(Now)
+            algorithm_ms.Add(0)
 
-                algorithmNames.Add("inputBufferCopy")
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
+            algorithmNames.Add("inputBufferCopy")
+            algorithmTimes.Add(Now)
+            algorithm_ms.Add(0)
 
-                algorithmNames.Add("ReturnCopyTime")
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
+            algorithmNames.Add("ReturnCopyTime")
+            algorithmTimes.Add(Now)
+            algorithm_ms.Add(0)
 
-                algorithmNames.Add(algName)
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
+            algorithmNames.Add(algName)
+            algorithmTimes.Add(Now)
+            algorithm_ms.Add(0)
 
-                algorithmStack = New Stack()
-                algorithmStack.Push(0)
-                algorithmStack.Push(1)
-                algorithmStack.Push(2)
-                algorithmStack.Push(3)
-            End If
-
-            algorithm_ms(0) += waitingForInput
-            algorithm_ms(1) += inputBufferCopy
-            algorithm_ms(2) += returnCopyTime
-            algorithmTimes(3) = Now  ' starting the main algorithm
+            algorithmStack = New Stack()
+            algorithmStack.Push(0)
+            algorithmStack.Push(1)
+            algorithmStack.Push(2)
+            algorithmStack.Push(3)
         End If
+
+        algorithm_ms(0) += waitingForInput
+        algorithm_ms(1) += inputBufferCopy
+        algorithm_ms(2) += returnCopyTime
+        algorithmTimes(3) = Now  ' starting the main algorithm
         If useRecordedData Then recordedData.Run(task.color.Clone)
 
         redOptions.Sync() ' update the task with redCloud variables
@@ -757,7 +754,7 @@ Public Class VBtask : Implements IDisposable
 
         edges.Run(task.grayStable)
         contours.Run(src)
-        brickBasics.Run(src)
+        bbo.Run(src)
 
         task.colorizer.Run(src)
 
@@ -801,7 +798,7 @@ Public Class VBtask : Implements IDisposable
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
         If activateTaskForms Then
-            If task.testAllRunning = False Then treeView.Activate()
+            treeView.Activate()
             allOptions.Activate()
             activateTaskForms = False
         End If
@@ -871,14 +868,12 @@ Public Class VBtask : Implements IDisposable
 
             ' if there were no cycles spent on this routine, then it was inactive.
             ' if any active algorithm has an index = -1, make sure it is running .Run, not .RunAlg
-            If task.testAllRunning = False Then ' no Treeview when running test all...
-                Dim index = algorithmNames.IndexOf(displayObject.traceName)
-                If index = -1 Then
-                    displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                               New cv.Point(dst2.Width / 3, dst2.Height / 2), 2))
-                    displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                               New cv.Point(dst2.Width / 3, dst2.Height / 2), 3))
-                End If
+            Dim index = algorithmNames.IndexOf(displayObject.traceName)
+            If index = -1 Then
+                displayObject.trueData.Add(New TrueText("This task is not active at this time.",
+                                                   New cv.Point(dst2.Width / 3, dst2.Height / 2), 2))
+                displayObject.trueData.Add(New TrueText("This task is not active at this time.",
+                                                   New cv.Point(dst2.Width / 3, dst2.Height / 2), 3))
             End If
 
             trueData = New List(Of TrueText)(displayObject.trueData)

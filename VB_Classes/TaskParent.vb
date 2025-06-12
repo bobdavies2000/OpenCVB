@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Drawing
-Imports System.Runtime.InteropServices
 Imports System.Drawing.Imaging
 Imports System.Windows.Forms
 Public Class TrueText
@@ -66,7 +65,7 @@ Public Class TaskParent : Implements IDisposable
         task.activeObjects.Add(Me)
 
         If task.recordTimings Then
-            If standalone And task.testAllRunning = False Then
+            If standalone Then
                 task.algorithm_ms.Clear()
                 task.algorithmNames.Clear()
                 task.algorithmNames.Add("waitingForInput")
@@ -708,12 +707,12 @@ Public Class TaskParent : Implements IDisposable
         Next
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.testAllRunning = False Then measureStartRun(traceName)
+        measureStartRun(traceName)
 
         trueData.Clear()
         RunAlg(src)
 
-        If task.testAllRunning = False Then measureEndRun(traceName)
+        measureEndRun(traceName)
     End Sub
     Public Overridable Sub RunAlg(src As cv.Mat)
         ' every algorithm overrides this Sub 

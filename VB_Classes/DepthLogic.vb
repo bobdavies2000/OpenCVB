@@ -20,8 +20,8 @@ Public Class DepthLogic_Basics : Inherits TaskParent
             Dim halfCount As Integer = Math.Floor(If(lp.bricks.Count Mod 2 = 0, lp.bricks.Count, lp.bricks.Count - 1) / 2)
             Dim depthValues As New List(Of Single)
             For i = 0 To halfCount - 1
-                Dim gc1 = task.brickList(lp.bricks(i))
-                Dim gc2 = task.brickList(lp.bricks(lp.bricks.Count - i - 1))
+                Dim gc1 = task.bbo.brickList(lp.bricks(i))
+                Dim gc2 = task.bbo.brickList(lp.bricks(lp.bricks.Count - i - 1))
 
                 Dim d1 = gc1.depth
                 Dim d2 = gc2.depth
@@ -50,7 +50,7 @@ Public Class DepthLogic_Basics : Inherits TaskParent
             If avg1 < avg2 Then offset = lp.bricks.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
                 For Each index In lp.bricks
-                    Dim brick = task.brickList(index)
+                    Dim brick = task.bbo.brickList(index)
                     dst1(brick.rect).SetTo(1)
                     If debugMode Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                     gcUpdates.Add(New Tuple(Of Integer, Single)(index, (avg1 + avg2) / 2))
@@ -61,7 +61,7 @@ Public Class DepthLogic_Basics : Inherits TaskParent
                 Dim depthIncr = (max - min) / lp.bricks.Count
                 For i = 0 To lp.bricks.Count - 1
                     Dim index = lp.bricks(i)
-                    Dim brick = task.brickList(index)
+                    Dim brick = task.bbo.brickList(index)
                     If offset > 0 Then
                         dst1(brick.rect).SetTo((offset - i + 1) * incr)
                         gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
@@ -77,11 +77,11 @@ Public Class DepthLogic_Basics : Inherits TaskParent
         Next
 
         For Each tuple In gcUpdates
-            task.brickList(tuple.Item1).depth = tuple.Item2
+            task.bbo.brickList(tuple.Item1).depth = tuple.Item2
         Next
 
         dst1.SetTo(0)
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             dst1(brick.rect).SetTo(brick.depth * 255 / task.MaxZmeters)
         Next
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
@@ -110,11 +110,11 @@ Public Class DepthLogic_Lines : Inherits TaskParent
 
         dst1.SetTo(0)
         For Each lp In task.logicalLines
-            Dim brick1 = task.brickList(lp.bricks(0))
-            Dim brick2 = task.brickList(lp.bricks.Last)
+            Dim brick1 = task.bbo.brickList(lp.bricks(0))
+            Dim brick2 = task.bbo.brickList(lp.bricks.Last)
             If brick1.correlation > task.fCorrThreshold Then
                 For Each index In lp.bricks
-                    Dim brick = task.brickList(index)
+                    Dim brick = task.bbo.brickList(index)
                     Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
                     If val = 0 Then
                         dst1(brick.rect).SetTo(lp.index)

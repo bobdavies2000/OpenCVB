@@ -229,7 +229,7 @@ Public Class FitLine_Grid : Inherits TaskParent
         dst2 = edges.dst2
 
         dst3.SetTo(0)
-        For Each brick In task.brickList
+        For Each brick In task.bbo.brickList
             If dst2(brick.rect).CountNonZero >= 5 Then
                 nZero.Run(dst2(brick.rect))
 
