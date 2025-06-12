@@ -349,16 +349,16 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
         guide.Run(src)
 
         redCx.Run(guide.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rcMapX = task.rcMap.Clone
+        rcMapX = task.redC.rcMap.Clone
         dst2 = redCx.dst2
-        rcListX = New List(Of rcData)(task.rcList)
-        labels(2) = CStr(task.rcList.Count) + " cells were found in vertical segments"
+        rcListX = New List(Of rcData)(task.redC.rcList)
+        labels(2) = CStr(task.redC.rcList.Count) + " cells were found in vertical segments"
 
         redCx.Run(guide.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rcMapY = task.rcMap.Clone
+        rcMapY = task.redC.rcMap.Clone
         dst3 = redCx.dst2
-        rcListY = New List(Of rcData)(task.rcList)
-        labels(3) = CStr(task.rcList.Count) + " cells were found in horizontal segments"
+        rcListY = New List(Of rcData)(task.redC.rcList)
+        labels(3) = CStr(task.redC.rcList.Count) + " cells were found in horizontal segments"
     End Sub
 End Class
 

@@ -751,27 +751,27 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         Next
 
         For Each pt In ptList
-            Dim index = task.rcMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = task.redC.rcMap.Get(Of Byte)(pt.Y, pt.X)
             If index = 0 Then Continue For
-            Dim rc = task.rcList(index)
+            Dim rc = task.redC.rcList(index)
             Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If val <> 0 Then
                 rc.ptFacets.Add(pt)
-                task.rcList(index) = rc
+                task.redC.rcList(index) = rc
             End If
         Next
 
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
 
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             For Each pt In rc.ptFacets
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         Next
 
-        If standalone And task.rcList.Count > 0 Then
-            Dim rc = task.rcList(task.rcD.index)
+        If standalone And task.redC.rcList.Count > 0 Then
+            Dim rc = task.redC.rcList(task.rcD.index)
             task.color.Rectangle(rc.rect, task.highlight, task.lineWidth)
             For Each pt In rc.ptFacets
                 DrawCircle(task.color, pt, task.DotSize, task.highlight)

@@ -44,12 +44,12 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         If standalone Then dst2 = runRedC(src, labels(2))
 
         Dim removeCells As New List(Of Integer)
-        For i = task.rcList.Count - 1 To 0 Step -1
-            Dim rc = task.rcList(i)
+        For i = task.redC.rcList.Count - 1 To 0 Step -1
+            Dim rc = task.redC.rcList(i)
             Dim nabs As New List(Of Integer)
             Dim contains As New List(Of Integer)
-            For j = 0 To task.rcList.Count - 1
-                Dim rcBig = task.rcList(j)
+            For j = 0 To task.redC.rcList.Count - 1
+                Dim rcBig = task.redC.rcList(j)
                 If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
                 If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
             Next
@@ -58,7 +58,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each index In removeCells
-            Dim rc = task.rcList(index)
+            Dim rc = task.redC.rcList(index)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
@@ -102,7 +102,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
 
         dst2 = cellGen.dst2
 
-        If task.heartBeat Then labels(2) = $"{task.rcList.Count} cells identified"
+        If task.heartBeat Then labels(2) = $"{task.redC.rcList.Count} cells identified"
 
         If showSelected Then task.setSelectedCell()
     End Sub
@@ -164,8 +164,8 @@ Public Class Flood_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             flood.Run(src)
-            rcList = New List(Of rcData)(task.rcList)
-            cellMap = task.rcMap.Clone
+            rcList = New List(Of rcData)(task.redC.rcList)
+            cellMap = task.redC.rcMap.Clone
             dst2 = flood.dst2.Clone
             dst3 = flood.dst2.Clone
             labels(2) = flood.labels(2)
@@ -179,7 +179,7 @@ Public Class Flood_Motion : Inherits TaskParent
         Else
             flood.Run(src)
             dst1.SetTo(0)
-            For Each rc In task.rcList
+            For Each rc In task.redC.rcList
                 If maxDists.Contains(rc.maxDist) Then
                     Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
                     dst1(lrc.rect).SetTo(lrc.color, lrc.mask)

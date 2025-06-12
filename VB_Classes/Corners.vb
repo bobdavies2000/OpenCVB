@@ -326,7 +326,7 @@ Public Class Corners_RedCloud : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        corners.Run(task.rcMap)
+        corners.Run(task.redC.rcMap)
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints

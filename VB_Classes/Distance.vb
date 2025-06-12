@@ -345,8 +345,8 @@ Public Class Distance_RedColor : Inherits TaskParent
 
         pixelVector.Clear()
         distances.Clear()
-        For i = 1 To task.rcList.Count - 1
-            Dim rc = task.rcList(i)
+        For i = 1 To task.redC.rcList.Count - 1
+            Dim rc = task.redC.rcList(i)
             hColor.inputMask = rc.mask
             hColor.Run(src(rc.rect))
 
@@ -384,7 +384,7 @@ Public Class Distance_RedColor : Inherits TaskParent
 
         dst2.SetTo(0)
         For i = 0 To distances.Count - 1
-            Dim rp = task.rcList(distances.ElementAt(i).Value)
+            Dim rp = task.redC.rcList(distances.ElementAt(i).Value)
             task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
         Next
         labels(2) = task.redC.labels(3)
@@ -394,7 +394,7 @@ Public Class Distance_RedColor : Inherits TaskParent
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastrcList = New List(Of rcData)(task.rcList)
+        lastrcList = New List(Of rcData)(task.redC.rcList)
     End Sub
 End Class
 

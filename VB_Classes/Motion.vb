@@ -132,19 +132,19 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
         dst2 = src
 
         runRedC(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If task.rcList.Count < 2 Then
+        If task.redC.rcList.Count < 2 Then
             rectList.Clear()
         Else
-            Dim nextRect = task.rcList.ElementAt(1).rect
-            For i = 2 To task.rcList.Count - 1
-                Dim rc = task.rcList.ElementAt(i)
+            Dim nextRect = task.redC.rcList.ElementAt(1).rect
+            For i = 2 To task.redC.rcList.Count - 1
+                Dim rc = task.redC.rcList.ElementAt(i)
                 nextRect = nextRect.Union(rc.rect)
             Next
         End If
 
         If standaloneTest() Then
-            If task.rcList.Count > 1 Then
-                labels(2) = CStr(task.rcList.Count) + " RedMask cells had motion"
+            If task.redC.rcList.Count > 1 Then
+                labels(2) = CStr(task.redC.rcList.Count) + " RedMask cells had motion"
             Else
                 labels(2) = "No motion detected"
             End If
@@ -514,10 +514,10 @@ Public Class Motion_Enclosing : Inherits TaskParent
         dst3 = runRedC(dst2, labels(2), Not dst2)
 
         motionRect = New cv.Rect
-        If task.rcList.Count < 2 Then Exit Sub
-        motionRect = task.rcList.ElementAt(1).rect
-        For i = 2 To task.rcList.Count - 1
-            Dim rc = task.rcList.ElementAt(i)
+        If task.redC.rcList.Count < 2 Then Exit Sub
+        motionRect = task.redC.rcList.ElementAt(1).rect
+        For i = 2 To task.redC.rcList.Count - 1
+            Dim rc = task.redC.rcList.ElementAt(i)
             motionRect = motionRect.Union(rc.rect)
         Next
 

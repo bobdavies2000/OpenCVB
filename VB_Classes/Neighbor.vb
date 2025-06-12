@@ -13,13 +13,13 @@ Public Class Neighbor_Basics : Inherits TaskParent
         If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
 
         knn.queries.Clear()
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             knn.queries.Add(rc.maxDist)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
 
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             For i = 0 To options.neighbors - 1
                 rc.nabs.Add(knn.neighbors(rc.index)(i))
             Next
@@ -29,7 +29,7 @@ Public Class Neighbor_Basics : Inherits TaskParent
             task.setSelectedCell()
             dst3.SetTo(0)
             For Each index In task.rcD.nabs
-                DrawCircle(dst2, task.rcList(index).maxDist, task.DotSize, task.highlight)
+                DrawCircle(dst2, task.redC.rcList(index).maxDist, task.DotSize, task.highlight)
             Next
         End If
     End Sub
@@ -49,7 +49,7 @@ Public Class Neighbor_Intersects : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
             dst2 = runRedC(src, labels(2))
-            src = task.rcMap
+            src = task.redC.rcMap
         End If
 
         Dim samples(src.Total - 1) As Byte
@@ -102,7 +102,7 @@ Public Class Neighbor_ColorOnly : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        corners.Run(task.rcMap.Clone())
+        corners.Run(task.redC.rcMap.Clone())
         For Each pt In corners.nPoints
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
@@ -130,8 +130,8 @@ Public Class Neighbor_Precise : Inherits TaskParent
         If standaloneTest() Or runRedCloud Then
             dst2 = runRedC(src, labels(2))
 
-            src = task.rcMap
-            rcList = task.rcList
+            src = task.redC.rcMap
+            rcList = task.redC.rcList
         End If
 
         Dim mapData(src.Total - 1) As Byte

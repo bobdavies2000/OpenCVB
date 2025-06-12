@@ -75,8 +75,8 @@ Public Class RedCloud_XYZ : Inherits TaskParent
         dst2 = runRedC(prep.dst2, labels(2))
 
         If task.heartBeat Then strOut = ""
-        For i = 0 To task.rcList.Count - 1
-            Dim rc = task.rcList(i)
+        For i = 0 To task.redC.rcList.Count - 1
+            Dim rc = task.redC.rcList(i)
             rcMask.SetTo(0)
             rcMask(rc.rect).SetTo(255, rc.mask)
             rc.mdList = New List(Of maskData)
@@ -91,7 +91,7 @@ Public Class RedCloud_XYZ : Inherits TaskParent
                     md.mask = rcMask(md.rect).Clone
                     rc.mdList(j) = md
                 Next
-                task.rcList(i) = rc
+                task.redC.rcList(i) = rc
             End If
         Next
 

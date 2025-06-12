@@ -616,7 +616,7 @@ End Class
 '        labels(2) = redCombo.labels(2)
 
 '        knnMin.inputPoints.Clear()
-'        For Each rc In task.rcList
+'        For Each rc In task.redC.rcList
 '            knnMin.inputPoints.Add(rc.maxDist)
 '        Next
 '        knnMin.Run(src)

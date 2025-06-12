@@ -41,19 +41,19 @@ Public Module vbc
     Public Function DisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             dst(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
         Return dst
     End Function
     Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        task.rcList.Clear()
-        task.rcList.Add(New rcData) ' placeholder rcData so map is correct.
-        task.rcMap.SetTo(0)
+        task.redC.rcList.Clear()
+        task.redC.rcList.Add(New rcData) ' placeholder rcData so map is correct.
+        task.redC.rcMap.SetTo(0)
         Static saveColorSetting = task.redOptions.trackingIndex
         For Each rc In sortedCells.Values
-            rc.index = task.rcList.Count
+            rc.index = task.redC.rcList.Count
 
             If saveColorSetting <> task.redOptions.trackingIndex Then rc.color = black
             Select Case task.redOptions.trackingIndex
@@ -68,20 +68,20 @@ Public Module vbc
                     rc.color = task.vecColors(index)
             End Select
 
-            task.rcList.Add(rc)
-            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redC.rcList.Add(rc)
+            task.redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             DisplayCells.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
             If rc.index >= 255 Then Exit For
         Next
         saveColorSetting = task.redOptions.trackingIndex
-        task.rcMap.SetTo(0, task.noDepthMask)
+        task.redC.rcMap.SetTo(0, task.noDepthMask)
         Return DisplayCells()
     End Function
     Public Function RebuildRCMap(rcList As List(Of rcData)) As cv.Mat
-        task.rcMap.SetTo(0)
+        task.redC.rcMap.SetTo(0)
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         For Each rc In rcList
-            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             dst(rc.rect).SetTo(rc.color, rc.mask)
             If rc.index >= 255 Then Exit For
         Next

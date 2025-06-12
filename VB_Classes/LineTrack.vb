@@ -42,18 +42,18 @@ Public Class LineTrack_Map : Inherits TaskParent
 
         Dim count As Integer
         dst3.SetTo(0)
-        Dim histarray(task.rcList.Count - 1) As Single
+        Dim histarray(task.redC.rcList.Count - 1) As Single
         Dim histogram As New cv.Mat
         For Each brick In task.bbo.brickList
-            cv.Cv2.CalcHist({task.rcMap(brick.rect)}, {0}, emptyMat, histogram, 1, {task.rcList.Count},
-                             New cv.Rangef() {New cv.Rangef(1, task.rcList.Count)})
+            cv.Cv2.CalcHist({task.redC.rcMap(brick.rect)}, {0}, emptyMat, histogram, 1, {task.redC.rcList.Count},
+                             New cv.Rangef() {New cv.Rangef(1, task.redC.rcList.Count)})
 
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
             ' if multiple lines intersect a grid rect, choose the largest redcloud cell containing them.
             ' The largest will be the index of the first non-zero histogram entry.
             For j = 1 To histarray.Count - 1
                 If histarray(j) > 0 Then
-                    Dim rc = task.rcList(j)
+                    Dim rc = task.redC.rcList(j)
                     dst3(brick.rect).SetTo(rc.color)
                     ' dst3(brick.rect).SetTo(0, Not dst1(brick.rect))
                     count += 1

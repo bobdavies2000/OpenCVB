@@ -1402,8 +1402,8 @@ Public Class Depth_CellTiers : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         valley.standaloneFlag = standalone
-        For i = 1 To Math.Min(10, task.rcList.Count - 1)
-            Dim rc = task.rcList(i)
+        For i = 1 To Math.Min(10, task.redC.rcList.Count - 1)
+            Dim rc = task.redC.rcList(i)
             Dim depthData = task.pcSplit(2)(rc.rect).Clone
             depthData.SetTo(0, Not rc.mask)
 

@@ -12,7 +12,6 @@ Public Class VBtask : Implements IDisposable
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
-    Public rcList As New List(Of rcData)
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of rcData)
     Public featList As New List(Of List(Of Integer))
@@ -20,7 +19,6 @@ Public Class VBtask : Implements IDisposable
     Public logicalLines As New List(Of lpData)
 
     Public fpMap As New cv.Mat ' feature map
-    Public rcMap As cv.Mat ' redColor map
 
     Public brickD As brickData ' the currently selected brick
     Public rcD As New rcData ' the currently selected red Cell
@@ -410,7 +408,7 @@ Public Class VBtask : Implements IDisposable
             If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
             ' MSER mistakenly can have 1 cell - just ignore it.
-            If rcList.Count > 1 Then setSelectedCell()
+            setSelectedCell()
 
             If optionsChanged = True And treeView IsNot Nothing Then ' treeview is not active during 'TestAll'.
                 treeView.optionsChanged = True
@@ -506,9 +504,6 @@ Public Class VBtask : Implements IDisposable
         featureOptions = New OptionsFeatures
         treeView = New TreeviewForm
 
-        rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.rcList = New List(Of rcData)
-
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
 
@@ -574,19 +569,20 @@ Public Class VBtask : Implements IDisposable
         trueData.Add(str)
     End Sub
     Public Sub setSelectedCell()
-        If rcList.Count = 0 Then Exit Sub
-        If ClickPoint = newPoint And rcList.Count > 1 Then
-            ClickPoint = rcList(1).maxDist
+        If task.redC Is Nothing Then Exit Sub
+        If task.redC.rcList.Count = 0 Then Exit Sub
+        If ClickPoint = newPoint And task.redC.rcList.Count > 1 Then
+            ClickPoint = task.redC.rcList(1).maxDist
         End If
-        Dim index = rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
+        Dim index = task.redC.rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
         If index = 0 Then Exit Sub
-        If index > 0 And index < rcList.Count Then
+        If index > 0 And index < task.redC.rcList.Count Then
             ' ClickPoint = rcList(index).maxDist
-            task.rcD = rcList(index)
+            task.rcD = task.redC.rcList(index)
             task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
-            If rcList.Count > 1 Then task.rcD = rcList(1)
+            If task.redC.rcList.Count > 1 Then task.rcD = task.redC.rcList(1)
         End If
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)

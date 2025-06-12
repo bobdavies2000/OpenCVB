@@ -5,7 +5,10 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedCell_Generate
     Dim redMask As New RedMask_Basics
+    Public rcList As New List(Of rcData)
+    Public rcMap As cv.Mat ' redColor map
     Public Sub New()
+        rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -46,7 +49,7 @@ Public Class RedColor_Reduction : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
-        dst3 = task.rcMap
+        dst3 = task.redC.rcMap
     End Sub
 End Class
 
@@ -67,9 +70,9 @@ Public Class RedColor_Hulls : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim defectCount As Integer
-        task.rcMap.SetTo(0)
+        task.redC.rcMap.SetTo(0)
         Dim rcList As New List(Of rcData)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             If rc.contour.Count >= 5 Then
                 rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
                 Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
@@ -80,12 +83,12 @@ Public Class RedColor_Hulls : Inherits TaskParent
                     defectCount += 1
                 End Try
                 DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
-                DrawContour(task.rcMap(rc.rect), rc.hull, rc.index, -1)
+                DrawContour(task.redC.rcMap(rc.rect), rc.hull, rc.index, -1)
             End If
             rcList.Add(rc)
         Next
-        task.rcList = New List(Of rcData)(rcList)
-        labels(2) = CStr(task.rcList.Count) + " hulls identified below.  " + CStr(defectCount) + " hulls failed to build the defect list."
+        task.redC.rcList = New List(Of rcData)(rcList)
+        labels(2) = CStr(task.redC.rcList.Count) + " hulls identified below.  " + CStr(defectCount) + " hulls failed to build the defect list."
     End Sub
 End Class
 
@@ -109,8 +112,8 @@ Public Class RedColor_FindCells : Inherits TaskParent
 
         dst2 = runRedC(src, labels(2))
 
-        Dim cppData(task.rcMap.Total - 1) As Byte
-        Marshal.Copy(task.rcMap.Data, cppData, 0, cppData.Length)
+        Dim cppData(task.redC.rcMap.Total - 1) As Byte
+        Marshal.Copy(task.redC.rcMap.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = RedColor_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleSrc.Free()
@@ -126,8 +129,8 @@ Public Class RedColor_FindCells : Inherits TaskParent
         dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         dst3.SetTo(0)
         For Each index In bricks
-            If task.rcList.Count <= index Then Continue For
-            Dim rc = task.rcList(index)
+            If task.redC.rcList.Count <= index Then Continue For
+            Dim rc = task.redC.rcList(index)
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
@@ -179,7 +182,7 @@ Public Class RedColor_Equations : Inherits TaskParent
         If standaloneTest() Then
             runRedC(src, labels(2))
             dst2 = task.redC.dst3
-            rcList = New List(Of rcData)(task.rcList)
+            rcList = New List(Of rcData)(task.redC.rcList)
         End If
 
         Dim newCells As New List(Of rcData)
@@ -235,7 +238,7 @@ Public Class RedColor_CellsAtDepth : Inherits TaskParent
             slotList(i) = New List(Of Integer)
         Next
         Dim hist(histBins - 1) As Single
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             Dim slot As Integer
             If rc.depth > task.MaxZmeters Then rc.depth = task.MaxZmeters
             slot = CInt((rc.depth / task.MaxZmeters) * histBins)
@@ -256,7 +259,7 @@ Public Class RedColor_CellsAtDepth : Inherits TaskParent
         If histIndex >= slotList.Count() Then histIndex = slotList.Count() - 1
         dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
         For i = 0 To slotList(histIndex).Count - 1
-            Dim rc = task.rcList(slotList(histIndex)(i))
+            Dim rc = task.redC.rcList(slotList(histIndex)(i))
             DrawContour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
             DrawContour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
         Next
@@ -339,7 +342,7 @@ Public Class RedColor_PlaneColor : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim fitPoints As New List(Of cv.Point3f)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             If rc.eq = newVec4f Then
                 rc.eq = New cv.Vec4f
                 If options.useMaskPoints Then
@@ -482,7 +485,7 @@ Public Class RedColor_LikelyFlatSurfaces : Inherits TaskParent
 
         vCells.Clear()
         hCells.Clear()
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             If rc.depth >= task.MaxZmeters Then Continue For
             Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then
@@ -579,7 +582,7 @@ Public Class RedColor_UnstableCells : Inherits TaskParent
         End If
 
         Dim currList As New List(Of cv.Point)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             If prevList.Contains(rc.maxDStable) = False Then
                 DrawContour(dst1(rc.rect), rc.contour, white, -1)
                 DrawContour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
@@ -614,7 +617,7 @@ Public Class RedColor_UnstableHulls : Inherits TaskParent
         End If
 
         Dim currList As New List(Of cv.Point)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             If prevList.Contains(rc.maxDStable) = False Then
                 DrawContour(dst1(rc.rect), rc.hull, white, -1)
@@ -649,13 +652,13 @@ Public Class RedColor_CellChanges : Inherits TaskParent
 
         Dim changedPixels = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero
         Dim changedCells As Integer
-        For Each rc As rcData In task.rcList
+        For Each rc As rcData In task.redC.rcList
             If rc.indexLast = 0 Then changedCells += 1
         Next
 
         dst2Last = dst2.Clone
         If task.heartBeat Then
-            labels(2) = "Changed cells = " + Format(changedCells, "000") + " cells or " + Format(changedCells / task.rcList.Count, "0%")
+            labels(2) = "Changed cells = " + Format(changedCells, "000") + " cells or " + Format(changedCells / task.redC.rcList.Count, "0%")
             labels(3) = "Changed pixel total = " + Format(changedPixels / 1000, "0.0") + "k or " + Format(changedPixels / dst2.Total, "0%")
         End If
     End Sub
@@ -698,7 +701,7 @@ Public Class RedColor_MostlyColor : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             If rc.depthPixels / rc.pixels > 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
     End Sub
@@ -840,7 +843,7 @@ Public Class RedColor_OnlyColorHist3D : Inherits TaskParent
         labels(2) = hColor.labels(3)
 
         runRedC(dst2)
-        dst3 = task.rcMap
+        dst3 = task.redC.rcMap
         dst3.SetTo(0, task.noDepthMask)
         labels(3) = task.redC.labels(2)
     End Sub
@@ -857,16 +860,16 @@ Public Class RedColor_OnlyColorAlt : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         runRedC(src)
-        Dim lastCells As New List(Of rcData)(task.rcList)
-        Dim lastMap As cv.Mat = task.rcMap.Clone
+        Dim lastCells As New List(Of rcData)(task.redC.rcList)
+        Dim lastMap As cv.Mat = task.redC.rcMap.Clone
         Dim lastColors As cv.Mat = dst3.Clone
 
         Dim newCells As New List(Of rcData)
-        task.rcMap.SetTo(0)
+        task.redC.rcMap.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Scalar)({black})
         Dim unmatched As Integer
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             Dim index = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If index < lastCells.Count Then
                 rc.color = lastColors.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X).ToVec3f
@@ -879,19 +882,19 @@ Public Class RedColor_OnlyColorAlt : Inherits TaskParent
             End If
             usedColors.Add(rc.color)
 
-            If task.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) = 0 Then
-                rc.index = task.rcList.Count
+            If task.redC.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) = 0 Then
+                rc.index = task.redC.rcList.Count
                 newCells.Add(rc)
-                task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                task.redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             End If
         Next
 
-        task.rcList = New List(Of rcData)(newCells)
-        labels(3) = CStr(task.rcList.Count) + " cells were identified."
+        task.redC.rcList = New List(Of rcData)(newCells)
+        labels(3) = CStr(task.redC.rcList.Count) + " cells were identified."
         labels(2) = task.redC.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
-        If task.rcList.Count > 0 Then dst2 = ShowPalette(lastMap)
+        If task.redC.rcList.Count > 0 Then dst2 = ShowPalette(lastMap)
     End Sub
 End Class
 
@@ -920,9 +923,9 @@ Public Class RedColor_UnmatchedCount : Inherits TaskParent
 
         Dim unMatchedCells As Integer
         Dim mostlyColor As Integer
-        For i = 0 To task.rcList.Count - 1
-            Dim rc = task.rcList(i)
-            If task.rcList(i).depthPixels / task.rcList(i).pixels < 0.5 Then mostlyColor += 1
+        For i = 0 To task.redC.rcList.Count - 1
+            Dim rc = task.redC.rcList(i)
+            If task.redC.rcList(i).depthPixels / task.redC.rcList(i).pixels < 0.5 Then mostlyColor += 1
             If rc.indexLast <> 0 Then
                 Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If val = 0 Then
@@ -947,8 +950,8 @@ Public Class RedColor_UnmatchedCount : Inherits TaskParent
             myFrameCount = 0
             Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
             labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
-            labels(2) = CStr(task.rcList.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
-                        CStr(mostlyColor) + " cells were mostly color and " + CStr(task.rcList.Count - mostlyColor) + " had depth."
+            labels(2) = CStr(task.redC.rcList.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
+                        CStr(mostlyColor) + " cells were mostly color and " + CStr(task.redC.rcList.Count - mostlyColor) + " had depth."
             changedCellCounts.Clear()
         End If
     End Sub
@@ -970,7 +973,7 @@ Public Class RedColor_ContourUpdate : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedC(src, labels(2))
-            rcList = task.rcList
+            rcList = task.redC.rcList
         End If
 
         dst3.SetTo(0)
@@ -999,11 +1002,11 @@ Public Class RedColor_MaxDist : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
         Next
 
-        addTour.rcList = task.rcList
+        addTour.rcList = task.redC.rcList
         addTour.Run(src)
         dst3 = addTour.dst3
 
@@ -1100,7 +1103,7 @@ Public Class RedColor_GenCellContains : Inherits TaskParent
         contains.Run(src)
 
         dst2.SetTo(0)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
         Next
@@ -1150,15 +1153,15 @@ Public Class RedColor_Consistent : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
 
-        diff.Run(task.rcMap)
+        diff.Run(task.redC.rcMap)
         dst1 = diff.dst2
 
-        cellLists.Add(New List(Of rcData)(task.rcList))
-        cellmaps.Add(task.rcMap And Not dst1)
+        cellLists.Add(New List(Of rcData)(task.redC.rcList))
+        cellmaps.Add(task.redC.rcMap And Not dst1)
         diffs.Add(dst1.Clone)
 
-        task.rcList.Clear()
-        task.rcList.Add(New rcData)
+        task.redC.rcList.Clear()
+        task.redC.rcList.Add(New rcData)
         For i = 0 To cellLists.Count - 1
             For Each rc In cellLists(i)
                 Dim present As Boolean = True
@@ -1170,17 +1173,17 @@ Public Class RedColor_Consistent : Inherits TaskParent
                     End If
                 Next
                 If present Then
-                    rc.index = task.rcList.Count
-                    task.rcList.Add(rc)
+                    rc.index = task.redC.rcList.Count
+                    task.redC.rcList.Add(rc)
                 End If
             Next
         Next
 
         dst2.SetTo(0)
-        task.rcMap.SetTo(0)
-        For Each rc In task.rcList
+        task.redC.rcMap.SetTo(0)
+        For Each rc In task.redC.rcList
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
         For Each mat In diffs
@@ -1218,15 +1221,15 @@ Public Class RedColor_Consistent1 : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
 
-        diff.Run(task.rcMap)
+        diff.Run(task.redC.rcMap)
         dst1 = diff.dst2
 
-        cellLists.Add(New List(Of rcData)(task.rcList))
-        cellmaps.Add(task.rcMap And Not dst1)
+        cellLists.Add(New List(Of rcData)(task.redC.rcList))
+        cellmaps.Add(task.redC.rcMap And Not dst1)
         diffs.Add(dst1.Clone)
 
-        task.rcList.Clear()
-        task.rcList.Add(New rcData)
+        task.redC.rcList.Clear()
+        task.redC.rcList.Add(New rcData)
         For i = 0 To cellLists.Count - 1
             For Each rc In cellLists(i)
                 Dim present As Boolean = True
@@ -1238,17 +1241,17 @@ Public Class RedColor_Consistent1 : Inherits TaskParent
                     End If
                 Next
                 If present Then
-                    rc.index = task.rcList.Count
-                    task.rcList.Add(rc)
+                    rc.index = task.redC.rcList.Count
+                    task.redC.rcList.Add(rc)
                 End If
             Next
         Next
 
         dst2.SetTo(0)
-        task.rcMap.SetTo(0)
-        For Each rc In task.rcList
+        task.redC.rcMap.SetTo(0)
+        For Each rc In task.redC.rcList
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
         For Each mat In diffs
@@ -1386,15 +1389,15 @@ Public Class RedColor_Gaps : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        frames.Run(task.rcMap.InRange(0, 0))
+        frames.Run(task.redC.rcMap.InRange(0, 0))
         dst3 = frames.dst2
 
-        If task.rcList.Count > 0 Then
+        If task.redC.rcList.Count > 0 Then
             dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
 
-        If task.rcList.Count > 0 Then
-            Dim rc = task.rcList(0) ' index can now be zero.
+        If task.redC.rcList.Count > 0 Then
+            Dim rc = task.redC.rcList(0) ' index can now be zero.
             dst3(rc.rect).SetTo(0, rc.mask)
         End If
         Dim count = dst3.CountNonZero
@@ -1461,7 +1464,7 @@ Public Class RedColor_BasicsHist : Inherits TaskParent
 
         If task.heartBeat Then
             dst2.SetTo(0)
-            For Each rc In task.rcList
+            For Each rc In task.redC.rcList
                 dst2(rc.rect).SetTo(rc.depth, rc.mask)
             Next
             Dim mm = GetMinMax(dst2)
@@ -1501,7 +1504,7 @@ Public Class RedColor_Flippers : Inherits TaskParent
         nonFlipCells.Clear()
         dst2.SetTo(0)
         Dim currMap = DisplayCells()
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             If lastColor <> currColor Then
@@ -1517,7 +1520,7 @@ Public Class RedColor_Flippers : Inherits TaskParent
         lastMap = currMap.Clone
 
         If task.heartBeat Then
-            labels(2) = CStr(unMatched) + " of " + CStr(task.rcList.Count) + " cells changed " +
+            labels(2) = CStr(unMatched) + " of " + CStr(task.redC.rcList.Count) + " cells changed " +
                         " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
         End If
     End Sub
@@ -1534,7 +1537,7 @@ Public Class RedColor_FlipTest : Inherits TaskParent
         desc = "Display nonFlipped cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastCells As New List(Of rcData)(task.rcList)
+        Dim lastCells As New List(Of rcData)(task.redC.rcList)
         flipper.Run(src)
         dst3 = flipper.dst2
 
@@ -1577,7 +1580,7 @@ Public Class RedColor_Contour : Inherits TaskParent
         dst3 = runRedC(src, labels(2))
 
         dst2.SetTo(0)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             For i = 1 To 8
                 Dim deltaX = Choose(i, -1, 1, 0, 0, -1, 1, -1, 1)
                 Dim deltaY = Choose(i, 0, 0, -1, 1, -1, 1, 1, -1)
@@ -1615,15 +1618,15 @@ Public Class RedColor_TopX : Inherits TaskParent
 
         If task.heartBeat Or task.optionsChanged Then
             topXcells.Clear()
-            For Each rc In task.rcList
+            For Each rc In task.redC.rcList
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 topXcells.Add(rc.maxDist)
             Next
         Else
             Dim maxList As New List(Of cv.Point)
             For Each pt In topXcells
-                Dim index = task.rcMap.Get(Of Byte)(pt.Y, pt.X)
-                Dim rc = task.rcList(index)
+                Dim index = task.redC.rcMap.Get(Of Byte)(pt.Y, pt.X)
+                Dim rc = task.redC.rcList(index)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
                 maxList.Add(rc.maxDist)
@@ -1654,15 +1657,15 @@ Public Class RedColor_Motion : Inherits TaskParent
         If task.fullImageStable Then Exit Sub ' full image stable means nothing needs to be done...
         runRedC(src, labels(2))
 
-        Static rcLastList As New List(Of rcData)(task.rcList)
+        Static rcLastList As New List(Of rcData)(task.redC.rcList)
 
         Dim count As Integer
         dst1.SetTo(0)
-        task.rcList.RemoveAt(0)
+        task.redC.rcList.RemoveAt(0)
         'Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim newList As New List(Of rcData), tmp As New cv.Mat
         Dim countMaxD As Integer, countMissedMaxD As Integer
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             tmp = task.motionMask(rc.rect) And rc.mask
             If tmp.CountNonZero = 0 Then
                 If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
@@ -1683,24 +1686,24 @@ Public Class RedColor_Motion : Inherits TaskParent
             End If
             dst1(rc.rect).SetTo(255, rc.mask)
         Next
-        labels(3) = CStr(count) + " of " + CStr(task.rcList.Count) + " redCloud cells had motion." +
+        labels(3) = CStr(count) + " of " + CStr(task.redC.rcList.Count) + " redCloud cells had motion." +
                     "  There were " + CStr(countMaxD) + " maxDstable matches and " + CStr(countMissedMaxD) + " misses"
 
-        task.rcList.Clear()
-        task.rcList.Add(New rcData)
+        task.redC.rcList.Clear()
+        task.redC.rcList.Add(New rcData)
         For Each rc In newList
-            rc.index = task.rcList.Count
-            task.rcList.Add(rc)
+            rc.index = task.redC.rcList.Count
+            task.redC.rcList.Add(rc)
         Next
 
-        rcLastList = New List(Of rcData)(task.rcList)
+        rcLastList = New List(Of rcData)(task.redC.rcList)
 
         dst3.SetTo(0)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        dst2 = RebuildRCMap(task.rcList)
+        dst2 = RebuildRCMap(task.redC.rcList)
         task.setSelectedCell()
     End Sub
 End Class
@@ -1718,7 +1721,7 @@ Public Class RedColor_Largest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
 
-        Dim rc = task.rcList(1)
+        Dim rc = task.redC.rcList(1)
         Static rcSave As rcData = rc, stableCount As Integer
         If rc.maxDStable <> rcSave.maxDStable Then
             rcSave = rc
@@ -1745,7 +1748,7 @@ Public Class RedColor_GridCellsOld : Inherits TaskParent
     Dim regions As New Region_Contours
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use the brickData regions to build task.rcList"
+        desc = "Use the brickData regions to build task.redC.rcList"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         regions.Run(src)
@@ -1761,7 +1764,7 @@ Public Class RedColor_GridCellsOld : Inherits TaskParent
         Dim rcList As New List(Of rcData)
         Dim usedList As New List(Of Integer)
         For Each md In mdList
-            cv.Cv2.CalcHist({task.rcMap(md.rect)}, {0}, md.mask, histogram, 1, {255}, ranges)
+            cv.Cv2.CalcHist({task.redC.rcMap(md.rect)}, {0}, md.mask, histogram, 1, {255}, ranges)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
             Dim index = rcList.Count
             Dim c = dst1.Get(Of cv.Vec3b)(md.maxDist.Y, md.maxDist.X)
@@ -1769,7 +1772,7 @@ Public Class RedColor_GridCellsOld : Inherits TaskParent
             For i = 1 To histArray.Count - 1
                 If usedList.Contains(i) Then Continue For
                 If histArray(i) > 0 Then
-                    Dim rc = task.rcList(i)
+                    Dim rc = task.redC.rcList(i)
                     If rc.depth > md.mm.minVal And rc.depth < md.mm.maxVal Then
                         rc.index = rcList.Count
                         rc.color = color
@@ -1795,19 +1798,19 @@ Public Class RedColor_GridCells : Inherits TaskParent
     Public Sub New()
         task.gOptions.TruncateDepth.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use the brickData regions to build task.rcList"
+        desc = "Use the brickData regions to build task.redC.rcList"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         regions.Run(src)
         dst1 = regions.dst2
 
-        Dim lastList As New List(Of rcData)(task.rcList)
+        Dim lastList As New List(Of rcData)(task.redC.rcList)
         runRedC(src, labels(2))
 
         dst2.SetTo(0)
 
         Dim rcList As New List(Of rcData)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             If task.motionMask(rc.rect).CountNonZero = 0 Then
                 If rc.indexLast > 0 Then rc = lastList(rc.indexLast)
             End If
@@ -1824,7 +1827,7 @@ Public Class RedColor_GridCells : Inherits TaskParent
             rcList.Add(rc)
         Next
 
-        task.rcList = New List(Of rcData)(rcList)
+        task.redC.rcList = New List(Of rcData)(rcList)
         labels(3) = CStr(rcList.Count) + " redCloud cells were found"
     End Sub
 End Class
@@ -1847,7 +1850,7 @@ Public Class RedColor_GridCellsHist : Inherits TaskParent
         dst1 = regions.redM.dst2
 
         runRedC(src, labels(2))
-        Static rcLastList As New List(Of rcData)(task.rcList)
+        Static rcLastList As New List(Of rcData)(task.redC.rcList)
 
         Dim mdList = New List(Of maskData)(regions.redM.mdList)
         Dim histogram As New cv.Mat
@@ -1855,7 +1858,7 @@ Public Class RedColor_GridCellsHist : Inherits TaskParent
         Dim rcList As New List(Of rcData)
         Dim lastCount As Integer
         Dim histArray(mdList.Count - 1) As Single
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             cv.Cv2.CalcHist({dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {255}, ranges)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
             Dim index = histArray.ToList.IndexOf(histArray.Max)
@@ -1877,7 +1880,7 @@ Public Class RedColor_GridCellsHist : Inherits TaskParent
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        task.rcList = New List(Of rcData)(rcList)
+        task.redC.rcList = New List(Of rcData)(rcList)
         rcLastList = New List(Of rcData)(rcList)
         labels(3) = CStr(rcList.Count) + " redCloud cells were found and " + CStr(lastCount) + " cells had no motion."
     End Sub

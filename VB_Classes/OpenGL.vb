@@ -598,7 +598,7 @@ Public Class OpenGL_DrawHulls : Inherits TaskParent
         Dim oglData As New List(Of cv.Point3f)
         oglData.Add(New cv.Point3f)
         Dim polygonCount As Integer
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             If rc.hull Is Nothing Then Continue For
             Dim hullIndex = oglData.Count
             oglData.Add(New cv.Point3f(rc.hull.Count, 0, 0))
@@ -658,7 +658,7 @@ Public Class OpenGL_Contours : Inherits TaskParent
         Dim oglData As New List(Of cv.Point3f)
         Dim lastDepth As cv.Scalar
         oglData.Add(New cv.Point3f)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             Dim d = rc.depth
             If d = 0 Then Continue For
 
@@ -1141,8 +1141,8 @@ Public Class OpenGL_RedCloudCell : Inherits TaskParent
         specZ.Run(src)
         SetTrueText(specZ.strOut, 3)
 
-        If task.ClickPoint = newPoint And task.rcList.Count > 1 Then
-            task.rcD = task.rcList(1) ' pick the largest cell
+        If task.ClickPoint = newPoint And task.redC.rcList.Count > 1 Then
+            task.rcD = task.redC.rcList(1) ' pick the largest cell
             task.ClickPoint = task.rcD.maxDist
         End If
 

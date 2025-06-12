@@ -2758,7 +2758,7 @@ Public Class XO_Region_RedColor : Inherits TaskParent
         connect.Run(src)
 
         dst3 = runRedC(src, labels(3))
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             Dim index = connect.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             dst2(rc.rect).SetTo(task.scalarColors(index), rc.mask)
         Next
@@ -4772,7 +4772,7 @@ Public Class XO_Contour_RedCloud : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
     End Sub
@@ -4798,7 +4798,7 @@ Public Class XO_OpenGL_PlaneClusters3D : Inherits TaskParent
 
         Dim pcPoints As New List(Of cv.Point3f)
         Dim blue As New cv.Point3f(0, 0, 1), red As New cv.Point3f(1, 0, 0), green As New cv.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             If rc.mmZ.maxVal > 0 Then
                 eq.rc = rc
                 eq.Run(src)
@@ -4999,7 +4999,7 @@ Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
         labels(2) = task.redC.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
         dst2.SetTo(0)
-        For Each rc In task.rcList
+        For Each rc In task.redC.rcList
             DrawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
