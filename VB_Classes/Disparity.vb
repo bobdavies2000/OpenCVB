@@ -1,6 +1,4 @@
-﻿Imports System.Dynamic
-Imports NAudio.Gui
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Disparity_Basics : Inherits TaskParent
     Dim match As New Match_Basics
     Public rightView As cv.Mat
@@ -25,8 +23,9 @@ Public Class Disparity_Basics : Inherits TaskParent
         match.template = task.leftView(rect)
         Dim maxDisparity As Integer = 128
         match.searchRect = New cv.Rect(Math.Max(0, rect.X - maxDisparity), rect.Y,
-                                 rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
-        If standalone Or rightView.Type <> cv.MatType.CV_8U Then rightView = task.rightView
+                           rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
+
+        rightView = task.rightView
 
         dst2.Rectangle(rect, black, task.lineWidth)
         match.Run(rightView)
