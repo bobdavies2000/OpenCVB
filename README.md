@@ -1,4 +1,4 @@
-# 2025 June (1) – FindContours, ReadMe.md, RedCloud Review, Gravity Vector, lpMap,
+# 2025 June (1) – FindContours, ReadMe.md, RedCloud Review, Gravity Vector, and Improved Line_Info.
 
 -   Over 1800 algorithms are included, averaging 37 lines of code per algorithm.
 -   Each retrieval mode in FindContours now has its own algorithm.
