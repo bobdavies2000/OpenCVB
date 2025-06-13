@@ -659,7 +659,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runRedC(src)
+        task.redC.Run(src)
         Dim maxRegion = 20
 
         If task.heartBeat Then

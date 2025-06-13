@@ -519,6 +519,7 @@ Public Class VBtask : Implements IDisposable
         contours = New Contour_Basics_List
         LRMeanSub = New MeanSubtraction_LeftRight
         rgbFilter = New Filter_Basics
+        redC = New RedColor_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics

@@ -1,40 +1,31 @@
-# 2025 May (1) – Experimental Inputs, Logical Depth in OpenGL, Bricks, Periphery, and RealSense Support.
+# 2025 June (1) – FindContours, ReadMe.md, RedCloud Review, Gravity Vector, lpMap,
 
--   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
--   A variety of alternative inputs were added for grayscale and color.
-    -   Any algorithm can be tested with different input using one click.
-    -   Working on edge detection? Prep the input as a sharpened image.
-    -   Working on RGB images? Test the algorithm again with HSV data.
-    -   Successful experiments would implement the alternative by default.
-    -   “Feature Options” (behind the global options) has the complete list.
--   The option for a random palette for all OpenCVB algorithms was removed.
-    -   The fixed palette is always preferred and simplifies that user interface.
--   Logical depth is now visualized in OpenGL for comparison with raw data.
-    -   Currently, the logical depth is not as good as the original data.
-    -   But the potential is there for improvement.
-    -   Gradient_Line smoothly applies a linear function to depth data.
--   Overnight testing could fail when image jumped in size – now corrected.
--   Removed the ‘Advice’ scheme – not needed when source is available.
-    -   Also, it was too much work to keep up to date.
--   OpenCVB’s matrix of squares (bricks) covers the entire image.
-    -   Depth, left/right correlation, features can categorize bricks into groups.
-    -   Any problem can be made more manageable when working with bricks.
--   Features of Delaunay polygons that extend beyond the image define a periphery.
-    -   The complementary interior defines a fully connected and visible region.
-    -   The Feature Coordinate System (FCS) also labels undefined regions.
--   Intel RealSense support now handles the mapping of RGB to left/right images.
-    -   Support for multiple Intel cameras broke (name change?). Now fixed.
-        -   Multiple cameras can be attached but only one camera will be used.
-    -   The Oak-D camera support is still TBD – Oak-D Pro 4 camera not here yet.
+-   Over 1800 algorithms are included, averaging 37 lines of code per algorithm.
+-   Each retrieval mode in FindContours now has its own algorithm.
+    -   The default retrieval mode is “List” since it has stable results and is fast.
+    -   A general purpose Contour_Basics allows selecting all retrieval modes.
+-   The “OpenCVB Layout” section of this document was completely rewritten.
+    -   Accumulated changes to the user interface were updated and explained.
+    -   There are fewer icons in the main toolbar – only the high-use icons remain.
+    -   The ‘Recent’ button in the toolbar makes it easy to switch between algorithms.
+    -   The ‘A-Z’ button is faster than navigating a combo box with so many entries.
+-   Backprojection algorithms were reviewed and updated.
+    -   BackProject_Basics_Depth shows each of the depth levels in the histogram.
+-   The “RedCloud” algorithms segment an image using a reduced point cloud.
+    -   “RedColor” algorithms segment an image using the RGB data.
+    -   RedCloud algorithms define segments that have cohesive XY values.
+-   The gravity vector from the IMU acceleration vector is slightly unstable.
+    -   The first attempt at stabilizing was to use a Kalman filter. Results: not bad.
+    -   The second attempt uses the longest RGB line as a proxy for gravity.
+        -   If the RGB line end points are not stable, capture the IMU gravity vector.
+        -   If the RGB line end points are stable, the gravity vector is unchanged.
+    -   The second attempt is currently the active method on each frame.
+-   The lpMap (line pointer map) was removed – lines are not easily clickable.
+    -   Instead, use the global option debug slider to identify a line for display.
+    -   See the “LineRGB_Info” algorithm to display the characteristics of a line.
 -   A log of previous changes is included at the bottom of this document.
 
-![A screenshot of a computer AI-generated content may be incorrect.](media/79f6e36c9e119263741e7b3774c34c3e.png)
-
-**Brick_LeftRightMouse:** *This algorithm translates path of the mouse movement in the color image to the left camera image (below left.) The bricks in the lower left are then translated to the right image (below right.) The reason this was difficult is that the RealSense cameras don’t align the left image with the color image automatically. Only the RealSense cameras require this 2-step translation.*
-
-![A collage of images of hands typing on a computer AI-generated content may be incorrect.](media/136a1ba998770c8ce43cb4b2fd8c0080.png)
-
-**Brick_LeftRightMouse:** *This algorithm is the same as the one above but uses the StereoLabs ZED 2 camera. Here the color image is aligned with the left image while the RealSense example shows that the left camera is not aligned with the color image. For both sample outputs, the lower right image shows the selected cells that match those in the lower left confirming that the translation between left and right cameras is working properly. There are other considerations though but that is TBD.*
+**![](media/58382b8918581bfb06ad7ea4a17fd803.gif)Gravity Vector:** *This output shows the typical subtle jitter for the gravity vector. The camera was not moving during this test and shows that the IMU captures the gravity vector but with slight variations from frame to frame. The new Gravity_Basics algorithm in OpenCVB uses the longest line in the RGB image to remove this variability. If the RGB line shows motion, the IMU gravity values are used.*
 
 \------------------------------------------------------------------------------------------------------------------
 
@@ -54,15 +45,13 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 # OpenCVB Layout
 
-![A screenshot of a computer Description automatically generated](media/1709e670143edb3c5e7240a592abdf14.png)
+![A collage of images of a person working on a computer AI-generated content may be incorrect.](media/99f8a694c5eace2b69f015640caca332.png)
 
-**OpenCVB Layout:** *The layout of the OpenCVB application shows the RGB camera output in the upper left, the colorized depth data in the upper right, and the algorithm outputs in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left.*
+**OpenCVB Layout:** *A typical layout of the OpenCVB application is shown above. The upper left contains the RGB camera output with lines for gravity and the horizon. The upper right contains several different displays of the depth information – see “Global Options”. Here, left/right correlation coefficients are shown with red highlighting the grid “bricks” with high correlation. Alternatively, it may show a conventional depth representation of yellow (close) to blue (far). The algorithm outputs in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left. Labels above the bottom images are controlled by the algorithm.*
 
-![](media/e4adab4252112acc87b50e007e22ac2f.png)
+![](media/62125113f320d08576258e7ea28bc8bb.png)
 
-**OpenCVB ToolBar:** *The first combo box selects the algorithm – here “SLR_Trends” while the second combo box selects the group of algorithms – here “\<All but Python\>” which controls what algorithms are available in the first combo box. The “\<All but Python\>” group includes all the C\#, C++, and VB.Net algorithms and excludes the Python algorithms.  It includes a count of algorithms in that group as well.*
-
-**Navigation Buttons:** *The ![](media/015b3a399d0988a17ea3e25e416a4fdd.png)buttons navigate between algorithms. Use these arrows to jump between algorithms. The “Recent” button will present a list of previous algorithms to allow jumping to algorithms other than the previous or next.*
+**OpenCVB ToolBar:** *The first combo box selects the algorithm – here “SLR_Trends” while the second combo box selects the group of algorithms – here “(1832) \< All \>” which controls what algorithms are available in the first combo box. The “(1832) \< All \>” group includes all algorithms.  The number in the group describes how many algorithms are in that group.*
 
 **Run and Pause:** *The ![](media/8a0dfa720460a53afbcd56d30b78e238.png)button will start and pause the algorithm.*
 
@@ -70,21 +59,23 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 **Regression Testing:** *The ![](media/f604bfdff224ebf4eadac1d9379a3b91.png) button will start and stop the overnight testing of each algorithm at various resolutions.*
 
-**Tree View:** *The ![](media/c8d6a2148f4de451bb6ddfca853a28ad.png) button shows the tree view of the current algorithm. Since many algorithms create a stack of inputs and outputs the tree view shows all them and allows any entry in the stack to be selected. Selecting an entry will show the output of that algorithm. Also shown in the Tree View is the percent utilization of each contributing algorithm.*
+**Magnify:** *The ![](media/d3475bdf6e3afa8ae87003ed8aafefcf.png) button will magnify the selected portion of the image. To select a portion of the image just click and hold while dragging the mouse over a portion of the image. Select the “DrawRect” and then click the magnify button.*
 
 **Pixel Viewer:** *The ![](media/b5c54b9b31c1c9e4aabb65640ba92463.png) button will display a separate form showing the pixel values for any of the 4 images. The pixel viewer is aware of the image type so if the image is 32 bit, it will show the floating point values.*
 
-**Algorithm Translation:** *The ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button invokes the Touchup.exe application that guides the translation of VB.Net algorithms to C\#.*
+**Recently Used Algorithms:** *The ![](media/2b0c572c8fc421c071cf13aa57437abc.png)button is a pulldown that displays the last 50 algorithms that were run. The “Test All” button (“Regression Testing”) does NOT update the recent list.*
 
-**Create Algorithm:** *The ![](media/850a870af3b7ca340674f12fb84dd90e.png) button will open a dialog box that guides the user to create a new algorithm. The different types of algorithms that may be created are VB.Net, C++, OpenGL, C\#, or Python.*
+**A-Z Button:** *The ![](media/fa9f33e3289db7e485b06594e2204c4c.png)button displays a list of all the algorithm categories. Click on any entry to open the first algorithm in that category. Using “A-Z” is faster than using the complete list of algorithms.*
 
-**OpenCVB Main Form Caption:** *The caption at the top requires some further explanation. The number of lines of code in OpenCVB and algorithms are shown. Using these, the average number of lines per algorithm is computed. Also, the name of the current camera is shown next to the frame rate for the camera and the frame rate for the algorithm. The camera is in its own thread so its frame rate may be higher than the rate at which the frames are processed in the algorithm thread.*
+**Algorithm Description:** *Every algorithm provides a simple description of the algorithm. It is always at the right edge of the main form and may be multiple lines.*
+
+**OpenCVB Main Form Caption:** *The caption at the top requires some further explanation. The number of lines of code in OpenCVB is shown along with the number of algorithms. The average number of lines per algorithm is computed from the count. Also, the name of the current camera is shown next to the frame rate for the camera and the frame rate for the algorithm. The camera is in its own thread so its frame rate may be higher than the rate at which the frames are processed in the algorithm thread.*
 
 # The Objective
 
-The objective is to solve many small computer vision problems and do so in a way that enables any of the solutions to be reused. The result is a toolkit for solving incrementally bigger problems. The hypothesis behind this approach is that human vision is not computationally intensive but is built on many, usually trivial algorithms working together. Computer vision problems are not huge; there are just an unmanageable number of them. A single app that allows algorithms to be easily created and combined is the primary motivation for the OpenCVB application.
+The objective is to solve many small vision problems and do so in a way that enables any of the solutions to be reused. The result is a toolkit for solving incrementally bigger problems. The hypothesis behind this approach is that human vision is not computationally intensive but is built on many, usually trivial algorithms working together. Computer vision problems are not huge; there are just an unmanageable number of them. A single app that allows algorithms to be easily created and combined is the primary motivation for the OpenCVB application.
 
-OpenCVB is targeting only RGBD cameras that produce depth and color and have an IMU to detect gravity and motion. These newer cameras have prompted a review of existing vision algorithms to see how they can be improved if depth and gravity are known. To enable revisiting existing algorithms, this software provides a single application that can run OpenCV algorithms on any of the cameras listed below.
+OpenCVB is targeted only for RGBD cameras that produce depth and color and have an IMU to detect gravity and motion. These newer cameras have prompted a review of existing vision algorithms to see how they can be improved if depth and gravity are known. To enable revisiting existing algorithms, this software provides a single application that can run OpenCV algorithms on any of the cameras listed below.
 
 Supporting multiple cameras with the same application adds a further level of generalization. Plus, adding more cameras is a multiplier. If there are over 2000 algorithms and 6 supported cameras, testing all of them requires 12,000 tests which is the reason for the integrated regression testing. If the different resolutions are added, the multiplier and the need for regression testing is even greater.
 
@@ -98,7 +89,7 @@ There are other objectives. Convolutions combined with neural nets (CNN’s) are
 
 # What If?
 
-And what if all cameras had depth and an IMU? Making this assumption explains why only a few cameras from StereoLabs, Intel, Microsoft, and others are currently supported. The data from each camera – color, depth, point cloud, and IMU data - is presented to all the algorithms in the same standardized format. More cameras with depth are expected to arrive and integration with OpenCVB is likely to follow. OpenCVB is an opportunity to experiment with the features of these cameras and apply the same algorithm to all of them.
+And what if all cameras had depth and an IMU? Making this assumption explains why only a few cameras from StereoLabs, Intel, Orbbec, and others are currently supported. The data from each camera – color, depth, point cloud, and IMU data - is presented to all the algorithms in the same standardized format. More cameras with depth are expected to arrive and integration with OpenCVB is likely to follow. OpenCVB is an opportunity to experiment with the features of these cameras and apply the same algorithm to all of them.
 
 The algorithms are notably short, almost always less than a page of code, labelled reasonably well, easily searched, and easily combined, while often providing links in the code to online documentation and versions for other platforms. Many existing algorithms on the web have environmental considerations that can obscure the meaning or context of an algorithm and complicate downloading. All the algorithms here contain just the algorithm separate from any camera dependencies and will work with each of the supported cameras. Isolating just the algorithm functionality enables easy adaptation to other environments or platforms.
 
@@ -2000,3 +1991,41 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of different colors AI-generated content may be incorrect.](media/8ecc1cc1682ce29ec4ba0dd0fdd6d9db.gif)
 
 **Structured_Core:** *The Structured_Core algorithm is similar in concept to structured light without additional hardware. All RGBD cameras can produce depth lines. By slicing through the point cloud with various increments, this example produces edges which line detection can use to find lines. Note how lines change from one depth image to the next. Depth data is fairly chaotic pixel by pixel. Depth lines should be coherent and will form the basis of ‘Logical Depth’.*
+
+# 2025 May (1) – Experimental Inputs, Logical Depth in OpenGL, Bricks, Periphery, and RealSense Support.
+
+-   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
+-   A variety of alternative inputs were added for grayscale and color.
+    -   Any algorithm can be tested with different input using one click.
+    -   Working on edge detection? Prep the input as a sharpened image.
+    -   Working on RGB images? Test the algorithm again with HSV data.
+    -   Successful experiments would implement the alternative by default.
+    -   “Feature Options” (behind the global options) has the complete list.
+-   The option for a random palette for all OpenCVB algorithms was removed.
+    -   The fixed palette is always preferred and simplifies that user interface.
+-   Logical depth is now visualized in OpenGL for comparison with raw data.
+    -   Currently, the logical depth is not as good as the original data.
+    -   But the potential is there for improvement.
+    -   Gradient_Line smoothly applies a linear function to depth data.
+-   Overnight testing could fail when image jumped in size – now corrected.
+-   Removed the ‘Advice’ scheme – not needed when source is available.
+    -   Also, it was too much work to keep up to date.
+-   OpenCVB’s matrix of squares (bricks) covers the entire image.
+    -   Depth, left/right correlation, features can categorize bricks into groups.
+    -   Any problem can be made more manageable when working with bricks.
+-   Features of Delaunay polygons that extend beyond the image define a periphery.
+    -   The complementary interior defines a fully connected and visible region.
+    -   The Feature Coordinate System (FCS) also labels undefined regions.
+-   Intel RealSense support now handles the mapping of RGB to left/right images.
+    -   Support for multiple Intel cameras broke (name change?). Now fixed.
+        -   Multiple cameras can be attached but only one camera will be used.
+    -   The Oak-D camera support is still TBD – Oak-D Pro 4 camera not here yet.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer AI-generated content may be incorrect.](media/79f6e36c9e119263741e7b3774c34c3e.png)
+
+**Brick_LeftRightMouse:** *This algorithm translates path of the mouse movement in the color image to the left camera image (below left.) The bricks in the lower left are then translated to the right image (below right.) The reason this was difficult is that the RealSense cameras don’t align the left image with the color image automatically. Only the RealSense cameras require this 2-step translation.*
+
+![A collage of images of hands typing on a computer AI-generated content may be incorrect.](media/136a1ba998770c8ce43cb4b2fd8c0080.png)
+
+**Brick_LeftRightMouse:** *This algorithm is the same as the one above but uses the StereoLabs ZED 2 camera. Here the color image is aligned with the left image while the RealSense example shows that the left camera is not aligned with the color image. For both sample outputs, the lower right image shows the selected cells that match those in the lower left confirming that the translation between left and right cameras is working properly. There are other considerations though but that is TBD.*

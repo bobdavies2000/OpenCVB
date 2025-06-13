@@ -310,7 +310,7 @@ Public Class RedColor_FPS : Inherits TaskParent
         fps.Run(src)
 
         If fps.heartBeat Then
-            runRedC(src)
+            task.redC.Run(src)
             dst0 = task.color.Clone
             dst1 = task.depthRGB.Clone
             dst2 = task.redC.dst2.Clone
@@ -479,7 +479,7 @@ Public Class RedColor_LikelyFlatSurfaces : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         verts.Run(src)
 
-        runRedC(src)
+        task.redC.Run(src)
         dst2.SetTo(0)
         dst3.SetTo(0)
 
@@ -842,7 +842,7 @@ Public Class RedColor_OnlyColorHist3D : Inherits TaskParent
         dst2 = hColor.dst3
         labels(2) = hColor.labels(3)
 
-        runRedC(dst2)
+        task.redC.Run(src)
         dst3 = task.redC.rcMap
         dst3.SetTo(0, task.noDepthMask)
         labels(3) = task.redC.labels(2)
@@ -859,7 +859,7 @@ Public Class RedColor_OnlyColorAlt : Inherits TaskParent
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runRedC(src)
+        task.redC.Run(src)
         Dim lastCells As New List(Of rcData)(task.redC.rcList)
         Dim lastMap As cv.Mat = task.redC.rcMap.Clone
         Dim lastColors As cv.Mat = dst3.Clone

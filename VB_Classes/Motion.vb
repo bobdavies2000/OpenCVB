@@ -131,7 +131,7 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
 
         dst2 = src
 
-        runRedC(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        task.redC.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
         If task.redC.rcList.Count < 2 Then
             rectList.Clear()
         Else

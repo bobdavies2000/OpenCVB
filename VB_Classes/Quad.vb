@@ -23,7 +23,6 @@ End Class
 Public Class Quad_GridTiles : Inherits TaskParent
     Public quadData As New List(Of cv.Point3f)
     Public Sub New()
-        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         labels = {"", "RedColor cells", "", "Simplified depth map with RedColor cell colors"}
@@ -80,7 +79,6 @@ Public Class Quad_MinMax : Inherits TaskParent
     Public oglOptions As New Options_OpenGLFunctions
     Const depthListMaxCount As Integer = 10
     Public Sub New()
-        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Create a representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -173,7 +171,6 @@ Public Class Quad_Hulls : Inherits TaskParent
     Dim hulls As New RedColor_Hulls
     Const depthListMaxCount As Integer = 10
     Public Sub New()
-        If standalone Then task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Create a triangle representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -251,7 +248,6 @@ Public Class Quad_Bricks : Inherits TaskParent
     Dim depthMaxList As New List(Of List(Of Single))
     Dim myListMax = 10
     Public Sub New()
-        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Create triangles from each brick in point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

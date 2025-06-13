@@ -736,7 +736,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
 
-        If standalone Then runRedC(src)
+        If standalone Then task.redC.Run(src)
 
         delaunay.inputPoints = task.features
         delaunay.Run(src)

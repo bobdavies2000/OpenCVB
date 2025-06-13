@@ -310,7 +310,6 @@ Public Class LeftRight_ContourLeft : Inherits TaskParent
     Dim contours As New Contour_Basics_List
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Segment the left view with contour_basics_List"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

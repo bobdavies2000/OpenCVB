@@ -10,7 +10,7 @@ Public Class Disparity_Basics : Inherits TaskParent
         desc = "Given a brick, find the match in the right view image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView
+        dst2 = task.color.Clone
 
         Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Static saveIndex As Integer = index
@@ -22,11 +22,11 @@ Public Class Disparity_Basics : Inherits TaskParent
         End If
         rect = task.gridRects(index)
 
-        match.template = dst2(rect)
+        match.template = task.leftView(rect)
         Dim maxDisparity As Integer = 128
         match.searchRect = New cv.Rect(Math.Max(0, rect.X - maxDisparity), rect.Y,
                                  rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
-        If standalone Then rightView = task.rightView
+        If standalone Or rightView.Type <> cv.MatType.CV_8U Then rightView = task.rightView
 
         dst2.Rectangle(rect, black, task.lineWidth)
         match.Run(rightView)
@@ -41,7 +41,7 @@ Public Class Disparity_Basics : Inherits TaskParent
         Dim max = saveCorrelations.Max
 
         If max = match.correlation And max > 0.8 Then bestRect = match.matchRect
-        dst3.Rectangle(bestRect, black, task.lineWidth + 1)
+        dst3.Rectangle(bestRect, black, task.lineWidth)
 
         If saveCorrelations.Count > 100 Then saveCorrelations.RemoveAt(0)
 
@@ -196,9 +196,9 @@ Public Class Disparity_Color8u : Inherits TaskParent
         dst1 = task.rightView.Clone
         color8u.Run(src)
 
-        dst2 = color8u.dst2
+        dst2 = src.Clone
         disparity.rightView = color8u.dst3
-        disparity.Run(dst2)
+        disparity.Run(color8u.dst2)
         dst3 = disparity.dst3
         labels = disparity.labels
 
@@ -207,7 +207,7 @@ Public Class Disparity_Color8u : Inherits TaskParent
 
         Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         Dim rect = task.gridRects(index)
-        dst2.Rectangle(rect, 255, task.lineWidth + 1)
+        dst2.Rectangle(rect, 255, task.lineWidth)
     End Sub
 End Class
 

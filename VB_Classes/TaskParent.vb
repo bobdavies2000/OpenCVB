@@ -596,22 +596,16 @@ Public Class TaskParent : Implements IDisposable
         Return addw.dst2
     End Function
     Public Function runRedC(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
-        If task.redC Is Nothing Then task.redC = New RedColor_Basics
         task.redC.inputRemoved = removeMask
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
     Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
-        If task.redC Is Nothing Then task.redC = New RedColor_Basics
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
-    Public Sub runRedC(src As cv.Mat)
-        If task.redC Is Nothing Then task.redC = New RedColor_Basics
-        task.redC.Run(src)
-    End Sub
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))

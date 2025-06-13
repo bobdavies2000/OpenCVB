@@ -3138,10 +3138,7 @@ Public Class Options_Spectrum : Inherits OptionParent
         Return ranges
     End Function
     Public Sub Run()
-        If task.firstPass Then
-            If task.redC Is Nothing Then task.redC = New RedColor_Basics
-            task.redC.Run(task.color)
-        End If
+        If task.firstPass Then task.redC.Run(task.color)
         Static frmSliders = FindFrm("Options_Spectrum Sliders")
         Static gapDSlider = OptionParent.FindSlider("Gap in depth spectrum (cm's)")
         Static gapGSlider = OptionParent.FindSlider("Gap in gray spectrum")

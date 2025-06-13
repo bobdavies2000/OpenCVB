@@ -80,7 +80,6 @@ End Class
 Public Class BrickPoint_MaskRedColor : Inherits TaskParent
     Dim fLess As New BrickPoint_FeatureLess
     Public Sub New()
-        task.redC = New RedColor_Basics
         desc = "Run RedColor with the featureless mask from BrickPoint_FeatureLess"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

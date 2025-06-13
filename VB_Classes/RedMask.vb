@@ -5,7 +5,6 @@ Public Class RedMask_Basics : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         cPtr = RedMask_Open()
-        If standalone Then task.redOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

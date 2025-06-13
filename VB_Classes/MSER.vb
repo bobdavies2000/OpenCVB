@@ -437,7 +437,7 @@ Public Class MSER_RedCloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         mser.Run(src)
 
-        runRedC(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        task.redC.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = task.redC.dst2
         labels(2) = task.redC.labels(2)
     End Sub

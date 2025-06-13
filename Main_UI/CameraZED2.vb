@@ -64,7 +64,7 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         zed.RetrieveImage(rightSL, sl.VIEW.RIGHT)
         rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC4, rightSL.GetPtr).
-                                          CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+                                         CvtColor(cv.ColorConversionCodes.BGRA2BGR)
         rightView = rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZBGRA) ' tried XYZ but it still comes with BGRA

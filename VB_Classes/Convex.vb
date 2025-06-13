@@ -139,7 +139,7 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
         Return newC
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runRedC(src)
+        task.redC.Run(src)
         dst1 = task.redC.dst2
         labels(1) = task.redC.labels(2)
         dst3 = convex.dst3
