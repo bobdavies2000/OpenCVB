@@ -359,6 +359,9 @@ Public Class TaskParent : Implements IDisposable
     Public Function srcMustBe8U(src As cv.Mat) As cv.Mat
         If src.Type <> cv.MatType.CV_8U Then
             Static color8U As New Color8U_Basics
+            If task.redOptions.ColorSource.SelectedText = "EdgeLine_Basics" Then
+                Return task.edges.dst2 ' already been run with each frame.
+            End If
             color8U.Run(src)
             Return color8U.dst2
         End If

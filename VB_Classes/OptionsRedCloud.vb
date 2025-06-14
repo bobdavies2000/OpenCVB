@@ -96,7 +96,7 @@ Public Class OptionsRedCloud
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem = "Reduction_Basics"
+        ColorSource.SelectedItem = "EdgeLine_Basics"
 
         Select Case task.cameraName
             Case "Oak-D camera"
