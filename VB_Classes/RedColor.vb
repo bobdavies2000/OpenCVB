@@ -12,7 +12,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
+        If standalone Or task.redOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
             dst1 = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
             dst1 = srcMustBe8U(src)

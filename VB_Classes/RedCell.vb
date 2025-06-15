@@ -157,9 +157,7 @@ Public Class RedCell_Binarize : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = src
         If task.heartBeat Or task.quarterBeat Then
-            task.redC.Run(src)
-            dst2 = task.redC.dst2
-            labels(2) = task.redC.labels(2)
+            dst2 = runRedC(src, labels(2))
 
             Dim grayMeans As New List(Of Single)
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

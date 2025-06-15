@@ -862,7 +862,7 @@ Public Class Contour_Basics_List : Inherits TaskParent
         dst2 = ShowPalette(contourMap)
 
         If task.heartBeat Then
-            labels(2) = "List found the " + CStr(contourList.Count) + " largest color contours of the " +
+            labels(2) = "Contour_Basics_List found the " + CStr(contourList.Count) + " largest color contours of the " +
                         CStr(allContours.Count) + " found.  "
         End If
     End Sub
