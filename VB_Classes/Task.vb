@@ -208,7 +208,7 @@ Public Class VBtask : Implements IDisposable
     Public histogramBins As Integer
 
     Public gOptions As OptionsGlobal
-    Public redOptions As OptionsRedCloud
+    Public redOptions As OptionsRedColor
     Public featureOptions As OptionsFeatures
     Public treeView As TreeviewForm
 
@@ -500,7 +500,7 @@ Public Class VBtask : Implements IDisposable
         allOptions.Show()
 
         gOptions = New OptionsGlobal
-        redOptions = New OptionsRedCloud
+        redOptions = New OptionsRedColor
         featureOptions = New OptionsFeatures
         treeView = New TreeviewForm
 

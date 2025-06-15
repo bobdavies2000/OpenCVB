@@ -439,26 +439,6 @@ End Class
 
 
 
-Public Class Color8U_Edges : Inherits TaskParent
-    Dim color8u As New Color8U_Sweep
-    Dim edges As New Edge_Canny
-    Public Sub New()
-        desc = "Find edges in the Color8U_Basics output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        color8u.Run(src)
-        dst2 = color8u.dst3
-
-        edges.Run(dst2)
-        dst3 = edges.dst2
-        labels(2) = color8u.strOut
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Color8U_LeftRight : Inherits TaskParent
     Dim color8u As New Color8U_Basics

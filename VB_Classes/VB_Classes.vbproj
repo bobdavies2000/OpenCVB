@@ -216,10 +216,10 @@
     <Compile Include="OptionsKeyboardInput.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsRedCloud.Designer.vb">
-      <DependentUpon>OptionsRedCloud.vb</DependentUpon>
+    <Compile Include="OptionsRedColor.Designer.vb">
+      <DependentUpon>OptionsRedColor.vb</DependentUpon>
     </Compile>
-    <Compile Include="OptionsRedCloud.vb">
+    <Compile Include="OptionsRedColor.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Projection.vb" />
@@ -502,8 +502,8 @@
     <EmbeddedResource Include="OptionsRadioButtons.resx">
       <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsRedCloud.resx">
-      <DependentUpon>OptionsRedCloud.vb</DependentUpon>
+    <EmbeddedResource Include="OptionsRedColor.resx">
+      <DependentUpon>OptionsRedColor.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsSliders.resx">
       <DependentUpon>OptionsSliders.vb</DependentUpon>

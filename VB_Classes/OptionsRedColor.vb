@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class OptionsRedCloud
+Public Class OptionsRedColor
     Public colorInputName As String
     Public colorInputIndex As Integer
     Public reductionType As String = "Use Simple Reduction"

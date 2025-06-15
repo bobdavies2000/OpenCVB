@@ -5122,3 +5122,106 @@ Public Class XO_LeftRight_Markers1 : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+
+Public Class XO_OpenGL_QuadBricks : Inherits TaskParent
+    Dim quad As New Quad_Bricks
+    Public Sub New()
+        task.ogl.oglFunction = oCase.minMaxBlocks
+        desc = "Create blocks in each roi using the min and max depth values"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        quad.Run(src)
+        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
+        dst2 = quad.dst2
+        labels(2) = quad.labels(2)
+
+        Dim index As Integer
+        For Each roi In task.gridRects
+            If index < quad.depths.Count Then
+                SetTrueText(Format(quad.depths(index), fmt1) + vbCrLf + Format(quad.depths(index + 1), fmt1), New cv.Point(roi.X, roi.Y), 2)
+            End If
+            index += 2
+        Next
+
+        task.ogl.pointCloudInput = New cv.Mat()
+        task.ogl.Run(src)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_OpenGL_QuadGridTiles : Inherits TaskParent
+    Dim tiles As New Quad_GridTiles
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        desc = "Display the quads built by Quad_Hulls in OpenGL - doesn't use OpenGL's point size"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        tiles.Run(src)
+        dst2 = tiles.dst2
+
+        task.ogl.dataInput = cv.Mat.FromPixelData(tiles.quadData.Count, 1, cv.MatType.CV_32FC3,
+                                                  tiles.quadData.ToArray)
+        task.ogl.Run(src)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+        labels = tiles.labels
+    End Sub
+End Class
+
+
+
+
+
+
+'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
+Public Class XO_OpenGL_QuadMinMax : Inherits TaskParent
+    Dim quad As New Quad_MinMax
+    Public Sub New()
+        task.ogl.oglFunction = oCase.quadBasics
+        desc = "Reflect the min and max for each roi of the RedCloud data"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        quad.Run(src)
+        dst2 = quad.dst2
+        dst3 = quad.dst3
+        labels = quad.labels
+        task.ogl.dataInput = cv.Mat.FromPixelData(quad.quadData.Count, 1, cv.MatType.CV_32FC3, quad.quadData.ToArray)
+
+        task.ogl.pointCloudInput = New cv.Mat()
+        task.ogl.Run(dst3)
+        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Color8U_Edges : Inherits TaskParent
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        desc = "Find edges in the Color8U_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.edges.dst2
+
+        edges.Run(dst2)
+        dst3 = edges.dst2
+        labels(2) = task.edges.strOut
+    End Sub
+End Class
