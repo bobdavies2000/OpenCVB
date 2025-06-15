@@ -1239,6 +1239,12 @@ Public Class Main_UI
             AvailableAlgorithms.SelectedIndex += 1
         End If
 
+        ' skip testing the OpenGL algorithms.  They are only for visualizations - not for other algorithms to use.
+        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+            If AvailableAlgorithms.Text.StartsWith("OpenGL_") = False Then Exit For
+            AvailableAlgorithms.SelectedIndex += 1
+        Next
+
         ' skip testing the XO_ algorithms.  They are obsolete.
         If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
