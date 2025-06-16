@@ -1067,3 +1067,75 @@ Public Class Contour_RedCloud : Inherits TaskParent
         labels(3) = CStr(contourList.Count) + " contours found"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class Contour_Hulls : Inherits TaskParent
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        desc = "Add hulls and improved contours using ConvexityDefects to each contour cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runContours(src, labels(2))
+
+        Dim defectCount As Integer
+        contourMap.SetTo(0)
+        contourList.Clear()
+        For Each contour In task.contours.contourList
+            If contour.points.Count >= 5 Then
+                contour.hull = cv.Cv2.ConvexHull(contour.points.ToArray, True).ToList
+                Dim hullIndices = cv.Cv2.ConvexHullIndices(contour.hull.ToArray, False)
+                Try
+                    Dim defects = cv.Cv2.ConvexityDefects(contour.points, hullIndices)
+                    contour.points = Convex_RedCloudDefects.betterContour(contour.points, defects)
+                Catch ex As Exception
+                    defectCount += 1
+                End Try
+                DrawContour(contourMap, contour.hull, contour.index, -1)
+                contourList.Add(contour)
+            End If
+        Next
+
+        dst3 = ShowPalette(contourMap)
+        labels(3) = CStr(contourList.Count) + " hulls identified below.  " + CStr(defectCount) +
+                    " hulls failed to build a defect list."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Contour_Lines : Inherits TaskParent
+    Dim hulls As New Contour_Hulls
+    Dim lines As New LineRGB_Basics
+    Public Sub New()
+        desc = "Build a list of the lines in the output of Contour_Hulls"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hulls.Run(src)
+        dst3 = hulls.dst3
+        labels(3) = hulls.labels(3)
+
+        lines.Run(dst3)
+        dst2 = src
+        For Each lp In lines.lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+        labels(2) = lines.labels(2)
+    End Sub
+End Class

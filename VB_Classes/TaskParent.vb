@@ -609,6 +609,10 @@ Public Class TaskParent : Implements IDisposable
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
+    Public Function runContours(src As cv.Mat, ByRef label As String) As cv.Mat
+        label = task.contours.labels(2)
+        Return task.contours.dst2
+    End Function
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))

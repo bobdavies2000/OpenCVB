@@ -41,61 +41,6 @@ End Class
 
 
 
-Public Class RedColor_Reduction : Inherits TaskParent
-    Public Sub New()
-        task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
-        task.gOptions.setHistogramBins(20)
-        desc = "Segment the image based On both the reduced color"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-        dst3 = task.redC.rcMap
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedColor_Hulls : Inherits TaskParent
-    Dim convex As New Convex_RedCloudDefects
-    Public Sub New()
-        labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
-        desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-
-        dst3.SetTo(0)
-        Dim defectCount As Integer
-        task.redC.rcMap.SetTo(0)
-        Dim rcList As New List(Of rcData)
-        For Each rc In task.redC.rcList
-            If rc.contour.Count >= 5 Then
-                rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
-                Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
-                Try
-                    Dim defects = cv.Cv2.ConvexityDefects(rc.contour, hullIndices)
-                    rc.contour = Convex_RedCloudDefects.betterContour(rc.contour, defects)
-                Catch ex As Exception
-                    defectCount += 1
-                End Try
-                DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
-                DrawContour(task.redC.rcMap(rc.rect), rc.hull, rc.index, -1)
-            End If
-            rcList.Add(rc)
-        Next
-        task.redC.rcList = New List(Of rcData)(rcList)
-        labels(2) = CStr(task.redC.rcList.Count) + " hulls identified below.  " + CStr(defectCount) + " hulls failed to build the defect list."
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -1978,5 +1923,64 @@ Public Class RedColor_BasicsNoMask : Inherits TaskParent
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedColor_Reduction : Inherits TaskParent
+    Public Sub New()
+        task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
+        task.gOptions.setHistogramBins(20)
+        desc = "Segment the image based On both the reduced color"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+        dst3 = task.redC.rcMap
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedColor_Hulls : Inherits TaskParent
+    Public rcList As New List(Of rcData)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
+        desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        Dim defectCount As Integer
+        task.redC.rcMap.SetTo(0)
+        rcList.Clear()
+        For Each rc In task.redC.rcList
+            If rc.contour.Count >= 5 Then
+                rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+                Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
+                Try
+                    Dim defects = cv.Cv2.ConvexityDefects(rc.contour, hullIndices)
+                    rc.contour = Convex_RedCloudDefects.betterContour(rc.contour, defects)
+                Catch ex As Exception
+                    defectCount += 1
+                End Try
+                DrawContour(rcMap(rc.rect), rc.hull, rc.index, -1)
+                rcList.Add(rc)
+            End If
+        Next
+        dst3 = ShowPalette(rcMap)
+        labels(3) = CStr(rcList.Count) + " hulls identified below.  " + CStr(defectCount) +
+                    " hulls failed to build the defect list."
     End Sub
 End Class
