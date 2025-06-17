@@ -522,10 +522,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                 If y2 >= 0 And y2 <= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, y2))
                 ep1 = pts(0)
                 If pts.Count < 2 Then
-                    If CInt(x2) = task.workingRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workingRes.Height))
-                    If CInt(y2) = task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
+                    If CInt(x2) >= task.workingRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workingRes.Height))
+                    If CInt(y2) >= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
                 End If
-                If pts.Count < 2 Then Dim k = 0
                 ep2 = pts(1)
                 Exit Sub
             End If
@@ -553,9 +552,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     End Function
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
-        If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
+        If pt.X >= task.color.Width Then pt.X = task.color.Width
         If pt.Y < 0 Then pt.Y = 0
-        If pt.Y > task.color.Height - 1 Then pt.Y = task.color.Height - 1
+        If pt.Y >= task.color.Height Then pt.Y = task.color.Height
         Return pt
     End Function
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)

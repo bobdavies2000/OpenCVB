@@ -120,6 +120,7 @@
     <Compile Include="FindContours.vb" />
     <Compile Include="FindNonZero.vb" />
     <Compile Include="BrickPoint.vb" />
+    <Compile Include="HullLine.vb" />
     <Compile Include="Intrinsics.vb" />
     <Compile Include="FindTriangle.vb" />
     <Compile Include="DepthLogic.vb" />

@@ -27,11 +27,11 @@
 
 **![](media/58382b8918581bfb06ad7ea4a17fd803.gif)Gravity Vector:** *This output shows the typical subtle jitter for the gravity vector. The camera was not moving during this test and shows that the IMU captures the gravity vector but with slight variations from frame to frame. The new Gravity_Basics algorithm in OpenCVB uses the longest line in the RGB image to remove this variability. If the RGB line shows motion, the IMU gravity values are used.*
 
-\------------------------------------------------------------------------------------------------------------------
+\----------------------------------------------------------------------------------------------------------
 
 NOTE: OpenCVB has evolved away from implementing algorithms in multiple languages because AI has made it convenient to translate the algorithms into any language. While C\#, C++, and Python are often discussed below, the algorithms are now exclusively written in VB.Net because it is the most convenient to type in and the simplest to read. Translate to any language using CodeConvert.ai.
 
-\------------------------------------------------------------------------------------------------------------------
+\----------------------------------------------------------------------------------------------------------
 
 # Introduction
 

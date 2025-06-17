@@ -1,6 +1,89 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MotionCam_Basics : Inherits TaskParent
     Public edgeList As New List(Of SortedList(Of Single, Integer))
+    Dim knn As New KNN_N2Basics
+    Public Sub New()
+        desc = "Find all the line edge points and display them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = task.lineRGB.dst2
+        labels(3) = "The top " + CStr(task.lineRGB.lpList.Count) + " longest lines in the image."
+
+        knn.queries.Clear()
+        Dim lpList As New List(Of lpData)
+        For Each lp In task.lineRGB.lpList
+            knn.queries.Add(lp.ep1)
+            knn.queries.Add(lp.ep2)
+            lpList.Add(lp)
+        Next
+
+        dst2 = src.Clone
+        For Each lp In lpList
+            lp = HullLine_EdgePoints.EdgePointOffset(lp, 1)
+            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+        Next
+
+        Static lpLast As New List(Of lpData)(task.lineRGB.lpList)
+        For Each lp In lpLast
+            lp = HullLine_EdgePoints.EdgePointOffset(lp, 5)
+            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, white, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, white, -1, task.lineType)
+        Next
+
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        lpLast = New List(Of lpData)(task.lineRGB.lpList)
+
+        labels(2) = CStr(task.lineRGB.lpList.Count * 2) + " edge points found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class MotionCam_MatchLast : Inherits TaskParent
+    Dim motion As New MotionCam_SideApproach
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Find the common trends in the image edge points of the top, left, right, and bottom."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        motion.Run(src)
+        dst1 = motion.dst1
+        labels(1) = motion.labels(1)
+
+        Static edgeList As New List(Of SortedList(Of Single, Integer))(motion.edgeList)
+        Static lpLastList As New List(Of lpData)(task.lineRGB.lpList)
+
+        For i = 0 To edgeList.Count - 1
+            If edgeList(i).Count = motion.edgeList(i).Count Then
+                For j = 0 To edgeList(i).Count - 1
+                    If edgeList(i).ElementAt(j).Key <> motion.edgeList(i).ElementAt(j).Key Then Dim k = 0
+                Next
+            Else
+                Dim k = 0
+            End If
+        Next
+
+        motion.buildDisplay(edgeList, lpLastList, 20, white)
+        dst2 = motion.dst2
+        trueData = motion.trueData
+
+        edgeList = New List(Of SortedList(Of Single, Integer))(motion.edgeList)
+        lpLastList = New List(Of lpData)(task.lineRGB.lpList)
+
+        labels(2) = motion.labels(2) + "  White points are for the previous frame"
+    End Sub
+End Class
+
+
+
+
+
+Public Class MotionCam_SideApproach : Inherits TaskParent
+    Public edgeList As New List(Of SortedList(Of Single, Integer))
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find all the line edge points and display them."
@@ -65,45 +148,5 @@ Public Class MotionCam_Basics : Inherits TaskParent
 
         labels(2) = CStr(task.lineRGB.lpList.Count * 2) + " edge points of the top " + CStr(task.lineRGB.lpList.Count) +
                     " longest lines in the image are shown."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class MotionCam_MatchLast : Inherits TaskParent
-    Dim motion As New MotionCam_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Find the common trends in the image edge points of the top, left, right, and bottom."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        motion.Run(src)
-        dst1 = motion.dst1
-        labels(1) = motion.labels(1)
-
-        Static edgeList As New List(Of SortedList(Of Single, Integer))(motion.edgeList)
-        Static lpLastList As New List(Of lpData)(task.lineRGB.lpList)
-
-        For i = 0 To edgeList.Count - 1
-            If edgeList(i).Count = motion.edgeList(i).Count Then
-                For j = 0 To edgeList(i).Count - 1
-                    If edgeList(i).ElementAt(j).Key <> motion.edgeList(i).ElementAt(j).Key Then Dim k = 0
-                Next
-            Else
-                Dim k = 0
-            End If
-        Next
-
-        motion.buildDisplay(edgeList, lpLastList, 20, white)
-        dst2 = motion.dst2
-        trueData = motion.trueData
-
-        edgeList = New List(Of SortedList(Of Single, Integer))(motion.edgeList)
-        lpLastList = New List(Of lpData)(task.lineRGB.lpList)
-
-        labels(2) = motion.labels(2) + "  White points are for the previous frame"
     End Sub
 End Class

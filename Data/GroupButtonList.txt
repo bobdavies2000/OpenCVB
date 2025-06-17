@@ -119,6 +119,7 @@ HOG
 Homography
 Hough
 Hull
+HullLine
 Image
 ImageOffset
 ImShow
