@@ -43,6 +43,7 @@ End Class
 
 Public Class HullLine_EdgePoints : Inherits TaskParent
     Dim hullLines As New HullLine_Basics
+    Dim knn As New KNN_EdgePoints
     Public Sub New()
         desc = "Find the edge points for the current and last frm for the hull lines."
     End Sub
@@ -62,6 +63,9 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
         hullLines.Run(src)
         dst3 = hullLines.dst2
         labels(3) = hullLines.labels(3)
+
+        knn.lpInput = hullLines.lpList
+        knn.Run(emptyMat)
 
         dst2 = src.Clone
         Static lpLast = New List(Of lpData)(hullLines.lpList)

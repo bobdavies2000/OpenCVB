@@ -522,7 +522,7 @@ Public Class Plot_Histogram : Inherits TaskParent
 
         mm = GetMinMax(histogram)
 
-        If mm.maxVal > 0 And histogram.Rows > 0 Then
+        If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Rows > 0 Then
             Dim incr = 255 / histogram.Rows
             For i = 0 To histArray.Count - 1
                 If Single.IsNaN(histArray(i)) Then histArray(i) = 0

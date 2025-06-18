@@ -2,7 +2,7 @@
 Public Class MotionCam_Basics : Inherits TaskParent
     Public edgeList As New List(Of SortedList(Of Single, Integer))
     Public minDistance As Integer = dst2.Width * 0.02
-    Dim knn As New KNN_N2Basics
+    Dim knn As New KNN_EdgePoints
     Public Sub New()
         desc = "Find all the line edge points and display them."
     End Sub
@@ -10,16 +10,10 @@ Public Class MotionCam_Basics : Inherits TaskParent
         dst2 = task.lineRGB.dst2
         labels(3) = "The top " + CStr(task.lineRGB.lpList.Count) + " longest lines in the image."
 
-        knn.queries.Clear()
-        Dim lpList As New List(Of lpData)
-        For Each lp In task.lineRGB.lpList
-            knn.queries.Add(lp.ep1)
-            knn.queries.Add(lp.ep2)
-            lpList.Add(lp)
-        Next
+        knn.lpInput = task.lineRGB.lpList
         knn.Run(emptyMat)
 
-        For Each lpIn In lpList
+        For Each lpIn In task.lineRGB.lpList
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
@@ -33,24 +27,8 @@ Public Class MotionCam_Basics : Inherits TaskParent
         Next
 
         lpLast = New List(Of lpData)(task.lineRGB.lpList)
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
-        Dim offsets As New List(Of Single)
-        For i = 0 To knn.queries.Count - 1
-            Dim p1 = knn.queries(i)
-            Dim index = knn.result(i, 0)
-            If index >= knn.trainInput.Count Then Continue For
-            Dim p2 = knn.trainInput(index)
-            Dim distance = p1.DistanceTo(p2)
-            If distance < minDistance Then offsets.Add(p1.DistanceTo(p2))
-        Next
-        If offsets.Count > 0 Then
-            Dim average = offsets.Average
-            If task.heartBeat Then
-                labels(2) = CStr(task.lineRGB.lpList.Count * 2) + " edge points found.  Average distance offset: " +
-                            Format(average, fmt3)
-            End If
-        End If
+        labels(2) = knn.labels(2)
     End Sub
 End Class
 

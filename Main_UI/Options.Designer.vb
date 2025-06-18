@@ -103,7 +103,7 @@ Partial Class Options
         Me.TestAllDuration.ReadOnly = True
         Me.TestAllDuration.Size = New System.Drawing.Size(88, 26)
         Me.TestAllDuration.TabIndex = 8
-        Me.TestAllDuration.Value = New Decimal(New Integer() {5, 0, 0, 0})
+        Me.TestAllDuration.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
         'DurationLabel
         '

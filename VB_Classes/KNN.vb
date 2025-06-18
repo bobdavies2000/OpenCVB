@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
+Imports OpenCvSharp
 Public Class KNN_Basics : Inherits TaskParent
     Public knn2 As New KNN_N2Basics
     Public trainInput As New List(Of cv.Point2f) ' put training data here
@@ -66,7 +67,7 @@ Public Class KNN_N2Basics : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Red)
         Next
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim KNNdimension = 2
 
         If standalone Then
@@ -133,7 +134,7 @@ Public Class KNN_N2BasicsTest : Inherits TaskParent
     Public knn As New KNN_Basics
     Dim random As New Random_Basics
     Public Sub New()
-       OptionParent.FindSlider("Random Pixel Count").Value = 10
+        OptionParent.FindSlider("Random Pixel Count").Value = 10
         desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub accumulateDisplay()
@@ -151,7 +152,7 @@ Public Class KNN_N2BasicsTest : Inherits TaskParent
             DrawCircle(dst3, pt, task.DotSize + 4, cv.Scalar.Red)
         Next
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             dst3.SetTo(0)
             random.Run(src)
@@ -184,7 +185,7 @@ Public Class KNN_N3Basics : Inherits TaskParent
         knn = cv.ML.KNearest.Create()
         desc = "Use knn with the input 3D points in the image.  Find the nearest neighbors."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm")
             Exit Sub
@@ -233,7 +234,7 @@ Public Class KNN_N4Basics : Inherits TaskParent
         labels(2) = "Red=TrainingData, yellow = queries, text shows Z distance to that point from query point"
         desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm")
             Exit Sub
@@ -279,10 +280,10 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
     Dim random As New Random_Basics3D
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
-       OptionParent.FindSlider("Random Pixel Count").Value = 100
+        OptionParent.FindSlider("Random Pixel Count").Value = 100
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             knn.queries.Clear()
             knn.trainInput.Clear()
@@ -339,10 +340,10 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
     Dim random As New Random_Basics4D
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
-       OptionParent.FindSlider("Random Pixel Count").Value = 5
+        OptionParent.FindSlider("Random Pixel Count").Value = 5
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             random.Run(src)
             knn.trainInput = New List(Of cv.Vec4f)(random.PointList)
@@ -391,7 +392,7 @@ Public Class KNN_Emax : Inherits TaskParent
         labels(3) = "Red=TrainingData, yellow = queries - use EMax sigma to introduce more chaos."
         desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         em.Run(src)
         random.Run(src)
 
@@ -522,7 +523,7 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
         labels = {"", "", "Highlight the tracked line (move camera to see track results)", "Candidate lines - standaloneTest() only"}
         desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
         Dim p1 As cv.Point2f, p2 As cv.Point2f
@@ -593,7 +594,7 @@ Public Class KNN_ClosestLine : Inherits TaskParent
     Public Sub New()
         desc = "Try to find the closest pair of points in the traininput.  Dynamically compute distance ceiling to determine when to report fail."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
         If lastP1 = New cv.Point2f Then
@@ -694,7 +695,7 @@ Public Class KNN_Farthest : Inherits TaskParent
         labels = {"", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line"}
         desc = "Use KNN to find the farthest point from each query point."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then
                 Static random As New Random_Basics
@@ -742,7 +743,7 @@ Public Class KNN_NNBasicsTest : Inherits TaskParent
         labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
         desc = "Test the use of the general form KNN_BasicsN algorithm"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             knn.trainInput.Clear()
             For i = 0 To knn.options.numPoints - 1
@@ -795,7 +796,7 @@ Public Class KNN_NNBasics : Inherits TaskParent
         knn = cv.ML.KNearest.Create()
         desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
@@ -854,7 +855,7 @@ Public Class KNN_NNearest : Inherits TaskParent
         knn = cv.ML.KNearest.Create()
         desc = "Find the nearest cells to the selected cell"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
@@ -1080,5 +1081,64 @@ Public Class KNN_MinDistance : Inherits TaskParent
         Next
         labels(2) = "After filtering for min distance = " + CStr(task.minDistance) + " there are " +
                     CStr(knn.queries.Count) + " points"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_EdgePoints : Inherits TaskParent
+    Public lpInput As New List(Of lpData)
+    Dim knn As New KNN_N2Basics
+    Public distances() As Single
+    Public minDistance As Integer = dst2.Width * 0.2
+    Public Sub New()
+        desc = "Match edgepoints from the current and previous frames."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lpInput = task.lineRGB.lpList
+
+        dst2 = src.Clone
+        For Each lp In task.lineRGB.lpList
+            HullLine_EdgePoints.EdgePointOffset(lp, 1)
+            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+        Next
+
+        knn.queries.Clear()
+        For Each lp In lpInput
+            knn.queries.Add(lp.ep1)
+            knn.queries.Add(lp.ep2)
+        Next
+
+        knn.Run(emptyMat)
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries) ' for the next iteration.
+
+        ReDim distances(minDistance - 1)
+        For i = 0 To knn.queries.Count - 1
+            Dim p1 = knn.queries(i)
+            Dim index = knn.result(i, 0)
+            If index >= knn.trainInput.Count Then Continue For
+            Dim p2 = knn.trainInput(index)
+
+            Dim intDistance = CInt(p1.DistanceTo(p2))
+            If intDistance >= minDistance Then intDistance = distances.Length - 1
+            distances(intDistance) += 1
+        Next
+
+        If distances.Count > 0 Then
+            Dim distList = distances.ToList
+            Dim maxIndex = distList.IndexOf(distList.Max)
+            labels(2) = CStr(lpInput.Count * 2) + " edge points found.  Peak distance at " + CStr(maxIndex) + " pixels"
+
+            If standalone Then
+                Static plot As New Plot_OverTimeSingle
+                plot.plotData = maxIndex
+                plot.Run(src)
+                dst3 = plot.dst2
+            End If
+        End If
     End Sub
 End Class

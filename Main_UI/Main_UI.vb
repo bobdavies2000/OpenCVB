@@ -1533,14 +1533,8 @@ Public Class Main_UI
                                       CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
             End If
 
-
-
-
-            If AlgorithmTestAllCount = 1200 Then Dim k = 0
-
-
-
-
+            GC.Collect()
+            GC.WaitForPendingFinalizers()
 
             ' Adjust drawrect for the ratio of the actual size and WorkingRes.
             If task.drawRect <> New cv.Rect Then
