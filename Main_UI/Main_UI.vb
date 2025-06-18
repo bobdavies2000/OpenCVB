@@ -1532,6 +1532,16 @@ Public Class Main_UI
                                       CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
                                       CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
             End If
+
+
+
+
+            If AlgorithmTestAllCount = 1200 Then Dim k = 0
+
+
+
+
+
             ' Adjust drawrect for the ratio of the actual size and WorkingRes.
             If task.drawRect <> New cv.Rect Then
                 ' relative size of algorithm size image to displayed image

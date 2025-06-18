@@ -47,7 +47,7 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
         desc = "Find the edge points for the current and last frm for the hull lines."
     End Sub
     Public Shared Function EdgePointOffset(lpIn As lpData, offset As Integer) As lpData
-        Dim lp = lpIn
+        Dim lp = New lpData(lpIn.p1, lpIn.p2)
         If lp.ep1.X <= 1 Then lp.ep1.X += offset
         If lp.ep1.Y <= 1 Then lp.ep1.Y += offset
         If lp.ep2.X <= 1 Then lp.ep2.X += offset
@@ -73,8 +73,8 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
 
         For Each lpIn In lpLast
             Dim lp = EdgePointOffset(lpIn, 5)
-            dst2.Circle(New cv.Point(CInt(lp.ep1.x), CInt(lp.ep1.y)), task.DotSize, white, -1, task.lineType)
-            dst2.Circle(New cv.Point(CInt(lp.ep2.x), CInt(lp.ep2.y)), task.DotSize, white, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, white, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, white, -1, task.lineType)
         Next
 
         lpLast = New List(Of lpData)(hullLines.lpList)

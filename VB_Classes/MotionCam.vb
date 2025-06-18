@@ -1,12 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MotionCam_Basics : Inherits TaskParent
     Public edgeList As New List(Of SortedList(Of Single, Integer))
+    Public minDistance As Integer = dst2.Width * 0.02
     Dim knn As New KNN_N2Basics
     Public Sub New()
         desc = "Find all the line edge points and display them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.lineRGB.dst2
+        dst2 = task.lineRGB.dst2
         labels(3) = "The top " + CStr(task.lineRGB.lpList.Count) + " longest lines in the image."
 
         knn.queries.Clear()
@@ -16,25 +17,40 @@ Public Class MotionCam_Basics : Inherits TaskParent
             knn.queries.Add(lp.ep2)
             lpList.Add(lp)
         Next
+        knn.Run(emptyMat)
 
-        dst2 = src.Clone
-        For Each lp In lpList
-            lp = HullLine_EdgePoints.EdgePointOffset(lp, 1)
+        For Each lpIn In lpList
+            Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         Static lpLast As New List(Of lpData)(task.lineRGB.lpList)
-        For Each lp In lpLast
-            lp = HullLine_EdgePoints.EdgePointOffset(lp, 5)
+        For Each lpIn In lpLast
+            Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, white, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, white, -1, task.lineType)
         Next
 
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         lpLast = New List(Of lpData)(task.lineRGB.lpList)
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
-        labels(2) = CStr(task.lineRGB.lpList.Count * 2) + " edge points found."
+        Dim offsets As New List(Of Single)
+        For i = 0 To knn.queries.Count - 1
+            Dim p1 = knn.queries(i)
+            Dim index = knn.result(i, 0)
+            If index >= knn.trainInput.Count Then Continue For
+            Dim p2 = knn.trainInput(index)
+            Dim distance = p1.DistanceTo(p2)
+            If distance < minDistance Then offsets.Add(p1.DistanceTo(p2))
+        Next
+        If offsets.Count > 0 Then
+            Dim average = offsets.Average
+            If task.heartBeat Then
+                labels(2) = CStr(task.lineRGB.lpList.Count * 2) + " edge points found.  Average distance offset: " +
+                            Format(average, fmt3)
+            End If
+        End If
     End Sub
 End Class
 
