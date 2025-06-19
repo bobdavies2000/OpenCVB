@@ -111,10 +111,10 @@ Public Class FindCells_Lines : Inherits TaskParent
         desc = "Find the cells containing lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        If task.hullLines.lpList.Count = 0 Then Exit Sub
 
         dst1.SetTo(0)
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.hullLines.lpList
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
         Next
 
@@ -190,10 +190,10 @@ Public Class FindCells_LineGaps : Inherits TaskParent
         desc = "Find cells that have a gap in depth from their neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        If task.hullLines.lpList.Count = 0 Then Exit Sub
 
         dst1.SetTo(0)
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.hullLines.lpList
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
         Next
 

@@ -502,36 +502,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
     Public b As Single
-    Public Sub BuildLongLine()
-        If p1.X <> p2.X Then
-            Dim b = p1.Y - p1.X * m
-            If p1.Y = p2.Y Then
-                ep1 = New cv.Point2f(0, p1.Y)
-                ep2 = New cv.Point2f(task.workingRes.Width, p1.Y)
-                Exit Sub
-            Else
-                Dim x1 = -b / m
-                Dim x2 = (task.workingRes.Height - b) / m
-                Dim y1 = b
-                Dim y2 = m * task.workingRes.Width + b
-
-                Dim pts As New List(Of cv.Point2f)
-                If x1 >= 0 And x1 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x1, 0))
-                If x2 >= 0 And x2 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x2, task.workingRes.Height))
-                If y1 >= 0 And y1 <= task.workingRes.Height Then pts.Add(New cv.Point2f(0, y1))
-                If y2 >= 0 And y2 <= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, y2))
-                ep1 = pts(0)
-                If pts.Count < 2 Then
-                    If CInt(x2) >= task.workingRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workingRes.Height))
-                    If CInt(y2) >= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
-                End If
-                ep2 = pts(1)
-                Exit Sub
-            End If
-        End If
-        ep1 = New cv.Point2f(p1.X, 0)
-        ep2 = New cv.Point2f(p1.X, task.workingRes.Height)
-    End Sub
     Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
         Dim perpSlope = -1 / m
         Dim angleRadians As Double = Math.Atan(perpSlope)
@@ -561,10 +531,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         p1 = validatePoint(_p1)
         p2 = validatePoint(_p2)
 
-        ' convention: p1 has closer depth than p2.  Switch if not...
-        Dim brick1 = task.bbo.brickList(task.bbo.brickMap.Get(Of Single)(p1.Y, p1.X))
-        Dim brick2 = task.bbo.brickList(task.bbo.brickMap.Get(Of Single)(p2.Y, p2.X))
-        If brick1.depth > brick2.depth Then
+        If p1.X > p2.X Then
             Dim ptTemp = p1
             p1 = p2
             p2 = ptTemp
@@ -586,9 +553,9 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             ' handle the special case of slope 0
             Dim stepSize = If(p1.Y > p2.Y, -task.cellSize, task.cellSize)
             For y = p1.Y To p2.Y Step stepSize
-                Dim index = task.bbo.brickMap.Get(Of Single)(y, p1.X)
+                Dim index = task.grid.gridMap.Get(Of Single)(y, p1.X)
                 bricks.Add(index)
-                brickptList.Add(task.bbo.brickList(index).rect.TopLeft)
+                brickptList.Add(task.gridRects(index).TopLeft)
             Next
         Else
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
@@ -596,20 +563,20 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                 Dim stepSize = If(p1.X > p2.X, -1, 1)
                 For x = p1.X To p2.X Step stepSize
                     Dim y = m * x + b
-                    Dim index = task.bbo.brickMap.Get(Of Single)(y, x)
+                    Dim index = task.grid.gridMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
-                        brickptList.Add(task.bbo.brickList(index).rect.TopLeft)
+                        brickptList.Add(task.gridRects(index).TopLeft)
                     End If
                 Next
             Else
                 Dim stepSize = If(p1.Y > p2.Y, -1, 1)
                 For y = p1.Y To p2.Y Step stepSize
                     Dim x = (y - b) / m
-                    Dim index = task.bbo.brickMap.Get(Of Single)(y, x)
+                    Dim index = task.grid.gridMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
-                        brickptList.Add(task.bbo.brickList(index).rect.TopLeft)
+                        brickptList.Add(task.gridRects(index).TopLeft)
                     End If
                 Next
             End If
@@ -625,7 +592,35 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         If minX + w >= task.workingRes.Width Then w = task.workingRes.Width - minX
         If minY + h >= task.workingRes.Height Then h = task.workingRes.Height - minY
         rect = New cv.Rect(minX, minY, w, h)
-        BuildLongLine()
+
+        If p1.X <> p2.X Then
+            Dim b = p1.Y - p1.X * m
+            If p1.Y = p2.Y Then
+                ep1 = New cv.Point2f(0, p1.Y)
+                ep2 = New cv.Point2f(task.workingRes.Width, p1.Y)
+                Exit Sub
+            Else
+                Dim x1 = -b / m
+                Dim x2 = (task.workingRes.Height - b) / m
+                Dim y1 = b
+                Dim y2 = m * task.workingRes.Width + b
+
+                Dim pts As New List(Of cv.Point2f)
+                If x1 >= 0 And x1 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x1, 0))
+                If x2 >= 0 And x2 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x2, task.workingRes.Height))
+                If y1 >= 0 And y1 <= task.workingRes.Height Then pts.Add(New cv.Point2f(0, y1))
+                If y2 >= 0 And y2 <= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, y2))
+                ep1 = pts(0)
+                If pts.Count < 2 Then
+                    If CInt(x2) >= task.workingRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workingRes.Height))
+                    If CInt(y2) >= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
+                End If
+                ep2 = pts(1)
+                Exit Sub
+            End If
+        End If
+        ep1 = New cv.Point2f(p1.X, 0)
+        ep2 = New cv.Point2f(p1.X, task.workingRes.Height)
     End Sub
     Sub New()
         p1 = New cv.Point2f()

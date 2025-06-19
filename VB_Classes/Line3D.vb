@@ -24,11 +24,11 @@ Public Class Line3D_Basics : Inherits TaskParent
 
         lines3D.Clear()
 
-        For Each lp In task.lineRGB.lpList
-            Dim gc1 = brickList(task.bbo.brickMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+        For Each lp In task.hullLines.lpList
+            Dim gc1 = brickList(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
             If gc1.depth = 0 Then Continue For
 
-            Dim gc2 = brickList(task.bbo.brickMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+            Dim gc2 = brickList(task.grid.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
             If gc2.depth = 0 Then Continue For
 
             lines3D.Add(New cv.Point3f(0, 0.9, 0.9))
@@ -45,7 +45,7 @@ Public Class Line3D_Basics : Inherits TaskParent
 
         If task.heartBeat Then
             strOut = CStr(lines3D.Count / 3) + " 3D lines are prepared in lines3D." + vbCrLf +
-                     CStr(task.lineRGB.lpList.Count - lines3D.Count / 3) + " lines occurred in areas with no depth and were skipped."
+                     CStr(task.hullLines.lpList.Count - lines3D.Count / 3) + " lines occurred in areas with no depth and were skipped."
         End If
         SetTrueText(strOut, 3)
     End Sub

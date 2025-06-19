@@ -106,7 +106,7 @@ Public Class Stable_Lines : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         basics.facetGen.inputPoints.Clear()
         dst1 = src.Clone
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.hullLines.lpList
             basics.facetGen.inputPoints.Add(lp.p1)
             basics.facetGen.inputPoints.Add(lp.p2)
             DrawLine(dst1, lp.p1, lp.p2, task.highlight)
@@ -122,7 +122,7 @@ Public Class Stable_Lines : Inherits TaskParent
             End If
         Next
         labels(2) = basics.labels(2)
-        labels(3) = CStr(task.lineRGB.lpList.Count) + " line end points were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(3) = CStr(task.hullLines.lpList.Count) + " line end points were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class
 

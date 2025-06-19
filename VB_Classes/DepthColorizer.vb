@@ -2,6 +2,8 @@
 Imports cv = OpenCvSharp
 Public Class DepthColorizer_Basics : Inherits TaskParent
     Public Sub New()
+        cPtr = Depth_Colorizer_Open()
+
         Dim gradientWidth = Math.Min(dst2.Width, 256)
         Dim f As Double = 1.0
         If saveVecColors.Count = 1 Then
@@ -53,30 +55,43 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.GridDepth.Checked Then
-            task.depthRGB = task.bbo.dst2
-        Else
-            dst1.SetTo(0)
-            If task.gOptions.DepthCorrelations.Checked Then
-                For Each brick In task.bbo.brickList
-                    If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
-                Next
-            Else
-                For Each brick In task.bbo.brickList
-                    If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
-                Next
-            End If
+        'If task.gOptions.GridDepth.Checked Then
+        '    task.depthRGB = task.bbo.dst2
+        'Else
+        '    dst1.SetTo(0)
+        '    If task.gOptions.DepthCorrelations.Checked Then
+        '        For Each brick In task.bbo.brickList
+        '            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
+        '        Next
+        '    Else
+        '        For Each brick In task.bbo.brickList
+        '            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
+        '        Next
+        '    End If
 
-            If task.gOptions.DepthCorrelations.Checked Then
-                task.depthRGB = ShowPaletteCorrelation(dst1)
-            Else
-                task.depthRGB = ShowPaletteDepth(dst1)
-            End If
-            task.depthRGB.SetTo(0, task.noDepthMask)
-        End If
-        labels(2) = task.bbo.labels(2)
+        '    If task.gOptions.DepthCorrelations.Checked Then
+        '        task.depthRGB = ShowPaletteCorrelation(dst1)
+        '    Else
+        '        task.depthRGB = ShowPaletteDepth(dst1)
+        '    End If
+        '    task.depthRGB.SetTo(0, task.noDepthMask)
+        'End If
+        'labels(2) = task.bbo.labels(2)
 
-        If standaloneTest() Then dst2 = task.depthRGB
+        'If standaloneTest() Then dst2 = task.depthRGB
+
+        Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
+        Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
+        Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
+        Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
+        handleSrc.Free()
+
+        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+
+        task.depthRGB = dst2
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
     End Sub
 End Class
 

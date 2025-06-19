@@ -281,7 +281,7 @@ Public Class Contour_Features : Inherits TaskParent
         For Each pt In task.features
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
             dst3.Circle(pt, task.DotSize, task.highlight, -1)
-            Dim index = task.bbo.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.bbo.brickList(index)
             SetTrueText(Format(brick.correlation, fmt1), pt, 3)
         Next
@@ -355,7 +355,7 @@ Public Class Contour_LineRGB : Inherits TaskParent
         dst2 = task.contours.dst2
         labels(2) = task.contours.labels(2)
 
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.hullLines.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub

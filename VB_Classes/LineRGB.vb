@@ -174,7 +174,7 @@ Public Class LineRGB_BasicsAlternative : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines across frames using the motion mask.  Results are in task.linergb.lpList."
+        desc = "Collect lines across frames using the motion mask.  Results are in task.hullLines.lpList."
     End Sub
     Private Function getLineCounts(lpList As List(Of lpData)) As Single()
         Dim histarray(lpList.Count - 1) As Single
@@ -193,7 +193,7 @@ Public Class LineRGB_BasicsAlternative : Inherits TaskParent
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then task.lineRGB.lpList.Clear()
+        If task.optionsChanged Then task.hullLines.lpList.Clear()
 
         Dim histArray = getLineCounts(lines.lpList)
         Dim newList As New List(Of lpData)
@@ -207,10 +207,10 @@ Public Class LineRGB_BasicsAlternative : Inherits TaskParent
 
         If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable.Clone)
 
-        histArray = getLineCounts(task.lineRGB.lpList)
+        histArray = getLineCounts(task.hullLines.lpList)
         For i = histArray.Count - 1 To 1 Step -1
             If histArray(i) Then
-                newList.Add(task.lineRGB.lpList(i)) ' Add the lines in the motion mask.
+                newList.Add(task.hullLines.lpList(i)) ' Add the lines in the motion mask.
             End If
         Next
 
@@ -224,18 +224,18 @@ Public Class LineRGB_BasicsAlternative : Inherits TaskParent
             If lp.length > 0 Then sortlines.Add(lp.length, lp)
         Next
 
-        task.lineRGB.lpList.Clear()
+        task.hullLines.lpList.Clear()
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-        task.lineRGB.lpList.Add(New lpData(New cv.Point, New cv.Point))
+        task.hullLines.lpList.Add(New lpData(New cv.Point, New cv.Point))
 
         dst2 = src
         For Each lp In sortlines.Values
-            lp.index = task.lineRGB.lpList.Count
-            task.lineRGB.lpList.Add(lp)
+            lp.index = task.hullLines.lpList.Count
+            task.hullLines.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
-        labels(2) = CStr(task.lineRGB.lpList.Count) + " lines were found."
+        labels(2) = CStr(task.hullLines.lpList.Count) + " lines were found."
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
     End Sub
 End Class
@@ -323,7 +323,7 @@ Public Class LineRGB_Intercepts : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        If task.hullLines.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
         p1List.Clear()
@@ -334,7 +334,7 @@ Public Class LineRGB_Intercepts : Inherits TaskParent
         leftIntercepts.Clear()
         rightIntercepts.Clear()
         Dim index As Integer
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.hullLines.lpList
             Dim minXX = Math.Min(lp.p1.X, lp.p2.X)
             If lp.p1.X <> minXX Then ' leftmost point is always in p1
                 Dim tmp = lp.p1
@@ -434,27 +434,27 @@ Public Class LineRGB_Info : Inherits TaskParent
         desc = "Display details about the line selected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = task.lineRGB.labels(2) + " - Use the global option 'DebugSlider' to select a line."
+        labels(2) = task.hullLines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
-        If task.lineRGB.lpList.Count <= 1 Then Exit Sub
+        If task.hullLines.lpList.Count <= 1 Then Exit Sub
         If standaloneTest() Then
             dst2.SetTo(0)
-            For Each lp In task.lineRGB.lpList
+            For Each lp In task.hullLines.lpList
                 dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
                 DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
             Next
         End If
 
         Dim lpIndex = Math.Abs(task.gOptions.DebugSlider.Value)
-        If lpIndex < task.lineRGB.lpList.Count Then task.lpD = task.lineRGB.lpList(lpIndex)
+        If lpIndex < task.hullLines.lpList.Count Then task.lpD = task.hullLines.lpList(lpIndex)
 
         strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
-        strOut += CStr(task.lineRGB.lpList.Count) + " lines found " + vbCrLf + vbCrLf
+        strOut += CStr(task.hullLines.lpList.Count) + " lines found " + vbCrLf + vbCrLf
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
         strOut += "Line ID = " + CStr(task.lpD.index) + vbCrLf + vbCrLf
-        strOut += "brickMap element = " + CStr(task.lpD.index) + vbCrLf
+        strOut += "index = " + CStr(task.lpD.index) + vbCrLf
         strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf + vbCrLf
@@ -485,7 +485,7 @@ Public Class LineRGB_ViewLeftRight : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(task.leftView)
         dst2.SetTo(0)
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.hullLines.lpList
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth)
         Next
         labels(2) = lines.labels(2)
@@ -717,10 +717,12 @@ End Class
 
 Public Class LineRGB_HorizontalTrig : Inherits TaskParent
     Public horizList As New List(Of lpData)
+    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Find all the Horizontal lines with horizon vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
         dst2 = src
 
         Dim p1 = task.horizonVec.p1, p2 = task.horizonVec.p2
@@ -729,7 +731,7 @@ Public Class LineRGB_HorizontalTrig : Inherits TaskParent
         Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
 
         horizList.Clear()
-        For Each lp In task.lineRGB.rawLines.lpList
+        For Each lp In lines.rawLines.lpList
             If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
 
             sideOpposite = lp.p2.Y - lp.p1.Y
@@ -750,10 +752,12 @@ End Class
 
 Public Class LineRGB_VerticalTrig : Inherits TaskParent
     Public vertList As New List(Of lpData)
+    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
         dst2 = src
 
         Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
@@ -762,7 +766,7 @@ Public Class LineRGB_VerticalTrig : Inherits TaskParent
         Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
 
         vertList.Clear()
-        For Each lp In task.lineRGB.rawLines.lpList
+        For Each lp In lines.lpList
             If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
 
             sideOpposite = lp.p2.X - lp.p1.X
@@ -789,10 +793,12 @@ End Class
 Public Class LineRGB_GravityToAverage : Inherits TaskParent
     Public vertList As New List(Of lpData)
     Dim kalman As New Kalman_Basics
+    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Highlight both vertical and horizontal lines - not terribly good..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
         Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
 
         kalman.kInput = {gravityDelta}
@@ -800,9 +806,9 @@ Public Class LineRGB_GravityToAverage : Inherits TaskParent
         gravityDelta = kalman.kOutput(0)
 
         dst2 = src
-        If standalone Then dst3 = task.lineRGB.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then dst3 = lines.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim deltaList As New List(Of Single)
-        For Each lp In task.lineRGB.rawLines.lpList
+        For Each lp In lines.rawLines.lpList
             If lp.vertical And Math.Sign(task.gravityVec.m) = Math.Sign(lp.m) Then
                 Dim delta = lp.ep1.X - lp.ep2.X
                 If Math.Abs(gravityDelta - delta) < 3 Then
@@ -836,10 +842,13 @@ End Class
 Public Class LineRGB_GravityToLongest : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Dim matchLine As New MatchLine_Basics
+    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Highlight both vertical and horizontal lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
+
         Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
 
         kalman.kInput = {gravityDelta}
@@ -847,7 +856,7 @@ Public Class LineRGB_GravityToLongest : Inherits TaskParent
         gravityDelta = kalman.kOutput(0)
 
         matchLine.lpInput = Nothing
-        For Each lp In task.lineRGB.rawLines.lpList
+        For Each lp In Lines.rawLines.lpList
             If lp.vertical Then
                 matchLine.lpInput = lp
                 Exit For
@@ -856,11 +865,11 @@ Public Class LineRGB_GravityToLongest : Inherits TaskParent
         If matchLine.lpInput Is Nothing Then Exit Sub
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        dst3 = task.lineRGB.rawLines.dst2
+        dst3 = lines.rawLines.dst2
 
-        'If standalone Then dst3 = task.lineRGB.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        'If standalone Then dst3 = task.hullLines.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         'Dim deltaList As New List(Of Single)
-        'For Each lp In task.lineRGB.rawLines.lpList
+        'For Each lp In task.hullLines.rawLines.lpList
         '    If lp.vertical And Math.Sign(task.gravityVec.m) = Math.Sign(lp.m) Then
         '        Dim delta = lp.ep1.X - lp.ep2.X
         '        If Math.Abs(gravityDelta - delta) < 3 Then

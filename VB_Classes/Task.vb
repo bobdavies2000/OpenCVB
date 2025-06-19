@@ -115,7 +115,7 @@ Public Class VBtask : Implements IDisposable
 
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
-    Public lineRGB As LineRGB_Basics
+    Public hullLines As HullLine_Basics
     Public bbo As Brick_Basics
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
@@ -512,9 +512,9 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        bbo = New Brick_Basics
+        'bbo = New Brick_Basics
         grid = New Grid_Basics
-        lineRGB = New LineRGB_Basics
+        hullLines = New HullLine_Basics
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
         LRMeanSub = New MeanSubtraction_LeftRight
@@ -750,7 +750,7 @@ Public Class VBtask : Implements IDisposable
 
         edges.Run(task.grayStable)
         contours.Run(src)
-        bbo.Run(src)
+        'bbo.Run(src)
 
         task.colorizer.Run(src)
 
@@ -789,7 +789,7 @@ Public Class VBtask : Implements IDisposable
 
         gravityHorizon.Run(src)
 
-        lineRGB.Run(src.Clone)
+        hullLines.Run(src)
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True

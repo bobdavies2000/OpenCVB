@@ -119,7 +119,7 @@ Public Class Brick_Plot : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.bbo.dst2
 
-        Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.bbo.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim brick As brickData
@@ -502,7 +502,7 @@ Public Class Brick_Features : Inherits TaskParent
         task.featurePoints.Clear()
         Dim rects As New List(Of cv.Rect)
         For Each pt In task.features
-            Dim index As Integer = task.bbo.brickMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.bbo.brickList(index)
             If features(index) Is Nothing Then features(index) = New List(Of cv.Point)
             features(index).Add(pt)
@@ -579,7 +579,7 @@ Public Class Brick_RegionLines : Inherits TaskParent
         dst3 = regions.dst3
         labels = regions.labels
 
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.hullLines.lpList
             Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
             Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
             If c1 <> c2 Then
@@ -615,7 +615,7 @@ Public Class Brick_Correlation : Inherits TaskParent
             dst3 = task.rightView
         End If
 
-        Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.bbo.brickList.Count Then Exit Sub
 
         Dim brick = task.bbo.brickList(index)
@@ -643,7 +643,7 @@ Public Class Brick_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.bbo.labels(2)
 
-        Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim brick As brickData = task.bbo.brickList(index)
         dst2 = src
@@ -733,7 +733,7 @@ Public Class Brick_Lines : Inherits TaskParent
         desc = "Lines can mean cells are connected - click on any highlighted brick to see info on that line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lineRGB.dst2
+        dst2 = task.hullLines.dst2
 
         dst3.SetTo(0)
         If task.heartBeat Then info.Run(emptyMat)
@@ -745,7 +745,7 @@ Public Class Brick_Lines : Inherits TaskParent
 
         SetTrueText(info.strOut, 3)
 
-        labels(2) = task.lineRGB.labels(2) + " - Click on any line in below to get details on that line."
+        labels(2) = task.hullLines.labels(2) + " - Click on any line in below to get details on that line."
     End Sub
 End Class
 
@@ -770,12 +770,12 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
 
         Static myBricks As New List(Of Integer)
         If standalone And task.testAllRunning Then
-            Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
             For i = index To index + 10
                 If myBricks.Contains(i) = False Then myBricks.Add(i)
             Next
         Else
-            Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             If myBricks.Contains(index) = False Then myBricks.Add(index)
         End If
 
@@ -802,7 +802,7 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim index As Integer = task.bbo.brickMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim brick As brickData
         If index > 0 And index < task.bbo.brickList.Count Then
             brick = task.bbo.brickList(index)

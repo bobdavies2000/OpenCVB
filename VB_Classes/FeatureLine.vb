@@ -12,14 +12,14 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         If standalone Then
             labels(3) = "Currently available lines."
             dst3.SetTo(0)
-            For Each lp In task.lineRGB.lpList
+            For Each lp In task.hullLines.lpList
                 dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
         End If
 
         dst2 = src.Clone
-        If task.lineRGB.lpList.Count > 1 Then
-            task.lpD = task.lineRGB.lpList(0)
+        If task.hullLines.lpList.Count > 1 Then
+            task.lpD = task.hullLines.lpList(0)
             dst2.Line(task.lpD.ep1, task.lpD.ep2, task.highlight, task.lineWidth + 1, task.lineType)
             dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
 

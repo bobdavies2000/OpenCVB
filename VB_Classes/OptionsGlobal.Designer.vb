@@ -402,6 +402,7 @@ Partial Class OptionsGlobal
         Me.DepthGroupBox.TabIndex = 78
         Me.DepthGroupBox.TabStop = False
         Me.DepthGroupBox.Text = "Depth Display"
+        Me.DepthGroupBox.Visible = False
         '
         'GridDepth
         '
@@ -416,18 +417,17 @@ Partial Class OptionsGlobal
         'DepthCorrelations
         '
         Me.DepthCorrelations.AutoSize = True
-        Me.DepthCorrelations.Checked = True
         Me.DepthCorrelations.Location = New System.Drawing.Point(16, 69)
         Me.DepthCorrelations.Name = "DepthCorrelations"
         Me.DepthCorrelations.Size = New System.Drawing.Size(167, 24)
         Me.DepthCorrelations.TabIndex = 2
-        Me.DepthCorrelations.TabStop = True
         Me.DepthCorrelations.Text = "Depth Correlations"
         Me.DepthCorrelations.UseVisualStyleBackColor = True
         '
         'ColorizedDepth
         '
         Me.ColorizedDepth.AutoSize = True
+        Me.ColorizedDepth.Checked = True
         Me.ColorizedDepth.Location = New System.Drawing.Point(16, 35)
         Me.ColorizedDepth.Name = "ColorizedDepth"
         Me.ColorizedDepth.Size = New System.Drawing.Size(148, 24)
