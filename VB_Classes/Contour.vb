@@ -199,7 +199,8 @@ Public Class Contour_Bricks : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = ShowPalette(task.contours.contourMap)
-        dst2.SetTo(white, task.contours.contourMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
+        task.contours.contourMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertTo(dst1, cv.MatType.CV_8U)
+        dst2.SetTo(white, dst1)
 
         task.contourD = Contour_Basics.selectContour()
 

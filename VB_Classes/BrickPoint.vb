@@ -343,7 +343,8 @@ Public Class BrickPoint_RedCloud : Inherits TaskParent
         dst2 = task.contours.dst2
         labels(2) = task.contours.labels(2)
 
-        dst3 = runRedC(src, labels(3), task.contours.contourMap)
+        task.contours.contourMap.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3 = runRedC(src, labels(3), dst1)
     End Sub
 End Class
 
