@@ -22,9 +22,6 @@ Public Class MeanSubtraction_LeftRight : Inherits TaskParent
         desc = "Apply mean subtraction to the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.LRMeanSubtraction.Checked Then
-            If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
-        End If
         LRMeanSub.Run(task.leftView)
         dst2 = LRMeanSub.dst2.Clone
         labels(2) = "LeftView image"

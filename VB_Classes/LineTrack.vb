@@ -44,7 +44,7 @@ Public Class LineTrack_Map : Inherits TaskParent
         dst3.SetTo(0)
         Dim histarray(task.redC.rcList.Count - 1) As Single
         Dim histogram As New cv.Mat
-        For Each brick In task.bbo.brickList
+        For Each brick In task.brickList
             cv.Cv2.CalcHist({task.redC.rcMap(brick.rect)}, {0}, emptyMat, histogram, 1, {task.redC.rcList.Count},
                              New cv.Rangef() {New cv.Rangef(1, task.redC.rcList.Count)})
 

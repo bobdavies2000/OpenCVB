@@ -780,7 +780,7 @@ Public Class XO_Brick_GrayScaleTest : Inherits TaskParent
             dst3.SetTo(0)
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim count As Integer
-            For Each brick In task.bbo.brickList
+            For Each brick In task.brickList
                 cv.Cv2.MeanStdDev(dst2(brick.rect), grayMean, grayStdev)
                 cv.Cv2.MeanStdDev(task.color(brick.rect), ColorMean, colorStdev)
                 Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
@@ -1946,6 +1946,7 @@ Public Class XO_Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean = True
     Dim lastCorrelation() As Single
     Public quad As New XO_Quad_Basics
+    Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
         task.rgbLeftAligned = If(task.cameraName.StartsWith("StereoLabs") Or task.cameraName.StartsWith("Orbbec"), True, False)
         desc = "Create the grid of bricks that reduce depth volatility"
@@ -1956,12 +1957,12 @@ Public Class XO_Brick_Basics : Inherits TaskParent
             ReDim lastCorrelation(task.gridRects.Count - 1)
         End If
 
+        LRMeanSub.Run(src)
+
         Dim stdev As cv.Scalar, mean As cv.Scalar
         Dim correlationMat As New cv.Mat
-        Dim leftview = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
-        Dim rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
 
-        task.bbo.brickList.Clear()
+        task.brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             brick.rect = task.gridRects(i)
@@ -1984,7 +1985,7 @@ Public Class XO_Brick_Basics : Inherits TaskParent
                     brick.rRect = brick.lRect
                     brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
                     brick.rRect = ValidateRect(brick.rRect)
-                    cv.Cv2.MatchTemplate(leftview(brick.lRect), rightView(brick.rRect), correlationMat,
+                    cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)
 
                     brick.correlation = correlationMat.Get(Of Single)(0, 0)
@@ -2001,7 +2002,7 @@ Public Class XO_Brick_Basics : Inherits TaskParent
                         brick.rRect = brick.lRect
                         brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
                         brick.rRect = ValidateRect(brick.rRect)
-                        cv.Cv2.MatchTemplate(leftview(brick.lRect), rightView(brick.rRect), correlationMat,
+                        cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
                                                       cv.TemplateMatchModes.CCoeffNormed)
 
                         brick.correlation = correlationMat.Get(Of Single)(0, 0)
@@ -2010,14 +2011,14 @@ Public Class XO_Brick_Basics : Inherits TaskParent
             End If
 
             lastCorrelation(i) = brick.correlation
-            brick.index = task.bbo.brickList.Count
+            brick.index = task.brickList.Count
             task.grid.gridMap(brick.rect).SetTo(i)
-            task.bbo.brickList.Add(brick)
+            task.brickList.Add(brick)
         Next
 
         quad.Run(src)
 
-        If task.heartBeat Then labels(2) = CStr(task.bbo.brickList.Count) + " bricks have the useful depth values."
+        If task.heartBeat Then labels(2) = CStr(task.brickList.Count) + " bricks have the useful depth values."
     End Sub
 End Class
 
@@ -2038,8 +2039,8 @@ Public Class XO_Quad_Basics : Inherits TaskParent
 
         task.grid.gridMap.SetTo(0)
         dst2.SetTo(0)
-        For i = 0 To task.bbo.brickList.Count - 1
-            Dim brick = task.bbo.brickList(i)
+        For i = 0 To task.brickList.Count - 1
+            Dim brick = task.brickList(i)
             task.grid.gridMap(brick.rect).SetTo(i)
             If brick.depth > 0 Then
                 brick.corners.Clear()
@@ -2668,8 +2669,8 @@ Public Class XO_Region_RectsH : Inherits TaskParent
         Dim index As Integer
         For Each tup In connect.hTuples
             If tup.Item1 = tup.Item2 Then Continue For
-            Dim brick1 = task.bbo.brickList(tup.Item1)
-            Dim brick2 = task.bbo.brickList(tup.Item2)
+            Dim brick1 = task.brickList(tup.Item1)
+            Dim brick2 = task.brickList(tup.Item2)
 
             Dim w = brick2.rect.BottomRight.X - brick1.rect.X
             Dim h = brick1.rect.Height
@@ -2706,8 +2707,8 @@ Public Class XO_Region_RectsV : Inherits TaskParent
         Dim index As Integer
         For Each tup In connect.vTuples
             If tup.Item1 = tup.Item2 Then Continue For
-            Dim brick1 = task.bbo.brickList(tup.Item1)
-            Dim brick2 = task.bbo.brickList(tup.Item2)
+            Dim brick1 = task.brickList(tup.Item1)
+            Dim brick2 = task.brickList(tup.Item2)
 
             Dim w = brick1.rect.Width
             Dim h = brick2.rect.BottomRight.Y - brick1.rect.Y
@@ -2783,14 +2784,14 @@ Public Class XO_Region_Gaps : Inherits TaskParent
 
         For Each tup In connect.hTuples
             If tup.Item2 - tup.Item1 = 0 Then
-                Dim brick = task.bbo.brickList(tup.Item1)
+                Dim brick = task.brickList(tup.Item1)
                 dst2(brick.rect).SetTo(0)
             End If
         Next
 
         For Each tup In connect.vTuples
-            Dim brick1 = task.bbo.brickList(tup.Item1)
-            Dim brick2 = task.bbo.brickList(tup.Item2)
+            Dim brick1 = task.brickList(tup.Item1)
+            Dim brick2 = task.brickList(tup.Item2)
             If brick2.rect.Y - brick1.rect.Y = 0 Then
                 dst2(brick1.rect).SetTo(0)
                 dst3(brick1.rect).SetTo(0)
@@ -2851,7 +2852,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
             DrawContour(dst1, facets, 255, task.lineWidth)
             DrawContour(task.fpMap, facets, lp.index)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim brick = task.bbo.brickList(task.grid.gridMap.Get(Of Single)(center.Y, center.X))
+            Dim brick = task.brickList(task.grid.gridMap.Get(Of Single)(center.Y, center.X))
             task.hullLines.lpList(i) = lp
         Next
 
@@ -3766,12 +3767,12 @@ Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
         edges.Run(task.grayStable.Clone)
 
         dst0.SetTo(0)
-        Dim brickPrev = task.bbo.brickList(0)
+        Dim brickPrev = task.brickList(0)
         Dim fLessCount As Integer = 1
-        For Each brick In task.bbo.brickList
+        For Each brick In task.brickList
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
 
-            Dim brickAbove = task.bbo.brickList(brick.index - task.cellsPerRow)
+            Dim brickAbove = task.brickList(brick.index - task.cellsPerRow)
             Dim val = brickAbove.contourFull
             If val = 0 Then val = dst0.Get(Of Byte)(brickPrev.rect.Y, brickPrev.rect.X)
             Dim count = edges.dst2(brick.rect).CountNonZero
@@ -3786,15 +3787,15 @@ Public Class XO_BrickPoint_FeatureLessOld2 : Inherits TaskParent
             brickPrev = brick
         Next
 
-        For i = task.bbo.brickList.Count - 1 To 1 Step -1
-            Dim brick = task.bbo.brickList(i)
+        For i = task.brickList.Count - 1 To 1 Step -1
+            Dim brick = task.brickList(i)
             If brick.contourFull > 0 Then
-                brickPrev = task.bbo.brickList(i - 1)
+                brickPrev = task.brickList(i - 1)
                 If brickPrev.contourFull > 0 And brickPrev.contourFull <> 0 And brickPrev.contourFull <> brick.contourFull And
                     brickPrev.contourFull <> 0 Then
                     brickPrev.contourFull = brick.contourFull
                     dst0(brickPrev.rect).SetTo(brick.contourFull)
-                    task.bbo.brickList(i - 1) = brickPrev
+                    task.brickList(i - 1) = brickPrev
                 End If
             End If
         Next
@@ -3822,7 +3823,7 @@ Public Class XO_BrickPoint_FeatureLessOld : Inherits TaskParent
         edges.Run(task.grayStable.Clone)
 
         fLessMask.SetTo(0)
-        For Each brick In task.bbo.brickList
+        For Each brick In task.brickList
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
 
             If edges.dst2(brick.rect).CountNonZero = 0 Then
@@ -3831,12 +3832,12 @@ Public Class XO_BrickPoint_FeatureLessOld : Inherits TaskParent
             End If
         Next
 
-        Dim brickPrev = task.bbo.brickList(0)
+        Dim brickPrev = task.brickList(0)
         classCount = 0
-        For Each brick In task.bbo.brickList
+        For Each brick In task.brickList
             If brick.rect.X = 0 Or brick.rect.Y = 0 Then Continue For
             If brick.contourFull = 255 Then
-                Dim brickAbove = task.bbo.brickList(brick.index - task.cellsPerRow)
+                Dim brickAbove = task.brickList(brick.index - task.cellsPerRow)
                 Dim val = brickAbove.contourFull
                 If val = 0 Then val = brickPrev.contourFull
                 If val = 0 And brick.contourFull <> 0 Then
@@ -4154,8 +4155,8 @@ Public Class XO_LineRect_CenterDepth : Inherits TaskParent
             Dim lpPerp = lp.perpendicularPoints(center, task.cellSize)
             Dim index1 As Integer = task.grid.gridMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
             Dim index2 As Integer = task.grid.gridMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
-            Dim brick1 = task.bbo.brickList(index1)
-            Dim brick2 = task.bbo.brickList(index2)
+            Dim brick1 = task.brickList(index1)
+            Dim brick2 = task.brickList(index2)
             If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
@@ -4240,7 +4241,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
             lpList.Add(lp)
         Next
 
-        For Each brick In task.bbo.brickList
+        For Each brick In task.brickList
             If dst1(brick.rect).CountNonZero = 0 Then Continue For
             hist.Run(dst1(brick.rect))
             For i = hist.histarray.Count - 1 To 1 Step -1 ' why reverse?  So longer lines will claim the brick last.
@@ -4256,7 +4257,7 @@ Public Class XO_LongLine_Basics : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             For Each index In lp.bricks
-                dst2.Rectangle(task.bbo.brickList(index).rect, task.highlight, task.lineWidth)
+                dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
             Next
         Next
 

@@ -120,16 +120,19 @@ End Class
 Public Class Photon_Distance3D : Inherits TaskParent
     Dim hist As New Hist_Basics
     Dim distances As New List(Of Single)
+    Dim bbo As New Brick_Basics
     Public Sub New()
         hist.plotHist.removeZeroEntry = False
         task.gOptions.setHistogramBins(10)
         task.gOptions.UseMotionMask.Checked = False
         desc = "Plot a histogram of the 3D distance of each picture from the previous image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bbo.Run(src)
+
         Dim currColors As New List(Of cv.Vec3b)
         For Each roi In task.gridRects
-            currColors.Add(task.bbo.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
+            currColors.Add(bbo.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
         Next
 
         Static lastColors As New List(Of cv.Vec3b)(currColors)

@@ -14,11 +14,14 @@ Public Class HullLine_Basics : Inherits TaskParent
         Dim sortedLines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each contour In hulls.contourList
             If contour.hull.Count < 5 Then Continue For
+
             Dim ptLast As cv.Point = contour.hull(0)
             For Each pt In contour.hull
                 Dim distance = pt.DistanceTo(ptLast)
                 If distance > minDistance Then
-                    sortedLines.Add(distance, New lpData(pt, ptLast))
+                    Dim lp = New lpData(pt, ptLast)
+                    lp.indexHull = contour.index
+                    sortedLines.Add(distance, lp)
                 End If
                 ptLast = pt
             Next
@@ -42,6 +45,55 @@ End Class
 
 
 Public Class HullLine_EdgePoints : Inherits TaskParent
+    Dim hullLines As New HullLine_Basics
+    Dim knn As New KNN_EdgePoints
+    Public Sub New()
+        desc = "Find the edge points for the current and last frm for the hull lines."
+    End Sub
+    Public Shared Function EdgePointOffset(lpIn As lpData, offset As Integer) As lpData
+        Dim lp = New lpData(lpIn.p1, lpIn.p2)
+        If lp.ep1.X <= 1 Then lp.ep1.X += offset
+        If lp.ep1.Y <= 1 Then lp.ep1.Y += offset
+        If lp.ep2.X <= 1 Then lp.ep2.X += offset
+        If lp.ep2.Y <= 1 Then lp.ep2.Y += offset
+        If lp.ep1.X >= task.workingRes.Width - 1 Then lp.ep1.X -= offset
+        If lp.ep1.Y >= task.workingRes.Height - 1 Then lp.ep1.Y -= offset
+        If lp.ep2.X >= task.workingRes.Width - 1 Then lp.ep2.X -= offset
+        If lp.ep2.Y >= task.workingRes.Height - 1 Then lp.ep2.Y -= offset
+        Return lp
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hullLines.Run(src)
+        dst3 = hullLines.dst2
+        labels(3) = hullLines.labels(3)
+
+        knn.lpInput = hullLines.lpList
+        knn.Run(emptyMat)
+
+        dst2 = src.Clone
+        Static lpLast = New List(Of lpData)(hullLines.lpList)
+        For Each lpIn In hullLines.lpList
+            Dim lp = EdgePointOffset(lpIn, 1)
+            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+        Next
+
+        For Each lpIn In lpLast
+            Dim lp = EdgePointOffset(lpIn, 5)
+            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, white, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, white, -1, task.lineType)
+        Next
+
+        lpLast = New List(Of lpData)(hullLines.lpList)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class HullLine_KNN : Inherits TaskParent
     Dim hullLines As New HullLine_Basics
     Dim knn As New KNN_EdgePoints
     Public Sub New()

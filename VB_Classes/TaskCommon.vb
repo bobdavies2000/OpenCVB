@@ -498,6 +498,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public rect As cv.Rect
     Public index As Integer
+    Public indexHull As Integer
     Public vertical As Boolean ' false is horizontal
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
@@ -662,21 +663,6 @@ Public Class brickData
     Public intensity As Byte ' sobel maximum intensity in this brick.
     Public pt As cv.Point ' Brick's Sobel maximum in absolute coordinates.
     Sub New()
-        index = task.bbo.brickList.Count
-        rect = task.gridRects(index)
-        lRect = rect
-        rRect = New cv.Rect
-
-        age = task.motionBasics.cellAge(index)
-        color = task.motionBasics.lastColor(index) ' the last color is actually the current color - motion basics runs first.
-        center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
-
-        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))
-
-        If depth > 0 Then
-            task.pcSplit(2)(rect).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(rect))
-            mm.range = mm.maxVal - mm.minVal
-        End If
     End Sub
 End Class
 

@@ -46,7 +46,6 @@ Partial Class OptionsGlobal
         Me.MaxDepthBar = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.LRMeanSubtraction = New System.Windows.Forms.CheckBox()
         Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
         Me.GridDepth = New System.Windows.Forms.RadioButton()
         Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
@@ -348,7 +347,6 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.LRMeanSubtraction)
         Me.GroupBox2.Controls.Add(Me.DepthGroupBox)
         Me.GroupBox2.Controls.Add(Me.TruncateDepth)
         Me.GroupBox2.Controls.Add(Me.MotionBox)
@@ -377,19 +375,6 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
-        '
-        'LRMeanSubtraction
-        '
-        Me.LRMeanSubtraction.AutoSize = True
-        Me.LRMeanSubtraction.Checked = True
-        Me.LRMeanSubtraction.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.LRMeanSubtraction.Location = New System.Drawing.Point(426, 25)
-        Me.LRMeanSubtraction.Name = "LRMeanSubtraction"
-        Me.LRMeanSubtraction.Size = New System.Drawing.Size(308, 24)
-        Me.LRMeanSubtraction.TabIndex = 79
-        Me.LRMeanSubtraction.Text = "MeanSubtraction on Left/Right images"
-        Me.LRMeanSubtraction.UseVisualStyleBackColor = True
-        Me.LRMeanSubtraction.Visible = False
         '
         'DepthGroupBox
         '
@@ -896,6 +881,5 @@ Partial Class OptionsGlobal
     Friend WithEvents DepthGroupBox As Windows.Forms.GroupBox
     Friend WithEvents DepthCorrelations As Windows.Forms.RadioButton
     Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
-    Friend WithEvents LRMeanSubtraction As Windows.Forms.CheckBox
     Friend WithEvents GridDepth As Windows.Forms.RadioButton
 End Class

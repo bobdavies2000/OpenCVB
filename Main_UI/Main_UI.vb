@@ -1718,12 +1718,12 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Dim depthAndCorrelationText As String = ""
+                'Dim depthAndCorrelationText As String = ""
                 Dim ptCursor As New cv.Point
                 Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
                     'Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                    'task.brickD = task.bbo.brickList(index)
+                    'task.brickD = task.brickList(index)
                     'depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
                     '                          CStr(task.brickD.index) + vbCrLf + "range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
                     '                          Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
@@ -1735,7 +1735,7 @@ Public Class Main_UI
                     'Else
                     '    ptTextLoc.Y -= task.brickD.rect.Height * 3
                     'End If
-                    'ptCursor = validatePoint(task.mouseMovePoint)
+                    ptCursor = validatePoint(task.mouseMovePoint)
                     SyncLock trueTextLock
                         Static saveObjectName = task.displayObjectName
                         If saveObjectName <> task.displayObjectName Then
@@ -1752,11 +1752,7 @@ Public Class Main_UI
                     End SyncLock
                 End If
 
-                depthAndCorrelationText = depthAndCorrelationText.Replace(vbCrLf, ", ")
-                If task.displayDst1 = False Or task.labels(1) = "" Then
-                    picLabels(1) = "Correlation bricks - " + CStr(task.cellSize) + "X" + CStr(task.cellSize) + "  " +
-                                   depthAndCorrelationText
-                End If
+                If task.displayDst1 = False Or task.labels(1) = "" Then picLabels(1) = "DepthRGB"
                 If task.dst0 IsNot Nothing Then
                     SyncLock cameraLock
                         dst(0) = task.dst0.Clone

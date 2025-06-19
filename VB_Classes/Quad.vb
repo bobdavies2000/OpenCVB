@@ -343,30 +343,33 @@ End Class
 
 
 Public Class Quad_Boundaries : Inherits TaskParent
+    Dim bbo As New Brick_Basics
     Public Sub New()
         labels(2) = "Depth differences large enough to label them boundaries"
         desc = "Find large differences in depth between cells that could provide boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.bbo.dst2.Clone
+        bbo.Run(src)
+
+        dst2 = bbo.dst2.Clone
         Dim width = dst2.Width / task.cellSize
         Dim height = dst2.Height / task.cellSize
-        For i = 0 To task.bbo.brickList.Count - width Step width
+        For i = 0 To task.brickList.Count - width Step width
             For j = i + 1 To i + width - 1
-                Dim d1 = task.bbo.brickList(j).depth
-                Dim d2 = task.bbo.brickList(j - 1).depth
+                Dim d1 = task.brickList(j).depth
+                Dim d2 = task.brickList(j - 1).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.bbo.brickList(j).rect, task.highlight, -1)
+                    dst2.Rectangle(task.brickList(j).rect, task.highlight, -1)
                 End If
             Next
         Next
 
         For i = 0 To width - 1
             For j = 1 To height - 1
-                Dim d1 = task.bbo.brickList(j * width).depth
-                Dim d2 = task.bbo.brickList((j - 1) * width).depth
+                Dim d1 = task.brickList(j * width).depth
+                Dim d2 = task.brickList((j - 1) * width).depth
                 If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                    dst2.Rectangle(task.bbo.brickList(j).rect, task.highlight, -1)
+                    dst2.Rectangle(task.brickList(j).rect, task.highlight, -1)
                 End If
             Next
         Next

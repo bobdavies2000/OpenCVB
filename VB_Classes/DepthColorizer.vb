@@ -60,11 +60,11 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         'Else
         '    dst1.SetTo(0)
         '    If task.gOptions.DepthCorrelations.Checked Then
-        '        For Each brick In task.bbo.brickList
+        '        For Each brick In task.brickList
         '            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
         '        Next
         '    Else
-        '        For Each brick In task.bbo.brickList
+        '        For Each brick In task.brickList
         '            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
         '        Next
         '    End If

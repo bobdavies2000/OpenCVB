@@ -20,7 +20,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
         For Each lp In lastList
             Dim noMotionTest As Boolean = True
             For Each index In lp.bricks
-                Dim brick = If(index < task.bbo.brickList.Count, task.bbo.brickList(index), task.bbo.brickList(0))
+                Dim brick = If(index < task.brickList.Count, task.brickList(index), task.brickList(0))
                 If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
                     noMotionTest = False
                     Exit For
@@ -37,7 +37,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
         For Each lp In rawLines.lpList
             Dim motionTest As Boolean = False
             For Each index In lp.bricks
-                Dim brick = task.bbo.brickList(index)
+                Dim brick = task.brickList(index)
                 If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
                     motionTest = True
                     Exit For
@@ -633,7 +633,7 @@ Public Class LineRGB_Bricks : Inherits TaskParent
         End If
 
         For Each index In lp.bricks
-            dst2.Rectangle(task.bbo.brickList(index).rect, task.highlight, task.lineWidth)
+            dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
         Next
         labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
     End Sub
@@ -659,7 +659,7 @@ Public Class LineRGB_BricksValidate : Inherits TaskParent
             End If
         End If
         For Each index In lp.bricks
-            dst2.Rectangle(task.bbo.brickList(index).rect, task.highlight, task.lineWidth)
+            dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
         Next
         labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
     End Sub

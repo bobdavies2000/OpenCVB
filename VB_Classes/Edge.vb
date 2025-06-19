@@ -1362,18 +1362,14 @@ End Class
 
 Public Class Edge_MeanSubtraction : Inherits TaskParent
     Dim canny As New Edge_Canny
+    Dim LRMeanSub As New MeanSubtraction_Basics
     Public Sub New()
         desc = "Use canny on the left image of the meanSubtraction task algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.LRMeanSubtraction.Checked Then
-            src = task.LRMeanSub.dst2
-        Else
-            Static LRMeanSub As New MeanSubtraction_Basics
-            LRMeanSub.Run(task.leftView)
-            src = LRMeanSub.dst2
-        End If
-        canny.Run(src)
+        LRMeanSub.Run(src)
+
+        canny.Run(LRMeanSub.dst2)
 
         If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motionMask)
     End Sub

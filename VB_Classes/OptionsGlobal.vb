@@ -366,9 +366,6 @@ Public Class OptionsGlobal
     Private Sub ShowQuadDepth_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-    Private Sub LRMeanSubtraction_CheckedChanged(sender As Object, e As EventArgs) Handles LRMeanSubtraction.CheckedChanged
-        task.optionsChanged = True
-    End Sub
     Private Sub UseMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles UseMotionMask.CheckedChanged
         task.optionsChanged = True
     End Sub

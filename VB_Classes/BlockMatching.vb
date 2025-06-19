@@ -4,6 +4,7 @@ Public Class BlockMatching_Basics : Inherits TaskParent
     Dim colorizer As New DepthColorizer_CPP
     Dim options As New Options_BlockMatching
     Public leftView As cv.Mat, rightView As cv.Mat
+    Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
         labels(2) = "Block matching disparity colorized like depth"
         labels(3) = "Right Image (used with left image)"
@@ -11,6 +12,7 @@ Public Class BlockMatching_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Options.Run()
+        LRMeanSub.Run(src)
 
 #If AZURE_SUPPORT Then
         If task.cameraName = "Azure Kinect 4K" Then
@@ -31,11 +33,8 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         blockMatch.SpeckleRange = 32
         blockMatch.Disp12MaxDiff = 1
 
-        leftView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst2, task.leftView)
-        rightView = If(task.gOptions.LRMeanSubtraction.Checked, task.LRMeanSub.dst3, task.rightView)
-
         Dim disparity As New cv.Mat
-        blockMatch.compute(leftView, rightView, disparity)
+        blockMatch.compute(LRMeanSub.dst2, LRMeanSub.dst3, disparity)
         disparity.ConvertTo(dst1, cv.MatType.CV_32F, 1 / 16)
         dst1 = dst1.Threshold(0, 0, cv.ThresholdTypes.Tozero)
         Dim topMargin = 10, sideMargin = 8

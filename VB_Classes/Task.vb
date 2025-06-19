@@ -116,10 +116,8 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
     Public hullLines As HullLine_Basics
-    Public bbo As Brick_Basics
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
-    Public LRMeanSub As MeanSubtraction_LeftRight
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
@@ -129,6 +127,8 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
+
+    Public brickList As New List(Of brickData)
 
     Public paletteRandom As Palette_RandomColors
     Public kalman As Kalman_Basics
@@ -512,14 +512,13 @@ Public Class VBtask : Implements IDisposable
         gravityHorizon = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        'bbo = New Brick_Basics
         grid = New Grid_Basics
         hullLines = New HullLine_Basics
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
-        LRMeanSub = New MeanSubtraction_LeftRight
         rgbFilter = New Filter_Basics
         redC = New RedColor_Basics
+        'bbo = New Brick_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -725,10 +724,6 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
-        If task.gOptions.LRMeanSubtraction.Checked Then
-            If task.optionsChanged Then task.motionMask.SetTo(255) ' force the change over...
-            LRMeanSub.Run(src)
-        End If
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         motionBasics.Run(src)

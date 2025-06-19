@@ -117,8 +117,7 @@ Public Class Contour_Basics_List : Inherits TaskParent
 
         contourMap.SetTo(0)
         Dim matched As Integer
-        For i = contourList.Count - 1 To 0 Step -1
-            Dim contour = contourList(i)
+        For Each contour In contourList
             Dim indexLast = contourMapLast.Get(Of Single)(contour.maxDist.Y, contour.maxDist.X)
             If indexLast > 0 Then
                 contour.maxDstable = contourLast(indexLast).maxDstable
@@ -282,7 +281,7 @@ Public Class Contour_Features : Inherits TaskParent
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
             dst3.Circle(pt, task.DotSize, task.highlight, -1)
             Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            Dim brick = task.bbo.brickList(index)
+            Dim brick = task.brickList(index)
             SetTrueText(Format(brick.correlation, fmt1), pt, 3)
         Next
         labels(2) = "There are " + CStr(task.contours.contourList.Count) + " contours and " +

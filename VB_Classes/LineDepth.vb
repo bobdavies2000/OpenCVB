@@ -33,7 +33,7 @@ Public Class LineDepth_Basics : Inherits TaskParent
             lp.index = task.logicalLines.Count + 1
             task.logicalLines.Add(lp)
             For Each index In lp.bricks
-                Dim brick = task.bbo.brickList(index)
+                Dim brick = task.brickList(index)
                 Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
                 If val = 0 Then
                     dst1(brick.rect).SetTo(lp.index)
@@ -86,7 +86,7 @@ Public Class LineDepth_Logical : Inherits TaskParent
             lp.index = task.logicalLines.Count + 1
             task.logicalLines.Add(lp)
             For Each index In lp.bricks
-                Dim brick = task.bbo.brickList(index)
+                Dim brick = task.brickList(index)
                 Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
                 If val = 0 Then
                     dst1(brick.rect).SetTo(lp.index)

@@ -1628,17 +1628,20 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadDepth : Inherits TaskParent
+    Dim bbo As New Brick_Basics
     Public Sub New()
         OptionParent.FindSlider("OpenCVB OpenGL buffer count").Value = 1
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Create a simple plane in each of bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.bbo.dst2
+        bbo.Run(src)
+
+        dst2 = bbo.dst2
         dst3 = task.colorizer.dst2
         labels(3) = task.colorizer.labels(2)
         Dim quadData As New List(Of cv.Point3f)
-        For Each brick In task.bbo.brickList
+        For Each brick In task.brickList
             If brick.depth = 0 Then Continue For
             If brick.corners.Count Then quadData.Add(brick.color)
             For Each pt In brick.corners
@@ -1648,7 +1651,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels(2) = task.bbo.labels(2)
+        labels(2) = bbo.labels(2)
         labels(3) = "There were " + CStr(quadData.Count / 5) + " quads found."
     End Sub
 End Class
@@ -1843,11 +1846,14 @@ End Class
 
 Public Class OpenGL_QuadConnected : Inherits TaskParent
     Dim connect As New Region_Core
+    Dim bbo As New Brick_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Build connected bricks and remove cells that are not connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        bbo.Run(src)
+
         connect.Run(src)
         dst2 = connect.dst2
         dst3 = connect.dst3
@@ -1855,11 +1861,11 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         Dim quadData As New List(Of cv.Point3f)
         Dim brick1 As brickData, brick2 As brickData
         For Each tup In connect.hTuples
-            brick1 = task.bbo.brickList(tup.Item1)
-            brick2 = task.bbo.brickList(tup.Item2)
+            brick1 = task.brickList(tup.Item1)
+            brick2 = task.brickList(tup.Item2)
             For i = tup.Item1 + 1 To tup.Item2 - 1
-                brick1 = task.bbo.brickList(i - 1)
-                brick2 = task.bbo.brickList(i)
+                brick1 = task.brickList(i - 1)
+                brick2 = task.brickList(i)
                 If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
                 If brick1.corners.Count = 0 Or brick2.corners.Count = 0 Then Continue For
 
@@ -1881,8 +1887,8 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         Dim width = dst2.Width / task.cellSize
         For Each tup In connect.vTuples
             For i = tup.Item1 To tup.Item2 - width Step width
-                brick1 = task.bbo.brickList(i)
-                brick2 = task.bbo.brickList(i + width)
+                brick1 = task.brickList(i)
+                brick2 = task.brickList(i + width)
                 If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
                 If brick1.corners.Count = 0 Or brick2.corners.Count = 0 Then Continue For
 
@@ -1904,7 +1910,7 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels = task.bbo.labels
+        labels = bbo.labels
     End Sub
 End Class
 

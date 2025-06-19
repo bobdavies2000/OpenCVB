@@ -509,7 +509,7 @@ Public Class Distance_DepthBricks : Inherits TaskParent
         dst3 = src.Clone
 
         Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
-        For Each brick In task.bbo.brickList
+        For Each brick In task.brickList
             Dim mm = GetMinMax(dst2(brick.rect))
             If mm.maxVal >= threshold Then
                 Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
