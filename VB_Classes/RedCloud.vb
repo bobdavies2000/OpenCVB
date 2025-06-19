@@ -512,7 +512,7 @@ Public Class RedCloud_Contours : Inherits TaskParent
     Dim prep As New RedCloud_PrepXY
     Dim options As New Options_Contours
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
@@ -528,7 +528,7 @@ Public Class RedCloud_Contours : Inherits TaskParent
         cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.List, mode)
         If allContours.Count <= 1 Then Exit Sub
 
-        contourList = Contour_Basics.sortContours(allContours, 255)
+        contourList = Contour_Basics.sortContours(allContours)
         contourMap.SetTo(0)
         For Each contour In contourList
             contourMap(contour.rect).SetTo(contour.index, contour.mask)
@@ -593,13 +593,13 @@ Public Class RedCloud_RedColor : Inherits TaskParent
 
         If task.heartBeat Then
             For Each contour In contours.contourList
-                SetTrueText(CStr(contour.index), contour.center, 2)
+                SetTrueText(CStr(contour.index), contour.maxDist, 2)
             Next
         End If
 
         dst3 = task.contours.dst2
         dst3(task.contourD.rect).SetTo(white, task.contourD.mask)
-        Contour_Info.setContourSelection(contours.contourList, contours.contourmap)
+        task.contourD = Contour_Basics.selectContour()
         labels(3) = task.contours.labels(2)
     End Sub
 End Class

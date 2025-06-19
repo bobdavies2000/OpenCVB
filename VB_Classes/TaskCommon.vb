@@ -756,11 +756,12 @@ End Class
 Public Class contourData
     Public rect As cv.Rect
     Public mask As cv.Mat
-    Public center As cv.Point
     Public pixels As Integer
     Public index As Integer
     Public depth As Single
     Public mm As mmData
+    Public maxDist As cv.Point
+    Public maxDstable As cv.Point
     Public points As New List(Of cv.Point)
     Public hull As New List(Of cv.Point)
     Public Function buildRect(tour As cv.Point()) As cv.Rect

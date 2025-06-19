@@ -47,7 +47,7 @@ Public Class Hull_Contour : Inherits TaskParent
         desc = "Compare the hull to the contour of a contour cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Contour_Info.setContourSelection(task.contours.contourList, task.contours.contourMap)
+        task.contourD = Contour_Basics.selectContour()
 
         dst2.SetTo(0)
         dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
