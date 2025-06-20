@@ -165,7 +165,7 @@ End Class
 Public Class Gravity_BrickRotate : Inherits TaskParent
     Dim survey As New BrickPoint_PopulationSurvey
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         desc = "Rotate the grid point using the offset from gravity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -177,7 +177,7 @@ Public Class Gravity_BrickRotate : Inherits TaskParent
         If rotateAngle >= angle Then rotateAngle = -angle
 
         dst1 = src
-        For Each brick In task.brickList
+        For Each brick In task.bricks.brickList
             If brick.pt.Y = brick.rect.Y Then dst1.Circle(brick.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 

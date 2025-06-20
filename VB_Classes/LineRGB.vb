@@ -6,7 +6,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
     Public rawLines As New LineRGB_Raw
     Public minAge As Integer = 5 ' line has to be around for a little while before it is recorded as a line.
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -21,7 +21,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
         For Each lp In lastList
             Dim noMotionTest As Boolean = True
             For Each index In lp.bricks
-                Dim brick = If(index < task.brickList.Count, task.brickList(index), task.brickList(0))
+                Dim brick = If(index < task.bricks.brickList.Count, task.bricks.brickList(index), task.bricks.brickList(0))
                 If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
                     noMotionTest = False
                     Exit For
@@ -38,7 +38,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
         For Each lp In rawLines.lpList
             Dim motionTest As Boolean = False
             For Each index In lp.bricks
-                Dim brick = task.brickList(index)
+                Dim brick = task.bricks.brickList(index)
                 If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
                     motionTest = True
                     Exit For
@@ -619,7 +619,7 @@ End Class
 Public Class LineRGB_Bricks : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         desc = "Create the bricks for a given line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -635,7 +635,7 @@ Public Class LineRGB_Bricks : Inherits TaskParent
         End If
 
         For Each index In lp.bricks
-            dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
+            dst2.Rectangle(task.bricks.brickList(index).rect, task.highlight, task.lineWidth)
         Next
         labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
     End Sub
@@ -649,7 +649,7 @@ End Class
 Public Class LineRGB_BricksValidate : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         desc = "Validate the bricks for a given line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -662,7 +662,7 @@ Public Class LineRGB_BricksValidate : Inherits TaskParent
             End If
         End If
         For Each index In lp.bricks
-            dst2.Rectangle(task.brickList(index).rect, task.highlight, task.lineWidth)
+            dst2.Rectangle(task.bricks.brickList(index).rect, task.highlight, task.lineWidth)
         Next
         labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
     End Sub

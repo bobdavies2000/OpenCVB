@@ -1533,9 +1533,6 @@ Public Class Main_UI
                                       CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
             End If
 
-            GC.Collect()
-            GC.WaitForPendingFinalizers()
-
             ' Adjust drawrect for the ratio of the actual size and WorkingRes.
             If task.drawRect <> New cv.Rect Then
                 ' relative size of algorithm size image to displayed image
@@ -1723,7 +1720,7 @@ Public Class Main_UI
                 Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
                     'Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                    'task.brickD = task.brickList(index)
+                    'task.brickD = task.bricks.brickList(index)
                     'depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
                     '                          CStr(task.brickD.index) + vbCrLf + "range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
                     '                          Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +

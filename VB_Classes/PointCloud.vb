@@ -370,6 +370,7 @@ End Class
 
 Public Class PointCloud_GridInspector : Inherits TaskParent
     Public Sub New()
+        task.brickRunFlag = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.mouseMovePoint.X = dst2.Width / 2
         desc = "Inspect x, y, and z values by brick"
@@ -389,7 +390,7 @@ Public Class PointCloud_GridInspector : Inherits TaskParent
         For i = 0 To dst2.Height - 1 Step task.cellSize
             Dim pt = New cv.Point2f(cLine, i)
             Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(task.brickList(index).pt.Y, task.brickList(index).pt.X)
+            Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(task.bricks.brickList(index).pt.Y, task.bricks.brickList(index).pt.X)
             SetTrueText("Row " + Format(i, "00") + vbTab + vbTab + Format(xyz(0), fmt2) + vbTab + Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
         Next
         labels(2) = "Values displayed are the point cloud X, Y, and Z values for column " + CStr(cLine)
@@ -632,6 +633,7 @@ End Class
 
 Public Class PointCloud_Continuous_GridX : Inherits TaskParent
     Public Sub New()
+        task.brickRunFlag = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show where the pointcloud is continuous at the brick resolution"
@@ -642,8 +644,8 @@ Public Class PointCloud_Continuous_GridX : Inherits TaskParent
 
         dst2.SetTo(0)
         dst3.SetTo(0)
-        Dim gcPrev = task.brickList(0)
-        For Each brick In task.brickList
+        Dim gcPrev = task.bricks.brickList(0)
+        For Each brick In task.bricks.brickList
             If brick.rect.X > 0 Then
                 If Math.Abs(brick.depth - gcPrev.depth) <= task.depthDiffMeters Then
                     dst2(brick.rect).SetTo(255)
@@ -666,6 +668,7 @@ End Class
 
 Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
     Public Sub New()
+        task.brickRunFlag = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show where the pointcloud is continuous at the brick resolution"
     End Sub
@@ -674,10 +677,10 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
         dst2.SetTo(0)
-        Dim gcPrev = task.brickList(0)
+        Dim gcPrev = task.bricks.brickList(0)
         Dim cellMat As New cv.Mat(task.cellSize, task.cellSize, cv.MatType.CV_8U, cv.Scalar.All(127))
-        For Each brick In task.brickList
-            Dim gcAbove = task.brickList(CInt(brick.index Mod task.cellsPerRow))
+        For Each brick In task.bricks.brickList
+            Dim gcAbove = task.bricks.brickList(CInt(brick.index Mod task.cellsPerRow))
             If brick.correlation > task.fCorrThreshold Then
                 If brick.rect.Y = 0 Or brick.rect.X = 0 Then Continue For
                 If Math.Abs(brick.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(128)

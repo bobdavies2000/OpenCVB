@@ -2,6 +2,7 @@
 Public Class LongLine_DepthDirection : Inherits TaskParent
     Public gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
+        task.brickRunFlag = True
         labels(2) = "Use the 'Features' option slider to select different lines."
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Display the direction of each line in depth"
@@ -22,8 +23,8 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             Dim halfCount As Integer = Math.Floor(If(lp.bricks.Count Mod 2 = 0, lp.bricks.Count, lp.bricks.Count - 1) / 2)
             Dim depthValues As New List(Of Single)
             For i = 0 To halfCount - 1
-                Dim gc1 = task.brickList(lp.bricks(i))
-                Dim gc2 = task.brickList(lp.bricks(lp.bricks.Count - i - 1))
+                Dim gc1 = task.bricks.brickList(lp.bricks(i))
+                Dim gc2 = task.bricks.brickList(lp.bricks(lp.bricks.Count - i - 1))
 
                 Dim d1 = gc1.depth
                 Dim d2 = gc2.depth
@@ -52,7 +53,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
             If avg1 < avg2 Then offset = lp.bricks.Count
             If Math.Abs(avg1 - avg2) < 0.01 Then ' task.depthDiffMeters Then
                 For Each index In lp.bricks
-                    Dim brick = task.brickList(index)
+                    Dim brick = task.bricks.brickList(index)
                     dst1(brick.rect).SetTo(1)
                     If debugmode Then dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                     gcUpdates.Add(New Tuple(Of Integer, Single)(index, (avg1 + avg2) / 2))
@@ -63,7 +64,7 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
                 Dim depthIncr = (max - min) / lp.bricks.Count
                 For i = 0 To lp.bricks.Count - 1
                     Dim index = lp.bricks(i)
-                    Dim brick = task.brickList(index)
+                    Dim brick = task.bricks.brickList(index)
                     If offset > 0 Then
                         dst1(brick.rect).SetTo((offset - i + 1) * incr)
                         gcUpdates.Add(New Tuple(Of Integer, Single)(index, min + (offset - i) * depthIncr))
@@ -98,6 +99,7 @@ End Class
 
 Public Class LongLine_Depth : Inherits TaskParent
     Public Sub New()
+        task.brickRunFlag = True
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
@@ -108,8 +110,8 @@ Public Class LongLine_Depth : Inherits TaskParent
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-        Dim gcMin = task.brickList(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-        Dim gcMax = task.brickList(task.grid.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+        Dim gcMin = task.bricks.brickList(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+        Dim gcMax = task.bricks.brickList(task.grid.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
 
         dst0.SetTo(0)
         dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)

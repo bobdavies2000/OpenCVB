@@ -605,7 +605,7 @@ End Class
 Public Class Feature_WithDepth : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         desc = "Show the feature points that have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -615,7 +615,7 @@ Public Class Feature_WithDepth : Inherits TaskParent
         Dim depthCount As Integer
         For Each pt In task.featurePoints
             Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            If task.brickList(index).depth > 0 Then
+            If task.bricks.brickList(index).depth > 0 Then
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 depthCount += 1
             End If

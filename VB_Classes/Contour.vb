@@ -269,7 +269,7 @@ End Class
 Public Class Contour_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         labels(3) = "Each of the feature points with their correlation coefficien"
         desc = "Show contours and features"
     End Sub
@@ -282,7 +282,7 @@ Public Class Contour_Features : Inherits TaskParent
             dst2.Circle(pt, task.DotSize, task.highlight, -1)
             dst3.Circle(pt, task.DotSize, task.highlight, -1)
             Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            Dim brick = task.brickList(index)
+            Dim brick = task.bricks.brickList(index)
             SetTrueText(Format(brick.correlation, fmt1), pt, 3)
         Next
         labels(2) = "There are " + CStr(task.contours.contourList.Count) + " contours and " +
@@ -1106,7 +1106,8 @@ Public Class Contour_Hulls : Inherits TaskParent
         desc = "Add hulls and improved contours using ConvexityDefects to each contour cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runContours(src, labels(2))
+        labels(2) = task.contours.labels(2)
+        dst2 = task.contours.dst2
 
         Dim defectCount As Integer
         contourMap.SetTo(0)

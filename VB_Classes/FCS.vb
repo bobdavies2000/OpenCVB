@@ -68,7 +68,7 @@ Public Class FCS_CreateList : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Dim feat As New Feature_Basics
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         labels(3) = "CV_8U map of Delaunay cells."
@@ -93,7 +93,7 @@ Public Class FCS_CreateList : Inherits TaskParent
             fp.index = i
 
             Dim brickIndex = task.grid.gridMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
-            Dim brick = task.brickList(brickIndex)
+            Dim brick = task.bricks.brickList(brickIndex)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
                 Dim fpLast = task.fpLastList(fpIndex)
@@ -565,7 +565,7 @@ End Class
 
 Public Class FCS_Info : Inherits TaskParent
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -583,7 +583,7 @@ Public Class FCS_Info : Inherits TaskParent
         strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
 
         strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
-        Dim brick = task.brickList(fp.brickIndex)
+        Dim brick = task.bricks.brickList(fp.brickIndex)
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
         strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
 

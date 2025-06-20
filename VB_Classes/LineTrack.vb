@@ -31,7 +31,7 @@ End Class
 Public Class LineTrack_Map : Inherits TaskParent
     Dim lTrack As New LineTrack_Basics
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         task.gOptions.CrossHairs.Checked = False
         desc = "Show the brickMap (bricks) and fpMap (features points) "
     End Sub
@@ -45,7 +45,7 @@ Public Class LineTrack_Map : Inherits TaskParent
         dst3.SetTo(0)
         Dim histarray(task.redC.rcList.Count - 1) As Single
         Dim histogram As New cv.Mat
-        For Each brick In task.brickList
+        For Each brick In task.bricks.brickList
             cv.Cv2.CalcHist({task.redC.rcMap(brick.rect)}, {0}, emptyMat, histogram, 1, {task.redC.rcList.Count},
                              New cv.Rangef() {New cv.Rangef(1, task.redC.rcList.Count)})
 

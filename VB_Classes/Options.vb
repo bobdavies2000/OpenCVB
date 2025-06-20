@@ -7319,7 +7319,6 @@ Public Class Options_Line : Inherits OptionParent
             sliders.setupTrackBar("Same line overlap %", 1, 100, 50)
             sliders.setupTrackBar("Distance to next center", 1, 100, 30)
         End If
-        Application.DoEvents()
     End Sub
     Public Sub Run()
         Static lenSlider = OptionParent.FindSlider("Min Line Length")
@@ -7907,7 +7906,6 @@ Public Class Options_FeaturesEx : Inherits OptionParent
             sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
             sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
         End If
-        Application.DoEvents()
     End Sub
     Public Sub Run()
         Static cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")

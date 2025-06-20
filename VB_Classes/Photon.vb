@@ -121,7 +121,7 @@ Public Class Photon_Distance3D : Inherits TaskParent
     Dim hist As New Hist_Basics
     Dim distances As New List(Of Single)
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         hist.plotHist.removeZeroEntry = False
         task.gOptions.setHistogramBins(10)
         task.gOptions.UseMotionMask.Checked = False
@@ -130,7 +130,7 @@ Public Class Photon_Distance3D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim currColors As New List(Of cv.Vec3b)
         For Each roi In task.gridRects
-            currColors.Add(task.bbo.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
+            currColors.Add(task.bricks.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
         Next
 
         Static lastColors As New List(Of cv.Vec3b)(currColors)

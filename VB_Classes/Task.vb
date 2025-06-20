@@ -119,7 +119,7 @@ Public Class VBtask : Implements IDisposable
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
     Public grid As Grid_Basics
-    Public bbo As Brick_Basics
+    Public bricks As Brick_Basics
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Filter_Basics
@@ -129,8 +129,7 @@ Public Class VBtask : Implements IDisposable
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
 
-    Public brickList As New List(Of brickData)
-    Public bboRunFlag As Boolean
+    Public brickRunFlag As Boolean
 
     Public paletteRandom As Palette_RandomColors
     Public kalman As Kalman_Basics
@@ -468,6 +467,9 @@ Public Class VBtask : Implements IDisposable
         useRecordedData = parms.useRecordedData
         externalPythonInvocation = parms.externalPythonInvocation
 
+        GC.Collect()
+        GC.WaitForFullGCComplete()
+
         ' set options for specific cameras here.
         Select Case task.cameraName
             Case "StereoLabs ZED 2/2i"
@@ -520,7 +522,7 @@ Public Class VBtask : Implements IDisposable
         contours = New Contour_Basics_List
         rgbFilter = New Filter_Basics
         redC = New RedColor_Basics
-        bbo = New Brick_Basics
+        bricks = New Brick_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -564,7 +566,6 @@ Public Class VBtask : Implements IDisposable
 
         myStopWatch = Stopwatch.StartNew()
         optionsChanged = True
-        Application.DoEvents()
     End Sub
     Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New TrueText(text, pt, picTag)
@@ -596,7 +597,7 @@ Public Class VBtask : Implements IDisposable
             allOptions.layoutOptions(normalRequest:=True)
         End If
 
-        Application.DoEvents()
+        Application.DoEvents() ' this lets the options container update.
         updateSettings()
 
         If algorithm_ms.Count = 0 Then
@@ -747,10 +748,9 @@ Public Class VBtask : Implements IDisposable
 
         edges.Run(task.grayStable)
         contours.Run(src)
-        'bbo.Run(src)
 
         colorizer.Run(src)
-        If task.bboRunFlag Then bbo.Run(src)
+        If task.brickRunFlag Then bricks.Run(src)
 
         TaskTimer.Enabled = True
 

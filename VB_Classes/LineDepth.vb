@@ -4,7 +4,7 @@ Public Class LineDepth_Basics : Inherits TaskParent
     Dim linesY As New LineRGB_Raw
     Dim struct As New Structured_Core
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the X- and Y-direction of the Structured_Core output"
     End Sub
@@ -34,7 +34,7 @@ Public Class LineDepth_Basics : Inherits TaskParent
             lp.index = task.logicalLines.Count + 1
             task.logicalLines.Add(lp)
             For Each index In lp.bricks
-                Dim brick = task.brickList(index)
+                Dim brick = task.bricks.brickList(index)
                 Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
                 If val = 0 Then
                     dst1(brick.rect).SetTo(lp.index)
@@ -62,7 +62,7 @@ End Class
 Public Class LineDepth_Logical : Inherits TaskParent
     Dim structured As New Structured_Basics
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Collect all the depth lines to make them accessible to all algorithms."
     End Sub
@@ -88,7 +88,7 @@ Public Class LineDepth_Logical : Inherits TaskParent
             lp.index = task.logicalLines.Count + 1
             task.logicalLines.Add(lp)
             For Each index In lp.bricks
-                Dim brick = task.brickList(index)
+                Dim brick = task.bricks.brickList(index)
                 Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)
                 If val = 0 Then
                     dst1(brick.rect).SetTo(lp.index)

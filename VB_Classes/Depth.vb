@@ -1429,7 +1429,7 @@ End Class
 
 Public Class Depth_ErrorEstimate : Inherits TaskParent
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
         labels(2) = "Colorized depth error estimate for the current image"
         desc = "Provide an estimate of the error based on the depth - a linear estimate based on the '2% at 2 meters' statement."
@@ -1440,7 +1440,7 @@ Public Class Depth_ErrorEstimate : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        For Each brick In task.brickList
+        For Each brick In task.bricks.brickList
             Dim testError = ErrorEstimate(brick.depth)
             dst1(brick.rect).SetTo(testError)
         Next
@@ -1463,7 +1463,7 @@ End Class
 
 Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
         labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
@@ -1474,7 +1474,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
 
         dst1 = src.Clone()
         dst1.SetTo(white, task.gridMask)
-        For Each brick In task.brickList
+        For Each brick In task.bricks.brickList
             Dim pt = brick.mm.minLoc
             subdiv.Insert(New cv.Point(pt.X + brick.rect.X, pt.Y + brick.rect.Y))
             DrawCircle(dst1(brick.rect), brick.mm.minLoc, task.DotSize, cv.Scalar.Red)

@@ -154,7 +154,7 @@ Public Class Options
         SnapCustom.Checked = Main_UI.settings.snapCustom
 
         TestAllDuration.Value = Main_UI.settings.testAllDuration
-        If TestAllDuration.Value < 10 Then TestAllDuration.Value = 10
+        If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
         cameraDisplayRes = Main_UI.settings.displayRes
         showConsoleLog.Checked = Main_UI.settings.showConsoleLog
     End Sub
@@ -167,7 +167,7 @@ Public Class Options
         Me.Hide()
     End Sub
     Private Sub TestAllDuration_ValueChanged(sender As Object, e As EventArgs) Handles TestAllDuration.ValueChanged
-        If TestAllDuration.Value < 10 Then TestAllDuration.Value = 10
+        If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
         testDuration = TestAllDuration.Value
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click

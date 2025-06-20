@@ -470,7 +470,7 @@ End Class
 Public Class GridROI_Canny : Inherits TaskParent
     Dim edges As New Edge_Basics
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Find all the GridCells with edges in them."
     End Sub
@@ -479,7 +479,7 @@ Public Class GridROI_Canny : Inherits TaskParent
         dst3 = edges.dst2
 
         dst2.SetTo(0)
-        For Each brick In task.brickList
+        For Each brick In task.bricks.brickList
             If dst3(brick.rect).CountNonZero Then src(brick.rect).CopyTo(dst2(brick.rect))
         Next
     End Sub

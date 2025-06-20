@@ -4,7 +4,7 @@ Public Class Line3D_Basics : Inherits TaskParent
     Public lines3D As New List(Of cv.Point3f)
     Public lines3DMat As New cv.Mat
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find all the lines in 3D using the structured slices through the bricks."
     End Sub
@@ -15,10 +15,10 @@ Public Class Line3D_Basics : Inherits TaskParent
         dst2 = lines.dst2
         labels(2) = lines.labels(2)
 
-        Static brickList As New List(Of brickData)(task.brickList)
+        Static brickList As New List(Of brickData)(task.bricks.brickList)
 
         For i = 0 To task.gridRects.Count - 1
-            Dim brick = task.brickList(i)
+            Dim brick = task.bricks.brickList(i)
             Dim val = task.motionMask.Get(Of Byte)(brick.center.Y, brick.center.X)
             If val Then brickList(i) = brick
         Next

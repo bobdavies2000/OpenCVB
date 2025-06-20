@@ -7,7 +7,7 @@ Public Class HighVis_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        For Each brick In task.brickList
+        For Each brick In task.bricks.brickList
             If brick.correlation > task.fCorrThreshold Then
                 If brick.correlation > 0 Then
                     dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
@@ -20,7 +20,7 @@ Public Class HighVis_Basics : Inherits TaskParent
         dst0 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         Dim mm = GetMinMax(dst1, dst0)
         dst2 = ShowPaletteDepth((dst1 - mm.minVal) * mm.maxVal / (mm.maxVal - mm.minVal))
-        labels(2) = task.bbo.labels(2)
+        labels(2) = task.bricks.labels(2)
 
         info.Run(src)
         SetTrueText(info.strOut, 3)

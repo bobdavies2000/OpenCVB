@@ -1401,7 +1401,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
     Dim fLess As New BrickPoint_FeatureLess
     Dim ranges() As cv.Rangef
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         ranges = {New cv.Rangef(0, 256)}
         task.gOptions.setHistogramBins(255)
         desc = "Build a histogram of one cell and predict any neighbors with an contourIndex"
@@ -1412,11 +1412,11 @@ Public Class Hist_BrickRegions : Inherits TaskParent
         Dim histList = New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim predictedList As New List(Of Integer)
         Dim brick As brickData
-        For Each brick In task.brickList
+        For Each brick In task.bricks.brickList
             If brick.contourFull Then
                 Dim nabes = task.gridNeighbors(brick.index)
                 For i = 1 To nabes.Count - 1 ' the first entry is for the brick...
-                    If task.brickList(nabes(i)).contourFull = 0 Then
+                    If task.bricks.brickList(nabes(i)).contourFull = 0 Then
                         If predictedList.Contains(nabes(i)) = False Then
                             histList.Add(brick.index, nabes(i))
                             predictedList.Add(nabes(i))
@@ -1431,7 +1431,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
         For Each ele In histList
             If brickIndex <> ele.Key Then
                 brickIndex = ele.Key
-                brick = task.brickList(brickIndex)
+                brick = task.bricks.brickList(brickIndex)
 
                 cv.Cv2.CalcHist({task.grayStable(brick.rect)}, {0}, Not task.edges.dst2(brick.rect), histogram, 1, {task.histogramBins}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -1455,7 +1455,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
                 Next
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If
-            Dim gc2 = task.brickList(ele.Value)
+            Dim gc2 = task.bricks.brickList(ele.Value)
             cv.Cv2.CalcBackProject({task.grayStable(gc2.rect)}, {0}, histogram, dst1(gc2.rect), ranges)
         Next
         dst2 = ShowPalette(dst1)

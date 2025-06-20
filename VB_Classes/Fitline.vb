@@ -221,7 +221,7 @@ Public Class FitLine_Grid : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim fitline As New FitLine_Basics
     Public Sub New()
-        task.bboRunFlag = True
+        task.brickRunFlag = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find lines within each brick."
     End Sub
@@ -230,7 +230,7 @@ Public Class FitLine_Grid : Inherits TaskParent
         dst2 = edges.dst2
 
         dst3.SetTo(0)
-        For Each brick In task.brickList
+        For Each brick In task.bricks.brickList
             If dst2(brick.rect).CountNonZero >= 5 Then
                 nZero.Run(dst2(brick.rect))
 
