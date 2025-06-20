@@ -3,6 +3,7 @@ Public Class DepthLogic_Basics : Inherits TaskParent
     Dim structured As New Structured_Basics
     Dim gcUpdates As New List(Of Tuple(Of Integer, Single))
     Public Sub New()
+        task.bboRunFlag = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Use the lp.bricks of bricks to build logical depth values for each cell."
     End Sub
@@ -100,6 +101,7 @@ End Class
 Public Class DepthLogic_Lines : Inherits TaskParent
     Dim depthLogic As New LineDepth_Basics
     Public Sub New()
+        task.bboRunFlag = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Reconstruct depth data using depth lines with high correlation (typically indicating featureless.)"
     End Sub

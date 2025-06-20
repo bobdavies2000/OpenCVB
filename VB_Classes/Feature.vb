@@ -605,6 +605,7 @@ End Class
 Public Class Feature_WithDepth : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
+        task.bboRunFlag = True
         desc = "Show the feature points that have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

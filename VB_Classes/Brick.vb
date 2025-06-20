@@ -2,7 +2,8 @@
 Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
-    Public instantUpdate As Boolean, brickDepthCount As Integer
+    Public instantUpdate As Boolean
+    Public brickDepthCount As Integer
     Public brickMap As New cv.Mat ' map of bricks to index in bricklist
     Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
@@ -124,16 +125,15 @@ End Class
 
 Public Class Brick_Plot : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
-    Dim bbo As New Brick_Basics
     Public Sub New()
+        task.bboRunFlag = True
         plotHist.createHistogram = True
         plotHist.addLabels = False
         labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
         desc = "Select any cell To plot a histogram Of that cell's depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bbo.Run(src)
-        dst2 = bbo.dst2
+        dst2 = task.bbo.dst2
 
         Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
@@ -168,6 +168,7 @@ End Class
 
 Public Class Brick_FullDepth : Inherits TaskParent
     Public Sub New()
+        task.bboRunFlag = True
         labels(2) = "Left image bricks - no overlap.  Click in any column to highlight that column."
         labels(3) = "Right image: corresponding bricks.  Overlap indicates uncertainty about depth."
         desc = "Display the bricks for all cells with depth."
@@ -205,21 +206,19 @@ End Class
 
 
 Public Class Brick_InstantUpdate : Inherits TaskParent
-    Dim bbo As New Brick_Basics
     Public Sub New()
-        bbo.instantUpdate = True
+        task.bboRunFlag = True
+        task.bbo.instantUpdate = True
         labels(3) = "Pointcloud image for cells with good visibility"
         desc = "Create the grid of bricks with good visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bbo.Run(src)
+        If task.heartBeat Then labels(2) = CStr(task.bbo.brickDepthCount) + " bricks have reasonable depth."
 
-        If task.heartBeat Then labels(2) = CStr(task.brickList.Count) + " bricks have reasonable depth."
+        dst2 = task.bbo.dst2
+        dst3 = task.bbo.dst3
 
-        dst2 = bbo.dst2
-        dst3 = bbo.dst3
-
-        labels(2) = bbo.labels(2)
+        labels(2) = task.bbo.labels(2)
     End Sub
 End Class
 
@@ -505,8 +504,8 @@ End Class
 Public Class Brick_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public features() As List(Of cv.Point)
-    Dim bbo As New Brick_Basics
     Public Sub New()
+        task.bboRunFlag = True
         task.featureOptions.DistanceSlider.Value = 3
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Featureless areas"
@@ -514,9 +513,8 @@ Public Class Brick_Features : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
-        bbo.Run(src)
 
-        dst2 = bbo.dst2
+        dst2 = task.bbo.dst2
 
         ReDim features(task.gridRects.Count - 1)
 
@@ -654,15 +652,13 @@ End Class
 
 
 Public Class Brick_Info : Inherits TaskParent
-    Dim bbo As New Brick_Basics
     Public Sub New()
+        task.bboRunFlag = True
         task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         desc = "Display the info about the select brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bbo.Run(src)
-
-        labels(2) = bbo.labels(2)
+        labels(2) = task.bbo.labels(2)
 
         Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
@@ -698,6 +694,7 @@ End Class
 
 Public Class Brick_LeftToColor : Inherits TaskParent
     Public Sub New()
+        task.bboRunFlag = True
         If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Align brick left rectangles in color with the left image.  StereoLabs and Orbbec already match."
     End Sub
@@ -724,6 +721,7 @@ End Class
 
 Public Class Brick_FitLeftInColor : Inherits TaskParent
     Public Sub New()
+        task.bboRunFlag = True
         desc = "Translate the left image into the same coordinates as the color image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -751,6 +749,7 @@ End Class
 Public Class Brick_Lines : Inherits TaskParent
     Dim info As New LineRGB_Info
     Public Sub New()
+        task.bboRunFlag = True
         desc = "Lines can mean cells are connected - click on any highlighted brick to see info on that line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -778,6 +777,7 @@ End Class
 Public Class Brick_LeftRightMouse : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()
+        task.bboRunFlag = True
         labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
         labels(3) = "Right view with the translated trace of bricks under the mouse."
         If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
@@ -817,6 +817,7 @@ End Class
 
 Public Class Brick_RGBtoLeft : Inherits TaskParent
     Public Sub New()
+        task.bboRunFlag = True
         labels(3) = "Right camera image..."
         If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Translate the RGB to left view - only needed for the Intel RealSense cameras."
@@ -906,15 +907,13 @@ End Class
 
 
 Public Class Brick_Map : Inherits TaskParent
-    Dim bbo As New Brick_Basics
     Public Sub New()
+        task.bboRunFlag = True
         labels(3) = "The map to identify each brick's depth."
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Display a heatmap of the correlation of the left and right images for each brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bbo.Run(src)
-
         dst1.SetTo(0)
         If task.gOptions.DepthCorrelations.Checked Then
             For Each brick In task.brickList
@@ -932,6 +931,6 @@ Public Class Brick_Map : Inherits TaskParent
             dst2 = ShowPaletteDepth(dst1)
         End If
         dst2.SetTo(0, task.noDepthMask)
-        labels(2) = bbo.labels(2)
+        labels(2) = task.bbo.labels(2)
     End Sub
 End Class

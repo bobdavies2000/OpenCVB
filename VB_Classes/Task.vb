@@ -119,6 +119,7 @@ Public Class VBtask : Implements IDisposable
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
     Public grid As Grid_Basics
+    Public bbo As Brick_Basics
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Filter_Basics
@@ -129,6 +130,7 @@ Public Class VBtask : Implements IDisposable
     Public colorizer As DepthColorizer_Basics
 
     Public brickList As New List(Of brickData)
+    Public bboRunFlag As Boolean
 
     Public paletteRandom As Palette_RandomColors
     Public kalman As Kalman_Basics
@@ -518,7 +520,7 @@ Public Class VBtask : Implements IDisposable
         contours = New Contour_Basics_List
         rgbFilter = New Filter_Basics
         redC = New RedColor_Basics
-        'bbo = New Brick_Basics
+        bbo = New Brick_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -747,7 +749,8 @@ Public Class VBtask : Implements IDisposable
         contours.Run(src)
         'bbo.Run(src)
 
-        task.colorizer.Run(src)
+        colorizer.Run(src)
+        If task.bboRunFlag Then bbo.Run(src)
 
         TaskTimer.Enabled = True
 

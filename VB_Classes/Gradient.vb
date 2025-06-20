@@ -106,6 +106,7 @@ Public Class Gradient_DepthLines : Inherits TaskParent
     Dim options As New Options_Distance
     Public lp As lpData
     Public Sub New()
+        task.bboRunFlag = True
         If standalone Then lp = New lpData
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

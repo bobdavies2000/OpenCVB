@@ -1,14 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Public Class HighVis_Basics : Inherits TaskParent
     Dim info As New Brick_Info
-    Dim bbo As New Brick_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Display all the bricks that have good visibility"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bbo.Run(src)
-
         dst1.SetTo(0)
         For Each brick In task.brickList
             If brick.correlation > task.fCorrThreshold Then
@@ -23,7 +20,7 @@ Public Class HighVis_Basics : Inherits TaskParent
         dst0 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         Dim mm = GetMinMax(dst1, dst0)
         dst2 = ShowPaletteDepth((dst1 - mm.minVal) * mm.maxVal / (mm.maxVal - mm.minVal))
-        labels(2) = bbo.labels(2)
+        labels(2) = task.bbo.labels(2)
 
         info.Run(src)
         SetTrueText(info.strOut, 3)

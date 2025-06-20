@@ -6,6 +6,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
     Public rawLines As New LineRGB_Raw
     Public minAge As Integer = 5 ' line has to be around for a little while before it is recorded as a line.
     Public Sub New()
+        task.bboRunFlag = True
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -618,6 +619,7 @@ End Class
 Public Class LineRGB_Bricks : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
+        task.bboRunFlag = True
         desc = "Create the bricks for a given line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -647,6 +649,7 @@ End Class
 Public Class LineRGB_BricksValidate : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
+        task.bboRunFlag = True
         desc = "Validate the bricks for a given line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

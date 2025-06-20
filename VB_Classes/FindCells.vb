@@ -3,6 +3,7 @@ Public Class FindCells_Basics : Inherits TaskParent
     Dim hist As New Hist_GridCell
     Public edgeRequest As Boolean
     Public Sub New()
+        task.bboRunFlag = True
         If standalone Then task.featureOptions.SelectedFeature.Value = 1
         labels(2) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
         desc = "Given lines or edges, build a grid of cells that cover them."

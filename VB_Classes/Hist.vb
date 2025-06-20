@@ -1401,6 +1401,7 @@ Public Class Hist_BrickRegions : Inherits TaskParent
     Dim fLess As New BrickPoint_FeatureLess
     Dim ranges() As cv.Rangef
     Public Sub New()
+        task.bboRunFlag = True
         ranges = {New cv.Rangef(0, 256)}
         task.gOptions.setHistogramBins(255)
         desc = "Build a histogram of one cell and predict any neighbors with an contourIndex"

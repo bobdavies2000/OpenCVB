@@ -269,6 +269,7 @@ End Class
 Public Class Contour_Features : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
+        task.bboRunFlag = True
         labels(3) = "Each of the feature points with their correlation coefficien"
         desc = "Show contours and features"
     End Sub
@@ -1126,8 +1127,7 @@ Public Class Contour_Hulls : Inherits TaskParent
         Next
 
         dst3 = ShowPalette(contourMap)
-        labels(3) = CStr(contourList.Count) + " hulls identified below.  " + CStr(defectCount) +
-                    " hulls failed to build a defect list."
+        labels(3) = CStr(contourList.Count) + " hulls"
     End Sub
 End Class
 

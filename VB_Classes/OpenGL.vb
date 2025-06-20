@@ -1628,16 +1628,14 @@ End Class
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class OpenGL_QuadDepth : Inherits TaskParent
-    Dim bbo As New Brick_Basics
     Public Sub New()
+        task.bboRunFlag = True
         OptionParent.FindSlider("OpenCVB OpenGL buffer count").Value = 1
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Create a simple plane in each of bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bbo.Run(src)
-
-        dst2 = bbo.dst2
+        dst2 = task.bbo.dst2
         dst3 = task.colorizer.dst2
         labels(3) = task.colorizer.labels(2)
         Dim quadData As New List(Of cv.Point3f)
@@ -1651,7 +1649,7 @@ Public Class OpenGL_QuadDepth : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels(2) = bbo.labels(2)
+        labels(2) = task.bbo.labels(2)
         labels(3) = "There were " + CStr(quadData.Count / 5) + " quads found."
     End Sub
 End Class
@@ -1846,14 +1844,12 @@ End Class
 
 Public Class OpenGL_QuadConnected : Inherits TaskParent
     Dim connect As New Region_Core
-    Dim bbo As New Brick_Basics
     Public Sub New()
+        task.bboRunFlag = True
         task.ogl.oglFunction = oCase.quadBasics
         desc = "Build connected bricks and remove cells that are not connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bbo.Run(src)
-
         connect.Run(src)
         dst2 = connect.dst2
         dst3 = connect.dst3
@@ -1910,7 +1906,7 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        labels = bbo.labels
+        labels = task.bbo.labels
     End Sub
 End Class
 

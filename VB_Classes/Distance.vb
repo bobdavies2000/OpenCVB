@@ -500,6 +500,7 @@ End Class
 Public Class Distance_DepthBricks : Inherits TaskParent
     Dim dist As New Distance_Depth
     Public Sub New()
+        task.bboRunFlag = True
         task.gOptions.DebugSlider.Value = 20
         desc = "Threshold the maxDist in each brick to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
     End Sub

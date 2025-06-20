@@ -31,6 +31,7 @@ End Class
 Public Class LineTrack_Map : Inherits TaskParent
     Dim lTrack As New LineTrack_Basics
     Public Sub New()
+        task.bboRunFlag = True
         task.gOptions.CrossHairs.Checked = False
         desc = "Show the brickMap (bricks) and fpMap (features points) "
     End Sub

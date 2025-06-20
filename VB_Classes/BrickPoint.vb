@@ -2,11 +2,14 @@
 Public Class BrickPoint_Basics : Inherits TaskParent
     Public sobel As New Edge_SobelQT
     Public intensityFeatures As New List(Of cv.Point2f)
+    Dim bbo As New Brick_Basics
     Public Sub New()
         labels(3) = "Sobel input to BrickPoint_Basics"
         desc = "Find the max Sobel point in each brick"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        bbo.Run(src)
+
         dst2 = src.Clone
 
         sobel.Run(task.grayStable.Clone)
@@ -130,6 +133,7 @@ End Class
 Public Class BrickPoint_DistanceAbove : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
     Public Sub New()
+        task.bboRunFlag = True
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = False
         desc = "Show grid points based on their distance to the grid point above."

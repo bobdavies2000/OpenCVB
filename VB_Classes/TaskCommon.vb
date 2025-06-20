@@ -498,7 +498,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public rect As cv.Rect
     Public index As Integer
-    Public indexHull As Integer
+    Public hullMaxDStable As cv.Point
     Public vertical As Boolean ' false is horizontal
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single

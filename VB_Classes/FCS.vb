@@ -68,6 +68,7 @@ Public Class FCS_CreateList : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Dim feat As New Feature_Basics
     Public Sub New()
+        task.bboRunFlag = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         labels(3) = "CV_8U map of Delaunay cells."
@@ -564,6 +565,7 @@ End Class
 
 Public Class FCS_Info : Inherits TaskParent
     Public Sub New()
+        task.bboRunFlag = True
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

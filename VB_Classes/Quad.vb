@@ -343,15 +343,13 @@ End Class
 
 
 Public Class Quad_Boundaries : Inherits TaskParent
-    Dim bbo As New Brick_Basics
     Public Sub New()
+        task.bboRunFlag = True
         labels(2) = "Depth differences large enough to label them boundaries"
         desc = "Find large differences in depth between cells that could provide boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bbo.Run(src)
-
-        dst2 = bbo.dst2.Clone
+        dst2 = task.bbo.dst2.Clone
         Dim width = dst2.Width / task.cellSize
         Dim height = dst2.Height / task.cellSize
         For i = 0 To task.brickList.Count - width Step width
