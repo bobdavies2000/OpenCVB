@@ -727,31 +727,6 @@ End Class
 
 
 
-Public Class Brick_FitLeftInColor : Inherits TaskParent
-    Public Sub New()
-        task.brickRunFlag = True
-        desc = "Translate the left image into the same coordinates as the color image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim correlationMat As New cv.Mat
-
-        Dim p1 = task.bricks.brickList(0).lRect.TopLeft
-        Dim p2 = task.bricks.brickList(task.bricks.brickList.Count - 1).lRect.BottomRight
-
-        Dim rect = ValidateRect(New cv.Rect(p1.X - task.cellSize, p1.Y - task.cellSize, task.cellSize * 2, task.cellSize * 2))
-        cv.Cv2.MatchTemplate(task.gray(New cv.Rect(0, 0, dst1.Width / 2, dst1.Height / 2)), task.leftView, dst2,
-                                       cv.TemplateMatchModes.CCoeffNormed)
-        Dim mm = GetMinMax(dst2)
-        dst3 = src(ValidateRect(New cv.Rect(mm.maxLoc.X / 2, mm.maxLoc.Y / 2, dst2.Width, dst2.Height)))
-        labels(2) = "Correlation coefficient peak = " + Format(mm.maxVal, fmt3)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Brick_Lines : Inherits TaskParent
