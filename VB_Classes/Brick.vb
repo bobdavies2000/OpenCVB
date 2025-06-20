@@ -6,17 +6,23 @@ Public Class Brick_Basics : Inherits TaskParent
     Public brickDepthCount As Integer
     Public brickList As New List(Of brickData)
     Public brickMap As New cv.Mat ' map of bricks to index in bricklist
-    Dim LRMeanSub As New MeanSubtraction_LeftRight
+    ' Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
         brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
         If task.cameraName.StartsWith("StereoLabs") Then task.rgbLeftAligned = True
         desc = "Create the grid of bricks that reduce depth volatility"
     End Sub
+    Public Function setBrickD() As brickData
+        Static pt As cv.Point2f = brickList(0).rect.TopLeft
+        If task.mouseClickFlag Then pt = task.ClickPoint
+        Dim index = brickMap.Get(Of Single)(pt.Y, pt.X)
+        Return brickList(Index)
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.bricks.brickList.Count <> task.gridRects.Count Then task.bricks.brickList.Clear()
 
-        LRMeanSub.Run(src)
+        ' LRMeanSub.Run(src)
 
         Dim correlationMat As New cv.Mat
         Dim brickLast As New List(Of brickData)(task.bricks.brickList)
@@ -86,8 +92,8 @@ Public Class Brick_Basics : Inherits TaskParent
 
                     ' depth can be zero if the translation of color to left fails or left to right fails.
                     If brick.depth > 0 And brick.lRect.Width = brick.rRect.Width Then
-                        cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect),
-                                                     correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                        cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
+                                             correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                         brick.correlation = correlationMat.Get(Of Single)(0, 0)
 
                         Dim p0 = getWorldCoordinates(brick.rect.TopLeft, brick.depth)
@@ -623,6 +629,7 @@ End Class
 Public Class Brick_Correlation : Inherits TaskParent
     Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
+        task.brickRunFlag = True
         desc = "Given a left image cell, find it's match in the right image, and display their correlation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -634,18 +641,17 @@ Public Class Brick_Correlation : Inherits TaskParent
 
         Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.bricks.brickList.Count Then Exit Sub
+        task.brickD = task.bricks.brickList(index)
 
-        Dim brick = task.bricks.brickList(index)
-        Dim pt = task.brickD.rect.TopLeft
-        Dim corr = brick.correlation
-        dst2.Circle(brick.lRect.TopLeft, task.DotSize, 255, -1)
-        SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
+        Dim corr = task.brickD.correlation
+        dst2.Circle(task.brickD.lRect.TopLeft, task.DotSize, 255, -1)
+        SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, task.brickD.rect.TopLeft, 2)
         labels(3) = "Correlation of the left brick to the right is " + Format(corr, fmt3)
 
         Dim grayScale As Integer = 128
-        dst2.Rectangle(brick.lRect, grayScale, task.lineWidth)
-        dst3.Rectangle(brick.rRect, grayScale, task.lineWidth)
-        labels(2) = "The correlation coefficient at " + pt.ToString + " is " + Format(corr, fmt3)
+        dst2.Rectangle(task.brickD.lRect, grayScale, task.lineWidth)
+        dst3.Rectangle(task.brickD.rRect, grayScale, task.lineWidth)
+        labels(2) = "The correlation coefficient at " + task.brickD.rect.TopLeft.ToString + " is " + Format(corr, fmt3)
     End Sub
 End Class
 
