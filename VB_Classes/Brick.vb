@@ -154,13 +154,17 @@ Public Class Brick_Plot : Inherits TaskParent
         Dim mm = GetMinMax(split(2))
         If Single.IsInfinity(mm.maxVal) Then Exit Sub
 
-        If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
-            plotHist.minRange = mm.minVal
-            plotHist.maxRange = mm.maxVal
-            plotHist.Run(split(2))
-            dst3 = plotHist.dst2
-            labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
-                            " to " + Format(plotHist.maxRange, fmt3)
+        Static lastMouse As cv.Point = task.mouseMovePoint
+        If task.heartBeat Or lastMouse <> task.mouseMovePoint Then
+            lastMouse = task.mouseMovePoint
+            If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
+                plotHist.minRange = mm.minVal
+                plotHist.maxRange = mm.maxVal
+                plotHist.Run(split(2))
+                dst3 = plotHist.dst2
+                labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
+                                " to " + Format(plotHist.maxRange, fmt3)
+            End If
         End If
     End Sub
 End Class
