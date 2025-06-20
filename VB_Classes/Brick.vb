@@ -6,7 +6,6 @@ Public Class Brick_Basics : Inherits TaskParent
     Public brickDepthCount As Integer
     Public brickList As New List(Of brickData)
     Public brickMap As New cv.Mat ' map of bricks to index in bricklist
-    ' Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
         brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
@@ -21,8 +20,6 @@ Public Class Brick_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.bricks.brickList.Count <> task.gridRects.Count Then task.bricks.brickList.Clear()
-
-        ' LRMeanSub.Run(src)
 
         Dim correlationMat As New cv.Mat
         Dim brickLast As New List(Of brickData)(task.bricks.brickList)
@@ -923,22 +920,37 @@ Public Class Brick_Map : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        If task.gOptions.DepthCorrelations.Checked Then
-            For Each brick In task.bricks.brickList
-                If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
-            Next
-        Else
-            For Each brick In task.bricks.brickList
-                If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
-            Next
-        End If
-
-        If task.gOptions.DepthCorrelations.Checked Then
-            dst2 = ShowPaletteCorrelation(dst1)
-        Else
-            dst2 = ShowPaletteDepth(dst1)
-        End If
+        Dim depthAndCorrelationText As String = ""
+        For Each brick In task.bricks.brickList
+            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
+        Next
+        dst2 = ShowPaletteCorrelation(dst1)
         dst2.SetTo(0, task.noDepthMask)
+
+        Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
+        If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
+            Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            task.brickD = task.bricks.brickList(index)
+            depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
+                                      CStr(task.brickD.index) + vbCrLf + "range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
+                                      Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
+                                      "correlation = " + Format(task.brickD.correlation, fmt3)
+
+            Dim ptTextLoc = task.brickD.rect.TopLeft
+            If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
+                ptTextLoc.X -= w * 0.15
+            Else
+                ptTextLoc.Y -= task.brickD.rect.Height * 3
+            End If
+
+            SetTrueText(depthAndCorrelationText, ptTextLoc, 2)
+            SetTrueText(depthAndCorrelationText, 3)
+        End If
         labels(2) = task.bricks.labels(2)
     End Sub
 End Class
+
+
+
+
+

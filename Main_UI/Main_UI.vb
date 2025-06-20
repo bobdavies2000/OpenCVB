@@ -1715,7 +1715,6 @@ Public Class Main_UI
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                'Dim depthAndCorrelationText As String = ""
                 Dim ptCursor As New cv.Point
                 Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then

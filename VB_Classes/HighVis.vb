@@ -8,13 +8,7 @@ Public Class HighVis_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
         For Each brick In task.bricks.brickList
-            If brick.correlation > task.fCorrThreshold Then
-                If brick.correlation > 0 Then
-                    dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
-                Else
-                    dst1(brick.rect).SetTo(0)
-                End If
-            End If
+            dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
         Next
 
         dst0 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
