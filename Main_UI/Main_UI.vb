@@ -1718,19 +1718,6 @@ Public Class Main_UI
                 Dim ptCursor As New cv.Point
                 Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-                    'Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                    'task.brickD = task.bricks.brickList(index)
-                    'depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
-                    '                          CStr(task.brickD.index) + vbCrLf + "range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
-                    '                          Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
-                    '                          "correlation = " + Format(task.brickD.correlation, fmt3)
-
-                    'Dim ptTextLoc = task.brickD.rect.topleft
-                    'If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
-                    '    ptTextLoc.X -= w * 0.15
-                    'Else
-                    '    ptTextLoc.Y -= task.brickD.rect.Height * 3
-                    'End If
                     ptCursor = validatePoint(task.mouseMovePoint)
                     SyncLock trueTextLock
                         Static saveObjectName = task.displayObjectName
@@ -1742,8 +1729,6 @@ Public Class Main_UI
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         End If
-                        ' if dst1 is being overridden, then don't display the brick info.
-                        ' If task.displayDst1 = False Then trueData.Add(New TrueText(depthAndCorrelationText, ptTextLoc, 1))
                         task.trueData.Clear()
                     End SyncLock
                 End If

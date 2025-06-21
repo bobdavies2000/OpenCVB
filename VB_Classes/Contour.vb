@@ -1,3 +1,4 @@
+Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
     Public options As New Options_Contours
@@ -117,7 +118,6 @@ Public Class Contour_Info : Inherits TaskParent
 
         For Each contour In task.contours.contourList
             If contour.index > 10 Then Exit For
-            Dim indexLast = task.contours.contourMap.Get(Of Single)(contour.maxDstable.Y, contour.maxDstable.X) - 1
             dst2.Circle(contour.maxDstable, task.DotSize, task.highlight, -1, task.lineType)
             SetTrueText(CStr(contour.index), contour.maxDstable, 2)
         Next
@@ -1025,18 +1025,19 @@ Public Class Contour_Sort : Inherits TaskParent
         Next
 
         Dim contourLast As New List(Of contourData)(contourList)
+        Dim contourMapLast = contourMap.Clone
+
         contourList.Clear()
+        contourMap.SetTo(0)
         For Each contour In sortedList.Values
             contour.index = contourList.Count
             contourList.Add(contour)
         Next
 
-        Dim contourMapLast = contourMap.Clone
-        contourMap.SetTo(0)
         Dim matched As Integer
         For Each contour In contourList
             Dim indexLast = contourMapLast.Get(Of Single)(contour.maxDist.Y, contour.maxDist.X) - 1
-            If indexLast > 0 Then
+            If indexLast >= 0 And contourLast.Count > indexLast Then
                 contour.maxDstable = contourLast(indexLast).maxDstable
                 matched += 1
             End If
@@ -1049,7 +1050,6 @@ Public Class Contour_Sort : Inherits TaskParent
             Dim indexStable = contourMap.Get(Of Single)(contour.maxDstable.Y, contour.maxDstable.X)
             If indexStable <> index Then contour.maxDstable = contour.maxDist
         Next
-
 
         If task.heartBeat Then
             labels(2) = "FindContours found the " + CStr(contourList.Count) + " that are big enough of the " +
@@ -1270,5 +1270,42 @@ Public Class Contour_Depth : Inherits TaskParent
 
         dst3 = ShowPalette(dst2)
         labels(2) = "CV_8U format of the " + CStr(depthContourList.Count) + " depth contours"
+    End Sub
+End Class
+
+
+
+
+Public Class Contour_DepthRegions : Inherits TaskParent
+    Public options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Dim sortContours As New Contour_Sort
+    Dim prep As New RedCloud_PrepXYZero
+    Public Sub New()
+        desc = "Use the mask from RedCloud_PrepXYZero to create color contours."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        prep.Run(src)
+
+        dst1 = prep.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
+        If sortContours.allContours.Count <= 1 Then Exit Sub
+
+        sortContours.Run(src)
+
+        contourList = sortContours.contourList
+        contourMap = sortContours.contourMap
+        labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
+
+        For Each contour In contourList
+            contour.ID = prep.dst3.Get(Of Byte)(contour.maxDist.Y, contour.maxDist.X)
+            contourMap(contour.rect).SetTo(contour.ID Mod 255, contour.mask)
+        Next
+
+        dst2 = ShowPalette(contourMap)
     End Sub
 End Class

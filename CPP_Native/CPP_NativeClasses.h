@@ -99,13 +99,10 @@ public:
                     res[loc + 1] = 0;
                     res[loc + dst.cols] = 0;
                     res[loc + dst.cols + 1] = 0;
-                    //res[loc + 2] = 0;
-                    //res[loc + dst.cols * 2] = 0;
-                    //res[loc + dst.cols * 2 + 1] = 0;
                 }
             }
         }
-        result.col(dst.cols - 1).setTo(0);
+        result.col(dst.cols - 1).setTo(0); // prevents flooding neighbors...
         result.col(dst.cols - 2).setTo(0);
     }
 };

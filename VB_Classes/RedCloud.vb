@@ -509,43 +509,6 @@ End Class
 
 
 
-Public Class RedCloud_PrepXY : Inherits TaskParent
-    Public mdList As New List(Of maskData)
-    Public classCount As Integer
-    Public Sub New()
-        cPtr = PrepXY_Open()
-        desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim inputX(task.pcSplit(0).Total * task.pcSplit(0).ElemSize - 1) As Byte
-        Dim inputY(task.pcSplit(1).Total * task.pcSplit(1).ElemSize - 1) As Byte
-
-        Marshal.Copy(task.pcSplit(0).Data, inputX, 0, inputX.Length)
-        Marshal.Copy(task.pcSplit(1).Data, inputY, 0, inputY.Length)
-
-        Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
-        Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
-
-        Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                  task.xRange, task.yRange, task.histogramBins)
-        handleX.Free()
-        handleY.Free()
-
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst2.SetTo(0, task.noDepthMask)
-
-        dst3 = ShowPalette(dst2)
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedCloud_RedColor : Inherits TaskParent
     Dim contours As New RedCloud_Contours
     Public Sub New()
@@ -589,10 +552,10 @@ Public Class RedCloud_Contours : Inherits TaskParent
         options.Run()
 
         prep.Run(src)
-        dst1 = ShowPalette(prep.dst2).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = ShowPalette(prep.dst2).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim mode = options.options2.ApproximationMode
-        cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
+        cv.Cv2.FindContours(dst0, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
         If sortContours.allContours.Count <= 1 Then Exit Sub
 
         sortContours.Run(src)
@@ -603,3 +566,55 @@ Public Class RedCloud_Contours : Inherits TaskParent
         dst2 = sortContours.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class RedCloud_PrepXY : Inherits TaskParent
+    Public Sub New()
+        cPtr = PrepXY_Open()
+        desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim inputX(task.pcSplit(0).Total * task.pcSplit(0).ElemSize - 1) As Byte
+        Dim inputY(task.pcSplit(1).Total * task.pcSplit(1).ElemSize - 1) As Byte
+
+        Marshal.Copy(task.pcSplit(0).Data, inputX, 0, inputX.Length)
+        Marshal.Copy(task.pcSplit(1).Data, inputY, 0, inputY.Length)
+
+        Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
+        Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
+
+        Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                  task.xRange, task.yRange, task.histogramBins)
+        handleX.Free()
+        handleY.Free()
+
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2.SetTo(0, task.noDepthMask)
+
+        dst3 = ShowPalette(dst2)
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_PrepXYZero : Inherits TaskParent
+    Dim prep As New RedCloud_PrepXY
+    Public Sub New()
+        desc = "Use the PrepXY output as a way to separate colors."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        dst3 = prep.dst3
+    End Sub
+End Class
+

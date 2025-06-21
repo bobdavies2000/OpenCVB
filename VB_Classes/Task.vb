@@ -875,7 +875,10 @@ Public Class VBtask : Implements IDisposable
             displayObject.trueData.Clear()
             labels = displayObject.labels
             If displayDst1 Then labels(1) = displayObject.labels(1)
+        Else
+            dst1 = depthRGB
         End If
+
         Return saveOptionsChanged
     End Function
     Public Sub Dispose() Implements IDisposable.Dispose
