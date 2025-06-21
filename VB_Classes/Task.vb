@@ -249,6 +249,7 @@ Public Class VBtask : Implements IDisposable
     Public scalarColors(255) As cv.Scalar
     Public vecColors(255) As cv.Vec3b
     Public depthColorMap As cv.Mat
+    Public colorMap As cv.Mat
     Public correlationColorMap As cv.Mat
 
     Public topCameraPoint As cv.Point
@@ -747,9 +748,9 @@ Public Class VBtask : Implements IDisposable
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
         edges.Run(task.grayStable)
+        colorizer.Run(src)
         contours.Run(src)
 
-        colorizer.Run(src)
         If task.brickRunFlag Then bricks.Run(src)
 
         TaskTimer.Enabled = True

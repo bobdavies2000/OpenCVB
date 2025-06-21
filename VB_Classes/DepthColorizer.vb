@@ -39,6 +39,9 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             task.depthColorMap = saveDepthColorMap
         End If
 
+        task.vecColors(0) = New cv.Vec3b ' black for the first color...
+        task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
+
         Dim color3 = cv.Scalar.Black, color4 = cv.Scalar.Red
         Dim corrColors = New List(Of cv.Vec3b)
         f = 1.0

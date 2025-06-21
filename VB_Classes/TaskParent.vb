@@ -565,17 +565,12 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Shared Function ShowPalette(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
-        Static colorMap As cv.Mat
-        If colorMap Is Nothing Then
-            colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors)
-            colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b)
-        End If
         If input.Type <> cv.MatType.CV_8U Then
             Dim input8u As New cv.Mat
             input.ConvertTo(input8u, cv.MatType.CV_8U)
-            cv.Cv2.ApplyColorMap(input8u, output, colorMap)
+            cv.Cv2.ApplyColorMap(input8u, output, task.colorMap)
         Else
-            cv.Cv2.ApplyColorMap(input, output, colorMap)
+            cv.Cv2.ApplyColorMap(input, output, task.colorMap)
         End If
 
         Return output

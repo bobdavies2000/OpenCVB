@@ -508,41 +508,6 @@ End Class
 
 
 
-Public Class RedCloud_Contours : Inherits TaskParent
-    Dim prep As New RedCloud_PrepXY
-    Dim options As New Options_Contours
-    Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        prep.Run(src)
-        dst2 = ShowPalette(prep.dst2).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Dim allContours As cv.Point()()
-        Dim mode = options.options2.ApproximationMode
-        cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.List, mode)
-        If allContours.Count <= 1 Then Exit Sub
-
-        contourList = Contour_Basics.sortContours(allContours)
-        contourMap.SetTo(0)
-        For Each contour In contourList
-            contourMap(contour.rect).SetTo(contour.index, contour.mask)
-        Next
-
-        dst3 = ShowPalette(contourMap)
-        If task.heartBeat Then labels(2) = CStr(contourList.Count) + " depth contours were found."
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class RedCloud_PrepXY : Inherits TaskParent
     Public mdList As New List(Of maskData)
@@ -601,5 +566,40 @@ Public Class RedCloud_RedColor : Inherits TaskParent
         dst3(task.contourD.rect).SetTo(white, task.contourD.mask)
         task.contourD = Contour_Basics.selectContour()
         labels(3) = task.contours.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Contours : Inherits TaskParent
+    Dim prep As New RedCloud_PrepXY
+    Dim options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Dim sortContours As New Contour_Sort
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        prep.Run(src)
+        dst1 = ShowPalette(prep.dst2).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
+        If sortContours.allContours.Count <= 1 Then Exit Sub
+
+        sortContours.Run(src)
+
+        contourList = sortContours.contourList
+        contourMap = sortContours.contourMap
+        labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
     End Sub
 End Class
