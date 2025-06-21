@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class HullLine_Basics : Inherits TaskParent
-    Dim hulls As New Contour_Hulls
+    Public hulls As New Contour_Hulls
     Public minDistance As Integer = dst2.Width * 0.02
     Public lpList As New List(Of lpData)
     Public lpLastList As New List(Of lpData)
@@ -114,5 +114,28 @@ Public Class HullLine_KNN : Inherits TaskParent
 
         labels(2) = CStr(task.hullLines.lpLastList.Count) + " edge points in the previous frame (white). " +
                     CStr(task.hullLines.lpList.Count) + " edge points found in the current frame (yellow)"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class HullLine_SelectHull : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Click on any hull to see it below with its edge points."
+        desc = "Display the contour hull selected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.hullLines.dst2
+        labels(2) = task.hullLines.labels(3)
+
+        Dim contour = task.hullLines.hulls.getSelectedHull()
+
+        dst1.SetTo(0)
+        DrawContour(dst1, contour.hull, contour.index + 1, -1)
+        dst3 = ShowPalette(dst1)
     End Sub
 End Class

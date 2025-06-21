@@ -736,8 +736,8 @@ End Class
 
 
 Public Class contourData
-    Public rect As cv.Rect
-    Public mask As cv.Mat
+    Public rect As New cv.Rect(0, 0, 1, 1)
+    Public mask As New cv.Mat(1, 1, cv.MatType.CV_8U)
     Public pixels As Integer
     Public index As Integer
     Public depth As Single
@@ -754,7 +754,5 @@ Public Class contourData
         Return TaskParent.ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
     End Function
     Public Sub New()
-        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-        rect = New cv.Rect(0, 0, 1, 1)
     End Sub
 End Class

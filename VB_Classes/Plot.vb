@@ -103,6 +103,7 @@ Public Class Plot_OverTimeSingle : Inherits TaskParent
     Public plotData As Single
     Public backColor = cv.Scalar.DarkGray
     Public max As Single, min As Single, avg, fmt As String
+    Public useFixedRange As Boolean
     Public plotColor = cv.Scalar.Blue
     Dim inputList As New List(Of Single)
     Public Sub New()
@@ -116,24 +117,33 @@ Public Class Plot_OverTimeSingle : Inherits TaskParent
         inputList.Add(plotData)
         dst2.ColRange(New cv.Range(0, inputList.Count)).SetTo(backColor)
 
-        max = inputList.Max
-        min = inputList.Min
+        If useFixedRange = False Then
+            max = inputList.Max
+            min = inputList.Min
+        End If
+        Dim y As Single
         For i = 0 To inputList.Count - 1
-            Dim y = 1 - (inputList(i) - min) / (max - min)
+            y = 1 - (inputList(i) - min) / (max - min)
             y *= dst2.Height - 1
-            Dim c As New cv.Point(i, y)
+            Dim c As New cv.Point2f(i, y)
             If c.X < 1 Then c.X = 1
-            DrawCircle(dst2, c, 1, plotColor)
+            dst2.Circle(c, task.DotSize, blue, -1, task.lineType)
         Next
 
         If inputList.Count > dst2.Width / 8 Then
             Dim diff = max - min
             Dim fmt = If(diff > 10, fmt0, If(diff > 2, fmt1, If(diff > 0.5, fmt2, fmt3)))
+            Dim nextText As String
             For i = 0 To 2
-                Dim nextText = Format(Choose(i + 1, max, inputList.Average, min), fmt)
-                Dim pt = Choose(i + 1, New cv.Point(0, 10), New cv.Point(0, dst2.Height / 2 - 5), New cv.Point(0, dst2.Height - 3))
+                If useFixedRange Then
+                    nextText = Choose(i + 1, CStr(max), CStr(CInt((max + min) / 2)), CStr(min))
+                Else
+                    nextText = Format(Choose(i + 1, max, inputList.Average, min), fmt)
+                End If
+                Dim pt = Choose(i + 1, New cv.Point(0, 10), New cv.Point(0, dst2.Height / 2 - 5),
+                                New cv.Point(0, dst2.Height - 3))
                 cv.Cv2.PutText(dst2, nextText, pt, cv.HersheyFonts.HersheyPlain, 0.7, white, 1, task.lineType)
-            Next
+                Next
         End If
 
         Dim p1 = New cv.Point(0, dst2.Height / 2)

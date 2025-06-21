@@ -12,7 +12,6 @@ Public Class Contour_Basics : Inherits TaskParent
         Static pt = task.ClickPoint
         If task.mouseClickFlag Then pt = task.ClickPoint
         Dim index As Integer = task.contours.contourMap.Get(Of Single)(pt.Y, pt.X)
-        If index = 0 Then index = 1
         task.color(task.contourD.rect).SetTo(cv.Scalar.White, task.contourD.mask)
         Return task.contours.contourList(index)
     End Function
@@ -49,7 +48,7 @@ Public Class Contour_Basics : Inherits TaskParent
             sortedList.Add(contour.pixels, contour)
         Next
 
-        Dim contourList As New List(Of contourData)({New contourData})
+        Dim contourList As New List(Of contourData)
         For Each contour In sortedList.Values
             contour.index = contourList.Count
             contourList.Add(contour)
@@ -1099,44 +1098,6 @@ End Class
 
 
 
-Public Class Contour_Hulls : Inherits TaskParent
-    Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-    Public Sub New()
-        desc = "Add hulls and improved contours using ConvexityDefects to each contour cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = task.contours.labels(2)
-        dst2 = task.contours.dst2
-
-        Dim defectCount As Integer
-        contourMap.SetTo(0)
-        contourList.Clear()
-        For Each contour In task.contours.contourList
-            If contour.points.Count >= 5 Then
-                contour.hull = cv.Cv2.ConvexHull(contour.points.ToArray, True).ToList
-                Dim hullIndices = cv.Cv2.ConvexHullIndices(contour.hull.ToArray, False)
-                Try
-                    Dim defects = cv.Cv2.ConvexityDefects(contour.points, hullIndices)
-                    contour.points = Convex_RedCloudDefects.betterContour(contour.points, defects)
-                Catch ex As Exception
-                    defectCount += 1
-                End Try
-                DrawContour(contourMap, contour.hull, contour.index, -1)
-                contourList.Add(contour)
-            End If
-        Next
-
-        dst3 = ShowPalette(contourMap)
-        labels(3) = CStr(contourList.Count) + " hulls"
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Contour_Lines : Inherits TaskParent
     Dim hulls As New Contour_Hulls
@@ -1184,5 +1145,111 @@ Public Class Contour_Isolate : Inherits TaskParent
         For Each contour In task.contours.contourList
             dst3.Circle(contour.maxDist, task.DotSize, task.highlight, -1, task.lineType)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Contour_Hulls : Inherits TaskParent
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public Sub New()
+        desc = "Add hulls and improved contours using ConvexityDefects to each contour cell"
+    End Sub
+    Public Function getSelectedHull() As contourData
+        Dim index = contourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        If index = 0 Then Return contourList(0)
+        Return contourList(index - 1)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        labels(2) = task.contours.labels(2)
+        dst2 = task.contours.dst2
+
+        contourMap.SetTo(0)
+        contourList.Clear()
+        For Each contour In task.contours.contourList
+            If contour.points.Count >= 5 Then
+                contour.hull = cv.Cv2.ConvexHull(contour.points.ToArray, True).ToList
+                DrawContour(contourMap, contour.hull, contour.index + 1, -1)
+                contourList.Add(contour)
+            End If
+        Next
+
+        dst3 = ShowPalette(contourMap)
+        labels(3) = CStr(contourList.Count) + " hulls"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contour_EdgePoints : Inherits TaskParent
+    Dim plot As New Plot_OverTimeSingle
+    Dim rangeVal As Integer = 3
+    Public Sub New()
+        plot.useFixedRange = True
+        plot.max = rangeVal
+        plot.min = -rangeVal
+        task.gOptions.DebugSlider.Value = 50
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        desc = "Find the edge points for each contour rect"
+    End Sub
+    Public Shared Function EdgePointOffset(ptIn As cv.Point, offset As Integer) As cv.Point
+        Dim pt = New cv.Point(ptIn.X, ptIn.Y)
+        If pt.X = 0 Then pt.X += offset
+        If pt.Y = 0 Then pt.Y += offset
+        If pt.X = 0 Then pt.X += offset
+        If pt.Y = 0 Then pt.Y += offset
+        If pt.X = task.workingRes.Width - 1 Then pt.X -= offset
+        If pt.Y = task.workingRes.Height - 1 Then pt.Y -= offset
+        If pt.X = task.workingRes.Width - 1 Then pt.X -= offset
+        If pt.Y = task.workingRes.Height - 1 Then pt.Y -= offset
+        Return pt
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0 = dst1.Clone
+        dst2 = task.hullLines.dst3
+        labels(2) = task.hullLines.labels(2)
+
+        Dim ptList As New List(Of cv.Point)
+        dst1.SetTo(0)
+        Dim maxLines = 3 ' task.gOptions.DebugSlider.Value * 2
+        For Each contour In task.contours.contourList
+            If contour.index < 3 Then Continue For
+            ptList.Add(New cv.Point(0, contour.rect.TopLeft.Y))
+            ptList.Add(New cv.Point(contour.rect.TopLeft.X, 0))
+
+            Dim index = ptList.Count - 1
+            For i = 0 To 1
+                Dim pt = ptList(index - i)
+                dst1.Set(Of Single)(pt.Y, pt.X, contour.index + 1)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+            If ptList.Count >= maxLines Then Exit For
+        Next
+
+        Dim distancesTop As New List(Of Integer)
+        For x = 0 To dst1.Width - 1
+            Dim contourIndex = dst1.Get(Of Single)(0, x)
+            If contourIndex <> 0 Then
+                For xx = Math.Max(0, x - rangeVal) To Math.Min(dst2.Width - 1, x + rangeVal)
+                    Dim lastIndex = dst0.Get(Of Single)(0, xx)
+                    If lastIndex = contourIndex Then distancesTop.Add(xx - x)
+                Next
+            End If
+        Next
+
+        plot.plotData = 0
+        If distancesTop.Count > 0 Then plot.plotData = distancesTop.Average
+        plot.Run(src)
+        dst3 = plot.dst2
+
+        labels(3) = "Top count = " + CStr(distancesTop.Count)
     End Sub
 End Class
