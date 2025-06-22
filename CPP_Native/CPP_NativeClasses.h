@@ -77,33 +77,33 @@ public:
 
         result.convertTo(result, CV_8U);
 
-        uchar* res = (uchar*)result.data;
-        for (int y = 0; y < dst.rows - 2; y++)
-        {
-            for (int x = 0; x < dst.cols - 2; x++)
-            {
-                int loc = dst.cols * y + x;
-                uchar val1 = res[loc];
-                uchar val2 = res[loc + 1];
-                bool zipData = false;
-                if (val1 != 0 && val2 != 0)
-                    if (val1 != val2) zipData = true;
+        //uchar* res = (uchar*)result.data;
+        //for (int y = 0; y < dst.rows - 2; y++)
+        //{
+        //    for (int x = 0; x < dst.cols - 2; x++)
+        //    {
+        //        int loc = dst.cols * y + x;
+        //        uchar val1 = res[loc];
+        //        uchar val2 = res[loc + 1];
+        //        bool zipData = false;
+        //        if (val1 != 0 && val2 != 0)
+        //            if (val1 != val2) zipData = true;
 
-                val2 = res[loc + dst.cols];
-                if (val1 != 0 && val2 != 0)
-                    if (val1 != val2) zipData = true;
+        //        val2 = res[loc + dst.cols];
+        //        if (val1 != 0 && val2 != 0)
+        //            if (val1 != val2) zipData = true;
 
-                if (zipData) 
-                {
-                    res[loc] = 0;
-                    res[loc + 1] = 0;
-                    res[loc + dst.cols] = 0;
-                    res[loc + dst.cols + 1] = 0;
-                }
-            }
-        }
-        result.col(dst.cols - 1).setTo(0); // prevents flooding neighbors...
-        result.col(dst.cols - 2).setTo(0);
+        //        if (zipData) 
+        //        {
+        //            res[loc] = 0;
+        //            res[loc + 1] = 0;
+        //            res[loc + dst.cols] = 0;
+        //            res[loc + dst.cols + 1] = 0;
+        //        }
+        //    }
+        //}
+        //result.col(dst.cols - 1).setTo(0); // prevents flooding neighbors...
+        //result.col(dst.cols - 2).setTo(0);
     }
 };
 

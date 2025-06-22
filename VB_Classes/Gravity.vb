@@ -28,6 +28,8 @@ Public Class Gravity_Basics : Inherits TaskParent
             dst2.SetTo(0)
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+            dst3 = src
+            dst3.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth, task.lineType)
         End If
         labels(2) = "IMU gravity use " + CStr(imuGravityCount) + " times or " + Format(imuGravityCount / task.frameCount, "0%")
     End Sub

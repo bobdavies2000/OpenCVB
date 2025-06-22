@@ -119,7 +119,7 @@ Public Class RedCloud_YZ : Inherits TaskParent
 
         stats.Run(src)
         dst1 = stats.dst3
-        SetTrueText(stats.strOut, 1)
+        SetTrueText(stats.strOut, 3)
     End Sub
 End Class
 
