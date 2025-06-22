@@ -33,9 +33,9 @@ if not exist OrbbecSDK_CSharp (
 
 if not exist OakD\depthai-core (
 	cd OakD
-	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/luxonis/depthai-core.git"
+	git.exe clone "https://github.com/luxonis/depthai-core.git"
 	cd depthai-core
-	"c:\Program Files\Git\bin\git.exe" submodule update --init --recursive
+	git.exe submodule update --init --recursive
 	cd ..\..\
 )
 

@@ -141,7 +141,17 @@ Public Class Main_UI
         ' the 3 lists below must have an entry for each camera - supported/640x480/1920...
         cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)  ' <<<<<<<<<<<< here is the list of supported cameras.
         With settings
-            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True}) ' Mynt support updated below
+            ' copies here for convenience.
+            'Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
+            '                                              "Orbbec Gemini 335L",
+            '                                              "Orbbec Gemini 336L",
+            '                                              "Oak-D camera",
+            '                                              "Intel(R) RealSense(TM) Depth Camera 435i",
+            '                                              "Intel(R) RealSense(TM) Depth Camera 455",
+            '                                              "MYNT-EYE-D1000",
+            '                                              "Orbbec Gemini 335"})
+            ' Mynt support updated below
+            .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
             .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
             .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
@@ -902,15 +912,19 @@ Public Class Main_UI
 
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
+
+#If AZURE_SUPPORT Then
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
+#End If
 
-        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Debug\", "LibUsb for Luxonis")
-        updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
+        If settings.cameraPresent(3) Then ' OakD is the 3rd element in cameraPresent but it is not defined explicitly.
+            updatePath(HomeDir.FullName + "OakD\build\depthai-core\Debug\", "LibUsb for Luxonis")
+            updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
 
-        updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
-        updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
-
+            updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
+            updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+        End If
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
@@ -942,8 +956,8 @@ Public Class Main_UI
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
 
-        setupPath()
         jsonRead()
+        setupPath()
         camSwitch()
 
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
