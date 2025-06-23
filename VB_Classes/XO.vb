@@ -5262,3 +5262,55 @@ Public Class XO_Brick_FitLeftInColor : Inherits TaskParent
         labels(2) = "Correlation coefficient peak = " + Format(mm.maxVal, fmt3)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class XO_FeatureLine_BasicsOld : Inherits TaskParent
+    Dim match As New Match_Basics
+    Public correlation1 As Single
+    Public correlation2 As Single
+    Public doubleCheckLine As Boolean
+    Dim lines As New LineRGB_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find and track the longest line by matching endpoint bricks."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src.Clone)
+
+        If standalone Then
+            labels(3) = "Currently available lines."
+            dst3.SetTo(0)
+            For Each lp In lines.lpList
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Next
+        End If
+
+        dst2 = src
+        If lines.lpList.Count = 0 Then Exit Sub
+
+        task.lpD = lines.lpList(0) ' the longest line...
+        dst2.Line(task.lpD.ep1, task.lpD.ep2, task.highlight, task.lineWidth + 1, task.lineType)
+        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
+
+        If doubleCheckLine Then
+            Dim index = task.lpD.bricks(0)
+            match.template = src(task.gridRects(index))
+
+            Dim searchRect = task.gridNabeRects(index)
+            match.Run(src(searchRect))
+            correlation1 = match.correlation
+
+            searchRect = task.gridNabeRects(task.lpD.bricks.Last)
+            match.Run(src(searchRect))
+            correlation2 = match.correlation
+            labels(2) = "Line end point correlations: " + Format(correlation1, fmt3) + " / " + Format(correlation2, fmt3)
+        Else
+            labels(2) = task.gravityHorizon.labels(2)
+        End If
+    End Sub
+End Class

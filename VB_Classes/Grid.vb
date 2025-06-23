@@ -373,8 +373,8 @@ Public Class Grid_TrackCenter : Inherits TaskParent
 
         Dim templatePad = match.options.templatePad
         Dim templateSize = match.options.templateSize
-        match.searchRect = ValidateRect(New cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize))
-        match.Run(src)
+        Dim searchRect = ValidateRect(New cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize))
+        match.Run(src(searchRect))
         center = match.matchCenter
 
         If standaloneTest() Then

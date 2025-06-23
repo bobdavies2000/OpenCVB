@@ -1,50 +1,74 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FeatureLine_Basics : Inherits TaskParent
     Dim match As New Match_Basics
-    Public correlation1 As Single
-    Public correlation2 As Single
-    Public doubleCheckLine As Boolean
+    Public gravityProxy As New lpData
+    Dim firstRect As cv.Rect, lastRect As cv.Rect
+    Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
+    Dim lineRGB As New LineRGB_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find and track the longest line by matching endpoint bricks."
+        desc = "Find and track the longest line by matching line bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
+        If task.optionsChanged Then lineRGB.lpList.Clear()
+
+        If matchRuns > 500 Then
+            Dim percent = lineRuns / matchRuns
+            lineRuns = 10
+            matchRuns = lineRuns / percent
+        End If
+
+        dst2 = src.Clone
+        If lineRGB.lpList.Count > 0 Then
+            matchRuns += 1
+            gravityProxy = lineRGB.lpList(0)
+
+            Dim matchInput As New cv.Mat
+            cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
+
+            match.Run(matchInput)
+
+            labels(2) = "Line correlations (first/last): " + Format(match.correlation, fmt3) + " / " +
+                        " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
+                        "line detection runs = " + CStr(totalLineRuns)
+        End If
+
+        If task.heartBeatLT Or lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Then
+            lineRGB.Run(src.Clone)
+            If lineRGB.lpList.Count = 0 Then Exit Sub
+
+            gravityProxy = lineRGB.lpList(0)
+            lineRuns += 1
+            totalLineRuns += 1
+
+            firstRect = task.gridNabeRects(gravityProxy.bricks(0))
+            lastRect = task.gridNabeRects(gravityProxy.bricks.Last)
+            If firstRect.Width <> lastRect.Width Or firstRect.Height <> lastRect.Height Then
+                Dim w = Math.Min(firstRect.Width, lastRect.Width)
+                Dim h = Math.Min(firstRect.Height, lastRect.Height)
+                firstRect = New cv.Rect(firstRect.X, firstRect.Y, w, h)
+                lastRect = New cv.Rect(lastRect.X, lastRect.Y, w, h)
+            End If
+
+            Dim matchTemplate As New cv.Mat
+            cv.Cv2.HConcat(src(firstRect), src(lastRect), matchTemplate)
+            match.template = matchTemplate
+        End If
+
+        If standaloneTest() Then
             labels(3) = "Currently available lines."
             dst3.SetTo(0)
-            For Each lp In task.hullLines.lpList
+            For Each lp In lineRGB.lpList
                 dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
         End If
 
-        dst2 = src.Clone
-        If task.hullLines.lpList.Count > 1 Then
-            task.lpD = task.hullLines.lpList(0)
-            dst2.Line(task.lpD.ep1, task.lpD.ep2, task.highlight, task.lineWidth + 1, task.lineType)
-            dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
-
-            If doubleCheckLine Then
-                Dim index = task.lpD.bricks(0)
-                match.template = src(task.gridRects(index))
-
-                Dim searchRect = task.gridNabeRects(index)
-                match.Run(src(searchRect))
-                correlation1 = match.correlation
-
-                searchRect = task.gridNabeRects(task.lpD.bricks.Last)
-                match.Run(src(searchRect))
-                correlation2 = match.correlation
-                labels(2) = "Line end point correlations: " + Format(correlation1, fmt3) + " / " + Format(correlation2, fmt3)
-            Else
-                labels(2) = task.gravityHorizon.labels(2)
-            End If
-        End If
+        dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
+        dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
+        dst2.Line(gravityProxy.p1, gravityProxy.p2, task.highlight, task.lineWidth + 1, task.lineType)
+        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
     End Sub
 End Class
-
-
-
-
 
 
 

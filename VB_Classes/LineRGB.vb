@@ -446,11 +446,11 @@ Public Class LineRGB_Info : Inherits TaskParent
             Next
         End If
 
-        Dim lpIndex = Math.Abs(task.gOptions.DebugSlider.Value)
-        If lpIndex < task.hullLines.lpList.Count Then task.lpD = task.hullLines.lpList(lpIndex)
+        'Dim lpIndex = Math.Abs(task.gOptions.DebugSlider.Value)
+        'If lpIndex < task.lineRGB.lpList.Count Then task.lpD = task.lineRGB.lpList(lpIndex)
 
-        strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
-        strOut += CStr(task.hullLines.lpList.Count) + " lines found " + vbCrLf + vbCrLf
+        'strOut = "Use the global options 'DebugSlider' to select the line for display " + vbCrLf + vbCrLf
+        'strOut += CStr(task.lineRGB.lpList.Count) + " lines found " + vbCrLf + vbCrLf
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 

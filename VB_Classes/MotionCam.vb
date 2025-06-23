@@ -1,5 +1,18 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MotionCam_Basics : Inherits TaskParent
+    Public Sub New()
+        desc = "Use the FeatureLine_Basics line to to figure out camera motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class MotionCam_MultiLine : Inherits TaskParent
     Public edgeList As New List(Of SortedList(Of Single, Integer))
     Public minDistance As Integer = dst2.Width * 0.02
     Dim knn As New KNN_EdgePoints

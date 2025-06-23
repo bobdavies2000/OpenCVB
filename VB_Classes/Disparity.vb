@@ -22,17 +22,17 @@ Public Class Disparity_Basics : Inherits TaskParent
 
         match.template = task.leftView(rect)
         Dim maxDisparity As Integer = 128
-        match.searchRect = New cv.Rect(Math.Max(0, rect.X - maxDisparity), rect.Y,
-                           rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
+        Dim searchRect = New cv.Rect(Math.Max(0, rect.X - maxDisparity), rect.Y,
+                         rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
 
         rightView = task.rightView
 
         dst2.Rectangle(rect, black, task.lineWidth)
-        match.Run(rightView)
+        match.Run(rightView(searchRect))
         dst3 = rightView
         matchRect = match.matchRect
 
-        dst3.Rectangle(match.searchRect, black, task.lineWidth)
+        dst3.Rectangle(searchRect, black, task.lineWidth)
         dst3.Rectangle(match.matchRect, black, task.lineWidth)
         saveCorrelations.Add(match.correlation)
 

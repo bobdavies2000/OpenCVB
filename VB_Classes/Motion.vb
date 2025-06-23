@@ -676,7 +676,6 @@ Public Class Motion_FPolyRect : Inherits TaskParent
     Public match As New Match_Basics
     Dim srcSave As New cv.Mat
     Public Sub New()
-        match.searchRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         desc = "Confirm the FPoly_LineRect matched the previous image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -983,8 +982,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         For i = 0 To featureRects.Count - 1
             Dim roi = featureRects(i)
             match.template = saveMat(roi)
-            match.searchRect = searchRects(i)
-            match.Run(src)
+            match.Run(src(searchRects(i)))
             dst3.Rectangle(match.matchRect, task.highlight, task.lineWidth)
             matchRects.Add(match.matchRect)
         Next
@@ -1051,8 +1049,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         For i = 0 To featureRects.Count - 1
             Dim roi = featureRects(i)
             match.template = dst1(roi)
-            match.searchRect = searchRects(i)
-            match.Run(src)
+            match.Run(src(searchRects(i)))
             dst3.Rectangle(match.matchRect, task.highlight, task.lineWidth)
             matchRects.Add(match.matchRect)
         Next

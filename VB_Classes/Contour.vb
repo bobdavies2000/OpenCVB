@@ -1281,7 +1281,7 @@ Public Class Contour_DepthRegions : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Dim sortContours As New Contour_Sort
-    Dim prep As New RedCloud_PrepXYZero
+    Dim prep As New RedPrep_Basics
     Public Sub New()
         desc = "Use the mask from RedCloud_PrepXYZero to create color contours."
     End Sub

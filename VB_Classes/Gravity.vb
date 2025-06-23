@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Dim gravity As New Gravity_BasicsRaw
-    Dim featLine As New FeatureLine_Basics
     Dim imuGravityCount As Integer
+    Dim featLine As New FeatureLine_Basics
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
@@ -11,14 +11,14 @@ Public Class Gravity_Basics : Inherits TaskParent
         Static savedLine = task.gravityVec
         featLine.Run(src)
 
-        If CInt(savedLine.ep1.X) <> CInt(task.lpD.ep1.X) Or
-           CInt(savedLine.ep1.Y) <> CInt(task.lpD.ep1.Y) Or
-           CInt(savedLine.ep2.X) <> CInt(task.lpD.ep2.X) Or
-           CInt(savedLine.ep2.Y) <> CInt(task.lpD.ep2.Y) Then
+        If CInt(savedLine.ep1.X) <> CInt(featLine.gravityProxy.ep1.X) Or
+           CInt(savedLine.ep1.Y) <> CInt(featLine.gravityProxy.ep1.Y) Or
+           CInt(savedLine.ep2.X) <> CInt(featLine.gravityProxy.ep2.X) Or
+           CInt(savedLine.ep2.Y) <> CInt(featLine.gravityProxy.ep2.Y) Then
 
             imuGravityCount += 1
             gravity.Run(src)
-            savedLine = task.lpD
+            savedLine = featLine.gravityProxy
             task.gravityVec = gravity.gravityVec
         End If
 
@@ -29,7 +29,7 @@ Public Class Gravity_Basics : Inherits TaskParent
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
             dst3 = src
-            dst3.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth, task.lineType)
+            dst3.Line(featLine.gravityProxy.p1, featLine.gravityProxy.p2, task.highlight, task.lineWidth, task.lineType)
         End If
         labels(2) = "IMU gravity use " + CStr(imuGravityCount) + " times or " + Format(imuGravityCount / task.frameCount, "0%")
     End Sub

@@ -6,9 +6,7 @@ Public Class Match_Basics : Inherits TaskParent
     Public optionsEx As New Options_Features
 
     Public template As cv.Mat ' Provide this
-    Public searchRect As New cv.Rect ' Provide this 
 
-    Public mm As mmData
     Public correlation As Single ' Resulting Correlation coefficient
     Public matchCenter As cv.Point
     Public matchRect As New cv.Rect
@@ -16,7 +14,8 @@ Public Class Match_Basics : Inherits TaskParent
         If standalone Then task.gOptions.DebugCheckBox.Checked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
+        desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
+               "(allows multiple targets per image.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -28,33 +27,39 @@ Public Class Match_Basics : Inherits TaskParent
             End If
         End If
 
-        If searchRect.Width = 0 Then
-            cv.Cv2.MatchTemplate(template, src, dst0, options.matchOption)
-        Else
-            cv.Cv2.MatchTemplate(template, src(searchRect), dst0, options.matchOption)
-        End If
-        mm = GetMinMax(dst0)
+        cv.Cv2.MatchTemplate(template, src, dst0, options.matchOption)
+        Dim mm = GetMinMax(dst0)
 
         correlation = mm.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
         Dim w = template.Width, h = template.Height
-        If searchRect.Width = 0 Then
-            matchCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
-            matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
-        Else
-            matchCenter = New cv.Point(searchRect.X + mm.maxLoc.X + w / 2, searchRect.Y + mm.maxLoc.Y + h / 2)
-            matchRect = New cv.Rect(searchRect.X + mm.maxLoc.X, searchRect.Y + mm.maxLoc.Y, w, h)
-        End If
+        matchCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
+        matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
             dst2 = src
             DrawCircle(dst2, matchCenter, task.DotSize, white)
-            dst3 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
         End If
     End Sub
 End Class
 
 
 
+
+
+
+Public Class Match_Duplicate : Inherits TaskParent
+    Public match As New Match_Basics
+    Public Sub New()
+        desc = "Test the correlation of 2 identical Mat's."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        If task.drawRect.Width = 0 Then task.drawRect = New cv.Rect(10, 10, 50, 50)
+        If task.optionsChanged Then match.template = src(task.drawRect)
+        match.Run(src(task.drawRect))
+        labels(2) = "Correlation coefficient = " + Format(match.correlation, fmt3)
+    End Sub
+End Class
 
 
 
