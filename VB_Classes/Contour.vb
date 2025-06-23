@@ -15,6 +15,7 @@ Public Class Contour_Basics : Inherits TaskParent
         Static pt = task.ClickPoint
         If task.mouseClickFlag Then pt = task.ClickPoint
         Dim index = task.contours.contourMap.Get(Of Single)(pt.Y, pt.X)
+        If index = 0 Then index = 1
         task.color(task.contourD.rect).SetTo(cv.Scalar.White, task.contourD.mask)
         Return task.contours.contourList(index - 1)
     End Function
@@ -23,15 +24,14 @@ Public Class Contour_Basics : Inherits TaskParent
 
         dst3 = task.edges.dst2
 
-        Dim allContours As cv.Point()()
         Dim mode = options.options2.ApproximationMode
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
-            cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+            cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
         Else
-            cv.Cv2.FindContours(dst3, allContours, Nothing, options.retrievalMode, mode)
+            cv.Cv2.FindContours(dst3, sortContours.allContours, Nothing, options.retrievalMode, mode)
         End If
-        If allContours.Count <= 1 Then Exit Sub
+        If sortContours.allContours.Count <= 1 Then Exit Sub
 
         sortContours.Run(src)
 
@@ -859,7 +859,7 @@ Public Class Contour_Isolate : Inherits TaskParent
         dst1.SetTo(0)
         For Each contour In task.contours.contourList
             If contour.index = task.contourD.index Then Continue For
-            dst1(contour.rect).SetTo(contour.index, contour.mask)
+            dst1(contour.rect).SetTo(contour.index + 1, contour.mask)
         Next
 
         dst3 = ShowPalette(dst1)
