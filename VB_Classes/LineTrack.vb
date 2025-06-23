@@ -8,14 +8,14 @@ Public Class LineTrack_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             dst1.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, cv.LineTypes.Link8)
         Next
 
         dst2 = runRedC(dst1, labels(2), Not dst1)
 
         dst3.SetTo(0)
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             DrawLine(dst3, lp.p1, lp.p2, white, task.lineWidth)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             DrawCircle(dst3, center, task.DotSize, task.highlight, -1)

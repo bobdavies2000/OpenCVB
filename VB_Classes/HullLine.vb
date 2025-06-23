@@ -69,18 +69,44 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
         Return lp
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.hullLines.dst2
-        labels(3) = task.hullLines.labels(3)
+        dst3 = task.lineRGB.dst2
+        labels(3) = task.lineRGB.labels(3)
 
         dst2 = src.Clone
-        For Each lpIn In task.hullLines.lpList
+        For Each lpIn In task.lineRGB.lpList
             Dim lp = EdgePointOffset(lpIn, 1)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
         Next
-        labels(2) = task.hullLines.labels(2)
+        labels(2) = task.lineRGB.labels(2)
     End Sub
 End Class
+
+
+
+
+
+Public Class HullLine_SelectHull : Inherits TaskParent
+    Dim hullLines As New HullLine_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Click on any hull to see it below with its edge points."
+        desc = "Display the contour hull selected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hullLines.Run(src)
+
+        dst2 = hullLines.dst2
+        labels(2) = hullLines.labels(3)
+
+        Dim contour = hullLines.hulls.getSelectedHull()
+
+        dst1.SetTo(0)
+        DrawContour(dst1, contour.hull, contour.index + 1, -1)
+        dst3 = ShowPalette(dst1)
+    End Sub
+End Class
+
 
 
 
@@ -89,53 +115,33 @@ End Class
 
 Public Class HullLine_KNN : Inherits TaskParent
     Dim knn As New KNN_EdgePoints
+    Dim hullLines As New HullLine_Basics
     Public Sub New()
         desc = "Find the edge points for the current and last frm for the hull lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.hullLines.dst2
-        labels(3) = task.hullLines.labels(3)
+        hullLines.Run(src)
 
-        knn.lpInput = task.hullLines.lpList
+        dst3 = hullLines.dst2
+        labels(3) = hullLines.labels(3)
+
+        knn.lpInput = hullLines.lpList
         knn.Run(src)
 
         dst2 = src.Clone
-        For Each lpIn In task.hullLines.lpList
+        For Each lpIn In hullLines.lpList
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
         Next
 
-        For Each lpIn In task.hullLines.lpLastList
+        For Each lpIn In hullLines.lpLastList
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, white, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, white, -1, task.lineType)
         Next
 
-        labels(2) = CStr(task.hullLines.lpLastList.Count) + " edge points in the previous frame (white). " +
-                    CStr(task.hullLines.lpList.Count) + " edge points found in the current frame (yellow)"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class HullLine_SelectHull : Inherits TaskParent
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Click on any hull to see it below with its edge points."
-        desc = "Display the contour hull selected."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.hullLines.dst2
-        labels(2) = task.hullLines.labels(3)
-
-        Dim contour = task.hullLines.hulls.getSelectedHull()
-
-        dst1.SetTo(0)
-        DrawContour(dst1, contour.hull, contour.index + 1, -1)
-        dst3 = ShowPalette(dst1)
+        labels(2) = CStr(hullLines.lpLastList.Count) + " edge points in the previous frame (white). " +
+                    CStr(hullLines.lpList.Count) + " edge points found in the current frame (yellow)"
     End Sub
 End Class

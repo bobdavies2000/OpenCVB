@@ -8,14 +8,14 @@ Public Class LongLine_DepthDirection : Inherits TaskParent
         desc = "Display the direction of each line in depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.hullLines.dst3
+        dst2 = task.lineRGB.dst3
 
         dst1.SetTo(0)
         gcUpdates.Clear()
         Dim avg1 As Single, avg2 As Single
         Dim debugmode = If(task.selectedFeature = 0, False, True)
 
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             If lp.bricks.Count = 0 Then Continue For
             If debugmode Then If task.selectedFeature <> lp.index Then Continue For
 
@@ -104,8 +104,8 @@ Public Class LongLine_Depth : Inherits TaskParent
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.hullLines.lpList.Count <= 1 Then Exit Sub
-        Dim lp = task.hullLines.lpList(0)
+        If task.lineRGB.lpList.Count <= 1 Then Exit Sub
+        Dim lp = task.lineRGB.lpList(0)
         dst2 = src
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
@@ -166,8 +166,8 @@ Public Class LongLine_Point : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then dst2 = src
-        If task.hullLines.lpList.Count = 0 Then Exit Sub
-        Dim lp = task.hullLines.lpList(0)
+        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        Dim lp = task.lineRGB.lpList(0)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         task.kalman.Run(emptyMat)
         lp.p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
@@ -218,11 +218,11 @@ Public Class LongLine_ExtendAll : Inherits TaskParent
         desc = "Create a list of all the extended lines in an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.hullLines.dst2
+        dst2 = task.lineRGB.dst2
 
         dst3 = src.Clone
         lpList.Clear()
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             DrawLine(dst3, lp.ep1, lp.ep2, task.highlight)
             lpList.Add(New lpData(lp.ep1, lp.ep2))
         Next
@@ -275,11 +275,11 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
                 If distance1 < distanceMid * 2 And distance2 < distanceMid * 2 Then
                     Dim cp As coinPoints
 
-                    Dim mps = task.hullLines.lpList(index)
+                    Dim mps = task.lineRGB.lpList(index)
                     cp.p1 = mps.p1
                     cp.p2 = mps.p2
 
-                    mps = task.hullLines.lpList(i)
+                    mps = task.lineRGB.lpList(i)
                     cp.p3 = mps.p1
                     cp.p4 = mps.p2
 

@@ -4,13 +4,12 @@ Public Class FeatureLine_Basics : Inherits TaskParent
     Public gravityProxy As New lpData
     Dim firstRect As cv.Rect, lastRect As cv.Rect
     Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
-    Dim lineRGB As New LineRGB_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and track the longest line by matching line bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then lineRGB.lpList.Clear()
+        If task.optionsChanged Then task.lineRGB.lpList.Clear()
 
         If matchRuns > 500 Then
             Dim percent = lineRuns / matchRuns
@@ -19,9 +18,9 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         End If
 
         dst2 = src.Clone
-        If lineRGB.lpList.Count > 0 Then
+        If task.lineRGB.lpList.Count > 0 Then
             matchRuns += 1
-            gravityProxy = lineRGB.lpList(0)
+            gravityProxy = task.lineRGB.lpList(0)
 
             Dim matchInput As New cv.Mat
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
@@ -33,11 +32,11 @@ Public Class FeatureLine_Basics : Inherits TaskParent
                         "line detection runs = " + CStr(totalLineRuns)
         End If
 
-        If task.heartBeatLT Or lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Then
-            lineRGB.Run(src.Clone)
-            If lineRGB.lpList.Count = 0 Then Exit Sub
+        If task.heartBeat Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Then
+            task.lineRGB.Run(src.Clone)
+            If task.lineRGB.lpList.Count = 0 Then Exit Sub
 
-            gravityProxy = lineRGB.lpList(0)
+            gravityProxy = task.lineRGB.lpList(0)
             lineRuns += 1
             totalLineRuns += 1
 
@@ -58,7 +57,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         If standaloneTest() Then
             labels(3) = "Currently available lines."
             dst3.SetTo(0)
-            For Each lp In lineRGB.lpList
+            For Each lp In task.lineRGB.lpList
                 dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
         End If

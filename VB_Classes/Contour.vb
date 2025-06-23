@@ -294,7 +294,7 @@ Public Class Contour_LineRGB : Inherits TaskParent
         dst2 = task.contours.dst2
         labels(2) = task.contours.labels(2)
 
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
@@ -936,8 +936,8 @@ Public Class Contour_EdgePoints : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = dst1.Clone
-        dst2 = task.hullLines.dst3
-        labels(2) = task.hullLines.labels(2)
+        dst2 = task.lineRGB.dst3
+        labels(2) = task.lineRGB.labels(2)
 
         Dim ptList As New List(Of cv.Point)
         dst1.SetTo(0)

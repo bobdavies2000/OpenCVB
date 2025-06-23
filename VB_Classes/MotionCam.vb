@@ -20,26 +20,26 @@ Public Class MotionCam_MultiLine : Inherits TaskParent
         desc = "Find all the line edge points and display them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.hullLines.dst2
-        labels(3) = "The top " + CStr(task.hullLines.lpList.Count) + " longest lines in the image."
+        dst2 = task.lineRGB.dst2
+        labels(3) = "The top " + CStr(task.lineRGB.lpList.Count) + " longest lines in the image."
 
-        knn.lpInput = task.hullLines.lpList
+        knn.lpInput = task.lineRGB.lpList
         knn.Run(emptyMat)
 
-        For Each lpIn In task.hullLines.lpList
+        For Each lpIn In task.lineRGB.lpList
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
         Next
 
-        Static lpLast As New List(Of lpData)(task.hullLines.lpList)
+        Static lpLast As New List(Of lpData)(task.lineRGB.lpList)
         For Each lpIn In lpLast
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, white, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, white, -1, task.lineType)
         Next
 
-        lpLast = New List(Of lpData)(task.hullLines.lpList)
+        lpLast = New List(Of lpData)(task.lineRGB.lpList)
 
         labels(2) = knn.labels(2)
     End Sub
@@ -62,7 +62,7 @@ Public Class MotionCam_MatchLast : Inherits TaskParent
         labels(1) = motion.labels(1)
 
         Static edgeList As New List(Of SortedList(Of Single, Integer))(motion.edgeList)
-        Static lpLastList As New List(Of lpData)(task.hullLines.lpList)
+        Static lpLastList As New List(Of lpData)(task.lineRGB.lpList)
 
         For i = 0 To edgeList.Count - 1
             If edgeList(i).Count = motion.edgeList(i).Count Then
@@ -79,7 +79,7 @@ Public Class MotionCam_MatchLast : Inherits TaskParent
         trueData = motion.trueData
 
         edgeList = New List(Of SortedList(Of Single, Integer))(motion.edgeList)
-        lpLastList = New List(Of lpData)(task.hullLines.lpList)
+        lpLastList = New List(Of lpData)(task.lineRGB.lpList)
 
         labels(2) = motion.labels(2) + "  White points are for the previous frame"
     End Sub
@@ -123,15 +123,15 @@ Public Class MotionCam_SideApproach : Inherits TaskParent
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.hullLines.dst2
-        labels(1) = "The top " + CStr(task.hullLines.lpList.Count) + " longest lines in the image."
+        dst1 = task.lineRGB.dst2
+        labels(1) = "The top " + CStr(task.lineRGB.lpList.Count) + " longest lines in the image."
 
         Dim top As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         Dim left As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         Dim right As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         Dim bottom As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
 
-        Dim lpList = task.hullLines.lpList
+        Dim lpList = task.lineRGB.lpList
         For Each lp In lpList
             If lp.ep1.X = 0 Then left.Add(lp.ep1.Y, lp.index)
             If lp.ep1.Y = 0 Then top.Add(lp.ep1.X, lp.index)
@@ -153,7 +153,7 @@ Public Class MotionCam_SideApproach : Inherits TaskParent
         dst2 = src.Clone
         buildDisplay(edgeList, lpList, 0, task.highlight)
 
-        labels(2) = CStr(task.hullLines.lpList.Count * 2) + " edge points of the top " + CStr(task.hullLines.lpList.Count) +
+        labels(2) = CStr(task.lineRGB.lpList.Count * 2) + " edge points of the top " + CStr(task.lineRGB.lpList.Count) +
                     " longest lines in the image are shown."
     End Sub
 End Class

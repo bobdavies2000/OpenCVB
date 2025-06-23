@@ -115,7 +115,7 @@ Public Class VBtask : Implements IDisposable
 
     ' add any task algorithms here.
     Public gmat As IMU_GMatrix
-    Public hullLines As HullLine_Basics
+    Public lineRGB As LineRGB_Basics
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
     Public grid As Grid_Basics
@@ -518,7 +518,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         grid = New Grid_Basics
-        hullLines = New HullLine_Basics
+        lineRGB = New LineRGB_Basics
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
         rgbFilter = New Filter_Basics
@@ -749,9 +749,9 @@ Public Class VBtask : Implements IDisposable
 
         edges.Run(task.grayStable)
         colorizer.Run(src)
-        contours.Run(src)
+        contours.Run(src.Clone)
 
-        If task.brickRunFlag Then bricks.Run(src)
+        If task.brickRunFlag Then bricks.Run(src.Clone)
 
         TaskTimer.Enabled = True
 
@@ -763,7 +763,7 @@ Public Class VBtask : Implements IDisposable
 
         If gOptions.CreateGif.Checked Then
             If gifCreator Is Nothing Then gifCreator = New Gif_OpenCVB
-            gifCreator.Run(src)
+            gifCreator.Run(src.Clone)
             If gifBuild Then
                 gifBuild = False
                 For i = 0 To gifImages.Count - 1
@@ -786,9 +786,7 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        gravityHorizon.Run(src)
-
-        hullLines.Run(src)
+        gravityHorizon.Run(src.Clone)
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True

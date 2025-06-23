@@ -29,7 +29,7 @@ Public Class RedTrack_Lines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then dst3.SetTo(0)
         Dim index As Integer
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             DrawLine(dst3, lp.p1, lp.p2, 255)
             index += 1
             If index > 10 Then Exit For
@@ -187,7 +187,7 @@ Public Class RedTrack_Points : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3.SetTo(0)
         Dim index As Integer
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             DrawCircle(dst3, lp.p1, task.DotSize, 255)
             DrawCircle(dst3, lp.p2, task.DotSize, 255)
             index += 1

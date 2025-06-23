@@ -528,13 +528,13 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
 
         Dim p1 As cv.Point2f, p2 As cv.Point2f
         If trainInput.Count = 0 Then
-            dst3 = task.hullLines.dst2
+            dst3 = task.lineRGB.dst2
         Else
             p1 = lastPair.p1
             p2 = lastPair.p2
         End If
 
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             If trainInput.Count = 0 Then
                 p1 = lp.p1
                 p2 = lp.p2
@@ -1098,10 +1098,10 @@ Public Class KNN_EdgePoints : Inherits TaskParent
         desc = "Match edgepoints from the current and previous frames."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lpInput = task.hullLines.lpList
+        If standalone Then lpInput = task.lineRGB.lpList
 
         dst2 = src.Clone
-        For Each lp In task.hullLines.lpList
+        For Each lp In task.lineRGB.lpList
             HullLine_EdgePoints.EdgePointOffset(lp, 1)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)

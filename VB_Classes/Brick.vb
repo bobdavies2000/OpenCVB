@@ -595,34 +595,6 @@ End Class
 
 
 
-Public Class Brick_RegionLines : Inherits TaskParent
-    Dim regions As New Region_Contours
-    Public Sub New()
-        desc = "Lines can mean cells are connected."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        regions.Run(src)
-        dst2 = regions.dst2
-        dst3 = regions.dst3
-        labels = regions.labels
-
-        For Each lp In task.hullLines.lpList
-            Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
-            Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
-            If c1 <> c2 Then
-                dst3.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
-            Else
-                dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 
@@ -733,22 +705,22 @@ Public Class Brick_Lines : Inherits TaskParent
     Dim info As New LineRGB_Info
     Public Sub New()
         task.brickRunFlag = True
-        desc = "Lines can mean cells are connected - click on any highlighted brick to see info on that line."
+        desc = "Lines can mean cells are connected - use the debug slider to indicate which line to highlight."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.hullLines.dst2
+        dst2 = task.lineRGB.dst2.Clone
 
-        dst3.SetTo(0)
         If task.heartBeat Then info.Run(emptyMat)
+        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+        If index < task.lineRGB.lpList.Count Then task.lpD = task.lineRGB.lpList(index) Else task.lpD = task.lineRGB.lpList(0)
         For Each index In task.lpD.bricks
             Dim brick = task.bricks.brickList(index)
-            If brick.index <> 0 Then dst3.Rectangle(brick.rect, task.highlight, 1, task.lineType)
+            dst2.Rectangle(brick.rect, task.highlight, task.lineWidth, task.lineType)
         Next
-        dst3.Line(task.lpD.p1, task.lpD.p2, white, task.lineWidth, task.lineType)
 
         SetTrueText(info.strOut, 3)
 
-        labels(2) = task.hullLines.labels(2) + " - Click on any line in below to get details on that line."
+        labels(2) = task.lineRGB.labels(2) + " - Click on any line in below to get details on that line."
     End Sub
 End Class
 
@@ -933,3 +905,25 @@ End Class
 
 
 
+Public Class Brick_RegionLines : Inherits TaskParent
+    Dim regions As New Region_Contours
+    Public Sub New()
+        desc = "Lines can mean cells are connected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        regions.Run(src)
+        dst2 = regions.dst2
+        dst3 = regions.dst3
+        labels = regions.labels
+
+        For Each lp In task.lineRGB.lpList
+            Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
+            Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
+            If c1 <> c2 Then
+                dst3.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
+            Else
+                dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
+            End If
+        Next
+    End Sub
+End Class

@@ -26,7 +26,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
         If match.correlation < task.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
             lpSave = lpInput
             ' default to longest line
-            If standalone Then lpInput = task.hullLines.lpList(0)
+            If standalone Then lpInput = task.lineRGB.lpList(0)
 
             Dim r = ValidateRect(New cv.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
                                              Math.Abs(lpInput.p1.X - lpInput.p2.X), Math.Abs(lpInput.p1.Y - lpInput.p2.Y)))
