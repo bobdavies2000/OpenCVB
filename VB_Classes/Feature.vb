@@ -4,6 +4,7 @@ Imports VB_Classes.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()
+        task.gravityHorizon.featLine.runOnEachFrame = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U mask with all the features present."
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
@@ -78,14 +79,11 @@ Public Class Feature_Basics : Inherits TaskParent
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
             Case FeatureSrc.LineInput
                 task.logicalLines.Clear()
-                Dim minDistance = task.featureOptions.DistanceSlider.Value
                 For Each lp In task.lineRGB.lpList
-                    If lp.length > minDistance Then
-                        features.Add(lp.p1)
-                        features.Add(lp.p2)
-                        lp.index = task.logicalLines.Count
-                        task.logicalLines.Add(lp)
-                    End If
+                    features.Add(lp.p1)
+                    features.Add(lp.p2)
+                    lp.index = task.logicalLines.Count
+                    task.logicalLines.Add(lp)
                 Next
         End Select
 
@@ -122,9 +120,7 @@ Public Class Feature_Basics : Inherits TaskParent
         Next
 
         If task.featureSource = FeatureSrc.LineInput Then
-            For Each lp In task.logicalLines
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            Next
+            dst2.SetTo(task.highlight, task.gravityHorizon.featLine.dst3)
         Else
             For Each pt In task.features
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)

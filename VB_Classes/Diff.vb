@@ -102,27 +102,6 @@ End Class
 
 
 
-Public Class Diff_Lines : Inherits TaskParent
-    Dim diff As New Diff_RGBAccum
-    Public Sub New()
-        labels = {"", "", "Add motion to see Diff output and lines input", "Wave at the camera to see results"}
-        desc = "identify lines in the diff output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        diff.Run(src)
-        dst2 = diff.dst2
-
-        dst3 = task.lineRGB.dst2
-        labels(2) = task.lineRGB.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Diff_Depth32f : Inherits TaskParent
     Public lastDepth32f As New cv.Mat
     Dim options As New Options_DiffDepth

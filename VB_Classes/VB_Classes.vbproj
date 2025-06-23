@@ -126,6 +126,7 @@
     <Compile Include="DepthLogic.vb" />
     <Compile Include="LineDepth.vb" />
     <Compile Include="MotionCam.vb" />
+    <Compile Include="MotionLine.vb" />
     <Compile Include="OptionFeatures.Designer.vb">
       <DependentUpon>OptionFeatures.vb</DependentUpon>
     </Compile>

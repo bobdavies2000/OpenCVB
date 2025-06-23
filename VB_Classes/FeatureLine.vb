@@ -4,6 +4,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
     Public gravityProxy As New lpData
     Dim firstRect As cv.Rect, lastRect As cv.Rect
     Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
+    Public runOnEachFrame As Boolean
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and track the longest line by matching line bricks."
@@ -32,7 +33,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
                         "line detection runs = " + CStr(totalLineRuns)
         End If
 
-        If task.heartBeat Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Then
+        If task.heartBeat Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
             task.lineRGB.Run(src.Clone)
             If task.lineRGB.lpList.Count = 0 Then Exit Sub
 
@@ -54,13 +55,11 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             match.template = matchTemplate
         End If
 
-        If standaloneTest() Then
-            labels(3) = "Currently available lines."
-            dst3.SetTo(0)
-            For Each lp In task.lineRGB.lpList
-                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Next
-        End If
+        labels(3) = "Currently available lines."
+        dst3.SetTo(0)
+        For Each lp In task.lineRGB.lpList
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
 
         dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
         dst2.Rectangle(lastRect, task.highlight, task.lineWidth)

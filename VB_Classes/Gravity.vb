@@ -2,7 +2,7 @@
 Public Class Gravity_Basics : Inherits TaskParent
     Dim gravity As New Gravity_BasicsRaw
     Dim imuGravityCount As Integer
-    Dim featLine As New FeatureLine_Basics
+    Public featLine As New FeatureLine_Basics
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub

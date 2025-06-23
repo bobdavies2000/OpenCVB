@@ -3,6 +3,7 @@ Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
+    Public lpLastList As New List(Of lpData)
     Public rawLines As New LineRGB_Raw
     Public minAge As Integer = 5 ' line has to be around for a little while before it is recorded as a line.
     Public Sub New()
@@ -10,15 +11,14 @@ Public Class LineRGB_Basics : Inherits TaskParent
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastList As New List(Of lpData)
         If task.optionsChanged Then
-            lastList.Clear()
+            lpLastList.Clear()
             lpList.Clear()
             task.motionMask.SetTo(255)
         End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-        For Each lp In lastList
+        For Each lp In lpLastList
             Dim noMotionTest As Boolean = True
             For Each index In lp.bricks
                 Dim brick = If(index < task.bricks.brickList.Count, task.bricks.brickList(index), task.bricks.brickList(0))
@@ -59,7 +59,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
-        lastList = New List(Of lpData)(lpList)
+        lpLastList = New List(Of lpData)(lpList)
         labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
     End Sub
 End Class

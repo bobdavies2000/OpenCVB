@@ -53,6 +53,7 @@ End Class
 
 
 Public Class HullLine_EdgePoints : Inherits TaskParent
+    Dim hullLines As New HullLine_Basics
     Public Sub New()
         desc = "Find the edge points for the current and last frm for the hull lines."
     End Sub
@@ -69,16 +70,17 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
         Return lp
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.lineRGB.dst2
-        labels(3) = task.lineRGB.labels(3)
+        hullLines.Run(src)
+        dst3 = hullLines.dst2
+        labels(3) = hullLines.labels(3)
 
         dst2 = src.Clone
-        For Each lpIn In task.lineRGB.lpList
+        For Each lpIn In hullLines.lpList
             Dim lp = EdgePointOffset(lpIn, 1)
             dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
             dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
         Next
-        labels(2) = task.lineRGB.labels(2)
+        labels(2) = hullLines.labels(2)
     End Sub
 End Class
 

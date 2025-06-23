@@ -103,33 +103,6 @@ End Class
 
 
 
-Public Class FindCells_Lines : Inherits TaskParent
-    Dim findCells As New FindCells_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        If standalone Then task.featureOptions.SelectedFeature.Value = 1
-        labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
-        desc = "Find the cells containing lines."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
-
-        dst1.SetTo(0)
-        For Each lp In task.lineRGB.lpList
-            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
-        Next
-
-        findCells.Run(dst1)
-        dst2 = findCells.dst2
-        dst3 = findCells.dst3
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class FindCells_Gaps : Inherits TaskParent
     Dim findCells As New FindCells_Basics
@@ -310,3 +283,24 @@ End Class
 
 
 
+Public Class FindCells_Lines : Inherits TaskParent
+    Dim findCells As New FindCells_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.featureOptions.SelectedFeature.Value = 1
+        labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
+        desc = "Find the cells containing lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+
+        dst1.SetTo(0)
+        For Each lp In task.lineRGB.lpList
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+        Next
+
+        findCells.Run(dst1)
+        dst2 = findCells.dst2
+        dst3 = findCells.dst3
+    End Sub
+End Class
