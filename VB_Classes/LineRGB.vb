@@ -18,33 +18,25 @@ Public Class LineRGB_Basics : Inherits TaskParent
         End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-        For Each lp In lpLastList
-            Dim noMotionTest As Boolean = True
-            For Each index In lp.bricks
-                Dim brick = If(index < task.bricks.brickList.Count, task.bricks.brickList(index), task.bricks.brickList(0))
-                If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
-                    noMotionTest = False
-                    Exit For
-                End If
-            Next
-            If noMotionTest And lp.bricks.Count > 1 Then
-                lp.age += 1
-                sortlines.Add(lp.length, lp)
-            End If
-        Next
+        'For Each lp In lpLastList
+        '    Dim noMotionTest As Boolean = True
+        '    For Each index In lp.bricks
+        '        Dim brick = If(index < task.bricks.brickList.Count, task.bricks.brickList(index), task.bricks.brickList(0))
+        '        If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
+        '            noMotionTest = False
+        '            Exit For
+        '        End If
+        '    Next
+        '    If noMotionTest And lp.bricks.Count > 1 Then
+        '        lp.age += 1
+        '        sortlines.Add(lp.length, lp)
+        '    End If
+        'Next
 
         rawLines.Run(src)
 
         For Each lp In rawLines.lpList
-            Dim motionTest As Boolean = False
-            For Each index In lp.bricks
-                Dim brick = task.bricks.brickList(index)
-                If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
-                    motionTest = True
-                    Exit For
-                End If
-            Next
-            If motionTest Then sortlines.Add(lp.length, lp)
+            sortlines.Add(lp.length, lp)
         Next
 
         lpList.Clear()

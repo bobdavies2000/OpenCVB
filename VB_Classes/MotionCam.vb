@@ -7,6 +7,7 @@ Public Class MotionCam_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
         If task.heartBeat Then dst1.SetTo(0) Else dst1.Rectangle(New cv.Rect(0, 0, dst0.Width, dst0.Height), 0, 1, cv.LineTypes.Link4)
+        If task.lineRGB.lpList.Count = 0 Then Exit Sub
 
         Dim lp1 = task.lineRGB.lpList(0)
         dst2.Line(lp1.p1, lp1.p2, task.highlight, task.lineWidth, task.lineType)

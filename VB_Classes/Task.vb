@@ -751,7 +751,7 @@ Public Class VBtask : Implements IDisposable
         colorizer.Run(src)
         contours.Run(src.Clone)
 
-        If task.brickRunFlag Then bricks.Run(src.Clone)
+        ' If task.brickRunFlag Then bricks.Run(src.Clone)
 
         TaskTimer.Enabled = True
 
