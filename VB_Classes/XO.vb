@@ -5314,3 +5314,160 @@ Public Class XO_FeatureLine_BasicsOld : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class XO_Depth_MeanStdev_MT : Inherits TaskParent
+    Dim meanSeries As New cv.Mat
+    Dim maxMeanVal As Single, maxStdevVal As Single
+    Public Sub New()
+        If standalone Then task.gOptions.GridSlider.Value = task.gOptions.GridSlider.Maximum
+        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then meanSeries = New cv.Mat(task.gridRects.Count, task.frameHistoryCount, cv.MatType.CV_32F, cv.Scalar.All(0))
+
+        Dim index = task.frameCount Mod task.frameHistoryCount
+        Dim meanValues(task.gridRects.Count - 1) As Single
+        Dim stdValues(task.gridRects.Count - 1) As Single
+        Parallel.For(0, task.gridRects.Count,
+        Sub(i)
+            Dim roi = task.gridRects(i)
+            Dim mean As cv.Scalar, stdev As cv.Scalar
+            cv.Cv2.MeanStdDev(task.pcSplit(2)(roi), mean, stdev, task.depthMask(roi))
+            meanSeries.Set(Of Single)(i, index, mean)
+            If task.frameCount >= task.frameHistoryCount - 1 Then
+                cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
+                meanValues(i) = mean
+                stdValues(i) = stdev
+            End If
+        End Sub)
+
+        If task.frameCount >= task.frameHistoryCount Then
+            Dim means As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
+            Dim stdevs As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
+            Dim meanmask = means.Threshold(1, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            Dim mm As mmData = GetMinMax(means, meanmask)
+            Dim stdMask = stdevs.Threshold(0.001, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
+            Dim mmStd = GetMinMax(stdevs, stdMask)
+
+            maxMeanVal = Math.Max(maxMeanVal, mm.maxVal)
+            maxStdevVal = Math.Max(maxStdevVal, mmStd.maxVal)
+
+            Parallel.For(0, task.gridRects.Count,
+            Sub(i)
+                Dim roi = task.gridRects(i)
+                dst3(roi).SetTo(255 * stdevs.Get(Of Single)(i, 0) / maxStdevVal)
+                dst3(roi).SetTo(0, task.noDepthMask(roi))
+
+                dst2(roi).SetTo(255 * means.Get(Of Single)(i, 0) / maxMeanVal)
+                dst2(roi).SetTo(0, task.noDepthMask(roi))
+            End Sub)
+
+            If task.heartBeat Then
+                maxMeanVal = 0
+                maxStdevVal = 0
+            End If
+
+            If standaloneTest() Then
+                For i = 0 To task.gridRects.Count - 1
+                    Dim roi = task.gridRects(i)
+                    SetTrueText(Format(meanValues(i), fmt3) + vbCrLf +
+                                Format(stdValues(i), fmt3), roi.Location, 3)
+                Next
+            End If
+
+            dst3 = dst3 Or task.gridMask
+            labels(2) = "The regions where the depth is volatile are brighter.  Stdev min " + Format(mmStd.minVal, fmt3) + " Stdev Max " + Format(mmStd.maxVal, fmt3)
+            labels(3) = "Mean/stdev for each ROI: Min " + Format(mm.minVal, fmt3) + " Max " + Format(mm.maxVal, fmt3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_ML_FillRGBDepth_MT : Inherits TaskParent
+    Dim shadow As New Depth_Holes
+    Dim colorizer As New DepthColorizer_CPP
+    Public Sub New()
+        task.gOptions.GridSlider.Maximum = dst2.Cols / 2
+        task.gOptions.GridSlider.Value = CInt(dst2.Cols / 2)
+
+        labels = {"", "", "ML filled shadow", ""}
+        desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
+    End Sub
+    Private Class CompareVec3f : Implements IComparer(Of cv.Vec3f)
+        Public Function Compare(ByVal a As cv.Vec3f, ByVal b As cv.Vec3f) As Integer Implements IComparer(Of cv.Vec3f).Compare
+            If a(0) = b(0) And a(1) = b(1) And a(2) = b(2) Then Return 0
+            Return If(a(0) < b(0), -1, 1)
+        End Function
+    End Class
+    Public Function detectAndFillShadow(holeMask As cv.Mat, borderMask As cv.Mat, depth32f As cv.Mat, color As cv.Mat, minLearnCount As Integer) As cv.Mat
+        Dim learnData As New SortedList(Of cv.Vec3f, Single)(New CompareVec3f)
+        Dim rng As New System.Random
+        Dim holeCount = cv.Cv2.CountNonZero(holeMask)
+        If borderMask.Channels() <> 1 Then borderMask = borderMask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim borderCount = cv.Cv2.CountNonZero(borderMask)
+        If holeCount > 0 And borderCount > minLearnCount Then
+            Dim color32f As New cv.Mat
+            color.ConvertTo(color32f, cv.MatType.CV_32FC3)
+
+            Dim learnInputList As New List(Of cv.Vec3f)
+            Dim responseInputList As New List(Of Single)
+
+            For y = 0 To holeMask.Rows - 1
+                For x = 0 To holeMask.Cols - 1
+                    If borderMask.Get(Of Byte)(y, x) Then
+                        Dim vec = color32f.Get(Of cv.Vec3f)(y, x)
+                        If learnData.ContainsKey(vec) = False Then
+                            learnData.Add(vec, depth32f.Get(Of Single)(y, x)) ' keep out duplicates.
+                            learnInputList.Add(vec)
+                            responseInputList.Add(depth32f.Get(Of Single)(y, x))
+                        End If
+                    End If
+                Next
+            Next
+
+            Dim learnInput As cv.Mat = cv.Mat.FromPixelData(learnData.Count, 3, cv.MatType.CV_32F, learnInputList.ToArray())
+            Dim depthResponse As cv.Mat = cv.Mat.FromPixelData(learnData.Count, 1, cv.MatType.CV_32F, responseInputList.ToArray())
+
+            ' now learn what depths are associated with which colors.
+            Dim rtree = cv.ML.RTrees.Create()
+            rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
+
+            ' now predict what the depth is based just on the color (and proximity to the region)
+            Using predictMat As New cv.Mat(1, 3, cv.MatType.CV_32F)
+                For y = 0 To holeMask.Rows - 1
+                    For x = 0 To holeMask.Cols - 1
+                        If holeMask.Get(Of Byte)(y, x) Then
+                            predictMat.Set(Of cv.Vec3f)(0, 0, color32f.Get(Of cv.Vec3f)(y, x))
+                            depth32f.Set(Of Single)(y, x, rtree.Predict(predictMat))
+                        End If
+                    Next
+                Next
+            End Using
+        End If
+        Return depth32f
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim minLearnCount = 5
+        Parallel.ForEach(task.gridRects,
+            Sub(roi)
+                task.pcSplit(2)(roi) = detectAndFillShadow(task.noDepthMask(roi), shadow.dst3(roi), task.pcSplit(2)(roi), src(roi),
+                                                           minLearnCount)
+            End Sub)
+
+        colorizer.Run(task.pcSplit(2))
+        dst2 = colorizer.dst2.Clone()
+        dst2.SetTo(white, task.gridMask)
+    End Sub
+End Class

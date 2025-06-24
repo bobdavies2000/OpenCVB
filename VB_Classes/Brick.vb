@@ -217,6 +217,7 @@ End Class
 Public Class Brick_InstantUpdate : Inherits TaskParent
     Public Sub New()
         task.brickRunFlag = True
+        task.bricks = New Brick_Basics
         task.bricks.instantUpdate = True
         labels(3) = "Pointcloud image for cells with good visibility"
         desc = "Create the grid of bricks with good visibility"

@@ -1483,6 +1483,7 @@ Public Class RedColor_FlipTest : Inherits TaskParent
         desc = "Display nonFlipped cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = runRedC(src, labels(2))
         Dim lastCells As New List(Of rcData)(task.redC.rcList)
         flipper.Run(src)
         dst3 = flipper.dst2
@@ -1750,8 +1751,8 @@ Public Class RedColor_GridCells : Inherits TaskParent
         regions.Run(src)
         dst1 = regions.dst2
 
-        Dim lastList As New List(Of rcData)(task.redC.rcList)
         runRedC(src, labels(2))
+        Dim lastList As New List(Of rcData)(task.redC.rcList)
 
         dst2.SetTo(0)
 
@@ -1972,7 +1973,7 @@ Public Class RedColor_Hulls : Inherits TaskParent
                 Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
                 Try
                     Dim defects = cv.Cv2.ConvexityDefects(rc.contour, hullIndices)
-                    rc.contour = Convex_RedCloudDefects.betterContour(rc.contour, defects)
+                    rc.contour = Convex_RedColorDefects.betterContour(rc.contour, defects)
                 Catch ex As Exception
                     defectCount += 1
                 End Try

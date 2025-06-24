@@ -10,7 +10,11 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         desc = "Find and track the longest line by matching line bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then task.lineRGB.lpList.Clear()
+        Static rectList = New List(Of cv.Rect)(task.gridNabeRects)
+        If task.optionsChanged Then
+            task.lineRGB.lpList.Clear()
+            rectList = New List(Of cv.Rect)(task.gridNabeRects)
+        End If
 
         If matchRuns > 500 Then
             Dim percent = lineRuns / matchRuns
@@ -42,8 +46,10 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             lineRuns += 1
             totalLineRuns += 1
 
-            firstRect = task.gridNabeRects(gravityProxy.bricks(0))
-            lastRect = task.gridNabeRects(gravityProxy.bricks.Last)
+            Dim index = task.grid.gridMap.Get(Of Single)(gravityProxy.p1.Y, gravityProxy.p1.X)
+            firstRect = rectList(index)
+            index = task.grid.gridMap.Get(Of Single)(gravityProxy.p2.Y, gravityProxy.p2.X)
+            lastRect = rectList(index)
 
             Dim matchTemplate As New cv.Mat
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchTemplate)

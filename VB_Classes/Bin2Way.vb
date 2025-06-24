@@ -162,6 +162,7 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        dst3 = runRedC(src, labels(3))
 
         If task.optionsChanged Then
             For i = 0 To rcList.Count - 1
@@ -175,6 +176,7 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
             task.redC.rcMap = cellMaps(i)
+
             task.redC.rcList = rcList(i)
             flood.inputRemoved = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))

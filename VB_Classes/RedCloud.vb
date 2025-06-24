@@ -443,28 +443,28 @@ End Class
 
 
 
-Public Class RedCloud_RedColor : Inherits TaskParent
-    Dim contours As New RedCloud_Contours
-    Public Sub New()
-        desc = "Show the output of the RedCloud and RedColor cells."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        dst2 = contours.dst3
-        labels(2) = contours.labels(2)
+'Public Class RedCloud_RedColor : Inherits TaskParent
+'    Dim contours As New RedCloud_Contours
+'    Public Sub New()
+'        desc = "Show the output of the RedCloud and RedColor cells."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        contours.Run(src)
+'        dst2 = contours.dst3
+'        labels(2) = contours.labels(2)
 
-        If task.heartBeat Then
-            For Each contour In contours.contourList
-                SetTrueText(CStr(contour.index), contour.maxDist, 2)
-            Next
-        End If
+'        If task.heartBeat Then
+'            For Each contour In contours.contourList
+'                SetTrueText(CStr(contour.index), contour.maxDist, 2)
+'            Next
+'        End If
 
-        dst3 = task.contours.dst2
-        dst3(task.contourD.rect).SetTo(white, task.contourD.mask)
-        task.contourD = Contour_Basics.selectContour()
-        labels(3) = task.contours.labels(2)
-    End Sub
-End Class
+'        dst3 = task.contours.dst2
+'        dst3(task.contourD.rect).SetTo(white, task.contourD.mask)
+'        task.contourD = Contour_Basics.selectContour()
+'        labels(3) = task.contours.labels(2)
+'    End Sub
+'End Class
 
 
 
@@ -474,30 +474,16 @@ End Class
 
 Public Class RedCloud_Contours : Inherits TaskParent
     Dim prep As New RedPrep_Basics
-    Dim options As New Options_Contours
-    Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-    Dim sortContours As New Contour_Sort
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
         prep.Run(src)
-        dst0 = ShowPalette(prep.dst2).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = prep.dst3
 
-        Dim mode = options.options2.ApproximationMode
-        cv.Cv2.FindContours(dst0, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
-        If sortContours.allContours.Count <= 1 Then Exit Sub
-
-        sortContours.Run(src)
-
-        contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
-        labels(2) = sortContours.labels(2)
-        dst2 = sortContours.dst2
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
     End Sub
 End Class
 

@@ -50,13 +50,13 @@ End Class
 
 
 
-Public Class Convex_RedCloud : Inherits TaskParent
+Public Class Convex_RedColor : Inherits TaskParent
     Dim convex As New Convex_Basics
     Public Sub New()
         labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
         desc = "Get lots of odd shapes from the RedColor_Basics output and use ConvexHull to simplify them."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         If task.rcD.contour IsNot Nothing Then
             convex.Run(src)
@@ -106,12 +106,12 @@ End Class
 
 
 
-Public Class Convex_RedCloudDefects : Inherits TaskParent
-    Dim convex As New Convex_RedCloud
+Public Class Convex_RedColorDefects : Inherits TaskParent
     Dim contours As New Contour_Largest
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedColor_Basics"}
+        labels(2) = "Hull outline in yellow, red is hull with defects removed.  Select any cell in the upper right..."
+        labels(3) = "Original mask that produces the hull at left"
         desc = "Find the convexityDefects in the selected RedCloud cell"
     End Sub
     Public Shared Function betterContour(c As List(Of cv.Point), defects() As cv.Vec4i) As List(Of cv.Point)
@@ -140,22 +140,28 @@ Public Class Convex_RedCloudDefects : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = runRedC(src, labels(1))
-        dst3 = convex.dst3
 
         Dim rc = task.rcD
         If rc.mask Is Nothing Then Exit Sub
 
-        dst2 = rc.mask.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
-        contours.Run(dst2)
+        Dim sz = New cv.Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
+        If rc.mask.Width > rc.mask.Height Then
+            sz = New cv.Size(dst2.Width, dst2.Height * rc.mask.Height / rc.mask.Width)
+        End If
+        dst0 = rc.mask.Resize(sz, 0, 0, cv.InterpolationFlags.Nearest)
+        Dim r = New cv.Rect(0, 0, dst0.Width, dst0.Height)
+        dst3.SetTo(0)
+        dst3(r).SetTo(white, dst0)
+        contours.Run(dst3)
         Dim c = contours.bestContour
 
         Dim hull = cv.Cv2.ConvexHull(c, False)
         Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
         dst2.SetTo(0)
-        DrawContour(dst2, hull.ToList, rc.color, -1)
+        DrawContour(dst2, hull.ToList, task.highlight, -1)
 
         Try
-            Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
+            Dim defects = cv.Cv2.ConvexityDefects(c, hullIndices.ToList)
             rc.contour = betterContour(c, defects)
         Catch ex As Exception
             SetTrueText("Convexity defects failed due to self-intersection.", 3)

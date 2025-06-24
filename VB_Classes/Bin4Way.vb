@@ -619,6 +619,7 @@ Public Class Bin4Way_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
+        dst3 = runRedC(src, labels(3))
 
         If task.optionsChanged Then
             For i = 0 To rcList.Count - 1

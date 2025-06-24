@@ -11,6 +11,8 @@ Public Class MSER_Basics : Inherits TaskParent
         desc = "Create cells for each region in MSER output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = runRedC(src, labels(3))
+
         detect.Run(src)
         Dim boxInput = New List(Of cv.Rect)(detect.boxes)
         Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
