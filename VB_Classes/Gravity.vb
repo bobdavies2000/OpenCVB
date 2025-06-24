@@ -14,7 +14,8 @@ Public Class Gravity_Basics : Inherits TaskParent
         If CInt(savedLine.ep1.X) <> CInt(featLine.gravityProxy.ep1.X) Or
            CInt(savedLine.ep1.Y) <> CInt(featLine.gravityProxy.ep1.Y) Or
            CInt(savedLine.ep2.X) <> CInt(featLine.gravityProxy.ep2.X) Or
-           CInt(savedLine.ep2.Y) <> CInt(featLine.gravityProxy.ep2.Y) Then
+           CInt(savedLine.ep2.Y) <> CInt(featLine.gravityProxy.ep2.Y) Or
+           task.lineRGB.lpList.Count = 0 Then ' No lines to confirm the gravity vector means use raw gravity vector.
 
             imuGravityCount += 1
             gravity.Run(src)
