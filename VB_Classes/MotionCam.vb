@@ -1,9 +1,20 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MotionCam_Basics : Inherits TaskParent
     Public Sub New()
-        desc = "Use the FeatureLine_Basics line to to figure out camera motion."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Use the FeatureLine_Basics line to figure out camera motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
+        If task.heartBeat Then dst1.SetTo(0) Else dst1.Rectangle(New cv.Rect(0, 0, dst0.Width, dst0.Height), 0, 1, cv.LineTypes.Link4)
+
+        Dim lp1 = task.lineRGB.lpList(0)
+        dst2.Line(lp1.p1, lp1.p2, task.highlight, task.lineWidth, task.lineType)
+        dst1.Line(lp1.ep1, lp1.ep2, 255, task.lineWidth, cv.LineTypes.Link4)
+
+        Dim center = New cv.Point(CInt((lp1.p1.X + lp1.p2.X) / 2), CInt((lp1.p1.Y + lp1.p2.Y) / 2))
+        Dim lp2 = lp1.perpendicularPoints(center)
+        dst1.Line(lp2.ep1, lp2.ep2, 255, task.lineWidth, cv.LineTypes.Link4)
     End Sub
 End Class
 

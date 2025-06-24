@@ -2897,7 +2897,7 @@ Public Class XO_FCSLine_Vertical : Inherits TaskParent
             For j = i + 1 To verts.vertList.Count - 1
                 Dim lp2 = verts.vertList(j)
                 Dim center = New cv.Point(CInt((lp1.p1.X + lp1.p2.X) / 2), CInt((lp1.p1.Y + lp1.p2.Y) / 2))
-                Dim lpPerp = lp1.perpendicularPoints(center, task.cellSize)
+                Dim lpPerp = lp1.perpendicularPoints(center)
                 Dim intersectionPoint = IntersectTest(lp1, lpPerp)
                 Dim distance = intersectionPoint.DistanceTo(center)
                 If distance <= options.proximity Then
@@ -4161,7 +4161,7 @@ Public Class XO_LineRect_CenterDepth : Inherits TaskParent
         For Each lp In task.lineRGB.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim lpPerp = lp.perpendicularPoints(center, task.cellSize)
+            Dim lpPerp = lp.perpendicularPoints(center)
             Dim index1 As Integer = task.grid.gridMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
             Dim index2 As Integer = task.grid.gridMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
             Dim brick1 = task.bricks.brickList(index1)

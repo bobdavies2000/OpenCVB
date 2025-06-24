@@ -34,6 +34,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         End If
 
         If task.heartBeat Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
+            task.motionMask.SetTo(255) ' force a complete line detection
             task.lineRGB.Run(src.Clone)
             If task.lineRGB.lpList.Count = 0 Then Exit Sub
 
@@ -43,12 +44,6 @@ Public Class FeatureLine_Basics : Inherits TaskParent
 
             firstRect = task.gridNabeRects(gravityProxy.bricks(0))
             lastRect = task.gridNabeRects(gravityProxy.bricks.Last)
-            If firstRect.Width <> lastRect.Width Or firstRect.Height <> lastRect.Height Then
-                Dim w = Math.Min(firstRect.Width, lastRect.Width)
-                Dim h = Math.Min(firstRect.Height, lastRect.Height)
-                firstRect = New cv.Rect(firstRect.X, firstRect.Y, w, h)
-                lastRect = New cv.Rect(lastRect.X, lastRect.Y, w, h)
-            End If
 
             Dim matchTemplate As New cv.Mat
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchTemplate)
@@ -63,8 +58,8 @@ Public Class FeatureLine_Basics : Inherits TaskParent
 
         dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
         dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
-        dst2.Line(gravityProxy.p1, gravityProxy.p2, task.highlight, task.lineWidth + 1, task.lineType)
-        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
+        dst2.Line(gravityProxy.p1, gravityProxy.p2, task.highlight, task.lineWidth, task.lineType)
+        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth, task.lineType)
     End Sub
 End Class
 

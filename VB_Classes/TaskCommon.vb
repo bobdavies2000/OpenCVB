@@ -504,11 +504,11 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public m As Single
     Public b As Single
-    Public Function perpendicularPoints(pt As cv.Point2f, distance As Integer) As lpData
+    Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / m
         Dim angleRadians As Double = Math.Atan(perpSlope)
-        Dim xShift = distance * Math.Cos(angleRadians)
-        Dim yShift = distance * Math.Sin(angleRadians)
+        Dim xShift = task.cellSize * Math.Cos(angleRadians)
+        Dim yShift = task.cellSize * Math.Sin(angleRadians)
         Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
         Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
         If p1.X < 0 Then p1.X = 0

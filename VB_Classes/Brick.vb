@@ -35,6 +35,7 @@ Public Class Brick_Basics : Inherits TaskParent
             brick.lRect = brick.rect
 
             brick.depth = task.pcSplit(2)(brick.rect).Mean(task.depthMask(brick.rect))
+            If brick.depth > Single.MaxValue Or brick.depth < Single.MinValue Then brick.depth = 0
 
             If brick.depth > 0 Then
                 task.pcSplit(2)(brick.rect).MinMaxLoc(brick.mm.minVal, brick.mm.maxVal, brick.mm.minLoc, brick.mm.maxLoc,

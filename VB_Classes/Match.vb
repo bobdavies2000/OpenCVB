@@ -36,8 +36,10 @@ Public Class Match_Basics : Inherits TaskParent
         matchCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
+            labels(2) += " src input"
+            labels(3) += "Template to compare the src input to"
             dst2 = src
-            DrawCircle(dst2, matchCenter, task.DotSize, white)
+            dst3 = template
         End If
     End Sub
 End Class
