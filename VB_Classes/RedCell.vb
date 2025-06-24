@@ -256,10 +256,10 @@ Public Class RedCell_Generate : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static redMask As New RedMask_Basics
-            redMask.Run(src)
-            mdList = redMask.mdList
+            SetTrueText("RedCell_Generate is run by numerous algorithms but generates no output when standalone. ", 2)
+            Exit Sub
         End If
+        If task.redC Is Nothing Then task.redC = New RedColor_Basics
 
         Dim initialList As New List(Of rcData)
         For i = 0 To mdList.Count - 1

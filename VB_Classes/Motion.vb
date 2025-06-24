@@ -120,6 +120,7 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
+        task.redC = New RedColor_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "The option-free version of Motion_BGSub"
     End Sub

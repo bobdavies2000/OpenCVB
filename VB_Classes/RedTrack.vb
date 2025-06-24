@@ -4,9 +4,9 @@ Public Class RedTrack_Basics : Inherits TaskParent
         If New cv.Size(task.dst2.Width, task.dst2.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        task.redC.Run(src)
-        labels(2) = task.redC.labels(3)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = runRedC(src, labels(2))
+        labels(2) = task.redC.labels(2)
         dst2.SetTo(0)
         For Each rc As rcData In task.redC.rcList
             DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
@@ -207,6 +207,7 @@ End Class
 
 Public Class RedTrack_Features : Inherits TaskParent
     Public Sub New()
+        task.redC = New RedColor_Basics
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}

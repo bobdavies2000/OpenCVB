@@ -653,13 +653,13 @@ Public Class Pixel_Vector3D : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         task.redOptions.HistBinBar3D.Value = 3
         labels = {"", "RedColor_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.redC.Run(src)
+        runRedC(src, labels(2))
         Dim maxRegion = 20
 
         If task.heartBeat Then
@@ -686,7 +686,6 @@ Public Class Pixel_Vector3D : Inherits TaskParent
             dst1(rc.rect).SetTo(rc.color, rc.mask)
             If rc.index <= maxRegion Then SetTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
-        labels(2) = task.redC.labels(2)
         labels(1) = task.redC.labels(3)
     End Sub
 End Class

@@ -8,7 +8,25 @@ Imports System.Runtime.InteropServices
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
+    ' add any task algorithms here.
     Public redC As RedColor_Basics
+    Public gmat As IMU_GMatrix
+    Public lineRGB As LineRGB_Basics
+    Public contours As Contour_Basics_List
+    Public edges As EdgeLine_Basics
+    Public grid As Grid_Basics
+    Public bricks As Brick_Basics
+    Public palette As Palette_LoadColorMap
+    Public PixelViewer As Pixel_Viewer
+    Public rgbFilter As Filter_Basics
+    Public ogl As OpenGL_Basics
+    Public gravityHorizon As Gravity_Basics
+    Public imuBasics As IMU_Basics
+    Public motionBasics As Motion_Basics
+    Public colorizer As DepthColorizer_Basics
+
+    Public brickRunFlag As Boolean
+
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
 
@@ -112,24 +130,6 @@ Public Class VBtask : Implements IDisposable
     Public algorithmNames As New List(Of String)
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
-
-    ' add any task algorithms here.
-    Public gmat As IMU_GMatrix
-    Public lineRGB As LineRGB_Basics
-    Public contours As Contour_Basics_List
-    Public edges As EdgeLine_Basics
-    Public grid As Grid_Basics
-    Public bricks As Brick_Basics
-    Public palette As Palette_LoadColorMap
-    Public PixelViewer As Pixel_Viewer
-    Public rgbFilter As Filter_Basics
-    Public ogl As OpenGL_Basics
-    Public gravityHorizon As Gravity_Basics
-    Public imuBasics As IMU_Basics
-    Public motionBasics As Motion_Basics
-    Public colorizer As DepthColorizer_Basics
-
-    Public brickRunFlag As Boolean
 
     Public paletteRandom As Palette_RandomColors
     Public kalman As Kalman_Basics
@@ -522,8 +522,6 @@ Public Class VBtask : Implements IDisposable
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
         rgbFilter = New Filter_Basics
-        redC = New RedColor_Basics
-        bricks = New Brick_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -751,7 +749,10 @@ Public Class VBtask : Implements IDisposable
         colorizer.Run(src)
         contours.Run(src.Clone)
 
-        ' If task.brickRunFlag Then bricks.Run(src.Clone)
+        If task.brickRunFlag Then
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            bricks.Run(src.Clone)
+        End If
 
         TaskTimer.Enabled = True
 

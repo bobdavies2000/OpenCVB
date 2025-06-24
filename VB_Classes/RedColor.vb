@@ -4,7 +4,7 @@ Imports OpenCvSharp.Flann
 Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedCell_Generate
-    Dim redMask As New RedMask_Basics
+    Public redMask As New RedMask_Basics
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat ' redColor map
     Public Sub New()
@@ -255,6 +255,7 @@ Public Class RedColor_FPS : Inherits TaskParent
         fps.Run(src)
 
         If fps.heartBeat Then
+            If task.redC Is Nothing Then task.redC = New RedColor_Basics
             task.redC.Run(src)
             dst0 = task.color.Clone
             dst1 = task.depthRGB.Clone
@@ -422,9 +423,9 @@ Public Class RedColor_LikelyFlatSurfaces : Inherits TaskParent
         desc = "Use the mask for vertical surfaces to identify RedCloud cells that appear to be flat."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        runRedC(src, labels(2))
         verts.Run(src)
 
-        task.redC.Run(src)
         dst2.SetTo(0)
         dst3.SetTo(0)
 
@@ -447,7 +448,6 @@ Public Class RedColor_LikelyFlatSurfaces : Inherits TaskParent
 
         Dim rcX = task.rcD
         SetTrueText("mean depth = " + Format(rcX.depth, "0.0"), 3)
-        labels(2) = task.redC.labels(2)
     End Sub
 End Class
 
@@ -783,11 +783,11 @@ Public Class RedColor_OnlyColorHist3D : Inherits TaskParent
         desc = "Use the backprojection of the 3D RGB histogram as input to RedColor_Basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        runRedC(src, labels(3))
         hColor.Run(src)
         dst2 = hColor.dst3
         labels(2) = hColor.labels(3)
 
-        task.redC.Run(src)
         dst3 = task.redC.rcMap
         dst3.SetTo(0, task.noDepthMask)
         labels(3) = task.redC.labels(2)
@@ -804,7 +804,8 @@ Public Class RedColor_OnlyColorAlt : Inherits TaskParent
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.redC.Run(src)
+        runRedC(src, labels(3))
+
         Dim lastCells As New List(Of rcData)(task.redC.rcList)
         Dim lastMap As cv.Mat = task.redC.rcMap.Clone
         Dim lastColors As cv.Mat = dst3.Clone
