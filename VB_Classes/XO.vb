@@ -293,12 +293,13 @@ Public Class XO_Horizon_Validate : Inherits TaskParent
     Dim match As New Match_Basics
     Dim ptLeft As New cv.Point2f, ptRight As New cv.Point2f
     Dim leftTemplate As cv.Mat, rightTemplate As cv.Mat
+    Dim options As New Options_Features
     Public Sub New()
         desc = "Validate the horizon points using Match_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim templatePad = match.options.templatePad
-        Dim templateSize = match.options.templateSize
+        Dim templatePad = options.templatePad
+        Dim templateSize = options.templateSize
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then
@@ -3657,19 +3658,20 @@ End Class
 Public Class XO_FeatureLine_Longest : Inherits TaskParent
     Dim glines As New LineRGB_GCloud
     Public knn As New KNN_ClosestTracker
-    Public options As New Options_Features
     Public gline As gravityLine
     Public match1 As New Match_Basics
     Public match2 As New Match_Basics
+    Dim options As New Options_Features
     Public Sub New()
         labels(2) = "Longest line end points are highlighted "
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+
         dst2 = src.Clone
-        Dim templatePad = match1.options.templatePad
-        Dim templateSize = match1.options.templateSize
+        Dim templatePad = options.templatePad
+        Dim templateSize = options.templateSize
 
         Static p1 As cv.Point, p2 As cv.Point
         If task.heartBeat Or match1.correlation < task.fCorrThreshold And match2.correlation < task.fCorrThreshold Then

@@ -103,11 +103,14 @@ End Class
 Public Class Math_RGBCorrelation : Inherits TaskParent
     Dim flow As New Font_FlowText
     Dim match As New Match_Basics
+    Dim options As New Options_Features
     Public Sub New()
         flow.parentData = Me
         desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim split = src.Split()
         match.template = split(0)
         match.Run(split(1))
@@ -123,7 +126,7 @@ Public Class Math_RGBCorrelation : Inherits TaskParent
 
         flow.nextMsg = blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation
         flow.Run(src)
-        labels(2) = "Log of " + match.options.matchText
+        labels(2) = "Log of " + options.matchText
     End Sub
 End Class
 

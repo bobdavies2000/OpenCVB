@@ -12,9 +12,9 @@ Public Class Tracker_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.grayStable
 
-        If task.drawRect <> saveRect Or task.optionsChanged Then
+        If task.optionsChanged Then
             If cPtr <> 0 Then Tracker_Basics_Close(cPtr)
             cPtr = Tracker_Basics_Open(options.trackType)
             saveRect = task.drawRect
@@ -40,5 +40,21 @@ Public Class Tracker_Basics : Inherits TaskParent
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Tracker_Basics_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Tracker_Correlation : Inherits TaskParent
+    Dim track As New Tracker_Basics
+    Public Sub New()
+        desc = "Use Tracker_Basics to initialize and then use correlation to keep tracking."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        track.Run(src)
+
     End Sub
 End Class

@@ -2,9 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
 Public Class Match_Basics : Inherits TaskParent
-    Public options As New Options_Features
-    Public optionsEx As New Options_Features
-
     Public template As cv.Mat ' Provide this
 
     Public correlation As Single ' Resulting Correlation coefficient
@@ -18,7 +15,6 @@ Public Class Match_Basics : Inherits TaskParent
                "(allows multiple targets per image.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
         If standalone Then
             If task.gOptions.DebugCheckBox.Checked Then
                 task.gOptions.DebugCheckBox.Checked = False
@@ -27,7 +23,7 @@ Public Class Match_Basics : Inherits TaskParent
             End If
         End If
 
-        cv.Cv2.MatchTemplate(template, src, dst0, options.matchOption)
+        cv.Cv2.MatchTemplate(template, src, dst0, cv.TemplateMatchModes.CCoeffNormed)
         Dim mm = GetMinMax(dst0)
 
         correlation = mm.maxVal

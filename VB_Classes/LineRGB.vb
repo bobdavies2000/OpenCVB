@@ -877,7 +877,6 @@ Public Class LineRGB_GravityLines : Inherits TaskParent
             If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 gLines.Add(lp)
-                Exit For ' only need the longest one...
             End If
         Next
 
