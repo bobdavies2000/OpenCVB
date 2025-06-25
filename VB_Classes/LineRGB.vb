@@ -34,6 +34,8 @@ Public Class LineRGB_Basics : Inherits TaskParent
         'Next
 
         rawLines.Run(src)
+        dst3 = rawLines.dst2
+        labels(3) = rawLines.labels(2)
 
         For Each lp In rawLines.lpList
             sortlines.Add(lp.length, lp)

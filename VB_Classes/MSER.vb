@@ -8,7 +8,7 @@ Public Class MSER_Basics : Inherits TaskParent
     Public floodPoints As New List(Of cv.Point)
 
     Public Sub New()
-        desc = "Create cells for each region in MSER output"
+        desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = runRedC(src, labels(3))
@@ -298,15 +298,16 @@ End Class
 
 Public Class MSER_ReducedRGB : Inherits TaskParent
     Dim mser As New MSER_Basics
-    Dim reduction As New Reduction_Basics
+    Dim color8u As New Color8U_Basics
     Public Sub New()
         OptionParent.findCheckBox("Use grayscale input").Checked = False
         desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(src)
+        color8u.Run(src)
+        dst3 = color8u.dst3
 
-        mser.Run(reduction.dst3)
+        mser.Run(dst3)
         dst2 = mser.dst2
         labels(2) = mser.labels(2)
     End Sub
