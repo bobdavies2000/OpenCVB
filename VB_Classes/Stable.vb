@@ -62,6 +62,7 @@ End Class
 Public Class Stable_BasicsCount : Inherits TaskParent
     Public basics As New Stable_Basics
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+    Dim ptBest As New BrickPoint_Basics
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
     End Sub
@@ -69,7 +70,6 @@ Public Class Stable_BasicsCount : Inherits TaskParent
         If task.features.Count > 0 Then
             basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         Else
-            Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
             basics.facetGen.inputPoints = ptBest.intensityFeatures
         End If

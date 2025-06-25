@@ -468,9 +468,6 @@ Public Class VBtask : Implements IDisposable
         useRecordedData = parms.useRecordedData
         externalPythonInvocation = parms.externalPythonInvocation
 
-        GC.Collect()
-        GC.WaitForFullGCComplete()
-
         ' set options for specific cameras here.
         Select Case task.cameraName
             Case "StereoLabs ZED 2/2i"
