@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
@@ -857,7 +856,7 @@ End Class
 
 
 
-Public Class LineRGB_GravityLines : Inherits TaskParent
+Public Class LineRGB_MatchGravity : Inherits TaskParent
     Dim options As New Options_GravityLines
     Public gLines As New List(Of lpData)
     Public Sub New()
@@ -872,6 +871,8 @@ Public Class LineRGB_GravityLines : Inherits TaskParent
         dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
         gLines.Clear()
         For Each lp In task.lineRGB.rawLines.lpList
+            If lp.vertical = False Then Continue For
+            If lp.length < options.minLength Then Continue For
             Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - lp.ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - lp.ep2.X)
             If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then
@@ -884,7 +885,8 @@ Public Class LineRGB_GravityLines : Inherits TaskParent
         If lineLen = 0 Then
             labels(2) = "There were no lines parallel to gravity in the RGB image."
         Else
-            labels(2) = "The best line parallel to gravity was " + CStr(lineLen) + " pixels in length."
+            labels(2) = "Of the " + CStr(gLines.Count) + " lines found, the best line parallel to gravity was " +
+                       CStr(CInt(lineLen)) + " pixels in length."
         End If
     End Sub
 End Class

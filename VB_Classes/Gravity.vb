@@ -3,6 +3,7 @@ Public Class Gravity_Basics : Inherits TaskParent
     Dim gravity As New Gravity_BasicsRaw
     Dim imuGravityCount As Integer
     Public featLine As New FeatureLine_Basics
+    Public gravityProxy As lpData
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
@@ -11,10 +12,11 @@ Public Class Gravity_Basics : Inherits TaskParent
         Static savedLine = task.gravityVec
         featLine.Run(src)
 
-        If CInt(savedLine.ep1.X) <> CInt(featLine.gravityProxy.ep1.X) Or
-           CInt(savedLine.ep1.Y) <> CInt(featLine.gravityProxy.ep1.Y) Or
-           CInt(savedLine.ep2.X) <> CInt(featLine.gravityProxy.ep2.X) Or
-           CInt(savedLine.ep2.Y) <> CInt(featLine.gravityProxy.ep2.Y) Or
+        gravityProxy = featLine.gravityProxy
+        If CInt(savedLine.ep1.X) <> CInt(gravityProxy.ep1.X) Or
+           CInt(savedLine.ep1.Y) <> CInt(gravityProxy.ep1.Y) Or
+           CInt(savedLine.ep2.X) <> CInt(gravityProxy.ep2.X) Or
+           CInt(savedLine.ep2.Y) <> CInt(gravityProxy.ep2.Y) Or
            task.lineRGB.lpList.Count = 0 Then ' No lines to confirm the gravity vector means use raw gravity vector.
 
             imuGravityCount += 1

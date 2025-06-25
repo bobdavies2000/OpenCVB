@@ -1,6 +1,5 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
-Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public lastColor(0) As cv.Vec3f

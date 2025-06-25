@@ -12,7 +12,7 @@ Public Class Tracker_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels() <> 1 Then src = task.grayStable
+        If src.Channels() <> 1 Then src = task.gray
 
         If task.optionsChanged Then
             If cPtr <> 0 Then Tracker_Basics_Close(cPtr)
@@ -50,11 +50,46 @@ End Class
 
 Public Class Tracker_Correlation : Inherits TaskParent
     Dim track As New Tracker_Basics
+    Dim match As New Match_Basics
+    Dim matchRect As cv.Rect
     Public Sub New()
         desc = "Use Tracker_Basics to initialize and then use correlation to keep tracking."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        track.Run(src)
+        Static runTrackerFlag As Boolean = True
+        Static trackRect = track.tRect, trackRuns As Integer, totalRuns As Integer
 
+        totalRuns += 1
+        If runTrackerFlag Then
+            track.Run(src)
+        End If
+        If trackRect <> track.tRect Then
+            trackRect = track.tRect
+            match.template = task.gray(trackRect)
+            matchRect = trackRect
+            runTrackerFlag = False
+            trackRuns += 1
+        End If
+        If matchRect.Width > 0 Then
+            match.Run(task.gray(matchRect))
+            matchRect = trackRect
+            If match.correlation < 0.98 Then runTrackerFlag = True
+        End If
+        labels(2) = "Correlation = " + Format(match.correlation, fmt3) + ".  TrackRuns% = " + Format(trackRuns / totalRuns, "0%")
+        dst2 = track.dst2
+        task.drawRect = New cv.Rect
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Tracker_GravityLine : Inherits TaskParent
+    Public Sub New()
+        desc = "Track the gravity line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
     End Sub
 End Class

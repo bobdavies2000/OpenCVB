@@ -1,4 +1,3 @@
-Imports OpenCvSharp.Features2D
 Imports cv = OpenCvSharp
 Public Class Stabilizer_Basics : Inherits TaskParent
     Dim match As New Match_Basics

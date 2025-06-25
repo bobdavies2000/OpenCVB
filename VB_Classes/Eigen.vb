@@ -1,4 +1,3 @@
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Eigen_Basics : Inherits TaskParent
     Public inputData() As Double

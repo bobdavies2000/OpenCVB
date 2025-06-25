@@ -20,7 +20,7 @@ Public Class VBtask : Implements IDisposable
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Filter_Basics
     Public ogl As OpenGL_Basics
-    Public gravityHorizon As Gravity_Basics
+    Public gravityBasics As Gravity_Basics
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
@@ -511,7 +511,7 @@ Public Class VBtask : Implements IDisposable
 
         colorizer = New DepthColorizer_Basics
         gmat = New IMU_GMatrix
-        gravityHorizon = New Gravity_Basics
+        gravityBasics = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         grid = New Grid_Basics
@@ -784,7 +784,7 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        gravityHorizon.Run(src.Clone)
+        gravityBasics.Run(src.Clone)
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
@@ -855,10 +855,14 @@ Public Class VBtask : Implements IDisposable
             If gOptions.CrossHairs.Checked Then
                 dst0.Line(horizonVec.p1, horizonVec.p2, white, task.lineWidth, task.lineType)
                 dst0.Line(gravityVec.p1, gravityVec.p2, white, task.lineWidth, task.lineType)
-                If task.gravityHorizon.featLine.gravityLines.gLines.Count > 0 Then
-                    Dim gLine = task.gravityHorizon.featLine.gravityLines.gLines(0)
-                    dst0.Line(gLine.p1, gLine.p2, task.highlight, task.lineWidth * 2, task.lineType)
-                End If
+                Dim gLine = task.gravityBasics.gravityProxy
+                dst0.Line(gLine.p1, gLine.p2, task.highlight, task.lineWidth * 2, task.lineType)
+                Dim gIndex = task.grid.gridMap.Get(Of Single)(gLine.p1.Y, gLine.p1.X)
+                Dim firstRect = task.gridNabeRects(gIndex)
+                gIndex = task.grid.gridMap.Get(Of Single)(gLine.p2.Y, gLine.p2.X)
+                Dim lastRect = task.gridNabeRects(gIndex)
+                dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
+                dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
             End If
 
             ' if there were no cycles spent on this routine, then it was inactive.

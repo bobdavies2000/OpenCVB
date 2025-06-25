@@ -1,6 +1,4 @@
-﻿Imports System.Windows
-Imports OpenCvSharp.Flann
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public brickDepthCount As Integer

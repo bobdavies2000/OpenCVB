@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports VB_Classes.TaskParent
 Imports System.Security.Cryptography
-Imports OpenCvSharp.Flann
 Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean

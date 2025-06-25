@@ -1,7 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports OpenCvSharp.XImgProc
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Public Class BackProject2D_Basics : Inherits TaskParent
     Public hist2d As New Hist2D_Basics

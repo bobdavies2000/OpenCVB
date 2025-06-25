@@ -1,10 +1,8 @@
-﻿Imports System.Windows
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class LineRect_Basics : Inherits TaskParent
     Public lpInput1 As lpData
     Public lpInput2 As lpData
-    Public rotatedRect As RotatedRect
+    Public rotatedRect As cv.RotatedRect
     Public Sub New()
         desc = "Create a rectangle from 2 lines"
     End Sub

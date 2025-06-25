@@ -5,17 +5,15 @@ Public Class FeatureLine_Basics : Inherits TaskParent
     Dim firstRect As cv.Rect, lastRect As cv.Rect
     Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
     Public runOnEachFrame As Boolean
-    Public gravityLines As New LineRGB_GravityLines
+    Public gravityRGB As New LineRGB_MatchGravity
+    Dim trackGravity As New Tracker_GravityLine
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and track the longest line by matching line bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static rectList = New List(Of cv.Rect)(task.gridNabeRects)
-        If task.optionsChanged Then
-            task.lineRGB.lpList.Clear()
-            rectList = New List(Of cv.Rect)(task.gridNabeRects)
-        End If
+        If task.optionsChanged Then task.lineRGB.lpList.Clear()
 
         If matchRuns > 500 Then
             Dim percent = lineRuns / matchRuns
@@ -32,6 +30,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
 
             match.Run(matchInput)
+            dst1 = match.dst2
 
             labels(2) = "Line correlations (first/last): " + Format(match.correlation, fmt3) + " / " +
                         " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
@@ -48,9 +47,9 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             totalLineRuns += 1
 
             Dim index = task.grid.gridMap.Get(Of Single)(gravityProxy.p1.Y, gravityProxy.p1.X)
-            firstRect = rectList(index)
+            firstRect = task.gridNabeRects(index)
             index = task.grid.gridMap.Get(Of Single)(gravityProxy.p2.Y, gravityProxy.p2.X)
-            lastRect = rectList(index)
+            lastRect = task.gridNabeRects(index)
 
             Dim matchTemplate As New cv.Mat
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchTemplate)
@@ -61,7 +60,11 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         dst3 = task.lineRGB.dst3
         labels(3) = task.lineRGB.labels(3)
 
-        gravityLines.Run(src)
+        gravityRGB.Run(src)
+        If gravityRGB.gLines.Count > 0 Then
+            trackGravity.Run(src)
+
+        End If
 
         dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
         dst2.Rectangle(lastRect, task.highlight, task.lineWidth)

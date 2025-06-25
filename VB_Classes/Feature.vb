@@ -4,7 +4,7 @@ Imports VB_Classes.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()
-        task.gravityHorizon.featLine.runOnEachFrame = True
+        task.gravityBasics.featLine.runOnEachFrame = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U mask with all the features present."
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
@@ -120,7 +120,7 @@ Public Class Feature_Basics : Inherits TaskParent
         Next
 
         If task.featureSource = FeatureSrc.LineInput Then
-            dst2.SetTo(task.highlight, task.gravityHorizon.featLine.dst3)
+            dst2.SetTo(task.highlight, task.gravityBasics.featLine.dst3)
         Else
             For Each pt In task.features
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)

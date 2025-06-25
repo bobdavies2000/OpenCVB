@@ -5312,7 +5312,7 @@ Public Class XO_FeatureLine_BasicsOld : Inherits TaskParent
             correlation2 = match.correlation
             labels(2) = "Line end point correlations: " + Format(correlation1, fmt3) + " / " + Format(correlation2, fmt3)
         Else
-            labels(2) = task.gravityHorizon.labels(2)
+            labels(2) = task.gravityBasics.labels(2)
         End If
     End Sub
 End Class

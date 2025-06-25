@@ -3,13 +3,11 @@ Imports System.Threading
 Imports System.Windows.Forms
 Public Class Match_Basics : Inherits TaskParent
     Public template As cv.Mat ' Provide this
-
     Public correlation As Single ' Resulting Correlation coefficient
     Public matchCenter As cv.Point
     Public matchRect As New cv.Rect
     Public Sub New()
         If standalone Then task.gOptions.DebugCheckBox.Checked = True
-        labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
                "(allows multiple targets per image.)"
@@ -27,16 +25,15 @@ Public Class Match_Basics : Inherits TaskParent
         Dim mm = GetMinMax(dst0)
 
         correlation = mm.maxVal
-        labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
+        labels(2) = "Template (at right) has " + Format(correlation, "#,##0.000") + " Correlation to the src input"
         Dim w = template.Width, h = template.Height
         matchCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
-            labels(2) += " src input"
-            labels(3) += "Template to compare the src input to"
             dst2 = src
             dst3 = template
         End If
+        labels(3) = "Template to compare the src input to"
     End Sub
 End Class
 

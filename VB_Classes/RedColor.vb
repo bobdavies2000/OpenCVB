@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Flann
 Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedCell_Generate
