@@ -853,16 +853,13 @@ Public Class VBtask : Implements IDisposable
             End If
 
             If gOptions.CrossHairs.Checked Then
-                dst0.Line(horizonVec.p1, horizonVec.p2, white, task.lineWidth, task.lineType)
-                dst0.Line(gravityVec.p1, gravityVec.p2, white, task.lineWidth, task.lineType)
-                Dim gLine = task.gravityBasics.gravityProxy
-                dst0.Line(gLine.p1, gLine.p2, task.highlight, task.lineWidth * 2, task.lineType)
-                Dim gIndex = task.grid.gridMap.Get(Of Single)(gLine.p1.Y, gLine.p1.X)
-                Dim firstRect = task.gridNabeRects(gIndex)
-                gIndex = task.grid.gridMap.Get(Of Single)(gLine.p2.Y, gLine.p2.X)
-                Dim lastRect = task.gridNabeRects(gIndex)
-                dst0.Rectangle(firstRect, task.highlight, task.lineWidth)
-                dst0.Rectangle(lastRect, task.highlight, task.lineWidth)
+                Gravity_Basics.showVectors(dst0)
+                Dim p1 = task.gravityBasics.gravityProxy.center
+                displayObject.trueData.Add(New TrueText("Camera Motion Check", p1, 0))
+
+                Dim p2 = task.gravityBasics.gravityRGB.center
+                p2 = New cv.Point(p2.X, p2.Y + 10)
+                displayObject.trueData.Add(New TrueText("Gravity Line Match", p2, 0))
             End If
 
             ' if there were no cycles spent on this routine, then it was inactive.
@@ -870,9 +867,9 @@ Public Class VBtask : Implements IDisposable
             Dim index = algorithmNames.IndexOf(displayObject.traceName)
             If index = -1 Then
                 displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                                   New cv.Point(dst2.Width / 3, dst2.Height / 2), 2))
+                                           New cv.Point(dst2.Width / 3, dst2.Height / 2), 2))
                 displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                                   New cv.Point(dst2.Width / 3, dst2.Height / 2), 3))
+                                           New cv.Point(dst2.Width / 3, dst2.Height / 2), 3))
             End If
 
             trueData = New List(Of TrueText)(displayObject.trueData)

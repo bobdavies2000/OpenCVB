@@ -1,18 +1,40 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Shapes
+Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
-    Dim gravity As New Gravity_BasicsRaw
+    Public options As New Options_GravityLines
+    Dim gravityRaw As New Gravity_BasicsRaw
     Dim imuGravityCount As Integer
     Public featLine As New FeatureLine_Basics
     Public gravityProxy As lpData
+    Public gravityRGB As lpData
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
+    Private Shared Sub showVec(dst As cv.Mat, vec As lpData)
+        dst.Line(vec.p1, vec.p2, task.highlight, task.lineWidth * 2, task.lineType)
+        Dim gIndex = task.grid.gridMap.Get(Of Single)(vec.p1.Y, vec.p1.X)
+        Dim firstRect = task.gridNabeRects(gIndex)
+        gIndex = task.grid.gridMap.Get(Of Single)(vec.p2.Y, vec.p2.X)
+        Dim lastRect = task.gridNabeRects(gIndex)
+        dst.Rectangle(firstRect, task.highlight, task.lineWidth)
+        dst.Rectangle(lastRect, task.highlight, task.lineWidth)
+    End Sub
+    Public Shared Sub showVectors(dst As cv.Mat)
+        dst.Line(task.horizonVec.p1, task.horizonVec.p2, white, task.lineWidth, task.lineType)
+        dst.Line(task.gravityVec.p1, task.gravityVec.p2, white, task.lineWidth, task.lineType)
+
+        showVec(dst, task.gravityBasics.gravityProxy)
+        showVec(dst, task.gravityBasics.gravityRGB)
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.firstPass Then gravity.Run(emptyMat)
+        options.Run()
+
+        If task.firstPass Then gravityRaw.Run(emptyMat)
         Static savedLine = task.gravityVec
         featLine.Run(src)
 
         gravityProxy = featLine.gravityProxy
+        gravityRGB = featLine.gravityRGB
         If CInt(savedLine.ep1.X) <> CInt(gravityProxy.ep1.X) Or
            CInt(savedLine.ep1.Y) <> CInt(gravityProxy.ep1.Y) Or
            CInt(savedLine.ep2.X) <> CInt(gravityProxy.ep2.X) Or
@@ -20,9 +42,9 @@ Public Class Gravity_Basics : Inherits TaskParent
            task.lineRGB.lpList.Count = 0 Then ' No lines to confirm the gravity vector means use raw gravity vector.
 
             imuGravityCount += 1
-            gravity.Run(src)
+            gravityRaw.Run(src)
             savedLine = featLine.gravityProxy
-            task.gravityVec = gravity.gravityVec
+            task.gravityVec = gravityRaw.gravityVec
         End If
 
         task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
@@ -124,6 +146,15 @@ Public Class Gravity_BasicsRaw : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
+        End If
+
+        If task.gravityBasics.gravityRGB IsNot Nothing Then
+            Dim deltaX1 = Math.Abs(gravityVec.ep1.X - task.gravityBasics.gravityRGB.ep1.X)
+            Dim deltaX2 = Math.Abs(gravityVec.ep2.X - task.gravityBasics.gravityRGB.ep2.X)
+            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then
+                gravityVec.ep1 = task.gravityBasics.gravityRGB.ep1
+                gravityVec.ep2 = task.gravityBasics.gravityRGB.ep2
+            End If
         End If
     End Sub
 End Class

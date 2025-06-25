@@ -2,10 +2,10 @@
 Public Class FeatureLine_Basics : Inherits TaskParent
     Dim match As New Match_Basics
     Public gravityProxy As New lpData
-    Dim firstRect As cv.Rect, lastRect As cv.Rect
+    Public gravityRGB As lpData
     Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
     Public runOnEachFrame As Boolean
-    Public gravityRGB As New LineRGB_MatchGravity
+    Public gravityMatch As New LineRGB_MatchGravity
     Dim trackGravity As New Tracker_GravityLine
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -21,6 +21,11 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             matchRuns = lineRuns / percent
         End If
 
+        Dim index = task.grid.gridMap.Get(Of Single)(gravityProxy.p1.Y, gravityProxy.p1.X)
+        Dim firstRect = task.gridNabeRects(index)
+        index = task.grid.gridMap.Get(Of Single)(gravityProxy.p2.Y, gravityProxy.p2.X)
+        Dim lastRect = task.gridNabeRects(index)
+
         dst2 = src.Clone
         If task.lineRGB.lpList.Count > 0 Then
             matchRuns += 1
@@ -32,7 +37,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             match.Run(matchInput)
             dst1 = matchInput
 
-            labels(2) = "Line correlations (first/last): " + Format(match.correlation, fmt3) + " / " +
+            labels(2) = "Line end point correlation: " + Format(match.correlation, fmt3) + " / " +
                         " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
                         "line detection runs = " + CStr(totalLineRuns)
         End If
@@ -46,11 +51,6 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             lineRuns += 1
             totalLineRuns += 1
 
-            Dim index = task.grid.gridMap.Get(Of Single)(gravityProxy.p1.Y, gravityProxy.p1.X)
-            firstRect = task.gridNabeRects(index)
-            index = task.grid.gridMap.Get(Of Single)(gravityProxy.p2.Y, gravityProxy.p2.X)
-            lastRect = task.gridNabeRects(index)
-
             Dim matchTemplate As New cv.Mat
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchTemplate)
             match.template = matchTemplate
@@ -60,10 +60,10 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         dst3 = task.lineRGB.dst3
         labels(3) = task.lineRGB.labels(3)
 
-        gravityRGB.Run(src)
-        If gravityRGB.gLines.Count > 0 Then
+        gravityMatch.Run(src)
+        If gravityMatch.gLines.Count > 0 Then
             trackGravity.Run(src)
-            gravityProxy = gravityRGB.gLines(0)
+            gravityRGB = gravityMatch.gLines(0)
         End If
 
         dst2.Rectangle(firstRect, task.highlight, task.lineWidth)

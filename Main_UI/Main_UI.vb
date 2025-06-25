@@ -1739,7 +1739,7 @@ Public Class Main_UI
                             trueData.Clear()
                             saveObjectName = task.displayObjectName
                         End If
-                        If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
+                        'If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         End If

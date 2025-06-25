@@ -854,7 +854,6 @@ End Class
 
 
 Public Class LineRGB_MatchGravity : Inherits TaskParent
-    Dim options As New Options_GravityLines
     Public gLines As New List(Of lpData)
     Dim match As New Match_Line
     Dim rawRuns As Integer, totalRuns As Integer
@@ -862,7 +861,6 @@ Public Class LineRGB_MatchGravity : Inherits TaskParent
         desc = "Find all the lines similar to gravity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
         dst3 = task.lineRGB.dst3
         labels(3) = task.lineRGB.labels(3)
         totalRuns += 1
@@ -890,10 +888,10 @@ Public Class LineRGB_MatchGravity : Inherits TaskParent
 
         For Each lp In lpList
             If lp.vertical = False Then Continue For
-            If lp.length < options.minLength Then Continue For
+            If lp.length < task.gravityBasics.options.minLength Then Continue For
             Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - lp.ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - lp.ep2.X)
-            If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then gLines.Add(lp)
+            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gLines.Add(lp)
         Next
 
         Dim lineLen = If(gLines.Count, gLines(0).length, 0)

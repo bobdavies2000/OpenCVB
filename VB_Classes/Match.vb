@@ -149,10 +149,6 @@ End Class
 
 
 
-
-
-
-
 Public Class Match_BestEntropy : Inherits TaskParent
     Dim entropy As New Entropy_Highest
     Dim match As New Match_DrawRect
@@ -173,11 +169,6 @@ Public Class Match_BestEntropy : Inherits TaskParent
         dst2.SetTo(white, task.gridMask)
     End Sub
 End Class
-
-
-
-
-
 
 
 
@@ -223,7 +214,7 @@ Public Class Match_Motion : Inherits TaskParent
                 Interlocked.Increment(updateCount)
             End If
         Next
-        'End Sub)
+
         dst2.SetTo(255, task.gridMask)
         dst3.SetTo(0)
         saveFrame.CopyTo(dst3, mask)
