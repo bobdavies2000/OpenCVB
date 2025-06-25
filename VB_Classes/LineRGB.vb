@@ -26,15 +26,12 @@ Public Class LineRGB_Basics : Inherits TaskParent
         Next
 
         lpList.Clear()
+        dst2 = src
         For Each lp In sortlines.Values
             lp.index = lpList.Count
             lpList.Add(lp)
-            If lpList.Count >= task.FeatureSampleSize Then Exit For
-        Next
-
-        dst2 = src
-        For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
         lpLastList = New List(Of lpData)(lpList)
@@ -859,6 +856,8 @@ End Class
 Public Class LineRGB_MatchGravity : Inherits TaskParent
     Dim options As New Options_GravityLines
     Public gLines As New List(Of lpData)
+    Dim match As New Match_Line
+    Dim rawRuns As Integer, totalRuns As Integer
     Public Sub New()
         desc = "Find all the lines similar to gravity."
     End Sub
@@ -866,19 +865,35 @@ Public Class LineRGB_MatchGravity : Inherits TaskParent
         options.Run()
         dst3 = task.lineRGB.dst3
         labels(3) = task.lineRGB.labels(3)
+        totalRuns += 1
+
+        labels(3) = "Runs to find lines / total runs = " + Format(rawRuns / totalRuns, "0%")
+        Dim lpList As New List(Of lpData)
+        Dim lengthTooShort As Boolean
+        If gLines.Count > 0 Then
+            match.lineInput = gLines(0)
+            match.Run(src)
+            If gLines(0).length < dst2.Height / 4 Then lengthTooShort = True
+        Else
+            match.correlation = 0
+        End If
 
         dst2 = src
         dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
-        gLines.Clear()
-        For Each lp In task.lineRGB.rawLines.lpList
+        If match.correlation < 0.98 Or lengthTooShort Then
+            lpList = New List(Of lpData)(task.lineRGB.rawLines.lpList)
+            rawRuns += 1
+            gLines.Clear()
+        Else
+            dst2.Line(gLines(0).p1, gLines(0).p2, task.highlight, task.lineWidth + 1, task.lineType)
+        End If
+
+        For Each lp In lpList
             If lp.vertical = False Then Continue For
             If lp.length < options.minLength Then Continue For
             Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - lp.ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - lp.ep2.X)
-            If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                gLines.Add(lp)
-            End If
+            If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then gLines.Add(lp)
         Next
 
         Dim lineLen = If(gLines.Count, gLines(0).length, 0)

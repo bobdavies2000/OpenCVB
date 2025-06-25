@@ -2,12 +2,15 @@
 Public Class DepthLogic_Basics : Inherits TaskParent
     Dim structured As New Structured_Basics
     Dim gcUpdates As New List(Of Tuple(Of Integer, Single))
+    Dim options As Options_Features
     Public Sub New()
         task.brickRunFlag = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Use the lp.bricks of bricks to build logical depth values for each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         structured.Run(src)
         labels = structured.labels
 
@@ -30,13 +33,13 @@ Public Class DepthLogic_Basics : Inherits TaskParent
                 Dim p1 = gc1.rect.TopLeft
                 Dim p2 = gc2.rect.TopLeft
 
-                If gc1.correlation >= task.fCorrThreshold Then
+                If gc1.correlation >= options.correlationThreshold Then
                     halfSum1.Add(d1)
                     depthValues.Add(d1)
                     If debugMode Then SetTrueText(Format(d1, fmt3), New cv.Point(p1.X + 20, p1.Y), 3)
                 End If
 
-                If gc2.correlation >= task.fCorrThreshold Then
+                If gc2.correlation >= options.correlationThreshold Then
                     halfsum2.Add(d2)
                     depthValues.Add(d2)
                     If debugMode Then SetTrueText(Format(d2, fmt3), New cv.Point(p2.X - 20, p2.Y), 3)
@@ -114,7 +117,7 @@ Public Class DepthLogic_Lines : Inherits TaskParent
         For Each lp In task.logicalLines
             Dim brick1 = task.bricks.brickList(lp.bricks(0))
             Dim brick2 = task.bricks.brickList(lp.bricks.Last)
-            If brick1.correlation > task.fCorrThreshold Then
+            If brick1.correlation > task.bricks.options.correlationThreshold Then
                 For Each index In lp.bricks
                     Dim brick = task.bricks.brickList(index)
                     Dim val = dst0.Get(Of Byte)(brick.pt.Y, brick.pt.X)

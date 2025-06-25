@@ -861,8 +861,8 @@ Public Class VBtask : Implements IDisposable
                 Dim firstRect = task.gridNabeRects(gIndex)
                 gIndex = task.grid.gridMap.Get(Of Single)(gLine.p2.Y, gLine.p2.X)
                 Dim lastRect = task.gridNabeRects(gIndex)
-                dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
-                dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
+                dst0.Rectangle(firstRect, task.highlight, task.lineWidth)
+                dst0.Rectangle(lastRect, task.highlight, task.lineWidth)
             End If
 
             ' if there were no cycles spent on this routine, then it was inactive.

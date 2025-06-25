@@ -4,7 +4,9 @@ Public Class Brick_Basics : Inherits TaskParent
     Public brickDepthCount As Integer
     Public brickList As New List(Of brickData)
     Public brickMap As New cv.Mat ' map of bricks to index in bricklist
+    Public options As New Options_Features
     Public Sub New()
+        task.bricks = Me
         brickMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
         If task.cameraName.StartsWith("StereoLabs") Then task.rgbLeftAligned = True
@@ -14,9 +16,11 @@ Public Class Brick_Basics : Inherits TaskParent
         Static pt As cv.Point2f = brickList(0).rect.TopLeft
         If task.mouseClickFlag Then pt = task.ClickPoint
         Dim index = brickMap.Get(Of Single)(pt.Y, pt.X)
-        Return brickList(Index)
+        Return brickList(index)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If task.bricks.brickList.Count <> task.gridRects.Count Then task.bricks.brickList.Clear()
 
         Dim correlationMat As New cv.Mat

@@ -2165,6 +2165,19 @@ public:
 	Options_FeaturesEx() {
 	}
 };
+class Options_FAST {
+public:
+	bool useNonMax = true;
+	void Run() {}
+	Options_FAST() {
+	}
+};
+class Options_GravityLines {
+public:
+	void Run() {}
+	Options_GravityLines() {
+	}
+};
 class Options_Features {
 public:
 	double quality =  0.01;
@@ -2178,18 +2191,5 @@ public:
 	int agastThreshold =  20;
 	void Run() {}
 	Options_Features() {
-	}
-};
-class Options_FAST {
-public:
-	bool useNonMax = true;
-	void Run() {}
-	Options_FAST() {
-	}
-};
-class Options_GravityLines {
-public:
-	void Run() {}
-	Options_GravityLines() {
 	}
 };

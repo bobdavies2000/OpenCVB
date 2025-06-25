@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
+Imports System.Text.RegularExpressions
 Public Class Match_Basics : Inherits TaskParent
     Public template As cv.Mat ' Provide this
     Public correlation As Single ' Resulting Correlation coefficient
@@ -29,7 +30,7 @@ Public Class Match_Basics : Inherits TaskParent
         Dim w = template.Width, h = template.Height
         matchCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
-        If standaloneTest() Then
+        If standaloneTest() Or src.Size = template.Size Then
             dst2 = src
             dst3 = template
         End If
@@ -205,15 +206,13 @@ Public Class Match_Motion : Inherits TaskParent
         Dim updateCount As Integer
         mask.SetTo(0)
 
-        'Parallel.ForEach(task.gridRects,
-        'Sub(roi)
         For Each roi In task.gridRects
             Dim correlation As New cv.Mat, mean As Single, stdev As Single
             cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
             If stdev > optionsMatch.stdevThreshold Then
                 cv.Cv2.MatchTemplate(dst2(roi), lastFrame(roi), correlation, options.matchOption)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If correlation.Get(Of Single)(0, 0) < task.fCorrThreshold Then
+                If correlation.Get(Of Single)(0, 0) < options.correlationThreshold Then
                     Interlocked.Increment(updateCount)
                 Else
                     mask(roi).SetTo(255)
@@ -229,7 +228,7 @@ Public Class Match_Motion : Inherits TaskParent
         dst3.SetTo(0)
         saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
-        Dim corrPercent = Format(task.fCorrThreshold, "0.0%") + " correlation"
+        Dim corrPercent = Format(options.correlationThreshold, "0.0%") + " correlation"
         labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " + CStr(task.gridRects.Count) + " with < " + corrPercent +
                     " or stdev < " + Format(optionsMatch.stdevThreshold, fmt0)
         labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " + corrPercent
@@ -245,7 +244,8 @@ End Class
 
 
 
-Public Class Match_Lines : Inherits TaskParent
+
+Public Class Match_LinesKNN : Inherits TaskParent
     Dim knn As New KNN_N4Basics
     Public Sub New()
         labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
@@ -449,7 +449,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
 
         options.Run()
 
-        If (target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold) Then target(0) = Nothing
+        If (target(0) IsNot Nothing And correlation(0) < options.correlationThreshold) Then target(0) = Nothing
         If task.mouseClickFlag Then
             ptx(0) = task.ClickPoint
             ptx(1) = New cv.Point2f(msRNG.Next(rSize, dst2.Width - 2 * rSize), msRNG.Next(rSize, dst2.Height - 2 * rSize))
@@ -478,7 +478,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
             correlation(i) = mmData.maxVal
             If i = 0 Then
                 dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
-                dst2 = dst2.Threshold(task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
+                dst2 = dst2.Threshold(options.correlationThreshold, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
             DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
@@ -611,5 +611,42 @@ Public Class Match_Points : Inherits TaskParent
             DrawPolkaDot(ptx(i), dst2)
         Next
         mPoint.target = src.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class Match_Line : Inherits TaskParent
+    Public lineInput As lpData
+    Dim match As New Match_Basics
+    Public correlation As Single
+    Public Sub New()
+        match.template = New cv.Mat
+        desc = "Match the endpoints of a line to make sure it is still there before line detection runs."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lineInput = task.gravityBasics.gravityProxy
+
+        Dim index = task.grid.gridMap.Get(Of Single)(lineInput.p1.Y, lineInput.p1.X)
+        Dim firstRect = task.gridNabeRects(index)
+        index = task.grid.gridMap.Get(Of Single)(lineInput.p2.Y, lineInput.p2.X)
+        Dim lastRect = task.gridNabeRects(index)
+
+        If correlation = 0 Then
+            cv.Cv2.HConcat(src(firstRect), src(lastRect), match.template)
+        End If
+
+        Dim matchInput As New cv.Mat
+        cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
+
+        match.Run(matchInput)
+        correlation = match.correlation
+
+        labels(2) = "Correlation = " + Format(correlation, fmt3)
+        If match.correlation < 0.98 Then correlation = 0 ' try again...
+        dst2 = matchInput
+        dst3 = match.template
     End Sub
 End Class

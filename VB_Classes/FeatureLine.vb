@@ -30,7 +30,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
 
             match.Run(matchInput)
-            dst1 = match.dst2
+            dst1 = matchInput
 
             labels(2) = "Line correlations (first/last): " + Format(match.correlation, fmt3) + " / " +
                         " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
@@ -63,7 +63,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         gravityRGB.Run(src)
         If gravityRGB.gLines.Count > 0 Then
             trackGravity.Run(src)
-
+            gravityProxy = gravityRGB.gLines(0)
         End If
 
         dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
@@ -117,7 +117,7 @@ Public Class FeatureLine_VH : Inherits TaskParent
             match.tCells.Add(brick.tc2)
 
             match.Run(src)
-            If match.tCells(0).correlation >= task.fCorrThreshold And match.tCells(1).correlation >= task.fCorrThreshold Then
+            If match.tCells(0).correlation >= options.correlationThreshold And match.tCells(1).correlation >= options.correlationThreshold Then
                 brick.tc1 = match.tCells(0)
                 brick.tc2 = match.tCells(1)
                 brick = gLines.updateGLine(src, brick, brick.tc1.center, brick.tc2.center)

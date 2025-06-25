@@ -32,7 +32,7 @@ Public Class OptionsFeatures
         task.edgeMethod = "Canny"
 
         ColorDiffSlider.Value = 10
-        FCorrSlider.Value = 50
+        MatchCorrSlider.Value = 50
         SelectedFeature.Value = 0
 
         ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
@@ -90,8 +90,8 @@ Public Class OptionsFeatures
         task.minDistance = DistanceSlider.Value
         task.optionsChanged = True
     End Sub
-    Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles FCorrSlider.ValueChanged
-        task.fCorrThreshold = FCorrSlider.Value / 100
+    Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
+        task.fCorrThreshold = MatchCorrSlider.Value / 100
         task.optionsChanged = True
         FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
     End Sub

@@ -23,7 +23,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
             Dim maxCorrelation = correlations.Max
-            If maxCorrelation >= task.fCorrThreshold Then
+            If maxCorrelation >= feat.options.correlationThreshold Then
                 Dim index = correlations.IndexOf(maxCorrelation)
                 lpList.Add(New lpData(p1, currFeatures(index)))
                 mpCorrelation.Add(maxCorrelation)

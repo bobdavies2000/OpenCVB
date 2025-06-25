@@ -3499,7 +3499,8 @@ Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
         Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
         Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
 
-        Dim correlationTest = tcells(0).correlation <= task.fCorrThreshold Or tcells(1).correlation <= task.fCorrThreshold
+        Dim correlationTest = tcells(0).correlation <= options.correlationThreshold Or
+                              tcells(1).correlation <= options.correlationThreshold
         lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
         If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
             Dim templatePad = options.templatePad
@@ -3635,7 +3636,7 @@ Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
         Dim rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
         match.template = src(rect)
         match.Run(src)
-        If match.correlation >= task.fCorrThreshold Then
+        If match.correlation >= options.correlationThreshold Then
             dst3 = match.dst0.Resize(dst3.Size)
             DrawLine(dst2, p1, p2, task.highlight)
             DrawCircle(dst2, p1, task.DotSize, task.highlight)
@@ -3674,7 +3675,8 @@ Public Class XO_FeatureLine_Longest : Inherits TaskParent
         Dim templateSize = options.templateSize
 
         Static p1 As cv.Point, p2 As cv.Point
-        If task.heartBeat Or match1.correlation < task.fCorrThreshold And match2.correlation < task.fCorrThreshold Then
+        If task.heartBeat Or match1.correlation < options.correlationThreshold And
+                             match2.correlation < options.correlationThreshold Then
             knn.Run(src.Clone)
 
             p1 = knn.lastPair.p1

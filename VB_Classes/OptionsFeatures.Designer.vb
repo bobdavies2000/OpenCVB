@@ -31,7 +31,7 @@ Partial Class OptionsFeatures
         Me.FeatureMethod = New System.Windows.Forms.ComboBox()
         Me.FeatureCorrelationLabel = New System.Windows.Forms.Label()
         Me.Label6 = New System.Windows.Forms.Label()
-        Me.FCorrSlider = New System.Windows.Forms.TrackBar()
+        Me.MatchCorrSlider = New System.Windows.Forms.TrackBar()
         Me.ColorDiffLabel = New System.Windows.Forms.Label()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.ColorDiffSlider = New System.Windows.Forms.TrackBar()
@@ -44,7 +44,7 @@ Partial Class OptionsFeatures
         Me.GrayGroup = New System.Windows.Forms.GroupBox()
         Me.ColorGroup = New System.Windows.Forms.GroupBox()
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.MatchCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -126,19 +126,19 @@ Partial Class OptionsFeatures
         Me.Label6.AutoSize = True
         Me.Label6.Location = New System.Drawing.Point(32, 408)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(220, 20)
+        Me.Label6.Size = New System.Drawing.Size(208, 20)
         Me.Label6.TabIndex = 25
-        Me.Label6.Text = "Feature Correlation Threshold"
+        Me.Label6.Text = "Match Correlation Threshold"
         '
-        'FCorrSlider
+        'MatchCorrSlider
         '
-        Me.FCorrSlider.Location = New System.Drawing.Point(28, 431)
-        Me.FCorrSlider.Maximum = 100
-        Me.FCorrSlider.Minimum = 1
-        Me.FCorrSlider.Name = "FCorrSlider"
-        Me.FCorrSlider.Size = New System.Drawing.Size(476, 69)
-        Me.FCorrSlider.TabIndex = 24
-        Me.FCorrSlider.Value = 75
+        Me.MatchCorrSlider.Location = New System.Drawing.Point(28, 431)
+        Me.MatchCorrSlider.Maximum = 100
+        Me.MatchCorrSlider.Minimum = 1
+        Me.MatchCorrSlider.Name = "MatchCorrSlider"
+        Me.MatchCorrSlider.Size = New System.Drawing.Size(476, 69)
+        Me.MatchCorrSlider.TabIndex = 24
+        Me.MatchCorrSlider.Value = 75
         '
         'ColorDiffLabel
         '
@@ -258,7 +258,7 @@ Partial Class OptionsFeatures
         Me.Controls.Add(Me.ColorDiffSlider)
         Me.Controls.Add(Me.FeatureCorrelationLabel)
         Me.Controls.Add(Me.Label6)
-        Me.Controls.Add(Me.FCorrSlider)
+        Me.Controls.Add(Me.MatchCorrSlider)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.EdgeMethods)
         Me.Controls.Add(Me.DistanceLabel)
@@ -270,7 +270,7 @@ Partial Class OptionsFeatures
         Me.Name = "OptionsFeatures"
         Me.Text = "Important Options for Features, Edges, Lines, and Masks"
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.FCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.MatchCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).EndInit()
@@ -287,7 +287,7 @@ Partial Class OptionsFeatures
     Friend WithEvents FeatureMethod As Windows.Forms.ComboBox
     Friend WithEvents FeatureCorrelationLabel As Windows.Forms.Label
     Friend WithEvents Label6 As Windows.Forms.Label
-    Friend WithEvents FCorrSlider As Windows.Forms.TrackBar
+    Friend WithEvents MatchCorrSlider As Windows.Forms.TrackBar
     Friend WithEvents ColorDiffLabel As Windows.Forms.Label
     Friend WithEvents Label7 As Windows.Forms.Label
     Friend WithEvents ColorDiffSlider As Windows.Forms.TrackBar

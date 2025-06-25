@@ -681,7 +681,7 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
         Dim cellMat As New cv.Mat(task.cellSize, task.cellSize, cv.MatType.CV_8U, cv.Scalar.All(127))
         For Each brick In task.bricks.brickList
             Dim gcAbove = task.bricks.brickList(CInt(brick.index Mod task.cellsPerRow))
-            If brick.correlation > task.fCorrThreshold Then
+            If brick.correlation > task.bricks.options.correlationThreshold Then
                 If brick.rect.Y = 0 Or brick.rect.X = 0 Then Continue For
                 If Math.Abs(brick.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(128)
                 If Math.Abs(brick.depth - gcAbove.depth) <= task.depthDiffMeters And

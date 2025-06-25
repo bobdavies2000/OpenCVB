@@ -7924,48 +7924,6 @@ End Class
 
 
 
-Public Class Options_Features : Inherits OptionParent
-    Public quality As Double = 0.01
-    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
-    Public matchText As String = ""
-    Public k As Double = 0.04
-    Public blockSize As Integer = 3
-
-    Dim options As New Options_FeaturesEx
-
-    Public templatePad As Integer = 10
-    Public templateSize As Integer = 0
-    Public resyncThreshold As Double = 0.95
-    Public agastThreshold As Integer = 20
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
-            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
-        End If
-    End Sub
-    Public Sub Run()
-        options.Run()
-
-        templatePad = options.templatePad
-        templateSize = options.templateSize
-        resyncThreshold = options.resyncThreshold
-        agastThreshold = options.agastThreshold
-
-        Static qualitySlider = OptionParent.FindSlider("Quality Level")
-        Static kSlider = OptionParent.FindSlider("k X1000")
-        Static vertRadio = findRadio("Vertical lines")
-        k = kSlider.value / 1000
-
-        quality = qualitySlider.Value / 100
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Options_FAST : Inherits OptionParent
     Public useNonMax As Boolean = True
     Public Sub New()
@@ -8002,5 +7960,49 @@ Public Class Options_GravityLines : Inherits OptionParent
         Static lenSlider = FindSlider("Minimum Length")
         pixelThreshold = thresholdSlider.value
         minLength = lenSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Features : Inherits OptionParent
+    Public quality As Double = 0.01
+    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
+    Public matchText As String = ""
+    Public k As Double = 0.04
+    Public blockSize As Integer = 3
+
+    Dim options As New Options_FeaturesEx
+
+    Public templatePad As Integer = 10
+    Public templateSize As Integer = 0
+    Public resyncThreshold As Double = 0.95
+    Public agastThreshold As Integer = 20
+    Public correlationThreshold As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
+            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
+            sliders.setupTrackBar("Brick Correlation Threshold", 0, 100, 50)
+        End If
+    End Sub
+    Public Sub Run()
+        options.Run()
+
+        templatePad = options.templatePad
+        templateSize = options.templateSize
+        resyncThreshold = options.resyncThreshold
+        agastThreshold = options.agastThreshold
+
+        Static qualitySlider = OptionParent.FindSlider("Quality Level")
+        Static kSlider = OptionParent.FindSlider("k X1000")
+        Static vertRadio = findRadio("Vertical lines")
+        k = kSlider.value / 1000
+
+        quality = qualitySlider.Value / 100
+        Static corrSlider = FindSlider("Brick Correlation Threshold")
+        correlationThreshold = corrSlider.value / 100
     End Sub
 End Class
